@@ -27,14 +27,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 )
 
 func TestLogFileTimedClosing(t *testing.T) {
@@ -65,17 +63,10 @@ func TestLogFileTimedClosing(t *testing.T) {
 		defer f.Close()
 		defer os.Remove(f.Name())
 
-<<<<<<< HEAD
 		t.Run(name, func(t *testing.T) {
-			reader, err := newFileReader(
+			reader, _, err := newFileReader(
 				logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
 				t.Context(),
-=======
-		t.Run(tc.name, func(t *testing.T) {
-			reader, _, err := newFileReader(
-				logp.NewNopLogger(),
-				context.TODO(),
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 				f,
 				readerConfig{},
 				closerConfig{
@@ -105,7 +96,7 @@ func TestLogFileTruncated(t *testing.T) {
 	defer f.Close()
 	defer os.Remove(f.Name())
 
-	reader, err := newFileReader(logptest.NewTestingLogger(t, ""), context.TODO(), f, readerConfig{}, closerConfig{})
+	reader, _, err := newFileReader(logptest.NewTestingLogger(t, ""), context.TODO(), f, readerConfig{}, closerConfig{}, false)
 	if err != nil {
 		t.Fatalf("error while creating logReader: %+v", err)
 	}
@@ -114,36 +105,9 @@ func TestLogFileTruncated(t *testing.T) {
 	_, err = reader.Read(buf)
 	assert.Nil(t, err)
 
-<<<<<<< HEAD
 	err = f.Truncate(0)
 	if err != nil {
 		t.Fatalf("error while truncating file: %+v", err)
-=======
-			fs := filestream{
-				readerConfig: readerConfig{BufferSize: 512},
-				compression:  CompressionAuto}
-
-			f, err := fs.newFile(osFile)
-			require.NoError(t, err, "could not create file for reading")
-
-			defer f.Close()
-			defer os.Remove(f.Name())
-
-			reader, _, err := newFileReader(
-				logp.NewNopLogger(), context.TODO(), f, fs.readerConfig, fs.closerConfig, false)
-			require.NoError(t, err, "error while creating logReader")
-
-			buf := make([]byte, 32)
-			_, err = reader.Read(buf)
-			assert.NoError(t, err)
-
-			err = tc.truncateFn(t, f)
-			require.NoError(t, err, "error while truncating file")
-
-			err = readUntilError(reader)
-			assert.ErrorIs(t, err, tc.wantErr)
-		})
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 	}
 
 	err = readUntilError(reader)
@@ -151,13 +115,31 @@ func TestLogFileTruncated(t *testing.T) {
 	assert.Equal(t, ErrFileTruncate, err)
 }
 
-<<<<<<< HEAD
 func createTestLogFile() *os.File {
 	f, err := ioutil.TempFile("", "filestream_reader_test")
 	if err != nil {
 		panic(err)
 	}
-=======
+	content := []byte("first log line\nanother interesting line\na third log message\n")
+	if _, err := f.Write(content); err != nil {
+		panic(err)
+	}
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
+		panic(err)
+	}
+	return f
+}
+
+func readUntilError(reader *logFile) error {
+	buf := make([]byte, 1024)
+	_, err := reader.Read(buf)
+	for err == nil {
+		buf := make([]byte, 1024)
+		_, err = reader.Read(buf)
+	}
+	return err
+}
+
 func TestLogFile_startReadUntilEOF(t *testing.T) {
 	// newLogFile builds a logFile with just enough state for
 	// startReadUntilEOF to run: a non-nil tg (Stop is called on it). The zero
@@ -270,15 +252,8 @@ func TestNewFileReader_startReadUntilEOFClosure(t *testing.T) {
 		*logFile, func(ctxtool.CancelContext), ctxtool.CancelContext,
 	) {
 		t.Helper()
-		fs := filestream{
-			readerConfig: readerConfig{BufferSize: 512},
-			compression:  CompressionAuto,
-		}
-		osFile := createTestPlainLogFile(t)
-		t.Cleanup(func() { _ = os.Remove(osFile.Name()) })
-
-		f, err := fs.newFile(osFile)
-		require.NoError(t, err, "could not create file for reading")
+		f := createTestPlainLogFile(t)
+		t.Cleanup(func() { _ = os.Remove(f.Name()) })
 		t.Cleanup(func() { _ = f.Close() })
 
 		canceler := ctxtool.WithCancelContext(context.Background())
@@ -353,15 +328,8 @@ func TestNewFileReader_startReadUntilEOFClosure(t *testing.T) {
 // reader.readerCtx.Cancel() directly — exactly what closeIfTimeout and
 // periodicStateCheck do internally.
 func TestLogFile_readUntilEOFAfterReaderCtxCancel(t *testing.T) {
-	fs := filestream{
-		readerConfig: readerConfig{BufferSize: 512},
-		compression:  CompressionAuto,
-	}
-	osFile := createTestPlainLogFile(t)
-	t.Cleanup(func() { _ = os.Remove(osFile.Name()) })
-
-	f, err := fs.newFile(osFile)
-	require.NoError(t, err, "could not create file for reading")
+	f := createTestPlainLogFile(t)
+	t.Cleanup(func() { _ = os.Remove(f.Name()) })
 	t.Cleanup(func() { _ = f.Close() })
 
 	canceler := ctxtool.WithCancelContext(context.Background())
@@ -422,15 +390,8 @@ func TestNewFileReader_backoffWakesOnCanceler(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			fs := filestream{
-				readerConfig: readerConfig{BufferSize: 512},
-				compression:  CompressionAuto,
-			}
-			osFile := createTestPlainLogFile(t)
-			t.Cleanup(func() { _ = os.Remove(osFile.Name()) })
-
-			f, err := fs.newFile(osFile)
-			require.NoError(t, err, "could not create file for reading")
+			f := createTestPlainLogFile(t)
+			t.Cleanup(func() { _ = os.Remove(f.Name()) })
 			t.Cleanup(func() { _ = f.Close() })
 
 			canceler := ctxtool.WithCancelContext(context.Background())
@@ -482,7 +443,6 @@ func createTestPlainLogFile(t *testing.T) *os.File {
 	f, err := os.CreateTemp("", "filestream_reader_test")
 	require.NoError(t, err, "could not create temp file")
 
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 	content := []byte("first log line\nanother interesting line\na third log message\n")
 	if _, err := f.Write(content); err != nil {
 		panic(err)
@@ -491,14 +451,4 @@ func createTestPlainLogFile(t *testing.T) *os.File {
 		panic(err)
 	}
 	return f
-}
-
-func readUntilError(reader *logFile) error {
-	buf := make([]byte, 1024)
-	_, err := reader.Read(buf)
-	for err == nil {
-		buf := make([]byte, 1024)
-		_, err = reader.Read(buf)
-	}
-	return err
 }

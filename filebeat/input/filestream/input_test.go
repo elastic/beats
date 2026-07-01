@@ -29,6 +29,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -357,7 +358,7 @@ func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
 		for _, cancelled := range []bool{false, true} {
 			ctx := newCtx(t, cancelled)
 			gotErr, shouldContinue := inp.handleReadError(
-				ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
+				ctx, ErrClosed, ctx.Logger, "/path", metrics)
 			assert.NoError(t, gotErr,
 				"ErrClosed with read_until_eof=false must not propagate")
 			assert.False(t, shouldContinue,
@@ -372,7 +373,7 @@ func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
 		}
 		ctx := newCtx(t, false)
 		gotErr, shouldContinue := inp.handleReadError(
-			ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
+			ctx, ErrClosed, ctx.Logger, "/path", metrics)
 		assert.NoError(t, gotErr,
 			"ErrClosed must not propagate when input isn't closed")
 		assert.False(t, shouldContinue,
@@ -385,7 +386,7 @@ func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
 		}
 		ctx := newCtx(t, true)
 		gotErr, shouldContinue := inp.handleReadError(
-			ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
+			ctx, ErrClosed, ctx.Logger, "/path", metrics)
 		assert.NoError(t, gotErr,
 			"handleReadError must return returning nil")
 		assert.True(t, shouldContinue,
@@ -413,7 +414,7 @@ func TestFilestream_handleReadError_OtherErrors(t *testing.T) {
 
 			t.Run("EOF", func(t *testing.T) {
 				gotErr, shouldContinue := inp.handleReadError(
-					inpCtx, io.EOF, logger, "/p", metrics, false)
+					inpCtx, io.EOF, logger, "/p", metrics)
 				if readUntilEOF {
 					assert.ErrorIs(t, gotErr, io.EOF,
 						"read_until_eof=true: EOF must propagate so readFromSource "+
@@ -426,14 +427,14 @@ func TestFilestream_handleReadError_OtherErrors(t *testing.T) {
 
 			t.Run("ErrInactive", func(t *testing.T) {
 				gotErr, shouldContinue := inp.handleReadError(
-					inpCtx, ErrInactive, logger, "/p", metrics, false)
+					inpCtx, ErrInactive, logger, "/p", metrics)
 				assert.ErrorIs(t, gotErr, ErrInactive)
 				assert.False(t, shouldContinue, "want shouldContinue == false")
 			})
 
 			t.Run("ErrFileTruncate", func(t *testing.T) {
 				gotErr, shouldContinue := inp.handleReadError(
-					inpCtx, ErrFileTruncate, logger, "/p", metrics, false)
+					inpCtx, ErrFileTruncate, logger, "/p", metrics)
 				assert.NoError(t, gotErr, "ErrFileTruncate shouldn't propagate")
 				assert.False(t, shouldContinue, "want shouldContinue == false")
 			})

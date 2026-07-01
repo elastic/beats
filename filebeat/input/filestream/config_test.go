@@ -18,16 +18,14 @@
 package filestream
 
 import (
-<<<<<<< HEAD
-=======
-	"encoding/json"
 	"fmt"
-	"strings"
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigValidate(t *testing.T) {

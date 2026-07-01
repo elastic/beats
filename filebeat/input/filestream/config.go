@@ -23,6 +23,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -99,7 +100,6 @@ type copyTruncateConfig commonRotationConfig
 
 func defaultConfig() config {
 	return config{
-<<<<<<< HEAD
 		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
@@ -108,20 +108,7 @@ func defaultConfig() config {
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
 		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
-=======
-		Reader:                    defaultReaderConfig(),
-		Paths:                     []string{},
-		Close:                     defaultCloserConfig(),
-		ReadUntilEOF:              loginp.DefaultReadUntilEOFConfig(),
-		IncludeFileOwnerName:      false,
-		IncludeFileOwnerGroupName: false,
-		CleanInactive:             -1,
-		CleanRemoved:              true,
-		HarvesterLimit:            0,
-		IgnoreOlder:               0,
-		Delete:                    defaultDeleterConfig(),
-		FileWatcher:               defaultFileWatcherConfig(), // Config key: prospector.scanner
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
+		ReadUntilEOF:   loginp.DefaultReadUntilEOFConfig(),
 	}
 }
 

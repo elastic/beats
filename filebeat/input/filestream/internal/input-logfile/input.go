@@ -32,17 +32,6 @@ import (
 type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
-<<<<<<< HEAD
-	id               string
-	metricsID        string
-	manager          *InputManager
-	ackCH            *updateChan
-	sourceIdentifier *SourceIdentifier
-	prospector       Prospector
-	harvester        Harvester
-	cleanTimeout     time.Duration
-	harvesterLimit   uint64
-=======
 	id                     string
 	manager                *InputManager
 	ackCH                  *updateChan
@@ -53,7 +42,6 @@ type managedInput struct {
 	cleanTimeout           time.Duration
 	harvesterLimit         uint64
 	readUntilEOF           ReadUntilEOFConfig
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 }
 
 // Name is required to implement the v2.Input interface

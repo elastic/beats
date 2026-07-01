@@ -127,52 +127,6 @@ func TestWaitUntilEOF_reachesEOFWithCloseOnEOF(t *testing.T) {
 			"EOF naturally via close.reader.on_eof")
 }
 
-// TestWaitUntilEOF_gzipFile exercises read_until_eof with a
-// gzip-compressed log file and pipeline backpressure. The harvester is
-// blocked on the first publish when the input is cancelled; the
-// remaining events must still be read out of the gzip stream and
-// published via the readUntilEOF mode.
-func TestWaitUntilEOF_gzipFile(t *testing.T) {
-	prefix := strings.Repeat("a", 1024)
-	events := 10
-	logGen := testingintegration.NewJSONGenerator(prefix)
-	_, files := testingintegration.GenerateGZIPLogFiles(t, 1, events, logGen)
-	path := files[0]
-
-	env := newInputTestingEnvironment(t)
-	id := "TestWaitUntilEOF_gzipFile"
-	waitEOFTimeout := 30 * time.Second
-	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                     id,
-		"paths":                  []string{path},
-		"compression":            "auto",
-		"read_until_eof.timeout": waitEOFTimeout,
-	})
-
-	env.pipeline.SetAllowedEvents(1)
-
-	ctx, cancelInput := context.WithCancel(context.Background())
-	t.Cleanup(cancelInput)
-	env.startInput(ctx, id, inp)
-
-	env.WaitLogsContains(fmt.Sprintf("A new file %s has been found", files[0]),
-		time.Minute, 1*time.Second)
-	env.WaitLogsContains("Starting harvester for file",
-		time.Minute, 1*time.Second)
-
-	cancelInput()
-	env.pipeline.UnblockClients()
-
-	env.WaitLogsContains(fmt.Sprintf(
-		"input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first",
-		waitEOFTimeout),
-		5*time.Second, 1*time.Second)
-
-	env.waitUntilEventCount(events)
-	env.WaitLogsContains("read_until_eof enabled, EOF reached. closing input",
-		waitEOFTimeout, 1*time.Second)
-}
-
 // TestWaitUntilEOF_fileDeletedDuringReadUntilEOF deletes the file after
 // readUntilEOF mode has started, and asserts the reader continues to drain
 // the fd to EOF — the Linux fd-still-readable semantic. It runs with

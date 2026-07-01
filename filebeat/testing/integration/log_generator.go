@@ -26,7 +26,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	uuid "github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid/v5"
 )
 
 // LogGenerator used for generating log files
@@ -159,28 +159,7 @@ func AppendLogFile(t *testing.T, filename string, lines int, generator LogGenera
 	WriteLines(t, file, filename, offset, lines, generator)
 }
 
-<<<<<<< HEAD
-// writeLines writes generated lines to the provided writer.
-=======
-// GenerateGZIPLogFile generates a single gzip-compressed log file with the
-// given filename, lines, and generator. The file content is identical to the
-// one produced by GenerateLogFile, but compressed using gzip.
-func GenerateGZIPLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
-	file, err := os.Create(filename)
-	if err != nil {
-		t.Fatalf("failed to create a gzip log file: %q", filename)
-		return
-	}
-	defer file.Close()
-
-	gw := gzip.NewWriter(file)
-	defer gw.Close()
-
-	WriteLines(t, gw, filename, 0, lines, generator)
-}
-
 // WriteLines writes generated lines to the provided writer.
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 // It is shared between GenerateLogFile and GenerateGZIPLogFile to
 // avoid duplicating the core writing logic.
 func WriteLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
