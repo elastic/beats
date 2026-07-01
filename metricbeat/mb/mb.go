@@ -80,6 +80,7 @@ type BaseModule struct {
 	config         ModuleConfig
 	rawConfig      *conf.C
 	statusReporter status.StatusReporter
+	userAgent      string
 	Logger         *logp.Logger
 }
 
@@ -112,6 +113,11 @@ func (m *BaseModule) SetStatusReporter(statusReporter status.StatusReporter) {
 	m.statusReporter = statusReporter
 }
 
+// UserAgent returns the beat user agent string for HTTP clients created by this module.
+func (m *BaseModule) UserAgent() string {
+	return m.userAgent
+}
+
 // WithConfig re-configures the module with the given raw configuration and returns a
 // copy of the module.
 // Intended to be called from module factories. Note that if metricsets are specified
@@ -137,6 +143,7 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	newBM := &BaseModule{
 		name:      m.name,
 		rawConfig: &config,
+		userAgent: m.userAgent,
 		Logger:    m.Logger,
 	}
 

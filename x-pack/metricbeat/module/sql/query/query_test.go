@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -170,7 +171,7 @@ func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]interface{}) er
 
 	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
-	_, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	if err != nil {
 		return err
 	}

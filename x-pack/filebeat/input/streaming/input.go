@@ -122,14 +122,14 @@ type noopReporter struct{}
 func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // getURL evaluates the url_program to compute the input URL from the current state.
-func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, log *logp.Logger, now func() time.Time) (string, error) {
+func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, userAgent string, log *logp.Logger, now func() time.Time) (string, error) {
 	if src == "" {
 		return url, nil
 	}
 
 	state["url"] = url
 	// CEL program which is used to prime/initialize the input url
-	url_prg, ast, err := newProgram(ctx, src, root, nil, log)
+	url_prg, ast, err := newProgram(ctx, src, root, nil, userAgent, log)
 	if err != nil {
 		return "", err
 	}
