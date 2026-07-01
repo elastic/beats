@@ -141,9 +141,14 @@ func TestApplyWithConfig(t *testing.T) {
 	assert.Empty(t, cfg.Certificates, "expected Certificates to be empty when cert reloader is active")
 	// RootCAs is populated from the provider's initial pool. Go ignores it when
 	// InsecureSkipVerify=true; CA verification is done via VerifyConnection instead.
-	// With verification_mode=none, VerifyConnection is nil (no verification performed).
+	// VerifyNone installs no callback in non-FIPS builds; FIPS builds install one
+	// to enforce key-type constraints.
 	assert.NotNil(t, cfg.RootCAs)
-	assert.Nil(t, cfg.VerifyConnection)
+	if fipsVerifyNoneCallback() == nil {
+		assert.Nil(t, cfg.VerifyConnection, "expected nil VerifyConnection for VerifyNone in non-FIPS builds")
+	} else {
+		assert.NotNil(t, cfg.VerifyConnection, "expected non-nil VerifyConnection for VerifyNone in FIPS builds")
+	}
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
@@ -254,9 +259,14 @@ func TestApplyWithServerConfig(t *testing.T) {
 	assert.Empty(t, cfg.Certificates, "expected Certificates to be empty when cert reloader is active")
 	// ClientCAs is populated from the provider's initial pool. Go ignores it when
 	// InsecureSkipVerify=true; CA verification is done via VerifyConnection instead.
-	// With verification_mode=none, VerifyConnection is nil (no verification performed).
+	// VerifyNone installs no callback in non-FIPS builds; FIPS builds install one
+	// to enforce key-type constraints.
 	assert.NotNil(t, cfg.ClientCAs)
-	assert.Nil(t, cfg.VerifyConnection)
+	if fipsVerifyNoneCallback() == nil {
+		assert.Nil(t, cfg.VerifyConnection, "expected nil VerifyConnection for VerifyNone in non-FIPS builds")
+	} else {
+		assert.NotNil(t, cfg.VerifyConnection, "expected non-nil VerifyConnection for VerifyNone in FIPS builds")
+	}
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))

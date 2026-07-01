@@ -40,7 +40,9 @@ func init() {
 	// Elliptic curves approved for use in ECDSA are specified in SP 800-186,
 	// as implemented in FIPS 186-5.
 	// Based on NIST SP 800-186 section 3 and SP 800-56A Rev.3
-	// only allows P-256, P-384, P-521
+	// only allows P-256, P-384, P-521.
+	// The same curve set is used for certificate public-key validation in
+	// isCertAllowedFIPS (tls_config_fips.go). Keep both in sync.
 	for name, curveType := range tlsCurveTypes {
 		switch tls.CurveID(curveType) {
 		case tls.CurveP256, tls.CurveP384, tls.CurveP521:
