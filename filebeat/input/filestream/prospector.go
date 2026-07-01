@@ -165,6 +165,15 @@ func (p *fileProspector) takeOverFn(
 
 	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 	fm.IdentifierName = p.identifier.Name()
+	// Carry the raw growing fingerprint of the current descriptor into the
+	// migrated meta, mirroring the OpCreate handler and migrateGrowingFingerprint.
+	// newKey is derived from fd, so the raw value stays consistent with the key.
+	// Without it a still-growing (below-threshold) entry would be taken over as a
+	// final/static entry: buildShortFingerprintSet would skip it, prefix matching
+	// on later growth would miss it, and the file would be re-read from offset 0.
+	// growingRawFingerprint returns "" for completed (final SHA-256) descriptors,
+	// so those keep serializing to the byte-identical static shape (omitempty).
+	fm.Fingerprint = growingRawFingerprint(fd)
 	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key, newKey)
 	return newKey, fm
 }

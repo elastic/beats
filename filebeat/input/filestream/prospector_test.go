@@ -1215,6 +1215,13 @@ func TestFileProspector_takeOverFn(t *testing.T) {
 		Info:        file.ExtendFileInfo(testFileInfo),
 		Fingerprint: loginp.FingerprintID{Sum: "test-fingerprint"},
 	}
+	// growingFD is a still-growing (below-threshold) descriptor: it carries a raw
+	// fingerprint header but no final SHA-256 Sum, so it is not Complete().
+	growingFD := loginp.FileDescriptor{
+		Filename:    "/path/to/file",
+		Info:        file.ExtendFileInfo(testFileInfo),
+		Fingerprint: loginp.FingerprintID{Raw: "6162636465"},
+	}
 
 	tests := map[string]struct {
 		identifier     fileIdentifier
@@ -1312,6 +1319,32 @@ func TestFileProspector_takeOverFn(t *testing.T) {
 			expectedMeta: fileMeta{
 				Source:         "/path/to/file",
 				IdentifierName: fingerprintName,
+			},
+			shouldTakeOver: true,
+		},
+		"successful takeover - native to growing fingerprint preserves raw fingerprint": {
+			identifier: mustIdentifier(t, fingerprintName),
+			takeOverState: loginp.TakeOverState{
+				Source:         "/path/to/file",
+				IdentifierName: nativeName,
+				Key:            "filestream::test-id::native::" + growingFD.Info.GetOSState().Identifier(),
+				FileStateOS:    growingFD.Info.GetOSState(),
+			},
+			files: map[string]loginp.FileDescriptor{
+				"/path/to/file": growingFD,
+			},
+			newIDFunc: func(s loginp.Source) string { return "filestream::new-id::" + s.Name() },
+			expectedNewKey: func() string {
+				fingerprintIdent := mustIdentifier(t, fingerprintName)
+				source := fingerprintIdent.GetSource(loginp.FSEvent{NewPath: "/path/to/file", Descriptor: growingFD})
+				return "filestream::new-id::" + source.Name()
+			}(),
+			// The below-threshold raw fingerprint must survive takeover so the
+			// entry stays prefix-matchable when the file grows further.
+			expectedMeta: fileMeta{
+				Source:         "/path/to/file",
+				IdentifierName: fingerprintName,
+				Fingerprint:    growingRawFingerprint(growingFD),
 			},
 			shouldTakeOver: true,
 		},
