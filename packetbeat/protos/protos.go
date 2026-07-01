@@ -117,22 +117,21 @@ type reporterFactory interface {
 	CreateReporter(*conf.C) (func(beat.Event), error)
 }
 
-func (s ProtocolsStruct) Init(test bool, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
-	return s.InitFiltered(test, "", pub, watch, cfgs, list)
+func (s ProtocolsStruct) Init(test bool, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C, logger *logp.Logger) error {
+	return s.InitFiltered(test, "", pub, watch, cfgs, list, logger)
 }
 
-func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
+func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C, logger *logp.Logger) error {
 	if len(cfgs) != 0 {
-		// TODO: https://github.com/elastic/ingest-dev/issues/6000
-		logp.NewLogger("").Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
+		logger.Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
 	}
 
 	for proto := range protocolSyms {
-		logp.Debug("protos", "registered protocol plugin: %v", proto)
+		logger.Named("protos").Debugf("registered protocol plugin: %v", proto)
 	}
 
 	for name, cfg := range cfgs {
-		err := s.configureProtocol(test, device, pub, watch, name, cfg)
+		err := s.configureProtocol(test, device, pub, watch, name, cfg, logger)
 		if err != nil {
 			return err
 		}
@@ -147,7 +146,7 @@ func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFact
 			return err
 		}
 
-		err = s.configureProtocol(test, device, pub, watch, module.Name, cfg)
+		err = s.configureProtocol(test, device, pub, watch, module.Name, cfg, logger)
 		if err != nil {
 			return err
 		}
@@ -156,7 +155,12 @@ func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFact
 	return nil
 }
 
-func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, name string, config *conf.C) error {
+func (s ProtocolsStruct) configureProtocol(
+	test bool,
+	device string,
+	pub reporterFactory,
+	watch *procs.ProcessesWatcher,
+	name string, config *conf.C, logger *logp.Logger) error {
 	// XXX: icmp is special, ignore here :/
 	if name == "icmp" {
 		return nil
@@ -164,18 +168,18 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 
 	proto, exists := protocolSyms[name]
 	if !exists {
-		logp.Err("Unknown protocol plugin: %v", name)
+		logger.Errorf("Unknown protocol plugin: %v", name)
 		return nil
 	}
 
 	plugin, exists := protocolPlugins[proto]
 	if !exists {
-		logp.Err("Protocol plugin '%v' not registered (%v).", name, proto.String())
+		logger.Errorf("Protocol plugin '%v' not registered (%v).", name, proto.String())
 		return nil
 	}
 
 	if !config.Enabled() {
-		logp.Info("Protocol plugin '%v' disabled by config", name)
+		logger.Infof("Protocol plugin '%v' disabled by config", name)
 		return nil
 	}
 
@@ -196,13 +200,13 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 		}
 	}
 
-	inst, err := plugin(test, results, watch, config)
+	inst, err := plugin(test, results, watch, config, logger)
 	if err != nil {
-		logp.Err("Failed to register protocol plugin: %v", err)
+		logger.Errorf("Failed to register protocol plugin: %v", err)
 		return err
 	}
 
-	s.register(proto, client, inst)
+	s.register(proto, client, inst, logger)
 	return nil
 }
 
@@ -224,9 +228,9 @@ func validateProtocolDevice(device string, config *conf.C) (bool, error) {
 	return true, nil
 }
 
-func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
+func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin, logger *logp.Logger) {
 	if _, exists := s.all[proto]; exists {
-		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
+		logger.Warnf("Protocol (%s) plugin will overwritten by another plugin", proto.String())
 	}
 
 	s.all[proto] = protocolInstance{
@@ -244,7 +248,7 @@ func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plu
 		success = true
 	}
 	if !success {
-		logp.Warn("Protocol (%s) register failed, port: %v", proto.String(), plugin.GetPorts())
+		logger.Warnf("Protocol (%s) register failed, port: %v", proto.String(), plugin.GetPorts())
 	}
 }
 

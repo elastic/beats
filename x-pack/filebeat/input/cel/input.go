@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"maps"
 	"net"
 	"net/http"
@@ -59,7 +58,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -188,17 +186,19 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	}
 	otelTracer := otelTracerProvider.Tracer(importPath)
 
-	if cfg.Resource.Tracer.enabled() {
-		id := httplog.SanitizeFileName(env.IDWithoutName)
-		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(env.Agent.Paths, inputName, path)
+	if cfg.Resource.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.Resource.Tracer.Filename)
 		if err != nil {
 			return err
 		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, env.Agent.Paths.Resolve(paths.Logs, inputName))
-		}
 		cfg.Resource.Tracer.Filename = resolved
+	}
+	if cfg.FailureDump != nil {
+		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.FailureDump.Filename)
+		if err != nil {
+			return err
+		}
+		cfg.FailureDump.Filename = resolved
 	}
 
 	client, trace, otelMetrics, contextInjector, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
@@ -242,7 +242,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
-	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
+	// The emitter is created here but not yet bound to a session. The
+	// factory closure captures a pointer that is set after the runSession
+	// is constructed, because newProgram runs before the session exists.
+	var emitter *sessionEmitter
+	emitOpt := lib.Emit(func() lib.Emitter {
+		if emitter == nil {
+			return nil
+		}
+		return emitter
+	})
+	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov, emitOpt)
 	if err != nil {
 		return err
 	}
@@ -303,6 +313,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// In addition to this and the functions and globals available
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
+	emitter = &sessionEmitter{pub: pub}
 	s := &runSession{
 		cfg:      cfg,
 		prg:      prg,
@@ -317,7 +328,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		env: env,
 		now: i.now,
 
-		pub: pub,
+		pub:     pub,
+		emitter: emitter,
 
 		log:      log,
 		health:   health,
@@ -355,7 +367,8 @@ type runSession struct {
 	env v2.Context
 	now func() time.Time
 
-	pub inputcursor.Publisher
+	pub     inputcursor.Publisher
+	emitter *sessionEmitter
 
 	log      *logp.Logger
 	health   status.StatusReporter
@@ -367,6 +380,43 @@ type runSession struct {
 	cursor     map[string]any
 	goodCursor map[string]any
 	goodURL    string
+}
+
+var _ lib.Emitter = (*sessionEmitter)(nil)
+
+// sessionEmitter adapts inputcursor.Publisher to the lib.Emitter interface,
+// allowing the emit macro to publish events during CEL evaluation.
+type sessionEmitter struct {
+	pub inputcursor.Publisher
+
+	// count tracks events published during a single eval for metrics.
+	count int64
+	// hadCursor records whether any Emit call included a non-nil cursor.
+	hadCursor bool
+}
+
+func (e *sessionEmitter) Emit(value, cursor any) error {
+	event, ok := value.(map[string]any)
+	if !ok {
+		return fmt.Errorf("emit: event must be a map, got %T", value)
+	}
+	err := e.pub.Publish(beat.Event{
+		Timestamp: time.Now(),
+		Fields:    event,
+	}, cursor)
+	if err != nil {
+		return err
+	}
+	e.count++
+	if cursor != nil {
+		e.hadCursor = true
+	}
+	return nil
+}
+
+func (e *sessionEmitter) reset() {
+	e.count = 0
+	e.hadCursor = false
 }
 
 func (s *runSession) runCycle(ctx context.Context) error {
@@ -552,6 +602,7 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	s.metrics.AddProgramExecution(execCtx)
 	start := s.now().In(time.UTC)
 
+	s.emitter.reset()
 	var err error
 	s.state, err = evalWith(execCtx, s.injector, s.prg, s.ast, s.state, start, s.wantDump, budget-1)
 	s.metrics.AddCELDuration(execCtx, time.Since(start))
@@ -601,6 +652,11 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", s.goodURL)
 	}
 
+	emitCount := s.emitter.count
+	if emitCount > 0 {
+		s.metrics.AddPublishedEvents(execCtx, uint(emitCount))
+	}
+
 	e, ok := s.state["events"]
 	if !ok {
 		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
@@ -608,6 +664,23 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		errorSpans(err, execSpan)
 		return result, err
 	}
+
+	if s.emitter.hadCursor {
+		var n int
+		switch ev := e.(type) {
+		case []any:
+			n = len(ev)
+		case map[string]any:
+			if ev != nil {
+				n = 1
+			}
+		}
+		if n != 1 {
+			execLog.Warnw("emit macro published events with cursors but state.events does not contain exactly one element; state.events should be a single-element array or object for cursor bookkeeping",
+				"emit_count", emitCount, "state_events_count", n)
+		}
+	}
+
 	var events []any
 	switch e := e.(type) {
 	case []any:
@@ -1116,11 +1189,6 @@ func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit r
 	return limit, true
 }
 
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
-
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context, tp *sdktrace.TracerProvider) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, *otel.ContextInjector, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
@@ -1176,42 +1244,12 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err = os.Remove(cfg.Resource.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Resource.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Resource.Tracer.Filename, log)
 	}
 	if !cfg.FailureDump.enabled() && cfg.FailureDump != nil && cfg.FailureDump.Filename != "" {
 		// We have a fail-dump name, but we are not enabled,
 		// so remove all dumps we own.
-		err = os.Remove(cfg.FailureDump.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.FailureDump.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.FailureDump.Filename)
-		base := strings.TrimSuffix(cfg.FailureDump.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.FailureDump.Filename, log)
 	}
 
 	// inside the otel RoundTripper
@@ -1281,6 +1319,7 @@ func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2
 func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 	attrs := []attribute.KeyValue{
 		semconv.ServiceInstanceID(env.IDWithoutName),
+		attribute.String("input_type", inputName),
 		attribute.String("package.name", cfg.GetPackageData("name")),
 		attribute.String("package.version", cfg.GetPackageData("version")),
 		attribute.String("package.data_stream", cfg.DataStream),
@@ -1385,6 +1424,13 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 
 		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
 		req.Header = prev.Header.Clone()
+
+		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
+			for _, k := range cfg.RedirectSensitiveHeaders {
+				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
+				req.Header.Del(k)
+			}
+		}
 
 		for _, k := range cfg.RedirectHeadersBanList {
 			log.Debugf("http client: ban header %v", k)
@@ -1493,7 +1539,7 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool, emitOpt cel.EnvOption) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1514,6 +1560,9 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
+		lib.Stream(),
+		lib.CSV(),
+		lib.Lines(),
 		lib.HTTPWithContextOpts(ctx, client, httpOptions),
 		lib.LimitWithApply(limitPolicies, func(m map[string]any, h http.Header) map[string]any {
 			waitUntil := handleRateLimit(log, m, h, limit)
@@ -1527,6 +1576,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 			"env":                  vars,
 			"remaining_executions": 0, // placeholder
 		}),
+		emitOpt,
 	}
 	if len(patterns) != 0 {
 		opts = append(opts, lib.Regexp(patterns))
