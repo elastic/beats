@@ -120,7 +120,7 @@ func (c *counterReg) newInt(name string) (*Int, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	i, err := c.ints.reg(name, c.logger)
+	i, err := c.ints.reg(name)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (c *counterReg) newUint(name string) (*Uint, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	i, err := c.uints.reg(name, c.logger)
+	i, err := c.uints.reg(name)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (c *counterReg) newFloat(name string) (*Float, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	i, err := c.floats.reg(name, c.logger)
+	i, err := c.floats.reg(name)
 	if err != nil {
 		return nil, err
 	}
@@ -152,9 +152,7 @@ func (c *counterReg) newFloat(name string) (*Float, error) {
 // XXX:
 //   - error on index > int max
 //   - error if already in use
-func (reg *counterTypeReg) reg(name string, logger *logp.Logger) (int, error) {
-	logger.Debugf("register flow counter: %v", name)
-
+func (reg *counterTypeReg) reg(name string) (int, error) {
 	i := len(reg.names)
 	reg.names = append(reg.names, name)
 	return i, nil
