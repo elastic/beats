@@ -98,7 +98,7 @@ func (mc *memcache) Parse(
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	tcpConn := ensureMemcacheConnection(private)
-	debug("memcache connection %p", tcpConn)
+	mc.logger.Debugf("memcache connection %p", tcpConn)
 	tcpConn = mc.memcacheParseTCP(tcpConn, pkt, tcptuple, dir)
 	if tcpConn == nil {
 		// explicitly return nil if tcpConn equals nil so ProtocolData really is nil
@@ -107,7 +107,7 @@ func (mc *memcache) Parse(
 	return tcpConn
 }
 
-func (mc *memcache) newStream(tcptuple *common.TCPTuple) *stream {
+func (mc *memcache) newStream() *stream {
 	s := &stream{}
 	s.parser.init(&mc.config)
 	s.Stream.Init(tcp.TCPMaxDataInStream)
@@ -123,13 +123,13 @@ func (mc *memcache) memcacheParseTCP(
 	// assume we are in sync
 	stream := tcpConn.streams[dir]
 	if stream == nil {
-		stream = mc.newStream(tcptuple)
+		stream = mc.newStream()
 		tcpConn.streams[dir] = stream
 	}
 
-	debug("add payload to stream(%p): %v", stream, dir)
+	mc.logger.Debugf("add payload to stream(%p): %v", stream, dir)
 	if err := stream.Append(pkt.Payload); err != nil {
-		debug("%v, dropping TCP streams", err)
+		mc.logger.Debugf("%v, dropping TCP streams", err)
 		mc.pushAllTCPTrans(tcpConn.connection)
 		tcpConn.drop(dir)
 		return nil
@@ -147,11 +147,11 @@ func (mc *memcache) memcacheParseTCP(
 	conn := tcpConn.connection
 
 	for stream.Buf.Total() > 0 {
-		debug("stream(%p) try to content", stream)
+		mc.logger.Debugf("stream(%p) try to content", stream)
 		msg, err := stream.parse(pkt.Ts)
 		if err != nil {
 			// parsing error, drop tcp stream and retry with next segment
-			debug("Ignore Memcache message, drop tcp stream: %v", err)
+			mc.logger.Debugf("Ignore Memcache message, drop tcp stream: %v", err)
 			mc.pushAllTCPTrans(conn)
 			tcpConn.drop(dir)
 			return nil
@@ -171,7 +171,7 @@ func (mc *memcache) memcacheParseTCP(
 	}
 
 	conn.timer = time.AfterFunc(mc.tcpTransTimeout, func() {
-		debug("connection=%p timed out", conn)
+		mc.logger.Debugf("connection=%p timed out", conn)
 		mc.pushAllTCPTrans(conn)
 	})
 
@@ -189,14 +189,13 @@ func (mc *memcache) onTCPMessage(
 	msg.CmdlineTuple = mc.watcher.FindProcessesTupleTCP(tuple)
 
 	if msg.IsRequest {
-		return mc.onTCPRequest(conn, tuple, dir, msg)
+		return mc.onTCPRequest(conn, dir, msg)
 	}
-	return mc.onTCPResponse(conn, tuple, dir, msg)
+	return mc.onTCPResponse(conn, dir, msg)
 }
 
 func (mc *memcache) onTCPRequest(
 	conn *connection,
-	tuple *common.IPPortTuple,
 	dir uint8,
 	msg *message,
 ) error {
@@ -207,8 +206,7 @@ func (mc *memcache) onTCPRequest(
 		msg.Direction = applayer.NetReverseDirection
 	}
 
-	debug("received memcached(tcp) request message=%p, tuple=%s",
-		msg, msg.IsRequest, msg.Tuple)
+	mc.logger.Debugf("received memcached(tcp) request message=%t, tuple=%+v", msg.IsRequest, msg.Tuple)
 
 	msg.isComplete = true
 	waitResponse := msg.noreply ||
@@ -224,7 +222,6 @@ func (mc *memcache) onTCPRequest(
 
 func (mc *memcache) onTCPResponse(
 	conn *connection,
-	tuple *common.IPPortTuple,
 	dir uint8,
 	msg *message,
 ) error {
@@ -235,8 +232,8 @@ func (mc *memcache) onTCPResponse(
 		msg.Direction = applayer.NetReverseDirection
 	}
 
-	debug("received memcached(tcp) response message=%p, tuple=%s",
-		msg, msg.IsRequest, msg.Tuple)
+	mc.logger.Debugf("received memcached(tcp) response message=%t, tuple=%+v",
+		msg.IsRequest, msg.Tuple)
 
 	// try to merge response with last received response
 	// (values and stats responses can be merged)
@@ -246,7 +243,7 @@ func (mc *memcache) onTCPResponse(
 		return err
 	}
 	if merged {
-		debug("response message got merged")
+		mc.logger.Debugf("response message got merged")
 		msg = prev
 	} else {
 		conn.responses.append(msg)
@@ -255,7 +252,7 @@ func (mc *memcache) onTCPResponse(
 		return nil
 	}
 
-	debug("response message complete")
+	mc.logger.Debugf("response message complete")
 
 	return mc.correlateTCP(conn)
 }
@@ -295,7 +292,7 @@ func (mc *memcache) correlateTCP(conn *connection) error {
 			}
 
 			// send request
-			debug("send single request=%p", requ)
+			mc.logger.Debugf("send single request=%p", requ)
 			err := mc.onTCPTrans(requ, nil)
 			if err != nil {
 				logp.Warn("error processing memcache transaction: %s", err)
@@ -307,12 +304,12 @@ func (mc *memcache) correlateTCP(conn *connection) error {
 		// stream is found (or after message gap) when we receive a response
 		// without having seen a request.
 		if requ == nil {
-			debug("found orphan memcached response=%p", resp)
+			mc.logger.Debugf("found orphan memcached response=%p", resp)
 			resp.AddNotes(noteTransactionNoRequ)
 			unmatchedResponses.Add(1)
 		}
 
-		debug("merge request=%p and response=%p", requ, resp)
+		mc.logger.Debugf("merge request=%p and response=%p", requ, resp)
 		err := mc.onTCPTrans(requ, resp)
 		if err != nil {
 			logp.Warn("error processing memcache transaction: %s", err)
@@ -324,8 +321,8 @@ func (mc *memcache) correlateTCP(conn *connection) error {
 }
 
 func (mc *memcache) onTCPTrans(requ, resp *message) error {
-	debug("received memcache(tcp) transaction")
-	trans := newTransaction(requ, resp)
+	mc.logger.Debugf("received memcache(tcp) transaction")
+	trans := newTransaction(requ, resp, mc.logger)
 	return mc.finishTransaction(trans)
 }
 
@@ -336,7 +333,7 @@ func (mc *memcache) GapInStream(
 	dir uint8, nbytes int,
 	private protos.ProtocolData,
 ) (priv protos.ProtocolData, drop bool) {
-	debug("memcache(tcp) stream gap detected")
+	mc.logger.Debugf("memcache(tcp) stream gap detected")
 
 	if !isMemcacheConnection(private) {
 		return private, false
@@ -345,7 +342,7 @@ func (mc *memcache) GapInStream(
 	conn := private.(*tcpConnectionData)
 	stream := conn.streams[dir]
 	if stream == nil {
-		debug("Inactive stream. Dropping connection state.")
+		mc.logger.Debugf("Inactive stream. Dropping connection state.")
 		return private, true
 	}
 
@@ -413,14 +410,14 @@ func (mc *memcache) pushAllTCPTrans(conn *connection) {
 	mc.correlateTCP(conn)
 
 	// only requests in map:
-	debug("publish incomplete transactions")
+	mc.logger.Debugf("publish incomplete transactions")
 	for !conn.requests.empty() {
 		msg := conn.requests.pop()
 		if !msg.isQuiet && !msg.noreply {
 			msg.AddNotes(noteTransUnfinished)
 			unfinishedTransactions.Add(1)
 		}
-		debug("push incomplete request=%p", msg)
+		mc.logger.Debugf("push incomplete request=%p", msg)
 		err := mc.onTCPTrans(msg, nil)
 		if err != nil {
 			logp.Warn("failed to publish unfinished transaction with %v", err)

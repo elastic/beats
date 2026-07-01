@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Decoders functions return a Decoder able to process the provided network
@@ -42,12 +43,24 @@ type Decoders func(_ layers.LinkType, device string, idx int) (decoders *decoder
 
 // DecodersFor returns a source of Decoders using the provided configuration
 // components. The id string is expected to be the ID of the beat.
+<<<<<<< HEAD
 func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config, loggers ...*logp.Logger) Decoders {
 	var logger *logp.Logger
 	if len(loggers) > 0 {
 		logger = loggers[0]
 	}
 
+=======
+func DecodersFor(
+	id string,
+	publisher *publish.TransactionPublisher,
+	protocols *protos.ProtocolsStruct,
+	watcher *procs.ProcessesWatcher,
+	flows *flows.Flows,
+	cfg config.Config,
+	logger *logp.Logger,
+) Decoders {
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 	return func(dl layers.LinkType, device string, idx int) (*decoder.Decoder, func(), error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
@@ -62,7 +75,7 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 				return nil, nil, err
 			}
 
-			p, err := icmp.New(false, reporter, watcher, icmpCfg)
+			p, err := icmp.New(false, reporter, watcher, icmpCfg, logger)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -86,7 +99,7 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 			allowMismatchedEth = cfg.Flows.AllowMismatchedEth
 		}
 
-		worker, err := decoder.New(flows, dl, icmp4, icmp6, tcp, udp, allowMismatchedEth)
+		worker, err := decoder.New(flows, dl, icmp4, icmp6, tcp, udp, allowMismatchedEth, logger)
 		if err != nil {
 			return nil, nil, err
 		}

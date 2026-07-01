@@ -225,8 +225,13 @@ func init() {
 	protos.Register("dns", New)
 }
 
+<<<<<<< HEAD
 func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
 	p := &dnsPlugin{logger: logp.NewNopLogger()}
+=======
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C, logger *logp.Logger) (protos.Plugin, error) {
+	p := &dnsPlugin{logger: logger.Named("dns")}
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {

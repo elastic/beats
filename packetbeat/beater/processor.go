@@ -99,20 +99,23 @@ type processorFactory struct {
 	name         string
 	err          chan error
 	beat         *beat.Beat
-	configurator func(*conf.C) (config.Config, error)
+	configurator func(*conf.C, *logp.Logger) (config.Config, error)
+	logger       *logp.Logger
 }
 
-func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C) (config.Config, error)) *processorFactory {
+func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C, *logp.Logger) (config.Config, error)) *processorFactory {
 	return &processorFactory{
 		name:         name,
 		err:          err,
 		beat:         beat,
 		configurator: configurator,
+		logger:       beat.Info.Logger,
 	}
 }
 
 // Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
 func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
+<<<<<<< HEAD
 	config, err := p.configurator(cfg)
 	if err != nil {
 		logp.Err("Failed to read the beat config: %v, %v", err, config)
@@ -122,6 +125,21 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	if err != nil {
 		logp.Err("Failed to generate ID from config: %v, %v", err, config)
 		return nil, err
+=======
+	return p.CreateWithReporter(pipeline, cfg, nil)
+}
+
+func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, error) {
+	config, err := p.configurator(cfg, p.logger)
+	if err != nil {
+		p.logger.Errorf("Failed to read the beat config: %v, %v", err, config)
+		return 0, nil, nil, nil, nil, err
+	}
+	id, err := configID(cfg)
+	if err != nil {
+		p.logger.Errorf("Failed to generate ID from config: %v, %v", err, config)
+		return 0, nil, nil, nil, nil, err
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 	}
 	if len(config.Interfaces) != 0 {
 		// Install Npcap if needed. This needs to happen before any other
@@ -156,20 +174,29 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	var watch procs.ProcessesWatcher
 	// Enable the process watcher only if capturing live traffic
 	if config.Interfaces[0].File == "" {
-		err = watch.Init(config.Procs)
+		err = watch.Init(config.Procs, p.logger)
 		if err != nil {
+<<<<<<< HEAD
 			logp.Critical("%s", err.Error())
 			return nil, err
+=======
+			p.logger.Errorf("%s", err.Error())
+			return 0, nil, nil, nil, nil, err
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 		}
 	} else {
-		logp.Info("Process watcher disabled when file input is used")
+		p.logger.Info("Process watcher disabled when file input is used")
 	}
 
 	flows, err := setupFlows(pipeline, &watch, config, p.beat.Info.Logger)
 	if err != nil {
 		return nil, err
 	}
+<<<<<<< HEAD
 	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, p.beat.Info.Logger)
+=======
+	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, reporter, p.logger)
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 	if err != nil {
 		return nil, err
 	}
@@ -205,10 +232,22 @@ func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg confi
 		return nil, err
 	}
 
-	return flows.NewFlows(client.PublishAll, watch, cfg.Flows)
+	return flows.NewFlows(client.PublishAll, watch, cfg.Flows, logger)
 }
 
+<<<<<<< HEAD
 func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows, logger *logp.Logger) (*sniffer.Sniffer, error) {
+=======
+func setupSniffer(
+	id string,
+	cfg config.Config,
+	pub *publish.TransactionPublisher,
+	watch *procs.ProcessesWatcher,
+	flows *flows.Flows,
+	reporter status.StatusReporter,
+	logger *logp.Logger,
+) (*sniffer.Sniffer, error) {
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -231,7 +270,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces = append(interfaces, iface)
 	}
 
-	logp.Debug("main", "Initializing protocol plugins")
+	logger.Named("main").Debug("Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
 	var closers []func()
 	var protocolLogger, tcpLogger *logp.Logger
@@ -240,12 +279,21 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		tcpLogger = logger.Named("tcp")
 	}
 	for i, iface := range interfaces {
+<<<<<<< HEAD
 		protocols := protos.NewProtocols(protocolLogger)
 		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}
 		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg, tcpLogger)
+=======
+		protocols := protos.NewProtocols()
+		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList, logger)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
+		}
+		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg, logger)
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 		closers = append(closers, protocols.Close)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
@@ -253,7 +301,11 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
+<<<<<<< HEAD
 	return sniffer.New(id, false, "", decoders, interfaces, logger, closers...)
+=======
+	return sniffer.New(id, false, "", decoders, interfaces, reporter, logger, closers...)
+>>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based

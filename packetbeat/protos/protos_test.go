@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/stretchr/testify/assert"
@@ -117,9 +118,9 @@ func newProtocols() Protocols {
 	udp := &UDPProtocol{Ports: []int{5060}}
 	tcpUDP := &TCPUDPProtocol{Ports: []int{53}}
 
-	p.register(1, nil, tcp)
-	p.register(2, nil, udp)
-	p.register(3, nil, tcpUDP)
+	p.register(1, nil, tcp, logp.NewNopLogger())
+	p.register(2, nil, udp, logp.NewNopLogger())
+	p.register(3, nil, tcpUDP, logp.NewNopLogger())
 	return p
 }
 
