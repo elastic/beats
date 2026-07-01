@@ -270,7 +270,7 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 
 	endpoints, err := proc.watcher.GetLocalPortToPIDMapping(transport)
 	if err != nil {
-		proc.procLogger.Errorf("unable to list local ports: %v", err)
+		proc.logger.Errorf("unable to list local ports: %v", err)
 	}
 
 	proc.expireProcessCache()
@@ -362,13 +362,13 @@ func (proc *ProcessesWatcher) GetProcess(pid int) *process {
 
 	p, err := sysinfo.Process(pid)
 	if err != nil {
-		proc.procLogger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
+		proc.logger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
 		return nil
 	}
 
 	info, err := p.Info()
 	if err != nil {
-		proc.procLogger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
+		proc.logger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
 		return nil
 	}
 

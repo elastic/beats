@@ -66,9 +66,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		return nil, err
 	}
 
-	if proc.isProcEnabled {
-		proc.procLogger.Debug("getLocalPortsToPIDs()")
-	}
+	proc.procLogger.Debug("getLocalPortsToPIDs()")
 
 	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false, proc.procLogger)
 	if err != nil {
