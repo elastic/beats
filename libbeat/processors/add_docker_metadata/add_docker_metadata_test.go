@@ -30,8 +30,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
@@ -192,10 +194,9 @@ func TestMatchContainer(t *testing.T) {
 		}, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := mapstr.M{
-		"foo": "container_id",
-	}
-	result, err := p.Run(&beat.Event{Fields: input})
+	input := mapstr.M{"foo": "container_id"}
+
+	result, err := p.Run(&beat.Event{Fields: input.Clone()})
 	assert.NoError(t, err, "processing an event")
 
 	assert.EqualValues(t, mapstr.M{
@@ -217,6 +218,19 @@ func TestMatchContainer(t *testing.T) {
 		},
 		"foo": "container_id",
 	}, result.Fields)
+
+	// RunPdata path: assert Run == RunPdata.
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, input))
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, result.Fields))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
 }
 
 func TestMatchContainerWithDedot(t *testing.T) {
