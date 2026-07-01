@@ -204,7 +204,7 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 ::::
 
 
-`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile. Before 9.5, the downside was that Filebeat waited until the file reached 1024 bytes before ingesting it; since 9.5 the [Enhanced Fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay.
+`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile. Since 9.5 the [Enhanced Fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay; before 9.5, the downside was that Filebeat waited until the file reached 1024 bytes before ingesting it.
 
 ::::{warning}
 Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
