@@ -31,7 +31,12 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-type ignoreInactiveType uint8
+type (
+	ignoreInactiveType uint8
+	// ignoreReason is the reason a file is ignored.
+	// This is needed to correctly generate metrics and debug logs
+	ignoreReason uint8
+)
 
 const (
 	InvalidIgnoreInactive = iota
@@ -40,6 +45,10 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
+
+	notIgnored ignoreReason = iota
+	ignoredByIgnoreOlder
+	ignoredByIgnoreInactive
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
@@ -66,6 +75,24 @@ func init() {
 		}
 		identifiersMap[name] = identifier
 	}
+}
+
+// fileIgnoreReason returns why a file should be ignored based on its modification time.
+func fileIgnoreReason(
+	modTime time.Time,
+	now time.Time,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) ignoreReason {
+	if ignoreOlder > 0 && now.Sub(modTime) > ignoreOlder {
+		return ignoredByIgnoreOlder
+	}
+
+	if !ignoreInactiveSince.IsZero() && modTime.Sub(ignoreInactiveSince) <= 0 {
+		return ignoredByIgnoreInactive
+	}
+
+	return notIgnored
 }
 
 // fileProspector implements the Prospector interface.
@@ -170,7 +197,7 @@ func (p *fileProspector) Init(
 	globalStore loginp.StoreUpdater,
 	newID func(loginp.Source) string,
 ) error {
-	files := p.filewatcher.GetFiles()
+	files, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
 
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
@@ -312,7 +339,7 @@ func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID fun
 		return nil
 	}
 
-	files := p.filewatcher.GetFiles()
+	files, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.TakeOverState) (string, any) {
@@ -325,7 +352,12 @@ func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID fun
 // Run starts the fileProspector which accepts FS events from a file watcher.
 //
 //nolint:dupl // Different prospectors have a similar run method
-func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *fileProspector) Run(
+	ctx input.Context,
+	s loginp.StateMetadataUpdater,
+	hg loginp.HarvesterGroup,
+	metrics *loginp.Metrics,
+) {
 	p.logger.Debug("Starting prospector")
 	defer p.logger.Debug("Prospector has stopped")
 
@@ -340,14 +372,13 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	// when it closes
 	hg.SetObserver(p.filewatcher.NotifyChan())
 
+	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
 	tg.Go(func() error {
-		p.filewatcher.Run(ctx.Cancelation)
+		p.filewatcher.Run(ctx.Cancelation, metrics, p.ignoreOlder, ignoreInactiveSince)
 		return nil
 	})
 
 	tg.Go(func() error {
-		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 
@@ -431,14 +462,15 @@ func (p *fileProspector) onFSEvent(
 }
 
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
-	if p.ignoreOlder > 0 {
-		now := time.Now()
-		if now.Sub(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
-			log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
-			return true
-		}
+	if p.ignoreOlder <= 0 && ignoreInactiveSince.IsZero() {
+		return false
 	}
-	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+
+	switch fileIgnoreReason(fe.Descriptor.Info.ModTime(), time.Now(), p.ignoreOlder, ignoreInactiveSince) {
+	case ignoredByIgnoreOlder:
+		log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
+		return true
+	case ignoredByIgnoreInactive:
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
 	}

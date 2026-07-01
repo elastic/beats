@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"time"
+
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -121,21 +123,33 @@ type FSEvent struct {
 	SrcID string
 }
 
+// FileScanOptions contains scan-time settings that influence file metrics.
+type FileScanOptions struct {
+	// Now is the reference time for scan-time age comparisons.
+	Now time.Time
+	// IgnoreOlder is the ignore_older threshold.
+	IgnoreOlder time.Duration
+	// IgnoreInactiveSince is the ignore_inactive reference time.
+	IgnoreInactiveSince time.Time
+}
+
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
 	// GetFiles returns the list of monitored files.
 	// The keys of the map are the paths to the files and
 	// the values are the file descriptors that contain all necessary information about the file.
-	GetFiles() map[string]FileDescriptor
+	GetFiles(FileScanOptions) (map[string]FileDescriptor, FileScanMetrics)
 }
 
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
 	FSScanner
 
-	// Run is the event loop which watchers for changes
+	// Run is the event loop which watches for changes
 	// in the file system and returns events based on the data.
-	Run(unison.Canceler)
+	// Aside from the metrics struct it also has ignore older
+	// and ignore inactive as arguments.
+	Run(ctx unison.Canceler, metrics *Metrics, ingoreOlder time.Duration, ignoreInativeSince time.Time)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for

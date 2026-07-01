@@ -667,7 +667,7 @@ type mockHarvester struct {
 	onRun func(input.Context, Source, Cursor, Publisher) error
 }
 
-func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher, metrics *Metrics) error {
+func (m *mockHarvester) Run(ctx input.Context, s Source, _ string, c Cursor, p Publisher, metrics *Metrics) error {
 	if m.wg != nil {
 		defer m.wg.Done()
 	}
