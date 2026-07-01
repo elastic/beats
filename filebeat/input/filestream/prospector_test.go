@@ -22,6 +22,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -89,8 +90,6 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		testCase := testCase
-
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
@@ -160,8 +159,6 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		testCase := testCase
-
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
@@ -451,8 +448,6 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
 				logger:      logp.NewNopLogger(),
@@ -502,12 +497,10 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		p.Run(ctx, testStore, hg)
 
-		wg.Done()
-	}()
+	})
 
 	// The prospector must persist the size of the file to the state
 	// as the offset, so when the file is updated only the new
@@ -554,8 +547,6 @@ func TestProspectorDeletedFile(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
 				logger:       logp.NewNopLogger(),
@@ -781,7 +772,7 @@ func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 // concurrent reads.
 type mockMetadataUpdater struct {
 	mu    sync.RWMutex
-	table map[string]interface{}
+	table map[string]any
 
 	FindCursorMetaCalled  atomic.Int64
 	ResetCursorCalled     int
@@ -794,7 +785,7 @@ type mockMetadataUpdater struct {
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
 	return &mockMetadataUpdater{
-		table: make(map[string]interface{}),
+		table: make(map[string]any),
 	}
 }
 
@@ -876,14 +867,12 @@ func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
 	return nil
 }
 
-func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interface{}) bool) {
+func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta any)) {
 	mu.mu.RLock()
 	defer mu.mu.RUnlock()
 	mu.IterateOnPrefixCalled.Add(1)
 	for key, meta := range mu.table {
-		if !fn(key, meta) {
-			return
-		}
+		fn(key, meta)
 	}
 }
 
@@ -895,7 +884,7 @@ func (mu *mockMetadataUpdater) KeyExists(key string) bool {
 	return ok
 }
 
-func (mu *mockMetadataUpdater) UpdateKey(oldKey, newKey string, meta interface{}) error {
+func (mu *mockMetadataUpdater) UpdateKey(oldKey, newKey string, meta any) error {
 	mu.mu.Lock()
 	defer mu.mu.Unlock()
 	mu.UpdateKeyCalled++
@@ -912,7 +901,7 @@ type mockUnpackValue struct {
 	key string
 }
 
-func (u *mockUnpackValue) UnpackCursorMeta(to interface{}) error {
+func (u *mockUnpackValue) UnpackCursorMeta(to any) error {
 	return typeconv.Convert(to, u.fileMeta)
 }
 
@@ -1043,7 +1032,7 @@ type testFileInfo struct {
 	name string
 	size int64
 	time time.Time
-	sys  interface{}
+	sys  any
 }
 
 func (t *testFileInfo) Name() string       { return t.name }
@@ -1051,7 +1040,7 @@ func (t *testFileInfo) Size() int64        { return t.size }
 func (t *testFileInfo) Mode() os.FileMode  { return 0 }
 func (t *testFileInfo) ModTime() time.Time { return t.time }
 func (t *testFileInfo) IsDir() bool        { return false }
-func (t *testFileInfo) Sys() interface{}   { return t.sys }
+func (t *testFileInfo) Sys() any           { return t.sys }
 
 func createTestFileDescriptor() loginp.FileDescriptor {
 	return createTestFileDescriptorWithInfo(&testFileInfo{})
@@ -1373,20 +1362,20 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 	const currentPath = "/var/log/app.log"
 
 	testCases := map[string]struct {
-		storeEntries       map[string]interface{}
+		storeEntries       map[string]any
 		currentFingerprint string
 		currentPath        string
 		expectedKey        string
 		expectedFound      bool
 	}{
 		"empty current fingerprint returns immediately": {
-			storeEntries:       map[string]interface{}{},
+			storeEntries:       map[string]any{},
 			currentFingerprint: "",
 			currentPath:        currentPath,
 			expectedFound:      false,
 		},
 		"valid prefix match": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1399,7 +1388,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      true,
 		},
 		"prefix match among entries for different paths": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::aa": fileMeta{
 					Source:         "/other/file.log",
 					IdentifierName: fingerprintName,
@@ -1417,7 +1406,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      true,
 		},
 		"skips non-fingerprint identity": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::native::abc123": fileMeta{
 					Source:         currentPath,
 					IdentifierName: nativeName,
@@ -1428,7 +1417,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      false,
 		},
 		"skips key with too many separators": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::aabb::extra": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1440,7 +1429,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      false,
 		},
 		"skips key with too few separators": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::malformed": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1455,7 +1444,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			// With the bounded-key optimization a growing entry is identified by
 			// a non-empty fileMeta.Fingerprint (the raw hex), not by the key tail.
 			// An entry with an empty Fingerprint is treated as final and skipped.
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1467,7 +1456,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      false,
 		},
 		"skips stored fingerprint longer than current": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::aabbccddee": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1479,7 +1468,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      false,
 		},
 		"skips stored fingerprint equal length to current": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1491,7 +1480,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      false,
 		},
 		"skips non-prefix fingerprint": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::xxxx": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1508,7 +1497,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			// the stored entry's Source must match currentPath; mismatched
 			// sources are rejected to avoid confusing two distinct files with a
 			// shared content prefix for renames of one another.
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         "/other/file.log",
 					IdentifierName: fingerprintName,
@@ -1520,7 +1509,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			expectedFound:      false,
 		},
 		"single colon in input ID is not a separator": {
-			storeEntries: map[string]interface{}{
+			storeEntries: map[string]any{
 				"filestream::my:input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
 					IdentifierName: fingerprintName,
@@ -1537,9 +1526,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			store := newMockMetadataUpdater()
-			for k, v := range tc.storeEntries {
-				store.table[k] = v
-			}
+			maps.Copy(store.table, tc.storeEntries)
 
 			p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
 			event := loginp.FSEvent{

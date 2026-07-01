@@ -179,7 +179,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
-	globalStore.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	globalStore.UpdateIdentifiers(func(v loginp.Value) (id string, val any) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -271,7 +271,7 @@ func (p *fileProspector) Init(
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 	} else {
 		p.logger.Debugf("trying to migrate file identity to %s", identifierName)
-		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
+		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, any) {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
 			if err != nil {
@@ -696,12 +696,12 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUpdater) {
 	p.shortFingerprints = newShortFingerprintSet()
 
-	updater.IterateOnPrefix(func(key string, meta interface{}) bool {
+	updater.IterateOnPrefix(func(key string, meta any) {
 		// Only fingerprint-identity entries hold growing state and participate
 		// in prefix matching; malformed and other-identity keys are skipped.
 		rk, ok := parseRegistryKey(key)
 		if !ok || !rk.isFingerprint() {
-			return true
+			return
 		}
 
 		// Convert with typeconv: when entries are freshly written in this
@@ -713,7 +713,7 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 		if err := typeconv.Convert(&fm, meta); err != nil {
 			p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
 				key, err)
-			return true
+			return
 		}
 		// The registry key holds only a fixed-size hash of the fingerprint
 		// (bounded-key optimization), so the raw fingerprint needed for prefix
@@ -722,10 +722,9 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 		// final SHA-256 and legacy/static entries leave it empty and are not
 		// eligible for prefix matching.
 		if fm.Fingerprint == "" {
-			return true
+			return
 		}
 		p.shortFingerprints.Add(key, fm.Fingerprint, fm.Source)
-		return true
 	})
 }
 

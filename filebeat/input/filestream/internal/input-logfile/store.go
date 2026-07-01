@@ -211,8 +211,7 @@ func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
 
 // IterateOnPrefix iterates over all entries that match this input's prefix.
 // The callback receives the key and cursor metadata for each entry.
-// Return false from the callback to stop iteration.
-func (s *sourceStore) IterateOnPrefix(fn func(key string, meta interface{}) bool) {
+func (s *sourceStore) IterateOnPrefix(fn func(key string, meta any)) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
@@ -235,9 +234,7 @@ func (s *sourceStore) IterateOnPrefix(fn func(key string, meta interface{}) bool
 			continue
 		}
 
-		if !fn(key, meta) {
-			return // stop iteration
-		}
+		fn(key, meta)
 	}
 }
 
