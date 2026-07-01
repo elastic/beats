@@ -211,7 +211,7 @@ The risk is limited to files that the newer Filebeat version had started reading
 Files that had already reached the fingerprint size before rollback are not affected.
 ::::
 
-Enhanced Fingerprint is not supported with `rotation.external.strategy: copytruncate` and is automatically disabled for those inputs, so files smaller than `offset`+`length` are not ingested there until they reach that size.
+You don't need to configure `rotation.external.strategy: copytruncate` when using the `fingerprint` file identity. Because the fingerprint follows the file content, the input detects copytruncate rotation on its own: after the active file is copied to its rotated name and then truncated, the rotated file keeps its identity and offset, while the truncated active file is picked up as a new file. If you do set `rotation.external.strategy: copytruncate` with the `fingerprint` file identity, it is unnecessary and is ignored, and Enhanced Fingerprint stays enabled.
 
 To opt out and restore the pre-9.5 behavior, where files smaller than `offset`+`length` are not ingested until they reach that size, set `growing` to `false`:
 

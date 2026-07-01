@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -113,6 +114,57 @@ prospector.scanner.fingerprint.enabled: false
 
 				require.Error(t, err)
 				require.Contains(t, err.Error(), tc.err)
+			})
+		}
+	})
+
+	t.Run("copytruncate rotation and fingerprint file identity", func(t *testing.T) {
+		cases := []struct {
+			name             string
+			fileIdentity     string
+			wantCopyTruncate bool
+		}{
+			{
+				name:             "Enhanced Fingerprint ignores copytruncate and uses the standard prospector",
+				fileIdentity:     "file_identity.fingerprint: ~",
+				wantCopyTruncate: false,
+			},
+			{
+				name:             "opting out of Enhanced Fingerprint keeps the copytruncate prospector",
+				fileIdentity:     "file_identity.fingerprint.growing: false",
+				wantCopyTruncate: true,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				cfgStr := fmt.Sprintf(`
+paths: ['some']
+%s
+prospector.scanner.fingerprint.enabled: true
+rotation.external.strategy.copytruncate:
+  suffix_regex: '\.\d$'
+`, tc.fileIdentity)
+
+				c, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+				require.NoError(t, err, "test config must be valid YAML")
+
+				cfg := defaultConfig()
+				require.NoError(t, c.Unpack(&cfg), "test config must unpack into filestream config")
+				require.NoError(t, normalizeConfig(c, &cfg), "normalizeConfig must succeed")
+
+				p, err := newProspector(cfg, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
+				require.NoError(t, err, "creating the prospector must succeed")
+
+				if tc.wantCopyTruncate {
+					assert.IsType(t, &copyTruncateFileProspector{}, p)
+					return
+				}
+
+				fp, ok := p.(*fileProspector)
+				require.True(t, ok, "expected the standard file prospector, got %T", p)
+				assert.True(t, fp.growingFingerprint,
+					"Enhanced Fingerprint must stay enabled when copytruncate is ignored")
 			})
 		}
 	})

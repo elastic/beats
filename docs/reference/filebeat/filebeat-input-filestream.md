@@ -145,6 +145,10 @@ By default, Filebeat is able to track files correctly in the following strategie
 
 However, in case of copytruncate strategy, you should provide additional configuration to Filebeat.
 
+::::{note}
+With the default `fingerprint` [file identity](/reference/filebeat/file-identity.md), you don't need `rotation.external.strategy.copytruncate` at all. The fingerprint follows the file content, so the input detects copytruncate rotation on its own. If you set it together with the `fingerprint` file identity, it is ignored.
+::::
+
 
 #### rotation.external.strategy.copytruncate [_rotation_external_strategy_copytruncate]
 
