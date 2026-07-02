@@ -31,7 +31,9 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-type ignoreInactiveType uint8
+type (
+	ignoreInactiveType uint8
+)
 
 const (
 	InvalidIgnoreInactive = iota
