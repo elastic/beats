@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -57,7 +58,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 	var zapBuf zaptest.Buffer
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		&zapBuf,
+		zapcore.Lock(zapcore.AddSync(&zapBuf)),
 		zapcore.DebugLevel,
 	)
 	observed, observer := observer.New(zapcore.DebugLevel)
@@ -128,6 +129,7 @@ func getComponent() (otelcol.Factories, error) {
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
 		logstashexporter.NewFactory(),
+		kafkaexporter.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error

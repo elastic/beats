@@ -79,14 +79,14 @@ func NewService(config Config, logger *logp.Logger) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
 
-	metricsClient, err := armmonitor.NewMetricsClient(credential, &arm.ClientOptions{
+	metricsClient, err := armmonitor.NewMetricsClient(config.SubscriptionId, credential, &arm.ClientOptions{
 		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create metrics client: %w", err)
 	}
 
-	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
+	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(config.SubscriptionId, credential, &arm.ClientOptions{
 		ClientOptions: clientOptions,
 	})
 	if err != nil {

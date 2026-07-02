@@ -10,17 +10,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	//mage:import
@@ -113,30 +111,13 @@ func PythonUnitTest() error {
 
 // BuildSystemTestBinary build a system test binary depending on the runner.
 func BuildSystemTestBinary() error {
-	binArgs := devtools.DefaultTestBinaryArgs()
-	args := []string{
-		"test", "-c",
-		"-o", binArgs.Name + ".test",
+	var opts []testbin.Option
+	// On Windows 7 32-bit we run out of memory if we enable DWARF.
+	if isWindows32bitRunner() {
+		opts = append(opts, testbin.WithExtraFlags("-ldflags=-w"))
 	}
-
-	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF
-	isWin32Runner := isWindows32bitRunner()
-	if isWin32Runner {
-		args = append(args, "-ldflags=-w")
-	}
-	if devtools.TestCoverage && !isWin32Runner {
-		args = append(args, "-coverpkg", "./...")
-	}
-
-	if len(binArgs.InputFiles) > 0 {
-		args = append(args, binArgs.InputFiles...)
-	}
-
-	start := time.Now()
-	defer func() {
-		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
-	}()
-	return sh.RunV("go", args...)
+	_, err := testbin.Build(devtools.BeatName, ".", opts...)
+	return err
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -241,7 +222,6 @@ func GoIntegTest(ctx context.Context) error {
 	}
 
 	if !devtools.IsInIntegTestEnv() {
-		devtools.BuildSystemTestBinary()
 		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 		// ES_USER must be admin in order for the Go Integration tests to function because they require
 		// indices:data/read/search

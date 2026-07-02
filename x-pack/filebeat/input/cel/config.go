@@ -14,11 +14,10 @@ import (
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/yaml.v3"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/mito/lib"
 )
@@ -57,7 +56,7 @@ type config struct {
 	// placed at state.secret before CEL program execution.
 	// The state.secret key is unconditionally redacted in
 	// debug logs.
-	SecretState map[string]interface{} `config:"secret_state"`
+	SecretState secretState `config:"secret_state"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
@@ -98,6 +97,30 @@ func (c config) GetPackageData(key string) string {
 		return "unknown"
 	}
 	return value
+}
+
+// secretState holds secret key-value pairs. It implements
+// the ucfg Unpacker interface to accept either a map (from
+// direct config) or a string (from Fleet secret resolution,
+// which delivers the stored YAML text as a scalar).
+//
+// The string case is needed because Fleet resolves secrets
+// to their stored string values. See
+// https://github.com/elastic/kibana/issues/267859
+type secretState struct {
+	m map[string]interface{}
+}
+
+func (s *secretState) Unpack(v interface{}) error {
+	switch v := v.(type) {
+	case map[string]interface{}:
+		s.m = v
+		return nil
+	case string:
+		return yaml.Unmarshal([]byte(v), &s.m)
+	default:
+		return fmt.Errorf("secret_state: expected string or map, got %T", v)
+	}
 }
 
 type redact struct {
@@ -166,9 +189,10 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectForwardHeaders: false,
-			RedirectMaxRedirects:   10,
-			Transport:              transport,
+			RedirectForwardHeaders:   false,
+			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
+			RedirectMaxRedirects:     10,
+			Transport:                transport,
 		},
 	}
 }
@@ -260,15 +284,16 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 }
 
 type ResourceConfig struct {
-	URL                    *urlConfig       `config:"url" validate:"required"`
-	Headers                http.Header      `config:"headers"`
-	Retry                  retryConfig      `config:"retry"`
-	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
-	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
-	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
-	MaxBodySize            int64            `config:"max_body_size"`
-	RateLimit              *rateLimitConfig `config:"rate_limit"`
-	KeepAlive              keepAlive        `config:"keep_alive"`
+	URL                      *urlConfig       `config:"url" validate:"required"`
+	Headers                  http.Header      `config:"headers"`
+	Retry                    retryConfig      `config:"retry"`
+	RedirectForwardHeaders   bool             `config:"redirect.forward_headers"`
+	RedirectHeadersBanList   []string         `config:"redirect.headers_ban_list"`
+	RedirectSensitiveHeaders []string         `config:"redirect.sensitive_headers"`
+	RedirectMaxRedirects     int              `config:"redirect.max_redirects"`
+	MaxBodySize              int64            `config:"max_body_size"`
+	RateLimit                *rateLimitConfig `config:"rate_limit"`
+	KeepAlive                keepAlive        `config:"keep_alive"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
@@ -318,13 +343,6 @@ func (c *ResourceConfig) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
-	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 	return nil
 }

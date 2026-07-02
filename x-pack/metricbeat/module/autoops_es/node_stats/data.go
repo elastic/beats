@@ -242,7 +242,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	timestampDiff := int64(0)
 	enrichedStats := map[string]mapstr.M{}
-	transactionId := utils.NewUUIDV4()
+	transactionId := utils.NewUUID()
 	metricSets := []mapstr.M{}
 	nodesList := make(map[string]string, len(nodeStats.Nodes))
 

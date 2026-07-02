@@ -198,6 +198,12 @@ func (c *KafkaConfig) Validate() error {
 		}
 	}
 
+	// Certificate hot-reload was introduced after this branch was cut. Disable it
+	// by default so it does not activate silently in a patch release.
+	if c.TLS != nil && c.TLS.CertificateReload.Enabled == nil {
+		c.TLS.CertificateReload.Enabled = new(false)
+	}
+
 	return nil
 }
 

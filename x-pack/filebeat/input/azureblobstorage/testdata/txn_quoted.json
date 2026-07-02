@@ -1,0 +1,18 @@
+[
+    {
+        "date": "2020-01-01",
+        "time": "00:00:00",
+        "content-type": "text/plain; charset=\"us-ascii\"",
+        "response-type": "multipart/mixed; boundary=\"gc0p4Jq0M2Yt08jU534c0p\"",
+        "host": "test.invalid",
+        "category": "demo"
+    },
+    {
+        "date": "2020-01-02",
+        "time": "12:30:00",
+        "content-type": "application/json",
+        "response-type": "application/json",
+        "host": "example.invalid",
+        "category": "demo"
+    }
+]

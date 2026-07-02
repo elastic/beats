@@ -1074,6 +1074,12 @@ Beat module
     alias to: beat.stats.libbeat.output.events.failed
 
 
+**`beats_stats.metrics.libbeat.output.events.failure_store`**
+:   type: alias
+
+    alias to: beat.stats.libbeat.output.events.failure_store
+
+
 **`beats_stats.metrics.libbeat.output.events.toomany`**
 :   type: alias
 
@@ -2518,6 +2524,12 @@ Event counters
 
 **`beat.stats.libbeat.output.events.failed`**
 :   Number of events failed
+
+    type: long
+
+
+**`beat.stats.libbeat.output.events.failure_store`**
+:   Number of events written to the failure store
 
     type: long
 

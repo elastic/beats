@@ -238,8 +238,9 @@ func (s *split) processMessage(ctx context.Context, trCtx *transformContext, roo
 		_, _ = obj.Put(s.keyField, key)
 	}
 
-	clone := root.Clone()
+	var clone mapstr.M
 	if s.keepParent {
+		clone = root.Clone()
 		_, _ = clone.Put(s.targetInfo.Name, v)
 	} else {
 		clone = obj
