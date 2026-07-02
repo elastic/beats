@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/testing/certutil"
 )
 
-func writeCAFile(t *testing.T, dir, name string) string {
+func writeCAFile(t testing.TB, dir, name string) string {
 	t.Helper()
 	_, _, pair, err := certutil.NewRootCA()
 	require.NoError(t, err)

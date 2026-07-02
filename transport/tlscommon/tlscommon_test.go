@@ -120,7 +120,7 @@ const (
 )
 
 // Setup key+cert pair for the tests
-func makeKeyCertPair(t *testing.T, blockType int, password string) (string, string) {
+func makeKeyCertPair(t testing.TB, blockType int, password string) (string, string) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	require.NoError(t, err)
 	var block *pem.Block

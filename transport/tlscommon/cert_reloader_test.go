@@ -30,7 +30,7 @@ import (
 
 // writeKeyAndCertFiles generates a cert/key pair and writes them to dir,
 // returning the file paths. Each call generates a distinct pair.
-func writeKeyAndCertFiles(t *testing.T, dir string) (certPath, keyPath string) {
+func writeKeyAndCertFiles(t testing.TB, dir string) (certPath, keyPath string) {
 	t.Helper()
 
 	keyPEM, certPEM := makeKeyCertPair(t, blockTypePKCS8, "")
