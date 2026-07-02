@@ -752,12 +752,13 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, 
 	}
 
 	ah := &actionHandler{
-		log:       bt.log,
-		inputType: osqueryInputType,
-		publisher: bt.pub,
-		queryExec: cli,
-		np:        configPlugin,
-		profiles:  bt.liveProfiles,
+		log:             bt.log,
+		inputType:       osqueryInputType,
+		publisher:       bt.pub,
+		queryExec:       cli,
+		np:              configPlugin,
+		profiles:        bt.liveProfiles,
+		profileDefaults: configPlugin,
 	}
 	rah.Attach(ah)
 	b.Manager.RegisterAction(rah)
