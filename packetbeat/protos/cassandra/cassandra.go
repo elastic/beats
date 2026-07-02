@@ -187,7 +187,7 @@ func (cassandra *cassandra) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int,
 	private protos.ProtocolData,
 ) (protos.ProtocolData, bool) {
-	conn := getConnection(private)
+	conn := getConnection(private, cassandra.logger)
 	if conn != nil {
 		cassandra.onDropConnection(conn)
 	}
@@ -201,7 +201,7 @@ func (cassandra *cassandra) onDropConnection(conn *connection) {
 }
 
 func (cassandra *cassandra) ensureConnection(private protos.ProtocolData) *connection {
-	conn := getConnection(private)
+	conn := getConnection(private, cassandra.logger)
 	if conn == nil {
 		conn = &connection{}
 		conn.trans.init(&cassandra.transConfig, cassandra.watcher, cassandra.pub.onTransaction, cassandra.logger)
@@ -209,18 +209,18 @@ func (cassandra *cassandra) ensureConnection(private protos.ProtocolData) *conne
 	return conn
 }
 
-func getConnection(private protos.ProtocolData) *connection {
+func getConnection(private protos.ProtocolData, logger *logp.Logger) *connection {
 	if private == nil {
 		return nil
 	}
 
 	priv, ok := private.(*connection)
 	if !ok {
-		logp.Warn("cassandra connection type error")
+		logger.Warn("cassandra connection type error")
 		return nil
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: cassandra connection data not set")
+		logger.Warn("Unexpected: cassandra connection data not set")
 		return nil
 	}
 	return priv

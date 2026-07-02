@@ -100,11 +100,6 @@ type httpPlugin struct {
 	logger, httpLogger, httpDetailedLogger *logp.Logger
 }
 
-var (
-	isDebug    = false
-	isDetailed = false
-)
-
 func init() {
 	protos.Register("http", New)
 }
@@ -271,7 +266,7 @@ func (http *httpPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	conn := ensureHTTPConnection(private)
+	conn := ensureHTTPConnection(private, http.logger)
 	conn = http.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
@@ -279,26 +274,26 @@ func (http *httpPlugin) Parse(
 	return conn
 }
 
-func ensureHTTPConnection(private protos.ProtocolData) *httpConnectionData {
-	conn := getHTTPConnection(private)
+func ensureHTTPConnection(private protos.ProtocolData, logger *logp.Logger) *httpConnectionData {
+	conn := getHTTPConnection(private, logger)
 	if conn == nil {
 		conn = &httpConnectionData{}
 	}
 	return conn
 }
 
-func getHTTPConnection(private protos.ProtocolData) *httpConnectionData {
+func getHTTPConnection(private protos.ProtocolData, logger *logp.Logger) *httpConnectionData {
 	if private == nil {
 		return nil
 	}
 
 	priv, ok := private.(*httpConnectionData)
 	if !ok {
-		logp.Warn("http connection data type error")
+		logger.Warn("http connection data type error")
 		return nil
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: http connection data not set")
+		logger.Warn("Unexpected: http connection data not set")
 		return nil
 	}
 
@@ -378,7 +373,7 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	http.debugf("Received FIN")
-	conn := getHTTPConnection(private)
+	conn := getHTTPConnection(private, http.logger)
 	if conn == nil {
 		return private
 	}
@@ -405,7 +400,7 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	conn := getHTTPConnection(private)
+	conn := getHTTPConnection(private, http.logger)
 	if conn == nil {
 		return private, false
 	}
@@ -548,7 +543,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		http.decodeBody(requ)
 		path, params, err := http.extractParameters(requ)
 		if err != nil {
-			logp.Warn("Fail to parse HTTP parameters: %v", err)
+			http.logger.Warnf("Fail to parse HTTP parameters: %v", err)
 		}
 
 		pbf.Source.Bytes = int64(requ.size)
@@ -872,7 +867,7 @@ func (http *httpPlugin) isSecretParameter(key string) bool {
 }
 
 func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
-	conn := getHTTPConnection(private)
+	conn := getHTTPConnection(private, http.logger)
 	if conn == nil {
 		return
 	}

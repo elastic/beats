@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type parserConfig struct {
@@ -35,6 +36,7 @@ type parser struct {
 	state   parserState
 	message *message
 	config  *parserConfig
+	logger  *logp.Logger
 }
 
 type parserState uint8
@@ -65,10 +67,18 @@ func init() {
 	parseCommand = doParseCommand
 }
 
-func newParser(config *parserConfig) *parser {
+func newParser(config *parserConfig, logger *logp.Logger) *parser {
 	var p parser
+	p.logger = logger
 	p.init(config)
 	return &p
+}
+
+//go:inline
+func (p *parser) debugf(format string, args ...interface{}) {
+	if p.logger.IsDebug() {
+		p.logger.Debugf(format, args...)
+	}
 }
 
 func (p *parser) init(config *parserConfig) {
@@ -78,7 +88,7 @@ func (p *parser) init(config *parserConfig) {
 }
 
 func (p *parser) reset() {
-	debug("parser(%p) reset", p)
+	p.debugf("parser(%p) reset", p)
 	p.init(p.config)
 }
 
@@ -123,7 +133,7 @@ func (p *parser) yield(nbytes int) parseResult {
 	msg := p.message
 	msg.Size = uint64(nbytes - int(msg.bytesLost))
 	p.message = nil
-	debug("yield(%p) memcache message type %v", p, msg.command.code)
+	p.debugf("yield(%p) memcache message type %v", p, msg.command.code)
 	return parseResult{nil, msg}
 }
 

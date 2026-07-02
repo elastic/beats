@@ -170,7 +170,7 @@ func TestParseHandshakeHeader(t *testing.T) {
 
 func TestParserParse(t *testing.T) {
 
-	parser := &parser{tlsLogger: logptest.NewTestingLogger(t, "")}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 	// An incomplete record header is ok but not complete
 	assert.Equal(t, resultMore, parser.parse(sBuf(t, "14")))
 
@@ -193,7 +193,7 @@ func TestParserParse(t *testing.T) {
 
 func TestParserHello(t *testing.T) {
 
-	parser := &parser{tlsLogger: logptest.NewTestingLogger(t, "")}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 	// An incomplete handshake header is ok and complete
 	assert.Equal(t, resultOK, parser.parse(sBuf(t, "160301000502000002FF")))
 	assert.Equal(t, 5, parser.handshakeBuf.Len())
@@ -272,7 +272,7 @@ func TestParserHello(t *testing.T) {
 }
 
 func TestCertificates(t *testing.T) {
-	parser := &parser{tlsLogger: logptest.NewTestingLogger(t, "")}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 
 	// A certificates message with two certificates
 	assert.Equal(t, resultOK, parser.parse(sBuf(t, certsMsg)))
@@ -353,7 +353,7 @@ func TestCertificates(t *testing.T) {
 }
 
 func TestRandom(t *testing.T) {
-	parser := &parser{tlsLogger: logptest.NewTestingLogger(t, "")}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 
 	for i, test := range []struct {
 		msg  string
@@ -491,7 +491,7 @@ func TestRandom(t *testing.T) {
 }
 
 func TestBadCertMessage(t *testing.T) {
-	parser := &parser{tlsLogger: logptest.NewTestingLogger(t, "")}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 
 	msgs := []string{
 		// empty message

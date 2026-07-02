@@ -130,7 +130,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	tcpStartSeq := tcphdr.Seq
 	payloadLen := uint64(len(pkt.Payload))
 	if payloadLen > uint64(^uint32(0)) {
-		logp.Warn("TCP payload length (%d) overflows uint32; dropping packet", len(pkt.Payload))
+		tcp.logger.Warnf("TCP payload length (%d) overflows uint32; dropping packet", len(pkt.Payload))
 		return
 	}
 	tcpSeq := tcpStartSeq + uint32(payloadLen)
@@ -245,8 +245,6 @@ const (
 	seqEq seqCompare = 0
 	seqGT seqCompare = 1
 )
-
-var isDebug = false
 
 func (tcp *TCP) getID() uint32 {
 	tcp.id++

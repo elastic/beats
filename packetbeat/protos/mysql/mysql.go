@@ -299,7 +299,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 		case mysqlStateStart:
 			m.start = s.parseOffset
 			if len(s.data[s.parseOffset:]) < 5 {
-				logp.Warn("MySQL Message too short. Ignore it.")
+				s.logger.Warnf("MySQL Message too short. Ignore it.")
 				return false, false
 			}
 			hdr := s.data[s.parseOffset : s.parseOffset+5]
@@ -368,7 +368,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					m.statementID = int(binary.LittleEndian.Uint32(s.data[m.start+5:]))
 				} else {
 					if m.start+5 > m.end || m.end > len(s.data) {
-						logp.Warn("MySQL query data too short. Ignoring.")
+						s.logger.Warnf("MySQL query data too short. Ignoring.")
 						return false, false
 					}
 					m.query = string(s.data[m.start+5 : m.end])
@@ -445,7 +445,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			if len(s.data[s.parseOffset:]) >= int(m.packetLength)+4 {
 				s.parseOffset += 4 // header
 				if len(s.data) <= s.parseOffset {
-					logp.Warn("MySQL packet has no data after header. Ignoring.")
+					s.logger.Warnf("MySQL packet has no data after header. Ignoring.")
 					return false, false
 				}
 				if s.data[s.parseOffset] == 0xfe {
@@ -1051,16 +1051,16 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	length, err := readLength(data, 0)
 	if err != nil {
-		logp.Warn("Invalid response: %v", err)
+		mysql.logger.Warn("Invalid response: %v", err)
 		return []string{}, [][]string{}
 	}
 	if length < 1 {
-		logp.Warn("Warning: Skipping empty Response")
+		mysql.logger.Warn("Warning: Skipping empty Response")
 		return []string{}, [][]string{}
 	}
 
 	if len(data) < 5 {
-		logp.Warn("Invalid response: data less than 5 bytes")
+		mysql.logger.Warn("Invalid response: data less than 5 bytes")
 		return []string{}, [][]string{}
 	}
 
@@ -1080,12 +1080,12 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 		for {
 			length, err = readLength(data, offset)
 			if err != nil {
-				logp.Warn("Invalid response: %v", err)
+				mysql.logger.Warn("Invalid response: %v", err)
 				return []string{}, [][]string{}
 			}
 
 			if len(data[offset:]) < 5 {
-				logp.Warn("Invalid response.")
+				mysql.logger.Warn("Invalid response.")
 				return []string{}, [][]string{}
 			}
 
@@ -1130,7 +1130,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			offset += length + 4
 			if len(data) < offset {
-				logp.Warn("Invalid response.")
+				mysql.logger.Warn("Invalid response.")
 				return []string{}, [][]string{}
 			}
 		}
@@ -1141,7 +1141,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 			var rowLen int
 
 			if len(data[offset:]) < 5 {
-				logp.Warn("Invalid response.")
+				mysql.logger.Warn("Invalid response.")
 				break
 			}
 
@@ -1153,7 +1153,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			length, err = readLength(data, offset)
 			if err != nil {
-				logp.Warn("Invalid response: %v", err)
+				mysql.logger.Warn("Invalid response: %v", err)
 				break
 			}
 			off := offset + 4 // skip length + packet number

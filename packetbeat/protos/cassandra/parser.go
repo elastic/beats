@@ -70,7 +70,6 @@ type message struct {
 // Error code if stream exceeds max allowed size on append.
 var (
 	errStreamTooLarge = errors.New("Stream data too large")
-	isDebug           = false
 )
 
 func (p *parser) init(
@@ -162,9 +161,7 @@ func (p *parser) parserBody() (bool, error) {
 
 	// check if the ops already ignored
 	if p.message.ignored {
-		if isDebug {
-			p.debugf("message marked to be ignored, let's do this")
-		}
+		p.debugf("message marked to be ignored, let's do this")
 		p.buf.Collect(bdyLen)
 	} else {
 		// start to parse body
@@ -183,7 +180,7 @@ func (p *parser) parserBody() (bool, error) {
 		if unParsedSize > 0 {
 			if !p.buf.Avail(unParsedSize) {
 				err := errors.New("should be enough bytes for cleanup,but not enough")
-				logp.Err("Finishing frame failed with: %v", err)
+				p.logger.Errorf("Finishing frame failed with: %v", err)
 				return false, err
 			}
 
@@ -195,7 +192,7 @@ func (p *parser) parserBody() (bool, error) {
 
 	finalCollectedFrameLength := p.buf.BufferConsumed()
 	if finalCollectedFrameLength-headLen != bdyLen {
-		logp.Err("body_length:%d, head_length:%d, all_consumed:%d",
+		p.logger.Errorf("body_length:%d, head_length:%d, all_consumed:%d",
 			bdyLen, headLen, finalCollectedFrameLength)
 		return false, errors.New("data messed while parse frame body")
 	}
@@ -223,7 +220,7 @@ func (p *parser) parse() (*message, error) {
 
 		_, err := p.framer.ReadHeader()
 		if err != nil {
-			logp.Err("%v", err)
+			p.logger.Errorf("%v", err)
 			p.framer = nil
 			return nil, err
 		}

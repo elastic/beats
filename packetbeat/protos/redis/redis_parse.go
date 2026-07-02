@@ -304,7 +304,7 @@ func (p *parser) dispatch(depth int, buf *streambuf.Buffer) (common.NetString, b
 		iserror = true
 		value, ok, complete = p.parseSimpleString(buf)
 	default:
-		p.logger.Debugf("Unexpected message starting with %s", buf.Bytes()[0])
+		p.logger.Debugf("Unexpected message starting with %d", buf.Bytes()[0])
 		return empty, false, false, false
 	}
 
@@ -318,7 +318,7 @@ func (p *parser) parseInt(buf *streambuf.Buffer) (common.NetString, bool, bool) 
 	value, ok, complete := p.parseSimpleString(buf)
 	if ok && complete {
 		if _, err := parseInt(value); err != nil {
-			logp.Err("Failed to read integer reply: %s", err)
+			p.logger.Errorf("Failed to read integer reply: %s", err)
 		}
 	}
 	return value, ok, complete
@@ -345,7 +345,7 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 
 	length, err := parseInt(line[1:])
 	if err != nil {
-		logp.Err("Failed to read bulk message: %s", err)
+		p.logger.Errorf("Failed to read bulk message: %s", err)
 		return empty, false, false
 	}
 
@@ -378,7 +378,7 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 
 	count, err := parseInt(line[1:])
 	if err != nil {
-		logp.Err("Failed to read number of bulk messages: %s", err)
+		p.logger.Errorf("Failed to read number of bulk messages: %s", err)
 		return empty, false, false, false
 	}
 	if count < 0 {

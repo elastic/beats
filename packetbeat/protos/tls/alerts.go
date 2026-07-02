@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -110,7 +109,7 @@ func (parser *parser) parseAlert(buf *bufferView) error {
 		return errRead
 	}
 	if severity < 1 || severity > 2 {
-		logp.Warn("invalid severity in alert: %v", severity)
+		parser.logger.Warnf("invalid severity in alert: %v", severity)
 	}
 	alert := alert{alertSeverity(severity), alertCode(code)}
 	parser.debugf("Got alert %v", alert)

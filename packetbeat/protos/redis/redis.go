@@ -161,11 +161,11 @@ func (redis *redisPlugin) ensureRedisConnection(private protos.ProtocolData) *re
 
 	priv, ok := private.(*redisConnectionData)
 	if !ok {
-		logp.Warn("redis connection data type error, create new one")
+		redis.logger.Warn("redis connection data type error, create new one")
 		return redis.newConnectionData()
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: redis connection data not set, create new one")
+		redis.logger.Warn("Unexpected: redis connection data not set, create new one")
 		return redis.newConnectionData()
 	}
 
@@ -280,7 +280,7 @@ func (redis *redisPlugin) correlate(conn *redisConnectionData) {
 		requ, okReq := conn.requests.Pop().(*redisMessage)
 		resp, okResp := conn.responses.Pop().(*redisMessage)
 		if !okReq || !okResp {
-			logp.Err("invalid type found in message queue")
+			redis.logger.Error("invalid type found in message queue")
 			continue
 		}
 		if redis.results != nil {

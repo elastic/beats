@@ -187,7 +187,7 @@ func (plugin *tlsPlugin) doParse(
 	if st == nil {
 		st = newStream(tcptuple)
 		st.cmdlineTuple = plugin.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
-		st.parser.tlsLogger = plugin.tlsLogger
+		st.parser.logger = plugin.tlsLogger
 		conn.streams[dir] = st
 	}
 
@@ -281,7 +281,7 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 	detailed := mapstr.M{}
 
-	emptyHello := &helloMessage{}
+	emptyHello := &helloMessage{logger: plugin.tlsLogger}
 	var clientHello, serverHello *helloMessage
 	if client.parser.hello != nil {
 		clientHello = client.parser.hello

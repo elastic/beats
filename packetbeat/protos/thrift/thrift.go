@@ -296,7 +296,7 @@ func (thrift *thriftPlugin) readConfig(config *thriftConfig) error {
 	}
 
 	if len(config.IdlFiles) > 0 {
-		thrift.idl, err = newThriftIdl(config.IdlFiles)
+		thrift.idl, err = newThriftIdl(config.IdlFiles, thrift.logger)
 		if err != nil {
 			return err
 		}
@@ -819,7 +819,7 @@ func (thrift *thriftPlugin) messageParser(s *thriftStream) (bool, bool) {
 					}
 				} else {
 					if len(m.fields) > 1 {
-						logp.Warn("Thrift RPC response with more than field. Ignoring all but first")
+						thrift.logger.Warn("Thrift RPC response with more than field. Ignoring all but first")
 					}
 					if len(m.fields) > 0 {
 						field := m.fields[0]

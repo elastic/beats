@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -275,7 +276,7 @@ func TestReconstructQuery(t *testing.T) {
 
 	for _, test := range tests {
 		assert.Equal(t, test.Output,
-			reconstructQuery(&test.Input, test.Full))
+			reconstructQuery(&test.Input, test.Full, logptest.NewTestingLogger(t, "")))
 	}
 }
 

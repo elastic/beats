@@ -154,7 +154,7 @@ func (f *Framer) ReadHeader() (head *frameHeader, err error) {
 		return nil, fmt.Errorf("frame body length can not be less than 0: %d", head.BodyLength)
 	} else if head.BodyLength > maxFrameSize {
 		// need to free up the connection to be used again
-		logp.Err("head length is too large")
+		f.logger.Errorf("head length is too large")
 		return nil, ErrFrameTooBig
 	}
 
@@ -221,7 +221,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	if f.Header.Flags&flagCompress == flagCompress {
 		// decompress data and switch to use bytearray decoder
 		if f.compres == nil {
-			logp.Err("hit compress flag, but compressor was not set")
+			f.logger.Errorf("hit compress flag, but compressor was not set")
 			panic(errors.New("hit compress flag, but compressor was not set"))
 		}
 
@@ -358,7 +358,7 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		errProtocol, errServer, errSyntax, errTruncate, errUnauthorized:
 		// ignored
 	default:
-		logp.Err("unknown error code: 0x%x", code)
+		f.logger.Errorf("unknown error code: 0x%x", code)
 	}
 
 	if len(detail) > 0 {
@@ -458,7 +458,7 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 
 	uuid, err := UUIDFromBytes((f.decoder).ReadShortBytes())
 	if err != nil {
-		logp.Err("Error in parsing UUID")
+		f.logger.Errorf("Error in parsing UUID")
 	}
 
 	result["prepared_id"] = uuid.String()
@@ -506,7 +506,7 @@ func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
 			data["args"] = decoder.ReadStringList()
 
 		default:
-			logp.Warn("unknown SCHEMA_CHANGE target: %q change: %q", target, change)
+			f.logger.Warnf("unknown SCHEMA_CHANGE target: %q change: %q", target, change)
 		}
 	}
 	return data
@@ -553,7 +553,7 @@ func (f *Framer) parseEventFrame() (data map[string]interface{}) {
 		// this should work for all versions
 		data["schema_change"] = f.parseResultSchemaChange()
 	default:
-		logp.Err("unknown event type: %q", eventType)
+		f.logger.Errorf("unknown event type: %q", eventType)
 	}
 
 	return data

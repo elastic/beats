@@ -113,7 +113,7 @@ func (p *plugin) GetPorts() []int {
 func (p *plugin) ParseUDP(pkt *protos.Packet) {
 	pi := newParsingInfo(pkt, pkt.Tuple.BaseTuple, p.sipLogger, p.sipDetailedLogger)
 	if _, err := p.doParse(pi); err != nil {
-		logp.Error(err)
+		p.logger.Error(err)
 	}
 }
 
@@ -124,7 +124,7 @@ func (p *plugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	conn := ensureConnection(private)
+	conn := ensureConnection(private, p.logger)
 	st := conn.streams[dir]
 	if st == nil {
 		st = newParsingInfo(pkt, tcptuple.BaseTuple, p.sipLogger, p.sipDetailedLogger)
@@ -136,7 +136,7 @@ func (p *plugin) Parse(
 
 	ok, err := p.doParse(st)
 	if err != nil {
-		logp.Error(err)
+		p.logger.Error(err)
 	}
 
 	if !ok {
@@ -148,26 +148,26 @@ func (p *plugin) Parse(
 	return private
 }
 
-func ensureConnection(private protos.ProtocolData) *connectionData {
-	conn := getConnection(private)
+func ensureConnection(private protos.ProtocolData, logger *logp.Logger) *connectionData {
+	conn := getConnection(private, logger)
 	if conn == nil {
 		conn = &connectionData{}
 	}
 	return conn
 }
 
-func getConnection(private protos.ProtocolData) *connectionData {
+func getConnection(private protos.ProtocolData, logger *logp.Logger) *connectionData {
 	if private == nil {
 		return nil
 	}
 
 	priv, ok := private.(*connectionData)
 	if !ok {
-		logp.Warn("connection data type error")
+		logger.Warn("connection data type error")
 		return nil
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: connection data not set")
+		logger.Warn("Unexpected: connection data not set")
 		return nil
 	}
 
@@ -181,7 +181,7 @@ func (p *plugin) ReceivedFin(
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	p.debugf("Received FIN")
-	conn := getConnection(private)
+	conn := getConnection(private, p.logger)
 	if conn == nil {
 		return private
 	}
@@ -215,7 +215,7 @@ func (p *plugin) GapInStream(
 	private protos.ProtocolData,
 ) (priv protos.ProtocolData, drop bool,
 ) {
-	conn := getConnection(private)
+	conn := getConnection(private, p.logger)
 	if conn == nil {
 		return private, false
 	}
@@ -277,7 +277,7 @@ func (p *plugin) ConnectionTimeout() time.Duration {
 }
 
 func (p *plugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
-	conn := getConnection(private)
+	conn := getConnection(private, p.logger)
 	if conn == nil {
 		return
 	}

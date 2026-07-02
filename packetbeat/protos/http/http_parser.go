@@ -618,16 +618,12 @@ func (p *parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, compl
 func (p *parser) shouldIncludeInBody(contenttype []byte, capturedContentTypes []string) bool {
 	for _, include := range capturedContentTypes {
 		if bytes.Contains(contenttype, []byte(include)) {
-			if isDebug {
-				p.debugf("Should Include Body = true Content-Type %s include_body %s",
-					contenttype, include)
-			}
+			p.debugf("Should Include Body = true Content-Type %s include_body %s",
+				contenttype, include)
 			return true
 		}
 	}
-	if isDebug {
-		p.debugf("Should Include Body = false Content-Type %s", contenttype)
-	}
+	p.debugf("Should Include Body = false Content-Type %s", contenttype)
 	return false
 }
 
