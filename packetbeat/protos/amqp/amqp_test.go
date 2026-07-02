@@ -48,11 +48,12 @@ func (e *eventStore) publish(event beat.Event) {
 }
 
 func amqpModForTests() (*eventStore, *amqpPlugin, error) {
-	var amqp amqpPlugin
 	results := &eventStore{}
-	config := defaultConfig
-	err := amqp.init(results.publish, &procs.ProcessesWatcher{}, &config)
-	return results, &amqp, err
+	plugin, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil, logp.L())
+	if err != nil {
+		return nil, nil, err
+	}
+	return results, plugin.(*amqpPlugin), nil
 }
 
 func testTCPTuple() *common.TCPTuple {

@@ -335,7 +335,7 @@ func (http *httpPlugin) doParse(
 			st.message = &message{ts: pkt.Ts}
 		}
 
-		parser := newParser(&http.parserConfig, http.logger)
+		parser := newParser(&http.parserConfig, http.httpLogger, http.httpDetailedLogger)
 		ok, complete := parser.parse(st, extraMsgSize)
 		extraMsgSize = 0
 		if !ok {

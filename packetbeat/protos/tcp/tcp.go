@@ -86,7 +86,7 @@ func NewTCP(p protos.Protocols, id, device string, idx int, logger *logp.Logger)
 
 func (tcp *TCP) debugf(format string, args ...interface{}) {
 	if tcp.logger.IsDebug() {
-		tcp.logger.Debug(fmt.Sprintf(format, args...))
+		tcp.logger.Debugf(format, args...)
 	}
 }
 

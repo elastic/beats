@@ -95,8 +95,9 @@ func (v version) String() string {
 }
 
 type parser struct {
-	config *parserConfig
-	logger *logp.Logger
+	config             *parserConfig
+	httpLogger         *logp.Logger
+	httpDetailedLogger *logp.Logger
 }
 
 type parserConfig struct {
@@ -127,21 +128,25 @@ var (
 	nameUserAgent        = []byte("user-agent")
 )
 
-func newParser(config *parserConfig, logger *logp.Logger) *parser {
-	return &parser{config: config, logger: logger}
+func newParser(config *parserConfig, httpLogger, httpDetailedLogger *logp.Logger) *parser {
+	return &parser{
+		config:             config,
+		httpLogger:         httpLogger,
+		httpDetailedLogger: httpDetailedLogger,
+	}
 }
 
 //go:inline
 func (parser *parser) debugf(format string, args ...interface{}) {
-	if parser.logger.Named("http").IsDebug() {
-		parser.logger.Named("http").Debugf(format, args...)
+	if parser.httpLogger.IsDebug() {
+		parser.httpLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
 func (parser *parser) detailedf(format string, args ...interface{}) {
-	if parser.logger.Named("httpdetailed").IsDebug() {
-		parser.logger.Named("httpdetailed").Debugf(format, args...)
+	if parser.httpDetailedLogger.IsDebug() {
+		parser.httpDetailedLogger.Debugf(format, args...)
 	}
 }
 
@@ -204,9 +209,9 @@ func (p *parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) 
 		// RESPONSE
 		m.isRequest = false
 		version = fline[5:8]
-		m.statusCode, m.statusPhrase, err = parseResponseStatus(fline[9:], p.logger)
+		m.statusCode, m.statusPhrase, err = parseResponseStatus(fline[9:], p.httpLogger)
 		if err != nil {
-			p.logger.Warn("Failed to understand HTTP response status: %s", fline[9:])
+			p.httpLogger.Warn("Failed to understand HTTP response status: %s", fline[9:])
 			return false, false, false
 		}
 
@@ -500,7 +505,7 @@ func (p *parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 		// HTTP/1.0 no content length. Add until the end of the connection
 		p.debugf("http conn close, received %d", size)
 		if size < 0 {
-			p.logger.Warn("invalid body size in packet")
+			p.httpLogger.Warn("invalid body size in packet")
 			return false, true
 		}
 		m.size += uint64(size)
@@ -512,7 +517,7 @@ func (p *parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 		s.bodyReceived += wanted
 		bodySize := len(m.rawHeaders) + m.contentLength
 		if bodySize < 0 {
-			p.logger.Warn("invalid body size in packet")
+			p.httpLogger.Warn("invalid body size in packet")
 			return false, true
 		}
 		m.size = uint64(bodySize)
@@ -534,7 +539,7 @@ func (p *parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complet
 	line := string(s.data[:i])
 	chunkLength, err := strconv.ParseInt(line, 16, 32)
 	if err != nil {
-		p.logger.Warn("Failed to understand chunked body start line")
+		p.httpLogger.Warn("Failed to understand chunked body start line")
 		return false, false, false
 	}
 	m.chunkedLength = int(chunkLength)
@@ -542,7 +547,7 @@ func (p *parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complet
 	s.data = s.data[i+2:] //+ \r\n
 	newSize := i + 2
 	if newSize < 0 {
-		p.logger.Warn("Invalid body size while parsing message")
+		p.httpLogger.Warn("Invalid body size while parsing message")
 		return false, false, false
 	}
 	m.size += uint64(newSize)
@@ -554,7 +559,7 @@ func (p *parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complet
 		}
 		m.size += 2
 		if s.data[0] != '\r' || s.data[1] != '\n' {
-			p.logger.Warn("expected CRLF sequence at end of message")
+			p.httpLogger.Warn("expected CRLF sequence at end of message")
 			return false, false, false
 		}
 		s.data = s.data[2:]
@@ -575,7 +580,7 @@ func (p *parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete boo
 		}
 		newSize := wanted + 2
 		if newSize < 0 {
-			p.logger.Warn("invalid body size in http body")
+			p.httpLogger.Warn("invalid body size in http body")
 			return false, false, false
 		}
 		m.size += uint64(newSize)
@@ -607,7 +612,7 @@ func (p *parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, compl
 
 	m.size += 2
 	if s.data[0] != '\r' || s.data[1] != '\n' {
-		p.logger.Warn("Expected CRLF sequence at end of message")
+		p.httpLogger.Warn("Expected CRLF sequence at end of message")
 		return false, false
 	}
 

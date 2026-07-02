@@ -27,6 +27,9 @@ import (
 )
 
 func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool) {
+	if s.logger == nil {
+		s.logger = amqp.amqpLogger
+	}
 	for s.parseOffset < len(s.data) {
 
 		if len(s.data[s.parseOffset:]) < 8 {
@@ -133,7 +136,7 @@ func (amqp *amqpPlugin) decodeMethodFrame(s *amqpStream, buf []byte) (bool, bool
 
 	fn, exists := amqp.methodMap[class][method]
 	if !exists {
-		amqp.amqpDetailedLogger.Debug("Received unknown or not supported method")
+		amqp.detailedf("Received unknown or not supported method")
 		return false, false
 	}
 

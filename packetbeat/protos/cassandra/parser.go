@@ -230,7 +230,7 @@ func (p *parser) parse() (*message, error) {
 	if p.CheckFrameOpsIgnored() {
 		// as we already ignore the content, we now mark the result is ignored
 		p.message.ignored = true
-		p.debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest())
+		p.debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest(p.logger))
 	}
 
 	msg := p.message
@@ -248,7 +248,7 @@ func (p *parser) parse() (*message, error) {
 	dir := applayer.NetOriginalDirection
 
 	isRequest := true
-	if p.framer.Header.Version.IsResponse() {
+	if p.framer.Header.Version.IsResponse(p.logger) {
 		dir = applayer.NetReverseDirection
 		isRequest = false
 	}

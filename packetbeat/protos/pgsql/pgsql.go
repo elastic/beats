@@ -37,7 +37,6 @@ import (
 
 type pgsqlPlugin struct {
 	log, debug, detail *logp.Logger
-	isDebug, isDetail  bool
 
 	// config
 	ports        []int
