@@ -911,7 +911,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 			continue
 		case "GOFIPS140":
 			foundFIPS = true
-			require.Contains(t, setting.Value, "v1.0.0", "GOFIPS140 must reference the certified module version")
+			require.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
 			continue
 		case "DefaultGODEBUG":
 			if strings.Contains(setting.Value, "fips140=on") {
