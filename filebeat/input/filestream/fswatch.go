@@ -354,17 +354,15 @@ func (w *fileWatcher) watch(
 // isFileIgnored returns true when a file is ignored, no matter the reason.
 func isFileIgnored(
 	fd loginp.FileDescriptor,
-	now time.Time,
-	ignoreOlder time.Duration,
-	ignoreInactiveSince time.Time,
+	opts loginp.FileScanOptions,
 ) bool {
 	modTime := fd.Info.ModTime()
 
-	if ignoreOlder > 0 && now.Sub(modTime) > ignoreOlder {
+	if opts.IgnoreOlder > 0 && opts.CurrentTime.Sub(modTime) > opts.IgnoreOlder {
 		return true
 	}
 
-	if !ignoreInactiveSince.IsZero() && modTime.Sub(ignoreInactiveSince) <= 0 {
+	if !opts.IgnoreInactiveSince.IsZero() && modTime.Sub(opts.IgnoreInactiveSince) <= 0 {
 		return true
 	}
 
@@ -591,7 +589,7 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 			}
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
-			if isFileIgnored(fd, opts.CurrentTime, opts.IgnoreOlder, opts.IgnoreInactiveSince) {
+			if isFileIgnored(fd, opts) {
 				scanMetrics.FilesIgnored++
 			}
 		}
