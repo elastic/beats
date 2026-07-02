@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -445,6 +446,47 @@ func TestMatchPIDs(t *testing.T) {
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
 	})
+}
+
+func TestMatchPIDsConcurrent(t *testing.T) {
+	containerID := "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b"
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), config.NewConfig(), MockWatcherFactory(
+		map[string]*docker.Container{
+			containerID: {
+				ID:    containerID,
+				Image: "image",
+				Name:  "name",
+			},
+		},
+		nil,
+	))
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+	t.Cleanup(func() {
+		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	})
+
+	// Concurrent Run calls on a shared processor must not race on the lazily
+	// initialized cgroup cache.
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+	for range 10 {
+		wg.Go(func() {
+			<-start
+
+			fields := mapstr.M{}
+			fields.Put("process.pid", 1000)
+
+			result, err := p.Run(&beat.Event{Fields: fields})
+			if !assert.NoError(t, err, "processing an event") {
+				return
+			}
+			cid, err := result.Fields.GetValue("container.id")
+			assert.NoError(t, err, "getting container.id")
+			assert.Equal(t, containerID, cid)
+		})
+	}
+	close(start)
+	wg.Wait()
 }
 
 func TestWatcherError(t *testing.T) {
