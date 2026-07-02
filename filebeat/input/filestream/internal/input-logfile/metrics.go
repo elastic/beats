@@ -207,7 +207,8 @@ func (m *Metrics) Cleanup() {
 		return
 	}
 
-	m.CleanupFileScanMetrics()
+	// Cleanup file scanner metrics
+	m.UpdateFileScanMetrics(FileScanMetrics{})
 
 	// Cleanup harvester metrics
 	m.harvesterMetricsMu.Lock()
@@ -287,15 +288,4 @@ func (m *Metrics) updateHarvesterBucketsLocked(current HarvesterMetrics) {
 	m.FilesIngestedPercentLt95.Add(current.FilesIngestedPercentLt95 - m.lastHarvesterMetrics.FilesIngestedPercentLt95)
 
 	m.lastHarvesterMetrics = current
-}
-
-// CleanupFileScanMetrics removes this input's last file scan contribution from
-// the shared aggregate scan gauges. Call this during input/prospector shutdown
-// so stale scan counts are not left behind after an input stops or restarts.
-func (m *Metrics) CleanupFileScanMetrics() {
-	if m == nil {
-		return
-	}
-
-	m.UpdateFileScanMetrics(FileScanMetrics{})
 }
