@@ -106,6 +106,7 @@ type parser struct {
 
 	// If a key-exchange message has been sent. Used to detect session resumption
 	keyExchanged bool
+	tlsLogger    *logp.Logger
 }
 
 // https://www.rfc-editor.org/rfc/rfc6960#section-4.2.1
@@ -247,6 +248,12 @@ func (hello *helloMessage) supportedCiphers() []string {
 	return ciphers
 }
 
+func (parser *parser) debugf(format string, args ...interface{}) {
+	if parser.tlsLogger != nil && parser.tlsLogger.IsDebug() {
+		parser.tlsLogger.Debugf(format, args...)
+	}
+}
+
 func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 	for buf.Avail(recordHeaderSize) {
 
@@ -266,17 +273,13 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 
 		switch header.recordType {
 		case recordTypeChangeCipherSpec: // single message of size 1 (byte 1)
-			if isDebug {
-				debugf("handshake completed")
-			}
+			parser.debugf("handshake completed")
 			// discard remaining data for this stream (encrypted)
 			_ = buf.Advance(buf.Len())
 			return resultEncrypted
 
 		case recordTypeHandshake:
-			if isDebug {
-				debugf("got handshake record of size %d", header.length)
-			}
+			parser.debugf("got handshake record of size %d", header.length)
 			if err = parser.bufferHandshake(buf, int(header.length)); err != nil {
 				logp.Warn("Error parsing handshake message: %v", err)
 				return resultFailed
@@ -290,14 +293,10 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 
 		case recordTypeApplicationData:
 			// TODO: Request / Response analytics
-			if isDebug {
-				debugf("ignoring application data length %d", header.length)
-			}
+			parser.debugf("ignoring application data length %d", header.length)
 
 		default:
-			if isDebug {
-				debugf("ignoring record type %d length %d", header.recordType, header.length)
-			}
+			parser.debugf("ignoring record type %d length %d", header.recordType, header.length)
 		}
 
 		_ = buf.Advance(limit)
@@ -369,9 +368,7 @@ func (parser *parser) setDirection(dir direction) {
 }
 
 func (parser *parser) parseHandshake(handshakeType handshakeType, buffer bufferView) bool {
-	if isDebug {
-		debugf("got handshake message %v [%d]", handshakeType, buffer.length())
-	}
+	parser.debugf("got handshake message %v [%d]", handshakeType, buffer.length())
 	switch handshakeType {
 	case helloRequest:
 		parser.setDirection(dirServer)

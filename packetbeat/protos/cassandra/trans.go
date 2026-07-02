@@ -35,6 +35,8 @@ type transactions struct {
 	onTransaction transactionHandler
 
 	watcher *procs.ProcessesWatcher
+
+	logger *logp.Logger
 }
 
 type transactionConfig struct {
@@ -48,10 +50,11 @@ type messageList struct {
 	head, tail *message
 }
 
-func (trans *transactions) init(c *transactionConfig, watcher *procs.ProcessesWatcher, cb transactionHandler) {
+func (trans *transactions) init(c *transactionConfig, watcher *procs.ProcessesWatcher, cb transactionHandler, logger *logp.Logger) {
 	trans.config = c
 	trans.watcher = watcher
 	trans.onTransaction = cb
+	trans.logger = logger
 }
 
 func (trans *transactions) onMessage(
@@ -66,12 +69,12 @@ func (trans *transactions) onMessage(
 
 	if msg.IsRequest {
 		if isDebug {
-			debugf("Received request with tuple: %s", tuple)
+			trans.logger.Debugf("Received request with tuple: %s", tuple)
 		}
 		err = trans.onRequest(tuple, dir, msg)
 	} else {
 		if isDebug {
-			debugf("Received response with tuple: %s", tuple)
+			trans.logger.Debugf("Received response with tuple: %s", tuple)
 		}
 		err = trans.onResponse(tuple, dir, msg)
 	}
@@ -157,7 +160,7 @@ func (trans *transactions) correlate() error {
 
 			if resp.header["op"] == "EVENT" {
 				if isDebug {
-					logp.Debug("cassandra", "server pushed message,%v", resp.header)
+					trans.logger.Debugf("server pushed message,%v", resp.header)
 				}
 
 				responses.pop()

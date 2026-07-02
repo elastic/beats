@@ -19,6 +19,7 @@ package redis
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"time"
 
@@ -39,6 +40,7 @@ type stream struct {
 	applayer.Stream
 	parser   parser
 	tcptuple *common.TCPTuple
+	logger   *logp.Logger
 }
 
 type redisConnectionData struct {
@@ -58,12 +60,8 @@ type redisPlugin struct {
 
 	watcher *procs.ProcessesWatcher
 	results protos.Reporter
+	logger  *logp.Logger
 }
-
-var (
-	debugf  = logp.MakeDebug("redis")
-	isDebug = false
-)
 
 var (
 	unmatchedResponses = monitoring.NewInt(nil, "redis.unmatched_responses")
@@ -82,6 +80,8 @@ func New(
 	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &redisPlugin{}
+	p.logger = logger.Named("redis")
+
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -95,12 +95,18 @@ func New(
 	return p, nil
 }
 
+//go:inline
+func (redis *redisPlugin) debugf(format string, args ...interface{}) {
+	if redis.logger.IsDebug() {
+		redis.logger.Debug(fmt.Sprintf(format, args...))
+	}
+}
+
 func (redis *redisPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *redisConfig) error {
 	redis.setFromConfig(config)
 
 	redis.results = results
 	redis.watcher = watcher
-	isDebug = logp.IsDebug("redis")
 
 	return nil
 }
@@ -174,22 +180,16 @@ func (redis *redisPlugin) doParse(
 ) *redisConnectionData {
 	st := conn.streams[dir]
 	if st == nil {
-		st = newStream(pkt.Ts, tcptuple)
+		st = newStream(pkt.Ts, tcptuple, redis.logger)
 		conn.streams[dir] = st
-		if isDebug {
-			debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
-		}
+		redis.debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 	}
 
 	if err := st.Append(pkt.Payload); err != nil {
-		if isDebug {
-			debugf("%v, dropping TCP stream: ", err)
-		}
+		redis.debugf("%v, dropping TCP stream: ", err)
 		return nil
 	}
-	if isDebug {
-		debugf("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
-	}
+	redis.debugf("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 
 	for st.Buf.Len() > 0 {
 		if st.parser.message == nil {
@@ -201,9 +201,7 @@ func (redis *redisPlugin) doParse(
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			conn.streams[dir] = nil
-			if isDebug {
-				debugf("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
-			}
+			redis.debugf("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
 			return conn
 		}
 
@@ -213,12 +211,10 @@ func (redis *redisPlugin) doParse(
 		}
 
 		msg := st.parser.message
-		if isDebug {
-			if msg.isRequest {
-				debugf("REDIS (%p) request message: %s", conn, msg.message)
-			} else {
-				debugf("REDIS (%p) response message: %s", conn, msg.message)
-			}
+		if msg.isRequest {
+			redis.debugf("REDIS (%p) request message: %s", conn, msg.message)
+		} else {
+			redis.debugf("REDIS (%p) response message: %s", conn, msg.message)
 		}
 
 		// all ok, go to next level and reset stream for new message
@@ -229,11 +225,14 @@ func (redis *redisPlugin) doParse(
 	return conn
 }
 
-func newStream(ts time.Time, tcptuple *common.TCPTuple) *stream {
+func newStream(ts time.Time, tcptuple *common.TCPTuple, logger *logp.Logger) *stream {
 	s := &stream{
 		tcptuple: tcptuple,
+		logger:   logger,
 	}
 	s.parser.message = newMessage(ts)
+	s.parser.logger = logger
+
 	s.Stream.Init(tcp.TCPMaxDataInStream)
 	return s
 }
@@ -269,7 +268,7 @@ func (redis *redisPlugin) correlate(conn *redisConnectionData) {
 	// drop responses with missing requests
 	if conn.requests.IsEmpty() {
 		for !conn.responses.IsEmpty() {
-			debugf("Response from unknown transaction. Ignoring")
+			redis.debugf("Response from unknown transaction. Ignoring")
 			unmatchedResponses.Add(1)
 			conn.responses.Pop()
 		}

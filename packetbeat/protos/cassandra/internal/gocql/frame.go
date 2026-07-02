@@ -29,7 +29,6 @@ import (
 
 var (
 	ErrFrameTooBig = errors.New("frame length is bigger than the maximum allowed")
-	debugf         = logp.MakeDebug("cassandra")
 )
 
 type frameHeader struct {
@@ -76,11 +75,14 @@ type Framer struct {
 	r *streambuf.Buffer
 
 	decoder Decoder
+
+	logger *logp.Logger
 }
 
-func NewFramer(r *streambuf.Buffer, compressor Compressor) *Framer {
+func NewFramer(r *streambuf.Buffer, compressor Compressor, logger *logp.Logger) *Framer {
 	f := framerPool.Get().(*Framer)
 	f.compres = compressor
+	f.logger = logger
 	f.r = r
 
 	return f
@@ -159,7 +161,7 @@ func (f *Framer) ReadHeader() (head *frameHeader, err error) {
 	headSize := f.r.BufferConsumed()
 	head.HeadLength = headSize
 
-	debugf("header: %v", head)
+	f.logger.Debugf("header: %v", head)
 
 	f.Header = head
 	return head, nil
@@ -195,7 +197,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	// the frame body. The rest of the body will then be the usual body
 	// corresponding to the response opcode.
 	if f.Header.Flags&flagTracing == flagTracing && (f.Header.Op&opQuery == opQuery || f.Header.Op&opExecute == opExecute || f.Header.Op&opPrepare == opPrepare) {
-		debugf("tracing enabled")
+		f.logger.Debugf("tracing enabled")
 
 		// seems no UUID to read, protocol incorrect?
 		// uid := decoder.ReadUUID()
@@ -203,7 +205,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	}
 
 	if f.Header.Flags&flagWarning == flagWarning {
-		debugf("hit warning flags")
+		f.logger.Debugf("hit warning flags")
 
 		warnings := decoder.ReadStringList()
 		// dealing with warnings
@@ -211,7 +213,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	}
 
 	if f.Header.Flags&flagCustomPayload == flagCustomPayload {
-		debugf("hit custom payload flags")
+		f.logger.Debugf("hit custom payload flags")
 
 		f.Header.CustomPayload = decoder.ReadBytesMap()
 	}
@@ -234,7 +236,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		decoder.Data = &dec
 		f.decoder = decoder
 
-		debugf("hit compress flags")
+		f.logger.Debugf("hit compress flags")
 	}
 
 	// assumes that the frame body has been read into rbuf
@@ -266,7 +268,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 	default:
 		// ignore
-		debugf("unknow ops, not processed, %v", f.Header)
+		f.logger.Debugf("unknow ops, not processed, %v", f.Header)
 
 	}
 

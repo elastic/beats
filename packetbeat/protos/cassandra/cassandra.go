@@ -38,6 +38,8 @@ type cassandra struct {
 	transConfig  transactionConfig
 	watcher      *procs.ProcessesWatcher
 	pub          transPub
+	logger       *logp.Logger
+	isDebug      bool
 }
 
 // Application Layer tcp stream data to be stored on tcp connection context.
@@ -50,8 +52,6 @@ type connection struct {
 type stream struct {
 	parser parser
 }
-
-var debugf = logp.MakeDebug("cassandra")
 
 func init() {
 	protos.Register("cassandra", New)
@@ -66,6 +66,9 @@ func New(
 	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &cassandra{}
+	p.logger = logger
+	p.isDebug = p.logger.IsDebug()
+
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -77,6 +80,12 @@ func New(
 		return nil, err
 	}
 	return p, nil
+}
+
+func (cassandra *cassandra) debugf(format string, args ...interface{}) {
+	if cassandra.isDebug {
+		cassandra.logger.Debugf(format, args...)
+	}
 }
 
 func (cassandra *cassandra) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *cassandraConfig) error {
@@ -112,7 +121,7 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 			maps[op] = true
 		}
 		parser.ignoredOps = maps
-		debugf("parsed config IgnoredOPs: %v ", parser.ignoredOps)
+		cassandra.debugf("parsed config IgnoredOPs: %v ", parser.ignoredOps)
 	}
 
 	// set transaction correlator configuration
@@ -153,12 +162,12 @@ func (cassandra *cassandra) Parse(
 		st = &stream{}
 		st.parser.init(&cassandra.parserConfig, func(msg *message) error {
 			return conn.trans.onMessage(tcptuple.IPPort(), dir, msg)
-		})
+		}, cassandra.logger)
 		conn.streams[dir] = st
 	}
 
 	if err := st.parser.feed(pkt.Ts, pkt.Payload); err != nil {
-		debugf("%v, dropping TCP stream for error in direction %v.", err, dir)
+		cassandra.debugf("%v, dropping TCP stream for error in direction %v.", err, dir)
 		cassandra.onDropConnection(conn)
 		return nil
 	}
@@ -195,7 +204,7 @@ func (cassandra *cassandra) ensureConnection(private protos.ProtocolData) *conne
 	conn := getConnection(private)
 	if conn == nil {
 		conn = &connection{}
-		conn.trans.init(&cassandra.transConfig, cassandra.watcher, cassandra.pub.onTransaction)
+		conn.trans.init(&cassandra.transConfig, cassandra.watcher, cassandra.pub.onTransaction, cassandra.logger)
 	}
 	return conn
 }

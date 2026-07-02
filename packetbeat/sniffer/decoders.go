@@ -74,12 +74,12 @@ func DecodersFor(
 			icmp6 = p
 		}
 
-		tcp, err := tcp.NewTCP(protocols, id, device, idx)
+		tcp, err := tcp.NewTCP(protocols, id, device, idx, logger)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		udp, err := udp.NewUDP(protocols, id, device, idx)
+		udp, err := udp.NewUDP(protocols, id, device, idx, logger)
 		if err != nil {
 			return nil, nil, err
 		}

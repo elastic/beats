@@ -99,9 +99,9 @@ func (alert alert) toMap(source string) mapstr.M {
 
 func (parser *parser) parseAlert(buf *bufferView) error {
 	if buf.length() != 2 {
-		if isDebug {
-			debugf("ignoring encrypted alert")
-		}
+
+		parser.debugf("ignoring encrypted alert")
+
 		return nil
 	}
 
@@ -113,9 +113,7 @@ func (parser *parser) parseAlert(buf *bufferView) error {
 		logp.Warn("invalid severity in alert: %v", severity)
 	}
 	alert := alert{alertSeverity(severity), alertCode(code)}
-	if isDebug {
-		debugf("Got alert %v", alert)
-	}
+	parser.debugf("Got alert %v", alert)
 	parser.alerts = append(parser.alerts, alert)
 	return nil
 }

@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -76,7 +77,7 @@ func (tp *testParser) parse() (*message, bool, bool) {
 		tp.payloads = tp.payloads[1:]
 	}
 
-	parser := newParser(&tp.http.parserConfig)
+	parser := newParser(&tp.http.parserConfig, logp.NewNopLogger())
 	ok, complete := parser.parse(st, 0)
 	return st.message, ok, complete
 }
@@ -100,7 +101,7 @@ func testParse(http *httpPlugin, data string) (*message, bool, bool) {
 }
 
 func testParseStream(http *httpPlugin, st *stream, extraLen int) (bool, bool) {
-	parser := newParser(&http.parserConfig)
+	parser := newParser(&http.parserConfig, logp.NewNopLogger())
 	return parser.parse(st, extraLen)
 }
 
@@ -615,7 +616,6 @@ func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
 }
 
 func TestEatBodyChunked(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
 
 	msgs := [][]byte{
 		[]byte("03\r"),
@@ -632,7 +632,7 @@ func TestEatBodyChunked(t *testing.T) {
 		chunkedLength: 5,
 		contentLength: 0,
 	}
-	parser := newParser(&testParserConfig)
+	parser := newParser(&testParserConfig, logptest.NewTestingLogger(t, ""))
 
 	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != false || ok != true || complete != false {
@@ -703,7 +703,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		chunkedLength: 5,
 		contentLength: 0,
 	}
-	parser := newParser(&testParserConfig)
+	parser := newParser(&testParserConfig, logptest.NewTestingLogger(t, ""))
 
 	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != true || ok != true || complete != false {
@@ -1933,7 +1933,7 @@ func TestExtractHostHeader(t *testing.T) {
 
 func benchmarkHTTPMessage(b *testing.B, data []byte) {
 	http := httpModForTests(nil)
-	parser := newParser(&http.parserConfig)
+	parser := newParser(&http.parserConfig, logp.NewNopLogger())
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data, message: new(message)}
@@ -1992,7 +1992,7 @@ func BenchmarkHTTPSplitResponse(b *testing.B) {
 		"\r\n")
 
 	http := httpModForTests(nil)
-	parser := newParser(&http.parserConfig)
+	parser := newParser(&http.parserConfig, logp.NewNopLogger())
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data1, message: new(message)}

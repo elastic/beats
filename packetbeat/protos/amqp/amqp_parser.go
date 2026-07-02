@@ -30,18 +30,18 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 	for s.parseOffset < len(s.data) {
 
 		if len(s.data[s.parseOffset:]) < 8 {
-			logp.Debug("amqp", "AMQP message smaller than a frame, waiting for more data")
+			amqp.amqpLogger.Debug("AMQP message smaller than a frame, waiting for more data")
 			return true, false
 		}
 
 		yes, version := isProtocolHeader(s.data[s.parseOffset:])
 		if yes {
-			debugf("Client header detected, version %d.%d.%d",
+			amqp.debugf("Client header detected, version %d.%d.%d",
 				version[0], version[1], version[2])
 			s.parseOffset += 8
 		}
 
-		f, err := readFrameHeader(s.data[s.parseOffset:])
+		f, err := readFrameHeader(s.data[s.parseOffset:], amqp.amqpLogger)
 		if err {
 			// incorrect header
 			return false, false
@@ -58,9 +58,9 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 		case bodyType:
 			ok, complete = s.decodeBodyFrame(f.content)
 		case heartbeatType:
-			detailedf("Heartbeat frame received")
+			amqp.detailedf("Heartbeat frame received")
 		default:
-			logp.Debug("amqp", "Received unknown AMQP frame")
+			amqp.amqpLogger.Debug("Received unknown AMQP frame")
 			return false, false
 		}
 
@@ -84,19 +84,19 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 }
 
 // func to read a frame header and check if it is valid and complete
-func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
+func readFrameHeader(data []byte, logger *logp.Logger) (ret *amqpFrame, err bool) {
 	var frame amqpFrame
 	if len(data) < 8 {
-		logp.Debug("amqp", "Partial frame header, waiting for more data")
+		logger.Debug("Partial frame header, waiting for more data")
 		return nil, false
 	}
 	frame.size = binary.BigEndian.Uint32(data[3:7])
 	if len(data) < int(frame.size)+8 {
-		logp.Debug("amqp", "Frame shorter than declared size, waiting for more data")
+		logger.Debug("Frame shorter than declared size, waiting for more data")
 		return nil, false
 	}
 	if data[frame.size+7] != frameEndOctet {
-		logp.Debug("amqp", "Missing frame end octet in frame, discarding it")
+		logger.Debug("Missing frame end octet in frame, discarding it")
 		return nil, true
 	}
 	frame.Type = frameType(data[0])
@@ -120,7 +120,7 @@ The Method Payload, according to official doc :
 
 func (amqp *amqpPlugin) decodeMethodFrame(s *amqpStream, buf []byte) (bool, bool) {
 	if len(buf) < 4 {
-		logp.Debug("amqp", "Method frame too small, waiting for more data")
+		amqp.amqpLogger.Debug("Method frame too small, waiting for more data")
 		return true, false
 	}
 	class := codeClass(binary.BigEndian.Uint16(buf[0:2]))
@@ -129,15 +129,15 @@ func (amqp *amqpPlugin) decodeMethodFrame(s *amqpStream, buf []byte) (bool, bool
 	s.message.parseArguments = amqp.parseArguments
 	s.message.bodySize = uint64(len(buf[4:]))
 
-	debugf("Received frame of class %d and method %d", class, method)
+	amqp.debugf("Received frame of class %d and method %d", class, method)
 
 	fn, exists := amqp.methodMap[class][method]
 	if !exists {
-		logp.Debug("amqpdetailed", "Received unknown or not supported method")
+		amqp.amqpDetailedLogger.Debug("Received unknown or not supported method")
 		return false, false
 	}
 
-	return fn(s.message, arguments)
+	return fn(s.message, arguments, amqp.amqpLogger)
 }
 
 /*
@@ -151,11 +151,11 @@ Structure of a content header, according to official doc :
 
 func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
 	if len(buf) < 14 {
-		logp.Debug("amqp", "Header frame too small, waiting for mode data")
+		amqp.amqpLogger.Debug("Header frame too small, waiting for more data")
 		return true
 	}
 	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
-	debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
+	amqp.debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
 
 	if amqp.parseHeaders {
 		err := getMessageProperties(s, buf[12:])
@@ -176,7 +176,7 @@ Structure of a body frame, according to official doc :
 func (s *amqpStream) decodeBodyFrame(buf []byte) (ok bool, complete bool) {
 	s.message.body = append(s.message.body, buf...)
 
-	debugf("A body frame of %d bytes long has been transmitted",
+	s.logger.Debugf("A body frame of %d bytes long has been transmitted",
 		len(buf))
 	// is the message complete ? If yes, let's publish it
 
@@ -193,7 +193,7 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	m := s.message
 
 	if len(data) < 2 {
-		logp.Debug("amqp", "Malformed packet: unexpected end of data")
+		s.logger.Debug("Malformed packet: unexpected end of data")
 		return true
 	}
 
@@ -212,17 +212,17 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 			break
 		}
 		if lastbit >= len(data) {
-			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			s.logger.Debug("Malformed packet: unexpected end of data")
 			return true
 		}
 	}
 
-	logp.Debug("amqp", "offset:%d, lastbit:%d", offset, lastbit)
+	s.logger.Debugf("offset:%d, lastbit:%d", offset, lastbit)
 
 	if hasProperty(prop1, contentTypeProp) {
-		contentType, consumed, err := getLVString[uint8](data, offset)
+		contentType, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get content type in header frame")
+			s.logger.Debug("Failed to get content type in header frame")
 			return true
 		}
 		m.fields["content-type"] = contentType
@@ -230,9 +230,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, contentEncodingProp) {
-		contentEncoding, consumed, err := getLVString[uint8](data, offset)
+		contentEncoding, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get content encoding in header frame")
+			s.logger.Debug("Failed to get content encoding in header frame")
 			return true
 		}
 		m.fields["content-encoding"] = contentEncoding
@@ -241,15 +241,15 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 
 	if hasProperty(prop1, headersProp) {
 		if int(offset) >= len(data) {
-			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			s.logger.Debug("Malformed packet: unexpected end of data")
 			return true
 		}
 		headers := mapstr.M{}
-		next, err, exists := getTable(headers, data, offset)
+		next, err, exists := getTable(headers, data, offset, s.logger)
 		if !err && exists {
 			m.fields["headers"] = headers
 		} else if err {
-			logp.Debug("amqp", "Failed to get headers")
+			s.logger.Debug("Failed to get headers")
 			return true
 		}
 		offset = next
@@ -257,7 +257,7 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 
 	if hasProperty(prop1, deliveryModeProp) {
 		if int(offset) >= len(data) {
-			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			s.logger.Debug("Malformed packet: unexpected end of data")
 			return true
 		}
 		switch data[offset] {
@@ -271,7 +271,7 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 
 	if hasProperty(prop1, priorityProp) {
 		if int(offset) >= len(data) {
-			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			s.logger.Debug("Malformed packet: unexpected end of data")
 			return true
 		}
 		m.fields["priority"] = data[offset]
@@ -279,9 +279,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, correlationIDProp) {
-		correlationID, consumed, err := getLVString[uint8](data, offset)
+		correlationID, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get correlation-id in header frame")
+			s.logger.Debug("Failed to get correlation-id in header frame")
 			return true
 		}
 		m.fields["correlation-id"] = correlationID
@@ -289,9 +289,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, replyToProp) {
-		replyTo, consumed, err := getLVString[uint8](data, offset)
+		replyTo, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get reply-to in header frame")
+			s.logger.Debug("Failed to get reply-to in header frame")
 			return true
 		}
 		m.fields["reply-to"] = replyTo
@@ -299,9 +299,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, expirationProp) {
-		expiration, consumed, err := getLVString[uint8](data, offset)
+		expiration, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get expiration in header frame")
+			s.logger.Debug("Failed to get expiration in header frame")
 			return true
 		}
 		m.fields["expiration"] = expiration
@@ -309,9 +309,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop2, messageIDProp) {
-		messageID, consumed, err := getLVString[uint8](data, offset)
+		messageID, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get message id in header frame")
+			s.logger.Debug("Failed to get message id in header frame")
 			return true
 		}
 		m.fields["message-id"] = messageID
@@ -321,7 +321,7 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	if hasProperty(prop2, timestampProp) {
 		timeInt, err := getIntegerAt[int64](data, offset)
 		if err {
-			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			s.logger.Debug("Malformed packet: unexpected end of data")
 			return true
 		}
 		t := time.Unix(timeInt, 0)
@@ -330,9 +330,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop2, typeProp) {
-		msgType, consumed, err := getLVString[uint8](data, offset)
+		msgType, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get message type in header frame")
+			s.logger.Debug("Failed to get message type in header frame")
 			return true
 		}
 		m.fields["type"] = msgType
@@ -340,9 +340,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop2, userIDProp) {
-		userID, consumed, err := getLVString[uint8](data, offset)
+		userID, consumed, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get user id in header frame")
+			s.logger.Debug("Failed to get user id in header frame")
 			return true
 		}
 		m.fields["user-id"] = userID
@@ -350,9 +350,9 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop2, appIDProp) {
-		appID, _, err := getLVString[uint8](data, offset)
+		appID, _, err := getLVString[uint8](data, offset, s.logger)
 		if err {
-			logp.Debug("amqp", "Failed to get app-id in header frame")
+			s.logger.Debug("Failed to get app-id in header frame")
 			return true
 		}
 		m.fields["app-id"] = appID
@@ -364,7 +364,7 @@ func (amqp *amqpPlugin) handleAmqp(m *amqpMessage, tcptuple *common.TCPTuple, di
 	if amqp.mustHideCloseMethod(m) {
 		return
 	}
-	debugf("A message is ready to be handled")
+	amqp.debugf("A message is ready to be handled")
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = amqp.watcher.FindProcessesTupleTCP(tcptuple.IPPort())

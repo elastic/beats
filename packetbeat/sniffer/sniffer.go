@@ -500,7 +500,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 func (s *sniffer) open(device string) (snifferHandle, error) {
 	if s.config.File != "" {
-		return newFileHandler(s.config.File, s.config.TopSpeed, s.config.Loop)
+		return newFileHandler(s.config.File, s.config.TopSpeed, s.config.Loop, s.log)
 	}
 
 	switch s.config.Type {
