@@ -101,10 +101,40 @@ The SASL mechanism to use when connecting to Kafka. It can be one of:
 * `PLAIN` for SASL/PLAIN.
 * `SCRAM-SHA-256` for SCRAM-SHA-256.
 * `SCRAM-SHA-512` for SCRAM-SHA-512.
+* `OAUTHBEARER` for SASL/OAUTHBEARER (requires [`sasl.credentials_path`](#_sasl_credentials_path)). {applies_to}`stack: ga 9.5.0`
 
 If `sasl.mechanism` is not set, `PLAIN` is used if `username` and `password` are provided. Otherwise, SASL authentication is disabled.
 
 To use `GSSAPI` mechanism to authenticate with Kerberos, you must leave this field empty, and use the [`kerberos`](#kerberos-option-kafka) options.
+
+
+### `sasl.credentials_path` [_sasl_credentials_path]
+```{applies_to}
+stack: ga 9.5.0
+```
+
+The path to a file containing a bearer token (JWT) to use for SASL/OAUTHBEARER authentication. Required when `sasl.mechanism` is `OAUTHBEARER`.
+
+The file is re-read on each SASL handshake, so tokens rotated by an external credential manager (for example SPIFFE/SPIRE, AWS IRSA, or GCP/Azure Workload Identity) are picked up automatically without a restart.
+
+
+### `sasl.extensions` [_sasl_extensions]
+```{applies_to}
+stack: ga 9.5.0
+```
+
+An optional map of key/value pairs to include in the SASL/OAUTHBEARER `ext` field ([RFC 7628](https://www.rfc-editor.org/rfc/rfc7628) section 3.1). Different Kafka providers use different extension keys; leave this unset if your provider requires none (for example AWS MSK).
+
+Example for Confluent Cloud:
+
+```yaml
+output.kafka:
+  sasl.mechanism: OAUTHBEARER
+  sasl.credentials_path: /var/run/secrets/tokens/kafka.jwt
+  sasl.extensions:
+    logicalCluster: lkc-xxxxx
+    identityPoolId: pool-xxxxx
+```
 
 
 ### `topic` [topic-option-kafka]
