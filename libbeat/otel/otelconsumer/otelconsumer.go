@@ -114,21 +114,24 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 // attempt's wait duration. Safe for concurrent use.
 func (out *otelConsumer) nextBackoff() time.Duration {
 	initDur := int64(out.retry.init) * 2
-	cur := out.backoffDuration.Load()
-	if cur < initDur {
-		cur = initDur
+	for {
+		observed := out.backoffDuration.Load()
+		cur := observed
+		if cur < initDur {
+			cur = initDur
+		}
+		next := cur * 2
+		if next > int64(out.retry.max) {
+			next = int64(out.retry.max)
+		}
+		if out.backoffDuration.CompareAndSwap(observed, next) {
+			half := cur / 2
+			if half < 1 {
+				half = 1
+			}
+			return time.Duration(half + rand.Int64N(half))
+		}
 	}
-	half := cur / 2
-	if half < 1 {
-		half = 1
-	}
-	wait := time.Duration(half + rand.Int64N(half))
-	next := cur * 2
-	if next > int64(out.retry.max) {
-		next = int64(out.retry.max)
-	}
-	out.backoffDuration.Store(next)
-	return wait
 }
 
 // resetBackoff returns the shared backoff window to its initial value, called

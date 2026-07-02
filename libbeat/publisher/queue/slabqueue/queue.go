@@ -117,8 +117,12 @@ func newQueue[T any](pool *Pool[T]) *Queue[T] {
 	return q
 }
 
-// SetGetDebounce overrides this queue's Get coalescing window. Only used by
-// BenchmarkGetDebounce to sweep a range of values for validation of default.
+// SetGetDebounce overrides this queue's Get coalescing window.
+//
+// It is intended for tests only (BenchmarkGetDebounce sweeps a range of values
+// to validate the default) and is NOT safe to call concurrently with Get: it
+// writes q.debounce without holding q.mu, so it must be set once right after the
+// queue is connected and before the queue is consumed.
 func (q *Queue[T]) SetGetDebounce(n time.Duration) {
 	if n < 0 {
 		n = 0

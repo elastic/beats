@@ -94,10 +94,10 @@ func BenchmarkReceiverQueueInteraction(b *testing.B) {
 
 	sink, err := exporterhelper.NewLogs(ctx, expSettings, &struct{}{},
 		func(_ context.Context, ld plog.Logs) error {
-			totalReceived.Add(int64(ld.LogRecordCount()))
 			time.Sleep(benchNetworkDelay)
 			select {
 			case batches <- struct{}{}:
+				totalReceived.Add(int64(ld.LogRecordCount()))
 			case <-done:
 			}
 			return nil
@@ -207,10 +207,10 @@ func benchNReceivers(b *testing.B, nReceivers int) {
 
 	sink, err := exporterhelper.NewLogs(ctx, expSettings, &struct{}{},
 		func(_ context.Context, ld plog.Logs) error {
-			totalReceived.Add(int64(ld.LogRecordCount()))
 			time.Sleep(benchNetworkDelay)
 			select {
 			case batches <- struct{}{}:
+				totalReceived.Add(int64(ld.LogRecordCount()))
 			case <-done:
 			}
 			return nil
@@ -365,11 +365,11 @@ func benchMixedReceivers(b *testing.B, nLight int) {
 					}
 				}
 			}
-			heavyReceived.Add(heavy)
-			lightReceived.Add(light)
 			time.Sleep(benchNetworkDelay)
 			select {
 			case batches <- struct{}{}:
+				heavyReceived.Add(heavy)
+				lightReceived.Add(light)
 			case <-done:
 			}
 			return nil
