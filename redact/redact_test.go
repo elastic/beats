@@ -531,6 +531,189 @@ func TestRedact(t *testing.T) {
 	}
 }
 
+func TestParseHeaderPairs(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  string
+		expect []headerPair
+	}{
+		{
+			name:   "single sensitive header",
+			input:  "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9",
+			expect: []headerPair{{name: "X-Elastic-App-Auth", value: "eyJhbGciOiJSUzI1NiJ9"}},
+		},
+		{
+			name:  "multiple headers",
+			input: "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9,Accept=application/json",
+			expect: []headerPair{
+				{name: "X-Elastic-App-Auth", value: "eyJhbGciOiJSUzI1NiJ9"},
+				{name: "Accept", value: "application/json"},
+			},
+		},
+		{
+			name:   "value contains equals sign",
+			input:  "X-Elastic-App-Auth=a=b=c",
+			expect: []headerPair{{name: "X-Elastic-App-Auth", value: "a=b=c"}},
+		},
+		{
+			name:   "whitespace trimmed around segment",
+			input:  " X-Elastic-App-Auth=token , Accept=application/json ",
+			expect: []headerPair{{name: "X-Elastic-App-Auth", value: "token"}, {name: "Accept", value: "application/json"}},
+		},
+		{
+			name:   "segment without equals is skipped",
+			input:  "no-equals,Accept=application/json",
+			expect: []headerPair{{name: "Accept", value: "application/json"}},
+		},
+		{
+			name:   "segment with empty name is skipped",
+			input:  "=emptyname,Accept=application/json",
+			expect: []headerPair{{name: "Accept", value: "application/json"}},
+		},
+		{
+			name:   "empty string yields no pairs",
+			input:  "",
+			expect: []headerPair{},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expect, parseHeaderPairs(tc.input))
+		})
+	}
+}
+
+func TestRedactHeaderValueKeys(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  map[string]any
+		opts   []RedactOption
+		expect map[string]any
+	}{
+		{
+			name: "single sensitive header: original becomes REDACTED, expanded entry added",
+			input: map[string]any{
+				"FLEET_HEADER": "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("FLEET_HEADER")},
+			expect: map[string]any{
+				"FLEET_HEADER":                     REDACTED,
+				"FLEET_HEADER::X-Elastic-App-Auth": REDACTED,
+			},
+		},
+		{
+			name: "non-sensitive header: original preserved, no expansion",
+			input: map[string]any{
+				"FLEET_HEADER": "Accept=application/json",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("FLEET_HEADER")},
+			expect: map[string]any{
+				"FLEET_HEADER": "Accept=application/json",
+			},
+		},
+		{
+			name: "multi-header value: original becomes REDACTED when any header is sensitive",
+			input: map[string]any{
+				"FLEET_HEADERS": "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9,Accept=application/json",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("FLEET_HEADERS")},
+			expect: map[string]any{
+				"FLEET_HEADERS":                     REDACTED,
+				"FLEET_HEADERS::X-Elastic-App-Auth": REDACTED,
+				"FLEET_HEADERS::Accept":             "application/json",
+			},
+		},
+		{
+			name: "multiple registered keys each expand independently",
+			input: map[string]any{
+				"FLEET_HEADER":        "X-Elastic-App-Auth=jwt1",
+				"FLEET_KIBANA_HEADER": "X-Elastic-App-Auth=jwt2",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("FLEET_HEADER", "FLEET_KIBANA_HEADER")},
+			expect: map[string]any{
+				"FLEET_HEADER":                            REDACTED,
+				"FLEET_HEADER::X-Elastic-App-Auth":        REDACTED,
+				"FLEET_KIBANA_HEADER":                     REDACTED,
+				"FLEET_KIBANA_HEADER::X-Elastic-App-Auth": REDACTED,
+			},
+		},
+		{
+			name: "multi-header value: original preserved, no expansion when no header is sensitive",
+			input: map[string]any{
+				"FLEET_HEADERS": "Accept=application/json,Content-Type=application/json",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("FLEET_HEADERS")},
+			expect: map[string]any{
+				"FLEET_HEADERS": "Accept=application/json,Content-Type=application/json",
+			},
+		},
+		{
+			name: "one key with sensitive headers expanded, another with only innocuous headers left unchanged",
+			input: map[string]any{
+				"FLEET_HEADERS":        "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9,Accept=application/json",
+				"FLEET_KIBANA_HEADERS": "Accept=application/json,Content-Type=application/json",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("FLEET_HEADERS", "FLEET_KIBANA_HEADERS")},
+			expect: map[string]any{
+				// FLEET_HEADERS had a sensitive header — original redacted, sub-entries added
+				"FLEET_HEADERS":                     REDACTED,
+				"FLEET_HEADERS::X-Elastic-App-Auth": REDACTED,
+				"FLEET_HEADERS::Accept":             "application/json",
+				// FLEET_KIBANA_HEADERS had no sensitive headers — left completely unchanged
+				"FLEET_KIBANA_HEADERS": "Accept=application/json,Content-Type=application/json",
+			},
+		},
+		{
+			name: "key-based redaction takes priority over header expansion",
+			//nolint:gosec // fake credentials for testing
+			input: map[string]any{
+				// SECRET_HEADER matches redactKey via "secret", so it is redacted
+				// wholesale before the header expansion logic is reached.
+				"SECRET_HEADER": "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("SECRET_HEADER")},
+			expect: map[string]any{
+				"SECRET_HEADER": REDACTED,
+			},
+		},
+		{
+			name: "without WithHeaderValueKeys option the value is unchanged",
+			input: map[string]any{
+				"FLEET_HEADER": "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9",
+			},
+			opts: nil,
+			expect: map[string]any{
+				"FLEET_HEADER": "X-Elastic-App-Auth=eyJhbGciOiJSUzI1NiJ9",
+			},
+		},
+		{
+			name: "value with no equals sign: original preserved, no expanded entries",
+			input: map[string]any{
+				"FLEET_HEADER": "not-a-header-value",
+				"OTHER":        "safe",
+			},
+			opts: []RedactOption{WithHeaderValueKeys("FLEET_HEADER")},
+			expect: map[string]any{
+				"FLEET_HEADER": "not-a-header-value",
+				"OTHER":        "safe",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var errOut bytes.Buffer
+			opts := append([]RedactOption{WithErrorOutput(&errOut)}, tc.opts...)
+
+			Redact(tc.input, opts...)
+
+			assert.Equal(t, tc.expect, tc.input)
+			assert.Empty(t, errOut.String(), "no warnings expected")
+		})
+	}
+}
+
 func TestRedactURL(t *testing.T) {
 	tests := []struct {
 		name     string
