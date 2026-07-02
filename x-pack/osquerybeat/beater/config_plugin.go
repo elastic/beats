@@ -81,6 +81,11 @@ type ConfigPlugin struct {
 	// Osquery configuration
 	osqueryConfig *config.OsqueryConfig
 
+	// globalProfileEnabled is the fleet-wide profiling default from
+	// elastic_options.profiling.profiling_all. Per-query overrides are resolved into
+	// QueryInfo.Profile at Set() time; this is used for live (ad-hoc) queries.
+	globalProfileEnabled bool
+
 	// onGenerateConfigApplied, if set, is invoked after osqueryd pulls generated config
 	// and pending query metadata is promoted (see GenerateConfig). Used so RRULE
 	// scheduling advances in lockstep with native osqueryd schedule application.
@@ -172,6 +177,14 @@ func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
 	return false
 }
 
+// GlobalProfileEnabled returns the fleet-wide profiling default applied to queries
+// that do not set their own profile override (notably live ad-hoc queries).
+func (p *ConfigPlugin) GlobalProfileEnabled() bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.globalProfileEnabled
+}
+
 func (p *ConfigPlugin) GetNamespace() string {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
@@ -246,6 +259,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
 	namespaces := make(map[string]string)
+	globalProfile := config.GetProfilingEnabled(inputs)
 
 	// Set the members if no errors
 	defer func() {
@@ -256,6 +270,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
 		p.queriesCount = queriesCount
+		p.globalProfileEnabled = globalProfile
 	}()
 
 	// Return if no inputs, all the members will be reset by deferred call above
@@ -291,7 +306,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
 			PackID:     packID,
-			Profile:    qi.Profile,
+			Profile:    config.ResolveProfiling(globalProfile, qi.Profiling),
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -358,7 +373,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Platform:   stream.Platform,
 				Version:    stream.Version,
 				ECSMapping: stream.ECSMapping,
-				Profile:    stream.Profile,
+				Profiling:  stream.Profiling,
 			}
 
 			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)
