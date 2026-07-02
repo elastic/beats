@@ -29,7 +29,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -90,6 +93,18 @@ func TestConfigDefault(t *testing.T) {
 	v, err = newEvent.GetValue("host.os.type")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
+
+	// RunPdata path: assert Run == RunPdata.
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+	body := pcommon.NewMap()
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, newEvent.Fields))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
 }
 
 func TestConfigNetInfoDisabled(t *testing.T) {
@@ -137,6 +152,18 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	v, err = newEvent.GetValue("host.os.type")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
+
+	// RunPdata path: assert Run == RunPdata.
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+	body := pcommon.NewMap()
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, newEvent.Fields))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
 }
 
 func TestConfigName(t *testing.T) {

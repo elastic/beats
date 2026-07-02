@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -38,6 +39,7 @@ type memcacheTest struct {
 func newMemcacheTest(config memcacheConfig) *memcacheTest {
 	mct := &memcacheTest{}
 	mc := &memcache{}
+	mc.logger = logp.NewNopLogger()
 	mc.init(nil, &procs.ProcessesWatcher{}, &config)
 	mc.handler = mct
 	mct.mc = mc
@@ -56,7 +58,7 @@ func (mct *memcacheTest) genTransaction(requ, resp *message) *transaction {
 		resp.CmdlineTuple = &common.ProcessTuple{}
 	}
 
-	t := newTransaction(requ, resp)
+	t := newTransaction(requ, resp, mct.mc.logger)
 	mct.mc.finishTransaction(t)
 	return t
 }

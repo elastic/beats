@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -45,7 +46,7 @@ type Config struct {
 }
 
 // FromStatic initializes a configuration given a config.C
-func (c Config) FromStatic(cfg *conf.C) (Config, error) {
+func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
 		return c, err

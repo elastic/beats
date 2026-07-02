@@ -95,11 +95,19 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter, closers ...func()) (*Sniffer, error) {
+func New(
+	id string,
+	testMode bool,
+	_ string,
+	decoders map[string]Decoders,
+	interfaces []config.InterfaceConfig,
+	reporter status.StatusReporter,
+	logger *logp.Logger,
+	closers ...func()) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		closers:  closers,
-		log:      logp.NewLogger("sniffer"),
+		log:      logger.Named("sniffer"),
 	}
 
 	for i, iface := range interfaces {
@@ -499,7 +507,7 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 	case "pcap":
 		return openPcap(device, s.filter, &s.config)
 	case "af_packet":
-		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config)
+		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config, s.log)
 	default:
 		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config.Type)
 	}
@@ -546,7 +554,7 @@ func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle
 	return h, nil
 }
 
-func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig, logger *logp.Logger) (snifferHandle, error) {
 	szFrame, szBlock, numBlocks, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	if err != nil {
 		return nil, err
@@ -563,7 +571,7 @@ func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (sniff
 		MetricsInterval: cfg.MetricsInterval,
 		FanoutGroupID:   cfg.FanoutGroup,
 		Promiscuous:     cfg.EnableAutoPromiscMode,
-	})
+	}, logger)
 	if err != nil {
 		return nil, err
 	}
