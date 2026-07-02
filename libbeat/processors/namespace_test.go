@@ -123,6 +123,53 @@ func TestNamespaceError(t *testing.T) {
 	}
 }
 
+func TestGetConstructor(t *testing.T) {
+	t.Run("returns constructor for simple name", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("test", newTestFilterRule)
+		fatalError(t, err)
+
+		c, err := ns.GetConstructor("test")
+		assert.NoError(t, err)
+		assert.NotNil(t, c)
+	})
+
+	t.Run("returns constructor for namespaced path", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("a.b.c", newTestFilterRule)
+		fatalError(t, err)
+
+		c, err := ns.GetConstructor("a.b.c")
+		assert.NoError(t, err)
+		assert.NotNil(t, c)
+	})
+
+	t.Run("returns error when leaf key does not exist", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("test", newTestFilterRule)
+		fatalError(t, err)
+
+		_, err = ns.GetConstructor("missing")
+		assert.Error(t, err)
+	})
+
+	t.Run("returns error when intermediate namespace key does not exist", func(t *testing.T) {
+		ns := NewNamespace()
+
+		_, err := ns.GetConstructor("a.b.c")
+		assert.Error(t, err)
+	})
+
+	t.Run("returns error when intermediate key is a plugin not a namespace", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("a", newTestFilterRule)
+		fatalError(t, err)
+
+		_, err = ns.GetConstructor("a.b")
+		assert.Error(t, err)
+	})
+}
+
 func newTestFilterRule(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
 	return &testFilterRule{}, nil
 }

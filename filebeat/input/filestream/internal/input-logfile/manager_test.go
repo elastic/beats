@@ -433,6 +433,8 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	writeSyncer := zapcore.AddSync(buf)
+	//nolint:forbidigo // This test needs to create a local instance of the
+	// logger and expose the buffer it writes to.
 	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))

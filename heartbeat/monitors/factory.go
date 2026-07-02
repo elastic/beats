@@ -100,7 +100,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		byId:                  map[string]*Monitor{},
 		mtx:                   &sync.Mutex{},
 		pluginsReg:            fp.PluginsReg,
-		logger:                logp.L(),
+		logger:                fp.BeatInfo.Logger,
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
@@ -205,7 +205,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop, f.logger)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
@@ -226,7 +226,7 @@ func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	if !config.Enabled() {
 		return nil
 	}
-	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
+	return checkMonitorConfig(config, plugin.GlobalPluginsReg, f.logger)
 }
 
 // getLocation returns the location either from the stdfields or the beat preferring stdfields. Returns nil if declared in neither spot.
@@ -318,7 +318,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		geoM, err := util.GeoConfigToMap(location.Geo)
 		if err != nil {
 			geoErrOnce.Do(func() {
-				logp.L().Warnf("could not add heartbeat geo info: %v", err)
+				info.Logger.Warnf("could not add heartbeat geo info: %v", err)
 			})
 		}
 
@@ -354,7 +354,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 	}
 
 	if !settings.Index.IsEmpty() {
-		logp.L().Warn("Deprecated use of 'index' setting in heartbeat monitor, use 'data_stream' instead!")
+		info.Logger.Warn("Deprecated use of 'index' setting in heartbeat monitor, use 'data_stream' instead!")
 		proc, err := indexProcessor(&settings.Index, info)
 		if err != nil {
 			return nil, err

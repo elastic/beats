@@ -34,9 +34,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestFileScannerSymlinks(t *testing.T) {
@@ -154,7 +152,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		sameFileFunc: testSameFile,
 	}
 
-	go w.watch(context.Background(), loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()), 0, time.Time{})
+	go w.watch(context.Background(), newTestMetrics(), 0, time.Time{})
 	assert.Equal(t, loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: testPath, Info: fi}, w.Event())
 
 	err = os.Rename(testPath, renamedPath)
@@ -167,7 +165,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	go w.watch(context.Background(), loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()), 0, time.Time{})
+	go w.watch(context.Background(), newTestMetrics(), 0, time.Time{})
 	evt := w.Event()
 
 	assert.Equal(t, loginp.OpRename, evt.Op)
@@ -192,7 +190,7 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go w.watch(ctx, loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()), 0, time.Time{})
+	go w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 	appLogPath := filepath.Join(tmpDir, "app.log")
 	rotatedAppLogPath := filepath.Join(tmpDir, "app.log.1")
@@ -206,7 +204,7 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 	require.Equal(t, "", evt.OldPath, "new file does not have an old path set")
 	require.Equal(t, appLogPath, evt.NewPath, "new file does not have an old path set")
 
-	go w.watch(ctx, loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()), 0, time.Time{})
+	go w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 	err = os.Rename(appLogPath, rotatedAppLogPath)
 	if err != nil {

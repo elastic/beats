@@ -125,8 +125,9 @@ type FSEvent struct {
 
 // FileScanOptions contains scan-time settings that influence file metrics.
 type FileScanOptions struct {
-	// Now is the reference time for scan-time age comparisons.
-	Now time.Time
+	// CurrentTime is the reference (current) time for a set of
+	// older/inactive time comparisons.
+	CurrentTime time.Time
 	// IgnoreOlder is the ignore_older threshold.
 	IgnoreOlder time.Duration
 	// IgnoreInactiveSince is the ignore_inactive reference time.
@@ -149,7 +150,7 @@ type FSWatcher interface {
 	// in the file system and returns events based on the data.
 	// Aside from the metrics struct it also has ignore older
 	// and ignore inactive as arguments.
-	Run(ctx unison.Canceler, metrics *Metrics, ingoreOlder time.Duration, ignoreInativeSince time.Time)
+	Run(ctx unison.Canceler, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for

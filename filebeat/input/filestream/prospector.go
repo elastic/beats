@@ -473,8 +473,9 @@ func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, igno
 	case ignoredByIgnoreInactive:
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 func (p *fileProspector) onRemove(log *logp.Logger, fe loginp.FSEvent, src loginp.Source, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {

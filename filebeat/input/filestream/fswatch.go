@@ -196,7 +196,7 @@ func (w *fileWatcher) watch(
 
 	now := time.Now()
 	paths, scanMetrics := w.scanner.GetFiles(loginp.FileScanOptions{
-		Now:                 now,
+		CurrentTime:         now,
 		IgnoreOlder:         ignoreOlder,
 		IgnoreInactiveSince: ignoreInactiveSince,
 	})
@@ -373,7 +373,12 @@ func appendHarvesterFile(
 	ignoreOlder time.Duration,
 	ignoreInactiveSince time.Time,
 ) []loginp.HarvesterFile {
-	if fd.GZIP || fd.Info.Size() <= 0 || isFileIgnored(fd, now, ignoreOlder, ignoreInactiveSince) {
+	opts := loginp.FileScanOptions{
+		CurrentTime:         now,
+		IgnoreOlder:         ignoreOlder,
+		IgnoreInactiveSince: ignoreInactiveSince,
+	}
+	if fd.GZIP || fd.Info.Size() <= 0 || isFileIgnored(fd, opts) {
 		return files
 	}
 
@@ -386,11 +391,9 @@ func appendHarvesterFile(
 // isFileIgnored returns true when a file is ignored, no matter the reason.
 func isFileIgnored(
 	fd loginp.FileDescriptor,
-	now time.Time,
-	ignoreOlder time.Duration,
-	ignoreInactiveSince time.Time,
+	opts loginp.FileScanOptions,
 ) bool {
-	return fileIgnoreReason(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) != notIgnored
+	return fileIgnoreReason(fd.Info.ModTime(), opts.CurrentTime, opts.IgnoreOlder, opts.IgnoreInactiveSince) != notIgnored
 }
 
 // getFileIdentity mimics the same algorithm used by the harvester to generate
@@ -541,8 +544,8 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 // GetFiles returns a map of file descriptors by filenames that
 // match the configured paths.
 func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
-	if opts.Now.IsZero() {
-		opts.Now = time.Now()
+	if opts.CurrentTime.IsZero() {
+		opts.CurrentTime = time.Now()
 	}
 
 	fdByName := map[string]loginp.FileDescriptor{}
@@ -613,7 +616,7 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 			}
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
-			if isFileIgnored(fd, opts.Now, opts.IgnoreOlder, opts.IgnoreInactiveSince) {
+			if isFileIgnored(fd, opts) {
 				scanMetrics.FilesIgnored++
 			}
 		}
