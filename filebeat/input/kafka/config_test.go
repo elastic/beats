@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/sarama"
 )
 
@@ -33,7 +33,7 @@ import (
 // consumer-group and network timeouts onto sarama's own defaults, so that
 // existing configurations are unaffected by these options being added.
 func TestNewSaramaConfigDefaults(t *testing.T) {
-	saramaConfig, err := newSaramaConfig(defaultConfig(), logp.NewNopLogger())
+	saramaConfig, err := newSaramaConfig(defaultConfig(), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	assert.Equal(t, 10*time.Second, saramaConfig.Consumer.Group.Session.Timeout)
@@ -54,7 +54,7 @@ func TestNewSaramaConfigTimeoutOverrides(t *testing.T) {
 	config.Timeout = 60 * time.Second
 	config.KeepAlive = 15 * time.Second
 
-	saramaConfig, err := newSaramaConfig(config, logp.NewNopLogger())
+	saramaConfig, err := newSaramaConfig(config, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	assert.Equal(t, 30*time.Second, saramaConfig.Consumer.Group.Session.Timeout)
@@ -66,7 +66,7 @@ func TestNewSaramaConfigTimeoutOverrides(t *testing.T) {
 }
 
 func TestNewSaramaConfigOAUTHBEARER(t *testing.T) {
-	logger := logp.NewNopLogger()
+	logger := logptest.NewTestingLogger(t, "")
 
 	baseConfig := func() kafkaInputConfig {
 		cfg := defaultConfig()
