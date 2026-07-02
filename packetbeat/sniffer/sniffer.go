@@ -145,7 +145,7 @@ func New(
 			iface.Device = ""
 		} else {
 			// try to resolve device name (ignore error if testMode is enabled)
-			if name, err := resolveDeviceName(iface.Device); err != nil {
+			if name, err := resolveDeviceName(iface.Device, s.log); err != nil {
 				if !testMode {
 					return nil, err
 				}
@@ -292,7 +292,7 @@ func (s *sniffer) pollDefaultRoute(ctx context.Context, device chan<- string, re
 // if it has a change from the old default route interface. If device resolution
 // fails, the default route interface is left unchanged.
 func (s *sniffer) poll(old string, device chan<- string) (current string) {
-	current, err := resolveDeviceName(s.config.Device)
+	current, err := resolveDeviceName(s.config.Device, s.log)
 	if err != nil {
 		s.log.Warnf("sniffer failed to poll default route device: %v", err)
 		return old
@@ -500,7 +500,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 func (s *sniffer) open(device string) (snifferHandle, error) {
 	if s.config.File != "" {
-		return newFileHandler(s.config.File, s.config.TopSpeed, s.config.Loop)
+		return newFileHandler(s.config.File, s.config.TopSpeed, s.config.Loop, s.log)
 	}
 
 	switch s.config.Type {

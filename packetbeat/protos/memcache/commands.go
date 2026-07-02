@@ -46,7 +46,7 @@ func argOptional(arg argDef) argDef {
 			return nil
 		}
 		if err != nil {
-			debug("optional err: %s", err)
+			parser.debugf("optional err: %s", err)
 		}
 		return err
 	}
