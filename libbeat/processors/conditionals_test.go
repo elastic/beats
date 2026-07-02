@@ -427,3 +427,18 @@ func TestIfElseThenErrorClosesThenProcessors(t *testing.T) {
 	assert.Equal(t, 1, p.closeCount,
 		"the 'then' processors must be closed when building the 'else' list fails")
 }
+
+func TestNewErrorClosesAlreadyConstructedProcessors(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	RegisterPlugin("test-new-close-on-error", cons)
+
+	first, err := conf.NewConfigFrom(map[string]any{"test-new-close-on-error": map[string]any{}})
+	require.NoError(t, err)
+	second, err := conf.NewConfigFrom(map[string]any{"test-new-does-not-exist": map[string]any{}})
+	require.NoError(t, err)
+
+	_, err = New(PluginConfig{first, second}, logptest.NewTestingLogger(t, ""))
+	require.Error(t, err, "building the processor list must fail")
+	assert.Equal(t, 1, p.closeCount,
+		"the already-constructed processors must be closed when list construction fails partway")
+}
