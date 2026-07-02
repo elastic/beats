@@ -1315,6 +1315,7 @@ func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2
 func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 	attrs := []attribute.KeyValue{
 		semconv.ServiceInstanceID(env.IDWithoutName),
+		attribute.String("input_type", inputName),
 		attribute.String("package.name", cfg.GetPackageData("name")),
 		attribute.String("package.version", cfg.GetPackageData("version")),
 		attribute.String("package.data_stream", cfg.DataStream),

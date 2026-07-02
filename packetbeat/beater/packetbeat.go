@@ -101,6 +101,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		configurator = initialConfig().FromStatic
 	}
 
+	logger := b.Info.Logger
+
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
@@ -110,7 +112,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if !b.Manager.Enabled() {
 		// Pipeline overwrite is only enabled on standalone packetbeat
 		// since pipelines are managed by fleet otherwise.
-		config, err := configurator(rawConfig)
+		config, err := configurator(rawConfig, logger)
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +134,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		factory:            factory,
 		overwritePipelines: overwritePipelines,
 		done:               make(chan struct{}),
-		logger:             b.Info.Logger,
+		logger:             logger,
 	}, nil
 }
 
