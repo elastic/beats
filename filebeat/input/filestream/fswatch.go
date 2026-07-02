@@ -295,7 +295,7 @@ func (w *fileWatcher) watch(
 			}
 		}
 
-		// we want progress metrics to all files, but truncated ones
+		// We want progress metrics for all files except truncated ones
 		if e.Op != loginp.OpTruncate {
 			harvesterFiles = appendHarvesterFile(harvesterFiles, fd, srcID, now, ignoreOlder, ignoreInactiveSince)
 		}

@@ -1532,7 +1532,7 @@ type testFileScanner struct {
 	files map[string]loginp.FileDescriptor
 }
 
-// GetFiles return s.files and empty metrics
+// GetFiles returns s.files and empty metrics.
 func (s *testFileScanner) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
 	return s.files, loginp.FileScanMetrics{}
 }
