@@ -393,7 +393,17 @@ func isFileIgnored(
 	fd loginp.FileDescriptor,
 	opts loginp.FileScanOptions,
 ) bool {
-	return fileIgnoreReason(fd.Info.ModTime(), opts.CurrentTime, opts.IgnoreOlder, opts.IgnoreInactiveSince) != notIgnored
+	modTime := fd.Info.ModTime()
+
+	if opts.IgnoreOlder > 0 && opts.CurrentTime.Sub(modTime) > opts.IgnoreOlder {
+		return true
+	}
+
+	if !opts.IgnoreInactiveSince.IsZero() && modTime.Sub(opts.IgnoreInactiveSince) <= 0 {
+		return true
+	}
+
+	return false
 }
 
 // getFileIdentity mimics the same algorithm used by the harvester to generate
