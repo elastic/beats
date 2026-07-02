@@ -1339,12 +1339,11 @@ func TestFileProspector_takeOverFn(t *testing.T) {
 				source := fingerprintIdent.GetSource(loginp.FSEvent{NewPath: "/path/to/file", Descriptor: growingFD})
 				return "filestream::new-id::" + source.Name()
 			}(),
-			// The below-threshold raw fingerprint must survive takeover so the
-			// entry stays prefix-matchable when the file grows further.
+			// The below-threshold raw fingerprint must survive takeover
 			expectedMeta: fileMeta{
 				Source:         "/path/to/file",
 				IdentifierName: fingerprintName,
-				Fingerprint:    growingRawFingerprint(growingFD),
+				Fingerprint:    growingFD.Fingerprint.GrowingRaw(),
 			},
 			shouldTakeOver: true,
 		},

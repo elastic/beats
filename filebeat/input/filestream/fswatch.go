@@ -320,10 +320,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			delete(w.prev, remainingPath)
 
 		// If it isn't an exact match, make it a candidate for prefix-match.
-		// growingRawFingerprint keeps only still-growing predecessors in the
+		// GrowingRaw keeps only still-growing predecessors in the
 		// index; completed entries match by their SHA-256 identity instead.
 		case w.growingFingerprint:
-			if raw := growingRawFingerprint(remainingDesc); raw != "" {
+			if raw := remainingDesc.Fingerprint.GrowingRaw(); raw != "" {
 				shortFingerprints.Add(remainingPath, raw, remainingPath)
 			}
 		}

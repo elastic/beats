@@ -98,6 +98,15 @@ func (f FingerprintID) Continues(next FingerprintID) bool {
 	return f.Raw != "" && strings.HasPrefix(next.Raw, f.Raw)
 }
 
+// GrowingRaw returns the raw (hex) fingerprint while the file is still growing,
+// or "" once the fingerprint is complete (the final SHA-256 Sum is set).
+func (f FingerprintID) GrowingRaw() string {
+	if f.Complete() {
+		return ""
+	}
+	return f.Raw
+}
+
 // FileDescriptor represents full information about a file.
 type FileDescriptor struct {
 	// Filename is an original filename this descriptor was created from.

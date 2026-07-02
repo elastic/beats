@@ -233,8 +233,8 @@ func TestFingerprintIDKey(t *testing.T) {
 // is persisted (in fileMeta.Fingerprint) only while the file is still growing.
 func TestGrowingRawFingerprint(t *testing.T) {
 	raw := "41414141"
-	assert.Equal(t, raw, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Raw: raw}}),
+	assert.Equal(t, raw, (loginp.FingerprintID{Raw: raw}).GrowingRaw(),
 		"a growing descriptor must persist its raw fingerprint for prefix matching")
-	assert.Empty(t, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Raw: raw, Sum: raw}}),
+	assert.Empty(t, (loginp.FingerprintID{Raw: raw, Sum: raw}).GrowingRaw(),
 		"a completed descriptor must not persist a raw fingerprint (keeps the entry byte-identical to static)")
 }
