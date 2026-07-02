@@ -7,9 +7,11 @@ package httpjson
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -18,6 +20,7 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -350,6 +353,211 @@ func TestProcessExpression(t *testing.T) {
 	for _, test := range tests {
 		got := processExpression(test.in)
 		assert.Equal(t, test.want, got)
+	}
+}
+
+func TestSameOrigin(t *testing.T) {
+	tests := []struct {
+		name   string
+		base   string
+		target string
+		want   bool
+	}{
+		{name: "same_host", base: "https://api.example.com/v1", target: "https://api.example.com/v2", want: true},
+		{name: "same_host_different_path", base: "https://api.example.com/events", target: "https://api.example.com/events?page=2", want: true},
+		{name: "different_host", base: "https://api.example.com", target: "https://evil.example.net", want: false},
+		{name: "different_subdomain", base: "https://api.example.com", target: "https://cdn.example.com", want: false},
+		{name: "scheme_downgrade", base: "https://api.example.com", target: "http://api.example.com", want: false},
+		{name: "scheme_upgrade", base: "http://api.example.com", target: "https://api.example.com", want: false},
+		{name: "same_ip", base: "https://192.168.1.1/api", target: "https://192.168.1.1/api?page=2", want: true},
+		{name: "different_ip", base: "https://192.168.1.1", target: "https://10.0.0.1", want: false},
+		{name: "different_port", base: "https://api.example.com:443", target: "https://api.example.com:8443", want: false},
+		{name: "explicit_default_port_matches_implicit", base: "https://api.example.com", target: "https://api.example.com:443", want: true},
+		{name: "explicit_non_default_port", base: "https://api.example.com:9200", target: "https://api.example.com:9200", want: true},
+		{name: "http_default_port_matches_implicit", base: "http://api.example.com", target: "http://api.example.com:80", want: true},
+		{name: "http_non_default_port", base: "http://api.example.com:8080", target: "http://api.example.com:8080", want: true},
+		{name: "http_different_port", base: "http://api.example.com:8080", target: "http://api.example.com:9090", want: false},
+		{name: "metadata_ssrf", base: "https://api.provider.com", target: "http://169.254.169.254/latest/meta-data/", want: false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			base := newURL(test.base)
+			target := newURL(test.target)
+			got := sameOrigin(base, target)
+			if got != test.want {
+				t.Errorf("sameOrigin(%q, %q) = %v, want %v", test.base, test.target, got, test.want)
+			}
+		})
+	}
+}
+
+func TestAllowedOrigin(t *testing.T) {
+	base := newURL("https://api.example.com")
+
+	tests := []struct {
+		name    string
+		allowed []string
+		target  string
+		want    bool
+	}{
+		{name: "same_as_base", target: "https://api.example.com/page/2", want: true},
+		{name: "cross_origin_no_allowlist", target: "https://cdn.example.net/page/2", want: false},
+		{
+			name:    "cross_origin_allowlisted",
+			allowed: []string{"https://cdn.example.net"},
+			target:  "https://cdn.example.net/page/2",
+			want:    true,
+		},
+		{
+			name:    "cross_origin_not_in_allowlist",
+			allowed: []string{"https://cdn.example.net"},
+			target:  "https://evil.example.org/page/2",
+			want:    false,
+		},
+		{
+			name:    "scheme_downgrade_despite_allowlist",
+			allowed: []string{"https://cdn.example.net"},
+			target:  "http://cdn.example.net/page/2",
+			want:    false,
+		},
+		{
+			name:    "http_allowlist_entry_cannot_bypass_https_base",
+			allowed: []string{"http://cdn.example.net"},
+			target:  "http://cdn.example.net/page/2",
+			want:    false,
+		},
+		{
+			name:    "allowlisted_with_matching_port",
+			allowed: []string{"https://cdn.example.net:8443"},
+			target:  "https://cdn.example.net:8443/page/2",
+			want:    true,
+		},
+		{
+			name:    "allowlisted_with_different_port",
+			allowed: []string{"https://cdn.example.net:8443"},
+			target:  "https://cdn.example.net:9443/page/2",
+			want:    false,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var allowed []*url.URL
+			for _, s := range test.allowed {
+				allowed = append(allowed, newURL(s))
+			}
+			target := newURL(test.target)
+			got := allowedOrigin(base, allowed, target)
+			if got != test.want {
+				t.Errorf("allowedOrigin(base, %v, %q) = %v, want %v", test.allowed, test.target, got, test.want)
+			}
+		})
+	}
+}
+
+func TestPaginationRejectsCrossOriginURL(t *testing.T) {
+	base := newURL("https://api.example.com/v1/events")
+	rf := &requestFactory{
+		url:        *base,
+		method:     "GET",
+		originURL:  base,
+		log:        logp.NewLogger("test"),
+		encoder:    registeredEncoders[""],
+		transforms: []basicTransform{},
+	}
+
+	trCtx := emptyTransformContext()
+	trCtx.lastResponse = &response{
+		url: *base,
+	}
+
+	// With no transforms mutating the URL, the request should succeed
+	// because the URL remains the same as the configured origin.
+	req, err := rf.newHTTPRequest(context.Background(), trCtx)
+	if err != nil {
+		t.Fatalf("same-origin request failed: %v", err)
+	}
+	if req.URL.Hostname() != "api.example.com" {
+		t.Fatalf("unexpected hostname: %s", req.URL.Hostname())
+	}
+
+	// Now simulate a transform that replaced the URL with a cross-origin one.
+	evil := newURL("https://evil.example.net/steal")
+	rf.url = *evil
+	_, err = rf.newHTTPRequest(context.Background(), trCtx)
+	if err == nil {
+		t.Fatal("expected error for cross-origin pagination URL, got nil")
+	}
+	if !strings.Contains(err.Error(), "does not match configured origin") {
+		t.Errorf("newHTTPRequest() error = %q; want substring %q", err, "does not match configured origin")
+	}
+}
+
+func TestChainStepOriginValidation(t *testing.T) {
+	tests := []struct {
+		name        string
+		base        string
+		chainTarget string
+		allowed     []string
+		wantErr     error
+	}{
+		{
+			name:        "same_origin",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://api.example.com/v1/details",
+		},
+		{
+			name:        "cross_origin_rejected",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://evil.example.net/steal",
+			wantErr:     errors.New(`pagination URL origin "evil.example.net" does not match configured origin "api.example.com"`),
+		},
+		{
+			name:        "cross_origin_port_rejected",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://api.example.com:8443/steal",
+			wantErr:     errors.New(`pagination URL origin "api.example.com:8443" does not match configured origin "api.example.com"`),
+		},
+		{
+			name:        "allowlisted_origin",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://cdn.example.net/v1/details",
+			allowed:     []string{"https://cdn.example.net"},
+		},
+		{
+			name:        "not_in_allowlist",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://evil.example.org/steal",
+			allowed:     []string{"https://cdn.example.net"},
+			wantErr:     errors.New(`pagination URL origin "evil.example.org" does not match configured origin "api.example.com"`),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var allowed []*url.URL
+			for _, s := range test.allowed {
+				allowed = append(allowed, newURL(s))
+			}
+			base := newURL(test.base)
+			target := newURL(test.chainTarget)
+			rf := &requestFactory{
+				url:            *target,
+				method:         "GET",
+				originURL:      base,
+				allowedOrigins: allowed,
+				isChain:        true,
+				log:            logptest.NewTestingLogger(t, t.Name()),
+				encoder:        registeredEncoders[""],
+				transforms:     []basicTransform{},
+			}
+
+			trCtx := emptyTransformContext()
+			trCtx.lastResponse = &response{url: *base}
+
+			_, err := rf.newHTTPRequest(context.Background(), trCtx)
+			if !sameError(err, test.wantErr) {
+				t.Errorf("unexpected error: got=%q want=%q", err, test.wantErr)
+			}
+		})
 	}
 }
 

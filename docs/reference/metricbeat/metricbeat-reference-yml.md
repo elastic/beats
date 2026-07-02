@@ -432,7 +432,7 @@ metricbeat.modules:
   #paths:
   #  - path: "/foo"
   #    namespace: "foo"
-  #    fields: # added to the the response in root. overwrites existing fields
+  #    fields: # added to the response in root. overwrites existing fields
   #      key: "value"
 
 #------------------------------- Jolokia Module -------------------------------
@@ -659,9 +659,9 @@ metricbeat.modules:
   metricsets:
     - event
   period: 10s
-  # Skip events older than Metricbeat's statup time is enabled by default.
+  # Skipping events older than Metricbeat's startup time is enabled by default.
   # Setting to false the skip_older setting will stop filtering older events.
-  # This setting is also useful went Event's timestamps are not populated properly.
+  # This setting is also useful when events' timestamps are not populated properly.
   #skip_older: false
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster

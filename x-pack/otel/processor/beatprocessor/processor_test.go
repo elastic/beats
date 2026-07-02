@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	_ "github.com/elastic/beats/v7/libbeat/cmd/instance" // needed for registering processors
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -222,6 +223,13 @@ func TestCreateProcessor(t *testing.T) {
 					"not_a_real_condition": map[string]any{},
 				},
 			},
+		}, testLogger())
+		require.Error(t, err)
+	})
+
+	t.Run("invalid processor", func(t *testing.T) {
+		_, err := createProcessor(map[string]any{
+			"unsupported_processor": map[string]any{},
 		}, testLogger())
 		require.Error(t, err)
 	})
