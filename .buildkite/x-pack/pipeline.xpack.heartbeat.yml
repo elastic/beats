@@ -32,7 +32,7 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-    # Platforms to be used for FIPS packaging nodes
+  # Platforms to be used for FIPS packaging nodes
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
   PLATFORMS_ARM64_FIPS: "+all linux/arm64"
 

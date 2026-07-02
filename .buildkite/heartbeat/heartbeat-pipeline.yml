@@ -115,7 +115,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
-          FIPS: "true"
+          FIPS: true
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -142,7 +142,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
-          FIPS: "true"
+          FIPS: true
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"

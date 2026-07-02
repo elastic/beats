@@ -90,8 +90,6 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 	} else if dsaKey, ok := hostCert.PublicKey.(*dsa2.PublicKey); ok {
 		if dsaKey.P != nil {
 			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
-		} else {
-			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
 		}
 	} else if ecdsa, ok := hostCert.PublicKey.(*ecdsa.PublicKey); ok {
 		_, _ = x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
