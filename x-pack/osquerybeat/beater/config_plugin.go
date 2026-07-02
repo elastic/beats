@@ -103,6 +103,9 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
 		log:          log.With("ctx", "config"),
 		queryInfoMap: make(queryInfoMap),
+		// Profiling is enabled by default (see config.ProfilingAllOrDefault); keep the
+		// live/ad-hoc default consistent before the first successful Set() applies policy.
+		globalProfileEnabled: true,
 	}
 
 	return p

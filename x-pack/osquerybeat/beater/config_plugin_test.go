@@ -462,6 +462,13 @@ func TestSetScheduledQueryProfileFlag(t *testing.T) {
 	}
 }
 
+func TestNewConfigPluginProfilingEnabledByDefault(t *testing.T) {
+	cfgp := NewConfigPlugin(logp.NewLogger("config_test"))
+	if !cfgp.GlobalProfileEnabled() {
+		t.Fatal("expected global profiling to be enabled by default before the first Set()")
+	}
+}
+
 func TestSetQueryProfileGlobalDefaultAndOverride(t *testing.T) {
 	logger := logp.NewLogger("config_test")
 
