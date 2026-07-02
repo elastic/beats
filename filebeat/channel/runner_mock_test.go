@@ -88,26 +88,6 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 		}
 	})
 
-	t.Run("new processors each time", func(t *testing.T) {
-		var processors []beat.Processor
-		for _, c := range r.cfgs {
-			processors = append(processors, c.Processing.Processor.All()...)
-			defer c.Processing.Processor.Close()
-		}
-
-		require.NotEmptyf(t, processors, "for this test the list of processors cannot be empty")
-
-		for i, p1 := range processors {
-			for j, p2 := range processors {
-				if i == j {
-					continue
-				}
-
-				require.NotSamef(t, p1, p2, "processors must not be re-used")
-			}
-		}
-	})
-
 	t.Run("close processor groups", func(t *testing.T) {
 		// Every client must close its processor group: repeated Close must be
 		// tolerated, and unreleased references would keep the processors (and
