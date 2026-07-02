@@ -117,19 +117,6 @@ func newQueue[T any](pool *Pool[T]) *Queue[T] {
 	return q
 }
 
-// SetGetDebounce overrides this queue's Get coalescing window.
-//
-// It is intended for tests only (BenchmarkGetDebounce sweeps a range of values
-// to validate the default) and is NOT safe to call concurrently with Get: it
-// writes q.debounce without holding q.mu, so it must be set once right after the
-// queue is connected and before the queue is consumed.
-func (q *Queue[T]) SetGetDebounce(n time.Duration) {
-	if n < 0 {
-		n = 0
-	}
-	q.debounce = n
-}
-
 // SetTarget sets this queue's per-queue live-event cap to n, and is safe to call
 // while the queue is in use. A producer blocks when this queue reaches n live
 // events even if the pool still has free slots. n <= 0 means uncapped (bounded
