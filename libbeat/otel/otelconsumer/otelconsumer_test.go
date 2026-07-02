@@ -292,6 +292,7 @@ func TestPublish(t *testing.T) {
 			err := otelConsumer.Publish(ctx, batch)
 			d := time.Since(start)
 			require.NoError(t, err, "Publish should not return an error")
+			require.Len(t, batch.Signals, 1, "expected exactly one signal from Publish")
 			assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag, "batch should be retried")
 			assert.GreaterOrEqual(t, d, initBackoff, "retry delay should be at least init")
 			assert.Less(t, d, 2*initBackoff+margin, "retry delay should not escalate past ~2*init (got %v)", d)
