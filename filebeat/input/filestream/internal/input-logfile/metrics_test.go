@@ -233,3 +233,108 @@ func TestMetricsCleanup(t *testing.T) {
 	_, ok := metrics.harvesterOffsets["test-id"]
 	assert.False(t, ok, "cleanup should remove active harvester offsets")
 }
+
+func TestAggregateGaugeLifecycle(t *testing.T) {
+	inputOneMetrics := NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	inputTwoMetrics := NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	t.Cleanup(inputOneMetrics.Cleanup)
+	t.Cleanup(inputTwoMetrics.Cleanup)
+
+	baseline := snapshotAggregateGauges(inputOneMetrics)
+
+	inputOneScan := FileScanMetrics{
+		FilesMatched:        10,
+		FilesUnique:         8,
+		FilesNoIngestTarget: 1,
+		FilesIgnored:        1,
+		FilesEmpty:          2,
+	}
+	inputOneHarvester := HarvesterMetrics{
+		FilesIngestedPercent100:    1,
+		FilesIngestedPercent95To99: 1,
+	}
+	inputOneMetrics.RegisterHarvesterOffset("input-one-complete", 100)
+	inputOneMetrics.RegisterHarvesterOffset("input-one-near", 95)
+	inputOneMetrics.UpdateFileScanMetrics(inputOneScan)
+	inputOneMetrics.UpdateHarvesterBuckets([]HarvesterFile{
+		{ID: "input-one-complete", Size: 100},
+		{ID: "input-one-near", Size: 100},
+	})
+
+	assert.Equal(t,
+		baseline.plus(inputOneScan, inputOneHarvester),
+		snapshotAggregateGauges(inputOneMetrics),
+		"aggregate gauges after first input update")
+
+	inputTwoScan := FileScanMetrics{
+		FilesMatched:        7,
+		FilesUnique:         6,
+		FilesNoIngestTarget: 1,
+		FilesIgnored:        0,
+		FilesEmpty:          1,
+	}
+	inputTwoHarvester := HarvesterMetrics{
+		FilesIngestedPercent100:  1,
+		FilesIngestedPercentLt95: 1,
+	}
+	inputTwoMetrics.RegisterHarvesterOffset("input-two-complete", 100)
+	inputTwoMetrics.RegisterHarvesterOffset("input-two-lagging", 94)
+	inputTwoMetrics.UpdateFileScanMetrics(inputTwoScan)
+	inputTwoMetrics.UpdateHarvesterBuckets([]HarvesterFile{
+		{ID: "input-two-complete", Size: 100},
+		{ID: "input-two-lagging", Size: 100},
+	})
+
+	assert.Equal(t,
+		baseline.plus(inputOneScan, inputOneHarvester).plus(inputTwoScan, inputTwoHarvester),
+		snapshotAggregateGauges(inputOneMetrics),
+		"aggregate gauges after second input update")
+
+	inputOneMetrics.Cleanup()
+	assert.Equal(t,
+		baseline.plus(inputTwoScan, inputTwoHarvester),
+		snapshotAggregateGauges(inputOneMetrics),
+		"aggregate gauges after first input cleanup")
+
+	inputTwoMetrics.Cleanup()
+	assert.Equal(t,
+		baseline,
+		snapshotAggregateGauges(inputOneMetrics),
+		"aggregate gauges after all inputs cleanup")
+}
+
+type aggregateGaugeSnapshot struct {
+	FileScanMetrics
+	HarvesterMetrics
+}
+
+func snapshotAggregateGauges(m *Metrics) aggregateGaugeSnapshot {
+	return aggregateGaugeSnapshot{
+		FileScanMetrics: FileScanMetrics{
+			FilesMatched:        m.FilesMatched.Get(),
+			FilesUnique:         m.FilesUnique.Get(),
+			FilesNoIngestTarget: m.FilesNoIngestTarget.Get(),
+			FilesIgnored:        m.FilesIgnored.Get(),
+			FilesEmpty:          m.FilesEmpty.Get(),
+		},
+		HarvesterMetrics: HarvesterMetrics{
+			FilesIngestedPercent100:    m.FilesIngestedPercent100.Get(),
+			FilesIngestedPercent95To99: m.FilesIngestedPercent95To99.Get(),
+			FilesIngestedPercentLt95:   m.FilesIngestedPercentLt95.Get(),
+		},
+	}
+}
+
+func (s aggregateGaugeSnapshot) plus(scan FileScanMetrics, harvester HarvesterMetrics) aggregateGaugeSnapshot {
+	s.FilesMatched += scan.FilesMatched
+	s.FilesUnique += scan.FilesUnique
+	s.FilesNoIngestTarget += scan.FilesNoIngestTarget
+	s.FilesIgnored += scan.FilesIgnored
+	s.FilesEmpty += scan.FilesEmpty
+
+	s.FilesIngestedPercent100 += harvester.FilesIngestedPercent100
+	s.FilesIngestedPercent95To99 += harvester.FilesIngestedPercent95To99
+	s.FilesIngestedPercentLt95 += harvester.FilesIngestedPercentLt95
+
+	return s
+}

@@ -1359,17 +1359,18 @@ The `filestream` input also exposes scanner and harvester progress metrics under
 `.monitoring.metrics.filebeat.filestream` in monitoring logs and under
 `filebeat.filestream` in the `/stats` HTTP endpoint output. These metrics are
 aggregate gauges across all running `filestream` inputs. They are updated after
-each scanner pass and reset when inputs stop. Harvester progress metrics count
-active plain-file harvesters only. GZIP files and files ignored by `filestream`
-settings or state are excluded.
+each scanner pass and reset when inputs stop. Harvester progress metrics measure
+how much data active plain-file harvesters have read from their files. They do
+not measure output publishing or acknowledgement progress. GZIP files and files
+ignored by `filestream` settings or state are excluded.
 
 | Metric | Description |
 | --- | --- |
 | `files_empty` | Number of matched files that are empty. |
 | `files_ignored` | Number of matched files ignored by `filestream` settings or state, such as `prospector.scanner.exclude_files`, `ignore_older`, or `ignore_inactive`. |
-| `files_ingested_percent_100` | Number of active plain-file harvesters whose offset is at or beyond the scanner-observed file size. |
-| `files_ingested_percent_95_99` | Number of active plain-file harvesters whose offset is at least 95% and less than 100% of the scanner-observed file size. |
-| `files_ingested_percent_lt_95` | Number of active plain-file harvesters whose offset is less than 95% of the scanner-observed file size. |
+| `files_ingested_percent_100` | Number of active plain-file harvesters whose read offset is at or beyond the scanner-observed file size. |
+| `files_ingested_percent_95_99` | Number of active plain-file harvesters whose read offset is at least 95% and less than 100% of the scanner-observed file size. |
+| `files_ingested_percent_lt_95` | Number of active plain-file harvesters whose read offset is less than 95% of the scanner-observed file size. |
 | `files_matched` | Number of filesystem path matches returned by the configured `paths` globs before duplicate, ignore, and ingestibility filtering. |
 | `files_no_ingest_target` | Number of matched non-empty files that did not produce an ingest target, such as duplicate matches, files that are too small to fingerprint or symlinks to already known files. |
 | `files_unique` | Number of unique files that produced ingest targets after scanner filtering and de-duplication. |
