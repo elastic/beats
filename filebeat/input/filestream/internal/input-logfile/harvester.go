@@ -475,7 +475,7 @@ func (hg *defaultHarvesterGroup) StopHarvesters() error {
 // the cursor state and unlock the key.
 func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
-	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
+	err := lockResource(ctx.Logger, key, resource, ctx.Cancelation)
 	if err != nil {
 		resource.Release()
 		return nil, err
@@ -488,13 +488,13 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	return resource, nil
 }
 
-func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Canceler) error {
+func lockResource(log *logp.Logger, key string, resource *resource, canceler inputv2.Canceler) error {
 	if !resource.lock.TryLock() {
-		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
+		log.Infof("Resource '%s' currently in use, waiting...", key)
 		err := resource.lock.LockContext(canceler)
-		log.Infof("Resource '%v' finally released. Lock acquired", resource.key)
+		log.Infof("Resource '%s' finally released. Lock acquired", key)
 		if err != nil {
-			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
+			log.Infof("Input for resource '%s' has been stopped while waiting", key)
 			return err
 		}
 	}
