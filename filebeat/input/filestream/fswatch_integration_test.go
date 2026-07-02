@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -42,7 +43,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 
 			// Write to the file, so we get a write operation
 			integration.WriteLogFile(t, logFilePath, 10, true)
-			fw.watch(t.Context())
+			fw.watch(t.Context(), newTestMetrics(), 0, time.Time{})
 			evt := <-fw.events
 			requireOperation(t, evt, loginp.OpWrite)
 
@@ -69,7 +70,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 				t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
 			}
 
-			fw.watch(t.Context())
+			fw.watch(t.Context(), newTestMetrics(), 0, time.Time{})
 			evt = <-fw.events
 			// Because of the notification sent with a smaller size than the actual file
 			// we should get a write operation
@@ -97,7 +98,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			if _, ok := fw.closedHarvesters[evt.SrcID]; !ok {
 				t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
 			}
-			fw.watch(t.Context())
+			fw.watch(t.Context(), newTestMetrics(), 0, time.Time{})
 
 			// The fileWatcher state has not changed, no events should be generated
 			eventsWritten := len(fw.events)
@@ -130,7 +131,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			}
 
 			// A delete event must be generated
-			fw.watch(t.Context())
+			fw.watch(t.Context(), newTestMetrics(), 0, time.Time{})
 			evt = <-fw.events
 			requireOperation(t, evt, loginp.OpDelete)
 
@@ -160,7 +161,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			}
 
 			// A rename event must be generated
-			fw.watch(t.Context())
+			fw.watch(t.Context(), newTestMetrics(), 0, time.Time{})
 			evt = <-fw.events
 			requireOperation(t, evt, loginp.OpRename)
 
@@ -200,7 +201,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			fw.events = make(chan loginp.FSEvent, 1)
 
 			// Scan the file system once
-			fw.watch(t.Context())
+			fw.watch(t.Context(), newTestMetrics(), 0, time.Time{})
 			evt := <-fw.events
 			requireOperation(t, evt, loginp.OpCreate)
 
