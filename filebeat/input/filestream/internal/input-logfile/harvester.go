@@ -73,13 +73,15 @@ func (rd *reader) currentID() string {
 	return rd.srcID
 }
 
-// remove cancels the reader's context and deletes its registration from the group
+// remove cancels the reader's context and deletes its registration from the group.
 func (rd *reader) remove() {
 	rd.group.mu.Lock()
 	defer rd.group.mu.Unlock()
 
 	rd.cancel()
-	delete(rd.group.table, rd.srcID)
+	if rd.group.table[rd.srcID] == rd {
+		delete(rd.group.table, rd.srcID)
+	}
 }
 
 type readerGroup struct {
