@@ -1103,6 +1103,133 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	assertGrowingRegistryEntry(t, tempDir, smallFile)
 }
 
+// TestFilestreamEnhancedFingerprint_DisableGrowingAfterEnabling exercises the
+// opt-out (revert) path: a deployment runs with Enhanced Fingerprint enabled
+// (the 9.5 default), then falls back to the legacy static behavior with
+// `file_identity.fingerprint.growing: false`.
+//
+// It documents the one transition that is not free of side effects, and why:
+//
+//   - A file already at or above the fingerprint size keys on its SHA-256,
+//     identical in both modes, so opting out never re-ingests it.
+//   - A file still below the fingerprint size was tracked in the growing phase
+//     under a raw-hex key. Static mode never computes that key, so the entry is
+//     orphaned and the file is held back until it reaches offset+length; when it
+//     does, it is picked up under a fresh SHA-256 key from offset 0, re-ingesting
+//     the bytes already read during the growing phase.
+func TestFilestreamEnhancedFingerprint_DisableGrowingAfterEnabling(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+
+	largeFile := filepath.Join(logDir, "large.log")
+	smallFile := filepath.Join(logDir, "small.log")
+
+	// Phase 1 (growing enabled): large file (~1500 bytes) above threshold,
+	// small file (~250 bytes) below it. Both are ingested (30 + 5 = 35 events).
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
+	appendToFile(t, largeFile, generateLines("large", 30))
+	appendToFile(t, smallFile, generateLines("small", 5))
+
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start under growing config")
+
+	filebeat.WaitPublishedEvents(15*time.Second, 35)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", smallFile),
+		10*time.Second, "growing phase did not reach EOF for the small file")
+
+	filebeat.Stop()
+
+	growingEvents := readOutputEvents(t, tempDir)
+	assert.Len(t, growingEvents, 35,
+		"growing phase should have ingested 30 (large) + 5 (small) = 35 lines")
+	assert.Len(t, messagesForFile(growingEvents, largeFile), 30,
+		"growing phase should have ingested all 30 lines of the large file")
+	assert.Len(t, messagesForFile(growingEvents, smallFile), 5,
+		"growing phase should have ingested the 5 lines of the below-threshold small file")
+
+	// Large file keys on SHA-256; small file keys on a raw-hex growing entry.
+	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
+	assertGrowingRegistryEntry(t, tempDir, smallFile)
+
+	// Phase 2: opt out (growing: false) and restart. The large file's SHA-256
+	// entry is reused; the still-below-threshold small file is held back.
+	filebeat.WriteConfigFile(staticFingerprintCfg(logDir, "1s", tempDir))
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not restart under static config")
+
+	// Held-back proof: static mode logs this every scan for the below-threshold file.
+	filebeat.WaitLogsContains(
+		"is too small for ingestion",
+		10*time.Second, "static mode did not report the below-threshold small file as too small")
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", largeFile),
+		10*time.Second, "static phase did not reach EOF for the large file")
+
+	afterOptOut := readOutputEvents(t, tempDir)
+	assert.Len(t, afterOptOut, 35,
+		"opting out must not re-ingest anything while the small file is still below threshold")
+	assert.Len(t, messagesForFile(afterOptOut, smallFile), 5,
+		"the below-threshold small file must not be re-read yet under static mode")
+
+	// Phase 3: grow the small file past the threshold with distinct content.
+	// Static mode computes its SHA-256 for the first time, finds no matching
+	// entry, and harvests from offset 0 — re-ingesting the original 5 lines.
+	appendToFile(t, smallFile, generateLines("small grow", 25))
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", smallFile),
+		15*time.Second, "static phase did not reach EOF for the grown small file")
+	// 35 (phase 1) + 30 (small file re-read in full: 5 original + 25 new) = 65.
+	filebeat.WaitPublishedEvents(15*time.Second, 65)
+
+	filebeat.Stop()
+
+	final := readOutputEvents(t, tempDir)
+	assert.Len(t, final, 65,
+		"expected 65 events: 35 from the growing phase + 30 from re-reading the "+
+			"small file in full once it crossed the threshold under static mode")
+	assert.Len(t, messagesForFile(final, largeFile), 30,
+		"the completed large file must never be re-ingested when opting out")
+
+	// Concrete proof of the duplication: the first original line appears twice
+	// (once in the growing phase, once re-ingested under static mode).
+	firstOriginal := strings.TrimSuffix(generateLines("small", 1), "\n")
+	dupCount := 0
+	for _, m := range messagesForFile(final, smallFile) {
+		if m == firstOriginal {
+			dupCount++
+		}
+	}
+	assert.Equal(t, 2, dupCount, "the first below-threshold line should appear twice")
+
+	// The small file now has an active final (SHA-256) entry. The orphaned
+	// growing entry may linger until clean_inactive removes it, so we assert on
+	// the presence of the final entry rather than exclusivity (which is why the
+	// existing assertSingleSHA256RegistryEntry helper is not used here).
+	var smallFinal, smallGrowing []string
+	for _, e := range readFingerprintRegistry(t, tempDir) {
+		if e.source != smallFile || e.removed {
+			continue
+		}
+		if e.growing {
+			smallGrowing = append(smallGrowing, e.key)
+		} else {
+			smallFinal = append(smallFinal, e.key)
+		}
+	}
+	assert.Len(t, smallFinal, 1,
+		"expected exactly one active final SHA-256 entry for the small file; got final=%v growing=%v",
+		smallFinal, smallGrowing)
+	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
+}
+
 // seedLegacyFingerprintRegistry writes a filestream registry in the exact
 // on-disk format a pre-growing-fingerprint Filebeat produced: a single static
 // fingerprint entry keyed by the SHA-256 of the file's first 1024 bytes (the
