@@ -45,11 +45,14 @@ func (e *eventStore) publish(event beat.Event) {
 
 // Helper function returning a Mongodb module that can be used
 // in tests. It publishes the transactions in the results channel.
-func mongodbModForTests() (*eventStore, *mongodbPlugin) {
+func mongodbModForTests(t *testing.T) (*eventStore, *mongodbPlugin) {
 	var mongodb mongodbPlugin
+	logger := logp.NewNopLogger()
+	mongodb.logger = logger.Named("mongodb")
 	results := &eventStore{}
 	config := defaultConfig
 	mongodb.init(results.publish, &procs.ProcessesWatcher{}, &config)
+	mongodb.logger = logptest.NewTestingLogger(t, "mongodb")
 	return results, &mongodb
 }
 
@@ -81,9 +84,8 @@ func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 
 // Test simple request / response.
 func TestSimpleFindLimit1(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
-	results, mongodb := mongodbModForTests()
+	results, mongodb := mongodbModForTests(t)
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
 	reqData, err := hex.DecodeString(
@@ -148,9 +150,8 @@ func TestSimpleFindLimit1(t *testing.T) {
 // Test simple request / response, where the response is split in
 // 3 messages
 func TestSimpleFindLimit1_split(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
-	results, mongodb := mongodbModForTests()
+	results, mongodb := mongodbModForTests(t)
 	mongodb.sendRequest = true
 	mongodb.sendResponse = true
 
@@ -282,7 +283,6 @@ func TestReconstructQuery(t *testing.T) {
 
 // max_docs option should be respected
 func TestMaxDocs(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
 	// more docs than configured
 	trans := transaction{
@@ -291,7 +291,7 @@ func TestMaxDocs(t *testing.T) {
 		},
 	}
 
-	results, mongodb := mongodbModForTests()
+	results, mongodb := mongodbModForTests(t)
 	mongodb.sendResponse = true
 	mongodb.maxDocs = 3
 
@@ -336,7 +336,6 @@ func TestMaxDocs(t *testing.T) {
 }
 
 func TestMaxDocSize(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
 	// more docs than configured
 	trans := transaction{
@@ -347,7 +346,7 @@ func TestMaxDocSize(t *testing.T) {
 		},
 	}
 
-	results, mongodb := mongodbModForTests()
+	results, mongodb := mongodbModForTests(t)
 	mongodb.sendResponse = true
 	mongodb.maxDocLength = 5
 
@@ -372,9 +371,8 @@ func TestOpCodeNames(t *testing.T) {
 
 // Test for a (recovered) panic parsing document length in request/response messages
 func TestDocumentLengthBoundsChecked(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
-	_, mongodb := mongodbModForTests()
+	_, mongodb := mongodbModForTests(t)
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
 	reqData, err := hex.DecodeString(

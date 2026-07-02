@@ -616,10 +616,12 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 			dstPort = tcptuple.SrcPort
 		}
 		priv.data[dir] = &mysqlStream{
-			data:     pkt.Payload,
-			message:  &mysqlMessage{ts: pkt.Ts},
-			isClient: mysql.isServerPort(dstPort),
-			logger:   mysql.logger,
+			data:           pkt.Payload,
+			message:        &mysqlMessage{ts: pkt.Ts},
+			isClient:       mysql.isServerPort(dstPort),
+			logger:         mysql.logger,
+			mysqlLogger:    mysql.mysqlLogger,
+			mysqlDetLogger: mysql.mysqlDetLogger,
 		}
 	} else {
 		// concatenate bytes

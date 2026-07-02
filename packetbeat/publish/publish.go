@@ -167,7 +167,7 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 	if fields != nil {
 		if p.ignoreOutgoing && fields.Network.Direction == pb.Egress {
-			p.logger.Debug("Ignore outbound transaction on: %s -> %s",
+			p.logger.Debugf("Ignore outbound transaction on: %s -> %s",
 				fields.Source.IP, fields.Destination.IP)
 			return nil, nil
 		}
