@@ -37,6 +37,7 @@ type parser struct {
 	message *message
 	config  *parserConfig
 	logger  *logp.Logger
+	isDebug bool
 }
 
 type parserState uint8
@@ -70,13 +71,14 @@ func init() {
 func newParser(config *parserConfig, logger *logp.Logger) *parser {
 	var p parser
 	p.logger = logger
+	p.isDebug = p.logger.IsDebug()
 	p.init(config)
 	return &p
 }
 
 //go:inline
 func (p *parser) debugf(format string, args ...interface{}) {
-	if p.logger.IsDebug() {
+	if p.isDebug {
 		p.logger.Debugf(format, args...)
 	}
 }

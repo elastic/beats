@@ -63,6 +63,7 @@ type tlsPlugin struct {
 	results                protos.Reporter
 	watcher                *procs.ProcessesWatcher
 	logger, tlsLogger      *logp.Logger
+	isDebug                bool
 }
 
 var (
@@ -86,6 +87,7 @@ func New(
 	p := &tlsPlugin{}
 	p.logger = logger
 	p.tlsLogger = logger.Named("tls")
+	p.isDebug = p.tlsLogger.IsDebug()
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -99,8 +101,9 @@ func New(
 	return p, nil
 }
 
+//go:inline
 func (plugin *tlsPlugin) debugf(format string, args ...interface{}) {
-	if plugin.tlsLogger.IsDebug() {
+	if plugin.isDebug {
 		plugin.tlsLogger.Debugf(format, args...)
 	}
 }

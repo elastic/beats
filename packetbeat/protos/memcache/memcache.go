@@ -49,6 +49,7 @@ type memcache struct {
 
 	handler memcacheHandler
 	logger  *logp.Logger
+	isDebug bool
 }
 
 type memcacheHandler interface {
@@ -141,6 +142,7 @@ func New(
 ) (protos.Plugin, error) {
 	p := &memcache{}
 	p.logger = logger.Named("memcache")
+	p.isDebug = p.logger.IsDebug()
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -155,7 +157,7 @@ func New(
 }
 
 func (mc *memcache) debugf(format string, args ...interface{}) {
-	if mc.logger.IsDebug() {
+	if mc.isDebug {
 		mc.logger.Debugf(format, args...)
 	}
 }

@@ -156,7 +156,7 @@ func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
 
 func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := validateEvent(event); err != nil {
-		p.logger.Warn("Dropping invalid event: %v", err)
+		p.logger.Warnf("Dropping invalid event: %v", err)
 		return nil, nil
 	}
 

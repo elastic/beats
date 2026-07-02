@@ -892,7 +892,7 @@ func (thrift *thriftPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8
 	flush := false
 
 	if stream.message.isRequest {
-		thrift.logger.Debug("Thrift request message: %s", stream.message.method)
+		thrift.logger.Debugf("Thrift request message: %s", stream.message.method)
 		if !thrift.captureReply {
 			// enable the stream in the other direction to get the reply
 			streamRev := priv.data[1-dir]

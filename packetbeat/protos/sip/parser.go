@@ -94,9 +94,9 @@ type parsingInfo struct {
 	state        parserState
 	bodyReceived int
 
-	message           *message
-	sipLogger         *logp.Logger
-	sipDetailedLogger *logp.Logger
+	message                      *message
+	sipLogger, sipDetailedLogger *logp.Logger
+	isDebug, isDetailedDebug     bool
 }
 
 func (pi *parsingInfo) prepareForNewMessage() {
@@ -108,14 +108,14 @@ func (pi *parsingInfo) prepareForNewMessage() {
 
 //go:inline
 func (pi *parsingInfo) debugf(format string, args ...interface{}) {
-	if pi.sipLogger.IsDebug() {
+	if pi.isDebug {
 		pi.sipLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
 func (pi *parsingInfo) detailedf(format string, args ...interface{}) {
-	if pi.sipDetailedLogger.IsDebug() {
+	if pi.isDetailedDebug {
 		pi.sipDetailedLogger.Debugf(format, args...)
 	}
 }
@@ -126,6 +126,8 @@ func newParsingInfo(pkt *protos.Packet, tuple common.BaseTuple, sipLogger, sipDe
 		data:              pkt.Payload,
 		sipLogger:         sipLogger,
 		sipDetailedLogger: sipDetailedLogger,
+		isDebug:           sipLogger.IsDebug(),
+		isDetailedDebug:   sipDetailedLogger.IsDebug(),
 	}
 }
 

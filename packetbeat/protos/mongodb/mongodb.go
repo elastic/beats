@@ -51,6 +51,7 @@ type mongodbPlugin struct {
 	results protos.Reporter
 	watcher *procs.ProcessesWatcher
 	logger  *logp.Logger
+	isDebug bool
 }
 
 type transactionKey struct {
@@ -73,6 +74,7 @@ func New(
 ) (protos.Plugin, error) {
 	p := &mongodbPlugin{}
 	p.logger = logger.Named("mongodb")
+	p.isDebug = p.logger.IsDebug()
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -88,7 +90,7 @@ func New(
 
 //go:inline
 func (mongodb *mongodbPlugin) debugf(format string, v ...interface{}) {
-	if mongodb.logger.IsDebug() {
+	if mongodb.isDebug {
 		mongodb.logger.Debugf(format, v...)
 	}
 }

@@ -61,6 +61,7 @@ type redisPlugin struct {
 	watcher *procs.ProcessesWatcher
 	results protos.Reporter
 	logger  *logp.Logger
+	isDebug bool
 }
 
 var (
@@ -81,6 +82,7 @@ func New(
 ) (protos.Plugin, error) {
 	p := &redisPlugin{}
 	p.logger = logger.Named("redis")
+	p.isDebug = p.logger.IsDebug()
 
 	config := defaultConfig
 	if !testMode {
@@ -97,7 +99,7 @@ func New(
 
 //go:inline
 func (redis *redisPlugin) debugf(format string, args ...interface{}) {
-	if redis.logger.IsDebug() {
+	if redis.isDebug {
 		redis.logger.Debug(fmt.Sprintf(format, args...))
 	}
 }

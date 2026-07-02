@@ -431,12 +431,12 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 	}
 
 	if dest.version.major != 3 {
-		dest.logger.Warn("Not a TLS hello (reported version %d.%d)",
+		dest.logger.Warnf("Not a TLS hello (reported version %d.%d)",
 			dest.version.major, dest.version.minor)
 		return 0, false
 	}
 	if sessionIDLength > 32 {
-		dest.logger.Warn("Not a TLS hello (session id length %d out of bounds)", sessionIDLength)
+		dest.logger.Warnf("Not a TLS hello (session id length %d out of bounds)", sessionIDLength)
 		return 0, false
 	}
 

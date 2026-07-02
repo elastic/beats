@@ -53,6 +53,7 @@ type plugin struct {
 	results                              protos.Reporter
 	watcher                              *procs.ProcessesWatcher
 	logger, sipLogger, sipDetailedLogger *logp.Logger
+	isDebug, isDetailed                  bool
 }
 
 func New(
@@ -78,6 +79,7 @@ func New(
 		p.logger = logger
 		p.sipLogger = logger.Named("sip")
 		p.sipDetailedLogger = logger.Named("sipdetailed")
+		p.isDebug, p.isDetailed = p.sipLogger.IsDebug(), p.sipDetailedLogger.IsDebug()
 		p.init(results, watcher, &config)
 		return p, nil
 	}
@@ -87,14 +89,14 @@ func New(
 
 //go:inline
 func (p *plugin) debugf(format string, args ...interface{}) {
-	if p.sipLogger.IsDebug() {
+	if p.isDebug {
 		p.sipLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
 func (p *plugin) detailedf(format string, args ...interface{}) {
-	if p.sipDetailedLogger.IsDebug() {
+	if p.isDetailed {
 		p.sipDetailedLogger.Debugf(format, args...)
 	}
 }
@@ -621,7 +623,7 @@ func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields, si
 
 	if !bytes.Equal(msg.contentType, constSDPContentType) {
 		if sipLogger.IsDebug() {
-			sipLogger.Debug("body content-type: %s is not supported", msg.contentType)
+			sipLogger.Debugf("body content-type: %s is not supported", msg.contentType)
 		}
 		return
 	}

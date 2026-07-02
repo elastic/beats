@@ -1053,7 +1053,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	length, err := readLength(data, 0)
 	if err != nil {
-		mysql.logger.Warn("Invalid response: %v", err)
+		mysql.logger.Warnf("Invalid response: %v", err)
 		return []string{}, [][]string{}
 	}
 	if length < 1 {
@@ -1114,7 +1114,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 			}
 			_ /*org table*/, off, complete, err = readLstring(data, off)
 			if err != nil || !complete {
-				mysql.logger.Debug("Reading field: %v %v", err, complete)
+				mysql.logger.Debugf("Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			name, off, complete, err := readLstring(data, off)

@@ -98,6 +98,7 @@ type httpPlugin struct {
 	results                                protos.Reporter
 	watcher                                *procs.ProcessesWatcher
 	logger, httpLogger, httpDetailedLogger *logp.Logger
+	isDebug, isDetail                      bool
 }
 
 func init() {
@@ -115,6 +116,7 @@ func New(
 	p.logger = logger
 	p.httpLogger = logger.Named("http")
 	p.httpDetailedLogger = logger.Named("httpdetailed")
+	p.isDebug, p.isDetail = p.httpLogger.IsDebug(), p.httpDetailedLogger.IsDebug()
 
 	config := defaultConfig
 	if !testMode {
@@ -131,14 +133,14 @@ func New(
 
 //go:inline
 func (p *httpPlugin) debugf(format string, args ...interface{}) {
-	if p.httpLogger.IsDebug() {
+	if p.isDebug {
 		p.httpLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
 func (p *httpPlugin) detailedf(format string, args ...interface{}) {
-	if p.httpDetailedLogger.IsDebug() {
+	if p.isDetail {
 		p.httpDetailedLogger.Debugf(format, args...)
 	}
 }

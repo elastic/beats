@@ -58,6 +58,7 @@ type TCP struct {
 
 	metrics *inputMetrics
 	logger  *logp.Logger
+	isDebug bool
 }
 
 // Creates and returns a new Tcp.
@@ -73,6 +74,7 @@ func NewTCP(p protos.Protocols, id, device string, idx int, logger *logp.Logger)
 		portMap:   portMap,
 		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap, logger),
 		logger:    logger.Named("tcp"),
+		isDebug:   logger.IsDebug(),
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -84,8 +86,9 @@ func NewTCP(p protos.Protocols, id, device string, idx int, logger *logp.Logger)
 	return tcp, nil
 }
 
+//go:inline
 func (tcp *TCP) debugf(format string, args ...interface{}) {
-	if tcp.logger.IsDebug() {
+	if tcp.isDebug {
 		tcp.logger.Debugf(format, args...)
 	}
 }

@@ -103,7 +103,7 @@ func (r *rpc) init(results protos.Reporter, config *rpcConfig) error {
 		func(k common.Key, v common.Value) {
 			nfs, ok := v.(*nfs)
 			if !ok {
-				r.logger.Error("Expired value is not a MapStr (%T).", v)
+				r.logger.Errorf("Expired value is not a MapStr (%T).", v)
 				return
 			}
 			r.handleExpiredPacket(nfs)

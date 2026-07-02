@@ -82,6 +82,7 @@ func New(
 	return p, nil
 }
 
+//go:inline
 func (cassandra *cassandra) debugf(format string, args ...interface{}) {
 	if cassandra.isDebug {
 		cassandra.logger.Debugf(format, args...)

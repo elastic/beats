@@ -37,6 +37,7 @@ import (
 
 type pgsqlPlugin struct {
 	log, debug, detail *logp.Logger
+	isDebug, isDetail  bool
 
 	// config
 	ports        []int
@@ -146,6 +147,9 @@ func New(
 	p.debug = logger.Named("pgsql")
 	p.detail = logger.Named("pgsqldetailed")
 
+	p.isDebug = p.debug.IsDebug()
+	p.isDetail = p.detail.IsDebug()
+
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -198,14 +202,14 @@ func (pgsql *pgsqlPlugin) getTransaction(k common.HashableTCPTuple) []*pgsqlTran
 
 //go:inline
 func (pgsql *pgsqlPlugin) debugf(format string, v ...interface{}) {
-	if pgsql.debug.IsDebug() {
+	if pgsql.isDebug {
 		pgsql.debug.Debugf(format, v...)
 	}
 }
 
 //go:inline
 func (pgsql *pgsqlPlugin) detailf(format string, v ...interface{}) {
-	if pgsql.detail.IsDebug() {
+	if pgsql.isDetail {
 		pgsql.detail.Debugf(format, v...)
 	}
 }
