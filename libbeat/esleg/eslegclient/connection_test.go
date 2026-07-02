@@ -243,9 +243,9 @@ func BenchmarkExecHTTPRequest(b *testing.B) {
 // TestConnectionTLS connects to a test HTTPS server that presents a 1024-bit
 // RSA certificate, which is below the FIPS 140-3 minimum of 2048 bits.
 // In a FIPS build the handshake must fail; in a non-FIPS build it must succeed.
-// Both "strict" and "none" are covered because elastic-agent-libs enforces the
-// FIPS key-type check through different callbacks depending on verification
-// mode (checkAllChainsFIPS vs. fipsVerifyNoneCallback).
+// Both "strict" (verifies the full certificate chain) and "none" (skips chain
+// building and inspects only the certificates the peer presents) are covered,
+// since the FIPS key-type restriction must hold on either path.
 func TestConnectionTLS(t *testing.T) {
 	for _, verificationMode := range []string{"strict", "none"} {
 		t.Run(verificationMode, func(t *testing.T) {
