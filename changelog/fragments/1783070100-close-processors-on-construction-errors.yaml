@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: fix go routine leak when a processor fails to start
+component: all
