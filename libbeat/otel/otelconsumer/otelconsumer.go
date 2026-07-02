@@ -21,15 +21,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand/v2"
 	"os"
 	"strings"
-	"sync/atomic"
 	"time"
 	"unicode"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -70,9 +69,6 @@ type otelConsumer struct {
 	isReceiverTest bool // whether we are running in receivertest context
 
 	retry retryConfig
-
-	// backoffDuration holds the current equal-jitter retry backoff window.
-	backoffDuration atomic.Int64
 }
 
 func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
@@ -110,39 +106,6 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 	}
 }
 
-// nextBackoff advances the shared equal-jitter retry backoff and returns this
-// attempt's wait duration. Safe for concurrent use.
-func (out *otelConsumer) nextBackoff() time.Duration {
-	initDur := int64(out.retry.init) * 2
-	for {
-		observed := out.backoffDuration.Load()
-		cur := observed
-		if cur < initDur {
-			cur = initDur
-		}
-		next := cur * 2
-		if next > int64(out.retry.max) {
-			next = int64(out.retry.max)
-		}
-		if out.backoffDuration.CompareAndSwap(observed, next) {
-			half := cur / 2
-			if half < 1 {
-				half = 1
-			}
-			return time.Duration(half + rand.Int64N(half))
-		}
-	}
-}
-
-// resetBackoff returns the shared backoff window to its initial value, called
-// after a successful publish.
-func (out *otelConsumer) resetBackoff() {
-	initDur := int64(out.retry.init) * 2
-	if out.backoffDuration.Load() != initDur {
-		out.backoffDuration.Store(initDur)
-	}
-}
-
 func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
 	events := batch.Events()
@@ -169,9 +132,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
-			select {
-			case <-time.After(out.nextBackoff()):
-			case <-ctx.Done():
+			bo := backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
+			if !bo.Wait() {
 				batch.Cancelled()
 				return nil
 			}
@@ -182,7 +144,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	batch.ACK()
 	st.AckedEvents(len(events))
-	out.resetBackoff()
 	return nil
 }
 
