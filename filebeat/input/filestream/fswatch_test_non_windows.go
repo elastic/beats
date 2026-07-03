@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -111,7 +112,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			files := fs.GetFiles()
+			files, _ := fs.GetFiles(loginp.FileScanOptions{})
 			paths := make([]string, 0)
 			for p := range files {
 				paths = append(paths, p)
@@ -151,7 +152,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		sameFileFunc: testSameFile,
 	}
 
-	go w.watch(context.Background())
+	go w.watch(context.Background(), newTestMetrics(), 0, time.Time{})
 	assert.Equal(t, loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: testPath, Info: fi}, w.Event())
 
 	err = os.Rename(testPath, renamedPath)
@@ -164,7 +165,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	go w.watch(context.Background())
+	go w.watch(context.Background(), newTestMetrics(), 0, time.Time{})
 	evt := w.Event()
 
 	assert.Equal(t, loginp.OpRename, evt.Op)
@@ -189,7 +190,7 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go w.watch(ctx)
+	go w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 	appLogPath := filepath.Join(tmpDir, "app.log")
 	rotatedAppLogPath := filepath.Join(tmpDir, "app.log.1")
@@ -203,7 +204,7 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 	require.Equal(t, "", evt.OldPath, "new file does not have an old path set")
 	require.Equal(t, appLogPath, evt.NewPath, "new file does not have an old path set")
 
-	go w.watch(ctx)
+	go w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 	err = os.Rename(appLogPath, rotatedAppLogPath)
 	if err != nil {

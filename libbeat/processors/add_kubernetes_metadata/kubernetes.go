@@ -20,6 +20,8 @@
 package add_kubernetes_metadata
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -57,6 +59,8 @@ type kubernetesAnnotator struct {
 	cache               *cache
 	kubernetesAvailable bool
 	initOnce            sync.Once
+	wg                  sync.WaitGroup
+	cancelCtx           context.CancelFunc
 }
 
 func init() {
@@ -80,31 +84,37 @@ func isKubernetesAvailable(client k8sclient.Interface, logger *logp.Logger) (boo
 	return true, nil
 }
 
-func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
+func isKubernetesAvailableWithTimeout(
+	ctx context.Context,
+	client k8sclient.Interface,
 	waitMetadataTimeout time.Duration,
 	waitMetadataRetryPeriod time.Duration,
 	logger *logp.Logger,
-) bool {
-	var err error
-	var kubernetesAvailable bool
+) (bool, error) {
+	ticker := time.NewTicker(waitMetadataRetryPeriod)
+	defer ticker.Stop()
 
-	deadline := time.Time{}
+	var timeoutC <-chan time.Time
 	if waitMetadataTimeout > 0 {
-		deadline = time.Now().Add(waitMetadataTimeout)
+		timeout := time.NewTimer(waitMetadataTimeout)
+		defer timeout.Stop()
+		timeoutC = timeout.C
 	}
+
 	for {
-		kubernetesAvailable, err = isKubernetesAvailable(client, logger)
-		if kubernetesAvailable {
-			return true
+		available, err := isKubernetesAvailable(client, logger)
+		if available {
+			return true, nil
 		}
 
-		if !deadline.IsZero() && time.Now().After(deadline) {
+		select {
+		case <-ctx.Done():
+			return false, fmt.Errorf("context cancelled while waiting for kubernetes to be available: %w", ctx.Err())
+		case <-timeoutC:
 			logger.Errorf("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
-			return false
+			return false, fmt.Errorf("timeout waiting for kubernetes to be available: %w", err)
+		case <-ticker.C:
 		}
-
-		time.Sleep(waitMetadataRetryPeriod)
-
 	}
 }
 
@@ -125,21 +135,26 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 
+	ctx, cancelCtx := context.WithCancel(context.Background())
 	processor := &kubernetesAnnotator{
-		log:   log,
-		cache: newCache(config.CleanupTimeout),
+		log:       log,
+		cache:     newCache(config.CleanupTimeout),
+		cancelCtx: cancelCtx,
 	}
 
 	if config.WaitMetadata {
-		processor.init(config, cfg)
+		err := processor.init(ctx, config, cfg)
 		if !processor.kubernetesAvailable {
-			return nil, fmt.Errorf("add_kubernetes_metadata: could not detect kubernetes env")
+			cancelCtx()
+			return nil, fmt.Errorf("add_kubernetes_metadata: %w", err)
 		}
 	} else {
 		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
 		// the k8s node is not yet ready.
+		processor.wg.Add(1)
 		go func() {
-			processor.init(config, cfg)
+			defer processor.wg.Done()
+			_ = processor.init(ctx, config, cfg)
 		}()
 	}
 
@@ -166,7 +181,8 @@ func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig,
 	return config, nil
 }
 
-func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
+func (k *kubernetesAnnotator) init(ctx context.Context, config kubeAnnotatorConfig, cfg *config.C) error {
+	var k8sError error
 	k.initOnce.Do(func() {
 		var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
@@ -188,17 +204,21 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			} else {
 				k.log.Debugf("Could not create kubernetes client using config: %v: %+v", config.KubeConfig, err)
 			}
+			k8sError = err
 			return
 		}
 
-		if !isKubernetesAvailableWithTimeout(client, config.WaitMetadataTimeout, config.WaitMetadataRetryPeriod, k.log) {
+		if available, err := isKubernetesAvailableWithTimeout(ctx, client, config.WaitMetadataTimeout, config.WaitMetadataRetryPeriod, k.log); !available {
+			k8sError = err
 			return
 		}
 
 		matchers := NewMatchers(config.Matchers, k.log)
 
 		if matchers.Empty() {
-			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
+			commonMsg := "Could not initialize kubernetes plugin with zero matcher plugins"
+			k.log.Debug(commonMsg)
+			k8sError = errors.New(commonMsg)
 			return
 		}
 
@@ -210,9 +230,9 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
 		}
 		if config.Scope == "node" {
-			config.Node, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
-			if err != nil {
-				k.log.Errorf("Couldn't discover Kubernetes node: %v", err)
+			config.Node, k8sError = kubernetes.DiscoverKubernetesNode(k.log, nd)
+			if k8sError != nil {
+				k.log.Errorf("Couldn't discover Kubernetes node: %v", k8sError)
 				return
 			}
 			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Node)
@@ -226,30 +246,31 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		}, nil, k.log)
 		if err != nil {
 			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
+			k8sError = err
 			return
 		}
 
 		metaConf := config.AddResourceMetadata
 
 		if metaConf.Node.Enabled() {
-			nodeWatcher, err = kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, kubernetes.WatchOptions{
+			nodeWatcher, k8sError = kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, kubernetes.WatchOptions{
 				SyncTimeout:  config.SyncPeriod,
 				Node:         config.Node,
 				HonorReSyncs: true,
 			}, nil, k.log)
-			if err != nil {
-				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+			if k8sError != nil {
+				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, k8sError)
 			}
 		}
 
 		if metaConf.Namespace.Enabled() {
-			namespaceWatcher, err = kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			namespaceWatcher, k8sError = kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
 			}, nil, k.log)
-			if err != nil {
-				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			if k8sError != nil {
+				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, k8sError)
 			}
 		}
 
@@ -262,7 +283,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			if err != nil {
 				k.log.Errorf("Error creating metadata client due to error %+v", err)
 			}
-			replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+			replicaSetWatcher, k8sError = kubernetes.NewNamedMetadataWatcher(
 				"resource_metadata_enricher_rs",
 				client,
 				metadataClient,
@@ -276,19 +297,19 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				metadata.RemoveUnnecessaryReplicaSetData,
 				k.log,
 			)
-			if err != nil {
-				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+			if k8sError != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, k8sError)
 			}
 			k.rsWatcher = replicaSetWatcher
 		}
 		if metaConf.CronJob {
-			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+			jobWatcher, k8sError = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
 			}, nil, k.log)
-			if err != nil {
-				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+			if k8sError != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, k8sError)
 			}
 			k.jobWatcher = jobWatcher
 		}
@@ -348,6 +369,8 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 	})
+
+	return k8sError
 }
 
 // Run runs the processor that adds a field `kubernetes` to the event fields that
@@ -404,9 +427,11 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (k *kubernetesAnnotator) Close() error {
-	// ensure there are no goroutines leaking
-	// after the processor has been closed
-	k.initOnce.Do(func() {})
+	if k.cancelCtx != nil {
+		k.cancelCtx()
+	}
+	k.wg.Wait()
+
 	if k.watcher != nil {
 		k.watcher.Stop()
 	}
@@ -425,6 +450,7 @@ func (k *kubernetesAnnotator) Close() error {
 	if k.cache != nil {
 		k.cache.stop()
 	}
+
 	return nil
 }
 

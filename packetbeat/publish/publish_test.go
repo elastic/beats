@@ -142,6 +142,7 @@ func TestFilterEvent(t *testing.T) {
 }
 
 func TestPublish(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "").Named("publish")
 	srcIP, dstIP := "192.145.2.4", "192.145.2.5"
 
 	event := func() *beat.Event {
@@ -167,6 +168,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(dstIP)},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -182,6 +184,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(srcIP)},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -197,6 +200,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(srcIP), net.ParseIP(dstIP)},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -212,6 +216,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(dstIP + "1")},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -228,6 +233,7 @@ func TestPublish(t *testing.T) {
 			localIPs:       []net.IP{net.ParseIP(srcIP)},
 			ignoreOutgoing: true,
 			name:           "test",
+			logger:         logger,
 		}
 
 		res, err := processor.Run(event())

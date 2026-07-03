@@ -45,9 +45,8 @@ type transProcessor struct {
 	localIPs         []net.IP // TODO: Periodically update this list.
 	internalNetworks []string
 	name             string
+	logger           *logp.Logger
 }
-
-var debugf = logp.MakeDebug("publish")
 
 func NewTransactionPublisher(
 	name string,
@@ -77,6 +76,7 @@ func NewTransactionPublisher(
 			internalNetworks: internalNetworks,
 			name:             name,
 			ignoreOutgoing:   ignoreOutgoing,
+			logger:           logger.Named("publish"),
 		},
 		log: logger,
 	}
@@ -158,7 +158,7 @@ func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
 
 func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := validateEvent(event); err != nil {
-		logp.Warn("Dropping invalid event: %v", err)
+		p.logger.Warnf("Dropping invalid event: %v", err)
 		return nil, nil
 	}
 
@@ -169,7 +169,7 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 	if fields != nil {
 		if p.ignoreOutgoing && fields.Network.Direction == pb.Egress {
-			debugf("Ignore outbound transaction on: %s -> %s",
+			p.logger.Debugf("Ignore outbound transaction on: %s -> %s",
 				fields.Source.IP, fields.Destination.IP)
 			return nil, nil
 		}
