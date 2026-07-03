@@ -1352,8 +1352,11 @@ Note: Each metric listed has a corresponding gzip_* counterpart (e.g.,
 the same data but exclusively for GZIP compressed files. The original metrics
 provide the total count, including both plain and GZIP files.
 
-### Harvester Metrics [_harvester_metrics]
-{applies_to}`stack: ga 9.5+`
+### Harvester metrics [_harvester_metrics]
+
+```{applies_to}
+stack: ga 9.5+
+```
 
 The `filestream` input also exposes scanner metrics under
 `.monitoring.metrics.filebeat.filestream` in monitoring logs and under
