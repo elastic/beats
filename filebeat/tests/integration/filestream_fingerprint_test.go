@@ -67,10 +67,9 @@ logging:
   metrics:
     enabled: false
 `
-	fingerprintEnhanced             = "file_identity.fingerprint: ~"
-	fingerprintStatic               = "file_identity.fingerprint:\n      growing: false"
-	fingerprintEnhancedKeepRemoved  = fingerprintEnhanced + "\n    clean_removed: false"
-	fingerprintEnhancedCleanRemoved = fingerprintEnhanced + "\n    clean_removed: true"
+	fingerprintEnhanced            = "file_identity.fingerprint: ~"
+	fingerprintStatic              = "file_identity.fingerprint:\n      growing: false"
+	fingerprintEnhancedKeepRemoved = fingerprintEnhanced + "\n    clean_removed: false"
 )
 
 func fingerprintCfg(logDir, checkInterval, fingerprintBlock, pathHome string) string {
@@ -85,6 +84,21 @@ func staticFingerprintCfg(logDir, checkInterval, pathHome string) string {
 	return fingerprintCfg(logDir, checkInterval, fingerprintStatic, pathHome)
 }
 
+// newFingerprintFilebeat builds a Filebeat process and the standard directory
+// layout shared by every test in this file: a home (temp) dir, a failure-only
+// output dump, and a logs/ subdir for the input's glob. It stops short of
+// writing config or starting so callers can control write/start ordering
+// (some tests create files before Start, some after).
+func newFingerprintFilebeat(t *testing.T) (filebeat *integration.BeatProc, tempDir, logDir string) {
+	t.Helper()
+	filebeat = integration.NewFilebeat(t)
+	tempDir = filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir = filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	return filebeat, tempDir, logDir
+}
+
 // TestFilestreamFingerprintSmallFiles documents the static (non-growing)
 // fingerprint behavior: files smaller than the fingerprint size (offset +
 // length, 1024 bytes by default) are held back and not ingested until they
@@ -92,13 +106,7 @@ func staticFingerprintCfg(logDir, checkInterval, pathHome string) string {
 // counterpart, where below-threshold files ARE ingested immediately.
 func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	logDir := filepath.Join(tempDir, "logs")
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		t.Fatalf("failed to create log directory: %s", err)
-	}
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
@@ -207,14 +215,7 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 // a final SHA-256 entry, while the still-small gzipped files stay growing.
 func TestFilestreamGrowingFingerprint(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		t.Fatalf("failed to create log directory: %s", err)
-	}
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
@@ -336,14 +337,7 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 // every file's events against its on-disk content, in order.
 func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		t.Fatalf("failed to create log directory: %s", err)
-	}
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
@@ -438,12 +432,7 @@ func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 // reconstruction of the short-fingerprint set.
 func TestFilestreamGrowingFingerprint_supersetFileNotConflated(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	aLog := filepath.Join(logDir, "a.log")
 	bLog := filepath.Join(logDir, "b.log")
@@ -502,14 +491,7 @@ func TestFilestreamGrowingFingerprint_supersetFileNotConflated(t *testing.T) {
 // different content is treated as a new file (no prefix match = new entry).
 func TestFilestreamGrowingFingerprintTruncation(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		t.Fatalf("failed to create log directory: %s", err)
-	}
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	logFile := filepath.Join(logDir, "truncate.log")
 
@@ -609,11 +591,10 @@ type outputEvent struct {
 			Fingerprint string `json:"fingerprint"`
 		} `json:"file"`
 	} `json:"log"`
-	rawLine string
 }
 
 // readOutputEvents reads all output files and returns parsed events sorted
-// by file path, then by timestamp.
+// by file path, then by log offset.
 func readOutputEvents(t *testing.T, tempDir string) []outputEvent {
 	t.Helper()
 
@@ -637,10 +618,12 @@ func readOutputEvents(t *testing.T, tempDir string) []outputEvent {
 
 			var event outputEvent
 			if err := json.Unmarshal([]byte(line), &event); err != nil {
+				// Tolerate a torn final line: readOutputEvents may run while
+				// Filebeat is still writing, so an incomplete last record is
+				// expected and must not fail the test.
 				t.Logf("failed to parse line: %s, error: %s", line, err)
 				continue
 			}
-			event.rawLine = line
 			events = append(events, event)
 		}
 
@@ -697,8 +680,32 @@ func assertFileEvents(t *testing.T, events []outputEvent, filePath string) {
 		"events for %s do not match file contents", filepath.Base(filePath))
 }
 
+// assertNoDuplicateMessages fails if any message appears more than once. Every
+// generated line is unique, so a duplicate means content was re-ingested.
+func assertNoDuplicateMessages(t *testing.T, msgs []string) {
+	t.Helper()
+	seen := make(map[string]struct{}, len(msgs))
+	for _, msg := range msgs {
+		_, duplicate := seen[msg]
+		require.False(t, duplicate, "duplicate event detected: %s", msg)
+		seen[msg] = struct{}{}
+	}
+}
+
+// assertMonotonicOffsets fails unless every event's log offset is strictly
+// greater than the previous one, proving the harvester continued from where it
+// left off rather than re-reading from offset 0. Events must be pre-sorted (as
+// readOutputEvents returns them).
+func assertMonotonicOffsets(t *testing.T, events []outputEvent) {
+	t.Helper()
+	for i := 1; i < len(events); i++ {
+		require.Greater(t, events[i].Log.Offset, events[i-1].Log.Offset,
+			"offsets must be monotonically increasing (event %d vs %d)", i-1, i)
+	}
+}
+
 // printOutputFileSorted reads the output file, parses each line as JSON,
-// and prints the events sorted by file path, then by timestamp.
+// and prints the events sorted by file path, then by log offset.
 func printOutputFileSorted(t *testing.T, tempDir string) {
 	t.Helper()
 
@@ -747,12 +754,7 @@ func printOutputOnFailure(t *testing.T, tempDir string) {
 // The key assertion is offset continuity: 5 total events (not 6 from re-read).
 func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	appLog := filepath.Join(logDir, "app.log")
 	appLogRenamed := filepath.Join(logDir, "app.log.1")
@@ -811,20 +813,8 @@ func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
 	msgs := messagesForFile(events, appLog)
 	require.Len(t, msgs, 5, "all events should be attributed to the original path")
 
-	// Verify no duplicate messages — each line is unique.
-	seen := make(map[string]struct{}, len(msgs))
-	for _, msg := range msgs {
-		_, duplicate := seen[msg]
-		require.False(t, duplicate, "duplicate event detected: %s", msg)
-		seen[msg] = struct{}{}
-	}
-
-	// Verify offsets are monotonically increasing — proves the harvester
-	// continued from where it left off, not re-read from 0.
-	for i := 1; i < len(events); i++ {
-		require.Greater(t, events[i].Log.Offset, events[i-1].Log.Offset,
-			"offsets must be monotonically increasing (event %d vs %d)", i-1, i)
-	}
+	assertNoDuplicateMessages(t, msgs)
+	assertMonotonicOffsets(t, events)
 
 	// ===== Phase 5: Stop Filebeat =====
 	filebeat.Stop()
@@ -845,12 +835,7 @@ func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
 // Expected: 30 events total (5 + 25), one migration log, no duplicates.
 func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	logFile := filepath.Join(logDir, "app.log")
 
@@ -872,24 +857,14 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
 
 	filebeat.WaitPublishedEvents(15*time.Second, 30)
 
-	// Verify: 30 unique events.
 	events := readOutputEvents(t, tempDir)
 	require.Len(t, events, 30, "expected exactly 30 events (5 + 25); more means re-ingestion")
 
 	msgs := messagesForFile(events, logFile)
 	require.Len(t, msgs, 30, "all events should be attributed to the test file")
 
-	seen := make(map[string]struct{}, len(msgs))
-	for _, msg := range msgs {
-		_, duplicate := seen[msg]
-		require.False(t, duplicate, "duplicate event detected: %s", msg)
-		seen[msg] = struct{}{}
-	}
-
-	for i := 1; i < len(events); i++ {
-		require.Greater(t, events[i].Log.Offset, events[i-1].Log.Offset,
-			"offsets must be monotonically increasing across the threshold transition (event %d vs %d)", i-1, i)
-	}
+	assertNoDuplicateMessages(t, msgs)
+	assertMonotonicOffsets(t, events)
 
 	filebeat.Stop()
 
@@ -915,12 +890,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
 // The promise: opting in to growing is contained to small files.
 func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	largeFile := filepath.Join(logDir, "large.log")
 	smallFile := filepath.Join(logDir, "small.log")
@@ -998,12 +968,7 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 //     the bytes already read during the growing phase.
 func TestFilestreamEnhancedFingerprint_DisableGrowingAfterEnabling(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	largeFile := filepath.Join(logDir, "large.log")
 	smallFile := filepath.Join(logDir, "small.log")
@@ -1093,20 +1058,10 @@ func TestFilestreamEnhancedFingerprint_DisableGrowingAfterEnabling(t *testing.T)
 	// growing entry may linger until clean_inactive removes it, so we assert on
 	// the presence of the final entry rather than exclusivity (which is why the
 	// existing assertSingleSHA256RegistryEntry helper is not used here).
-	var smallFinal, smallGrowing []string
-	for _, e := range readFingerprintRegistry(t, tempDir) {
-		if e.source != smallFile || e.removed {
-			continue
-		}
-		if e.growing {
-			smallGrowing = append(smallGrowing, e.key)
-		} else {
-			smallFinal = append(smallFinal, e.key)
-		}
-	}
+	smallFinal, smallGrowing := activeFingerprintEntries(readFingerprintRegistry(t, tempDir), smallFile)
 	assert.Len(t, smallFinal, 1,
-		"expected exactly one active final SHA-256 entry for the small file; got final=%v growing=%v",
-		smallFinal, smallGrowing)
+		"expected exactly one active final SHA-256 entry for the small file; got final=%d growing=%d",
+		len(smallFinal), len(smallGrowing))
 	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
 }
 
@@ -1163,12 +1118,7 @@ func seedLegacyFingerprintRegistry(t *testing.T, tempDir, inputID, filePath stri
 // independent of what the new binary writes.
 func TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	// Case 2: a file above the 1024-byte threshold, already fully ingested by
 	// the old (static) Filebeat -> a legacy SHA-256 registry entry at EOF.
@@ -1253,12 +1203,7 @@ func TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry(t *testing.T) {
 // that was already at threshold.
 func TestFilestreamEnhancedFingerprint_NoDuplicationConfigReload(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 	inputsDir := filepath.Join(tempDir, "inputs.d")
 	require.NoError(t, os.MkdirAll(inputsDir, 0o755), "failed to create inputs.d directory")
 
@@ -1388,12 +1333,7 @@ logging:
 // already harvested before the stop.
 func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	logFile := filepath.Join(logDir, "app.log")
 
@@ -1426,13 +1366,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testi
 	require.Len(t, events, 30,
 		"expected exactly 30 events (5 before + 25 after); more means content was re-ingested across the restart")
 
-	msgs := messagesForFile(events, logFile)
-	seen := make(map[string]struct{}, len(msgs))
-	for _, msg := range msgs {
-		_, duplicate := seen[msg]
-		require.False(t, duplicate, "duplicate event detected: %s", msg)
-		seen[msg] = struct{}{}
-	}
+	assertNoDuplicateMessages(t, messagesForFile(events, logFile))
 
 	filebeat.Stop()
 
@@ -1460,12 +1394,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testi
 // entry from before the rename is removed.
 func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	homeDir := filebeat.TempDir()
-	printOutputOnFailure(t, homeDir)
-	logDir := filepath.Join(homeDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, homeDir, logDir := newFingerprintFilebeat(t)
 
 	appLog := filepath.Join(logDir, "app.log")
 	appLogRenamed := filepath.Join(logDir, "app.log.1")
@@ -1518,17 +1447,8 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) 
 	msgs := messagesForFile(events, appLog)
 	assert.Len(t, msgs, 30, "all events should be attributed to the original path (harvester known behaviour)")
 
-	seen := make(map[string]struct{}, len(msgs))
-	for _, msg := range msgs {
-		_, duplicate := seen[msg]
-		assert.False(t, duplicate, "duplicate event detected: %s", msg)
-		seen[msg] = struct{}{}
-	}
-
-	for i := 1; i < len(events); i++ {
-		assert.Greater(t, events[i].Log.Offset, events[i-1].Log.Offset,
-			"offsets must be monotonically increasing (event %d vs %d)", i-1, i)
-	}
+	assertNoDuplicateMessages(t, msgs)
+	assertMonotonicOffsets(t, events)
 
 	filebeat.Stop()
 
@@ -1546,12 +1466,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) 
 // Requires `clean_removed: false`.
 func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	appLog := filepath.Join(logDir, "app.log")
 	appLogRenamed := filepath.Join(logDir, "app.log.1")
@@ -1595,13 +1510,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 	require.Len(t, preMsgs, 5, "5 before-restart events should be attributed to the original path")
 	require.Len(t, postMsgs, 25, "25 after-restart events should be attributed to the post-rename path")
 
-	allMsgs := append(append([]string{}, preMsgs...), postMsgs...)
-	seen := make(map[string]struct{}, len(allMsgs))
-	for _, msg := range allMsgs {
-		_, duplicate := seen[msg]
-		require.False(t, duplicate, "duplicate event detected: %s", msg)
-		seen[msg] = struct{}{}
-	}
+	assertNoDuplicateMessages(t, append(append([]string{}, preMsgs...), postMsgs...))
 
 	filebeat.Stop()
 
@@ -1634,12 +1543,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 // TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart).
 func TestFilestreamEnhancedFingerprint_RenameBelowThresholdAcrossRestartKeepRemoved(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	appLog := filepath.Join(logDir, "app.log")
 	appLogRenamed := filepath.Join(logDir, "app.log.1")
@@ -1713,12 +1617,7 @@ func TestFilestreamEnhancedFingerprint_RenameBelowThresholdAcrossRestartKeepRemo
 // Both must be ingested completely under growing mode.
 func TestFilestreamEnhancedFingerprint_Gzip(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	smallGzFile := filepath.Join(logDir, "small.log.gz")
 	largeGzFile := filepath.Join(logDir, "large.log.gz")
@@ -1776,12 +1675,7 @@ func TestFilestreamEnhancedFingerprint_Gzip(t *testing.T) {
 // above→below case (SHA-256 → raw-hex), specific to Enhanced Fingerprint.
 func TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold(t *testing.T) {
 	t.Parallel()
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
 	logFile := filepath.Join(logDir, "app.log")
 
@@ -1837,24 +1731,10 @@ func TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold(t *testin
 	// - An active raw-hex entry exists for the file under its new (post-
 	//   truncation) identity.
 	// - The pre-truncation SHA-256 entry may still be present too
-	state := readFingerprintRegistry(t, tempDir)
-	var (
-		activeRawHex []string
-		activeSHA256 []string
-	)
-	for _, e := range state {
-		if e.source != logFile || e.removed {
-			continue
-		}
-		if e.growing {
-			activeRawHex = append(activeRawHex, e.key)
-		} else {
-			activeSHA256 = append(activeSHA256, e.key)
-		}
-	}
+	activeSHA256, activeRawHex := activeFingerprintEntries(readFingerprintRegistry(t, tempDir), logFile)
 	assert.NotEmpty(t, activeRawHex,
-		"expected at least one active raw-hex registry entry for %q (the post-truncation identity); got SHA-256=%v raw-hex=%v",
-		logFile, activeSHA256, activeRawHex)
+		"expected at least one active raw-hex registry entry for %q (the post-truncation identity); got SHA-256=%d raw-hex=%d",
+		logFile, len(activeSHA256), len(activeRawHex))
 	assert.LessOrEqual(t, len(activeSHA256), 1,
 		"expected at most one stale SHA-256 entry (pre-truncation orphan), got %d", len(activeSHA256))
 }
@@ -1907,6 +1787,23 @@ func readFingerprintRegistry(t *testing.T, tempDir string) map[string]fingerprin
 		}
 	}
 	return state
+}
+
+// activeFingerprintEntries returns the non-removed registry entries whose
+// source is filePath, split into final (SHA-256) and growing (raw-hex)
+// entries. It is the shared filter behind the registry assertions below.
+func activeFingerprintEntries(state map[string]fingerprintRegistryEntry, filePath string) (final, growing []fingerprintRegistryEntry) {
+	for _, e := range state {
+		if e.source != filePath || e.removed {
+			continue
+		}
+		if e.growing {
+			growing = append(growing, e)
+		} else {
+			final = append(final, e)
+		}
+	}
+	return final, growing
 }
 
 // assertFingerprintMigratedToSHA256 asserts that the given file has exactly
@@ -1971,51 +1868,32 @@ func assertFingerprintMigratedToSHA256(t *testing.T, homeDir, filePath string) {
 // have been created.
 func assertSingleSHA256RegistryEntry(t *testing.T, tempDir, filePath string) {
 	t.Helper()
-	state := readFingerprintRegistry(t, tempDir)
+	final, growing := activeFingerprintEntries(readFingerprintRegistry(t, tempDir), filePath)
 
-	var activeKeysForFile []fingerprintRegistryEntry
-	for _, e := range state {
-		if e.source != filePath {
-			continue
-		}
-		if e.removed {
-			continue
-		}
-		activeKeysForFile = append(activeKeysForFile, e)
-	}
-
-	require.Len(t, activeKeysForFile, 1,
-		"expected exactly one active fingerprint registry entry for %q; got %d",
-		filePath, len(activeKeysForFile))
-	assert.False(t, activeKeysForFile[0].growing,
-		"expected the active entry to be final (not growing)")
-	assert.Len(t, activeKeysForFile[0].fingerprint, 64,
+	require.Len(t, final, 1,
+		"expected exactly one active final (SHA-256) registry entry for %q; got final=%d growing=%d",
+		filePath, len(final), len(growing))
+	assert.Empty(t, growing, "expected no active growing entries for %q", filePath)
+	assert.Len(t, final[0].fingerprint, 64,
 		"expected the active entry to be keyed by a SHA-256 (64-char) fingerprint; got len=%d",
-		len(activeKeysForFile[0].fingerprint))
+		len(final[0].fingerprint))
 }
 
 // assertGrowingRegistryEntry asserts that the file has exactly one active
-// fingerprint entry whose key is NOT the 64-char SHA-256 form — i.e. the
-// file is being tracked in the growing phase (raw-hex of bytes available so
-// far). Used to verify that a small file below the configured threshold is
-// indeed being tracked under growing mode (and would migrate to SHA-256 if
-// the file ever grew past offset+length).
+// fingerprint entry still in the growing phase. Growing is identified by a
+// non-empty Meta.Fingerprint (see fingerprintRegistryEntry.growing), not by
+// key length: with the bounded-key optimization a growing key is also 64
+// chars. Used to verify that a small file below the configured threshold is
+// tracked under growing mode (and would migrate to SHA-256 if it ever grew
+// past offset+length).
 func assertGrowingRegistryEntry(t *testing.T, tempDir, filePath string) {
 	t.Helper()
-	state := readFingerprintRegistry(t, tempDir)
+	final, growing := activeFingerprintEntries(readFingerprintRegistry(t, tempDir), filePath)
 
-	var activeKeysForFile []fingerprintRegistryEntry
-	for _, e := range state {
-		if e.source != filePath || e.removed {
-			continue
-		}
-		activeKeysForFile = append(activeKeysForFile, e)
-	}
-
-	require.Len(t, activeKeysForFile, 1,
-		"expected exactly one active fingerprint registry entry for %q; got %d",
-		filePath, len(activeKeysForFile))
-	assert.True(t, activeKeysForFile[0].growing,
-		"expected the active entry to be in the growing phase (Meta.Fingerprint set); "+
-			"got a final entry — file is treated as final, not growing")
+	require.Len(t, growing, 1,
+		"expected exactly one active growing registry entry for %q; got growing=%d final=%d",
+		filePath, len(growing), len(final))
+	assert.Empty(t, final,
+		"expected no active final entries for %q; got a final entry — file is treated as final, not growing",
+		filePath)
 }
