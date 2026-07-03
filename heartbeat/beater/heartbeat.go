@@ -93,7 +93,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
-		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second, logger)
+		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second, logger, b.Info)
 		if err != nil {
 			if parsedConfig.RunOnce {
 				trace.Abort()
@@ -284,7 +284,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		}
 
 		// Backoff panics with 0 duration, set to smallest unit
-		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond, bt.logger)
+		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond, bt.logger, b.Info)
 		if err != nil {
 			bt.logger.Warnf("skipping monitor state management during managed reload: %v", err)
 		} else {
@@ -336,6 +336,7 @@ func makeESClient(
 	attempts int,
 	wait time.Duration,
 	logger *logp.Logger,
+	info beat.Info,
 ) (*eslegclient.Connection, error) {
 	var (
 		esClient *eslegclient.Connection
@@ -364,8 +365,12 @@ func makeESClient(
 		return nil, fmt.Errorf("error setting the ES timeout in config: %w", err)
 	}
 
+	clientInfo := info
+	clientInfo.Beat = "Heartbeat"
+	clientInfo.Logger = logger
+
 	for i := 0; i < attempts; i++ {
-		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logger)
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, clientInfo)
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil

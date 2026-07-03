@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -236,7 +235,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Make: func(s string, config *config.C, logger *logp.Logger) (plugin.Plugin, error) {
+			Make: func(s string, config *config.C, info beat.Info) (plugin.Plugin, error) {
 				built.Add(1)
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
@@ -251,11 +250,11 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 
 				err := config.Unpack(&unpacked)
 				if err != nil {
-					return plugin.Plugin{DoClose: closer, Logger: logger}, err
+					return plugin.Plugin{DoClose: closer, Logger: info.Logger}, err
 				}
 				j := createMockJob()
 
-				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1, Logger: logger}, nil
+				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1, Logger: info.Logger}, nil
 			},
 			Stats: plugin.NewPluginCountersRecorder("test", reg),
 		},

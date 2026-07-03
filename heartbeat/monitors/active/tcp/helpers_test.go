@@ -42,7 +42,7 @@ func testTCPConfigCheck(t *testing.T, configMap mapstr.M) *beat.Event {
 	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
-	p, err := create("tcp", config, logptest.NewTestingLogger(t, ""))
+	p, err := create("tcp", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
