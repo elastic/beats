@@ -1370,3 +1370,20 @@ Note: Each metric listed has a corresponding gzip_* counterpart (e.g.,
 `gzip_files_opened_total`, `gzip_messages_read_total`). These counterparts track
 the same data but exclusively for GZIP compressed files. The original metrics
 provide the total count, including both plain and GZIP files.
+
+### Harvester Metrics [_harvester_metrics]
+{applies_to}`stack: ga 9.5+`
+
+The `filestream` input also exposes scanner metrics under
+`.monitoring.metrics.filebeat.filestream` in monitoring logs and under
+`filebeat.filestream` in the `/stats` HTTP endpoint output. These metrics are
+aggregate gauges across all running `filestream` inputs. They are updated after
+each scanner pass and reset when inputs stop.
+
+| Metric | Description |
+| --- | --- |
+| `files_empty` | Number of matched files that are empty. |
+| `files_ignored` | Number of matched files ignored by `filestream` settings or state, such as `prospector.scanner.exclude_files`, `ignore_older`, or `ignore_inactive`. |
+| `files_matched` | Number of filesystem path matches returned by the configured `paths` globs before duplicate, ignore, and ingestibility filtering. |
+| `files_no_ingest_target` | Number of matched non-empty files that did not produce an ingest target, such as duplicate matches, files that are too small to fingerprint or symlinks to already known files. |
+| `files_unique` | Number of unique files that produced ingest targets after scanner filtering and de-duplication. |

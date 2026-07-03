@@ -154,6 +154,7 @@ file_identity.fingerprint:
   growing: true`
 	}
 	return fmt.Sprintf(`
+id: benchmark
 type: filestream
 prospector.scanner.check_interval: 100ms
 close.reader.on_eof: true%s
@@ -532,7 +533,7 @@ func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
 		}
 	}
 
-	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	metrics := newTestMetrics()
 
 	t.Run("read_until_eof=false: always close", func(t *testing.T) {
 		inp := &filestream{
@@ -585,7 +586,7 @@ func TestFilestream_handleReadError_OtherErrors(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	logger := logptest.NewTestingLogger(t, "")
-	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	metrics := newTestMetrics()
 
 	for _, readUntilEOF := range []bool{false, true} {
 		name := fmt.Sprintf("read_until_eof=%v", readUntilEOF)

@@ -458,7 +458,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
-			p.Run(ctx, newMockMetadataUpdater(), hg)
+			p.Run(ctx, newMockMetadataUpdater(), hg, nil)
 
 			assert.ElementsMatch(t, test.expectedEvents, hg.events, "expected different harvester events")
 		})
@@ -498,8 +498,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
 	wg.Go(func() {
-		p.Run(ctx, testStore, hg)
-
+		p.Run(ctx, testStore, hg, nil)
 	})
 
 	// The prospector must persist the size of the file to the state
@@ -559,7 +558,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/path/to/file")
 
-			p.Run(ctx, testStore, newTestHarvesterGroup())
+			p.Run(ctx, testStore, newTestHarvesterGroup(), nil)
 
 			has := testStore.has("path::/path/to/file")
 
@@ -640,7 +639,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 			testStore.set("path::/old/path/to/file")
 
 			hg := newTestHarvesterGroup()
-			p.Run(ctx, testStore, hg)
+			p.Run(ctx, testStore, hg, nil)
 
 			has := testStore.has("path::/old/path/to/file")
 			if test.trackRename {
@@ -765,9 +764,11 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 	return evt
 }
 
-func (m *mockFileWatcher) Run(_ unison.Canceler) {}
+func (m *mockFileWatcher) Run(_ unison.Canceler, _ *loginp.Metrics, _ time.Duration, _ time.Time) {}
 
-func (m *mockFileWatcher) GetFiles() map[string]loginp.FileDescriptor { return m.filesOnDisk }
+func (m *mockFileWatcher) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	return m.filesOnDisk, loginp.FileScanMetrics{}
+}
 
 func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return m.c
@@ -1023,7 +1024,7 @@ func TestOnRenameFileIdentity(t *testing.T) {
 			}
 
 			hg := newTestHarvesterGroup()
-			p.Run(ctx, testStore, hg)
+			p.Run(ctx, testStore, hg, nil)
 
 			got := testStore.get(id)
 			meta := fileMeta{}

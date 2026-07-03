@@ -79,7 +79,6 @@ have to copy/clone it some VMs):
 ```
 cp -r /vagrant ./beats # Filebeat won't run correctly on the mounted volume
 cd ./beats/filebeat
-mage buildSystemTestBinary
 go test -count=1 -tags integration ./tests/integration -run TestJournaldInputReadsMessagesFromAllBoots -v
 ```
 
@@ -211,7 +210,7 @@ Then you can read the newly created file:
 root@vagrant-debian-12:~/filebeat# journalctl --file ./example.journal
 Oct 02 04:16:54 vagrant-debian-12 unknown[1908]: Hello Journal!
 Oct 02 04:17:50 vagrant-debian-12 my-test[1924]: Hello Journal!
-root@vagrant-debian-12:~/filebeat# 
+root@vagrant-debian-12:~/filebeat#
 ```
 
 Bear in mind that `systemd-journal-remote` will **append** to the

@@ -21,6 +21,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"strings"
+	"time"
 
 	"github.com/elastic/go-concert/unison"
 
@@ -121,21 +122,24 @@ type FileDescriptor struct {
 	// GZIP indicates if the file is compressed with GZIP.
 	GZIP bool
 
-	// bytesIngested is the number of bytes already ingested by the harvester
-	// for this file
+	// bytesIngested is the number of bytes already ingested by the harvester for this file.
 	bytesIngested int64
+	// bytesIngestedSet distinguishes an explicit ingested offset of 0 (a harvester closed before
+	// ingesting anything) from bytesIngested never having been set.
+	bytesIngestedSet bool
 }
 
 // SetBytesIngested allows for setting a size that is different than the one in Info
 func (fd *FileDescriptor) SetBytesIngested(s int64) {
 	fd.bytesIngested = s
+	fd.bytesIngestedSet = true
 }
 
 // SizeOrBytesIngested returns the bytes ingested for the file or its size.
-// If [SetBytesIngested] has been called with a value other
-// than zero, the bytes ingested is returned, otherwise Info.Size() is returned.
+// If [SetBytesIngested] has been called, the bytes ingested is returned
+// (including a value of zero), otherwise Info.Size() is returned.
 func (fd FileDescriptor) SizeOrBytesIngested() int64 {
-	if fd.bytesIngested != 0 {
+	if fd.bytesIngestedSet {
 		return fd.bytesIngested
 	}
 
@@ -195,21 +199,34 @@ type FSEvent struct {
 	SrcID string
 }
 
+// FileScanOptions contains scan-time settings that influence file metrics.
+type FileScanOptions struct {
+	// CurrentTime is the reference (current) time for a set of
+	// older/inactive time comparisons.
+	CurrentTime time.Time
+	// IgnoreOlder is the ignore_older threshold.
+	IgnoreOlder time.Duration
+	// IgnoreInactiveSince is the ignore_inactive reference time.
+	IgnoreInactiveSince time.Time
+}
+
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
 	// GetFiles returns the list of monitored files.
 	// The keys of the map are the paths to the files and
 	// the values are the file descriptors that contain all necessary information about the file.
-	GetFiles() map[string]FileDescriptor
+	GetFiles(FileScanOptions) (map[string]FileDescriptor, FileScanMetrics)
 }
 
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
 	FSScanner
 
-	// Run is the event loop which watchers for changes
+	// Run is the event loop which watches for changes
 	// in the file system and returns events based on the data.
-	Run(unison.Canceler)
+	// Aside from the metrics struct it also has ignore older
+	// and ignore inactive as arguments.
+	Run(ctx unison.Canceler, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for

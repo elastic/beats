@@ -49,7 +49,18 @@ const (
 var (
 	errFileTooSmall = errors.New("file size is too small for ingestion")
 	errFileEmpty    = errors.New("file is empty")
+	errFileIgnored  = errors.New("ignored by scanner configuration")
 )
+
+type ignoredFileError string
+
+func (e ignoredFileError) Error() string {
+	return string(e)
+}
+
+func (e ignoredFileError) Unwrap() error {
+	return errFileIgnored
+}
 
 // fileWatcherConfig is the prospector.scanner configuration
 type fileWatcherConfig struct {
@@ -137,11 +148,17 @@ func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return w.notifyChan
 }
 
-func (w *fileWatcher) Run(ctx unison.Canceler) {
+func (w *fileWatcher) Run(
+	ctx unison.Canceler,
+	metrics *loginp.Metrics,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) {
 	defer close(w.events)
+	defer metrics.CleanupFileScanMetrics()
 
 	// run initial scan before starting regular
-	w.watch(ctx)
+	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
 
 	// Read from notifyChan in a separate goroutine becase
 	// there are cases when w.watch can take minutes or even
@@ -161,7 +178,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	for {
 		select {
 		case <-tick:
-			w.watch(ctx)
+			w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
 		case <-ctx.Done():
 			return
 		}
@@ -175,11 +192,22 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 	w.closedHarvestersMutex.Unlock()
 }
 
-func (w *fileWatcher) watch(ctx unison.Canceler) {
+func (w *fileWatcher) watch(
+	ctx unison.Canceler,
+	metrics *loginp.Metrics,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) {
 	w.log.Debug("Start next scan")
 
 	// file identity is updated in GetFiles
-	paths := w.scanner.GetFiles()
+	now := time.Now()
+	paths, scanMetrics := w.scanner.GetFiles(loginp.FileScanOptions{
+		CurrentTime:         now,
+		IgnoreOlder:         ignoreOlder,
+		IgnoreInactiveSince: ignoreInactiveSince,
+	})
+	metrics.UpdateFileScanMetrics(scanMetrics)
 
 	// for debugging purposes
 	writtenCount := 0
@@ -439,6 +467,24 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.prev = paths
 }
 
+// isFileIgnored returns true when a file is ignored, no matter the reason.
+func isFileIgnored(
+	fd loginp.FileDescriptor,
+	opts loginp.FileScanOptions,
+) bool {
+	modTime := fd.Info.ModTime()
+
+	if opts.IgnoreOlder > 0 && opts.CurrentTime.Sub(modTime) > opts.IgnoreOlder {
+		return true
+	}
+
+	if !opts.IgnoreInactiveSince.IsZero() && modTime.Sub(opts.IgnoreInactiveSince) <= 0 {
+		return true
+	}
+
+	return false
+}
+
 // getFileIdentity mimics the same algorithm used by the harvester to generate
 // the file identity to any given file.
 // See 'startHarvester' on internal/input-logfile/harvester.go.
@@ -480,8 +526,8 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 // advance the scanner's completedFingerprints set, so these pre-watch scans
 // cannot suppress the bridging raw header a still-growing entry needs to
 // migrate its registry key after a restart.
-func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
-	return w.scanner.GetFiles()
+func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	return w.scanner.GetFiles(opts)
 }
 
 type fingerprintConfig struct {
@@ -614,12 +660,17 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 
 // GetFiles returns a map of file descriptors by filenames that
 // match the configured paths.
-func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
+func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	if opts.CurrentTime.IsZero() {
+		opts.CurrentTime = time.Now()
+	}
+
 	fdByName := map[string]loginp.FileDescriptor{}
 	// used to determine if a symlink resolves in a already known target
 	uniqueIDs := map[string]string{}
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
+	scanMetrics := loginp.FileScanMetrics{}
 
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
@@ -627,24 +678,36 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			s.log.Errorf("glob(%s) failed: %v", path, err)
 			continue
 		}
+		scanMetrics.FilesMatched += int64(len(matches))
 
 		for _, filename := range matches {
 			// in case multiple globs match on the same file we filter out duplicates
 			if _, knownFile := uniqueFiles[filename]; knownFile {
+				scanMetrics.FilesNoIngestTarget++
 				continue
 			}
 			uniqueFiles[filename] = struct{}{}
 
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				if !errors.Is(err, errFileEmpty) {
-					s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				if errors.Is(err, errFileEmpty) {
+					scanMetrics.FilesEmpty++
+					continue
 				}
+
+				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				if errors.Is(err, errFileIgnored) {
+					scanMetrics.FilesIgnored++
+					continue
+				}
+
+				scanMetrics.FilesNoIngestTarget++
 				continue
 			}
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
+				scanMetrics.FilesNoIngestTarget++
 				if s.smallFilesWarned.CompareAndSwap(false, true) {
 					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
 						"least %d in size for ingestion to start. To change this "+
@@ -657,21 +720,27 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 				continue
 			}
 			if err != nil {
+				scanMetrics.FilesNoIngestTarget++
 				s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 				continue
 			}
 
 			fileID := fd.FileID()
 			if knownFilename, exists := uniqueIDs[fileID]; exists {
+				scanMetrics.FilesNoIngestTarget++
 				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
 				continue
 			}
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
+			if isFileIgnored(fd, opts) {
+				scanMetrics.FilesIgnored++
+			}
 		}
 	}
 
-	return fdByName
+	scanMetrics.FilesUnique = int64(len(fdByName))
+	return fdByName, scanMetrics
 }
 
 type ingestTarget struct {
@@ -683,11 +752,11 @@ type ingestTarget struct {
 
 func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
 	if s.isFileExcluded(filename) {
-		return it, fmt.Errorf("file %q is excluded from ingestion", filename)
+		return it, ignoredFileError(fmt.Sprintf("file %q is excluded from ingestion", filename))
 	}
 
 	if !s.isFileIncluded(filename) {
-		return it, fmt.Errorf("file %q is not included in ingestion", filename)
+		return it, ignoredFileError(fmt.Sprintf("file %q is not included in ingestion", filename))
 	}
 
 	it.filename = filename
@@ -734,11 +803,11 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		}
 
 		if s.isFileExcluded(it.originalFilename) {
-			return it, fmt.Errorf("file %q->%q is excluded from ingestion", it.filename, it.originalFilename)
+			return it, ignoredFileError(fmt.Sprintf("file %q->%q is excluded from ingestion", it.filename, it.originalFilename))
 		}
 
 		if !s.isFileIncluded(it.originalFilename) {
-			return it, fmt.Errorf("file %q->%q is not included in ingestion", it.filename, it.originalFilename)
+			return it, ignoredFileError(fmt.Sprintf("file %q->%q is not included in ingestion", it.filename, it.originalFilename))
 		}
 	}
 
