@@ -9,26 +9,19 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: enhancement
 
-# REQUIRED for all kinds
-# Change summary; a 80ish characters long description of the change.
-summary: fix panic when logging.metrics.period is 0
+summary: Add Elasticsearch-backed state store support for entity-analytics agentless deployments.
 
-# REQUIRED for breaking-change, deprecation, known-issue
-# Long description; in case the summary is not enough to describe the change
-# this field accommodate a description without length limits.
-# description:
+description: |
+  The entity-analytics minimal-state input can now use an Elasticsearch-backed
+  state store when running in agentless mode. State is persisted to an
+  Elasticsearch index (agentless-state-<input-id>) instead of local bbolt,
+  enabling stateless pod scheduling. The store backend is selected automatically
+  based on the AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES environment
+  variable set by the agentless controller.
 
-# REQUIRED for breaking-change, deprecation, known-issue
-# impact:
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# action:
-
-# REQUIRED for all kinds
-# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -36,7 +29,7 @@ component: all
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/51462
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs

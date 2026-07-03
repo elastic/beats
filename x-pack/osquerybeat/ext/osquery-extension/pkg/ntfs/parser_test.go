@@ -139,7 +139,7 @@ func TestVolumeInfo_FindByInode(t *testing.T) {
 
 			assert.Equal(t, tt.wantInode, result.Inode, "inode mismatch")
 			assert.Equal(t, tt.wantType, result.Type, "type mismatch")
-			assert.Equal(t, int32(1), result.Active, "entry should be active")
+			assert.True(t, result.Active, "entry should be active")
 			assert.NotEmpty(t, result.Path, "path should not be empty")
 		})
 	}
@@ -196,7 +196,7 @@ func TestVolumeInfo_FindByPath(t *testing.T) {
 
 			assert.Equal(t, tt.wantFilename, result.Filename, "filename mismatch")
 			assert.Equal(t, tt.wantType, result.Type, "type mismatch")
-			assert.Equal(t, int32(1), result.Active, "entry should be active")
+			assert.True(t, result.Active, "entry should be active")
 			assert.Equal(t, tt.path, result.Path, "path mismatch")
 			assert.Positive(t, result.Inode, "inode should be non-zero")
 		})

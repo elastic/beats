@@ -31,7 +31,22 @@ The `entity-analytics` input supports the following configuration options plus t
 
 ### `provider` [_provider_2]
 
-The identity provider. Must be one of: `activedirectory`, `azure-ad` or `okta`.
+The identity provider. Must be one of: `activedirectory`, `azure-ad`, `jamf`, or `okta`.
+
+
+### `use_minimal_state` [_use_minimal_state]
+
+```{applies_to}
+stack: preview 9.5.0
+```
+
+When set to `true`, the input uses the minimal-state sync implementation. This mode uses significantly less local storage than the legacy implementation and supports Elasticsearch-backed state for agentless deployments.
+
+In agentless deployments, state is stored in Elasticsearch (index `agentless-state-<input-id>`) rather than on local disk, enabling stateless pod scheduling. The routing is automatic when the `AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES` environment variable includes `entity-analytics`.
+
+When running with a local file store (the default for non-agentless deployments), state is stored in a bbolt database under the Filebeat data directory.
+
+Defaults to `false`. In Fleet-managed agentless deployments, integration packages set this to `true` automatically.
 
 
 ## Common options [filebeat-input-entity-analytics-common-options]
@@ -383,7 +398,7 @@ The necessary API permissions need to be granted in Azure in order for the provi
 | User.Read.All | Application |
 | Device.Read.All | Application |
 
-When using the `enrich_with: ["mfa"]` option, an additional permission is required:
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When using the `enrich_with: ["mfa"]` or `enrich_with: ["sign_in_activity"]` options, an additional permission is required:
 
 | Permission | Type |
 | --- | --- |
@@ -423,13 +438,21 @@ The `/delta` endpoint will provide changes that have occurred since the last cal
 
 The group metadata will be used to enrich users and devices with group membership information. Direct memberships, along with transitive memberships, will be provided for users and devices.
 
-When the `enrich_with: ["mfa"]` option is set, an additional call is made each sync/update cycle to:
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["mfa"]` option is set, an additional call is made each sync/update cycle to:
 
 * [/reports/authenticationMethods/userRegistrationDetails](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http)
 
 This endpoint returns MFA registration state for all users and does not support delta queries, so the full list is fetched on every cycle. The result is merged into each user document under the `azure_ad.mfa` field.
 
 Note that MFA enrichment is **best-effort**: a change to a user's MFA registration state alone will not trigger an incremental user update. Updated MFA data is only included in a published user event when that user is already being published due to an identity delta (a change to the user record, group membership, or device). A full synchronization will always include the latest MFA state for all users.
+
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["sign_in_activity"]` option is set, an additional call is made on each full synchronization and on incremental updates that include at least one user identity change to:
+
+* [/users?$select=id,signInActivity](https://learn.microsoft.com/en-us/graph/api/resources/signinactivity?view=graph-rest-1.0)
+
+This endpoint returns the last sign-in timestamps for all users. The `signInActivity` property cannot be included in `/users/delta` queries because Microsoft Graph stores it outside the main directory data store. A separate non-delta request is required. The result is merged into each user document under the `azure_ad.signInActivity` field.
+
+Note that sign-in activity enrichment is **best-effort** and follows the same semantics as MFA enrichment: a sign-in event alone will not trigger an incremental user update. Updated sign-in activity is only included in a published user event when that user is already being published due to an identity delta. A full synchronization will always include the latest sign-in timestamps for all users.
 
 
 #### Sending User and Device Metadata to Elasticsearch [_sending_user_and_device_metadata_to_elasticsearch_2]
@@ -488,7 +511,7 @@ Example user document:
 }
 ```
 
-When the `enrich_with: ["mfa"]` option is set, user documents will also include an `azure_ad.mfa` field with MFA registration details:
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["mfa"]` option is set, user documents will also include an `azure_ad.mfa` field with MFA registration details:
 
 ```json
 {
@@ -533,6 +556,47 @@ When the `enrich_with: ["mfa"]` option is set, user documents will also include 
     }
 }
 ```
+
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["sign_in_activity"]` option is set, user documents will also include an `azure_ad.signInActivity` field with the user's last sign-in timestamps:
+
+```json
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "azure_ad": {
+        "userPrincipalName": "example.user@example.com",
+        "mail": "example.user@example.com",
+        "displayName": "Example User",
+        "givenName": "Example",
+        "surname": "User",
+        "jobTitle": "Software Engineer",
+        "mobilePhone": "123-555-1000",
+        "businessPhones": ["123-555-0122"],
+        "signInActivity": {
+            "lastSignInDateTime": "2024-01-15T08:00:00Z",
+            "lastSignInRequestId": "f3a931f0-1234-5678-abcd-ef1234567890",
+            "lastNonInteractiveSignInDateTime": "2024-01-15T08:30:00Z",
+            "lastNonInteractiveSignInRequestId": "a1b2c3d4-5678-90ab-cdef-123456789012"
+        }
+    },
+    "user": {
+        "id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+        "group": [
+            {
+                "id": "331676df-b8fd-4492-82ed-02b927f8dd80",
+                "name": "group1"
+            }
+        ]
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+```
+
+After ingest pipeline processing, the `azure_ad.signInActivity.lastSignInDateTime` value is normalized and mapped to `user.entity.lifecycle.last_activity`.
 
 Device documents will show the current state of the device.
 
@@ -718,14 +782,18 @@ Add [device query relationship expansions](https://learn.microsoft.com/en-us/gra
 
 #### `enrich_with` [_enrich_with_azuread]
 
-Additional data to fetch and merge into user documents. This is an array of enrichment types. Currently only `"mfa"` is supported. If not set, no additional enrichment is performed.
+{applies_to}`{stack: preview 9.4+, serverless: preview}` Additional data to fetch and merge into user documents. This is an array of enrichment types. Supported values are `"mfa"` and `"sign_in_activity"`. If not set, no additional enrichment is performed.
 
 When `"mfa"` is included, the provider calls the [`/reports/authenticationMethods/userRegistrationDetails`](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http) endpoint on each sync/update cycle and merges the result into each matching user document under the `azure_ad.mfa` field. This requires the `AuditLog.Read.All` application permission.
 
-Example:
+When `"sign_in_activity"` is included, the provider calls `/users?$select=id,signInActivity` on each full synchronization and on incremental updates that include at least one user identity change, then merges the last sign-in timestamps into each matching user document under the `azure_ad.signInActivity` field. The `signInActivity` property cannot be requested via the `/users/delta` endpoint because Microsoft Graph stores it outside the main directory data store. This separate non-delta call is therefore required. This also requires the `AuditLog.Read.All` application permission.
+
+Both enrichments are **best-effort**: they are skipped on no-op incremental updates (cycles where no user identity deltas occurred) and will not themselves trigger user update events.
+
+Both values can be specified together:
 
 ```yaml
-enrich_with: ["mfa"]
+enrich_with: ["mfa", "sign_in_activity"]
 ```
 
 
@@ -1376,6 +1444,60 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `update_total` | The total number of incremental updates. |
 | `update_error` | The number of incremental updates that failed due to an error. |
 | `update_processing_time` | Histogram of the elapsed incremental updates times in nanoseconds (time of API contact to items sent to output). |
+
+## Operational limits [_operational_limits]
+
+```{applies_to}
+stack: preview 9.5.0
+```
+
+The following scaling guidance applies to the minimal-state implementation (`use_minimal_state: true`). The legacy implementation has different characteristics.
+
+### EntraID (azure-ad) group scaling
+
+EntraID is the most complex sync path due to group membership graph expansion. The primary scaling factor is **group count**, because each active incremental sync refetches all groups regardless of how many entities changed.
+
+| Groups | API calls per sync | Projected time at 50ms/call |
+| --- | --- | --- |
+| 100 | ~103 | ~5s |
+| 1,000 | ~1,003 | ~50s |
+| 5,000 | ~5,003 | ~250s |
+| 10,000 | ~10,003 | ~500s |
+
+The ceiling is determined by API call count multiplied by per-call latency. Graph CPU (membership expansion) is negligible relative to network time at all realistic scales. At the default `update_interval` of 15 minutes (900s):
+
+- At 10ms/call latency: supports ~90,000 groups
+- At 50ms/call latency: supports ~18,000 groups
+- At 100ms/call latency: supports ~9,000 groups
+
+If a sync cannot complete within `update_interval`, the system cannot converge. Increase `update_interval` for larger environments.
+
+### Scratch storage (EntraID)
+
+The EntraID membership graph is stored in a temporary file (bbolt) rather than in-memory. This bounds Go heap usage for large directories — the heap holds only the BFS working set, not the full adjacency data. The trade-off is ephemeral disk usage:
+
+- At 2.5M edges (5,000 groups × 500 members), the scratch file is approximately 103 MB.
+- Mmap'd pages are OS-reclaimable under memory pressure and do not contribute to OOM kills in cgroup-limited containers.
+- Build time is dominated by API call latency, not local I/O.
+
+The `scratch_dir` provider configuration option overrides the default temporary directory. Files use the prefix `entcollect-scratch-*`.
+
+### Rate limiting
+
+EntraID APIs may return 429 (Too Many Requests) with `Retry-After` headers. Throttle wait time is additive to baseline sync duration. For example, at 1,000 groups with a policy of one throttle per 50 requests, expect ~20 throttle events adding ~20s total.
+
+### Document size
+
+Average per-document payload size (before Elasticsearch indexing overhead):
+
+| Provider | Typical doc size |
+| --- | --- |
+| EntraID | 93–99 B (fixture baseline; real documents larger with full attributes) |
+| Active Directory | ~264 B |
+| Okta | ~280 B |
+| Jamf | ~524 B (includes hardware/OS inventory) |
+
+At 10,000 users with ~500 B average (realistic with full attributes), each full sync produces ~5 MB of uncompressed payload — modest for Elasticsearch at a 15-minute interval.
 
 ::::{note}
 This input is experimental and is under active developement. Configuration options and behaviors may change without warning. Use with caution and do not use in production environments.

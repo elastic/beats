@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand/v2"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -42,7 +41,7 @@ var (
 
 // NewFailoverClient combines a set of NetworkClients into one NetworkClient instances,
 // with at most one active client. If the active client fails, another client
-// will be used.
+// will be used. The client will be chosen in deterministic, round-robin order.
 func NewFailoverClient(clients []NetworkClient) NetworkClient {
 	if len(clients) == 1 {
 		return clients[0]
@@ -69,15 +68,7 @@ func (f *failoverClient) Connect(ctx context.Context) error {
 	case l == 2 && 0 <= active && active <= 1:
 		next = 1 - active
 	default:
-		for {
-			// Connect to random server to potentially spread the
-			// load when large number of beats with same set of sinks
-			// are started up at about the same time.
-			next = rand.Int() % l
-			if next != active {
-				break
-			}
-		}
+		next = (active + 1) % l
 	}
 
 	client := f.clients[next]

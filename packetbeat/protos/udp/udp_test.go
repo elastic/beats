@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	// import plugins for testing
 	_ "github.com/elastic/beats/v7/packetbeat/protos/http"
@@ -110,7 +111,7 @@ func testSetup(t *testing.T) *TestStruct {
 	plugin := &TestProtocol{Ports: []int{PORT}}
 	protocols.udp[PROTO] = plugin
 
-	udp, err := NewUDP(protocols, "test", "test", 0)
+	udp, err := NewUDP(protocols, "test", "test", 0, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Error("Error creating UDP handler: ", err)
 	}

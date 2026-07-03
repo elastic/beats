@@ -44,6 +44,7 @@ var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), ve
 func create(
 	name string,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -70,7 +71,7 @@ func create(
 		body = buf.Bytes()
 	}
 
-	validator, err := makeValidateResponse(&config.Check.Response)
+	validator, err := makeValidateResponse(&config.Check.Response, logger)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
@@ -92,8 +93,7 @@ func create(
 		}
 	} else {
 		// preload TLS configuration
-		// TODO: Use local logger
-		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, logp.NewLogger(""))
+		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, logger)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
@@ -121,7 +121,7 @@ func create(
 		js[i] = wraputil.WithURLField(u, job)
 	}
 
-	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts)}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts), Logger: logger}, nil
 }
 
 func newRoundTripper(config *Config) (http.RoundTripper, error) {

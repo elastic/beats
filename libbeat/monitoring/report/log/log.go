@@ -71,6 +71,12 @@ var gauges = map[string]bool{
 	"system.load.norm.1":                   true,
 	"system.load.norm.5":                   true,
 	"system.load.norm.15":                  true,
+
+	"filebeat.filestream.files_matched":          true,
+	"filebeat.filestream.files_unique":           true,
+	"filebeat.filestream.files_no_ingest_target": true,
+	"filebeat.filestream.files_ignored":          true,
+	"filebeat.filestream.files_empty":            true,
 }
 
 // IsGauge returns true when the given metric key name represents a gauge value.
