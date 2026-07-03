@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
@@ -41,7 +40,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -51,8 +49,6 @@ const (
 )
 
 var (
-	userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
-
 	// for testing
 	timeNow = time.Now
 )
@@ -223,7 +219,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg, ctx.Agent.UserAgent)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		ctx.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())

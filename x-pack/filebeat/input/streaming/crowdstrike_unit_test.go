@@ -163,7 +163,7 @@ func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient
 			"events": [body],
 			?"cursor": body.?metadata.optMap(m, {"offset": m.offset}),
 		})
-	`, root, nil, log)
+	`, root, nil, "", log)
 	if err != nil {
 		t.Fatalf("failed to compile CEL program: %v", err)
 	}
