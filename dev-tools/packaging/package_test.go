@@ -28,8 +28,11 @@ import (
 	"compress/gzip"
 	"context"
 	"debug/buildinfo"
+<<<<<<< HEAD
 	"debug/elf"
 	"encoding/json"
+=======
+>>>>>>> a829d56a0 (Use native Go for Linux FIPS builds (#51345))
 	"errors"
 	"flag"
 	"fmt"
@@ -45,7 +48,6 @@ import (
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
 	"github.com/moby/moby/api/types/container"
-	"github.com/moby/moby/api/types/strslice"
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
@@ -587,6 +589,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 			t.Fatalf("error loading docker image: %s", err)
 		}
 
+<<<<<<< HEAD
 		loadRespBody, err := io.ReadAll(loadResp)
 		if err != nil {
 			t.Fatalf("failed to read image load response: %s", err)
@@ -600,6 +603,9 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 		imageID := strings.TrimRight(after, "\\n\"}\r\n")
 
 		var caps strslice.StrSlice
+=======
+		var caps []string
+>>>>>>> a829d56a0 (Use native Go for Linux FIPS builds (#51345))
 		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}
@@ -826,41 +832,29 @@ func checkFIPS(t *testing.T, beatName, path string) {
 	require.NoError(t, err)
 
 	foundTags := false
-	foundExperiment := false
+	foundFIPS := false
+	foundFIPSDefault := false
 	for _, setting := range info.Settings {
 		switch setting.Key {
 		case "-tags":
 			foundTags = true
 			require.Contains(t, setting.Value, "requirefips")
 			continue
-		case "GOEXPERIMENT":
-			foundExperiment = true
-			require.Contains(t, setting.Value, "systemcrypto")
+		case "GOFIPS140":
+			foundFIPS = true
+			require.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
+			continue
+		case "DefaultGODEBUG":
+			if strings.Contains(setting.Value, "fips140=on") {
+				foundFIPSDefault = true
+			}
 			continue
 		}
 	}
 
 	require.True(t, foundTags, "Did not find -tags within binary version information")
-	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
-
-	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
-	f, err := elf.Open(binaryPath)
-	require.NoError(t, err, "unable to open ELF file")
-
-	symbols, err := f.Symbols()
-	if err != nil {
-		t.Logf("no symbols present in %q: %v", binaryPath, err)
-		return
-	}
-
-	hasOpenSSL := false
-	for _, symbol := range symbols {
-		if strings.Contains(symbol.Name, "OpenSSL_version") {
-			hasOpenSSL = true
-			break
-		}
-	}
-	require.True(t, hasOpenSSL, "unable to find OpenSSL_version symbol")
+	require.True(t, foundFIPS, "Did not find GOFIPS140 within binary version information")
+	require.True(t, foundFIPSDefault, "Did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
 }
 
 // inspector is a file contents inspector. It vets the contents of the file
