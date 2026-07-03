@@ -1,5 +1,0 @@
-2026/07/03 14:21:05 testbin.Build (go test -c -o /Users/khushijain/Documents/beats/x-pack/filebeat/filebeat.test) took 1.180735042s.
-=== RUN   TestTCPInputOTelE2E
---- PASS: TestTCPInputOTelE2E (16.32s)
-PASS
-ok  	github.com/elastic/beats/v7/x-pack/filebeat/tests/integration	20.074s
