@@ -69,7 +69,7 @@ func makeGoTestArgs(name string) GoTestArgs {
 		TestName:        name,
 		Race:            RaceDetector,
 		Packages:        []string{"./..."},
-		Env:             make(map[string]string),
+		Env:             fipsTestEnv(),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -89,6 +89,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 		TestName:        fmt.Sprintf("%s-%s", name, pkg),
 		Race:            RaceDetector,
 		Packages:        []string{fmt.Sprintf("./module/%s", pkg)},
+		Env:             fipsTestEnv(),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -139,6 +140,18 @@ func testTagsFromEnv() []string {
 		tags = append(tags, "requirefips")
 	}
 	return tags
+}
+
+// fipsTestEnv returns the environment variables required to compile and run FIPS tests.
+func fipsTestEnv() map[string]string {
+	env := make(map[string]string, len(FIPSConfig.Compile.Env))
+	if !FIPSBuild {
+		return env
+	}
+	for k, v := range FIPSConfig.Compile.Env {
+		env[k] = v
+	}
+	return env
 }
 
 // DefaultGoTestUnitArgs returns a default set of arguments for running
