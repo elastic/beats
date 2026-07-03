@@ -17,6 +17,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -24,6 +25,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -295,6 +297,164 @@ func TestCrowdstrikeOAuthHTTPClientRespectsConfiguredTimeout(t *testing.T) {
 	if elapsed > tokenDelay {
 		t.Fatalf("expected FollowStream to fail before server delay %v, but it took %v: %v", tokenDelay, elapsed, err)
 	}
+}
+
+func TestFollowStreamRetryCapHonorsMaxAttempts(t *testing.T) {
+	logp.TestingSetup()
+
+	discoverURL, tokenURL, hits := startEmptyDiscover(t)
+	const maxAttempts = 15 // Deliberately > the unconfigured cap of 10.
+	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newEmptyDiscoverFollower(t, cfg, nil)
+
+	err := s.FollowStream(context.Background())
+	if err == nil {
+		t.Fatal("FollowStream() error = nil; want max-attempts error")
+	}
+	// Regression: a configured MaxAttempts greater than 10 must be honoured,
+	// not silently capped at the unconfigured default of 10.
+	want := fmt.Sprintf("max retry attempts (%d) exceeded", maxAttempts)
+	if !strings.Contains(err.Error(), want) {
+		t.Errorf("FollowStream() error = %v; want substring %q", err, want)
+	}
+	if got := hits.Load(); got != int64(maxAttempts) {
+		t.Errorf("discover attempts = %d; want %d", got, maxAttempts)
+	}
+}
+
+func TestFollowStreamInfiniteRetriesDoesNotCap(t *testing.T) {
+	logp.TestingSetup()
+
+	discoverURL, tokenURL, hits := startEmptyDiscover(t)
+	// MaxAttempts is intentionally tiny: InfiniteRetries must override it and
+	// the unconfigured cap of 10 entirely.
+	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{InfiniteRetries: true, MaxAttempts: 1, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newEmptyDiscoverFollower(t, cfg, nil)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- s.FollowStream(ctx) }()
+
+	// Wait until well past the unconfigured cap to prove the input keeps
+	// retrying, then cancel.
+	deadline := time.After(10 * time.Second)
+	for hits.Load() <= 12 {
+		select {
+		case <-deadline:
+			t.Fatalf("discover attempts = %d before timeout; want > 12", hits.Load())
+		case err := <-done:
+			t.Fatalf("FollowStream returned early after %d attempts: %v", hits.Load(), err)
+		case <-time.After(5 * time.Millisecond):
+		}
+	}
+	cancel()
+
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Errorf("FollowStream() error = %v; want nil after context cancel", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for FollowStream to return after cancel")
+	}
+}
+
+func TestFollowStreamDefersDegraded(t *testing.T) {
+	logp.TestingSetup()
+
+	discoverURL, tokenURL, _ := startEmptyDiscover(t)
+	// With MaxAttempts=5 and the degrade threshold of 3, the input reports
+	// DEGRADED only on attempts 3 and 4, then terminates on attempt 5 without
+	// reporting DEGRADED on the earlier transient failures.
+	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: 5, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	rec := &degradedRecorder{}
+	s := newEmptyDiscoverFollower(t, cfg, rec)
+
+	if err := s.FollowStream(context.Background()); err == nil {
+		t.Fatal("FollowStream() error = nil; want max-attempts error")
+	}
+	if got := rec.count(); got != 2 {
+		t.Errorf("DEGRADED reports = %d; want 2 (attempts 3 and 4 only)", got)
+	}
+}
+
+// startEmptyDiscover starts a token endpoint and a discover endpoint that
+// returns 200 with an empty body (the transient EOF condition observed from
+// CrowdStrike), returning the discover URL, token URL, and a counter of
+// discover requests.
+func startEmptyDiscover(t *testing.T) (discoverURL, tokenURL string, hits *atomic.Int64) {
+	t.Helper()
+	tokenSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"access_token":"token","token_type":"bearer","expires_in":3600}`)
+	}))
+	t.Cleanup(tokenSrv.Close)
+
+	hits = new(atomic.Int64)
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+	}))
+	t.Cleanup(discoverSrv.Close)
+	return discoverSrv.URL, tokenSrv.URL, hits
+}
+
+func emptyDiscoverConfig(t *testing.T, discoverURL, tokenURL string, r *retry) config {
+	t.Helper()
+	u, err := url.Parse(discoverURL)
+	if err != nil {
+		t.Fatalf("failed to parse discover URL: %v", err)
+	}
+	return config{
+		Type: "crowdstrike",
+		URL:  &urlConfig{u},
+		Auth: authConfig{
+			OAuth2: oAuth2Config{
+				ClientID:     "id",
+				ClientSecret: "secret",
+				TokenURL:     tokenURL,
+			},
+		},
+		CrowdstrikeAppID: "test",
+		Retry:            r,
+		Program: `
+			state.response.decode_json().as(body,{
+				"events": [body],
+			})`,
+	}
+}
+
+func newEmptyDiscoverFollower(t *testing.T, cfg config, stat status.StatusReporter) StreamFollower {
+	t.Helper()
+	log := logp.NewNopLogger()
+	env := v2.Context{ID: "crowdstrike_test", MetricsRegistry: monitoring.NewRegistry()}
+	s, err := NewFalconHoseFollower(context.Background(), env, cfg, nil, &testPublisher{log}, stat, log, time.Now)
+	if err != nil {
+		t.Fatalf("failed to construct follower: %v", err)
+	}
+	return s
+}
+
+// degradedRecorder counts the number of times DEGRADED is reported.
+type degradedRecorder struct {
+	mu sync.Mutex
+	n  int
+}
+
+func (r *degradedRecorder) UpdateStatus(s status.Status, _ string) {
+	if s != status.Degraded {
+		return
+	}
+	r.mu.Lock()
+	r.n++
+	r.mu.Unlock()
+}
+
+func (r *degradedRecorder) count() int {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.n
 }
 
 func TestFollowStreamCancelsRefreshOnReconnect(t *testing.T) {

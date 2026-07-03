@@ -64,6 +64,29 @@ func TestFollowSession_FirehoseHTTPError(t *testing.T) {
 	}
 }
 
+func TestFollowSession_EmptyDiscoverBody(t *testing.T) {
+	logp.TestingSetup()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// A 200 OK with an empty body, as observed from the CrowdStrike
+		// discover endpoint; Decode returns io.EOF.
+		w.Header().Set("Content-Type", "application/json")
+	}))
+	defer discoverSrv.Close()
+
+	s := newTestStream(t, discoverSrv.URL, discoverSrv.Client())
+	state, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{})
+	if err == nil {
+		t.Fatal("expected error from followSession, got nil")
+	}
+	if want := "discover stream returned an empty body"; !strings.Contains(err.Error(), want) {
+		t.Errorf("followSession() error = %v; want substring %q", err, want)
+	}
+	if state == nil {
+		t.Error("expected non-nil state on non-hard error")
+	}
+}
+
 func TestFollowSession_NonObjectMessage(t *testing.T) {
 	logp.TestingSetup()
 
