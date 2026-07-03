@@ -433,17 +433,21 @@ This file identity option uses file fingerprints produced by the [scanner](#file
 ::::
 
 
-Please refer to the [fingerprint configuration for details](#filebeat-input-filestream-scan-fingerprint).
+Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
 
 ```yaml
 file_identity.fingerprint: ~
 ```
 
     `growing` {applies_to}`stack: ga 9.5.0+`
-    :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication.
-    Refer to [Enhanced Fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
-    Set to `false` to restore the pre-9.5 behavior.
+  :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
+      
+      Set to `false` to restore the pre-9.5 behavior.
 
+      ```yaml
+      file_identity.fingerprint:
+        growing: true
+      ```
     
 
 **`native`**
