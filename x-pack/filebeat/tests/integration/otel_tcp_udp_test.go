@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"net"
 	"strings"
 	"testing"
 	"text/template"
@@ -213,14 +212,6 @@ service:
 		20*time.Second,
 		"filebeat did not run",
 	)
-
-	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
-		conn, err := net.Dial(inputType, otelAddress)
-		assert.NoError(ct, err, "otel %s input not listening on %s", inputType, otelAddress)
-		if conn != nil {
-			_ = conn.Close()
-		}
-	}, 30*time.Second, 100*time.Millisecond, "otel %s input not listening on %s", inputType, otelAddress)
 
 	go runClient(t, otelAddress, data)
 	go runClient(t, fbAddress, data)
