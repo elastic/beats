@@ -102,7 +102,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 				t.Fatal("closed harvester notification did not populate 'closedHarvesters'")
 			}
 
-			fw.watch(t.Context())
+			fw.watch(t.Context(), newTestMetrics(), 0, time.Time{})
 			// Because the harvester reported offset 0 while the file has data, a write operation
 			// must be generated to restart ingestion.
 			if len(fw.events) == 0 {
