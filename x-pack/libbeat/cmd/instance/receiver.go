@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/otelstorage"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
@@ -27,6 +28,7 @@ import (
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/extension/xextension/storage"
 	"go.opentelemetry.io/collector/receiver"
 )
 
@@ -38,6 +40,11 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
+	// ctx and id are retained so a generic OTel storage.Extension can be
+	// adapted into a backend.Registry (which obtains a storage.Client scoped to
+	// this receiver) when the beat resolves its configured storage extension.
+	ctx context.Context
+	id  component.ID
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -110,6 +117,8 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		Logger:              b.Info.Logger,
 		bridge:              bridge,
 		releaseSystemBridge: releaseSystem,
+		ctx:                 ctx,
+		id:                  receiverID,
 	}, nil
 }
 
@@ -145,17 +154,17 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
-	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
+	if w, ok := br.beater.(backend.WithStorageExtension); ok {
 		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
 			storageID, err := br.beat.RawConfig.String("storage", -1)
 			if err != nil {
 				return fmt.Errorf("error reading storage extension from config: %w", err)
 			}
-			esStorageExtension, err := br.getESStateStoreExtension(host, storageID)
+			storageExtension, err := br.getStorageExtension(host, storageID)
 			if err != nil {
-				return fmt.Errorf("error getting ES state store extension: %w", err)
+				return fmt.Errorf("error getting storage extension: %w", err)
 			}
-			w.WithESStateStoreExtension(esStorageExtension)
+			w.WithStorageExtension(storageExtension)
 		}
 	}
 
@@ -240,19 +249,27 @@ func (br *BeatReceiver) stopMonitoring() error {
 	return nil
 }
 
-func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExtension string) (backend.Registry, error) {
+func (br *BeatReceiver) getStorageExtension(host component.Host, storageExtensionID string) (backend.Registry, error) {
 	componentID := component.ID{}
-	err := componentID.UnmarshalText([]byte(storageExtension))
+	err := componentID.UnmarshalText([]byte(storageExtensionID))
 	if err != nil {
-		return nil, fmt.Errorf("invalid component id for ES state store extension (%v): %w", []byte(storageExtension), err)
+		return nil, fmt.Errorf("invalid component id for storage extension (%v): %w", []byte(storageExtensionID), err)
 	}
-	extension, ok := host.GetExtensions()[componentID]
+	ext, ok := host.GetExtensions()[componentID]
 	if !ok {
 		return nil, fmt.Errorf("extension with id %s not found", componentID.String())
 	}
-	reg, ok := extension.(backend.Registry)
-	if !ok {
-		return nil, fmt.Errorf("extension '%s' is not a backend.Registry", componentID.String())
+
+	// An extension can serve as a state store in two ways. If it natively
+	// implements backend.Registry (e.g. the Elasticsearch storage extension),
+	// use it directly. Otherwise, if it is a generic OTel storage extension
+	// (e.g. file_storage), adapt it into a backend.Registry.
+	switch e := ext.(type) {
+	case backend.Registry:
+		return e, nil
+	case storage.Extension:
+		return otelstorage.NewRegistryFromExtension(br.ctx, e, br.id), nil
+	default:
+		return nil, fmt.Errorf("extension %q is neither a backend.Registry nor an OTel storage.Extension", componentID.String())
 	}
-	return reg, nil
 }
