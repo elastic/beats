@@ -51,7 +51,7 @@ type HBRunnerFactory interface {
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
 type RunnerFactory struct {
-	info                  beat.Info
+	info                  *beat.Info
 	addTask               scheduler.AddTask
 	stateLoader           monitorstate.StateLoader
 	byId                  map[string]*Monitor
@@ -95,7 +95,7 @@ type FactoryParams struct {
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
 func NewFactory(fp FactoryParams) *RunnerFactory {
 	return &RunnerFactory{
-		info:                  fp.BeatInfo,
+		info:                  &fp.BeatInfo,
 		addTask:               fp.AddTask,
 		byId:                  map[string]*Monitor{},
 		mtx:                   &sync.Mutex{},
@@ -150,7 +150,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		return NoopRunner{}, nil
 	}
 
-	configEditor, err := newCommonPublishConfigs(f.info, f.beatLocation, c)
+	configEditor, err := newCommonPublishConfigs(*f.info, f.beatLocation, c)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop, f.logger)
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
@@ -226,7 +226,7 @@ func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	if !config.Enabled() {
 		return nil
 	}
-	return checkMonitorConfig(config, plugin.GlobalPluginsReg, f.logger)
+	return checkMonitorConfig(config, plugin.GlobalPluginsReg, *f.info)
 }
 
 // getLocation returns the location either from the stdfields or the beat preferring stdfields. Returns nil if declared in neither spot.
