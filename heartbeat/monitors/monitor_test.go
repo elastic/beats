@@ -25,8 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -76,7 +76,7 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	mon, err := newMonitor(conf, reg, c, sched.Add, nil, nil, logptest.NewTestingLogger(t, ""))
+	mon, err := newMonitor(conf, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -125,7 +125,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	m, err := newMonitor(serverMonConf, reg, c, sched.Add, nil, nil, logptest.NewTestingLogger(t, ""))
+	m, err := newMonitor(serverMonConf, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil)
 	require.Error(t, err)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
@@ -134,7 +134,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 	require.Equal(t, int64(0), built.Load())
 	require.Equal(t, int64(0), closed.Load())
 
-	require.Error(t, checkMonitorConfig(serverMonConf, reg, logptest.NewTestingLogger(t, "")))
+	require.Error(t, checkMonitorConfig(serverMonConf, reg, beat.Info{Logger: logptest.NewTestingLogger(t, "")}))
 }
 
 type MockStatusReporter struct {
@@ -163,8 +163,8 @@ func TestStatusReporter(t *testing.T) {
 	mockDegradedPluginFactory := plugin.PluginFactory{
 		Name:    "fail",
 		Aliases: []string{"failAlias"},
-		Make: func(s string, cfg *conf.C, logger *logp.Logger) (plugin.Plugin, error) {
-			return plugin.Plugin{Logger: logger}, fmt.Errorf("error plugin")
+		Make: func(s string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			return plugin.Plugin{Logger: info.Logger}, fmt.Errorf("error plugin")
 		},
 		Stats: plugin.NewPluginCountersRecorder("fail", monReg),
 	}
@@ -175,7 +175,7 @@ func TestStatusReporter(t *testing.T) {
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	m, err := newMonitor(cfg, reg, c, sched.Add, nil, nil, logptest.NewTestingLogger(t, ""))
+	m, err := newMonitor(cfg, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil)
 	require.NoError(t, err)
 
 	// Track status marked as failed during run_once execution

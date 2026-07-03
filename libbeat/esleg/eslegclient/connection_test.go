@@ -37,6 +37,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -126,7 +127,6 @@ func TestHeaders(t *testing.T) {
 }
 
 func TestUserAgentHeader(t *testing.T) {
-
 	// remove some randomness from this test
 	version.SetPackageVersion("8.15")
 
@@ -150,15 +150,19 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 			expectedUA: "testbeat/8.15",
 		},
-		{
-			name:         "libbeat-fallback",
-			connSettings: ConnectionSettings{},
-			expectedUA:   "Libbeat/8.15",
-		},
 	}
 
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
+			b := beat.Beat{
+				Info: beat.Info{},
+			}
+
+			if testCase.connSettings.Beatname != "" {
+				b.Info.Beat = testCase.connSettings.Beatname
+			}
+
+			b.GenerateUserAgent()
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if !strings.Contains(r.UserAgent(), testCase.expectedUA) {
 					t.Errorf("User-Agent must be '%s', got '%s'", testCase.expectedUA, r.UserAgent())
