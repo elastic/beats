@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/processors"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 
@@ -35,7 +35,7 @@ type runnerFactoryMock struct {
 	cfgs        []beat.ClientConfig
 }
 
-func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
+func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (InputRunner, error) {
 	// When using the connector multiple times to create a client
 	// it's using the same editor function for creating a new client
 	// with a modified configuration that includes predefined processing.
@@ -48,23 +48,38 @@ func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cf
 
 		// storing the config that the client was created with
 		// it's needed for the `Assert` later
-		r.cfgs = append(r.cfgs, client.(*clientMock).cfg)
+		r.cfgs = append(r.cfgs, client.(*clientMock).cfg) //nolint:errcheck // Safe to ignore in tests
 	}
-	return &struct {
-		cfgfile.Runner
-	}{}, nil
+	return &noopRunner{}, nil
 }
+
+// noopRunner is a test double for InputRunner: it records the shared processors
+// handed to it and closes them on Stop.
+type noopRunner struct {
+	closers []processors.Closer
+}
+
+func (*noopRunner) Start() {}
+func (r *noopRunner) Stop() {
+	for _, c := range r.closers {
+		_ = c.Close()
+	}
+}
+func (*noopRunner) String() string                  { return "noopRunner" }
+func (r *noopRunner) AddCloser(c processors.Closer) { r.closers = append(r.closers, c) }
+
+var _ InputRunner = (*noopRunner)(nil)
 
 func (runnerFactoryMock) CheckConfig(config *conf.C) error {
 	return nil
 }
 
-// Assert runs various checks for the clients created by the wrapped pipeline connector
-// We check that the processing configuration does not reference the same addresses as before,
-// re-using some parts of the processing configuration will result in various issues, such as:
-// * closing processors multiple times
-// * using closed processors
-// * modifiying an object shared by multiple pipeline clients
+// Assert runs various checks for the clients created by the wrapped pipeline
+// connector. Processing.Meta and Processing.Fields must still be a per-client
+// copy (they are mutated downstream); the user-configured and index processors
+// are now shared across clients via sharedProcessor wrappers (#50376): each
+// client gets a distinct wrapper, but the wrapped instance is the same (see
+// assertSharedProcessors).
 func (r runnerFactoryMock) Assert(t *testing.T) {
 	t.Helper()
 
@@ -88,24 +103,13 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 		}
 	})
 
-	t.Run("new processors each time", func(t *testing.T) {
-		var processors []beat.Processor
+	t.Run("processor wrappers are per-client, inner instances are shared", func(t *testing.T) {
+		perClient := make([][]beat.Processor, 0, len(r.cfgs))
 		for _, c := range r.cfgs {
-			processors = append(processors, c.Processing.Processor.All()...)
+			perClient = append(perClient, c.Processing.Processor.All())
 			defer c.Processing.Processor.Close()
 		}
-
-		require.NotEmptyf(t, processors, "for this test the list of processors cannot be empty")
-
-		for i, p1 := range processors {
-			for j, p2 := range processors {
-				if i == j {
-					continue
-				}
-
-				require.NotSamef(t, p1, p2, "processors must not be re-used")
-			}
-		}
+		assertSharedProcessors(t, perClient)
 	})
 }
 

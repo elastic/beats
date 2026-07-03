@@ -18,6 +18,8 @@
 package channel
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -28,13 +30,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
-
-type onCreateFactory struct {
-	factory cfgfile.RunnerFactory
-	create  onCreateWrapper
-}
-
-type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *conf.C) (cfgfile.Runner, error)
 
 // commonInputConfig defines common input settings
 // for the publisher pipeline.
@@ -61,94 +56,148 @@ type commonInputConfig struct {
 	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
 }
 
-func (f *onCreateFactory) CheckConfig(cfg *conf.C) error {
-	return f.factory.CheckConfig(cfg)
-}
-
-func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
-	return f.create(f.factory, pipeline, cfg)
-}
-
-// RunnerFactoryWithCommonInputSettings wraps a runner factory, such that all runners
-// created by this factory have the same processing capabilities and related
-// configuration file settings.
-//
-// Common settings ensured by this factory wrapper:
+// RunnerFactoryWithCommonInputSettings wraps a runner factory so all runners
+// it creates share the same processing capabilities and configuration-file
+// settings:
 //   - *fields*: common fields to be added to the pipeline
 //   - *fields_under_root*: select at which level to store the fields
 //   - *tags*: add additional tags to the events
 //   - *processors*: list of local processors to be added to the processing pipeline
 //   - *keep_null*: keep or remove 'null' from events to be published
 //   - *_module_name* (hidden setting): Add fields describing the module name
-//   - *_ fileset_name* (hidden setting):
+//   - *_fileset_name* (hidden setting):
 //   - *pipeline*: Configure the ES Ingest Node pipeline name to be used for events from this input
 //   - *index*: Configure the index name for events to be collected from this input
 //   - *type*: implicit event type
 //   - *service.type*: implicit event type
-func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
-	return wrapRunnerCreate(f,
-		func(
-			f cfgfile.RunnerFactory,
-			pipeline beat.PipelineConnector,
-			cfg *conf.C,
-		) (runner cfgfile.Runner, err error) {
-			pipeline, err = withClientConfig(info, pipeline, cfg)
-			if err != nil {
-				return nil, err
-			}
-
-			return f.Create(pipeline, cfg)
-		})
+//
+// The user-configured `processors:` list and the index processor are
+// instantiated once per input and shared across all pipeline clients.
+func RunnerFactoryWithCommonInputSettings(info beat.Info, f InputRunnerFactory) cfgfile.RunnerFactory {
+	return &commonSettingsFactory{info: info, inner: f}
 }
 
-func wrapRunnerCreate(f cfgfile.RunnerFactory, edit onCreateWrapper) cfgfile.RunnerFactory {
-	return &onCreateFactory{factory: f, create: edit}
+type commonSettingsFactory struct {
+	info  beat.Info
+	inner InputRunnerFactory
 }
 
-// withClientConfig reads common Beat input instance configurations from the
-// configuration object and ensure that the settings are applied to each client.
-func withClientConfig(
-	beatInfo beat.Info,
-	pipeline beat.PipelineConnector,
-	cfg *conf.C,
-) (beat.PipelineConnector, error) {
-	editor, err := newCommonConfigEditor(beatInfo, cfg)
+func (f *commonSettingsFactory) CheckConfig(cfg *conf.C) error {
+	return f.inner.CheckConfig(cfg)
+}
+
+func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
+	editor, sharedProcessors, err := newCommonConfigEditor(f.info, cfg)
 	if err != nil {
 		return nil, err
 	}
-	return pipetool.WithClientConfigEdit(pipeline, editor), nil
-}
 
-func newCommonConfigEditor(
-	beatInfo beat.Info,
-	cfg *conf.C,
-) (pipetool.ConfigEditor, error) {
-	config := commonInputConfig{}
-	if err := cfg.Unpack(&config); err != nil {
+	r, err := f.inner.Create(pipetool.WithClientConfigEdit(pipeline, editor), cfg)
+	if err != nil {
+		_ = sharedProcessors.Close()
 		return nil, err
 	}
 
+	r.AddCloser(sharedProcessors)
+
+	return r, nil
+}
+
+// InputRunner is a cfgfile.Runner that also owns the per-input shared
+// processors built by newCommonConfigEditor. It closes them on Stop, after its
+// pipeline clients have drained so in-flight events still see them.
+type InputRunner interface {
+	cfgfile.Runner
+
+	// AddCloser hands the runner the shared processors to close on Stop.
+	AddCloser(processors.Closer)
+}
+
+// InputRunnerFactory is a variant of cfgfile.RunnerFactory whose runners are InputRunners.
+type InputRunnerFactory interface {
+	Create(pipeline beat.PipelineConnector, cfg *conf.C) (InputRunner, error)
+	CheckConfig(cfg *conf.C) error
+}
+
+// sharedProcessor is a run-only view of an input-owned processor. The
+// per-input processors are built once and shared across every pipeline client
+// the input opens (one per filestream harvester). Embedding the beat.Processor
+// interface promotes only Run/String, hiding Closer and PathSetter, so a
+// pipeline client closing its own processor list (when a harvester stops)
+// cannot tear down or re-initialise state still used by sibling
+// harvesters. The shared instances are path-initialised and closed exactly
+// once by the owning input (see newCommonConfigEditor and InputRunner).
+type sharedProcessor struct {
+	beat.Processor
+}
+
+// newCommonConfigEditor builds the per-client editor closure plus the shared
+// per-input processors that the editor's clients reference. The shared
+// processors are returned separately so the caller closes them at input
+// shutdown rather than at first-client shutdown.
+func newCommonConfigEditor(
+	beatInfo beat.Info,
+	cfg *conf.C,
+) (pipetool.ConfigEditor, *processors.Processors, error) {
+	config := commonInputConfig{}
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, nil, err
+	}
+
+	// Build the user-configured processors once per input
+	userProcessors, err := processors.New(config.Processors, beatInfo.Logger)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return newConfigEditor(beatInfo, config, userProcessors)
+}
+
+// newConfigEditor wires the resolved input config and the input-owned user
+// processors into the per-client editor closure and the shared per-input
+// processor list. It is split out from newCommonConfigEditor so the
+// registry-driven processors.New build stays separate from the wiring, which
+// lets tests inject processors directly instead of registering a global plugin.
+func newConfigEditor(
+	beatInfo beat.Info,
+	config commonInputConfig,
+	userProcessors *processors.Processors,
+) (pipetool.ConfigEditor, *processors.Processors, error) {
 	serviceType := config.ServiceType
 	if serviceType == "" {
 		serviceType = config.Module
 	}
 
-	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
-		var indexProcessor beat.Processor
-		if !config.Index.IsEmpty() {
-			staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
-			timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
-			if err != nil {
-				return clientCfg, err
-			}
-			indexProcessor = add_formatted_index.New(timestampFormat)
-		}
-
-		userProcessors, err := processors.New(config.Processors, beatInfo.Logger)
+	var indexProcessor beat.Processor
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
 		if err != nil {
-			return clientCfg, err
+			_ = userProcessors.Close()
+			return nil, nil, fmt.Errorf("failed to build the index processor: %w", err)
 		}
+		indexProcessor = add_formatted_index.New(timestampFormat)
+	}
 
+	shared := processors.NewList(beatInfo.Logger)
+	if indexProcessor != nil {
+		shared.AddProcessor(indexProcessor)
+	}
+	shared.AddProcessors(*userProcessors)
+
+	// Path-aware processors (cache, script, conditionals with path-aware
+	// children, ...) must have their paths set before Run, otherwise
+	// SafeProcessor.Run returns ErrPathsNotSet and drops every event. The
+	// per-client publisher group can no longer do this for us because the
+	// sharedProcessor wrapper hides PathSetter, so we initialise the shared
+	// instances once here. The beat paths are already configured at startup,
+	// before any input is created.
+	if err := shared.SetPaths(beatInfo.Paths); err != nil {
+		_ = shared.Close()
+		return nil, nil, fmt.Errorf("failed to set paths for input processors: %w", err)
+	}
+
+	editor := func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
 		meta := clientCfg.Processing.Meta.Clone()
 		fields := clientCfg.Processing.Fields.Clone()
 
@@ -170,15 +219,19 @@ func newCommonConfigEditor(
 		// 1. add support for index configuration via processor
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
+		//
+		// Shared processors are wrapped per client (sharedProcessor) and kept
+		// as flat siblings to preserve the client group's continue-on-error
+		// semantics (see TestProcessorsForConfigIsFlat).
 		procs := processors.NewList(beatInfo.Logger)
 		if indexProcessor != nil {
-			procs.AddProcessor(indexProcessor)
+			procs.AddProcessor(sharedProcessor{indexProcessor})
 		}
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
 		}
-		if userProcessors != nil {
-			procs.AddProcessors(*userProcessors)
+		for _, p := range userProcessors.List {
+			procs.AddProcessor(sharedProcessor{p})
 		}
 
 		clientCfg.Processing.EventMetadata = config.EventMetadata
@@ -189,7 +242,9 @@ func newCommonConfigEditor(
 		clientCfg.Processing.DisableHost = config.PublisherPipeline.DisableHost
 
 		return clientCfg, nil
-	}, nil
+	}
+
+	return editor, shared, nil
 }
 
 func setOptional(to mapstr.M, key string, value string) {
