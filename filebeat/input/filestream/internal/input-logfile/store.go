@@ -97,7 +97,7 @@ type resource struct {
 	// stateMutex is used to lock the resource when it is update/read from
 	// multiple go-routines like the ACK handler or the input publishing an
 	// event.
-	// stateMutex is used to access the fields 'stored', 'state', 'internalInSync' and 'version'.
+	// It is used to access the fields 'key', 'stored', 'state', 'internalInSync' and 'version'.
 	stateMutex sync.Mutex
 
 	// stored indicates that the state is available in the registry file. It is false for new entries.
