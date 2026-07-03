@@ -12,11 +12,14 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"regexp"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -89,6 +92,152 @@ func createJSONResponse(data interface{}, statusCode int) (*http.Response, error
 
 	resp.Header.Set("Content-Type", "application/json")
 	return resp, nil
+}
+
+// flakyTransporter wraps customTransporter and answers the first failListBlobs
+// "list blobs" requests with a synthetic Azure "503 ServerBusy" before letting
+// requests through. It reproduces the transient throttling from sdh-beats#7324
+// so we can assert that blob listing (pagination) is now retried.
+type flakyTransporter struct {
+	inner         *customTransporter
+	failListBlobs int
+
+	mu           sync.Mutex
+	listAttempts int
+}
+
+func (t *flakyTransporter) Do(req *http.Request) (*http.Response, error) {
+	// The list-blobs call is the pagination request (GET on the container with
+	// comp=list); blob downloads use a different path and are left untouched.
+	if req.URL.Query().Get("comp") == "list" {
+		t.mu.Lock()
+		shouldFail := t.listAttempts < t.failListBlobs
+		if shouldFail {
+			t.listAttempts++
+		}
+		t.mu.Unlock()
+		if shouldFail {
+			return serverBusyResponse(req), nil
+		}
+	}
+	return t.inner.Do(req)
+}
+
+// attempts reports how many list-blobs requests have been observed so far,
+// under the same lock used to record them.
+func (t *flakyTransporter) attempts() int {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	return t.listAttempts
+}
+
+func serverBusyResponse(req *http.Request) *http.Response {
+	const body = `<?xml version="1.0" encoding="utf-8"?><Error><Code>ServerBusy</Code><Message>The server is busy.</Message></Error>`
+	h := make(http.Header)
+	h.Set("Content-Type", "application/xml")
+	return &http.Response{
+		StatusCode: http.StatusServiceUnavailable,
+		Status:     "503 The server is busy.",
+		Body:       io.NopCloser(strings.NewReader(body)),
+		Header:     h,
+		Request:    req,
+	}
+}
+
+// Test_ListBlobsRetriesOnTransientError verifies that a transient 503 during
+// blob listing no longer kills the input: with retries configured, the pager
+// recovers and every expected blob is still ingested.
+func Test_ListBlobsRetriesOnTransientError(t *testing.T) {
+	logp.TestingSetup()
+
+	serv := httptest.NewServer(mock.AzureStorageServer())
+	t.Cleanup(serv.Close)
+
+	// Fail the first three list attempts, then succeed. With max_retries: 10 the
+	// pager has enough attempts left to get through the throttling.
+	transport := &flakyTransporter{
+		inner:         &customTransporter{rt: http.DefaultTransport, servURL: serv.URL},
+		failListBlobs: 3,
+	}
+
+	baseConfig := map[string]interface{}{
+		"account_name": "beatsblobnew",
+		"auth.oauth2": map[string]interface{}{
+			"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
+			"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
+			"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
+		},
+		"max_workers": 2,
+		"poll":        false,
+		"containers": []map[string]interface{}{
+			{"name": beatsContainer},
+		},
+		// Keep the backoff tiny so the test stays fast.
+		"retry": map[string]interface{}{
+			"max_retries":         10,
+			"initial_retry_delay": "1ms",
+			"max_retry_delay":     "5ms",
+		},
+	}
+	expected := map[string]bool{
+		mock.Beatscontainer_blob_ata_json:      true,
+		mock.Beatscontainer_blob_data3_json:    true,
+		mock.Beatscontainer_blob_docs_ata_json: true,
+	}
+
+	cfg := conf.MustNewConfigFrom(baseConfig)
+	c := config{}
+	require.NoError(t, cfg.Unpack(&c))
+
+	// inject the flaky transport; the retry policy is wired from c.Retry.
+	c.Auth.OAuth2.clientOptions = azcore.ClientOptions{
+		InsecureAllowCredentialWithHTTP: true,
+		Transport:                       transport,
+	}
+
+	input := newStatelessInput(c, serv.URL+"/", logp.NewNopLogger())
+	assert.NoError(t, input.Test(v2.TestContext{}), "input.Test should succeed")
+
+	chanClient := beattest.NewChanClient(len(expected))
+	t.Cleanup(func() { _ = chanClient.Close() })
+
+	ctx, cancel := newV2Context(t)
+	t.Cleanup(cancel)
+	ctx.ID += "-retry"
+
+	var g errgroup.Group
+	g.Go(func() error {
+		return input.Run(ctx, chanClient)
+	})
+
+	timeout := time.NewTimer(10 * time.Second)
+	t.Cleanup(func() { timeout.Stop() })
+
+	var receivedCount int
+wait:
+	for {
+		select {
+		case <-timeout.C:
+			t.Errorf("timed out waiting for %d events after transient list failures", len(expected))
+			cancel()
+			break wait
+		case got := <-chanClient.Channel:
+			val, err := got.Fields.GetValue("message")
+			assert.NoError(t, err, "published event should carry a message field")
+			assert.True(t, expected[val.(string)], "received unexpected message: %v", val)
+			receivedCount++
+			if receivedCount == len(expected) {
+				cancel()
+				break wait
+			}
+		}
+	}
+
+	// Wait for the input to finish so the transport goroutines are done before
+	// we inspect the attempt counter.
+	assert.NoError(t, g.Wait(), "input run should complete without error")
+	assert.GreaterOrEqual(t, transport.attempts(), 3,
+		"the list-blobs request should have been retried past the transient 503s")
 }
 
 func Test_OAuth2(t *testing.T) {

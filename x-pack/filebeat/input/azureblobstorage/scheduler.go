@@ -139,7 +139,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				containerName: s.src.ContainerName,
 			}
 
-			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.log)
+			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.src.Retry, s.log)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
@@ -147,7 +147,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				return err
 			}
 
-			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.status, s.metrics, s.log)
+			job := newJob(blobClient, v, blobURL, s.state, s.src, int32(s.src.Retry.MaxRetries), s.publisher, s.status, s.metrics, s.log)
 			jobs = append(jobs, job)
 		}
 

@@ -112,7 +112,7 @@ func TestDecoding(t *testing.T) {
 					LastModified: &time.Time{},
 				},
 			}
-			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, p, noopReporter{}, nil, log)
+			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, 0, p, noopReporter{}, nil, log)
 			j.src.ReaderConfig.Decoding = tc.config
 			err = j.decode(context.Background(), f, "test")
 			if err != nil {
