@@ -166,7 +166,7 @@ func (c config) Validate() error {
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
 	noEmit := lib.Emit(func() lib.Emitter { return nil })
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false, noEmit)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, "", patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false, noEmit)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}

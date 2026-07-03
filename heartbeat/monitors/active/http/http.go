@@ -24,9 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -44,7 +44,7 @@ var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), ve
 func create(
 	name string,
 	cfg *conf.C,
-	logger *logp.Logger,
+	info beat.Info,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -71,7 +71,7 @@ func create(
 		body = buf.Bytes()
 	}
 
-	validator, err := makeValidateResponse(&config.Check.Response, logger)
+	validator, err := makeValidateResponse(&config.Check.Response, info.Logger)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
@@ -83,24 +83,24 @@ func create(
 	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
 	// separate DNS rtt data.
 	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
-		transport, err := newRoundTripper(&config)
+		transport, err := newRoundTripper(&config, userAgent)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
+			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator, userAgent)
 		}
 	} else {
 		// preload TLS configuration
-		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, logger)
+		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, info.Logger)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
 		config.Transport.TLS = nil
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator, userAgent)
 		}
 	}
 
@@ -121,10 +121,10 @@ func create(
 		js[i] = wraputil.WithURLField(u, job)
 	}
 
-	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts), Logger: logger}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts), Logger: info.Logger}, nil
 }
 
-func newRoundTripper(config *Config) (http.RoundTripper, error) {
+func newRoundTripper(config *Config, userAgent string) (http.RoundTripper, error) {
 	return config.Transport.RoundTripper(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithoutProxyEnvironmentVariables(),

@@ -38,7 +38,7 @@ import (
 // to prevent a start/stop cycle for select fields updates
 type HashConfigFunc func(cfg *conf.C) (uint64, error)
 
-type PluginMake func(string, *conf.C, *logp.Logger) (p Plugin, err error)
+type PluginMake func(string, *conf.C, beat.Info) (p Plugin, err error)
 type PluginUpdate func(*conf.C) (err error)
 
 // PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
@@ -225,6 +225,6 @@ func (r *PluginsReg) MonitorNames() []string {
 	return names
 }
 
-func (e *PluginFactory) Create(cfg *conf.C, logger *logp.Logger) (p Plugin, err error) {
-	return e.Make(e.Name, cfg, logger)
+func (e *PluginFactory) Create(cfg *conf.C, info beat.Info) (p Plugin, err error) {
+	return e.Make(e.Name, cfg, info)
 }
