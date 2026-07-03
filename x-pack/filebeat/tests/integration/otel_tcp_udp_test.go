@@ -20,7 +20,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
@@ -33,25 +32,29 @@ const (
 )
 
 func TestTCPInputOTelE2E(t *testing.T) {
-	ports := libbeattesting.MustAvailableTCP4Ports(t, 2)
+	otelServerAddr := "127.0.0.1:9042"
+	fbServerAddr := "127.0.0.1:9043"
+
 	runSocketInputOTelE2E(
 		t,
 		"tcp",
 		tcpInputTestMsg,
-		hostAddress(ports[0]),
-		hostAddress(ports[1]),
+		otelServerAddr,
+		fbServerAddr,
 		nettest.RunTCPClient,
 	)
 }
 
 func TestUDPInputOTelE2E(t *testing.T) {
-	ports := libbeattesting.MustAvailableTCP4Ports(t, 2)
+	otelServerAddr := "127.0.0.1:9042"
+	fbServerAddr := "127.0.0.1:9043"
+
 	runSocketInputOTelE2E(
 		t,
 		"udp",
 		udpInputTestMsg,
-		hostAddress(ports[0]),
-		hostAddress(ports[1]),
+		otelServerAddr,
+		fbServerAddr,
 		nettest.RunUDPClient,
 	)
 }
