@@ -64,15 +64,8 @@ type FileDescriptor struct {
 	Info file.ExtendedFileInfo
 	// Fingerprint is a computed hash of the file header
 	Fingerprint string
-<<<<<<< HEAD
 	// bytesIngested is the number of bytes already ingested by the harvester
 	// for this file
-=======
-	// GZIP indicates if the file is compressed with GZIP.
-	GZIP bool
-
-	// bytesIngested is the number of bytes already ingested by the harvester for this file.
->>>>>>> 8fc2ff170 (fix(filestream): honor offset-0 harvester close in SizeOrBytesIngested (#51675))
 	bytesIngested int64
 	// bytesIngestedSet distinguishes an explicit ingested offset of 0 (a harvester closed before
 	// ingesting anything) from bytesIngested never having been set.
