@@ -168,7 +168,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		return nil, err
 	}
 
-	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, log)
+	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, env.Agent.UserAgent, log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		stat.UpdateStatus(status.Failed, err.Error())
