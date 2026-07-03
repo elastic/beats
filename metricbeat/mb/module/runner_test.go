@@ -21,16 +21,19 @@ package module_test
 
 import (
 	"runtime"
+	"sync/atomic"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/cpu"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 
@@ -131,3 +134,76 @@ func newPubClientFactory() (*pubtest.ChanClient, func() beat.Client) {
 	client := pubtest.NewChanClient(10)
 	return client, func() beat.Client { return client }
 }
+
+func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
+	// Wrap a no-op processor with SafeWrap so it becomes a safeProcessorWithClose.
+	proc, err := processors.SafeWrap(func(_ *conf.C, _ *logp.Logger) (beat.Processor, error) {
+		return noopCloser{}, nil
+	})(nil, nil)
+	require.NoError(t, err)
+
+	publishing := make(chan struct{})
+	unblock := make(chan struct{})
+
+	var runErr atomic.Pointer[error]
+
+	client := &blockingClient{
+		onPublish: func(e beat.Event) {
+			close(publishing)
+			<-unblock
+			// This is the call that fails in production when the processor
+			// chain is closed before the publish goroutine finishes.
+			if _, err := proc.Run(&e); err != nil {
+				runErr.Store(&err)
+			}
+		},
+		onClose: func() error {
+			return processors.Close(proc)
+		},
+	}
+
+	config, err := conf.NewConfigFrom(map[string]interface{}{
+		"module":     moduleName,
+		"metricsets": []string{pushMetricSetName},
+		"period":     "1s",
+	})
+	require.NoError(t, err)
+
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+	require.NoError(t, err)
+
+	r := module.NewRunner(client, m)
+	r.Start()
+	<-publishing // a publish is now in progress and blocked
+
+	// r.Stop() waits for in-flight publish goroutines before calling
+	// client.Close(), so we must release the blocked goroutine from here.
+	go close(unblock)
+	r.Stop()
+
+	if p := runErr.Load(); p != nil {
+		assert.NoError(t, *p, "proc.Run failed inside Publish — processor was closed before the publish goroutine finished")
+	}
+}
+
+// noopCloser is a pass-through processor that implements processors.Closer.
+// The Closer interface is what causes SafeWrap to produce a safeProcessorWithClose,
+// which tracks whether Close has been called and returns ErrClosed from Run afterwards.
+type noopCloser struct{}
+
+func (noopCloser) Run(e *beat.Event) (*beat.Event, error) { return e, nil }
+func (noopCloser) Close() error                           { return nil }
+func (noopCloser) String() string                         { return "noop" }
+
+type blockingClient struct {
+	onPublish func(beat.Event)
+	onClose   func() error
+}
+
+func (c *blockingClient) Publish(e beat.Event) { c.onPublish(e) }
+func (c *blockingClient) PublishAll(es []beat.Event) {
+	for _, e := range es {
+		c.onPublish(e)
+	}
+}
+func (c *blockingClient) Close() error { return c.onClose() }
