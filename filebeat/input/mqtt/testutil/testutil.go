@@ -25,6 +25,7 @@ import (
 	"time"
 
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -88,7 +89,7 @@ func EmitMessages(t *testing.T, ctx context.Context, publisher libmqtt.Client, t
 				if !token.WaitTimeout(waitTimeout) {
 					require.Fail(t, "timed out publishing to topic %q", topic)
 				}
-				require.NoError(t, token.Error(), "failed to publish to topic %q", topic)
+				assert.NoError(t, token.Error(), "failed to publish to topic %q", topic)
 			}
 		}
 	}()
