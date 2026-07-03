@@ -47,6 +47,9 @@ func NewConditional(
 	}
 }
 
+var _ PdataProcessor = (*WhenProcessor)(nil)
+var _ PdataProcessor = (*ClosingWhenProcessor)(nil)
+
 // WhenProcessor is a tuple of condition plus a Processor.
 type WhenProcessor struct {
 	condition conditions.Condition

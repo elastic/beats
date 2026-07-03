@@ -99,8 +99,37 @@ func (c *RRuleScheduleConfig) IsEnabled() bool {
 // ElasticOptions contains Beat-specific options that are not part of
 // osquery's native config schema.
 type ElasticOptions struct {
-	Install             *InstallConfig             `config:"install" json:"-"`
-	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
+	Install *InstallConfig `config:"install" json:"-"`
+	// Profiling groups all query profiling settings (global publish default and local storage).
+	Profiling *ProfilingConfig `config:"profiling" json:"-"`
+}
+
+// ProfilingConfig groups all query profiling settings. When ProfilingAll is enabled (the default),
+// profiles are collected and published to the osquery_manager.query_profile data stream for all
+// queries that do not set their own profiling flag. It still requires the query_profile input stream
+// to be present for events to be published. Storage controls local retention of live profiles
+// for diagnostics, independent of publishing.
+type ProfilingConfig struct {
+	ProfilingAll *bool                      `config:"profiling_all" json:"-"`
+	Storage      *QueryProfileStorageConfig `config:"storage" json:"-"`
+}
+
+// ProfilingAllOrDefault returns the global profiling default, which is enabled unless
+// explicitly set to false.
+func (c ProfilingConfig) ProfilingAllOrDefault() bool {
+	if c.ProfilingAll == nil {
+		return true
+	}
+	return *c.ProfilingAll
+}
+
+// ResolveProfiling returns the effective profiling decision for a query: a per-query
+// override wins when set, otherwise the global default applies.
+func ResolveProfiling(globalDefault bool, override *bool) bool {
+	if override != nil {
+		return *override
+	}
+	return globalDefault
 }
 
 // QueryProfileStorageConfig controls local storage of live query profiles.
@@ -163,11 +192,12 @@ type Query struct {
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
 
-	// Optional internal flag to emit per-query profiling for this scheduled query
+	// Optional per-query override to emit profiling for this scheduled query
 	// (native: osquery_schedule metrics; RRULE: process-level deltas like live queries).
+	// When nil the global elastic_options.profiling.profiling_all default applies (see ResolveProfiling).
 	// RRULE/live profiling uses the same serialized osquery client; native osqueryd schedules
 	// can still add process load outside that bracket. Not rendered into osqueryd configuration.
-	Profile bool `config:"profile" json:"-"`
+	Profiling *bool `config:"profiling" json:"-"`
 }
 
 type Pack struct {

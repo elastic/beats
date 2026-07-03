@@ -20,6 +20,7 @@ jobs:
       (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude'))
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-mention-in-issue.lock.yml@v0
     with:
+      report-failure-as-issue: false
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         export GOTOOLCHAIN=auto

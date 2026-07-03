@@ -15,18 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package watcher
+//go:build !requirefips
 
-import "time"
+package hasher
 
-var defaultFilePollInterval = 5 * time.Second
+import (
+	"crypto/sha1"
+	"crypto/sha256"
+	"hash"
+)
 
-type watchConfig struct {
-	Path string        `config:"watch.poll_file.path"`
-	Poll time.Duration `config:"watch.poll_file.interval" validate:"min=1"`
-}
-
-// DefaultWatchConfig is used to initialize watch config data.
-var DefaultWatchConfig = watchConfig{
-	Poll: defaultFilePollInterval,
-}
+var (
+	validHashes = map[HashType]func() hash.Hash{
+		SHA1:   sha1.New,
+		SHA256: sha256.New,
+	}
+)

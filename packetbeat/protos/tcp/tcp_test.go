@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -45,7 +47,7 @@ const (
 var httpProtocol, mysqlProtocol, redisProtocol protos.Protocol
 
 func init() {
-	new := func(_ bool, _ protos.Reporter, _ *procs.ProcessesWatcher, _ *conf.C) (protos.Plugin, error) {
+	new := func(_ bool, _ protos.Reporter, _ *procs.ProcessesWatcher, _ *conf.C, _ *logp.Logger) (protos.Plugin, error) {
 		return &TestProtocol{}, nil
 	}
 
@@ -305,7 +307,7 @@ func TestTCSeqPayload(t *testing.T) {
 						parse: makeCollectPayload(&state, true),
 					},
 				},
-			}, "test", "test", 0)
+			}, "test", "test", 0, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -343,7 +345,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 	p := protocols{}
 	p.tcp = make(map[protos.Protocol]protos.TCPPlugin)
 	p.tcp[1] = &TestProtocol{Ports: []int{ServerPort}}
-	tcp, _ := NewTCP(p, "", "", 0)
+	tcp, _ := NewTCP(p, "", "", 0, logptest.NewTestingLogger(b, ""))
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {

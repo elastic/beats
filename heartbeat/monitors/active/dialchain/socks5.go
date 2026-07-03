@@ -35,11 +35,11 @@ import (
 //	      "rtt": { "connect": { "us": ... }}
 //	  }
 //	}
-func SOCKS5Layer(config *transport.ProxyConfig) Layer {
+func SOCKS5Layer(config *transport.ProxyConfig, logger *logp.Logger) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
-		dialer, err := transport.ProxyDialer(logp.NewLogger("socks5Layer"), config, startTimerAfterDial(&timer, next))
+		dialer, err := transport.ProxyDialer(logger, config, startTimerAfterDial(&timer, next))
 		if err != nil {
 			return nil, err
 		}
