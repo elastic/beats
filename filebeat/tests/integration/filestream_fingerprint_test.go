@@ -661,7 +661,7 @@ func readFileLines(t *testing.T, path string) []string {
 	require.NoError(t, err, "failed to read %s", path)
 
 	var lines []string
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		if line != "" {
 			lines = append(lines, line)
 		}
@@ -1269,7 +1269,7 @@ logging:
 	//   - smallFile: 5 lines  (~250 bytes), below threshold → dropped by
 	//     static (errFileTooSmall); no registry entry.
 	require.NoError(t,
-		os.WriteFile(inputConfigFile, []byte(fmt.Sprintf(staticInputCfg, logDir)), 0o644),
+		os.WriteFile(inputConfigFile, fmt.Appendf(nil, staticInputCfg, logDir), 0o644),
 		"failed to write initial static input config")
 	appendToFile(t, largeFile, generateLines("large", 30))
 	appendToFile(t, smallFile, generateLines("small", 5))
@@ -1291,7 +1291,7 @@ logging:
 	// Phase 2: replace the input config to enable growing fingerprint.
 	// Expected post-reload total: 30 (large, unchanged) + 5 (small, new) = 35.
 	require.NoError(t,
-		os.WriteFile(inputConfigFile, []byte(fmt.Sprintf(growingInputCfg, logDir)), 0o644),
+		os.WriteFile(inputConfigFile, fmt.Appendf(nil, growingInputCfg, logDir), 0o644),
 		"failed to replace input config with growing-enabled version")
 
 	// Wait for the input to be stopped

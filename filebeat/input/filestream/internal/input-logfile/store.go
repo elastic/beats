@@ -250,7 +250,7 @@ func (s *sourceStore) IterateOnPrefix(fn func(key string, meta any)) {
 //   - The harvester holding the resource lock continues to work with the same
 //     *resource pointer - only the key field and table entry change
 //   - Cursor updates from the harvester continue to work on the same resource
-func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
+func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 

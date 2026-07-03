@@ -61,7 +61,7 @@ type StateMetadataUpdater interface {
 	// UpdateKey updates an entry from oldKey to newKey with updated metadata.
 	// This is used by the growing fingerprint migration to update the registry
 	// key when a file's fingerprint grows.
-	UpdateKey(oldKey, newKey string, meta interface{}) error
+	UpdateKey(oldKey, newKey string, meta any) error
 
 	// KeyExists returns true if the given key already has an entry in the
 	// store. This is a fast O(1) lookup with no side effects (no Retain/Release).

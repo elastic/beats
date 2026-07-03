@@ -1469,7 +1469,7 @@ func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
 	for _, tc := range cases {
 		b.Run(tc.name, func(b *testing.B) {
 			dir := b.TempDir()
-			for i := 0; i < benchmarkFileCount; i++ {
+			for i := range benchmarkFileCount {
 				filename := filepath.Join(dir, fmt.Sprintf("file-%d.log", i))
 				content := fmt.Sprintf("content-%d\n", i)
 				// ~10KB per file: well above the 1024-byte threshold, so every
@@ -1822,7 +1822,7 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 	assert.NotEmpty(t, fp.Raw, "crossing scan must carry the bridging raw header")
 
 	// Stable scans: still Complete, but the now-redundant raw header is dropped.
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		fp = scan()
 		require.True(t, fp.Complete(), "stable file stays Complete")
 		assert.Empty(t, fp.Raw,

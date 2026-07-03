@@ -368,9 +368,9 @@ func TestNormalizeConfig(t *testing.T) {
 		},
 		{
 			name: "growing=true enables scanner growing",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{
-					"fingerprint": map[string]interface{}{"growing": true},
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": true},
 				},
 			},
 			wantEnabled: true,
@@ -378,9 +378,9 @@ func TestNormalizeConfig(t *testing.T) {
 		},
 		{
 			name: "growing=false disables scanner growing",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{
-					"fingerprint": map[string]interface{}{"growing": false},
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": false},
 				},
 			},
 			wantEnabled: true,
@@ -388,11 +388,11 @@ func TestNormalizeConfig(t *testing.T) {
 		},
 		{
 			name: "scanner-level growing is ignored",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"fingerprint": nil},
-				"prospector": map[string]interface{}{
-					"scanner": map[string]interface{}{
-						"fingerprint": map[string]interface{}{"growing": false},
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"growing": false},
 					},
 				},
 			},
@@ -401,13 +401,13 @@ func TestNormalizeConfig(t *testing.T) {
 		},
 		{
 			name: "identity growing overrides scanner-level growing",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{
-					"fingerprint": map[string]interface{}{"growing": false},
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": false},
 				},
-				"prospector": map[string]interface{}{
-					"scanner": map[string]interface{}{
-						"fingerprint": map[string]interface{}{"growing": true},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"growing": true},
 					},
 				},
 			},
@@ -416,9 +416,9 @@ func TestNormalizeConfig(t *testing.T) {
 		},
 		{
 			name: "invalid growing is rejected",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{
-					"fingerprint": map[string]interface{}{"growing": "not-a-bool"},
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": "not-a-bool"},
 				},
 			},
 			wantErr: "cannot read 'file_identity.fingerprint' config",
