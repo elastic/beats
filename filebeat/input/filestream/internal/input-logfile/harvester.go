@@ -29,7 +29,6 @@ import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -477,10 +476,16 @@ func (hg *defaultHarvesterGroup) StopHarvesters() error {
 // the cursor state and unlock the key.
 func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
-	err := lockResource(ctx.Logger, key, resource, ctx.Cancelation)
-	if err != nil {
-		resource.Release()
-		return nil, err
+
+	if !resource.lock.TryLock() {
+		ctx.Logger.Infof("Resource '%s' currently in use, waiting...", key)
+		err := resource.lock.LockContext(ctx.Cancelation)
+		ctx.Logger.Infof("Resource '%s' finally released. Lock acquired", key)
+		if err != nil {
+			ctx.Logger.Infof("Input for resource '%s' has been stopped while waiting", key)
+			resource.Release()
+			return nil, err
+		}
 	}
 
 	resource.stateMutex.Lock()
@@ -488,19 +493,6 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource.stateMutex.Unlock()
 
 	return resource, nil
-}
-
-func lockResource(log *logp.Logger, key string, resource *resource, canceler inputv2.Canceler) error {
-	if !resource.lock.TryLock() {
-		log.Infof("Resource '%s' currently in use, waiting...", key)
-		err := resource.lock.LockContext(canceler)
-		log.Infof("Resource '%s' finally released. Lock acquired", key)
-		if err != nil {
-			log.Infof("Input for resource '%s' has been stopped while waiting", key)
-			return err
-		}
-	}
-	return nil
 }
 
 func releaseResource(resource *resource) {
