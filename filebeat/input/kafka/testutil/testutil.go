@@ -110,6 +110,8 @@ func strDefault(a, defaults string) string {
 }
 
 func EnsureKafkaTopicReadyForWrites(t *testing.T, topic string) {
+	t.Helper()
+
 	config := sarama.NewConfig()
 	config.Version = sarama.V1_0_0_0
 	hosts := []string{GetTestKafkaHost()}

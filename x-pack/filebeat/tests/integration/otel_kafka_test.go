@@ -143,6 +143,7 @@ func consumeKafkaTopic(t *testing.T, topic string) []byte {
 	t.Helper()
 
 	cfg := sarama.NewConfig()
+	cfg.Version = sarama.V1_0_0_0
 	cfg.Consumer.Return.Errors = true
 
 	t.Cleanup(func() {
