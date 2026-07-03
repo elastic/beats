@@ -2094,9 +2094,91 @@ service:
 	}
 }
 
-// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full otel pipeline.
+type benchPreset struct {
+	name string
+
+	// beats queue
+	memQueueEvents       int
+	memQueueMinEvents    int
+	memQueueFlushTimeout string
+
+	// sending_queue
+	maxConnsPerHost   int
+	expBatchMaxSize   int
+	expBatchMinSize   int
+	expFlushTimeout   string
+	expNumConsumers   int
+	expQueueSize      int
+	eventCountPerRecv int
+}
+
+var benchPresets = []benchPreset{
+	{
+		name:                 "throughput",
+		memQueueEvents:       12800,
+		memQueueMinEvents:    1600,
+		memQueueFlushTimeout: "5s",
+		maxConnsPerHost:      4,
+		expBatchMaxSize:      1600,
+		expBatchMinSize:      1600,
+		expFlushTimeout:      "5s",
+		expNumConsumers:      4,
+		expQueueSize:         12800,
+		eventCountPerRecv:    32_000, // 20 x 1600
+	},
+	{
+		name:                 "balanced",
+		memQueueEvents:       3200,
+		memQueueMinEvents:    1600,
+		memQueueFlushTimeout: "10s",
+		maxConnsPerHost:      1,
+		expBatchMaxSize:      1600,
+		expBatchMinSize:      1600,
+		expFlushTimeout:      "10s",
+		expNumConsumers:      1,
+		expQueueSize:         3200,
+		eventCountPerRecv:    32_000, // 20 x 1600
+	},
+	{
+		name:                 "scale",
+		memQueueEvents:       3200,
+		memQueueMinEvents:    1600,
+		memQueueFlushTimeout: "20s",
+		maxConnsPerHost:      1,
+		expBatchMaxSize:      1600,
+		expBatchMinSize:      1600,
+		expFlushTimeout:      "20s",
+		expNumConsumers:      1,
+		expQueueSize:         3200,
+		eventCountPerRecv:    32_000, // 20 x 1600
+	},
+	{
+		name:                 "latency",
+		memQueueEvents:       4100,
+		memQueueMinEvents:    2050,
+		memQueueFlushTimeout: "1s",
+		maxConnsPerHost:      1,
+		expBatchMaxSize:      50,
+		expBatchMinSize:      50,
+		expFlushTimeout:      "1s",
+		expNumConsumers:      1,
+		expQueueSize:         4100,
+		eventCountPerRecv:    32_800, // 16 x 2050
+	},
+}
+
+// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full
+// otel pipeline, once per benchmark preset (see benchPresets).
 func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
-	const eventCount = 100_000
+	for _, preset := range benchPresets {
+		b.Run(preset.name, func(b *testing.B) {
+			benchmarkFilebeatOTelThroughputMockES(b, preset)
+		})
+	}
+}
+
+func benchmarkFilebeatOTelThroughputMockES(b *testing.B, preset benchPreset) {
+	eventCount := preset.eventCountPerRecv * 3
 
 	for b.Loop() {
 		b.StopTimer()
@@ -2134,15 +2216,41 @@ func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
 		)
 
 		cfg := renderOtelConfig(b, `receivers:
-  filebeatreceiver:
+  filebeatreceiver/1:
     filebeat:
       inputs:
         - type: benchmark
           enabled: true
-          count: {{.EventCount}}
-    path.home: {{.PathHome}}
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/1
     setup.template.enabled: false
-    queue.mem.flush.timeout: 0s
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/2
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/3:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/3
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
     processors: []
 exporters:
   elasticsearch:
@@ -2152,28 +2260,46 @@ exporters:
     endpoints:
       - {{.ESEndpoint}}
     logs_index: benchtest
-    max_conns_per_host: 4
+    max_conns_per_host: {{.MaxConnsPerHost}}
     sending_queue:
       batch:
-        flush_timeout: 5s
-        max_size: 1600
-        min_size: 0
+        flush_timeout: {{.ExpFlushTimeout}}
+        max_size: {{.ExpBatchMaxSize}}
+        min_size: {{.ExpBatchMinSize}}
         sizer: items
       block_on_overflow: true
       enabled: true
-      num_consumers: 4
-      queue_size: 12800
+      num_consumers: {{.ExpNumConsumers}}
+      queue_size: {{.ExpQueueSize}}
       wait_for_result: true
     suppress_conflict_errors: true
 processors:
   beat:
     processors:
       - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            env: staging
 service:
   pipelines:
-    logs:
+    logs/1:
       receivers:
-        - filebeatreceiver
+        - filebeatreceiver/1
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/2:
+      receivers:
+        - filebeatreceiver/2
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/3:
+      receivers:
+        - filebeatreceiver/3
       processors:
         - beat
       exporters:
@@ -2184,13 +2310,31 @@ service:
     metrics:
       level: none
 `, struct {
-			EventCount int
-			PathHome   string
-			ESEndpoint string
+			EventCountPerReceiver int
+			PathHome              string
+			ESEndpoint            string
+			MemQueueEvents        int
+			MemQueueMinEvents     int
+			MemQueueFlushTimeout  string
+			MaxConnsPerHost       int
+			ExpBatchMaxSize       int
+			ExpBatchMinSize       int
+			ExpFlushTimeout       string
+			ExpNumConsumers       int
+			ExpQueueSize          int
 		}{
-			EventCount: eventCount,
-			PathHome:   tmpDir,
-			ESEndpoint: mockServer.URL,
+			EventCountPerReceiver: preset.eventCountPerRecv,
+			PathHome:              tmpDir,
+			ESEndpoint:            mockServer.URL,
+			MemQueueEvents:        preset.memQueueEvents,
+			MemQueueMinEvents:     preset.memQueueMinEvents,
+			MemQueueFlushTimeout:  preset.memQueueFlushTimeout,
+			MaxConnsPerHost:       preset.maxConnsPerHost,
+			ExpBatchMaxSize:       preset.expBatchMaxSize,
+			ExpBatchMinSize:       preset.expBatchMinSize,
+			ExpFlushTimeout:       preset.expFlushTimeout,
+			ExpNumConsumers:       preset.expNumConsumers,
+			ExpQueueSize:          preset.expQueueSize,
 		})
 
 		b.StartTimer()
