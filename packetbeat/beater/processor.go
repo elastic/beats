@@ -199,6 +199,7 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		config.IgnoreOutgoing,
 		config.Interfaces[0].File == "",
 		config.Interfaces[0].InternalNetworks,
+		p.logger,
 	)
 	if err != nil {
 		return 0, nil, nil, nil, nil, err
@@ -290,7 +291,7 @@ func setupSniffer(
 		interfaces = append(interfaces, iface)
 	}
 
-	logger.Named("main").Debug("Initializing protocol plugins")
+	logger.Debug("Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
 	var closers []func()
 	for i, iface := range interfaces {

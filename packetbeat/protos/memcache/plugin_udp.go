@@ -88,21 +88,21 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	buffer := streambuf.NewFixed(pkt.Payload)
 	header, err := parseUDPHeader(buffer)
 	if err != nil {
-		debug("parsing memcache udp header failed")
+		mc.debugf("parsing memcache udp header failed")
 		return
 	}
 
-	debug("new udp datagram requestId=%v, seqNumber=%v, numDatagrams=%v",
+	mc.debugf("new udp datagram requestId=%v, seqNumber=%v, numDatagrams=%v",
 		header.requestID, header.seqNumber, header.numDatagrams)
 
 	// find connection object based on ips and ports (forward->reverse connection)
 	connection, dir := mc.getUDPConnection(&pkt.Tuple)
-	debug("udp connection: %p", connection)
+	mc.debugf("udp connection: %p", connection)
 
 	// get udp transaction combining forward/reverse direction 'streams'
 	// for current requestId
 	trans := connection.udpTransactionForID(header.requestID)
-	debug("udp transaction (id=%v): %p", header.requestID, trans)
+	mc.debugf("udp transaction (id=%v): %p", header.requestID, trans)
 
 	// Clean old transaction. We do the cleaning after potentially adding a new
 	// transaction to the connection object, so connection object will not be
@@ -117,12 +117,12 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	// get UDP transaction stream combining datagram packets in transaction
 	udpMsg := trans.udpMessageForDir(&header, dir)
 	if udpMsg == nil {
-		debug("dropping memcache(UDP) transaction with invalid fragment metadata")
+		mc.debugf("dropping memcache(UDP) transaction with invalid fragment metadata")
 		connection.killTransaction(trans)
 		return
 	}
 	if udpMsg.numDatagrams != header.numDatagrams {
-		debug("number of datagram mismatches in stream")
+		mc.debugf("number of datagram mismatches in stream")
 		connection.killTransaction(trans)
 		return
 	}
@@ -132,9 +132,9 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	done := false
 	if payload != nil {
 		// parse memcached message
-		msg, err := parseUDP(&mc.config, pkt.Ts, payload)
+		msg, err := parseUDP(&mc.config, pkt.Ts, payload, mc.logger)
 		if err != nil {
-			debug("failed to parse memcached(UDP) message: %s", err)
+			mc.debugf("failed to parse memcached(UDP) message: %s", err)
 			connection.killTransaction(trans)
 			return
 		}
@@ -142,16 +142,16 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 		// apply memcached to transaction
 		done, err = mc.onUDPMessage(trans, &pkt.Tuple, dir, msg)
 		if err != nil {
-			debug("error processing memcache message: %s", err)
+			mc.debugf("error processing memcache message: %s", err)
 			connection.killTransaction(trans)
 			done = true
 		}
 	}
 	if !done {
 		trans.timer = time.AfterFunc(mc.udpConfig.transTimeout, func() {
-			debug("transaction timeout -> forward")
+			mc.debugf("transaction timeout -> forward")
 			if err := mc.onUDPTrans(trans); err != nil {
-				debug("error processing timeout memcache transaction: %s", err)
+				mc.debugf("error processing timeout memcache transaction: %s", err)
 			}
 			mc.udpExpTrans.push(trans)
 		})
@@ -181,7 +181,7 @@ func (mc *memcache) onUDPMessage(
 	dir applayer.NetDirection,
 	msg *message,
 ) (bool, error) {
-	debug("received memcached(udp) message")
+	mc.debugf("received memcached(udp) message")
 
 	if msg.IsRequest {
 		msg.Direction = applayer.NetOriginalDirection
@@ -215,7 +215,7 @@ func (mc *memcache) onUDPMessage(
 }
 
 func (mc *memcache) onUDPTrans(udp *udpTransaction) error {
-	debug("received memcache(udp) transaction")
+	mc.debugf("received memcache(udp) transaction")
 	trans := newTransaction(udp.request, udp.response, mc.logger)
 	return mc.finishTransaction(trans)
 }
@@ -234,7 +234,7 @@ func (c *udpConnection) udpTransactionForID(requestID uint16) *udpTransaction {
 	if trans != nil && trans.timer != nil {
 		stopped := trans.timer.Stop()
 		if !stopped {
-			logp.Warn("timer stopped while processing transaction -> create new transaction")
+			c.memcache.logger.Warnf("timer stopped while processing transaction -> create new transaction")
 			trans = nil
 		}
 	}
@@ -368,8 +368,9 @@ func parseUDP(
 	config *parserConfig,
 	ts time.Time,
 	buf *streambuf.Buffer,
+	logger *logp.Logger,
 ) (*message, error) {
-	parser := newParser(config)
+	parser := newParser(config, logger)
 	msg, err := parser.parse(buf, ts)
 	if err != nil && msg == nil {
 		err = errUDPIncompleteMessage
