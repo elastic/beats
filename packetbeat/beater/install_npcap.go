@@ -61,12 +61,12 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 		return nil
 	}
 
-	log := b.Info.Logger.Named("npcap_install")
 	// Only check whether we have been requested to never_install if there
 	// is already an Npcap installation present. This should not be necessary,
 	// but the start-up logic of packetbeat is tightly coupled to the presence
 	// of a backing sniffer. This should really not be necessary, but the changes
 	// to modify this behaviour are non-trivial, so just avoid the issue.
+	log := b.Info.Logger.Named("npcap_install")
 	isInstalled := strings.HasPrefix(npcap.Version(), "Npcap version")
 	if isInstalled {
 		canInstall, err := canInstallNpcap(b, cfg, log)
