@@ -6,6 +6,7 @@ package azureblobstorage
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -23,6 +24,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -238,6 +240,105 @@ wait:
 	assert.NoError(t, g.Wait(), "input run should complete without error")
 	assert.GreaterOrEqual(t, transport.attempts(), 3,
 		"the list-blobs request should have been retried past the transient 503s")
+}
+
+// recordingStatusReporter captures the statuses reported by the input so tests
+// can assert on the transitions.
+type recordingStatusReporter struct {
+	mu       sync.Mutex
+	statuses []status.Status
+}
+
+func (r *recordingStatusReporter) UpdateStatus(s status.Status, _ string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.statuses = append(r.statuses, s)
+}
+
+func (r *recordingStatusReporter) has(target status.Status) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	for _, s := range r.statuses {
+		if s == target {
+			return true
+		}
+	}
+	return false
+}
+
+// Test_ListBlobsNonFatalWhilePolling verifies that a sustained listing failure
+// (throttling that outlives the SDK's per-request retries) is non-fatal when
+// polling: the input is marked Degraded and keeps running so it can recover on
+// a later poll. Without polling there is no next cycle, so the failure surfaces
+// and the input stops.
+func Test_ListBlobsNonFatalWhilePolling(t *testing.T) {
+	logp.TestingSetup()
+
+	// A server that always answers with 503 ServerBusy, simulating a sustained
+	// Azure Storage outage.
+	serv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = io.WriteString(w, `<?xml version="1.0" encoding="utf-8"?><Error><Code>ServerBusy</Code><Message>The server is busy.</Message></Error>`)
+	}))
+	t.Cleanup(serv.Close)
+
+	baseConfig := map[string]interface{}{
+		"account_name":                        "beatsblobnew",
+		"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+		"max_workers":                         1,
+		"containers": []map[string]interface{}{
+			{"name": beatsContainer},
+		},
+		// Keep the retry backoff tiny so the failing list call returns quickly.
+		"retry": map[string]interface{}{
+			"max_retries":         1,
+			"initial_retry_delay": "1ms",
+			"max_retry_delay":     "5ms",
+		},
+	}
+
+	newSched := func(t *testing.T, poll bool, statusRec status.StatusReporter) *scheduler {
+		t.Helper()
+		cfg := conf.MustNewConfigFrom(baseConfig)
+		c := defaultConfig()
+		require.NoError(t, cfg.Unpack(&c), "config should unpack")
+
+		log := logp.NewNopLogger()
+		serviceClient, credential, err := fetchServiceClientAndCreds(c, c.Retry, serv.URL+"/", log)
+		require.NoError(t, err, "service client should be created")
+		containerClient, err := fetchContainerClient(serviceClient, beatsContainer, log)
+		require.NoError(t, err, "container client should be created")
+
+		src := &Source{
+			AccountName:   c.AccountName,
+			ContainerName: beatsContainer,
+			MaxWorkers:    1,
+			Poll:          poll,
+			PollInterval:  time.Millisecond,
+			Retry:         c.Retry,
+		}
+		return newScheduler(&publisher{}, containerClient, credential, src, &c, newState(), serv.URL+"/", statusRec, nil, log)
+	}
+
+	t.Run("polling keeps the input alive and Degraded", func(t *testing.T) {
+		rec := &recordingStatusReporter{}
+		sched := newSched(t, true, rec)
+
+		err := sched.scheduleOnce(context.Background())
+		assert.NoError(t, err, "a listing failure while polling must be non-fatal so the input keeps running")
+		assert.True(t, rec.has(status.Degraded), "the input should be marked Degraded after a listing failure")
+		assert.False(t, rec.has(status.Failed), "a polling listing failure must not mark the input Failed")
+	})
+
+	t.Run("without polling the failure is fatal", func(t *testing.T) {
+		rec := &recordingStatusReporter{}
+		sched := newSched(t, false, rec)
+
+		err := sched.scheduleOnce(context.Background())
+		assert.Error(t, err, "without polling there is no recovery, so the listing failure must surface")
+		assert.True(t, rec.has(status.Failed), "a one-shot listing failure should mark the input Failed")
+	})
 }
 
 func Test_OAuth2(t *testing.T) {

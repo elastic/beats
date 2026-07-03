@@ -23,7 +23,11 @@ description: >
   previously a transient error such as an HTTP 503 `ServerBusy` during listing
   could exhaust the small, non-configurable default retries and stop the input.
   The settings apply per storage account. Defaults are unchanged when the block
-  is omitted.
+  is omitted. Additionally, when polling is enabled, a transient blob-listing
+  failure that outlives the retries (503, 429 or a network timeout) is now
+  non-fatal: the input is marked degraded and retries on the next poll interval
+  instead of exiting, so longer outages are ridden out. Permanent failures such
+  as a missing container still stop the input.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: "filebeat"
