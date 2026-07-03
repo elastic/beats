@@ -120,7 +120,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		if err := instance.InitPaths(cfg); err != nil {
 			return nil, fmt.Errorf("error initializing paths: %w", err)
 		}
-		b.Info.Paths = paths.Paths
+		b.Info.Paths = paths.Paths //nolint:forbidigo // to be fixed
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
