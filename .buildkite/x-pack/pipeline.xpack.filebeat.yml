@@ -9,7 +9,11 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
+<<<<<<< HEAD
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1782878510"
+=======
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1781496166"
+>>>>>>> a829d56a0 (Use native Go for Linux FIPS builds (#51345))
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
   IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
   IMAGE_WIN_10_VERSION: "1.0.1782878510"
