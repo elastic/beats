@@ -67,9 +67,10 @@ logging:
   metrics:
     enabled: false
 `
-	fingerprintEnhanced            = "file_identity.fingerprint: ~"
-	fingerprintStatic              = "file_identity.fingerprint:\n      growing: false"
-	fingerprintEnhancedKeepRemoved = fingerprintEnhanced + "\n    clean_removed: false"
+	fingerprintEnhanced             = "file_identity.fingerprint: ~"
+	fingerprintStatic               = "file_identity.fingerprint:\n      growing: false"
+	fingerprintEnhancedKeepRemoved  = fingerprintEnhanced + "\n    clean_removed: false"
+	fingerprintEnhancedCleanRemoved = fingerprintEnhanced + "\n    clean_removed: true"
 )
 
 func fingerprintCfg(logDir, checkInterval, fingerprintBlock, pathHome string) string {
@@ -84,15 +85,13 @@ func staticFingerprintCfg(logDir, checkInterval, pathHome string) string {
 	return fingerprintCfg(logDir, checkInterval, fingerprintStatic, pathHome)
 }
 
-// TestFilestreamFingerprintSmallFiles tests that files smaller than the
-// fingerprint size (default 1024 bytes) are not ingested until they grow
-// large enough.
-//
-// This test documents the current behavior. When growing_fingerprint is
-// implemented, the assertions should be updated to verify that small files
-// ARE ingested immediately.
+// TestFilestreamFingerprintSmallFiles documents the static (non-growing)
+// fingerprint behavior: files smaller than the fingerprint size (offset +
+// length, 1024 bytes by default) are held back and not ingested until they
+// grow past the threshold. TestFilestreamGrowingFingerprint is the growing
+// counterpart, where below-threshold files ARE ingested immediately.
 func TestFilestreamFingerprintSmallFiles(t *testing.T) {
-	t.Skip("the way we log small files changed. needs to update this test")
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -120,9 +119,10 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	appendToFile(t, file3, headerContent)
 
 	filebeat.WaitLogsContains(
-		"3 files are too small to be ingested, files need to be at least 1024 in size for ingestion to start",
+		"ingestion from some files will be delayed, files need to be at "+
+			"least 1024 in size for ingestion to start",
 		5*time.Second,
-		"expected log about file size for fingerprinting",
+		"expected the delayed-ingestion warning for the below-threshold files",
 	)
 
 	// output file isn't created yet as no event has been published. Thus, check
@@ -155,8 +155,8 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	appendToFile(t, file2, file2SmallContent)
 	appendToFile(t, file3, file3SmallContent)
 	filebeat.WaitLogsContains(
-		"2 files are too small to be ingested, files need to be at least 1024 in size for ingestion to start",
-		5*time.Second, "wrong number os small files",
+		"file size is too small for ingestion",
+		5*time.Second, "expected the below-threshold files to be reported as too small",
 	)
 
 	// still only file1's events (file2 and file3 still too small)
@@ -200,9 +200,13 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 // This test includes both plain text and gzipped files to verify that growing
 // fingerprint works correctly with compressed files.
 //
-// This is the counterpart to TestFilestreamFingerprintSmallFiles which tests
-// the current fingerprint behavior where small files are not ingested.
+// This is the counterpart to TestFilestreamFingerprintSmallFiles, which pins
+// the static (non-growing) fingerprint behavior where below-threshold files are
+// held back. The final phase grows the plain files past the fingerprint
+// threshold and asserts they migrate from a growing (raw-hex) registry entry to
+// a final SHA-256 entry, while the still-small gzipped files stay growing.
 func TestFilestreamGrowingFingerprint(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -272,8 +276,31 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	require.NoError(t, os.WriteFile(file5, file5ContentGZ, 0644),
 		"failed to write gzipped file")
 
-	// Wait for all 4 files to be read to EOF
-	// Note: gzipped files show "EOF has been reached. Closing." instead of "End of file reached"
+	// Wait for all files to be read to EOF, in any order (they are written at
+	// nearly the same time). Gzipped files log "EOF has been reached. Closing."
+	// instead of "End of file reached".
+	filebeat.WaitLogsContainsAnyOrder(
+		[]string{
+			fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
+			fmt.Sprintf("End of file reached: %s; Backoff now.", file2),
+			fmt.Sprintf("End of file reached: %s; Backoff now.", file3),
+			fmt.Sprintf("EOF has been reached. Closing. Path='%s'", file5),
+		},
+		10*time.Second,
+		"files were not fully read after growth/new gzipped file created",
+	)
+
+	// Total events: 4 files × 5 lines each = 20 events + 1 GZIP small file (1 line)
+	filebeat.WaitPublishedEvents(10*time.Second, 21)
+
+	// ===== Phase 3: Grow the plain files past the fingerprint threshold =====
+	// Each plain file is ~250 bytes so far; +20 lines (~1000 bytes) pushes them
+	// past the 1024-byte threshold, so their identity transitions from a
+	// growing (raw-hex) key to a final SHA-256 key. Gzipped files cannot grow.
+	appendToFile(t, file1, generateLines("file1 big line", 20))
+	appendToFile(t, file2, generateLines("file2 big line", 20))
+	appendToFile(t, file3, generateLines("file3 big line", 20))
+
 	filebeat.WaitLogsContainsAnyOrder(
 		[]string{
 			fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
@@ -281,31 +308,34 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 			fmt.Sprintf("End of file reached: %s; Backoff now.", file3),
 		},
 		10*time.Second,
-		"plain files were not fully read after growth",
+		"plain files were not fully read after crossing the threshold",
 	)
 
-	// Wait for gzipped file separately as it has a different EOF log message
-	filebeat.WaitLogsContains(
-		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", file5),
-		10*time.Second,
-		"gzipped file was not fully read after growth",
-	)
+	// 21 (previous) + 3 files × 20 new lines = 81 events.
+	filebeat.WaitPublishedEvents(15*time.Second, 81)
 
-	// Total events: 4 files × 5 lines each = 20 events + 1 GZIP small file (1 line)
-	filebeat.WaitPublishedEvents(10*time.Second, 21)
-
-	// ===== Phase 3: Stop Filebeat =====
+	// ===== Phase 4: Stop Filebeat =====
 	filebeat.Stop()
+
+	// Registry shape: the plain files crossed the threshold and are now keyed by
+	// a final SHA-256 entry (no meta.fingerprint); the gzipped files stayed
+	// below the threshold (fingerprint is computed on decompressed content) and
+	// remain growing (raw-hex) entries.
+	assertSingleSHA256RegistryEntry(t, tempDir, file1)
+	assertSingleSHA256RegistryEntry(t, tempDir, file2)
+	assertSingleSHA256RegistryEntry(t, tempDir, file3)
+	assertGrowingRegistryEntry(t, tempDir, file4)
+	assertGrowingRegistryEntry(t, tempDir, file5)
 }
 
-// TestFilestreamGrowingFingerprint_update_while_stopped tests the
-// growing_fingerprint file identity which allows files of any size to be
-// ingested immediately. The fingerprint grows as the file grows, and the
-// registry entry is migrated to the new key.
-//
-// This is the counterpart to TestFilestreamFingerprintSmallFiles which tests
-// the current fingerprint behavior where small files are not ingested.
+// TestFilestreamGrowingFingerprint_update_while_stopped verifies growing
+// fingerprint across a restart when files that start with identical content (a
+// fingerprint collision) diverge with unique content while Filebeat is stopped.
+// Each file must be tracked independently after the restart: no content is
+// mixed up between files and nothing is re-read. The final assertion checks
+// every file's events against its on-disk content, in order.
 func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -348,14 +378,16 @@ func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 
 	// ===== Phase 2: Grow only file1 =====
 	// Only file1 is appended to (file2 and file3 stay at the shared header).
-	// file1 grows past the collision header and publishes its additional lines;
-	// the settled total is 5 published events (1 from Phase 1 + file1's growth).
+	// Once file1 diverges it leaves the collision; file2 and file3 still collide
+	// with each other, so one of them may surface and publish its header here.
+	// That makes the intermediate event count timing-dependent, so we only wait
+	// for file1 to reach EOF (log-based) and defer all count/content assertions
+	// to the deterministic final state after the restart.
 	appendToFile(t, file1, generateLines("file1 unique line", 4))
 
-	filebeat.WaitPublishedEvents(5*time.Second, 5)
 	filebeat.WaitLogsContains(
 		fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
-		10*time.Second, "file was not read to EOF")
+		10*time.Second, "file1 was not read to EOF")
 
 	// ===== Phase 3: Stop Filebeat =====
 	filebeat.Stop()
@@ -383,170 +415,14 @@ func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 	)
 
 	filebeat.WaitPublishedEvents(10*time.Second, 20)
-}
 
-// TestFilestreamGrowingFingerprint_do_not_mix_up_files tests that growing
-// fingerprint correctly distinguishes between files that start with identical
-// content but later diverge. This verifies that when multiple files have the
-// same initial content (causing a fingerprint collision), each file is tracked
-// independently once they grow with different content, even across Filebeat
-// restarts.
-func TestFilestreamGrowingFingerprint_do_not_mix_up_files(t *testing.T) {
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		t.Fatalf("failed to create log directory: %s", err)
-	}
-
-	file1 := filepath.Join(logDir, "file1.log")
-	file2 := filepath.Join(logDir, "file2.log")
-
-	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
-	filebeat.Start()
-
-	filebeat.WaitLogsContains("Input 'filestream' starting",
-		10*time.Second, "filestream did not start")
-
-	// ===== Phase 1: Create 2 files with identical content =====
-	// Both files have the same content, creating a fingerprint collision.
-	// Only one file will be tracked initially.
-	headerContent := generateLines("header line", 1)
-	appendToFile(t, file1, headerContent)
-	appendToFile(t, file2, headerContent)
-
-	// One of the colliding files is ingested first; which one wins is not
-	// deterministic (scan iteration order), so match the EOF log without
-	// binding it to a specific path (only the winner's harvester runs here).
-	filebeat.WaitLogsContains(
-		"End of file reached:",
-		10*time.Second,
-		"file was not read to EOF",
-	)
-	filebeat.WaitPublishedEvents(5*time.Second, 1)
-
-	// ===== Phase 2: file2 grows with unique content =====
-	// file2 diverges from file1, getting its own fingerprint.
-	appendToFile(t, file2, generateLines("file2 unique line", 4))
-
-	// 6 Events: 1 (file1) + 5 (file2: 1 header + 4 unique) = 6 total
-	filebeat.WaitPublishedEvents(5*time.Second, 6)
-	filebeat.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", file2),
-		10*time.Second, "file was not read to EOF")
-
-	// ===== Phase 3: Stop Filebeat =====
-	filebeat.Stop()
-
-	// ===== Phase 4: Both files grow while Filebeat is stopped =====
-	// file1 gets unique content (4 lines), file2 gets more unique content (5 lines).
-	// This tests that both files are correctly identified after restart.
-	file1Content := generateLines("file1 unique line", 4)
-	file2Content := generateLines("file2 2nd unique line", 5)
-	appendToFile(t, file1, file1Content)
-	appendToFile(t, file2, file2Content)
-
-	// ===== Phase 5: Restart Filebeat and verify all content is ingested =====
-	// 15 Events: 6 (previous) + 4 (file1 new) + 5 (file2 new) = 15 total
-	filebeat.Start()
-	filebeat.WaitLogsContainsAnyOrder(
-		[]string{
-			fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
-			fmt.Sprintf("End of file reached: %s; Backoff now.", file2),
-		},
-		10*time.Second,
-		"files were not fully read after growth",
-	)
-
-	filebeat.WaitPublishedEvents(10*time.Second, 15)
-
-	// Verify events match the actual file contents, in order
+	// Verify each file's events match its on-disk content, in order — proving
+	// the shared collision header and the later per-file divergence were not
+	// mixed up between files and nothing was re-read.
 	events := readOutputEvents(t, tempDir)
 	assertFileEvents(t, events, file1)
 	assertFileEvents(t, events, file2)
-}
-
-// TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_deletion
-// tests that growing fingerprint correctly handles the scenario where one of
-// two files with identical initial content is deleted during shutdown. This
-// verifies that when file1 is deleted while Filebeat is stopped, file2 (which
-// started with the same content) is correctly identified and fully ingested
-// without being confused with file1's registry entry.
-func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_deletion(t *testing.T) {
-	filebeat := integration.NewFilebeat(t)
-
-	tempDir := filebeat.TempDir()
-	printOutputOnFailure(t, tempDir)
-	logDir := filepath.Join(tempDir, "logs")
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		t.Fatalf("failed to create log directory: %s", err)
-	}
-
-	file1 := filepath.Join(logDir, "file1.log")
-	file2 := filepath.Join(logDir, "file2.log")
-
-	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
-	filebeat.Start()
-
-	filebeat.WaitLogsContains("Input 'filestream' starting",
-		10*time.Second, "filestream did not start")
-
-	// ===== Phase 1: Create 2 files with identical content =====
-	// Both files have the same content, creating a fingerprint collision.
-	// Only one of them is tracked initially; which one wins the collision
-	// depends on scan iteration order and is not deterministic, so we don't
-	// assume file1 wins — we wait for either file to reach EOF and then
-	// identify the winner from the published events.
-	headerContent := generateLines("header line", 1)
-	appendToFile(t, file1, headerContent)
-	appendToFile(t, file2, headerContent)
-
-	// Either file may win the collision, so match the EOF log without binding
-	// it to a specific path (only the winner's harvester runs at this point).
-	filebeat.WaitLogsContains(
-		"End of file reached:",
-		10*time.Second,
-		"no file was read to EOF",
-	)
-	filebeat.WaitPublishedEvents(5*time.Second, 1)
-
-	// Identify which file won the collision (got the single event). The
-	// other file is the "loser" whose distinct identity is only established
-	// once it diverges with unique content.
-	phase1 := readOutputEvents(t, tempDir)
-	winner, loser := file1, file2
-	if len(messagesForFile(phase1, file2)) > 0 {
-		winner, loser = file2, file1
-	}
-
-	// ===== Phase 2: Stop Filebeat =====
-	filebeat.Stop()
-
-	// ===== Phase 3: Delete the winner and grow the loser while stopped =====
-	// The already-ingested file is removed, and the colliding file grows with
-	// unique content. This tests that the survivor is correctly identified as
-	// a different file and not confused with the deleted file's registry entry.
-	require.NoError(t, os.Remove(winner), "failed to remove the ingested file")
-	appendToFile(t, loser, generateLines("loser unique line", 4))
-
-	// ===== Phase 4: Restart Filebeat and verify the survivor is fully ingested =====
-	// Events: 1 (winner before deletion) + 5 (loser: 1 header + 4 unique) = 6 total
-	filebeat.Start()
-	filebeat.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", loser),
-		10*time.Second, "file was not read to EOF")
-
-	filebeat.WaitPublishedEvents(10*time.Second, 6)
-
-	// Verify events match the actual file contents, in order.
-	// The winner was deleted, so only check the loser; also verify the
-	// winner got exactly 1 event (the header ingested before deletion).
-	events := readOutputEvents(t, tempDir)
-	winnerMsgs := messagesForFile(events, winner)
-	require.Len(t, winnerMsgs, 1, "the deleted file should have 1 event (before deletion)")
-	assertFileEvents(t, events, loser)
+	assertFileEvents(t, events, file3)
 }
 
 // TestFilestreamGrowingFingerprint_supersetFileNotConflated verifies that a
@@ -555,14 +431,13 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_dele
 // is tracked as its own file and ingested from the beginning. The prefix
 // relationship must NOT be mistaken for "the existing file grew".
 //
-// This is distinct from do_not_mix_up_files, where the second file first
-// appears identical (a collision) and only later diverges: here the new file is
-// never identical to the existing one, so the prefix relationship is present
-// from the first time it is seen. It is covered both while Filebeat is running
-// (b.log) and across a restart (c.log), which exercise different code paths:
-// the watch loop's rename detection vs. the prospector's startup
+// The prefix relationship is present from the first time the new file is seen
+// (it is never identical to the existing one). It is covered both while Filebeat
+// is running (b.log) and across a restart (c.log), which exercise different code
+// paths: the watch loop's rename detection vs. the prospector's startup
 // reconstruction of the short-fingerprint set.
 func TestFilestreamGrowingFingerprint_supersetFileNotConflated(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -626,6 +501,7 @@ func TestFilestreamGrowingFingerprint_supersetFileNotConflated(t *testing.T) {
 // TestFilestreamGrowingFingerprintTruncation tests that truncation with
 // different content is treated as a new file (no prefix match = new entry).
 func TestFilestreamGrowingFingerprintTruncation(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -870,6 +746,7 @@ func printOutputOnFailure(t *testing.T, tempDir string) {
 // the store metadata but does not affect the in-flight harvester's path.
 // The key assertion is offset continuity: 5 total events (not 6 from re-read).
 func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -880,7 +757,7 @@ func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
 	appLog := filepath.Join(logDir, "app.log")
 	appLogRenamed := filepath.Join(logDir, "app.log.1")
 
-	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "5s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -967,6 +844,7 @@ func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
 //
 // Expected: 30 events total (5 + 25), one migration log, no duplicates.
 func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1036,6 +914,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
 //
 // The promise: opting in to growing is contained to small files.
 func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1118,6 +997,7 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 //     does, it is picked up under a fresh SHA-256 key from offset 0, re-ingesting
 //     the bytes already read during the growing phase.
 func TestFilestreamEnhancedFingerprint_DisableGrowingAfterEnabling(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1282,6 +1162,7 @@ func seedLegacyFingerprintRegistry(t *testing.T, tempDir, inputID, filePath stri
 // legacy on-disk format, so it pins on-disk format compatibility itself,
 // independent of what the new binary writes.
 func TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1371,6 +1252,7 @@ func TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry(t *testing.T) {
 // must reuse the existing SHA-256 entry and produce no new events for a file
 // that was already at threshold.
 func TestFilestreamEnhancedFingerprint_NoDuplicationConfigReload(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1505,6 +1387,7 @@ logging:
 // SHA-256, resuming from the stored offset without re-ingesting content
 // already harvested before the stop.
 func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1576,6 +1459,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testi
 // ends up with one active SHA-256 entry for app.log.1 and the raw-hex
 // entry from before the rename is removed.
 func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	homeDir := filebeat.TempDir()
@@ -1661,6 +1545,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) 
 // happen while Filebeat is stopped.
 // Requires `clean_removed: false`.
 func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1725,6 +1610,96 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 	assertFingerprintMigratedToSHA256(t, tempDir, appLogRenamed)
 }
 
+// TestFilestreamEnhancedFingerprint_RenameBelowThresholdAcrossRestartKeepRemoved
+// documents the deliberate behaviour for a file that is renamed AND appended
+// while Filebeat is stopped, staying below the fingerprint threshold, with
+// clean_removed:false (so the pre-rename entry is not cleaned by path at
+// startup).
+//
+// The renamed file reappears under a NEW path as OpCreate on the first scan.
+// Its raw-hex fingerprint carries the stored entry's fingerprint as a strict
+// prefix, but a below-threshold fingerprint is not Complete(), and the
+// prospector deliberately does NOT accept a non-Complete() cross-path prefix
+// match as a continuation: a short prefix is too weak to tell "the same file
+// grew" apart from "a distinct file that merely shares a header prefix".
+// Resuming here would reintroduce the silent data loss tracked in
+// https://github.com/elastic/beats/issues/51417 (a distinct new file adopting a
+// vanished file's cursor). So the file is re-ingested from offset 0:
+// at-least-once duplication, which is recoverable, is preferred over data loss,
+// which is not.
+//
+// The full-size fingerprint path is unaffected: once above the threshold the
+// identity is a hash over the whole fingerprint window and a moved+appended
+// file resumes from its cursor as before (see
+// TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart).
+func TestFilestreamEnhancedFingerprint_RenameBelowThresholdAcrossRestartKeepRemoved(t *testing.T) {
+	t.Parallel()
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+
+	appLog := filepath.Join(logDir, "app.log")
+	appLogRenamed := filepath.Join(logDir, "app.log.1")
+
+	// clean_removed disabled so the pre-rename entry (source app.log) survives
+	// startup and can be recovered by the prospector's prefix-match fallback.
+	filebeat.WriteConfigFile(
+		fingerprintCfg(logDir, "1s", fingerprintEnhancedKeepRemoved, tempDir))
+
+	// Phase 1: small file (one line, ~50 bytes) — below threshold, raw-hex key.
+	appendToFile(t, appLog, generateLines("app original line", 1))
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+	filebeat.WaitPublishedEvents(10*time.Second, 1)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", appLog),
+		10*time.Second, "phase 1 did not reach EOF")
+
+	// Phase 2: stop, then rename + append while stopped, staying below the
+	// threshold (5 lines total ≈ 250 bytes < 1024).
+	filebeat.Stop()
+	require.NoError(t, os.Rename(appLog, appLogRenamed),
+		"failed to rename app.log -> app.log.1 while filebeat is stopped")
+	appendToFile(t, appLogRenamed, generateLines("app appended line", 4))
+
+	// Phase 3: restart. The renamed file arrives as OpCreate under the new path.
+	// Below threshold it is NOT recognised as the grown app.log (see docstring),
+	// so it is re-ingested in full from offset 0.
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not restart")
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", appLogRenamed),
+		10*time.Second, "renamed file was not read to EOF")
+
+	// 1 (original, old path) + 5 (full re-ingest, new path) = 6. Resuming from
+	// the stored cursor would instead yield 5.
+	filebeat.WaitPublishedEvents(15*time.Second, 6)
+
+	filebeat.Stop()
+
+	events := readOutputEvents(t, tempDir)
+	require.Len(t, events, 6,
+		"expected 6 events (1 original + 5 re-ingested); 5 would mean the renamed file resumed from the cursor")
+
+	// The original line is published twice: once under the old path (phase 1)
+	// and once as part of the full re-ingest under the new path. This
+	// at-least-once duplication is the accepted trade-off (see docstring).
+	require.Len(t, messagesForFile(events, appLog), 1,
+		"the original line should be attributed once to the pre-rename path")
+	require.Len(t, messagesForFile(events, appLogRenamed), 5,
+		"the renamed file is re-ingested in full (1 original + 4 appended) under the new path")
+	assertFileEvents(t, events, appLogRenamed)
+
+	// The re-ingested file is still below threshold, so it is tracked as a
+	// growing entry under the new path.
+	assertGrowingRegistryEntry(t, tempDir, appLogRenamed)
+}
+
 // TestFilestreamEnhancedFingerprint_Gzip covers Enhanced Fingerprint on
 // GZIP-compressed files. The fingerprint is computed on DECOMPRESSED content,
 // so the threshold check is against the decompressed size, not the on-disk
@@ -1737,6 +1712,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 //
 // Both must be ingested completely under growing mode.
 func TestFilestreamEnhancedFingerprint_Gzip(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
@@ -1799,6 +1775,7 @@ func TestFilestreamEnhancedFingerprint_Gzip(t *testing.T) {
 // below→below case (raw-hex → different raw-hex). This test covers the
 // above→below case (SHA-256 → raw-hex), specific to Enhanced Fingerprint.
 func TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold(t *testing.T) {
+	t.Parallel()
 	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
