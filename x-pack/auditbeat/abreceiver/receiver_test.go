@@ -27,6 +27,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -331,6 +333,59 @@ func BenchmarkFactory(b *testing.B) {
 		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
+}
+
+func TestReceiverStatus(t *testing.T) {
+	inputID := "ab-status-test"
+
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		inputStatus := inputStatuses.PutEmptyMap(inputID)
+		inputStatus.PutStr("status", state)
+		inputStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"auditbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":        "file_integrity",
+						"id":            inputID,
+						"enabled":       true,
+						"paths":         []string{t.TempDir()},
+						"scan_at_start": false,
+					},
+				},
+			},
+			"logging": map[string]any{
+				"level":     "info",
+				"selectors": []string{"*"},
+			},
+			"path.home":               t.TempDir(),
+			"management.otel.enabled": true,
+		},
+	}
+
+	// The file_integrity module is push-based (PushMetricSetV2) so it only
+	// reports status.Starting. The group reporter maps that to StatusOK at the
+	// top level while per-input attributes reflect the individual module state.
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T: t,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Beat:    "auditbeat",
+				Config:  &cfg,
+				Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+			},
+		},
+		Status: componentstatus.NewEvent(componentstatus.StatusOK,
+			componentstatus.WithAttributes(inputStatusAttributes(
+				componentstatus.StatusStarting.String(), "file_integrity/file is starting"))),
+	})
 }
 
 func TestReceiverHook(t *testing.T) {

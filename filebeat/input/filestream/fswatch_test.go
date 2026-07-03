@@ -39,8 +39,13 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
+
+func newTestMetrics() *loginp.Metrics {
+	return loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+}
 
 func TestFileWatcher(t *testing.T) {
 	dir := t.TempDir()
@@ -63,7 +68,7 @@ scanner:
 	logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests"))
 	fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 
-	go fw.Run(ctx)
+	go fw.Run(ctx, newTestMetrics(), 0, time.Time{})
 
 	t.Run("detects a new file", func(t *testing.T) {
 		basename := "created.log"
@@ -212,7 +217,7 @@ scanner:
 
 		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
 		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
-		go fw.Run(ctx)
+		go fw.Run(ctx, newTestMetrics(), 0, time.Time{})
 
 		basename := "created.log"
 		filename := filepath.Join(dir, basename)
@@ -247,7 +252,7 @@ scanner:
 
 		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
 		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
-		go fw.Run(ctx)
+		go fw.Run(ctx, newTestMetrics(), 0, time.Time{})
 
 		basename := "created.log"
 		filename := filepath.Join(dir, basename)
@@ -295,7 +300,7 @@ scanner:
 		runDone := make(chan struct{})
 		go func() {
 			defer close(runDone)
-			fw.Run(ctx)
+			fw.Run(ctx, newTestMetrics(), 0, time.Time{})
 		}()
 		t.Cleanup(func() { <-runDone })
 
@@ -336,7 +341,7 @@ scanner:
 
 		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
 		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
-		go fw.Run(ctx)
+		go fw.Run(ctx, newTestMetrics(), 0, time.Time{})
 
 		basename := "created.log"
 		filename := filepath.Join(dir, basename)
@@ -402,7 +407,7 @@ scanner:
 		runDone := make(chan struct{})
 		go func() {
 			defer close(runDone)
-			fw.Run(ctx)
+			fw.Run(ctx, newTestMetrics(), 0, time.Time{})
 		}()
 
 		expectedEvents := []loginp.FSEvent{
@@ -464,7 +469,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 		// 1. A single file exists
 		initialContent := strings.Repeat("a", 96)
 		require.NoError(t, os.WriteFile(activePath, []byte(initialContent), 0o600), "failed to write initial active file")
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		initialEvents := drainPendingFSEvents(w.events)
 		requireEventSignatures(t, initialEvents, []loginp.FSEvent{
@@ -479,7 +484,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 		//   - truncate foo.log and add data (less than previously)
 		copyFile(t, activePath, rotatedPath)
 		require.NoError(t, os.WriteFile(activePath, []byte(strings.Repeat("b", 64)), 0o600), "failed to rewrite active file after rotation")
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		events := drainPendingFSEvents(w.events)
 		requireEventSignatures(t, events, []loginp.FSEvent{
@@ -500,7 +505,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 		// 1. A single file exists
 		initialContent := strings.Repeat("c", 96)
 		require.NoError(t, os.WriteFile(activePath, []byte(initialContent), 0o600), "failed to write initial active file")
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		initialEvents := drainPendingFSEvents(w.events)
 		requireEventSignatures(t, initialEvents, []loginp.FSEvent{
@@ -512,7 +517,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 
 		// 2. The file is copied: foo.log -> foo.log.1
 		copyFile(t, activePath, rotatedPath)
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		// Expectation: no file events, because both files are considered the same
 		copyStepEvents := drainPendingFSEvents(w.events)
@@ -521,7 +526,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 
 		// 3. foo.log is truncated & written to (less data than before).
 		require.NoError(t, os.WriteFile(activePath, []byte(strings.Repeat("d", 64)), 0o600), "failed to truncate and rewrite active file")
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		// Expectation: 'foo.log' is considered new and 'foo.log.1' is considered a rename
 		truncateStepEvents := drainPendingFSEvents(w.events)
@@ -538,7 +543,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 		// 1. A single file exists
 		initialContent := strings.Repeat("e", 96)
 		require.NoError(t, os.WriteFile(activePath, []byte(initialContent), 0o600), "failed to write initial active file")
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		initialEvents := drainPendingFSEvents(w.events)
 		requireEventSignatures(t, initialEvents, []loginp.FSEvent{
@@ -550,7 +555,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 
 		// 2. The file is copied: foo.log -> foo.log.1
 		copyFile(t, activePath, rotatedPath)
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		// Expectation: no file events, because both files are considered the same
 		copyStepEvents := drainPendingFSEvents(w.events)
@@ -559,7 +564,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 
 		// 3. foo.log is truncated (0 bytes)
 		require.NoError(t, os.WriteFile(activePath, nil, 0o600), "failed to truncate active file to empty")
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		// Expectation: foo.log is considered renamed: foo.log -> foo.log.1
 		// the empty file foo.log is ignored because it is empty
@@ -570,7 +575,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 
 		// 4. data is added to foo.log
 		require.NoError(t, os.WriteFile(activePath, []byte(strings.Repeat("f", 64)), 0o600), "failed to add new data to active file")
-		w.watch(ctx)
+		w.watch(ctx, newTestMetrics(), 0, time.Time{})
 
 		// Expectation: foo.log is discovered as a new file
 		newDataStepEvents := drainPendingFSEvents(w.events)
@@ -607,6 +612,7 @@ func copyFile(t *testing.T, from, to string) {
 
 	content, err := os.ReadFile(from)
 	require.NoError(t, err, "failed to read source file %q", from)
+	//nolint:gosec // All paths are controlled by the test code. It's safe
 	require.NoError(t, os.WriteFile(to, content, 0o600), "failed to write destination file %q", to)
 }
 
@@ -1149,7 +1155,8 @@ scanner:
 		t.Run(tc.name, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
 			s := createScannerWithConfig(t, logger, paths, tc.cfgStr, tc.compression)
-			requireEqualFiles(t, tc.expDesc, s.GetFiles())
+			files, _ := s.GetFiles(loginp.FileScanOptions{})
+			requireEqualFiles(t, tc.expDesc, files)
 		})
 	}
 
@@ -1166,11 +1173,11 @@ scanner:
 		// the glob for the very small files
 		paths := []string{filepath.Join(dir, undersizedGlob)}
 		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
-		files := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Empty(t, files)
-		files = s.GetFiles()
+		files, _ = s.GetFiles(loginp.FileScanOptions{})
 		require.Empty(t, files)
-		files = s.GetFiles()
+		files, _ = s.GetFiles(loginp.FileScanOptions{})
 		require.Empty(t, files)
 
 		logs := parseLogs(buffer.String())
@@ -1244,7 +1251,7 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		assert.Len(t, files, 1, "empty.log must be excluded")
 		assert.Contains(t, files, nonEmpty, "nonempty.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
@@ -1276,11 +1283,98 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		assert.Len(t, files, 1, "empty_link.log must be excluded")
 		assert.Contains(t, files, nonEmptyLink, "nonempty_link.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
 	})
+}
+
+func TestFileScannerScanMetrics(t *testing.T) {
+	dir := t.TempDir()
+	keepLog := filepath.Join(dir, "keep.log")
+	excludedLog := filepath.Join(dir, "excluded.log")
+	emptyLog := filepath.Join(dir, "empty.log")
+	smallLog := filepath.Join(dir, "small.log")
+	dirLog := filepath.Join(dir, "directory.log")
+	linkLog := filepath.Join(dir, "link.log")
+	oldLog := filepath.Join(dir, "old.log")
+
+	now := time.Now()
+	require.NoError(t, os.WriteFile(keepLog, []byte(strings.Repeat("k", 128)), 0644), "failed to write keep log")
+	require.NoError(t, os.WriteFile(excludedLog, []byte(strings.Repeat("e", 128)), 0644), "failed to write excluded log")
+	require.NoError(t, os.WriteFile(emptyLog, nil, 0644), "failed to write empty log")
+	require.NoError(t, os.WriteFile(smallLog, []byte("small"), 0644), "failed to write small log")
+	require.NoError(t, os.WriteFile(oldLog, []byte(strings.Repeat("o", 128)), 0644), "failed to write old log")
+	require.NoError(t, os.Mkdir(dirLog, 0755), "failed to create directory")
+	require.NoError(t, os.Symlink(keepLog, linkLog), "failed to create symlink")
+	require.NoError(t, os.Chtimes(oldLog, now.Add(-2*time.Hour), now.Add(-2*time.Hour)), "failed to age old log")
+
+	paths := []string{
+		filepath.Join(dir, "*.log"),
+	}
+	cfgStr := `
+scanner:
+  exclude_files: ['.*excluded.*']
+  symlinks: false
+  recursive_glob: false
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 64
+`
+
+	scanner := createScannerWithConfig(t, logp.NewNopLogger(), paths, cfgStr, CompressionNone)
+	files, scanMetrics := scanner.GetFiles(loginp.FileScanOptions{
+		CurrentTime: now,
+		IgnoreOlder: time.Hour,
+	})
+	require.Contains(t, files, keepLog, "keep log must be ingestible")
+	require.Contains(t, files, oldLog, "old log must still be returned")
+	require.Len(t, files, 2, "keep and old logs should be ingestible scan targets")
+
+	assert.Equal(t, loginp.FileScanMetrics{
+		FilesIgnored:        2,
+		FilesMatched:        7,
+		FilesNoIngestTarget: 3,
+		FilesEmpty:          1,
+		FilesUnique:         2,
+	}, scanMetrics, "unexpected scan metrics")
+}
+
+func TestFileWatcherScanMetricsCountsIgnoredFiles(t *testing.T) {
+	dir := t.TempDir()
+	oldLog := filepath.Join(dir, "old.log")
+	newLog := filepath.Join(dir, "new.log")
+
+	require.NoError(t, os.WriteFile(oldLog, []byte("old\n"), 0644), "failed to write old log")
+	require.NoError(t, os.WriteFile(newLog, []byte("new\n"), 0644), "failed to write new log")
+	oldModTime := time.Now().Add(-2 * time.Hour)
+	require.NoError(t, os.Chtimes(oldLog, oldModTime, oldModTime), "failed to age old log")
+
+	fw := createWatcherWithConfig(t, logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, `
+scanner:
+  fingerprint.enabled: false
+`)
+	metrics := newTestMetrics()
+	baseline := loginp.FileScanMetrics{
+		FilesMatched:        metrics.FilesMatched.Get(),
+		FilesUnique:         metrics.FilesUnique.Get(),
+		FilesNoIngestTarget: metrics.FilesNoIngestTarget.Get(),
+		FilesIgnored:        metrics.FilesIgnored.Get(),
+		FilesEmpty:          metrics.FilesEmpty.Get(),
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	fw.watch(ctx, metrics, time.Hour, time.Time{})
+
+	assert.Equal(t, baseline.FilesMatched+2, metrics.FilesMatched.Get(), "files_matched")
+	assert.Equal(t, baseline.FilesUnique+2, metrics.FilesUnique.Get(), "files_unique")
+	assert.Equal(t, baseline.FilesNoIngestTarget, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target")
+	assert.Equal(t, baseline.FilesIgnored+1, metrics.FilesIgnored.Get(), "files_ignored")
+	assert.Equal(t, baseline.FilesEmpty, metrics.FilesEmpty.Get(), "files_empty")
 }
 
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
@@ -1315,7 +1409,7 @@ func BenchmarkGetFiles(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Len(b, files, benchmarkFileCount)
 	}
 }
@@ -1343,7 +1437,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Len(b, files, benchmarkFileCount)
 	}
 }

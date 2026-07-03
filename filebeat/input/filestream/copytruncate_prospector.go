@@ -136,6 +136,9 @@ func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
 	if !fi.ts.IsZero() {
 		return fi.ts
 	}
+	if len(fi.path) < len(s.format) {
+		return time.Time{}
+	}
 	fileTs := fi.path[len(fi.path)-len(s.format):]
 
 	ts, err := time.Parse(s.format, fileTs)
@@ -196,7 +199,12 @@ type copyTruncateFileProspector struct {
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
-func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *copyTruncateFileProspector) Run(
+	ctx input.Context,
+	s loginp.StateMetadataUpdater,
+	hg loginp.HarvesterGroup,
+	metrics *loginp.Metrics,
+) {
 	log := ctx.Logger.With("prospector", copyTruncateProspectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
@@ -205,14 +213,14 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 
 	var tg unison.MultiErrGroup
 
+	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+
 	tg.Go(func() error {
-		p.filewatcher.Run(ctx.Cancelation)
+		p.filewatcher.Run(ctx.Cancelation, metrics, p.ignoreOlder, ignoreInactiveSince)
 		return nil
 	})
 
 	tg.Go(func() error {
-		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 
