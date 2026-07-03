@@ -47,6 +47,8 @@ func WriteToKafkaTopic(
 	t *testing.T, topic string, message string,
 	headers []sarama.RecordHeader,
 ) {
+	t.Helper()
+
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForLocal
 	config.Producer.Return.Successes = true
