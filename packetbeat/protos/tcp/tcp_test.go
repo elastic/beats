@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -306,7 +307,7 @@ func TestTCSeqPayload(t *testing.T) {
 						parse: makeCollectPayload(&state, true),
 					},
 				},
-			}, "test", "test", 0)
+			}, "test", "test", 0, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -344,7 +345,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 	p := protocols{}
 	p.tcp = make(map[protos.Protocol]protos.TCPPlugin)
 	p.tcp[1] = &TestProtocol{Ports: []int{ServerPort}}
-	tcp, _ := NewTCP(p, "", "", 0)
+	tcp, _ := NewTCP(p, "", "", 0, logptest.NewTestingLogger(b, ""))
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {

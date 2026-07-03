@@ -56,10 +56,26 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 	}
 
 	var mysql mysqlPlugin
+	logger := logp.NewNopLogger()
+	mysql.logger = logger
+	mysql.mysqlLogger = logger.Named("mysql")
+	mysql.mysqlDetLogger = logger.Named("mysql.detail")
 	config := defaultConfig
 	config.Ports = []int{serverPort}
 	mysql.init(callback, &procs.ProcessesWatcher{}, &config)
 	return &mysql
+}
+
+func newTestMySQLStream(data []byte, isClient bool) *mysqlStream {
+	logger := logp.NewNopLogger()
+	return &mysqlStream{
+		data:           data,
+		message:        new(mysqlMessage),
+		isClient:       isClient,
+		logger:         logger,
+		mysqlLogger:    logger.Named("mysql"),
+		mysqlDetLogger: logger.Named("mysql.detail"),
+	}
 }
 
 func Test_parseStateNames(t *testing.T) {
@@ -85,7 +101,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage), isClient: true}
+	stream := newTestMySQLStream(message, true)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -116,7 +132,7 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -152,7 +168,7 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -197,7 +213,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -250,7 +266,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -286,7 +302,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -571,7 +587,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 			"66726f6d20746573")
 	assert.NoError(t, err)
 
-	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
+	stream := newTestMySQLStream(reqData, true)
 	ok, complete := mysqlMessageParser(stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)

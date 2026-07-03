@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func thriftIdlForTesting(t *testing.T, content string) *thriftIdl {
@@ -32,7 +33,7 @@ func thriftIdlForTesting(t *testing.T, content string) *thriftIdl {
 	f.WriteString(content)
 	f.Close()
 
-	idl, err := newThriftIdl([]string{f.Name()})
+	idl, err := newThriftIdl([]string{f.Name()}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("Parsing failed:", err)
 	}

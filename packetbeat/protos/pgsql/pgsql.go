@@ -33,8 +33,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
-
-	"go.uber.org/zap"
 )
 
 type pgsqlPlugin struct {
@@ -145,7 +143,17 @@ func New(
 	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
+<<<<<<< HEAD
 	p.SetLogger(logp.NewNopLogger())
+=======
+	p.log = logger
+	p.debug = logger.Named("pgsql")
+	p.detail = logger.Named("pgsqldetailed")
+
+	p.isDebug = p.debug.IsDebug()
+	p.isDetail = p.detail.IsDebug()
+
+>>>>>>> be145e43b ([beatreceiver] Remove global logger packetbeat 2/2 (#51682))
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
