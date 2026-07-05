@@ -190,6 +190,7 @@ func (in *inputV2) processSQSMessage(ctx context.Context, disc *sqsDiscoveryV2, 
 		publishWithBackpressure(cc, 50*time.Millisecond, func() {
 			client.Publish(e)
 		})
+		metrics.s3EventsCreatedTotal.Inc()
 		publishCount++
 	})
 
