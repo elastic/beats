@@ -178,7 +178,7 @@ func (p *pollingDiscoveryV2) worker(ctx context.Context, pipeline beat.Pipeline,
 			}
 			p.metrics.s3ObjectsAckedTotal.Inc()
 			if st.Stored {
-				if err := p.processor.Finalize(ctx, p.s3, evt); err != nil {
+				if err := p.processor.Finalize(context.WithoutCancel(ctx), p.s3, evt); err != nil {
 					p.log.Errorf("S3 finalization failed for %q: %v", st.Key, err)
 					p.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 finalization failed: %s", err))
 				}
@@ -239,7 +239,7 @@ func (p *pollingDiscoveryV2) listObjects(ctx context.Context, workChan chan<- st
 			case workChan <- st:
 				p.metrics.s3ObjectsProcessedTotal.Inc()
 			case <-ctx.Done():
-				return ids, numListed, true
+				return ids, numListed, false
 			}
 		}
 	}
