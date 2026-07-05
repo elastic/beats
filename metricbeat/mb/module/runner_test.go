@@ -169,7 +169,7 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	r := module.NewRunner(client, m)
