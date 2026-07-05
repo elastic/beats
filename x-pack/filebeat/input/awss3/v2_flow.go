@@ -77,11 +77,6 @@ func newConcurrencyController(cfg concurrencyControllerConfig) *concurrencyContr
 	return cc
 }
 
-// Current returns the current allowed concurrency level.
-func (cc *concurrencyController) Current() int {
-	return int(cc.level.Get())
-}
-
 // OnSuccess signals that a unit of work completed without backpressure.
 // The controller may increase concurrency.
 func (cc *concurrencyController) OnSuccess() {
