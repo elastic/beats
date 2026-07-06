@@ -48,6 +48,8 @@ func TestCELInputOTelE2E(t *testing.T) {
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
 
+	tempDir := t.TempDir()
+
 	type options struct {
 		Index       string
 		ESURL       string
@@ -55,6 +57,7 @@ func TestCELInputOTelE2E(t *testing.T) {
 		Password    string
 		ResourceURL string
 		Program     string
+		PathHome    string
 	}
 
 	celFilebeatConfig := `filebeat.inputs:
@@ -98,6 +101,7 @@ processors:
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
         management.otel.enabled: true
+        path.home: {{ .PathHome }}
 ` + otelElasticsearchServiceYAML
 
 	var configBuffer bytes.Buffer
@@ -108,6 +112,7 @@ processors:
 		ResourceURL: celSrv.URL,
 		Program:     celProgram,
 		Index:       otelIndex,
+		PathHome:    tempDir,
 	}))
 
 	oteltestcol.New(t, configBuffer.String())
@@ -166,7 +171,7 @@ processors:
 			assert.NoError(ct, err)
 			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
 		},
-		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+		2*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
