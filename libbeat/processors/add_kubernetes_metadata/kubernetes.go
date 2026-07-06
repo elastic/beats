@@ -153,7 +153,8 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 			return nil, fmt.Errorf("add_kubernetes_metadata: %w", err)
 		}
 	} else {
-		// Complete the processor's initialization asynchronously
+		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
+		// the k8s node is not yet ready.
 		processor.wg.Go(func() {
 			_ = processor.init(ctx, config, cfg)
 		})
