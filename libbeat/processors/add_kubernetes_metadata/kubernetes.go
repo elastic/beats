@@ -58,26 +58,10 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
-<<<<<<< HEAD
-	log                 *logp.Logger
-	watcher             kubernetes.Watcher
-	nsWatcher           kubernetes.Watcher
-	nodeWatcher         kubernetes.Watcher
-	rsWatcher           kubernetes.Watcher
-	jobWatcher          kubernetes.Watcher
-	indexers            *Indexers
-	matchers            *Matchers
-	cache               *cache
-	kubernetesAvailable bool
-	initOnce            sync.Once
-=======
-	log       *logp.Logger
-	state     atomic.Pointer[initializedState]
-	cache     *cache
-	initOnce  sync.Once
-	wg        sync.WaitGroup
-	cancelCtx context.CancelFunc
->>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
+	log      *logp.Logger
+	state    atomic.Pointer[initializedState]
+	cache    *cache
+	initOnce sync.Once
 }
 
 func init() {
@@ -134,30 +118,13 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
-		log:                 log,
-		cache:               newCache(config.CleanupTimeout),
-		kubernetesAvailable: false,
+		log:   log,
+		cache: newCache(config.CleanupTimeout),
 	}
 
-<<<<<<< HEAD
 	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
 	go processor.init(config, cfg)
-=======
-	if config.WaitMetadata {
-		err := processor.init(ctx, config, cfg)
-		if processor.state.Load() == nil {
-			cancelCtx()
-			return nil, fmt.Errorf("add_kubernetes_metadata: %w", err)
-		}
-	} else {
-		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
-		// the k8s node is not yet ready.
-		processor.wg.Go(func() {
-			_ = processor.init(ctx, config, cfg)
-		})
-	}
->>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 
 	return processor, nil
 }
@@ -205,12 +172,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		matchers := NewMatchers(config.Matchers, k.log)
 
 		if matchers.Empty() {
-<<<<<<< HEAD
 			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
-=======
-			k.log.Debug("Could not initialize kubernetes plugin with zero matcher plugins")
-			k8sError = errors.New("could not initialize kubernetes plugin with zero matcher plugins")
->>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 			return
 		}
 
@@ -326,7 +288,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			},
 		})
 
-		// Publish the fully constructed state atomically before starting the watchers
+		// Publish the fully constructed state atomically before starting the watchers.
 		k.state.Store(&initializedState{
 			watcher:     watcher,
 			nsWatcher:   namespaceWatcher,
@@ -373,18 +335,13 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 // contains a map with various Kubernetes metadata.
 // This processor does not access or modify the `Meta` of the event.
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
-	if !k.kubernetesAvailable {
-		return event, nil
-	}
-<<<<<<< HEAD
-	if kubernetesMetadataExist(event) {
-=======
-
 	// A nil state means init has not published yet (still running or kubernetes unavailable); the
 	// load pairs with the Store in init for a race-free read.
 	state := k.state.Load()
 	if state == nil {
->>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
+		return event, nil
+	}
+	if kubernetesMetadataExist(event) {
 		return event, nil
 	}
 
@@ -430,31 +387,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (k *kubernetesAnnotator) Close() error {
-<<<<<<< HEAD
 	// ensure there are no goroutines leaking
 	// after the processor has been closed
 	k.initOnce.Do(func() {})
-	if k.watcher != nil {
-		k.watcher.Stop()
-	}
-	if k.nodeWatcher != nil {
-		k.nodeWatcher.Stop()
-	}
-	if k.nsWatcher != nil {
-		k.nsWatcher.Stop()
-	}
-	if k.rsWatcher != nil {
-		k.rsWatcher.Stop()
-	}
-	if k.jobWatcher != nil {
-		k.jobWatcher.Stop()
-=======
-	if k.cancelCtx != nil {
-		k.cancelCtx()
-	}
-	// Wait for any in-flight init goroutine to finish before tearing down.
-	k.wg.Wait()
-
 	if state := k.state.Load(); state != nil {
 		if state.watcher != nil {
 			state.watcher.Stop()
@@ -471,7 +406,6 @@ func (k *kubernetesAnnotator) Close() error {
 		if state.jobWatcher != nil {
 			state.jobWatcher.Stop()
 		}
->>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 	}
 	if k.cache != nil {
 		k.cache.stop()
@@ -508,14 +442,14 @@ func (*kubernetesAnnotator) String() string {
 	return "add_kubernetes_metadata"
 }
 
-// configWithKubeadm returns sets use_kubeadm to the given value, without mutating cfg.
+// configWithKubeadm sets use_kubeadm to the given value without mutating cfg.
 func configWithKubeadm(log *logp.Logger, cfg *config.C, kubeAdm bool) *config.C {
 	if cfg == nil {
 		return nil
 	}
 	clone, err := config.MergeConfigs(cfg)
 	if err != nil {
-		// Copying a valid config does not fail in practice; keep the original untouched
+		// Copying a valid config does not fail in practice; keep the original untouched.
 		log.Errorf("couldn't copy add_resource_metadata config to set use_kubeadm: %+v", err)
 		return cfg
 	}
