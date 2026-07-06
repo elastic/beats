@@ -52,6 +52,10 @@ type state struct {
 type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+
+	// Fingerprint holds the raw (hex-encoded) growing fingerprint while the file
+	// is still below the threshold (offset+length).
+	Fingerprint string `json:"fingerprint,omitempty" struct:"fingerprint,omitempty"`
 }
 
 // filestream is the input for reading from files which
@@ -67,6 +71,7 @@ type filestream struct {
 	compression               string
 	includeFileOwnerName      bool
 	includeFileOwnerGroupName bool
+	includeFileFingerprint    bool
 	hasLineFilter             bool
 
 	// Function references for testing
@@ -147,6 +152,7 @@ func configure(
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		includeFileFingerprint:    c.IncludeFileFingerprint,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		waitGracePeriodFn:         waitGracePeriod,
@@ -167,11 +173,19 @@ func configure(
 // identities should turn it off unless the user explicitly sets it.
 func normalizeConfig(cfg *conf.C, c *config) error {
 	if c.FileIdentity == nil {
+		c.FileWatcher.Scanner.Fingerprint.Growing = defaultFingerprintIdentityConfig().Growing
 		return nil
 	}
 
 	name := c.FileIdentity.Name()
 	if name == fingerprintName {
+		fingerprintCfg := defaultFingerprintIdentityConfig()
+		if sub := c.FileIdentity.Config(); sub != nil {
+			if err := sub.Unpack(&fingerprintCfg); err != nil {
+				return fmt.Errorf("cannot read 'file_identity.fingerprint' config: %w", err)
+			}
+		}
+		c.FileWatcher.Scanner.Fingerprint.Growing = fingerprintCfg.Growing
 		return nil
 	}
 
@@ -446,7 +460,11 @@ func (inp *filestream) buildPipeline(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
+	var fingerprint string
+	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
+		fingerprint = fs.desc.Fingerprint.Sum
+	}
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 

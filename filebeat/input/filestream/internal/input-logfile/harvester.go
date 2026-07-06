@@ -19,7 +19,6 @@ package input_logfile
 
 import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Harvester collects the lines from a configured source. It is operated by the
@@ -103,6 +102,8 @@ type HarvesterGroup interface {
 	StopHarvesters() error
 	// SetObserver sets the observer to get notified when a harvester closes.
 	SetObserver(c chan HarvesterStatus)
+	// Migrate moves a running harvester's bookkeeping registration in-place
+	Migrate(oldID string, next Source)
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID
@@ -119,10 +120,16 @@ type HarvesterStatus struct {
 // to modify the cursor state and unlock the key.
 func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
-	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
-	if err != nil {
-		resource.Release()
-		return nil, err
+
+	if !resource.lock.TryLock() {
+		ctx.Logger.Infof("Resource '%s' currently in use, waiting...", key)
+		err := resource.lock.LockContext(ctx.Cancelation)
+		ctx.Logger.Infof("Resource '%s' finally released. Lock acquired", key)
+		if err != nil {
+			ctx.Logger.Infof("Input for resource '%s' has been stopped while waiting", key)
+			resource.Release()
+			return nil, err
+		}
 	}
 
 	resource.stateMutex.Lock()
@@ -130,19 +137,6 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource.stateMutex.Unlock()
 
 	return resource, nil
-}
-
-func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Canceler) error {
-	if !resource.lock.TryLock() {
-		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
-		err := resource.lock.LockContext(canceler)
-		log.Infof("Resource '%v' finally released. Lock acquired", resource.key)
-		if err != nil {
-			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
-			return err
-		}
-	}
-	return nil
 }
 
 func releaseResource(resource *resource) {

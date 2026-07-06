@@ -151,12 +151,12 @@ func TestJamfIntegration_CursorRoundTrip(t *testing.T) {
 
 // runInputOnce starts a minimalStateInput, waits for the first full sync to
 // complete (events arrive), and stops it. It returns the Run error.
-func runInputOnce(t *testing.T, dataDir string, providerName string, p entcollect.Provider, client *fakeClient) error {
+func runInputOnce(t *testing.T, dataDir string, providerName string, prov entcollect.Provider, client *fakeClient) error {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "integ")
 
 	mi := &minimalStateInput{
-		provider:         p,
+		provider:         prov,
 		providerName:     providerName,
 		fullSyncInterval: time.Hour,
 		incrSyncInterval: time.Hour,
@@ -215,40 +215,31 @@ func runInputOnce(t *testing.T, dataDir string, providerName string, p entcollec
 // runInputOnce and runs a single incremental sync via runSync. This
 // bypasses the timer loop in Run(), which always fires a full sync
 // first and cannot reliably trigger incremental-only execution.
-func runIncrementalOnce(t *testing.T, dataDir string, providerName string, p entcollect.Provider, client *fakeClient) error {
+func runIncrementalOnce(t *testing.T, dataDir string, providerName string, prov entcollect.Provider, client *fakeClient) error {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "integ-incr")
 
 	dbPath := filepath.Join(dataDir, "kvstore", "integ-"+providerName+".db")
-	store, err := kvstore.NewStore(log, dbPath, 0600)
+	store, err := kvstore.NewStore(log, dbPath, 0o600)
 	if err != nil {
 		t.Fatalf("open bbolt for incremental: %v", err)
 	}
 	defer store.Close()
 
-	mi := &minimalStateInput{
-		provider:         p,
-		providerName:     providerName,
-		fullSyncInterval: time.Hour,
-		incrSyncInterval: time.Hour,
-		logger:           log,
-		path:             &paths.Path{Data: dataDir},
-	}
-
 	acking := &ackingClient{inner: client}
 	ctx := context.Background()
 	slogger := slog.New(slog.NewTextHandler(&testLogWriter{t}, nil))
+	s := &bboltSyncer{store: store, bucketName: "entcollect." + providerName}
 
-	return mi.runSync(
+	return s.runSync(
 		v2.Context{
 			Logger:      log,
 			ID:          "integ-" + providerName,
 			Cancelation: v2.GoContextFromCanceler(ctx),
 		},
-		store,
+		prov,
 		acking,
 		slogger,
-		"entcollect."+providerName,
 		false,
 	)
 }
@@ -259,7 +250,7 @@ func assertBboltKey(t *testing.T, dataDir, providerName, key string) {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "assert-bbolt")
 	dbPath := filepath.Join(dataDir, "kvstore", "integ-"+providerName+".db")
-	store, err := kvstore.NewStore(log, dbPath, 0600)
+	store, err := kvstore.NewStore(log, dbPath, 0o600)
 	if err != nil {
 		t.Fatalf("open bbolt for assertion: %v", err)
 	}
@@ -281,7 +272,7 @@ func deleteBboltKey(t *testing.T, dataDir, providerName, key string) {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "delete-bbolt")
 	dbPath := filepath.Join(dataDir, "kvstore", "integ-"+providerName+".db")
-	store, err := kvstore.NewStore(log, dbPath, 0600)
+	store, err := kvstore.NewStore(log, dbPath, 0o600)
 	if err != nil {
 		t.Fatalf("open bbolt for deletion: %v", err)
 	}

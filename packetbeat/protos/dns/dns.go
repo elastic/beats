@@ -224,8 +224,8 @@ func init() {
 	protos.Register("dns", New)
 }
 
-func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
-	p := &dnsPlugin{logger: logp.NewLogger("dns")}
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C, logger *logp.Logger) (protos.Plugin, error) {
+	p := &dnsPlugin{logger: logger.Named("dns")}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {

@@ -830,6 +830,34 @@ func (g *harvesterRunner) Continue(ctx inputv2.Context, previous, next Source) {
 	})
 }
 
+// Migrate re-keys a running source from oldID to next's identity without
+// stopping it, so a later Start(next) no-ops instead of spawning a duplicate.
+// No-op if nothing runs under oldID or next's key is already taken.
+func (g *harvesterRunner) Migrate(oldID string, next Source) {
+	newID := g.identifier.ID(next)
+
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	if oldID == newID {
+		return
+	}
+	ps := g.states[oldID]
+	if ps == nil {
+		// Nothing running under oldID (absent or already finished).
+		return
+	}
+	if _, exists := g.states[newID]; exists {
+		// Target occupied — don't clobber an existing registration.
+		return
+	}
+
+	delete(g.states, oldID)
+	ps.srcID = newID
+	ps.src = next
+	g.states[newID] = ps
+}
+
 // StopHarvesters stops all harvesters and the waker goroutine. With
 // read_until_eof enabled it first drains every source to EOF (bounded by the
 // configured Timeout) so data is not left unread on shutdown.

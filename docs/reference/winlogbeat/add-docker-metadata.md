@@ -75,7 +75,7 @@ It has the following settings:
 :   (Optional) Match container ID from a log path present in the `log.file.path` field. Enabled by default.
 
 `match_short_id`
-:   (Optional) Match container short ID from a log path present in the `log.file.path` field. Disabled by default. This allows to match directories names that have the first 12 characters of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
+:   (Optional) Match container short ID from a log path present in the `log.file.path` field. Disabled by default. This allows matching directory names that have the first 12 characters of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
 
 `match_source_index`
 :   (Optional) Index in the source path split by `/` to look for container ID. It defaults to 4 to match `/var/lib/docker/containers/<container_id>/*.log`

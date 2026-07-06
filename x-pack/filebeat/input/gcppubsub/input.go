@@ -29,12 +29,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 const (
@@ -81,10 +79,11 @@ func configID(config *conf.C) (string, error) {
 type pubsubInput struct {
 	config
 
-	status   status.StatusReporter
-	log      *logp.Logger
-	outlet   channel.Outleter // Output of received pubsub messages.
-	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
+	status    status.StatusReporter
+	log       *logp.Logger
+	userAgent string
+	outlet    channel.Outleter // Output of received pubsub messages.
+	inputCtx  context.Context  // Wraps the Done channel from parent input.Context.
 
 	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
 	workerCancel context.CancelFunc // Used to signal that the worker should stop.
@@ -144,6 +143,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 		config:       conf,
 		status:       stat,
 		log:          logger,
+		userAgent:    inputContext.UserAgent,
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
@@ -367,19 +367,18 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 		opts = append(opts, option.WithCredentialsJSON(in.CredentialsJSON))
 	}
 
-	userAgent := useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	if !in.config.Transport.Proxy.Disable && in.config.Transport.Proxy.URL != nil {
 		c, err := httpcommon.HTTPTransportSettings{Proxy: in.config.Transport.Proxy}.Client()
 		if err != nil {
 			return nil, err
 		}
 		c.Transport = userAgentDecorator{
-			UserAgent: userAgent,
+			UserAgent: in.userAgent,
 			Transport: c.Transport,
 		}
 		opts = append(opts, option.WithHTTPClient(c))
 	} else {
-		opts = append(opts, option.WithUserAgent(userAgent))
+		opts = append(opts, option.WithUserAgent(in.userAgent))
 	}
 
 	return pubsub.NewClient(ctx, in.ProjectID, opts...)
