@@ -32,14 +32,18 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
+
+var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
 	name          string
@@ -2633,7 +2637,7 @@ func TestInput(t *testing.T) {
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
-				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: userAgent},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher

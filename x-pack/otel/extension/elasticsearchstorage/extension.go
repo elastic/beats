@@ -8,6 +8,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
@@ -42,7 +43,7 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 	if err != nil {
 		return err
 	}
-	client, err := eslegclient.NewConnectedClient(ctx, c, "Filebeat", e.logger)
+	client, err := eslegclient.NewConnectedClient(ctx, c, beat.Info{Beat: "Filebeat", Logger: e.logger})
 	if err != nil {
 		return err
 	}
