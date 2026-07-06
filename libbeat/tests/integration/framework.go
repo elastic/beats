@@ -54,6 +54,7 @@ import (
 
 	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
@@ -1407,4 +1408,46 @@ func GetEventsFromFileOutput[E any](b *BeatProc, n int, waitForFile bool) []E {
 	}
 
 	return events
+}
+
+// GetMetricsFromLogs finds the next 'Non-zero metrics in the last' log entry
+// and parses [metricName] as E, [metricName] must use the dotted path
+// notation. Ex: 'monitoring.metrics.filebeat.filestream'.
+// GetMetricsFromLogs uses our elastic-agent-libs/config to
+// easily parse the metrics JSON using the dotted notation.
+// On error, t.Fatal is called, however error accessing the metric
+// is ignored because some monitoring metrics entries might not contain
+// all metrics.
+func GetMetricsFromLogs[E any](b *BeatProc, metricName string) E {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	var found bool
+	var line string
+	var m E
+	found, b.logFileOffset, line = b.searchStrInLogs(logFile, "Non-zero metrics in the last", b.logFileOffset)
+	if found {
+		var event map[string]any
+		if err := json.Unmarshal([]byte(line), &event); err != nil {
+			b.t.Fatalf("cannot parse log metrics as JSON: %s", err)
+		}
+
+		cc, err := config.NewConfigFrom(event)
+		if err != nil {
+			b.t.Fatal(err)
+		}
+		if has, err := cc.Has(metricName, -1); has && err == nil {
+			child, err := cc.Child(metricName, -1)
+			if err != nil {
+				b.t.Fatalf("cannot get %q: %s", metricName, err)
+			}
+			if err := child.Unpack(&m); err != nil {
+				b.t.Fatalf("cannot parse metrics: %s", err)
+			}
+
+			return m
+		}
+	}
+
+	return m
 }

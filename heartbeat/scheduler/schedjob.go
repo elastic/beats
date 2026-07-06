@@ -36,12 +36,13 @@ type schedJob struct {
 	entrypoint  TaskFunc
 	jobLimitSem *semaphore.Weighted
 	activeTasks atomic.Int64
+	logger      *logp.Logger
 }
 
 // runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
 // Subtasks are run in separate goroutines.
 // returns the time execution began on its first task
-func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, task TaskFunc) *schedJob {
+func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, task TaskFunc, logger *logp.Logger) *schedJob {
 	return &schedJob{
 		id:          id,
 		ctx:         ctx,
@@ -49,6 +50,7 @@ func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, t
 		jobLimitSem: s.jobLimitSem[jobType],
 		entrypoint:  task,
 		wg:          &sync.WaitGroup{},
+		logger:      logger,
 	}
 }
 
@@ -65,7 +67,7 @@ func (sj *schedJob) run() (startedAt time.Time) {
 		if err == nil {
 			defer sj.jobLimitSem.Release(1)
 		} else {
-			logp.L().Errorf("could not acquire semaphore: %v", err)
+			sj.logger.Errorf("could not acquire semaphore: %v", err)
 		}
 	}
 

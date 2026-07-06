@@ -2,7 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:deadcode,unused // This code will be used later.
 package cel
 
 import (
@@ -27,18 +26,23 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/icholy/digest"
+	"go.opentelemetry.io/otel/attribute"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
+
+var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
 	name          string
@@ -2632,7 +2636,7 @@ func TestInput(t *testing.T) {
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
-				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: userAgent},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
@@ -2759,15 +2763,6 @@ func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing
 		config["resource.url"] = server.URL
 		t.Cleanup(server.Close)
 	}
-}
-
-func newV2Context() (v2.Context, func()) {
-	ctx, cancel := context.WithCancel(context.Background())
-	return v2.Context{
-		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "test_id",
-		Cancelation: ctx,
-	}, cancel
 }
 
 //nolint:errcheck // No point checking errors in test server.
@@ -3034,26 +3029,6 @@ func paginationHandler() http.HandlerFunc {
 	}
 }
 
-//nolint:errcheck // No point checking errors in test server.
-func paginationArrayHandler() http.HandlerFunc {
-	var count int
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
-		switch count {
-		case 0:
-			w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
-		case 1:
-			if r.URL.Query().Get("page") != "bar" {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(`{"error":"wrong page token value"}`))
-				return
-			}
-			w.Write([]byte(`[{"foo":"bar"}]`))
-		}
-		count++
-	}
-}
-
 var redactorTests = []struct {
 	name  string
 	state mapstr.M
@@ -3248,6 +3223,55 @@ func TestRedactor(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetResourceAttributesIncludesInputType(t *testing.T) {
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("input_type should be set from input name: got %q, want %q", got, want)
+	}
+}
+
+func TestGetResourceAttributesInputTypeCannotBeOverridden(t *testing.T) {
+	t.Setenv("OTEL_RESOURCE_ATTRIBUTES", "input_type=httpjson,deployment.environment=production")
+
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("built-in input_type should not be overridden from OTEL_RESOURCE_ATTRIBUTES: got %q, want %q", got, want)
+	}
+	if got, want := attrsMap["deployment.environment"], "production"; got != want {
+		t.Errorf("custom resource attributes from OTEL_RESOURCE_ATTRIBUTES should still be included: got %q, want %q", got, want)
+	}
+}
+
+func toResourceAttributeMap(attrs []attribute.KeyValue) map[string]string {
+	result := make(map[string]string, len(attrs))
+	for _, attr := range attrs {
+		result[string(attr.Key)] = attr.Value.AsString()
+	}
+	return result
 }
 
 // sameErrorOrContains reports whether got matches want: both nil, or got's

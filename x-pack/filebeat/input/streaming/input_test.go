@@ -852,7 +852,7 @@ func TestURLEval(t *testing.T) {
 			if now == nil {
 				now = time.Now
 			}
-			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, logptest.NewTestingLogger(t, "websocket_url_eval_test"), now)
+			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, "", logptest.NewTestingLogger(t, "websocket_url_eval_test"), now)
 			if err != nil && !errors.Is(err, context.Canceled) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, nil)
 			}

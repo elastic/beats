@@ -47,6 +47,7 @@ type websocketStream struct {
 	cfg         config
 	cursor      map[string]any
 	status      status.StatusReporter
+	userAgent   string
 	tokenSource oauth2.TokenSource
 	tokenExpiry <-chan time.Time
 	time        func() time.Time
@@ -126,10 +127,11 @@ func NewWebsocketFollower(ctx context.Context, env v2.Context, cfg config, curso
 	}
 	stat.UpdateStatus(status.Configuring, "")
 	s := websocketStream{
-		id:     env.ID,
-		cfg:    cfg,
-		cursor: cursor,
-		status: stat,
+		id:        env.ID,
+		cfg:       cfg,
+		cursor:    cursor,
+		userAgent: env.Agent.UserAgent,
+		status:    stat,
 		processor: processor{
 			ns:      "websocket",
 			pub:     pub,
@@ -193,7 +195,7 @@ func NewWebsocketFollower(ctx context.Context, env v2.Context, cfg config, curso
 		return nil, err
 	}
 
-	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, log)
+	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, env.Agent.UserAgent, log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		stat.UpdateStatus(status.Failed, err.Error())
@@ -218,7 +220,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 	}
 
 	// initialize the input url with the help of the url_program.
-	url, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
+	url, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.userAgent, s.log, s.now)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		s.status.UpdateStatus(status.Failed, "failed to get url: "+err.Error())
@@ -302,7 +304,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			s.tokenExpiry = time.After(time.Until(token.Expiry) - s.cfg.Auth.OAuth2.TokenExpiryBuffer)
 			// Re-evaluate url_program before reconnecting so that cursor
 			// changes since the last connection are reflected in the URL.
-			updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
+			updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.userAgent, s.log, s.now)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorw("failed to re-evaluate url_program on token refresh, using previous url", "error", err)
@@ -351,7 +353,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				}
 				// Re-evaluate url_program before reconnecting so that cursor
 				// changes since the last connection are reflected in the URL.
-				updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
+				updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.userAgent, s.log, s.now)
 				if err != nil {
 					s.metrics.errorsTotal.Inc()
 					s.log.Errorw("failed to re-evaluate url_program on reconnect, using previous url", "error", err)

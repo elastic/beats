@@ -41,6 +41,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -83,11 +84,11 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("tls", config)
+	p, err := create("tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -323,11 +324,12 @@ func TestLargeResponse(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("largeresp", config)
+	logger := logptest.NewTestingLogger(t, "")
+	p, err := create("largeresp", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logger)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -414,6 +416,8 @@ func TestJsonBody(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, nil))
@@ -439,11 +443,11 @@ func TestJsonBody(t *testing.T) {
 			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
-			p, err := create("largeresp", config)
+			p, err := create("largeresp", config, beat.Info{Logger: logger})
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
-			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logger)[0]
 
 			event := &beat.Event{}
 			_, err = job(event)
@@ -673,11 +677,12 @@ func TestRedirect(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect", config)
+	logger := logptest.NewTestingLogger(t, "")
+	p, err := create("redirect", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logger)[0]
 
 	events, err := jobs.ExecJobAndConts(t, job)
 	require.NoError(t, err)
@@ -745,11 +750,11 @@ func TestRedirectWithTLS(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect-tls", config)
+	p, err := create("redirect-tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	events, err := jobs.ExecJobAndConts(t, job)
 	require.NoError(t, err)
@@ -796,11 +801,11 @@ func TestNoHeaders(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("http", config)
+	p, err := create("http", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -979,11 +984,11 @@ func TestUserAgentInject(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	p, err := create("ua", cfg)
+	p, err := create("ua", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
