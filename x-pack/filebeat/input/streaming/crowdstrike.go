@@ -16,6 +16,7 @@ import (
 	"strconv"
 	"time"
 
+	"golang.org/x/net/publicsuffix"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
@@ -36,10 +37,11 @@ type falconHoseStream struct {
 
 	status status.StatusReporter
 
-	creds         *clientcredentials.Config
-	authTransport *rateLimitTransport
-	discoverURL   string
-	plainClient   *http.Client
+	creds          *clientcredentials.Config
+	authTransport  *rateLimitTransport
+	discoverURL    string
+	allowedOrigins []*url.URL
+	plainClient    *http.Client
 
 	time func() time.Time
 }
@@ -73,6 +75,57 @@ func runRefreshLoopWithAfter(ctx context.Context, wait time.Duration, after func
 				return
 			}
 		}
+	}
+}
+
+// sameOrigin reports whether target shares the same origin as base. It returns
+// true when the hostnames are identical or when both resolve to the same
+// registrable domain (eTLD+1). It rejects HTTPS-to-HTTP scheme downgrades.
+// For IP addresses or hosts where the registrable domain is undefined, only
+// an exact hostname match is accepted.
+func sameOrigin(base, target *url.URL) bool {
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	bh := base.Hostname()
+	th := target.Hostname()
+	if bh == th {
+		return true
+	}
+	bd, bErr := publicsuffix.EffectiveTLDPlusOne(bh)
+	td, tErr := publicsuffix.EffectiveTLDPlusOne(th)
+	if bErr != nil || tErr != nil {
+		return false
+	}
+	return bd == td
+}
+
+// allowedOrigin reports whether target is permitted given the discover URL's
+// origin and an optional set of explicitly allowed origins. The target is
+// accepted when sameOrigin(base, target) is true or when the target's
+// scheme, hostname, and port match any entry in allowed. Absent ports are
+// normalised to the scheme default (443 for HTTPS, 80 for HTTP).
+func allowedOrigin(base *url.URL, allowed []*url.URL, target *url.URL) bool {
+	if sameOrigin(base, target) {
+		return true
+	}
+	for _, a := range allowed {
+		if a.Scheme == target.Scheme && a.Hostname() == target.Hostname() && portOrDefault(a) == portOrDefault(target) {
+			return true
+		}
+	}
+	return false
+}
+
+func portOrDefault(u *url.URL) string {
+	if p := u.Port(); p != "" {
+		return p
+	}
+	switch u.Scheme {
+	case "https", "wss":
+		return "443"
+	default:
+		return "80"
 	}
 }
 
@@ -115,7 +168,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		return nil, err
 	}
 
-	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, log)
+	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, env.Agent.UserAgent, log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		stat.UpdateStatus(status.Failed, err.Error())
@@ -132,6 +185,16 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 	query := url.Values{"appId": []string{cfg.CrowdstrikeAppID}}
 	u.RawQuery = query.Encode()
 	s.discoverURL = u.String()
+
+	for _, raw := range cfg.ResourceOrigins {
+		o, err := url.Parse(raw)
+		if err != nil {
+			err = fmt.Errorf("failed to parse resource_origins entry %q: %w", raw, err)
+			stat.UpdateStatus(status.Failed, err.Error())
+			return nil, err
+		}
+		s.allowedOrigins = append(s.allowedOrigins, o)
+	}
 
 	// Build the auth transport before zeroing timeouts for the streaming
 	// client. The oauth2 token endpoint needs normal request timeouts;
@@ -185,6 +248,10 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	var err error
 	attempt := 0
 	const maxAttemptsUnconfigured = 10
+	// Number of consecutive failures tolerated before reporting DEGRADED,
+	// so a single transient blip (e.g. an empty discover response) does not
+	// churn the unit health status.
+	const degradeAfterAttempts = 3
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
@@ -199,8 +266,14 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 			attempt++
 
-			if s.cfg.Retry != nil && !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
-				return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+			// The unconfigured cap must only apply when no retry policy is
+			// set. Keeping it as an else-if on the configured branch caused
+			// infinite_retries and max_attempts > 10 to be silently capped
+			// at 10.
+			if s.cfg.Retry != nil {
+				if !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
+					return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+				}
 			} else if attempt >= maxAttemptsUnconfigured {
 				return fmt.Errorf("max retry attempts (%d unconfigured) exceeded: %w", maxAttemptsUnconfigured, err)
 			}
@@ -217,7 +290,9 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 				waitTime = rle.wait
 			}
 
-			s.status.UpdateStatus(status.Degraded, err.Error())
+			if attempt >= degradeAfterAttempts {
+				s.status.UpdateStatus(status.Degraded, err.Error())
+			}
 			s.log.Warnw("session warning", "error", err, "attempt", attempt, "wait", waitTime.String())
 
 			select {
@@ -247,9 +322,10 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
-		err = fmt.Errorf("failed GET to discover stream: %w", err)
-		s.status.UpdateStatus(status.Degraded, err.Error())
-		return state, err
+		// Status transitions are owned by the FollowStream retry loop so
+		// that a single transient failure does not immediately report
+		// DEGRADED; just return the error here.
+		return state, fmt.Errorf("failed GET to discover stream: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -291,15 +367,42 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	err = dec.Decode(&body)
 	if err != nil {
+		// A 200 response with an empty body yields io.EOF from Decode. This
+		// is a transient upstream condition (the discover endpoint
+		// occasionally returns no content), distinct from a malformed body,
+		// so surface it clearly rather than as a generic decode failure.
+		if errors.Is(err, io.EOF) {
+			return state, errors.New("discover stream returned an empty body")
+		}
 		return state, fmt.Errorf("failed to decode discover body: %w", err)
 	}
 	s.log.Debugw("stream discover metadata", logp.Namespace(s.ns), "meta", mapstr.M(body.Meta))
+
+	discoverOrigin, err := url.Parse(s.discoverURL)
+	if err != nil {
+		return state, fmt.Errorf("failed to parse discover url for origin check: %w", err)
+	}
 
 	cursors, _ := state["cursor"].(map[string]any)
 	// Clean up state feed annotation. This unfortunate code placement
 	// is in order to avoid allocating defers in a loop.
 	defer delete(state, "feed")
 	for _, r := range body.Resources {
+		feedURL, err := url.Parse(r.FeedURL)
+		if err != nil {
+			return state, fmt.Errorf("failed to parse feed url: %w", err)
+		}
+		if !allowedOrigin(discoverOrigin, s.allowedOrigins, feedURL) {
+			return nil, hardError{fmt.Errorf("feed url origin %q does not match discover origin %q", feedURL.Host, discoverOrigin.Host)}
+		}
+		refreshURL, err := url.Parse(r.RefreshURL)
+		if err != nil {
+			return state, fmt.Errorf("failed to parse refresh url: %w", err)
+		}
+		if !allowedOrigin(discoverOrigin, s.allowedOrigins, refreshURL) {
+			return nil, hardError{fmt.Errorf("refresh url origin %q does not match discover origin %q", refreshURL.Host, discoverOrigin.Host)}
+		}
+
 		feedName := r.FeedURL // Retain this since we will mutate it to set the offset.
 		var offset int
 		if cursor, ok := cursors[feedName].(map[string]any); ok {
@@ -340,10 +443,6 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		}()
 
 		if offset > 0 {
-			feedURL, err := url.Parse(r.FeedURL)
-			if err != nil {
-				return state, fmt.Errorf("failed to parse feed url: %w", err)
-			}
 			feedQuery, err := url.ParseQuery(feedURL.RawQuery)
 			if err != nil {
 				return state, fmt.Errorf("failed to parse feed query: %w", err)

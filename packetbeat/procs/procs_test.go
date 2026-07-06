@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type mockWatcher struct {
@@ -176,7 +177,7 @@ func TestFindProcessTuple(t *testing.T) {
 			},
 		})
 	procs := ProcessesWatcher{}
-	err := procs.init(config, w)
+	err := procs.init(config, w, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	for _, testCase := range []struct {

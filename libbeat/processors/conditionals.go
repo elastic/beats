@@ -43,9 +43,21 @@ func NewConditional(
 			return nil, err
 		}
 
-		return addCondition(cfg, rule, log)
+		cond, err := addCondition(cfg, rule, log)
+		if err != nil {
+			// The processor was already constructed and may hold resources
+			// (or a reference to a shared instance): release it.
+			if closeErr := Close(rule); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("failed to close processor after condition error: %w", closeErr))
+			}
+			return nil, err
+		}
+		return cond, nil
 	}
 }
+
+var _ PdataProcessor = (*WhenProcessor)(nil)
+var _ PdataProcessor = (*ClosingWhenProcessor)(nil)
 
 // WhenProcessor is a tuple of condition plus a Processor.
 type WhenProcessor struct {
@@ -227,6 +239,13 @@ func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (beat.Processor,
 		return nil, err
 	}
 	if elseProcessors, err = newProcessors(c.Else); err != nil {
+		// The 'then' processors were already constructed and may hold
+		// resources (or references to shared instances): release them.
+		if ifProcessors != nil {
+			if closeErr := ifProcessors.Close(); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("failed to close 'then' processors after 'else' error: %w", closeErr))
+			}
+		}
 		return nil, err
 	}
 

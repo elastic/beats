@@ -30,10 +30,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func Init(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
+func Init(info beat.Info, components statestore.States) []v2.Plugin {
 	return append(
-		genericInputs(log, components),
-		osInputs(info, log, components)...,
+		genericInputs(info.Logger, components),
+		osInputs(info, components)...,
 	)
 }
 
