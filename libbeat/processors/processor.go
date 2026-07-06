@@ -79,34 +79,41 @@ func NewList(log *logp.Logger) *Processors {
 }
 
 // New creates a list of processors from a list of free user configurations.
+// The logger argument cannot be nil.
 func New(config PluginConfig, logger *logp.Logger) (*Processors, error) {
-	if logger == nil {
-		logger = logp.NewLogger(logName)
-	}
 	procs := NewList(logger)
+
+	// abort closes the processors constructed so far, so a failed list does
+	// not leak their resources (or shared-instance references).
+	abort := func(err error) (*Processors, error) {
+		if closeErr := procs.Close(); closeErr != nil {
+			err = errors.Join(err, fmt.Errorf("failed to close partially constructed processor list: %w", closeErr))
+		}
+		return nil, err
+	}
 
 	for _, procConfig := range config {
 		// Handle if/then/else processor which has multiple top-level keys.
 		if procConfig.HasField("if") {
 			p, err := NewIfElseThenProcessor(procConfig, logger)
 			if err != nil {
-				return nil, fmt.Errorf("failed to make if/then/else processor: %w", err)
+				return abort(fmt.Errorf("failed to make if/then/else processor: %w", err))
 			}
 			procs.AddProcessor(p)
 			continue
 		}
 
 		if len(procConfig.GetFields()) != 1 {
-			return nil, fmt.Errorf("each processor must have exactly one "+
+			return abort(fmt.Errorf("each processor must have exactly one "+
 				"action, but found %d actions (%v)",
 				len(procConfig.GetFields()),
-				strings.Join(procConfig.GetFields(), ","))
+				strings.Join(procConfig.GetFields(), ",")))
 		}
 
 		actionName := procConfig.GetFields()[0]
 		actionCfg, err := procConfig.Child(actionName, -1)
 		if err != nil {
-			return nil, err
+			return abort(err)
 		}
 
 		gen, exists := registry.reg[actionName]
@@ -116,14 +123,14 @@ func New(config PluginConfig, logger *logp.Logger) (*Processors, error) {
 				validActions = append(validActions, k)
 
 			}
-			return nil, fmt.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
+			return abort(fmt.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", ")))
 		}
 
 		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
 		constructor := gen.Plugin()
 		plugin, err := constructor(actionCfg, logger)
 		if err != nil {
-			return nil, err
+			return abort(err)
 		}
 
 		procs.AddProcessor(plugin)
