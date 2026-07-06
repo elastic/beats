@@ -266,7 +266,6 @@ func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Conte
 			log.Debugf("File %s is rotated", event.NewPath)
 
 			p.onRotatedFile(log, ctx, event, src, group)
-
 		} else {
 			log.Debugf("File %s is original", event.NewPath)
 			// if file is original, add it to the bookeeper
