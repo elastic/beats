@@ -87,8 +87,8 @@ service:
 
 	require.Eventually(t, func() bool {
 		return col.ObservedLogs().
-			FilterMessageSnippet("Starting metrics logging every 30s").Len() > 0
-	}, 30*time.Second, 100*time.Millisecond, "Expected auditbeat receiver to start and log metrics")
+			FilterMessageSnippet("Skipping metrics logging").Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "Expected auditbeat receiver to start and initialize the metric reporter")
 }
 
 func TestHeartbeatReceiver(t *testing.T) {
@@ -126,8 +126,8 @@ service:
 
 	require.Eventually(t, func() bool {
 		return col.ObservedLogs().
-			FilterMessageSnippet("Starting metrics logging every 30s").Len() > 0
-	}, 30*time.Second, 100*time.Millisecond, "Expected heartbeat receiver to start and log metrics")
+			FilterMessageSnippet("Skipping metrics logging").Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "Expected heartbeat receiver to start and initialize the metric reporter")
 }
 
 // TestOsquerybeatReceiverRegistered verifies that the osquerybeat receiver
@@ -213,6 +213,6 @@ service:
 
 	require.Eventually(t, func() bool {
 		return col.ObservedLogs().
-			FilterMessageSnippet("Starting metrics logging every 30s").Len() > 0
-	}, 30*time.Second, 100*time.Millisecond, "Expected packetbeat receiver to start and log metrics")
+			FilterMessageSnippet("Skipping metrics logging").Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "Expected packetbeat receiver to start and initialize the metric reporter")
 }
