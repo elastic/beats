@@ -162,8 +162,8 @@ type harvesterRunner struct {
 // longer matches the source's nextCheck (re-parked or torn down) is stale and
 // skipped when popped.
 type parkedEntry struct {
-	ps  *sourceState
-	due time.Time
+	state *sourceState
+	due   time.Time
 }
 
 type sourceHeap []*parkedEntry
@@ -236,92 +236,92 @@ func (g *harvesterRunner) start() {
 
 func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c }
 
-// run spawns a reader goroutine for ps unless one is already reading it (or it is
+// run spawns a reader goroutine for state unless one is already reading it (or it is
 // being torn down, or the group is shutting down). While draining (read_until_eof
 // shutdown) a closed runner still spawns readers for parked sources.
-func (g *harvesterRunner) run(ps *sourceState) {
+func (g *harvesterRunner) run(state *sourceState) {
 	g.mu.Lock()
 	switch {
 	// Shutting down without draining: finishRemaining sweeps remaining sources.
 	case g.closed && !g.draining:
 		g.mu.Unlock()
 		return
-	// A reader goroutine already owns ps and will tear it down.
-	case ps.status == statusRunning:
+	// A reader goroutine already owns state and will tear it down.
+	case state.status == statusRunning:
 		g.mu.Unlock()
 		return
 	// PollResume hand-off holder: Stop/stopAndWait may set statusClosing on a
 	// polling source without finishing (see Stop); tear down here. finish() is
 	// idempotent.
-	case ps.finished || ps.status == statusClosing:
+	case state.finished || state.status == statusClosing:
 		g.mu.Unlock()
-		g.finish(ps)
+		g.finish(state)
 		return
 	}
-	g.setStatus(ps, statusRunning)
+	g.setStatus(state, statusRunning)
 	g.wg.Add(1)
 	g.mu.Unlock()
 
-	go g.readOnce(ps)
+	go g.readOnce(state)
 }
 
 // readOnce reads a source until the read would block or a terminal condition is
 // reached, then parks or tears it down and exits.
-func (g *harvesterRunner) readOnce(ps *sourceState) {
+func (g *harvesterRunner) readOnce(state *sourceState) {
 	defer g.wg.Done()
 
 	g.mu.Lock()
-	if ps.status == statusClosing || ps.finished {
+	if state.status == statusClosing || state.finished {
 		g.mu.Unlock()
-		g.finish(ps)
+		g.finish(state)
 		return
 	}
-	needSetup := !ps.setUp
+	needSetup := !state.setUp
 	g.mu.Unlock()
 
 	// First read of a source acquires its lock, client and session. Subsequent
 	// reads (after a park/resume) reuse them, so a tailing file keeps its fd open.
 	if needSetup {
-		ps.ctx.Logger.Debug("Starting harvester for file")
-		if err := g.setup(ps); err != nil {
-			ps.ctx.Logger.Errorf("could not set up harvester: %v", err)
+		state.ctx.Logger.Debug("Starting harvester for file")
+		if err := g.setup(state); err != nil {
+			state.ctx.Logger.Errorf("could not set up harvester: %v", err)
 			// Report permanent setup failures as a degraded state for the input.
 			if isPermanentHarvesterError(err) {
-				ps.ctx.UpdateStatus(
+				state.ctx.UpdateStatus(
 					status.Degraded,
 					fmt.Sprintf("Harvester for Filestream input %q failed: %s", g.inputID, err),
 				)
 			}
-			g.finish(ps)
+			g.finish(state)
 			return
 		}
 		g.mu.Lock()
-		ps.setUp = true
-		closing := ps.status == statusClosing || ps.finished
+		state.setUp = true
+		closing := state.status == statusClosing || state.finished
 		g.mu.Unlock()
 		if closing {
-			g.finish(ps)
+			g.finish(state)
 			return
 		}
 	}
 
-	before := ps.session.Offset()
-	verdict, err := ps.session.ReadSlice(ps.ctx, ps.publisher)
-	after := ps.session.Offset()
+	before := state.session.Offset()
+	verdict, err := state.session.ReadSlice(state.ctx, state.publisher)
+	after := state.session.Offset()
 
 	g.mu.Lock()
-	if ps.status == statusClosing || ps.finished {
+	if state.status == statusClosing || state.finished {
 		g.mu.Unlock()
-		g.finish(ps)
+		g.finish(state)
 		return
 	}
 
 	if err != nil || verdict == SliceDone {
 		g.mu.Unlock()
 		if err != nil {
-			ps.ctx.Logger.Debugf("Harvester stopped with error: %v", err)
+			state.ctx.Logger.Debugf("Harvester stopped with error: %v", err)
 		}
-		g.finish(ps)
+		g.finish(state)
 		return
 	}
 
@@ -329,26 +329,26 @@ func (g *harvesterRunner) readOnce(ps *sourceState) {
 	// has now been drained, so tear it down instead of parking it.
 	if g.draining {
 		g.mu.Unlock()
-		g.finish(ps)
+		g.finish(state)
 		return
 	}
 
 	// Park for the waker and exit the goroutine. A slice that made progress resets
 	// the backoff; one that read nothing grows it.
 	if after > before {
-		g.park(ps, minWakerBackoff)
+		g.park(state, minWakerBackoff)
 	} else {
-		g.park(ps, growBackoff(ps.backoff))
+		g.park(state, growBackoff(state.backoff))
 	}
 	g.mu.Unlock()
 	g.signalWaker()
 }
 
 // setup acquires the per-source resources: registry lock, pipeline client,
-// cursor/publisher and the reading session, populating ps. On error it releases
-// whatever it acquired and leaves ps's resource fields nil.
-func (g *harvesterRunner) setup(ps *sourceState) error {
-	resource, err := lock(ps.ctx, g.store, ps.srcID)
+// cursor/publisher and the reading session, populating state. On error it releases
+// whatever it acquired and leaves state's resource fields nil.
+func (g *harvesterRunner) setup(state *sourceState) error {
+	resource, err := lock(state.ctx, g.store, state.srcID)
 	if err != nil {
 		return err
 	}
@@ -367,29 +367,29 @@ func (g *harvesterRunner) setup(ps *sourceState) error {
 
 	g.store.UpdateTTL(resource, g.cleanTimeout)
 
-	ps.resource = resource
-	ps.client = client
-	ps.cursor = makeCursor(resource)
-	ps.publisher = &cursorPublisher{canceler: ps.ctx.Cancelation, client: client, cursor: &ps.cursor}
+	state.resource = resource
+	state.client = client
+	state.cursor = makeCursor(resource)
+	state.publisher = &cursorPublisher{canceler: state.ctx.Cancelation, client: client, cursor: &state.cursor}
 
-	session, err := g.harvester.OpenSession(ps.ctx, ps.src, ps.cursor, g.metrics)
+	session, err := g.harvester.OpenSession(state.ctx, state.src, state.cursor, g.metrics)
 	if err != nil {
 		_ = client.Close()
 		releaseResource(resource)
-		ps.resource = nil
-		ps.client = nil
-		ps.publisher = nil
+		state.resource = nil
+		state.client = nil
+		state.publisher = nil
 		return err
 	}
-	ps.session = session
-	ps.isGZIP = session.IsGZIP()
+	state.session = session
+	state.isGZIP = session.IsGZIP()
 
 	g.metrics.FilesActive.Inc()
 	g.metrics.HarvesterRunning.Inc()
 	g.metrics.FilesOpened.Inc()
 	g.metrics.HarvesterOpenFiles.Inc()
 	g.metrics.HarvesterStarted.Inc()
-	if ps.isGZIP {
+	if state.isGZIP {
 		g.metrics.FilesGZIPActive.Inc()
 		g.metrics.HarvesterGZIPRunning.Inc()
 		g.metrics.FilesGZIPOpened.Inc()
@@ -411,10 +411,10 @@ func (g *harvesterRunner) Restart(ctx inputv2.Context, src Source) {
 	g.spawn(func() {
 		srcID := g.identifier.ID(src)
 		g.mu.Lock()
-		ps := g.states[srcID]
+		state := g.states[srcID]
 		g.mu.Unlock()
-		if ps != nil {
-			g.stopAndWait(ps)
+		if state != nil {
+			g.stopAndWait(state)
 		}
 		g.enqueue(ctx, src)
 	})
@@ -447,32 +447,32 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 	ctx.Cancelation = hctx
 	ctx.Logger = ctx.Logger.With("source_file", srcID)
 
-	ps := &sourceState{
+	state := &sourceState{
 		srcID:  srcID,
 		src:    src,
 		ctx:    ctx,
 		cancel: cancel,
 		done:   make(chan struct{}),
 	}
-	g.states[srcID] = ps
+	g.states[srcID] = state
 
 	// Hard open-files limit: if every slot is taken, queue the source instead of
 	// opening it. It holds no fd and no goroutine until finish() promotes it when
 	// an open file closes.
 	if g.harvesterLimit > 0 && g.nOpen >= g.harvesterLimit {
-		g.setStatus(ps, statusWaiting)
-		g.waiting = append(g.waiting, ps)
+		g.setStatus(state, statusWaiting)
+		g.waiting = append(g.waiting, state)
 		g.mu.Unlock()
 		ctx.Logger.Debugf("harvester_limit (%d) reached, queueing %s", g.harvesterLimit, srcID)
 		return
 	}
 
-	ps.holdsSlot = true
+	state.holdsSlot = true
 	g.nOpen++
-	g.setStatus(ps, statusNew)
+	g.setStatus(state, statusNew)
 	g.mu.Unlock()
 
-	g.run(ps)
+	g.run(state)
 }
 
 // promoteLocked moves the next live waiting source into an open slot and returns
@@ -522,8 +522,8 @@ func (g *harvesterRunner) waker() {
 		}
 		g.mu.Unlock()
 
-		for _, ps := range due {
-			g.pollParked(ps)
+		for _, state := range due {
+			g.pollParked(state)
 		}
 
 		// If we processed any, loop immediately to pick up sources that became
@@ -557,10 +557,10 @@ func statusIsActive(s sourceStatus) bool {
 	return s == statusNew || s == statusRunning || s == statusPolling
 }
 
-// setStatus transitions ps to ns and keeps the active/parked gauge counters in
+// setStatus transitions state to ns and keeps the active/parked gauge counters in
 // sync. statusClosing counts as neither. Caller holds g.mu.
-func (g *harvesterRunner) setStatus(ps *sourceState, ns sourceStatus) {
-	old := ps.status
+func (g *harvesterRunner) setStatus(state *sourceState, ns sourceStatus) {
+	old := state.status
 	if old == ns {
 		return
 	}
@@ -580,16 +580,16 @@ func (g *harvesterRunner) setStatus(ps *sourceState, ns sourceStatus) {
 	case statusIsActive(ns):
 		g.nActive++
 	}
-	ps.status = ns
+	state.status = ns
 }
 
-// park schedules ps to be polled by the waker after backoff, recording it on the
+// park schedules state to be polled by the waker after backoff, recording it on the
 // parked min-heap. Caller holds g.mu.
-func (g *harvesterRunner) park(ps *sourceState, backoff time.Duration) {
-	ps.backoff = backoff
-	ps.nextCheck = time.Now().Add(backoff)
-	g.setStatus(ps, statusParked)
-	heap.Push(&g.parked, &parkedEntry{ps: ps, due: ps.nextCheck})
+func (g *harvesterRunner) park(state *sourceState, backoff time.Duration) {
+	state.backoff = backoff
+	state.nextCheck = time.Now().Add(backoff)
+	g.setStatus(state, statusParked)
+	heap.Push(&g.parked, &parkedEntry{state: state, due: state.nextCheck})
 }
 
 // popDue removes and returns the parked sources whose nextCheck is due, claiming
@@ -602,10 +602,10 @@ func (g *harvesterRunner) popDue(now time.Time) []*sourceState {
 			break
 		}
 		e, _ := heap.Pop(&g.parked).(*parkedEntry)
-		ps := e.ps
-		if ps.status == statusParked && ps.nextCheck.Equal(e.due) {
-			g.setStatus(ps, statusPolling)
-			due = append(due, ps)
+		state := e.state
+		if state.status == statusParked && state.nextCheck.Equal(e.due) {
+			g.setStatus(state, statusPolling)
+			due = append(due, state)
 		}
 	}
 	return due
@@ -613,16 +613,16 @@ func (g *harvesterRunner) popDue(now time.Time) []*sourceState {
 
 // pollParked polls one due source and acts on the result: resume (spawn a
 // reader), close (tear down) or re-park. Must be called without holding g.mu.
-func (g *harvesterRunner) pollParked(ps *sourceState) {
-	result := ps.session.Poll()
+func (g *harvesterRunner) pollParked(state *sourceState) {
+	result := state.session.Poll()
 
 	g.mu.Lock()
-	if ps.status == statusClosing || ps.finished {
+	if state.status == statusClosing || state.finished {
 		g.mu.Unlock()
-		g.finish(ps)
+		g.finish(state)
 		return
 	}
-	if ps.status != statusPolling {
+	if state.status != statusPolling {
 		// Claimed by another actor (e.g. a drain reader during shutdown) while we
 		// were polling; leave it to that actor.
 		g.mu.Unlock()
@@ -631,12 +631,12 @@ func (g *harvesterRunner) pollParked(ps *sourceState) {
 	switch result {
 	case PollResume:
 		g.mu.Unlock()
-		g.run(ps) // new data: spawn a reader
+		g.run(state) // new data: spawn a reader
 	case PollClose:
 		g.mu.Unlock()
-		g.finish(ps)
+		g.finish(state)
 	default: // PollPark
-		g.park(ps, growBackoff(ps.backoff))
+		g.park(state, growBackoff(state.backoff))
 		g.mu.Unlock()
 	}
 }
@@ -658,14 +658,14 @@ func (g *harvesterRunner) Stop(src Source) {
 	srcID := g.identifier.ID(src)
 
 	g.mu.Lock()
-	ps := g.states[srcID]
-	if ps == nil {
+	state := g.states[srcID]
+	if state == nil {
 		g.mu.Unlock()
 		return
 	}
-	prev := ps.status
-	g.setStatus(ps, statusClosing)
-	cancel := ps.cancel
+	prev := state.status
+	g.setStatus(state, statusClosing)
+	cancel := state.cancel
 	g.mu.Unlock()
 
 	if cancel != nil {
@@ -677,27 +677,27 @@ func (g *harvesterRunner) Stop(src Source) {
 	// For running/polling, the reader or waker that holds it finishes it after
 	// the cancel.
 	if prev == statusParked || prev == statusNew || prev == statusWaiting {
-		g.finish(ps)
+		g.finish(state)
 	}
 }
 
 // stopAndWait stops a source and blocks until it has been fully torn down. Used
 // by Restart so the new harvester does not race the old one's resource lock.
-func (g *harvesterRunner) stopAndWait(ps *sourceState) {
+func (g *harvesterRunner) stopAndWait(state *sourceState) {
 	g.mu.Lock()
-	if ps.finished {
+	if state.finished {
 		// A finish is already in flight; wait for it to fully tear down (done is
 		// closed last, after the source is removed) so a following enqueue does
 		// not see the dying source and skip the restart.
-		done := ps.done
+		done := state.done
 		g.mu.Unlock()
 		<-done
 		return
 	}
-	prev := ps.status
-	g.setStatus(ps, statusClosing)
-	cancel := ps.cancel
-	done := ps.done
+	prev := state.status
+	g.setStatus(state, statusClosing)
+	cancel := state.cancel
+	done := state.done
 	g.mu.Unlock()
 
 	if cancel != nil {
@@ -706,7 +706,7 @@ func (g *harvesterRunner) stopAndWait(ps *sourceState) {
 	// A parked, queued or still-new source has no goroutine that will finish it
 	// (see Stop), so tear it down here; otherwise wait for the holder to do it.
 	if prev == statusParked || prev == statusNew || prev == statusWaiting {
-		g.finish(ps)
+		g.finish(state)
 		return
 	}
 	<-done
@@ -715,32 +715,32 @@ func (g *harvesterRunner) stopAndWait(ps *sourceState) {
 // finish tears down a source's resources exactly once and removes it from the
 // runner. It must be called without holding g.mu and never while a goroutine
 // is inside the source's ReadSlice (the status/cancel protocol guarantees this).
-func (g *harvesterRunner) finish(ps *sourceState) {
+func (g *harvesterRunner) finish(state *sourceState) {
 	g.mu.Lock()
-	if ps.finished {
+	if state.finished {
 		g.mu.Unlock()
 		return
 	}
-	g.setStatus(ps, statusClosing) // adjust gauge counters from whatever it was
-	ps.finished = true
-	wasSetUp := ps.setUp
+	g.setStatus(state, statusClosing) // adjust gauge counters from whatever it was
+	state.finished = true
+	wasSetUp := state.setUp
 	g.mu.Unlock()
 
-	g.notifyObserver(ps)
+	g.notifyObserver(state)
 
-	log := ps.ctx.Logger
-	if ps.session != nil {
+	log := state.ctx.Logger
+	if state.session != nil {
 		log.Debug("Closing reader of filestream")
-		_ = ps.session.Close()
+		_ = state.session.Close()
 	}
-	if ps.client != nil {
-		_ = ps.client.Close()
+	if state.client != nil {
+		_ = state.client.Close()
 	}
-	if ps.resource != nil {
-		releaseResource(ps.resource)
+	if state.resource != nil {
+		releaseResource(state.resource)
 	}
-	if ps.cancel != nil {
-		ps.cancel()
+	if state.cancel != nil {
+		state.cancel()
 	}
 
 	// Only balance the metrics that setup incremented; a source torn down before
@@ -751,7 +751,7 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 		g.metrics.FilesClosed.Inc()
 		g.metrics.HarvesterOpenFiles.Dec()
 		g.metrics.HarvesterClosed.Inc()
-		if ps.isGZIP {
+		if state.isGZIP {
 			g.metrics.FilesGZIPActive.Dec()
 			g.metrics.HarvesterGZIPRunning.Dec()
 			g.metrics.FilesGZIPClosed.Inc()
@@ -767,10 +767,10 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 	// the slot here (after the fd is closed) and promoting the next queued source
 	// keeps the open-files count at or below harvesterLimit at all times.
 	g.mu.Lock()
-	delete(g.states, ps.srcID)
+	delete(g.states, state.srcID)
 	var promoted *sourceState
-	if ps.holdsSlot {
-		ps.holdsSlot = false
+	if state.holdsSlot {
+		state.holdsSlot = false
 		g.nOpen--
 		if !g.closed {
 			promoted = g.promoteLocked()
@@ -778,20 +778,20 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 	}
 	g.mu.Unlock()
 
-	close(ps.done)
+	close(state.done)
 
 	if promoted != nil {
 		g.run(promoted)
 	}
 }
 
-func (g *harvesterRunner) notifyObserver(ps *sourceState) {
-	if g.notifyChan == nil || ps.session == nil {
+func (g *harvesterRunner) notifyObserver(state *sourceState) {
+	if g.notifyChan == nil || state.session == nil {
 		return
 	}
-	offset := ps.session.Offset()
+	offset := state.session.Offset()
 	select {
-	case g.notifyChan <- HarvesterStatus{ID: ps.srcID, Size: offset}:
+	case g.notifyChan <- HarvesterStatus{ID: state.srcID, Size: offset}:
 	case <-g.ctx.Cancelation.Done():
 	}
 }
@@ -836,8 +836,8 @@ func (g *harvesterRunner) Migrate(oldID string, next Source) {
 	if oldID == newID {
 		return
 	}
-	ps := g.states[oldID]
-	if ps == nil {
+	state := g.states[oldID]
+	if state == nil {
 		// Nothing running under oldID (absent or already finished).
 		return
 	}
@@ -847,9 +847,9 @@ func (g *harvesterRunner) Migrate(oldID string, next Source) {
 	}
 
 	delete(g.states, oldID)
-	ps.srcID = newID
-	ps.src = next
-	g.states[newID] = ps
+	state.srcID = newID
+	state.src = next
+	g.states[newID] = state
 }
 
 // StopHarvesters stops all harvesters and the waker goroutine. With
@@ -871,11 +871,11 @@ func (g *harvesterRunner) StopHarvesters() error {
 // draining. The caller holds g.mu; stopNow releases it.
 func (g *harvesterRunner) stopNow() error {
 	g.closed = true
-	for _, ps := range g.states {
-		if ps != nil {
-			g.setStatus(ps, statusClosing)
-			if ps.cancel != nil {
-				ps.cancel()
+	for _, state := range g.states {
+		if state != nil {
+			g.setStatus(state, statusClosing)
+			if state.cancel != nil {
+				state.cancel()
 			}
 		}
 	}
@@ -899,11 +899,11 @@ func (g *harvesterRunner) drainAndStop() error {
 	// so they read any remaining data to EOF. Sources the waker is currently
 	// polling are handled by that poll (pollParked re-spawns a reader on resume).
 	toDrain := make([]*sourceState, 0, len(g.states))
-	for _, ps := range g.states {
+	for _, state := range g.states {
 		// Queued sources were never opened; shutdown should not open new files to
 		// drain them. finishRemaining tears them down.
-		if ps != nil && ps.status != statusRunning && ps.status != statusPolling && ps.status != statusWaiting {
-			toDrain = append(toDrain, ps)
+		if state != nil && state.status != statusRunning && state.status != statusPolling && state.status != statusWaiting {
+			toDrain = append(toDrain, state)
 		}
 	}
 	// Only an actual in-flight drain is worth announcing: if every source already
@@ -918,17 +918,17 @@ func (g *harvesterRunner) drainAndStop() error {
 	}
 
 	g.signalWaker() // let the waker observe closed and exit
-	for _, ps := range toDrain {
-		g.run(ps) // draining: read to EOF, then finish (not park)
+	for _, state := range toDrain {
+		g.run(state) // draining: read to EOF, then finish (not park)
 	}
 
 	// Bound the drain: cancel every source after Timeout so a stuck read or a
 	// blocked output unblocks and tears down.
 	timer := time.AfterFunc(g.readUntilEOF.Timeout, func() {
 		g.mu.Lock()
-		for _, ps := range g.states {
-			if ps != nil && ps.cancel != nil {
-				ps.cancel()
+		for _, state := range g.states {
+			if state != nil && state.cancel != nil {
+				state.cancel()
 			}
 		}
 		g.mu.Unlock()
@@ -957,14 +957,14 @@ func (g *harvesterRunner) drainAndStop() error {
 func (g *harvesterRunner) finishRemaining() {
 	g.mu.Lock()
 	remaining := make([]*sourceState, 0, len(g.states))
-	for _, ps := range g.states {
-		if ps != nil {
-			remaining = append(remaining, ps)
+	for _, state := range g.states {
+		if state != nil {
+			remaining = append(remaining, state)
 		}
 	}
 	g.mu.Unlock()
-	for _, ps := range remaining {
-		g.finish(ps)
+	for _, state := range remaining {
+		g.finish(state)
 	}
 }
 

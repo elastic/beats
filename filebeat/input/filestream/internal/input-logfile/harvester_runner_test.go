@@ -415,9 +415,9 @@ func TestHarvesterRunner_ParkAndResume(t *testing.T) {
 	require.Equal(t, 1, parked, "parked gauge should count the parked source")
 
 	// Simulate the waker firing: pop the due source and poll it.
-	ps := g.popDueNow()
-	require.NotNil(t, ps, "the parked source should be due")
-	g.pollParked(ps)
+	state := g.popDueNow()
+	require.NotNil(t, state, "the parked source should be due")
+	g.pollParked(state)
 
 	requireEventually(t, func() bool { return !g.hasID(id) },
 		"resumed source should be read again and torn down at EOF")
@@ -438,8 +438,8 @@ func TestHarvesterRunner_ParkThenClose(t *testing.T) {
 	}
 	g := testHarvesterRunner(t, h, 0)
 	src := &testSource{name: "/path/to/test"}
-	id, ps := startParkedAndClaimDue(t, g, src)
-	g.pollParked(ps)
+	id, state := startParkedAndClaimDue(t, g, src)
+	g.pollParked(state)
 
 	requireEventually(t, func() bool { return !g.hasID(id) },
 		"a parked source should tear down on a close poll")
@@ -465,17 +465,17 @@ func TestHarvesterRunner_ParkPollGrowsBackoff(t *testing.T) {
 		return ok && s == statusParked
 	}, "source should park")
 
-	ps, ok := g.stateFor(id)
+	state, ok := g.stateFor(id)
 	require.True(t, ok)
-	require.Equal(t, minWakerBackoff, ps.backoff, "a progressing read parks with the minimum backoff")
+	require.Equal(t, minWakerBackoff, state.backoff, "a progressing read parks with the minimum backoff")
 
-	ps = g.popDueNow()
-	require.NotNil(t, ps)
-	g.pollParked(ps)
+	state = g.popDueNow()
+	require.NotNil(t, state)
+	g.pollParked(state)
 
 	requireEventually(t, func() bool {
 		s, ok := g.statusOf(id)
-		return ok && s == statusParked && ps.backoff == growBackoff(minWakerBackoff)
+		return ok && s == statusParked && state.backoff == growBackoff(minWakerBackoff)
 	}, "an idle poll should re-park with a grown backoff")
 
 	require.NoError(t, g.StopHarvesters())
@@ -601,12 +601,12 @@ func TestHarvesterRunner_RunSkipsAlreadyActive(t *testing.T) {
 
 	// A reader goroutine already owns a running source: run must be a no-op (no
 	// new goroutine, status unchanged) and leave teardown to that reader.
-	ps := &sourceState{srcID: "x", ctx: startContext(t), status: statusRunning, done: make(chan struct{})}
+	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusRunning, done: make(chan struct{})}
 	g.mu.Lock()
-	g.states["x"] = ps
+	g.states["x"] = state
 	g.mu.Unlock()
 
-	g.run(ps)
+	g.run(state)
 
 	got, _ := g.statusOf("x")
 	require.Equal(t, statusRunning, got, "run must not disturb a source a reader already owns")
@@ -639,7 +639,7 @@ func TestHarvesterRunner_StopFinishesNewSource(t *testing.T) {
 	id := g.identifier.ID(src)
 
 	_, cancel := context.WithCancel(context.Background())
-	ps := &sourceState{
+	state := &sourceState{
 		srcID:  id,
 		src:    src,
 		ctx:    startContext(t),
@@ -648,7 +648,7 @@ func TestHarvesterRunner_StopFinishesNewSource(t *testing.T) {
 		done:   make(chan struct{}),
 	}
 	g.mu.Lock()
-	g.states[id] = ps
+	g.states[id] = state
 	g.nActive++ // enqueue counts statusNew as active
 	g.mu.Unlock()
 
@@ -656,7 +656,7 @@ func TestHarvesterRunner_StopFinishesNewSource(t *testing.T) {
 
 	require.False(t, g.hasID(id), "a stopped new source must be removed")
 	select {
-	case <-ps.done:
+	case <-state.done:
 	default:
 		t.Fatal("done channel must be closed after stopping a new source")
 	}
@@ -673,7 +673,7 @@ func TestHarvesterRunner_StopAndWaitFinishesNewSource(t *testing.T) {
 	id := "new-src"
 
 	_, cancel := context.WithCancel(context.Background())
-	ps := &sourceState{
+	state := &sourceState{
 		srcID:  id,
 		ctx:    startContext(t),
 		cancel: cancel,
@@ -681,13 +681,13 @@ func TestHarvesterRunner_StopAndWaitFinishesNewSource(t *testing.T) {
 		done:   make(chan struct{}),
 	}
 	g.mu.Lock()
-	g.states[id] = ps
+	g.states[id] = state
 	g.nActive++
 	g.mu.Unlock()
 
 	done := make(chan struct{})
 	go func() {
-		g.stopAndWait(ps)
+		g.stopAndWait(state)
 		close(done)
 	}()
 	select {
@@ -704,14 +704,14 @@ func TestHarvesterRunner_RunFinishesSourceClosedDuringPollHandoff(t *testing.T) 
 	h := parkYieldResumeHarvester()
 	g := testHarvesterRunner(t, h, 0)
 	src := &testSource{name: "/path/to/test"}
-	id, ps := startParkedAndClaimDue(t, g, src)
+	id, state := startParkedAndClaimDue(t, g, src)
 
 	g.Stop(src)
 	require.True(t, g.hasID(id), "Stop must hand a polling source to its holder, not finish it")
 	s, _ := g.statusOf(id)
 	require.Equal(t, statusClosing, s)
 
-	g.run(ps)
+	g.run(state)
 	requireEventually(t, func() bool { return !g.hasID(id) },
 		"run() must finish a source closed during the poll hand-off")
 	require.True(t, h.lastSession().isClosed(), "session must be closed on teardown")
@@ -727,11 +727,11 @@ func TestHarvesterRunner_RunFinishesSourceClosedDuringPollHandoff(t *testing.T) 
 func TestHarvesterRunner_StopAndWaitUnblockedByPollHandoff(t *testing.T) {
 	g := testHarvesterRunner(t, parkYieldResumeHarvester(), 0)
 	src := &testSource{name: "/path/to/test"}
-	id, ps := startParkedAndClaimDue(t, g, src)
+	id, state := startParkedAndClaimDue(t, g, src)
 
 	done := make(chan struct{})
 	go func() {
-		g.stopAndWait(ps) // sets statusClosing, then blocks on <-ps.done
+		g.stopAndWait(state) // sets statusClosing, then blocks on <-state.done
 		close(done)
 	}()
 
@@ -740,7 +740,7 @@ func TestHarvesterRunner_StopAndWaitUnblockedByPollHandoff(t *testing.T) {
 		return ok && s == statusClosing
 	}, "stopAndWait should mark the source closing and wait for its holder")
 
-	g.run(ps)
+	g.run(state)
 
 	select {
 	case <-done:
@@ -898,7 +898,7 @@ func parkYieldResumeHarvester() *fakeHarvester {
 
 // startParkedAndClaimDue starts src, waits until parked, then pops it as
 // statusPolling (waker hand-off point before pollParked/run).
-func startParkedAndClaimDue(t *testing.T, g *harvesterRunner, src *testSource) (id string, ps *sourceState) {
+func startParkedAndClaimDue(t *testing.T, g *harvesterRunner, src *testSource) (id string, state *sourceState) {
 	t.Helper()
 	id = g.identifier.ID(src)
 	g.Start(startContext(t), src)
@@ -906,9 +906,9 @@ func startParkedAndClaimDue(t *testing.T, g *harvesterRunner, src *testSource) (
 		s, ok := g.statusOf(id)
 		return ok && s == statusParked
 	}, "source should park after a yielding read")
-	ps = g.popDueNow()
-	require.NotNil(t, ps, "the parked source should be due")
-	return id, ps
+	state = g.popDueNow()
+	require.NotNil(t, state, "the parked source should be due")
+	return id, state
 }
 
 // blockUntilCancelled is a readFn that blocks until the source's context is
@@ -1047,18 +1047,18 @@ func (g *harvesterRunner) hasID(id string) bool {
 func (g *harvesterRunner) stateFor(id string) (*sourceState, bool) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	ps, ok := g.states[id]
-	return ps, ok
+	state, ok := g.states[id]
+	return state, ok
 }
 
 func (g *harvesterRunner) statusOf(id string) (sourceStatus, bool) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	ps, ok := g.states[id]
+	state, ok := g.states[id]
 	if !ok {
 		return 0, false
 	}
-	return ps.status, true
+	return state.status, true
 }
 
 func (g *harvesterRunner) parkedLen() int {
