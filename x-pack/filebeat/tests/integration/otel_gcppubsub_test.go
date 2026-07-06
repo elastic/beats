@@ -75,7 +75,7 @@ output:
       - {{ .ESURL }}
     username: {{ .Username }}
     password: {{ .Password }}
-    index: logs-integration-{{ .Namespace }}
+    index: {{ .Index }}
 
 queue.mem.flush.timeout: 0s
 setup.template.enabled: false
@@ -114,7 +114,7 @@ processors:
 	}
 
 	var configBuffer bytes.Buffer
-	optionsValue.Index = otelNamespace
+	optionsValue.Index = otelIndex
 	optionsValue.Subscription = "test-subscription-otel"
 	require.NoError(t, template.Must(template.New("config").Parse(gcpOTelConfig)).Execute(&configBuffer, optionsValue))
 
@@ -123,7 +123,7 @@ processors:
 	// reset buffer
 	configBuffer.Reset()
 
-	optionsValue.Index = fbNameSpace
+	optionsValue.Index = fbIndex
 	optionsValue.Subscription = "test-subscription-fb"
 	require.NoError(t, template.Must(template.New("config").Parse(gcpFilebeatConfig)).Execute(&configBuffer, optionsValue))
 

@@ -49,7 +49,7 @@ func TestCELInputOTelE2E(t *testing.T) {
 	fbIndex := "logs-integration-" + fbNamespace
 
 	type options struct {
-		Namespace   string
+		Index       string
 		ESURL       string
 		Username    string
 		Password    string
@@ -70,7 +70,7 @@ output:
       - {{ .ESURL }}
     username: {{ .Username }}
     password: {{ .Password }}
-    index: logs-integration-{{ .Namespace }}
+    index: {{ .Index }}
 
 queue.mem.flush.timeout: 0s
 setup.template.enabled: false
@@ -107,7 +107,7 @@ processors:
 		Password:    password,
 		ResourceURL: celSrv.URL,
 		Program:     celProgram,
-		Namespace:   otelNamespace,
+		Index:       otelIndex,
 	}))
 
 	oteltestcol.New(t, configBuffer.String())
@@ -120,7 +120,7 @@ processors:
 		Password:    password,
 		ResourceURL: celSrv.URL,
 		Program:     celProgram,
-		Namespace:   fbNamespace,
+		Index:       fbIndex,
 	}))
 
 	filebeat := integration.NewBeat(
