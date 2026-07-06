@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -46,7 +47,18 @@ const (
 	checkNodeReadyAttempts = 10
 )
 
+// initializedState holds the fields that init populates and that Run or Close read after startup.
+type initializedState struct {
+	watcher     kubernetes.Watcher
+	nsWatcher   kubernetes.Watcher
+	nodeWatcher kubernetes.Watcher
+	rsWatcher   kubernetes.Watcher
+	jobWatcher  kubernetes.Watcher
+	matchers    *Matchers
+}
+
 type kubernetesAnnotator struct {
+<<<<<<< HEAD
 	log                 *logp.Logger
 	watcher             kubernetes.Watcher
 	nsWatcher           kubernetes.Watcher
@@ -58,6 +70,14 @@ type kubernetesAnnotator struct {
 	cache               *cache
 	kubernetesAvailable bool
 	initOnce            sync.Once
+=======
+	log       *logp.Logger
+	state     atomic.Pointer[initializedState]
+	cache     *cache
+	initOnce  sync.Once
+	wg        sync.WaitGroup
+	cancelCtx context.CancelFunc
+>>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 }
 
 func init() {
@@ -119,9 +139,25 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		kubernetesAvailable: false,
 	}
 
+<<<<<<< HEAD
 	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
 	go processor.init(config, cfg)
+=======
+	if config.WaitMetadata {
+		err := processor.init(ctx, config, cfg)
+		if processor.state.Load() == nil {
+			cancelCtx()
+			return nil, fmt.Errorf("add_kubernetes_metadata: %w", err)
+		}
+	} else {
+		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
+		// the k8s node is not yet ready.
+		processor.wg.Go(func() {
+			_ = processor.init(ctx, config, cfg)
+		})
+	}
+>>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 
 	return processor, nil
 }
@@ -150,15 +186,6 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 	k.initOnce.Do(func() {
 		var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
-		// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-		err := config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
-		if err != nil {
-			k.log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
-		}
-		err = config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
-		if err != nil {
-			k.log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
-		}
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
@@ -178,11 +205,15 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		matchers := NewMatchers(config.Matchers, k.log)
 
 		if matchers.Empty() {
+<<<<<<< HEAD
 			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
+=======
+			k.log.Debug("Could not initialize kubernetes plugin with zero matcher plugins")
+			k8sError = errors.New("could not initialize kubernetes plugin with zero matcher plugins")
+>>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 			return
 		}
 
-		k.matchers = matchers
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
 			ConfigHost:  config.Node,
 			Client:      client,
@@ -209,7 +240,11 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		metaConf := config.AddResourceMetadata
+		// Copy add_resource_metadata and its sub-configs before propagating use_kubeadm, so init
+		// never mutates the caller-owned config.
+		metaConf := *config.AddResourceMetadata
+		metaConf.Node = configWithKubeadm(k.log, metaConf.Node, config.KubeAdm)
+		metaConf.Namespace = configWithKubeadm(k.log, metaConf.Namespace, config.KubeAdm)
 
 		if metaConf.Node.Enabled() {
 			nodeWatcher, err = kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, kubernetes.WatchOptions{
@@ -259,7 +294,6 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 			}
-			k.rsWatcher = replicaSetWatcher
 		}
 		if metaConf.CronJob {
 			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
@@ -270,55 +304,60 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
 			}
-			k.jobWatcher = jobWatcher
 		}
 
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
-		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, &metaConf)
 
-		k.indexers = NewIndexers(config.Indexers, metaGen)
-		k.watcher = watcher
-		k.kubernetesAvailable = true
-		k.nodeWatcher = nodeWatcher
-		k.nsWatcher = namespaceWatcher
+		indexers := NewIndexers(config.Indexers, metaGen)
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod, _ := obj.(*kubernetes.Pod)
-				k.addPod(pod)
+				k.addPod(indexers, pod)
 			},
 			UpdateFunc: func(obj interface{}) {
 				pod, _ := obj.(*kubernetes.Pod)
-				k.updatePod(pod)
+				k.updatePod(indexers, pod)
 			},
 			DeleteFunc: func(obj interface{}) {
 				pod, _ := obj.(*kubernetes.Pod)
-				k.removePod(pod)
+				k.removePod(indexers, pod)
 			},
+		})
+
+		// Publish the fully constructed state atomically before starting the watchers
+		k.state.Store(&initializedState{
+			watcher:     watcher,
+			nsWatcher:   namespaceWatcher,
+			nodeWatcher: nodeWatcher,
+			rsWatcher:   replicaSetWatcher,
+			jobWatcher:  jobWatcher,
+			matchers:    matchers,
 		})
 
 		// NOTE: order is important here since pod meta will include node meta and hence node.Store() should
 		// be populated before trying to generate metadata for Pods.
-		if k.nodeWatcher != nil {
-			if err := k.nodeWatcher.Start(); err != nil {
+		if nodeWatcher != nil {
+			if err := nodeWatcher.Start(); err != nil {
 				k.log.Debugf("Couldn't start node watcher: %v", err)
 				return
 			}
 		}
-		if k.nsWatcher != nil {
-			if err := k.nsWatcher.Start(); err != nil {
+		if namespaceWatcher != nil {
+			if err := namespaceWatcher.Start(); err != nil {
 				k.log.Debugf("Couldn't start namespace watcher: %v", err)
 				return
 			}
 		}
-		if k.rsWatcher != nil {
-			if err := k.rsWatcher.Start(); err != nil {
+		if replicaSetWatcher != nil {
+			if err := replicaSetWatcher.Start(); err != nil {
 				k.log.Debugf("Couldn't start replicaSet watcher: %v", err)
 				return
 			}
 		}
-		if k.jobWatcher != nil {
-			if err := k.jobWatcher.Start(); err != nil {
+		if jobWatcher != nil {
+			if err := jobWatcher.Start(); err != nil {
 				k.log.Debugf("Couldn't start job watcher: %v", err)
 				return
 			}
@@ -337,11 +376,19 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if !k.kubernetesAvailable {
 		return event, nil
 	}
+<<<<<<< HEAD
 	if kubernetesMetadataExist(event) {
+=======
+
+	// A nil state means init has not published yet (still running or kubernetes unavailable); the
+	// load pairs with the Store in init for a race-free read.
+	state := k.state.Load()
+	if state == nil {
+>>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 		return event, nil
 	}
 
-	index := k.matchers.MetadataIndex(event.Fields)
+	index := state.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
@@ -383,6 +430,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (k *kubernetesAnnotator) Close() error {
+<<<<<<< HEAD
 	// ensure there are no goroutines leaking
 	// after the processor has been closed
 	k.initOnce.Do(func() {})
@@ -400,6 +448,30 @@ func (k *kubernetesAnnotator) Close() error {
 	}
 	if k.jobWatcher != nil {
 		k.jobWatcher.Stop()
+=======
+	if k.cancelCtx != nil {
+		k.cancelCtx()
+	}
+	// Wait for any in-flight init goroutine to finish before tearing down.
+	k.wg.Wait()
+
+	if state := k.state.Load(); state != nil {
+		if state.watcher != nil {
+			state.watcher.Stop()
+		}
+		if state.nodeWatcher != nil {
+			state.nodeWatcher.Stop()
+		}
+		if state.nsWatcher != nil {
+			state.nsWatcher.Stop()
+		}
+		if state.rsWatcher != nil {
+			state.rsWatcher.Stop()
+		}
+		if state.jobWatcher != nil {
+			state.jobWatcher.Stop()
+		}
+>>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
 	}
 	if k.cache != nil {
 		k.cache.stop()
@@ -407,26 +479,26 @@ func (k *kubernetesAnnotator) Close() error {
 	return nil
 }
 
-func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
-	metadata := k.indexers.GetMetadata(pod)
+func (k *kubernetesAnnotator) addPod(indexers *Indexers, pod *kubernetes.Pod) {
+	metadata := indexers.GetMetadata(pod)
 	for _, m := range metadata {
 		k.cache.set(m.Index, m.Data)
 	}
 }
 
-func (k *kubernetesAnnotator) updatePod(pod *kubernetes.Pod) {
-	k.removePod(pod)
+func (k *kubernetesAnnotator) updatePod(indexers *Indexers, pod *kubernetes.Pod) {
+	k.removePod(indexers, pod)
 
 	// Add it again only if it is not being deleted
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
 		return
 	}
 
-	k.addPod(pod)
+	k.addPod(indexers, pod)
 }
 
-func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {
-	indexes := k.indexers.GetIndexes(pod)
+func (k *kubernetesAnnotator) removePod(indexers *Indexers, pod *kubernetes.Pod) {
+	indexes := indexers.GetIndexes(pod)
 	for _, idx := range indexes {
 		k.cache.delete(idx)
 	}
@@ -434,4 +506,21 @@ func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {
 
 func (*kubernetesAnnotator) String() string {
 	return "add_kubernetes_metadata"
+}
+
+// configWithKubeadm returns sets use_kubeadm to the given value, without mutating cfg.
+func configWithKubeadm(log *logp.Logger, cfg *config.C, kubeAdm bool) *config.C {
+	if cfg == nil {
+		return nil
+	}
+	clone, err := config.MergeConfigs(cfg)
+	if err != nil {
+		// Copying a valid config does not fail in practice; keep the original untouched
+		log.Errorf("couldn't copy add_resource_metadata config to set use_kubeadm: %+v", err)
+		return cfg
+	}
+	if err := clone.SetBool("use_kubeadm", -1, kubeAdm); err != nil {
+		log.Errorf("couldn't set use_kubeadm variable due to error %+v", err)
+	}
+	return clone
 }
