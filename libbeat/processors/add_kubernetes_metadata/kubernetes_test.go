@@ -44,11 +44,8 @@ func TestAnnotatorSkipped(t *testing.T) {
 	processor := kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(&processor, &Matchers{matchers: []Matcher{matcher}})
 
 	processor.cache.set("foo",
 		mapstr.M{
@@ -93,20 +90,9 @@ func TestAnnotatorSkipped(t *testing.T) {
 
 // Test metadata are not included in the event
 func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"lookup_fields": []string{"kubernetes.pod.name"},
-	})
-	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	// state is left nil, i.e. init never published (kubernetes unavailable).
 	processor := kubernetesAnnotator{
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: false,
 	}
 
 	intialEventMap := mapstr.M{
@@ -244,13 +230,17 @@ func newAnnotatorForTest(t testing.TB, cacheKey string, meta mapstr.M) *kubernet
 	processor := &kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 	processor.cache.set(cacheKey, meta)
 	return processor
+}
+
+// setReady publishes a minimal initializedState so the processor treats
+// kubernetes as available, mirroring what init does on success. Tests that
+// don't drive real watchers only need matchers populated.
+func setReady(k *kubernetesAnnotator, matchers *Matchers) {
+	k.state.Store(&initializedState{matchers: matchers})
 }
 
 // baseEvent returns an event that will match cacheKey via container.id.
@@ -401,11 +391,8 @@ func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
 	processor := &kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 	processor.cache.set("mypod", meta)
 
 	event, err := processor.Run(&beat.Event{
@@ -552,11 +539,8 @@ func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
 	processor := &kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(b, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 
 	const cacheKey = "abc123container"
 
@@ -609,3 +593,100 @@ func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
 		}
 	}
 }
+<<<<<<< HEAD
+=======
+
+// unavailableK8sClient returns a client whose discovery always fails, so
+// isKubernetesAvailableWithTimeout loops until timeout or context cancel.
+func unavailableK8sClient() k8sclient.Interface {
+	client := k8sfake.NewSimpleClientset()
+	client.PrependReactor("get", "version", func(k8stesting.Action) (bool, runtime.Object, error) {
+		return true, nil, errors.New("kubernetes unavailable")
+	})
+	return client
+}
+
+// TestCloseUnblocksAsyncInit verifies that Close cancels an async init stuck in the
+// indefinite kubernetes availability wait (timeout=0) and does not leak goroutines.
+func TestCloseUnblocksAsyncInit(t *testing.T) {
+	// Ignore cache.cleanup goroutines from other tests in this package that never call cache.stop().
+	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
+
+	logger := logptest.NewTestingLogger(t, selector)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	proc := &kubernetesAnnotator{
+		log:       logger,
+		cache:     newCache(10 * time.Second),
+		cancelCtx: cancel,
+	}
+
+	proc.wg.Add(1)
+	initStarted := make(chan struct{})
+	go func() {
+		defer proc.wg.Done()
+		proc.initOnce.Do(func() {
+			close(initStarted)
+			_, _ = isKubernetesAvailableWithTimeout(
+				ctx,
+				unavailableK8sClient(),
+				0, // wait indefinitely (same as wait_for_metadata_timeout: 0)
+				10*time.Millisecond,
+				logger,
+			)
+		})
+	}()
+
+	<-initStarted
+	// Ensure we are past the first failed discovery and inside the select/wait loop.
+	time.Sleep(30 * time.Millisecond)
+
+	closeDone := make(chan error, 1)
+	go func() {
+		closeDone <- proc.Close()
+	}()
+
+	select {
+	case err := <-closeDone:
+		require.NoError(t, err, "Close must return after cancelling the availability wait")
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("Close blocked: on main Close() waits on initOnce while init is stuck in the availability loop")
+	}
+}
+
+func TestIsKubernetesAvailableWithTimeout(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, selector)
+	unavailable := unavailableK8sClient()
+	available := k8sfake.NewSimpleClientset()
+
+	t.Run("success", func(t *testing.T) {
+		ctx := context.Background()
+		ok, err := isKubernetesAvailableWithTimeout(ctx, available, 0, time.Millisecond, logger)
+		require.NoError(t, err)
+		assert.True(t, ok)
+	})
+
+	t.Run("timeout", func(t *testing.T) {
+		ctx := context.Background()
+		start := time.Now()
+		ok, err := isKubernetesAvailableWithTimeout(ctx, unavailable, 80*time.Millisecond, 10*time.Millisecond, logger)
+		elapsed := time.Since(start)
+
+		require.Error(t, err)
+		assert.False(t, ok)
+		assert.Contains(t, err.Error(), "timeout waiting for kubernetes")
+		assert.GreaterOrEqual(t, elapsed, 80*time.Millisecond)
+	})
+
+	t.Run("context cancelled", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		ok, err := isKubernetesAvailableWithTimeout(ctx, unavailable, 0, 10*time.Millisecond, logger)
+		require.Error(t, err)
+		assert.False(t, ok)
+		assert.Contains(t, err.Error(), "context cancelled")
+		assert.ErrorIs(t, err, context.Canceled)
+	})
+}
+>>>>>>> 7dd3846c1 (add_kubernetes_metadata: fix startup data race (#51739))
