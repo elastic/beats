@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -200,7 +200,7 @@ func TestGenerateHints(t *testing.T) {
 
 		m := heartbeatHints{
 			config: defaultConfig(),
-			logger: logp.L(),
+			logger: logptest.NewTestingLogger(t, ""),
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, test.len, len(cfgs), test.message)
