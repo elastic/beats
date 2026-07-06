@@ -11,7 +11,7 @@
 kind: enhancement
 
 # Change summary; a 80ish characters long description of the change.
-summary: filestream parks idle harvesters instead of holding a goroutine per open file
+summary: filestream uses less memory and fewer goroutines when harvesting many files
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.

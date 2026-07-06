@@ -42,7 +42,6 @@ func TestLogFileRenamed(t *testing.T) {
 		logptest.NewTestingLogger(t, ""),
 		context.TODO(),
 		f,
-		readerConfig{},
 		closerConfig{
 			OnStateChange: stateChangeCloserConfig{
 				CheckInterval: 1 * time.Second,
@@ -78,7 +77,6 @@ func TestLogFileRemoved(t *testing.T) {
 		logptest.NewTestingLogger(t, ""),
 		context.TODO(),
 		f,
-		readerConfig{},
 		closerConfig{
 			OnStateChange: stateChangeCloserConfig{
 				CheckInterval: 1 * time.Second,

@@ -60,7 +60,6 @@ func TestLogFileCloseOnEOF(t *testing.T) {
 				logp.NewNopLogger(),
 				context.TODO(),
 				f,
-				readerConfig{},
 				closerConfig{
 					Reader: readerCloserConfig{OnEOF: true},
 				},
@@ -123,7 +122,7 @@ func TestLogFileTruncated(t *testing.T) {
 			defer os.Remove(f.Name())
 
 			reader, err := newFileReader(
-				logp.NewNopLogger(), context.TODO(), f, fs.readerConfig, fs.closerConfig)
+				logp.NewNopLogger(), context.TODO(), f, fs.closerConfig)
 			require.NoError(t, err, "error while creating logReader")
 
 			buf := make([]byte, 32)
@@ -205,7 +204,7 @@ func TestLogFileNonBlocking(t *testing.T) {
 	})
 
 	reader, err := newFileReader(
-		logp.NewNopLogger(), context.TODO(), f, readerConfig{}, closerConfig{})
+		logp.NewNopLogger(), context.TODO(), f, closerConfig{})
 	require.NoError(t, err, "error while creating logReader")
 
 	// Drain the initial content written by createTestPlainLogFile.

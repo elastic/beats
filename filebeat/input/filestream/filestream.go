@@ -64,7 +64,6 @@ func newFileReader(
 	log *logp.Logger,
 	canceler input.Canceler,
 	f File,
-	_ readerConfig,
 	closerConfig closerConfig,
 ) (*logFile, error) {
 	offset, err := f.Seek(0, io.SeekCurrent)

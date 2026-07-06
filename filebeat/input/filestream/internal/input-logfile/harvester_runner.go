@@ -319,7 +319,7 @@ func (g *harvesterRunner) readOnce(ps *sourceState) {
 	if err != nil || verdict == SliceDone {
 		g.mu.Unlock()
 		if err != nil {
-			ps.ctx.Logger.Debugf("Harvester stopped: %v", err)
+			ps.ctx.Logger.Debugf("Harvester stopped with error: %v", err)
 		}
 		g.finish(ps)
 		return
@@ -728,13 +728,9 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 
 	g.notifyObserver(ps)
 
-	// ps.ctx.Logger is nil only for hand-built test states; production sources
-	// always carry a logger set by enqueue.
 	log := ps.ctx.Logger
 	if ps.session != nil {
-		if log != nil {
-			log.Debug("Closing reader of filestream")
-		}
+		log.Debug("Closing reader of filestream")
 		_ = ps.session.Close()
 	}
 	if ps.client != nil {
@@ -762,9 +758,7 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 			g.metrics.HarvesterOpenGZIPFiles.Dec()
 			g.metrics.HarvesterGZIPClosed.Inc()
 		}
-		if log != nil {
-			log.Debug("Stopped harvester for file")
-		}
+		log.Debug("Stopped harvester for file")
 	}
 
 	// Remove the source from the runner only after its resources are released,

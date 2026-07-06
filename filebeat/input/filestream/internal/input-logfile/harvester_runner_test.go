@@ -601,7 +601,7 @@ func TestHarvesterRunner_RunSkipsAlreadyActive(t *testing.T) {
 
 	// A reader goroutine already owns a running source: run must be a no-op (no
 	// new goroutine, status unchanged) and leave teardown to that reader.
-	ps := &sourceState{srcID: "x", status: statusRunning, done: make(chan struct{})}
+	ps := &sourceState{srcID: "x", ctx: startContext(t), status: statusRunning, done: make(chan struct{})}
 	g.mu.Lock()
 	g.states["x"] = ps
 	g.mu.Unlock()
@@ -617,12 +617,12 @@ func TestHarvesterRunner_RunSkipsAlreadyActive(t *testing.T) {
 
 	// A finished source is skipped: finish() is idempotent, so run must not panic
 	// or re-tear-down.
-	fin := &sourceState{srcID: "y", finished: true, done: make(chan struct{})}
+	fin := &sourceState{srcID: "y", ctx: startContext(t), finished: true, done: make(chan struct{})}
 	g.run(fin)
 	require.False(t, g.hasID("y"))
 
 	// A closing source with no holder must be torn down by run().
-	closing := &sourceState{srcID: "z", status: statusClosing, done: make(chan struct{})}
+	closing := &sourceState{srcID: "z", ctx: startContext(t), status: statusClosing, done: make(chan struct{})}
 	g.mu.Lock()
 	g.states["z"] = closing
 	g.mu.Unlock()
@@ -642,6 +642,7 @@ func TestHarvesterRunner_StopFinishesNewSource(t *testing.T) {
 	ps := &sourceState{
 		srcID:  id,
 		src:    src,
+		ctx:    startContext(t),
 		cancel: cancel,
 		status: statusNew,
 		done:   make(chan struct{}),
@@ -674,6 +675,7 @@ func TestHarvesterRunner_StopAndWaitFinishesNewSource(t *testing.T) {
 	_, cancel := context.WithCancel(context.Background())
 	ps := &sourceState{
 		srcID:  id,
+		ctx:    startContext(t),
 		cancel: cancel,
 		status: statusNew,
 		done:   make(chan struct{}),

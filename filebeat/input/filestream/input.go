@@ -431,7 +431,7 @@ func (inp *filestream) buildPipeline(
 	// NewLineReader uses additional buffering to deal with encoding and testing
 	// for new lines in input stream. Simple 8-bit based encodings, or plain
 	// don't require 'complicated' logic.
-	logReader, err := newFileReader(log, canceler, f, inp.readerConfig, closerCfg)
+	logReader, err := newFileReader(log, canceler, f, closerCfg)
 	if err != nil {
 		return nil, nil, err
 	}

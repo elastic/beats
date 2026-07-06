@@ -24,6 +24,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -75,6 +76,9 @@ func TestHarvestSession_Poll(t *testing.T) {
 	})
 
 	t.Run("removed file closes", func(t *testing.T) {
+		if runtime.GOOS == "windows" {
+			t.Skip("removing an open file is not supported on Windows; covered by the fakeFile stat subtests")
+		}
 		closer := closerConfig{OnStateChange: stateChangeCloserConfig{Removed: true}}
 		s := newPollSession(t, closer, "hello\n")
 		require.NoError(t, os.Remove(s.src.newPath))
@@ -82,6 +86,9 @@ func TestHarvestSession_Poll(t *testing.T) {
 	})
 
 	t.Run("renamed file closes", func(t *testing.T) {
+		if runtime.GOOS == "windows" {
+			t.Skip("renaming an open file is not supported on Windows; covered by the fakeFile stat subtests")
+		}
 		closer := closerConfig{OnStateChange: stateChangeCloserConfig{Renamed: true}}
 		s := newPollSession(t, closer, "hello\n")
 		require.NoError(t, os.Rename(s.src.newPath, s.src.newPath+".moved"))
@@ -281,7 +288,7 @@ func TestLogFile_Read(t *testing.T) {
 	t.Run("returns ErrClosed when the canceler is already cancelled", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
-		r, err := newFileReader(logp.NewNopLogger(), ctx, &fakeFile{}, readerConfig{}, closerConfig{})
+		r, err := newFileReader(logp.NewNopLogger(), ctx, &fakeFile{}, closerConfig{})
 		require.NoError(t, err)
 		_, err = r.Read(make([]byte, 8))
 		require.ErrorIs(t, err, ErrClosed)
@@ -294,7 +301,7 @@ func TestLogFile_Read(t *testing.T) {
 			readFunc: func(b []byte) (int, error) { return copy(b, "hi"), io.EOF },
 			statFI:   fakeFileInfo{size: 100}, // size >= offset: not truncated
 		}
-		r, err := newFileReader(logp.NewNopLogger(), context.Background(), f, readerConfig{}, closerConfig{})
+		r, err := newFileReader(logp.NewNopLogger(), context.Background(), f, closerConfig{})
 		require.NoError(t, err)
 		n, err := r.Read(make([]byte, 8))
 		require.NoError(t, err)
