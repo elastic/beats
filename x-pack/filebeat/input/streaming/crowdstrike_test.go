@@ -17,7 +17,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -300,12 +299,12 @@ func TestCrowdstrikeOAuthHTTPClientRespectsConfiguredTimeout(t *testing.T) {
 }
 
 func TestFollowStreamRetryCapHonorsMaxAttempts(t *testing.T) {
-	logp.TestingSetup()
+	log := logptest.NewTestingLogger(t, t.Name())
 
 	discoverURL, tokenURL, hits := startEmptyDiscover(t)
 	const maxAttempts = 15 // Deliberately > the unconfigured cap of 10.
 	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
-	s := newEmptyDiscoverFollower(t, cfg, nil)
+	s := newEmptyDiscoverFollower(t, cfg, nil, log)
 
 	err := s.FollowStream(context.Background())
 	if err == nil {
@@ -323,13 +322,13 @@ func TestFollowStreamRetryCapHonorsMaxAttempts(t *testing.T) {
 }
 
 func TestFollowStreamInfiniteRetriesDoesNotCap(t *testing.T) {
-	logp.TestingSetup()
+	log := logptest.NewTestingLogger(t, t.Name())
 
 	discoverURL, tokenURL, hits := startEmptyDiscover(t)
 	// MaxAttempts is intentionally tiny: InfiniteRetries must override it and
 	// the unconfigured cap of 10 entirely.
 	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{InfiniteRetries: true, MaxAttempts: 1, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
-	s := newEmptyDiscoverFollower(t, cfg, nil)
+	s := newEmptyDiscoverFollower(t, cfg, nil, log)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -361,7 +360,7 @@ func TestFollowStreamInfiniteRetriesDoesNotCap(t *testing.T) {
 }
 
 func TestFollowStreamDefersDegraded(t *testing.T) {
-	logp.TestingSetup()
+	log := logptest.NewTestingLogger(t, t.Name())
 
 	discoverURL, tokenURL, _ := startEmptyDiscover(t)
 	// With MaxAttempts=5 and the degrade threshold of 3, the input reports
@@ -369,7 +368,7 @@ func TestFollowStreamDefersDegraded(t *testing.T) {
 	// reporting DEGRADED on the earlier transient failures.
 	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: 5, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
 	rec := &degradedRecorder{}
-	s := newEmptyDiscoverFollower(t, cfg, rec)
+	s := newEmptyDiscoverFollower(t, cfg, rec, log)
 
 	if err := s.FollowStream(context.Background()); err == nil {
 		t.Fatal("FollowStream() error = nil; want max-attempts error")
@@ -425,9 +424,8 @@ func emptyDiscoverConfig(t *testing.T, discoverURL, tokenURL string, r *retry) c
 	}
 }
 
-func newEmptyDiscoverFollower(t *testing.T, cfg config, stat status.StatusReporter) StreamFollower {
+func newEmptyDiscoverFollower(t *testing.T, cfg config, stat status.StatusReporter, log *logp.Logger) StreamFollower {
 	t.Helper()
-	log := logp.NewNopLogger()
 	env := v2.Context{ID: "crowdstrike_test", MetricsRegistry: monitoring.NewRegistry()}
 	s, err := NewFalconHoseFollower(context.Background(), env, cfg, nil, &testPublisher{log}, stat, log, time.Now)
 	if err != nil {
@@ -438,23 +436,17 @@ func newEmptyDiscoverFollower(t *testing.T, cfg config, stat status.StatusReport
 
 // degradedRecorder counts the number of times DEGRADED is reported.
 type degradedRecorder struct {
-	mu sync.Mutex
-	n  int
+	n atomic.Int64
 }
 
 func (r *degradedRecorder) UpdateStatus(s status.Status, _ string) {
-	if s != status.Degraded {
-		return
+	if s == status.Degraded {
+		r.n.Add(1)
 	}
-	r.mu.Lock()
-	r.n++
-	r.mu.Unlock()
 }
 
-func (r *degradedRecorder) count() int {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.n
+func (r *degradedRecorder) count() int64 {
+	return r.n.Load()
 }
 
 func TestFollowStreamCancelsRefreshOnReconnect(t *testing.T) {

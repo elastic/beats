@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -65,8 +66,6 @@ func TestFollowSession_FirehoseHTTPError(t *testing.T) {
 }
 
 func TestFollowSession_EmptyDiscoverBody(t *testing.T) {
-	logp.TestingSetup()
-
 	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// A 200 OK with an empty body, as observed from the CrowdStrike
 		// discover endpoint; Decode returns io.EOF.
@@ -176,7 +175,7 @@ func newTestStream(t *testing.T, discoverURL string, firehoseClient *http.Client
 
 func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient *http.Client, pub cursor.Publisher) *falconHoseStream {
 	t.Helper()
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, t.Name())
 	reg := monitoring.NewRegistry()
 	m := newInputMetrics(reg, log)
 
