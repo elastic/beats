@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix goroutine leak when processor construction fails.
+component: all
