@@ -11,17 +11,22 @@
 kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
-summary: Fix CrowdStrike streaming input retry cap so max_attempts and infinite_retries are honoured.
+summary: Make the CrowdStrike streaming input self-heal from transient discover failures.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 # NOTE: This field will be rendered only for breaking-change and known-issue kinds at the moment.
 description: |
-  Fix the CrowdStrike streaming input retry loop so a configured max_attempts
+  Transient connection-level failures from the CrowdStrike discover endpoint
+  (an empty 200 body, network errors and timeouts) are now retried indefinitely
+  with capped back-off instead of counting toward max_attempts and terminating
+  the input, so the input self-heals once the upstream recovers rather than
+  needing an agent restart. Termination is reserved for genuine hard errors
+  (origin mismatch, auth/config) and other soft errors still honour the
+  configured attempt limit. Also fix the retry loop so a configured max_attempts
   greater than 10 and infinite_retries are no longer silently capped at the
-  unconfigured default of 10. The empty-body case from the discover endpoint is
-  now reported as a distinct transient error, and the input no longer reports
-  DEGRADED on the first transient failure.
+  unconfigured default of 10, and the input no longer reports DEGRADED on the
+  first transient failure.
 
 # Affected component; a word indicating the component this changeset affects.
 component: filebeat
