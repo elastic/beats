@@ -560,12 +560,9 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// log.file.fingerprint is opt-in (include_file_fingerprint, default false).
-	// A growing file's raw fingerprint material is the RAW hex of the file
-	// header, not a SHA-256, so publishing it would expose file content. Only
-	// publish the SHA-256 once the fingerprint is complete; below the threshold
-	// we publish no fingerprint at all. A renamed file may still carry the old
-	// path until the next open — that pre-existing limitation is unchanged here.
+	// Only publish the completed SHA-256. A still-growing fingerprint's material
+	// is the raw hex of the file header, not a hash, so publishing it would
+	// expose file content.
 	var fingerprint string
 	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
 		fingerprint = fs.desc.Fingerprint.Sum
