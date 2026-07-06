@@ -1,5 +1,0 @@
-2026/07/03 16:58:45 testbin.Build (go test -c -o /Users/khushijain/Documents/beats/x-pack/filebeat/filebeat.test) took 1.222419583s.
-=== RUN   TestUDPInputOTelE2E
---- PASS: TestUDPInputOTelE2E (16.08s)
-PASS
-ok  	github.com/elastic/beats/v7/x-pack/filebeat/tests/integration	19.598s
