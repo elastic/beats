@@ -35,18 +35,18 @@ func writeCPIO(t *testing.T, entries []cpioEntry) []byte {
 	// for all fields except mtime and filesize, which are 11 chars. Fields not
 	// relevant to extraction (dev, ino, uid, gid, rdev) are written as zero.
 	writeEntry := func(path string, mode uint64, body []byte) {
-		name := append([]byte(path), 0)                  // file name, NUL terminated
-		buf.WriteString("070707")                        // magic identifying the odc format
-		buf.WriteString("000000")                        // dev
-		buf.WriteString("000000")                        // ino
-		buf.WriteString(fmt.Sprintf("%06o", mode))       // mode (file type + perm bits)
-		buf.WriteString("000000")                        // uid
-		buf.WriteString("000000")                        // gid
-		buf.WriteString("000001")                        // nlink (1 link)
-		buf.WriteString("000000")                        // rdev
-		buf.WriteString(fmt.Sprintf("%011o", 0))         // mtime (epoch 0, irrelevant here)
-		buf.WriteString(fmt.Sprintf("%06o", len(name)))  // namesize, includes the trailing NUL
-		buf.WriteString(fmt.Sprintf("%011o", len(body))) // filesize
+		name := append([]byte(path), 0)       // file name, NUL terminated
+		buf.WriteString("070707")             // magic identifying the odc format
+		buf.WriteString("000000")             // dev
+		buf.WriteString("000000")             // ino
+		fmt.Fprintf(&buf, "%06o", mode)       // mode (file type + perm bits)
+		buf.WriteString("000000")             // uid
+		buf.WriteString("000000")             // gid
+		buf.WriteString("000001")             // nlink (1 link)
+		buf.WriteString("000000")             // rdev
+		fmt.Fprintf(&buf, "%011o", 0)         // mtime (epoch 0, irrelevant here)
+		fmt.Fprintf(&buf, "%06o", len(name))  // namesize, includes the trailing NUL
+		fmt.Fprintf(&buf, "%011o", len(body)) // filesize
 		buf.Write(name)
 		buf.Write(body)
 	}
@@ -112,6 +112,10 @@ func TestExpandPayloadRejectsPathTraversal(t *testing.T) {
 		{
 			name:  "nested traversal escapes",
 			entry: cpioEntry{path: "a/../../escape.txt", mode: modeRegular, body: []byte("pwned")},
+		},
+		{
+			name:  "absolute path escapes",
+			entry: cpioEntry{path: "/escape.txt", mode: modeRegular, body: []byte("pwned")},
 		},
 	}
 
