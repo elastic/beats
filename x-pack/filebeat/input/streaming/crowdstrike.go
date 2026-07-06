@@ -248,6 +248,10 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	var err error
 	attempt := 0
 	const maxAttemptsUnconfigured = 10
+	// Number of consecutive failures tolerated before reporting DEGRADED,
+	// so a single transient blip (e.g. an empty discover response) does not
+	// churn the unit health status.
+	const degradeAfterAttempts = 3
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
@@ -262,8 +266,14 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 			attempt++
 
-			if s.cfg.Retry != nil && !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
-				return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+			// The unconfigured cap must only apply when no retry policy is
+			// set. Keeping it as an else-if on the configured branch caused
+			// infinite_retries and max_attempts > 10 to be silently capped
+			// at 10.
+			if s.cfg.Retry != nil {
+				if !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
+					return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+				}
 			} else if attempt >= maxAttemptsUnconfigured {
 				return fmt.Errorf("max retry attempts (%d unconfigured) exceeded: %w", maxAttemptsUnconfigured, err)
 			}
@@ -281,7 +291,9 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 				waitTime = rle.wait
 			}
 
-			s.status.UpdateStatus(status.Degraded, err.Error())
+			if attempt >= degradeAfterAttempts {
+				s.status.UpdateStatus(status.Degraded, err.Error())
+			}
 			s.log.Warnw("session warning", "error", err, "attempt", attempt, "wait", waitTime.String())
 
 			select {
@@ -311,9 +323,10 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
-		err = fmt.Errorf("failed GET to discover stream: %w", err)
-		s.status.UpdateStatus(status.Degraded, err.Error())
-		return state, err
+		// Status transitions are owned by the FollowStream retry loop so
+		// that a single transient failure does not immediately report
+		// DEGRADED; just return the error here.
+		return state, fmt.Errorf("failed GET to discover stream: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -355,6 +368,13 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	err = dec.Decode(&body)
 	if err != nil {
+		// A 200 response with an empty body yields io.EOF from Decode. This
+		// is a transient upstream condition (the discover endpoint
+		// occasionally returns no content), distinct from a malformed body,
+		// so surface it clearly rather than as a generic decode failure.
+		if errors.Is(err, io.EOF) {
+			return state, errors.New("discover stream returned an empty body")
+		}
 		return state, fmt.Errorf("failed to decode discover body: %w", err)
 	}
 	s.log.Debugw("stream discover metadata", logp.Namespace(s.ns), "meta", mapstr.M(body.Meta))
