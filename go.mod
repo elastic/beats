@@ -237,10 +237,6 @@ require (
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
-<<<<<<< HEAD
-=======
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.155.0
->>>>>>> 539bc0e2b ( chore: update OTel Collector dependencies to `v0.155.0`/`v1.61.0` (#51684))
 	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
 	github.com/richardlehane/mscfb v1.0.6
 	github.com/rogpeppe/go-internal v1.14.1
@@ -280,15 +276,10 @@ require (
 	www.velocidex.com/golang/regparser v0.0.0-20250203141505-31e704a67ef7
 )
 
-<<<<<<< HEAD
-require go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
-=======
 require (
 	github.com/cenkalti/backoff/v6 v6.0.0 // indirect
-	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
 )
->>>>>>> 539bc0e2b ( chore: update OTel Collector dependencies to `v0.155.0`/`v1.61.0` (#51684))
 
 require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
@@ -501,37 +492,6 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/config/configcompression v1.60.0 // indirect
-	go.opentelemetry.io/collector/config/configmiddleware v1.60.0 // indirect
-	go.opentelemetry.io/collector/config/confignet v1.60.0 // indirect
-	go.opentelemetry.io/collector/config/configopaque v1.60.0 // indirect
-	go.opentelemetry.io/collector/config/configretry v1.60.0 // indirect
-	go.opentelemetry.io/collector/config/configtelemetry v0.154.0 // indirect
-	go.opentelemetry.io/collector/confmap/xconfmap v0.154.0 // indirect
-	go.opentelemetry.io/collector/connector v0.154.0 // indirect
-	go.opentelemetry.io/collector/connector/connectortest v0.154.0 // indirect
-	go.opentelemetry.io/collector/connector/xconnector v0.154.0 // indirect
-	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.154.0 // indirect
-	go.opentelemetry.io/collector/consumer/xconsumer v0.154.0 // indirect
-	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.154.0 // indirect
-	go.opentelemetry.io/collector/exporter/xexporter v0.154.0 // indirect
-	go.opentelemetry.io/collector/extension/extensioncapabilities v0.154.0 // indirect
-	go.opentelemetry.io/collector/extension/extensionmiddleware v0.154.0 // indirect
-	go.opentelemetry.io/collector/extension/xextension v0.154.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.60.0 // indirect
-	go.opentelemetry.io/collector/internal/componentalias v0.154.0 // indirect
-	go.opentelemetry.io/collector/internal/fanoutconsumer v0.154.0 // indirect
-	go.opentelemetry.io/collector/internal/telemetry v0.154.0 // indirect
-	go.opentelemetry.io/collector/pdata/pprofile v0.154.0 // indirect
-	go.opentelemetry.io/collector/pdata/testdata v0.154.0 // indirect
-	go.opentelemetry.io/collector/pdata/xpdata v0.154.0 // indirect
-	go.opentelemetry.io/collector/pipeline/xpipeline v0.154.0 // indirect
-	go.opentelemetry.io/collector/processor/processortest v0.154.0 // indirect
-	go.opentelemetry.io/collector/processor/xprocessor v0.154.0 // indirect
-	go.opentelemetry.io/collector/receiver/xreceiver v0.154.0 // indirect
-	go.opentelemetry.io/collector/service/hostcapabilities v0.154.0 // indirect
-=======
 	go.opentelemetry.io/collector/config/configcompression v1.61.0 // indirect
 	go.opentelemetry.io/collector/config/configmiddleware v1.61.0 // indirect
 	go.opentelemetry.io/collector/config/confignet v1.61.0 // indirect
@@ -548,7 +508,7 @@ require (
 	go.opentelemetry.io/collector/exporter/xexporter v0.155.0 // indirect
 	go.opentelemetry.io/collector/extension/extensioncapabilities v0.155.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.155.0 // indirect
-	go.opentelemetry.io/collector/extension/xextension v0.155.0
+	go.opentelemetry.io/collector/extension/xextension v0.155.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.61.0 // indirect
 	go.opentelemetry.io/collector/internal/componentalias v0.155.0 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.155.0 // indirect
@@ -561,7 +521,6 @@ require (
 	go.opentelemetry.io/collector/processor/xprocessor v0.155.0 // indirect
 	go.opentelemetry.io/collector/receiver/xreceiver v0.155.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.155.0 // indirect
->>>>>>> 539bc0e2b ( chore: update OTel Collector dependencies to `v0.155.0`/`v1.61.0` (#51684))
 	go.opentelemetry.io/contrib/bridges/otelzap v0.19.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.68.0 // indirect
 	go.opentelemetry.io/contrib/otelconf v0.24.0 // indirect
