@@ -57,6 +57,18 @@ type state struct {
 type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+	// Fingerprint holds the raw (hex-encoded) growing fingerprint while the file
+	// is still below the threshold (offset+length). With the bounded-key
+	// optimization the registry key is a fixed-size hash of this value, so the
+	// raw fingerprint—which prefix matching needs—must be persisted in the value
+	// instead of the key.
+	//
+	// A non-empty Fingerprint is the single source of truth for "this entry is
+	// still growing": final SHA-256 entries (and legacy/static entries written
+	// before this feature) leave it empty, so they serialize to exactly the same
+	// {source, identifier_name} shape as before and need no migration. omitempty
+	// guarantees that byte-identical form on disk.
+	Fingerprint string `json:"fingerprint,omitempty" struct:"fingerprint,omitempty"`
 }
 
 // filestream is the input for reading from files which
@@ -174,13 +186,34 @@ func configure(
 // normalizeConfig reconciles filestream defaults with file_identity semantics.
 // In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
 // identities should turn it off unless the user explicitly sets it.
+//
+// For the fingerprint identity it reads the user-facing
+// `file_identity.fingerprint.growing` flag — the only public knob for growing
+// mode — and propagates it to the scanner's fingerprint config so the
+// scanner-side computation honours growing mode. Any value set under
+// `prospector.scanner.fingerprint.growing` in YAML is silently ignored.
+//
+// When file_identity is omitted, the default identity is the fingerprint
+// identity (see newFileIdentifier), so the same growing default is applied.
 func normalizeConfig(cfg *conf.C, c *config) error {
 	if c.FileIdentity == nil {
+		// Default (no file_identity): the fingerprint identity is used, so
+		// apply its growing default just like the explicit branch below.
+		c.FileWatcher.Scanner.Fingerprint.Growing = defaultFingerprintIdentityConfig().Growing
 		return nil
 	}
 
 	name := c.FileIdentity.Name()
 	if name == fingerprintName {
+		fingerprintCfg := defaultFingerprintIdentityConfig()
+		if sub := c.FileIdentity.Config(); sub != nil {
+			if err := sub.Unpack(&fingerprintCfg); err != nil {
+				return fmt.Errorf("cannot read 'file_identity.fingerprint' config: %w", err)
+			}
+		}
+		// file_identity.fingerprint is the ONLY user-facing config for
+		// growing mode. Propagate to the scanner config.
+		c.FileWatcher.Scanner.Fingerprint.Growing = fingerprintCfg.Growing
 		return nil
 	}
 
@@ -527,9 +560,15 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
+	// log.file.fingerprint is opt-in (include_file_fingerprint, default false).
+	// A growing file's raw fingerprint material is the RAW hex of the file
+	// header, not a SHA-256, so publishing it would expose file content. Only
+	// publish the SHA-256 once the fingerprint is complete; below the threshold
+	// we publish no fingerprint at all. A renamed file may still carry the old
+	// path until the next open — that pre-existing limitation is unchanged here.
 	var fingerprint string
-	if inp.includeFileFingerprint {
-		fingerprint = fs.desc.Fingerprint
+	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
+		fingerprint = fs.desc.Fingerprint.Sum
 	}
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)
 
