@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"net"
 	"strings"
 	"testing"
 	"text/template"
@@ -33,7 +32,10 @@ const (
 )
 
 func TestTCPInputOTelE2E(t *testing.T) {
-	otelServerAddr, fbServerAddr := ephemeralTCPAddr(t)
+	// TODO: change this to use port from log lines
+	// See https://github.com/elastic/beats/pull/51617
+	otelServerAddr := "127.0.0.1:9042"
+	fbServerAddr := "127.0.0.1:9043"
 
 	runSocketInputOTelE2E(
 		t,
@@ -46,7 +48,10 @@ func TestTCPInputOTelE2E(t *testing.T) {
 }
 
 func TestUDPInputOTelE2E(t *testing.T) {
-	otelServerAddr, fbServerAddr := ephemeralTCPAddr(t)
+	// TODO: change this to use port from log lines
+	// See https://github.com/elastic/beats/pull/51617
+	otelServerAddr := "127.0.0.1:9042"
+	fbServerAddr := "127.0.0.1:9043"
 
 	runSocketInputOTelE2E(
 		t,
@@ -284,31 +289,4 @@ service:
 // HostAddress returns the host:port address used by net input integration tests.
 func hostAddress(port uint16) string {
 	return fmt.Sprintf("127.0.0.1:%d", port)
-}
-
-// ephemeralTCPAddr binds to two ephemeral localhost port at the same time, immediately releases
-// it, and returns the resolved "host:port" so a caller can configure a
-// server to listen on it.
-func ephemeralTCPAddr(t *testing.T) (string, string) {
-	t.Helper()
-
-	l1, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatalf("cannot bind an ephemeral port: %s", err)
-	}
-	t.Cleanup(func() { _ = l1.Close() })
-
-	l2, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatalf("cannot bind an ephemeral port: %s", err)
-	}
-	t.Cleanup(func() { _ = l2.Close() })
-
-	addr1 := l1.Addr().String()
-	addr2 := l2.Addr().String()
-
-	_ = l1.Close()
-	_ = l2.Close()
-
-	return addr1, addr2
 }
