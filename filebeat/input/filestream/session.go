@@ -331,6 +331,10 @@ func (s *harvestSession) Close() error {
 	if s.file != nil {
 		err := s.file.Close()
 		s.file = nil
+		s.log.Debugf("Closed reader. Path='%s'", s.src.newPath)
+		if err != nil {
+			s.log.Errorf("Error stopping filestream reader: %v", err)
+		}
 		return err
 	}
 	return nil

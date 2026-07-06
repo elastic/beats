@@ -153,7 +153,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 
 		require.Equal(t, uint64(3), s.metrics.MessagesGZIPRead.Get(), "gzip_messages_read_total")
 		require.Equal(t, uint64(3), s.metrics.EventsGZIPProcessed.Get(), "gzip_events_processed_total")
-		require.Greater(t, s.metrics.BytesGZIPProcessed.Get(), uint64(0), "gzip_bytes_processed_total")
+		require.Positive(t, s.metrics.BytesGZIPProcessed.Get(), "gzip_bytes_processed_total")
 	})
 
 	t.Run("a trailing partial line is read but yields and then parks", func(t *testing.T) {
