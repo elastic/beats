@@ -12,20 +12,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// concurrencyController dynamically adjusts the number of concurrent workers
-// between 1 and maxWorkers based on pipeline backpressure. It uses a simple
-// additive-increase/multiplicative-decrease (AIMD) approach:
+// concurrencyObserver tracks the effective concurrency level based on pipeline
+// backpressure using additive-increase/multiplicative-decrease (AIMD):
 //
 //   - When a worker completes without experiencing backpressure (publish did
-//     not block for longer than publishLatencyThreshold), the controller
-//     considers the pipeline healthy and may increase concurrency.
-//   - When backpressure is detected (publish blocked), the controller reduces
-//     concurrency.
+//     not block for longer than publishLatencyThreshold), the observer
+//     considers the pipeline healthy and may increase the recorded level.
+//   - When backpressure is detected (publish blocked), the observer reduces
+//     the recorded level.
 //
-// Config values (number_of_workers) become the upper bound rather than a fixed
-// pool size. Users who previously tuned this knob get the same ceiling, but the
-// controller finds the right operating point automatically.
-type concurrencyController struct {
+// The observer does not gate admission. The semaphore in the run loop is
+// the hard ceiling. The AIMD level records what the system converges to so
+// operators can see the effective concurrency and tune number_of_workers.
+type concurrencyObserver struct {
 	maxWorkers int
 	log        *logp.Logger
 
@@ -40,16 +39,16 @@ type concurrencyController struct {
 	scaleDown *monitoring.Uint
 }
 
-// concurrencyControllerConfig holds tuning for the controller.
+// concurrencyObserverConfig holds tuning for the observer.
 // AdjustCooldown prevents oscillation; 5s is a sensible production default.
-type concurrencyControllerConfig struct {
+type concurrencyObserverConfig struct {
 	MaxWorkers     int
 	AdjustCooldown time.Duration
 	Log            *logp.Logger
 	Registry       *monitoring.Registry
 }
 
-func newConcurrencyController(cfg concurrencyControllerConfig) *concurrencyController {
+func newConcurrencyObserver(cfg concurrencyObserverConfig) *concurrencyObserver {
 	if cfg.MaxWorkers < 1 {
 		cfg.MaxWorkers = 1
 	}
@@ -65,7 +64,7 @@ func newConcurrencyController(cfg concurrencyControllerConfig) *concurrencyContr
 
 	initial := max(cfg.MaxWorkers/2, 1)
 
-	cc := &concurrencyController{
+	o := &concurrencyObserver{
 		maxWorkers:     cfg.MaxWorkers,
 		adjustCooldown: cfg.AdjustCooldown,
 		log:            cfg.Log,
@@ -73,60 +72,60 @@ func newConcurrencyController(cfg concurrencyControllerConfig) *concurrencyContr
 		scaleUps:       monitoring.NewUint(cfg.Registry, "concurrency_scale_ups_total"),
 		scaleDown:      monitoring.NewUint(cfg.Registry, "concurrency_scale_downs_total"),
 	}
-	cc.level.Set(int64(initial))
-	return cc
+	o.level.Set(int64(initial))
+	return o
 }
 
 // OnSuccess signals that a unit of work completed without backpressure.
-// The controller may increase concurrency.
-func (cc *concurrencyController) OnSuccess() {
-	cc.mu.Lock()
-	defer cc.mu.Unlock()
-	if time.Since(cc.lastAdjust) < cc.adjustCooldown {
+// The observer may increase the recorded concurrency level.
+func (o *concurrencyObserver) OnSuccess() {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	if time.Since(o.lastAdjust) < o.adjustCooldown {
 		return
 	}
-	cur := int(cc.level.Get())
-	if cur < cc.maxWorkers {
+	cur := int(o.level.Get())
+	if cur < o.maxWorkers {
 		next := cur + 1
-		cc.level.Set(int64(next))
-		cc.lastAdjust = time.Now()
-		cc.scaleUps.Inc()
-		cc.log.Infow("Concurrency increased.", "from", cur, "to", next, "max", cc.maxWorkers)
+		o.level.Set(int64(next))
+		o.lastAdjust = time.Now()
+		o.scaleUps.Inc()
+		o.log.Infow("Concurrency increased.", "from", cur, "to", next, "max", o.maxWorkers)
 	}
 }
 
 // OnBackpressure signals that publishing blocked, indicating the pipeline
-// is saturated. The controller reduces concurrency (multiplicative decrease).
-func (cc *concurrencyController) OnBackpressure() {
-	cc.mu.Lock()
-	defer cc.mu.Unlock()
-	if time.Since(cc.lastAdjust) < cc.adjustCooldown {
+// is saturated. The observer reduces the recorded level (multiplicative decrease).
+func (o *concurrencyObserver) OnBackpressure() {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	if time.Since(o.lastAdjust) < o.adjustCooldown {
 		return
 	}
-	cur := int(cc.level.Get())
+	cur := int(o.level.Get())
 	next := max(cur/2, 1)
 	if next != cur {
-		cc.level.Set(int64(next))
-		cc.lastAdjust = time.Now()
-		cc.scaleDown.Inc()
-		cc.log.Infow("Concurrency decreased (backpressure).", "from", cur, "to", next, "max", cc.maxWorkers)
+		o.level.Set(int64(next))
+		o.lastAdjust = time.Now()
+		o.scaleDown.Inc()
+		o.log.Infow("Concurrency decreased (backpressure).", "from", cur, "to", next, "max", o.maxWorkers)
 	}
 }
 
 // ScaleUps returns the total number of scale-up events.
-func (cc *concurrencyController) ScaleUps() uint64 { return cc.scaleUps.Get() }
+func (o *concurrencyObserver) ScaleUps() uint64 { return o.scaleUps.Get() }
 
 // ScaleDowns returns the total number of scale-down events.
-func (cc *concurrencyController) ScaleDowns() uint64 { return cc.scaleDown.Get() }
+func (o *concurrencyObserver) ScaleDowns() uint64 { return o.scaleDown.Get() }
 
-// publishWithBackpressure wraps a publish function and signals the controller
+// publishWithBackpressure wraps a publish function and signals the observer
 // when backpressure is detected (publish takes longer than the threshold).
-func publishWithBackpressure(cc *concurrencyController, threshold time.Duration, publish func()) {
+func publishWithBackpressure(co *concurrencyObserver, threshold time.Duration, publish func()) {
 	start := time.Now()
 	publish()
 	if time.Since(start) > threshold {
-		cc.OnBackpressure()
+		co.OnBackpressure()
 	} else {
-		cc.OnSuccess()
+		co.OnSuccess()
 	}
 }

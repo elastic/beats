@@ -135,7 +135,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 		Status:            st,
 	})
 
-	cc := newConcurrencyController(concurrencyControllerConfig{
+	co := newConcurrencyObserver(concurrencyObserverConfig{
 		MaxWorkers:     in.config.NumberOfWorkers,
 		AdjustCooldown: 5 * time.Second,
 		Log:            log.Named("flow"),
@@ -162,7 +162,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 		wg.Add(1)
 		go func() {
 			defer func() { <-sem; wg.Done() }()
-			in.processSQSMessage(msgCtx, disc, cc, msg, pipeline, metrics)
+			in.processSQSMessage(msgCtx, disc, co, msg, pipeline, metrics)
 		}()
 	})
 
@@ -170,7 +170,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 	return nil
 }
 
-func (in *inputV2) processSQSMessage(ctx context.Context, disc *sqsDiscoveryV2, cc *concurrencyController, msg types.Message, pipeline beat.Pipeline, metrics *inputMetrics) {
+func (in *inputV2) processSQSMessage(ctx context.Context, disc *sqsDiscoveryV2, co *concurrencyObserver, msg types.Message, pipeline beat.Pipeline, metrics *inputMetrics) {
 	id := metrics.beginSQSWorker()
 	defer metrics.endSQSWorker(id)
 
@@ -187,7 +187,7 @@ func (in *inputV2) processSQSMessage(ctx context.Context, disc *sqsDiscoveryV2, 
 
 	publishCount := 0
 	result := disc.ProcessMessage(ctx, &msg, func(e beat.Event) {
-		publishWithBackpressure(cc, 50*time.Millisecond, func() {
+		publishWithBackpressure(co, 50*time.Millisecond, func() {
 			client.Publish(e)
 		})
 		metrics.s3EventsCreatedTotal.Inc()

@@ -98,7 +98,7 @@ func benchmarkInputSQSV2(t *testing.T, log *logp.Logger, workerCount int) testin
 			Status:            &statusReporterHelperMock{},
 		})
 
-		cc := newConcurrencyController(concurrencyControllerConfig{
+		co := newConcurrencyObserver(concurrencyObserverConfig{
 			MaxWorkers:     workerCount,
 			AdjustCooldown: 5 * time.Second,
 			Log:            log.Named("flow"),
@@ -133,7 +133,7 @@ func benchmarkInputSQSV2(t *testing.T, log *logp.Logger, workerCount int) testin
 			wg.Add(1)
 			go func() {
 				defer func() { <-sem; wg.Done() }()
-				processSQSMessageV2Bench(msgCtx, disc, cc, msg, pipeline, metrics)
+				processSQSMessageV2Bench(msgCtx, disc, co, msg, pipeline, metrics)
 			}()
 		})
 
@@ -157,7 +157,7 @@ func benchmarkInputSQSV2(t *testing.T, log *logp.Logger, workerCount int) testin
 
 // processSQSMessageV2Bench mirrors inputV2.processSQSMessage but is a free
 // function so the benchmark doesn't need a full inputV2 instance.
-func processSQSMessageV2Bench(ctx context.Context, disc *sqsDiscoveryV2, cc *concurrencyController, msg sqsTypes.Message, pipeline beat.Pipeline, metrics *inputMetrics) {
+func processSQSMessageV2Bench(ctx context.Context, disc *sqsDiscoveryV2, co *concurrencyObserver, msg sqsTypes.Message, pipeline beat.Pipeline, metrics *inputMetrics) {
 	id := metrics.beginSQSWorker()
 	defer metrics.endSQSWorker(id)
 
@@ -170,7 +170,7 @@ func processSQSMessageV2Bench(ctx context.Context, disc *sqsDiscoveryV2, cc *con
 
 	publishCount := 0
 	result := disc.ProcessMessage(ctx, &msg, func(e beat.Event) {
-		publishWithBackpressure(cc, 50*time.Millisecond, func() {
+		publishWithBackpressure(co, 50*time.Millisecond, func() {
 			client.Publish(e)
 		})
 		metrics.s3EventsCreatedTotal.Inc()
