@@ -13,6 +13,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../libbeat/tests/system
 _PARALLEL_SAFE_TESTS = ("test_modules.py", "test_xpack_modules.py")
 
 
+@pytest.hookimpl(tryfirst=True)
 def pytest_collection_modifyitems(config, items):
     """
     Pin every non-module system test to a single xdist worker.
@@ -22,10 +23,17 @@ def pytest_collection_modifyitems(config, items):
     Assigning all non-module tests to one shared group keeps them serial (as
     today) while leaving the module fileset tests free to distribute across
     workers. Without pytest-xdist this hook is a no-op.
+
+    ``tryfirst`` is required: pytest-xdist's worker turns the ``xdist_group``
+    marker into the ``@group`` nodeid suffix it schedules on from its own
+    ``pytest_collection_modifyitems``, so ours must add the marker before that
+    runs. The grouping happens during collection on the workers, where the
+    ``numprocesses``/``dist`` options are not set (they live on the controller),
+    so detect an active run via ``PYTEST_XDIST_WORKER`` too.
     """
-    if not config.pluginmanager.hasplugin("xdist"):
-        return
-    if not config.getoption("numprocesses", None):
+    distributing = bool(os.environ.get("PYTEST_XDIST_WORKER")) or bool(
+        config.getoption("numprocesses", None))
+    if not distributing:
         return
     for item in items:
         if any(name in item.nodeid for name in _PARALLEL_SAFE_TESTS):
