@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -83,6 +84,7 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
+	running                  atomic.Bool
 }
 
 type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
@@ -530,6 +532,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
+	fb.running.Store(true)
 	waitFinished.Wait()
 
 	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters.
@@ -589,6 +592,16 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 // Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
 	fb.logger.Info("Stopping filebeat")
+
+	if !fb.running.Load() {
+		fb.logger.Info("Waiting for init to finish before stopping")
+		// Wait for Run to reach waitFinished.Wait() before closing done, so that
+		// Stop is never delivered before the beater is ready to handle it. Poll
+		// for up to 5 seconds; if Run hasn't started by then, proceed anyway.
+		for i := 0; i < 50 && !fb.running.Load(); i++ {
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
 
 	// Stop Filebeat
 	fb.stopOnce.Do(func() { close(fb.done) })
