@@ -200,7 +200,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				return err
 			}
 
-			job := newJob(blobClient, v, blobURL, s.state, s.src, int32(s.src.Retry.MaxRetries), s.publisher, s.status, s.metrics, s.log)
+			job := newJob(blobClient, v, blobURL, s.state, s.src, s.src.Retry.MaxRetries, s.publisher, s.status, s.metrics, s.log)
 			jobs = append(jobs, job)
 		}
 
@@ -244,6 +244,16 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		if len(jobs) != 0 {
 			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].name(), jobs[len(jobs)-1].name())
 		}
+	}
+
+	// A successful listing pass is itself a recovery signal. When jobs are
+	// scheduled they report Running as they publish events, but a poll that
+	// lists cleanly yet schedules no jobs (no new blobs, or everything filtered
+	// out or already past the checkpoint) would otherwise leave the input stuck
+	// in a Degraded state set by an earlier transient listing failure. Report
+	// Running here so the input recovers even on an empty poll.
+	if s.src.Poll && numJobs == 0 {
+		s.status.UpdateStatus(status.Running, "")
 	}
 
 	return nil

@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // all test files are read from the "testdata" directory
@@ -35,8 +35,7 @@ type noopReporter struct{}
 func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 func TestDecoding(t *testing.T) {
-	logp.TestingSetup()
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, "")
 
 	testCases := []struct {
 		name          string

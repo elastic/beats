@@ -15,6 +15,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -29,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // customTransporter implements the Transporter interface with a custom Do & RoundTrip method
@@ -150,7 +152,7 @@ func serverBusyResponse(req *http.Request) *http.Response {
 // blob listing no longer kills the input: with retries configured, the pager
 // recovers and every expected blob is still ingested.
 func Test_ListBlobsRetriesOnTransientError(t *testing.T) {
-	logp.TestingSetup()
+	logger := logptest.NewTestingLogger(t, "")
 
 	serv := httptest.NewServer(mock.AzureStorageServer())
 	t.Cleanup(serv.Close)
@@ -197,7 +199,7 @@ func Test_ListBlobsRetriesOnTransientError(t *testing.T) {
 		Transport:                       transport,
 	}
 
-	input := newStatelessInput(c, serv.URL+"/", logp.NewNopLogger())
+	input := newStatelessInput(c, serv.URL+"/", logger)
 	assert.NoError(t, input.Test(v2.TestContext{}), "input.Test should succeed")
 
 	chanClient := beattest.NewChanClient(len(expected))
@@ -266,14 +268,22 @@ func (r *recordingStatusReporter) has(target status.Status) bool {
 	return false
 }
 
+// last returns the most recently reported status, if any.
+func (r *recordingStatusReporter) last() (status.Status, bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if len(r.statuses) == 0 {
+		return 0, false
+	}
+	return r.statuses[len(r.statuses)-1], true
+}
+
 // Test_ListBlobsNonFatalWhilePolling verifies that a sustained listing failure
 // (throttling that outlives the SDK's per-request retries) is non-fatal when
 // polling: the input is marked Degraded and keeps running so it can recover on
 // a later poll. Without polling there is no next cycle, so the failure surfaces
 // and the input stops.
 func Test_ListBlobsNonFatalWhilePolling(t *testing.T) {
-	logp.TestingSetup()
-
 	// A server that always answers with 503 ServerBusy, simulating a sustained
 	// Azure Storage outage.
 	serv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -304,7 +314,7 @@ func Test_ListBlobsNonFatalWhilePolling(t *testing.T) {
 		c := defaultConfig()
 		require.NoError(t, cfg.Unpack(&c), "config should unpack")
 
-		log := logp.NewNopLogger()
+		log := logptest.NewTestingLogger(t, "")
 		serviceClient, credential, err := fetchServiceClientAndCreds(c, c.Retry, serv.URL+"/", log)
 		require.NoError(t, err, "service client should be created")
 		containerClient, err := fetchContainerClient(serviceClient, beatsContainer, log)
@@ -341,6 +351,84 @@ func Test_ListBlobsNonFatalWhilePolling(t *testing.T) {
 	})
 }
 
+// Test_ListBlobsRecoversToRunningOnEmptyPoll covers the Degraded -> Running
+// recovery path for the edge case where a poll recovers but schedules no jobs
+// (no new blobs, or everything filtered out or already past the checkpoint).
+// A transient listing failure first marks the input Degraded; once listing
+// succeeds the input must report Running again even though the successful poll
+// publishes no events (so nothing else would clear the Degraded state).
+func Test_ListBlobsRecoversToRunningOnEmptyPoll(t *testing.T) {
+	// healthy flips from false (503 ServerBusy) to true (a valid but empty
+	// listing) between the two polls, simulating an outage that clears.
+	var healthy atomic.Bool
+	serv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/xml")
+		if !healthy.Load() {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, _ = io.WriteString(w, `<?xml version="1.0" encoding="utf-8"?><Error><Code>ServerBusy</Code><Message>The server is busy.</Message></Error>`)
+			return
+		}
+		// A valid but empty blob listing: the poll succeeds yet schedules no jobs.
+		_, _ = io.WriteString(w, `<?xml version="1.0" encoding="utf-8"?>
+<EnumerationResults ServiceEndpoint="https://127.0.0.1/" ContainerName="`+beatsContainer+`">
+	<Blobs></Blobs>
+	<NextMarker />
+</EnumerationResults>`)
+	}))
+	t.Cleanup(serv.Close)
+
+	baseConfig := map[string]interface{}{
+		"account_name":                        "beatsblobnew",
+		"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+		"max_workers":                         1,
+		"poll":                                true,
+		"containers": []map[string]interface{}{
+			{"name": beatsContainer},
+		},
+		// Keep the retry backoff tiny so the failing list call returns quickly.
+		"retry": map[string]interface{}{
+			"max_retries":         1,
+			"initial_retry_delay": "1ms",
+			"max_retry_delay":     "5ms",
+		},
+	}
+
+	cfg := conf.MustNewConfigFrom(baseConfig)
+	c := defaultConfig()
+	require.NoError(t, cfg.Unpack(&c), "config should unpack")
+
+	log := logptest.NewTestingLogger(t, "")
+	serviceClient, credential, err := fetchServiceClientAndCreds(c, c.Retry, serv.URL+"/", log)
+	require.NoError(t, err, "service client should be created")
+	containerClient, err := fetchContainerClient(serviceClient, beatsContainer, log)
+	require.NoError(t, err, "container client should be created")
+
+	src := &Source{
+		AccountName:   c.AccountName,
+		ContainerName: beatsContainer,
+		MaxWorkers:    1,
+		Poll:          true,
+		PollInterval:  time.Millisecond,
+		Retry:         c.Retry,
+	}
+	rec := &recordingStatusReporter{}
+	sched := newScheduler(&publisher{}, containerClient, credential, src, &c, newState(), serv.URL+"/", rec, nil, log)
+
+	// First poll: the outage is ongoing, so the transient listing failure is
+	// non-fatal and marks the input Degraded.
+	require.NoError(t, sched.scheduleOnce(context.Background()), "a transient listing failure while polling must be non-fatal")
+	require.True(t, rec.has(status.Degraded), "the input should be Degraded after a transient listing failure")
+
+	// Second poll: listing succeeds but returns no blobs. The input must still
+	// report Running so a recovery that schedules no jobs is not left Degraded.
+	healthy.Store(true)
+	require.NoError(t, sched.scheduleOnce(context.Background()), "a successful empty poll must not error")
+
+	got, ok := rec.last()
+	require.True(t, ok, "at least one status should have been reported")
+	assert.Equal(t, status.Running, got, "an empty but successful poll should return the input to Running")
+}
+
 func Test_OAuth2(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -375,7 +463,6 @@ func Test_OAuth2(t *testing.T) {
 		},
 	}
 
-	logp.TestingSetup()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			serv := httptest.NewServer(tt.mockHandler())

@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var configTests = []struct {
@@ -112,7 +111,6 @@ var configTests = []struct {
 }
 
 func TestConfig(t *testing.T) {
-	logp.TestingSetup()
 	for _, test := range configTests {
 		t.Run(test.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -135,8 +133,6 @@ func TestConfig(t *testing.T) {
 // onto the Azure SDK retry options, and that any option left unset keeps the
 // SDK-matching default seeded by defaultConfig (including for a partial block).
 func TestRetryConfig(t *testing.T) {
-	logp.TestingSetup()
-
 	t.Run("explicit", func(t *testing.T) {
 		cfg := conf.MustNewConfigFrom(map[string]interface{}{
 			"account_name":                        "beatsblobnew",
@@ -153,7 +149,7 @@ func TestRetryConfig(t *testing.T) {
 		c := defaultConfig()
 		require.NoError(t, cfg.Unpack(&c), "unpacking a valid retry config should succeed")
 
-		assert.Equal(t, 20, c.Retry.MaxRetries, "max_retries should unpack")
+		assert.Equal(t, int32(20), c.Retry.MaxRetries, "max_retries should unpack")
 		assert.Equal(t, time.Second, c.Retry.InitialRetryDelay, "initial_retry_delay should unpack")
 		assert.Equal(t, 30*time.Second, c.Retry.MaxRetryDelay, "max_retry_delay should unpack")
 
@@ -176,7 +172,7 @@ func TestRetryConfig(t *testing.T) {
 
 		// Omitting the retry block keeps the seeded SDK-matching defaults, so
 		// behaviour is identical to not configuring retries at all.
-		assert.Equal(t, defaultMaxRetries, c.Retry.MaxRetries, "an unset max_retries must keep the default")
+		assert.Equal(t, int32(defaultMaxRetries), c.Retry.MaxRetries, "an unset max_retries must keep the default")
 		assert.Equal(t, defaultInitialRetryDelay, c.Retry.InitialRetryDelay, "an unset initial_retry_delay must keep the default")
 		assert.Equal(t, defaultMaxRetryDelay, c.Retry.MaxRetryDelay, "an unset max_retry_delay must keep the default")
 	})
@@ -197,7 +193,7 @@ func TestRetryConfig(t *testing.T) {
 		c := defaultConfig()
 		require.NoError(t, cfg.Unpack(&c), "unpacking a partial retry config should succeed")
 
-		assert.Equal(t, 7, c.Retry.MaxRetries, "an explicit max_retries must be preserved")
+		assert.Equal(t, int32(7), c.Retry.MaxRetries, "an explicit max_retries must be preserved")
 		assert.Equal(t, defaultInitialRetryDelay, c.Retry.InitialRetryDelay, "an omitted initial_retry_delay must keep the default")
 		assert.Equal(t, defaultMaxRetryDelay, c.Retry.MaxRetryDelay, "an omitted max_retry_delay must keep the default")
 	})

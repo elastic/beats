@@ -150,7 +150,7 @@ type retryConfig struct {
 	// attempt. Defaults to 3. A negative value disables retrying of failed
 	// requests. (Note that the SDK's blob-download stream reader always retries
 	// a mid-stream read failure at least a few times regardless of this value.)
-	MaxRetries int `config:"max_retries"`
+	MaxRetries int32 `config:"max_retries"`
 	// InitialRetryDelay is the starting delay for the exponential backoff
 	// between attempts. Each subsequent retry waits longer, capped by
 	// MaxRetryDelay. Defaults to 800ms.

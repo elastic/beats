@@ -137,7 +137,7 @@ $$$supported-attributes$$$
 14. [timestamp_epoch](#attrib-timestamp_epoch)
 15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4+`
 16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0+`
-17. [retry](#attrib-retry)
+17. [retry](#attrib-retry) {applies_to}`stack: ga 8.19.9` {applies_to}`stack: ga 9.3.8` {applies_to}`stack: ga 9.4.4` {applies_to}`stack: ga 9.5.0`
 
 ## `account_name` [attrib-account-name]
 
@@ -372,6 +372,8 @@ filebeat.inputs:
 The example configuration above will fetch blobs present in specified container from the virtual `cloudTrail` directory. This operation occurs via the SDK in the blob-storage server so the impact on memory is negligible.
 
 ## `retry` [attrib-retry]
+
+{applies_to}`stack: ga 8.19.9` {applies_to}`stack: ga 9.3.8` {applies_to}`stack: ga 9.4.4` {applies_to}`stack: ga 9.5.0`
 
 This attribute controls how transient Azure Storage failures are retried. Azure occasionally returns throttling responses such as `HTTP 429` or `HTTP 503` (`ServerBusy`), and brief network problems can also interrupt requests. The retry settings feed the Azure SDK's retry policy, which sits in the client request pipeline, so they apply to **every** request the input makes — both listing blobs (pagination) and downloading them.
 

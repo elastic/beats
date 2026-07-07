@@ -40,7 +40,7 @@ func fetchServiceClientAndCreds(cfg config, retryCfg retryConfig, url string, lo
 // defaultConfig, so a zero value here only occurs when explicitly configured.
 func azureRetryOptions(rc retryConfig) policy.RetryOptions {
 	return policy.RetryOptions{
-		MaxRetries:    int32(rc.MaxRetries),
+		MaxRetries:    rc.MaxRetries,
 		RetryDelay:    rc.InitialRetryDelay,
 		MaxRetryDelay: rc.MaxRetryDelay,
 	}
