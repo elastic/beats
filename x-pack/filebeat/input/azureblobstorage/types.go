@@ -25,6 +25,7 @@ type Source struct {
 	ReaderConfig             readerConfig
 	ExpandEventListFromField string
 	PathPrefix               string
+	Retry                    retryConfig
 }
 
 func (s *Source) Name() string {
