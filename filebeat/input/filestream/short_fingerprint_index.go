@@ -79,10 +79,9 @@ func (s *shortFingerprintSet) Add(key, hash string, hexLen int, source string) {
 	keys[key] = struct{}{}
 }
 
-// AddRaw adds an entry from in-memory raw (hex) fingerprint material, deriving
-// the (hash, hex length) form. The raw material itself is not retained.
-// Entries with an empty fingerprint are ignored. Safe to call on a nil
-// receiver.
+// AddRaw adds an entry from in-memory raw fingerprint material, deriving the (hash, hex length)
+// form. The raw material itself is not retained. Entries with an empty fingerprint are ignored.
+// Safe to call on a nil receiver.
 func (s *shortFingerprintSet) AddRaw(key, raw, source string) {
 	if s == nil || raw == "" {
 		return
@@ -197,10 +196,8 @@ func (s *shortFingerprintSet) FindPrefixMatchFunc(targetFingerprint string, keep
 	}
 	slices.Sort(s.lengths)
 
-	// Ascending walk so the hash is fed incrementally; a hit at a longer
-	// length overwrites earlier ones, implementing longest-match-wins.
-	// Indexing the bucket with string(Key()) lets the compiler elide the
-	// lookup-key allocation.
+	// Ascending walk so the hash is fed incrementally; a hit at a longer length overwrites earlier
+	// ones, implementing longest-match-wins.
 	s.hasher.Reset()
 	s.target = append(s.target[:0], targetFingerprint...)
 	fed := 0

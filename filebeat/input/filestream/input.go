@@ -880,7 +880,7 @@ func (inp *filestream) handleReadError(
 		// an explicit Close — the input is not shutting down and we must
 		// close normally.
 		if inp.readUntilEOF.Enabled && ctx.Cancelation.Err() != nil {
-			return nil, true
+			return nil, true //nolint:nilerr // intentional
 		}
 
 		log.Debugf("Reader was closed. Closing. Path='%s'", path)
