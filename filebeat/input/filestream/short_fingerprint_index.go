@@ -23,27 +23,14 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 )
 
-// shortFingerprintSet manages a set of entries whose fingerprint is still
-// in the growing phase (below the configured threshold). Used by both the
-// filewatcher (for rename+grow detection) and the prospector (for key
-// migration on growth and threshold transition).
-//
-// It never holds raw fingerprint material: an entry is only the identity hash
-// (FingerprintID.Key(), which the registry key carries) plus the raw
-// material's hex length; "stored raw is a strict prefix of target" is decided
-// as "the hashes agree at the stored length". This is what lets the registry
-// persist only (hash, length) for growing entries.
+// shortFingerprintSet manages a set of entries whose fingerprint is still in the growing phase.
 type shortFingerprintSet struct {
 	entries map[string]shortFingerprintEntry // key → entry
-	// byLen indexes entry keys by (hex length, hash) so a lookup is one hash
-	// snapshot + one map access per distinct stored length, independent of the
-	// number of entries. The innermost set handles distinct keys sharing the
-	// same material (e.g. two identical-content files in the watcher's
-	// path-keyed set).
+	// byLen indexes entry keys by (hex length, hash) so a lookup is one hash snapshot and one map
+	// access per distinct stored length, independent of the number of entries.
 	byLen map[int]map[string]map[string]struct{} // hex length → hash → keys
 
-	// Scratch state reused across FindPrefixMatchFunc calls to keep lookups
-	// allocation-free.
+	// Scratch state reused across FindPrefixMatchFunc calls to keep lookups allocation-free.
 	hasher  *loginp.RawFingerprintHasher
 	target  []byte
 	lengths []int
