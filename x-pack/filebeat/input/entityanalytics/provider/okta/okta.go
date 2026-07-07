@@ -12,14 +12,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"slices"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -118,15 +114,10 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	// Allow a single fetch operation to obtain limits from the API.
 	p.lim = okta.NewRateLimiter(p.cfg.LimitWindow, p.cfg.LimitFixed)
 
-	if p.cfg.Tracer.enabled() {
-		id := sanitizeFileName(inputCtx.IDWithoutName)
-		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(Name, path)
+	if p.cfg.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(inputCtx.Agent.Paths, Name, inputCtx.IDWithoutName, p.cfg.Tracer.Filename)
 		if err != nil {
 			return err
-		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, Name))
 		}
 		p.cfg.Tracer.Filename = resolved
 	}
@@ -212,11 +203,6 @@ func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, e
 	return client.StandardClient(), nil
 }
 
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
-
 // requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
 // is non-nil.
 func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Logger) *http.Client {
@@ -226,22 +212,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	if !cfg.Tracer.enabled() {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err := os.Remove(cfg.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Tracer.Filename, log)
 		return cli
 	}
 
@@ -261,16 +232,6 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
-// repeated instances. The request.tracer.filename may have ":" when an input
-// has cursor config and the macOS Finder will treat this as path-separator and
-// causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // clientOption returns constructed client configuration options, including

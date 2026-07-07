@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Close Beat processors on beat OTel processor shutdown to avoid leaking resources on collector reloads.
+component: all

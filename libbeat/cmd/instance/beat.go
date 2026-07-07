@@ -66,7 +66,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/filewatcher"
+
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -153,7 +153,13 @@ type certReloadConfig struct {
 	Reload           cfgfile.Reload `config:"restart_on_cert_change" yaml:"restart_on_cert_change"`
 }
 
-func (c certReloadConfig) Validate() error {
+func (c *certReloadConfig) Validate() error {
+	// Certificate hot-reload was introduced after this branch was cut. Disable it
+	// by default so it does not activate silently in a patch release.
+	if c.CertificateReload.Enabled == nil {
+		c.CertificateReload.Enabled = new(false)
+	}
+
 	if c.Reload.Period < time.Second {
 		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
 	}
@@ -388,7 +394,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
-		Paths:          b.Info.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
@@ -428,7 +433,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
 	if !management.UnderAgent() {
-		bl := locks.New(b.Info, b.Info.Paths)
+		bl := locks.New(b.Info)
 		err := bl.Lock()
 		if err != nil {
 			return err
@@ -692,7 +697,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 
-			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Info.Paths, b.Config.LifecycleConfig)
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 			if err != nil {
 				return fmt.Errorf("error creating index management handler: %w", err)
 			}
@@ -1137,7 +1142,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Info.Paths, b.Config.LifecycleConfig)
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
 		}
@@ -1208,65 +1213,10 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	if !extendedTLSCfg.Reload.Enabled {
 		return nil
 	}
-	logger.Debug("exit on CA certs change enabled")
 
-	possibleFilesToWatch := append(
-		extendedTLSCfg.CAs,
-		extendedTLSCfg.Certificate.Certificate,
-		extendedTLSCfg.Certificate.Key,
-	)
-
-	filesToWatch := []string{}
-	for _, f := range possibleFilesToWatch {
-		if f == "" {
-			continue
-		}
-		if tlscommon.IsPEMString(f) {
-			// That's an embedded cert, we're only interested in files
-			continue
-		}
-
-		logger.Debugf("watching '%s' for changes", f)
-		filesToWatch = append(filesToWatch, f)
-	}
-
-	// If there are no files to watch, don't do anything.
-	if len(filesToWatch) == 0 {
-		logger.Debug("no files to watch, filewatcher will not be started")
-		return nil
-	}
-
-	watcher := filewatcher.New(filesToWatch...)
-	// Ignore the first scan as it will always return
-	// true for files changed. The output has not been
-	// started yet, so even if the files have changed since
-	// the Beat started, they don't need to be reloaded
-	_, _, _ = watcher.Scan()
-
-	// Watch for file changes while the Beat is alive
-	go func() {
-		ticker := time.Tick(extendedTLSCfg.Reload.Period)
-
-		for {
-			<-ticker
-			files, changed, err := watcher.Scan()
-			if err != nil {
-				logger.Warnf("could not scan certificate files: %s", err.Error())
-			}
-
-			if changed {
-				logger.Infof(
-					"some of the following files have been modified: %v, restarting %s.",
-					files, b.Info.Beat)
-
-				b.shouldReexec = true
-				b.Manager.Stop()
-
-				// we're done, finish the goroutine just for the sake of it
-				return
-			}
-		}
-	}()
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
+		"TLS certificates and CAs are now automatically reloaded using 'ssl.certificate_reload'. " +
+		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 
 	return nil
 }
@@ -1280,7 +1230,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
-	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), b.Info.Paths)
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
 }
 
 func (b *Beat) registerClusterUUIDFetching() {

@@ -20,6 +20,7 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -100,6 +101,24 @@ func (p *fileProspector) Init(
 
 		fd, ok := files[fm.Source]
 		if !ok {
+			return "", fm
+		}
+
+		registryKey := v.Key()
+		split := strings.Split(registryKey, identitySep)
+		// Wrong key format
+		if len(split) != 4 {
+			return "", fm
+		}
+
+		registryFileIdentity := split[2] + identitySep + split[3]
+		fileIdentity := p.identifier.GetSource(loginp.FSEvent{
+			NewPath:    fm.Source,
+			Descriptor: fd,
+		}).Name()
+
+		// Same paths, different file, do not migrate ID
+		if registryFileIdentity != fileIdentity {
 			return "", fm
 		}
 
@@ -235,7 +254,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
@@ -257,7 +276,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-	log = log.With("source_file", event.SrcID)
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {

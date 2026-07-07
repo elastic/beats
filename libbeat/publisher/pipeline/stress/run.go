@@ -62,22 +62,21 @@ func RunTests(
 
 	log := logp.L()
 
+	info.Paths = paths.New()
+	info.Paths.Home = "."
+	info.Paths.Config = "."
+	info.Paths.Data = "."
+	info.Paths.Logs = "."
+
 	processing, err := processing.MakeDefaultSupport(false, nil)(info, log, cfg)
 	if err != nil {
 		return err
 	}
 
-	beatPaths := paths.New()
-	beatPaths.Home = "."
-	beatPaths.Config = "."
-	beatPaths.Data = "."
-	beatPaths.Logs = "."
-
 	pipelineSettings := pipeline.Settings{
 		WaitClose:     0,
 		WaitCloseMode: pipeline.NoWaitOnClose,
 		Processors:    processing,
-		Paths:         beatPaths,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(info,
@@ -89,7 +88,7 @@ func RunTests(
 		config.Pipeline,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config(), beatPaths)
+			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config())
 			return cfg.Name(), out, err
 		},
 		pipelineSettings,

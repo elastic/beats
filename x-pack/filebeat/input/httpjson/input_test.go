@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,11 +21,13 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var testCases = []struct {
@@ -444,57 +447,26 @@ var testCases = []struct {
 		},
 		expectedNoFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
 	},
-	{
-		name:        "tracer_escaping_logs",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {},
-		baseConfig: map[string]interface{}{
-			"interval":                1,
-			"request.method":          http.MethodGet,
-			"request.url":             "https://example.com/",
-			"request.tracer.enabled":  true,
-			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-		},
-		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'request'`, inputName),
-	},
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
 	{
 		name: "tracer_disabled_escaping_logs",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			timeNow = func() time.Time {
-				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
-				return t
-			}
-
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
-			t.Cleanup(func() { timeNow = time.Now })
 		},
 		baseConfig: map[string]interface{}{
-			"interval":       1,
-			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
-						"target":  "url.params.$filter",
-						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
-						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
-					},
-				},
-			},
-			"cursor": map[string]interface{}{
-				"timestamp": map[string]interface{}{
-					"value": `[[index .last_response.body "@timestamp"]]`,
-				},
-			},
+			"interval":                1,
+			"request.method":          http.MethodGet,
 			"request.tracer.enabled":  false,
 			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
 		},
-		handler: dateCursorHandler(),
-		expected: []string{
-			`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
-			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
-			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
-		},
+		handler: defaultHandler(http.MethodGet, "", ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name: "pagination",
@@ -1669,8 +1641,11 @@ func TestInput(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(test.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
+			ctx, cancel, err := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			var g errgroup.Group
 			g.Go(func() error {
@@ -1687,7 +1662,10 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected event: %v", got)
 				}
 				cancel()
-				assert.NoError(t, g.Wait())
+				err = g.Wait()
+				if !sameErrorOrContains(err, test.wantErr) {
+					t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
+				}
 				return
 			}
 
@@ -1748,8 +1726,11 @@ func BenchmarkInput(b *testing.B) {
 				chanClient := beattest.NewChanClient(len(test.expected))
 				b.Cleanup(func() { _ = chanClient.Close() })
 
-				ctx, cancel := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
+				ctx, cancel, err := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
 				b.Cleanup(cancel)
+				if err != nil {
+					b.Fatal(err)
+				}
 
 				var g errgroup.Group
 				g.Go(func() error {
@@ -1865,15 +1846,20 @@ func newChainPaginationTestServer(
 	}
 }
 
-func newV2Context(id string) (v2.Context, func()) {
+func newV2Context(id string) (v2.Context, func(), error) {
 	ctx, cancel := context.WithCancel(context.Background())
+	cwd, err := os.Getwd()
+	if err != nil {
+		return v2.Context{}, cancel, fmt.Errorf("failed to get working directory: %w", err)
+	}
 	return v2.Context{
 		Logger:          logp.NewLogger("httpjson_test"),
 		ID:              id,
 		IDWithoutName:   id,
 		Cancelation:     ctx,
+		Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
 		MetricsRegistry: monitoring.NewRegistry(),
-	}, cancel
+	}, cancel, nil
 }
 
 //nolint:errcheck // We can safely ignore errors here
@@ -2075,5 +2061,18 @@ func paginationArrayHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`[{"foo":"bar"}]`))
 		}
 		count += 1
+	}
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }

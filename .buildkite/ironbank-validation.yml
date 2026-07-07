@@ -4,6 +4,8 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1782878510"
+
 steps:
   - label: ":package: :test_tube: Package and Validate Iron Bank for x-pack/heartbeat"
     command: |
@@ -19,7 +21,7 @@ steps:
       make -C ironbank validate-ironbank
     agents:
       provider: "gcp"
-      image: "platform-ingest-beats-ubuntu-2204-1768449671"
+      image: "${IMAGE_UBUNTU_X86_64}"
       machineType: "n2-standard-8"
     artifact_paths:
       - "x-pack/heartbeat/build/distributions/*"

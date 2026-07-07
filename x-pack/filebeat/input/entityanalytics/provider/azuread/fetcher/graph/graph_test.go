@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
@@ -328,7 +328,7 @@ func TestGraph_Groups(t *testing.T) {
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -392,7 +392,7 @@ func TestGraph_Users(t *testing.T) {
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -502,7 +502,7 @@ func TestGraph_Devices(t *testing.T) {
 			require.NoError(t, err)
 			auth := mock.New(mock.DefaultTokenValue)
 
-			f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+			f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -627,12 +627,11 @@ var validateConfigTests = []struct {
 		},
 	},
 	{
-		name: "invalid_path",
+		name: "invalid_path_accepted_at_config_time",
 		config: map[string]any{
 			"tracer.enabled":  true,
 			"tracer.filename": "/var/logs/path.log",
 		},
-		wantErr: errors.New(`request tracer path must be within "azure-ad" path accessing 'tracer'`),
 	},
 }
 

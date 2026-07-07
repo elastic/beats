@@ -46,7 +46,7 @@ type filebeatStore struct {
 	notifier *es.Notifier
 }
 
-func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
+func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
 	var (
 		reg backend.Registry
 		err error
@@ -61,7 +61,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 	}
 
 	reg, err = memlog.New(logger, memlog.Settings{
-		Root:     beatPaths.Resolve(paths.Data, cfg.Path),
+		Root:     info.Paths.Resolve(paths.Data, cfg.Path),
 		FileMode: cfg.Permissions,
 	})
 	if err != nil {

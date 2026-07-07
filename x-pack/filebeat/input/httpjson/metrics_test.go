@@ -121,8 +121,11 @@ func TestMetrics(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(tc.expectedEvents))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
+			ctx, cancel, err := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			var g errgroup.Group
 			g.Go(func() error {

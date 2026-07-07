@@ -11,22 +11,18 @@
 kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
-summary: Fix internal processing time metric for azureeventhub input.
+summary: Fix filestream data loss when a harvester closes before ingesting any data
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# NOTE: This field will be rendered only for breaking-change and known-issue kinds at the moment.
-#description:
+description: >
+  When a filestream harvester was closed before ingesting anything (for example
+  while still in its initial backoff), it reported an ingested offset of 0. The
+  file watcher could not distinguish this genuine 0 from "no offset reported",
+  so it fell back to the file size and never emitted a write event. As a result
+  no new harvester was started and the file's contents were never ingested,
+  causing silent data loss. The reported offset of 0 is now honored, so a new
+  harvester is started and the file is ingested.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: filebeat
-
-# PR URL; optional; the PR number that added the changeset.
-# If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
-# NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
-# Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/40547
-
-# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
-# If not present is automatically filled by the tooling with the issue linked to the PR number.
-#issue: https://github.com/owner/repo/1234

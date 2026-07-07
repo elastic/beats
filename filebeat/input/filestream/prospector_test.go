@@ -36,6 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	testingfs "github.com/elastic/elastic-agent-libs/testing/fs"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -166,6 +168,79 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			err := p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
 			assert.Equal(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
+		})
+	}
+}
+
+func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
+	workDir := testingfs.TempDir(t, "")
+	sourcePath := filepath.Join(workDir, "app.log")
+	oldSourcePath := filepath.Join(workDir, "app.log.1")
+
+	oldFile, err := os.Create(oldSourcePath)
+	require.NoError(t, err, "creating old log file")
+	defer oldFile.Close()
+
+	oldInfo, err := oldFile.Stat()
+	require.NoError(t, err, "stating old log file")
+	oldDescriptor := loginp.FileDescriptor{
+		Filename:    sourcePath,
+		Info:        file.ExtendFileInfo(oldInfo),
+		Fingerprint: "old-fingerprint",
+	}
+
+	currentFile, err := os.Create(sourcePath)
+	require.NoError(t, err, "creating current log file")
+	defer currentFile.Close()
+
+	currentInfo, err := currentFile.Stat()
+	require.NoError(t, err, "stating current log file")
+	currentDescriptor := loginp.FileDescriptor{
+		Filename:    sourcePath,
+		Info:        file.ExtendFileInfo(currentInfo),
+		Fingerprint: "current-fingerprint",
+	}
+
+	globalIdentifier, err := loginp.NewSourceIdentifier(pluginName, "")
+	require.NoError(t, err, "creating global source identifier")
+	inputIdentifier, err := loginp.NewSourceIdentifier(pluginName, "input-id")
+	require.NoError(t, err, "creating input source identifier")
+
+	for _, identityName := range []string{nativeName, fingerprintName} {
+		t.Run(identityName, func(t *testing.T) {
+			identifier := mustIdentifier(t, identityName)
+			oldSource := identifier.GetSource(loginp.FSEvent{
+				NewPath:    sourcePath,
+				Descriptor: oldDescriptor,
+			})
+
+			oldKey := globalIdentifier.ID(oldSource)
+			globalStore := newMockProspectorCleaner(map[string]loginp.Value{
+				oldKey: &mockUnpackValue{
+					key: oldKey,
+					fileMeta: fileMeta{
+						Source:         sourcePath,
+						IdentifierName: identityName,
+					},
+				},
+			})
+
+			p := fileProspector{
+				logger:     logptest.NewFileLogger(t, workDir).Logger,
+				identifier: identifier,
+				filewatcher: newMockFileWatcherWithFiles(
+					map[string]loginp.FileDescriptor{
+						sourcePath: currentDescriptor,
+					}),
+			}
+
+			err = p.Init(newMockProspectorCleaner(nil), globalStore, inputIdentifier.ID)
+			require.NoError(t, err, "prospector Init must succeed")
+			assert.Empty(
+				t,
+				globalStore.updatedKeys,
+				"stale global registry entry must not be migrated to the current file",
+			)
 		})
 	}
 }
@@ -557,8 +632,6 @@ func TestProspectorRenamedFile(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
 				logger:            logp.NewNopLogger(),
@@ -842,6 +915,17 @@ func mustPathIdentifier(renamed bool) fileIdentifier {
 		return &renamedPathIdentifier{pathIdentifier}
 	}
 	return pathIdentifier
+}
+
+func mustIdentifier(t *testing.T, name string) fileIdentifier {
+	t.Helper()
+
+	factory, ok := identifierFactories[name]
+	require.Truef(t, ok, "identifier factory %q must exist", name)
+
+	identifier, err := factory(nil, logp.NewNopLogger())
+	require.NoErrorf(t, err, "creating %q identifier", name)
+	return identifier
 }
 
 func TestOnRenameFileIdentity(t *testing.T) {

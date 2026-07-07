@@ -13,11 +13,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -141,13 +138,6 @@ func (c *tracerConfig) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.MaxSize = 1
-	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 	return nil
 }
@@ -385,21 +375,16 @@ func (f *graph) doRequest(ctx context.Context, method, url string, body io.Reade
 }
 
 // New creates a new instance of the graph fetcher.
-func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (fetcher.Fetcher, error) {
+func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator, p *paths.Path) (fetcher.Fetcher, error) {
 	var c graphConf
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("unable to unpack Graph API Fetcher config: %w", err)
 	}
 
-	if c.Tracer.enabled() {
-		id = sanitizeFileName(id)
-		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+	if c.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(p, inputName, id, c.Tracer.Filename)
 		if err != nil {
 			return nil, err
-		}
-		if !ok {
-			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
 		}
 		c.Tracer.Filename = resolved
 	}
@@ -462,11 +447,6 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	return &f, nil
 }
 
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
-
 // requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
 // is non-nil.
 func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *logp.Logger) *http.Client {
@@ -476,22 +456,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	if !cfg.Tracer.enabled() {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err := os.Remove(cfg.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Tracer.Filename, log)
 		return cli
 	}
 
@@ -511,16 +476,6 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	maxBodyLen := max(1, cfg.Tracer.MaxSize) * 1e6 / 10 // 10% of file max
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
-// repeated instances. The request.tracer.filename may have ":" when an input
-// has cursor config and the macOS Finder will treat this as path-separator and
-// causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 func formatQuery(name string, query []string, dflt string, expand map[string][]string) (string, error) {

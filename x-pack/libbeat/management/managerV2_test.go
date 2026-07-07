@@ -811,6 +811,32 @@ func TestErrorPerUnit(t *testing.T) {
 	}, 10*time.Second, 100*time.Millisecond, "desired state, was not reached")
 }
 
+// TestReloadNilOutputUnit verifies reload does not panic when no output unit is present.
+func TestReloadNilOutputUnit(t *testing.T) {
+	r := reload.NewRegistry()
+	output := &mockOutput{
+		ReloadFn: func(config *reload.ConfigWithMeta) error {
+			return nil
+		},
+	}
+	r.MustRegisterOutput(output)
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{Enabled: false},
+		r,
+		nil,
+		logptest.NewTestingLogger(t, ""),
+	)
+	require.NoError(t, err, "could not instantiate ManagerV2")
+
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok, "unexpected type for BeatV2Manager: %T", m)
+
+	require.NotPanics(t, func() {
+		mm.reload(map[unitKey]*agentUnit{})
+	}, "reload must not panic when there is no output unit")
+}
+
 type reloadable struct {
 	mx          sync.Mutex
 	config      *reload.ConfigWithMeta

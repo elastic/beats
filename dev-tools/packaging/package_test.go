@@ -44,9 +44,9 @@ import (
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/strslice"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
@@ -577,59 +577,58 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 		}
 		defer f.Close()
 
-		c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		dockerClient, err := client.New(client.FromEnv)
 		if err != nil {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
 
-		loadResp, err := c.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
+		loadResp, err := dockerClient.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
 		if err != nil {
 			t.Fatalf("error loading docker image: %s", err)
 		}
 
-		loadRespBody, err := io.ReadAll(loadResp.Body)
+		loadRespBody, err := io.ReadAll(loadResp)
 		if err != nil {
 			t.Fatalf("failed to read image load response: %s", err)
 		}
-		loadResp.Body.Close()
+		loadResp.Close()
 
 		_, after, found := strings.Cut(string(loadRespBody), "Loaded image: ")
 		if !found {
 			t.Fatalf("image load response was unexpected: %s", string(loadRespBody))
 		}
-		imageId := strings.TrimRight(after, "\\n\"}\r\n")
+		imageID := strings.TrimRight(after, "\\n\"}\r\n")
 
 		var caps strslice.StrSlice
-		if strings.Contains(imageId, "packetbeat") {
+		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}
 
-		createResp, err := c.ContainerCreate(ctx,
-			&container.Config{
-				Image: imageId,
-			},
-			&container.HostConfig{
-				CapAdd: caps,
-			},
-			nil,
-			nil,
-			"")
+		createResp, err := dockerClient.ContainerCreate(ctx,
+			client.ContainerCreateOptions{
+				Config: &container.Config{
+					Image: imageID,
+				},
+				HostConfig: &container.HostConfig{
+					CapAdd: caps,
+				},
+			})
 		if err != nil {
 			t.Fatalf("error creating container from image: %s", err)
 		}
 		defer func() {
-			err := c.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			_, err := dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})
 			if err != nil {
 				t.Errorf("error removing container: %s", err)
 			}
 		}()
 
-		err = c.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		_, err = dockerClient.ContainerStart(ctx, createResp.ID, client.ContainerStartOptions{})
 		if err != nil {
 			t.Fatalf("failed to start container: %s", err)
 		}
 		defer func() {
-			err := c.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			_, err := dockerClient.ContainerStop(ctx, createResp.ID, client.ContainerStopOptions{})
 			if err != nil {
 				t.Errorf("error stopping container: %s", err)
 			}
@@ -648,7 +647,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
 				return
 			case <-ticker.C:
-				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 				if err != nil {
 					t.Logf("could not get logs: %s", err)
 				}

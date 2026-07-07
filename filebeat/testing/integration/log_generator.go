@@ -26,7 +26,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	uuid "github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid/v5"
 )
 
 // LogGenerator used for generating log files
@@ -129,7 +129,7 @@ func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGene
 	}
 	defer file.Close()
 
-	writeLines(t, file, filename, 0, lines, generator)
+	WriteLines(t, file, filename, 0, lines, generator)
 }
 
 // AppendLogFile appends a given line count to an existing file
@@ -156,13 +156,13 @@ func AppendLogFile(t *testing.T, filename string, lines int, generator LogGenera
 		t.Fatalf("failed to count lines in %q: %s", filename, err)
 	}
 
-	writeLines(t, file, filename, offset, lines, generator)
+	WriteLines(t, file, filename, offset, lines, generator)
 }
 
-// writeLines writes generated lines to the provided writer.
+// WriteLines writes generated lines to the provided writer.
 // It is shared between GenerateLogFile and GenerateGZIPLogFile to
 // avoid duplicating the core writing logic.
-func writeLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
+func WriteLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
 	for i := offset + 1; i <= offset+lines; i++ {
 		line := generator.GenerateLine(filename, i) + "\n"
 		if _, err := w.Write([]byte(line)); err != nil {

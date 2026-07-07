@@ -204,7 +204,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
 		bt.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.paths, moduleOptions...)
+	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
 
 	if bt.otelStatusFactoryWrapper != nil {
 		factory = bt.otelStatusFactoryWrapper(factory)
@@ -263,7 +263,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.paths, bt.moduleOptions...)
+	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
