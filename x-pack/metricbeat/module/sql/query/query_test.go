@@ -104,9 +104,16 @@ func testMetricSetConfig(queryText string) map[string]interface{} {
 func newTestMetricSet(t *testing.T, cfg map[string]interface{}) *MetricSet {
 	t.Helper()
 
-	ms := mbtest.NewMetricSet(t, cfg)
-	qms, ok := ms.(*MetricSet)
-	require.Truef(t, ok, "expected *MetricSet, got %T", ms)
+	c, err := conf.NewConfigFrom(cfg)
+	require.NoError(t, err)
+	// Use a per-test data directory so cursor state stays isolated and the
+	// test does not depend on the (removed) global paths singleton.
+	beatPaths := &paths.Path{Data: t.TempDir()}
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: beatPaths, Logger: logptest.NewTestingLogger(t, "")})
+	require.NoError(t, err)
+	require.Len(t, metricsets, 1)
+	qms, ok := metricsets[0].(*MetricSet)
+	require.Truef(t, ok, "expected *MetricSet, got %T", metricsets[0])
 	return qms
 }
 
@@ -155,22 +162,17 @@ func withFakeDBClientFactory(t *testing.T, db dbClient) {
 	})
 }
 
-func withTempDataPath(t *testing.T) {
-	t.Helper()
-	origData := paths.Paths.Data
-	paths.Paths.Data = t.TempDir()
-	t.Cleanup(func() {
-		paths.Paths.Data = origData
-	})
-}
-
 func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]interface{}) error {
 	t.Helper()
-	withTempDataPath(t)
 
 	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
+<<<<<<< HEAD
 	_, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+=======
+	beatPaths := &paths.Path{Data: t.TempDir()}
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: beatPaths, Logger: logptest.NewTestingLogger(t, "")})
+>>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
 	if err != nil {
 		return err
 	}
@@ -493,7 +495,6 @@ func TestFetch_VariableMode_MergeResultsSuccess(t *testing.T) {
 }
 
 func TestInitCursorAndClose(t *testing.T) {
-	withTempDataPath(t)
 	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC"))
 	ms.Config.Cursor = cursor.Config{
 		Enabled: true,
@@ -866,5 +867,5 @@ func TestInferTypeFromMetricsAndDriverHelpers(t *testing.T) {
 	assert.NotEmpty(t, queryDBNames("mssql"))
 	assert.Empty(t, queryDBNames("postgres"))
 	assert.Equal(t, "USE [mydb];", dbSelector("sqlserver", "mydb"))
-	assert.Equal(t, "", dbSelector("postgres", "mydb"))
+	assert.Empty(t, dbSelector("postgres", "mydb"))
 }

@@ -58,7 +58,11 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 		return nil, nil, ErrPathsRequired
 	}
 
+<<<<<<< HEAD
 	bm, err := newBaseModuleFromConfig(config, logger)
+=======
+	bm, err := newBaseModuleFromConfig(config, info.Logger, info.Paths)
+>>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -78,11 +82,12 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 
 // newBaseModuleFromConfig creates a new BaseModule from config. The returned
 // BaseModule's name will always be lower case.
-func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger) (BaseModule, error) {
+func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger, paths *paths.Path) (BaseModule, error) {
 	baseModule := BaseModule{
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
 		Logger:    logger,
+		Paths:     paths,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
 	if err != nil {
@@ -114,9 +119,7 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 }
 
 func initMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger) ([]MetricSet, error) {
-	var (
-		errs []error
-	)
+	var errs []error
 
 	bms, err := newBaseMetricSets(r, m, p, logger)
 	if err != nil {
