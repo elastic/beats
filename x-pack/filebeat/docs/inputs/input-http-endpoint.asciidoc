@@ -258,7 +258,7 @@ In-flight byte limiting example:
   retry_after: 5
 ----
 
-This configuration limits memory usage by tracking in-flight request bytes. When total in-flight bytes exceed 5MB, new requests receive a 503 response with a `Retry-After: 5` header. Once in-flight bytes drop below 4MB, new requests are accepted again. If a single request causes in-flight bytes to exceed the 10MB hard limit during reading, that request is terminated with a 500 error.
+This configuration limits memory usage by tracking in-flight request bytes. When total in-flight bytes exceed 5MB, new requests receive a 503 response with a `Retry-After: 5` header. Once in-flight bytes drop below 4MB, new requests are accepted again. If a single request causes in-flight bytes to exceed the 10MB hard limit during reading, that request is terminated with a 503 Service Unavailable response and a `Retry-After` header.
 
 ==== Configuration options
 
