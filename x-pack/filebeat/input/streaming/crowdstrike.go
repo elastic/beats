@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -246,12 +247,18 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	defer cli.CloseIdleConnections()
 
 	var err error
+	// attempt counts only failures that count toward the termination cap, i.e.
+	// non-transient ones. failures counts every consecutive failure and drives
+	// the back-off and DEGRADED reporting, so a persistent transient outage
+	// still backs off and is surfaced as DEGRADED without ever terminating the
+	// input.
 	attempt := 0
+	failures := 0
 	const maxAttemptsUnconfigured = 10
 	// Number of consecutive failures tolerated before reporting DEGRADED,
 	// so a single transient blip (e.g. an empty discover response) does not
 	// churn the unit health status.
-	const degradeAfterAttempts = 3
+	const degradeAfterFailures = 3
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
@@ -264,26 +271,35 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 				return err
 			}
 
-			attempt++
+			failures++
 
-			// The unconfigured cap must only apply when no retry policy is
-			// set. Keeping it as an else-if on the configured branch caused
-			// infinite_retries and max_attempts > 10 to be silently capped
-			// at 10.
-			if s.cfg.Retry != nil {
-				if !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
-					return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+			// Transient connection-level failures (empty discover body,
+			// failed discover GET, timeouts) self-heal once the upstream
+			// recovers, so they retry with capped back-off indefinitely
+			// rather than counting toward the attempt limit and terminating
+			// the input. Only genuine hardErrors terminate immediately; other
+			// soft errors still honour the configured (or default) attempt cap.
+			if !errors.Is(err, transientError{}) {
+				attempt++
+				// The unconfigured cap must only apply when no retry policy is
+				// set. Keeping it as an else-if on the configured branch caused
+				// infinite_retries and max_attempts > 10 to be silently capped
+				// at 10.
+				if s.cfg.Retry != nil {
+					if !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
+						return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+					}
+				} else if attempt >= maxAttemptsUnconfigured {
+					return fmt.Errorf("max retry attempts (%d unconfigured) exceeded: %w", maxAttemptsUnconfigured, err)
 				}
-			} else if attempt >= maxAttemptsUnconfigured {
-				return fmt.Errorf("max retry attempts (%d unconfigured) exceeded: %w", maxAttemptsUnconfigured, err)
 			}
 
 			var waitTime time.Duration
 			if s.cfg.Retry != nil {
-				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, attempt)
+				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, failures)
 			} else {
 				s.log.Warnw("no retry configured: using linear back-off")
-				waitTime = min(time.Duration(attempt)*time.Second, 30*time.Second)
+				waitTime = min(time.Duration(failures)*time.Second, 30*time.Second)
 			}
 
 			var rle *rateLimitError
@@ -291,10 +307,10 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 				waitTime = rle.wait
 			}
 
-			if attempt >= degradeAfterAttempts {
+			if failures >= degradeAfterFailures {
 				s.status.UpdateStatus(status.Degraded, err.Error())
 			}
-			s.log.Warnw("session warning", "error", err, "attempt", attempt, "wait", waitTime.String())
+			s.log.Warnw("session warning", "error", err, "transient", errors.Is(err, transientError{}), "attempt", attempt, "failures", failures, "wait", waitTime.String())
 
 			select {
 			case <-ctx.Done():
@@ -306,6 +322,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 		// Reset for success.
 		attempt = 0
+		failures = 0
 		s.status.UpdateStatus(status.Running, "")
 	}
 }
@@ -323,9 +340,19 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
-		// Status transitions are owned by the FollowStream retry loop so
-		// that a single transient failure does not immediately report
-		// DEGRADED; just return the error here.
+		// A connection-level failure (refused, reset, DNS, timeout), including
+		// a network failure while fetching the OAuth token, is transient: the
+		// retry loop backs off and retries without counting it toward the
+		// attempt limit or terminating the input. A non-network failure (for
+		// example an OAuth auth error from bad credentials) is left as an
+		// ordinary soft error so a genuine misconfiguration still terminates
+		// the input after the configured attempts rather than retrying forever.
+		// Status transitions are owned by the retry loop so a single blip does
+		// not immediately report DEGRADED.
+		var netErr net.Error
+		if errors.As(err, &netErr) {
+			return state, transientError{fmt.Errorf("failed GET to discover stream: %w", err)}
+		}
 		return state, fmt.Errorf("failed GET to discover stream: %w", err)
 	}
 	defer resp.Body.Close()
@@ -371,9 +398,10 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		// A 200 response with an empty body yields io.EOF from Decode. This
 		// is a transient upstream condition (the discover endpoint
 		// occasionally returns no content), distinct from a malformed body,
-		// so surface it clearly rather than as a generic decode failure.
+		// so mark it transient and surface it clearly rather than as a
+		// generic decode failure.
 		if errors.Is(err, io.EOF) {
-			return state, errors.New("discover stream returned an empty body")
+			return state, transientError{errors.New("discover stream returned an empty body")}
 		}
 		return state, fmt.Errorf("failed to decode discover body: %w", err)
 	}
@@ -541,6 +569,24 @@ func (e hardError) Is(target error) bool {
 }
 
 func (e hardError) Unwrap() error {
+	return e.error
+}
+
+// transientError is a connection-level error that the retry loop retries
+// indefinitely with capped back-off instead of counting toward the attempt
+// limit. It is the counterpart to hardError: hardError terminates the input,
+// transientError never does.
+type transientError struct {
+	error
+}
+
+// Is returns true if target is a transientError.
+func (e transientError) Is(target error) bool {
+	_, ok := target.(transientError)
+	return ok
+}
+
+func (e transientError) Unwrap() error {
 	return e.error
 }
 
