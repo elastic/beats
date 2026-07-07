@@ -20,6 +20,7 @@ package input_logfile
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"hash"
 	"strings"
 	"time"
 
@@ -77,6 +78,41 @@ type FingerprintID struct {
 // which is exactly when the final SHA-256 Sum is set.
 func (f FingerprintID) Complete() bool { return f.Sum != "" }
 
+// RawFingerprintHasher incrementally computes the growing-key hash, hex(sha256(raw)): Key snapshots
+// the hash of everything fed so far, so prefix hashes at several lengths cost one pass.
+type RawFingerprintHasher struct {
+	h      hash.Hash
+	sumBuf [sha256.Size]byte
+	hexBuf [2 * sha256.Size]byte
+}
+
+func NewRawFingerprintHasher() *RawFingerprintHasher {
+	return &RawFingerprintHasher{h: sha256.New()}
+}
+
+// Feed appends raw fingerprint material to the stream.
+func (r *RawFingerprintHasher) Feed(material []byte) {
+	r.h.Write(material)
+}
+
+// Reset restores the hasher for a new stream, so callers can reuse one allocation across lookups.
+func (r *RawFingerprintHasher) Reset() {
+	r.h.Reset()
+}
+
+// Key returns the hash of everything fed so far. The next call reuses the returned slice.
+func (r *RawFingerprintHasher) Key() []byte {
+	hex.Encode(r.hexBuf[:], r.h.Sum(r.sumBuf[:0]))
+	return r.hexBuf[:]
+}
+
+// HashRawFingerprint returns hex(sha256(raw)), the identity hash of growing fingerprint material.
+// It is the one-shot form of RawFingerprintHasher.
+func HashRawFingerprint(raw string) string {
+	sum := sha256.Sum256([]byte(raw))
+	return hex.EncodeToString(sum[:])
+}
+
 // Key returns the registry/identity key for this fingerprint:
 // - The complete Sum when it's available.
 // - A SHA-256 hash of Raw when it's incomplete.
@@ -86,8 +122,7 @@ func (f FingerprintID) Key() string {
 	case f.Complete():
 		return f.Sum
 	case f.Raw != "":
-		sum := sha256.Sum256([]byte(f.Raw))
-		return hex.EncodeToString(sum[:])
+		return HashRawFingerprint(f.Raw)
 	default:
 		return ""
 	}
@@ -106,6 +141,12 @@ func (f FingerprintID) GrowingRaw() string {
 		return ""
 	}
 	return f.Raw
+}
+
+// GrowingByteLen returns the number of content bytes covered by the growing fingerprint, or 0 once
+// the fingerprint is complete.
+func (f FingerprintID) GrowingByteLen() int64 {
+	return int64(hex.DecodedLen(len(f.GrowingRaw())))
 }
 
 // FileDescriptor represents full information about a file.

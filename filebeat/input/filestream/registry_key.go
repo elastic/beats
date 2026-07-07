@@ -84,6 +84,13 @@ func (k registryKey) isFingerprint() bool {
 	return k.identityName == fingerprintName
 }
 
+// fingerprintHash returns the identity tail of a fingerprint key: the bounded
+// hash FingerprintID.Key() produced (the final SHA-256, or the hash of the
+// growing raw material). Only meaningful when isFingerprint().
+func (k registryKey) fingerprintHash() string {
+	return k.identityValue
+}
+
 // keyForIdentity returns a full registry key that keeps this key's plugin and
 // input prefix but swaps in a new "<identityName>::<identityValue>" identity
 // (typically Source.Name()). It is used when a file's fingerprint grows and its

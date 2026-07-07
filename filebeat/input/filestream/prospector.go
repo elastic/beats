@@ -18,10 +18,10 @@
 package filestream
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
@@ -167,10 +167,8 @@ func (p *fileProspector) takeOverFn(
 
 	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 	fm.IdentifierName = p.identifier.Name()
-	// Carry the raw growing fingerprint of the current descriptor into the migrated meta.
-	// GrowingRaw returns "" for completed descriptors, so the field is omitted on disk, matching a
-	// static fingerprint entry.
-	fm.Fingerprint = fd.Fingerprint.GrowingRaw()
+	// Carry the growing fingerprint length of the current descriptor into the migrated meta.
+	fm.FingerprintLen = fd.Fingerprint.GrowingByteLen()
 	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key, newKey)
 	return newKey, fm
 }
@@ -408,7 +406,7 @@ func (p *fileProspector) onFSEvent(
 			err := updater.UpdateMetadata(src, fileMeta{
 				Source:         event.NewPath,
 				IdentifierName: p.identifier.Name(),
-				Fingerprint:    event.Descriptor.Fingerprint.GrowingRaw(),
+				FingerprintLen: event.Descriptor.Fingerprint.GrowingByteLen(),
 			})
 			if err != nil {
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
@@ -531,7 +529,8 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 
 		hg.Start(ctx, src)
 	} else {
-		// The path changed; update the persisted metadata but preserve the raw growing Fingerprint.
+		// The path changed; update the persisted metadata but preserve the
+		// growing FingerprintLen.
 		var meta fileMeta
 		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
@@ -558,20 +557,22 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 	}
 }
 
-// isStrictPrefix reports whether prefix is a non-empty string strictly
-// shorter than target, and target begins with prefix.
-func isStrictPrefix(target, prefix string) bool {
-	return prefix != "" && len(prefix) < len(target) && strings.HasPrefix(target, prefix)
-}
-
 // indexGrowingFingerprint adds an entry to the prefix-matching index, but only
 // while the file is still growing. Completed (final SHA-256) entries match by
 // their exact identity and must not participate in prefix matching, so they are
 // skipped.
 func (p *fileProspector) indexGrowingFingerprint(key string, d loginp.FileDescriptor, source string) {
-	if raw := d.Fingerprint.GrowingRaw(); raw != "" {
-		p.shortFingerprints.Add(key, raw, source)
+	raw := d.Fingerprint.GrowingRaw()
+	if raw == "" {
+		return
 	}
+	// The registry key's identity tail already is the hash of raw
+	// (FingerprintID.Key), so don't recompute the SHA-256.
+	if rk, ok := parseRegistryKey(key); ok && rk.isFingerprint() {
+		p.shortFingerprints.Add(key, rk.fingerprintHash(), len(raw), source)
+		return
+	}
+	p.shortFingerprints.AddRaw(key, raw, source)
 }
 
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
@@ -642,10 +643,10 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 }
 
 // buildShortFingerprintSet scans the store once and populates shortFingerprints
-// with the still-growing entries: those whose persisted fileMeta.Fingerprint is
-// a non-empty raw-hex value (still below the configured threshold). Completed
-// (final SHA-256) and legacy/static entries leave Fingerprint empty and are
-// skipped, since they match by exact identity rather than prefix.
+// with the still-growing entries: those whose persisted fileMeta.FingerprintLen
+// is non-zero (still below the configured threshold). Completed (final SHA-256)
+// and legacy/static entries leave FingerprintLen zero and are skipped, since
+// they match by exact identity rather than prefix.
 func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUpdater) {
 	p.shortFingerprints = newShortFingerprintSet()
 
@@ -657,27 +658,16 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 			return
 		}
 
-		// Convert with typeconv: when entries are freshly written in this
-		// process the cursorMeta is a fileMeta value, but when loaded from
-		// the persistent registry on startup it is a map[string]interface{}
-		// produced by JSON decoding into interface{}. typeconv.Convert
-		// handles both cases.
+		// typeconv.Convert handles both fileMeta and map[string]any
 		var fm fileMeta
 		if err := typeconv.Convert(&fm, meta); err != nil {
 			p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
 				key, err)
 			return
 		}
-		// The registry key holds only a fixed-size hash of the fingerprint
-		// (bounded-key optimization), so the raw fingerprint needed for prefix
-		// matching is read from the persisted value, not parsed from the key.
-		// A non-empty Fingerprint is exactly the set of still-growing entries;
-		// final SHA-256 and legacy/static entries leave it empty and are not
-		// eligible for prefix matching.
-		if fm.Fingerprint == "" {
-			return
-		}
-		p.shortFingerprints.Add(key, fm.Fingerprint, fm.Source)
+		// The key carries the hash, the value the length — exactly what
+		// hash-based prefix matching needs. Add() drops non-growing entries.
+		p.shortFingerprints.Add(key, rk.fingerprintHash(), hex.EncodedLen(int(fm.FingerprintLen)), fm.Source)
 	})
 }
 
@@ -755,16 +745,16 @@ func (p *fileProspector) migrateGrowingFingerprint(
 	newSrc loginp.Source,
 	event loginp.FSEvent,
 ) error {
-	// Carry the raw growing fingerprint into the migrated meta.
-	// On growth below threshold it is the (longer) raw-hex, keeping the entry
+	// Carry the growing fingerprint length into the migrated meta.
+	// On growth below threshold it is the (larger) length, keeping the entry
 	// marked as growing. On a threshold-crossing migration the descriptor is
-	// final SHA-256, so GrowingRaw returns "" and the field is
+	// final SHA-256, so GrowingByteLen returns 0 and the field is
 	// omitted on disk — making the migrated entry byte-identical to a static
 	// fingerprint entry.
 	newMeta := fileMeta{
 		Source:         event.NewPath,
 		IdentifierName: fingerprintName,
-		Fingerprint:    event.Descriptor.Fingerprint.GrowingRaw(),
+		FingerprintLen: event.Descriptor.Fingerprint.GrowingByteLen(),
 	}
 
 	// Keep the old key's plugin/input prefix and swap in the new identity.

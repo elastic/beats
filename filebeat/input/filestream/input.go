@@ -57,18 +57,7 @@ type state struct {
 type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
-	// Fingerprint holds the raw (hex-encoded) growing fingerprint while the file
-	// is still below the threshold (offset+length). With the bounded-key
-	// optimization the registry key is a fixed-size hash of this value, so the
-	// raw fingerprint—which prefix matching needs—must be persisted in the value
-	// instead of the key.
-	//
-	// A non-empty Fingerprint is the single source of truth for "this entry is
-	// still growing": final SHA-256 entries (and legacy/static entries written
-	// before this feature) leave it empty, so they serialize to exactly the same
-	// {source, identifier_name} shape as before and need no migration. omitempty
-	// guarantees that byte-identical form on disk.
-	Fingerprint string `json:"fingerprint,omitempty" struct:"fingerprint,omitempty"`
+	FingerprintLen int64  `json:"fingerprint_len,omitempty" struct:"fingerprint_len,omitempty"`
 }
 
 // filestream is the input for reading from files which
@@ -891,7 +880,7 @@ func (inp *filestream) handleReadError(
 		// an explicit Close — the input is not shutting down and we must
 		// close normally.
 		if inp.readUntilEOF.Enabled && ctx.Cancelation.Err() != nil {
-			return nil, true
+			return nil, true //nolint:nilerr // intentional
 		}
 
 		log.Debugf("Reader was closed. Closing. Path='%s'", path)

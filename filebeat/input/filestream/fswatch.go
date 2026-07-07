@@ -320,39 +320,45 @@ func (w *fileWatcher) watch(
 	//   3. Unmatched-leftover emission — anything still in w.prev becomes
 	//      OpDelete, anything still in newFilesByName becomes OpCreate.
 
-	// Exact-FileID rename match: For growing mode, also accumulate the
-	// short-fingerprint index from prev entries that did NOT get an exact
-	// match — they are the candidates for the next (prefix-match) pass.
-	var shortFingerprints *shortFingerprintSet
-	if w.growingFingerprint {
-		shortFingerprints = newShortFingerprintSet()
-	}
-
+	// Exact-FileID rename match.
 	for remainingPath, remainingDesc := range w.prev {
 		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
+		if !renamed {
+			continue
+		}
 
-		switch {
-		// Exact-FileID rename match
-		case renamed:
-			srcID := w.getFileIdentity(remainingDesc)
-			select {
-			case <-ctx.Done():
-				return
-			case w.events <- renamedEvent(
-				remainingPath, newDesc.Filename, *newDesc, srcID):
-				renamedCount++
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- renamedEvent(
+			remainingPath, newDesc.Filename, *newDesc, srcID):
+			renamedCount++
+		}
+
+		delete(newFilesByName, newDesc.Filename)
+		delete(newFilesByID, remainingDesc.FileID())
+		delete(w.prev, remainingPath)
+	}
+
+	// Prefix-match candidates are the still-growing prev entries left after
+	// the exact-match pass (GrowingRaw is empty for completed entries, which
+	// match by their SHA-256 identity instead). The index is only built when
+	// this scan has a new file that could justify a match — a delete-only
+	// scan pays no hashing.
+	var shortFingerprints *shortFingerprintSet
+	if w.growingFingerprint {
+		for _, newDesc := range newFilesByName {
+			if newDesc.Fingerprint.Complete() {
+				shortFingerprints = newShortFingerprintSet()
+				break
 			}
-
-			delete(newFilesByName, newDesc.Filename)
-			delete(newFilesByID, remainingDesc.FileID())
-			delete(w.prev, remainingPath)
-
-		// If it isn't an exact match, make it a candidate for prefix-match.
-		// GrowingRaw keeps only still-growing predecessors in the
-		// index; completed entries match by their SHA-256 identity instead.
-		case w.growingFingerprint:
+		}
+	}
+	if shortFingerprints != nil {
+		for remainingPath, remainingDesc := range w.prev {
 			if raw := remainingDesc.Fingerprint.GrowingRaw(); raw != "" {
-				shortFingerprints.Add(remainingPath, raw, remainingPath)
+				shortFingerprints.AddRaw(remainingPath, raw, remainingPath)
 			}
 		}
 	}
