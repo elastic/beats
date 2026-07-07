@@ -78,11 +78,8 @@ type FingerprintID struct {
 // which is exactly when the final SHA-256 Sum is set.
 func (f FingerprintID) Complete() bool { return f.Sum != "" }
 
-// RawFingerprintHasher incrementally computes the growing-key hash,
-// hex(sha256(raw)): Key snapshots the hash of everything fed so far without
-// disturbing the stream, so prefix hashes at several lengths cost one pass.
-// It is the single definition of the formula; HashRawFingerprint is its
-// one-shot form.
+// RawFingerprintHasher incrementally computes the growing-key hash, hex(sha256(raw)): Key snapshots
+// the hash of everything fed so far, so prefix hashes at several lengths cost one pass.
 type RawFingerprintHasher struct {
 	h      hash.Hash
 	sumBuf [sha256.Size]byte
@@ -95,28 +92,22 @@ func NewRawFingerprintHasher() *RawFingerprintHasher {
 
 // Feed appends raw fingerprint material to the stream.
 func (r *RawFingerprintHasher) Feed(material []byte) {
-	//nolint:errcheck // sha256 Write cannot fail
-	r.h.Write(material)
+	r.h.Write(material) //nolint:errcheck // sha256 Write cannot fail
 }
 
-// Reset restores the hasher for a new stream, so callers can reuse one
-// allocation across lookups.
+// Reset restores the hasher for a new stream, so callers can reuse one allocation across lookups.
 func (r *RawFingerprintHasher) Reset() {
 	r.h.Reset()
 }
 
-// Key returns the hash of everything fed so far. The returned slice is reused
-// by the next call: index a map with string(Key()) or copy it, don't retain it.
+// Key returns the hash of everything fed so far. The next call reuses the returned slice.
 func (r *RawFingerprintHasher) Key() []byte {
 	hex.Encode(r.hexBuf[:], r.h.Sum(r.sumBuf[:0]))
 	return r.hexBuf[:]
 }
 
-// HashRawFingerprint returns hex(sha256(raw)), the identity hash of growing
-// fingerprint material: the registry-key tail Key() produces for still-growing
-// entries, and the value the prefix-match index compares against. It is the
-// one-shot form of RawFingerprintHasher, kept allocation-light (stack Sum256)
-// because Key() calls it per event on the watch loop.
+// HashRawFingerprint returns hex(sha256(raw)), the identity hash of growing fingerprint material.
+// It is the one-shot form of RawFingerprintHasher.
 func HashRawFingerprint(raw string) string {
 	sum := sha256.Sum256([]byte(raw))
 	return hex.EncodeToString(sum[:])
@@ -152,9 +143,8 @@ func (f FingerprintID) GrowingRaw() string {
 	return f.Raw
 }
 
-// GrowingByteLen returns the number of content bytes covered by the growing
-// fingerprint (half its hex length), or 0 once the fingerprint is complete.
-// It is what fileMeta persists instead of the raw material itself.
+// GrowingByteLen returns the number of content bytes covered by the growing fingerprint, or 0 once
+// the fingerprint is complete.
 func (f FingerprintID) GrowingByteLen() int64 {
 	return int64(len(f.GrowingRaw()) / 2)
 }
