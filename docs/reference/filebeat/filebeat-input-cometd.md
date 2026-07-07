@@ -10,7 +10,7 @@ applies_to:
 # CometD input [filebeat-input-cometd]
 
 
-Use the `https://docs.cometd.org/[cometd]` input to stream the real-time events from a [Salesforce generic subscription Push Topic](https://resources.docs.salesforce.com/sfdc/pdf/api_streaming.pdf).
+Use the `https://docs.cometd.org/[cometd]` input to stream the real-time events from a [Salesforce generic subscription Push Topic](https://developer.salesforce.com/docs/atlas.en-us.api_streaming.meta/api_streaming/intro_stream.htm).
 
 This input can, for example, be used to receive Login and Logout events that are generated when users log in or out of the Salesforce instance.
 
