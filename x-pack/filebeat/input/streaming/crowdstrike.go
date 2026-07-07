@@ -296,11 +296,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 			var waitTime time.Duration
 			if s.cfg.Retry != nil {
-<<<<<<< HEAD
-				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, attempt)
-=======
-				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, failures, s.cfg.Retry.MaxAttempts)
->>>>>>> ff9660ba6 (x-pack/filebeat/input/streaming: self-heal CrowdStrike transient discover failures (#51737))
+				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, failures)
 			} else {
 				s.log.Warnw("no retry configured: using linear back-off")
 				waitTime = min(time.Duration(failures)*time.Second, 30*time.Second)
