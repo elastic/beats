@@ -105,8 +105,8 @@ func TestNewReceiver(t *testing.T) {
 				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
 			assert.Condition(c, func() bool {
-				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+				metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+				return assert.NotEmpty(t, metricsSkipped.All(), "metric reporter did not initialize")
 			}, "failed to check metrics logging")
 		},
 	})
@@ -287,8 +287,8 @@ func TestMultipleReceivers(t *testing.T) {
 				startLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
 				assert.Equalf(c, 1, startLogs.Len(), "%v should have a single start log", helper)
 
-				startMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
-				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single start metrircs logging every 30s", helper)
+				startMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
+				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single skipping metrics logging entry", helper)
 
 				metaPath := filepath.Join(helper.home, "/data/meta.json")
 				assert.FileExistsf(c, metaPath, "%s of %v should exist", metaPath, helper)

@@ -27,6 +27,7 @@ import (
 	"time"
 
 	rd "github.com/gomodule/redigo/redis"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -96,7 +97,7 @@ func EmitInputData(t *testing.T, ctx context.Context, pool *rd.Pool) {
 		conn := pool.Get()
 		defer func() {
 			err := conn.Close()
-			require.NoError(t, err)
+			assert.NoError(t, err)
 		}()
 
 		for {
@@ -105,7 +106,7 @@ func EmitInputData(t *testing.T, ctx context.Context, pool *rd.Pool) {
 				return
 			case <-ticker.C:
 				_, err := conn.Do("EVAL", script, 0)
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			}
 		}
 	}()
