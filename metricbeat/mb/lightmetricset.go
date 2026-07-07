@@ -115,11 +115,10 @@ func (m *LightMetricSet) baseModule(base BaseMetricSet) (*BaseModule, error) {
 	}
 
 	// Create the base module
-	baseModule, err := newBaseModuleFromConfig(rawConfig, base.Logger())
+	baseModule, err := newBaseModuleFromConfig(rawConfig, base.Logger(), base.GetPath())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create base module: %w", err)
 	}
 	baseModule.name = m.Module
 	return &baseModule, nil
-
 }

@@ -227,6 +227,22 @@ func TestPostgreSQL(t *testing.T) {
 }
 
 func TestOracle(t *testing.T) {
+<<<<<<< HEAD
+=======
+	// Skip if Oracle Instant Client is not installed.
+	// The godror driver requires the Oracle Instant Client library (libclntsh.dylib/so).
+	// See: https://oracle.github.io/odpi/doc/installation.html
+	testDB, err := sql.Open("godror", "user/pass@localhost:1521/test")
+	if err == nil {
+		err = testDB.PingContext(t.Context())
+		_ = testDB.Close()
+	}
+	if err != nil && containsOracleClientError(err.Error()) {
+		t.Skip("Skipping Oracle integration tests: Oracle Instant Client not installed. " +
+			"See https://oracle.github.io/odpi/doc/installation.html")
+	}
+
+>>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
 	service := compose.EnsureUp(t, "oracle")
 	host, port, _ := net.SplitHostPort(service.Host())
 
@@ -367,7 +383,7 @@ func waitForOracleConnection(t *testing.T, host, port string) {
 
 	for i := 0; i < maxRetries; i++ {
 		// First check if the port is open
-		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), 10*time.Second)
+		conn, err := (&net.Dialer{Timeout: 10 * time.Second}).DialContext(t.Context(), "tcp", net.JoinHostPort(host, port))
 		if err == nil {
 			conn.Close()
 			// Give Oracle a bit more time to fully initialize
