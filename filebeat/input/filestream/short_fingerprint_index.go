@@ -41,6 +41,12 @@ type shortFingerprintSet struct {
 	// same material (e.g. two identical-content files in the watcher's
 	// path-keyed set).
 	byLen map[int]map[string]map[string]struct{} // hex length → hash → keys
+
+	// Scratch state reused across FindPrefixMatchFunc calls to keep lookups
+	// allocation-free.
+	hasher  *loginp.RawFingerprintHasher
+	target  []byte
+	lengths []int
 }
 
 // shortFingerprintEntry represents a tracked short fingerprint.
@@ -54,6 +60,7 @@ func newShortFingerprintSet() *shortFingerprintSet {
 	return &shortFingerprintSet{
 		entries: make(map[string]shortFingerprintEntry),
 		byLen:   make(map[int]map[string]map[string]struct{}),
+		hasher:  loginp.NewRawFingerprintHasher(),
 	}
 }
 
@@ -192,28 +199,28 @@ func (s *shortFingerprintSet) FindPrefixMatchFunc(targetFingerprint string, keep
 	}
 
 	// Only lengths strictly below the target's can hold strict prefixes.
-	lengths := make([]int, 0, len(s.byLen))
+	s.lengths = s.lengths[:0]
 	for l := range s.byLen {
 		if l < len(targetFingerprint) {
-			lengths = append(lengths, l)
+			s.lengths = append(s.lengths, l)
 		}
 	}
-	if len(lengths) == 0 {
+	if len(s.lengths) == 0 {
 		return "", shortFingerprintEntry{}, false
 	}
-	slices.Sort(lengths)
+	slices.Sort(s.lengths)
 
 	// Ascending walk so the hash is fed incrementally; a hit at a longer
 	// length overwrites earlier ones, implementing longest-match-wins.
 	// Indexing the bucket with string(Key()) lets the compiler elide the
 	// lookup-key allocation.
-	hasher := loginp.NewRawFingerprintHasher()
-	target := []byte(targetFingerprint)
+	s.hasher.Reset()
+	s.target = append(s.target[:0], targetFingerprint...)
 	fed := 0
-	for _, l := range lengths {
-		hasher.Feed(target[fed:l])
+	for _, l := range s.lengths {
+		s.hasher.Feed(s.target[fed:l])
 		fed = l
-		candidates := s.byLen[l][string(hasher.Key())]
+		candidates := s.byLen[l][string(s.hasher.Key())]
 		for candidate := range candidates {
 			e := s.entries[candidate]
 			if keep == nil || keep(e) {

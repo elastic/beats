@@ -99,6 +99,12 @@ func (r *RawFingerprintHasher) Feed(material []byte) {
 	r.h.Write(material)
 }
 
+// Reset restores the hasher for a new stream, so callers can reuse one
+// allocation across lookups.
+func (r *RawFingerprintHasher) Reset() {
+	r.h.Reset()
+}
+
 // Key returns the hash of everything fed so far. The returned slice is reused
 // by the next call: index a map with string(Key()) or copy it, don't retain it.
 func (r *RawFingerprintHasher) Key() []byte {
