@@ -43,9 +43,9 @@ func TestExamples(t *testing.T) {
 	sensorMetrics, err := ReportSensors(results[0])
 	assert.NoError(t, err)
 	assert.Len(t, sensorMetrics, 7)
-	assert.Equal(t, sensorMetrics["core_4"].Value.ValueOr(0), uint64(52))
-	assert.Equal(t, sensorMetrics["core_3"].Label, "Core 3")
-	assert.Equal(t, sensorMetrics["core_3"].Max.ValueOr(0), uint64(81))
+	assert.Equal(t, uint64(52), sensorMetrics["core_4"].Value.ValueOr(0))
+	assert.Equal(t, "Core 3", sensorMetrics["core_3"].Label)
+	assert.Equal(t, uint64(81), sensorMetrics["core_3"].Max.ValueOr(0))
 
 	// Test Thinkpad
 	resultsx250, err := DetectHwmon(resolve.NewTestResolver(thinkpad))

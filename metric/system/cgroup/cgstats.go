@@ -66,7 +66,7 @@ func (stat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 
 	timeDelta := curTime.Sub(prevTime)
 	timeDeltaNanos := timeDelta / time.Nanosecond
-	totalCPUDeltaNanos := int64(stat.CPUAccounting.Total.NS - prevStat.CPUAccounting.Total.NS)
+	totalCPUDeltaNanos := int64(stat.CPUAccounting.Total.NS - prevStat.CPUAccounting.Total.NS) //nolint:gosec // G115 — cgroup CPU counters are bounded deltas
 
 	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
 	var cpuCount int
@@ -78,8 +78,8 @@ func (stat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 
 	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
 	normalizedPct := pct / float64(cpuCount)
-	userCPUDeltaMillis := int64(stat.CPUAccounting.Stats.User.NS - prevStat.CPUAccounting.Stats.User.NS)
-	systemCPUDeltaMillis := int64(stat.CPUAccounting.Stats.System.NS - prevStat.CPUAccounting.Stats.System.NS)
+	userCPUDeltaMillis := int64(stat.CPUAccounting.Stats.User.NS - prevStat.CPUAccounting.Stats.User.NS)       //nolint:gosec // G115 — cgroup CPU counters are bounded deltas
+	systemCPUDeltaMillis := int64(stat.CPUAccounting.Stats.System.NS - prevStat.CPUAccounting.Stats.System.NS) //nolint:gosec // G115 — cgroup CPU counters are bounded deltas
 
 	userPct := float64(userCPUDeltaMillis) / float64(timeDeltaNanos)
 	systemPct := float64(systemCPUDeltaMillis) / float64(timeDeltaNanos)
@@ -125,7 +125,7 @@ func (stat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 	}
 	timeDelta := curTime.Sub(prevTime)
 	timeDeltaNanos := timeDelta / time.Nanosecond
-	totalCPUDeltaNanos := int64(stat.CPU.Stats.Usage.NS - prevStat.CPU.Stats.Usage.NS)
+	totalCPUDeltaNanos := int64(stat.CPU.Stats.Usage.NS - prevStat.CPU.Stats.Usage.NS) //nolint:gosec // G115 — cgroup CPU counters are bounded deltas
 
 	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
 
@@ -133,8 +133,8 @@ func (stat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 
 	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
 	normalizedPct := pct / float64(cpuCount)
-	userCPUDeltaMillis := int64(stat.CPU.Stats.User.NS - prevStat.CPU.Stats.User.NS)
-	systemCPUDeltaMillis := int64(stat.CPU.Stats.System.NS - prevStat.CPU.Stats.System.NS)
+	userCPUDeltaMillis := int64(stat.CPU.Stats.User.NS - prevStat.CPU.Stats.User.NS)       //nolint:gosec // G115 — cgroup CPU counters are bounded deltas
+	systemCPUDeltaMillis := int64(stat.CPU.Stats.System.NS - prevStat.CPU.Stats.System.NS) //nolint:gosec // G115 — cgroup CPU counters are bounded deltas
 
 	userPct := float64(userCPUDeltaMillis) / float64(timeDeltaNanos)
 	systemPct := float64(systemCPUDeltaMillis) / float64(timeDeltaNanos)

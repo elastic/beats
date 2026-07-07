@@ -44,7 +44,7 @@ func MemStatsReporter(logger *logp.Logger, processStats *process.Stats) func(mon
 		return nil
 	}
 	p := psprocess.Process{
-		Pid: int32(pid),
+		Pid: int32(pid), //nolint:gosec // G115 — self PID fits in int32
 	}
 
 	ctx := context.Background()
@@ -59,11 +59,11 @@ func MemStatsReporter(logger *logp.Logger, processStats *process.Stats) func(mon
 		V.OnRegistryStart()
 		defer V.OnRegistryFinished()
 
-		monitoring.ReportInt(V, "memory_total", int64(stats.TotalAlloc))
+		monitoring.ReportInt(V, "memory_total", int64(stats.TotalAlloc)) //nolint:gosec // G115 — runtime.MemStats values fit in int64
 		if m == monitoring.Full {
-			monitoring.ReportInt(V, "memory_alloc", int64(stats.Alloc))
-			monitoring.ReportInt(V, "memory_sys", int64(stats.Sys))
-			monitoring.ReportInt(V, "gc_next", int64(stats.NextGC))
+			monitoring.ReportInt(V, "memory_alloc", int64(stats.Alloc)) //nolint:gosec // G115 — runtime.MemStats values fit in int64
+			monitoring.ReportInt(V, "memory_sys", int64(stats.Sys))     //nolint:gosec // G115 — runtime.MemStats values fit in int64
+			monitoring.ReportInt(V, "gc_next", int64(stats.NextGC))     //nolint:gosec // G115 — runtime.MemStats values fit in int64
 		}
 
 		statm, err := p.MemoryInfoWithContext(ctx)
@@ -72,7 +72,7 @@ func MemStatsReporter(logger *logp.Logger, processStats *process.Stats) func(mon
 			return
 		}
 
-		monitoring.ReportInt(V, "rss", int64(statm.RSS))
+		monitoring.ReportInt(V, "rss", int64(statm.RSS)) //nolint:gosec // G115 — RSS fits in int64
 	}
 }
 
@@ -83,7 +83,7 @@ func InstanceCPUReporter(logger *logp.Logger, processStats *process.Stats) func(
 		return nil
 	}
 	p := psprocess.Process{
-		Pid: int32(pid),
+		Pid: int32(pid), //nolint:gosec // G115 — self PID fits in int32
 	}
 
 	ctx := context.Background()
@@ -223,17 +223,17 @@ func ReportMetricsCGV1(logger *logp.Logger, pid int, cgroups *cgroup.Reader, V m
 			}
 			monitoring.ReportNamespace(V, "cfs", func() {
 				monitoring.ReportNamespace(V, "period", func() {
-					monitoring.ReportInt(V, "us", int64(cpu.CFS.PeriodMicros.Us))
+					monitoring.ReportInt(V, "us", int64(cpu.CFS.PeriodMicros.Us)) //nolint:gosec // G115 — cgroup period fits in int64
 				})
 				monitoring.ReportNamespace(V, "quota", func() {
-					monitoring.ReportInt(V, "us", int64(cpu.CFS.QuotaMicros.Us))
+					monitoring.ReportInt(V, "us", int64(cpu.CFS.QuotaMicros.Us)) //nolint:gosec // G115 — cgroup quota fits in int64
 				})
 			})
 			monitoring.ReportNamespace(V, "stats", func() {
-				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods))
+				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods)) //nolint:gosec // G115 — cgroup stats fit in int64
 				monitoring.ReportNamespace(V, "throttled", func() {
-					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods))
-					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us))
+					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods)) //nolint:gosec // G115 — cgroup stats fit in int64
+					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us))           //nolint:gosec // G115 — cgroup stats fit in int64
 				})
 			})
 		})
@@ -245,7 +245,7 @@ func ReportMetricsCGV1(logger *logp.Logger, pid int, cgroups *cgroup.Reader, V m
 				monitoring.ReportString(V, "id", cpuacct.ID)
 			}
 			monitoring.ReportNamespace(V, "total", func() {
-				monitoring.ReportInt(V, "ns", int64(cpuacct.Total.NS))
+				monitoring.ReportInt(V, "ns", int64(cpuacct.Total.NS)) //nolint:gosec // G115 — cgroup stats fit in int64
 			})
 		})
 	}
@@ -257,10 +257,10 @@ func ReportMetricsCGV1(logger *logp.Logger, pid int, cgroups *cgroup.Reader, V m
 			}
 			monitoring.ReportNamespace(V, "mem", func() {
 				monitoring.ReportNamespace(V, "limit", func() {
-					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Limit.Bytes))
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Limit.Bytes)) //nolint:gosec // G115 — memory stats fit in int64
 				})
 				monitoring.ReportNamespace(V, "usage", func() {
-					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage.Bytes))
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage.Bytes)) //nolint:gosec // G115 — memory stats fit in int64
 				})
 			})
 		})
@@ -280,10 +280,10 @@ func ReportMetricsCGV2(logger *logp.Logger, pid int, cgroups *cgroup.Reader, V m
 				monitoring.ReportString(V, "id", cpu.ID)
 			}
 			monitoring.ReportNamespace(V, "stats", func() {
-				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods.ValueOr(0)))
+				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods.ValueOr(0))) //nolint:gosec // G115 — cgroup stats fit in int64
 				monitoring.ReportNamespace(V, "throttled", func() {
-					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods.ValueOr(0)))
-					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us.ValueOr(0)))
+					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods.ValueOr(0))) //nolint:gosec // G115 — cgroup stats fit in int64
+					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us.ValueOr(0)))           //nolint:gosec // G115 — cgroup stats fit in int64
 				})
 			})
 		})
@@ -296,7 +296,7 @@ func ReportMetricsCGV2(logger *logp.Logger, pid int, cgroups *cgroup.Reader, V m
 			}
 			monitoring.ReportNamespace(V, "mem", func() {
 				monitoring.ReportNamespace(V, "usage", func() {
-					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage.Bytes))
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage.Bytes)) //nolint:gosec // G115 — memory stats fit in int64
 				})
 			})
 		})

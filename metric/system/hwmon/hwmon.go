@@ -239,7 +239,7 @@ func stringStripInt(name, path string) (opt.Uint, error) {
 	if err != nil {
 		return opt.NewUintNone(), fmt.Errorf("error converting value %s: %w", raw, err)
 	}
-	return opt.UintWith(uint64(conv)), nil
+	return opt.UintWith(uint64(conv)), nil //nolint:gosec // G115 — hwmon sysfs values are non-negative
 }
 
 // Another helper that's used for float64 metrics/

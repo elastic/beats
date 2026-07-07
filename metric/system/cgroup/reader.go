@@ -212,7 +212,7 @@ func (r *Reader) GetStatsForPid(pid int) (CGStats, error) {
 }
 
 // GetV1StatsForProcess returns cgroup metrics and limits associated with a process.
-func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) { //nolint: dupl // return value is different
+func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) { //nolint:dupl // return value is different
 	// Read /proc/[pid]/cgroup to get the paths to the cgroup metrics.
 	paths, err := r.ProcessCgroupPaths(pid)
 	if err != nil {
@@ -236,7 +236,7 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) { //nolint: dup
 }
 
 // GetV2StatsForProcess returns cgroup metrics and limits associated with a process.
-func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) { //nolint: dupl // return value is different
+func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) { //nolint:dupl // return value is different
 	// Read /proc/[pid]/cgroup to get the paths to the cgroup metrics.
 	paths, err := r.ProcessCgroupPaths(pid)
 	if err != nil {
@@ -390,7 +390,7 @@ func (r *Reader) readControllerList(cgroupsFile string) ([]string, error) {
 		cgFilePath = filepath.Join(r.cgroupMountpoints.V2Loc, r.cgroupMountpoints.ContainerizedRootMount, cgpath, "cgroup.controllers")
 	}
 
-	controllersRaw, err := os.ReadFile(cgFilePath)
+	controllersRaw, err := os.ReadFile(cgFilePath) //nolint:gosec // G304 — path is constructed from cgroup mountpoint and validated cgroup path
 	if err != nil {
 		return nil, fmt.Errorf("error reading cgroup '%s': file %s: %w", cgpath, cgFilePath, err)
 	}

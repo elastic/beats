@@ -34,7 +34,7 @@ import (
 //
 // Deprecated: use NumCPUWithLogger
 func NumCPU() int {
-	return NumCPUWithLogger(logp.NewLogger(""))
+	return NumCPUWithLogger(logp.NewLogger("")) //nolint:forbidigo // backward-compatible default logger
 }
 
 func NumCPUWithLogger(logger *logp.Logger) int {

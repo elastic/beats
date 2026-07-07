@@ -44,7 +44,7 @@ func FDUsageReporter(logger *logp.Logger, processStats *process.Stats) func(_ mo
 		}
 	}
 	p := psprocess.Process{
-		Pid: int32(pid),
+		Pid: int32(pid), //nolint:gosec // G115 — self PID fits in int32
 	}
 
 	ctx := context.Background()
@@ -72,8 +72,8 @@ func FDUsageReporter(logger *logp.Logger, processStats *process.Stats) func(_ mo
 		softLimit := 0
 		for _, stat := range stats {
 			if stat.Resource == psprocess.RLIMIT_NOFILE {
-				hardLimit = int(stat.Hard)
-				softLimit = int(stat.Soft)
+				hardLimit = int(stat.Hard) //nolint:gosec // G115 — rlimit values fit in int
+				softLimit = int(stat.Soft) //nolint:gosec // G115 — rlimit values fit in int
 			}
 		}
 

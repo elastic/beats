@@ -1,38 +1,49 @@
 name: golangci-lint
 on:
+  workflow_dispatch:
   pull_request:
+    paths:
+      - '**/*.go'
+      - '**/go.mod'
+      - '**/go.sum'
+      - '.go-version'
+      - '.golangci.yml'
+      - '.github/workflows/golangci-lint.yml'
+
 permissions:
   contents: read
+  # Optional: allow read access to pull request. Use with `only-new-issues` option.
   pull-requests: read
 jobs:
   golangci:
     strategy:
       matrix:
-        include:
-          - GOOS: windows
-            runner: ubuntu-latest
-          - GOOS: linux
-            runner: ubuntu-latest
-          - GOOS: darwin
-            runner: macos-latest
-    name: lint-${{ matrix.GOOS }}
-    runs-on: ${{ matrix.runner }}
+        os: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
+    name: lint
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Read .go-version file
-        id: goversion
-        run: echo "::set-output name=version::$(cat .go-version)"
-
-      - uses: actions/setup-go@v4
+      - uses: actions/checkout@v7
         with:
-          go-version: "${{ steps.goversion.outputs.version }}"
+          persist-credentials: false
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: .go-version
 
       - name: golangci-lint
         env:
-          GOOS: ${{ matrix.GOOS }}
-          CGO_ENABLED: ${{ matrix.GOOS == 'darwin' && '1' || '' }}
-        uses: golangci/golangci-lint-action@v7
+          CGO_ENABLED: 1
+        # Pin the full commit hash
+        # https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions
+        uses: golangci/golangci-lint-action@82606bf257cbaff209d206a39f5134f0cfbfd2ee # v9.2.1
         with:
-          version: v2.10.1
-          args: --timeout=30m
+          version: v2.12.2
+          # Regarding `--whole-files`, the linter is supposed to support linting of changed a patch only but,
+          # for some reason, it's very unreliable this way - sometimes it does not report any or some
+          # issues without linting the whole files, so we have to use `--whole-files`
+          # which can lead to some frustration from developers who would like to
+          # fix a single line in an existing codebase and the linter would force them
+          # into fixing all linting issues in the whole file instead
+          args: --timeout=30m --whole-files
+          only-new-issues: true

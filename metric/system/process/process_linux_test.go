@@ -181,7 +181,7 @@ func TestParseProcStat(t *testing.T) {
 	got, err := parseProcStat(data)
 	require.NoError(t, err, "parseProcStat returned and error")
 
-	assert.Equal(t, want, got, "")
+	assert.Equal(t, want, got)
 }
 
 func TestCgroupsBadCgroupsConfig(t *testing.T) {

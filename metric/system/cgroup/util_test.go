@@ -252,8 +252,8 @@ func TestMountpointsV2(t *testing.T) {
 	// unpack the interface so we can test this a little better
 	rawObject, ok := stats.(*StatsV2)
 	require.True(t, ok)
-	require.Equal(t, rawObject.ID, "session-520.scope")
-	require.Equal(t, rawObject.Path, "/user.slice/user-1000.slice/session-520.scope")
+	require.Equal(t, "session-520.scope", rawObject.ID)
+	require.Equal(t, "/user.slice/user-1000.slice/session-520.scope", rawObject.Path)
 }
 
 func assertContains(t testing.TB, m map[string]struct{}, key string) {

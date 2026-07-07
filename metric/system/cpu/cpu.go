@@ -33,7 +33,7 @@ import (
 // periods.
 // Deprecated: use LoadWithLogger
 func Load() (*LoadMetrics, error) {
-	return LoadWithLogger(logp.NewLogger(""))
+	return LoadWithLogger(logp.NewLogger("")) //nolint:forbidigo // backward-compatible default logger
 }
 
 // LoadWithLogger returns CPU load information for the previous 1, 5, and 15 minute

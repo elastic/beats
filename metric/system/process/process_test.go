@@ -56,7 +56,9 @@ func TestProcessEvent(t *testing.T) {
 	require.Empty(t, proc.Username)
 	require.Empty(t, proc.Args)
 
-	require.NotNil(t, root["process"].(map[string]any)["memory"])
+	procMap, ok := root["process"].(map[string]any)
+	require.True(t, ok)
+	require.NotNil(t, procMap["memory"])
 }
 
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
@@ -146,7 +148,9 @@ func TestGetOneRoot(t *testing.T) {
 	evt, rootEvt, err := testConfig.GetOneRootEvent(os.Getpid())
 	require.NoError(t, err)
 
-	require.NotEmpty(t, rootEvt["process"].(map[string]any)["pid"])
+	rootProc, ok := rootEvt["process"].(map[string]any)
+	require.True(t, ok)
+	require.NotEmpty(t, rootProc["pid"])
 
 	require.NotEmpty(t, evt["cpu"])
 }
@@ -176,12 +180,12 @@ func TestGetOne(t *testing.T) {
 	assert.NoError(t, err, "Init")
 
 	_, _, err = testConfig.Get()
-	assert.True(t, isNonFatal(err), fmt.Sprintf("Fatal Error: %s", err))
+	assert.True(t, isNonFatal(err), "Fatal Error: %s", err)
 
 	time.Sleep(time.Second * 2)
 
 	procData, _, err := testConfig.Get()
-	assert.True(t, isNonFatal(err), fmt.Sprintf("Fatal Error: %s", err))
+	assert.True(t, isNonFatal(err), "Fatal Error: %s", err)
 
 	t.Logf("Proc: %s", procData[0].StringToPrint())
 }
@@ -228,8 +232,11 @@ func TestNetworkFilter(t *testing.T) {
 
 	_, exists := data.GetValue("network.ip.Forwarding")
 	require.NoError(t, exists, "filter did not preserve key")
-	ipMetrics, _ := data.GetValue("network.ip")
-	require.Equal(t, 1, len(ipMetrics.(map[string]any)))
+	ipMetrics, err := data.GetValue("network.ip")
+	require.NoError(t, err)
+	ipMetricsMap, ok := ipMetrics.(map[string]any)
+	require.True(t, ok)
+	require.Len(t, ipMetricsMap, 1)
 }
 
 func TestFilter(t *testing.T) {
@@ -279,7 +286,7 @@ func TestFilter(t *testing.T) {
 		assert.ErrorIs(t, err, NonFatalErr{})
 	}
 
-	assert.Equal(t, 1, len(oneData))
+	assert.Len(t, oneData, 1)
 }
 
 func TestProcessList(t *testing.T) {
@@ -340,7 +347,7 @@ func TestGetProcess(t *testing.T) {
 
 	switch runtime.GOOS {
 	case "darwin", "linux", "freebsd":
-		assert.True(t, len(process.Env) > 0, "empty environment")
+		assert.NotEmpty(t, process.Env, "empty environment")
 	}
 
 	switch runtime.GOOS {
@@ -387,7 +394,7 @@ func TestProcMemPercentage(t *testing.T) {
 	procStats.ProcsMap.SetPid(p.Pid.ValueOr(0), p)
 
 	rssPercent := GetProcMemPercentage(p, 10000)
-	assert.Equal(t, rssPercent.ValueOr(0), 0.1416)
+	assert.InDelta(t, 0.1416, rssPercent.ValueOr(0), 0.0001)
 }
 
 func TestProcCpuPercentage(t *testing.T) {
@@ -420,8 +427,8 @@ func TestProcCpuPercentage(t *testing.T) {
 	unNormalized := newState.CPU.Total.Norm.Pct.ValueOr(0) * cpu
 	normalizedTest := metric.Round(unNormalized / 48)
 
-	assert.EqualValues(t, 0.0721, normalizedTest)
-	assert.EqualValues(t, 3.459, newState.CPU.Total.Pct.ValueOr(0))
+	assert.InDelta(t, 0.0721, normalizedTest, 0.0001)
+	assert.InDelta(t, 3.459, newState.CPU.Total.Pct.ValueOr(0), 0.001)
 }
 
 func TestIncludeTopProcesses(t *testing.T) {
@@ -657,14 +664,14 @@ func TestProcessesExcluded(t *testing.T) {
 	require.NoError(t, state.Init())
 
 	_, processes, err := state.Get()
-	assert.True(t, isNonFatal(err), fmt.Sprintf("Fatal Error: %s", err))
+	assert.True(t, isNonFatal(err), "Fatal Error: %s", err)
 
 	for _, pMap := range processes {
 		iPid, err := pMap.GetValue("process.pid")
 		require.NoError(t, err)
 		pid, ok := iPid.(int) // to avoid panics
 		require.True(t, ok)
-		if _, excluded := state.excludedPIDs[uint64(pid)]; excluded {
+		if _, excluded := state.excludedPIDs[uint64(pid)]; excluded { //nolint:gosec // G115 — PID is non-negative
 			// if pid is excluded, its arglist amd commandline should be empty
 			ok, _ = pMap.HasKey("process.args")
 			require.False(t, ok)
@@ -679,7 +686,7 @@ func TestProcessesExcluded(t *testing.T) {
 //go:generate docker run --rm -v ./testdata:/app --entrypoint g++ docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-main -pthread -std=c++11 -o /app/threads /app/threads.cpp
 //go:generate docker run --rm -v ./testdata:/app --entrypoint o64-clang++ docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-darwin -pthread -std=c++11 -o /app/threads-darwin /app/threads.cpp
 //go:generate docker run --rm -v ./testdata:/app --entrypoint x86_64-w64-mingw32-g++-posix docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-main -pthread -std=c++11 -o /app/threads.exe /app/threads.cpp
-func runThreads(t *testing.T) *exec.Cmd { //nolint:unused // needed by other platforms
+func runThreads(t *testing.T) *exec.Cmd { //nolint:unused,nolintlint // used from platform-specific test files (process_linux_darwin_test.go, process_windows_test.go)
 	t.Helper()
 
 	supportedPlatforms := []string{"linux/amd64", "darwin/amd64", "windows/amd64"}

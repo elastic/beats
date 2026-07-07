@@ -43,8 +43,8 @@ func TestCounterLength(t *testing.T) {
 	userRawData, err := query.GetRawCounterArray(totalUserTimeCounter, true)
 	require.NoError(t, err)
 
-	require.Equal(t, len(kernelRawData), len(idleRawData))
-	require.Equal(t, len(userRawData), len(idleRawData))
+	require.Len(t, kernelRawData, len(idleRawData))
+	require.Len(t, userRawData, len(idleRawData))
 
 	for i := range userRawData {
 		require.Equal(t, userRawData[i].InstanceName, kernelRawData[i].InstanceName, "InstanceName should be equal")

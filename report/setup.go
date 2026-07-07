@@ -56,7 +56,7 @@ func SetupMetrics(logger *logp.Logger, name, version string) error {
 // SetupMetricsOptions performs creation of metrics handlers using specified options.
 func SetupMetricsOptions(opts MetricOptions) error {
 	if opts.Logger == nil {
-		opts.Logger = logp.NewLogger("")
+		opts.Logger = logp.NewLogger("") //nolint:forbidigo // backward-compatible default logger
 	}
 
 	monitoring.NewFunc(opts.SystemMetrics, "cpu", ReportSystemCPUUsage(opts.Logger), monitoring.Report)

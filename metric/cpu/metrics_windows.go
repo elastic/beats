@@ -54,9 +54,9 @@ func getUsingSystemTimes() (CPUMetrics, error) {
 
 	globalMetrics := CPUMetrics{}
 	//convert from duration to ticks
-	idleMetric := uint64(idle / time.Millisecond)
-	sysMetric := uint64(kernel / time.Millisecond)
-	userMetrics := uint64(user / time.Millisecond)
+	idleMetric := uint64(idle / time.Millisecond)  //nolint:gosec // G115 — system time values are non-negative
+	sysMetric := uint64(kernel / time.Millisecond) //nolint:gosec // G115 — system time values are non-negative
+	userMetrics := uint64(user / time.Millisecond) //nolint:gosec // G115 — system time values are non-negative
 	globalMetrics.totals.Idle = opt.UintWith(idleMetric)
 	globalMetrics.totals.Sys = opt.UintWith(sysMetric)
 	globalMetrics.totals.User = opt.UintWith(userMetrics)
@@ -68,9 +68,9 @@ func getUsingSystemTimes() (CPUMetrics, error) {
 	}
 	globalMetrics.list = make([]CPU, 0, len(cpus))
 	for _, cpu := range cpus {
-		idleMetric := uint64(cpu.IdleTime / time.Millisecond)
-		sysMetric := uint64(cpu.KernelTime / time.Millisecond)
-		userMetrics := uint64(cpu.UserTime / time.Millisecond)
+		idleMetric := uint64(cpu.IdleTime / time.Millisecond)  //nolint:gosec // G115 — CPU time values are non-negative
+		sysMetric := uint64(cpu.KernelTime / time.Millisecond) //nolint:gosec // G115 — CPU time values are non-negative
+		userMetrics := uint64(cpu.UserTime / time.Millisecond) //nolint:gosec // G115 — CPU time values are non-negative
 		globalMetrics.list = append(globalMetrics.list, CPU{
 			Idle: opt.UintWith(idleMetric),
 			Sys:  opt.UintWith(sysMetric),
@@ -111,9 +111,9 @@ func getUsingPerfCounters(query *pdh.Query) (CPUMetrics, error) {
 		kernelTime := time.Duration(kernelRawData[i].RawValue.FirstValue*100) / time.Millisecond
 		userTime := time.Duration(userRawData[i].RawValue.FirstValue*100) / time.Millisecond
 
-		globalMetrics.list[i].Idle = opt.UintWith(uint64(idleTime))
-		globalMetrics.list[i].Sys = opt.UintWith(uint64(kernelTime))
-		globalMetrics.list[i].User = opt.UintWith(uint64(userTime))
+		globalMetrics.list[i].Idle = opt.UintWith(uint64(idleTime))  //nolint:gosec // G115 — CPU time values are non-negative
+		globalMetrics.list[i].Sys = opt.UintWith(uint64(kernelTime)) //nolint:gosec // G115 — CPU time values are non-negative
+		globalMetrics.list[i].User = opt.UintWith(uint64(userTime))  //nolint:gosec // G115 — CPU time values are non-negative
 
 		// add the per-cpu time to track the total time spent by system
 		idle += idleTime

@@ -158,7 +158,7 @@ var PidStates = map[byte]PidState{
 // cannot be compiled.
 func (procStats *Stats) Init() error {
 	if procStats.Logger == nil {
-		procStats.Logger = logp.NewLogger("processes")
+		procStats.Logger = logp.NewLogger("processes") //nolint:forbidigo // backward-compatible default logger
 	}
 	var err error
 	procStats.host, err = sysinfo.Host()

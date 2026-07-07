@@ -34,9 +34,10 @@ func (fs *FSStat) GetUsage() error {
 		return fmt.Errorf("error in Statfs syscall: %w", err)
 	}
 
-	fs.Total = opt.UintWith(stat.Blocks).MultUint64OrNone(uint64(stat.Bsize))
-	fs.Free = opt.UintWith(stat.Bfree).MultUint64OrNone(uint64(stat.Bsize))
-	fs.Avail = opt.UintWith(stat.Bavail).MultUint64OrNone(uint64(stat.Bsize))
+	blockSize := uint64(stat.Bsize) //nolint:gosec,nolintlint // G115 — statfs block size is non-negative
+	fs.Total = opt.UintWith(stat.Blocks).MultUint64OrNone(blockSize)
+	fs.Free = opt.UintWith(stat.Bfree).MultUint64OrNone(blockSize)
+	fs.Avail = opt.UintWith(stat.Bavail).MultUint64OrNone(blockSize)
 	fs.Files = opt.UintWith(stat.Files)
 	fs.FreeFiles = opt.UintWith(stat.Ffree)
 

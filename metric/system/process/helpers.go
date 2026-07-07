@@ -30,14 +30,14 @@ import (
 // unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch
 // to a typeconv.Time value.
 func unixTimeMsToTime(unixTimeMs uint64) string {
-	return typeconv.Time(time.Unix(0, int64(unixTimeMs*1000000))).String()
+	return typeconv.Time(time.Unix(0, int64(unixTimeMs*1000000))).String() //nolint:gosec // G115 — millisecond timestamp fits in int64
 }
 
-func stripNullByte(buf []byte) string { //nolint:unused // it is used in platform specific code
+func stripNullByte(buf []byte) string { //nolint:unused,nolintlint // used from platform-specific code (process_darwin.go, process_aix.go)
 	return string(buf[0 : len(buf)-1])
 }
 
-func stripNullByteRaw(buf []byte) []byte { //nolint:unused // it is used in platform specific code
+func stripNullByteRaw(buf []byte) []byte { //nolint:unused,nolintlint // used from platform-specific code (process_darwin.go, process_aix.go)
 	return buf[0 : len(buf)-1]
 }
 
@@ -82,7 +82,7 @@ func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 
 	timeDelta := s1.SampleTime.Sub(s0.SampleTime)
 	timeDeltaDur := timeDelta / time.Millisecond
-	totalCPUDeltaMillis := int64(s1.CPU.Total.Ticks.ValueOr(0) - s0.CPU.Total.Ticks.ValueOr(0))
+	totalCPUDeltaMillis := int64(s1.CPU.Total.Ticks.ValueOr(0) - s0.CPU.Total.Ticks.ValueOr(0)) //nolint:gosec // G115 — process CPU tick delta is bounded
 
 	pct := float64(totalCPUDeltaMillis) / float64(timeDeltaDur)
 	// In theory this can only happen if the time delta is 0, which is unlikely but possible.

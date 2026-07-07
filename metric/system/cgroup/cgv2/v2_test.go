@@ -327,7 +327,7 @@ func TestGetCPU(t *testing.T) {
 				b, err := os.ReadFile(filepath.Join(v2Path, "cpu.stat"))
 				require.NoError(t, err)
 				dir := t.TempDir()
-				err = os.WriteFile(filepath.Join(dir, "cpu.stat"), b, 0644)
+				err = os.WriteFile(filepath.Join(dir, "cpu.stat"), b, 0o644) //nolint:gosec // G703 — test fixture written to temp dir
 				require.NoError(t, err)
 				return dir
 			},
@@ -382,7 +382,7 @@ func TestGetCPU(t *testing.T) {
 			cpu := CPUSubsystem{}
 			err := cpu.Get(test.setup(t))
 			require.NoError(t, err, "error in Get")
-			assert.EqualValues(t, test.expected, cpu)
+			assert.Equal(t, test.expected, cpu)
 		})
 	}
 }

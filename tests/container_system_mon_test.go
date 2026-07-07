@@ -56,7 +56,7 @@ func TestKernelProc(t *testing.T) {
 			continue
 		}
 		statfile := filepath.Join("/proc/", name, "stat")
-		statRaw, err := os.ReadFile(statfile) //nolint:gosec // G703 — path is constructed from /proc PID entries, no traversal risk
+		statRaw, err := os.ReadFile(statfile)
 		require.NoError(t, err)
 		statPart := strings.Split(string(statRaw), " ")
 		ppid := statPart[3]

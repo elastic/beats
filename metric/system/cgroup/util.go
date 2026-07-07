@@ -330,9 +330,9 @@ func guessContainerCgroupPath(v2Loc string, OurPid int) (string, error) {
 			return nil
 		}
 		if strings.Contains(d.Name(), "procs") {
-			pidfile, err := os.ReadFile(path) //nolint: nilerr // we can get lots of weird permissions errors here, so don't fail on an error
+			pidfile, err := os.ReadFile(path) //nolint:gosec // G122 — cgroup.procs paths come from cgroup filesystem walk
 			if err != nil {
-				return nil //nolint: nilerr // we can get lots of weird permissions errors here, so don't fail on an error
+				return nil //nolint:nilerr // we can get lots of weird permissions errors here, so don't fail on an error
 			}
 			if foundMatchingPidInProcsFile(OurPid, string(pidfile)) {
 				foundCgroupPath = path

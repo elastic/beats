@@ -106,7 +106,7 @@ func FetchNumThreads(pid int) (int, error) {
 	targetProcessHandle, err := syscall.OpenProcess(
 		xsyswindows.PROCESS_QUERY_INFORMATION,
 		false,
-		uint32(pid))
+		uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return 0, fmt.Errorf("OpenProcess failed for PID %d: %w", pid, err)
 	}
@@ -203,7 +203,7 @@ func getProcArgs(pid int) ([]string, error) {
 		windows.PROCESS_QUERY_LIMITED_INFORMATION|
 			windows.PROCESS_VM_READ,
 		false,
-		uint32(pid))
+		uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return nil, fmt.Errorf("OpenProcess failed for PID %d: %w", pid, err)
 	}
@@ -232,7 +232,7 @@ func getProcArgs(pid int) ([]string, error) {
 }
 
 func getProcTimes(pid int) (uint64, uint64, uint64, error) {
-	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -246,7 +246,7 @@ func getProcTimes(pid int) (uint64, uint64, uint64, error) {
 	}
 
 	// Everything expects ticks, so we need to go some math.
-	return uint64(windows.FiletimeToDuration(&cpu.UserTime).Nanoseconds() / 1e6), uint64(windows.FiletimeToDuration(&cpu.KernelTime).Nanoseconds() / 1e6), uint64(cpu.CreationTime.Nanoseconds() / 1e6), nil
+	return uint64(windows.FiletimeToDuration(&cpu.UserTime).Nanoseconds() / 1e6), uint64(windows.FiletimeToDuration(&cpu.KernelTime).Nanoseconds() / 1e6), uint64(cpu.CreationTime.Nanoseconds() / 1e6), nil //nolint:gosec // G115 — process time values are non-negative
 }
 
 // procMem gets the memory usage for the given PID.
@@ -258,7 +258,7 @@ func procMem(pid int) (uint64, uint64, error) {
 	handle, err := syscall.OpenProcess(
 		windows.PROCESS_QUERY_LIMITED_INFORMATION,
 		false,
-		uint32(pid))
+		uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return 0, 0, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -275,7 +275,7 @@ func procMem(pid int) (uint64, uint64, error) {
 
 // getProcName returns the process name associated with the PID.
 func getProcName(pid int) (string, error) {
-	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return "", fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -285,7 +285,6 @@ func getProcName(pid int) (string, error) {
 
 	filename, err := windows.GetProcessImageFileName(handle)
 
-	//nolint:nilerr // safe to ignore this error
 	if err != nil {
 		if isNonFatal(err) {
 			// if we're able to open the handle but GetProcessImageFileName fails with access denied error,
@@ -300,7 +299,7 @@ func getProcName(pid int) (string, error) {
 
 // getProcStatus returns the status of a process.
 func getPidStatus(pid int) (PidState, error) {
-	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return Unknown, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -322,7 +321,7 @@ func getPidStatus(pid int) (PidState, error) {
 
 // getParentPid returns the parent process ID of a process.
 func getParentPid(pid int) (int, error) {
-	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return 0, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -338,7 +337,6 @@ func getParentPid(pid int) (int, error) {
 	return int(procInfo.InheritedFromUniqueProcessID), nil
 }
 
-//nolint:unused // this is actually used while dereferencing the pointer, but results in lint failure.
 type systemProcessInformation struct {
 	NextEntryOffset uint32
 	NumberOfThreads uint32
@@ -370,7 +368,7 @@ type systemProcessInformation struct {
 }
 
 func getProcCredName(pid int) (string, error) {
-	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid)) //nolint:gosec // G115 — PID is non-negative
 	if err != nil {
 		return "", fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}

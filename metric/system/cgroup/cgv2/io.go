@@ -66,7 +66,7 @@ func (io *IOSubsystem) Get(path string, resolveDevIDs bool) error {
 	//Pressure doesn't exist on certain V2 implementations.
 	_, err = os.Stat(filepath.Join(path, "io.pressure"))
 	if errors.Is(err, os.ErrNotExist) {
-		logp.L().Debugf("io.pressure does not exist. Skipping.")
+		logp.L().Debugf("io.pressure does not exist. Skipping.") //nolint:forbidigo // backward-compatible global logger
 		return nil
 	}
 

@@ -27,7 +27,7 @@ func TestGetCPU(t *testing.T) {
 	cpuCount, exists, err := getCPU()
 	assert.NoError(t, err, "getCPU")
 	if exists {
-		assert.Greater(t, cpuCount, 0)
+		assert.Positive(t, cpuCount)
 		t.Logf("Got actual CPU counts: %d", cpuCount)
 	} else {
 		t.Logf("No CPU counts implementation on platform, falling back.")

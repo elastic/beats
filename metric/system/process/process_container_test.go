@@ -18,7 +18,6 @@
 package process
 
 import (
-	"fmt"
 	"os"
 	"os/user"
 	"runtime"
@@ -134,11 +133,12 @@ func TestSystemHostFromContainer(t *testing.T) {
 		validateProcResult(t, result)
 	} else {
 		_, roots, err := testStats.Get()
-		require.True(t, isNonFatal(err), fmt.Sprintf("Fatal error: %s", err))
+		require.True(t, isNonFatal(err), "Fatal error: %s", err)
 
 		for _, proc := range roots {
-			t.Logf("proc: %d: %s", proc["process"].(map[string]any)["pid"],
-				proc["process"].(map[string]any)["command_line"])
+			procMap, ok := proc["process"].(map[string]any)
+			require.True(t, ok)
+			t.Logf("proc: %v: %v", procMap["pid"], procMap["command_line"])
 		}
 	}
 }
@@ -171,7 +171,9 @@ func validateProcResult(t *testing.T, result mapstr.M) {
 
 	// if privileged or root, look for data from /proc/[pid]/io
 	if privilegedMode && userID == 0 {
-		ioReadBytes := result["io"].(map[string]any)["read_char"]
+		ioMap, ok := result["io"].(map[string]any)
+		require.True(t, ok)
+		ioReadBytes := ioMap["read_char"]
 		assert.NotNil(t, ioReadBytes, formatArgs...)
 	}
 
@@ -189,7 +191,9 @@ func validateProcResult(t *testing.T, result mapstr.M) {
 			assert.Contains(t, result, "cgroup", formatArgs...)
 		} else {
 			t.Log("WARN: skipping 'cgroup' check, this is because of known issue https://github.com/elastic/elastic-agent-system-metrics/issues/270")
-			t.Logf(formatArgs[0].(string), formatArgs[1:]...)
+			format, ok := formatArgs[0].(string)
+			require.True(t, ok)
+			t.Logf(format, formatArgs[1:]...)
 		}
 	}
 }

@@ -50,7 +50,7 @@ func TestParseBlkioValueWithoutOp(t *testing.T) {
 
 	assert.Equal(t, uint64(1), opValue.Major)
 	assert.Equal(t, uint64(2), opValue.Minor)
-	assert.Equal(t, "", opValue.Operation)
+	assert.Empty(t, opValue.Operation)
 	assert.Equal(t, uint64(10088), opValue.Value)
 }
 

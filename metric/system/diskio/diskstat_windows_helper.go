@@ -79,11 +79,11 @@ func ioCounters(logger *logp.Logger, names ...string) (map[string]disk.IOCounter
 			Name:       drive.Name,
 			ReadCount:  uint64(counter.ReadCount),
 			WriteCount: uint64(counter.WriteCount),
-			ReadBytes:  uint64(counter.BytesRead),
-			WriteBytes: uint64(counter.BytesWritten),
+			ReadBytes:  uint64(counter.BytesRead),    //nolint:gosec // G115 — disk counter values are non-negative
+			WriteBytes: uint64(counter.BytesWritten), //nolint:gosec // G115 — disk counter values are non-negative
 			// Ticks (which is equal to 100 nanoseconds) will be converted to milliseconds for consistency reasons for both ReadTime and WriteTime (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.ticks?redirectedfrom=MSDN&view=netframework-4.8#remarks)
-			ReadTime:  uint64(counter.ReadTime / 10000),
-			WriteTime: uint64(counter.WriteTime / 10000),
+			ReadTime:  uint64(counter.ReadTime / 10000),  //nolint:gosec // G115 — disk counter values are non-negative
+			WriteTime: uint64(counter.WriteTime / 10000), //nolint:gosec // G115 — disk counter values are non-negative
 		}
 	}
 	return ret, nil
@@ -184,7 +184,7 @@ func isValidLogicalDrive(path string) bool {
 	ret, _, err := syscall.SyscallN(procGetDriveTypeW.Addr(), uintptr(unsafe.Pointer(utfPath)))
 
 	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5 DRIVE_UNKNOWN = 0 DRIVE_RAMDISK = 6
-	if ret == 1 || ret == 5 || ret == 0 || ret == 6 || err != errorSuccess { //nolint: errorlint // keep old behaviour
+	if ret == 1 || ret == 5 || ret == 0 || ret == 6 || err != errorSuccess { //nolint:errorlint // keep old behaviour
 		return false
 	}
 
@@ -209,12 +209,12 @@ func GetVolumeLabel(path *uint16) (string, error) {
 	err := windows.GetVolumeInformation(
 		path,
 		&lpVolumeNameBuffer[0],
-		uint32(len(lpVolumeNameBuffer)),
+		uint32(len(lpVolumeNameBuffer)), //nolint:gosec // G115 — buffer length fits in uint32
 		&lpVolumeSerialNumber,
 		&lpMaximumComponentLength,
 		&lpFileSystemFlags,
 		&lpFileSystemNameBuffer[0],
-		uint32(len(lpFileSystemNameBuffer)))
+		uint32(len(lpFileSystemNameBuffer))) //nolint:gosec // G115 — buffer length fits in uint32
 	if err != nil {
 		return "", err
 	}

@@ -24,11 +24,17 @@ import (
 )
 
 func TestRound(t *testing.T) {
-	assert.EqualValues(t, 0.5, Round(0.5))
-	assert.EqualValues(t, 0.5, Round(0.50004))
-	assert.EqualValues(t, 0.5001, Round(0.50005))
+	const epsilon = 0.00000005
 
-	assert.EqualValues(t, 1234.5, Round(1234.5))
-	assert.EqualValues(t, 1234.5, Round(1234.50004))
-	assert.EqualValues(t, 1234.5001, Round(1234.50005))
+	assert.InDelta(t, 0.5, Round(0.5), epsilon)
+	assert.InDelta(t, 0.5, Round(0.50004), epsilon)
+	assert.InDelta(t, 0.5001, Round(0.50005), epsilon)
+
+	assert.InDelta(t, 1234.5, Round(1234.5), epsilon)
+	assert.InDelta(t, 1234.5, Round(1234.50004), epsilon)
+	assert.InDelta(t, 1234.5001, Round(1234.50005), epsilon)
+
+	assert.InDelta(t, -0.5, Round(-0.5), epsilon)
+	assert.InDelta(t, -0.5, Round(-0.50004), epsilon)
+	assert.InDelta(t, -0.5001, Round(-0.50005), epsilon)
 }

@@ -234,7 +234,7 @@ func (metric *Metrics) CPUCount() int {
 
 // cpuMetricTimeDelta is a helper used by fillTicks to calculate the delta between two CPU tick values
 func cpuMetricTimeDelta(prev, current opt.Uint, timeDelta uint64, numCPU int) float64 {
-	cpuDelta := int64(current.ValueOr(0) - prev.ValueOr(0))
+	cpuDelta := int64(current.ValueOr(0) - prev.ValueOr(0)) //nolint:gosec // G115 — CPU tick delta is bounded
 	pct := float64(cpuDelta) / float64(timeDelta)
 	return metric.Round(pct * float64(numCPU))
 }

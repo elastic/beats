@@ -76,7 +76,7 @@ func combineMap(map1, map2 map[string]uint64, filter []string) map[string]any {
 func checkMaxConn(inKey string, in uint64) any {
 
 	if inKey == "MaxConn" {
-		return int64(in)
+		return int64(in) //nolint:gosec // G115 — MaxConn is a signed SNMP counter by RFC 2012
 	}
 	return in
 }

@@ -77,7 +77,7 @@ func TestLsassFound(t *testing.T) {
 	require.NotEmpty(t, m)
 
 	for pid := range m {
-		state, err := GetInfoForPid(resolve.NewTestResolver("/"), int(pid))
+		state, err := GetInfoForPid(resolve.NewTestResolver("/"), int(pid)) //nolint:gosec // G115 — map key PID is non-negative
 		if err == nil {
 			require.Contains(t, processNames, state.Name)
 		}
