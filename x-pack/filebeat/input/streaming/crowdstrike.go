@@ -247,12 +247,18 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	defer cli.CloseIdleConnections()
 
 	var err error
+	// attempt counts only failures that count toward the termination cap, i.e.
+	// non-transient ones. failures counts every consecutive failure and drives
+	// the back-off and DEGRADED reporting, so a persistent transient outage
+	// still backs off and is surfaced as DEGRADED without ever terminating the
+	// input.
 	attempt := 0
+	failures := 0
 	const maxAttemptsUnconfigured = 10
 	// Number of consecutive failures tolerated before reporting DEGRADED,
 	// so a single transient blip (e.g. an empty discover response) does not
 	// churn the unit health status.
-	const degradeAfterAttempts = 3
+	const degradeAfterFailures = 3
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
@@ -265,7 +271,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 				return err
 			}
 
-			attempt++
+			failures++
 
 			// Transient connection-level failures (empty discover body,
 			// failed discover GET, timeouts) self-heal once the upstream
@@ -274,6 +280,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 			// the input. Only genuine hardErrors terminate immediately; other
 			// soft errors still honour the configured (or default) attempt cap.
 			if !errors.Is(err, transientError{}) {
+				attempt++
 				// The unconfigured cap must only apply when no retry policy is
 				// set. Keeping it as an else-if on the configured branch caused
 				// infinite_retries and max_attempts > 10 to be silently capped
@@ -289,20 +296,20 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 			var waitTime time.Duration
 			if s.cfg.Retry != nil {
-				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, attempt, s.cfg.Retry.MaxAttempts)
+				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, failures, s.cfg.Retry.MaxAttempts)
 			} else {
 				s.log.Warnw("no retry configured: using linear back-off")
-				waitTime = min(time.Duration(attempt)*time.Second, 30*time.Second)
+				waitTime = min(time.Duration(failures)*time.Second, 30*time.Second)
 			}
 			var rle *rateLimitError
 			if errors.As(err, &rle) && rle.wait > waitTime {
 				waitTime = rle.wait
 			}
 
-			if attempt >= degradeAfterAttempts {
+			if failures >= degradeAfterFailures {
 				s.status.UpdateStatus(status.Degraded, err.Error())
 			}
-			s.log.Warnw("session warning", "error", err, "transient", errors.Is(err, transientError{}), "attempt", attempt, "wait", waitTime.String())
+			s.log.Warnw("session warning", "error", err, "transient", errors.Is(err, transientError{}), "attempt", attempt, "failures", failures, "wait", waitTime.String())
 
 			select {
 			case <-ctx.Done():
@@ -314,6 +321,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 		// Reset for success.
 		attempt = 0
+		failures = 0
 		s.status.UpdateStatus(status.Running, "")
 	}
 }

@@ -439,6 +439,46 @@ func TestFollowStreamTransientRetriesPastCap(t *testing.T) {
 	}
 }
 
+// TestFollowStreamTransientFailuresDoNotConsumeAttemptCap verifies that
+// transient failures preceding a non-transient one do not count toward the
+// attempt limit: the input terminates only after a full MaxAttempts worth of
+// non-transient failures, regardless of how many transient failures came first.
+func TestFollowStreamTransientFailuresDoNotConsumeAttemptCap(t *testing.T) {
+	log := logptest.NewTestingLogger(t, t.Name())
+
+	const transientFailures = 5 // Empty-body (transient) failures before the real error.
+	const maxAttempts = 3       // Non-transient attempts allowed before termination.
+	var served atomic.Int64
+	// Serve transientFailures empty bodies, then non-transient 500s.
+	discover := func(w http.ResponseWriter, r *http.Request) {
+		if served.Add(1) <= transientFailures {
+			emptyBodyDiscover(w, r)
+			return
+		}
+		serverErrorDiscover(w, r)
+	}
+
+	discoverURL, tokenURL, hits := startDiscover(t, discover)
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newDiscoverFollower(t, cfg, nil, log)
+
+	err := s.FollowStream(context.Background())
+	if err == nil {
+		t.Fatal("FollowStream() error = nil; want max-attempts error")
+	}
+	want := fmt.Sprintf("max retry attempts (%d) exceeded", maxAttempts)
+	if !strings.Contains(err.Error(), want) {
+		t.Errorf("FollowStream() error = %v; want substring %q", err, want)
+	}
+	// The transient failures must not consume the attempt budget: the input
+	// terminates only after transientFailures + maxAttempts discover requests.
+	// A single shared counter (transient failures counting toward the cap)
+	// would instead terminate on the first non-transient failure.
+	if got, want := hits.Load(), int64(transientFailures+maxAttempts); got != want {
+		t.Errorf("discover attempts = %d; want %d (%d transient + %d non-transient)", got, want, transientFailures, maxAttempts)
+	}
+}
+
 // startDiscover starts a token endpoint and a discover endpoint served by the
 // given handler, returning the discover URL, token URL, and a counter of
 // discover requests.
