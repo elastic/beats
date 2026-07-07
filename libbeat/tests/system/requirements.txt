@@ -21,6 +21,7 @@ docopt==0.6.2
 elasticsearch==8.0.0
 enum34==1.1.6
 exceptiongroup==1.2.0
+execnet==2.1.1
 googleapis-common-protos==1.56.4
 grpcio==1.68.1
 idna==3.7
@@ -55,6 +56,7 @@ pyrsistent==0.16.0
 pytest==7.3.2
 pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
+pytest-xdist==3.6.1
 python-dotenv==0.21.1
 PyYAML==6.0.1
 redis==4.4.4
