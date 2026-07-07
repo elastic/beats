@@ -108,7 +108,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 
 	buildContext, err := os.Open(tarPath)
 	if err != nil {
-		return fmt.Errorf("error opening temp dur: %w", err)
+		return fmt.Errorf("error opening temp dir: %w", err)
 	}
 	defer buildContext.Close()
 

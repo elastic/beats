@@ -53,11 +53,8 @@ func TestAnnotatorSkipped(t *testing.T) {
 	processor := kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(&processor, &Matchers{matchers: []Matcher{matcher}})
 
 	processor.cache.set("foo",
 		mapstr.M{
@@ -102,20 +99,9 @@ func TestAnnotatorSkipped(t *testing.T) {
 
 // Test metadata are not included in the event
 func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"lookup_fields": []string{"kubernetes.pod.name"},
-	})
-	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	// state is left nil, i.e. init never published (kubernetes unavailable).
 	processor := kubernetesAnnotator{
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: false,
 	}
 
 	intialEventMap := mapstr.M{
@@ -253,13 +239,17 @@ func newAnnotatorForTest(t testing.TB, cacheKey string, meta mapstr.M) *kubernet
 	processor := &kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 	processor.cache.set(cacheKey, meta)
 	return processor
+}
+
+// setReady publishes a minimal initializedState so the processor treats
+// kubernetes as available, mirroring what init does on success. Tests that
+// don't drive real watchers only need matchers populated.
+func setReady(k *kubernetesAnnotator, matchers *Matchers) {
+	k.state.Store(&initializedState{matchers: matchers})
 }
 
 // baseEvent returns an event that will match cacheKey via container.id.
@@ -410,11 +400,8 @@ func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
 	processor := &kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 	processor.cache.set("mypod", meta)
 
 	event, err := processor.Run(&beat.Event{
@@ -561,11 +548,8 @@ func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
 	processor := &kubernetesAnnotator{
 		log:   logptest.NewTestingLogger(b, selector),
 		cache: newCache(10 * time.Second),
-		matchers: &Matchers{
-			matchers: []Matcher{matcher},
-		},
-		kubernetesAvailable: true,
 	}
+	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 
 	const cacheKey = "abc123container"
 
@@ -623,7 +607,7 @@ func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
 // isKubernetesAvailableWithTimeout loops until timeout or context cancel.
 func unavailableK8sClient() k8sclient.Interface {
 	client := k8sfake.NewSimpleClientset()
-	client.Fake.PrependReactor("get", "version", func(k8stesting.Action) (bool, runtime.Object, error) {
+	client.PrependReactor("get", "version", func(k8stesting.Action) (bool, runtime.Object, error) {
 		return true, nil, errors.New("kubernetes unavailable")
 	})
 	return client

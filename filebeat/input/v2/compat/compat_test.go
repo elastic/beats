@@ -53,7 +53,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
+		factory := RunnerFactory(beat.Info{Logger: log}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.NewConfig())
@@ -97,7 +97,6 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(
-			log,
 			beat.Info{Logger: log},
 			monitoring.NewRegistry(),
 			loader.Loader)
@@ -141,7 +140,6 @@ type: test
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
 		factory := RunnerFactory(
-			log,
 			beat.Info{Logger: log},
 			monitoring.NewRegistry(),
 			loader.Loader)
@@ -179,7 +177,6 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		}))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(
-			log,
 			beat.Info{Logger: log},
 			monitoring.NewRegistry(),
 			loader.Loader)
@@ -206,7 +203,6 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		}))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(
-			log,
 			beat.Info{Logger: log},
 			monitoring.NewRegistry(),
 			loader.Loader)
@@ -230,7 +226,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
+		factory := RunnerFactory(beat.Info{Logger: log}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{

@@ -21,9 +21,27 @@ import (
 	"io"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
+
+// DefaultGetDebounce is the coalescing window a newly connected queue starts
+// with. Get waits this long after events first appear before draining the FIFO,
+// so a trickle of events yields one modest batch (and one downstream Publish
+// goroutine) rather than one per event. It bounds the output worker's goroutine
+// fan-out to roughly downstream_round_trip / debounce without capping batch
+// size, so throughput is largely unaffected.
+//
+// This value was tuned from the result of BenchmarkGetDebounce, which sweeps a range of
+// debounce values and reports. Based on the results, 1ms was chosen.
+//
+// debounce=0 lets the mixed receiver case spray ~430 tiny-batch Publish goroutines,
+// while any value >=~250us collapses that to ~100 with no further gain; throughput then
+// declines ~1-2% per additional ms, so 1ms keeps ~98.5% of peak throughput,
+// ~100 goroutines, and roughly halved CPU/event. The balance point before extra
+// debounce only costs throughput.
+var DefaultGetDebounce = 1 * time.Millisecond
 
 // Queue is a per-pipeline façade over a shared Pool. It owns the FIFO of slot
 // indices belonging to one pipeline; the actual event storage lives in the
@@ -36,6 +54,13 @@ type Queue[T any] struct {
 	tail    int // index of the tail slot, or -1
 	count   int
 	closing bool
+
+	// producers is the set of open producers publishing into this queue. It
+	// exists so Close can fan out and unblock every producer's ACKWaitChan on
+	// (force-)close — force-close suppresses per-event ACK callbacks, so the
+	// ack accounting alone would never close those channels. Producers add
+	// themselves in Producer and remove themselves in Close; guarded by mu.
+	producers map[*producer[T]]struct{}
 
 	// pendingHead/pendingTail is the intrusive FIFO of batches that have been
 	// returned from Get but not yet Done()'d, threaded through batch.next in
@@ -73,16 +98,20 @@ type Queue[T any] struct {
 	doneOnce  sync.Once
 	doneCh    chan struct{} // closed when fully drained or force-closed
 	forced    atomic.Bool
+
+	debounce time.Duration // coalescing window for Get
 }
 
 func newQueue[T any](pool *Pool[T]) *Queue[T] {
 	q := &Queue[T]{
-		pool:    pool,
-		head:    -1,
-		tail:    -1,
-		notify:  make(chan struct{}, 1),
-		closeCh: make(chan struct{}),
-		doneCh:  make(chan struct{}),
+		pool:      pool,
+		head:      -1,
+		tail:      -1,
+		notify:    make(chan struct{}, 1),
+		closeCh:   make(chan struct{}),
+		doneCh:    make(chan struct{}),
+		producers: make(map[*producer[T]]struct{}),
+		debounce:  DefaultGetDebounce,
 	}
 	q.limCond = sync.NewCond(&q.limMu)
 	return q
@@ -187,14 +216,7 @@ func (q *Queue[T]) wakeLimitWaiters() {
 }
 
 // isClosing reports whether Close has been called on this queue.
-func (q *Queue[T]) isClosing() bool {
-	select {
-	case <-q.closeCh:
-		return true
-	default:
-		return false
-	}
-}
+func (q *Queue[T]) isClosing() bool { return chClosed(q.closeCh) }
 
 // Producer returns a producer that publishes to this queue. Each producer is
 // given a stable home shard for the pool's free list, spread across shards by
@@ -202,47 +224,59 @@ func (q *Queue[T]) isClosing() bool {
 // shards.
 func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
 	home := int((q.pool.homeCounter.Add(1) - 1) & uint64(q.pool.free.mask)) //nolint:gosec // G115: masked by the shard count, always a small non-negative index
-	return &producer[T]{queue: q, cfg: cfg, home: home}
+	p := &producer[T]{queue: q, cfg: cfg, home: home, ackWait: make(chan struct{})}
+	q.mu.Lock()
+	if q.closing {
+		// The queue is already (force-)closing. A producer created now will
+		// never see its events drain, so hand back one whose ackWait is
+		// already closed rather than registering it for a fan-out that has
+		// already happened.
+		q.mu.Unlock()
+		p.forceCloseAckWait()
+		return p
+	}
+	q.producers[p] = struct{}{}
+	q.mu.Unlock()
+	return p
 }
 
-// Get blocks until at least one event is available (or the queue is closed)
-// and returns a batch of up to maxEvents. If maxEvents <= 0, all currently
-// queued events are returned.
+// removeProducer unregisters a producer from the force-close fan-out set. Called
+// from producer.Close; safe to call for a producer that was never registered
+// (e.g. one created after the queue began closing).
+func (q *Queue[T]) removeProducer(p *producer[T]) {
+	q.mu.Lock()
+	delete(q.producers, p)
+	q.mu.Unlock()
+}
+
+// Get returns a batch of events from this pipeline's FIFO. It blocks until at
+// least one event is available, applies the queue's debounce coalescing window,
+// then returns everything currently queued. It returns io.EOF once the queue is
+// closed and drained.
 func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
+	debounced := false
 	for {
 		q.mu.Lock()
 		if q.count > 0 {
+			if !debounced && q.debounce > 0 && !q.closing && !q.forced.Load() {
+				q.mu.Unlock()
+				timer := time.NewTimer(q.debounce)
+				select {
+				case <-timer.C:
+				case <-q.closeCh:
+					timer.Stop()
+				case <-q.pool.closed:
+					timer.Stop()
+					return nil, io.EOF
+				}
+				debounced = true
+				continue
+			}
 			n := q.count
-			if maxEvents > 0 && maxEvents < n {
-				n = maxEvents
+			if maxEvents > 0 {
+				n = min(n, maxEvents)
 			}
-			// Pull a recycled batch from the pool. Its slices retain
-			// their backing arrays from previous uses; we reset
-			// lengths and append into them. The batch is owned solely
-			// by this Queue/consumer/worker chain until Done/Release
-			// returns it to the pool.
-			b := q.pool.getBatch()
-			b.queue = q
-			b.indices = b.indices[:0]
-			b.done = false
-			b.freed = false
-			b.next = nil
-			cur := q.head
-			for i := 0; i < n; i++ {
-				b.indices = append(b.indices, cur)
-				cur = q.pool.slot(cur).next
-			}
-			q.head = cur
-			if cur == -1 {
-				q.tail = -1
-			}
-			q.count -= n
-			if q.pendingTail != nil {
-				q.pendingTail.next = b
-			} else {
-				q.pendingHead = b
-			}
-			q.pendingTail = b
+			b := q.buildBatchLocked(n)
 			q.mu.Unlock()
 			q.pool.observer.ConsumeEvents(n, 0)
 			return b, nil
@@ -263,6 +297,33 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 			return nil, io.EOF
 		}
 	}
+}
+
+// buildBatchLocked removes the first n events from this pipeline's FIFO and
+// returns them as a recycled batch, appended to the pending-ack list so
+// producer ACK callbacks still fire in publish order. It must be called with
+// q.mu held and 0 < n <= q.count.
+func (q *Queue[T]) buildBatchLocked(n int) *batch[T] {
+	b := q.pool.getBatch()
+	b.queue = q
+	d := q.pool.dir.Load()
+	cur := q.head
+	for i := 0; i < n; i++ {
+		b.indices = append(b.indices, cur)
+		cur = d.slot(cur).next
+	}
+	q.head = cur
+	if cur == -1 {
+		q.tail = -1
+	}
+	q.count -= n
+	if q.pendingTail != nil {
+		q.pendingTail.next = b
+	} else {
+		q.pendingHead = b
+	}
+	q.pendingTail = b
+	return b
 }
 
 // Close shuts down the queue.
@@ -286,14 +347,26 @@ func (q *Queue[T]) Close(force bool) error {
 		q.forced.Store(true)
 	}
 	q.mu.Lock()
-	if !q.closing {
-		q.closing = true
-	}
+	q.closing = true
+	// On force-close, snapshot and clear the producer set so we can fan out an
+	// unconditional ackWait close outside the lock — force-close suppresses the
+	// per-event ACK callbacks that would otherwise close those channels. A
+	// graceful close leaves the set intact: events keep draining and each
+	// producer's ackWait closes naturally as its events are acked (and a later
+	// force-close, e.g. on timeout, can still fan out to them).
+	var ackWaitProducers []*producer[T]
 	var releaseIndices []int
 	if force {
+		if len(q.producers) > 0 {
+			ackWaitProducers = make([]*producer[T], 0, len(q.producers))
+			for p := range q.producers {
+				ackWaitProducers = append(ackWaitProducers, p)
+			}
+			q.producers = make(map[*producer[T]]struct{})
+		}
 		if q.count > 0 {
 			// Walk the FIFO and gather the slots so we can release them back to
-			// the pool below (outside the lock, since pool.free is a channel).
+			// the pool below, outside the lock, to keep the critical section short.
 			cur := q.head
 			for cur != -1 {
 				releaseIndices = append(releaseIndices, cur)
@@ -325,6 +398,12 @@ func (q *Queue[T]) Close(force bool) error {
 		q.wakeLimitWaiters()
 	})
 	q.signal()
+
+	// Force-close: unblock every still-open producer's ACKWaitChan, since the
+	// suppressed ACK callbacks will never advance their ack accounting.
+	for _, p := range ackWaitProducers {
+		p.forceCloseAckWait()
+	}
 
 	if len(releaseIndices) > 0 {
 		var zero T
@@ -369,11 +448,11 @@ func (q *Queue[T]) QueueType() string { return QueueType }
 // of its per-queue cap (if set) and the shared pool budget. With no per-queue
 // cap it is just the pool budget.
 func (q *Queue[T]) BufferConfig() queue.BufferConfig {
-	max := q.pool.Target()
-	if lim := int(q.limit.Load()); lim > 0 && lim < max {
-		max = lim
+	maxEvents := q.pool.Target()
+	if lim := int(q.limit.Load()); lim > 0 {
+		maxEvents = min(maxEvents, lim)
 	}
-	return queue.BufferConfig{MaxEvents: max}
+	return queue.BufferConfig{MaxEvents: maxEvents}
 }
 
 // signal wakes a goroutine blocked in Get. Non-blocking: at most one pending
@@ -397,4 +476,30 @@ func (q *Queue[T]) maybeMarkDone() {
 // markDone closes doneCh idempotently.
 func (q *Queue[T]) markDone() {
 	q.doneOnce.Do(func() { close(q.doneCh) })
+}
+
+// drainReadyLocked peels every already-Done() batch off the head of the pending
+// FIFO and returns them as a list in publish order, the prefix whose producer
+// ACK callbacks are now ready to fire. Anything from a not-yet-done batch onward
+// stays in the list. It also re-checks whether the queue is now fully drained.
+// Returned batches are no longer reachable from the queue, so the caller may ACK
+// and recycle them once it releases q.mu. Must be called with q.mu held.
+func (q *Queue[T]) drainReadyLocked() *batch[T] {
+	var head, tail *batch[T]
+	for q.pendingHead != nil && q.pendingHead.done {
+		ready := q.pendingHead
+		q.pendingHead = ready.next
+		ready.next = nil
+		if tail == nil {
+			head = ready
+		} else {
+			tail.next = ready
+		}
+		tail = ready
+	}
+	if q.pendingHead == nil {
+		q.pendingTail = nil
+	}
+	q.maybeMarkDone()
+	return head
 }

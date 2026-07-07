@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -308,7 +309,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				monitoring := beatmonitoring.NewMonitoring()
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+				aModule, metricSets, err := mb.NewModule(tc.config, r, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 				require.NoError(t, err)
 
 				// Set the mock status reporter
@@ -538,7 +539,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				monitoring := beatmonitoring.NewMonitoring()
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+				aModule, metricSets, err := mb.NewModule(tc.config, r, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 				require.NoError(t, err)
 
 				// Set the mock status reporter

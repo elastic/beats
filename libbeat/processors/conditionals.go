@@ -22,10 +22,14 @@ import (
 	"fmt"
 	"strings"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -39,9 +43,21 @@ func NewConditional(
 			return nil, err
 		}
 
-		return addCondition(cfg, rule, log)
+		cond, err := addCondition(cfg, rule, log)
+		if err != nil {
+			// The processor was already constructed and may hold resources
+			// (or a reference to a shared instance): release it.
+			if closeErr := Close(rule); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("failed to close processor after condition error: %w", closeErr))
+			}
+			return nil, err
+		}
+		return cond, nil
 	}
 }
+
+var _ PdataProcessor = (*WhenProcessor)(nil)
+var _ PdataProcessor = (*ClosingWhenProcessor)(nil)
 
 // WhenProcessor is a tuple of condition plus a Processor.
 type WhenProcessor struct {
@@ -88,6 +104,57 @@ func (r *WhenProcessor) SetPaths(paths *paths.Path) error {
 
 func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
+}
+
+// RunPdata implements the pdata fast path. The condition is evaluated via
+// PdataValuesMap, which reads directly from the pcommon.Map without converting
+// to mapstr.M. If the condition passes and the inner processor also supports
+// RunPdata, the inner processor's RunPdata is called — no round-trip allocation.
+// If the inner processor only supports the legacy Run path, a round-trip
+// conversion is performed only when the condition passes (saving the conversion
+// on the fast-reject path).
+func (r *WhenProcessor) RunPdata(body pcommon.Map) (bool, error) {
+	if !r.condition.Check(otelmap.PdataValuesMap{M: body}) {
+		return false, nil
+	}
+	if pp, ok := r.p.(PdataProcessor); ok {
+		return pp.RunPdata(body)
+	}
+	// Inner processor is legacy-only: round-trip through mapstr.M.
+	// This fallback exists so that processors that have not yet implemented
+	// PdataProcessor can still participate in a pdata pipeline without
+	// requiring callers to handle the conversion themselves.
+	//
+	// otelconsumer serializes beat.Event.Meta into the pdata body under the
+	// "@metadata" key. Extract it into event.Meta so that inner processors
+	// using the @metadata target (e.g. add_fields with target:"@metadata")
+	// see and can modify the correct field.
+	event := &beat.Event{Fields: otelmap.ToMapstr(body)}
+	if raw, err := event.Fields.GetValue("@metadata"); err == nil {
+		switch m := raw.(type) {
+		case mapstr.M:
+			event.Meta = m
+		case map[string]interface{}:
+			event.Meta = mapstr.M(m)
+		}
+		_ = event.Fields.Delete("@metadata")
+	}
+	out, err := r.p.Run(event)
+	if err != nil {
+		return false, err
+	}
+	if out == nil {
+		return true, nil
+	}
+	// Write Meta back under "@metadata" so it survives the round-trip.
+	if len(out.Meta) > 0 {
+		if out.Fields == nil {
+			out.Fields = mapstr.M{}
+		}
+		out.Fields["@metadata"] = out.Meta
+	}
+	body.Clear()
+	return false, otelmap.FromMapstr(body, out.Fields)
 }
 
 // ClosingWhenProcessor is the same as WhenProcessor but has the Close
@@ -172,6 +239,13 @@ func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (beat.Processor,
 		return nil, err
 	}
 	if elseProcessors, err = newProcessors(c.Else); err != nil {
+		// The 'then' processors were already constructed and may hold
+		// resources (or references to shared instances): release them.
+		if ifProcessors != nil {
+			if closeErr := ifProcessors.Close(); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("failed to close 'then' processors after 'else' error: %w", closeErr))
+			}
+		}
 		return nil, err
 	}
 

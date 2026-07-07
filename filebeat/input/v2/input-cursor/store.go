@@ -160,7 +160,7 @@ func (s *store) Release() {
 
 func (s *store) close() {
 	if err := s.persistentStore.Close(); err != nil {
-		s.log.Errorf("Closing registry store did report an error: %+v", err)
+		s.log.Errorf("Closing registry store reported an error: %+v", err)
 	}
 }
 

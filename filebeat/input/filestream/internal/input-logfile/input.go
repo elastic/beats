@@ -92,7 +92,7 @@ func (inp *managedInput) Run(
 			inp.harvesterLimit,
 			harvesterGroupStopTimeout,
 			ctx.Logger,
-			"harvester:"),
+			"harvester"),
 		metrics: metrics,
 		inputID: inp.id,
 	}
@@ -109,7 +109,7 @@ func (inp *managedInput) Run(
 	// Any errors encountered by harvester will change state to Degraded
 	ctx.UpdateStatus(status.Running, "")
 
-	inp.prospector.Run(ctx, sourceStore, hg)
+	inp.prospector.Run(ctx, sourceStore, hg, metrics)
 
 	return nil
 }

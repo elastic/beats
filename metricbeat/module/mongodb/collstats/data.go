@@ -19,6 +19,7 @@ package collstats
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -103,6 +104,31 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 			"max":            mustGetMapStrValue(data, "stats.max"),
 			"nindexes":       mustGetMapStrValue(data, "stats.nindexes"),
 		},
+	}
+
+	// Optionally enrich stats with extended fields if present
+	statsValue, ok := event["stats"]
+	if !ok {
+		return nil, errors.New("event stats section is missing")
+	}
+	statsMap, ok := statsValue.(mapstr.M)
+	if !ok {
+		return nil, fmt.Errorf("event stats has unexpected type %T", statsValue)
+	}
+
+	// For each optional key, only set if present in source data
+	optionalKeys := []string{
+		"stats.numOrphanDocs",
+		"stats.shardCount",
+		"stats.freeStorageSize",
+		"stats.capped",
+		"stats.scaleFactor",
+	}
+	for _, k := range optionalKeys {
+		if v, err := data.GetValue(k); err == nil && v != nil {
+			leaf := k[strings.LastIndex(k, ".")+1:]
+			statsMap[leaf] = v
+		}
 	}
 
 	return event, nil

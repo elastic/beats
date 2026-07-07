@@ -18,10 +18,12 @@
 package ratelimit
 
 import (
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/jonboulle/clockwork"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -177,6 +179,44 @@ func TestRateLimit(t *testing.T) {
 			require.Equal(t, test.outEvents, out)
 		})
 	}
+}
+
+// TestRateLimitConcurrentRun exercises a single processor instance from
+// multiple goroutines. A beat-level (global) processor can be run
+// concurrently, so makeKey must not mutate the shared config. Run with -race
+// to catch the regression where makeKey sorted config.Fields in place on every
+// Run.
+func TestRateLimitConcurrentRun(t *testing.T) {
+	// Provide the fields unsorted so a per-Run sort would actually mutate the
+	// shared slice and trip the race detector.
+	p, err := new(conf.MustNewConfigFrom(mapstr.M{
+		"limit":  "1000000/s",
+		"fields": []string{"gamma", "alpha", "beta"},
+	}), logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	const (
+		goroutines = 8
+		perRoutine = 200
+	)
+
+	var wg sync.WaitGroup
+	for g := range goroutines {
+		wg.Go(func() {
+			for i := range perRoutine {
+				event := beat.Event{
+					Fields: mapstr.M{
+						"alpha": g,
+						"beta":  i,
+						"gamma": g + i,
+					},
+				}
+				_, err := p.Run(&event)
+				assert.NoError(t, err)
+			}
+		})
+	}
+	wg.Wait()
 }
 
 func TestAllocs(t *testing.T) {
