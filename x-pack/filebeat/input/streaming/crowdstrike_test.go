@@ -276,7 +276,7 @@ func TestCrowdstrikeOAuthHTTPClientRespectsConfiguredTimeout(t *testing.T) {
 			})`,
 	}
 
-	log := logp.NewNopLogger()
+	log := logptest.NewTestingLogger(t, t.Name())
 	env := v2.Context{
 		ID:              "crowdstrike_timeout_test",
 		MetricsRegistry: monitoring.NewRegistry(),
@@ -286,25 +286,40 @@ func TestCrowdstrikeOAuthHTTPClientRespectsConfiguredTimeout(t *testing.T) {
 		t.Fatalf("failed to construct follower: %v", err)
 	}
 
-	start := time.Now()
-	err = s.FollowStream(context.Background())
-	elapsed := time.Since(start)
+	// The token fetch times out on every attempt. A timeout is a transient
+	// error, so the input keeps retrying rather than terminating (MaxAttempts
+	// is ignored for transient errors). The configured timeout must make each
+	// attempt give up well before the token server would respond, so the
+	// discover endpoint is never reached (guarded above). If the timeout were
+	// not applied, the token fetch would succeed after tokenDelay and reach
+	// discover, failing the test.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- s.FollowStream(ctx) }()
 
-	if err == nil {
-		t.Fatal("expected FollowStream to fail due to token request timeout, but it succeeded")
-	}
-	if elapsed > tokenDelay {
-		t.Fatalf("expected FollowStream to fail before server delay %v, but it took %v: %v", tokenDelay, elapsed, err)
+	// Allow enough time that a non-timed-out token fetch would have completed
+	// and reached discover, exercising several retry attempts in the meantime.
+	time.Sleep(tokenDelay + 50*time.Millisecond)
+	cancel()
+
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Errorf("FollowStream() error = %v; want nil after context cancel", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for FollowStream to return after cancel")
 	}
 }
 
 func TestFollowStreamRetryCapHonorsMaxAttempts(t *testing.T) {
 	log := logptest.NewTestingLogger(t, t.Name())
 
-	discoverURL, tokenURL, hits := startEmptyDiscover(t)
+	discoverURL, tokenURL, hits := startDiscover(t, serverErrorDiscover)
 	const maxAttempts = 15 // Deliberately > the unconfigured cap of 10.
-	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
-	s := newEmptyDiscoverFollower(t, cfg, nil, log)
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newDiscoverFollower(t, cfg, nil, log)
 
 	err := s.FollowStream(context.Background())
 	if err == nil {
@@ -324,11 +339,11 @@ func TestFollowStreamRetryCapHonorsMaxAttempts(t *testing.T) {
 func TestFollowStreamInfiniteRetriesDoesNotCap(t *testing.T) {
 	log := logptest.NewTestingLogger(t, t.Name())
 
-	discoverURL, tokenURL, hits := startEmptyDiscover(t)
+	discoverURL, tokenURL, hits := startDiscover(t, serverErrorDiscover)
 	// MaxAttempts is intentionally tiny: InfiniteRetries must override it and
 	// the unconfigured cap of 10 entirely.
-	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{InfiniteRetries: true, MaxAttempts: 1, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
-	s := newEmptyDiscoverFollower(t, cfg, nil, log)
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{InfiniteRetries: true, MaxAttempts: 1, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newDiscoverFollower(t, cfg, nil, log)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -362,13 +377,13 @@ func TestFollowStreamInfiniteRetriesDoesNotCap(t *testing.T) {
 func TestFollowStreamDefersDegraded(t *testing.T) {
 	log := logptest.NewTestingLogger(t, t.Name())
 
-	discoverURL, tokenURL, _ := startEmptyDiscover(t)
+	discoverURL, tokenURL, _ := startDiscover(t, serverErrorDiscover)
 	// With MaxAttempts=5 and the degrade threshold of 3, the input reports
 	// DEGRADED only on attempts 3 and 4, then terminates on attempt 5 without
-	// reporting DEGRADED on the earlier transient failures.
-	cfg := emptyDiscoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: 5, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	// reporting DEGRADED on the earlier failures.
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: 5, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
 	rec := &degradedRecorder{}
-	s := newEmptyDiscoverFollower(t, cfg, rec, log)
+	s := newDiscoverFollower(t, cfg, rec, log)
 
 	if err := s.FollowStream(context.Background()); err == nil {
 		t.Fatal("FollowStream() error = nil; want max-attempts error")
@@ -378,11 +393,96 @@ func TestFollowStreamDefersDegraded(t *testing.T) {
 	}
 }
 
-// startEmptyDiscover starts a token endpoint and a discover endpoint that
-// returns 200 with an empty body (the transient EOF condition observed from
-// CrowdStrike), returning the discover URL, token URL, and a counter of
+// TestFollowStreamTransientRetriesPastCap verifies that a transient discover
+// failure (a 200 with an empty body) is retried indefinitely with back-off
+// instead of counting toward MaxAttempts and terminating the input, so the
+// input self-heals once the upstream recovers.
+func TestFollowStreamTransientRetriesPastCap(t *testing.T) {
+	log := logptest.NewTestingLogger(t, t.Name())
+
+	discoverURL, tokenURL, hits := startDiscover(t, emptyBodyDiscover)
+	// MaxAttempts is small on purpose: a transient error must ignore it.
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: 3, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	rec := &degradedRecorder{}
+	s := newDiscoverFollower(t, cfg, rec, log)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- s.FollowStream(ctx) }()
+
+	// Wait until well past MaxAttempts to prove the transient error does not
+	// terminate the input, then cancel.
+	deadline := time.After(10 * time.Second)
+	for hits.Load() <= 6 {
+		select {
+		case <-deadline:
+			t.Fatalf("discover attempts = %d before timeout; want > 6", hits.Load())
+		case err := <-done:
+			t.Fatalf("FollowStream terminated after %d attempts: %v; transient errors must not terminate", hits.Load(), err)
+		case <-time.After(5 * time.Millisecond):
+		}
+	}
+	cancel()
+
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Errorf("FollowStream() error = %v; want nil after context cancel", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for FollowStream to return after cancel")
+	}
+	// The persistent transient outage should still surface as DEGRADED.
+	if rec.count() == 0 {
+		t.Error("DEGRADED reports = 0; want > 0 while the transient outage persists")
+	}
+}
+
+// TestFollowStreamTransientFailuresDoNotConsumeAttemptCap verifies that
+// transient failures preceding a non-transient one do not count toward the
+// attempt limit: the input terminates only after a full MaxAttempts worth of
+// non-transient failures, regardless of how many transient failures came first.
+func TestFollowStreamTransientFailuresDoNotConsumeAttemptCap(t *testing.T) {
+	log := logptest.NewTestingLogger(t, t.Name())
+
+	const transientFailures = 5 // Empty-body (transient) failures before the real error.
+	const maxAttempts = 3       // Non-transient attempts allowed before termination.
+	var served atomic.Int64
+	// Serve transientFailures empty bodies, then non-transient 500s.
+	discover := func(w http.ResponseWriter, r *http.Request) {
+		if served.Add(1) <= transientFailures {
+			emptyBodyDiscover(w, r)
+			return
+		}
+		serverErrorDiscover(w, r)
+	}
+
+	discoverURL, tokenURL, hits := startDiscover(t, discover)
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newDiscoverFollower(t, cfg, nil, log)
+
+	err := s.FollowStream(context.Background())
+	if err == nil {
+		t.Fatal("FollowStream() error = nil; want max-attempts error")
+	}
+	want := fmt.Sprintf("max retry attempts (%d) exceeded", maxAttempts)
+	if !strings.Contains(err.Error(), want) {
+		t.Errorf("FollowStream() error = %v; want substring %q", err, want)
+	}
+	// The transient failures must not consume the attempt budget: the input
+	// terminates only after transientFailures + maxAttempts discover requests.
+	// A single shared counter (transient failures counting toward the cap)
+	// would instead terminate on the first non-transient failure.
+	if got, want := hits.Load(), int64(transientFailures+maxAttempts); got != want {
+		t.Errorf("discover attempts = %d; want %d (%d transient + %d non-transient)", got, want, transientFailures, maxAttempts)
+	}
+}
+
+// startDiscover starts a token endpoint and a discover endpoint served by the
+// given handler, returning the discover URL, token URL, and a counter of
 // discover requests.
-func startEmptyDiscover(t *testing.T) (discoverURL, tokenURL string, hits *atomic.Int64) {
+func startDiscover(t *testing.T, discover http.HandlerFunc) (discoverURL, tokenURL string, hits *atomic.Int64) {
 	t.Helper()
 	tokenSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -393,13 +493,25 @@ func startEmptyDiscover(t *testing.T) (discoverURL, tokenURL string, hits *atomi
 	hits = new(atomic.Int64)
 	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		hits.Add(1)
-		w.Header().Set("Content-Type", "application/json")
+		discover(w, r)
 	}))
 	t.Cleanup(discoverSrv.Close)
 	return discoverSrv.URL, tokenSrv.URL, hits
 }
 
-func emptyDiscoverConfig(t *testing.T, discoverURL, tokenURL string, r *retry) config {
+// emptyBodyDiscover responds 200 with an empty body: the transient EOF
+// condition observed from the CrowdStrike discover endpoint.
+func emptyBodyDiscover(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+}
+
+// serverErrorDiscover responds 500: a non-transient soft error that counts
+// toward the retry attempt limit.
+func serverErrorDiscover(w http.ResponseWriter, _ *http.Request) {
+	http.Error(w, "internal server error", http.StatusInternalServerError)
+}
+
+func discoverConfig(t *testing.T, discoverURL, tokenURL string, r *retry) config {
 	t.Helper()
 	u, err := url.Parse(discoverURL)
 	if err != nil {
@@ -424,7 +536,7 @@ func emptyDiscoverConfig(t *testing.T, discoverURL, tokenURL string, r *retry) c
 	}
 }
 
-func newEmptyDiscoverFollower(t *testing.T, cfg config, stat status.StatusReporter, log *logp.Logger) StreamFollower {
+func newDiscoverFollower(t *testing.T, cfg config, stat status.StatusReporter, log *logp.Logger) StreamFollower {
 	t.Helper()
 	env := v2.Context{ID: "crowdstrike_test", MetricsRegistry: monitoring.NewRegistry()}
 	s, err := NewFalconHoseFollower(context.Background(), env, cfg, nil, &testPublisher{log}, stat, log, time.Now)
