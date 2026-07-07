@@ -122,6 +122,7 @@ $$$supported-attributes$$$
 5. [storage_url](#attrib-storage-url)
 6. [containers](#attrib-containers)
 7. [name](#attrib-container-name)
+<<<<<<< HEAD
 8. [max_workers](#attrib-max_workers)
 9. [poll](#attrib-poll)
 10. [poll_interval](#attrib-poll_interval)
@@ -129,6 +130,18 @@ $$$supported-attributes$$$
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 13. [timestamp_epoch](#attrib-timestamp_epoch)
 14. [custom_properties](#attrib-custom-properties)
+=======
+8. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0+`
+9. [max_workers](#attrib-max_workers)
+10. [poll](#attrib-poll)
+11. [poll_interval](#attrib-poll_interval)
+12. [file_selectors](#attrib-file_selectors)
+13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
+14. [timestamp_epoch](#attrib-timestamp_epoch)
+15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4+`
+16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0+`
+17. [retry](#attrib-retry) {applies_to}`stack: ga 9.3+`
+>>>>>>> 0f86bf11c ([x-pack/filebeat/input/azureblobstorage] -  Harden blob listing against transient failures and implement configurable retries (#51701))
 
 ## `account_name` [attrib-account-name]
 
@@ -336,6 +349,70 @@ filebeat.inputs:
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
+<<<<<<< HEAD
+=======
+## `path_prefix` [attrib-path_prefix]
+
+```{applies_to}
+stack: ga 9.1.4
+```
+
+This attribute can be used to filter out files or blobs that have a prefix string that is different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority over the root level values if both are specified.
+
+### Example configuration
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    path_prefix: "cloudTrail/"
+```
+
+The example configuration above will fetch blobs present in specified container from the virtual `cloudTrail` directory. This operation occurs via the SDK in the blob-storage server so the impact on memory is negligible.
+
+## `retry` [attrib-retry]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+This attribute controls how transient Azure Storage failures are retried. Azure occasionally returns throttling responses such as `HTTP 429` or `HTTP 503` (`ServerBusy`), and brief network problems can also interrupt requests. The retry settings feed the Azure SDK's retry policy, which sits in the client request pipeline, so they apply to **every** request the input makes — both for listing blobs (pagination) and for downloading them.
+
+The `retry` attribute contains the following sub-attributes:
+
+- `max_retries`: The number of times a failed request is retried after the first attempt. A negative value disables retries. Defaults to `3`.
+- `initial_retry_delay`: The base delay used for the exponential backoff between attempts. Each subsequent retry waits longer, up to `max_retry_delay`. Defaults to `800ms`.
+- `max_retry_delay`: The upper bound on the backoff, so that during a long outage the input keeps retrying at a steady interval instead of drifting towards ever larger waits. Defaults to `60s`.
+
+Every sub-attribute is optional. Omitting the `retry` attribute (or any of its sub-attributes) keeps the Azure SDK defaults, so existing configurations continue to behave as before. The settings are applied per storage account and, therefore, affect all configured containers.
+
+When polling is enabled, a transient blob-listing failure that outlives these retries (for example, an HTTP 503 `ServerBusy`, an HTTP 429, or a network timeout) no longer stops the input. Instead, the input is marked `degraded` and the listing is retried on the next [`poll_interval`](#attrib-poll_interval). This allows the input to ride out longer outages rather than exiting. Permanent failures, such as a missing container or an authentication error, still stop the input.
+
+### Example configuration
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  retry:
+    max_retries: 20
+    initial_retry_delay: 1s
+    max_retry_delay: 30s
+  containers:
+  - name: container_1
+```
+
+This example lets the input ride out longer bursts of Azure throttling: it retries a failed request up to `20` times, starting with a `1s` delay and backing off exponentially up to a `30s` ceiling between attempts.
+
+>>>>>>> 0f86bf11c ([x-pack/filebeat/input/azureblobstorage] -  Harden blob listing against transient failures and implement configurable retries (#51701))
 ## Custom properties [attrib-custom-properties]
 
 Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set or override custom blob properties provides more flexibility when reading blobs from a remote storage where the user might only have read access.
