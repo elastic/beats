@@ -317,23 +317,23 @@ func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
 }
 
 func createEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd}
+	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
 func writeEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Descriptor: fd}
+	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
 func truncateEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Descriptor: fd}
+	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
 func renamedEvent(oldPath, path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Descriptor: fd}
+	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
 func deleteEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd}
+	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd, SrcID: srcID}
 }
 
 func (w *fileWatcher) Event() loginp.FSEvent {
