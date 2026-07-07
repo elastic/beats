@@ -57,18 +57,17 @@ type state struct {
 type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
-	// Fingerprint holds the raw (hex-encoded) growing fingerprint while the file
-	// is still below the threshold (offset+length). With the bounded-key
-	// optimization the registry key is a fixed-size hash of this value, so the
-	// raw fingerprint—which prefix matching needs—must be persisted in the value
-	// instead of the key.
+	// FingerprintLen is the number of content bytes (from the configured
+	// offset) the still-growing fingerprint covers. The registry key already
+	// is the hash of the raw material (bounded key), and hash-based prefix
+	// matching needs only that hash plus this length, so the raw header bytes
+	// themselves are never persisted.
 	//
-	// A non-empty Fingerprint is the single source of truth for "this entry is
-	// still growing": final SHA-256 entries (and legacy/static entries written
-	// before this feature) leave it empty, so they serialize to exactly the same
-	// {source, identifier_name} shape as before and need no migration. omitempty
-	// guarantees that byte-identical form on disk.
-	Fingerprint string `json:"fingerprint,omitempty" struct:"fingerprint,omitempty"`
+	// A non-zero FingerprintLen is the single source of truth for "this entry
+	// is still growing": final SHA-256 entries (and legacy/static entries
+	// written before this feature) leave it zero, so with omitempty they
+	// serialize to exactly the same {source, identifier_name} shape as before.
+	FingerprintLen int64 `json:"fingerprint_len,omitempty" struct:"fingerprint_len,omitempty"`
 }
 
 // filestream is the input for reading from files which

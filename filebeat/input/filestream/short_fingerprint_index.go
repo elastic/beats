@@ -17,35 +17,105 @@
 
 package filestream
 
+import (
+	"slices"
+
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+)
+
 // shortFingerprintSet manages a set of entries whose fingerprint is still
-// in the growing phase (raw-hex, below the configured threshold). Used by both
-// the filewatcher (for rename+grow detection) and the prospector (for key
+// in the growing phase (below the configured threshold). Used by both the
+// filewatcher (for rename+grow detection) and the prospector (for key
 // migration on growth and threshold transition).
+//
+// It never holds raw fingerprint material: an entry is only the identity hash
+// (FingerprintID.Key(), which the registry key carries) plus the raw
+// material's hex length; "stored raw is a strict prefix of target" is decided
+// as "the hashes agree at the stored length". This is what lets the registry
+// persist only (hash, length) for growing entries.
 type shortFingerprintSet struct {
 	entries map[string]shortFingerprintEntry // key → entry
+	// byLen indexes entry keys by (hex length, hash) so a lookup is one hash
+	// snapshot + one map access per distinct stored length, independent of the
+	// number of entries. The innermost set handles distinct keys sharing the
+	// same material (e.g. two identical-content files in the watcher's
+	// path-keyed set).
+	byLen map[int]map[string]map[string]struct{} // hex length → hash → keys
 }
 
 // shortFingerprintEntry represents a tracked short fingerprint.
 type shortFingerprintEntry struct {
-	Fingerprint string
-	Source      string // file path
+	Hash   string // hex(sha256(raw)) — FingerprintID.Key() of the raw material
+	HexLen int    // len(raw): hex characters, i.e. 2× the content bytes
+	Source string // file path
 }
 
 func newShortFingerprintSet() *shortFingerprintSet {
 	return &shortFingerprintSet{
 		entries: make(map[string]shortFingerprintEntry),
+		byLen:   make(map[int]map[string]map[string]struct{}),
 	}
 }
 
-// Add adds an entry. Callers must only add entries that are currently in the
-// growing phase; the index does not enforce this. Entries with an empty
-// fingerprint are ignored. Safe to call on a nil receiver.
-func (s *shortFingerprintSet) Add(key, fingerprint, source string) {
-	if s == nil || fingerprint == "" {
+// Add adds an entry from its already-derived (hash, hex length) form, e.g.
+// loaded from the registry where the key carries the hash and the value the
+// length. Callers must only add entries that are currently in the growing
+// phase; the set does not enforce this. Entries with an empty hash or a
+// non-positive length are ignored. Safe to call on a nil receiver.
+func (s *shortFingerprintSet) Add(key, hash string, hexLen int, source string) {
+	if s == nil || hash == "" || hexLen <= 0 {
 		return
 	}
 
-	s.entries[key] = shortFingerprintEntry{Fingerprint: fingerprint, Source: source}
+	if old, ok := s.entries[key]; ok {
+		s.deleteIndexSlot(old.HexLen, old.Hash, key)
+	}
+	s.entries[key] = shortFingerprintEntry{Hash: hash, HexLen: hexLen, Source: source}
+
+	hashes := s.byLen[hexLen]
+	if hashes == nil {
+		hashes = make(map[string]map[string]struct{})
+		s.byLen[hexLen] = hashes
+	}
+	keys := hashes[hash]
+	if keys == nil {
+		keys = make(map[string]struct{})
+		hashes[hash] = keys
+	}
+	keys[key] = struct{}{}
+}
+
+// AddRaw adds an entry from in-memory raw (hex) fingerprint material, deriving
+// the (hash, hex length) form. The raw material itself is not retained.
+// Entries with an empty fingerprint are ignored. Safe to call on a nil
+// receiver.
+func (s *shortFingerprintSet) AddRaw(key, raw, source string) {
+	if s == nil || raw == "" {
+		return
+	}
+	s.Add(key, loginp.HashRawFingerprint(raw), len(raw), source)
+}
+
+// deleteIndexSlot removes key from the (hexLen, hash) bucket, pruning emptied
+// maps: a long-lived set would otherwise accumulate dead lengths (every
+// growth migration retires one) and pay a hash snapshot per dead length on
+// every lookup.
+func (s *shortFingerprintSet) deleteIndexSlot(hexLen int, hash, key string) {
+	hashes := s.byLen[hexLen]
+	if hashes == nil {
+		return
+	}
+	keys := hashes[hash]
+	if keys == nil {
+		return
+	}
+	delete(keys, key)
+	if len(keys) == 0 {
+		delete(hashes, hash)
+	}
+	if len(hashes) == 0 {
+		delete(s.byLen, hexLen)
+	}
 }
 
 // Remove removes an entry by key. Safe to call on a nil receiver.
@@ -53,7 +123,10 @@ func (s *shortFingerprintSet) Remove(key string) {
 	if s == nil {
 		return
 	}
-	delete(s.entries, key)
+	if e, ok := s.entries[key]; ok {
+		s.deleteIndexSlot(e.HexLen, e.Hash, key)
+		delete(s.entries, key)
+	}
 }
 
 // RemoveBySource removes every entry whose source matches.
@@ -68,6 +141,7 @@ func (s *shortFingerprintSet) RemoveBySource(source string) {
 	}
 	for key, entry := range s.entries {
 		if entry.Source == source {
+			s.deleteIndexSlot(entry.HexLen, entry.Hash, key)
 			delete(s.entries, key)
 		}
 	}
@@ -106,20 +180,46 @@ func (s *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource str
 // rename-eligible candidate instead of testing only the single longest prefix
 // match (which could discard a genuine rename in favor of a still-present
 // distinct file that merely shares a longer header).
-// Returns the key and entry on match. Safe to call on a nil receiver.
+//
+// targetFingerprint is streamed through a single hasher; at every stored
+// length below len(targetFingerprint) the hash is snapshotted and looked up in
+// that length's bucket, so the cost is one pass over the target plus a map
+// access per distinct stored length — no raw fingerprint material is needed or
+// kept. Returns the key and entry on match. Safe to call on a nil receiver.
 func (s *shortFingerprintSet) FindPrefixMatchFunc(targetFingerprint string, keep func(shortFingerprintEntry) bool) (key string, entry shortFingerprintEntry, found bool) {
-	if s == nil || targetFingerprint == "" {
+	if s == nil || targetFingerprint == "" || len(s.entries) == 0 {
 		return "", shortFingerprintEntry{}, false
 	}
-	for k, e := range s.entries {
-		if !isStrictPrefix(targetFingerprint, e.Fingerprint) {
-			continue
+
+	// Only lengths strictly below the target's can hold strict prefixes.
+	lengths := make([]int, 0, len(s.byLen))
+	for l := range s.byLen {
+		if l < len(targetFingerprint) {
+			lengths = append(lengths, l)
 		}
-		if keep != nil && !keep(e) {
-			continue
-		}
-		if !found || len(e.Fingerprint) > len(entry.Fingerprint) {
-			key, entry, found = k, e, true
+	}
+	if len(lengths) == 0 {
+		return "", shortFingerprintEntry{}, false
+	}
+	slices.Sort(lengths)
+
+	// Ascending walk so the hash is fed incrementally; a hit at a longer
+	// length overwrites earlier ones, implementing longest-match-wins.
+	// Indexing the bucket with string(Key()) lets the compiler elide the
+	// lookup-key allocation.
+	hasher := loginp.NewRawFingerprintHasher()
+	target := []byte(targetFingerprint)
+	fed := 0
+	for _, l := range lengths {
+		hasher.Feed(target[fed:l])
+		fed = l
+		candidates := s.byLen[l][string(hasher.Key())]
+		for candidate := range candidates {
+			e := s.entries[candidate]
+			if keep == nil || keep(e) {
+				key, entry, found = candidate, e, true
+				break
+			}
 		}
 	}
 	return key, entry, found
