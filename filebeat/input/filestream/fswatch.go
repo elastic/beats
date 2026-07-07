@@ -42,8 +42,12 @@ import (
 const (
 	RecursiveGlobDepth           = 8
 	DefaultFingerprintSize int64 = 1024 // 1KB
-	scannerDebugKey              = "scanner"
-	watcherDebugKey              = "file_watcher"
+	// MinFingerprintSize is the smallest allowed fingerprint length (one SHA-256 block).
+	MinFingerprintSize int64 = sha256.BlockSize
+	// MaxFingerprintSize caps fingerprint length; larger values risk exhausting scanner memory.
+	MaxFingerprintSize int64 = 10 * 1024 * 1024 // 10MB
+	scannerDebugKey          = "scanner"
+	watcherDebugKey          = "file_watcher"
 )
 
 var (
@@ -600,9 +604,14 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 	}
 
 	if s.cfg.Fingerprint.Enabled {
-		if s.cfg.Fingerprint.Length < sha256.BlockSize {
-			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
+		if s.cfg.Fingerprint.Length < MinFingerprintSize {
+			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, MinFingerprintSize)
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
+		}
+		if s.cfg.Fingerprint.Length > MaxFingerprintSize {
+			s.log.Warnf("fingerprint length %d bytes exceeds the maximum of %d bytes, capping to the maximum",
+				s.cfg.Fingerprint.Length, MaxFingerprintSize)
+			s.cfg.Fingerprint.Length = MaxFingerprintSize
 		}
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d, growing %t",
 			s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length, s.cfg.Fingerprint.Growing)
