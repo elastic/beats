@@ -27,6 +27,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -44,6 +46,7 @@ func TestNewReceiver(t *testing.T) {
 	}
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"auditbeat": map[string]any{
 				"modules": []map[string]any{
 					{
@@ -84,8 +87,8 @@ func TestNewReceiver(t *testing.T) {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
 			}, "failed to connect to monitoring socket stats endpoint, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
-				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+				metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+				return assert.NotEmpty(t, metricsSkipped.All(), "metric reporter did not initialize")
 			}, "failed to check metrics logging")
 		},
 	})
@@ -108,6 +111,7 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 	config1 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"auditbeat": map[string]any{
 				"modules": []map[string]any{
 					{
@@ -132,6 +136,7 @@ func TestMultipleReceivers(t *testing.T) {
 
 	config2 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"auditbeat": map[string]any{
 				"modules": []map[string]any{
 					{
@@ -180,10 +185,10 @@ func TestMultipleReceivers(t *testing.T) {
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "auditbeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 
-			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "auditbeatreceiver/r1"))
-			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrics logging every 30s")
-			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "auditbeatreceiver/r2"))
-			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrics logging every 30s")
+			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "auditbeatreceiver/r1"))
+			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single skipping metrics logging entry")
+			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "auditbeatreceiver/r2"))
+			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single skipping metrics logging entry")
 
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
@@ -328,6 +333,59 @@ func BenchmarkFactory(b *testing.B) {
 		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
+}
+
+func TestReceiverStatus(t *testing.T) {
+	inputID := "ab-status-test"
+
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		inputStatus := inputStatuses.PutEmptyMap(inputID)
+		inputStatus.PutStr("status", state)
+		inputStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"auditbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":        "file_integrity",
+						"id":            inputID,
+						"enabled":       true,
+						"paths":         []string{t.TempDir()},
+						"scan_at_start": false,
+					},
+				},
+			},
+			"logging": map[string]any{
+				"level":     "info",
+				"selectors": []string{"*"},
+			},
+			"path.home":               t.TempDir(),
+			"management.otel.enabled": true,
+		},
+	}
+
+	// The file_integrity module is push-based (PushMetricSetV2) so it only
+	// reports status.Starting. The group reporter maps that to StatusOK at the
+	// top level while per-input attributes reflect the individual module state.
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T: t,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Beat:    "auditbeat",
+				Config:  &cfg,
+				Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+			},
+		},
+		Status: componentstatus.NewEvent(componentstatus.StatusOK,
+			componentstatus.WithAttributes(inputStatusAttributes(
+				componentstatus.StatusStarting.String(), "file_integrity/file is starting"))),
+	})
 }
 
 func TestReceiverHook(t *testing.T) {

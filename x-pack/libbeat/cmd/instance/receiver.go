@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -183,34 +182,36 @@ func (br *BeatReceiver) Start(host component.Host) error {
 	return nil
 }
 
-// BeatReceiver.Shutdown() stops beat receiver.
-func (br *BeatReceiver) Shutdown() error {
+// BeatReceiver.Shutdown stops the beat receiver. The supplied context bounds
+// how long the publisher pipeline waits for outstanding acknowledgments before
+// it is force-closed (issue #49794); if it carries no deadline the pipeline's
+// configured close timeout is used.
+func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	if br.bridge != nil {
 		br.bridge.Shutdown()
 	}
 	if br.releaseSystemBridge != nil {
 		br.releaseSystemBridge()
 	}
-	// Notify the publisher pipeline to shut down (if configured this will
-	// wait for a specified timeout for outstanding events to be
-	// acknowledged).
-	// On a live system the cast to io.Closer will always succeed because
-	// Publisher is implemented by pipeline.Pipeline.
-	if c, ok := br.beat.Publisher.(io.Closer); ok {
-		if err := c.Close(); err != nil {
-			br.Logger.Errorf("error closing beat receiver publisher: %v", err)
-		}
-	}
-
-	// At this point the publisher pipeline is stopped and no more events can
-	// be sent or acknowledged. Notify the beater to shutdown as well.
+	// The Beater owns shutdown sequencing: stop it first so it can close its
+	// inputs and finalize acknowledgments before the pipeline is disconnected.
+	// See https://github.com/elastic/beats/issues/49794.
 	br.beater.Stop()
 
-	// Trigger the stop callback to close the publisher pipeline. Some beaters
-	// (e.g. metricbeat) call Manager.Stop() in their Run() method, but others
-	// (e.g. packetbeat in static mode) do not. The OtelManager.stopOnce
-	// ensures the callback runs exactly once regardless.
+	// Trigger the stop callback. Some beaters (e.g. metricbeat) call
+	// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
+	// static mode) do not. The OtelManager.stopOnce ensures the callback runs
+	// exactly once regardless.
 	br.beat.Manager.Stop()
+
+	// Now disconnect the publisher pipeline (this waits for outstanding events
+	// to be acknowledged, bounded by the caller's context deadline or the
+	// pipeline's configured close timeout). For a receiver sharing an intake
+	// queue this disconnects only this pipeline and waits for its own events,
+	// leaving co-tenant receivers untouched.
+	if err := br.beat.Publisher.Disconnect(ctx); err != nil {
+		br.Logger.Errorf("error closing beat receiver publisher: %v", err)
+	}
 
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()

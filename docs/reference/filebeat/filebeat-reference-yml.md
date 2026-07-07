@@ -576,7 +576,7 @@ filebeat.inputs:
 
   # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
   #multiline.match: after
 
   # The maximum number of lines that are combined into one event.
@@ -684,7 +684,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -779,7 +779,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -970,7 +970,7 @@ filebeat.inputs:
 #- type: redis
   #enabled: false
 
-  # List of hosts to pool to retrieve the slow log information.
+  # List of hosts to poll to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
   # How often the input checks for redis slow log.
@@ -1083,6 +1083,19 @@ filebeat.inputs:
 
   # How long to wait before retrying a failed read.
   #consume_backoff: 2s
+
+  # Network timeout for the connection to the brokers (dial, read and write).
+  #timeout: 30s
+
+  # Keep-alive period for active network connections (0 disables it).
+  #keep_alive: 0s
+
+  # Consumer group session timeout. Increase for higher-latency consumers to
+  # avoid spurious rebalances.
+  #session_timeout: 10s
+
+  # How often the consumer sends heartbeats. Must be lower than session_timeout.
+  #heartbeat_interval: 3s
 
   # How long to wait for the minimum number of input bytes while reading.
   #max_wait_time: 250ms
@@ -1330,55 +1343,37 @@ filebeat.inputs:
 #filebeat.registry.migrate_file: ${path.data}/registry
 
 # The storage backend for the registry. Supported values are "memlog" and
-# "bbolt". The default is "memlog", which uses an in-memory log with periodic
-# disk flushing. The "bbolt" backend uses a bbolt (BoltDB) database for
-# persistent on-disk storage with support for compaction and TTL-based cleanup.
+# "otel_file_storage". The default is "memlog", which uses an in-memory log
+# with periodic disk flushing. The "otel_file_storage" backend stores state
+# using the same on-disk layout as the OpenTelemetry Collector file_storage
+# extension (under registry.path).
+# NOTE: The "otel_file_storage" backend is in technical preview (available
+# since 9.5) and may be changed or removed in a future release.
 #filebeat.registry.backend: memlog
 
-# ----------------------- Bbolt backend settings -------------------------------
-# WARNING: The bbolt backend is EXPERIMENTAL and may change or be removed in
-# future releases. Do not use in production without understanding the risks.
+# ----------------------- OTel file_storage backend settings -------------------
+# NOTE: This configuration section is in technical preview (available since 9.5)
+# and may be changed or removed in a future release.
+# These settings apply only when filebeat.registry.backend is set to
+# "otel_file_storage". Registry data files live under filebeat.registry.path;
+# optional fields below map to the OpenTelemetry file_storage extension config.
+# The running beat name (for example "filebeat") is used as the OpenTelemetry
+# receiver identity for storage client file naming; no separate setting is used.
 #
-# These settings apply only when filebeat.registry.backend is set to "bbolt".
-# The database files are stored under the registry.path directory.
-# Configuration parameter names are aligned with the OpenTelemetry
-# filestorage extension for future compatibility.
-
-# Timeout for obtaining a file lock on the bbolt database file. Default: 1s.
-#filebeat.registry.bbolt.timeout: 1s
-
-# Controls whether fdatasync is called after each write transaction commit.
-# When false (the default), writes are buffered by the OS and flushed lazily.
-# This is faster but recent writes can be lost on an unclean shutdown (power
-# failure, kernel panic). A normal Filebeat shutdown is not affected.
-# When true, every write is synced to disk before returning, guaranteeing
-# durability at the cost of reduced write throughput. Default: false.
-#filebeat.registry.bbolt.fsync: false
-
-# If true, database compaction runs on every start. Compaction rewrites the
-# database to reclaim unused disk space. Default: false.
-#filebeat.registry.bbolt.compaction.on_start: false
-
-# Maximum number of items processed per transaction during compaction and
-# retention cleanup. A value of 0 disables batching, processing all items
-# in a single transaction. Default: 65536.
-#filebeat.registry.bbolt.compaction.max_transaction_size: 65536
-
-# If true, leftover temporary files from a previous compaction that was
-# interrupted (e.g. by a crash) are removed on start. Default: false.
-#filebeat.registry.bbolt.compaction.cleanup_on_start: false
-
-# How long entries are kept before being removed. A zero value disables
-# TTL-based removal. Expired entries become invisible to reads immediately,
-# but are only physically deleted from disk when retention.interval is also
-# set to a positive value. Default: 0 (disabled).
-#filebeat.registry.bbolt.retention.ttl: 0
-
-# How often to remove expired entries from disk. Only effective when
-# retention.ttl is also set to a positive value. A zero value disables
-# periodic removal.
-# Default: 0 (disabled).
-#filebeat.registry.bbolt.retention.interval: 0
+#filebeat.registry.otel_file_storage.timeout: 1s
+#filebeat.registry.otel_file_storage.fsync: false
+# Filebeat defaults create_directory to true when no otel_file_storage
+# section is provided. When otel_file_storage is configured explicitly,
+# the upstream default (false) applies unless overridden here.
+#filebeat.registry.otel_file_storage.create_directory: true
+# directory_permissions defaults to "0700" when create_directory is true
+# and directory_permissions is not set explicitly.
+#filebeat.registry.otel_file_storage.directory_permissions: "0700"
+#filebeat.registry.otel_file_storage.recreate: false
+#
+# See the OpenTelemetry Collector file_storage extension documentation for
+# compaction and other nested options:
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -1564,7 +1559,7 @@ filebeat.inputs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -2781,7 +2776,7 @@ logging.files:
 # sensitive information) together with other log messages, a different
 # log file, only for log entries containing raw events, is used. It will
 # use the same level, selectors and all other configurations from the
-# default logger, but it will have it's own file configuration.
+# default logger, but it will have its own file configuration.
 #
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.

@@ -53,10 +53,12 @@ type Constructor func(config *config.C, logger *logp.Logger) (beat.Processor, er
 var registry = NewNamespace()
 
 func RegisterPlugin(name string, constructor Constructor) {
-	logp.L().Named(logName).Debugf("Register plugin %s", name)
-
 	err := registry.Register(name, SafeWrap(constructor))
 	if err != nil {
 		panic(err)
 	}
+}
+
+func GetConstructor(name string) (Constructor, error) {
+	return registry.GetConstructor(name)
 }

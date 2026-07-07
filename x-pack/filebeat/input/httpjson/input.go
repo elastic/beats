@@ -11,12 +11,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -34,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
@@ -42,10 +38,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -55,8 +49,6 @@ const (
 )
 
 var (
-	userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
-
 	// for testing
 	timeNow = time.Now
 )
@@ -184,26 +176,39 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	log := ctx.Logger.With("input_url", cfg.Request.URL)
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	if cfg.Request.Tracer.enabled() {
-		id := sanitizeFileName(ctx.IDWithoutName)
-		path := strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+	if cfg.Request.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, cfg.Request.Tracer.Filename)
 		if err != nil {
 			return err
 		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
-		}
 		cfg.Request.Tracer.Filename = resolved
 
-		// Propagate tracer behaviour to all chain children.
-		for i, c := range cfg.Chain {
-			if c.Step != nil { // Request is validated as required.
-				cfg.Chain[i].Step.Request.Tracer = cfg.Request.Tracer
+		if cfg.Request.Tracer.enabled() {
+			// Propagate tracer behaviour to all chain children.
+			for i, c := range cfg.Chain {
+				if c.Step != nil { // Request is validated as required.
+					cfg.Chain[i].Step.Request.Tracer = cfg.Request.Tracer
+				}
+				if c.While != nil { // Request is validated as required.
+					cfg.Chain[i].While.Request.Tracer = cfg.Request.Tracer
+				}
 			}
-			if c.While != nil { // Request is validated as required.
-				cfg.Chain[i].While.Request.Tracer = cfg.Request.Tracer
+		}
+	}
+	for i, c := range cfg.Chain {
+		if c.Step != nil && c.Step.Request.Tracer != nil { // Request is validated as required.
+			resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, c.Step.Request.Tracer.Filename)
+			if err != nil {
+				return err
 			}
+			cfg.Chain[i].Step.Request.Tracer.Filename = resolved
+		}
+		if c.While != nil && c.While.Request.Tracer != nil { // Request is validated as required.
+			resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, c.While.Request.Tracer.Filename)
+			if err != nil {
+				return err
+			}
+			cfg.Chain[i].While.Request.Tracer.Filename = resolved
 		}
 	}
 
@@ -214,7 +219,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg, ctx.Agent.UserAgent)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		ctx.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
@@ -286,15 +291,6 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 type noopReporter struct{}
 
 func (noopReporter) UpdateStatus(status.Status, string) {}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
-// The request.tracer.filename may have ":" when a httpjson input has cursor config and
-// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
-}
 
 // newHTTPClient returns a new httpClient based on the provided configuration values and
 // sharing common OAuth2 client if it is configured. If authCfg.OAuth2.isEnabled() is true
@@ -372,11 +368,6 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 	return &httpClient{client: client, limiter: limiter}, nil
 }
 
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
-
 func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
 	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings(), log)...)
 	if err != nil {
@@ -402,22 +393,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 	} else if cfg.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err = os.Remove(cfg.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Tracer.Filename, log)
 	}
 
 	if reg != nil {
@@ -495,6 +471,13 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 
 		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
 		req.Header = prev.Header.Clone()
+
+		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
+			for _, k := range config.RedirectSensitiveHeaders {
+				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
+				req.Header.Del(k)
+			}
+		}
 
 		for _, k := range config.RedirectHeadersBanList {
 			log.Debugf("http client: ban header %v", k)

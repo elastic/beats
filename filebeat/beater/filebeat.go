@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -48,7 +49,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -64,6 +64,13 @@ const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for th
 	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
+// defaultShutdownDrainTimeout bounds how long Filebeat waits on shutdown for
+// already-published events to be acknowledged (and their cursors written to the
+// registry) when shutdown_timeout is not configured. It matches the default
+// publisher pipeline WaitClose, preserving the bounded drain the framework used
+// to perform before disconnecting the pipeline (issue #49794).
+const defaultShutdownDrainTimeout = time.Second
+
 var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
@@ -78,7 +85,7 @@ type Filebeat struct {
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
+type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
 
 var _ backend.WithESStateStoreExtension = (*Filebeat)(nil)
 
@@ -94,6 +101,16 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %w", err) //nolint:staticcheck //Keep old behavior
 	}
+
+	// Report the effective shutdown drain bound to the framework so its shutdown
+	// watchdog waits for our drain (plus a small margin) instead of force-closing
+	// the pipeline early. This mirrors the bound used in Run: the configured
+	// shutdown_timeout, or the short default when it is unset.
+	drainTimeout := config.ShutdownTimeout
+	if drainTimeout <= 0 {
+		drainTimeout = defaultShutdownDrainTimeout
+	}
+	b.ShutdownTimeout = drainTimeout
 
 	if err := cfgwarn.CheckRemoved6xSettings(
 		rawConfig,
@@ -113,7 +130,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		EnableAllFilesets:         enableAllFilesets,
 		ForceEnableModuleFilesets: forceEnableModuleFilesets,
 	}
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides, b.Info.Paths)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +142,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	if b.API != nil {
 		if err = inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry()); err != nil {
-			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+			return nil, fmt.Errorf("failed to attach input API to monitoring endpoint server: %w", err)
 		}
 	}
 
@@ -182,14 +199,14 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		ctx, cancel := context.WithCancel(context.TODO())
 		defer cancel()
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", fb.logger)
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, b.Info)
 		if err != nil {
 			return err
 		}
 
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
-		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config(), fb.logger)
+		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config(), b.Info)
 		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
 		forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
 		filesetOverrides := fileset.FilesetOverrides{
@@ -197,7 +214,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 			ForceEnableModuleFilesets: forceEnableModuleFilesets,
 		}
 
-		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides, b.Info.Paths)
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides)
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
 				// All module configs need to be loaded to enable all the filesets
@@ -319,12 +336,16 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Info.Paths)
+	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
 	}
 	defer stateStore.Close()
+
+	if b.API != nil {
+		b.API.SetStateInspectorRegistry(stateStore.shared.registry, stateStore.storeName)
+	}
 
 	// If notifier is set, configure the listener for output configuration
 	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
@@ -384,9 +405,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
-	inputsLogger := fb.logger.Named("input")
-	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore, b.Info.Paths)
-	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
+	inputInfo := b.Info
+	inputInfo.Logger = b.Info.Logger.Named("input")
+	v2Inputs := fb.pluginFactory(inputInfo, stateStore)
+	v2InputLoader, err := v2.NewLoader(inputInfo.Logger, v2Inputs, "type", cfg.DefaultType)
 	if err != nil {
 		panic(err) // loader detected invalid state.
 	}
@@ -403,8 +425,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
-		compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring.InputsRegistry(), v2InputLoader),
-		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
+		compat.RunnerFactory(inputInfo, b.Monitoring.InputsRegistry(), v2InputLoader),
+		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, b.Info),
 	))
 
 	if fb.otelStatusFactoryWrapper != nil {
@@ -421,13 +443,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
 	defer cancelPipelineFactoryCtx()
 	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
+		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
 	} else {
 		if !b.Manager.Enabled() {
 			fb.logger.Warn(pipelinesWarning)
 		}
 	}
-	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines, b.Info.Paths)
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Info.Paths)
 	if err != nil {
 		fb.logger.Errorf("Could not init crawler: %v", err)
@@ -510,36 +532,55 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters
-	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
-	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
-	//       or publisher might panic due to concurrent updates.
+	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters.
+	// The inputs are stopped first so no new events are produced; the events
+	// already enqueued are drained from the pipeline below, while the registrar
+	// and input state stores are still running.
 	inputs.Stop()
 	modules.Stop()
 	adiscover.Stop()
 	crawler.Stop()
 	cancelPipelineFactoryCtx()
 
-	// On a standard run the pipeline has already waited for acknowledgments
-	// and shut down at this point, so all events that will be acknowledged
-	// already have been. However for the "once" option supported by the
-	// log input, events may still be active.
-	if *once {
-		timeout := fb.config.ShutdownTimeout
-		// Wait for all events to be processed or timeout
+	// In "--once" mode Filebeat is a batch run: it has read its inputs to EOF and
+	// must publish every event before exiting. When no shutdown_timeout is
+	// configured, wait unbounded for all published events to be acknowledged
+	// before disconnecting, matching the historical --once drain (issue #49794).
+	// A partial final batch is flushed by the queue's flush timeout, so this
+	// terminates once the input is fully sent; an explicit stop (fb.done) still
+	// breaks the wait. A configured shutdown_timeout instead bounds the drain via
+	// the Disconnect below. Without this, a slow output (e.g. Elasticsearch) that
+	// cannot ack within the default drain would drop events on a --once run.
+	if *once && fb.config.ShutdownTimeout <= 0 {
 		waitEvents := newSignalWait()
-		defer waitEvents.Wait()
-
 		waitEvents.Add(withLog(wgEvents.Wait,
-			"Continue shutdown: All enqueued events being published.", fb.logger))
-		// Wait for either timeout or explicit shutdown.
-		if timeout > 0 {
-			fb.logger.Infof("Shutdown output timer started. Waiting for max %v.", timeout)
-			waitEvents.Add(withLog(waitDuration(timeout),
-				"Continue shutdown: Time out waiting for events being published.", fb.logger))
-		} else {
-			waitEvents.AddChan(fb.done)
-		}
+			"Continue shutdown: All enqueued events have been published.", fb.logger))
+		waitEvents.AddChan(fb.done)
+		waitEvents.Wait()
+	}
+
+	// The Beater owns shutdown sequencing (issue #49794): now that the inputs are
+	// stopped, drain the publisher pipeline so the events we already published are
+	// acknowledged — and their cursors written to the registry and input state
+	// stores — while those stores are still running. The stores are closed by the
+	// defers above (registrar.Stop, stateStore.Close), which run only after Run
+	// returns, so the acknowledgments delivered during this drain are persisted.
+	// This also flushes any partial final batch the queue is still holding.
+	//
+	// The drain is bounded so a stuck output cannot block shutdown forever:
+	// ShutdownTimeout when configured, otherwise a short default matching the
+	// bounded drain the framework historically performed before disconnecting the
+	// pipeline. The framework also disconnects the pipeline after Run returns, but
+	// Disconnect is idempotent, so this is the effective drain.
+	timeout := fb.config.ShutdownTimeout
+	if timeout <= 0 {
+		timeout = defaultShutdownDrainTimeout
+	}
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	fb.logger.Infof("Shutdown drain started. Waiting up to %v for events to be acknowledged.", timeout)
+	if err := b.Publisher.Disconnect(shutdownCtx); err != nil {
+		fb.logger.Errorf("Error draining the publisher pipeline on shutdown: %v", err)
 	}
 
 	return nil
@@ -554,9 +595,9 @@ func (fb *Filebeat) Stop() {
 }
 
 // Create a new pipeline loader (es client) factory
-func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *logp.Logger) fileset.PipelineLoaderFactory {
+func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, info beat.Info) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", logger)
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, info)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err) //nolint:staticcheck //Keep old behavior
 		}

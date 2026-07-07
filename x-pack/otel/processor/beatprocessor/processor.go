@@ -13,11 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
-	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
-	"github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
-	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
-	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
-	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -82,24 +78,19 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
 		}
 
-		var processorInstance beat.Processor
-		var createProcessorError error
-
 		switch processorName {
-		case "add_cloud_metadata":
-			processorInstance, createProcessorError = add_cloud_metadata.New(processorConfig, logpLogger)
-		case "add_docker_metadata":
-			processorInstance, createProcessorError = add_docker_metadata.New(processorConfig, logpLogger)
-		case "add_fields":
-			processorInstance, createProcessorError = addfields.CreateAddFields(processorConfig, logpLogger)
-		case "add_host_metadata":
-			processorInstance, createProcessorError = add_host_metadata.New(processorConfig, logpLogger)
-		case "add_kubernetes_metadata":
-			processorInstance, createProcessorError = add_kubernetes_metadata.New(processorConfig, logpLogger)
+		case "add_host_metadata", "add_cloud_metadata", "add_docker_metadata", "add_kubernetes_metadata", "add_fields":
 		default:
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
 
+		constructor, err := processors.GetConstructor(processorName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get constructor for '%s': %w", processorName, err)
+		}
+
+		// no need to wrap NewConditional because it is being wrapped when processors are registered
+		processorInstance, createProcessorError := constructor(processorConfig, logpLogger)
 		if createProcessorError != nil {
 			return nil, fmt.Errorf("failed to create processor '%s': %w", processorName, createProcessorError)
 		}
@@ -114,8 +105,17 @@ func (p *beatProcessor) Start(_ context.Context, _ component.Host) error {
 	return nil
 }
 
+// Shutdown closes every processor that was constructed for this component.
 func (p *beatProcessor) Shutdown(_ context.Context) error {
-	return nil
+	var errs []error
+	for _, proc := range p.processors {
+		if err := processors.Close(proc); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	// Drop the references so a repeated Shutdown does not double-close.
+	p.processors = nil
+	return errors.Join(errs...)
 }
 
 func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {
@@ -158,14 +158,11 @@ func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, er
 
 	beatEvent.Meta = mapstr.M{}
 
-	beatEvent.Fields = logRecord.Body().Map().AsRaw()
+	beatEvent.Fields = otelmap.ToMapstr(logRecord.Body().Map())
 
 	return beatEvent, nil
 }
 
 func packBeatEventIntoOTelLogRecord(beatEvent *beat.Event, logRecord plog.LogRecord) error {
-	beatEvent.Fields = beatEvent.Fields.Clone()
-	otelmap.ConvertNonPrimitive((map[string]any)(beatEvent.Fields))
-	err := logRecord.Body().Map().FromRaw(beatEvent.Fields)
-	return err
+	return otelmap.FromMapstr(logRecord.Body().Map(), beatEvent.Fields)
 }

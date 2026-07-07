@@ -39,7 +39,7 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 
 	pipeline := makePipeline(t, Settings{}, makeDiscardQueue())
 
-	defer pipeline.Close()
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 	n := 66000
 	clients := []beat.Client{}
@@ -99,7 +99,7 @@ func TestPipelineWaitCloseThenForce(t *testing.T) {
 		WaitClose:     time.Millisecond,
 	}
 	pipeline := makePipeline(t, settings, mockQueue)
-	require.NoError(t, pipeline.Close())
+	require.NoError(t, pipeline.Disconnect(t.Context()))
 	<-closed
 	<-forceClosed
 }
@@ -154,6 +154,9 @@ type testQueue struct {
 type testProducer struct {
 	publish func(try bool, event publisher.Event) (queue.EntryID, bool)
 	cancel  func()
+	// ackWait, when non-nil, is returned by ACKWaitChan; otherwise a pre-closed
+	// channel is returned so callers selecting on it never block.
+	ackWait chan struct{}
 }
 
 func (q *testQueue) Close(force bool) error {
@@ -210,6 +213,13 @@ func (p *testProducer) Close() {
 	if p.cancel != nil {
 		p.cancel()
 	}
+}
+
+func (p *testProducer) ACKWaitChan() <-chan struct{} {
+	if p.ackWait != nil {
+		return p.ackWait
+	}
+	return closedChan
 }
 
 func makeTestQueue() queue.Queue[publisher.Event] {

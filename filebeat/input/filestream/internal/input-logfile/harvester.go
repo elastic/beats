@@ -29,14 +29,10 @@ import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
-var (
-	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
-	ErrHarvesterLimitReached   = errors.New("harvester limit reached")
-)
+var ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
 
 type permanentHarvesterError struct {
 	err error
@@ -62,24 +58,51 @@ type Harvester interface {
 	Run(inputv2.Context, Source, Cursor, Publisher, *Metrics) error
 }
 
+// reader is the handle for one running harvester's registration in a readerGroup.
+type reader struct {
+	group  *readerGroup
+	srcID  string // current registration key, guarded by group.mu
+	cancel context.CancelFunc
+}
+
+func (rd *reader) currentID() string {
+	rd.group.mu.Lock()
+	defer rd.group.mu.Unlock()
+
+	return rd.srcID
+}
+
+// remove cancels the reader's context and deletes its registration from the group.
+func (rd *reader) remove() {
+	rd.group.mu.Lock()
+	defer rd.group.mu.Unlock()
+
+	rd.cancel()
+	if rd.group.table[rd.srcID] == rd {
+		delete(rd.group.table, rd.srcID)
+	}
+}
+
 type readerGroup struct {
-	mu    sync.Mutex
-	table map[string]context.CancelFunc
+	mu sync.Mutex
+	// table maps each source ID to its reader handle; a nil value is a
+	// reservation made by reserve before the harvester registers itself.
+	table map[string]*reader
 }
 
 func newReaderGroup() *readerGroup {
 	return &readerGroup{
-		table: make(map[string]context.CancelFunc),
+		table: make(map[string]*reader),
 	}
 }
 
-// newContext creates a new context, cancel function and associates it with the given id within
-// the reader group. Using the cancel function does not remvoe the association.
-// An error is returned if the id is already associated with a context. The cancel
-// function is nil in that case and must not be called.
+// newContext creates a new context and registers a reader for the given id within the reader group.
+// The returned reader carries the cancel function for the context; calling it is optional and does
+// not remove the registration.
+// An error is returned if a reader is already registered for the id.
 //
-// The context will be automatically cancelled once the ID is removed from the group. Calling `cancel` is optional.
-func (r *readerGroup) newContext(id string, cancelation inputv2.Canceler) (context.Context, context.CancelFunc, error) {
+// The context will be automatically cancelled once the ID is removed from the group.
+func (r *readerGroup) newContext(id string, cancelation inputv2.Canceler) (context.Context, *reader, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -89,20 +112,42 @@ func (r *readerGroup) newContext(id string, cancelation inputv2.Canceler) (conte
 
 	ctx, cancel := context.WithCancel(ctxtool.FromCanceller(cancelation))
 
-	r.table[id] = cancel
-	return ctx, cancel, nil
+	rd := &reader{group: r, srcID: id, cancel: cancel}
+	r.table[id] = rd
+	return ctx, rd, nil
 }
 
 func (r *readerGroup) remove(id string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	cancel := r.table[id]
-	if cancel != nil {
-		cancel()
+	if rd := r.table[id]; rd != nil {
+		rd.cancel()
 	}
 
 	delete(r.table, id)
+}
+
+// migrate moves a running harvester's registration from oldID to newID, keeping the same reader.
+func (r *readerGroup) migrate(oldID, newID string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	rd := r.table[oldID]
+	if rd == nil {
+		// Nothing running under oldID (absent or only reserved).
+		return false
+	}
+
+	if _, exists := r.table[newID]; exists {
+		// Target occupied — don't clobber an existing registration.
+		return false
+	}
+
+	delete(r.table, oldID)
+	rd.srcID = newID
+	r.table[newID] = rd
+	return true
 }
 
 func (r *readerGroup) reserve(id string) bool {
@@ -132,6 +177,8 @@ type HarvesterGroup interface {
 	StopHarvesters() error
 	// SetObserver sets the observer to get notified when a harvester closes
 	SetObserver(c chan HarvesterStatus)
+	// Migrate moves a running harvester's bookkeeping registration in-place
+	Migrate(oldID string, next Source)
 }
 
 type defaultHarvesterGroup struct {
@@ -146,6 +193,7 @@ type defaultHarvesterGroup struct {
 	metrics      *Metrics
 	notifyChan   chan HarvesterStatus
 	inputID      string
+	readUntilEOF ReadUntilEOFConfig
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID
@@ -179,13 +227,11 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
 	if fn == nil {
 		return
 	}
+
 	if err := hg.tg.Go(fn); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
@@ -198,10 +244,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-	ctx.Logger.Debug("Restarting harvester for file")
+	ctx.Logger.Debugf("Restarting harvester for %s", src)
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
@@ -230,16 +273,23 @@ func startHarvester(
 		// until a slot is available. Without this early check, repeated file events
 		// would spawn goroutines that wait on the semaphore only to discover (after
 		// acquiring it) that a harvester is already running, causing a goroutine leak.
-		ctx.Logger.Debug("Harvester already running")
+		ctx.Logger.Debugf("Harvester already running for %s", srcID)
 		return nil
 	}
 
 	return func(canceler context.Context) (err error) {
+		// rd is this harvester's registration handle; cleanup goes through it
+		// rather than srcID because a migration can re-key the registration.
+		var rd *reader
 		defer func() {
 			if v := recover(); v != nil {
-				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
-				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
-				hg.readers.remove(srcID)
+				err = fmt.Errorf("harvester panic for source %q: %+v\n%s", srcID, v, debug.Stack())
+				if rd != nil {
+					rd.remove()
+				} else {
+					// Not registered yet, only the reserve() placeholder exists.
+					hg.readers.remove(srcID)
+				}
 			}
 
 			// Report permanent harvester errors as a degraded state for the input.
@@ -251,12 +301,16 @@ func startHarvester(
 			}
 		}()
 
+		// We clone the logger here where we need it to avoid redundant copies that increase memory pressure.
+		ctx.Logger = ctx.Logger.With("source_file", srcID)
+
 		if restart {
 			// stop previous harvester
 			hg.readers.remove(srcID)
 		}
 
-		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
+		var harvesterCtx context.Context
+		harvesterCtx, rd, err = hg.readers.newContext(srcID, canceler)
 		if err != nil {
 			// The only possible returned error is ErrHarvesterAlreadyRunning, which is a normal
 			// behaviour of the Filestream input, it's not really an error, it's just a situation.
@@ -283,11 +337,11 @@ func startHarvester(
 		}()
 
 		ctx.Cancelation = harvesterCtx
-		defer cancelHarvester()
+		defer rd.cancel()
 
 		resource, err := lock(ctx, hg.store, srcID)
 		if err != nil {
-			hg.readers.remove(srcID)
+			rd.remove()
 			return fmt.Errorf("error while locking resource: %w", err)
 		}
 		defer releaseResource(resource)
@@ -296,7 +350,7 @@ func startHarvester(
 			EventListener: newInputACKHandler(hg.ackCH),
 		})
 		if err != nil {
-			hg.readers.remove(srcID)
+			rd.remove()
 			return permanentHarvesterError{
 				err: fmt.Errorf("error while connecting to output with pipeline: %w", err),
 			}
@@ -305,7 +359,25 @@ func startHarvester(
 
 		hg.store.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(resource)
-		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+
+		// When read_until_eof is enabled the canceler must be nil. If the harvester
+		// is blocked in client.Publish at the moment of input cancel, Publish
+		// eventually returns once backpressure releases. With a non-nil canceler,
+		// forward would then return ctx.Cancelation.Err() (context.Canceled),
+		// readLineFromSource would surface it as a generic error, and
+		// handleReadError would end the normal-read loop without entering the
+		// readUntilEOF drain. Returning nil here lets the outer loop re-check
+		// ctx.Cancelation and fall through to the readUntilEOF loop and finish
+		// reading the file and publishing events until EOF or the timeout is
+		// reached.
+		var publisherCanceler = ctx.Cancelation
+		if hg.readUntilEOF.Enabled {
+			publisherCanceler = nil
+		}
+		publisher := &cursorPublisher{
+			canceler: publisherCanceler,
+			client:   client,
+			cursor:   &cursor}
 
 		defer func() {
 			// The cursor struct used by Filestream, it is defined on:
@@ -321,21 +393,21 @@ func startHarvester(
 				return
 			}
 
-			hg.notifyObserver(canceler, srcID, st.Offset)
+			hg.notifyObserver(canceler, rd.currentID(), st.Offset)
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()
 
-		ctx.Logger.Debug("Starting harvester for file")
+		ctx.Logger.Debugf("Starting harvester for file. offset %v", resource.cursor)
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
-			hg.readers.remove(srcID)
+			rd.remove()
 			return fmt.Errorf("error while running harvester: %w", err)
 		}
 		// If the context was not cancelled it means that the Harvester is stopping because of
 		// some internal decision, not due to outside interaction.
 		// If it is stopping itself, it must clean up the bookkeeper.
 		if !errors.Is(ctx.Cancelation.Err(), context.Canceled) {
-			hg.readers.remove(srcID)
+			rd.remove()
 		}
 
 		return nil
@@ -386,6 +458,15 @@ func (hg *defaultHarvesterGroup) Stop(s Source) {
 	})
 }
 
+// Migrate moves a running harvester's bookkeeping registration from oldID to next's identity
+// WITHOUT stopping it. It is used after an in-place registry key migration so that a subsequent
+// Start(next) finds the harvester already registered and no-ops, instead of spawning a duplicate
+// that would block forever on the shared resource lock. It does nothing if no harvester runs under
+// oldID or next's key is already taken.
+func (hg *defaultHarvesterGroup) Migrate(oldID string, next Source) {
+	hg.readers.migrate(oldID, hg.identifier.ID(next))
+}
+
 // StopHarvesters stops all running Harvesters.
 func (hg *defaultHarvesterGroup) StopHarvesters() error {
 	return hg.tg.Stop()
@@ -395,10 +476,16 @@ func (hg *defaultHarvesterGroup) StopHarvesters() error {
 // the cursor state and unlock the key.
 func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
-	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
-	if err != nil {
-		resource.Release()
-		return nil, err
+
+	if !resource.lock.TryLock() {
+		ctx.Logger.Infof("Resource '%s' currently in use, waiting...", key)
+		err := resource.lock.LockContext(ctx.Cancelation)
+		ctx.Logger.Infof("Resource '%s' finally released. Lock acquired", key)
+		if err != nil {
+			ctx.Logger.Infof("Input for resource '%s' has been stopped while waiting", key)
+			resource.Release()
+			return nil, err
+		}
 	}
 
 	resource.stateMutex.Lock()
@@ -406,19 +493,6 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource.stateMutex.Unlock()
 
 	return resource, nil
-}
-
-func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Canceler) error {
-	if !resource.lock.TryLock() {
-		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
-		err := resource.lock.LockContext(canceler)
-		log.Infof("Resource '%v' finally released. Lock acquired", resource.key)
-		if err != nil {
-			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
-			return err
-		}
-	}
-	return nil
 }
 
 func releaseResource(resource *resource) {

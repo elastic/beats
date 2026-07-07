@@ -35,7 +35,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/filebeat/features"
+	"github.com/elastic/beats/v7/libbeat/features"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
@@ -446,6 +446,7 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	monitoringPorts := libbeattesting.MustAvailableTCP4Ports(t, 2)
 	otelConfig := struct {
 		Index     string
 		Receivers []multiReceiverConfig
@@ -453,12 +454,12 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		Index: "logs-integration-" + namespace,
 		Receivers: []multiReceiverConfig{
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+				MonitoringPort: int(monitoringPorts[0]),
 				InputFile:      logFilePath,
 				PathHome:       filepath.Join(tmpdir, "r1"),
 			},
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+				MonitoringPort: int(monitoringPorts[1]),
 				InputFile:      logFilePath,
 				PathHome:       filepath.Join(tmpdir, "r2"),
 			},
@@ -2093,6 +2094,129 @@ service:
 	}
 }
 
+// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full otel pipeline.
+func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
+	const eventCount = 100_000
+
+	for b.Loop() {
+		b.StopTimer()
+
+		tmpDir := b.TempDir()
+
+		var totalReceived atomic.Int64
+		var totalBytes atomic.Int64
+		var firstNano atomic.Int64
+		var lastNano atomic.Int64
+		var firstOnce sync.Once
+
+		mockHandler := func(action api.Action, event []byte) int {
+			if action.Action != "create" {
+				return http.StatusOK
+			}
+			now := time.Now().UnixNano()
+			firstOnce.Do(func() { firstNano.Store(now) })
+			lastNano.Store(now)
+			totalReceived.Add(1)
+			totalBytes.Add(int64(len(event)))
+			return http.StatusOK
+		}
+
+		mockServer := httptest.NewServer(
+			api.NewDeterministicAPIHandler(
+				uuid.Must(uuid.NewV4()),
+				"",
+				nil,
+				time.Now().Add(24*time.Hour),
+				0,
+				0,
+				mockHandler,
+			),
+		)
+
+		cfg := renderOtelConfig(b, `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCount}}
+    path.home: {{.PathHome}}
+    setup.template.enabled: false
+    queue.mem.flush.timeout: 0s
+    processors: []
+exporters:
+  elasticsearch:
+    compression: gzip
+    compression_params:
+      level: 1
+    endpoints:
+      - {{.ESEndpoint}}
+    logs_index: benchtest
+    max_conns_per_host: 4
+    sending_queue:
+      batch:
+        flush_timeout: 5s
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
+      enabled: true
+      num_consumers: 4
+      queue_size: 12800
+      wait_for_result: true
+    suppress_conflict_errors: true
+processors:
+  beat:
+    processors:
+      - add_host_metadata: ~
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+  telemetry:
+    logs:
+      level: warn
+    metrics:
+      level: none
+`, struct {
+			EventCount int
+			PathHome   string
+			ESEndpoint string
+		}{
+			EventCount: eventCount,
+			PathHome:   tmpDir,
+			ESEndpoint: mockServer.URL,
+		})
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, cfg)
+
+		require.Eventually(b, func() bool {
+			return totalReceived.Load() >= int64(eventCount)
+		}, 5*time.Minute, 10*time.Millisecond, "timed out waiting for all %d events to reach mock-ES", eventCount)
+
+		first := firstNano.Load()
+		last := lastNano.Load()
+		if first > 0 && last > first {
+			duration := time.Duration(last - first)
+			b.ReportMetric(float64(eventCount)/duration.Seconds(), "events/sec")
+		}
+		received := totalReceived.Load()
+		if received > 0 {
+			b.ReportMetric(float64(totalBytes.Load())/float64(received), "bytes/event")
+		}
+
+		col.Shutdown()
+		mockServer.Close()
+	}
+}
+
 // TestBeatProcessorSharedAcrossPipelines verifies that when the same beat
 // processor component ID is referenced by multiple OTel pipelines, only a
 // single underlying beatProcessor instance is created. This avoids duplicate
@@ -2173,4 +2297,66 @@ exporters:
 
 	processorInstanceCount := col.ObservedLogs().FilterMessageSnippet("Configured Beat processor").Len()
 	assert.Equal(t, 1, processorInstanceCount, "expected beat processor to be configured once (shared instance), but got %d", processorInstanceCount)
+}
+
+// TestBeatProcessorWhenCondition verifies that `when` conditions are
+// honored for beat processors.
+func TestBeatProcessorWhenCondition(t *testing.T) {
+	cfg := `service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      processors:
+        - beat
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: debug
+    metrics:
+      level: none
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "marker test message"
+          count: 1
+    queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_fields:
+          target: ""
+          fields:
+            should_be_added: "yes"
+          when.contains.message: "marker"
+      - add_fields:
+          target: ""
+          fields:
+            should_not_be_added: "yes"
+          when.not.contains.message: "marker"
+exporters:
+  debug:
+    verbosity: detailed
+`
+	col := oteltestcol.New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Body: Map({").
+			FilterMessageSnippet(`"message":"marker test message"`).
+			FilterMessageSnippet(`"should_be_added":"yes"`).
+			Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "expected event to be enriched")
+
+	// The processor whose condition does not match must not enrich the event.
+	matchingNotAdded := col.ObservedLogs().
+		FilterMessageSnippet("Body: Map({").
+		FilterMessageSnippet(`"should_not_be_added"`).
+		Len()
+	assert.Equal(t, 0, matchingNotAdded, "expected `should_not_be_added` field to be absent")
 }

@@ -47,7 +47,9 @@ func TestNewReceiver(t *testing.T) {
 	}
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -102,8 +104,8 @@ func TestNewReceiver(t *testing.T) {
 				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
 			assert.Condition(c, func() bool {
-				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+				metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+				return assert.NotEmpty(t, metricsSkipped.All(), "metric reporter did not initialize")
 			}, "failed to check metrics logging")
 		},
 	})
@@ -126,7 +128,9 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 	config1 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -151,7 +155,9 @@ func TestMultipleReceivers(t *testing.T) {
 
 	config2 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -208,10 +214,10 @@ func TestMultipleReceivers(t *testing.T) {
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 
-			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
-			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrircs logging every 30s")
-			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
-			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrircs logging every 30s")
+			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single skipping metrics logging entry")
+			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single skipping metrics logging entry")
 
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
@@ -400,6 +406,7 @@ func TestReceiverStatus(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
 					"metricbeat": map[string]any{
 						"max_start_delay": "0s",
 						"modules": []map[string]any{

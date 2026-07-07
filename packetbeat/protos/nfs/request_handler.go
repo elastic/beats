@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -54,11 +53,11 @@ func (r *rpc) handleExpiredPacket(nfs *nfs) {
 
 // called when we process a RPC call
 func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
-	if _, err := xdr.getUInt(); dropMalformed("rpc call version", err) {
+	if _, err := xdr.getUInt(); dropMalformed("rpc call version", err, r.logger) {
 		return
 	}
 	rpcProg, err := xdr.getUInt()
-	if dropMalformed("rpc call program", err) {
+	if dropMalformed("rpc call program", err, r.logger) {
 		return
 	}
 	if rpcProg != nfsProgramNumber {
@@ -92,11 +91,11 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 	pbf.Network.Transport = "tcp"
 
 	nfsVers, err := xdr.getUInt()
-	if dropMalformed("rpc call nfs version", err) {
+	if dropMalformed("rpc call nfs version", err, r.logger) {
 		return
 	}
 	nfsProc, err := xdr.getUInt()
-	if dropMalformed("rpc call nfs procedure", err) {
+	if dropMalformed("rpc call nfs procedure", err, r.logger) {
 		return
 	}
 
@@ -117,11 +116,11 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 	fields := evt.Fields
 
 	authFlavor, err := xdr.getUInt()
-	if dropMalformed("rpc auth flavor", err) {
+	if dropMalformed("rpc auth flavor", err, r.logger) {
 		return
 	}
 	authOpaque, err := xdr.getDynamicOpaque()
-	if dropMalformed("rpc auth opaque", err) {
+	if dropMalformed("rpc auth opaque", err, r.logger) {
 		return
 	}
 	switch authFlavor {
@@ -132,12 +131,12 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		cred := mapstr.M{}
 		credXdr := makeXDR(authOpaque)
 		stamp, err := credXdr.getUInt()
-		if dropMalformed("rpc unix cred stamp", err) {
+		if dropMalformed("rpc unix cred stamp", err, r.logger) {
 			return
 		}
 		cred["stamp"] = stamp
 		machine, err := credXdr.getString()
-		if dropMalformed("rpc unix cred machinename", err) {
+		if dropMalformed("rpc unix cred machinename", err, r.logger) {
 			return
 		}
 		if machine == "" {
@@ -149,21 +148,21 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		fields["host.hostname"] = machine
 
 		uid, err := credXdr.getUInt()
-		if dropMalformed("rpc unix cred uid", err) {
+		if dropMalformed("rpc unix cred uid", err, r.logger) {
 			return
 		}
 		cred["uid"] = uid
 		fields["user.id"] = uid
 
 		gid, err := credXdr.getUInt()
-		if dropMalformed("rpc unix cred gid", err) {
+		if dropMalformed("rpc unix cred gid", err, r.logger) {
 			return
 		}
 		cred["gid"] = gid
 		fields["group.id"] = gid
 
 		gids, err := credXdr.getUIntVector()
-		if dropMalformed("rpc unix cred gids", err) {
+		if dropMalformed("rpc unix cred gids", err, r.logger) {
 			return
 		}
 		cred["gids"] = gids
@@ -175,10 +174,10 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 	}
 
 	// eat auth verifier
-	if _, err := xdr.getUInt(); dropMalformed("rpc verifier flavor", err) {
+	if _, err := xdr.getUInt(); dropMalformed("rpc verifier flavor", err, r.logger) {
 		return
 	}
-	if _, err := xdr.getDynamicOpaque(); dropMalformed("rpc verifier body", err) {
+	if _, err := xdr.getDynamicOpaque(); dropMalformed("rpc verifier body", err, r.logger) {
 		return
 	}
 
@@ -192,7 +191,7 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		event: evt,
 	}
 	info, err := nfs.getRequestInfo(xdr)
-	if dropMalformed("nfs request info", err) {
+	if dropMalformed("nfs request info", err, r.logger) {
 		return
 	}
 	fields["nfs"] = info
@@ -211,7 +210,7 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 // called when we process a RPC reply
 func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 	replyStatus, err := xdr.getUInt()
-	if dropMalformed("rpc reply status", err) {
+	if dropMalformed("rpc reply status", err, r.logger) {
 		return
 	}
 	// we are interested only in accepted rpc reply
@@ -220,10 +219,10 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 	}
 
 	// eat auth verifier
-	if _, err := xdr.getUInt(); dropMalformed("rpc reply verifier flavor", err) {
+	if _, err := xdr.getUInt(); dropMalformed("rpc reply verifier flavor", err, r.logger) {
 		return
 	}
-	if _, err := xdr.getDynamicOpaque(); dropMalformed("rpc reply verifier body", err) {
+	if _, err := xdr.getDynamicOpaque(); dropMalformed("rpc reply verifier body", err, r.logger) {
 		return
 	}
 
@@ -242,7 +241,7 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 	if v != nil {
 		nfs, ok := v.(*nfs)
 		if !ok {
-			logp.Warn("nfs: failed to assert nfs interface")
+			r.logger.Warnf("nfs: failed to assert nfs interface")
 			return
 
 		}
@@ -252,17 +251,17 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 		fields := nfs.event.Fields
 		rpcInfo, ok := fields["rpc"].(mapstr.M)
 		if !ok {
-			logp.Warn("nfs: failed to assert map[string]")
+			r.logger.Warnf("nfs: failed to assert map[string]")
 			return
 
 		}
 		statusVal, err := xdr.getUInt()
-		if dropMalformed("rpc accept status", err) {
+		if dropMalformed("rpc accept status", err, r.logger) {
 			return
 		}
 		status := int(statusVal)
 		if status < 0 || status >= len(acceptStatus) {
-			logp.Warn("nfs: rpc accept status %d out of range", status)
+			r.logger.Warnf("nfs: rpc accept status %d out of range", status)
 			return
 		}
 		rpcInfo["status"] = acceptStatus[status]
@@ -271,12 +270,12 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 		if status == 0 {
 			nfsInfo, ok := fields["nfs"].(mapstr.M)
 			if !ok {
-				logp.Warn("nfs: failed to assert map[string]")
+				r.logger.Warnf("nfs: failed to assert map[string]")
 				return
 
 			}
 			nfsStatus, err := nfs.getNFSReplyStatus(xdr)
-			if dropMalformed("nfs reply status", err) {
+			if dropMalformed("nfs reply status", err, r.logger) {
 				return
 			}
 			nfsInfo["status"] = nfsStatus
