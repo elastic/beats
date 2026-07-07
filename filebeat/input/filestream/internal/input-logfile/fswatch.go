@@ -92,7 +92,7 @@ func NewRawFingerprintHasher() *RawFingerprintHasher {
 
 // Feed appends raw fingerprint material to the stream.
 func (r *RawFingerprintHasher) Feed(material []byte) {
-	r.h.Write(material) //nolint:errcheck // sha256 Write cannot fail
+	r.h.Write(material)
 }
 
 // Reset restores the hasher for a new stream, so callers can reuse one allocation across lookups.

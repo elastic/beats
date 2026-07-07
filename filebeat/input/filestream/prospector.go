@@ -168,8 +168,6 @@ func (p *fileProspector) takeOverFn(
 	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 	fm.IdentifierName = p.identifier.Name()
 	// Carry the growing fingerprint length of the current descriptor into the migrated meta.
-	// GrowingByteLen returns 0 for completed descriptors, so the field is omitted on disk, matching a
-	// static fingerprint entry.
 	fm.FingerprintLen = fd.Fingerprint.GrowingByteLen()
 	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key, newKey)
 	return newKey, fm
@@ -660,9 +658,7 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 			return
 		}
 
-		// Convert with typeconv: cursorMeta is a fileMeta value when freshly
-		// written in this process, a map[string]interface{} when loaded from
-		// the persistent registry on startup; typeconv.Convert handles both.
+		// typeconv.Convert handles both fileMeta and map[string]any
 		var fm fileMeta
 		if err := typeconv.Convert(&fm, meta); err != nil {
 			p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
