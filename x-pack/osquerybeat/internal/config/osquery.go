@@ -102,6 +102,44 @@ type ElasticOptions struct {
 	Install *InstallConfig `config:"install" json:"-"`
 	// Profiling groups all query profiling settings (global publish default and local storage).
 	Profiling *ProfilingConfig `config:"profiling" json:"-"`
+	// Extensions configures loading of customer-managed osquery extensions.
+	Extensions *ExtensionsConfig `config:"extensions" json:"-"`
+}
+
+// ExtensionsConfig configures loading of customer-managed (third-party or
+// customer-built) osquery extensions. These extensions are NOT developed,
+// validated, or supported by Elastic; customers are fully responsible for
+// their security, maintenance, and stability.
+//
+// Paths lists absolute entries on the endpoint, where each entry may be:
+//   - a directory: every extension binary found directly in it is autoloaded
+//     (files ending in ".ext" on Unix or ".exe" on Windows);
+//   - a file: that specific extension binary is autoloaded;
+//   - a glob pattern (containing *, ? or [ ]): each match is resolved as a
+//     directory or file per the rules above.
+//
+// osquerybeat never copies these binaries and never writes into the Elastic
+// Agent install tree; it only appends the resolved paths to the osquery
+// extensions autoload file that lives in the runtime data directory. osqueryd
+// enforces safe file permissions on autoloaded extensions (owned by the running
+// user, not writable by group or others); unsafe, non-executable, or otherwise
+// invalid binaries are skipped and logged rather than aborting startup.
+type ExtensionsConfig struct {
+	// Paths lists absolute directories, files, or glob patterns to resolve into
+	// extension binaries.
+	Paths []string `config:"paths" json:"-"`
+	// Timeout optionally overrides osquery's extensions_timeout (seconds), the
+	// time osqueryd waits for autoloaded extensions to register.
+	Timeout int `config:"timeout" json:"-"`
+}
+
+// PathsOrEmpty returns the configured extension paths, or an empty slice when no
+// extensions are configured.
+func (c *ExtensionsConfig) PathsOrEmpty() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Paths
 }
 
 // ProfilingConfig groups all query profiling settings. When ProfilingAll is enabled (the default),

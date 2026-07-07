@@ -57,6 +57,8 @@ func (m *mockOsqueryd) DataPath() string {
 	return "/tmp/test-osquery-data"
 }
 
+func (m *mockOsqueryd) SetExtensions(paths []string, timeout int) {}
+
 type statusEvent struct {
 	Status  status.Status
 	Message string

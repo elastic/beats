@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -60,7 +61,7 @@ func TestOsqueryRunnerCancellable(t *testing.T) {
 	runCh := make(chan struct{}, 1)
 
 	//nolint:unparam // false positive on returning nil error, need this signature
-	runfn := func(ctx context.Context, _ osqd.Flags, _ <-chan []config.InputConfig) error {
+	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
 		runCh <- struct{}{}
 		<-ctx.Done()
 		return nil
@@ -110,7 +111,7 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	var runs int
 
 	//nolint:unparam // false positive on returning nil error, need this signature
-	runfn := func(ctx context.Context, _ osqd.Flags, _ <-chan []config.InputConfig) error {
+	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
 		runs++
 		runCh <- struct{}{}
 		<-ctx.Done()
@@ -187,5 +188,93 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	diff := cmp.Diff(2, runs)
 	if diff != "" {
 		t.Error(diff)
+	}
+}
+
+func TestOsqueryRunnerRestartOnExtensionsChange(t *testing.T) {
+	to := 10 * time.Second
+
+	parentCtx := context.Background()
+	logger := logp.NewLogger("osquery_runner")
+
+	runCh := make(chan struct{}, 1)
+
+	var (
+		mx       sync.Mutex
+		runs     int
+		lastExts config.ExtensionsConfig
+	)
+
+	//nolint:unparam // false positive on returning nil error, need this signature
+	runfn := func(ctx context.Context, _ osqd.Flags, exts config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+		mx.Lock()
+		runs++
+		lastExts = exts
+		mx.Unlock()
+		runCh <- struct{}{}
+		<-ctx.Done()
+		return nil
+	}
+
+	ctx, cn := context.WithCancel(parentCtx)
+	defer cn()
+
+	g, ctx := errgroup.WithContext(ctx)
+
+	runner := newOsqueryRunner(logger)
+	g.Go(func() error {
+		return runner.Run(ctx, runfn)
+	})
+
+	withExt := func(paths []string) []config.InputConfig {
+		return []config.InputConfig{
+			{
+				Osquery: &config.OsqueryConfig{
+					ElasticOptions: &config.ElasticOptions{
+						Extensions: &config.ExtensionsConfig{Paths: paths},
+					},
+				},
+			},
+		}
+	}
+
+	// Initial start with one extension entry.
+	if err := runner.Update(ctx, withExt([]string{"/opt/ext/a"})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, to); err != nil {
+		t.Fatal("failed starting:", err)
+	}
+
+	// Changing the entry set should restart the runner function.
+	if err := runner.Update(ctx, withExt([]string{"/opt/ext/a", "/opt/ext/b"})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, to); err != nil {
+		t.Fatal("failed starting after extensions update:", err)
+	}
+
+	// Same entry set should not restart the runner function.
+	if err := runner.Update(ctx, withExt([]string{"/opt/ext/a", "/opt/ext/b"})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, 300*time.Millisecond); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatal("unexpected error type after update with the same extensions:", err)
+	}
+
+	cn()
+
+	er := waitGroupWithTimeout(parentCtx, g, to)
+	if er != nil && !errors.Is(er, context.Canceled) {
+		t.Fatal("failed running:", er)
+	}
+
+	mx.Lock()
+	defer mx.Unlock()
+	if diff := cmp.Diff(2, runs); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff([]string{"/opt/ext/a", "/opt/ext/b"}, lastExts.Paths); diff != "" {
+		t.Errorf("extensions not propagated to runfn: %s", diff)
 	}
 }

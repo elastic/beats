@@ -52,6 +52,11 @@ type Runner interface {
 	Run(ctx context.Context, flags Flags) error
 	SocketPath() string
 	DataPath() string
+	// SetExtensions configures customer-managed extension entries (directories,
+	// files, or glob patterns) to resolve and autoload, plus an optional
+	// extensions_timeout override (seconds, ignored when <= 0). It must be called
+	// before Run so prepare() writes the autoload file for the desired set on (re)start.
+	SetExtensions(paths []string, timeout int)
 }
 
 type RunnerFactory func(socketPath string, opts ...Option) (Runner, error)
@@ -69,6 +74,12 @@ type OSQueryD struct {
 
 	extensionsTimeout     int
 	configRefreshInterval int
+
+	// extensionEntries holds absolute directories, files, or glob patterns that
+	// are resolved into customer-managed extension binaries appended to the
+	// autoload file after the mandatory Elastic extension.
+	extMx            sync.Mutex
+	extensionEntries []string
 
 	log *logp.Logger
 }
@@ -90,6 +101,14 @@ func WithBinaryPath(binPath string) Option {
 func WithExtensionPath(extPath string) Option {
 	return func(q *OSQueryD) {
 		q.extPath = extPath
+	}
+}
+
+// WithExtensions sets the initial customer-managed extension entries (directories,
+// files, or glob patterns) to resolve.
+func WithExtensions(paths []string) Option {
+	return func(q *OSQueryD) {
+		q.extensionEntries = append([]string(nil), paths...)
 	}
 }
 
@@ -174,6 +193,31 @@ func (q *OSQueryD) SocketPath() string {
 
 func (q *OSQueryD) DataPath() string {
 	return q.dataPath
+}
+
+// SetExtensions updates the customer-managed extension entries (directories, files,
+// or glob patterns) to resolve and an optional extensions_timeout override (seconds,
+// ignored when <= 0). The new set is applied on the next Run (which rewrites the
+// autoload file via prepare()).
+func (q *OSQueryD) SetExtensions(paths []string, timeout int) {
+	q.extMx.Lock()
+	defer q.extMx.Unlock()
+	q.extensionEntries = append([]string(nil), paths...)
+	if timeout > 0 {
+		q.extensionsTimeout = timeout
+	}
+}
+
+func (q *OSQueryD) getExtensionEntries() []string {
+	q.extMx.Lock()
+	defer q.extMx.Unlock()
+	return append([]string(nil), q.extensionEntries...)
+}
+
+// AutoloadPath returns the path of the osquery extensions autoload file within
+// the given osquery data directory.
+func AutoloadPath(dataPath string) string {
+	return filepath.Join(dataPath, osqueryAutoload)
 }
 
 // Check checks if the binary exists and executable
@@ -318,9 +362,14 @@ func (q *OSQueryD) prepare() (func(), error) {
 		}
 	}
 
+	// Resolve the configured entries (directories, files, or globs) into
+	// customer-managed extension binaries. Invalid entries are logged and skipped
+	// so a bad extension never aborts osqueryd startup.
+	extraExtensions := q.collectExtensionBinaries(q.getExtensionEntries())
+
 	// Write the autoload file
 	extensionAutoloadPath := q.resolveDataPath(osqueryAutoload)
-	err = prepareAutoloadFile(extensionAutoloadPath, extensionPath, q.log)
+	err = prepareAutoloadFile(extensionAutoloadPath, extensionPath, extraExtensions, q.log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare extensions autoload file, %w", err)
 	}
@@ -344,30 +393,234 @@ func (q *OSQueryD) prepare() (func(), error) {
 	return func() {}, nil
 }
 
-func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, log *logp.Logger) error {
-	ok, err := fileutil.FileExists(extensionAutoloadPath)
-	if err != nil {
-		return fmt.Errorf("failed to check osquery.autoload file exists, %w", err)
-	}
+func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, extraPaths []string, log *logp.Logger) error {
+	desired := autoloadContent(mandatoryExtensionPath, extraPaths)
 
-	rewrite := false
-
-	if ok {
-		log.Debugf("Extensions autoload file %s exists, verify the first extension is ours", extensionAutoloadPath)
-		err = verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath)
-		if err != nil {
-			log.Debugf("Extensions autoload file %v verification failed, err: %v, create a new one", extensionAutoloadPath, err)
-			rewrite = true
+	rewrite := true
+	existing, err := os.ReadFile(extensionAutoloadPath)
+	switch {
+	case err == nil:
+		// Rewrite only when the desired content differs or an already-listed path
+		// no longer verifies (line 0 must remain the mandatory extension and every
+		// referenced path must exist).
+		if string(existing) == desired {
+			if verr := verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath); verr != nil {
+				log.Debugf("Extensions autoload file %v verification failed, err: %v, create a new one", extensionAutoloadPath, verr)
+			} else {
+				log.Debugf("Extensions autoload file %s is up to date", extensionAutoloadPath)
+				rewrite = false
+			}
+		} else {
+			log.Debugf("Extensions autoload file %s differs from desired content, rewrite it", extensionAutoloadPath)
 		}
-	} else {
+	case os.IsNotExist(err):
 		log.Debugf("Extensions autoload file %s doesn't exists, create a new one", extensionAutoloadPath)
-		rewrite = true
+	default:
+		return fmt.Errorf("failed to read osquery.autoload file, %w", err)
 	}
 
 	if rewrite {
-		if err := os.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0600); err != nil {
+		if err := os.WriteFile(extensionAutoloadPath, []byte(desired), 0600); err != nil {
 			return fmt.Errorf("failed write osquery extension autoload file, %w", err)
 		}
+	}
+	return nil
+}
+
+// autoloadContent builds the desired osquery.autoload file content: the mandatory
+// Elastic extension always on the first line, followed by any customer-managed
+// extension paths (deduplicated, mandatory excluded).
+func autoloadContent(mandatoryExtensionPath string, extraPaths []string) string {
+	lines := []string{mandatoryExtensionPath}
+	seen := map[string]struct{}{mandatoryExtensionPath: {}}
+	for _, p := range extraPaths {
+		if p == "" {
+			continue
+		}
+		if _, ok := seen[p]; ok {
+			continue
+		}
+		seen[p] = struct{}{}
+		lines = append(lines, p)
+	}
+	return strings.Join(lines, "\n")
+}
+
+// collectExtensionBinaries resolves the configured entries, logs the outcome, and
+// returns the valid extension binary paths safe to reference in the autoload file.
+func (q *OSQueryD) collectExtensionBinaries(entries []string) []string {
+	results := ResolveExtensions(entries)
+	var out []string
+	for _, res := range results {
+		if res.Error != "" {
+			if q.log != nil {
+				q.log.Warnf("Skipping customer-managed osquery extension entry %q: %v. Custom extensions are not developed, validated, or supported by Elastic.", res.Entry, res.Error)
+			}
+			continue
+		}
+		for _, skip := range res.Skipped {
+			if q.log != nil {
+				q.log.Warnf("Skipping customer-managed osquery extension %q: %v. Ensure the binary is a regular executable file owned by the osquery user and not writable by group or others.", skip.Path, skip.Reason)
+			}
+		}
+		for _, p := range res.Loaded {
+			if q.log != nil {
+				q.log.Infof("Autoloading customer-managed osquery extension %q (unsupported by Elastic; loaded at customer's own risk)", p)
+			}
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// ExtensionSkip records a customer-managed extension binary that was skipped and why.
+type ExtensionSkip struct {
+	Path   string
+	Reason string
+}
+
+// ExtensionResolveResult holds the outcome of resolving a single configured entry
+// (a directory, a file, or a glob pattern).
+type ExtensionResolveResult struct {
+	Entry   string
+	Error   string // entry-level error (e.g. not an absolute path, missing file, bad glob)
+	Loaded  []string
+	Skipped []ExtensionSkip
+}
+
+// ResolveExtensions resolves each configured entry into osquery extension binaries.
+// An entry may be a directory (scanned for files with the platform extension suffix),
+// a specific extension binary file, or a glob pattern whose matches are resolved as
+// directories or files. It reports, per entry, the valid binaries and the ones skipped
+// with a reason. It performs no logging so callers can use it both for autoload
+// preparation and for diagnostics. osqueryd still applies its own safe-permission gate
+// at load time (osquerybeat never passes --allow_unsafe), so unsafe binaries are
+// additionally skipped by osqueryd and surfaced in diagnostics.
+func ResolveExtensions(entries []string) []ExtensionResolveResult {
+	if len(entries) == 0 {
+		return nil
+	}
+	seen := map[string]struct{}{}
+	results := make([]ExtensionResolveResult, 0, len(entries))
+	for _, entry := range entries {
+		res := ExtensionResolveResult{Entry: entry}
+		switch {
+		case entry == "":
+			res.Error = "empty path"
+		case !filepath.IsAbs(entry):
+			res.Error = "path must be absolute"
+		case isGlobPattern(entry):
+			matches, err := filepath.Glob(entry)
+			if err != nil {
+				res.Error = fmt.Sprintf("invalid glob pattern: %v", err)
+				break
+			}
+			sort.Strings(matches)
+			for _, m := range matches {
+				resolveExtensionPath(m, false, seen, &res)
+			}
+		default:
+			resolveExtensionPath(entry, true, seen, &res)
+		}
+		results = append(results, res)
+	}
+	return results
+}
+
+// resolveExtensionPath resolves a single concrete path (a directory or a file) into
+// extension binaries, appending results to res. When literal is true the path came
+// directly from configuration (so a stat failure is an entry-level error); when false
+// it came from a glob match (so failures are recorded as skips).
+func resolveExtensionPath(path string, literal bool, seen map[string]struct{}, res *ExtensionResolveResult) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		if literal {
+			res.Error = err.Error()
+		} else {
+			res.Skipped = append(res.Skipped, ExtensionSkip{Path: path, Reason: err.Error()})
+		}
+		return
+	}
+	if fi.IsDir() {
+		scanExtensionDir(path, seen, res)
+		return
+	}
+	// A file selected explicitly (literal path or glob match) is autoloaded without a
+	// suffix filter; only the safe-binary pre-check applies.
+	addExtensionBinary(path, seen, res)
+}
+
+// scanExtensionDir adds every file with the platform extension suffix found directly
+// in dir. os.ReadDir returns entries sorted by name, so the autoload content is
+// deterministic.
+func scanExtensionDir(dir string, seen map[string]struct{}, res *ExtensionResolveResult) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		res.Skipped = append(res.Skipped, ExtensionSkip{Path: dir, Reason: err.Error()})
+		return
+	}
+	suffix := extensionFileSuffix()
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		if !strings.HasSuffix(e.Name(), suffix) {
+			continue
+		}
+		addExtensionBinary(filepath.Join(dir, e.Name()), seen, res)
+	}
+}
+
+// addExtensionBinary validates a candidate binary path and appends it to the loaded
+// or skipped list, deduplicating across all resolved entries.
+func addExtensionBinary(path string, seen map[string]struct{}, res *ExtensionResolveResult) {
+	if _, ok := seen[path]; ok {
+		return
+	}
+	seen[path] = struct{}{}
+	if err := ValidateExtensionPath(path); err != nil {
+		res.Skipped = append(res.Skipped, ExtensionSkip{Path: path, Reason: err.Error()})
+		return
+	}
+	res.Loaded = append(res.Loaded, path)
+}
+
+// isGlobPattern reports whether the entry contains glob metacharacters.
+func isGlobPattern(p string) bool {
+	return strings.ContainsAny(p, "*?[")
+}
+
+// extensionFileSuffix returns the file suffix osquery extension binaries use on
+// the current platform.
+func extensionFileSuffix() string {
+	if runtime.GOOS == "windows" {
+		return ".exe"
+	}
+	return ".ext"
+}
+
+// ValidateExtensionPath performs the beat-side pre-check for a customer-managed
+// extension binary (absolute path, exists, regular file, executable). The
+// ownership/writability safe-permission checks are enforced by osqueryd itself at
+// load time (osquerybeat never passes --allow_unsafe).
+func ValidateExtensionPath(p string) error {
+	if p == "" {
+		return errors.New("empty path")
+	}
+	if !filepath.IsAbs(p) {
+		return errors.New("path must be absolute")
+	}
+	fi, err := os.Stat(p)
+	if err != nil {
+		return err
+	}
+	if !fi.Mode().IsRegular() {
+		return errors.New("not a regular file")
+	}
+	// osquery requires an executable extension binary; the ownership/writability
+	// (safe-permission) checks are enforced by osqueryd itself at load time.
+	if runtime.GOOS != "windows" && fi.Mode().Perm()&0o111 == 0 {
+		return errors.New("file is not executable")
 	}
 	return nil
 }

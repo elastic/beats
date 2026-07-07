@@ -7,6 +7,7 @@ package config
 import (
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -386,6 +387,68 @@ func TestGetOsqueryInstallConfig(t *testing.T) {
 		}
 		if selected.ArtifactURL != installCfg.Linux.AMD64.ArtifactURL {
 			t.Fatalf("unexpected artifact_url: %s", selected.ArtifactURL)
+		}
+	})
+}
+
+func TestGetOsqueryExtensions(t *testing.T) {
+	t.Run("missing input returns empty", func(t *testing.T) {
+		cfg := GetOsqueryExtensions(nil)
+		if len(cfg.Paths) != 0 || cfg.Timeout != 0 {
+			t.Fatalf("expected empty extensions config, got %+v", cfg)
+		}
+	})
+
+	t.Run("returns first input osquery extensions", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						Extensions: &ExtensionsConfig{
+							Paths:   []string{"/opt/ext", "/opt/other/*.ext"},
+							Timeout: 30,
+						},
+					},
+				},
+			},
+		}
+		cfg := GetOsqueryExtensions(inputs)
+		if cfg.Timeout != 30 {
+			t.Fatalf("unexpected timeout: %d", cfg.Timeout)
+		}
+		if len(cfg.Paths) != 2 || cfg.Paths[0] != "/opt/ext" || cfg.Paths[1] != "/opt/other/*.ext" {
+			t.Fatalf("unexpected paths: %v", cfg.Paths)
+		}
+	})
+
+	t.Run("unpacks config tags from yaml", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(map[string]interface{}{
+			"inputs": []map[string]interface{}{
+				{
+					"osquery": map[string]interface{}{
+						"elastic_options": map[string]interface{}{
+							"extensions": map[string]interface{}{
+								"paths":   []string{"/opt/ext"},
+								"timeout": 15,
+							},
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var parsed Config
+		if err := c.Unpack(&parsed); err != nil {
+			t.Fatal(err)
+		}
+		cfg := GetOsqueryExtensions(parsed.Inputs)
+		if cfg.Timeout != 15 {
+			t.Fatalf("unexpected timeout: %d", cfg.Timeout)
+		}
+		if len(cfg.Paths) != 1 || cfg.Paths[0] != "/opt/ext" {
+			t.Fatalf("unexpected paths: %v", cfg.Paths)
 		}
 	})
 }

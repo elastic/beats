@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -89,8 +90,10 @@ type osquerybeat struct {
 	cancel context.CancelFunc
 	mx     sync.Mutex
 
-	diagMx        sync.RWMutex
-	diagQueryExec queryExecutor
+	diagMx          sync.RWMutex
+	diagQueryExec   queryExecutor
+	diagExtensions  config.ExtensionsConfig
+	diagOsqueryData string
 
 	// parent process watcher (disabled via disableWatcher when running as an OTel receiver)
 	watcher        *Watcher
@@ -266,8 +269,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// It exits if osqueryd fails to run for any reason, like a bad configuration for example
 	runner := newOsqueryRunner(bt.log)
 	g.Go(func() error {
-		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
-			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah, osqdMetrics)
+		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error {
+			return bt.runOsquery(ctx, b, osq, flags, extensions, inputCh, rah, osqdMetrics)
 		})
 	})
 
@@ -386,6 +389,99 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			return data
 		},
 	)
+
+	b.Manager.RegisterDiagnosticHook(
+		"osquery_extensions",
+		"Customer-managed osquery extensions: configuration, autoload file, and extensions loaded by osqueryd.",
+		"osquery_extensions.json",
+		"application/json",
+		func() []byte {
+			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
+			defer cancel()
+
+			data, err := json.MarshalIndent(bt.extensionsDiagnosticsPayload(ctx), "", "  ")
+			if err != nil {
+				if bt.log != nil {
+					bt.log.Warnw("Failed to collect osquery extensions diagnostics.", "error", err)
+				}
+				return diagnosticsErrorJSON(err.Error())
+			}
+			return data
+		},
+	)
+}
+
+// extensionsDiagnosticsPayload reports the customer-managed extension configuration,
+// the per-path pre-check result, the current autoload file contents, and the
+// extensions osqueryd actually loaded (via the osquery_extensions table). This makes
+// load failures (missing binary, unsafe permissions) visible in agent diagnostics.
+func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[string]interface{} {
+	bt.diagMx.RLock()
+	extensions := bt.diagExtensions
+	dataPath := bt.diagOsqueryData
+	qe := bt.diagQueryExec
+	bt.diagMx.RUnlock()
+
+	payload := map[string]interface{}{
+		"generated_at":       time.Now().UTC().Format(time.RFC3339Nano),
+		"unsupported_notice": "Custom extensions are not developed, validated, or supported by Elastic. Customers are fully responsible for security, maintenance, and stability.",
+	}
+
+	resolved := osqd.ResolveExtensions(extensions.Paths)
+	entries := make([]map[string]interface{}, 0, len(resolved))
+	loadedCount := 0
+	for _, res := range resolved {
+		entry := map[string]interface{}{"entry": res.Entry}
+		if res.Error != "" {
+			entry["status"] = "error"
+			entry["reason"] = res.Error
+		} else {
+			entry["status"] = "ok"
+			entry["loaded"] = res.Loaded
+			loadedCount += len(res.Loaded)
+			if len(res.Skipped) > 0 {
+				skipped := make([]map[string]interface{}, 0, len(res.Skipped))
+				for _, s := range res.Skipped {
+					skipped = append(skipped, map[string]interface{}{"path": s.Path, "reason": s.Reason})
+				}
+				entry["skipped"] = skipped
+			}
+		}
+		entries = append(entries, entry)
+	}
+	payload["configured_entries"] = entries
+	payload["configured_entries_count"] = len(entries)
+	payload["discovered_extensions_count"] = loadedCount
+	if extensions.Timeout > 0 {
+		payload["extensions_timeout"] = extensions.Timeout
+	}
+
+	if dataPath != "" {
+		autoloadPath := osqd.AutoloadPath(dataPath)
+		payload["autoload_path"] = autoloadPath
+		if content, err := os.ReadFile(autoloadPath); err != nil {
+			payload["autoload_error"] = err.Error()
+		} else {
+			entries := []string{}
+			for _, l := range strings.Split(strings.TrimRight(string(content), "\n"), "\n") {
+				if l != "" {
+					entries = append(entries, l)
+				}
+			}
+			payload["autoload_entries"] = entries
+		}
+	}
+
+	if qe != nil {
+		rows, err := qe.Query(ctx, "SELECT name, version, sdk_version, path, type FROM osquery_extensions;", 10*time.Second)
+		if err != nil {
+			payload["loaded_extensions_error"] = err.Error()
+		} else {
+			payload["loaded_extensions"] = rows
+		}
+	}
+
+	return payload
 }
 
 func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
@@ -394,8 +490,20 @@ func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
 	bt.diagQueryExec = qe
 }
 
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
+func (bt *osquerybeat) setExtensionsDiagnostics(extensions config.ExtensionsConfig, dataPath string) {
+	bt.diagMx.Lock()
+	defer bt.diagMx.Unlock()
+	bt.diagExtensions = extensions
+	bt.diagOsqueryData = dataPath
+}
+
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
 	socketPath := osq.SocketPath()
+
+	// Apply customer-managed extension entries before starting osqueryd so prepare()
+	// writes the autoload file for the current set, and record them for diagnostics.
+	osq.SetExtensions(extensions.PathsOrEmpty(), extensions.Timeout)
+	bt.setExtensionsDiagnostics(extensions, osq.DataPath())
 
 	// Create a cache for queries types resolution
 	cache, err := lru.New[string, map[string]string](adhocOsqueriesTypesCacheSize)

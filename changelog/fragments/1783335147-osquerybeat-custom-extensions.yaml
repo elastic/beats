@@ -1,0 +1,18 @@
+# REQUIRED
+kind: enhancement
+
+# REQUIRED
+summary: Add support for loading customer-managed osquery extensions via `elastic_options.extensions`
+
+# OPTIONAL
+description: >
+  osquerybeat can now autoload customer-managed osquery extensions configured through
+  `osquery.elastic_options.extensions.paths`. Each entry may be a directory (scanned for extension
+  binaries), a specific extension binary file, or a glob pattern; resolved binaries on the endpoint
+  (never copied into the Elastic Agent install directory) are appended to the runtime autoload file
+  after the mandatory Elastic extension. Missing, non-executable, or unsafe binaries are skipped and
+  logged without aborting osqueryd, and discovered/loaded extensions are reported in the
+  `osquery_extensions` agent diagnostics. These extensions are not supported by Elastic.
+
+# REQUIRED
+component: osquerybeat

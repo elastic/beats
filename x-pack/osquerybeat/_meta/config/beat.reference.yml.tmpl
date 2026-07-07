@@ -53,6 +53,30 @@ osquerybeat:
 #            #ssl.key: "/etc/pki/client/cert.key"
 #            # NOTE: custom osquery is installed in the bundled osquery directory.
 #            # NOTE: if custom artifact install/validation fails, osquerybeat startup fails.
+#          extensions:
+#            # Customer-managed osquery extensions to autoload. These extensions are
+#            # NOT developed, validated, or supported by Elastic; customers are fully
+#            # responsible for their security, maintenance, and stability, and load
+#            # them at their own risk.
+#            #
+#            # Each entry is an absolute path and may be a directory (every extension
+#            # binary in it is autoloaded; files ending in ".ext" on Unix or ".exe" on
+#            # Windows), a specific extension binary file, or a glob pattern (containing
+#            # *, ? or [ ]) whose matches are resolved as directories or files.
+#            # osquerybeat never copies binaries and never writes into the Elastic Agent
+#            # install directory. Binaries must be owned by the user running osquery and
+#            # not writable by group or others; osqueryd enforces these safe permissions
+#            # and skips (with a logged warning) any binary that is missing, not
+#            # executable, or unsafe, without aborting startup. Extension tables are then
+#            # queryable via live and scheduled queries (no autocomplete in the UI, since
+#            # schemas are not pre-generated).
+#            paths:
+#              - "/opt/osquery-extensions"
+#              - "/opt/custom/my_extension.ext"
+#              - "/opt/vendor/*.ext"
+#            # Optional override for osquery's extensions_timeout (seconds), the time
+#            # osqueryd waits for autoloaded extensions to register.
+#            #timeout: 10
 #      streams:
 #        - id: "CFDE1EAA-0C6C-4D19-9EEC-45802B2A8C01"
 #          query: "select * from processes"
