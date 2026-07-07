@@ -1,0 +1,30 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: bug-fix
+
+# Change summary; a 80ish characters long description of the change.
+summary: Fix winlog input crash and event loss during shutdown
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: >
+  The winlog input could crash with a native access violation (0xc0000005)
+  during shutdown when the event log was closed while a Read was still
+  rendering an event. The event log was closed asynchronously from a
+  context-cancellation callback on a different goroutine than the read loop,
+  so closing freed the native Windows Event Log handles (subscription, render
+  contexts and publisher metadata) while in-flight EvtRender/EvtFormatMessage
+  calls were still using them. The crash restarted the component and dropped
+  in-flight events. The event log is now closed on the same goroutine as the
+  read loop, after it has stopped, eliminating the race.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: filebeat
