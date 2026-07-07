@@ -146,7 +146,7 @@ func (f FingerprintID) GrowingRaw() string {
 // GrowingByteLen returns the number of content bytes covered by the growing fingerprint, or 0 once
 // the fingerprint is complete.
 func (f FingerprintID) GrowingByteLen() int64 {
-	return int64(len(f.GrowingRaw()) / 2)
+	return int64(hex.DecodedLen(len(f.GrowingRaw())))
 }
 
 // FileDescriptor represents full information about a file.
