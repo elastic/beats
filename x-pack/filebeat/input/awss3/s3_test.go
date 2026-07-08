@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -141,7 +142,7 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   listPrefix,
 			RegionName:         "region",
 		}
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
 			log:             log,
 			config:          cfg,
@@ -245,7 +246,7 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   listPrefix,
 			BackupConfig:       backupCfg,
 		}
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
 		registry, err := newStateRegistry(nil, store, listPrefix, cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
@@ -400,7 +401,7 @@ func TestS3Poller(t *testing.T) {
 			RegionName:         "region",
 		}
 
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
 			log: log,
 			config: config{
@@ -506,7 +507,7 @@ func TestS3Poller(t *testing.T) {
 			LexicographicalOrdering:     true,
 			LexicographicalLookbackKeys: 100,
 		}
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
 			log:             log,
 			config:          cfg,
@@ -547,7 +548,7 @@ func TestS3Poller(t *testing.T) {
 			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
 			Times(1).
 			DoAndReturn(func(_, _, startAfterKey string) s3Pager {
-				require.Equal(t, "", startAfterKey)
+				require.Empty(t, startAfterKey)
 				return mockPager
 			})
 
@@ -595,7 +596,7 @@ func TestS3Poller(t *testing.T) {
 			LexicographicalOrdering:     true,
 			LexicographicalLookbackKeys: 100,
 		}
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
 			log:             log,
 			config:          cfg,
@@ -633,7 +634,7 @@ func TestS3Poller(t *testing.T) {
 			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Eq("")).
 			Times(1).
 			DoAndReturn(func(_, _, startAfterKey string) s3Pager {
-				require.Equal(t, "", startAfterKey)
+				require.Empty(t, startAfterKey)
 				return mockPager
 			})
 
@@ -680,7 +681,7 @@ func TestS3Poller(t *testing.T) {
 			RegionName:              "region",
 			LexicographicalOrdering: false,
 		}
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
 			log:             log,
 			config:          cfg,
@@ -818,7 +819,7 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   "",
 			RegionName:         "region",
 		}
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
 			log:             log,
 			config:          cfg,
