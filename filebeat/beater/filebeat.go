@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -84,7 +83,7 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
-	running                  atomic.Bool
+	runningCh                chan struct{}
 }
 
 type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
@@ -176,6 +175,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	fb := &Filebeat{
 		done:           make(chan struct{}),
+		runningCh:      make(chan struct{}),
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 		pluginFactory:  plugins,
@@ -532,7 +532,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
-	fb.running.Store(true)
+	close(fb.runningCh)
 	waitFinished.Wait()
 
 	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters.
@@ -593,14 +593,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 func (fb *Filebeat) Stop() {
 	fb.logger.Info("Stopping filebeat")
 
-	if !fb.running.Load() {
-		fb.logger.Info("Waiting for init to finish before stopping")
-		// Wait for Run to reach waitFinished.Wait() before closing done, so that
-		// Stop is never delivered before the beater is ready to handle it. Poll
-		// for up to 5 seconds; if Run hasn't started by then, proceed anyway.
-		for i := 0; i < 50 && !fb.running.Load(); i++ {
-			time.Sleep(100 * time.Millisecond)
-		}
+	// Wait for Run to reach waitFinished.Wait() before closing done, so that
+	// Stop is never delivered before the beater is ready to handle it.
+	select {
+	case <-fb.runningCh:
+	case <-time.After(5 * time.Second):
+		fb.logger.Warn("Timed out waiting for Run to reach ready state; stopping anyway")
 	}
 
 	// Stop Filebeat

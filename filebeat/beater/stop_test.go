@@ -25,13 +25,14 @@ import (
 )
 
 // TestStopWaitsForRunReady proves that Stop does not close the done channel
-// until Run has set fb.running to true (i.e., reached waitFinished.Wait).
+// until Run has closed runningCh (i.e., reached waitFinished.Wait).
 // This guards against a race where the OTel collector calls Shutdown before
 // the beat's Run goroutine has initialised its shutdown-signal machinery.
 func TestStopWaitsForRunReady(t *testing.T) {
 	fb := &Filebeat{
-		done:   make(chan struct{}),
-		logger: logp.NewNopLogger(),
+		done:      make(chan struct{}),
+		runningCh: make(chan struct{}),
+		logger:    logp.NewNopLogger(),
 	}
 
 	stopDone := make(chan struct{})
@@ -40,24 +41,20 @@ func TestStopWaitsForRunReady(t *testing.T) {
 		fb.Stop()
 	}()
 
-	// Give Stop a moment to enter its polling loop.
-	time.Sleep(150 * time.Millisecond)
-
-	// done must still be open: Stop is waiting for running to become true.
+	// done must still be open: Stop is waiting for runningCh to be closed.
 	select {
 	case <-fb.done:
-		t.Fatal("Stop closed done before Run set running to true")
+		t.Fatal("Stop closed done before Run closed runningCh")
 	default:
 	}
 
 	// Simulate Run() reaching the waitFinished.Wait() call.
-	fb.running.Store(true)
+	close(fb.runningCh)
 
-	// Stop should close done within the next polling interval (≤100 ms).
 	select {
 	case <-fb.done:
 	case <-time.After(500 * time.Millisecond):
-		t.Fatal("Stop did not close done after running was set to true")
+		t.Fatal("Stop did not close done after runningCh was closed")
 	}
 
 	<-stopDone
