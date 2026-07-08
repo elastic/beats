@@ -59,7 +59,7 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 		return nil, nil, ErrPathsRequired
 	}
 
-	bm, err := newBaseModuleFromConfig(config, info.Logger, info.Paths)
+	bm, err := newBaseModuleFromConfig(config, logger, p)
 	if err != nil {
 		return nil, nil, err
 	}
