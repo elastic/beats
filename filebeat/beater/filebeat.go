@@ -175,7 +175,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	fb := &Filebeat{
 		done:           make(chan struct{}),
-		runReady:       &closeOnce{},
+		runReady:       &closeOnce{ch: make(chan struct{})},
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 		pluginFactory:  plugins,
