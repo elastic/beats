@@ -595,17 +595,24 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 // Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
+	fb.StopWithContext(context.Background())
+}
+
+// StopWithContext is like Stop but respects ctx when waiting for Run to reach
+// its ready state, so the caller's deadline is not consumed by the wait.
+func (fb *Filebeat) StopWithContext(ctx context.Context) {
 	fb.logger.Info("Stopping filebeat")
 
 	// Wait for Run to reach waitFinished.Wait() before closing done, so that
 	// Stop is never delivered before the beater is ready to handle it.
 	select {
 	case <-fb.runReady.ch:
+	case <-ctx.Done():
+		fb.logger.Warn("Context cancelled waiting for Run to reach ready state; stopping anyway")
 	case <-time.After(5 * time.Second):
 		fb.logger.Warn("Timed out waiting for Run to reach ready state; stopping anyway")
 	}
 
-	// Stop Filebeat
 	fb.stopOnce.Do(func() { close(fb.done) })
 }
 

@@ -30,6 +30,14 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 )
 
+// contextStopper is an optional extension of beat.Beater for beaters that can
+// respect a context deadline while waiting to reach their ready state. If a
+// beater implements this, Shutdown uses it so the OTel context deadline is not
+// consumed by the ready-state wait before Disconnect is called.
+type contextStopper interface {
+	StopWithContext(ctx context.Context)
+}
+
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
 	beat                *instance.Beat
@@ -196,7 +204,13 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	// The Beater owns shutdown sequencing: stop it first so it can close its
 	// inputs and finalize acknowledgments before the pipeline is disconnected.
 	// See https://github.com/elastic/beats/issues/49794.
-	br.beater.Stop()
+	// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
+	// shutdown deadline during their ready-state wait.
+	if cs, ok := br.beater.(contextStopper); ok {
+		cs.StopWithContext(ctx)
+	} else {
+		br.beater.Stop()
+	}
 
 	// Trigger the stop callback. Some beaters (e.g. metricbeat) call
 	// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
