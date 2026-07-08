@@ -83,7 +83,7 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
-	runningCh                chan struct{}
+	runReady                 *closeOnce
 }
 
 type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
@@ -175,7 +175,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	fb := &Filebeat{
 		done:           make(chan struct{}),
-		runningCh:      make(chan struct{}),
+		runReady:       &closeOnce{},
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 		pluginFactory:  plugins,
@@ -272,6 +272,9 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
+	// Close runReady so that Shutdown doesn't have to wait no
+	// matter how we exit from Run.
+	defer fb.runReady.Close()
 
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
@@ -532,7 +535,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
-	close(fb.runningCh)
+	// Safe for Shutdown to be called
+	fb.runReady.Close()
 	waitFinished.Wait()
 
 	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters.
@@ -596,7 +600,7 @@ func (fb *Filebeat) Stop() {
 	// Wait for Run to reach waitFinished.Wait() before closing done, so that
 	// Stop is never delivered before the beater is ready to handle it.
 	select {
-	case <-fb.runningCh:
+	case <-fb.runReady.ch:
 	case <-time.After(5 * time.Second):
 		fb.logger.Warn("Timed out waiting for Run to reach ready state; stopping anyway")
 	}
@@ -615,4 +619,15 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, info beat.I
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
+}
+
+type closeOnce struct {
+	ch   chan struct{}
+	once sync.Once
+}
+
+func (coc *closeOnce) Close() {
+	coc.once.Do(func() {
+		close(coc.ch)
+	})
 }
