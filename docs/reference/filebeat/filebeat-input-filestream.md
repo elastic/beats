@@ -1383,7 +1383,7 @@ The `filestream` input also exposes scanner and harvester progress metrics under
 aggregate gauges across all running `filestream` inputs. They are updated after
 each scanner pass and reset when inputs stop. Harvester progress metrics measure
 how much data active plain-file harvesters have read from their files. They do
-not measure output publishing or acknowledgement progress. GZIP files and files
+not measure output publishing or acknowledgment progress. GZIP files and files
 ignored by `filestream` settings or state are excluded.
 
 | Metric | Description |
