@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
-	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
@@ -850,9 +849,4 @@ service:
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-}
-
-func deleteDataStreamsFromES(t *testing.T, es *elasticsearch.Client, dataStreams []string) {
-	_, err := es.Indices.DeleteDataStream(dataStreams)
-	require.NoError(t, err, "failed to delete data streams")
 }
