@@ -28,9 +28,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/paths"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -45,7 +44,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
+func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
+	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
 	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
@@ -54,8 +54,10 @@ func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
 		settings,
 	)
 	require.NoError(t, err)
-	// Inject a test queue so the outputController doesn't create one
-	p.outputController.queue = qu
+	if outputController, ok := p.outputController.(*processOutputController); ok {
+		// Inject a test queue so the outputController doesn't create one
+		outputController.queue = qu
+	}
 
 	return p
 }
@@ -69,7 +71,7 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer pipeline.Close()
+		defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
@@ -91,7 +93,7 @@ func TestClient(t *testing.T) {
 		l := logptest.NewTestingLogger(t, "")
 
 		// a small in-memory queue with a very short flush interval
-		q := memqueue.NewQueue(l, nil, memqueue.Settings{
+		q := memqueue.NewQueue[publisher.Event](l, nil, memqueue.Settings{
 			Events:        5,
 			MaxGetRequest: 1,
 			FlushTimeout:  time.Millisecond,
@@ -133,8 +135,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
-					//nolint:errcheck // it always succeeds
-					e := batch.Entry(i).(publisher.Event)
+					e := batch.Entry(i)
 					received = append(received, e.Content)
 				}
 				batch.Done()
@@ -186,7 +187,7 @@ func TestClient(t *testing.T) {
 		client.PublishAll(sent[3:]) // number 4
 
 		require.NoError(t, client.Close(), "failed closing pipeline client")
-		require.NoError(t, pipeline.Close(), "failed closing pipeline")
+		require.NoError(t, pipeline.Disconnect(t.Context()), "failed closing pipeline")
 
 		// waiting for all events to be consumed from the queue
 		<-done
@@ -194,82 +195,213 @@ func TestClient(t *testing.T) {
 	})
 }
 
-func TestClientWaitClose(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
-	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
-		p, err := New(beat.Info{Logger: logger},
-			Monitors{},
-			conf.Namespace{},
-			outputs.Group{},
-			settings,
-		)
-		if err != nil {
-			panic(err)
-		}
-		// Inject a test queue so the outputController doesn't create one
-		p.outputController.queue = qu
-
-		return p
+// TestDisconnectIsIdempotent verifies that the second stage of client shutdown
+// runs its finalization exactly once, even if disconnect is called more than
+// once (e.g. by both a per-client path and the Pipeline).
+func TestDisconnectIsIdempotent(t *testing.T) {
+	removed := 0
+	c := &client{
+		logger:         logp.NewNopLogger(),
+		observer:       nilObserver,
+		eventListener:  acker.Nil(),
+		clientListener: &mockClientListener{},
+		onRemove:       func() { removed++ },
 	}
 
-	q := memqueue.NewQueue(logger, nil, memqueue.Settings{Events: 1}, 0, nil)
-	pipeline := makePipeline(Settings{}, q)
-	defer pipeline.Close()
+	c.disconnect()
+	c.disconnect() // must hit the idempotency guard and do nothing
 
-	t.Run("WaitClose blocks", func(t *testing.T) {
+	assert.Equal(t, 1, removed, "disconnect must finalize (and unregister) exactly once")
+}
+
+// TestClientFinalizedWhenDrainedMidRun verifies that a client closed while the
+// pipeline keeps running is finalized (stage two) by the reaper as soon as its
+// events drain — it is unregistered without waiting for a pipeline disconnect.
+func TestClientFinalizedWhenDrainedMidRun(t *testing.T) {
+	routinesChecker := resources.NewGoroutinesChecker()
+	defer routinesChecker.Check(t)
+
+	pipeline := makePipeline(t, Settings{}, makeTestQueue())
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
+
+	client, err := pipeline.ConnectWith(beat.ClientConfig{})
+	require.NoError(t, err)
+
+	pipeline.clientsMu.Lock()
+	require.Len(t, pipeline.clients, 1, "client should be registered after connect")
+	pipeline.clientsMu.Unlock()
+
+	// Close mid-run; the pipeline is NOT disconnected. The test producer's
+	// ack-wait channel is already closed, so the reaper should finalize the
+	// client and unregister it promptly.
+	require.NoError(t, client.Close())
+
+	require.Eventually(t, func() bool {
+		pipeline.clientsMu.Lock()
+		defer pipeline.clientsMu.Unlock()
+		return len(pipeline.clients) == 0
+	}, 5*time.Second, 5*time.Millisecond,
+		"reaper should finalize and unregister a drained client without a pipeline disconnect")
+}
+
+// TestReaperFinalizesClientThatDrainsAfterClose verifies that a client whose
+// events are still in flight at Close stays registered while the reaper
+// re-polls, and is finalized once its events drain (its ACKWaitChan closes).
+// This exercises the reaper's re-poll path for not-yet-drained clients.
+func TestReaperFinalizesClientThatDrainsAfterClose(t *testing.T) {
+	routinesChecker := resources.NewGoroutinesChecker()
+	defer routinesChecker.Check(t)
+
+	// A shared ack-wait channel that the test holds open until it decides the
+	// clients' events have "drained".
+	ackWait := make(chan struct{})
+	tq := &testQueue{
+		producer: func(_ queue.ProducerConfig) queue.Producer[publisher.Event] {
+			return &testProducer{
+				publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 1, true },
+				ackWait: ackWait,
+			}
+		},
+		done: make(chan struct{}),
+	}
+	pipeline := makePipeline(t, Settings{}, tq)
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
+
+	// Close one client; it is handed to the reaper but cannot drain yet (the
+	// test holds ackWait open). Close a second while the first is still pending
+	// so the reaper also sees it via the notify path.
+	c1, err := pipeline.ConnectWith(beat.ClientConfig{})
+	require.NoError(t, err)
+	require.NoError(t, c1.Close())
+
+	c2, err := pipeline.ConnectWith(beat.ClientConfig{})
+	require.NoError(t, err)
+	require.NoError(t, c2.Close())
+
+	// Across several reaper ticks both clients must stay registered: their
+	// events have not drained, so the reaper's re-poll must not finalize them.
+	require.Never(t, func() bool {
+		pipeline.clientsMu.Lock()
+		defer pipeline.clientsMu.Unlock()
+		return len(pipeline.clients) != 2
+	}, 3*reaperInterval, reaperInterval/2,
+		"clients must stay registered until their events drain")
+
+	// Drain: now both clients' events are acknowledged.
+	close(ackWait)
+	require.Eventually(t, func() bool {
+		pipeline.clientsMu.Lock()
+		defer pipeline.clientsMu.Unlock()
+		return len(pipeline.clients) == 0
+	}, 5*time.Second, 5*time.Millisecond,
+		"reaper must finalize both clients once their events drain")
+}
+
+// TestEmptyProducerACKWaitChanClosed verifies the placeholder producer used
+// when publishing is disabled reports an already-closed ack-wait channel, so a
+// caller selecting on it never blocks.
+func TestEmptyProducerACKWaitChanClosed(t *testing.T) {
+	select {
+	case <-emptyProducer{}.ACKWaitChan():
+	default:
+		t.Fatal("emptyProducer.ACKWaitChan must be closed")
+	}
+}
+
+// TestCloseSerializesWithInFlightPublish verifies that Close serializes with an
+// in-flight Publish: while a Publish holds the client mutex (here, blocked
+// inside a processor), Close must not proceed to flip isOpen / close the
+// producer until that Publish completes. This is the mutex-ordering guarantee
+// from the fix for https://github.com/elastic/beats/issues/49390. In the strict
+// two-stage model Close no longer waits for acknowledgments, so once the
+// in-flight Publish finishes Close returns promptly.
+func TestCloseSerializesWithInFlightPublish(t *testing.T) {
+	// inProcessor is closed once the processor is running, letting the
+	// test know Publish is in the race window.
+	inProcessor := make(chan struct{})
+	// releaseProcessor is closed by the test to let the processor finish.
+	releaseProcessor := make(chan struct{})
+
+	c := &client{
+		logger: logp.NewNopLogger(),
+		processors: &testProcessor{
+			processorFn: func(in *beat.Event) (*beat.Event, error) {
+				close(inProcessor) // signal: we are inside the processor
+				<-releaseProcessor // block until test says go
+				return in, nil
+			},
+		},
+		producer: &testProducer{
+			publish: func(_ bool, event publisher.Event) (queue.EntryID, bool) {
+				return 1, true
+			},
+		},
+		observer:       nilObserver,
+		eventListener:  acker.Nil(),
+		clientListener: &mockClientListener{},
+	}
+	c.isOpen.Store(true)
+
+	// Start Publish in a goroutine — it will block inside the processor while
+	// holding the client mutex.
+	publishDone := make(chan struct{})
+	go func() {
+		defer close(publishDone)
+		c.Publish(beat.Event{Fields: mapstr.M{"hello": "world"}})
+	}()
+
+	// Wait until Publish is inside the processor (holding the mutex).
+	<-inProcessor
+
+	closeDone := make(chan struct{})
+	go func() {
+		defer close(closeDone)
+		c.Close()
+	}()
+
+	// Close must block on the client mutex until the in-flight Publish finishes.
+	select {
+	case <-closeDone:
+		t.Fatal("Close returned while an in-flight Publish still held the client mutex")
+	case <-time.After(100 * time.Millisecond):
+		// Good — Close is serialized behind the in-flight Publish.
+	}
+
+	// Release the processor so Publish completes and releases the mutex.
+	close(releaseProcessor)
+	<-publishDone
+
+	// Close should now return promptly: strict mode does not wait for acks.
+	select {
+	case <-closeDone:
+		// Good — Close returned once the in-flight Publish completed.
+	case <-time.After(10 * time.Second):
+		t.Fatal("Close did not return after the in-flight Publish completed")
+	}
+}
+
+func TestClientWaitClose(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
+	pipeline := makePipeline(t, Settings{}, q)
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
+
+	// In the strict two-stage model (issue #50104) client.Close no longer blocks
+	// for ClientConfig.WaitClose: it stops new events, closes the producer, and
+	// returns immediately. Waiting for acknowledgments is now the pipeline's
+	// responsibility at Disconnect time.
+	t.Run("Close returns immediately without waiting for acks", func(t *testing.T) {
 		routinesChecker := resources.NewGoroutinesChecker()
 		defer routinesChecker.Check(t)
 
-		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			WaitClose: 500 * time.Millisecond,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer client.Close()
-
-		// Send an event which never gets acknowledged.
-		client.Publish(beat.Event{})
-
-		closed := make(chan struct{})
-		go func() {
-			defer close(closed)
-			client.Close()
-		}()
-
-		select {
-		case <-closed:
-			t.Fatal("expected Close to wait for event acknowledgement")
-		case <-time.After(100 * time.Millisecond):
-		}
-
-		select {
-		case <-closed:
-		case <-time.After(10 * time.Second):
-			t.Fatal("expected Close to stop waiting after WaitClose elapses")
-		}
-	})
-
-	t.Run("ACKing events unblocks WaitClose", func(t *testing.T) {
-		routinesChecker := resources.NewGoroutinesChecker()
-		defer routinesChecker.Check(t)
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			WaitClose: time.Minute,
 		})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer client.Close()
 
-		// Send an event which gets acknowledged immediately.
-		output := newMockClient(func(batch publisher.Batch) error {
-			batch.ACK()
-			return nil
-		})
-		defer output.Close()
-		pipeline.outputController.Set(outputs.Group{Clients: []outputs.Client{output}})
-		defer pipeline.outputController.Set(outputs.Group{})
-
+		// Send an event which never gets acknowledged (no output is configured).
 		client.Publish(beat.Event{})
 
 		closed := make(chan struct{})
@@ -278,10 +410,12 @@ func TestClientWaitClose(t *testing.T) {
 			client.Close()
 		}()
 
+		// Despite WaitClose being a minute and the event never being acked,
+		// Close must return promptly.
 		select {
 		case <-closed:
 		case <-time.After(10 * time.Second):
-			t.Fatal("expected Close to stop waiting after event acknowledgement")
+			t.Fatal("Close must return immediately in the strict two-stage model, even with unacknowledged events")
 		}
 	})
 }
@@ -327,7 +461,7 @@ func TestMonitoring(t *testing.T) {
 		)
 
 		require.NoError(t, err)
-		defer pipeline.Close()
+		defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
@@ -406,7 +540,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 
 	cc, ok := c.(*client)
 	require.True(t, ok, "pipeline.ConnectWith return value cannot be cast to client")
-	cc.producer = &testProducer{publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+	cc.producer = &testProducer{publish: func(try bool, event publisher.Event) (queue.EntryID, bool) {
 		return queue.EntryID(1), true
 	}}
 
@@ -477,7 +611,7 @@ type testProcessorSupporter struct {
 }
 
 // Create a running processor interface based on the given config
-func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
+func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
 	return p.Processor, nil
 }
 

@@ -20,6 +20,7 @@ package publish
 import (
 	"errors"
 	"net"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,9 +33,11 @@ import (
 
 type TransactionPublisher struct {
 	done      chan struct{}
+	wg        sync.WaitGroup
 	pipeline  beat.Pipeline
 	canDrop   bool
 	processor transProcessor
+	log       *logp.Logger
 }
 
 type transProcessor struct {
@@ -42,9 +45,8 @@ type transProcessor struct {
 	localIPs         []net.IP // TODO: Periodically update this list.
 	internalNetworks []string
 	name             string
+	logger           *logp.Logger
 }
-
-var debugf = logp.MakeDebug("publish")
 
 func NewTransactionPublisher(
 	name string,
@@ -52,6 +54,7 @@ func NewTransactionPublisher(
 	ignoreOutgoing bool,
 	canDrop bool,
 	internalNetworks []string,
+	logger *logp.Logger,
 ) (*TransactionPublisher, error) {
 	addrs, err := common.LocalIPAddrs()
 	if err != nil {
@@ -73,13 +76,16 @@ func NewTransactionPublisher(
 			internalNetworks: internalNetworks,
 			name:             name,
 			ignoreOutgoing:   ignoreOutgoing,
+			logger:           logger.Named("publish"),
 		},
+		log: logger,
 	}
 	return p, nil
 }
 
 func (p *TransactionPublisher) Stop() {
 	close(p.done)
+	p.wg.Wait()
 }
 
 func (p *TransactionPublisher) CreateReporter(
@@ -96,7 +102,7 @@ func (p *TransactionPublisher) CreateReporter(
 		return nil, err
 	}
 
-	processors, err := processors.New(meta.Processors, nil)
+	processors, err := processors.New(meta.Processors, p.log)
 	if err != nil {
 		return nil, err
 	}
@@ -123,6 +129,7 @@ func (p *TransactionPublisher) CreateReporter(
 	// start worker, so post-processing and processor-pipeline
 	// can work concurrently to sniffer acquiring new events
 	ch := make(chan beat.Event, 3)
+	p.wg.Add(1)
 	go p.worker(ch, client)
 	return func(event beat.Event) {
 		select {
@@ -134,6 +141,8 @@ func (p *TransactionPublisher) CreateReporter(
 }
 
 func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
+	defer p.wg.Done()
+	defer client.Close()
 	for {
 		select {
 		case <-p.done:
@@ -149,7 +158,7 @@ func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
 
 func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := validateEvent(event); err != nil {
-		logp.Warn("Dropping invalid event: %v", err)
+		p.logger.Warnf("Dropping invalid event: %v", err)
 		return nil, nil
 	}
 
@@ -160,7 +169,7 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 	if fields != nil {
 		if p.ignoreOutgoing && fields.Network.Direction == pb.Egress {
-			debugf("Ignore outbound transaction on: %s -> %s",
+			p.logger.Debugf("Ignore outbound transaction on: %s -> %s",
 				fields.Source.IP, fields.Destination.IP)
 			return nil, nil
 		}

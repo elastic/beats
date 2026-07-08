@@ -51,7 +51,9 @@ type metadata struct {
 }
 
 func Ensure(ctx context.Context, cfg config.InstallConfig, installDir string, log *logp.Logger) (Result, error) {
-	if err := cfg.NormalizeAndValidate(); err != nil {
+	var err error
+	cfg, err = cfg.NormalizeAndValidate()
+	if err != nil {
 		return Result{}, err
 	}
 	selected, enabled := cfg.SelectedForPlatform(runtime.GOOS, runtime.GOARCH)

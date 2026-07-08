@@ -94,6 +94,7 @@ processors:
 
 	otelConfig := fmt.Sprintf(`receivers:
   filebeatreceiver:
+    include_metadata: true
     filebeat:
       inputs:
         - type: filestream
@@ -174,7 +175,6 @@ service:
 		"log.file.path",
 		// only present in beats receivers
 		"log.file.device_id",
-		"log.file.fingerprint",
 	}
 
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
@@ -196,6 +196,7 @@ func TestLogstashExporterProxyURL(t *testing.T) {
 
 	otelConfig := fmt.Sprintf(`receivers:
   filebeatreceiver:
+    include_metadata: true  
     filebeat:
       inputs:
         - type: filestream

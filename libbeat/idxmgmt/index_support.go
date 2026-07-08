@@ -251,7 +251,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		return err
 	}
 	if withILM {
-		log.Info("Auto lifecycle enable success.")
+		log.Info("Auto lifecycle enabled successfully.")
 	}
 
 	// create feature objects for ILM and template setup

@@ -123,9 +123,10 @@ The default value is `1`.
 ### `loadbalance` [_loadbalance]
 
 When `loadbalance: true` is set, Packetbeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Packetbeat can connect to at least one of its configured hosts.
-Use the `worker` or `workers` setting to specify the number of connections per host.
 
-When `loadbalance: false` is set, Packetbeat sends data to a single host at a time. The target host is chosen at random from the list of configured hosts, and all data is sent to that target until the connection fails, when a new target is selected. Data will still be sent as long as Packetbeat can connect to at least one of its configured hosts.
+Set `loadbalance: false` to send data to one host at a time. Packetbeat connects to the first configured host and sends all data to that host. If the connection fails, Packetbeat fails over to the next configured host. As long as Packetbeat can connect to at least one configured host, it continues to send data.
+
+Use the `worker` or `workers` setting to specify the number of concurrent connections per active host.
 
 The default value is `true`.
 
@@ -458,8 +459,18 @@ output.elasticsearch:
 
 #### `dead_letter_index` [_dead_letter_index]
 
+```{applies_to}
+stack: deprecated 9.5.0+, beta 9.0-9.4
+```
+
 ::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
+:applies_to: {"stack": "deprecated 9.5.0+, beta 9.0-9.4" }
+
+Starting in version 9.5.0, this functionality is deprecated.
+
+In versions 9.0-9.4, it is in beta. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
+
+To handle documents that fail to index, use the data stream [failure store](docs-content://manage-data/data-store/data-streams/failure-store.md#use-failure-store).
 ::::
 
 

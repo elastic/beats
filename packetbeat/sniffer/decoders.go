@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Decoders functions return a Decoder able to process the provided network
@@ -40,10 +41,19 @@ type Decoders func(_ layers.LinkType, device string, idx int) (decoders *decoder
 
 // DecodersFor returns a source of Decoders using the provided configuration
 // components. The id string is expected to be the ID of the beat.
-func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
+func DecodersFor(
+	id string,
+	publisher *publish.TransactionPublisher,
+	protocols *protos.ProtocolsStruct,
+	watcher *procs.ProcessesWatcher,
+	flows *flows.Flows,
+	cfg config.Config,
+	logger *logp.Logger,
+) Decoders {
 	return func(dl layers.LinkType, device string, idx int) (*decoder.Decoder, func(), error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
+		var icmpCloser protos.PluginCloser
 		icmpCfg, err := cfg.ICMP()
 		if err != nil {
 			return nil, nil, err
@@ -54,21 +64,22 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 				return nil, nil, err
 			}
 
-			icmp, err := icmp.New(false, reporter, watcher, icmpCfg)
+			p, err := icmp.New(false, reporter, watcher, icmpCfg, logger)
 			if err != nil {
 				return nil, nil, err
 			}
 
-			icmp4 = icmp
-			icmp6 = icmp
+			icmpCloser = p
+			icmp4 = p
+			icmp6 = p
 		}
 
-		tcp, err := tcp.NewTCP(protocols, id, device, idx)
+		tcp, err := tcp.NewTCP(protocols, id, device, idx, logger)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		udp, err := udp.NewUDP(protocols, id, device, idx)
+		udp, err := udp.NewUDP(protocols, id, device, idx, logger)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -77,13 +88,15 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 			allowMismatchedEth = cfg.Flows.AllowMismatchedEth
 		}
 
-		worker, err := decoder.New(flows, dl, icmp4, icmp6, tcp, udp, allowMismatchedEth)
+		worker, err := decoder.New(flows, dl, icmp4, icmp6, tcp, udp, allowMismatchedEth, logger)
 		if err != nil {
 			return nil, nil, err
 		}
 
 		cleanup := func() {
-			// Close metric collection.
+			if icmpCloser != nil {
+				icmpCloser.Close()
+			}
 			tcp.Close()
 			udp.Close()
 		}

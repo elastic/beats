@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -22,14 +21,12 @@ import (
 )
 
 func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
-
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 
 	// Set lastState and add test process to cache so it will be reported as stopped.
-	f.(*SysInfoMetricSet).lastState = time.Now()
+	f.(*SysInfoMetricSet).lastState = time.Now() //nolint:errcheck // unchecked type assertion
 	p := testProcess()
-	f.(*SysInfoMetricSet).cache.DiffAndUpdateCache([]*Process{p})
+	f.(*SysInfoMetricSet).cache.DiffAndUpdateCache([]*Process{p}) //nolint:errcheck // unchecked type assertion
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {

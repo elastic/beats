@@ -47,6 +47,7 @@ func TestNewReceiver(t *testing.T) {
 	monitorHost := hostFromSocket(monitorSocket)
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
@@ -104,8 +105,8 @@ func TestNewReceiver(t *testing.T) {
 				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
 			assert.Condition(c, func() bool {
-				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+				metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+				return assert.NotEmpty(t, metricsSkipped.All(), "metric reporter did not initialize")
 			}, "failed to check metrics logging")
 		},
 	})
@@ -158,7 +159,9 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		rcvr, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
 }
@@ -168,6 +171,7 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 func multiReceiverConfig(helper multiReceiverHelper) *Config {
 	return &Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
@@ -283,8 +287,8 @@ func TestMultipleReceivers(t *testing.T) {
 				startLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
 				assert.Equalf(c, 1, startLogs.Len(), "%v should have a single start log", helper)
 
-				startMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
-				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single start metrircs logging every 30s", helper)
+				startMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
+				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single skipping metrics logging entry", helper)
 
 				metaPath := filepath.Join(helper.home, "/data/meta.json")
 				assert.FileExistsf(c, metaPath, "%s of %v should exist", metaPath, helper)
@@ -375,6 +379,7 @@ func TestReceiverStatus(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
 					"filebeat": map[string]any{
 						"inputs": []map[string]any{
 							{

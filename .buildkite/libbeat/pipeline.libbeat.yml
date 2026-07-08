@@ -3,19 +3,19 @@ name: "beats-libbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64-1772337686"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64-1781496166"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
-  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1772337686"
-  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1772337686"
-  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1772337686"
-  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1772337686"
-  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
-  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips-1772337686"
-
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1781496166"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
+  IMAGE_WIN_10_VERSION: "1.0.1781496166"
+  IMAGE_WIN_11_VERSION: "1.0.1781496166"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1781496166"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1781496166"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1781496166"
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   #Deps
@@ -103,13 +103,11 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "aws"
-          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
-          instanceType: "m5.xlarge"
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
-          GOEXPERIMENT: "systemcrypto"
-          ASDF_PYTHON_VERSION: "3.9.13"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
@@ -209,35 +207,6 @@ steps:
         notify:
           - github_commit_status:
               context: "libbeat: Go Integration Tests / Windows"
-
-      - label: ":ubuntu: Libbeat: Python Integration Tests"
-        key: "mandatory-python-int-test"
-        command: |
-          set -euo pipefail
-          cd libbeat
-          mage pythonIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "libbeat/build/*.xml"
-          - "libbeat/build/*.json"
-          - "libbeat/build/integration-tests/*"
-          - "libbeat/build/integration-tests/Test*/*"
-          - "libbeat/build/integration-tests/Test*/data/**/*"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "libbeat: Python Integration Tests"
 
       - label: ":ubuntu: Libbeat: Stress Tests"
         key: "mandatory-stress-test"
@@ -344,11 +313,11 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          imageVersion: "${IMAGE_WIN_10_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
@@ -365,11 +334,11 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          imageVersion: "${IMAGE_WIN_11_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"

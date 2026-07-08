@@ -92,6 +92,11 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 	// diff current & desired state, create action lists
 	for _, config := range configs {
+		if !config.Config.Enabled() {
+			r.logger.Debug("Runner config is disabled, skipping")
+			continue
+		}
+
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)

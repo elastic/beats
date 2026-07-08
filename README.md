@@ -28,7 +28,7 @@ Beat  | Description
 
 In addition to the above Beats, which are officially supported by
 [Elastic](https://elastic.co), the community has created a set of other Beats
-that make use of libbeat but live outside of this Github repository. We maintain
+that make use of libbeat but live outside of this GitHub repository. We maintain
 a list of community Beats
 [here](https://www.elastic.co/guide/en/beats/libbeat/master/community-beats.html).
 
@@ -68,6 +68,12 @@ report issues, help us reproduce issues, fix bugs, add functionality, or even
 create your own Beat.
 
 Please start by reading our [CONTRIBUTING](CONTRIBUTING.md) file.
+
+## AI Coding Agents
+
+Repository instructions for AI coding agents are in [AGENTS.md](AGENTS.md). 
+To use it, copy it to the agent-specific filename: CLAUDE.md, GEMINI.md,
+and similar files, which are ignored by Git.
 
 ## Building Beats from the Source
 

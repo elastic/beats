@@ -139,6 +139,22 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 
 
+### `querylog` log fileset settings [_querylog_log_fileset_settings]
+
+**`var.paths`**
+:   An array of glob-based paths that specify where to look for the query log files. All patterns supported by [Go Glob](https://golang.org/pkg/path/filepath/#Glob) are also supported here. This fileset ingests Elasticsearch query log JSON only (one JSON object per line). For example, you can use wildcards to fetch all files from a predefined level of subdirectories: `/path/to/log/*/*.log`. This fetches all `.log` files from the subfolders of `/path/to/log`. It does not fetch log files from the `/path/to/log` folder itself. If this setting is left empty, Filebeat will choose log paths based on your operating system.
+
+    Example config:
+
+    ```yaml
+      querylog:
+        enabled: true
+        var.paths:
+          - /var/log/elasticsearch/*_querylog.json
+    ```
+
+
+
 ### `deprecation` log fileset settings [_deprecation_log_fileset_settings]
 
 **`var.paths`**

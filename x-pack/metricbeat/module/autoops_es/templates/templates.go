@@ -92,9 +92,9 @@ var TemplateIndexNamesToIgnore = GetTemplateNamesToFilterOut()
 
 type FilterTemplate[T any] func(pattern []string) utils.Predicate[T]
 
-type ReportNamedTemplate func(transactionId string, info *utils.ClusterInfo, template mapstr.M)
+type ReportNamedTemplate func(info *utils.ClusterInfo, template mapstr.M)
 
-type GetNamedTemplates[T any] func(transactionId string, info *utils.ClusterInfo, templates *T, reporter ReportNamedTemplate) (errs []error)
+type GetNamedTemplates[T any] func(info *utils.ClusterInfo, templates *T, reporter ReportNamedTemplate) (errs []error)
 
 // Exposed as a function for testing. This should not change at runtime.
 func GetTemplateNamesToFilterOut() []string {
@@ -141,13 +141,11 @@ func GetPartitionedTemplatesWithErrors[T any](templates []T, namer utils.Supplie
 }
 
 // Loop across the `partitionedTemplates` and request them in associated batches, then extract and report them as events sharing a Transaction ID.
-func HandlePartitionedTemplates[T any](m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.ClusterInfo, templatePathPrefix string, partitionedTemplates [][]string, getNamedTemplates GetNamedTemplates[T]) (string, error) {
+func HandlePartitionedTemplates[T any](m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.ClusterInfo, templatePathPrefix string, partitionedTemplates [][]string, getNamedTemplates GetNamedTemplates[T]) error {
 	var errs []error
 	lastIndex := len(partitionedTemplates) - 1
 
 	excludeTemplateSubstring := utils.GetStrenv(EXCLUDE_STRING_IN_TEMPLATE_NAMES_NAME, "%{")
-
-	transactionId := utils.NewUUIDV4()
 
 	for i, templatesBatch := range partitionedTemplates {
 		if len(templatesBatch) == 0 {
@@ -164,8 +162,8 @@ func HandlePartitionedTemplates[T any](m *elasticsearch.MetricSet, r mb.Reporter
 			continue
 		}
 
-		namedTemplatesErrs := getNamedTemplates(transactionId, info, templates, func(transactionId string, info *utils.ClusterInfo, template mapstr.M) {
-			r.Event(events.CreateEvent(info, mapstr.M{"template": template}, transactionId))
+		namedTemplatesErrs := getNamedTemplates(info, templates, func(info *utils.ClusterInfo, template mapstr.M) {
+			r.Event(events.CreateEventWithoutTransactionId(info, mapstr.M{"template": template}))
 		})
 
 		errs = append(errs, namedTemplatesErrs...)
@@ -175,7 +173,7 @@ func HandlePartitionedTemplates[T any](m *elasticsearch.MetricSet, r mb.Reporter
 		}
 	}
 
-	return transactionId, errors.Join(errs...)
+	return errors.Join(errs...)
 }
 
 // Loop across the `partitionedTemplates` and request them individually, then extract and report them as events sharing a Transaction ID.
@@ -184,8 +182,6 @@ func HandleIndividualTemplateRequests[T any](m *elasticsearch.MetricSet, r mb.Re
 	lastIndex := len(partitionedTemplates) - 1
 
 	excludeTemplateSubstring := utils.GetStrenv(EXCLUDE_STRING_IN_TEMPLATE_NAMES_NAME, "%{")
-
-	transactionId := utils.NewUUIDV4()
 
 	for i, templatesBatch := range partitionedTemplates {
 		if len(templatesBatch) == 0 {
@@ -203,8 +199,8 @@ func HandleIndividualTemplateRequests[T any](m *elasticsearch.MetricSet, r mb.Re
 				continue
 			}
 
-			namedTemplatesErrs := getNamedTemplates(transactionId, info, templateData, func(transactionId string, info *utils.ClusterInfo, template mapstr.M) {
-				r.Event(events.CreateEvent(info, mapstr.M{"template": template}, transactionId))
+			namedTemplatesErrs := getNamedTemplates(info, templateData, func(info *utils.ClusterInfo, template mapstr.M) {
+				r.Event(events.CreateEventWithoutTransactionId(info, mapstr.M{"template": template}))
 			})
 
 			errs = append(errs, namedTemplatesErrs...)

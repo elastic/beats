@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"runtime"
 	"testing"
 	"time"
 
@@ -65,6 +66,10 @@ func TestActionHandlerExecute(t *testing.T) {
 
 	actionID := uuid.Must(uuid.NewV4()).String()
 	actionSQL := "select * from uptime"
+	nonMatchingPlatform := "windows"
+	if runtime.GOOS == "windows" {
+		nonMatchingPlatform = "linux"
+	}
 	request := map[string]interface{}{
 		"id": actionID,
 		"data": map[string]interface{}{
@@ -79,6 +84,7 @@ func TestActionHandlerExecute(t *testing.T) {
 
 		Request map[string]interface{}
 		Err     error
+		Skipped bool
 	}{
 		{
 			Name:    "no executor",
@@ -96,6 +102,19 @@ func TestActionHandlerExecute(t *testing.T) {
 			QueryExecutor: &mockExecutor{},
 			Publisher:     &mockPublisher{},
 			Request:       request,
+		},
+		{
+			Name:          "skips non matching platform",
+			QueryExecutor: &mockExecutor{},
+			Publisher:     &mockPublisher{},
+			Request: map[string]interface{}{
+				"id": actionID,
+				"data": map[string]interface{}{
+					"query":    actionSQL,
+					"platform": nonMatchingPlatform,
+				},
+			},
+			Skipped: true,
 		},
 		{
 			Name:          "executor error",
@@ -136,6 +155,21 @@ func TestActionHandlerExecute(t *testing.T) {
 			if tc.Err == nil {
 				if ok {
 					t.Fatal("Unexpected error:", errVal)
+				} else if tc.Skipped {
+					diff := cmp.Diff("", tc.QueryExecutor.(*mockExecutor).receivedSql)
+					if diff != "" {
+						t.Error(diff)
+					}
+
+					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).idValue)
+					if diff != "" {
+						t.Error(diff)
+					}
+
+					diff = cmp.Diff(0, res["count"])
+					if diff != "" {
+						t.Error(diff)
+					}
 				} else {
 					diff := cmp.Diff(tc.QueryExecutor.(*mockExecutor).receivedSql, actionSQL)
 					if diff != "" {

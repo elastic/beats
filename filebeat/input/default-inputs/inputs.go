@@ -28,13 +28,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func Init(info beat.Info, log *logp.Logger, components statestore.States, path *paths.Path) []v2.Plugin {
+func Init(info beat.Info, components statestore.States) []v2.Plugin {
 	return append(
-		genericInputs(log, components),
-		osInputs(info, log, components)...,
+		genericInputs(info.Logger, components),
+		osInputs(info, components)...,
 	)
 }
 
@@ -45,7 +44,7 @@ func genericInputs(log *logp.Logger, components statestore.States) []v2.Plugin {
 		tcp.Plugin(),
 		udp.Plugin(),
 		unix.Plugin(),
-		logv2.LogPluginV2(log, components),
-		logv2.ContainerPluginV2(log, components),
+		logv2.LogPluginV2(log),
+		logv2.ContainerPluginV2(log),
 	}
 }

@@ -99,7 +99,7 @@ func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
+		fileID:              formatIdentity(i.name, osstate.InodeString()+"-"+i.markerContents()),
 		identifierGenerator: i.name,
 	}
 }

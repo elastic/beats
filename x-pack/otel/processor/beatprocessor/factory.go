@@ -33,7 +33,7 @@ func NewFactory() processor.Factory {
 	return processor.NewFactory(
 		component.MustNewType(Name),
 		createDefaultConfig,
-		processor.WithLogs(createLogsProcessor, component.StabilityLevelDevelopment),
+		processor.WithLogs(createLogsProcessor, component.StabilityLevelAlpha),
 	)
 }
 

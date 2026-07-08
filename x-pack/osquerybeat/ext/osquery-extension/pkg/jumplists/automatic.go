@@ -22,15 +22,15 @@ const (
 	sliceLimit = 1 * 1024 * 1024 * 1024 // 1 GB, arbitrary limit to prevent OOM from malformed files
 )
 
-func parseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*jumplist, error) {
+func parseAutomaticJumplistFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*jumplist, error) {
 	// Create a minimal JumpList object to return if there is an error.
 	automaticJumpList := &jumplist{
-		jumplistMeta: &jumplistMeta{
+		Meta: &Meta{
 			UserProfile:   &jumpliststypes.UserProfile{Username: userProfile.Username, Sid: userProfile.Sid},
 			ApplicationID: getAppIdFromFileName(filePath),
 			JumplistMeta:  &jumpliststypes.JumplistMeta{JumplistType: string(jumplistTypeAutomatic), SourceFilePath: filePath},
 		},
-		entries: []*jumplistEntry{},
+		entries: []*Entry{},
 	}
 
 	// Open the jumplist file
@@ -64,7 +64,6 @@ func parseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *
 	for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
 		// TODO: Parse the DestListPropertyStore stream.
 		if strings.EqualFold(entry.Name, DestListPropertyStoreStreamName) {
-			log.Infof("DestListPropertyStore stream found for path %s", filePath)
 			continue
 		}
 
@@ -134,10 +133,10 @@ func parseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *
 
 	// We have a parsed DestList object and a map of Lnk objects.
 	// Now we need to associate the Lnk objects with the DestList entries.
-	entries := make([]*jumplistEntry, 0, len(destList.Entries))
+	entries := make([]*Entry, 0, len(destList.Entries))
 	for _, entry := range destList.Entries {
 		// Create a minimal JumpListEntry object to return if there is an error.
-		jumpListEntry := &jumplistEntry{
+		jumpListEntry := &Entry{
 			DestListEntry: entry,
 			Lnk:           &Lnk{},
 		}

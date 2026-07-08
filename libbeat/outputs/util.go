@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
@@ -40,11 +41,11 @@ func Fail(err error) (Group, error) { return Group{}, err }
 func Success(
 	cfg config.Namespace,
 	batchSize, retry int,
-	encoderFactory queue.EncoderFactory,
+	encoderFactory queue.EncoderFactory[publisher.Event],
 	logger *logp.Logger,
 	beatPaths *paths.Path,
 	clients ...Client) (Group, error) {
-	var q queue.QueueFactory
+	var q queue.QueueFactory[publisher.Event]
 	if cfg.IsSet() && cfg.Config().Enabled() {
 		switch cfg.Name() {
 		case memqueue.QueueType:
@@ -52,7 +53,7 @@ func Success(
 			if err != nil {
 				return Group{}, fmt.Errorf("unable to get memory queue settings: %w", err)
 			}
-			q = memqueue.FactoryForSettings(settings)
+			q = memqueue.FactoryForSettings[publisher.Event](settings)
 		case diskqueue.QueueType:
 			if management.UnderAgent() {
 				logger = logger.Named("output")
@@ -89,10 +90,39 @@ func NetworkClients(netclients []NetworkClient) []Client {
 // The first argument is expected to contain a queue config.Namespace.
 // The queue config is passed to assign the queue factory when
 // elastic-agent reloads the output.
-func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory, logger *logp.Logger, beatPaths *paths.Path, netclients []NetworkClient) (Group, error) {
+func SuccessNet(cfg config.Namespace,
+	loadbalance bool,
+	batchSize,
+	retry int,
+	encoderFactory queue.EncoderFactory[publisher.Event],
+	logger *logp.Logger,
+	beatPaths *paths.Path,
+	worker int,
+	netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
-		return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NewFailoverClient(netclients))
+		if worker < 1 {
+			worker = 1
+		}
+		if worker == 1 {
+			return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NewFailoverClient(netclients))
+		}
+
+		if len(netclients)%worker != 0 {
+			return Group{}, fmt.Errorf("output worker count (%d) does not match host list (%d network clients)", worker, len(netclients))
+		}
+
+		// This logic is tied to how ReadHostList() duplicates entry
+		numHosts := len(netclients) / worker
+		groupNetClients := make([]NetworkClient, worker)
+		for i := 0; i < worker; i++ {
+			hostClients := make([]NetworkClient, numHosts)
+			for h := 0; h < numHosts; h++ {
+				hostClients[h] = netclients[h*worker+i]
+			}
+			groupNetClients[i] = NewFailoverClient(hostClients)
+		}
+		return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NetworkClients(groupNetClients)...)
 	}
 
 	clients := NetworkClients(netclients)

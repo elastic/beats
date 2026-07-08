@@ -69,15 +69,15 @@ func (r *readerGroup) hasID(id string) bool {
 }
 
 func TestReaderGroup(t *testing.T) {
-	requireGroupSuccess := func(t *testing.T, ctx context.Context, cf context.CancelFunc, err error) {
+	requireGroupSuccess := func(t *testing.T, ctx context.Context, rd *reader, err error) {
 		require.NotNil(t, ctx)
-		require.NotNil(t, cf)
+		require.NotNil(t, rd)
 		require.NoError(t, err)
 	}
 
-	requireGroupError := func(t *testing.T, ctx context.Context, cf context.CancelFunc, err error) {
+	requireGroupError := func(t *testing.T, ctx context.Context, rd *reader, err error) {
 		require.Nil(t, ctx)
-		require.Nil(t, cf)
+		require.Nil(t, rd)
 		require.Error(t, err)
 	}
 
@@ -95,12 +95,12 @@ func TestReaderGroup(t *testing.T) {
 
 	t.Run("assert inserting existing key returns error", func(t *testing.T) {
 		rg := newReaderGroup()
-		ctx, cf, err := rg.newContext("test-id", context.Background())
-		requireGroupSuccess(t, ctx, cf, err)
+		ctx, rd, err := rg.newContext("test-id", t.Context())
+		requireGroupSuccess(t, ctx, rd, err)
 		require.Len(t, rg.table, 1)
 
-		newCtx, newCf, err := rg.newContext("test-id", context.Background())
-		requireGroupError(t, newCtx, newCf, err)
+		newCtx, newRd, err := rg.newContext("test-id", t.Context())
+		requireGroupError(t, newCtx, newRd, err)
 	})
 
 	t.Run("assert reserve allows newContext to upgrade the reservation", func(t *testing.T) {
@@ -108,12 +108,12 @@ func TestReaderGroup(t *testing.T) {
 
 		assert.True(t, rg.reserve("test-id"), "first reserve should succeed")
 
-		ctx, cf, err := rg.newContext("test-id", context.Background())
-		requireGroupSuccess(t, ctx, cf, err)
+		ctx, rd, err := rg.newContext("test-id", t.Context())
+		requireGroupSuccess(t, ctx, rd, err)
 
 		// A second newContext should fail since a real harvester is now registered.
-		newCtx, newCf, err := rg.newContext("test-id", context.Background())
-		requireGroupError(t, newCtx, newCf, err)
+		newCtx, newRd, err := rg.newContext("test-id", t.Context())
+		requireGroupError(t, newCtx, newRd, err)
 	})
 
 	t.Run("assert remove on a reserved entry and allows re-reserve", func(t *testing.T) {
@@ -129,8 +129,8 @@ func TestReaderGroup(t *testing.T) {
 
 	t.Run("assert new key is added, can be removed and its context is cancelled", func(t *testing.T) {
 		rg := newReaderGroup()
-		ctx, cf, err := rg.newContext("test-id", context.Background())
-		requireGroupSuccess(t, ctx, cf, err)
+		ctx, rd, err := rg.newContext("test-id", t.Context())
+		requireGroupSuccess(t, ctx, rd, err)
 		require.Len(t, rg.table, 1)
 
 		require.NoError(t, ctx.Err())
@@ -139,10 +139,49 @@ func TestReaderGroup(t *testing.T) {
 		require.Empty(t, rg.table)
 		require.ErrorIs(t, ctx.Err(), context.Canceled)
 
-		newCtx, newCf, err := rg.newContext("test-id", context.Background())
-		requireGroupSuccess(t, newCtx, newCf, err)
+		newCtx, newRd, err := rg.newContext("test-id", t.Context())
+		requireGroupSuccess(t, newCtx, newRd, err)
 		require.Len(t, rg.table, 1)
 		require.NoError(t, newCtx.Err())
+	})
+
+	t.Run("migrate moves a running registration to a new id", func(t *testing.T) {
+		rg := newReaderGroup()
+		require.True(t, rg.reserve("old-id"), "reserve should succeed")
+		ctx, rd, err := rg.newContext("old-id", t.Context())
+		requireGroupSuccess(t, ctx, rd, err)
+		require.Equal(t, "old-id", rd.currentID())
+
+		require.True(t, rg.migrate("old-id", "new-id"), "migrate should succeed")
+		assert.True(t, rg.hasID("new-id"), "registration should be under the new id")
+		assert.False(t, rg.hasID("old-id"), "old id should be gone")
+		assert.False(t, rg.reserve("new-id"), "reserve on the migrated id must fail")
+		assert.Equal(t, "new-id", rd.currentID(), "the reader handle must track the new id")
+		require.NoError(t, ctx.Err(), "migration must not cancel the running context")
+
+		// The harvester cleans up via its reader handle, which now targets new-id.
+		rd.remove()
+		assert.Empty(t, rg.table)
+		require.ErrorIs(t, ctx.Err(), context.Canceled, "reader.remove must cancel the context")
+	})
+
+	t.Run("migrate is a no-op when it cannot move the registration", func(t *testing.T) {
+		rg := newReaderGroup()
+		ctx, rd, err := rg.newContext("running", t.Context())
+		requireGroupSuccess(t, ctx, rd, err)
+		ctx, rd, err = rg.newContext("other", t.Context())
+		requireGroupSuccess(t, ctx, rd, err)
+		require.True(t, rg.reserve("reserved-only"), "reserve should succeed")
+
+		assert.False(t, rg.migrate("absent", "dest"), "absent old id must not migrate")
+		assert.False(t, rg.migrate("reserved-only", "dest"), "reserved-only old id must not migrate")
+		assert.False(t, rg.migrate("running", "other"), "occupied new id must not be clobbered")
+		assert.False(t, rg.migrate("running", "running"), "equal ids must not migrate")
+
+		// None of the failed migrations changed the table.
+		assert.True(t, rg.hasID("running"))
+		assert.True(t, rg.hasID("other"))
+		assert.False(t, rg.hasID("dest"))
 	})
 }
 
@@ -513,6 +552,49 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		require.Equal(t, 2, mockHarvester.getRunCount())
 	})
+
+	t.Run("assert Migrate re-keys a running harvester so Start(new) does not spawn a duplicate", func(t *testing.T) {
+		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
+
+		goroutinesChecker := resources.NewGoroutinesChecker()
+		defer goroutinesChecker.WaitUntilOriginalCount()
+
+		source1 := &testSource{name: "/path/to/growing/old"}
+		source2 := &testSource{name: "/path/to/growing/new"}
+		id1 := hg.identifier.ID(source1)
+		id2 := hg.identifier.ID(source2)
+
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+		hg.Start(ctx, source1)
+
+		// Wait until the harvester is running and registered under the old key.
+		requireEventually(t,
+			func() bool { return mockHarvester.getRunCount() == 1 && hg.readers.hasID(id1) },
+			"harvester should be running and registered under the old key")
+
+		// Simulate the growing-fingerprint bookkeeper migration old->new.
+		hg.Migrate(id1, source2)
+		require.True(t, hg.readers.hasID(id2), "registration should move to the new key")
+		assert.False(t, hg.readers.hasID(id1), "old key should be gone")
+
+		// Starting under the new key must NOT spawn a second harvester: the
+		// bookkeeper already has it, so reserve fails and Start no-ops.
+		hg.Start(ctx, source2)
+		require.Never(t,
+			func() bool { return mockHarvester.getRunCount() != 1 },
+			200*time.Millisecond, eventuallyInterval,
+			"no duplicate harvester must be started for the migrated key")
+
+		// Stopping the new key reaches the harvester still running under it.
+		hg.Stop(source2)
+		requireEventually(t,
+			func() bool { return !hg.readers.hasID(id2) },
+			"source should be removed from bookkeeper after stop on the new key")
+
+		require.NoError(t, hg.StopHarvesters())
+		require.Equal(t, 1, mockHarvester.getRunCount())
+	})
 }
 
 func TestCursorAllEventsPublished(t *testing.T) {
@@ -812,6 +894,10 @@ func (mp *MockPipeline) ConnectWith(config beat.ClientConfig) (beat.Client, erro
 // Connect connects the mock pipeline with a client using the default configuration.
 func (mp *MockPipeline) Connect() (beat.Client, error) {
 	return mp.ConnectWith(beat.ClientConfig{})
+}
+
+func (mp *MockPipeline) Disconnect(ctx context.Context) error {
+	return mp.c.Close()
 }
 
 type mockStatusReporter struct{}

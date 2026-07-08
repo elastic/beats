@@ -47,9 +47,9 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 				fatalfInitCmd(err)
 			}
 
-			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Paths, b.Config.LifecycleConfig)
+			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Config.LifecycleConfig)
 			if err != nil {
-				fatalf("error creating file handler: %s", err)
+				fatalf("Error creating file handler: %s", err)
 			}
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeForce, idxmgmt.LoadModeDisabled); err != nil {

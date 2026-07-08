@@ -57,7 +57,7 @@ type winlogInput struct{}
 func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Windows Event Logs",
 		Doc:        "The winlog input collects logs from the local windows event log service",

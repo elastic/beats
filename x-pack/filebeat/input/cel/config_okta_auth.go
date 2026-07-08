@@ -32,11 +32,12 @@ import (
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
 // For more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource
 type oktaTokenSource struct {
-	mu      sync.Mutex
-	ctx     context.Context
-	conf    *oauth2.Config
-	token   *oauth2.Token
-	oktaJWK []byte
+	mu         sync.Mutex
+	ctx        context.Context
+	conf       *oauth2.Config
+	token      *oauth2.Token
+	oktaJWK    []byte
+	oktaJWKPEM string
 }
 
 // fetchOktaOauthClient fetches an OAuth2 client using the Okta JWK credentials.
@@ -53,7 +54,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 	var (
 		claim  dpop.ClaimerFunc
 		key    crypto.Signer
-		method jwt.SigningMethod
+		method = jwt.SigningMethodRS256
 	)
 	if o.DPoPKeyPEM != "" {
 		claim = func() *jwt.RegisteredClaims {
@@ -72,7 +73,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode dpop signer: %w", err)
 		}
-		cli, err := dpop.NewTokenClient(claim, key, jwt.SigningMethodRS256, nil)
+		cli, err := dpop.NewTokenClient(claim, key, method, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to make token client: %w", err)
 		}
@@ -101,10 +102,11 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 	}
 
 	tokenSource := &oktaTokenSource{
-		conf:    conf,
-		ctx:     ctx,
-		oktaJWK: o.OktaJWKJSON,
-		token:   token,
+		conf:       conf,
+		ctx:        ctx,
+		oktaJWK:    o.OktaJWKJSON,
+		oktaJWKPEM: o.OktaJWKPEM,
+		token:      token,
 	}
 	// reuse the tokenSource to refresh the token (automatically calls
 	// the custom Token() method when token is no longer valid).
@@ -122,7 +124,17 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
-	oktaJWT, err := generateOktaJWT(ts.oktaJWK, ts.conf)
+	if ts.token != nil && ts.token.Valid() {
+		return ts.token, nil
+	}
+
+	var oktaJWT string
+	var err error
+	if ts.oktaJWKPEM != "" {
+		oktaJWT, err = generateOktaJWTPEM(ts.oktaJWKPEM, ts.conf)
+	} else {
+		oktaJWT, err = generateOktaJWT(ts.oktaJWK, ts.conf)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error generating Okta JWT: %w", err)
 	}
@@ -130,6 +142,7 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error exchanging Okta JWT for bearer token: %w", err)
 	}
+	ts.token = token
 
 	return token, nil
 }

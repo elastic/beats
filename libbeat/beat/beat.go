@@ -18,15 +18,17 @@
 package beat
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
@@ -45,6 +47,14 @@ type Creator func(*Beat, *config.C) (Beater, error)
 // The Stop() method is invoked the first time (and only the first time) a
 // shutdown signal is received. The Stop()-method normally will stop the Run()-loop,
 // such that the beat can gracefully shutdown.
+//
+// Shutdown ownership: the Beater owns shutdown sequencing. On Stop, the Beater
+// is responsible for closing the inputs/clients it connected to the publisher
+// pipeline before Run returns, so that final events can be published and their
+// acknowledgments finalized. The framework disconnects the publisher pipeline
+// only after Run returns; a Beater must not assume the pipeline is still
+// connected once it has been told to stop. See
+// https://github.com/elastic/beats/issues/49794.
 type Beater interface {
 	// The main event loop. This method should block until signalled to stop by an
 	// invocation of the Stop() method.
@@ -89,7 +99,15 @@ type Beat struct {
 
 	API      *api.Server      // API server. This is nil unless the http endpoint is enabled.
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
-	Paths    *paths.Path      // per beat paths definition
+
+	// ShutdownTimeout, when set by a Creator, tells the framework how long the
+	// Beater may take to drain in-flight events (and persist their cursors)
+	// during shutdown before the publisher pipeline is force-disconnected. The
+	// framework's shutdown watchdog waits at least this long (plus a fixed grace
+	// margin) for beater.Run to return before forcing a disconnect, so a
+	// configured shutdown_timeout is not cut short. Zero means use the default
+	// grace period. See https://github.com/elastic/beats/issues/49794.
+	ShutdownTimeout time.Duration
 }
 
 func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
@@ -131,8 +149,12 @@ func (beat *Beat) GenerateUserAgent() {
 	mode := beat.userAgentMode()
 	unprivileged := beat.userAgentUnprivilegedMode()
 
+	var uaOpts []string
+	if features.IsElasticsearchStateStoreEnabled() {
+		uaOpts = append(uaOpts, "agentless")
+	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
-		mode, unprivileged, beat.Info.FIPSDistribution)
+		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
 }
 
 // BeatConfig struct contains the basic configuration of every beat

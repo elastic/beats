@@ -26,6 +26,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -50,7 +52,10 @@ const (
 // initCgroupPaths initializes a new cgroup reader. This enables
 // unit testing by allowing us to stub the OS interface.
 var initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
-	return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	return cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		RootfsMountpoint:  rootfsMountpoint,
+		IgnoreRootCgroups: ignoreRootCgroups,
+	})
 }
 
 func init() {
@@ -66,8 +71,15 @@ type addDockerMetadata struct {
 	pidFields       []string      // Field names that contain PIDs.
 	cgroups         *common.Cache // Cache of PID (int) to container ids (string).
 	dedot           bool          // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool          // If Docker exists in env, then it is set to true
+	dockerAvailable atomic.Bool   // If Docker exists in env, then it is set to true
+	closeRetry      chan struct{} // Channel to signal the connection retry goroutine to stop
+	waitRetry       sync.WaitGroup
+	closeOnce       sync.Once
+	closeErr        error
 	cgreader        processors.CGReader
+	retryPeriod     time.Duration // Period to wait when reconnecting to Docker
+	retryTimeout    time.Duration // Maximum time to wait when connecting to Docker, 0 means wait forever.
+	retryIsBlocking bool          // If true, startup waits for the retry loop before returning.
 }
 
 const selector = "add_docker_metadata"
@@ -83,24 +95,9 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	var dockerAvailable bool
-
-	watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
-	if err != nil {
-		dockerAvailable = false
-		log.Debugf("%v: docker environment not detected: %+v", processorName, err)
-	} else {
-		dockerAvailable = true
-		log.Debugf("%v: docker environment detected", processorName)
-		if err = watcher.Start(); err != nil {
-			// mark dockerAvailable as false because watcher creation failed
-			dockerAvailable = false
-			log.Infof("unable to start the docker watcher: %v", err)
-		}
-	}
-
 	// Use extract_field processor to get container ID from source file path.
 	var sourceProcessor beat.Processor
+	var err error
 	if config.MatchSource {
 		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "log.file.path",
@@ -121,16 +118,125 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
 	}
 
-	return &addDockerMetadata{
+	dm := addDockerMetadata{
 		log:             log,
-		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		dedot:           config.DeDot,
-		dockerAvailable: dockerAvailable,
 		cgreader:        reader,
-	}, nil
+		closeRetry:      make(chan struct{}),
+		retryPeriod:     config.WaitMetadataRetry,
+		retryTimeout:    config.WaitMetadataTimeout,
+		retryIsBlocking: config.WaitMetadata,
+	}
+
+	constructAndStartWatcher := func() (docker.Watcher, error) {
+		watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
+		if err != nil {
+			log.Debugf("%v: docker environment not detected: %+v", processorName, err)
+			return nil, err
+		}
+
+		log.Debugf("%v: docker environment detected", processorName)
+		if err = watcher.Start(); err != nil {
+			log.Debugf("unable to start the docker watcher: %v", err)
+			return nil, err
+		}
+
+		log.Info("successfully connected to docker")
+		return watcher, nil
+	}
+
+	connectToDocker := func() error {
+		watcher, err := constructAndStartWatcher()
+		if err != nil {
+			return err
+		}
+
+		dm.watcher = watcher
+		dm.dockerAvailable.Store(true)
+		return nil
+	}
+
+	retryStart := time.Now()
+	if err := connectToDocker(); err != nil {
+		if dm.retryIsBlocking {
+			connected, _, lastErr := dm.retryConnectToDocker(connectToDocker, retryStart)
+			if !connected {
+				if err := processors.Close(dm.sourceProcessor); err != nil {
+					dm.log.Debugf("error closing source processor after docker connection timeout: %v", err)
+				}
+				if lastErr == nil {
+					lastErr = err
+				}
+				return nil, fmt.Errorf("%s: could not connect to docker: %w", processorName, lastErr)
+			}
+		} else {
+			// If docker is not available, try reconnecting asynchronously until the timeout expires.
+			dm.startDockerConnectionRetry(connectToDocker, retryStart)
+		}
+	}
+
+	return &dm, nil
+}
+
+func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() error, retryStart time.Time) {
+	d.waitRetry.Go(func() {
+		defer d.log.Debug("retry goroutine done")
+		connected, stopped, _ := d.retryConnectToDocker(connectToDocker, retryStart)
+		if !connected && !stopped {
+			d.log.Warnf(
+				"stopped retrying docker connection before metadata became available; wait_for_metadata_timeout=%s elapsed",
+				d.retryTimeout,
+			)
+		}
+	})
+}
+
+func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() error, retryStart time.Time) (connected bool, stopped bool, lastErr error) {
+	blockingStr := "non-blocking"
+	if d.retryIsBlocking {
+		blockingStr = "blocking"
+	}
+
+	d.log.Warnf(
+		"could not connect to docker, retrying (%s) connection attempts every %s "+
+			"with a maximum wait of %s (0 means indefinitely)",
+		blockingStr,
+		d.retryPeriod,
+		d.retryTimeout,
+	)
+
+	ticker := time.NewTicker(d.retryPeriod)
+	defer ticker.Stop()
+
+	var timeoutC <-chan time.Time
+	var timeoutTimer *time.Timer
+	if d.retryTimeout > 0 {
+		remaining := time.Until(retryStart.Add(d.retryTimeout))
+		if remaining <= 0 {
+			return false, false, nil
+		}
+		timeoutTimer = time.NewTimer(remaining)
+		timeoutC = timeoutTimer.C
+		defer timeoutTimer.Stop()
+	}
+
+	for {
+		select {
+		case <-ticker.C:
+			if err := connectToDocker(); err != nil {
+				lastErr = err
+			} else {
+				return true, false, nil
+			}
+		case <-timeoutC:
+			return false, false, lastErr
+		case <-d.closeRetry:
+			return false, true, lastErr
+		}
+	}
 }
 
 func lazyCgroupCacheInit(d *addDockerMetadata) {
@@ -145,7 +251,7 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 }
 
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	if !d.dockerAvailable {
+	if !d.dockerAvailable.Load() {
 		return event, nil
 	}
 	var cid string
@@ -218,7 +324,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		_, _ = meta.Put("container.id", container.ID)
 		_, _ = meta.Put("container.image.name", container.Image)
 		_, _ = meta.Put("container.name", container.Name)
-		event.Fields.DeepUpdate(meta.Clone())
+		event.Fields.DeepUpdate(meta)
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
 	}
@@ -227,18 +333,26 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (d *addDockerMetadata) Close() error {
-	if d.cgroups != nil {
-		d.cgroups.StopJanitor()
-	}
-	// Watcher can be nil if processor failed on creation
-	if d.watcher != nil {
-		d.watcher.Stop()
-	}
-	err := processors.Close(d.sourceProcessor)
-	if err != nil {
-		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
-	}
-	return nil
+	d.closeOnce.Do(func() {
+		if d.cgroups != nil {
+			d.cgroups.StopJanitor()
+		}
+
+		// Stop the retry goroutine, this is safe to call even if the goroutine is not running.
+		close(d.closeRetry)
+		d.waitRetry.Wait()
+
+		// If the watcher is running, stop it.
+		if d.dockerAvailable.Load() && d.watcher != nil {
+			d.watcher.Stop()
+		}
+
+		err := processors.Close(d.sourceProcessor)
+		if err != nil {
+			d.closeErr = fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
+		}
+	})
+	return d.closeErr
 }
 
 func (d *addDockerMetadata) String() string {
@@ -266,7 +380,12 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 		if d.cgroups != nil {
 			if cid := d.cgroups.Get(pid); cid != nil {
 				d.log.Debugf("Using cached cgroups for pid=%v", pid)
-				return cid.(string), nil
+				cidStr, ok := cid.(string)
+				if !ok {
+					d.log.Debugf("cached cgroup value for pid=%v is not a string (type=%T)", pid, cid)
+					continue
+				}
+				return cidStr, nil
 			}
 		}
 

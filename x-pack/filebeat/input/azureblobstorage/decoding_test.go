@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // all test files are read from the "testdata" directory
@@ -35,8 +35,7 @@ type noopReporter struct{}
 func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 func TestDecoding(t *testing.T) {
-	logp.TestingSetup()
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, "")
 
 	testCases := []struct {
 		name          string
@@ -77,6 +76,20 @@ func TestDecoding(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:          "csv_quoted_values",
+			file:          "txn_quoted.csv",
+			content:       "text/csv",
+			numEvents:     2,
+			assertAgainst: "txn_quoted.json",
+			config: decoder.Config{
+				Codec: &decoder.CodecConfig{
+					CSV: &decoder.CSVCodecConfig{
+						Enabled: true,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -98,7 +111,7 @@ func TestDecoding(t *testing.T) {
 					LastModified: &time.Time{},
 				},
 			}
-			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, p, noopReporter{}, nil, log)
+			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, 0, p, noopReporter{}, nil, log)
 			j.src.ReaderConfig.Decoding = tc.config
 			err = j.decode(context.Background(), f, "test")
 			if err != nil {

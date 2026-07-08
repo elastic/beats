@@ -18,6 +18,7 @@
 package add_host_metadata
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"runtime"
@@ -28,8 +29,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -60,7 +63,7 @@ func TestConfigDefault(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -90,6 +93,18 @@ func TestConfigDefault(t *testing.T) {
 	v, err = newEvent.GetValue("host.os.type")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
+
+	// RunPdata path: assert Run == RunPdata.
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+	body := pcommon.NewMap()
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, newEvent.Fields))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
 }
 
 func TestConfigNetInfoDisabled(t *testing.T) {
@@ -107,7 +122,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -137,6 +152,18 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	v, err = newEvent.GetValue("host.os.type")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
+
+	// RunPdata path: assert Run == RunPdata.
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+	body := pcommon.NewMap()
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, newEvent.Fields))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
 }
 
 func TestConfigName(t *testing.T) {
@@ -199,6 +226,48 @@ func TestConfigGeoEnabled(t *testing.T) {
 	assert.Len(t, eventGeoField, len(config))
 }
 
+func TestGeoFieldsAreNotMutatedAcrossEvents(t *testing.T) {
+	testConfig, err := conf.NewConfigFrom(map[string]interface{}{
+		"geo.name": "yerevan-am",
+	})
+	require.NoError(t, err)
+
+	factory := func() (hostInfo, error) {
+		return &mockHostInfo{
+			Hostname: hostName,
+		}, nil
+	}
+	p, err := newWithHostInfoFactory(testConfig, logptest.NewTestingLogger(t, ""), factory)
+	require.NoError(t, err)
+
+	firstEvent := &beat.Event{
+		Fields:    mapstr.M{},
+		Timestamp: time.Now(),
+	}
+
+	firstEvent, err = p.Run(firstEvent)
+	require.NoError(t, err)
+
+	_, err = firstEvent.PutValue("host.geo.city_name", "Yerevan")
+	require.NoError(t, err)
+
+	secondEvent := &beat.Event{
+		Fields:    mapstr.M{},
+		Timestamp: time.Now(),
+	}
+
+	secondEvent, err = p.Run(secondEvent)
+	require.NoError(t, err)
+
+	secondGeo, err := secondEvent.GetValue("host.geo")
+	require.NoError(t, err)
+
+	geoMap, ok := secondGeo.(mapstr.M)
+	require.True(t, ok)
+	_, hasCityName := geoMap["city_name"]
+	assert.False(t, hasCityName, "host.geo from previous event leaked into subsequent events")
+}
+
 func TestConfigGeoDisabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    mapstr.M{},
@@ -233,7 +302,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -313,7 +382,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 

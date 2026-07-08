@@ -14,6 +14,48 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// MFAResponse is the set of MFA registration details returned by the mock fetcher.
+// Keys are the UUIDs of users in UserResponse.
+var MFAResponse = map[uuid.UUID]*fetcher.MFARegistrationDetails{
+	uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+		IsMFACapable:          true,
+		IsMFARegistered:       true,
+		IsPasswordlessCapable: false,
+		IsSsprCapable:         false,
+		IsSsprEnabled:         false,
+		IsSsprRegistered:      false,
+		MethodsRegistered:     []string{"microsoftAuthenticatorPush", "softwareOneTimePasscode"},
+		UserPreferredMethodForSecondaryAuthentication: "push",
+		UserType: "member",
+	},
+	uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+		IsMFACapable:          false,
+		IsMFARegistered:       false,
+		IsPasswordlessCapable: false,
+		IsSsprCapable:         false,
+		IsSsprEnabled:         false,
+		IsSsprRegistered:      false,
+		MethodsRegistered:     []string{},
+		UserPreferredMethodForSecondaryAuthentication: "",
+		UserType: "member",
+	},
+}
+
+// SignInActivityResponse is the set of sign-in activity details returned by the mock fetcher.
+// Keys are the UUIDs of users in UserResponse.
+var SignInActivityResponse = map[uuid.UUID]*fetcher.SignInActivityDetails{
+	uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+		LastSignInDateTime:               "2024-01-15T08:00:00Z",
+		LastSignInRequestId:              "req-id-1",
+		LastNonInteractiveSignInDateTime: "2024-01-15T08:30:00Z",
+	},
+	uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+		LastSignInDateTime:               "2024-01-14T10:00:00Z",
+		LastSignInRequestId:              "req-id-2",
+		LastNonInteractiveSignInDateTime: "2024-01-14T11:00:00Z",
+	},
+}
+
 var (
 	GroupDeltaLinkResponse  = "group-delta-link"
 	UserDeltaLinkResponse   = "user-delta-link"
@@ -160,6 +202,16 @@ func (f *mock) Users(ctx context.Context, _ string) ([]*fetcher.User, string, er
 // Devices returns a fixed set of devices.
 func (f *mock) Devices(ctx context.Context, _ string) ([]*fetcher.Device, string, error) {
 	return DeviceResponse, DeviceDeltaLinkResponse, nil
+}
+
+// UserMFADetails returns a fixed set of MFA registration details.
+func (f *mock) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFARegistrationDetails, error) {
+	return MFAResponse, nil
+}
+
+// UserSignInActivity returns a fixed set of sign-in activity details.
+func (f *mock) UserSignInActivity(ctx context.Context) (map[uuid.UUID]*fetcher.SignInActivityDetails, error) {
+	return SignInActivityResponse, nil
 }
 
 // SetLogger is not used for this implementation.
