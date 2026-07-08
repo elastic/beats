@@ -59,13 +59,23 @@ func BenchmarkFilestream(b *testing.B) {
 		lineCount   int
 		fileCount   int
 		fingerprint bool
+		growing     bool
 	}{
-		{"1_file/inode", 10_000, 1, false},
-		{"1_file/fingerprint", 10_000, 1, true},
-		{"100_files/inode", 1000, 100, false},
-		{"100_files/fingerprint", 1000, 100, true},
-		{"1000_files/fingerprint", 20, 1000, true},
-		{"10000_files/fingerprint", 20, 10_000, true},
+		{"1_file/inode", 10_000, 1, false, false},
+		{"1_file/fingerprint", 10_000, 1, true, false},
+		{"100_files/inode", 1000, 100, false, false},
+		{"100_files/fingerprint", 1000, 100, true, false},
+		{"1000_files/fingerprint", 20, 1000, true, false},
+		{"10000_files/fingerprint", 20, 10_000, true, false},
+		// Growing fingerprint: many small files that stay below the 1024-byte
+		// threshold, so each is tracked by a bounded growing-fingerprint key.
+		// This is the scenario the bounded-key optimization targets; the full
+		// pipeline here (incl. the registry/WAL writes the key participates in)
+		// is what scanner-only benchmarks miss. With -benchmem the B/op delta
+		// against an unbounded-key build reflects the smaller per-cursor-update
+		// WAL records.
+		{"1000_files/growing", 5, 1000, true, true},
+		{"10000_files/growing", 5, 10_000, true, true},
 	}
 
 	for _, tc := range cases {
@@ -81,7 +91,7 @@ func BenchmarkFilestream(b *testing.B) {
 			}
 
 			expEvents := tc.lineCount * tc.fileCount
-			cfg := filestreamBenchCfg(ingestPath, tc.fingerprint)
+			cfg := filestreamBenchCfg(ingestPath, tc.fingerprint, tc.growing)
 			b.ResetTimer()
 
 			for i := 0; i < b.N; i++ {
@@ -128,7 +138,7 @@ paths:
 	})
 }
 
-func filestreamBenchCfg(path string, fingerprint bool) string {
+func filestreamBenchCfg(path string, fingerprint, growing bool) string {
 	identity := `
 prospector.scanner.fingerprint.enabled: false
 file_identity.native: ~`
@@ -136,6 +146,12 @@ file_identity.native: ~`
 		identity = `
 prospector.scanner.fingerprint.enabled: true
 file_identity.fingerprint: ~`
+	}
+	if growing {
+		identity = `
+prospector.scanner.fingerprint.enabled: true
+file_identity.fingerprint:
+  growing: true`
 	}
 	return fmt.Sprintf(`
 id: benchmark

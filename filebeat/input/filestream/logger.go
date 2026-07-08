@@ -33,8 +33,8 @@ func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) *logp.Logger {
 		zap.String("operation", event.Op.String()),
 		zap.String("source_file", event.SrcID),
 	)
-	if event.Descriptor.Fingerprint != "" {
-		fields = append(fields, zap.String("fingerprint", event.Descriptor.Fingerprint))
+	if fp := event.Descriptor.Fingerprint; fp.Complete() {
+		fields = append(fields, zap.String("fingerprint", fp.Sum))
 	}
 	if info := event.Descriptor.Info; info != nil {
 		if osID := info.GetOSState().Identifier(); osID != "" {
