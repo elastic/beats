@@ -59,11 +59,7 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 		return nil, nil, ErrPathsRequired
 	}
 
-<<<<<<< HEAD
-	bm, err := newBaseModuleFromConfig(config, logger)
-=======
 	bm, err := newBaseModuleFromConfig(config, info.Logger, info.Paths)
->>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -120,13 +116,7 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 }
 
 func initMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger) ([]MetricSet, error) {
-<<<<<<< HEAD
-	var (
-		errs multierror.Errors
-	)
-=======
-	var errs []error
->>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
+	var errs multierror.Errors
 
 	bms, err := newBaseMetricSets(r, m, p, logger)
 	if err != nil {

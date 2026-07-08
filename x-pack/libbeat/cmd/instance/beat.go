@@ -106,24 +106,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Path paths.Path `config:"path"`
 	}{}
 
-<<<<<<< HEAD
-		if err := cfg.Unpack(&partialConfig); err != nil {
-			return nil, fmt.Errorf("error extracting default paths: %w", err)
-		}
-		p := paths.New()
-		if err := p.InitPaths(&partialConfig.Path); err != nil {
-			return nil, fmt.Errorf("error initializing default paths: %w", err)
-		}
-		b.Info.Paths = p
-	} else {
-		if err := instance.InitPaths(cfg); err != nil {
-			return nil, fmt.Errorf("error initializing paths: %w", err)
-		}
-		b.Info.Paths = paths.Paths
-=======
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return nil, fmt.Errorf("error extracting default paths: %w", err)
->>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
 	}
 
 	p := paths.New()
@@ -299,7 +283,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 // setLogger configures a logp logger and sets it on b.Info.Logger
 func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Core) error {
-
 	var err error
 	logpConfig := logp.Config{}
 	logpConfig.AddCaller = true

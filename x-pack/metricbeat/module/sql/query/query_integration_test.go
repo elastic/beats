@@ -7,6 +7,7 @@
 package query
 
 import (
+	"database/sql"
 	"fmt"
 	"net"
 	"os"
@@ -165,7 +166,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("table mode", func(t *testing.T) {
@@ -189,7 +189,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("merged mode", func(t *testing.T) {
@@ -197,8 +196,8 @@ func TestPostgreSQL(t *testing.T) {
 				config: config{
 					Driver: "postgres",
 					Queries: []query{
-						query{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
-						query{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
 					},
 					ResponseFormat: tableResponseFormat,
 					RawData: rawData{
@@ -221,14 +220,11 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 	})
 }
 
 func TestOracle(t *testing.T) {
-<<<<<<< HEAD
-=======
 	// Skip if Oracle Instant Client is not installed.
 	// The godror driver requires the Oracle Instant Client library (libclntsh.dylib/so).
 	// See: https://oracle.github.io/odpi/doc/installation.html
@@ -242,7 +238,6 @@ func TestOracle(t *testing.T) {
 			"See https://oracle.github.io/odpi/doc/installation.html")
 	}
 
->>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
 	service := compose.EnsureUp(t, "oracle")
 	host, port, _ := net.SplitHostPort(service.Host())
 
