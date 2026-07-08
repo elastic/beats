@@ -58,11 +58,7 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 		return nil, nil, ErrPathsRequired
 	}
 
-<<<<<<< HEAD
-	bm, err := newBaseModuleFromConfig(config, logger)
-=======
-	bm, err := newBaseModuleFromConfig(config, info.Logger, info.Paths)
->>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
+	bm, err := newBaseModuleFromConfig(config, logger, p)
 	if err != nil {
 		return nil, nil, err
 	}
