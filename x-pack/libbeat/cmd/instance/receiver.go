@@ -46,6 +46,7 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
+	runDone             chan error // receives the error from beater.Run; closed when Run returns
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -181,12 +182,14 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		br.reporter = rep
 	}
 
-	if err := br.beater.Run(&br.beat.Beat); err != nil {
-		// set beatreceiver status
-		groupReporter.UpdateStatus(status.Failed, err.Error())
-		return fmt.Errorf("beat receiver run error: %w", err)
-	}
-
+	br.runDone = make(chan error, 1)
+	go func() {
+		err := br.beater.Run(&br.beat.Beat)
+		if err != nil {
+			groupReporter.UpdateStatus(status.Failed, err.Error())
+		}
+		br.runDone <- err
+	}()
 	return nil
 }
 
@@ -217,6 +220,15 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	// static mode) do not. The OtelManager.stopOnce ensures the callback runs
 	// exactly once regardless.
 	br.beat.Manager.Stop()
+
+	// Wait for beater.Run to return before disconnecting the pipeline, so the
+	// beater owns its full shutdown drain and the pipeline is not torn down
+	// while inputs are still active. Bounded by ctx so a hung beater does not
+	// block Shutdown indefinitely.
+	select {
+	case <-br.runDone:
+	case <-ctx.Done():
+	}
 
 	// Now disconnect the publisher pipeline (this waits for outstanding events
 	// to be acknowledged, bounded by the caller's context deadline or the
