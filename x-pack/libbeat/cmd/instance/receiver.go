@@ -27,11 +27,29 @@ import (
 	"go.opentelemetry.io/collector/component"
 )
 
+// contextStopper is an optional extension of beat.Beater for beaters that can
+// respect a context deadline while waiting to reach their ready state. If a
+// beater implements this, Shutdown uses it so the OTel context deadline is not
+// consumed by the ready-state wait before Disconnect is called.
+type contextStopper interface {
+	StopWithContext(ctx context.Context)
+}
+
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
+<<<<<<< HEAD
 	beat   *instance.Beat
 	beater beat.Beater
 	Logger *logp.Logger
+=======
+	beat                *instance.Beat
+	beater              beat.Beater
+	reporter            *log.Reporter
+	Logger              *logp.Logger
+	bridge              *oteltelemetry.RegistryBridge
+	releaseSystemBridge func()
+	runDone             chan error // receives the error from beater.Run; closed when Run returns
+>>>>>>> af686c255 (synchronize filebeat run and shutdown functions (#51800))
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -136,19 +154,70 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 	})
 
-	if err := br.beater.Run(&br.beat.Beat); err != nil {
-		// set beatreceiver status
-		groupReporter.UpdateStatus(status.Failed, err.Error())
-		return fmt.Errorf("beat receiver run error: %w", err)
-	}
-
+	br.runDone = make(chan error, 1)
+	go func() {
+		err := br.beater.Run(&br.beat.Beat)
+		if err != nil {
+			groupReporter.UpdateStatus(status.Failed, err.Error())
+		}
+		br.runDone <- err
+	}()
 	return nil
 }
 
+<<<<<<< HEAD
 // BeatReceiver.Stop() stops beat receiver.
 func (br *BeatReceiver) Shutdown() error {
 	br.beater.Stop()
 
+=======
+// BeatReceiver.Shutdown stops the beat receiver. The supplied context bounds
+// how long the publisher pipeline waits for outstanding acknowledgments before
+// it is force-closed (issue #49794); if it carries no deadline the pipeline's
+// configured close timeout is used.
+func (br *BeatReceiver) Shutdown(ctx context.Context) error {
+	if br.bridge != nil {
+		br.bridge.Shutdown()
+	}
+	if br.releaseSystemBridge != nil {
+		br.releaseSystemBridge()
+	}
+	// The Beater owns shutdown sequencing: stop it first so it can close its
+	// inputs and finalize acknowledgments before the pipeline is disconnected.
+	// See https://github.com/elastic/beats/issues/49794.
+	// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
+	// shutdown deadline during their ready-state wait.
+	if cs, ok := br.beater.(contextStopper); ok {
+		cs.StopWithContext(ctx)
+	} else {
+		br.beater.Stop()
+	}
+
+	// Trigger the stop callback. Some beaters (e.g. metricbeat) call
+	// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
+	// static mode) do not. The OtelManager.stopOnce ensures the callback runs
+	// exactly once regardless.
+	br.beat.Manager.Stop()
+
+	// Wait for beater.Run to return before disconnecting the pipeline, so the
+	// beater owns its full shutdown drain and the pipeline is not torn down
+	// while inputs are still active. Bounded by ctx so a hung beater does not
+	// block Shutdown indefinitely.
+	select {
+	case <-br.runDone:
+	case <-ctx.Done():
+	}
+
+	// Now disconnect the publisher pipeline (this waits for outstanding events
+	// to be acknowledged, bounded by the caller's context deadline or the
+	// pipeline's configured close timeout). For a receiver sharing an intake
+	// queue this disconnects only this pipeline and waits for its own events,
+	// leaving co-tenant receivers untouched.
+	if err := br.beat.Publisher.Disconnect(ctx); err != nil {
+		br.Logger.Errorf("error closing beat receiver publisher: %v", err)
+	}
+
+>>>>>>> af686c255 (synchronize filebeat run and shutdown functions (#51800))
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()
 	if err := proc.Close(); err != nil {
