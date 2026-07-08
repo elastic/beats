@@ -163,8 +163,8 @@ func TestActionFromMap(t *testing.T) {
 			}
 
 			if tc.Name == "valid profile flag" {
-				if !a.Profile {
-					t.Errorf("expected Profile to be true, got false")
+				if a.Profile == nil || !*a.Profile {
+					t.Errorf("expected Profile to be true, got %v", a.Profile)
 				}
 			}
 			if tc.Name == "valid platform" {

@@ -85,7 +85,7 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("tls", config, logptest.NewTestingLogger(t, ""))
+	p, err := create("tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
@@ -326,7 +326,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	logger := logptest.NewTestingLogger(t, "")
-	p, err := create("largeresp", config, logger)
+	p, err := create("largeresp", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -444,7 +444,7 @@ func TestJsonBody(t *testing.T) {
 			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
-			p, err := create("largeresp", config, logger)
+			p, err := create("largeresp", config, beat.Info{Logger: logger})
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
@@ -675,7 +675,7 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	logger := logptest.NewTestingLogger(t, "")
-	p, err := create("redirect", config, logger)
+	p, err := create("redirect", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -747,7 +747,7 @@ func TestRedirectWithTLS(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect-tls", config, logptest.NewTestingLogger(t, ""))
+	p, err := create("redirect-tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
@@ -798,7 +798,7 @@ func TestNoHeaders(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("http", config, logptest.NewTestingLogger(t, ""))
+	p, err := create("http", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -981,7 +981,7 @@ func TestUserAgentInject(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	p, err := create("ua", cfg, logptest.NewTestingLogger(t, ""))
+	p, err := create("ua", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")

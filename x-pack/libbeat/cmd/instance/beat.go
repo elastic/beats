@@ -103,25 +103,19 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	cfg := (*config.C)(tmp)
-	if settings.Name == "filebeat" {
-		partialConfig := struct {
-			Path paths.Path `config:"path"`
-		}{}
+	partialConfig := struct {
+		Path paths.Path `config:"path"`
+	}{}
 
-		if err := cfg.Unpack(&partialConfig); err != nil {
-			return nil, fmt.Errorf("error extracting default paths: %w", err)
-		}
-		p := paths.New()
-		if err := p.InitPaths(&partialConfig.Path); err != nil {
-			return nil, fmt.Errorf("error initializing default paths: %w", err)
-		}
-		b.Info.Paths = p
-	} else {
-		if err := instance.InitPaths(cfg); err != nil {
-			return nil, fmt.Errorf("error initializing paths: %w", err)
-		}
-		b.Info.Paths = paths.Paths
+	if err := cfg.Unpack(&partialConfig); err != nil {
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
+
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error initializing default paths: %w", err)
+	}
+	b.Info.Paths = p
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -156,6 +150,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	b.RawConfig = cfg
+
+	// Periodic metrics snapshots are expensive to collect and mostly
+	// redundant under a receiver, where metrics are already exported
+	// through the otel telemetry provider. Default them off.
+	b.Config.MetricLogging = config.MustNewConfigFrom(map[string]any{"period": 0})
+
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking config data: %w", err)

@@ -439,6 +439,57 @@ func TestGetBlocksUntilPublish(t *testing.T) {
 	}
 }
 
+// TestGetReturnsPromptly verifies Get returns queued events shortly after they
+// arrive — only the small debounce window, never a long block.
+func TestGetReturnsPromptly(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 16}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	_, ok := p.Publish(1)
+	require.True(t, ok)
+
+	start := time.Now()
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	assert.Equal(t, 1, b.Count())
+	assert.Less(t, time.Since(start), 200*time.Millisecond, "Get should return within the debounce window, not block")
+	b.Done()
+}
+
+// TestGetCoalescesQueuedEvents verifies Get returns all currently-queued events
+// in a single batch (capped by maxEvents) rather than one batch per event, so
+// the output worker's Publish fan-out stays bounded.
+func TestGetCoalescesQueuedEvents(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 16}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	for i := 0; i < 5; i++ {
+		_, ok := p.Publish(i)
+		require.True(t, ok)
+	}
+
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	assert.Equal(t, 5, b.Count(), "Get should return all queued events in one batch")
+	b.Done()
+
+	// maxEvents still caps a single Get.
+	for i := 0; i < 4; i++ {
+		_, ok := p.Publish(i)
+		require.True(t, ok)
+	}
+	b2, err := q.Get(2)
+	require.NoError(t, err)
+	assert.Equal(t, 2, b2.Count(), "Get(2) must return at most maxEvents")
+	b2.Done()
+}
+
 // TestCloseUnblocksGet verifies a pending Get returns EOF when the queue is
 // closed.
 func TestCloseUnblocksGet(t *testing.T) {

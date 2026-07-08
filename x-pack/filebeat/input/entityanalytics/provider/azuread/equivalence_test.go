@@ -50,6 +50,8 @@ import (
 //   - Legacy puts MFA under azure_ad.mfa (fetcher.MFARegistrationDetails);
 //     entcollect puts MFA under user.risk.mfa (ecentraid.MFADetails).
 //     MFA user-ID coverage is compared; field values are not.
+//   - Sign-in activity uses the same field path (azure_ad.signInActivity)
+//     on both sides with compatible JSON tags, so values are compared.
 //   - event.kind: asset present only in minimal-state (set by adapter).
 //   - event.action format differs: legacy uses "user-discovered" etc.;
 //     minimal-state uses entcollect.ActionDiscovered.
@@ -60,7 +62,7 @@ import (
 //     Users migrating configs will see different ownership document shapes
 //     in production.
 func TestEquivalence_FullSync(t *testing.T) {
-	legacyUsers, legacyDevices, legacyUserGroups, legacyDeviceGroups, legacyMFAUserIDs := runLegacyFetch(t)
+	legacyUsers, legacyDevices, legacyUserGroups, legacyDeviceGroups, legacyMFAUserIDs, legacySignIn := runLegacyFetch(t)
 
 	srv := startEquivGraphServer(t)
 	minimalDocs := runMinimalFullSync(t, srv)
@@ -82,6 +84,7 @@ func TestEquivalence_FullSync(t *testing.T) {
 	compareGroups(t, "device", legacyDeviceGroups, minimalDevices, "device.group")
 
 	compareMFACoverage(t, legacyMFAUserIDs, minimalUsers)
+	compareSignInActivity(t, legacySignIn, minimalUsers)
 
 	// Sanity: verify we actually compared non-trivial data.
 	if len(legacyUsers) == 0 {
@@ -99,18 +102,23 @@ func TestEquivalence_FullSync(t *testing.T) {
 	if len(legacyMFAUserIDs) == 0 {
 		t.Error("sanity: no legacy MFA user IDs")
 	}
+	if len(legacySignIn) == 0 {
+		t.Error("sanity: no legacy sign-in activity data")
+	}
 }
 
 // runLegacyFetch runs the legacy doFetch path with the mock fetcher and
-// extracts entity payloads, group memberships, and MFA user-ID coverage.
+// extracts entity payloads, group memberships, MFA user-ID coverage,
+// and sign-in activity data.
 func runLegacyFetch(t *testing.T) (
 	users, devices []idPayload,
 	userGroups, deviceGroups map[string][]groupECS,
 	mfaUserIDs []string,
+	signInActivity map[string]json.RawMessage,
 ) {
 	t.Helper()
 	a := azure{
-		conf:    conf{Dataset: "all", EnrichWith: []string{"mfa"}},
+		conf:    conf{Dataset: "all", EnrichWith: []string{"mfa", "sign_in_activity"}},
 		logger:  logptest.NewTestingLogger(t, "test-legacy"),
 		auth:    mockauth.New(""),
 		fetcher: mockfetcher.New(),
@@ -127,6 +135,7 @@ func runLegacyFetch(t *testing.T) (
 	}
 
 	userGroups = make(map[string][]groupECS)
+	signInActivity = make(map[string]json.RawMessage)
 	for _, u := range ss.users {
 		b, err := json.Marshal(u.Fields)
 		if err != nil {
@@ -148,6 +157,13 @@ func runLegacyFetch(t *testing.T) (
 
 		if u.MFA != nil {
 			mfaUserIDs = append(mfaUserIDs, u.ID.String())
+		}
+		if u.SignInActivity != nil {
+			raw, err := json.Marshal(u.SignInActivity)
+			if err != nil {
+				t.Fatal(err)
+			}
+			signInActivity[u.ID.String()] = raw
 		}
 	}
 
@@ -172,7 +188,7 @@ func runLegacyFetch(t *testing.T) (
 		}
 	}
 
-	return users, devices, userGroups, deviceGroups, mfaUserIDs
+	return users, devices, userGroups, deviceGroups, mfaUserIDs, signInActivity
 }
 
 // runMinimalFullSync runs the entcollect FullSync path against the httptest
@@ -187,7 +203,7 @@ func runMinimalFullSync(t *testing.T, srv *httptest.Server) []entcollect.Documen
 	cfg.LoginEndpoint = srv.URL
 	cfg.APIEndpoint = srv.URL + "/v1.0"
 	cfg.Dataset = "all"
-	cfg.EnrichWith = []string{"mfa"}
+	cfg.EnrichWith = []string{"mfa", "sign_in_activity"}
 
 	p := ecentraid.NewWithClient(cfg, srv.Client())
 
@@ -290,6 +306,15 @@ func startEquivGraphServer(t *testing.T) *httptest.Server {
 		_ = json.NewEncoder(w).Encode(map[string]any{"value": mockMFAAsGraphJSON()})
 	})
 
+	// Sign-in activity.
+	mux.HandleFunc("GET /v1.0/users", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("$select") != "id,signInActivity" {
+			http.NotFound(w, r)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"value": mockSignInActivityAsGraphJSON()})
+	})
+
 	srv := httptest.NewServer(mux)
 	srvURL = srv.URL
 	t.Cleanup(srv.Close)
@@ -364,6 +389,27 @@ func mockMFAAsGraphJSON() []map[string]any {
 			"methodsRegistered":     mfa.MethodsRegistered,
 			"userPreferredMethodForSecondaryAuthentication": mfa.UserPreferredMethodForSecondaryAuthentication,
 			"userType": mfa.UserType,
+		}
+		result = append(result, entry)
+	}
+	return result
+}
+
+// mockSignInActivityAsGraphJSON converts mock fetcher sign-in activity data
+// into Graph API response entries with nested signInActivity objects.
+func mockSignInActivityAsGraphJSON() []map[string]any {
+	var result []map[string]any
+	for userID, sia := range mockfetcher.SignInActivityResponse {
+		entry := map[string]any{
+			"id": userID.String(),
+			"signInActivity": map[string]any{
+				"lastSignInDateTime":                sia.LastSignInDateTime,
+				"lastSignInRequestId":               sia.LastSignInRequestId,
+				"lastNonInteractiveSignInDateTime":  sia.LastNonInteractiveSignInDateTime,
+				"lastNonInteractiveSignInRequestId": sia.LastNonInteractiveSignInRequestId,
+				"lastSuccessfulSignInDateTime":      sia.LastSuccessfulSignInDateTime,
+				"lastSuccessfulSignInRequestId":     sia.LastSuccessfulSignInRequestId,
+			},
 		}
 		result = append(result, entry)
 	}
@@ -492,6 +538,61 @@ func compareMFACoverage(t *testing.T, legacyMFAUserIDs []string, minimalUsers []
 	for i := range legacyMFAUserIDs {
 		if legacyMFAUserIDs[i] != minimalMFAUserIDs[i] {
 			t.Errorf("MFA user-ID[%d] mismatch: legacy=%q, minimal=%q", i, legacyMFAUserIDs[i], minimalMFAUserIDs[i])
+		}
+	}
+}
+
+// compareSignInActivity checks that the same set of user IDs received
+// sign-in activity enrichment and that the JSON-serialized values match.
+// Unlike MFA (which uses different field paths), both providers publish
+// sign-in activity at azure_ad.signInActivity with compatible JSON tags,
+// so values can be compared directly.
+func compareSignInActivity(t *testing.T, legacySignIn map[string]json.RawMessage, minimalUsers []entcollect.Document) {
+	t.Helper()
+
+	minimalSignIn := make(map[string]json.RawMessage)
+	for _, doc := range minimalUsers {
+		raw, ok := doc.Fields["azure_ad.signInActivity"]
+		if !ok {
+			continue
+		}
+		b, err := json.Marshal(raw)
+		if err != nil {
+			t.Fatalf("marshal minimal sign-in activity for %s: %v", doc.ID, err)
+		}
+		minimalSignIn[doc.ID] = b
+	}
+
+	if len(legacySignIn) != len(minimalSignIn) {
+		t.Errorf("sign-in activity user count mismatch: legacy=%d, minimal=%d", len(legacySignIn), len(minimalSignIn))
+	}
+
+	for id, legacyRaw := range legacySignIn {
+		minimalRaw, ok := minimalSignIn[id]
+		if !ok {
+			t.Errorf("sign-in activity for user %q: present in legacy, missing in minimal", id)
+			continue
+		}
+
+		var legacyMap, minimalMap map[string]any
+		if err := json.Unmarshal(legacyRaw, &legacyMap); err != nil {
+			t.Fatal(err)
+		}
+		if err := json.Unmarshal(minimalRaw, &minimalMap); err != nil {
+			t.Fatal(err)
+		}
+
+		legacyNorm, _ := json.Marshal(legacyMap)
+		minimalNorm, _ := json.Marshal(minimalMap)
+		if string(legacyNorm) != string(minimalNorm) {
+			t.Errorf("sign-in activity for user %q value mismatch:\n  legacy:  %s\n  minimal: %s",
+				id, legacyNorm, minimalNorm)
+		}
+	}
+
+	for id := range minimalSignIn {
+		if _, ok := legacySignIn[id]; !ok {
+			t.Errorf("sign-in activity for user %q: present in minimal, missing in legacy", id)
 		}
 	}
 }

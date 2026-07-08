@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"sync"
 	"testing"
 	"time"
 
@@ -167,6 +168,112 @@ func (l *replayingGapEventLog) IsFile() bool {
 func (l *replayingGapEventLog) IgnoreMissingChannel() bool {
 	return false
 }
+
+// TestRunClosesEventLogWithoutRacingRead verifies that when the runner's
+// context is cancelled while a Read is in progress, the event log is not
+// closed until that Read has returned. Closing the event log frees native
+// Windows Event Log handles; doing so concurrently with an in-flight
+// Read/render previously caused an access violation crash during shutdown.
+func TestRunClosesEventLogWithoutRacingRead(t *testing.T) {
+	api := &concurrencyProbeEventLog{readStarted: make(chan struct{})}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := make(chan error, 1)
+	go func() {
+		done <- Run(
+			noOpStatusReporter{},
+			ctx,
+			monitoring.NewRegistry(),
+			api,
+			checkpoint.EventLogState{Name: "System"},
+			noOpPublisher{},
+			logp.NewLogger("eventlog_runner_test"),
+		)
+	}()
+
+	// Cancel only once a Read is actively in progress so that a close racing
+	// the read would be observable.
+	<-api.readStarted
+	cancel()
+
+	select {
+	case err := <-done:
+		require.NoError(t, err)
+	case <-time.After(10 * time.Second):
+		t.Fatal("Run did not return after context cancellation")
+	}
+
+	require.False(t, api.observedOverlap(), "Close must not run while a Read is in progress")
+	require.True(t, api.wasClosed(), "event log must be closed when the runner returns")
+}
+
+// concurrencyProbeEventLog records whether Read and Close ever overlap.
+type concurrencyProbeEventLog struct {
+	mu          sync.Mutex
+	reading     bool
+	overlap     bool
+	closed      bool
+	readStarted chan struct{}
+	signalOnce  sync.Once
+}
+
+func (l *concurrencyProbeEventLog) Open(_ checkpoint.EventLogState, _ *monitoring.Registry) error {
+	return nil
+}
+
+func (l *concurrencyProbeEventLog) Checkpoint() checkpoint.EventLogState {
+	return checkpoint.EventLogState{Name: "System"}
+}
+
+func (l *concurrencyProbeEventLog) Read() ([]Record, error) {
+	l.mu.Lock()
+	if l.closed {
+		l.overlap = true
+	}
+	l.reading = true
+	l.mu.Unlock()
+
+	l.signalOnce.Do(func() { close(l.readStarted) })
+
+	// Keep the read in progress long enough to expose a racing close.
+	time.Sleep(50 * time.Millisecond)
+
+	l.mu.Lock()
+	l.reading = false
+	l.mu.Unlock()
+	return nil, nil
+}
+
+func (l *concurrencyProbeEventLog) Reset() error { return nil }
+
+func (l *concurrencyProbeEventLog) Close() error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if l.reading {
+		l.overlap = true
+	}
+	l.closed = true
+	return nil
+}
+
+func (l *concurrencyProbeEventLog) observedOverlap() bool {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.overlap
+}
+
+func (l *concurrencyProbeEventLog) wasClosed() bool {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.closed
+}
+
+func (l *concurrencyProbeEventLog) Name() string               { return "System" }
+func (l *concurrencyProbeEventLog) Channel() string            { return "System" }
+func (l *concurrencyProbeEventLog) IsFile() bool               { return false }
+func (l *concurrencyProbeEventLog) IgnoreMissingChannel() bool { return false }
 
 type noOpPublisher struct{}
 
