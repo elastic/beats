@@ -109,7 +109,7 @@ func newTestMetricSet(t *testing.T, cfg map[string]interface{}) *MetricSet {
 	// Use a per-test data directory so cursor state stays isolated and the
 	// test does not depend on the (removed) global paths singleton.
 	beatPaths := &paths.Path{Data: t.TempDir()}
-	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: beatPaths, Logger: logptest.NewTestingLogger(t, "")})
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beatPaths, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	require.Len(t, metricsets, 1)
 	qms, ok := metricsets[0].(*MetricSet)
@@ -167,12 +167,8 @@ func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]interface{}) er
 
 	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
-<<<<<<< HEAD
-	_, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
-=======
 	beatPaths := &paths.Path{Data: t.TempDir()}
-	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: beatPaths, Logger: logptest.NewTestingLogger(t, "")})
->>>>>>> 37f3d269d (remove global paths from metricbeat (#51591))
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beatPaths, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		return err
 	}
