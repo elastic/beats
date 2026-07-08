@@ -42,8 +42,12 @@ import (
 const (
 	RecursiveGlobDepth           = 8
 	DefaultFingerprintSize int64 = 1024 // 1KB
-	scannerDebugKey              = "scanner"
-	watcherDebugKey              = "file_watcher"
+	// MinFingerprintSize is the smallest allowed fingerprint length (one SHA-256 block).
+	MinFingerprintSize int64 = sha256.BlockSize
+	// MaxFingerprintSize caps fingerprint length; larger values risk exhausting scanner memory.
+	MaxFingerprintSize int64 = 10 * 1024 * 1024 // 10MB
+	scannerDebugKey          = "scanner"
+	watcherDebugKey          = "file_watcher"
 )
 
 var (
@@ -320,39 +324,45 @@ func (w *fileWatcher) watch(
 	//   3. Unmatched-leftover emission — anything still in w.prev becomes
 	//      OpDelete, anything still in newFilesByName becomes OpCreate.
 
-	// Exact-FileID rename match: For growing mode, also accumulate the
-	// short-fingerprint index from prev entries that did NOT get an exact
-	// match — they are the candidates for the next (prefix-match) pass.
-	var shortFingerprints *shortFingerprintSet
-	if w.growingFingerprint {
-		shortFingerprints = newShortFingerprintSet()
-	}
-
+	// Exact-FileID rename match.
 	for remainingPath, remainingDesc := range w.prev {
 		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
+		if !renamed {
+			continue
+		}
 
-		switch {
-		// Exact-FileID rename match
-		case renamed:
-			srcID := w.getFileIdentity(remainingDesc)
-			select {
-			case <-ctx.Done():
-				return
-			case w.events <- renamedEvent(
-				remainingPath, newDesc.Filename, *newDesc, srcID):
-				renamedCount++
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- renamedEvent(
+			remainingPath, newDesc.Filename, *newDesc, srcID):
+			renamedCount++
+		}
+
+		delete(newFilesByName, newDesc.Filename)
+		delete(newFilesByID, remainingDesc.FileID())
+		delete(w.prev, remainingPath)
+	}
+
+	// Prefix-match candidates are the still-growing prev entries left after
+	// the exact-match pass (GrowingRaw is empty for completed entries, which
+	// match by their SHA-256 identity instead). The index is only built when
+	// this scan has a new file that could justify a match — a delete-only
+	// scan pays no hashing.
+	var shortFingerprints *shortFingerprintSet
+	if w.growingFingerprint {
+		for _, newDesc := range newFilesByName {
+			if newDesc.Fingerprint.Complete() {
+				shortFingerprints = newShortFingerprintSet()
+				break
 			}
-
-			delete(newFilesByName, newDesc.Filename)
-			delete(newFilesByID, remainingDesc.FileID())
-			delete(w.prev, remainingPath)
-
-		// If it isn't an exact match, make it a candidate for prefix-match.
-		// GrowingRaw keeps only still-growing predecessors in the
-		// index; completed entries match by their SHA-256 identity instead.
-		case w.growingFingerprint:
+		}
+	}
+	if shortFingerprints != nil {
+		for remainingPath, remainingDesc := range w.prev {
 			if raw := remainingDesc.Fingerprint.GrowingRaw(); raw != "" {
-				shortFingerprints.Add(remainingPath, raw, remainingPath)
+				shortFingerprints.AddRaw(remainingPath, raw, remainingPath)
 			}
 		}
 	}
@@ -600,9 +610,14 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 	}
 
 	if s.cfg.Fingerprint.Enabled {
-		if s.cfg.Fingerprint.Length < sha256.BlockSize {
-			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
+		if s.cfg.Fingerprint.Length < MinFingerprintSize {
+			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, MinFingerprintSize)
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
+		}
+		if s.cfg.Fingerprint.Length > MaxFingerprintSize {
+			s.log.Warnf("fingerprint length %d bytes exceeds the maximum of %d bytes, capping to the maximum",
+				s.cfg.Fingerprint.Length, MaxFingerprintSize)
+			s.cfg.Fingerprint.Length = MaxFingerprintSize
 		}
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d, growing %t",
 			s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length, s.cfg.Fingerprint.Growing)
