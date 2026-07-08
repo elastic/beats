@@ -34,7 +34,7 @@ func TestEmit(t *testing.T) {
 	})
 
 	event := <-listener.Events()
-	assert.Equal(t, event["foo"], "bar")
+	assert.Equal(t, "bar", event["foo"])
 }
 
 func TestEmitOrder(t *testing.T) {
@@ -45,8 +45,8 @@ func TestEmitOrder(t *testing.T) {
 
 	event1 := <-listener.Events()
 	event2 := <-listener.Events()
-	assert.Equal(t, event1, Event{"first": "event"})
-	assert.Equal(t, event2, Event{"second": "event"})
+	assert.Equal(t, Event{"first": "event"}, event1)
+	assert.Equal(t, Event{"second": "event"}, event2)
 }
 
 func TestSubscribeFilter(t *testing.T) {
@@ -57,7 +57,7 @@ func TestSubscribeFilter(t *testing.T) {
 	bus.Publish(Event{"second": "event"})
 
 	event := <-listener.Events()
-	assert.Equal(t, event, Event{"second": "event"})
+	assert.Equal(t, Event{"second": "event"}, event)
 }
 
 func TestMultipleListeners(t *testing.T) {
@@ -70,11 +70,11 @@ func TestMultipleListeners(t *testing.T) {
 
 	event1 := <-listener1.Events()
 	event2 := <-listener1.Events()
-	assert.Equal(t, event1, Event{"a": "event"})
-	assert.Equal(t, event2, Event{"a": 1, "b": 2})
+	assert.Equal(t, Event{"a": "event"}, event1)
+	assert.Equal(t, Event{"a": 1, "b": 2}, event2)
 
 	event1 = <-listener2.Events()
-	assert.Equal(t, event1, Event{"a": 1, "b": 2})
+	assert.Equal(t, Event{"a": 1, "b": 2}, event1)
 
 	select {
 	case event2 = <-listener2.Events():
@@ -95,9 +95,9 @@ func TestListenerClose(t *testing.T) {
 	bus.Publish(Event{"third": "event"})
 
 	event := <-listener.Events()
-	assert.Equal(t, event, Event{"first": "event"})
+	assert.Equal(t, Event{"first": "event"}, event)
 	event = <-listener.Events()
-	assert.Equal(t, event, Event{"second": "event"})
+	assert.Equal(t, Event{"second": "event"}, event)
 
 	// Channel was closed, we get an empty event
 	event = <-listener.Events()
@@ -112,10 +112,10 @@ func TestUnsubscribedBus(t *testing.T) {
 	bus.Publish(Event{"second": "event"})
 	event := <-listener.Events()
 	event1 := <-listener.Events()
-	assert.Equal(t, event, Event{"first": "event"})
-	assert.Equal(t, event1, Event{"second": "event"})
+	assert.Equal(t, Event{"first": "event"}, event)
+	assert.Equal(t, Event{"second": "event"}, event1)
 
 	bus.Publish(Event{"a": 1, "b": 2})
 	event2 := <-listener.Events()
-	assert.Equal(t, event2, Event{"a": 1, "b": 2})
+	assert.Equal(t, Event{"a": 1, "b": 2}, event2)
 }

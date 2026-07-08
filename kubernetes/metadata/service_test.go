@@ -304,7 +304,7 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		nsConfig, err := config.NewConfigFrom(map[string]interface{}{
+		nsConfig, err := config.NewConfigFrom(map[string]any{
 			"include_annotations": []string{"ns.annotation"},
 		})
 		require.NoError(t, err)

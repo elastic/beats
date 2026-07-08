@@ -67,7 +67,7 @@ type ClusterConfiguration struct {
 }
 
 // WithFields FieldOption allows adding specific fields into the generated metadata
-func WithFields(key string, value interface{}) FieldOptions {
+func WithFields(key string, value any) FieldOptions {
 	return func(meta mapstr.M) {
 		_ = safemapstr.Put(meta, key, value)
 	}

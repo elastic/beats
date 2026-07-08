@@ -100,7 +100,7 @@ func (rs *replicaset) GenerateFromName(name string, opts ...FieldOptions) mapstr
 
 // RemoveUnnecessaryReplicaSetData removes all data from a ReplicaSet resource, except what we need to compute
 // Pod metadata. This function works for both ReplicaSet and PartialObjectMetadata.
-func RemoveUnnecessaryReplicaSetData(obj interface{}) (interface{}, error) {
+func RemoveUnnecessaryReplicaSetData(obj any) (any, error) {
 	switch old := obj.(type) {
 	case *appsv1.ReplicaSet:
 		transformed := &appsv1.ReplicaSet{

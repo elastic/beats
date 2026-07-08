@@ -22,5 +22,5 @@ import "strings"
 // DeDot a string by replacing all . with _
 // This helps when sending data to Elasticsearch to prevent object and key collisions.
 func DeDot(s string) string {
-	return strings.Replace(s, ".", "_", -1)
+	return strings.ReplaceAll(s, ".", "_")
 }

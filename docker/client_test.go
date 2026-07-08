@@ -28,10 +28,14 @@ import (
 
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient(client.DefaultDockerHost, nil, nil)
+	logger := logptest.NewTestingLogger(t, "")
+
+	c, err := NewClient(client.DefaultDockerHost, nil, nil, logger)
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 
@@ -51,7 +55,7 @@ func TestNewClient(t *testing.T) {
 	// Test we can hardcode version
 	os.Setenv("DOCKER_API_VERSION", "1.22")
 
-	c, err = NewClient(client.DefaultDockerHost, nil, nil)
+	c, err = NewClient(client.DefaultDockerHost, nil, nil, logger)
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 	assert.Equal(t, "1.22", c.ClientVersion())

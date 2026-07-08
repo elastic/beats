@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package docker
 
@@ -36,6 +35,7 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type MockClient struct {
@@ -43,9 +43,9 @@ type MockClient struct {
 	containers    [][]container.Summary
 	containersErr error
 	// event list to send on Events call
-	events []interface{}
+	events []any
 	// done channel is closed when the client has sent all events
-	done chan interface{}
+	done chan any
 }
 
 func (m *MockClient) ContainerList(ctx context.Context, options dockerclient.ContainerListOptions) (dockerclient.ContainerListResult, error) {
@@ -188,7 +188,7 @@ func TestWatcherAddEvents(t *testing.T) {
 				},
 			},
 		},
-		[]interface{}{
+		[]any{
 			events.Message{
 				Action: "start",
 				Actor: events.Actor{
@@ -241,7 +241,7 @@ func TestWatcherAddEventsShortID(t *testing.T) {
 				},
 			},
 		},
-		[]interface{}{
+		[]any{
 			events.Message{
 				Action: "start",
 				Actor: events.Actor{
@@ -295,7 +295,7 @@ func TestWatcherUpdateEvent(t *testing.T) {
 				},
 			},
 		},
-		[]interface{}{
+		[]any{
 			events.Message{
 				Action: "update",
 				Actor: events.Actor{
@@ -318,7 +318,7 @@ func TestWatcherUpdateEvent(t *testing.T) {
 			Labels: map[string]string{"label": "bar"},
 		},
 	}, watcher.Containers())
-	assert.Equal(t, 0, len(watcher.deleted))
+	assert.Empty(t, watcher.deleted)
 }
 
 func TestWatcherUpdateEventShortID(t *testing.T) {
@@ -343,7 +343,7 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 				},
 			},
 		},
-		[]interface{}{
+		[]any{
 			events.Message{
 				Action: "update",
 				Actor: events.Actor{
@@ -367,7 +367,7 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 			Labels: map[string]string{"label": "bar"},
 		},
 	}, watcher.Containers())
-	assert.Equal(t, 0, len(watcher.deleted))
+	assert.Empty(t, watcher.deleted)
 }
 
 func TestWatcherDie(t *testing.T) {
@@ -383,7 +383,7 @@ func TestWatcherDie(t *testing.T) {
 				},
 			},
 		},
-		[]interface{}{
+		[]any{
 			events.Message{
 				Action: "die",
 				Actor: events.Actor{
@@ -403,11 +403,11 @@ func TestWatcherDie(t *testing.T) {
 	defer watcher.Stop()
 
 	// Check it doesn't get removed while we request meta for the container
-	for i := 0; i < 18; i++ {
+	for range 18 {
 		watcher.Container("0332dbd79e20")
 		clock.Sleep(watcher.cleanupTimeout / 2)
 		watcher.runCleanup()
-		if !assert.Equal(t, 1, len(watcher.Containers())) {
+		if !assert.Len(t, watcher.Containers(), 1) {
 			break
 		}
 	}
@@ -419,7 +419,7 @@ func TestWatcherDie(t *testing.T) {
 	// Check that after the cleanup period the container is removed
 	clock.Sleep(watcher.cleanupTimeout + 1*time.Second)
 	watcher.runCleanup()
-	assert.Equal(t, 0, len(watcher.Containers()))
+	assert.Empty(t, watcher.Containers())
 }
 
 func TestWatcherDieShortID(t *testing.T) {
@@ -435,7 +435,7 @@ func TestWatcherDieShortID(t *testing.T) {
 				},
 			},
 		},
-		[]interface{}{
+		[]any{
 			events.Message{
 				Action: "die",
 				Actor: events.Actor{
@@ -456,11 +456,11 @@ func TestWatcherDieShortID(t *testing.T) {
 	defer watcher.Stop()
 
 	// Check it doesn't get removed while we request meta for the container
-	for i := 0; i < 18; i++ {
+	for range 18 {
 		watcher.Container("0332dbd79e20")
 		clock.Sleep(watcher.cleanupTimeout / 2)
 		watcher.runCleanup()
-		if !assert.Equal(t, 1, len(watcher.Containers())) {
+		if !assert.Len(t, watcher.Containers(), 1) {
 			break
 		}
 	}
@@ -472,7 +472,7 @@ func TestWatcherDieShortID(t *testing.T) {
 	// Check that after the cleanup period the container is removed
 	clock.Sleep(watcher.cleanupTimeout + 1*time.Second)
 	watcher.runCleanup()
-	assert.Equal(t, 0, len(watcher.Containers()))
+	assert.Empty(t, watcher.Containers())
 }
 
 func TestWatcherNoError(t *testing.T) {
@@ -501,21 +501,20 @@ func TestWatcherNoError(t *testing.T) {
 	require.Len(t, obs.FilterMessageSnippet("Failed to call listContainers").All(), 1)
 }
 
-func testWatcher(t *testing.T, containers [][]container.Summary, events []interface{}) (*watcher, chan interface{}) {
+func testWatcher(t *testing.T, containers [][]container.Summary, events []any) (*watcher, chan any) {
 	return testWatcherShortID(t, containers, events, false)
 }
 
-func testWatcherShortID(t *testing.T, containers [][]container.Summary, events []interface{}, enable bool) (*watcher, chan interface{}) {
-	err := logp.TestingSetup()
-	require.NoError(t, err)
+func testWatcherShortID(t *testing.T, containers [][]container.Summary, events []any, enable bool) (*watcher, chan any) {
+	logger := logptest.NewTestingLogger(t, "")
 
 	client := &MockClient{
 		containers: containers,
 		events:     events,
-		done:       make(chan interface{}),
+		done:       make(chan any),
 	}
 
-	w, err := NewWatcherWithClient(logp.L(), client, 200*time.Millisecond, enable)
+	w, err := NewWatcherWithClient(logger, client, 200*time.Millisecond, enable)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -527,7 +526,7 @@ func testWatcherShortID(t *testing.T, containers [][]container.Summary, events [
 	return watcher, client.done
 }
 
-func runAndWait(w *watcher, done chan interface{}) *watcher {
+func runAndWait(w *watcher, done chan any) *watcher {
 	_ = w.Start()
 	<-done
 	w.Stop()

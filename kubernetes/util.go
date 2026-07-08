@@ -56,7 +56,10 @@ type DefaultDiscoveryUtils struct{}
 
 func GetKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
-	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
+	if envKubeConfig == "" {
+		return ""
+	}
+	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) { //nolint:gosec // KUBECONFIG is a standard environment variable for kubeconfig path
 		return envKubeConfig
 	}
 	return ""

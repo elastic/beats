@@ -97,7 +97,7 @@ func (b *bus) Publish(e Event) {
 		return
 	}
 
-	if b.store != nil && len(b.store) != 0 {
+	if len(b.store) != 0 {
 		doBreak := false
 		for !doBreak {
 			select {

@@ -82,14 +82,14 @@ type WatchOptions struct {
 	Namespace string
 	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
 	// vs what does not.
-	IsUpdated func(old, new interface{}) bool
+	IsUpdated func(old, new any) bool
 	// HonorReSyncs allows resync events to be requeued on the worker
 	HonorReSyncs bool
 }
 
 type item struct {
-	object    interface{}
-	objectRaw interface{}
+	object    any
+	objectRaw any
 	state     string
 }
 
@@ -145,9 +145,17 @@ func NewNamedWatcherWithInformer(
 	queue = workqueue.NewNamed(name)
 
 	if opts.IsUpdated == nil {
-		opts.IsUpdated = func(o, n interface{}) bool {
-			old, _ := accessor.ResourceVersion(o.(runtime.Object))
-			new, _ := accessor.ResourceVersion(n.(runtime.Object))
+		opts.IsUpdated = func(o, n any) bool {
+			oldObj, ok := o.(runtime.Object)
+			if !ok {
+				return true
+			}
+			newObj, ok := n.(runtime.Object)
+			if !ok {
+				return true
+			}
+			old, _ := accessor.ResourceVersion(oldObj)
+			new, _ := accessor.ResourceVersion(newObj)
 
 			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
 			return old != new
@@ -168,13 +176,13 @@ func NewNamedWatcherWithInformer(
 	}
 
 	_, err := w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(o interface{}) {
+		AddFunc: func(o any) {
 			w.enqueue(o, add)
 		},
-		DeleteFunc: func(o interface{}) {
+		DeleteFunc: func(o any) {
 			w.enqueue(o, delete)
 		},
-		UpdateFunc: func(o, n interface{}) {
+		UpdateFunc: func(o, n any) {
 			if opts.IsUpdated(o, n) {
 				w.enqueue(n, update)
 			} else if opts.HonorReSyncs {
@@ -298,7 +306,7 @@ func (w *watcher) Stop() {
 
 // enqueue takes the most recent object that was received, figures out the namespace/name of the object
 // and adds it to the work queue for processing.
-func (w *watcher) enqueue(obj interface{}, state string) {
+func (w *watcher) enqueue(obj any, state string) {
 	// DeletionHandlingMetaNamespaceKeyFunc that we get a key only if the resource's state is not Unknown.
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
@@ -312,7 +320,7 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 }
 
 // cacheObject updates watcher with the old version of cache objects before change during update events
-func (w *watcher) cacheObject(o interface{}) {
+func (w *watcher) cacheObject(o any) {
 	if old, ok := o.(runtime.Object); !ok {
 		utilruntime.HandleError(fmt.Errorf("expected object in cache got %#v", o))
 	} else {

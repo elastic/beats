@@ -425,7 +425,7 @@ func TestPod_Generate(t *testing.T) {
 		},
 	}
 
-	config, err := config.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]any{
 		"include_annotations": []string{"app", "k8s.app"},
 		"annotations.dedot":   false,
 	})
@@ -549,7 +549,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		config, err := config.NewConfigFrom(map[string]interface{}{
+		config, err := config.NewConfigFrom(map[string]any{
 			"include_annotations": []string{"app", "k8s.app"},
 		})
 		assert.NoError(t, err)
@@ -660,7 +660,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		config, err := config.NewConfigFrom(map[string]interface{}{
+		config, err := config.NewConfigFrom(map[string]any{
 			"include_annotations": []string{"app"},
 		})
 		assert.NoError(t, err)
@@ -805,17 +805,17 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		c, err := config.NewConfigFrom(map[string]interface{}{
+		c, err := config.NewConfigFrom(map[string]any{
 			"include_annotations": []string{"app"},
 		})
 
 		assert.NoError(t, err)
 
-		namespaceConfig, _ := config.NewConfigFrom(map[string]interface{}{
+		namespaceConfig, _ := config.NewConfigFrom(map[string]any{
 			"include_labels":      []string{"app.kubernetes.io/name"},
 			"include_annotations": []string{"ns.annotation"},
 		})
-		nodeConfig, _ := config.NewConfigFrom(map[string]interface{}{
+		nodeConfig, _ := config.NewConfigFrom(map[string]any{
 			"include_labels":      []string{"nodekey2"},
 			"include_annotations": []string{"node.annotation"},
 		})

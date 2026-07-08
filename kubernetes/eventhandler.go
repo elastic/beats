@@ -40,36 +40,36 @@ import (
 // idea: allow the On* methods to return an error so that the RateLimited WorkQueue
 // idea: can requeue the failed event processing.
 type ResourceEventHandler interface {
-	OnAdd(obj interface{})
-	OnUpdate(obj interface{})
-	OnDelete(obj interface{})
+	OnAdd(obj any)
+	OnUpdate(obj any)
+	OnDelete(obj any)
 }
 
 // ResourceEventHandlerFuncs is an adaptor to let you easily specify as many or
 // as few of the notification functions as you want while still implementing
 // ResourceEventHandler.
 type ResourceEventHandlerFuncs struct {
-	AddFunc    func(obj interface{})
-	UpdateFunc func(obj interface{})
-	DeleteFunc func(obj interface{})
+	AddFunc    func(obj any)
+	UpdateFunc func(obj any)
+	DeleteFunc func(obj any)
 }
 
 // OnAdd calls AddFunc if it's not nil.
-func (r ResourceEventHandlerFuncs) OnAdd(obj interface{}) {
+func (r ResourceEventHandlerFuncs) OnAdd(obj any) {
 	if r.AddFunc != nil {
 		r.AddFunc(obj)
 	}
 }
 
 // OnUpdate calls UpdateFunc if it's not nil.
-func (r ResourceEventHandlerFuncs) OnUpdate(obj interface{}) {
+func (r ResourceEventHandlerFuncs) OnUpdate(obj any) {
 	if r.UpdateFunc != nil {
 		r.UpdateFunc(obj)
 	}
 }
 
 // OnDelete calls DeleteFunc if it's not nil.
-func (r ResourceEventHandlerFuncs) OnDelete(obj interface{}) {
+func (r ResourceEventHandlerFuncs) OnDelete(obj any) {
 	if r.DeleteFunc != nil {
 		r.DeleteFunc(obj)
 	}
@@ -80,17 +80,17 @@ type NoOpEventHandlerFuncs struct {
 }
 
 // OnAdd does a no-op on an add event
-func (n NoOpEventHandlerFuncs) OnAdd(obj interface{}) {
+func (n NoOpEventHandlerFuncs) OnAdd(obj any) {
 
 }
 
 // OnUpdate does a no-op on an update event
-func (n NoOpEventHandlerFuncs) OnUpdate(obj interface{}) {
+func (n NoOpEventHandlerFuncs) OnUpdate(obj any) {
 
 }
 
 // OnDelete does a no-op on a delete event
-func (n NoOpEventHandlerFuncs) OnDelete(obj interface{}) {
+func (n NoOpEventHandlerFuncs) OnDelete(obj any) {
 
 }
 
@@ -99,12 +99,12 @@ func (n NoOpEventHandlerFuncs) OnDelete(obj interface{}) {
 // that starts passing the filter after an update is considered an add, and an
 // object that stops passing the filter after an update is considered a delete.
 type FilteringResourceEventHandler struct {
-	FilterFunc func(obj interface{}) bool
+	FilterFunc func(obj any) bool
 	Handler    ResourceEventHandler
 }
 
 // OnAdd calls the nested handler only if the filter succeeds
-func (r FilteringResourceEventHandler) OnAdd(obj interface{}) {
+func (r FilteringResourceEventHandler) OnAdd(obj any) {
 	if !r.FilterFunc(obj) {
 		return
 	}
@@ -112,7 +112,7 @@ func (r FilteringResourceEventHandler) OnAdd(obj interface{}) {
 }
 
 // OnUpdate ensures the proper handler is called depending on whether the filter matches
-func (r FilteringResourceEventHandler) OnUpdate(obj interface{}) {
+func (r FilteringResourceEventHandler) OnUpdate(obj any) {
 	if !r.FilterFunc(obj) {
 		return
 	}
@@ -120,7 +120,7 @@ func (r FilteringResourceEventHandler) OnUpdate(obj interface{}) {
 }
 
 // OnDelete calls the nested handler only if the filter succeeds
-func (r FilteringResourceEventHandler) OnDelete(obj interface{}) {
+func (r FilteringResourceEventHandler) OnDelete(obj any) {
 	if !r.FilterFunc(obj) {
 		return
 	}
@@ -128,12 +128,12 @@ func (r FilteringResourceEventHandler) OnDelete(obj interface{}) {
 }
 
 // podUpdaterHandlerFunc is a function that handles pod updater notifications.
-type podUpdaterHandlerFunc func(interface{})
+type podUpdaterHandlerFunc func(any)
 
 // podUpdaterStore is the interface that an object needs to implement to be
 // used as a pod updater store.
 type podUpdaterStore interface {
-	List() []interface{}
+	List() []any
 }
 
 // namespacePodUpdater notifies updates on pods when their namespaces are updated.
@@ -155,7 +155,7 @@ func NewNamespacePodUpdater(handler podUpdaterHandlerFunc, store podUpdaterStore
 }
 
 // OnUpdate handles update events on namespaces.
-func (n *namespacePodUpdater) OnUpdate(obj interface{}) {
+func (n *namespacePodUpdater) OnUpdate(obj any) {
 	ns, ok := obj.(*Namespace)
 	if !ok {
 		return
@@ -174,8 +174,8 @@ func (n *namespacePodUpdater) OnUpdate(obj interface{}) {
 	cachedNamespace, ok := cachedObject.(*Namespace)
 
 	if ok && ns.Name == cachedNamespace.Name {
-		labelscheck := reflect.DeepEqual(ns.ObjectMeta.Labels, cachedNamespace.ObjectMeta.Labels)
-		annotationscheck := reflect.DeepEqual(ns.ObjectMeta.Annotations, cachedNamespace.ObjectMeta.Annotations)
+		labelscheck := reflect.DeepEqual(ns.Labels, cachedNamespace.Labels)
+		annotationscheck := reflect.DeepEqual(ns.Annotations, cachedNamespace.Annotations)
 		// Only if there is a difference in Metadata labels or annotations proceed to Pod update
 		if !labelscheck || !annotationscheck {
 			for _, pod := range n.store.List() {
@@ -191,11 +191,11 @@ func (n *namespacePodUpdater) OnUpdate(obj interface{}) {
 
 // OnAdd handles add events on namespaces. Nothing to do, if pods are added to this
 // namespace they will generate their own add events.
-func (*namespacePodUpdater) OnAdd(interface{}) {}
+func (*namespacePodUpdater) OnAdd(any) {}
 
 // OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
 // namespace they will generate their own delete events.
-func (*namespacePodUpdater) OnDelete(interface{}) {}
+func (*namespacePodUpdater) OnDelete(any) {}
 
 // nodePodUpdater notifies updates on pods when their nodes are updated.
 type nodePodUpdater struct {
@@ -216,7 +216,7 @@ func NewNodePodUpdater(handler podUpdaterHandlerFunc, store podUpdaterStore, nod
 }
 
 // OnUpdate handles update events on nodes.
-func (n *nodePodUpdater) OnUpdate(obj interface{}) {
+func (n *nodePodUpdater) OnUpdate(obj any) {
 	node, ok := obj.(*Node)
 	if !ok {
 		return
@@ -234,8 +234,8 @@ func (n *nodePodUpdater) OnUpdate(obj interface{}) {
 	cachedNode, ok := cachedObject.(*Node)
 
 	if ok && node.Name == cachedNode.Name {
-		labelscheck := reflect.DeepEqual(node.ObjectMeta.Labels, cachedNode.ObjectMeta.Labels)
-		annotationscheck := reflect.DeepEqual(node.ObjectMeta.Annotations, cachedNode.ObjectMeta.Annotations)
+		labelscheck := reflect.DeepEqual(node.Labels, cachedNode.Labels)
+		annotationscheck := reflect.DeepEqual(node.Annotations, cachedNode.Annotations)
 		// Only if there is a difference in Metadata labels or annotations proceed to Pod update
 		if !labelscheck || !annotationscheck {
 			for _, pod := range n.store.List() {
@@ -250,8 +250,8 @@ func (n *nodePodUpdater) OnUpdate(obj interface{}) {
 
 // OnAdd handles add events on namespaces. Nothing to do, if pods are added to this
 // namespace they will generate their own add events.
-func (*nodePodUpdater) OnAdd(interface{}) {}
+func (*nodePodUpdater) OnAdd(any) {}
 
 // OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
 // namespace they will generate their own delete events.
-func (*nodePodUpdater) OnDelete(interface{}) {}
+func (*nodePodUpdater) OnDelete(any) {}

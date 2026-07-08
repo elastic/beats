@@ -21,8 +21,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"k8s.io/apimachinery/pkg/api/meta"
+
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 
 	k8s "k8s.io/client-go/kubernetes"
 

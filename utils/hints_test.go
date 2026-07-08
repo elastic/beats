@@ -42,7 +42,7 @@ func TestGetProcessors(t *testing.T) {
 	assert.Equal(t, []mapstr.M{
 		mapstr.M{
 			"add_fields": mapstr.M{
-				"fields": map[string]interface{}{
+				"fields": map[string]any{
 					"foo": "bar",
 				},
 			},
@@ -313,7 +313,7 @@ func TestGenerateHints(t *testing.T) {
 		}
 
 		generateHints, incorrectHints := GenerateHints(annMap, "foobar", "co.elastic", true, allSupportedHints)
-		assert.Equal(t, test.expectedIncorrectHints, len(incorrectHints)) // We validate how many incorrect hints are provided per test case.
+		assert.Len(t, incorrectHints, test.expectedIncorrectHints) // We validate how many incorrect hints are provided per test case.
 		assert.Equal(t, test.result, generateHints)
 	}
 }
@@ -414,7 +414,7 @@ func TestGenerateHintsWithValidatedisabled(t *testing.T) {
 		}
 
 		generateHints, incorrectHints := GenerateHints(annMap, "foobar", "co.elastic", false, allSupportedHints)
-		assert.Equal(t, test.expectedIncorrectHints, len(incorrectHints)) // We validate how many incorrect hints are provided per test case.
+		assert.Len(t, incorrectHints, test.expectedIncorrectHints) // We validate how many incorrect hints are provided per test case.
 		assert.Equal(t, test.result, generateHints)
 	}
 }

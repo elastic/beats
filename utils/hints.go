@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -147,7 +148,7 @@ func getStringAsList(input string) []string {
 	}
 	list := strings.Split(input, ",")
 
-	for i := 0; i < len(list); i++ {
+	for i := range list {
 		list[i] = strings.TrimSpace(list[i])
 	}
 
@@ -180,7 +181,11 @@ func GetHintAsConfigs(hints mapstr.M, key string, logger *logp.Logger) []mapstr.
 // IsEnabled will return true when 'enabled' is **explicitly** set to true.
 func IsEnabled(hints mapstr.M, key string) bool {
 	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
-		enabled, _ := strconv.ParseBool(value.(string))
+		str, ok := value.(string)
+		if !ok {
+			return false
+		}
+		enabled, _ := strconv.ParseBool(str)
 		return enabled
 	}
 
@@ -190,7 +195,11 @@ func IsEnabled(hints mapstr.M, key string) bool {
 // IsDisabled will return true when 'enabled' is **explicitly** set to false.
 func IsDisabled(hints mapstr.M, key string, logger *logp.Logger) bool {
 	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
-		enabled, err := strconv.ParseBool(value.(string))
+		str, ok := value.(string)
+		if !ok {
+			return false
+		}
+		enabled, err := strconv.ParseBool(str)
 		if err != nil {
 			logger.Named(logName).Debugw("Error parsing 'enabled' hint.",
 				"error", err, "autodiscover.hints", hints)
@@ -384,12 +393,8 @@ func checkSupportedHints(actualannotation, key string, allSupportedHints []strin
 	found := false
 	var incorrecthint string
 
-	for _, checksupported := range allSupportedHints {
-		if actualannotation == checksupported {
-			found = true
-			break
-		}
-
+	if slices.Contains(allSupportedHints, actualannotation) {
+		found = true
 	}
 	if !found {
 		incorrecthint = key

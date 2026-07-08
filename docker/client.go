@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package docker
 
@@ -44,11 +43,10 @@ func NewClient(host string, httpClient *http.Client, httpHeaders map[string]stri
 	version := os.Getenv("DOCKER_API_VERSION")
 	if version != "" {
 		log.Debugf("Docker client will use API version %v as set by the DOCKER_API_VERSION environment variable.", version)
-		opts = append(opts, client.WithVersion(version))
+		opts = append(opts, client.WithAPIVersion(version))
 	} else {
 		log.Debug("Docker client will negotiate the API version on the first request.")
-		opts = append(opts, client.WithAPIVersionNegotiation())
 	}
 
-	return client.NewClientWithOpts(opts...)
+	return client.New(opts...)
 }
