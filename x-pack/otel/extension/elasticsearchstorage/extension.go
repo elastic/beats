@@ -6,7 +6,9 @@ package elasticsearchstorage
 
 import (
 	"context"
+	"fmt"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -17,12 +19,14 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
+	"go.opentelemetry.io/collector/extension/xextension/storage"
 )
 
 var (
 	_ extension.Extension = (*elasticStorage)(nil)
 	_ backend.Registry    = (*elasticStorage)(nil)
 	_ backend.Store       = (*lockedStore)(nil)
+	_ storage.Extension   = (*elasticStorage)(nil)
 )
 
 type elasticStorage struct {
@@ -66,6 +70,38 @@ func (e *elasticStorage) Access(name string) (backend.Store, error) {
 		inner: es.NewStore(e.ctx, e.logger, e.client, name),
 		mu:    &e.clientMu,
 	}, nil
+}
+
+// GetClient implements storage.Extension: it hands an OTel component a
+// storage.Client scoped to a per-identity Elasticsearch index. The index is
+// created lazily on the first write (not here), so a transient ES outage while
+// a receiver acquires its client does not stop the receiver from starting.
+// All clients share the extension's single connection and clientMu.
+func (e *elasticStorage) GetClient(ctx context.Context, kind component.Kind, id component.ID, storageName string) (storage.Client, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if e.client == nil {
+		return nil, fmt.Errorf("elasticsearch_storage: GetClient called before Start")
+	}
+	return &esStorageClient{ext: e, index: composeIndexName(kind, id, storageName)}, nil
+}
+
+// retryConfig resolves the configured retry knobs, applying defaults so a
+// programmatically-constructed Config (e.g. in tests) still gets sane values.
+func (e *elasticStorage) retryConfig() retryParams {
+	r := e.cfg.Retry
+	p := retryParams{maxAttempts: r.MaxAttempts, baseDelay: r.BaseDelay, maxDelay: r.MaxDelay}
+	if p.maxAttempts <= 0 {
+		p.maxAttempts = 3
+	}
+	if p.baseDelay <= 0 {
+		p.baseDelay = 100 * time.Millisecond
+	}
+	if p.maxDelay <= 0 {
+		p.maxDelay = 5 * time.Second
+	}
+	return p
 }
 
 func (e *elasticStorage) Close() error {
