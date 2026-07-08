@@ -299,7 +299,7 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 		res.key = oldKeyValue
 		res.cursorMeta = oldMeta
 		res.stored = oldStored
-		s.store.ephemeralStore.table[oldKey] = res
+		s.store.ephemeralStore.table[oldKeyValue] = res
 		delete(s.store.ephemeralStore.table, newKey)
 		return fmt.Errorf(
 			"UpdateKey: failed to persist new key %q; keeping old key %q to avoid state loss",
