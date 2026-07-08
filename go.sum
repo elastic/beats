@@ -429,6 +429,8 @@ github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20 h1:bVZ3kDKa8Tqw9qvNrD
 github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20/go.mod h1:A1DWjF89MFVnxzmzTaMF7CwVy9PDem7DalMkm8RIMoY=
 github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102 h1:HBjzmhV2CkYn0qBDv9DN4/irmJ94xppH3kVL9VgBA8k=
 github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102/go.mod h1:xoTq5saXNyokdlvOhMz+JQGU+RTzTtYzqo1Bc86q3Fs=
+github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7 h1:LTx9zlFG3yxjLuxjf/D3NsS06ivZw7L/3TWqjkFe1Ak=
+github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.4 h1:7NRnWJDFjEKpOjnHhtzrPGZWr9EMrYFsLjF4q0Czosk=
 github.com/elastic/gosigar v0.14.4/go.mod h1:tx91Eb3YgFk6y++h88fRAnxic3Si1ZDHooqnJU/hqo8=
 github.com/elastic/mito v1.27.0 h1:FM01Ql1OMx6uL3ogW0LoI8Ruc0O6gzmwLNBV8Zk13Yw=
@@ -985,8 +987,6 @@ github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e h1:hUGyBE/4CXRPTh
 github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e/go.mod h1:Sb6li54lXV0yYEjI4wX8cucdQ9gqUJV3+Ngg3l9g30I=
 github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54 h1:jbchLJWyhKcmOjkbC4zDvT/n5EEd7g6hnnF760rEyRA=
 github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54/go.mod h1:Vrkh1pnjV9Bl8c3P9zH0/D4NlOHWP5d4/hF4YTULaec=
-github.com/samuelvl/gopacket v0.0.0-20260703114848-a5059dceefc3 h1:2LllNEu3iUcJV/4ajNlbpnLxBRpcTza4GcSrfDMYVxw=
-github.com/samuelvl/gopacket v0.0.0-20260703114848-a5059dceefc3/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/sebdah/goldie v1.0.0 h1:9GNhIat69MSlz/ndaBg48vl9dF5fI+NBB6kfOxgfkMc=
 github.com/sebdah/goldie v1.0.0/go.mod h1:jXP4hmWywNEwZzhMuv2ccnqTSFpuq8iyQhtQdkkZBH4=
 github.com/segmentio/fasthash v1.0.3 h1:EI9+KE1EwvMLBWwjpRDc+fEM+prwxDYbslddQGtrmhM=
