@@ -447,11 +447,11 @@ func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 
 func (e *inputTestingEnvironment) getOutputMessages() []string {
 	messages := make([]string, 0)
-	for _, c := range e.pipeline.clients {
-		for _, evt := range c.GetEvents() {
-			//nolint:errcheck // It's a test, we can force the type cast
-			messages = append(messages, evt.Fields["message"].(string))
-		}
+	// GetAllEvents holds the connector mutex. A concurrent harvester restart
+	// can add a client while this method reads the events.
+	for _, evt := range e.pipeline.GetAllEvents() {
+		//nolint:errcheck // It's a test, we can force the type cast
+		messages = append(messages, evt.Fields["message"].(string))
 	}
 	return messages
 }
