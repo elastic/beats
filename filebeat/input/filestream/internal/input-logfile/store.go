@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -34,6 +35,9 @@ import (
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
+
+// ErrKeyGone indicates the registry key does not exist (anymore)
+var ErrKeyGone = errors.New("registry key does not exist")
 
 // sourceStore is a store which can access resources using the Source
 // from an input.
@@ -256,11 +260,11 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 
 	res := s.store.ephemeralStore.table[oldKey]
 	if res == nil {
-		return fmt.Errorf("old key %s not found", oldKey)
+		return fmt.Errorf("old key %s: %w", oldKey, ErrKeyGone)
 	}
 
 	if res.isDeleted() {
-		return fmt.Errorf("old key %s is deleted", oldKey)
+		return fmt.Errorf("old key %s is deleted: %w", oldKey, ErrKeyGone)
 	}
 
 	// Check if new key already exists
@@ -272,9 +276,14 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 	defer res.stateMutex.Unlock()
 
 	oldKeyValue := res.key
+	oldMeta := res.cursorMeta
+	oldStored := res.stored
 	res.key = newKey
 	res.cursorMeta = meta
 	res.stored = false
+	// The entry belongs to a live, just-scanned file; refresh Updated so the migrated entry is not
+	// immediately eligible for clean_inactive gc.
+	res.internalState.Updated = time.Now()
 
 	// Update the table: remove old entry, add new entry with same resource.
 	s.store.ephemeralStore.table[newKey] = res
@@ -286,10 +295,12 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 	// res.stored=true only on a successful write.
 	s.store.writeState(res)
 	if !res.stored {
-		// The write under newKey failed (already logged by writeState). Do NOT
-		// remove the old key: it is still the only durable record of this entry.
-		// The in-memory resource now lives under newKey and will be re-persisted
-		// on the next cursor checkpoint, so we do not lose state in memory either.
+		// The write under newKey failed. Roll back so memory and disk agree on oldKey again.
+		res.key = oldKeyValue
+		res.cursorMeta = oldMeta
+		res.stored = oldStored
+		s.store.ephemeralStore.table[oldKeyValue] = res
+		delete(s.store.ephemeralStore.table, newKey)
 		return fmt.Errorf(
 			"UpdateKey: failed to persist new key %q; keeping old key %q to avoid state loss",
 			newKey, oldKeyValue)
