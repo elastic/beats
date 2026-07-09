@@ -2725,7 +2725,7 @@ func BenchmarkGetFiles(b *testing.B) {
 	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
 	require.NoError(b, err)
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Len(b, files, benchmarkFileCount)
 	}
@@ -2744,7 +2744,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
 	require.NoError(b, err)
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Len(b, files, benchmarkFileCount)
 	}
@@ -3407,4 +3407,178 @@ func parseLogs(buff string) []logEntry {
 	}
 
 	return logEntries
+}
+
+// TestFileScannerReusesPinnedHarvesterFingerprint tests reuse from an open harvester.
+func TestFileScannerReusesPinnedHarvesterFingerprint(t *testing.T) {
+	const sentinelSum = "cached-sentinel-sum"
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{Enabled: true, Offset: 0, Length: 64},
+	}
+
+	scanSum := func(t *testing.T, path string, tbl *fileStateTable) string {
+		t.Helper()
+		s, err := newFileScanner(logp.NewNopLogger(), []string{path}, cfg, CompressionNone)
+		require.NoError(t, err, "newFileScanner")
+		s.harvesterState = tbl
+		fd, ok := s.GetFiles(loginp.FileScanOptions{}).Files[path]
+		require.True(t, ok, "scan must find the file")
+		return fd.Fingerprint.Sum
+	}
+
+	setup := func(t *testing.T) (path string, info file.ExtendedFileInfo, realSum string) {
+		t.Helper()
+		src := tempFileSource(t, strings.Repeat("A", 128))
+		realSum = scanSum(t, src.newPath, nil)
+		require.NotEmpty(t, realSum, "setup file must produce a complete fingerprint")
+		return src.newPath, src.desc.Info, realSum
+	}
+
+	seedPinned := func(tbl *fileStateTable, path string, info file.ExtendedFileInfo, fp loginp.FingerprintID) {
+		h := publishHandle(tbl, "id", loginp.FileDescriptor{Filename: path, Info: info, Fingerprint: fp})
+		h.PinOSState(info.GetOSState())
+	}
+
+	changeUntilCtimeMoves := func(t *testing.T, path string, before file.ExtendedFileInfo, change func() error) {
+		t.Helper()
+		require.EventuallyWithT(t, func(c *assert.CollectT) {
+			assert.NoError(c, change(), "change the file")
+			fi, err := os.Stat(path)
+			if assert.NoError(c, err, "stat test file") {
+				assert.NotEqual(c, changeTime(before), changeTime(fi), "ctime must move")
+			}
+		}, 5*time.Second, 10*time.Millisecond)
+	}
+
+	t.Run("reuses the cached fingerprint for an unchanged pinned file", func(t *testing.T) {
+		path, info, realSum := setup(t)
+		if changeTime(info) == 0 {
+			t.Skip("no ctime on this platform: fingerprints are never reused")
+		}
+		tbl := newFileStateTable()
+		seedPinned(tbl, path, info, completeFP(sentinelSum))
+
+		got := scanSum(t, path, tbl)
+		assert.Equal(t, sentinelSum, got, "the scanner must reuse the pinned fingerprint instead of re-reading")
+		assert.NotEqual(t, realSum, got, "sanity: the cached sentinel differs from the real fingerprint")
+	})
+
+	t.Run("re-reads when the file changed since the cached descriptor", func(t *testing.T) {
+		path, info, realSum := setup(t)
+		tbl := newFileStateTable()
+		seedPinned(tbl, path, info, completeFP(sentinelSum))
+
+		future := time.Now().Add(time.Hour)
+		require.NoError(t, os.Chtimes(path, future, future))
+
+		assert.Equal(t, realSum, scanSum(t, path, tbl), "a changed file must be re-fingerprinted")
+	})
+
+	t.Run("re-reads when only the ctime changed", func(t *testing.T) {
+		path, info, realSum := setup(t)
+		if changeTime(info) == 0 {
+			t.Skip("no ctime on this platform")
+		}
+		tbl := newFileStateTable()
+		seedPinned(tbl, path, info, completeFP(sentinelSum))
+
+		// chmod changes ctime without changing the size or mtime.
+		mode := os.FileMode(0o600)
+		changeUntilCtimeMoves(t, path, info, func() error {
+			mode ^= 0o040
+			return os.Chmod(path, mode)
+		})
+
+		assert.Equal(t, realSum, scanSum(t, path, tbl), "a ctime change alone must cause a re-read")
+	})
+
+	t.Run("re-reads an in-place rewrite that restores mtime", func(t *testing.T) {
+		path, info, _ := setup(t)
+		if changeTime(info) == 0 {
+			t.Skip("no ctime on this platform")
+		}
+		tbl := newFileStateTable()
+		seedPinned(tbl, path, info, completeFP(sentinelSum))
+
+		// Only ctime identifies this rewrite.
+		changeUntilCtimeMoves(t, path, info, func() error {
+			if err := os.WriteFile(path, []byte(strings.Repeat("B", 128)), 0o600); err != nil {
+				return err
+			}
+			return os.Chtimes(path, info.ModTime(), info.ModTime())
+		})
+		fi, err := os.Stat(path)
+		require.NoError(t, err, "stat test file")
+		require.Equal(t, info.Size(), fi.Size(), "the rewrite must keep the size")
+		require.True(t, info.ModTime().Equal(fi.ModTime()), "the rewrite must restore mtime")
+
+		assert.Equal(t, scanSum(t, path, nil), scanSum(t, path, tbl), "the rewritten header must be re-fingerprinted")
+	})
+
+	t.Run("re-reads when the cached fingerprint is still growing", func(t *testing.T) {
+		path, info, realSum := setup(t)
+		tbl := newFileStateTable()
+		seedPinned(tbl, path, info, loginp.FingerprintID{Raw: "deadbeef"}) // incomplete
+
+		assert.Equal(t, realSum, scanSum(t, path, tbl), "a still-growing pinned file must be re-fingerprinted")
+	})
+
+	t.Run("re-reads when the file is not pinned", func(t *testing.T) {
+		path, info, realSum := setup(t)
+		tbl := newFileStateTable()
+		publishHandle(tbl, "id", loginp.FileDescriptor{Filename: path, Info: info, Fingerprint: completeFP(sentinelSum)})
+
+		assert.Equal(t, realSum, scanSum(t, path, tbl), "an unpinned entry must not be reused")
+	})
+
+	t.Run("re-reads when a different inode is pinned", func(t *testing.T) {
+		path, info, realSum := setup(t)
+		tbl := newFileStateTable()
+		h := publishHandle(tbl, "id", loginp.FileDescriptor{Filename: path, Info: info, Fingerprint: completeFP(sentinelSum)})
+		h.PinOSState(nonZeroOSState(t))
+
+		assert.Equal(t, realSum, scanSum(t, path, tbl), "a dev+ino mismatch must not reuse the cached fingerprint")
+	})
+
+	t.Run("re-reads when the harvester was last seen at another path", func(t *testing.T) {
+		path, info, realSum := setup(t)
+		tbl := newFileStateTable()
+		seedPinned(tbl, filepath.Join(filepath.Dir(path), "old.log"), info, completeFP(sentinelSum))
+
+		assert.Equal(t, realSum, scanSum(t, path, tbl), "a path with no open harvester must be read")
+	})
+}
+
+// BenchmarkGetFilesWithFingerprintPinned compares scans with and without open harvesters.
+func BenchmarkGetFilesWithFingerprintPinned(b *testing.B) {
+	for _, pinned := range []bool{false, true} {
+		name := "harvesters=none"
+		if pinned {
+			name = "harvesters=all"
+		}
+		b.Run(name, func(b *testing.B) {
+			paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
+			cfg := fileScannerConfig{
+				Fingerprint: fingerprintConfig{Enabled: true, Offset: 0, Length: 1024},
+			}
+			s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
+			require.NoError(b, err, "newFileScanner")
+
+			if pinned {
+				tbl := newFileStateTable()
+				for _, fd := range s.GetFiles(loginp.FileScanOptions{}).Files {
+					if changeTime(fd.Info) == 0 {
+						b.Skip("no ctime on this platform: fingerprints are never reused")
+					}
+					publishHandle(tbl, fd.Filename, fd).PinOSState(fd.Info.GetOSState())
+				}
+				s.harvesterState = tbl
+			}
+
+			for b.Loop() {
+				files := s.GetFiles(loginp.FileScanOptions{}).Files
+				require.Len(b, files, benchmarkFileCount)
+			}
+		})
+	}
 }

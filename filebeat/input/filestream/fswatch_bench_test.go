@@ -441,7 +441,7 @@ func BenchmarkGetFilesSharedDir(b *testing.B) {
 			for i := range inputs {
 				glob := filepath.Join(base, fmt.Sprintf("pod-%04d-container-*.log", i%total))
 				var err error
-				scanners[i], err = newFileScannerWithCache(logp.NewNopLogger(), []string{glob}, cfg, CompressionNone, dc, maxDirCacheAge)
+				scanners[i], err = newFileScannerWithCache(logp.NewNopLogger(), []string{glob}, cfg, CompressionNone, dc, maxDirCacheAge, nil)
 				require.NoError(b, err)
 			}
 
