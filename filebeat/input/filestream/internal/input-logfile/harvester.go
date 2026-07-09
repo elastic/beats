@@ -55,7 +55,7 @@ type Harvester interface {
 	Test(Source, inputv2.TestContext) error
 	// Run is the event loop which reads from the source
 	// and forwards it to the publisher.
-	Run(inputv2.Context, Source, Cursor, Publisher, *Metrics) error
+	Run(inputv2.Context, Source, string, Cursor, Publisher, *Metrics) error
 }
 
 // reader is the handle for one harvester's registration in a readerGroup.
@@ -409,7 +409,7 @@ func startHarvester(
 		}()
 
 		ctx.Logger.Debugf("Starting harvester for file. offset %v", resource.cursor)
-		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
+		err = hg.harvester.Run(ctx, src, id, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			rd.remove()
 			return fmt.Errorf("error while running harvester: %w", err)
