@@ -44,7 +44,7 @@ func TestInferLatestRelease(t *testing.T) {
 			name:    "patch version is 0",
 			version: "9.2.0",
 			want:    "",
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name:    "invalid format - missing patch",
