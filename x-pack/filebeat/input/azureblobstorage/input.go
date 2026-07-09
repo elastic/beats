@@ -78,11 +78,7 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
-<<<<<<< HEAD
-=======
-			PathPrefix:               container.PathPrefix,
 			Retry:                    config.Retry,
->>>>>>> 0f86bf11c ([x-pack/filebeat/input/azureblobstorage] -  Harden blob listing against transient failures and implement configurable retries (#51701))
 		})
 	}
 

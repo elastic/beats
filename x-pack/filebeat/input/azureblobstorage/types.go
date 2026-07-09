@@ -23,11 +23,7 @@ type Source struct {
 	FileSelectors            []fileSelectorConfig
 	ReaderConfig             readerConfig
 	ExpandEventListFromField string
-<<<<<<< HEAD
-=======
-	PathPrefix               string
 	Retry                    retryConfig
->>>>>>> 0f86bf11c ([x-pack/filebeat/input/azureblobstorage] -  Harden blob listing against transient failures and implement configurable retries (#51701))
 }
 
 func (s *Source) Name() string {

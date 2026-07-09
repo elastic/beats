@@ -72,15 +72,10 @@ type config struct {
 	// ExpandEventListFromField specifies a field from which to expand event lists.
 	// It can be set globally or overridden at the container level.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
-<<<<<<< HEAD
-=======
-	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
-	PathPrefix string `config:"path_prefix"`
 	// Retry tunes how transient Azure Storage failures are retried. It applies
 	// to the whole account (all containers), since the SDK client is created per
 	// container from these shared values.
 	Retry retryConfig `config:"retry"`
->>>>>>> 0f86bf11c ([x-pack/filebeat/input/azureblobstorage] -  Harden blob listing against transient failures and implement configurable retries (#51701))
 }
 
 // container contains the config for each specific blob storage container in the root account.

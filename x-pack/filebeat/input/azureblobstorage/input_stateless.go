@@ -62,11 +62,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
-<<<<<<< HEAD:x-pack/filebeat/input/azureblobstorage/input_stateless.go
-=======
-			PathPrefix:               container.PathPrefix,
 			Retry:                    in.config.Retry,
->>>>>>> 0f86bf11c ([x-pack/filebeat/input/azureblobstorage] -  Harden blob listing against transient failures and implement configurable retries (#51701)):x-pack/filebeat/input/azureblobstorage/input_stateless_test.go
 		}
 
 		st := newState()
