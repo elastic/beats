@@ -20,43 +20,53 @@ package testutils
 import (
 	"runtime/debug"
 	"strings"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// FIPSBuildInfo captures the FIPS-related settings found in a binary's build info.
-type FIPSBuildInfo struct {
-	TagsFound               bool
-	TagsHaveRequireFIPS     bool
-	GOFIPS140Found          bool
-	GOFIPS140Value          string
-	GOFIPS140IsCertified    bool // value starts with the certified module version, e.g. "v1.0.0"
-	DefaultGODEBUGFound     bool
-	DefaultGODEBUGHasFIPSOn bool
+// fipsCheckT is the subset of *testing.T that CheckFIPSBuildInfo needs. It's kept as
+// an interface (rather than *testing.T directly) so this package's own tests can
+// exercise the failure paths with a fake, instead of failing the enclosing test run.
+type fipsCheckT interface {
+	Helper()
+	Errorf(format string, args ...any)
+	Failed() bool
+	FailNow()
 }
 
-// CheckFIPSBuildInfo scans a binary's build settings (as reported by debug/buildinfo)
-// for the markers that indicate a FIPS-compliant build: the "requirefips" build tag,
-// a GOFIPS140 setting referencing the certified module version, and a DefaultGODEBUG
-// setting that enables fips140=on at runtime.
-func CheckFIPSBuildInfo(settings []debug.BuildSetting) FIPSBuildInfo {
-	var info FIPSBuildInfo
+// CheckFIPSBuildInfo asserts that a binary's build settings (as reported by
+// debug/buildinfo) contain the markers of a FIPS-compliant build: the
+// "requirefips" build tag, a GOFIPS140 setting referencing the certified
+// module version, and a DefaultGODEBUG setting that enables fips140=on at
+// runtime. All markers are checked before the test is failed, so a single
+// run reports every missing marker instead of just the first.
+func CheckFIPSBuildInfo(t fipsCheckT, settings []debug.BuildSetting) {
+	t.Helper()
+
+	var foundTags, foundFIPS, foundFIPSDefault bool
 	for _, setting := range settings {
 		switch setting.Key {
 		case "-tags":
-			info.TagsFound = true
-			info.TagsHaveRequireFIPS = strings.Contains(setting.Value, "requirefips")
+			foundTags = true
+			assert.Contains(t, setting.Value, "requirefips")
 		case "GOFIPS140":
-			info.GOFIPS140Found = true
-			info.GOFIPS140Value = setting.Value
-			info.GOFIPS140IsCertified = strings.HasPrefix(setting.Value, "v1.0.0")
+			foundFIPS = true
+			assert.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
 		case "DefaultGODEBUG":
-			info.DefaultGODEBUGFound = true
 			for entry := range strings.SplitSeq(setting.Value, ",") {
 				if key, val, ok := strings.Cut(entry, "="); ok && key == "fips140" && val == "on" {
-					info.DefaultGODEBUGHasFIPSOn = true
+					foundFIPSDefault = true
 					break
 				}
 			}
 		}
 	}
-	return info
+
+	assert.True(t, foundTags, "did not find -tags within binary version information")
+	assert.True(t, foundFIPS, "did not find GOFIPS140 within binary version information")
+	assert.True(t, foundFIPSDefault, "did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
+
+	if t.Failed() {
+		t.FailNow()
+	}
 }

@@ -901,13 +901,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 	info, err := buildinfo.ReadFile(binaryPath)
 	require.NoError(t, err)
 
-	fips := testutils.CheckFIPSBuildInfo(info.Settings)
-
-	require.True(t, fips.TagsFound, "Did not find -tags within binary version information")
-	require.True(t, fips.TagsHaveRequireFIPS, "-tags did not contain requirefips")
-	require.True(t, fips.GOFIPS140Found, "Did not find GOFIPS140 within binary version information")
-	require.True(t, fips.GOFIPS140IsCertified, "GOFIPS140 must reference the certified module version, got %q", fips.GOFIPS140Value)
-	require.True(t, fips.DefaultGODEBUGHasFIPSOn, "Did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
+	testutils.CheckFIPSBuildInfo(t, info.Settings)
 }
 
 // inspector is a file contents inspector. It vets the contents of the file

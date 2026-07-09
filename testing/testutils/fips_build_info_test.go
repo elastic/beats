@@ -18,24 +18,44 @@
 package testutils
 
 import (
+	"fmt"
 	"runtime/debug"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
+// fakeT is a minimal fipsCheckT that records failures instead of stopping the
+// goroutine, so failure paths can be asserted on directly.
+type fakeT struct {
+	failed bool
+	errors []string
+}
+
+func (f *fakeT) Helper() {}
+
+func (f *fakeT) Errorf(format string, args ...any) {
+	f.failed = true
+	f.errors = append(f.errors, fmt.Sprintf(format, args...))
+}
+
+func (f *fakeT) Failed() bool { return f.failed }
+
+func (f *fakeT) FailNow() {}
+
 func TestCheckFIPSBuildInfo(t *testing.T) {
 	tests := []struct {
-		name       string
-		godebug    string
-		wantFIPSOn bool
+		name     string
+		godebug  string
+		wantPass bool
 	}{
-		{name: "fips140=on", godebug: "fips140=on,tlsmlkem=0", wantFIPSOn: true},
-		{name: "fips140=on last", godebug: "tlsmlkem=0,fips140=on", wantFIPSOn: true},
-		{name: "fips140=only is not fips140=on", godebug: "fips140=only,tlsmlkem=0", wantFIPSOn: false},
-		{name: "fips140=off", godebug: "fips140=off", wantFIPSOn: false},
-		{name: "no fips140 entry", godebug: "tlsmlkem=0", wantFIPSOn: false},
-		{name: "empty", godebug: "", wantFIPSOn: false},
+		{name: "fips140=on", godebug: "fips140=on,tlsmlkem=0", wantPass: true},
+		{name: "fips140=on last", godebug: "tlsmlkem=0,fips140=on", wantPass: true},
+		{name: "fips140=only is not fips140=on", godebug: "fips140=only,tlsmlkem=0", wantPass: false},
+		{name: "fips140=off", godebug: "fips140=off", wantPass: false},
+		{name: "no fips140 entry", godebug: "tlsmlkem=0", wantPass: false},
+		{name: "empty", godebug: "", wantPass: false},
 	}
 
 	for _, tc := range tests {
@@ -46,23 +66,22 @@ func TestCheckFIPSBuildInfo(t *testing.T) {
 				{Key: "DefaultGODEBUG", Value: tc.godebug},
 			}
 
-			result := CheckFIPSBuildInfo(settings)
+			ft := &fakeT{}
+			CheckFIPSBuildInfo(ft, settings)
 
-			require.True(t, result.TagsFound)
-			require.True(t, result.TagsHaveRequireFIPS)
-			require.True(t, result.GOFIPS140Found)
-			require.True(t, result.GOFIPS140IsCertified)
-			require.True(t, result.DefaultGODEBUGFound)
-			require.Equal(t, tc.wantFIPSOn, result.DefaultGODEBUGHasFIPSOn)
+			require.Equal(t, !tc.wantPass, ft.failed, "errors: %v", ft.errors)
 		})
 	}
 }
 
 func TestCheckFIPSBuildInfo_MissingSettings(t *testing.T) {
-	result := CheckFIPSBuildInfo(nil)
+	ft := &fakeT{}
+	CheckFIPSBuildInfo(ft, nil)
 
-	require.False(t, result.TagsFound)
-	require.False(t, result.GOFIPS140Found)
-	require.False(t, result.DefaultGODEBUGFound)
-	require.False(t, result.DefaultGODEBUGHasFIPSOn)
+	require.True(t, ft.failed)
+	require.Len(t, ft.errors, 3, "expected all three markers to be reported missing, got: %v", ft.errors)
+	joined := strings.Join(ft.errors, "\n")
+	require.Contains(t, joined, "did not find -tags within binary version information")
+	require.Contains(t, joined, "did not find GOFIPS140 within binary version information")
+	require.Contains(t, joined, "did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
 }

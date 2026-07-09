@@ -53,18 +53,9 @@ func VerifyEnvVars(t *testing.T) {
 func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 	t.Helper()
 	info, err := buildinfo.ReadFile(binaryPath)
-	assert.NoError(t, err)
+	require.NoError(t, err, "unable to read build info from %s", binaryPath)
 
-	fips := testutils.CheckFIPSBuildInfo(info.Settings)
-
-	assert.True(t, fips.TagsFound, "did not find build tags")
-	assert.True(t, fips.TagsHaveRequireFIPS, "-tags did not contain requirefips")
-	assert.True(t, fips.GOFIPS140Found, "did not find GOFIPS140 within binary version information")
-	assert.True(t, fips.GOFIPS140IsCertified, "GOFIPS140 must reference the certified module version, got %q", fips.GOFIPS140Value)
-	assert.True(t, fips.DefaultGODEBUGHasFIPSOn, "did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
-	if t.Failed() {
-		t.Fatal("Unable to verify FIPS binary.") // stop test if non-FIPS binary is used.
-	}
+	testutils.CheckFIPSBuildInfo(t, info.Settings)
 }
 
 // RunSmokeTest runs the beat on binaryPath with the passed config, and ensures that data ends up in Elasticsearch.
