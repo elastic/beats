@@ -467,7 +467,7 @@ func TestHarvesterRunner_ParkPollGrowsBackoff(t *testing.T) {
 
 	state, ok := g.stateFor(id)
 	require.True(t, ok)
-	require.Equal(t, minWakerBackoff, state.backoff, "a progressing read parks with the minimum backoff")
+	require.Equal(t, g.backoff.Init, state.backoff, "a progressing read parks with the minimum backoff")
 
 	state = g.popDueNow()
 	require.NotNil(t, state)
@@ -475,7 +475,7 @@ func TestHarvesterRunner_ParkPollGrowsBackoff(t *testing.T) {
 
 	requireEventually(t, func() bool {
 		s, ok := g.statusOf(id)
-		return ok && s == statusParked && state.backoff == growBackoff(minWakerBackoff)
+		return ok && s == statusParked && state.backoff == growBackoff(g.backoff.Init, g.backoff.Init, g.backoff.Max)
 	}, "an idle poll should re-park with a grown backoff")
 
 	require.NoError(t, g.StopHarvesters())
@@ -1032,11 +1032,12 @@ func TestHarvesterRunner_ReadUntilEOFTimeoutBoundsDrain(t *testing.T) {
 
 // TestGrowBackoff covers the backoff growth, including the cap at the maximum.
 func TestGrowBackoff(t *testing.T) {
-	require.Equal(t, minWakerBackoff, growBackoff(0), "non-positive grows to the minimum")
-	require.Equal(t, minWakerBackoff, growBackoff(-time.Second), "negative grows to the minimum")
-	require.Equal(t, 2*minWakerBackoff, growBackoff(minWakerBackoff), "doubles below the cap")
-	require.Equal(t, maxWakerBackoff, growBackoff(maxWakerBackoff), "is capped at the maximum")
-	require.Equal(t, maxWakerBackoff, growBackoff(maxWakerBackoff-time.Millisecond),
+	const init, max = time.Second, 10 * time.Second
+	require.Equal(t, init, growBackoff(0, init, max), "non-positive grows to the minimum")
+	require.Equal(t, init, growBackoff(-time.Second, init, max), "negative grows to the minimum")
+	require.Equal(t, 2*init, growBackoff(init, init, max), "doubles below the cap")
+	require.Equal(t, max, growBackoff(max, init, max), "is capped at the maximum")
+	require.Equal(t, max, growBackoff(max-time.Millisecond, init, max),
 		"doubling past the cap clamps to the maximum")
 }
 
@@ -1068,6 +1069,7 @@ func testHarvesterRunnerEOF(t *testing.T, h Harvester, limit uint64, eof ReadUnt
 		NewMetrics(monitoring.NewRegistry(), logger),
 		"test-input",
 		eof,
+		DefaultBackoffConfig(),
 	)
 }
 
@@ -1281,7 +1283,9 @@ func (g *harvesterRunner) countStates() int {
 func (g *harvesterRunner) popDueNow() *sourceState {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	due := g.popDue(time.Now().Add(2 * maxWakerBackoff))
+	// Far enough in the future that any real backoff config is due, regardless
+	// of how the runner under test was configured.
+	due := g.popDue(time.Now().Add(24 * time.Hour))
 	if len(due) == 0 {
 		return nil
 	}

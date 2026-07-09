@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -425,6 +426,63 @@ paths:
 				"will lead to data duplication, please use a different ID. Metrics "+
 				"collection has been disabled on this input.",
 			"did not find the expected message about the duplicated input ID")
+	})
+}
+
+// TestInputManager_Create_BackoffConfig asserts InputManager.Create wires the
+// filestream input's backoff config (independently parsed here, like
+// read_until_eof and harvester_limit) into the harvesterRunner it builds:
+// defaulted when absent, and taken from the config when set.
+func TestInputManager_Create_BackoffConfig(t *testing.T) {
+	newManager := func(t *testing.T) *InputManager {
+		t.Helper()
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		testStore, err := storeReg.Get("test")
+		require.NoError(t, err)
+		log, _ := newBufferLogger()
+		return &InputManager{
+			Logger:     log,
+			StateStore: testStateStore{Store: testStore},
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+				var wg sync.WaitGroup
+				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+			},
+		}
+	}
+
+	t.Run("defaulted when absent from config", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: backoff-default
+paths:
+  - /var/log/foo
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, DefaultBackoffConfig(), mi.backoff)
+	})
+
+	t.Run("taken from config when set", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: backoff-custom
+paths:
+  - /var/log/foo
+backoff:
+  init: 5s
+  max: 30s
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, BackoffConfig{Init: 5 * time.Second, Max: 30 * time.Second}, mi.backoff)
 	})
 }
 

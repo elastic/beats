@@ -166,9 +166,11 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		TakeOver            TakeOverConfig     `config:"take_over"`
 		LegacyCleanInactive bool               `config:"legacy_clean_inactive"`
 		ReadUntilEOF        ReadUntilEOFConfig `config:"read_until_eof"`
+		Backoff             BackoffConfig      `config:"backoff"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
+		Backoff:       DefaultBackoffConfig(),
 	}
 
 	if err := config.Unpack(&settings); err != nil {
@@ -285,6 +287,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		prospector:             prospector,
 		harvester:              harvester,
 		readUntilEOF:           settings.ReadUntilEOF,
+		backoff:                settings.Backoff,
 		sourceIdentifier:       srcIdentifier,
 		previousSrcIdentifiers: previousSrcIdentifiers,
 		cleanTimeout:           settings.CleanInactive,
@@ -426,4 +429,20 @@ type ReadUntilEOFConfig struct {
 	Enabled bool `config:"enabled"`
 	// Timeout is the maximum time to wait for EOF to be reached.
 	Timeout time.Duration `config:"timeout" validate:"min=1"`
+}
+
+// BackoffConfig configures how aggressively the waker polls a parked (idle,
+// caught up to EOF) source for new data: Init is the first wait, doubling on
+// every still-idle poll up to Max, and resetting to Init as soon as a read
+// makes progress. See harvesterRunner.growBackoff.
+type BackoffConfig struct {
+	Init time.Duration `config:"init" validate:"nonzero"`
+	Max  time.Duration `config:"max" validate:"nonzero"`
+}
+
+func DefaultBackoffConfig() BackoffConfig {
+	return BackoffConfig{
+		Init: 2 * time.Second,
+		Max:  10 * time.Second,
+	}
 }

@@ -45,11 +45,6 @@ func isPermanentHarvesterError(err error) bool {
 	return errors.As(err, &permanentErr)
 }
 
-const (
-	minWakerBackoff = 1 * time.Second
-	maxWakerBackoff = 10 * time.Second
-)
-
 // sourceStatus is the scheduling state of a source. A source is in exactly one
 // status at a time (guarded by harvesterRunner.mu), which guarantees a
 // single reader goroutine operates a source's session at any moment.
@@ -127,6 +122,10 @@ type harvesterRunner struct {
 	// in-flight reads. See StopHarvesters.
 	readUntilEOF ReadUntilEOFConfig
 
+	// backoff bounds how the waker paces re-checking a parked source; see
+	// growBackoff.
+	backoff BackoffConfig
+
 	// Observability gauges (nil when no metrics registry is available).
 	mActive  *monitoring.Uint // sources with a reader goroutine
 	mParked  *monitoring.Uint // sources parked, watched by the waker
@@ -196,6 +195,7 @@ func newHarvesterRunner(
 	metrics *Metrics,
 	inputID string,
 	readUntilEOF ReadUntilEOFConfig,
+	backoff BackoffConfig,
 ) *harvesterRunner {
 	g := &harvesterRunner{
 		pipeline:       pipeline,
@@ -207,6 +207,7 @@ func newHarvesterRunner(
 		metrics:        metrics,
 		inputID:        inputID,
 		readUntilEOF:   readUntilEOF,
+		backoff:        backoff,
 		harvesterLimit: harvesterLimit,
 		ctx:            ctx,
 		states:         map[string]*sourceState{},
@@ -336,9 +337,9 @@ func (g *harvesterRunner) readOnce(state *sourceState) {
 	// Park for the waker and exit the goroutine. A slice that made progress resets
 	// the backoff; one that read nothing grows it.
 	if after > before {
-		g.park(state, minWakerBackoff)
+		g.park(state, g.backoff.Init)
 	} else {
-		g.park(state, growBackoff(state.backoff))
+		g.park(state, growBackoff(state.backoff, g.backoff.Init, g.backoff.Max))
 	}
 	g.mu.Unlock()
 	g.signalWaker()
@@ -542,7 +543,7 @@ func (g *harvesterRunner) waker() {
 			continue
 		}
 
-		wait := maxWakerBackoff
+		wait := g.backoff.Max
 		if hasNext {
 			if d := time.Until(next); d < wait {
 				wait = d
@@ -646,7 +647,7 @@ func (g *harvesterRunner) pollParked(state *sourceState) {
 		g.mu.Unlock()
 		g.finish(state)
 	default: // PollPark
-		g.park(state, growBackoff(state.backoff))
+		g.park(state, growBackoff(state.backoff, g.backoff.Init, g.backoff.Max))
 		g.mu.Unlock()
 	}
 }
@@ -1011,9 +1012,11 @@ func (g *harvesterRunner) signalWaker() {
 	}
 }
 
-func growBackoff(cur time.Duration) time.Duration {
+// growBackoff returns the next backoff for a still-idle parked source: init on
+// the first (or a reset) call, doubling on every subsequent call up to max.
+func growBackoff(cur, init, max time.Duration) time.Duration {
 	if cur <= 0 {
-		return minWakerBackoff
+		return init
 	}
-	return min(cur*2, maxWakerBackoff)
+	return min(cur*2, max)
 }

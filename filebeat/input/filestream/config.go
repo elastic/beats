@@ -126,7 +126,7 @@ type stateChangeCloserConfig struct {
 }
 
 type readerConfig struct {
-	Backoff        backoffConfig           `config:"backoff"`
+	Backoff        loginp.BackoffConfig    `config:"backoff"`
 	BufferSize     int                     `config:"buffer_size"`
 	Encoding       string                  `config:"encoding"`
 	ExcludeLines   []match.Matcher         `config:"exclude_lines"`
@@ -136,11 +136,6 @@ type readerConfig struct {
 	Tail           bool                    `config:"seek_to_tail"`
 
 	Parsers parser.Config `config:",inline"`
-}
-
-type backoffConfig struct {
-	Init time.Duration `config:"init" validate:"nonzero"`
-	Max  time.Duration `config:"max" validate:"nonzero"`
 }
 
 type rotationConfig struct {
@@ -189,10 +184,7 @@ func defaultCloserConfig() closerConfig {
 
 func defaultReaderConfig() readerConfig {
 	return readerConfig{
-		Backoff: backoffConfig{
-			Init: 2 * time.Second,
-			Max:  10 * time.Second,
-		},
+		Backoff:        loginp.DefaultBackoffConfig(),
 		BufferSize:     16 * humanize.KiByte,
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
