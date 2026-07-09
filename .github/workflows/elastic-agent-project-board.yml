@@ -3,6 +3,9 @@ on:
   issues:
     types:
       - labeled
+permissions:
+  contents: none
+
 jobs:
   add_to_data_plane-project:
     runs-on: ubuntu-latest
