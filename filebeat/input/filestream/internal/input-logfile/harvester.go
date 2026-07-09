@@ -102,8 +102,12 @@ type HarvesterGroup interface {
 	StopHarvesters() error
 	// SetObserver sets the observer to get notified when a harvester closes.
 	SetObserver(c chan HarvesterStatus)
-	// Migrate moves a running harvester's bookkeeping registration in-place
-	Migrate(oldID string, next Source)
+	// Migrate re-keys a running (or pending) harvester's bookkeeping
+	// registration from oldID to next's identity, calling updateStore with the
+	// new key in the same critical section so the registry entry and the
+	// registration move atomically. It is also safe to call when nothing is
+	// registered under oldID: only the store is updated then.
+	Migrate(oldID string, next Source, updateStore func(newID string) error) error
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID
@@ -120,7 +124,14 @@ type HarvesterStatus struct {
 // to modify the cursor state and unlock the key.
 func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
+	if err := lockResource(ctx, resource, key); err != nil {
+		return nil, err
+	}
+	return resource, nil
+}
 
+// lockResource locks an already retained resource for exclusive access.
+func lockResource(ctx inputv2.Context, resource *resource, key string) error {
 	if !resource.lock.TryLock() {
 		ctx.Logger.Infof("Resource '%s' currently in use, waiting...", key)
 		err := resource.lock.LockContext(ctx.Cancelation)
@@ -128,7 +139,7 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 		if err != nil {
 			ctx.Logger.Infof("Input for resource '%s' has been stopped while waiting", key)
 			resource.Release()
-			return nil, err
+			return err
 		}
 	}
 
@@ -136,7 +147,7 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource.lockedVersion = resource.version
 	resource.stateMutex.Unlock()
 
-	return resource, nil
+	return nil
 }
 
 func releaseResource(resource *resource) {

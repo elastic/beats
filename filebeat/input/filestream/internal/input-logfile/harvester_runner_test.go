@@ -530,6 +530,197 @@ func TestHarvesterRunner_Continue(t *testing.T) {
 	require.NoError(t, g.StopHarvesters())
 }
 
+// TestHarvesterRunner_MigrateRekeysRunningSource asserts Migrate re-keys a
+// running source's registration in-memory and calls updateStore with the new
+// id in the same call, without disturbing the running harvester.
+func TestHarvesterRunner_MigrateRekeysRunningSource(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	oldSrc := &testSource{name: "/path/to/old"}
+	newSrc := &testSource{name: "/path/to/new"}
+	oldID := g.identifier.ID(oldSrc)
+	newID := g.identifier.ID(newSrc)
+
+	g.Start(startContext(t), oldSrc)
+	requireEventually(t, func() bool { return h.opens() == 1 && g.hasID(oldID) },
+		"harvester should be running under the old id")
+
+	var storeCalledWith string
+	err := g.Migrate(oldID, newSrc, func(id string) error {
+		storeCalledWith = id
+		return nil
+	})
+	require.NoError(t, err)
+	assert.Equal(t, newID, storeCalledWith, "updateStore must be called with the new id")
+
+	assert.True(t, g.hasID(newID), "registration should be under the new id")
+	assert.False(t, g.hasID(oldID), "old id should be gone")
+	state, ok := g.stateFor(newID)
+	require.True(t, ok)
+	assert.Same(t, newSrc, state.src, "the state must track the new source")
+
+	// The migration must not disturb the running harvester: still one open
+	// session, still running.
+	assert.Equal(t, 1, h.opens())
+	assert.False(t, h.lastSession().isClosed())
+
+	g.Stop(newSrc)
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_MigrateThenStartNextIsNoop asserts that once Migrate has
+// re-keyed a running source, a follow-up Start for the new identity is a no-op
+// instead of spawning a duplicate harvester for the same file. This is the
+// scenario behind https://github.com/elastic/beats/pull/51801: a migration
+// racing with harvester startup used to leave a stale reservation that a
+// follow-up Start would fill with a second harvester.
+func TestHarvesterRunner_MigrateThenStartNextIsNoop(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	oldSrc := &testSource{name: "/path/to/old"}
+	newSrc := &testSource{name: "/path/to/new"}
+	oldID := g.identifier.ID(oldSrc)
+
+	g.Start(startContext(t), oldSrc)
+	requireEventually(t, func() bool { return h.opens() == 1 && g.hasID(oldID) },
+		"harvester should be running under the old id")
+
+	require.NoError(t, g.Migrate(oldID, newSrc, func(string) error { return nil }))
+
+	g.Start(startContext(t), newSrc)
+	assert.Never(t, func() bool { return h.opens() > 1 }, 200*time.Millisecond, eventuallyInterval,
+		"Start for the migrated-to identity must not spawn a second harvester")
+
+	g.Stop(newSrc)
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_MigrateRefusesOccupiedTarget asserts Migrate does not
+// clobber an existing registration under the target id, and does not touch the
+// store when it refuses.
+func TestHarvesterRunner_MigrateRefusesOccupiedTarget(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	src1 := &testSource{name: "/path/to/1"}
+	src2 := &testSource{name: "/path/to/2"}
+	id1 := g.identifier.ID(src1)
+	id2 := g.identifier.ID(src2)
+
+	g.Start(startContext(t), src1)
+	g.Start(startContext(t), src2)
+	requireEventually(t, func() bool { return h.opens() == 2 && g.hasID(id1) && g.hasID(id2) },
+		"both harvesters should be running")
+
+	err := g.Migrate(id1, src2, func(string) error {
+		t.Error("the store must not be updated when the target is occupied")
+		return nil
+	})
+	require.Error(t, err)
+
+	assert.True(t, g.hasID(id1), "the source under id1 must be untouched")
+	assert.True(t, g.hasID(id2), "the occupied target must be untouched")
+
+	g.Stop(src1)
+	g.Stop(src2)
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_MigrateStoreErrorLeavesStateUnchanged asserts that when
+// updateStore fails, Migrate returns the error and leaves the in-memory
+// registration under the old id.
+func TestHarvesterRunner_MigrateStoreErrorLeavesStateUnchanged(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	next := &testSource{name: "/path/to/next"}
+	id := g.identifier.ID(src)
+	nextID := g.identifier.ID(next)
+
+	g.Start(startContext(t), src)
+	requireEventually(t, func() bool { return h.opens() == 1 && g.hasID(id) },
+		"harvester should be running")
+
+	storeErr := fmt.Errorf("registry write failed")
+	err := g.Migrate(id, next, func(string) error { return storeErr })
+	require.ErrorIs(t, err, storeErr)
+
+	assert.True(t, g.hasID(id), "failed migration must keep the old registration")
+	assert.False(t, g.hasID(nextID), "failed migration must not create the new registration")
+
+	g.Stop(src)
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_MigrateWithoutRunningSourceStillUpdatesStore asserts
+// Migrate still calls updateStore when nothing is registered under oldID
+// (e.g. the harvester already finished, or oldID was never started), without
+// inventing a registration for the target.
+func TestHarvesterRunner_MigrateWithoutRunningSourceStillUpdatesStore(t *testing.T) {
+	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
+	g.start()
+
+	next := &testSource{name: "/path/to/next"}
+	nextID := g.identifier.ID(next)
+
+	called := false
+	err := g.Migrate("absent-id", next, func(id string) error {
+		called = true
+		assert.Equal(t, nextID, id)
+		return nil
+	})
+	require.NoError(t, err)
+	assert.True(t, called, "the store update must run even with no harvester registered")
+	assert.False(t, g.hasID(nextID), "no registration must be invented")
+
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_MigrateSkipsFinishedSource asserts Migrate treats a
+// source that is already tearing down (finished but not yet removed from the
+// runner) as absent: it still updates the store, but does not re-key the
+// dying registration, leaving finish to remove it under its original id.
+func TestHarvesterRunner_MigrateSkipsFinishedSource(t *testing.T) {
+	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
+
+	state := &sourceState{srcID: "old-id", ctx: startContext(t), finished: true, done: make(chan struct{})}
+	g.mu.Lock()
+	g.states["old-id"] = state
+	g.mu.Unlock()
+	close(state.done)
+
+	next := &testSource{name: "/path/to/next"}
+	called := false
+	err := g.Migrate("old-id", next, func(string) error {
+		called = true
+		return nil
+	})
+	require.NoError(t, err)
+	assert.True(t, called, "the store update must still run")
+
+	assert.True(t, g.hasID("old-id"), "the finishing registration must be left for finish to remove")
+	assert.False(t, g.hasID(g.identifier.ID(next)), "no new registration must be created for a finishing source")
+}
+
 // TestHarvesterRunner_StopUnknownSourceIsNoop asserts Stop on a source that is
 // not being harvested does nothing and does not panic.
 func TestHarvesterRunner_StopUnknownSourceIsNoop(t *testing.T) {

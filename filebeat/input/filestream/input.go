@@ -53,9 +53,9 @@ type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 
-	// Fingerprint holds the raw (hex-encoded) growing fingerprint while the file
-	// is still below the threshold (offset+length).
-	Fingerprint string `json:"fingerprint,omitempty" struct:"fingerprint,omitempty"`
+	// FingerprintLen holds the byte length of the growing fingerprint while the
+	// file is still below the threshold (offset+length).
+	FingerprintLen int64 `json:"fingerprint_len,omitempty" struct:"fingerprint_len,omitempty"`
 }
 
 // filestream is the input for reading from files which

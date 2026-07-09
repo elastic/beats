@@ -344,12 +344,22 @@ func (g *harvesterRunner) readOnce(state *sourceState) {
 	g.signalWaker()
 }
 
+// currentResource atomically returns state's current registration key and the
+// store resource for it, serialized against Migrate so a reader never pairs a
+// stale key with a resource that already moved under it (see Migrate).
+func (g *harvesterRunner) currentResource(state *sourceState) (string, *resource) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	return state.srcID, g.store.Get(state.srcID)
+}
+
 // setup acquires the per-source resources: registry lock, pipeline client,
 // cursor/publisher and the reading session, populating state. On error it releases
 // whatever it acquired and leaves state's resource fields nil.
 func (g *harvesterRunner) setup(state *sourceState) error {
-	resource, err := lock(state.ctx, g.store, state.srcID)
-	if err != nil {
+	id, resource := g.currentResource(state)
+	if err := lockResource(state.ctx, resource, id); err != nil {
 		return err
 	}
 
@@ -824,32 +834,44 @@ func (g *harvesterRunner) Continue(ctx inputv2.Context, previous, next Source) {
 	})
 }
 
-// Migrate re-keys a running source from oldID to next's identity without
-// stopping it, so a later Start(next) no-ops instead of spawning a duplicate.
-// No-op if nothing runs under oldID or next's key is already taken.
-func (g *harvesterRunner) Migrate(oldID string, next Source) {
+// Migrate re-keys a running (or pending) source from oldID to next's identity
+// without stopping it, so a later Start(next) finds it already registered and
+// no-ops instead of spawning a duplicate. The registry re-key (updateStore) and
+// the in-memory re-key happen in the same critical section: a Start racing with
+// Migrate either lands before it (Migrate then refuses the now-occupied target)
+// or after it (Start sees the migrated registration and no-ops), never both
+// spawning a harvester for the same source. It is also safe to call when
+// nothing is registered under oldID (or the registration is already tearing
+// down): only the store is updated then.
+func (g *harvesterRunner) Migrate(oldID string, next Source, updateStore func(newID string) error) error {
 	newID := g.identifier.ID(next)
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
-	if oldID == newID {
-		return
-	}
-	state := g.states[oldID]
-	if state == nil {
-		// Nothing running under oldID (absent or already finished).
-		return
-	}
 	if _, exists := g.states[newID]; exists {
-		// Target occupied — don't clobber an existing registration.
-		return
+		// Target occupied — don't clobber an existing registration, and leave
+		// the store alone.
+		return fmt.Errorf("a harvester is already registered for %q", newID)
+	}
+
+	if err := updateStore(newID); err != nil {
+		return err
+	}
+
+	state := g.states[oldID]
+	if state == nil || state.finished {
+		// Nothing to re-key in memory: either no source is registered under
+		// oldID, or it is already tearing down (finish deletes it under its
+		// original key once torn down).
+		return nil
 	}
 
 	delete(g.states, oldID)
 	state.srcID = newID
 	state.src = next
 	g.states[newID] = state
+	return nil
 }
 
 // StopHarvesters stops all harvesters and the waker goroutine. With
