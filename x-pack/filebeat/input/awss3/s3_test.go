@@ -857,7 +857,7 @@ func waitForChannel(t *testing.T, ch <-chan struct{}, timeout time.Duration) {
 
 func Test_S3StateHandling(t *testing.T) {
 	bucket := "bucket"
-	logger := logp.NewLogger(inputName)
+	logger := logptest.NewTestingLogger(t, inputName)
 	fixedTimeNow := time.Now()
 
 	tests := []struct {

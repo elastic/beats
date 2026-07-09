@@ -244,9 +244,6 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			if state.Stored {
 				if err := finalize(); err != nil {
 					in.log.Errorf("failed finalizing S3 object key %q in bucket %q: %v", state.Key, state.Bucket, err)
-					in.status.UpdateStatus(status.Degraded,
-						fmt.Sprintf("S3 object finalization failure for object key '%s' in bucket '%s': %s",
-							state.Key, state.Bucket, err.Error()))
 				}
 			}
 
