@@ -77,6 +77,7 @@ type addDockerMetadata struct {
 	waitRetry       sync.WaitGroup
 	closeOnce       sync.Once
 	closeErr        error
+	closed          atomic.Bool // Set by Close so a late cgroupCache skips starting the janitor.
 	cgreader        processors.CGReader
 	retryPeriod     time.Duration // Period to wait when reconnecting to Docker
 	retryTimeout    time.Duration // Maximum time to wait when connecting to Docker, 0 means wait forever.
@@ -249,8 +250,11 @@ func (d *addDockerMetadata) cgroupCache() *common.Cache {
 			d.log.Debugf("Evicted cached cgroups for PID=%v", k)
 		}
 		cache := common.NewCacheWithRemovalListener(cgroupCacheExpiration, 100, evictionListener)
-		cache.StartJanitor(5 * time.Second)
 		d.cgroups.Store(cache)
+		// Avoid a race and only start the janitor only if Close() has not be called yet.
+		if !d.closed.Load() {
+			cache.StartJanitor(5 * time.Second)
+		}
 	})
 	return d.cgroups.Load()
 }
@@ -339,6 +343,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 func (d *addDockerMetadata) Close() error {
 	d.closeOnce.Do(func() {
+		d.closed.Store(true) // Prevent the janitor from starting.
 		if cgroups := d.cgroups.Load(); cgroups != nil {
 			cgroups.StopJanitor()
 		}

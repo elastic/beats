@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -487,6 +488,43 @@ func TestMatchPIDsConcurrent(t *testing.T) {
 	}
 	close(start)
 	wg.Wait()
+}
+
+// TestCloseBeforeCgroupCacheNoJanitorLeak covers Close running before the lazy cgroup cache is
+// initialized. A later cgroupCache call (as a late Run would trigger) must not start a janitor
+// goroutine that Close can no longer stop.
+func TestCloseBeforeCgroupCacheNoJanitorLeak(t *testing.T) {
+	containerID := "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b"
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), config.NewConfig(), MockWatcherFactory(
+		map[string]*docker.Container{
+			containerID: {
+				ID:    containerID,
+				Image: "image",
+				Name:  "name",
+			},
+		},
+		nil,
+	))
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+	d := p.(*addDockerMetadata)
+
+	assert.NoError(t, processors.Close(p), "closing processor")
+	assert.Nil(t, d.cgroups.Load(), "cgroups should be nil, the cache was never initialized before Close")
+
+	// Stop any janitor a regression would start so it does not affect other tests.
+	t.Cleanup(func() {
+		if c := d.cgroups.Load(); c != nil {
+			c.StopJanitor()
+		}
+	})
+
+	// Baseline after Close, once all processor goroutines have stopped.
+	goroutinesChecker := resources.NewGoroutinesChecker()
+	goroutinesChecker.FinalizationTimeout = 2 * time.Second
+
+	d.cgroupCache()
+
+	goroutinesChecker.Check(t)
 }
 
 func TestWatcherError(t *testing.T) {
