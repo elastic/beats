@@ -407,8 +407,8 @@ github.com/elastic/go-lumber v0.2.0 h1:BVGh+jq6tmp5ajAQ4QaPLcwC8vYqQ0yzt0tmWfuz7
 github.com/elastic/go-lumber v0.2.0/go.mod h1:HHaWnZamYKWsR9/eZNHqRHob8iQDKnchHmmskT/SKko=
 github.com/elastic/go-perf v0.0.0-20260224073651-af0ee0c731b7 h1:fGi5uudj7m5O1RgQl+bSZmwlqvuUMEi97X7TzWBOMGk=
 github.com/elastic/go-perf v0.0.0-20260224073651-af0ee0c731b7/go.mod h1:ucTo2u8JvFyIPQOaRlX7aVF0d3wwmF1dy/PVp5GUHZI=
-github.com/elastic/go-quark v0.3.0 h1:d4vokx0psEJo+93fnhvWpTJMggPd9rfMJSleoLva4xA=
-github.com/elastic/go-quark v0.3.0/go.mod h1:bO/XIGZBUJGxyiJ9FTsSYn9YlfOTRJnmOP+iBE2FyjA=
+github.com/elastic/go-quark v0.6.0 h1:ESbcnjLheNn3QNSCdwTcqV+z+IRKt5+UQ3LaoKv5DJs=
+github.com/elastic/go-quark v0.6.0/go.mod h1:bO/XIGZBUJGxyiJ9FTsSYn9YlfOTRJnmOP+iBE2FyjA=
 github.com/elastic/go-seccomp-bpf v1.5.0 h1:gJV+U1iP+YC70ySyGUUNk2YLJW5/IkEw4FZBJfW8ZZY=
 github.com/elastic/go-seccomp-bpf v1.5.0/go.mod h1:umdhQ/3aybliBF2jjiZwS492I/TOKz+ZRvsLT3hVe1o=
 github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9 h1:UbquKP8gHTRugCZQ/KoVQrz8XnHzncsrHFfgTa+PfTg=
