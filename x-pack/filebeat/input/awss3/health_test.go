@@ -147,9 +147,9 @@ func TestSQSHealth_ContextCanceledSuppressed(t *testing.T) {
 	h := newSQSHealth(r, logp.NewNopLogger())
 	h.UpdateStatus(status.Running, "Input is running")
 
-	// Shutdown errors should not set any conditions.
+	// Shutdown errors (context.Canceled only) should not set any conditions.
 	h.SetDeleteFailed(context.Canceled)
-	h.SetFinalizeFailed(context.DeadlineExceeded)
+	h.SetFinalizeFailed(context.Canceled)
 	h.RecordPoisonPill(context.Canceled)
 	h.SetProcessingError(context.Canceled)
 
@@ -205,10 +205,68 @@ func TestSQSHealth_ProcessingErrorDoesNotDegrade(t *testing.T) {
 	h := newSQSHealth(r, logp.NewNopLogger())
 	h.UpdateStatus(status.Running, "Input is running")
 
-	// Processing errors are transient (message will retry) — no status change.
+	// Below threshold: no status change.
+	h.SetProcessingError(errors.New("s3 download failed"))
 	h.SetProcessingError(errors.New("s3 download failed"))
 	if len(r.updates) != 1 {
-		t.Fatalf("want no status change from processing error, got %d: %+v", len(r.updates), r.updates)
+		t.Fatalf("want no status change from transient processing errors, got %d: %+v", len(r.updates), r.updates)
+	}
+}
+
+func TestSQSHealth_SustainedProcessingErrorDegrades(t *testing.T) {
+	r := &testReporter{}
+	h := newSQSHealth(r, logp.NewNopLogger())
+	h.UpdateStatus(status.Running, "Input is running")
+
+	// Hit the threshold (3 consecutive).
+	h.SetProcessingError(errors.New("access denied"))
+	h.SetProcessingError(errors.New("access denied"))
+	h.SetProcessingError(errors.New("access denied"))
+	if len(r.updates) != 2 || r.updates[1].status != status.Degraded {
+		t.Fatalf("want Degraded after sustained processing failures, got %+v", r.updates)
+	}
+
+	// Successful disposition clears it.
+	h.ClearDisposition()
+	last := r.updates[len(r.updates)-1]
+	if last.status != status.Running {
+		t.Errorf("want Running after clear, got %v", last.status)
+	}
+}
+
+func TestSQSHealth_LatchAfterStopped(t *testing.T) {
+	r := &testReporter{}
+	h := newSQSHealth(r, logp.NewNopLogger())
+	h.UpdateStatus(status.Running, "Input is running")
+	h.UpdateStatus(status.Stopped, "Done")
+
+	n := len(r.updates)
+
+	// Further updates should be ignored.
+	h.ClearDisposition()
+	h.SetDeleteFailed(errors.New("fail"))
+	h.SetWorkerError(errors.New("fail"))
+	h.UpdateStatus(status.Running, "Input is running")
+
+	if len(r.updates) != n {
+		t.Fatalf("want no updates after Stopped, got %d (was %d): %+v", len(r.updates), n, r.updates[n:])
+	}
+}
+
+func TestSQSHealth_LatchAfterFailed(t *testing.T) {
+	r := &testReporter{}
+	h := newSQSHealth(r, logp.NewNopLogger())
+	h.UpdateStatus(status.Running, "Input is running")
+	h.UpdateStatus(status.Failed, "Broken")
+
+	n := len(r.updates)
+
+	h.ClearDisposition()
+	h.SetDeleteFailed(errors.New("fail"))
+	h.UpdateStatus(status.Running, "Input is running")
+
+	if len(r.updates) != n {
+		t.Fatalf("want no updates after Failed, got %d (was %d): %+v", len(r.updates), n, r.updates[n:])
 	}
 }
 

@@ -19,6 +19,10 @@ import (
 // failures required before the input reports Degraded for receive errors.
 const defaultRecvFailThreshold = 3
 
+// defaultProcFailThreshold is the number of consecutive S3 object processing
+// failures required before the input reports Degraded for processing errors.
+const defaultProcFailThreshold = 3
+
 // sqsHealth aggregates health signals from the SQS reader, S3 processors,
 // and message disposition callbacks into a single coherent status for Fleet.
 //
@@ -38,8 +42,13 @@ type sqsHealth struct {
 	consecutiveRecvFails int
 	recvFailThreshold    int
 
+	consecutiveProcFails int
+	procFailThreshold    int
+
 	currentStatus status.Status
 	currentMsg    string
+
+	closed bool
 }
 
 type condition string
@@ -47,6 +56,7 @@ type condition string
 const (
 	condReceive  condition = "receive"
 	condWorker   condition = "worker"
+	condProcess  condition = "process"
 	condDelete   condition = "delete"
 	condFinalize condition = "finalize"
 	condPoison   condition = "poison"
@@ -63,6 +73,7 @@ func newSQSHealth(reporter status.StatusReporter, log *logp.Logger) *sqsHealth {
 		log:               log,
 		conditions:        make(map[condition]healthCondition),
 		recvFailThreshold: defaultRecvFailThreshold,
+		procFailThreshold: defaultProcFailThreshold,
 	}
 }
 
@@ -77,11 +88,19 @@ func (h *sqsHealth) UpdateStatus(s status.Status, msg string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	if h.closed {
+		return
+	}
+
 	switch s {
 	case status.Starting, status.Configuring, status.Stopping, status.Stopped, status.Failed:
 		clear(h.conditions)
 		h.consecutiveRecvFails = 0
+		h.consecutiveProcFails = 0
 		h.publish(s, msg)
+		if s == status.Stopped || s == status.Failed {
+			h.closed = true
+		}
 	case status.Running:
 		h.consecutiveRecvFails = 0
 		delete(h.conditions, condReceive)
@@ -101,25 +120,37 @@ func (h *sqsHealth) UpdateStatus(s status.Status, msg string) {
 func (h *sqsHealth) SetWorkerError(err error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.closed {
+		return
+	}
 	h.conditions[condWorker] = healthCondition{
-		msg: fmt.Sprintf("worker setup failed: %s", err),
+		msg: fmt.Sprintf("The input could not start an SQS message processor: %s", err),
 		at:  time.Now(),
 	}
 	h.update()
 }
 
 // SetProcessingError records an S3 processing failure. Errors caused by
-// context cancellation (shutdown/reload) are suppressed.
+// context cancellation (shutdown) are suppressed. Individual failures do
+// not degrade, but sustained consecutive failures (above threshold)
+// indicate a persistent problem like missing S3 permissions.
 func (h *sqsHealth) SetProcessingError(err error) {
 	if isShutdownErr(err) {
 		return
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	// Processing errors are transient per the design; the message will
-	// retry via visibility timeout. We do not set a condition for individual
-	// processing failures; they are logged and counted in metrics.
-	// Only poison pills and delete/finalize failures set conditions.
+	if h.closed {
+		return
+	}
+	h.consecutiveProcFails++
+	if h.consecutiveProcFails >= h.procFailThreshold {
+		h.conditions[condProcess] = healthCondition{
+			msg: fmt.Sprintf("The input cannot process S3 objects (%d consecutive failures): %s", h.consecutiveProcFails, err),
+			at:  time.Now(),
+		}
+		h.update()
+	}
 }
 
 // SetDeleteFailed records a failure to delete an SQS message after
@@ -131,8 +162,11 @@ func (h *sqsHealth) SetDeleteFailed(err error) {
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.closed {
+		return
+	}
 	h.conditions[condDelete] = healthCondition{
-		msg: fmt.Sprintf("SQS delete failed (message may be reprocessed): %s", err),
+		msg: fmt.Sprintf("The input processed an SQS message but could not delete it from the queue. AWS may deliver the message again, which can result in duplicate events: %s", err),
 		at:  time.Now(),
 	}
 	h.update()
@@ -146,8 +180,11 @@ func (h *sqsHealth) SetFinalizeFailed(err error) {
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.closed {
+		return
+	}
 	h.conditions[condFinalize] = healthCondition{
-		msg: fmt.Sprintf("S3 finalization failed (manual cleanup required): %s", err),
+		msg: fmt.Sprintf("The input could not copy an S3 object to the backup bucket, or could not delete the source object after backup. Check the backup bucket configuration and permissions: %s", err),
 		at:  time.Now(),
 	}
 	h.update()
@@ -161,18 +198,27 @@ func (h *sqsHealth) RecordPoisonPill(err error) {
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.closed {
+		return
+	}
 	h.conditions[condPoison] = healthCondition{
-		msg: fmt.Sprintf("message deleted as poison pill (possible data loss): %s", err),
+		msg: fmt.Sprintf("The input stopped retrying an SQS message after repeated processing failures and deleted it from the queue. Data from that notification may be missing: %s", err),
 		at:  time.Now(),
 	}
 	h.update()
 }
 
-// ClearDisposition clears delete, finalize, and poison-pill conditions
-// after a successful end-to-end message completion (delete + finalize).
+// ClearDisposition clears delete, finalize, poison-pill, and processing
+// conditions after a successful end-to-end message completion (delete +
+// finalize). Resets the consecutive processing failure counter.
 func (h *sqsHealth) ClearDisposition() {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.closed {
+		return
+	}
+	h.consecutiveProcFails = 0
+	delete(h.conditions, condProcess)
 	delete(h.conditions, condDelete)
 	delete(h.conditions, condFinalize)
 	delete(h.conditions, condPoison)
@@ -183,22 +229,22 @@ func (h *sqsHealth) ClearDisposition() {
 // publishes it if changed. Must be called with h.mu held.
 func (h *sqsHealth) update() {
 	if len(h.conditions) == 0 {
-		h.publish(status.Running, "input is running")
+		h.publish(status.Running, "Input is running")
 		return
 	}
-	// Pick the condition to report. Priority order: worker, receive,
-	// delete, finalize, poison.
 	msg := h.pickMessage()
 	h.publish(status.Degraded, msg)
 }
 
+// pickMessage returns the message from the highest-priority active condition.
+// Priority order: worker, receive, process, delete, finalize, poison.
 func (h *sqsHealth) pickMessage() string {
-	for _, key := range []condition{condWorker, condReceive, condDelete, condFinalize, condPoison} {
+	for _, key := range []condition{condWorker, condReceive, condProcess, condDelete, condFinalize, condPoison} {
 		if c, ok := h.conditions[key]; ok {
 			return c.msg
 		}
 	}
-	return "input is degraded"
+	return "Input is degraded"
 }
 
 // publish sends the status to the underlying reporter if it differs from
@@ -214,5 +260,5 @@ func (h *sqsHealth) publish(s status.Status, msg string) {
 }
 
 func isShutdownErr(err error) bool {
-	return errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded)
+	return errors.Is(err, context.Canceled)
 }
