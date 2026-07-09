@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
