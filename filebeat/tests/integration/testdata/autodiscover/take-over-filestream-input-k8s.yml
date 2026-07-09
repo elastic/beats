@@ -1,0 +1,40 @@
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      node: {{.nodeName}}
+      templates:
+        - condition:
+            equals:
+              kubernetes.pod.name: {{.podName}}
+          config:
+            - type: filestream
+              id: "${data.kubernetes.container.id}-logs"
+              index: "{{.index}}"
+              take_over:
+                enabled: true
+              prospector.scanner.symlinks: true
+              close.on_state_change.inactive: 2s
+              paths:
+                - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+              parsers:
+                - container: ~
+
+queue.mem:
+  flush.timeout: 0s
+
+output.elasticsearch:
+  hosts:
+    - "{{.esHost}}"
+  username: "{{.esUser}}"
+  password: "{{.esPass}}"
+  allow_older_versions: true
+  preset: latency
+
+logging:
+  level: debug
+  files:
+    rotateonstartup: false
+  selectors:
+    - "*"
+  metrics:
+    enabled: false

@@ -116,7 +116,8 @@ type mysqlStream struct {
 	parseState  parseState
 	isClient    bool
 
-	message *mysqlMessage
+	message                             *mysqlMessage
+	logger, mysqlLogger, mysqlDetLogger *logp.Logger
 }
 
 type parseState int
@@ -163,6 +164,8 @@ type mysqlPlugin struct {
 	// function pointer for mocking
 	handleMysql func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
 		dir uint8, raw_msg []byte)
+
+	logger, mysqlLogger, mysqlDetLogger *logp.Logger
 }
 
 func init() {
@@ -174,8 +177,12 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &mysqlPlugin{}
+	p.logger = logger
+	p.mysqlLogger = logger.Named("mysql")
+	p.mysqlDetLogger = logger.Named("mysql.detail")
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -218,6 +225,11 @@ func (mysql *mysqlPlugin) setFromConfig(config *mysqlConfig) {
 	mysql.sendResponse = config.SendResponse
 	mysql.transactionTimeout = config.TransactionTimeout
 	mysql.prepareStatementTimeout = config.StatementTimeout
+}
+
+func (mysql *mysqlPlugin) Close() {
+	mysql.transactions.StopJanitor()
+	mysql.prepareStatements.StopJanitor()
 }
 
 func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *mysqlTransaction {
@@ -279,7 +291,7 @@ func isRequest(typ uint8) bool {
 }
 
 func mysqlMessageParser(s *mysqlStream) (bool, bool) {
-	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %s", s.parseState)
+	s.mysqlDetLogger.Debugf("MySQL parser called. parseState = %s", s.parseState)
 
 	m := s.message
 	for s.parseOffset < len(s.data) {
@@ -287,7 +299,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 		case mysqlStateStart:
 			m.start = s.parseOffset
 			if len(s.data[s.parseOffset:]) < 5 {
-				logp.Warn("MySQL Message too short. Ignore it.")
+				s.logger.Warnf("MySQL Message too short. Ignore it.")
 				return false, false
 			}
 			hdr := s.data[s.parseOffset : s.parseOffset+5]
@@ -295,7 +307,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			m.seq = hdr[3]
 			m.typ = hdr[4]
 
-			logp.Debug("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d isClient=%v", m.packetLength, m.seq, m.typ, s.isClient)
+			s.mysqlLogger.Debugf("MySQL Header: Packet length %d, Seq %d, Type=%d isClient=%v", m.packetLength, m.seq, m.typ, s.isClient)
 
 			if s.isClient {
 				// starts Command Phase
@@ -315,17 +327,17 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				m.isRequest = false
 
 				if hdr[4] == 0x00 || hdr[4] == 0xfe {
-					logp.Debug("mysqldetailed", "Received OK response")
+					s.mysqlDetLogger.Debug("Received OK response")
 					m.start = s.parseOffset
 					s.parseState = mysqlStateEatMessage
 					m.isOK = true
 				} else if hdr[4] == 0xff {
-					logp.Debug("mysqldetailed", "Received ERR response")
+					s.mysqlDetLogger.Debug("Received ERR response")
 					m.start = s.parseOffset
 					s.parseState = mysqlStateEatMessage
 					m.isError = true
 				} else if m.packetLength == 1 {
-					logp.Debug("mysqldetailed", "Query response. Number of fields %d", hdr[4])
+					s.mysqlDetLogger.Debugf("Query response. Number of fields %d", hdr[4])
 					m.numberOfFields = int(hdr[4])
 					m.start = s.parseOffset
 					s.parseOffset += 5
@@ -350,13 +362,13 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				// get the statement id
 				if m.typ == mysqlCmdStmtExecute || m.typ == mysqlCmdStmtClose {
 					if len(s.data[m.start+5:]) < 4 {
-						logp.Warn("MySQL statementID data too short. Ignoring")
+						s.logger.Warn("MySQL statementID data too short. Ignoring")
 						return false, false
 					}
 					m.statementID = int(binary.LittleEndian.Uint32(s.data[m.start+5:]))
 				} else {
 					if m.start+5 > m.end || m.end > len(s.data) {
-						logp.Warn("MySQL query data too short. Ignoring.")
+						s.logger.Warnf("MySQL query data too short. Ignoring.")
 						return false, false
 					}
 					m.query = string(s.data[m.start+5 : m.end])
@@ -368,7 +380,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					return true, false
 				}
 				if err != nil {
-					logp.Debug("mysql", "Error on read_linteger: %s", err)
+					s.mysqlLogger.Debugf("Error on read_linteger: %s", err)
 					return false, false
 				}
 				m.affectedRows = affectedRows
@@ -379,7 +391,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					return true, false
 				}
 				if err != nil {
-					logp.Debug("mysql", "Error on read_linteger: %s", err)
+					s.mysqlLogger.Debugf("Error on read_linteger: %s", err)
 					return false, false
 				}
 				m.insertID = insertID
@@ -390,7 +402,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				// string[5] sql state
 				// string<EOF> error message
 				if (m.start + 13) >= len(s.data) {
-					logp.Warn("MySql Error code is the wrong size. Ignoring.")
+					s.logger.Warn("MySql Error code is the wrong size. Ignoring.")
 					return false, false
 				}
 				m.errorCode = binary.LittleEndian.Uint16(s.data[m.start+5 : m.start+7])
@@ -399,11 +411,11 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			}
 			msgSize := m.end - m.start
 			if msgSize < 0 {
-				logp.Warn("MySQL message size invalid. Ignoring.")
+				s.logger.Warn("MySQL message size invalid. Ignoring.")
 				return false, false
 			}
 			m.size = uint64(msgSize)
-			logp.Debug("mysqldetailed", "Message complete. remaining=%d",
+			s.mysqlDetLogger.Debugf("Message complete. remaining=%d",
 				len(s.data[s.parseOffset:]))
 
 			// PREPARE_OK packet for Prepared Statement
@@ -433,11 +445,11 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			if len(s.data[s.parseOffset:]) >= int(m.packetLength)+4 {
 				s.parseOffset += 4 // header
 				if len(s.data) <= s.parseOffset {
-					logp.Warn("MySQL packet has no data after header. Ignoring.")
+					s.logger.Warnf("MySQL packet has no data after header. Ignoring.")
 					return false, false
 				}
 				if s.data[s.parseOffset] == 0xfe {
-					logp.Debug("mysqldetailed", "Received EOF packet")
+					s.mysqlDetLogger.Debug("Received EOF packet")
 					// EOF marker
 					s.parseOffset += int(m.packetLength)
 
@@ -448,7 +460,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 						return true, false
 					}
 					if err != nil {
-						logp.Debug("mysql", "Error on read_lstring: %s", err)
+						s.mysqlLogger.Debugf("Error on read_lstring: %s", err)
 						return false, false
 					}
 					db /*schema */, off, complete, err := readLstring(s.data, off)
@@ -456,7 +468,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 						return true, false
 					}
 					if err != nil {
-						logp.Debug("mysql", "Error on read_lstring: %s", err)
+						s.mysqlLogger.Debugf("Error on read_lstring: %s", err)
 						return false, false
 					}
 					table /* table */, _ /*off*/, complete, err := readLstring(s.data, off)
@@ -464,7 +476,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 						return true, false
 					}
 					if err != nil {
-						logp.Debug("mysql", "Error on read_lstring: %s", err)
+						s.mysqlLogger.Debugf("Error on read_lstring: %s", err)
 						return false, false
 					}
 
@@ -475,7 +487,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					} else if !strings.Contains(m.tables, dbTable) {
 						m.tables = m.tables + ", " + dbTable
 					}
-					logp.Debug("mysqldetailed", "db=%s, table=%s", db, table)
+					s.mysqlDetLogger.Debugf("db=%s, table=%s", db, table)
 					s.parseOffset += int(m.packetLength)
 					// go to next field
 				}
@@ -493,7 +505,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			m.packetLength = leUint24(hdr[:3])
 			m.seq = hdr[3]
 
-			logp.Debug("mysqldetailed", "Rows: packet length %d, packet number %d", m.packetLength, m.seq)
+			s.mysqlDetLogger.Debugf("Rows: packet length %d, packet number %d", m.packetLength, m.seq)
 
 			if len(s.data[s.parseOffset:]) < int(m.packetLength)+4 {
 				// wait for more
@@ -502,12 +514,12 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 
 			s.parseOffset += 4 // header
 			if len(s.data) <= s.parseOffset {
-				logp.Warn("MySQL packet has no data after header. Ignoring.")
+				s.logger.Warn("MySQL packet has no data after header. Ignoring.")
 				return false, false
 			}
 
 			if s.data[s.parseOffset] == 0xfe {
-				logp.Debug("mysqldetailed", "Received EOF packet")
+				s.mysqlDetLogger.Debugf("Received EOF packet")
 				// EOF marker
 				s.parseOffset += int(m.packetLength)
 
@@ -522,7 +534,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				}
 				bodySize := m.end - m.start
 				if bodySize < 0 {
-					logp.Warn("MySQL message body size invalid. Ignoring.")
+					s.logger.Warn("MySQL message body size invalid. Ignoring.")
 					return false, false
 				}
 				m.size = uint64(bodySize)
@@ -604,15 +616,18 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 			dstPort = tcptuple.SrcPort
 		}
 		priv.data[dir] = &mysqlStream{
-			data:     pkt.Payload,
-			message:  &mysqlMessage{ts: pkt.Ts},
-			isClient: mysql.isServerPort(dstPort),
+			data:           pkt.Payload,
+			message:        &mysqlMessage{ts: pkt.Ts},
+			isClient:       mysql.isServerPort(dstPort),
+			logger:         mysql.logger,
+			mysqlLogger:    mysql.mysqlLogger,
+			mysqlDetLogger: mysql.mysqlDetLogger,
 		}
 	} else {
 		// concatenate bytes
 		priv.data[dir].data = append(priv.data[dir].data, pkt.Payload...)
 		if len(priv.data[dir].data) > tcp.TCPMaxDataInStream {
-			logp.Debug("mysql", "Stream data too large, dropping TCP stream")
+			mysql.mysqlLogger.Debug("Stream data too large, dropping TCP stream")
 			priv.data[dir] = nil
 			return priv
 		}
@@ -625,12 +640,12 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 		}
 
 		ok, complete := mysqlMessageParser(priv.data[dir])
-		logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%v complete=%v", ok, complete)
+		mysql.mysqlDetLogger.Debugf("mysqlMessageParser returned ok=%v complete=%v", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			priv.data[dir] = nil
-			logp.Debug("mysql", "Ignore MySQL message. Drop tcp stream. Try parsing with the next segment")
+			mysql.mysqlLogger.Debug("Ignore MySQL message. Drop tcp stream. Try parsing with the next segment")
 			return priv
 		}
 
@@ -699,7 +714,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 	trans := mysql.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.mysql != nil {
-			logp.Debug("mysql", "Two requests without a Response. Dropping old request: %s", trans.mysql)
+			mysql.logger.Debugf("Two requests without a Response. Dropping old request: %s", trans.mysql)
 			unmatchedRequests.Add(1)
 		}
 	} else {
@@ -778,13 +793,13 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 	trans := mysql.getTransaction(msg.tcpTuple.Hashable())
 	if trans == nil {
-		logp.Debug("mysql", "Response from unknown transaction. Ignoring.")
+		mysql.logger.Debug("Response from unknown transaction. Ignoring.")
 		unmatchedResponses.Add(1)
 		return
 	}
 	// check if the request was received
 	if trans.mysql == nil {
-		logp.Debug("mysql", "Response from unknown transaction. Ignoring.")
+		mysql.logger.Debug("Response from unknown transaction. Ignoring.")
 		unmatchedResponses.Add(1)
 		return
 
@@ -835,13 +850,13 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 	mysql.publishTransaction(trans)
 	mysql.transactions.Delete(trans.tuple.Hashable())
 
-	logp.Debug("mysql", "Mysql transaction completed: %s %s %s", trans.query, trans.params, trans.mysql)
+	mysql.mysqlLogger.Debugf("Mysql transaction completed: %s %s %s", trans.query, trans.params, trans.mysql)
 }
 
 func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysqlStmtData) []string {
 	dataLen := len(data)
 	if dataLen < 14 {
-		logp.Debug("mysql", "Data too small")
+		mysql.mysqlLogger.Debug("Data too small")
 		return nil
 	}
 	var paramType, paramUnsigned uint8
@@ -867,7 +882,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	}
 	// stmt bound
 	if dataLen <= offset {
-		logp.Debug("mysql", "Data too small")
+		mysql.mysqlLogger.Debug("Data too small")
 		return nil
 	}
 	stmtBound := data[offset]
@@ -876,7 +891,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	if stmtBound == 1 {
 		paramOffset += nparam * 2
 		if dataLen <= paramOffset {
-			logp.Debug("mysql", "Data too small to contain parameters")
+			mysql.mysqlLogger.Debug("Data too small to contain parameters")
 			return nil
 		}
 		// First call or rebound (1)
@@ -884,11 +899,11 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramType = data[offset]
 			offset++
 			nparamType = append(nparamType, paramType)
-			logp.Debug("mysqldetailed", "type = %d", paramType)
+			mysql.mysqlLogger.Named("mysqldetailed").Debugf("type = %d", paramType)
 			paramUnsigned = data[offset]
 			offset++
 			if paramUnsigned != 0 {
-				logp.Debug("mysql", "Illegal param unsigned")
+				mysql.mysqlLogger.Debug("Illegal param unsigned")
 				return nil
 			}
 		}
@@ -916,7 +931,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_SHORT
 		case 0x02:
 			if dataLen < paramOffset+2 {
-				logp.Debug("mysql", "Data too small")
+				mysql.mysqlLogger.Debug("Data too small")
 				return nil
 			}
 			valueString := strconv.Itoa(int(binary.LittleEndian.Uint16(data[paramOffset:])))
@@ -925,7 +940,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_LONG
 		case 0x03:
 			if dataLen < paramOffset+4 {
-				logp.Debug("mysql", "Data too small")
+				mysql.mysqlLogger.Debug("Data too small")
 				return nil
 			}
 			valueString := strconv.Itoa(int(binary.LittleEndian.Uint32(data[paramOffset:])))
@@ -945,7 +960,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		//  FIELD_TYPE_LONGLONG
 		case 0x08:
 			if dataLen < paramOffset+8 {
-				logp.Debug("mysql", "Data too small")
+				mysql.mysqlLogger.Debug("Data too small")
 				return nil
 			}
 			valueInt := binary.LittleEndian.Uint64(data[paramOffset : paramOffset+8])
@@ -959,7 +974,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			var year, month, day, hour, minute, second string
 			paramLen := int(data[paramOffset])
 			if dataLen < paramOffset+paramLen+1 {
-				logp.Debug("mysql", "Data too small")
+				mysql.mysqlLogger.Debug("Data too small")
 				return nil
 			}
 			paramOffset++
@@ -987,7 +1002,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x0b:
 			paramLen := int(data[paramOffset])
 			if dataLen < paramOffset+paramLen+1 {
-				logp.Debug("mysql", "Data too small")
+				mysql.mysqlLogger.Debug("Data too small")
 				return nil
 			}
 			paramOffset++
@@ -1003,7 +1018,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			case 0xfc: /* 252 - 64k chars */
 				paramLen16 := int(binary.LittleEndian.Uint16(data[paramOffset : paramOffset+2]))
 				if dataLen < paramOffset+paramLen16+2 {
-					logp.Debug("mysql", "Data too small")
+					mysql.mysqlLogger.Debug("Data too small")
 					return nil
 				}
 				paramOffset += 2
@@ -1012,7 +1027,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			case 0xfd: /* 64k - 16M chars */
 				paramLen24 := int(leUint24(data[paramOffset : paramOffset+3]))
 				if dataLen < paramOffset+paramLen24+3 {
-					logp.Debug("mysql", "Data too small")
+					mysql.mysqlLogger.Debug("Data too small")
 					return nil
 				}
 				paramOffset += 3
@@ -1020,14 +1035,14 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramOffset += paramLen24
 			default: /* < 252 chars     */
 				if dataLen < paramOffset+paramLen {
-					logp.Debug("mysql", "Data too small")
+					mysql.mysqlLogger.Debug("Data too small")
 					return nil
 				}
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen]))
 				paramOffset += paramLen
 			}
 		default:
-			logp.Debug("mysql", "Unknown param type")
+			mysql.mysqlLogger.Debug("Unknown param type")
 			return nil
 		}
 
@@ -1038,16 +1053,16 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	length, err := readLength(data, 0)
 	if err != nil {
-		logp.Warn("Invalid response: %v", err)
+		mysql.logger.Warnf("Invalid response: %v", err)
 		return []string{}, [][]string{}
 	}
 	if length < 1 {
-		logp.Warn("Warning: Skipping empty Response")
+		mysql.logger.Warn("Warning: Skipping empty Response")
 		return []string{}, [][]string{}
 	}
 
 	if len(data) < 5 {
-		logp.Warn("Invalid response: data less than 5 bytes")
+		mysql.logger.Warn("Invalid response: data less than 5 bytes")
 		return []string{}, [][]string{}
 	}
 
@@ -1061,18 +1076,18 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 	default:
 		offset := 5
 
-		logp.Debug("mysql", "Data len: %d", len(data))
+		mysql.mysqlLogger.Debugf("Data len: %d", len(data))
 
 		// Read fields
 		for {
 			length, err = readLength(data, offset)
 			if err != nil {
-				logp.Warn("Invalid response: %v", err)
+				mysql.logger.Warn("Invalid response: %v", err)
 				return []string{}, [][]string{}
 			}
 
 			if len(data[offset:]) < 5 {
-				logp.Warn("Invalid response.")
+				mysql.logger.Warn("Invalid response.")
 				return []string{}, [][]string{}
 			}
 
@@ -1084,32 +1099,32 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			_ /* catalog */, off, complete, err := readLstring(data, offset+4)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %v %v", err, complete)
+				mysql.mysqlLogger.Debugf("Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*database*/, off, complete, err = readLstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %v %v", err, complete)
+				mysql.mysqlLogger.Debugf("Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*table*/, off, complete, err = readLstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %v %v", err, complete)
+				mysql.mysqlLogger.Debugf("Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*org table*/, off, complete, err = readLstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %v %v", err, complete)
+				mysql.logger.Debugf("Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			name, off, complete, err := readLstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %v %v", err, complete)
+				mysql.mysqlLogger.Debugf("Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /* org name */, _ /*off*/, complete, err = readLstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %v %v", err, complete)
+				mysql.mysqlLogger.Debugf("Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 
@@ -1117,7 +1132,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			offset += length + 4
 			if len(data) < offset {
-				logp.Warn("Invalid response.")
+				mysql.logger.Warn("Invalid response.")
 				return []string{}, [][]string{}
 			}
 		}
@@ -1128,7 +1143,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 			var rowLen int
 
 			if len(data[offset:]) < 5 {
-				logp.Warn("Invalid response.")
+				mysql.logger.Warn("Invalid response.")
 				break
 			}
 
@@ -1140,7 +1155,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			length, err = readLength(data, offset)
 			if err != nil {
-				logp.Warn("Invalid response: %v", err)
+				mysql.logger.Warn("Invalid response: %v", err)
 				break
 			}
 			off := offset + 4 // skip length + packet number
@@ -1159,7 +1174,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 					var complete bool
 					text, off, complete, err = readLstring(data, off)
 					if err != nil || !complete {
-						logp.Debug("mysql", "Error parsing rows: %+v %t", err, complete)
+						mysql.mysqlLogger.Debugf("Error parsing rows: %+v %t", err, complete)
 						// nevertheless, return what we have so far
 						return fields, rows
 					}
@@ -1174,7 +1189,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 				}
 			}
 
-			logp.Debug("mysqldetailed", "Append row: %v", row)
+			mysql.mysqlDetLogger.Debugf("Append row: %v", row)
 
 			rows = append(rows, row)
 			if len(rows) >= mysql.maxStoreRows {
@@ -1192,7 +1207,7 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 		return
 	}
 
-	logp.Debug("mysql", "mysql.results exists")
+	mysql.mysqlLogger.Debug("mysql.results exists")
 
 	evt, pbf := pb.NewBeatEvent(t.ts)
 	pbf.SetSource(&t.src)

@@ -2,13 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:deadcode,unused // This code will be used later.
 package cel
 
 import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -26,17 +26,23 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/icholy/digest"
+	"go.opentelemetry.io/otel/attribute"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
+
+var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
 	name          string
@@ -562,6 +568,211 @@ var inputTests = []struct {
 		}},
 	},
 
+	// Emit tests.
+	{
+		name: "emit_no_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello"},{"message":"world"}].emit(e, e)}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+	},
+	{
+		name: "emit_with_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello","id":1},{"message":"world","id":2}].emit(e, {"message":e.message}, {"id":e.id})}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": int64(1)},
+			{"id": int64(2)},
+		},
+	},
+
+	// Emit error-handling pattern (mirrors the documented example).
+	{
+		name: "emit_error_handling_success",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"},{"msg":"b"}].emit(e, e, {"id": e.msg}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"msg": "a"},
+			{"msg": "b"},
+			{"published": float64(2), "cursor": map[string]interface{}{"id": "b"}},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": "a"},
+			{"id": "b"},
+			{"id": "b"},
+		},
+	},
+	{
+		name: "emit_error_handling_failure",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"}, "bad"].emit(e, e, {"id": "x"}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"msg": "a"},
+			{"error": "emit: event must be a map, got string"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": "x"},
+		},
+	},
+
+	// Stream decode tests.
+	{
+		name: "decode_csv_stream_lazy_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  name,age,city
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA8tLzE3VSUxP1UnOLKnkcszJTE7VMTbQ8UstV4jML8rmcspP0jEy1fHJz0vJz+MCACmhrnIuAAAA"
+	).stream_gzip().decode_csv_stream_lazy().map(row,
+		row
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"name": "Alice", "age": "30", "city": "New York"},
+			{"name": "Bob", "age": "25", "city": "London"},
+		},
+	},
+	{
+		name: "decode_csv_stream_lazy_no_header_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA3PMyUxO1TE20PFLLVeIzC/K5nLKT9IxMtXxyc9Lyc/jAgAMH1FQIAAAAA=="
+	).stream_gzip().decode_csv_stream_lazy_no_header().map(row,
+		{"fields": row}
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"fields": []interface{}{"Alice", "30", "New York"}},
+			{"fields": []interface{}{"Bob", "25", "London"}},
+		},
+	},
+	{
+		name: "decode_lines_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().map(line,
+		{"line": line}
+	).as(lines,
+		{"events": lines}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
+	},
+	{
+		name: "emit_with_decode_lines_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().emit(line,
+		{"line": line}
+	).as(result,
+		{
+			"events": [],
+			"emit_result": result,
+		}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
+	},
+
 	// FS-based tests.
 	{
 		name: "ndjson_log_file_simple",
@@ -906,9 +1117,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]any{
-					"message": `failed eval: ERROR: <input>:3:21: response body too big
- |   "events": [string(body)]
- | ....................^`,
+					"message": `failed eval: ERROR: <input>:2:5: response body too big
+ |  get(state.url).Body.as(body, {
+ | ....^`,
 				},
 			},
 		},
@@ -1502,17 +1713,22 @@ var inputTests = []struct {
 		},
 		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
 	},
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
 	{
-		name: "tracer_escaping_logs",
+		name:   "tracer_disabled_escaping_logs",
+		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval":                 1,
-			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  true,
+			"resource.tracer.enabled":  false,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state":                    map[string]interface{}{},
-			"program":                  "{}",
+			"program":                  `bytes(get(state.url).Body).as(body, {"events": [body.decode_json()]})`,
 		},
-		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -1956,7 +2172,14 @@ var inputTests = []struct {
 	})
 	`,
 		},
-		handler: oauth2Handler,
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf("unexpected UA: %s", r.UserAgent())))
+				return
+			}
+			oauth2Handler(w, r)
+		},
 		want: []map[string]interface{}{
 			{"hello": "world"},
 		},
@@ -2116,13 +2339,11 @@ var inputTests = []struct {
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
-			// Loss of location information here is a result of changes in the runtime.
-			// We no longer look into macros at all. This is a huge loss for debugging.
 			{
 				"error": map[string]interface{}{
-					"message": `failed eval: ERROR: <input>:5:14: no such overload
- |    "events": events,
- | .............^`,
+					"message": `failed eval: ERROR: <input>:3:20: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | ...................^`,
 				},
 			},
 		},
@@ -2177,7 +2398,7 @@ var inputTests = []struct {
 			},
 		},
 		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
 		want: []map[string]interface{}{{
 			"message": map[string]interface{}{
 				"value": "division by zero",
@@ -2199,7 +2420,7 @@ var inputTests = []struct {
 			},
 		},
 		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2227,13 +2448,13 @@ var inputTests = []struct {
 		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
 		prepare: func() error {
 			// Make a file that the configuration should delete.
-			err := os.MkdirAll("failure_dumps", 0o700)
+			err := os.MkdirAll(filepath.Join("cel", "failure_dumps"), 0o700)
 			if err != nil {
 				return err
 			}
-			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+			return os.WriteFile(filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
 		},
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2337,7 +2558,7 @@ func TestInput(t *testing.T) {
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
-	err := os.RemoveAll("failure_dumps")
+	err := os.RemoveAll(filepath.Join("cel", "failure_dumps"))
 	if err != nil {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
@@ -2375,7 +2596,7 @@ func TestInput(t *testing.T) {
 			}
 
 			var tempDir string
-			if conf.Resource.Tracer != nil {
+			if conf.Resource.Tracer.enabled() {
 				err := os.MkdirAll("cel", 0o700)
 				if err != nil {
 					t.Fatalf("failed to create root logging destination: %v", err)
@@ -2406,11 +2627,16 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			id := "test_id:" + test.name
+			cwd, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("failed to get working directory: %v", err)
+			}
 			v2Ctx := v2.Context{
 				Logger:          logp.NewLogger("cel_test"),
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: userAgent},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
@@ -2420,7 +2646,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
-			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+			if !sameErrorOrContains(err, test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantFile != "" {
@@ -2537,15 +2763,6 @@ func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing
 		config["resource.url"] = server.URL
 		t.Cleanup(server.Close)
 	}
-}
-
-func newV2Context() (v2.Context, func()) {
-	ctx, cancel := context.WithCancel(context.Background())
-	return v2.Context{
-		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "test_id",
-		Cancelation: ctx,
-	}, cancel
 }
 
 //nolint:errcheck // No point checking errors in test server.
@@ -2812,26 +3029,6 @@ func paginationHandler() http.HandlerFunc {
 	}
 }
 
-//nolint:errcheck // No point checking errors in test server.
-func paginationArrayHandler() http.HandlerFunc {
-	var count int
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
-		switch count {
-		case 0:
-			w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
-		case 1:
-			if r.URL.Query().Get("page") != "bar" {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(`{"error":"wrong page token value"}`))
-				return
-			}
-			w.Write([]byte(`[{"foo":"bar"}]`))
-		}
-		count++
-	}
-}
-
 var redactorTests = []struct {
 	name  string
 	state mapstr.M
@@ -3025,5 +3222,67 @@ func TestRedactor(t *testing.T) {
 				t.Errorf("unexpected redaction:\n--- got\n--- want\n%s", cmp.Diff(got, test.wantRedact))
 			}
 		})
+	}
+}
+
+func TestGetResourceAttributesIncludesInputType(t *testing.T) {
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("input_type should be set from input name: got %q, want %q", got, want)
+	}
+}
+
+func TestGetResourceAttributesInputTypeCannotBeOverridden(t *testing.T) {
+	t.Setenv("OTEL_RESOURCE_ATTRIBUTES", "input_type=httpjson,deployment.environment=production")
+
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("built-in input_type should not be overridden from OTEL_RESOURCE_ATTRIBUTES: got %q, want %q", got, want)
+	}
+	if got, want := attrsMap["deployment.environment"], "production"; got != want {
+		t.Errorf("custom resource attributes from OTEL_RESOURCE_ATTRIBUTES should still be included: got %q, want %q", got, want)
+	}
+}
+
+func toResourceAttributeMap(attrs []attribute.KeyValue) map[string]string {
+	result := make(map[string]string, len(attrs))
+	for _, attr := range attrs {
+		result[string(attr.Key)] = attr.Value.AsString()
+	}
+	return result
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }

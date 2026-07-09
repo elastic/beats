@@ -40,8 +40,6 @@ var PipelinesFS *embed.FS
 
 var errNoFS = errors.New("no embedded file system")
 
-const logName = "pipeline"
-
 type pipeline struct {
 	id       string
 	contents map[string]interface{}
@@ -56,7 +54,7 @@ func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwrite
 	if err != nil {
 		return nil, err
 	}
-	return load(esClient, pipelines, overwritePipelines)
+	return load(esClient, pipelines, overwritePipelines, info.Logger.Named("pipeline"))
 }
 
 // readAll reads pipelines from the the embedded filesystem and
@@ -127,11 +125,9 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 // load will only overwrite existing pipelines if overwritePipelines is
 // true. An error in loading one of the pipelines will cause the
 // successfully loaded ones to be deleted.
-func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool) (loaded []string, err error) {
-	log := logp.NewLogger(logName)
-
+func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool, logger *logp.Logger) (loaded []string, err error) {
 	for _, pipeline := range pipelines {
-		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, log)
+		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, logger)
 		if err != nil {
 			err = fmt.Errorf("error loading pipeline %s: %w", pipeline.id, err)
 			break

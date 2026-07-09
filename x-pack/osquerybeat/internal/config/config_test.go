@@ -144,7 +144,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := tc.cfg.NormalizeAndValidate()
+			normalized, err := tc.cfg.NormalizeAndValidate()
 			if tc.wantErr && err == nil {
 				t.Fatalf("expected error")
 			}
@@ -152,8 +152,8 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 			if tc.name == "normalizes sha to lowercase" {
-				if tc.cfg.Linux.AMD64.SHA256 != "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {
-					t.Fatalf("expected lowercased sha256, got %s", tc.cfg.Linux.AMD64.SHA256)
+				if normalized.Linux.AMD64.SHA256 != "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {
+					t.Fatalf("expected lowercased sha256, got %s", normalized.Linux.AMD64.SHA256)
 				}
 			}
 		})
@@ -339,7 +339,7 @@ func TestInstallConfigEmptyPlatformNotEnabled(t *testing.T) {
 		Linux: &InstallPlatformConfig{},
 	}
 
-	if err := cfg.NormalizeAndValidate(); err != nil {
+	if _, err := cfg.NormalizeAndValidate(); err != nil {
 		t.Fatalf("empty platform config should validate without error: %v", err)
 	}
 	if cfg.Enabled() {

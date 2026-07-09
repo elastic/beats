@@ -66,7 +66,7 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 	log := logp.NewLogger("winlogbeat")
 
 	// resolve registry file path
-	config.RegistryFile = b.Paths.Resolve(paths.Data, config.RegistryFile)
+	config.RegistryFile = b.Info.Paths.Resolve(paths.Data, config.RegistryFile)
 	log.Infof("State will be read from and persisted to %s",
 		config.RegistryFile)
 
@@ -110,7 +110,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 		overwritePipelines := config.OverwritePipelines
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Winlogbeat", b.Info.Logger)
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, b.Info)
 		if err != nil {
 			return err
 		}

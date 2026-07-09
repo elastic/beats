@@ -15,13 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
+
 package ech
 
 import (
 	"debug/buildinfo"
 	"os"
-	"os/exec"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -55,33 +55,28 @@ func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 	info, err := buildinfo.ReadFile(binaryPath)
 	assert.NoError(t, err)
 
-	var checkLinks, foundTags, foundExperiment bool
+	var foundTags, foundFIPS, foundFIPSDefault bool
 	for _, setting := range info.Settings {
 		switch setting.Key {
 		case "-tags":
 			foundTags = true
 			assert.Contains(t, setting.Value, "requirefips")
 			continue
-		case "GOEXPERIMENT":
-			foundExperiment = true
-			assert.Contains(t, setting.Value, "systemcrypto")
+		case "GOFIPS140":
+			foundFIPS = true
+			assert.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
 			continue
-		case "-ldflags":
-			if !strings.Contains(setting.Value, "-s") {
-				checkLinks = true
+		case "DefaultGODEBUG":
+			if strings.Contains(setting.Value, "fips140=on") {
+				foundFIPSDefault = true
 			}
+			continue
 		}
 	}
 
 	assert.True(t, foundTags, "did not find build tags")
-	assert.True(t, foundExperiment, "did not find GOEXPERIMENT")
-
-	if checkLinks && runtime.GOOS == "linux" {
-		t.Log("Binary is not stripped, checking for OpenSSL in the symbols table.")
-		output, err := exec.CommandContext(t.Context(), "go", "tool", "nm", binaryPath).Output()
-		assert.NoError(t, err, "unable to run go tool nm")
-		assert.Contains(t, output, "OpenSSL_version", "Unable to find OpenSSL_version in symbols link")
-	}
+	assert.True(t, foundFIPS, "did not find GOFIPS140 within binary version information")
+	assert.True(t, foundFIPSDefault, "did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
 	if t.Failed() {
 		t.Fatal("Unable to verify FIPS binary.") // stop test if non-FIPS binary is used.
 	}

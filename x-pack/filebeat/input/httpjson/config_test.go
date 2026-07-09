@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -692,6 +693,52 @@ LNV/bIgMHOMoxiGrwyjAhg==
 			case c.expectedErr != "":
 				if err == nil || err.Error() != c.expectedErr {
 					t.Fatalf("Configuration validation failed. expecting %q error but got %q", c.expectedErr, err)
+				}
+			}
+		})
+	}
+}
+
+func TestPaginationAllowedHostsValidation(t *testing.T) {
+	tests := []struct {
+		name    string
+		hosts   []interface{}
+		wantErr string
+	}{
+		{
+			name:  "valid_entries",
+			hosts: []interface{}{"https://cdn.example.com", "https://api.other.com:8443"},
+		},
+		{
+			name:    "missing_scheme",
+			hosts:   []interface{}{"cdn.example.com"},
+			wantErr: `pagination_allowed_hosts entry "cdn.example.com" must have both a scheme and a host`,
+		},
+		{
+			name:    "missing_host",
+			hosts:   []interface{}{"https://"},
+			wantErr: `pagination_allowed_hosts entry "https://" must have both a scheme and a host`,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			m := map[string]interface{}{
+				"request.url":                       "https://localhost",
+				"response.pagination_allowed_hosts": test.hosts,
+			}
+			cfg := conf.MustNewConfigFrom(m)
+			c := defaultConfig()
+			err := cfg.Unpack(&c)
+			if test.wantErr == "" {
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+			} else {
+				if err == nil {
+					t.Fatalf("expected error containing %q, got nil", test.wantErr)
+				}
+				if !strings.Contains(err.Error(), test.wantErr) {
+					t.Errorf("Unpack() error = %q; want substring %q", err, test.wantErr)
 				}
 			}
 		})

@@ -39,6 +39,8 @@ import (
 )
 
 var (
+	otelDistroBuildDir = "otel/distributions/beats-otel-collector/_build"
+
 	// BeatsWithDashboards is a list of Beats to collect dashboards from.
 	BeatsWithDashboards = []string{
 		"heartbeat",
@@ -144,6 +146,7 @@ func AddLicenseHeaders() error {
 		),
 		licenser(
 			licenser.License("Elastic"),
+			licenser.Exclude(otelDistroBuildDir),
 			licenser.Path("x-pack"),
 		),
 	)
@@ -169,6 +172,7 @@ func CheckLicenseHeaders() error {
 		licenser(
 			licenser.Check(),
 			licenser.License("Elastic"),
+			licenser.Exclude(otelDistroBuildDir),
 			licenser.Path("x-pack"),
 		),
 	)

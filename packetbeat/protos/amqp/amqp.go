@@ -18,6 +18,7 @@
 package amqp
 
 import (
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -34,11 +35,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
 
-var (
-	debugf    = logp.MakeDebug("amqp")
-	detailedf = logp.MakeDebug("amqpdetailed")
-)
-
 type amqpPlugin struct {
 	ports                     []int
 	sendRequest               bool
@@ -53,7 +49,9 @@ type amqpPlugin struct {
 	watcher                   *procs.ProcessesWatcher
 
 	// map containing functions associated with different method numbers
-	methodMap map[codeClass]map[codeMethod]amqpMethod
+	methodMap                              map[codeClass]map[codeMethod]amqpMethod
+	logger, amqpLogger, amqpDetailedLogger *logp.Logger
+	isDebug, isDetailed                    bool
 }
 
 var (
@@ -70,8 +68,16 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &amqpPlugin{}
+	p.logger = logger
+	p.amqpLogger = logger.Named("amqp")
+	p.amqpDetailedLogger = logger.Named("amqpdetailed")
+
+	p.isDebug = p.amqpLogger.IsDebug()
+	p.isDetailed = p.amqpDetailedLogger.IsDebug()
+
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -83,6 +89,20 @@ func New(
 		return nil, err
 	}
 	return p, nil
+}
+
+//go:inline
+func (amqp *amqpPlugin) debugf(format string, args ...interface{}) {
+	if amqp.isDebug {
+		amqp.amqpLogger.Debugf(format, args...)
+	}
+}
+
+//go:inline
+func (amqp *amqpPlugin) detailedf(format string, args ...interface{}) {
+	if amqp.isDetailed {
+		amqp.amqpDetailedLogger.Debugf(format, args...)
+	}
 }
 
 func (amqp *amqpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *amqpConfig) error {
@@ -99,6 +119,10 @@ func (amqp *amqpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWa
 	amqp.results = results
 	amqp.watcher = watcher
 	return nil
+}
+
+func (amqp *amqpPlugin) Close() {
+	amqp.transactions.StopJanitor()
 }
 
 func (amqp *amqpPlugin) initMethodMap() {
@@ -198,7 +222,7 @@ func (amqp *amqpPlugin) ConnectionTimeout() time.Duration {
 func (amqp *amqpPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	detailedf("Parse method triggered")
+	amqp.detailedf("Parse method triggered")
 
 	priv := amqpPrivateData{}
 	if private != nil {
@@ -213,12 +237,13 @@ func (amqp *amqpPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 		priv.data[dir] = &amqpStream{
 			data:    pkt.Payload,
 			message: &amqpMessage{ts: pkt.Ts},
+			logger:  amqp.amqpLogger,
 		}
 	} else {
 		// concatenate data bytes
 		priv.data[dir].data = append(priv.data[dir].data, pkt.Payload...)
 		if len(priv.data[dir].data) > tcp.TCPMaxDataInStream {
-			debugf("Stream data too large, dropping TCP stream")
+			amqp.debugf("Stream data too large, dropping TCP stream")
 			priv.data[dir] = nil
 			return priv
 		}
@@ -248,7 +273,7 @@ func (amqp *amqpPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 
 func (amqp *amqpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-	detailedf("GapInStream called")
+	amqp.detailedf("GapInStream called")
 	return private, true
 }
 
@@ -264,7 +289,7 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.amqp != nil {
-			debugf("Two requests without a Response. Dropping old request: %s", trans.amqp)
+			amqp.debugf("Two requests without a Response. Dropping old request: %s", trans.amqp)
 			unmatchedRequests.Add(1)
 		}
 	} else {
@@ -298,7 +323,7 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 	// any response and publish
 	if isAsynchronous(trans) {
 		amqp.publishTransaction(trans)
-		debugf("Amqp transaction completed")
+		amqp.debugf("Amqp transaction completed")
 		amqp.transactions.Delete(trans.tuple.Hashable())
 		return
 	}
@@ -313,7 +338,7 @@ func (amqp *amqpPlugin) handleAmqpResponse(msg *amqpMessage) {
 	tuple := msg.tcpTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans == nil || trans.amqp == nil {
-		debugf("Response from unknown transaction. Ignoring.")
+		amqp.debugf("Response from unknown transaction. Ignoring.")
 		unmatchedResponses.Add(1)
 		return
 	}
@@ -333,7 +358,7 @@ func (amqp *amqpPlugin) handleAmqpResponse(msg *amqpMessage) {
 
 	amqp.publishTransaction(trans)
 
-	debugf("Amqp transaction completed")
+	amqp.debugf("Amqp transaction completed")
 
 	// remove from map
 	amqp.transactions.Delete(trans.tuple.Hashable())
@@ -343,7 +368,7 @@ func (amqp *amqpPlugin) handleAmqpResponse(msg *amqpMessage) {
 }
 
 func (amqp *amqpPlugin) expireTransaction(trans *amqpTransaction) {
-	debugf("Transaction expired")
+	amqp.debugf("Transaction expired")
 
 	// possibility of a connection.close or channel.close method that didn't get an
 	// ok answer. Let's publish it.
@@ -374,7 +399,7 @@ func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 	// message itself
 	trans.bytesIn = client.bodySize
 
-	if client.bodySize > uint64(amqp.maxBodyLength) {
+	if amqp.maxBodyLength >= 0 && client.bodySize > uint64(amqp.maxBodyLength) {
 		trans.body = client.body[:amqp.maxBodyLength]
 	} else {
 		trans.body = client.body
@@ -384,7 +409,7 @@ func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 
 	trans.amqp = client.fields
 	amqp.publishTransaction(trans)
-	debugf("Amqp transaction completed")
+	amqp.debugf("Amqp transaction completed")
 	// delete trans from map
 	amqp.transactions.Delete(trans.tuple.Hashable())
 }
@@ -408,7 +433,7 @@ func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
 	// message itself
 	trans.bytesOut = server.bodySize
 
-	if server.bodySize > uint64(amqp.maxBodyLength) {
+	if amqp.maxBodyLength >= 0 && server.bodySize > uint64(amqp.maxBodyLength) {
 		trans.body = server.body[:amqp.maxBodyLength]
 	} else {
 		trans.body = server.body
@@ -422,7 +447,7 @@ func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
 	trans.amqp = server.fields
 
 	amqp.publishTransaction(trans)
-	debugf("Amqp transaction completed")
+	amqp.debugf("Amqp transaction completed")
 	// delete trans from map
 	amqp.transactions.Delete(trans.tuple.Hashable())
 }
@@ -435,8 +460,16 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 	evt, pbf := pb.NewBeatEvent(t.ts)
 	pbf.SetSource(&t.src)
 	pbf.SetDestination(&t.dst)
-	pbf.Source.Bytes = int64(t.bytesIn)
-	pbf.Destination.Bytes = int64(t.bytesOut)
+	if t.bytesIn > math.MaxInt64 {
+		pbf.Source.Bytes = math.MaxInt64
+	} else {
+		pbf.Source.Bytes = int64(t.bytesIn)
+	}
+	if t.bytesOut > math.MaxInt64 {
+		pbf.Destination.Bytes = math.MaxInt64
+	} else {
+		pbf.Destination.Bytes = int64(t.bytesOut)
+	}
 	pbf.Event.Start = t.ts
 	pbf.Event.End = t.endTime
 	pbf.Event.Dataset = "amqp"
@@ -542,7 +575,9 @@ func isStringable(m *amqpMessage) bool {
 func (amqp *amqpPlugin) getTransaction(k common.HashableTCPTuple) *amqpTransaction {
 	v := amqp.transactions.Get(k)
 	if v != nil {
-		return v.(*amqpTransaction)
+		if trans, ok := v.(*amqpTransaction); ok {
+			return trans
+		}
 	}
 	return nil
 }

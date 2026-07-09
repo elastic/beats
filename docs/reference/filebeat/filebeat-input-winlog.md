@@ -3,17 +3,11 @@ navigation_title: "winlog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-winlog.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga 9.5+
+  serverless: ga
 ---
 
 # winlog input [filebeat-input-winlog]
-
-
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
 
 Use the `winlog` input to read Windows event logs. It reads from one event log using Windows APIs, filters the events based on user-configured criteria, then sends the event data to the configured outputs. It watches the event log so that new event data is sent in a timely manner. The read position for the event log is persisted to disk to allow the input to resume after restarts.
 
@@ -131,18 +125,18 @@ If this option is specified, the input filters events that are older than the sp
 A boolean flag to indicate that the log contains only events collected from remote hosts using the Windows Event Collector. The value defaults to true for the ForwardedEvents log and false for any other log. **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
-This settings allows Filebeat to optimize reads for forwarded events that are already rendered. When the value is true Filebeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
+This setting allows Filebeat to optimize reads for forwarded events that are already rendered. When the value is true Filebeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
 
 
 ### `event_id` [_event_id]
 
-An allowlist and blocklist of event IDs. The value is a comma-separated list. The accepted values are single event IDs to include (e.g. 4624), a range of event IDs to include (e.g. 4700-4800), and single event IDs to exclude (e.g. -4735). **{This option is only available on operating systems +
+An allowlist and blocklist of event IDs. The value is a comma-separated list. The accepted values are single event IDs to include (for example, `4624`), a range of event IDs to include (for example, `4700-4800`), single event IDs to exclude (for example, `-4735`), and a range of event IDs to exclude (for example, `-4701-4710`). **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
 ```yaml
 - type: winlog
   name: Security
-  event_id: 4624, 4625, 4700-4800, -4735
+  event_id: 4624, 4625, 4700-4800, -4735, -4701-4710
 ```
 
 

@@ -86,7 +86,6 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 
 	// report aggregated status for all sub-components
 	evt := r.calculateOtelStatus()
-	r.emitDummyStatus(evt)
 	componentstatus.ReportStatus(r.host, evt)
 }
 
@@ -103,18 +102,7 @@ func (r *reporter) UpdateStatus(status status.Status, msg string) {
 		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
 	}
 	evt := componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
-	r.emitDummyStatus(evt)
 	componentstatus.ReportStatus(r.host, evt)
-}
-
-func (r *reporter) emitDummyStatus(evt *componentstatus.Event) {
-	oppositeStatus := getOppositeStatus(evt.Status())
-	if oppositeStatus != componentstatus.StatusNone {
-		// emit a dummy event first to ensure the otel core framework acknowledges the change
-		// workaround for https://github.com/open-telemetry/opentelemetry-collector/issues/14282
-		dummyEvt := componentstatus.NewEvent(oppositeStatus)
-		componentstatus.ReportStatus(r.host, dummyEvt)
-	}
 }
 
 // calculateOtelStatus aggregates the statuses of all runners
@@ -172,18 +160,6 @@ type subReporter struct {
 func (m *subReporter) UpdateStatus(status status.Status, msg string) {
 	// report status to its parent
 	m.r.updateStatusForRunner(m.id, status, msg)
-}
-
-// getOppositeStatus returns the opposite status of the given status, and None if no such status exists.
-func getOppositeStatus(status componentstatus.Status) componentstatus.Status {
-	switch status {
-	case componentstatus.StatusOK:
-		return componentstatus.StatusRecoverableError
-	case componentstatus.StatusRecoverableError:
-		return componentstatus.StatusOK
-	default:
-		return componentstatus.StatusNone
-	}
 }
 
 // beatStatusToOtelStatus converts a beat status to an otel status.

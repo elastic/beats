@@ -2,9 +2,9 @@
 
 | Status    |                     |
 | --------- | ------------------- |
-| Stability | [development]: logs |
+| Stability | [alpha]: logs       |
 
-[development]: https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/component-stability.md#development
+[alpha]: https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/component-stability.md#alpha
 
 The Beat processor (`beat`) is an OpenTelemetry Collector processor that wraps the [Beat processors].
 This allows you to use Beat processors like e.g. [add_host_metadata] anywhere in the OpenTelemetry Collector's pipeline, independently of Beat receivers.

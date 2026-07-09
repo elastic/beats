@@ -24,7 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -43,6 +43,11 @@ type journalctl struct {
 	logger   *logp.Logger
 	canceler input.Canceler
 	waitDone sync.WaitGroup
+
+	// Stop chan and StopOnce are used to ensure the stdout reader goroutine
+	// can stop even if nobody is reading from the dataChan.
+	stopCh   chan struct{}
+	stopOnce sync.Once
 }
 
 // NewFactory returns a function that instantiates [journalctl].
@@ -69,16 +74,17 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 			cmd:      cmd,
 			dataChan: make(chan []byte),
 			logger:   logger,
+			stopCh:   make(chan struct{}),
 		}
 
 		var err error
 		jctl.stdout, err = cmd.StdoutPipe()
 		if err != nil {
-			return &journalctl{}, fmt.Errorf("cannot get stdout pipe: %w", err)
+			return nil, fmt.Errorf("cannot get stdout pipe: %w", err)
 		}
 		jctl.stderr, err = cmd.StderrPipe()
 		if err != nil {
-			return &journalctl{}, fmt.Errorf("cannot get stderr pipe: %w", err)
+			return nil, fmt.Errorf("cannot get stderr pipe: %w", err)
 		}
 
 		processCmdLine := strings.Join(append([]string{journalctlPath}, args...), " ")
@@ -92,7 +98,7 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 		// Start the process before trying to read from the pipes
 		// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
 		if err := cmd.Start(); err != nil {
-			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
+			return nil, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
 		}
 
 		jctl.logger = jctl.logger.With(
@@ -138,37 +144,15 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 				data, err := reader.ReadBytes('\n')
 				if err != nil {
 					if !errors.Is(err, io.EOF) {
-						var logError = false
-						var pathError *fs.PathError
-						if errors.As(err, &pathError) {
-							// Because we're reading from the stdout from a process that will
-							// eventually exit, it can happen that when reading we get the
-							// fs.PathError below instead of an io.EOF. This is expected,
-							// it only means the process has exited, its stdout has been
-							// closed and there is nothing else for us to read.
-							// This is expected and does not cause any data loss.
-							// So we log at level debug to have it in our logs if ever needed
-							// while avoiding adding error level logs on user's deployments
-							// for situations that are well handled.
-							if pathError.Op == "read" &&
-								pathError.Path == "|0" &&
-								pathError.Err.Error() == "file already closed" {
-								logger.Debugf("cannot read from journalctl stdout: '%s'", err)
-							} else {
-								logError = true
-							}
-						} else {
-							logError = true
-						}
-						if logError {
-							logger.Errorf("cannot read from journalctl stdout: '%s'", err)
-						}
+						logger.Errorf("cannot read from journalctl stdout: '%s'", err)
 					}
 					return
 				}
 
 				select {
 				case <-jctl.canceler.Done():
+					return
+				case <-jctl.stopCh:
 					return
 				case jctl.dataChan <- data:
 				}
@@ -193,10 +177,26 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 	}
 }
 
-// Kill Terminates the journalctl process using a SIGKILL.
+// Kill terminates the journalctl process by sending SIGKILL, then it
+// blocks until all background goroutines (stdout/stderr readers and
+// the process-wait goroutine) have exited.
 func (j *journalctl) Kill() error {
 	j.logger.Debug("sending SIGKILL to journalctl")
-	return j.cmd.Process.Kill()
+
+	// Signal the stdout reader goroutine to exit, this ensures
+	// j.waitDone.Wait() won't block if the stdout reader goroutine
+	// is trying to send data and nobody is reading from its channel.
+	j.stopOnce.Do(func() {
+		close(j.stopCh)
+	})
+
+	err := j.cmd.Process.Kill()
+	j.waitDone.Wait()
+	if errors.Is(err, os.ErrProcessDone) {
+		return nil
+	}
+
+	return err
 }
 
 // Next returns the next journal entry (as JSON). If `finished` is true, then

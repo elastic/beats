@@ -218,7 +218,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, 
 	}
 
 	if templateComponent.load && !ilmComponent.load && ilmComponent.enabled {
-		return false, "Loading template with ILM settings whithout loading ILM " +
+		return false, "Loading template with ILM settings without loading ILM " +
 			"policy can lead to issues and is not recommended. " +
 			"Check your configuration."
 	}
@@ -251,7 +251,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		return err
 	}
 	if withILM {
-		log.Info("Auto lifecycle enable success.")
+		log.Info("Auto lifecycle enabled successfully.")
 	}
 
 	// create feature objects for ILM and template setup

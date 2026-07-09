@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix add_host_metadata host.geo map sharing across events causing data corruption.
+component: libbeat
+issue: https://github.com/elastic/beats/issues/49721

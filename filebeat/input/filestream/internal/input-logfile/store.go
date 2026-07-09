@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -34,6 +35,9 @@ import (
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
+
+// ErrKeyGone indicates the registry key does not exist (anymore)
+var ErrKeyGone = errors.New("registry key does not exist")
 
 // sourceStore is a store which can access resources using the Source
 // from an input.
@@ -97,7 +101,7 @@ type resource struct {
 	// stateMutex is used to lock the resource when it is update/read from
 	// multiple go-routines like the ACK handler or the input publishing an
 	// event.
-	// stateMutex is used to access the fields 'stored', 'state', 'internalInSync' and 'version'.
+	// It is used to access the fields 'key', 'stored', 'state', 'internalInSync' and 'version'.
 	stateMutex sync.Mutex
 
 	// stored indicates that the state is available in the registry file. It is false for new entries.
@@ -209,6 +213,124 @@ func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
 	return s.store.resetCursor(key, cur)
 }
 
+// IterateOnPrefix iterates over all entries that match this input's prefix.
+// The callback receives the key and cursor metadata for each entry.
+func (s *sourceStore) IterateOnPrefix(fn func(key string, meta any)) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		// MatchesInput is a cheap, lock-free key check, so filter on it first to
+		// avoid locking resources that belong to other inputs.
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		// Take the resource lock once to both check deletion and snapshot
+		// cursorMeta: writers (updateOp.Execute, updateMetadata, UpdateKey) mutate
+		// these while holding only stateMutex, not ephemeralStore.mu, so reading
+		// them without the resource lock would be a data race on the interface value.
+		res.stateMutex.Lock()
+		deleted := res.unsafeIsDeleted()
+		meta := res.cursorMeta
+		res.stateMutex.Unlock()
+		if deleted {
+			continue
+		}
+
+		fn(key, meta)
+	}
+}
+
+// UpdateKey updates an entry from oldKey to newKey with updated metadata.
+// This is used by the growing fingerprint migration (see
+// fileProspector.migrateGrowingFingerprint) to update the registry key when
+// a file's fingerprint grows.
+//
+// This operation updates the key IN PLACE without requiring the resource lock.
+// This is safe because:
+//   - We hold the ephemeral store mutex, preventing concurrent table modifications
+//   - We hold the resource's stateMutex while modifying state fields
+//   - The harvester holding the resource lock continues to work with the same
+//     *resource pointer - only the key field and table entry change
+//   - Cursor updates from the harvester continue to work on the same resource
+func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	res := s.store.ephemeralStore.table[oldKey]
+	if res == nil {
+		return fmt.Errorf("old key %s: %w", oldKey, ErrKeyGone)
+	}
+
+	if res.isDeleted() {
+		return fmt.Errorf("old key %s is deleted: %w", oldKey, ErrKeyGone)
+	}
+
+	// Check if new key already exists
+	if existing := s.store.ephemeralStore.table[newKey]; existing != nil && !existing.isDeleted() {
+		return fmt.Errorf("new key %s already exists", newKey)
+	}
+
+	res.stateMutex.Lock()
+	defer res.stateMutex.Unlock()
+
+	oldKeyValue := res.key
+	oldMeta := res.cursorMeta
+	oldStored := res.stored
+	res.key = newKey
+	res.cursorMeta = meta
+	res.stored = false
+	// The entry belongs to a live, just-scanned file; refresh Updated so the migrated entry is not
+	// immediately eligible for clean_inactive gc.
+	res.internalState.Updated = time.Now()
+
+	// Update the table: remove old entry, add new entry with same resource.
+	s.store.ephemeralStore.table[newKey] = res
+	delete(s.store.ephemeralStore.table, oldKey)
+
+	// Persist the entry under the new key BEFORE removing the old one, so a
+	// crash between the two leaves the state recoverable under newKey. This
+	// mirrors the ordering in UpdateIdentifiers/TakeOver. writeState sets
+	// res.stored=true only on a successful write.
+	s.store.writeState(res)
+	if !res.stored {
+		// The write under newKey failed. Roll back so memory and disk agree on oldKey again.
+		res.key = oldKeyValue
+		res.cursorMeta = oldMeta
+		res.stored = oldStored
+		s.store.ephemeralStore.table[oldKeyValue] = res
+		delete(s.store.ephemeralStore.table, newKey)
+		return fmt.Errorf(
+			"UpdateKey: failed to persist new key %q; keeping old key %q to avoid state loss",
+			newKey, oldKeyValue)
+	}
+
+	// Best-effort cleanup: newKey is already durable and the table is swapped.
+	// Returning an error here can't undo the migration.
+	// See also: UpdateIdentifiers and TakeOver remove the old key the same best-effort way.
+	// The persistent store has no atomic multi-key write, so a crash between the newKey write and
+	// this removal can leave a stale oldKey that later prefix-matches another file.
+	if err := s.store.persistentStore.Remove(oldKeyValue); err != nil {
+		s.store.log.Errorf(
+			"UpdateKey: failed to remove old key %q from persistent store: %v",
+			oldKeyValue, err)
+	}
+
+	return nil
+}
+
+// KeyExists returns true if a non-deleted entry exists for the given key.
+// Unlike FindCursorMeta, this performs no Retain/Release and no deserialization.
+func (s *sourceStore) KeyExists(key string) bool {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+	if res := s.store.ephemeralStore.table[key]; res != nil {
+		return !res.isDeleted()
+	}
+	return false
+}
+
 // CleanIf sets the TTL of a resource if the predicate return true.
 func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	s.store.ephemeralStore.mu.Lock()
@@ -298,16 +420,15 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 // Filestream inputs or the Log input. fn should return the new registry ID
 // and new CursorMeta. If fn returns an empty string, the entry is skipped.
 //
-// When fn returns a valid ID, the old resource is removed from both,
-// the in-memory and persistent store. The operations are synchronous.
-//
-// If the resource migrated was from the Log input, `TakeOver` will
-// remove it from the persistent store, however the Log input reigstrar
-// will write it back when Filebeat is shutting down. However,
-// there is a mechanism in place to detect this situation and avoid
-// migrating the same state over and over again.
-// See the comments on this method for more details.
+// When fn returns a valid ID:
+//   - If the old resource was from a Filestream input, it is removed from both
+//     the in-memory and disk store.
+//   - If it was from a Log input, it is left untouched.
 func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
+	// Lock the ephemeral store so we can migrate the states in one go
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
 	matchPreviousFilestreamIDs := func(key string) bool {
 		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {
@@ -358,44 +479,6 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 					return true, err
 				}
 
-				// That is a workaround for the problems with the
-				// Log input Registrar (`filebeat/registrar`) and the way it
-				// handles states.
-				// There are two problems:
-				//  - 1. The Log input store/registrar does not have an API for
-				//       removing states
-				//  - 2. When `registrar.Registrar` starts, it copies all states
-				//       belonging to the Log input from the disk store into
-				//       memory and when the Registrar is shutting down, it
-				//       writes all states to the disk. This all happens even
-				//       if no Log input was ever started.
-				// This means that no matter what we do here, the states from
-				// the Log input are always re-written to disk.
-				// See: filebeat/registrar/registrar.go, deferred statement on
-				// `Registrar.Run`.
-				//
-				// However, there is a "reset state" code, that runs
-				// during the Registrar initialisation and sets the
-				// TTL to -2, once the Log input havesting that file starts
-				// the TTL is set to -1 (never expires) or the configured
-				// value.
-				// See: filebeat/registrar/registrar.go (readStatesFrom) and
-				// filebeat/beater/filebeat.go (registrar.Start())
-				//
-				// This means that while the Log input is running and the file
-				// has been active at any moment during the Filebeat's execution
-				// the TTL is never going to be -2 during the shutdown.
-				//
-				// So, if TTL == -2, then in the previous run of Filebeat, there
-				// was no Log input using this state, which likely means, it is
-				// a state that has already been migrated to Filestream.
-				//
-				// The worst case that can happen is that we re-ingest the file
-				// once, which is still better than copying an old state with
-				// an incorrect offset every time Filebeat starts.
-				if logSt.TTL == -2 {
-					return true, nil
-				}
 				st.Key = key
 				fromLogInput[key] = st
 			}
@@ -403,10 +486,6 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			return true, nil
 		})
 	}
-
-	// Lock the ephemeral store so we can migrate the states in one go
-	s.store.ephemeralStore.mu.Lock()
-	defer s.store.ephemeralStore.mu.Unlock()
 
 	// Migrate all states from the Filestream input
 	for k := range fromFilestreamInput {
@@ -423,11 +502,19 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			continue
 		}
 
+		// cleanup must be called on any "exit point" from this loop iteration.
+		// It is responsible for correctly releasing the locked resource.
+		cleanup := func() {
+			res.Release()
+			res.lock.Unlock()
+		}
+
 		st, err := newTakeOverState(inpFile.State{}, res)
 		if err != nil {
 			// This should never happen. newTakeOverState can only fail if
 			// Filestream state format has changed
 			s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+			cleanup()
 			continue
 		}
 		newKey, updatedMeta := fn(st)
@@ -436,7 +523,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			// Unlock the resource and return
 			if res := s.store.ephemeralStore.unsafeFind(newKey, false); res != nil {
 				res.Release()
-				res.lock.Unlock()
+				cleanup()
 				continue
 			}
 
@@ -466,16 +553,24 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
 		}
 
-		res.Release()
-		res.lock.Unlock()
+		cleanup()
 	}
 
 	// Migrate all states from the Log input
 	for k, v := range fromLogInput {
 		newKey, updatedMeta := fn(v)
 		if len(newKey) > 0 {
-			// Find or create a resource. It should always create a new one.
 			res := s.store.ephemeralStore.unsafeFind(newKey, true)
+
+			// If the new key already exists in the store, the file has already
+			// been taken over. Skip it to avoid overwriting a valid Filestream
+			// state with a potentially stale Log input state.
+			if !res.IsNew() {
+				res.Release()
+				s.store.log.Infof("state for '%s' already exists as '%s', skipping takeover from Log input", k, newKey)
+				continue
+			}
+
 			res.cursorMeta = updatedMeta
 			// Convert the offset to the correct type
 			res.cursor = struct {
@@ -490,13 +585,6 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			// Update in-memory store
 			s.store.ephemeralStore.table[newKey] = res
 
-			// "remove" from the disk store.
-			// It will add a remove entry in the log file for this key, however
-			// the Registrar used by the Log input will write to disk all states
-			// it read when Filebeat was starting, thus "overriding" this delete.
-			// We keep it here because when we remove the Log input we will ensure
-			// the entry is actually remove from the disk store.
-			_ = s.store.persistentStore.Remove(k)
 			res.Release()
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
 		}
@@ -558,7 +646,7 @@ func (s *store) Release() {
 
 func (s *store) close() {
 	if err := s.persistentStore.Close(); err != nil {
-		s.log.Errorf("Closing registry store did report an error: %+v", err)
+		s.log.Errorf("Closing registry store reported an error: %+v", err)
 	}
 }
 
@@ -574,7 +662,8 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
-	return typeconv.Convert(to, resource.cursorMeta)
+	defer resource.Release()
+	return resource.UnpackCursorMeta(to)
 }
 
 // updateMetadata updates the cursor metadata in the persistent store.
@@ -583,11 +672,13 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
+	defer resource.Release()
+
+	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
 
 	resource.cursorMeta = meta
-
 	s.writeState(resource)
-	resource.Release()
 	return nil
 }
 
@@ -761,6 +852,8 @@ func (r *resource) UnpackCursor(to interface{}) error {
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
 func (r *resource) UnpackCursorMeta(to interface{}) error {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.cursorMeta)
 }
 
@@ -802,24 +895,12 @@ func (r *resource) copyInto(dst *resource) {
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {
-	internalState := r.internalState
-
-	// This is required to prevent the cleaner from removing the
-	// entry from the registry immediately.
-	// It still might be removed if the output is blocked for a long
-	// time. If removed the whole file is resent to the output when found/updated.
-	internalState.Updated = time.Now()
-	return &resource{
-		key:                    key,
-		stored:                 r.stored,
-		internalState:          internalState,
-		activeCursorOperations: r.activeCursorOperations,
-		cursor:                 r.cursor,
-		pendingCursorValue:     nil,
-		pendingUpdate:          nil,
-		cursorMeta:             r.cursorMeta,
-		lock:                   unison.MakeMutex(),
+	dst := &resource{
+		key:  key,
+		lock: unison.MakeMutex(),
 	}
+	r.copyInto(dst)
+	return dst
 }
 
 // pendingCursor returns the current published cursor state not yet ACKed.
@@ -870,7 +951,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		var st state
 		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
+			log.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
 				key, err)
 			return true, nil
 		}

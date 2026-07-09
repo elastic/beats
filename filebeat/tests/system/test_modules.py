@@ -5,12 +5,19 @@ import os
 import unittest
 import glob
 import subprocess
+import time
 
 import json
 import logging
 from parameterized import parameterized
 from elasticsearch import Elasticsearch, NotFoundError
 from deepdiff import DeepDiff
+
+# Maximum time (seconds) Filebeat is allowed to ingest a module's test file.
+# Inputs started with --once exit as soon as the file is fully read; tailing
+# inputs (journald, filestream) never exit, so the test stops Filebeat once the
+# expected events have been indexed or this timeout elapses.
+MODULE_INGEST_TIMEOUT = 60
 
 # datasets for which @timestamp is removed due to date missing
 remove_timestamp = {
@@ -24,6 +31,7 @@ remove_timestamp = {
     "cisco.nexus",
     "citrix.netscaler",
     "cylance.protect",
+    "elasticsearch.querylog",
     "f5.bigipafm",
     "fortinet.clientendpoint",
     "haproxy.log",
@@ -120,6 +128,11 @@ def load_fileset_test_cases():
     return test_cases
 
 
+def module_uses_filestream_input(module, fileset):
+    """Filesets that only define filestream inputs need the same flags as RUN_AS_FILESTREAM."""
+    return module == "elasticsearch" and fileset == "querylog"
+
+
 class Test(BaseTest):
 
     def init(self):
@@ -191,7 +204,7 @@ class Test(BaseTest):
         # if the test file contains '.journal', later it will try to remove
         # the '--once' flag and the journald input will be used,
         # so there is nothing to do here.
-        if log_as_filestream() and ".journal" not in test_file:
+        if (log_as_filestream() or module_uses_filestream_input(module, fileset)) and ".journal" not in test_file:
             cmd.append("-E")
             cmd.append("features.log_input_run_as_filestream.enabled=true")
             cmd.append("-M")
@@ -220,6 +233,18 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file))
 
+        # elasticsearch/querylog sets a data stream index on the input; override
+        # so events land in the test index (same as output.elasticsearch.index).
+        if module == "elasticsearch" and fileset == "querylog":
+            cmd.extend(
+                [
+                    "-M",
+                    "{module}.{fileset}.input.index={index_name}".format(
+                        module=module, fileset=fileset, index_name=self.index_name
+                    ),
+                ]
+            )
+
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
         with open(os.path.join(output_path, "output.log"), "ab") as output:
@@ -240,17 +265,19 @@ class Test(BaseTest):
                                     stdout=output,
                                     stderr=subprocess.STDOUT,
                                     bufsize=0)
-            # The journald input (used by some modules like 'system') does not
-            # support the --once flag, hence we run Filebeat for at most
-            # 15 seconds, if it does not finish, then kill the process.
-            # If for any reason the Filebeat process gets stuck, only SIGKILL
-            # will terminate it. We use SIGKILL to avoid leaking any running
-            # process that could interfere with other tests
-            try:
-                proc.wait(15)
-            except subprocess.TimeoutExpired:
-                # Send SIGKILL
-                proc.kill()
+            if "--once" in cmd:
+                # Process will exit on its own once the file is fully read. Wait the maximum time,
+                # if it doesn't exit by then, kill it to avoid leaking a process.
+                try:
+                    proc.wait(MODULE_INGEST_TIMEOUT)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.wait()
+            else:
+                # The journald and filestream inputs do not support --once and
+                # tail the file forever. Stop filebeat once elasticsearch has
+                # indexed the expected number of events (or the timeout elapses).
+                self._wait_for_events_then_stop(proc, test_file, MODULE_INGEST_TIMEOUT)
 
         # List of errors to check in filebeat output logs
         errors = ["error loading pipeline for fileset"]
@@ -287,11 +314,43 @@ class Test(BaseTest):
                 pass
             else:
                 # Remove some fields if running the Filestream input
-                if log_as_filestream():
+                if log_as_filestream() or module_uses_filestream_input(module, fileset):
                     remove_filestream_fields(objects)
                 self.assert_fields_are_documented(obj)
 
         self._test_expected_events(test_file, objects)
+
+    def _wait_for_events_then_stop(self, proc, test_file, timeout):
+        expected = self._expected_event_count(test_file)
+        deadline = time.monotonic() + timeout
+        try:
+            while time.monotonic() < deadline:
+                if proc.poll() is not None:
+                    # Filebeat exited on its own; nothing left to stop.
+                    return
+                if expected is not None and self._indexed_event_count() >= expected:
+                    break
+                time.sleep(0.5)
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+            proc.wait()
+
+    def _expected_event_count(self, test_file):
+        if os.getenv("GENERATE"):
+            return None
+        try:
+            with open(test_file + "-expected.json", "r") as f:
+                return len(json.load(f))
+        except (FileNotFoundError, ValueError):
+            return None
+
+    def _indexed_event_count(self):
+        try:
+            self.es.indices.refresh(index=self.index_name)
+            return self.es.count(index=self.index_name)["count"]
+        except NotFoundError:
+            return 0
 
     def _test_expected_events(self, test_file, objects):
 
@@ -329,8 +388,10 @@ class Test(BaseTest):
             ev = expected[idx]
             obj = objects[idx]
 
-            # Flatten objects for easier comparing
+            # Flatten objects for easier comparing (clean_keys expects dot notation;
+            # goldens may be nested JSON or pre-flattened like apache/access).
             obj = self.flatten_object(obj, {}, "")
+            ev = self.flatten_object(ev, {}, "")
             clean_keys(obj)
             clean_keys(ev)
 
@@ -366,8 +427,9 @@ def clean_keys(obj):
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
-    if log_as_filestream() and "tags" in obj:
-        obj["tags"].remove("take_over")
+    if (log_as_filestream() or obj.get("event.dataset") == "elasticsearch.querylog") and "tags" in obj:
+        if "take_over" in obj["tags"]:
+            obj["tags"].remove("take_over")
         if len(obj["tags"]) == 0:
             delete_key(obj, "tags")
 

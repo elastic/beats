@@ -12,7 +12,7 @@ applies_to:
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-If you are starting development of a new custom HTTP API input, we recommend that you use the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md) which provides greater flexibility and an improved developer experience.
+If you are starting development of a new custom HTTP API input, we recommend that you use the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md) which provides greater flexibility and an improved developer experience. Existing `httpjson` inputs can be migrated to CEL using the [`run_as_cel`](#run-as-cel) option.
 
 This input supports:
 
@@ -735,12 +735,23 @@ The maximum time to wait before a retry is attempted. Default: `60s`.
 
 ### `request.redirect.forward_headers` [_request_redirect_forward_headers]
 
-When set to `true` request headers are forwarded in case of a redirect. Default: `false`.
+When set to `true` request headers are forwarded in case of a redirect. Headers listed in `redirect.sensitive_headers` are removed automatically on cross-origin or HTTPS-to-HTTP redirects. Default: `false`.
 
 
 ### `request.redirect.headers_ban_list` [_request_redirect_headers_ban_list]
 
 When `redirect.forward_headers` is set to `true`, all headers *except* the ones defined in this list will be forwarded. Default: `[]`.
+
+
+### `request.redirect.sensitive_headers` [_request_redirect_sensitive_headers]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+A list of header names that are automatically removed when a redirect crosses to a different host or downgrades from HTTPS to HTTP. This prevents credential leakage to unintended origins. Default: `["Authorization", "Proxy-Authorization", "Cookie"]`.
+
+Set to `[]` to disable cross-origin header stripping and forward all headers regardless of the redirect target (not recommended unless the target shares the same authentication domain).
 
 
 ### `request.redirect.max_redirects` [_request_redirect_max_redirects]
@@ -1005,6 +1016,22 @@ Nested split operation. Split operations can be nested at will. An event won’t
 ### `response.request_body_on_pagination` [_response_request_body_on_pagination]
 
 If set to true, the values in `request.body` are sent for pagination requests. Default: `false`.
+
+
+### `response.pagination_allowed_hosts` [response-pagination-allowed-hosts]
+
+An optional list of additional origins that pagination URLs are allowed to target. By default, pagination URLs derived from API responses (via `set` with `target: url.value`) must share the same origin (scheme, hostname, and port) as the configured `request.url`. If a remote API legitimately returns pagination URLs on a different origin (for example, a CDN), list those origins here.
+
+Each entry must include a scheme and a host, and may include a port. Example:
+
+```yaml
+response:
+  pagination_allowed_hosts:
+    - "https://cdn.provider.com"
+    - "https://api-secondary.provider.com:8443"
+```
+
+Default: empty (only URLs matching the configured `request.url` origin are accepted).
 
 
 ### `response.pagination` [response-pagination]
@@ -1499,7 +1526,7 @@ Example:
     }
     ```
 
-    This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
+    This behavior of targeted fixed pattern replacement in the url helps solve various use cases.
 
 
 **Some useful points to remember:**
@@ -1727,6 +1754,123 @@ filebeat.inputs:
         fields: ["message"]
         target: "json"
 ```
+
+
+### `run_as_cel` [run-as-cel]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+When set to `true`, the input is transparently redirected to the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md). This allows an existing `httpjson` configuration to run under the CEL engine without changing the input `type`. A `cel.program` must be provided when this option is enabled.
+
+Shared configuration fields are automatically translated to their CEL equivalents:
+
+| httpjson field | CEL field |
+| --- | --- |
+| `interval` | `interval` |
+| `id` | `id` |
+| `request.url` | `resource.url` |
+| `request.timeout` | `resource.timeout` |
+| `request.ssl` | `resource.ssl` |
+| `request.proxy_url` | `resource.proxy_url` |
+| `request.proxy_headers` | `resource.proxy_headers` |
+| `request.proxy_disable` | `resource.proxy_disable` |
+| `request.idle_connection_timeout` | `resource.idle_connection_timeout` |
+| `request.keep_alive` | `resource.keep_alive` |
+| `request.retry` | `resource.retry` |
+| `request.redirect` | `resource.redirect` |
+| `request.tracer` | `resource.tracer` |
+| `auth` | `auth` |
+
+Fields that are specific to httpjson (such as `request.transforms`, `response.transforms`, `response.split`, `response.pagination`, and `chain`) are not transferred and have no effect when `run_as_cel` is enabled. The CEL program is responsible for equivalent logic.
+
+If the httpjson input has existing cursor state, it is automatically carried over to the CEL input on the first run. After that first run the CEL input writes its own cursor, and all subsequent runs, whether the next interval or after a restart, read from the CEL cursor. The original httpjson cursor is not modified, so removing `run_as_cel` restores the original httpjson behavior with its last cursor intact.
+
+Default: `false`.
+
+
+### `cel.program` [cel-program]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+The CEL program to execute when [`run_as_cel`](#run-as-cel) is enabled. This is the same program format used by the [CEL input's `program` field](/reference/filebeat/filebeat-input-cel.md). Required when `run_as_cel` is `true`.
+
+
+### `cel.state` [cel-state]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+Initial state for the CEL program, equivalent to the [CEL input's `state` field](/reference/filebeat/filebeat-input-cel.md). May include an initial `cursor` object that is used as the bootstrap value on the first execution when no stored cursor exists.
+
+
+### `cel.max_executions` [cel-max-executions]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+The maximum number of CEL program executions per interval. Equivalent to the [CEL input's `max_executions` field](/reference/filebeat/filebeat-input-cel.md). Default: `1000`.
+
+
+### `cel.regexp` [cel-regexp]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+A map of named regular expression patterns available to the CEL program. Equivalent to the [CEL input's `regexp` field](/reference/filebeat/filebeat-input-cel.md).
+
+
+### `cel.xsd` [cel-xsd]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+A map of named XSD schemas for XML decoding in the CEL program. Equivalent to the [CEL input's `xsd` field](/reference/filebeat/filebeat-input-cel.md).
+
+
+### `cel.redact` [cel-redact]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+Redaction configuration for the CEL program. Equivalent to the [CEL input's `redact` field](/reference/filebeat/filebeat-input-cel.md).
+
+::::{admonition} Example: migrating an httpjson input to CEL
+```yaml
+filebeat.inputs:
+- type: httpjson
+  id: my-api-input
+  interval: 60s
+  run_as_cel: true
+  request.url: https://api.example.com/events
+  auth.oauth2:
+    client.id: my-client-id
+    client.secret: my-client-secret
+    token_url: https://auth.example.com/oauth2/token
+  request.ssl.verification_mode: full
+  request.timeout: 30s
+  cel.program: |
+    state.url.with({
+        "Header": {"Accept": ["application/json"]},
+    }).as(req, request("GET", req).as(resp,
+        bytes(resp.Body).decode_json().as(body, {
+            "events": body.items.map(e, {"message": e.encode_json()}),
+            "cursor": {"since": body.items[body.items.size()-1].updated_at},
+        })
+    ))
+  cel.state:
+    cursor:
+      since: "2024-01-01T00:00:00Z"
+```
+::::
 
 
 ## Request life cycle [_request_life_cycle]

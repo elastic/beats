@@ -21,9 +21,22 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/Masterminds/semver"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var testOsqueryVersion = distro.OsquerydVersion()
+
+func nextPatchVersion(version string) string {
+	parsed, err := semver.NewVersion(version)
+	if err != nil {
+		return version
+	}
+	next := parsed.IncPatch()
+	return (&next).String()
+}
 
 func testInstallConfig(url, sha string) config.InstallConfig {
 	cfg := config.InstallConfig{
@@ -129,7 +142,7 @@ func TestExtractArtifactUnsupportedFormat(t *testing.T) {
 }
 
 func TestExtractArtifactFromSignedURLPath(t *testing.T) {
-	artifactBytes := buildTarGzArtifact(t, "5.19.0", true)
+	artifactBytes := buildTarGzArtifact(t, testOsqueryVersion, true)
 	artifactFile := filepath.Join(t.TempDir(), "artifact.tar.gz")
 	if err := os.WriteFile(artifactFile, artifactBytes, 0600); err != nil {
 		t.Fatalf("write artifact failed: %v", err)
@@ -240,7 +253,7 @@ func TestEnsureReuseInstalledByChecksum(t *testing.T) {
 	}
 
 	log := logp.NewLogger("artifact_test")
-	version := "5.19.0"
+	version := testOsqueryVersion
 	artifactBytes := buildTarGzArtifact(t, version, true)
 	sum := sha256.Sum256(artifactBytes)
 	sha := hex.EncodeToString(sum[:])
@@ -281,8 +294,8 @@ func TestEnsureChecksumUpdateCleansOldRelease(t *testing.T) {
 	}
 
 	log := logp.NewLogger("artifact_test")
-	artifactV1 := buildTarGzArtifact(t, "5.19.0", true)
-	artifactV2 := buildTarGzArtifact(t, "5.20.0", true)
+	artifactV1 := buildTarGzArtifact(t, testOsqueryVersion, true)
+	artifactV2 := buildTarGzArtifact(t, nextPatchVersion(testOsqueryVersion), true)
 
 	sum1 := sha256.Sum256(artifactV1)
 	sha1 := hex.EncodeToString(sum1[:])
@@ -332,7 +345,7 @@ func TestEnsureConcurrentCallsUseSingleInstallFlow(t *testing.T) {
 	}
 
 	log := logp.NewLogger("artifact_test")
-	version := "5.19.0"
+	version := testOsqueryVersion
 	artifactBytes := buildTarGzArtifact(t, version, true)
 	sum := sha256.Sum256(artifactBytes)
 	sha := hex.EncodeToString(sum[:])
@@ -405,7 +418,7 @@ func TestEnsureWithoutExtensionInArtifactSucceeds(t *testing.T) {
 	}
 
 	log := logp.NewLogger("artifact_test")
-	version := "5.19.0"
+	version := testOsqueryVersion
 	artifactBytes := buildTarGzArtifact(t, version, false)
 	sum := sha256.Sum256(artifactBytes)
 	sha := hex.EncodeToString(sum[:])
@@ -432,7 +445,7 @@ func TestEnsurePersistsMinimalRuntimePayload(t *testing.T) {
 	}
 
 	log := logp.NewLogger("artifact_test")
-	version := "5.19.0"
+	version := testOsqueryVersion
 	artifactBytes := buildTarGzArtifactWithExtra(t, version, "docs/README.txt", []byte("extra"))
 	sum := sha256.Sum256(artifactBytes)
 	sha := hex.EncodeToString(sum[:])
@@ -501,8 +514,8 @@ func TestEnsureConcurrentCallsWithDifferentSHAs(t *testing.T) {
 	}
 
 	log := logp.NewLogger("artifact_test")
-	artifactV1 := buildTarGzArtifact(t, "5.19.0", true)
-	artifactV2 := buildTarGzArtifact(t, "5.20.0", true)
+	artifactV1 := buildTarGzArtifact(t, testOsqueryVersion, true)
+	artifactV2 := buildTarGzArtifact(t, nextPatchVersion(testOsqueryVersion), true)
 
 	sum1 := sha256.Sum256(artifactV1)
 	sha1 := hex.EncodeToString(sum1[:])

@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -68,15 +69,7 @@ type Autodiscover struct {
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
-func NewAutodiscover(
-	name string,
-	pipeline beat.PipelineConnector,
-	factory cfgfile.RunnerFactory,
-	configurer EventConfigurer,
-	c *Config,
-	keystore keystore.Keystore,
-	logger *logp.Logger,
-) (*Autodiscover, error) {
+func NewAutodiscover(name string, pipeline beat.PipelineConnector, factory cfgfile.RunnerFactory, configurer EventConfigurer, c *Config, keystore keystore.Keystore, logger *logp.Logger, path *paths.Path) (*Autodiscover, error) {
 	logger = logger.Named("autodiscover")
 
 	// Init Event bus
@@ -85,7 +78,7 @@ func NewAutodiscover(
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range c.Providers {
-		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
+		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore, path)
 		if err != nil {
 			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}

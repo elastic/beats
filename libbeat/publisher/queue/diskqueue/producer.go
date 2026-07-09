@@ -18,6 +18,9 @@
 package diskqueue
 
 import (
+	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -36,6 +39,12 @@ type diskQueueProducer struct {
 	// already-closed channel, which would panic.)
 	cancelled bool
 	done      chan struct{}
+
+	// ackWait is closed when Close is called. The disk queue persists events
+	// durably and does not track per-producer in-memory acknowledgments, so
+	// there is nothing to wait for beyond Close itself.
+	ackWait chan struct{}
+	ackOnce sync.Once
 }
 
 // A request sent from a producer to the core loop to add a frame to the queue.
@@ -49,16 +58,16 @@ type producerWriteRequest struct {
 // diskQueueProducer implementation of the queue.Producer interface
 //
 
-func (producer *diskQueueProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+func (producer *diskQueueProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
 	return 0, producer.publish(event, true)
 }
 
-func (producer *diskQueueProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+func (producer *diskQueueProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {
 	return 0, producer.publish(event, false)
 }
 
 func (producer *diskQueueProducer) publish(
-	event queue.Entry, shouldBlock bool,
+	event publisher.Event, shouldBlock bool,
 ) bool {
 	if producer.cancelled {
 		return false
@@ -95,9 +104,16 @@ func (producer *diskQueueProducer) publish(
 }
 
 func (producer *diskQueueProducer) Close() {
+	// Resolve ackWait immediately rather than waiting for the queue to drain.
+	// The disk queue is durable and can hold a very large (multi-GB) backlog.
+	producer.ackOnce.Do(func() { close(producer.ackWait) })
 	if producer.cancelled {
 		return
 	}
 	producer.cancelled = true
 	close(producer.done)
+}
+
+func (producer *diskQueueProducer) ACKWaitChan() <-chan struct{} {
+	return producer.ackWait
 }

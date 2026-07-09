@@ -16,13 +16,19 @@ var (
 )
 
 type conf struct {
-	Provider string `config:"provider" validate:"required"`
+	Provider        string `config:"provider" validate:"required"`
+	UseMinimalState bool   `config:"use_minimal_state"`
 }
 
 func (c *conf) Validate() error {
+	if c.UseMinimalState {
+		if !provider.HasMinimalStateProvider(c.Provider) {
+			return ErrProviderUnknown
+		}
+		return nil
+	}
 	if !provider.Has(c.Provider) {
 		return ErrProviderUnknown
 	}
-
 	return nil
 }

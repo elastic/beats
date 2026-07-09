@@ -7,6 +7,7 @@ on:
 permissions:
   actions: read
   contents: read
+  copilot-requests: write
   issues: write
   pull-requests: read
 
@@ -14,6 +15,7 @@ jobs:
   run:
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
     with:
+      report-failure-as-issue: false
       title-prefix: "[libbeat-pipeline-lifecycle]"
       severity-threshold: "high"
       additional-instructions: |
@@ -96,5 +98,3 @@ jobs:
           the fix direction
         - A note on which issues are only detectable under `-race` vs reproducible deterministically
         - Any components you audited and found clean
-    secrets:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

@@ -20,14 +20,21 @@ package stress
 import (
 	"context"
 	"math/rand/v2"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+// AckedEventCount is incremented for every event ACKed by the test output.
+// Reset and read by the stress harness around a timed run so callers can
+// derive an events-per-second figure for a given (gen, pipeline, out)
+// configuration. Exported so external test runners (e.g. a wrapper that
+// drives memqueue and slabqueue side-by-side) can read it.
+var AckedEventCount atomic.Uint64
 
 type testOutput struct {
 	config     testOutputConfig
@@ -56,7 +63,7 @@ func init() {
 	outputs.RegisterType("test", makeTestOutput)
 }
 
-func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *conf.C, beatPaths *paths.Path) (outputs.Group, error) {
+func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *conf.C) (outputs.Group, error) {
 	config := defaultTestOutputConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)
@@ -68,7 +75,7 @@ func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Obs
 		clients[i] = client
 	}
 
-	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, nil, beat.Logger, beatPaths, clients...)
+	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, nil, beat.Logger, beat.Paths, clients...)
 }
 
 func (*testOutput) Close() error { return nil }
@@ -106,6 +113,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	// ack complete batch
 	batch.ACK()
 	t.observer.AckedEvents(n)
+	AckedEventCount.Add(uint64(n))
 
 	return nil
 }

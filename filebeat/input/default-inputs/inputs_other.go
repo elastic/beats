@@ -22,11 +22,10 @@ package inputs
 import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type osComponents interface{}
 
-func osInputs(info beat.Info, log *logp.Logger, components osComponents) []v2.Plugin {
+func osInputs(_ beat.Info, _ osComponents) []v2.Plugin {
 	return []v2.Plugin{}
 }

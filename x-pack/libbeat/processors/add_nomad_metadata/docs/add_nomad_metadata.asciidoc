@@ -86,7 +86,7 @@ in each event.
 Indexers use allocation metadata to create unique identifiers for each one of
 the pods.
 
-Avaliable indexers are:
+Available indexers are:
 `allocation_name`:: Identifies allocations by its name and namespace (as
 `<namespace>/<name>`)
 `allocation_uuid`:: Identifies allocations by its unique identifier.

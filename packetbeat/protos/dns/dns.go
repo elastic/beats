@@ -198,7 +198,12 @@ func (t *dnsTuple) revHashable() hashableDNSTuple {
 func (dns *dnsPlugin) getTransaction(k hashableDNSTuple) *dnsTransaction {
 	v := dns.transactions.Get(k)
 	if v != nil {
-		return v.(*dnsTransaction)
+		trans, ok := v.(*dnsTransaction)
+		if !ok {
+			dns.logger.Errorf("Value for key %v is not a *dnsTransaction", k)
+			return nil
+		}
+		return trans
 	}
 	return nil
 }
@@ -219,8 +224,8 @@ func init() {
 	protos.Register("dns", New)
 }
 
-func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
-	p := &dnsPlugin{logger: logp.NewLogger("dns")}
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C, logger *logp.Logger) (protos.Plugin, error) {
+	p := &dnsPlugin{logger: logger.Named("dns")}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -279,9 +284,18 @@ func newTransaction(ts time.Time, tuple dnsTuple, cmd common.ProcessTuple) *dnsT
 func (dns *dnsPlugin) deleteTransaction(k hashableDNSTuple) *dnsTransaction {
 	v := dns.transactions.Delete(k)
 	if v != nil {
-		return v.(*dnsTransaction)
+		trans, ok := v.(*dnsTransaction)
+		if !ok {
+			dns.logger.Errorf("Deleted value for key %v is not a *dnsTransaction", k)
+			return nil
+		}
+		return trans
 	}
 	return nil
+}
+
+func (dns *dnsPlugin) Close() {
+	dns.transactions.StopJanitor()
 }
 
 func (dns *dnsPlugin) GetPorts() []int {
