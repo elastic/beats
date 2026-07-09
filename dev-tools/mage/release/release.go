@@ -43,7 +43,7 @@ func UpdateVersion(newVersion string) error {
 		return fmt.Errorf("version pattern not found in %s", versionFile)
 	}
 
-	err = os.WriteFile(versionFile, []byte(newContent), 0644)
+	err = os.WriteFile(versionFile, []byte(newContent), 0644) //nolint:gosec // G703: fixed release tooling path, not user-controlled
 	if err != nil {
 		return fmt.Errorf("failed to write %s: %w", versionFile, err)
 	}
@@ -138,7 +138,7 @@ func UpdateTestEnv(latestVersion, currentVersion string) error {
 		newContent := pattern.ReplaceAllString(string(content), replacement)
 
 		if newContent != string(content) {
-			err = os.WriteFile(filePath, []byte(newContent), 0644)
+			err = os.WriteFile(filePath, []byte(newContent), 0644) //nolint:gosec // G703: fixed release tooling path, not user-controlled
 			if err != nil {
 				return fmt.Errorf("failed to write %s: %w", filePath, err)
 			}
@@ -175,7 +175,7 @@ func applyReplacements(filePath string, rules []replacementRule) error {
 	}
 
 	if newContent != string(content) {
-		err = os.WriteFile(filePath, []byte(newContent), 0644)
+		err = os.WriteFile(filePath, []byte(newContent), 0644) //nolint:gosec // G703: fixed release tooling path, not user-controlled
 		if err != nil {
 			return fmt.Errorf("failed to write %s: %w", filePath, err)
 		}

@@ -20,15 +20,29 @@ package release
 import (
 	"context"
 	"fmt"
-	"os/exec"
+	"regexp"
+
+	"golang.org/x/sys/execabs"
+)
+
+var (
+	releaseVersionPattern  = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
+	changelogCommitPattern = regexp.MustCompile(`^(HEAD|[0-9a-fA-F]{7,40})$`)
 )
 
 // PrepareChangelog generates changelog using the Python beats-changelog package
 func PrepareChangelog(fromVersion, toCommit string) error {
 	fmt.Printf("Generating changelog from %s to %s...\n", fromVersion, toCommit)
 
+	if !releaseVersionPattern.MatchString(fromVersion) {
+		return fmt.Errorf("invalid release version: %s", fromVersion)
+	}
+	if !changelogCommitPattern.MatchString(toCommit) {
+		return fmt.Errorf("invalid changelog commit reference: %s", toCommit)
+	}
+
 	// Check if beats-changelog is available
-	_, err := exec.LookPath("beats-changelog")
+	_, err := execabs.LookPath("beats-changelog")
 	if err != nil {
 		return fmt.Errorf("beats-changelog not found in PATH. Please install it first: %w", err)
 	}
@@ -36,7 +50,7 @@ func PrepareChangelog(fromVersion, toCommit string) error {
 	// Run beats-changelog split command
 	// Example: beats-changelog split --from v9.2.0 --to <commit>
 	ctx := context.Background()
-	cmd := exec.CommandContext(ctx, "beats-changelog", "split",
+	cmd := execabs.CommandContext(ctx, "beats-changelog", "split",
 		"--from", "v"+fromVersion,
 		"--to", toCommit,
 	)

@@ -248,13 +248,22 @@ func TestCheckRequirements(t *testing.T) {
 			}
 
 			// Change to temp directory
-			origDir, _ := os.Getwd()
-			defer os.Chdir(origDir)
-			os.Chdir(tmpDir)
+			origDir, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("Failed to get current directory: %v", err)
+			}
+			defer func() {
+				if err := os.Chdir(origDir); err != nil {
+					t.Errorf("Failed to restore directory: %v", err)
+				}
+			}()
+			if err := os.Chdir(tmpDir); err != nil {
+				t.Fatalf("Failed to change to temp directory: %v", err)
+			}
 
 			// Initialize git repo (this will fail if git is not available, but that's ok for this test)
 			// We're mainly testing the version validation logic
-			err := checkRequirements(cfg)
+			err = checkRequirements(cfg)
 
 			if tt.shouldError {
 				if err == nil {
