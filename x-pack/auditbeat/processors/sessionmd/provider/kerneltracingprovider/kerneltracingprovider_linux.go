@@ -29,10 +29,13 @@ import (
 )
 
 type prvdr struct {
-	ctx            context.Context
-	logger         *logp.Logger
-	qq             *quark.Queue
-	qqMtx          *sync.Mutex
+	ctx    context.Context
+	logger *logp.Logger
+
+	qqMtx sync.Mutex
+	qq    *quark.Queue
+
+	backoffMtx     sync.Mutex
 	combinedWait   time.Duration
 	inBackoff      bool
 	backoffStart   time.Time
@@ -94,15 +97,11 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 	procMetrics := NewStats(reg)
 
 	p := &prvdr{
-		ctx:            ctx,
-		logger:         logger,
-		qq:             qq,
-		qqMtx:          new(sync.Mutex),
-		combinedWait:   0 * time.Millisecond,
-		inBackoff:      false,
-		backoffStart:   time.Now(),
-		since:          time.Now(),
-		backoffSkipped: 0,
+		ctx:          ctx,
+		logger:       logger,
+		qq:           qq,
+		backoffStart: time.Now(),
+		since:        time.Now(),
 	}
 
 	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr, stats *Stats) {
@@ -176,8 +175,7 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 
 	start := time.Now()
 
-	p.handleBackoff(start)
-	if p.inBackoff {
+	if p.handleBackoff(start) {
 		return nil
 	}
 
@@ -187,11 +185,11 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 		waited := time.Since(start)
 		if _, found := p.lookupLocked(pid); found {
 			p.logger.Debugw("got process that was missing ", "waited", waited)
-			p.combinedWait = p.combinedWait + waited
+			p.addCombinedWait(waited)
 			return nil
 		}
 		if waited >= maxWaitLimit {
-			p.combinedWait = p.combinedWait + waited
+			p.addCombinedWait(waited)
 			return fmt.Errorf("process %v was not seen after %v", pid, waited)
 		}
 		time.Sleep(nextWait)
@@ -203,20 +201,25 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 	}
 }
 
-// handleBackoff handles backoff logic of `Sync`
+// handleBackoff handles backoff logic of `Sync` and reports whether the
+// provider is currently in backoff (in which case the caller must skip waiting
+// for the process to appear in the cache).
+//
 // If the combinedWait time exceeds the combinedWaitLimit duration, the provider will go into backoff state until the backoffDuration is exceeded.
 // If in a backoff period, it will track the number of skipped processes, and then log the number when exiting backoff.
 //
 // If there have been no backoffs within the resetDuration, the combinedWait duration is reset to zero, to keep a moving window in which delays are tracked.
-func (p *prvdr) handleBackoff(now time.Time) {
+func (p *prvdr) handleBackoff(now time.Time) bool {
+	p.backoffMtx.Lock()
+	defer p.backoffMtx.Unlock()
+
 	if p.inBackoff {
 		if now.Sub(p.backoffStart) > backoffDuration {
 			p.logger.Infow("ended backoff, skipped processes", "backoffSkipped", p.backoffSkipped)
 			p.inBackoff = false
-			p.combinedWait = 0 * time.Millisecond
+			p.combinedWait = 0
 		} else {
 			p.backoffSkipped += 1
-			return
 		}
 	} else {
 		if p.combinedWait > combinedWaitLimit {
@@ -224,13 +227,21 @@ func (p *prvdr) handleBackoff(now time.Time) {
 			p.inBackoff = true
 			p.backoffStart = now
 			p.backoffSkipped = 0
-			return
 		}
 		if now.Sub(p.since) > resetDuration {
 			p.since = now
-			p.combinedWait = 0 * time.Millisecond
+			p.combinedWait = 0
 		}
 	}
+	return p.inBackoff
+}
+
+// addCombinedWait adds waited to the shared wait budget under backoffMtx.
+func (p *prvdr) addCombinedWait(waited time.Duration) {
+	p.backoffMtx.Lock()
+	defer p.backoffMtx.Unlock()
+
+	p.combinedWait += waited
 }
 
 // GetProcess returns a reference to Process struct that contains all known information for the
@@ -288,7 +299,7 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	return &ret, nil
 }
 
-func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
+func (p *prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 	p.qqMtx.Lock()
 	defer p.qqMtx.Unlock()
 
@@ -296,7 +307,7 @@ func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 }
 
 // fillParent populates the parent process fields with the attributes of the process with PID `ppid`
-func (p prvdr) fillParent(process *types.Process, ppid uint32) {
+func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 	proc, found := p.lookupLocked(ppid)
 	if !found {
 		return
@@ -330,7 +341,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 }
 
 // fillGroupLeader populates the process group leader fields with the attributes of the process with PID `pgid`
-func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
+func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	proc, found := p.lookupLocked(pgid)
 	if !found {
 		return
@@ -365,7 +376,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 }
 
 // fillSessionLeader populates the session leader fields with the attributes of the process with PID `sid`
-func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
+func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	proc, found := p.lookupLocked(sid)
 	if !found {
 		return
@@ -400,7 +411,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 }
 
 // fillEntryLeader populates the entry leader fields with the attributes of the process with PID `elid`
-func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
+func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 	proc, found := p.lookupLocked(elid)
 	if !found {
 		return

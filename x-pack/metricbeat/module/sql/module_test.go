@@ -5,6 +5,7 @@
 package sql
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -39,17 +41,15 @@ func TestModuleBuilderSharesState(t *testing.T) {
 // GetCursorRegistry return the exact same *statestore.Registry pointer when
 // the data path has not changed.
 func TestGetCursorRegistryReturnsSamePointer(t *testing.T) {
-	tmpDir := t.TempDir()
-	origData := paths.Paths.Data
-	paths.Paths.Data = tmpDir
-	t.Cleanup(func() { paths.Paths.Data = origData })
+	tmpPaths := paths.New()
+	tmpPaths.Data = t.TempDir()
 
 	factory := ModuleBuilder()
 
-	mod1, err := factory(mb.BaseModule{})
+	mod1, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths})
 	require.NoError(t, err)
 
-	mod2, err := factory(mb.BaseModule{})
+	mod2, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths})
 	require.NoError(t, err)
 
 	sqlMod1, ok := mod1.(Module)
@@ -74,66 +74,59 @@ func TestGetCursorRegistryReturnsSamePointer(t *testing.T) {
 		"Repeated calls on the same module must return cached registry")
 }
 
-// TestGetCursorRegistryPathChange verifies that changing paths.Paths.Data
-// causes GetCursorRegistry to create a new registry at the new location.
+// TestGetCursorRegistryPathChange verifies that using a module with a different
+// per-instance data path causes GetCursorRegistry to create a new registry at
+// the new location.
 func TestGetCursorRegistryPathChange(t *testing.T) {
-	tmpDir1 := t.TempDir()
-	tmpDir2 := t.TempDir()
-
-	origData := paths.Paths.Data
-	t.Cleanup(func() { paths.Paths.Data = origData })
+	tmpPaths1 := paths.New()
+	tmpPaths1.Data = t.TempDir()
+	tmpPaths2 := paths.New()
+	tmpPaths2.Data = t.TempDir()
 
 	factory := ModuleBuilder()
-	mod, err := factory(mb.BaseModule{})
+	mod1, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths1})
 	require.NoError(t, err)
 
-	sqlMod, ok := mod.(Module)
-	require.True(t, ok, "mod should implement sql.Module")
+	mod2, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths2})
+	require.NoError(t, err)
+
+	sqlMod1, ok := mod1.(Module)
+	require.True(t, ok, "mod1 should implement sql.Module")
+
+	sqlMod2, ok := mod2.(Module)
+	require.True(t, ok, "mod2 should implement sql.Module")
 
 	// First path
-	paths.Paths.Data = tmpDir1
-	reg1, err := sqlMod.GetCursorRegistry()
+	reg1, err := sqlMod1.GetCursorRegistry()
 	require.NoError(t, err)
 	require.NotNil(t, reg1)
 
 	// Same path - cached
-	reg1again, err := sqlMod.GetCursorRegistry()
+	reg1again, err := sqlMod1.GetCursorRegistry()
 	require.NoError(t, err)
 	assert.Same(t, reg1, reg1again)
 
-	// Change path - new registry expected
-	paths.Paths.Data = tmpDir2
-	reg2, err := sqlMod.GetCursorRegistry()
+	// Second path - new registry expected
+	reg2, err := sqlMod2.GetCursorRegistry()
 	require.NoError(t, err)
 	require.NotNil(t, reg2)
 	assert.NotSame(t, reg1, reg2,
 		"Changing the data path must produce a new registry")
-
-	// Revert to first path - yet another new registry (previous one is not cached)
-	paths.Paths.Data = tmpDir1
-	reg3, err := sqlMod.GetCursorRegistry()
-	require.NoError(t, err)
-	require.NotNil(t, reg3)
-	assert.NotSame(t, reg1, reg3,
-		"Reverting to a previous path creates a new registry (old cache was replaced)")
-	assert.NotSame(t, reg2, reg3)
 }
 
 // TestGetCursorRegistryConcurrent verifies that concurrent calls to
 // GetCursorRegistry from multiple goroutines are safe and all return
 // the same pointer.
 func TestGetCursorRegistryConcurrent(t *testing.T) {
-	tmpDir := t.TempDir()
-	origData := paths.Paths.Data
-	paths.Paths.Data = tmpDir
-	t.Cleanup(func() { paths.Paths.Data = origData })
+	tmpPaths := paths.New()
+	tmpPaths.Data = t.TempDir()
 
 	factory := ModuleBuilder()
 
 	const n = 20
 	modules := make([]mb.Module, n)
 	for i := range modules {
-		mod, err := factory(mb.BaseModule{})
+		mod, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths})
 		require.NoError(t, err)
 		modules[i] = mod
 	}
@@ -151,8 +144,17 @@ func TestGetCursorRegistryConcurrent(t *testing.T) {
 		wg.Add(1)
 		go func(mod mb.Module) {
 			defer wg.Done()
-			reg, err := mod.(Module).GetCursorRegistry()
-			resultsCh <- result{reg: reg, err: err}
+			sqlMod, ok := mod.(Module)
+			if !ok {
+				resultsCh <- result{err: fmt.Errorf("module does not implement sql.Module")}
+				return
+			}
+			reg, err := sqlMod.GetCursorRegistry()
+			if err != nil {
+				resultsCh <- result{err: err}
+				return
+			}
+			resultsCh <- result{reg: reg}
 		}(modules[i])
 	}
 

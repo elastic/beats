@@ -1235,6 +1235,25 @@ scanner:
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
 
+	t.Run("caps a fingerprint larger than the maximum and warns", func(t *testing.T) {
+		cfg := fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  MaxFingerprintSize + 1,
+			},
+		}
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		s, err := newFileScanner(inMemoryLog, paths, cfg, CompressionNone)
+		require.NoError(t, err, "an oversized fingerprint length must be capped, not rejected")
+		assert.Equal(t, MaxFingerprintSize, s.cfg.Fingerprint.Length,
+			"the fingerprint length must be capped to the maximum")
+		assert.Len(t, s.readBuffer, int(MaxFingerprintSize),
+			"the read buffer must be allocated at the capped length, not the configured one")
+		assert.Contains(t, buff.String(), "exceeds the maximum",
+			"capping an oversized fingerprint length must log a warning")
+	})
+
 	t.Run("empty regular files are silently excluded", func(t *testing.T) {
 		dir := t.TempDir()
 		empty := filepath.Join(dir, "empty.log")
