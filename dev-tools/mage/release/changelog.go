@@ -90,13 +90,9 @@ func RunChangelog(cfg *ReleaseConfig) error {
 		return fmt.Errorf("working directory is not clean. Please commit or stash changes first")
 	}
 
-	// Create changelog branch
+	// Ensure changelog branch exists
 	branchName := fmt.Sprintf("prepare-changelog-%s", cfg.CurrentRelease)
-	if err := repo.CreateBranch(branchName); err != nil {
-		return err
-	}
-
-	if err := repo.CheckoutBranch(branchName); err != nil {
+	if err := repo.EnsureBranch(branchName); err != nil {
 		return err
 	}
 
@@ -116,23 +112,18 @@ func RunChangelog(cfg *ReleaseConfig) error {
 
 	// Commit changes
 	commitMsg := fmt.Sprintf("Update changelog for %s", cfg.CurrentRelease)
-	if err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
+	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
 	// Push and create PR (skip in dry-run mode)
 	if cfg.DryRun {
 		fmt.Println("DRY RUN: Skipping push and PR creation")
-		fmt.Printf("Branch created: %s\n", branchName)
+		fmt.Printf("Branch prepared: %s\n", branchName)
 		fmt.Println("Review changes with 'git diff'")
 		return nil
 	}
 
-	if err := repo.Push("origin"); err != nil {
-		return err
-	}
-
-	// Create PR
 	gh := NewGitHubClient(cfg.GitHubToken)
 	prBody := fmt.Sprintf(`## Changelog Updates for %s
 
@@ -155,13 +146,17 @@ Please review the changelog entries and merge when ready.
 		Labels:    []string{"changelog", "release"},
 	}
 
-	pr, err := gh.CreatePR(prOpts)
+	pr, err := finalizePR(repo, gh, branchName, cfg.ReleaseBranch, prOpts)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("\n=== Changelog Workflow Complete ===\n")
-	fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
+	if pr != nil {
+		fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
+	} else {
+		fmt.Println("No PR created (changelog already up to date)")
+	}
 
 	return nil
 }

@@ -20,6 +20,8 @@ package release
 import (
 	"fmt"
 	"strings"
+
+	"github.com/google/go-github/v68/github"
 )
 
 // checkRequirements validates prerequisites before running a release workflow
@@ -79,20 +81,15 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 
 	// Create release branch (e.g., "9.3")
 	releaseBranch := cfg.ReleaseBranch
-	fmt.Printf("Creating release branch: %s\n", releaseBranch)
-	if err := repo.CreateBranch(releaseBranch); err != nil {
+	fmt.Printf("Ensuring release branch: %s\n", releaseBranch)
+	if err := repo.EnsureBranch(releaseBranch); err != nil {
 		return err
 	}
 
 	// Create update branch from release branch
 	updateBranch := fmt.Sprintf("update-version-%s", cfg.CurrentRelease)
-	if err := repo.CheckoutBranch(releaseBranch); err != nil {
-		return err
-	}
-	if err := repo.CreateBranch(updateBranch); err != nil {
-		return err
-	}
-	if err := repo.CheckoutBranch(updateBranch); err != nil {
+	fmt.Printf("Ensuring update branch: %s\n", updateBranch)
+	if err := repo.EnsureBranch(updateBranch); err != nil {
 		return err
 	}
 
@@ -114,14 +111,14 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 
 	// Commit changes
 	commitMsg := fmt.Sprintf("Update version to %s for release", cfg.CurrentRelease)
-	if err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
+	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
 	// Push and create PR (skip in dry-run mode)
 	if cfg.DryRun {
 		fmt.Println("\nDRY RUN: Skipping push and PR creation")
-		fmt.Printf("Branches created: %s, %s\n", releaseBranch, updateBranch)
+		fmt.Printf("Branches prepared: %s, %s\n", releaseBranch, updateBranch)
 		fmt.Println("Review changes with 'git diff'")
 		return nil
 	}
@@ -134,15 +131,6 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 		return err
 	}
 
-	// Push update branch
-	if err := repo.CheckoutBranch(updateBranch); err != nil {
-		return err
-	}
-	if err := repo.Push("origin"); err != nil {
-		return err
-	}
-
-	// Create PR
 	gh := NewGitHubClient(cfg.GitHubToken)
 	prBody := fmt.Sprintf(`## Release %s
 
@@ -168,13 +156,17 @@ cc @%s
 		Labels:    []string{"release", "version"},
 	}
 
-	pr, err := gh.CreatePR(prOpts)
+	pr, err := finalizePR(repo, gh, updateBranch, releaseBranch, prOpts)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("\n=== Major/Minor Release Workflow Complete ===\n")
-	fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
+	if pr != nil {
+		fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
+	} else {
+		fmt.Println("No PR created (release already up to date)")
+	}
 
 	return nil
 }
@@ -227,11 +219,8 @@ This PR updates test environment configurations for the %s patch release.
 	}
 
 	// PR 1: Docs and version
-	fmt.Println("\n--- Creating PR 1: Docs and Version ---")
-	if err := repo.CreateBranch(prConfigs[0].BranchName); err != nil {
-		return err
-	}
-	if err := repo.CheckoutBranch(prConfigs[0].BranchName); err != nil {
+	fmt.Println("\n--- Preparing PR 1: Docs and Version ---")
+	if err := repo.EnsureBranch(prConfigs[0].BranchName); err != nil {
 		return err
 	}
 
@@ -242,21 +231,18 @@ This PR updates test environment configurations for the %s patch release.
 		return err
 	}
 
-	if err := repo.CommitAll(fmt.Sprintf("Update docs and version for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
+	if _, err := repo.CommitAll(fmt.Sprintf("Update docs and version for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
 	// PR 2: Test environment (only if LATEST_RELEASE is set)
 	testEnvHasChanges := false
 	if cfg.LatestRelease != "" {
-		fmt.Println("\n--- Creating PR 2: Test Environment ---")
+		fmt.Println("\n--- Preparing PR 2: Test Environment ---")
 		if err := repo.CheckoutBranch(cfg.BaseBranch); err != nil {
 			return err
 		}
-		if err := repo.CreateBranch(prConfigs[1].BranchName); err != nil {
-			return err
-		}
-		if err := repo.CheckoutBranch(prConfigs[1].BranchName); err != nil {
+		if err := repo.EnsureBranch(prConfigs[1].BranchName); err != nil {
 			return err
 		}
 
@@ -264,58 +250,101 @@ This PR updates test environment configurations for the %s patch release.
 			return err
 		}
 
-		// Only commit if there are changes
-		clean, err := repo.IsClean()
+		committed, err := repo.CommitAll(fmt.Sprintf("Update testing environment for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail)
 		if err != nil {
 			return err
 		}
-		if !clean {
-			if err := repo.CommitAll(fmt.Sprintf("Update testing environment for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
-				return err
-			}
+		if committed {
 			testEnvHasChanges = true
 		} else {
-			fmt.Println("No test environment changes to commit")
+			ahead, err := repo.HasCommitsAheadOf(cfg.BaseBranch)
+			if err != nil {
+				return err
+			}
+			testEnvHasChanges = ahead
+			if !testEnvHasChanges {
+				fmt.Println("No test environment changes to commit")
+			}
 		}
 	} else {
 		fmt.Println("\nSkipping test environment PR (LATEST_RELEASE not set)")
 	}
 
 	// Determine which branches to push and which PRs to create
-	branchesToPush := []string{prConfigs[0].BranchName}
-	prsToCreate := []PRConfig{prConfigs[0]}
+	branchesToFinalize := []struct {
+		branch string
+		base   string
+		config PRConfig
+	}{
+		{
+			branch: prConfigs[0].BranchName,
+			base:   cfg.BaseBranch,
+			config: prConfigs[0],
+		},
+	}
 
 	if testEnvHasChanges {
-		branchesToPush = append(branchesToPush, prConfigs[1].BranchName)
-		prsToCreate = append(prsToCreate, prConfigs[1])
+		branchesToFinalize = append(branchesToFinalize, struct {
+			branch string
+			base   string
+			config PRConfig
+		}{
+			branch: prConfigs[1].BranchName,
+			base:   cfg.BaseBranch,
+			config: prConfigs[1],
+		})
 	}
 
 	// Push and create PRs (skip in dry-run mode)
 	if cfg.DryRun {
 		fmt.Println("\nDRY RUN: Skipping push and PR creation")
-		fmt.Printf("Branches created: %v\n", branchesToPush)
+		branchNames := make([]string, 0, len(branchesToFinalize))
+		for _, item := range branchesToFinalize {
+			branchNames = append(branchNames, item.branch)
+		}
+		fmt.Printf("Branches prepared: %v\n", branchNames)
 		return nil
 	}
 
-	// Push branches
-	for _, branchName := range branchesToPush {
-		if err := repo.CheckoutBranch(branchName); err != nil {
-			return err
+	gh := NewGitHubClient(cfg.GitHubToken)
+	var prs []*github.PullRequest
+	for i, item := range branchesToFinalize {
+		baseBranch := item.config.Base
+		if baseBranch == "" {
+			if cfg.ReleaseBranch != "" {
+				baseBranch = cfg.ReleaseBranch
+			} else {
+				baseBranch = cfg.BaseBranch
+			}
 		}
-		if err := repo.Push("origin"); err != nil {
-			return err
-		}
-	}
 
-	// Create PRs
-	prs, err := CreateMultiplePRs(cfg, prsToCreate)
-	if err != nil {
-		return err
+		opts := PROptions{
+			Owner:     cfg.ProjectOwner,
+			Repo:      cfg.ProjectRepo,
+			Title:     item.config.Title,
+			Head:      item.config.BranchName,
+			Base:      baseBranch,
+			Body:      item.config.Body,
+			Draft:     false,
+			Reviewers: cfg.ProjectReviewers,
+			Labels:    item.config.Labels,
+		}
+
+		pr, err := finalizePR(repo, gh, item.branch, item.base, opts)
+		if err != nil {
+			return fmt.Errorf("failed to finalize PR %d/%d: %w", i+1, len(branchesToFinalize), err)
+		}
+		if pr != nil {
+			prs = append(prs, pr)
+		}
 	}
 
 	fmt.Printf("\n=== Patch Release Workflow Complete ===\n")
 	for i, pr := range prs {
 		fmt.Printf("PR %d: %s\n", i+1, pr.GetHTMLURL())
+	}
+	if len(prs) == 0 {
+		fmt.Println("No PRs created (release already up to date)")
 	}
 
 	return nil
@@ -351,4 +380,34 @@ func RunNextDevMinor(cfg *ReleaseConfig) error {
 	fmt.Println("RunNextDevMinor - Full implementation pending")
 
 	return fmt.Errorf("RunNextDevMinor not fully implemented yet")
+}
+
+// finalizePR pushes a branch when it has new commits and creates or reuses an open PR.
+func finalizePR(repo *GitRepo, gh *GitHubClient, branchName, baseBranch string, opts PROptions) (*github.PullRequest, error) {
+	if err := repo.CheckoutBranch(branchName); err != nil {
+		return nil, err
+	}
+
+	existingPR, found, err := gh.FindOpenPR(opts.Owner, opts.Repo, opts.Head, opts.Base)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		return existingPR, nil
+	}
+
+	ahead, err := repo.HasCommitsAheadOf(baseBranch)
+	if err != nil {
+		return nil, err
+	}
+	if !ahead {
+		fmt.Printf("No new commits on %s compared to %s; skipping push and PR creation\n", branchName, baseBranch)
+		return nil, nil
+	}
+
+	if err := repo.Push("origin"); err != nil {
+		return nil, err
+	}
+
+	return gh.CreatePR(opts)
 }

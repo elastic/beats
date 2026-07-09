@@ -27,6 +27,7 @@ import (
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/storer"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
@@ -49,8 +50,30 @@ func OpenRepo(path string) (*GitRepo, error) {
 	}, nil
 }
 
-// CreateBranch creates a new branch from the current HEAD
+// BranchExists reports whether a local branch exists.
+func (g *GitRepo) BranchExists(branchName string) (bool, error) {
+	_, err := g.repo.Reference(plumbing.NewBranchReferenceName(branchName), true)
+	if err == nil {
+		return true, nil
+	}
+	if errors.Is(err, plumbing.ErrReferenceNotFound) {
+		return false, nil
+	}
+	return false, fmt.Errorf("failed to check branch %s: %w", branchName, err)
+}
+
+// CreateBranch creates a new branch from the current HEAD.
+// It is idempotent when the branch already exists locally.
 func (g *GitRepo) CreateBranch(branchName string) error {
+	exists, err := g.BranchExists(branchName)
+	if err != nil {
+		return err
+	}
+	if exists {
+		fmt.Printf("Branch already exists: %s\n", branchName)
+		return nil
+	}
+
 	headRef, err := g.repo.Head()
 	if err != nil {
 		return fmt.Errorf("failed to get HEAD: %w", err)
@@ -68,8 +91,44 @@ func (g *GitRepo) CreateBranch(branchName string) error {
 	return nil
 }
 
-// CheckoutBranch checks out an existing branch
+// EnsureBranch checks out an existing local or remote branch, or creates it from HEAD.
+func (g *GitRepo) EnsureBranch(branchName string) error {
+	exists, err := g.BranchExists(branchName)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return g.CheckoutBranch(branchName)
+	}
+
+	remoteRef, err := g.repo.Reference(plumbing.NewRemoteReferenceName("origin", branchName), true)
+	if err == nil {
+		localRef := plumbing.NewHashReference(plumbing.NewBranchReferenceName(branchName), remoteRef.Hash())
+		if err := g.repo.Storer.SetReference(localRef); err != nil {
+			return fmt.Errorf("failed to create local branch %s from origin: %w", branchName, err)
+		}
+		fmt.Printf("Created local branch from origin: %s\n", branchName)
+		return g.CheckoutBranch(branchName)
+	}
+	if !errors.Is(err, plumbing.ErrReferenceNotFound) {
+		return fmt.Errorf("failed to check remote branch %s: %w", branchName, err)
+	}
+
+	if err := g.CreateBranch(branchName); err != nil {
+		return err
+	}
+	return g.CheckoutBranch(branchName)
+}
+
+// CheckoutBranch checks out an existing branch.
+// It is idempotent when the branch is already checked out.
 func (g *GitRepo) CheckoutBranch(branchName string) error {
+	currentBranch, err := g.GetCurrentBranch()
+	if err == nil && currentBranch == branchName {
+		fmt.Printf("Already on branch: %s\n", branchName)
+		return nil
+	}
+
 	w, err := g.repo.Worktree()
 	if err != nil {
 		return fmt.Errorf("failed to get worktree: %w", err)
@@ -86,17 +145,27 @@ func (g *GitRepo) CheckoutBranch(branchName string) error {
 	return nil
 }
 
-// CommitAll stages all changes and creates a commit
-func (g *GitRepo) CommitAll(message, authorName, authorEmail string) error {
+// CommitAll stages all changes and creates a commit.
+// It is idempotent and returns committed=false when there is nothing to commit.
+func (g *GitRepo) CommitAll(message, authorName, authorEmail string) (bool, error) {
 	w, err := g.repo.Worktree()
 	if err != nil {
-		return fmt.Errorf("failed to get worktree: %w", err)
+		return false, fmt.Errorf("failed to get worktree: %w", err)
 	}
 
 	// Add all changes
 	err = w.AddGlob(".")
 	if err != nil {
-		return fmt.Errorf("failed to stage changes: %w", err)
+		return false, fmt.Errorf("failed to stage changes: %w", err)
+	}
+
+	status, err := w.Status()
+	if err != nil {
+		return false, fmt.Errorf("failed to get status: %w", err)
+	}
+	if status.IsClean() {
+		fmt.Println("No changes to commit")
+		return false, nil
 	}
 
 	// Create commit
@@ -108,11 +177,55 @@ func (g *GitRepo) CommitAll(message, authorName, authorEmail string) error {
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("failed to commit: %w", err)
+		return false, fmt.Errorf("failed to commit: %w", err)
 	}
 
 	fmt.Printf("Created commit: %s\n", commit.String())
-	return nil
+	return true, nil
+}
+
+// HasCommitsAheadOf reports whether HEAD has commits not reachable from baseBranch.
+func (g *GitRepo) HasCommitsAheadOf(baseBranch string) (bool, error) {
+	headRef, err := g.repo.Head()
+	if err != nil {
+		return false, fmt.Errorf("failed to get HEAD: %w", err)
+	}
+
+	baseRef, err := g.repo.Reference(plumbing.NewBranchReferenceName(baseBranch), true)
+	if err != nil {
+		if errors.Is(err, plumbing.ErrReferenceNotFound) {
+			return true, nil
+		}
+		return false, fmt.Errorf("failed to get base branch %s: %w", baseBranch, err)
+	}
+
+	if headRef.Hash() == baseRef.Hash() {
+		return false, nil
+	}
+
+	commitIter, err := g.repo.Log(&git.LogOptions{From: headRef.Hash()})
+	if err != nil {
+		return false, fmt.Errorf("failed to walk commits: %w", err)
+	}
+	defer commitIter.Close()
+
+	foundBase := false
+	err = commitIter.ForEach(func(c *object.Commit) error {
+		if c.Hash == baseRef.Hash() {
+			foundBase = true
+			return storer.ErrStop
+		}
+		return nil
+	})
+	if err != nil && !errors.Is(err, storer.ErrStop) {
+		return false, fmt.Errorf("failed to compare commits with %s: %w", baseBranch, err)
+	}
+
+	if foundBase {
+		return true, nil
+	}
+
+	return headRef.Hash() != baseRef.Hash(), nil
 }
 
 // Push pushes the current branch to the remote

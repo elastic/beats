@@ -77,6 +77,52 @@ const defaultBeatVersion = "9.3.0"
 	}
 }
 
+func TestUpdateVersionIdempotent(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	versionDir := filepath.Join(tmpDir, "libbeat", "version")
+	err := os.MkdirAll(versionDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create version dir: %v", err)
+	}
+
+	versionFile := filepath.Join(versionDir, "version.go")
+	initialContent := `package version
+
+const defaultBeatVersion = "9.4.0"
+`
+	err = os.WriteFile(versionFile, []byte(initialContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version file: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	err = UpdateVersion("9.4.0")
+	if err != nil {
+		t.Fatalf("UpdateVersion should succeed when version is already set: %v", err)
+	}
+
+	content, err := os.ReadFile(versionFile)
+	if err != nil {
+		t.Fatalf("Failed to read version file: %v", err)
+	}
+	if string(content) != initialContent {
+		t.Errorf("Idempotent UpdateVersion should not modify file. Got:\n%s", string(content))
+	}
+}
+
 func TestUpdateDocs(t *testing.T) {
 	tmpDir := t.TempDir()
 

@@ -323,6 +323,11 @@ func TestCreateAndCheckoutBranch(t *testing.T) {
 	if currentBranch != branchName {
 		t.Errorf("GetCurrentBranch() = %v, want %v", currentBranch, branchName)
 	}
+
+	// Creating the same branch again should be idempotent
+	if err := repo.CreateBranch(branchName); err != nil {
+		t.Fatalf("CreateBranch failed on second call: %v", err)
+	}
 }
 
 // TestCommitAll tests the CommitAll function
@@ -376,9 +381,12 @@ func TestCommitAll(t *testing.T) {
 	}
 
 	// Commit the change
-	err = repo.CommitAll("test commit", "Test User", "test@example.com")
+	committed, err := repo.CommitAll("test commit", "Test User", "test@example.com")
 	if err != nil {
 		t.Fatalf("CommitAll failed: %v", err)
+	}
+	if !committed {
+		t.Fatal("CommitAll should report a commit was created")
 	}
 
 	// Verify repo is clean after commit
@@ -389,5 +397,14 @@ func TestCommitAll(t *testing.T) {
 
 	if !clean {
 		t.Error("Repository should be clean after commit")
+	}
+
+	// Second commit attempt should be a no-op
+	committed, err = repo.CommitAll("test commit", "Test User", "test@example.com")
+	if err != nil {
+		t.Fatalf("CommitAll failed on second call: %v", err)
+	}
+	if committed {
+		t.Error("CommitAll should be idempotent when there are no changes")
 	}
 }

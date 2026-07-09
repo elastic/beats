@@ -20,6 +20,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/google/go-github/v68/github"
 	"golang.org/x/oauth2"
@@ -58,8 +59,17 @@ func NewGitHubClient(token string) *GitHubClient {
 	}
 }
 
-// CreatePR creates a pull request
+// CreatePR creates a pull request, or returns an existing open PR with the same head and base.
 func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
+	existingPR, found, err := gh.FindOpenPR(opts.Owner, opts.Repo, opts.Head, opts.Base)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		fmt.Printf("Open PR already exists #%d: %s\n", existingPR.GetNumber(), existingPR.GetHTMLURL())
+		return existingPR, nil
+	}
+
 	newPR := &github.NewPullRequest{
 		Title: &opts.Title,
 		Head:  &opts.Head,
@@ -94,6 +104,31 @@ func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
 
 	fmt.Printf("Created PR #%d: %s\n", pr.GetNumber(), pr.GetHTMLURL())
 	return pr, nil
+}
+
+// FindOpenPR returns an open pull request for the given head and base branches, if one exists.
+func (gh *GitHubClient) FindOpenPR(owner, repo, head, base string) (*github.PullRequest, bool, error) {
+	headQuery := head
+	if !strings.Contains(head, ":") {
+		headQuery = fmt.Sprintf("%s:%s", owner, head)
+	}
+
+	prs, _, err := gh.client.PullRequests.List(gh.ctx, owner, repo, &github.PullRequestListOptions{
+		State: "open",
+		Head:  headQuery,
+		Base:  base,
+		ListOptions: github.ListOptions{
+			PerPage: 1,
+		},
+	})
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to list pull requests: %w", err)
+	}
+	if len(prs) == 0 {
+		return nil, false, nil
+	}
+
+	return prs[0], true, nil
 }
 
 // AddLabels adds labels to a pull request or issue

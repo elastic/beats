@@ -36,6 +36,12 @@ func UpdateVersion(newVersion string) error {
 	// Pattern: const defaultBeatVersion = "X.Y.Z"
 	pattern := regexp.MustCompile(`const defaultBeatVersion = ".*"`)
 	replacement := fmt.Sprintf(`const defaultBeatVersion = "%s"`, newVersion)
+	targetLine := replacement
+
+	if strings.Contains(string(content), targetLine) {
+		fmt.Printf("Version already set to %s in %s\n", newVersion, versionFile)
+		return nil
+	}
 
 	newContent := pattern.ReplaceAllString(string(content), replacement)
 
