@@ -22,7 +22,6 @@ package ech
 import (
 	"debug/buildinfo"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -32,6 +31,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/testing/testutils"
 )
 
 // VerifyEnvVars ensures that the env vars to connect to ES are set, and that the ES_HOST starts with https
@@ -55,31 +55,13 @@ func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 	info, err := buildinfo.ReadFile(binaryPath)
 	assert.NoError(t, err)
 
-	var foundTags, foundFIPS, foundFIPSDefault bool
-	for _, setting := range info.Settings {
-		switch setting.Key {
-		case "-tags":
-			foundTags = true
-			assert.Contains(t, setting.Value, "requirefips")
-			continue
-		case "GOFIPS140":
-			foundFIPS = true
-			assert.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
-			continue
-		case "DefaultGODEBUG":
-			for _, entry := range strings.Split(setting.Value, ",") {
-				if key, val, ok := strings.Cut(entry, "="); ok && key == "fips140" && val == "on" {
-					foundFIPSDefault = true
-					break
-				}
-			}
-			continue
-		}
-	}
+	fips := testutils.CheckFIPSBuildInfo(info.Settings)
 
-	assert.True(t, foundTags, "did not find build tags")
-	assert.True(t, foundFIPS, "did not find GOFIPS140 within binary version information")
-	assert.True(t, foundFIPSDefault, "did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
+	assert.True(t, fips.TagsFound, "did not find build tags")
+	assert.True(t, fips.TagsHaveRequireFIPS, "-tags did not contain requirefips")
+	assert.True(t, fips.GOFIPS140Found, "did not find GOFIPS140 within binary version information")
+	assert.True(t, fips.GOFIPS140IsCertified, "GOFIPS140 must reference the certified module version, got %q", fips.GOFIPS140Value)
+	assert.True(t, fips.DefaultGODEBUGHasFIPSOn, "did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
 	if t.Failed() {
 		t.Fatal("Unable to verify FIPS binary.") // stop test if non-FIPS binary is used.
 	}

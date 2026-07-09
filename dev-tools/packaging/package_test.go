@@ -46,6 +46,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/testing/testutils"
 )
 
 const (
@@ -900,33 +901,13 @@ func checkFIPS(t *testing.T, beatName, path string) {
 	info, err := buildinfo.ReadFile(binaryPath)
 	require.NoError(t, err)
 
-	foundTags := false
-	foundFIPS := false
-	foundFIPSDefault := false
-	for _, setting := range info.Settings {
-		switch setting.Key {
-		case "-tags":
-			foundTags = true
-			require.Contains(t, setting.Value, "requirefips")
-			continue
-		case "GOFIPS140":
-			foundFIPS = true
-			require.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
-			continue
-		case "DefaultGODEBUG":
-			for _, entry := range strings.Split(setting.Value, ",") {
-				if key, val, ok := strings.Cut(entry, "="); ok && key == "fips140" && val == "on" {
-					foundFIPSDefault = true
-					break
-				}
-			}
-			continue
-		}
-	}
+	fips := testutils.CheckFIPSBuildInfo(info.Settings)
 
-	require.True(t, foundTags, "Did not find -tags within binary version information")
-	require.True(t, foundFIPS, "Did not find GOFIPS140 within binary version information")
-	require.True(t, foundFIPSDefault, "Did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
+	require.True(t, fips.TagsFound, "Did not find -tags within binary version information")
+	require.True(t, fips.TagsHaveRequireFIPS, "-tags did not contain requirefips")
+	require.True(t, fips.GOFIPS140Found, "Did not find GOFIPS140 within binary version information")
+	require.True(t, fips.GOFIPS140IsCertified, "GOFIPS140 must reference the certified module version, got %q", fips.GOFIPS140Value)
+	require.True(t, fips.DefaultGODEBUGHasFIPSOn, "Did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
 }
 
 // inspector is a file contents inspector. It vets the contents of the file
