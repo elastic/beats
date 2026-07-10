@@ -56,12 +56,8 @@ func (c *Config) InitDefaults() {
 
 func (c *Config) Validate() error {
 	supportedVersions := []string{ConsumerVersionV1, ConsumerVersionV2}
-	if !anyOf(supportedVersions, c.Version) {
+	if !slices.Contains(supportedVersions, c.Version) {
 		return fmt.Errorf("not supported version %v, expected one of %s", c.Version, strings.Join(supportedVersions, ", "))
 	}
 	return nil
-}
-
-func anyOf(elems []string, s string) bool {
-	return slices.Contains(elems, s)
 }
