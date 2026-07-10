@@ -135,7 +135,7 @@ stack: ga 9.3.8+, ga 9.4.4+, ga 9.5+
 
 A stable identifier that enables Kafka static group membership ([KIP-345](https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances)). When set, a consumer that restarts and rejoins the group within [`session_timeout`](#_session_timeout) is recognized as the same member and keeps its partition assignment, avoiding the rebalances that a rolling restart of multiple instances would otherwise trigger. Requires `version` to be at least `2.3.0`.
 
-Each consumer instance sharing a `group_id` must use a **unique** `group_instance_id`; two live members with the same value cause the broker to fence one of them. Set it to a value that is unique to each consumer instance and stable across restarts. Unset by default, in which case the consumer uses dynamic membership.
+Each consumer instance sharing a `group_id` must use a **unique** `group_instance_id`. Two live members with the same value cause the broker to fence one of them. Set `group_instance_id` to a value that is unique to each consumer instance and stable across restarts. The option is unset by default, in which case the consumer uses dynamic membership.
 
 ```yaml
 - type: kafka
