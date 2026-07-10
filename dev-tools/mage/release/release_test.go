@@ -205,6 +205,53 @@ func TestUpdateDocs(t *testing.T) {
 	}
 }
 
+func TestUpdateStackVersion(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.3.0
+:doc-branch: current
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	err = UpdateStackVersion("9.5.1")
+	if err != nil {
+		t.Fatalf("UpdateStackVersion failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.5.1") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: current") {
+		t.Errorf("doc-branch should remain unchanged. Got:\n%s", string(content))
+	}
+}
+
 func TestUpdateDocsDocBranchCurrent(t *testing.T) {
 	tmpDir := t.TempDir()
 	docsDir := filepath.Join(tmpDir, "libbeat/docs")
@@ -236,7 +283,7 @@ func TestUpdateDocsDocBranchCurrent(t *testing.T) {
 	}
 
 	err = UpdateDocsWithOptions(DocsUpdateOptions{
-		BaseBranch:     "main",
+		BaseBranch:     "9.5",
 		CurrentVersion: "9.5.1",
 		ReleaseBranch:  "9.5",
 	})
@@ -252,7 +299,7 @@ func TestUpdateDocsDocBranchCurrent(t *testing.T) {
 		t.Errorf("stack-version not updated. Got:\n%s", string(content))
 	}
 	if !strings.Contains(string(content), ":doc-branch: 9.5") {
-		t.Errorf("doc-branch not updated from current. Got:\n%s", string(content))
+		t.Errorf("doc-branch not updated for patch docs. Got:\n%s", string(content))
 	}
 }
 

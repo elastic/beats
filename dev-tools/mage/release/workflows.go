@@ -97,11 +97,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	if err := UpdateVersion(nextRelease); err != nil {
 		return err
 	}
-	if err := UpdateDocsWithOptions(DocsUpdateOptions{
-		BaseBranch:     releaseBranch,
-		CurrentVersion: nextRelease,
-		ReleaseBranch:  releaseBranch,
-	}); err != nil {
+	if err := UpdateStackVersion(nextRelease); err != nil {
 		return err
 	}
 	if err := RunMakeUpdate(); err != nil {
@@ -253,9 +249,6 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 		CurrentVersion: cfg.CurrentRelease,
 		ReleaseBranch:  releaseBranch,
 	}); err != nil {
-		return err
-	}
-	if err := RunMakeUpdate(); err != nil {
 		return err
 	}
 	docsCommitMsg := fmt.Sprintf("docs: update docs")

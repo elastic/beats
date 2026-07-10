@@ -19,15 +19,11 @@ package release
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
-
-const docsURLMarker = "# Docs: https://www.elastic.co/guide/en/beats/"
 
 var (
 	k8sImageVersionPattern = regexp.MustCompile(`(image: docker\.elastic\.co/[^:]+):\d+\.\d+\.\d+`)
@@ -76,6 +72,23 @@ func UpdateVersion(newVersion string) error {
 	return nil
 }
 
+// UpdateStackVersion updates only :stack-version: in libbeat/docs/version.asciidoc.
+// Used by prepare-next-release, which does not change :doc-branch: so modules.d
+// files keep pointing at /current/ after make update.
+func UpdateStackVersion(newVersion string) error {
+	versionRules := []replacementRule{
+		{
+			pattern:     regexp.MustCompile(`:stack-version:\s*\d+\.\d+\.\d+`),
+			replacement: fmt.Sprintf(":stack-version: %s", newVersion),
+		},
+	}
+	if err := applyReplacements("libbeat/docs/version.asciidoc", versionRules); err != nil {
+		return err
+	}
+	fmt.Printf("Updated stack-version to %s in libbeat/docs/version.asciidoc\n", newVersion)
+	return nil
+}
+
 // UpdateDocs updates version references using release-branch defaults.
 func UpdateDocs(newVersion string) error {
 	releaseBranch := inferReleaseBranch(newVersion)
@@ -102,10 +115,6 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 	docBranch := opts.BaseBranch
 	if docBranch == "main" || docBranch == "current" {
 		docBranch = opts.ReleaseBranch
-	}
-
-	if err := updateDocsURLs(opts.BaseBranch, opts.ReleaseBranch); err != nil {
-		return err
 	}
 
 	versionRules := []replacementRule{
@@ -186,55 +195,6 @@ func UpdateTestEnv(latestVersion, currentVersion string) error {
 	}
 
 	fmt.Printf("Updated test environment files (latest=%s, current=%s)\n", latestVersion, currentVersion)
-	return nil
-}
-
-func updateDocsURLs(baseBranch, releaseBranch string) error {
-	if baseBranch == "" || releaseBranch == "" || baseBranch == releaseBranch {
-		return nil
-	}
-
-	oldSegment := "/" + baseBranch + "/"
-	newSegment := "/" + releaseBranch + "/"
-	updatedFiles := 0
-
-	err := filepath.WalkDir(".", func(path string, d fs.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if d.IsDir() {
-			if d.Name() == ".git" || d.Name() == "build" {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-
-		content, err := os.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		if !strings.Contains(string(content), docsURLMarker) {
-			return nil
-		}
-
-		newContent := strings.ReplaceAll(string(content), oldSegment, newSegment)
-		if newContent == string(content) {
-			return nil
-		}
-
-		if err := os.WriteFile(path, []byte(newContent), 0644); err != nil { //nolint:gosec // G703: fixed release tooling path
-			return fmt.Errorf("failed to write %s: %w", path, err)
-		}
-		fmt.Printf("Updated docs URLs in %s\n", path)
-		updatedFiles++
-		return nil
-	})
-	if err != nil {
-		return fmt.Errorf("failed to update docs URLs: %w", err)
-	}
-	if updatedFiles > 0 {
-		fmt.Printf("Updated docs URLs in %d files (%s -> %s)\n", updatedFiles, baseBranch, releaseBranch)
-	}
 	return nil
 }
 
