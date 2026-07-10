@@ -61,11 +61,13 @@ func checkRequirements(cfg *ReleaseConfig) error {
 	return nil
 }
 
-// RunMajorMinorRelease executes the major/minor release workflow (creates 1 PR)
+// RunMajorMinorRelease executes the feature-freeze workflow:
+// 1. Creates the release branch
+// 2. Opens a version/docs PR for NEXT_RELEASE (prepare-next-release)
+// 3. Opens a test-environment PR for NEXT_RELEASE
 func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	fmt.Println("=== Starting Major/Minor Release Workflow ===")
 
-	// Validate and check requirements
 	if err := cfg.Validate(); err != nil {
 		return err
 	}
@@ -79,51 +81,96 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 		return err
 	}
 
-	// Create release branch (e.g., "9.3")
 	releaseBranch := cfg.ReleaseBranch
-	fmt.Printf("Ensuring release branch: %s\n", releaseBranch)
-	if err := repo.EnsureBranch(releaseBranch); err != nil {
+	nextRelease := cfg.NextRelease
+
+	fmt.Printf("Creating release branch: %s\n", releaseBranch)
+	if err := repo.EnsureBranchFrom(cfg.BaseBranch, releaseBranch); err != nil {
 		return err
 	}
 
-	// Create update branch from release branch
-	updateBranch := fmt.Sprintf("update-version-%s", cfg.CurrentRelease)
-	fmt.Printf("Ensuring update branch: %s\n", updateBranch)
-	if err := repo.EnsureBranch(updateBranch); err != nil {
+	versionBranch := fmt.Sprintf("update-version-next-%s", nextRelease)
+	fmt.Printf("\n--- Creating PR 1: Version to NEXT_RELEASE ---\n")
+	if err := repo.EnsureBranchFrom(releaseBranch, versionBranch); err != nil {
+		return err
+	}
+	if err := UpdateVersion(nextRelease); err != nil {
+		return err
+	}
+	if err := UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     releaseBranch,
+		CurrentVersion: nextRelease,
+		ReleaseBranch:  releaseBranch,
+	}); err != nil {
+		return err
+	}
+	if err := RunMakeUpdate(); err != nil {
+		return err
+	}
+	versionCommitMsg := fmt.Sprintf("[Release] Update version to %s", nextRelease)
+	if _, err := repo.CommitAll(versionCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
-	// Update files
-	fmt.Println("Updating version files...")
-	if err := UpdateVersion(cfg.CurrentRelease); err != nil {
+	testEnvBranch := fmt.Sprintf("update-testing-env-next-%s", nextRelease)
+	fmt.Printf("\n--- Creating PR 2: Test Environments to NEXT_RELEASE ---\n")
+	if err := repo.EnsureBranchFrom(releaseBranch, testEnvBranch); err != nil {
+		return err
+	}
+	if err := UpdateTestEnv(cfg.CurrentRelease, nextRelease); err != nil {
+		return err
+	}
+	testEnvCommitMsg := fmt.Sprintf("[Release] Update test environments for %s", nextRelease)
+	testEnvCommitted, err := repo.CommitAll(testEnvCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
+	if err != nil {
 		return err
 	}
 
-	if err := UpdateDocs(cfg.CurrentRelease); err != nil {
-		return err
+	branchesToFinalize := []workflowPR{
+		{
+			branch: versionBranch,
+			base:   releaseBranch,
+			opts: PROptions{
+				Owner:     cfg.ProjectOwner,
+				Repo:      cfg.ProjectRepo,
+				Title:     fmt.Sprintf("[Release] Update version to %s", nextRelease),
+				Head:      versionBranch,
+				Base:      releaseBranch,
+				Body:      nextVersionPRBody(nextRelease, cfg.CurrentRelease),
+				Reviewers: cfg.ProjectReviewers,
+				Labels:    []string{"release version"},
+			},
+		},
 	}
 
-	if cfg.LatestRelease != "" {
-		if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
-			return err
-		}
+	if testEnvCommitted {
+		branchesToFinalize = append(branchesToFinalize, workflowPR{
+			branch: testEnvBranch,
+			base:   releaseBranch,
+			opts: PROptions{
+				Owner:     cfg.ProjectOwner,
+				Repo:      cfg.ProjectRepo,
+				Title:     fmt.Sprintf("[Release] Update test environments for %s", nextRelease),
+				Head:      testEnvBranch,
+				Base:      releaseBranch,
+				Body:      nextTestEnvPRBody(nextRelease, cfg.CurrentRelease),
+				Reviewers: cfg.ProjectReviewers,
+				Labels:    []string{"release testing"},
+			},
+		})
+	} else {
+		fmt.Println("No test environment changes to commit")
 	}
 
-	// Commit changes
-	commitMsg := fmt.Sprintf("Update version to %s for release", cfg.CurrentRelease)
-	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
-		return err
-	}
-
-	// Push and create PR (skip in dry-run mode)
 	if cfg.DryRun {
 		fmt.Println("\nDRY RUN: Skipping push and PR creation")
-		fmt.Printf("Branches prepared: %s, %s\n", releaseBranch, updateBranch)
-		fmt.Println("Review changes with 'git diff'")
+		fmt.Printf("Release branch prepared: %s\n", releaseBranch)
+		for _, item := range branchesToFinalize {
+			fmt.Printf("Branch prepared: %s\n", item.branch)
+		}
 		return nil
 	}
 
-	// Push release branch first
 	if err := repo.CheckoutBranch(releaseBranch); err != nil {
 		return err
 	}
@@ -132,46 +179,31 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	}
 
 	gh := NewGitHubClient(cfg.GitHubToken)
-	prBody := fmt.Sprintf(`## Release %s
-
-This PR prepares the repository for the %s release.
-
-### Changes
-- Updated version to %s
-- Updated documentation references
-- Updated test environment configurations
-
-cc @%s
-`, cfg.CurrentRelease, cfg.CurrentRelease, cfg.CurrentRelease, strings.Join(cfg.ProjectReviewers, " @"))
-
-	prOpts := PROptions{
-		Owner:     cfg.ProjectOwner,
-		Repo:      cfg.ProjectRepo,
-		Title:     fmt.Sprintf("Release %s", cfg.CurrentRelease),
-		Head:      updateBranch,
-		Base:      releaseBranch,
-		Body:      prBody,
-		Draft:     false,
-		Reviewers: cfg.ProjectReviewers,
-		Labels:    []string{"release", "version"},
-	}
-
-	pr, err := finalizePR(repo, gh, updateBranch, releaseBranch, prOpts)
-	if err != nil {
-		return err
+	var prs []*github.PullRequest
+	for i, item := range branchesToFinalize {
+		pr, err := finalizePR(repo, gh, item.branch, item.base, item.opts)
+		if err != nil {
+			return fmt.Errorf("failed to finalize PR %d/%d: %w", i+1, len(branchesToFinalize), err)
+		}
+		if pr != nil {
+			prs = append(prs, pr)
+		}
 	}
 
 	fmt.Printf("\n=== Major/Minor Release Workflow Complete ===\n")
-	if pr != nil {
-		fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
-	} else {
-		fmt.Println("No PR created (release already up to date)")
+	fmt.Printf("Release branch created: %s\n", releaseBranch)
+	for i, pr := range prs {
+		fmt.Printf("PR %d: %s\n", i+1, pr.GetHTMLURL())
 	}
+	if len(prs) == 0 {
+		fmt.Println("No PRs created (release already up to date)")
+	}
+	fmt.Println("\nNote: Release notes PR should be created separately using release:runChangelog")
 
 	return nil
 }
 
-// RunPatchRelease executes the patch release workflow (creates 2 PRs)
+// RunPatchRelease executes the patch release workflow (creates up to 3 PRs)
 func RunPatchRelease(cfg *ReleaseConfig) error {
 	fmt.Println("=== Starting Patch Release Workflow ===")
 
@@ -183,154 +215,135 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 		return err
 	}
 
-	// Define PRs to create
-	prConfigs := []PRConfig{
-		{
-			BranchName: fmt.Sprintf("update-docs-version-%s", cfg.CurrentRelease),
-			Title:      fmt.Sprintf("Update docs and version for %s", cfg.CurrentRelease),
-			Body: fmt.Sprintf(`## Update Documentation and Version for %s
-
-This PR updates documentation and version files for the %s patch release.
-
-### Changes
-- Updated version to %s
-- Updated documentation references
-`, cfg.CurrentRelease, cfg.CurrentRelease, cfg.CurrentRelease),
-			Labels: []string{"release", "version", "docs"},
-		},
-		{
-			BranchName: fmt.Sprintf("update-testing-env-%s", cfg.CurrentRelease),
-			Title:      fmt.Sprintf("Update testing environment for %s", cfg.CurrentRelease),
-			Body: fmt.Sprintf(`## Update Testing Environment for %s
-
-This PR updates test environment configurations for the %s patch release.
-
-### Changes
-- Updated docker-compose files with new version
-`, cfg.CurrentRelease, cfg.CurrentRelease),
-			Labels: []string{"release", "testing"},
-		},
+	if cfg.LatestRelease == "" {
+		return fmt.Errorf("LATEST_RELEASE is required for patch releases")
 	}
 
-	// For each PR config, create branch, make changes, commit, and push
 	repo, err := OpenRepo(".")
 	if err != nil {
 		return err
 	}
 
-	// PR 1: Docs and version
-	fmt.Println("\n--- Preparing PR 1: Docs and Version ---")
-	if err := repo.EnsureBranch(prConfigs[0].BranchName); err != nil {
-		return err
+	releaseBranch := cfg.ReleaseBranch
+	if releaseBranch == "" {
+		releaseBranch = inferReleaseBranch(cfg.CurrentRelease)
 	}
 
+	versionBranch := fmt.Sprintf("update-version-%s", cfg.CurrentRelease)
+	fmt.Println("\n--- Creating PR 1: Version ---")
+	if err := repo.EnsureBranchFrom(releaseBranch, versionBranch); err != nil {
+		return err
+	}
 	if err := UpdateVersion(cfg.CurrentRelease); err != nil {
 		return err
 	}
-	if err := UpdateDocs(cfg.CurrentRelease); err != nil {
+	versionCommitMsg := fmt.Sprintf("[Release] update version")
+	versionCommitted, err := repo.CommitAll(versionCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
+	if err != nil {
 		return err
 	}
 
-	if _, err := repo.CommitAll(fmt.Sprintf("Update docs and version for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
+	docsBranch := fmt.Sprintf("update-docs-%s", cfg.CurrentRelease)
+	fmt.Println("\n--- Creating PR 2: Docs ---")
+	if err := repo.EnsureBranchFrom(releaseBranch, docsBranch); err != nil {
+		return err
+	}
+	if err := UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     releaseBranch,
+		CurrentVersion: cfg.CurrentRelease,
+		ReleaseBranch:  releaseBranch,
+	}); err != nil {
+		return err
+	}
+	if err := RunMakeUpdate(); err != nil {
+		return err
+	}
+	docsCommitMsg := fmt.Sprintf("docs: update docs")
+	docsCommitted, err := repo.CommitAll(docsCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
+	if err != nil {
 		return err
 	}
 
-	// PR 2: Test environment (only if LATEST_RELEASE is set)
-	testEnvHasChanges := false
-	if cfg.LatestRelease != "" {
-		fmt.Println("\n--- Preparing PR 2: Test Environment ---")
-		if err := repo.CheckoutBranch(cfg.BaseBranch); err != nil {
-			return err
-		}
-		if err := repo.EnsureBranch(prConfigs[1].BranchName); err != nil {
-			return err
-		}
-
-		if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
-			return err
-		}
-
-		committed, err := repo.CommitAll(fmt.Sprintf("Update testing environment for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail)
-		if err != nil {
-			return err
-		}
-		if committed {
-			testEnvHasChanges = true
-		} else {
-			ahead, err := repo.HasCommitsAheadOf(cfg.BaseBranch)
-			if err != nil {
-				return err
-			}
-			testEnvHasChanges = ahead
-			if !testEnvHasChanges {
-				fmt.Println("No test environment changes to commit")
-			}
-		}
-	} else {
-		fmt.Println("\nSkipping test environment PR (LATEST_RELEASE not set)")
+	testEnvBranch := fmt.Sprintf("update-testing-env-%s", cfg.CurrentRelease)
+	fmt.Println("\n--- Creating PR 3: Test Environment ---")
+	if err := repo.EnsureBranchFrom(releaseBranch, testEnvBranch); err != nil {
+		return err
+	}
+	if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
+		return err
+	}
+	testEnvCommitMsg := fmt.Sprintf("[Release] update test environment")
+	testEnvCommitted, err := repo.CommitAll(testEnvCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
+	if err != nil {
+		return err
 	}
 
-	// Determine which branches to push and which PRs to create
-	branchesToFinalize := []struct {
-		branch string
-		base   string
-		config PRConfig
-	}{
-		{
-			branch: prConfigs[0].BranchName,
-			base:   cfg.BaseBranch,
-			config: prConfigs[0],
-		},
+	branchesToFinalize := make([]workflowPR, 0, 3)
+	if versionCommitted {
+		branchesToFinalize = append(branchesToFinalize, workflowPR{
+			branch: versionBranch,
+			base:   releaseBranch,
+			opts: PROptions{
+				Owner:     cfg.ProjectOwner,
+				Repo:      cfg.ProjectRepo,
+				Title:     fmt.Sprintf("[Release] update version %s", cfg.CurrentRelease),
+				Head:      versionBranch,
+				Base:      releaseBranch,
+				Body:      patchVersionPRBody(cfg.CurrentRelease),
+				Reviewers: cfg.ProjectReviewers,
+				Labels:    []string{"release version"},
+			},
+		})
 	}
-
-	if testEnvHasChanges {
-		branchesToFinalize = append(branchesToFinalize, struct {
-			branch string
-			base   string
-			config PRConfig
-		}{
-			branch: prConfigs[1].BranchName,
-			base:   cfg.BaseBranch,
-			config: prConfigs[1],
+	if docsCommitted {
+		branchesToFinalize = append(branchesToFinalize, workflowPR{
+			branch: docsBranch,
+			base:   releaseBranch,
+			opts: PROptions{
+				Owner:     cfg.ProjectOwner,
+				Repo:      cfg.ProjectRepo,
+				Title:     fmt.Sprintf("docs: update docs versions %s", cfg.CurrentRelease),
+				Head:      docsBranch,
+				Base:      releaseBranch,
+				Body:      patchDocsPRBody(cfg.CurrentRelease),
+				Reviewers: cfg.ProjectReviewers,
+				Labels:    []string{"release docs"},
+			},
+		})
+	}
+	if testEnvCommitted {
+		branchesToFinalize = append(branchesToFinalize, workflowPR{
+			branch: testEnvBranch,
+			base:   releaseBranch,
+			opts: PROptions{
+				Owner:     cfg.ProjectOwner,
+				Repo:      cfg.ProjectRepo,
+				Title:     fmt.Sprintf("[Release] Update test environments for %s", cfg.CurrentRelease),
+				Head:      testEnvBranch,
+				Base:      releaseBranch,
+				Body:      patchTestEnvPRBody(cfg.CurrentRelease),
+				Reviewers: cfg.ProjectReviewers,
+				Labels:    []string{"release testing"},
+			},
 		})
 	}
 
-	// Push and create PRs (skip in dry-run mode)
+	if len(branchesToFinalize) == 0 {
+		fmt.Println("No changes to commit for patch release")
+	}
+
 	if cfg.DryRun {
 		fmt.Println("\nDRY RUN: Skipping push and PR creation")
-		branchNames := make([]string, 0, len(branchesToFinalize))
 		for _, item := range branchesToFinalize {
-			branchNames = append(branchNames, item.branch)
+			fmt.Printf("Branch prepared: %s\n", item.branch)
 		}
-		fmt.Printf("Branches prepared: %v\n", branchNames)
 		return nil
 	}
 
 	gh := NewGitHubClient(cfg.GitHubToken)
 	var prs []*github.PullRequest
 	for i, item := range branchesToFinalize {
-		baseBranch := item.config.Base
-		if baseBranch == "" {
-			if cfg.ReleaseBranch != "" {
-				baseBranch = cfg.ReleaseBranch
-			} else {
-				baseBranch = cfg.BaseBranch
-			}
-		}
-
-		opts := PROptions{
-			Owner:     cfg.ProjectOwner,
-			Repo:      cfg.ProjectRepo,
-			Title:     item.config.Title,
-			Head:      item.config.BranchName,
-			Base:      baseBranch,
-			Body:      item.config.Body,
-			Draft:     false,
-			Reviewers: cfg.ProjectReviewers,
-			Labels:    item.config.Labels,
-		}
-
-		pr, err := finalizePR(repo, gh, item.branch, item.base, opts)
+		pr, err := finalizePR(repo, gh, item.branch, item.base, item.opts)
 		if err != nil {
 			return fmt.Errorf("failed to finalize PR %d/%d: %w", i+1, len(branchesToFinalize), err)
 		}
@@ -350,36 +363,48 @@ This PR updates test environment configurations for the %s patch release.
 	return nil
 }
 
-// RunNextRelease executes the next release workflow (creates 2 PRs + backport PR)
+// RunNextRelease executes prepare-next-release only (2 PRs onto the release branch).
 func RunNextRelease(cfg *ReleaseConfig) error {
-	fmt.Println("=== Starting Next Release Workflow ===")
-	fmt.Println("Note: This workflow creates 2 PRs for version updates + 1 backport PR")
-
-	if err := cfg.Validate(); err != nil {
-		return err
-	}
-
-	// Implementation similar to RunPatchRelease but with additional backport PR
-	// This is a placeholder for the full implementation
-	fmt.Println("RunNextRelease - Full implementation pending")
-
-	return fmt.Errorf("RunNextRelease not fully implemented yet")
+	return RunMajorMinorRelease(cfg)
 }
 
-// RunNextDevMinor executes the next dev minor workflow (creates 3 PRs)
-func RunNextDevMinor(cfg *ReleaseConfig) error {
-	fmt.Println("=== Starting Next Dev Minor Workflow ===")
-	fmt.Println("Note: This workflow creates 3 PRs (version + docs + test-env)")
+type workflowPR struct {
+	branch string
+	base   string
+	opts   PROptions
+}
 
-	if err := cfg.Validate(); err != nil {
-		return err
-	}
+func nextVersionPRBody(nextRelease, currentRelease string) string {
+	return fmt.Sprintf(`Updates references to the new release %s.
 
-	// Implementation similar to RunPatchRelease but with 3 PRs
-	// This is a placeholder for the full implementation
-	fmt.Println("RunNextDevMinor - Full implementation pending")
+Merge after the release %s.
+`, nextRelease, currentRelease)
+}
 
-	return fmt.Errorf("RunNextDevMinor not fully implemented yet")
+func nextTestEnvPRBody(nextRelease, currentRelease string) string {
+	return fmt.Sprintf(`Update test environment versions to the correct Elastic Stack version.
+
+Merge only after the release of %s.
+`, currentRelease)
+}
+
+func patchDocsPRBody(currentRelease string) string {
+	return fmt.Sprintf(`Updates docs versions to %s.
+
+Merge before the final Release build.
+`, currentRelease)
+}
+
+func patchVersionPRBody(currentRelease string) string {
+	return fmt.Sprintf(`Updates version to %s.
+
+Merge before the final Release build.
+`, currentRelease)
+}
+
+func patchTestEnvPRBody(currentRelease string) string {
+	return fmt.Sprintf(`Updates test environments for %s.
+`, currentRelease)
 }
 
 // finalizePR pushes a branch when it has new commits and creates or reuses an open PR.

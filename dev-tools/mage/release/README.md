@@ -28,8 +28,8 @@ This package provides release automation for the Beats project, migrated from Ma
 - Deprecated version checks
 
 **Workflows supported:**
-1. **Major/Minor Release** - Creates 1 PR with all updates
-2. **Patch Release** - Creates 2 PRs (docs+version, test-env)
+1. **Major/Minor Release** - Creates release branch + 2 PRs for NEXT_RELEASE (version/docs, test-env)
+2. **Patch Release** - Creates up to 3 PRs (version, docs, test-env)
 3. **Changelog** - Generates changelog and creates 1 PR
 
 ## Prerequisites

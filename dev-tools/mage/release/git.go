@@ -91,6 +91,26 @@ func (g *GitRepo) CreateBranch(branchName string) error {
 	return nil
 }
 
+// EnsureBranchFrom checks out baseBranch and creates or checks out branchName from that point.
+func (g *GitRepo) EnsureBranchFrom(baseBranch, branchName string) error {
+	if err := g.CheckoutBranch(baseBranch); err != nil {
+		return fmt.Errorf("failed to checkout base branch %s: %w", baseBranch, err)
+	}
+
+	exists, err := g.BranchExists(branchName)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return g.CheckoutBranch(branchName)
+	}
+
+	if err := g.CreateBranch(branchName); err != nil {
+		return err
+	}
+	return g.CheckoutBranch(branchName)
+}
+
 // EnsureBranch checks out an existing local or remote branch, or creates it from HEAD.
 func (g *GitRepo) EnsureBranch(branchName string) error {
 	exists, err := g.BranchExists(branchName)

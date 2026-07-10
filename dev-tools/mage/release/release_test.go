@@ -148,13 +148,21 @@ func TestUpdateDocs(t *testing.T) {
 		t.Fatalf("Failed to create version.asciidoc: %v", err)
 	}
 
-	// Create K8s manifest
+	// Create K8s manifest with wolfi image tag (matches production manifests)
 	k8sFile := filepath.Join(tmpDir, "deploy/kubernetes/metricbeat-kubernetes.yaml")
-	k8sContent := `image: docker.elastic.co/beats/metricbeat:9.3.0
+	k8sContent := `image: docker.elastic.co/beats/metricbeat-wolfi:9.3.0
 `
 	err = os.WriteFile(k8sFile, []byte(k8sContent), 0644)
 	if err != nil {
 		t.Fatalf("Failed to create K8s file: %v", err)
+	}
+
+	heartbeatFile := filepath.Join(tmpDir, "deploy/kubernetes/heartbeat-kubernetes.yaml")
+	heartbeatContent := `image: docker.elastic.co/beats/heartbeat-wolfi:9.3.0
+`
+	err = os.WriteFile(heartbeatFile, []byte(heartbeatContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create heartbeat K8s file: %v", err)
 	}
 
 	// Change to temp directory
@@ -186,10 +194,65 @@ func TestUpdateDocs(t *testing.T) {
 		t.Errorf("version.asciidoc doc-branch not updated. Got:\n%s", string(content))
 	}
 
-	// Verify K8s file was updated
+	// Verify K8s files were updated
 	content, _ = os.ReadFile(k8sFile)
-	if !strings.Contains(string(content), "docker.elastic.co/beats/metricbeat:9.4.0") {
+	if !strings.Contains(string(content), "docker.elastic.co/beats/metricbeat-wolfi:9.4.0") {
 		t.Errorf("K8s file not updated. Got:\n%s", string(content))
+	}
+	content, _ = os.ReadFile(heartbeatFile)
+	if !strings.Contains(string(content), "docker.elastic.co/beats/heartbeat-wolfi:9.4.0") {
+		t.Errorf("Heartbeat K8s file not updated. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsDocBranchCurrent(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.3.0
+:doc-branch: current
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	err = UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     "main",
+		CurrentVersion: "9.5.1",
+		ReleaseBranch:  "9.5",
+	})
+	if err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.5.1") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: 9.5") {
+		t.Errorf("doc-branch not updated from current. Got:\n%s", string(content))
 	}
 }
 
@@ -207,11 +270,24 @@ func TestUpdateTestEnv(t *testing.T) {
 	latestYml := filepath.Join(testEnvDir, "latest.yml")
 	latestContent := `services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.2
 `
 	err = os.WriteFile(latestYml, []byte(latestContent), 0644)
 	if err != nil {
 		t.Fatalf("Failed to create latest.yml: %v", err)
+	}
+
+	composeDir := filepath.Join(tmpDir, "metricbeat")
+	err = os.MkdirAll(composeDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create metricbeat dir: %v", err)
+	}
+	composeFile := filepath.Join(composeDir, "docker-compose.yml")
+	composeContent := `image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-9.2.2}-1
+`
+	err = os.WriteFile(composeFile, []byte(composeContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create docker-compose.yml: %v", err)
 	}
 
 	// Change to temp directory
@@ -228,16 +304,22 @@ func TestUpdateTestEnv(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	// Test updating test env
+	// LATEST=9.3.0, CURRENT=9.4.0 per beats.mak semantics
 	err = UpdateTestEnv("9.3.0", "9.4.0")
 	if err != nil {
 		t.Fatalf("UpdateTestEnv failed: %v", err)
 	}
 
-	// Verify file was updated
+	// latest.yml uses LATEST version
 	content, _ := os.ReadFile(latestYml)
-	if !strings.Contains(string(content), "docker.elastic.co/elasticsearch/elasticsearch:9.4.0") {
-		t.Errorf("Test env file not updated. Got:\n%s", string(content))
+	if !strings.Contains(string(content), "docker.elastic.co/elasticsearch/elasticsearch:9.3.0") {
+		t.Errorf("latest.yml should use latest version. Got:\n%s", string(content))
+	}
+
+	// docker-compose defaults use LATEST version
+	content, _ = os.ReadFile(composeFile)
+	if !strings.Contains(string(content), "${ELASTICSEARCH_VERSION:-9.3.0}") {
+		t.Errorf("docker-compose default not updated. Got:\n%s", string(content))
 	}
 }
 
@@ -362,9 +444,9 @@ func TestUpdateTestEnvNoChanges(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	// Test updating test env with non-matching version
-	// This should complete without error even though no changes are made
-	err = UpdateTestEnv("9.2.0", "9.3.0")
+	// TestUpdateTestEnvNoChanges - uses non-matching file content; latest.yml keeps 9.1.0
+	// Same latest version already present — should not modify latest.yml
+	err = UpdateTestEnv("9.1.0", "9.3.0")
 	if err != nil {
 		t.Fatalf("UpdateTestEnv should not fail when no matches found: %v", err)
 	}

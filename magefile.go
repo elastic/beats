@@ -317,13 +317,22 @@ func (Release) RunMajorMinor() error {
 }
 
 // RunPatch executes the complete patch release workflow
-// This creates 2 PRs (docs+version, test-env)
+// This creates up to 3 PRs (version, docs, test-env)
 func (Release) RunPatch() error {
 	cfg, err := release.LoadConfigFromEnv()
 	if err != nil {
 		return err
 	}
 	return release.RunPatchRelease(cfg)
+}
+
+// RunNextRelease executes the next-release workflow (2 PRs onto the release branch)
+func (Release) RunNextRelease() error {
+	cfg, err := release.LoadConfigFromEnv()
+	if err != nil {
+		return err
+	}
+	return release.RunNextRelease(cfg)
 }
 
 // RunChangelog executes the complete changelog workflow

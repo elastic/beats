@@ -4,7 +4,7 @@ Quick reference guide for Beats release automation using mage.
 
 ## Prerequisites
 
-- Go 1.25+
+- Go 1.22+
 - Git
 - GitHub token with repo permissions
 - Python with beats-changelog package (for changelog workflows)
@@ -33,7 +33,7 @@ The following values are automatically inferred from `CURRENT_RELEASE` and can b
 
 - **LATEST_RELEASE**: Calculated as `CURRENT_RELEASE` with patch version decremented by 1
   - Example: `9.3.4` → `9.3.3`
-  - Note: Fails if patch version is 0 (use explicit env var for first patch release)
+  - Note: For `.0` minor releases, set `LATEST_RELEASE` explicitly when running patch or changelog workflows
 
 - **NEXT_RELEASE**: Calculated as `CURRENT_RELEASE` with patch version incremented by 1
   - Example: `9.3.4` → `9.3.5`
@@ -47,7 +47,7 @@ These values are inferred to reduce manual configuration. You can always overrid
 
 ### Major/Minor Release (9.3.0)
 
-Creates 1 PR with all version updates:
+Creates the release branch and 2 PRs for the next patch (e.g. 9.3.0 → PRs for 9.3.1):
 
 ```bash
 export CURRENT_RELEASE="9.3.0"
@@ -68,7 +68,7 @@ mage release:runMajorMinor
 
 ### Patch Release (9.2.1)
 
-Creates 2 PRs (docs+version, test-env):
+Creates up to 3 PRs (version, docs, test-env):
 
 ```bash
 git checkout 9.2
@@ -107,8 +107,9 @@ mage release:runChangelog
 These orchestrate the complete workflow:
 
 ```bash
-mage release:runMajorMinor    # Major/minor release (1 PR)
-mage release:runPatch          # Patch release (2 PRs)
+mage release:runMajorMinor    # Major/minor release (release branch + 2 PRs)
+mage release:runPatch          # Patch release (up to 3 PRs)
+mage release:runNextRelease    # Alias for major/minor next-release PRs
 mage release:runChangelog      # Changelog workflow (1 PR)
 ```
 

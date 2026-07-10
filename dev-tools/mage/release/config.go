@@ -128,8 +128,7 @@ func inferLatestRelease(currentRelease string) (string, error) {
 		return "", fmt.Errorf("invalid patch version: %s", parts[2])
 	}
 
-	// For minor releases (e.g., 9.5.0), we cannot infer the previous release
-	// User must provide LATEST_RELEASE explicitly via environment variable
+	// For minor releases (e.g., 9.5.0), the previous release must be set via LATEST_RELEASE.
 	if patch == 0 {
 		return "", nil
 	}
