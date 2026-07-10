@@ -209,9 +209,23 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			state.Stored = true
 		}
 
+		finalize := objHandler.FinalizeS3Object
+
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
+<<<<<<< HEAD
 			err := in.states.AddState(state)
+=======
+			// Finalize the object (backup/delete) after all events are ACKed.
+			// Only successfully processed objects are finalized.
+			if state.Stored {
+				if err := finalize(); err != nil {
+					in.log.Errorf("failed finalizing S3 object key %q in bucket %q: %v", state.Key, state.Bucket, err)
+				}
+			}
+
+			err := in.registry.AddState(state)
+>>>>>>> e3ddd67c0 (Fix: Implement backup_to_bucket_ and delete_after_backup for aws-s3 polling mode (#49734))
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure checkpointing (saving completed object state): %s", err.Error()))
