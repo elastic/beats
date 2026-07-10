@@ -155,7 +155,18 @@ func (s *harvestSession) ReadSlice(
 	}
 	defer r.Close() // keepFileOpen: closes the pipeline, leaves the fd open
 
+	var deadline time.Time
+	if s.inp.sliceBudget > 0 {
+		deadline = time.Now().Add(s.inp.sliceBudget)
+	}
+
 	for ctx.Cancelation.Err() == nil {
+		if !deadline.IsZero() && time.Now().After(deadline) {
+			s.readOffset = logReader.ReadOffset()
+			s.log.Debugf("Slice time budget reached: %s; yielding.", s.src.newPath)
+			return loginp.SliceYield, nil
+		}
+
 		message, err := r.Next()
 		if err != nil {
 			switch {

@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -245,6 +246,35 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		verdict, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
 		require.NoError(t, err, "an unexpected read error ends the slice without surfacing the error")
 		require.Equal(t, loginp.SliceDone, verdict)
+	})
+
+	t.Run("a slice budget yields before EOF even though more data remains", func(t *testing.T) {
+		// Enough lines that reading them all would take more than an
+		// effectively-zero budget, without depending on real timing.
+		content := strings.Repeat("line\n", 100)
+		s := newReadSession(t, closerConfig{}, content, 0)
+		s.inp.sliceBudget = time.Nanosecond // expires virtually immediately
+		pub := &countingPublisher{}
+
+		verdict, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceYield, verdict,
+			"a time-boxed slice must yield so Poll runs, not report done")
+		require.Less(t, len(pub.events), 100, "the budget must cut the slice short before EOF")
+	})
+
+	t.Run("no slice budget reads to EOF regardless of content size", func(t *testing.T) {
+		// sliceBudget's zero value (the default, when nothing needs a bounded
+		// slice) must not change behaviour: the slice still runs to EOF.
+		content := strings.Repeat("line\n", 100)
+		s := newReadSession(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}}, content, 0)
+		require.Zero(t, s.inp.sliceBudget)
+		pub := &countingPublisher{}
+
+		verdict, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceDone, verdict)
+		require.Len(t, pub.events, 100)
 	})
 }
 

@@ -35,6 +35,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -199,6 +200,60 @@ paths:
 			}
 		})
 	}
+}
+
+// TestConfigure_SliceBudget asserts configure only bounds ReadSlice's duration
+// (filestream.sliceBudget, at close.on_state_change.check_interval) when
+// something depends on Poll running while a file stays continuously busy:
+// harvester_limit needs a close condition to free its slot, and
+// close.on_state_change.renamed only matters for a file still being written to
+// under its old name. Otherwise it's left unbounded to avoid the extra
+// pipeline-rebuild/stat overhead where nothing needs it.
+func TestConfigure_SliceBudget(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
+	require.NoError(t, err)
+
+	build := func(t *testing.T, extra string) *filestream {
+		t.Helper()
+		cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: test
+paths:
+  - /var/log/foo
+%s
+`, extra))
+		_, harvester, err := configure(cfg, logger, srcIdentifier)
+		require.NoError(t, err)
+		fs, ok := harvester.(*filestream)
+		require.True(t, ok)
+		return fs
+	}
+
+	t.Run("unset by default", func(t *testing.T) {
+		fs := build(t, "")
+		assert.Zero(t, fs.sliceBudget, "no setting needs a bounded slice")
+	})
+
+	t.Run("set when harvester_limit is enabled", func(t *testing.T) {
+		fs := build(t, "harvester_limit: 5")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("set when close.on_state_change.renamed is enabled", func(t *testing.T) {
+		fs := build(t, "close.on_state_change.renamed: true")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("set when close.reader.after_interval is enabled", func(t *testing.T) {
+		fs := build(t, "close.reader.after_interval: 30s")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("unaffected by settings that don't need it", func(t *testing.T) {
+		fs := build(t, "close.on_state_change.inactive: 1m\nclose.on_state_change.removed: true")
+		assert.Zero(t, fs.sliceBudget)
+	})
 }
 
 func TestNewFile(t *testing.T) {

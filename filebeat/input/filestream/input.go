@@ -74,6 +74,11 @@ type filestream struct {
 	includeFileFingerprint    bool
 	hasLineFilter             bool
 
+	// sliceBudget, when > 0, bounds how long a single ReadSlice call keeps
+	// reading a file that never runs dry, so Poll still runs on schedule for a
+	// continuously-busy file.
+	sliceBudget time.Duration
+
 	// Function references for testing
 	waitGracePeriodFn func(
 		ctx input.Context,
@@ -159,6 +164,12 @@ func configure(
 		tickFn:                    time.Tick,
 		removeFn:                  os.Remove,
 		statFn:                    os.Stat,
+	}
+
+	// Bound slice duration only when something depends on Poll running while a
+	// file stays continuously busy.
+	if c.HarvesterLimit > 0 || c.Close.OnStateChange.Renamed || c.Close.Reader.AfterInterval > 0 {
+		filestream.sliceBudget = c.Close.OnStateChange.CheckInterval
 	}
 
 	// Read the scan interval from the prospector so we can use during the
