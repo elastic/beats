@@ -10,11 +10,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // fakeActionExtension implements ActionExtension for testing OtelManager's
@@ -51,7 +49,7 @@ func (a *fakeAction) Execute(_ context.Context, params map[string]interface{}) (
 }
 
 func TestOtelManager_RegisterAction(t *testing.T) {
-	m := &OtelManager{}
+	m := &OtelManager{logger: logp.NewNopLogger()}
 	ext := &fakeActionExtension{}
 
 	// Before an extension is set, RegisterAction/UnregisterAction must be safe
@@ -83,9 +81,7 @@ func TestOtelManager_RegisterAction(t *testing.T) {
 // so it is visible from this beat's own process. RegisterAction itself
 // cannot return an error: its signature is fixed by management.Manager.
 func TestOtelManager_RegisterAction_LogsExtensionError(t *testing.T) {
-	observedCore, observedLogs := observer.New(zapcore.ErrorLevel)
-	logger, err := logp.NewZapLogger(zap.New(observedCore))
-	require.NoError(t, err)
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "otelmanager")
 
 	m := &OtelManager{logger: logger}
 	ext := &fakeActionExtension{registerErr: assert.AnError}
@@ -100,7 +96,7 @@ func TestOtelManager_RegisterAction_LogsExtensionError(t *testing.T) {
 }
 
 func TestOtelManager_SetActionExtension_SharesReceiverNameWithDiagnostics(t *testing.T) {
-	m := &OtelManager{}
+	m := &OtelManager{logger: logp.NewNopLogger()}
 	diagExt := &fakeDiagnosticExtension{}
 	actionExt := &fakeActionExtension{}
 
