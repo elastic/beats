@@ -2794,6 +2794,19 @@ filebeat.inputs:
   # How long to wait before retrying a failed read.
   #consume_backoff: 2s
 
+  # Network timeout for the connection to the brokers (dial, read and write).
+  #timeout: 30s
+
+  # Keep-alive period for active network connections (0 disables it).
+  #keep_alive: 0s
+
+  # Consumer group session timeout. Increase for higher-latency consumers to
+  # avoid spurious rebalances.
+  #session_timeout: 10s
+
+  # How often the consumer sends heartbeats. Must be lower than session_timeout.
+  #heartbeat_interval: 3s
+
   # How long to wait for the minimum number of input bytes while reading.
   #max_wait_time: 250ms
 
