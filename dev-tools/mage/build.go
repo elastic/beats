@@ -127,18 +127,14 @@ func DefaultBuildArgs() BuildArgs {
 // The list of supported platforms is compiled based on the Go release notes: https://golang.org/doc/devel/release.html
 // The list has been updated according to the Go version: 1.16
 func positionIndependentCodeSupported() bool {
-	return oneOf(Platform.GOOS, "darwin") ||
-		(Platform.GOOS == "linux" && oneOf(Platform.GOARCH, "riscv64", "amd64", "arm", "arm64", "ppc64le", "386")) ||
+	return slices.Contains([]string{"darwin"}, Platform.GOOS) ||
+		(Platform.GOOS == "linux" && slices.Contains([]string{"riscv64", "amd64", "arm", "arm64", "ppc64le", "386"}, Platform.GOARCH)) ||
 		(Platform.GOOS == "aix" && Platform.GOARCH == "ppc64") ||
 
 		// Windows 32bit supports ASLR, but Windows Server 2003 and earlier do not.
 		// According to the support matrix (https://www.elastic.co/support/matrix), these old versions
 		// are not supported.
 		(Platform.GOOS == "windows")
-}
-
-func oneOf(value string, lst ...string) bool {
-	return slices.Contains(lst, value)
 }
 
 // DefaultGolangCrossBuildArgs returns the default BuildArgs for use in

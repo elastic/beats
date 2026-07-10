@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"syscall"
 	"time"
 
@@ -367,8 +366,4 @@ type containerServiceInfo struct {
 
 func (i *containerServiceInfo) Name() string {
 	return i.ContainerStatus.ServiceName()
-}
-
-func contains(list []string, item string) bool {
-	return slices.Contains(list, item)
 }
