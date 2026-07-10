@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"syscall"
 	"time"
 
@@ -374,10 +375,5 @@ func (i *containerServiceInfo) Name() string {
 }
 
 func contains(list []string, item string) bool {
-	for _, i := range list {
-		if item == i {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, item)
 }

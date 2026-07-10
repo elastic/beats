@@ -18,6 +18,7 @@
 package acker
 
 import (
+	"slices"
 	"sync"
 	"sync/atomic"
 
@@ -223,7 +224,7 @@ func (a *trackingACKer) ClientClosed() {}
 // If the output ACKs 3 events, then all events from index 0 to 6 will be reported because:
 // - the drop sequence for events 2 and 3 is in between the number of forwarded and ACKed events
 // - events 5-6 have been dropped as well, but event 7 is not ACKed yet
-func EventPrivateReporter(fn func(acked int, data []interface{})) beat.EventListener {
+func EventPrivateReporter(fn func(acked int, data []any)) beat.EventListener {
 	a := &eventDataACKer{fn: fn}
 	a.EventListener = TrackingCounter(a.onACK)
 	return a
@@ -232,8 +233,8 @@ func EventPrivateReporter(fn func(acked int, data []interface{})) beat.EventList
 type eventDataACKer struct {
 	beat.EventListener
 	mu   sync.Mutex
-	data []interface{}
-	fn   func(acked int, data []interface{})
+	data []any
+	fn   func(acked int, data []any)
 }
 
 func (a *eventDataACKer) AddEvent(event beat.Event, published bool) {
@@ -260,11 +261,11 @@ func (a *eventDataACKer) onACK(acked, total int) {
 
 // LastEventPrivateReporter reports only the 'latest' published and acked
 // event if a batch of events have been ACKed.
-func LastEventPrivateReporter(fn func(acked int, data interface{})) beat.EventListener {
+func LastEventPrivateReporter(fn func(acked int, data any)) beat.EventListener {
 	ignored := 0
-	return EventPrivateReporter(func(acked int, data []interface{}) {
-		for i := len(data) - 1; i >= 0; i-- {
-			if d := data[i]; d != nil {
+	return EventPrivateReporter(func(acked int, data []any) {
+		for _, v := range slices.Backward(data) {
+			if d := v; d != nil {
 				fn(ignored+acked, d)
 				ignored = 0
 				return

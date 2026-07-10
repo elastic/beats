@@ -85,7 +85,6 @@ func TestWhenProcessor(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.title, func(t *testing.T) {
 			makeFilter := func() beat.Processor {
 				cfg, err := conf.NewConfigFrom(test.filter)

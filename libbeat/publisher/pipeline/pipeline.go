@@ -337,11 +337,9 @@ func (p *Pipeline) startReaper() {
 	p.reaperPending = make(map[*client]struct{})
 	p.reaperNotify = make(chan struct{}, 1)
 	p.reaperDone = make(chan struct{})
-	p.reaperWG.Add(1)
-	go func() {
-		defer p.reaperWG.Done()
+	p.reaperWG.Go(func() {
 		p.reapClosedClients()
-	}()
+	})
 }
 
 // finalizeWhenDrained hands a Closed client to the reaper so it is finalized

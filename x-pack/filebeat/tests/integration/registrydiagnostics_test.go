@@ -44,11 +44,11 @@ func TestFilestreamRegistryIsInDiagnostics(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "stream-filestream-" + t.Name(),
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id":            "stream-filestream-" + t.Name(),
 						"enabled":       true,
 						"type":          "filestream",
-						"paths":         []interface{}{logfile},
+						"paths":         []any{logfile},
 						"file.identity": map[string]any{},
 						"prospector.scanner.fingerprint": map[string]any{
 							"enabled": false,
@@ -70,7 +70,7 @@ func TestFilestreamRegistryIsInDiagnostics(t *testing.T) {
 			Type: "file",
 			Name: "file",
 			Source: integration.RequireNewStruct(t,
-				map[string]interface{}{
+				map[string]any{
 					"type":     "file",
 					"path":     filebeat.TempDir(),
 					"filename": "output",
@@ -152,7 +152,7 @@ func TestEmptyegistryIsInDiagnostics(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "stream-benchmark-" + t.Name(),
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id":      "stream-benchmark-" + t.Name(),
 						"enabled": true,
 						"count":   2,
@@ -173,7 +173,7 @@ func TestEmptyegistryIsInDiagnostics(t *testing.T) {
 			Type: "file",
 			Name: "file",
 			Source: integration.RequireNewStruct(t,
-				map[string]interface{}{
+				map[string]any{
 					"type":     "file",
 					"path":     filebeat.TempDir(),
 					"filename": "output",

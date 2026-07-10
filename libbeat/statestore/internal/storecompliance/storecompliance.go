@@ -129,12 +129,12 @@ func testRemove(t *testing.T, factory BackendFactory) {
 }
 
 func testIteration(t *testing.T, factory BackendFactory) {
-	data := map[string]interface{}{
-		"a": map[string]interface{}{"field": "hello"},
-		"b": map[string]interface{}{"field": "world"},
+	data := map[string]any{
+		"a": map[string]any{"field": "hello"},
+		"b": map[string]any{"field": "world"},
 	}
 
-	addTestData := func(store *Store, reopen bool, data map[string]interface{}) {
+	addTestData := func(store *Store, reopen bool, data map[string]any) {
 		for k, v := range data {
 			store.MustSet(k, v)
 		}
@@ -145,9 +145,9 @@ func testIteration(t *testing.T, factory BackendFactory) {
 		t.Run("all keys", WithStore(factory, func(t *testing.T, store *Store) {
 			addTestData(store, reopen, data)
 
-			got := map[string]interface{}{}
+			got := map[string]any{}
 			err := store.Each(func(key string, dec backend.ValueDecoder) (bool, error) {
-				var tmp interface{}
+				var tmp any
 				if err := dec.Decode(&tmp); err != nil {
 					return false, err
 				}

@@ -101,7 +101,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 	var sourceProcessor beat.Processor
 	var err error
 	if config.MatchSource {
-		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
+		var procConf, _ = conf.NewConfigFrom(map[string]any{
 			"field":     "log.file.path",
 			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,

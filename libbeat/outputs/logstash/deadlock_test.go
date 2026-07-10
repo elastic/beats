@@ -42,7 +42,7 @@ func TestDeadlockListener(t *testing.T) {
 	dl.ackChan = make(chan int, 1)
 
 	// Verify that the listener doesn't trigger when receiving regular acks
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		// Advance the "current time" and ping the ticker channel to refresh
 		// the timeout check, then send an ack and confirm that it hasn't timed
 		// out yet.

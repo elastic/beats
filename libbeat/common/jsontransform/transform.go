@@ -31,15 +31,15 @@ func TransformNumbers(dict mapstr.M) {
 		switch vv := v.(type) {
 		case json.Number:
 			dict[k] = transformNumber(vv)
-		case map[string]interface{}:
+		case map[string]any:
 			TransformNumbers(vv)
-		case []interface{}:
+		case []any:
 			transformNumbersArray(vv)
 		}
 	}
 }
 
-func transformNumber(value json.Number) interface{} {
+func transformNumber(value json.Number) any {
 	i64, err := value.Int64()
 	if err == nil {
 		return i64
@@ -51,14 +51,14 @@ func transformNumber(value json.Number) interface{} {
 	return value.String()
 }
 
-func transformNumbersArray(arr []interface{}) {
+func transformNumbersArray(arr []any) {
 	for i, v := range arr {
 		switch vv := v.(type) {
 		case json.Number:
 			arr[i] = transformNumber(vv)
-		case map[string]interface{}:
+		case map[string]any:
 			TransformNumbers(vv)
-		case []interface{}:
+		case []any:
 			transformNumbersArray(vv)
 		}
 	}
