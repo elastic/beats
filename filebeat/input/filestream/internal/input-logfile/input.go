@@ -43,6 +43,7 @@ type managedInput struct {
 	harvesterLimit         uint64
 	readUntilEOF           ReadUntilEOFConfig
 	backoff                BackoffConfig
+	stateCheckInterval     time.Duration
 }
 
 // Name is required to implement the v2.Input interface
@@ -87,6 +88,7 @@ func (inp *managedInput) Run(
 		inp.id,
 		inp.readUntilEOF,
 		inp.backoff,
+		inp.stateCheckInterval,
 	)
 	hg.start()
 

@@ -481,6 +481,37 @@ func TestHarvesterRunner_ParkPollGrowsBackoff(t *testing.T) {
 	require.NoError(t, g.StopHarvesters())
 }
 
+// TestHarvesterRunner_ParkCapsDueAtStateCheckInterval asserts park schedules the
+// next poll at min(backoff, stateCheckInterval): once backoff has grown past
+// stateCheckInterval, the source must still be polled at least every
+// stateCheckInterval (so close.on_state_change.removed/renamed/inactive and
+// close.reader.after_interval keep being evaluated), not at the larger backoff
+// cadence. It also asserts the state-check deadline itself only advances once
+// reached, so parking again before then does not reset it early.
+func TestHarvesterRunner_ParkCapsDueAtStateCheckInterval(t *testing.T) {
+	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
+	g.stateCheckInterval = 5 * time.Second
+
+	state := &sourceState{srcID: "x", ctx: startContext(t), done: make(chan struct{})}
+	g.mu.Lock()
+	g.states["x"] = state
+
+	before := time.Now()
+	g.park(state, 2*time.Second) // backoff (2s) below the check interval (5s): backoff governs.
+	assert.WithinDuration(t, before.Add(2*time.Second), state.nextCheck, 100*time.Millisecond,
+		"a fresh backoff below the check interval should govern the due time")
+	firstDeadline := state.nextStateCheck
+	assert.WithinDuration(t, before.Add(5*time.Second), firstDeadline, 100*time.Millisecond,
+		"the state-check deadline should be initialised on the first park")
+
+	g.park(state, 20*time.Second) // backoff now exceeds the check interval: it must not win.
+	assert.Equal(t, firstDeadline, state.nextStateCheck,
+		"the state-check deadline must not reset early just because we parked again before it was reached")
+	assert.Equal(t, firstDeadline, state.nextCheck,
+		"due must be capped at the state-check deadline once backoff grows past it")
+	g.mu.Unlock()
+}
+
 // TestHarvesterRunner_StopHarvestersStopsParked asserts StopHarvesters tears down
 // a parked source and stops the waker (no goroutine leak).
 func TestHarvesterRunner_StopHarvestersStopsParked(t *testing.T) {
@@ -737,6 +768,39 @@ func TestHarvesterRunner_StopHarvestersIdempotent(t *testing.T) {
 	g.start()
 	require.NoError(t, g.StopHarvesters())
 	require.NoError(t, g.StopHarvesters(), "StopHarvesters must be idempotent")
+}
+
+// TestHarvesterRunner_StopHarvestersTimesOutOnStuckHarvester asserts
+// StopHarvesters gives up and returns an error after stopTimeout instead of
+// blocking forever when a harvester doesn't exit after cancellation (e.g. stuck
+// in Publish while output backpressure never clears): the input's shutdown must
+// make forward progress, leaving the stuck harvester to finish in the
+// background whenever it eventually unblocks.
+func TestHarvesterRunner_StopHarvestersTimesOutOnStuckHarvester(t *testing.T) {
+	release := make(chan struct{}) // closed at the end to let the stuck read finish
+	h := &fakeHarvester{
+		readFn: func(_ int, ctx v2.Context) (SliceVerdict, error) {
+			<-ctx.Cancelation.Done() // acknowledges cancellation...
+			<-release                // ...but doesn't actually return, like a blocked Publish
+			return SliceDone, nil
+		},
+	}
+	g := testHarvesterRunner(t, h, 0)
+	g.stopTimeout = 50 * time.Millisecond // short-circuit the real (~1 minute) default for the test
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+	requireEventually(t, func() bool { return h.opens() == 1 }, "harvester should be running")
+
+	err := g.StopHarvesters()
+	require.Error(t, err, "StopHarvesters must not block forever on a stuck harvester")
+	assert.Contains(t, err.Error(), "timed out")
+
+	close(release)
+	requireEventually(t, func() bool { return !g.hasID(id) },
+		"the stuck harvester should tear itself down once it eventually unblocks")
 }
 
 // TestHarvesterRunner_StartAfterShutdownIsIgnored asserts that once the runner is
@@ -1070,6 +1134,7 @@ func testHarvesterRunnerEOF(t *testing.T, h Harvester, limit uint64, eof ReadUnt
 		"test-input",
 		eof,
 		DefaultBackoffConfig(),
+		DefaultStateCheckInterval,
 	)
 }
 

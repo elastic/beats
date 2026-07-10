@@ -486,6 +486,61 @@ backoff:
 	})
 }
 
+// TestInputManager_Create_StateCheckInterval asserts InputManager.Create wires
+// close.on_state_change.check_interval (independently parsed here, like
+// backoff and read_until_eof) into the harvesterRunner it builds: defaulted
+// when absent, and taken from the config when set.
+func TestInputManager_Create_StateCheckInterval(t *testing.T) {
+	newManager := func(t *testing.T) *InputManager {
+		t.Helper()
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		testStore, err := storeReg.Get("test")
+		require.NoError(t, err)
+		log, _ := newBufferLogger()
+		return &InputManager{
+			Logger:     log,
+			StateStore: testStateStore{Store: testStore},
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+				var wg sync.WaitGroup
+				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+			},
+		}
+	}
+
+	t.Run("defaulted when absent from config", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: check-interval-default
+paths:
+  - /var/log/foo
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, DefaultStateCheckInterval, mi.stateCheckInterval)
+	})
+
+	t.Run("taken from config when set", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: check-interval-custom
+paths:
+  - /var/log/foo
+close.on_state_change.check_interval: 20s
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, 20*time.Second, mi.stateCheckInterval)
+	})
+}
+
 func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	buf := &bytes.Buffer{}
 	encoderConfig := zap.NewProductionEncoderConfig()

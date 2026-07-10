@@ -77,14 +77,15 @@ type sourceState struct {
 	cancel    context.CancelFunc
 
 	// Runner bookkeeping, guarded by harvesterRunner.mu.
-	status    sourceStatus
-	holdsSlot bool // occupies one of the harvesterLimit open slots
-	setUp     bool // resources (lock/client/session) acquired
-	isGZIP    bool // source reads a GZIP file; for the GZIP lifecycle metrics
-	backoff   time.Duration
-	nextCheck time.Time
-	finished  bool
-	done      chan struct{} // closed by finish; lets Restart wait for teardown
+	status         sourceStatus
+	holdsSlot      bool // occupies one of the harvesterLimit open slots
+	setUp          bool // resources (lock/client/session) acquired
+	isGZIP         bool // source reads a GZIP file; for the GZIP lifecycle metrics
+	backoff        time.Duration
+	nextCheck      time.Time
+	nextStateCheck time.Time
+	finished       bool
+	done           chan struct{} // closed by finish; lets Restart wait for teardown
 }
 
 // harvesterRunner implements HarvesterGroup by spawning one short-lived
@@ -125,6 +126,19 @@ type harvesterRunner struct {
 	// backoff bounds how the waker paces re-checking a parked source; see
 	// growBackoff.
 	backoff BackoffConfig
+
+	// stateCheckInterval is the maximum time a parked source can go without a
+	// Poll, regardless of how far its read backoff has grown: it bounds how
+	// promptly close.on_state_change.removed/renamed/inactive and
+	// close.reader.after_interval are detected. See park.
+	stateCheckInterval time.Duration
+
+	// stopTimeout bounds how long StopHarvesters waits for harvesters to finish
+	// before giving up: 1 minute, plus readUntilEOF.Timeout (with headroom) when
+	// draining is enabled. A harvester stuck past this (e.g. blocked in Publish
+	// because output backpressure never clears) is left running in the
+	// background rather than hanging the input's shutdown forever.
+	stopTimeout time.Duration
 
 	// Observability gauges (nil when no metrics registry is available).
 	mActive  *monitoring.Uint // sources with a reader goroutine
@@ -196,22 +210,31 @@ func newHarvesterRunner(
 	inputID string,
 	readUntilEOF ReadUntilEOFConfig,
 	backoff BackoffConfig,
+	stateCheckInterval time.Duration,
 ) *harvesterRunner {
+	stopTimeout := time.Minute
+	if readUntilEOF.Enabled {
+		// headroom just above the readUntilEOF timeout to allow the routine time to finish
+		stopTimeout += readUntilEOF.Timeout + 100*time.Millisecond
+	}
+
 	g := &harvesterRunner{
-		pipeline:       pipeline,
-		harvester:      harvester,
-		cleanTimeout:   cleanTimeout,
-		store:          store,
-		ackCH:          ackCH,
-		identifier:     identifier,
-		metrics:        metrics,
-		inputID:        inputID,
-		readUntilEOF:   readUntilEOF,
-		backoff:        backoff,
-		harvesterLimit: harvesterLimit,
-		ctx:            ctx,
-		states:         map[string]*sourceState{},
-		wakerCh:        make(chan struct{}, 1),
+		pipeline:           pipeline,
+		harvester:          harvester,
+		cleanTimeout:       cleanTimeout,
+		store:              store,
+		ackCH:              ackCH,
+		identifier:         identifier,
+		metrics:            metrics,
+		inputID:            inputID,
+		readUntilEOF:       readUntilEOF,
+		backoff:            backoff,
+		stateCheckInterval: stateCheckInterval,
+		stopTimeout:        stopTimeout,
+		harvesterLimit:     harvesterLimit,
+		ctx:                ctx,
+		states:             map[string]*sourceState{},
+		wakerCh:            make(chan struct{}, 1),
 	}
 
 	if reg := ctx.MetricsRegistry; reg != nil {
@@ -598,9 +621,17 @@ func (g *harvesterRunner) setStatus(state *sourceState, ns sourceStatus) {
 // parked min-heap. Caller holds g.mu.
 func (g *harvesterRunner) park(state *sourceState, backoff time.Duration) {
 	state.backoff = backoff
-	state.nextCheck = time.Now().Add(backoff)
+	now := time.Now()
+	if !state.nextStateCheck.After(now) {
+		state.nextStateCheck = now.Add(g.stateCheckInterval)
+	}
+	due := now.Add(backoff)
+	if state.nextStateCheck.Before(due) {
+		due = state.nextStateCheck
+	}
+	state.nextCheck = due
 	g.setStatus(state, statusParked)
-	heap.Push(&g.parked, &parkedEntry{state: state, due: state.nextCheck})
+	heap.Push(&g.parked, &parkedEntry{state: state, due: due})
 }
 
 // popDue removes and returns the parked sources whose nextCheck is due, claiming
@@ -905,7 +936,10 @@ func (g *harvesterRunner) stopNow() error {
 	g.mu.Unlock()
 
 	g.signalWaker()
-	g.wg.Wait()
+	if err := g.waitBounded(g.stopTimeout); err != nil {
+		g.ctx.Logger.Errorf("%v; a stuck harvester will keep running in the background", err)
+		return err
+	}
 	g.finishRemaining()
 	return nil
 }
@@ -957,10 +991,15 @@ func (g *harvesterRunner) drainAndStop() error {
 		g.mu.Unlock()
 	})
 
-	g.wg.Wait()
+	err := g.waitBounded(g.stopTimeout)
 	// Stop reports true only if it cancelled the timer before it fired, i.e. the
 	// drain reached EOF on its own; false means the Timeout elapsed first.
 	reachedEOF := timer.Stop()
+
+	if err != nil {
+		g.ctx.Logger.Errorf("%v; a stuck harvester will keep running in the background", err)
+		return err
+	}
 	g.finishRemaining()
 
 	if draining {
@@ -973,6 +1012,23 @@ func (g *harvesterRunner) drainAndStop() error {
 		}
 	}
 	return nil
+}
+
+// waitBounded waits for every runner goroutine (readers and the waker) to
+// finish, giving up after timeout instead of blocking forever.
+func (g *harvesterRunner) waitBounded(timeout time.Duration) error {
+	done := make(chan struct{})
+	go func() {
+		g.wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return nil
+	case <-time.After(timeout):
+		return fmt.Errorf("harvester group stop timed out after %s waiting for harvesters to finish", timeout)
+	}
 }
 
 // finishRemaining tears down any sources still registered after the readers and

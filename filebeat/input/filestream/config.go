@@ -170,7 +170,7 @@ func defaultConfig() config {
 func defaultCloserConfig() closerConfig {
 	return closerConfig{
 		OnStateChange: stateChangeCloserConfig{
-			CheckInterval: 5 * time.Second,
+			CheckInterval: loginp.DefaultStateCheckInterval,
 			Removed:       defaultCloserOnStateChangeRemoved(),
 			Inactive:      5 * time.Minute,
 			Renamed:       false,
