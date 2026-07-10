@@ -29,26 +29,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-//go:fix inline
-func stringp(x string) *string {
-	return new(x)
-}
-
-//go:fix inline
-func float64p(x float64) *float64 {
-	return new(x)
-}
-
-//go:fix inline
-func uint64p(x uint64) *uint64 {
-	return new(x)
-}
-
-//go:fix inline
-func int64p(x int64) *int64 {
-	return new(x)
-}
-
 func TestParseMetricFamiliesMalformedInput(t *testing.T) {
 	logger := logp.NewLogger("test")
 
