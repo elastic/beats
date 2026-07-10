@@ -91,10 +91,13 @@ func (n *OtelManager) PostInit()                          {}
 func (n *OtelManager) Start() error                       { return nil }
 func (n *OtelManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *OtelManager) RegisterAction(action management.Action) {
-	if n.actionExt != nil {
-		if err := n.actionExt.RegisterActionHandler(n.receiverName, action.Execute); err != nil {
-			n.logger.Errorf("failed to register action %q for receiver %q: %v", action.Name(), n.receiverName, err)
-		}
+	if n.actionExt == nil {
+		n.logger.Errorf("failed to register action %q for receiver %q: no registered action extension", action.Name(), n.receiverName)
+		return
+	}
+
+	if err := n.actionExt.RegisterActionHandler(n.receiverName, action.Execute); err != nil {
+		n.logger.Errorf("failed to register action %q for receiver %q: %v", action.Name(), n.receiverName, err)
 	}
 }
 func (n *OtelManager) UnregisterAction(action management.Action) {
