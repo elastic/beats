@@ -52,10 +52,10 @@ func TestOtelManager_RegisterAction(t *testing.T) {
 	m := &OtelManager{logger: logp.NewNopLogger()}
 	ext := &fakeActionExtension{}
 
-	// Before an extension is set, RegisterAction/UnregisterAction must be safe
-	// no-ops (mirrors the behavior before this feature existed).
+	// Before an extension is set, UnregisterAction must be a safe no-op
+	// (mirrors the behavior before this feature existed). RegisterAction is
+	// covered separately below since it now logs instead of no-opping.
 	action := &fakeAction{name: "osquery"}
-	assert.NotPanics(t, func() { m.RegisterAction(action) })
 	assert.NotPanics(t, func() { m.UnregisterAction(action) })
 
 	m.SetActionExtension("osquerybeatreceiver/_agent-component/osquery-default/stream", ext)
@@ -72,6 +72,20 @@ func TestOtelManager_RegisterAction(t *testing.T) {
 	m.UnregisterAction(action)
 	assert.Equal(t, "osquerybeatreceiver/_agent-component/osquery-default/stream", ext.unregisteredName)
 	assert.Nil(t, ext.handler)
+}
+
+// TestOtelManager_RegisterAction_LogsWhenNoExtensionConfigured verifies that
+// RegisterAction logs (rather than silently dropping the action) when no
+// action extension has been set on the manager yet, since that leaves the
+// beat's action permanently unroutable until an extension is configured.
+func TestOtelManager_RegisterAction_LogsWhenNoExtensionConfigured(t *testing.T) {
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "otelmanager")
+	m := &OtelManager{logger: logger}
+
+	assert.NotPanics(t, func() { m.RegisterAction(&fakeAction{name: "osquery"}) })
+
+	require.Equal(t, 1, observedLogs.Len(), "registering an action with no extension configured should be logged")
+	assert.Contains(t, observedLogs.All()[0].Message, "no registered action extension")
 }
 
 // TestOtelManager_RegisterAction_LogsExtensionError verifies that when the
