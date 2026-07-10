@@ -24,6 +24,7 @@ import (
 	"io"
 	"os"
 	"slices"
+	"sync/atomic"
 	"time"
 
 	"go.uber.org/zap"
@@ -235,6 +236,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 func (inp *filestream) Run(
 	ctx input.Context,
 	src loginp.Source,
+	sourceID string,
 	cursor loginp.Cursor,
 	publisher loginp.Publisher,
 	metrics *loginp.Metrics) error {
@@ -266,6 +268,13 @@ func (inp *filestream) Run(
 		state.Offset = 0
 	}
 
+	var metricsOffset *atomic.Int64
+	if !fs.desc.GZIP {
+		var cleanupActiveOffset func()
+		metricsOffset, cleanupActiveOffset = metrics.RegisterHarvesterOffset(sourceID, state.Offset)
+		defer cleanupActiveOffset()
+	}
+
 	metrics.FilesActive.Inc()
 	metrics.HarvesterRunning.Inc()
 	defer metrics.FilesActive.Dec()
@@ -287,7 +296,7 @@ func (inp *filestream) Run(
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
 	err = inp.readFromSource(
-		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics,
+		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metricsOffset, metrics,
 		startReadUntilEOF)
 	if err != nil {
 		// First handle actual errors
@@ -549,12 +558,9 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// log.file.fingerprint is opt-in (include_file_fingerprint, default false).
-	// A growing file's raw fingerprint material is the RAW hex of the file
-	// header, not a SHA-256, so publishing it would expose file content. Only
-	// publish the SHA-256 once the fingerprint is complete; below the threshold
-	// we publish no fingerprint at all. A renamed file may still carry the old
-	// path until the next open — that pre-existing limitation is unchanged here.
+	// Only publish the completed SHA-256. A still-growing fingerprint's material
+	// is the raw hex of the file header, not a hash, so publishing it would
+	// expose file content.
 	var fingerprint string
 	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
 		fingerprint = fs.desc.Fingerprint.Sum
@@ -729,6 +735,7 @@ func (inp *filestream) readFromSource(
 	s state,
 	p loginp.Publisher,
 	isGZIP bool,
+	metricsOffset *atomic.Int64,
 	metrics *loginp.Metrics,
 	startReadUntilEOF func(ctxtool.CancelContext)) error {
 
@@ -750,7 +757,7 @@ func (inp *filestream) readFromSource(
 
 	var err error
 	for ctx.Cancelation.Err() == nil {
-		err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, p)
+		err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, metricsOffset, p)
 		err, shouldContinue := inp.handleReadError(ctx, err, log, path, metrics, isGZIP)
 		if !shouldContinue {
 			return err
@@ -770,7 +777,7 @@ func (inp *filestream) readFromSource(
 			inp.readUntilEOF.Timeout)
 	LOOP:
 		for eofCancelCtx.Err() == nil {
-			err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, p)
+			err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, metricsOffset, p)
 			err, shouldContinue := inp.handleReadError(ctx, err, log, path, metrics, isGZIP)
 			if errors.Is(err, io.EOF) {
 				log.Debug("read_until_eof enabled, EOF reached. closing input")
@@ -788,7 +795,7 @@ func (inp *filestream) readFromSource(
 	return nil
 }
 
-func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, metrics *loginp.Metrics, isGZIP bool, s *state, p loginp.Publisher) error {
+func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, metrics *loginp.Metrics, isGZIP bool, s *state, metricsOffset *atomic.Int64, p loginp.Publisher) error {
 	message, err := r.Next()
 	if err != nil {
 		return err
@@ -797,6 +804,9 @@ func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, met
 	// state offset increase. Mutated through *s so subsequent reads in
 	// readFromSource see the accumulated offset
 	s.Offset += int64(message.Bytes) + int64(message.Offset)
+	if metricsOffset != nil {
+		metricsOffset.Store(s.Offset)
+	}
 
 	flags, err := message.Fields.GetValue("log.flags")
 	if err == nil {
