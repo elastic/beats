@@ -723,7 +723,7 @@ This option is not supported on Windows.
 ```yaml {applies_to}
 stack: ga 9.5.0
 ```
-Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `false`. The file path (`log.file.path`) is always present in events regardless of this setting.
+Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `true`. The file path (`log.file.path`) is always present in events regardless of this setting.
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
