@@ -164,11 +164,12 @@ func (f *fakeActionDiagExtension) RegisterDiagnosticHook(name, _, _, _ string, _
 	f.registeredDiagName = name
 }
 
-func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) {
+func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.registeredActionFor = name
 	f.actionHandler = handler
+	return nil
 }
 
 func (f *fakeActionDiagExtension) UnregisterActionHandler(name string) {

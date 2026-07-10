@@ -10,6 +10,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // fakeActionExtension implements ActionExtension for testing OtelManager's
@@ -18,11 +23,13 @@ type fakeActionExtension struct {
 	registeredName   string
 	handler          func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)
 	unregisteredName string
+	registerErr      error
 }
 
-func (f *fakeActionExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) {
+func (f *fakeActionExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error {
 	f.registeredName = name
 	f.handler = handler
+	return f.registerErr
 }
 
 func (f *fakeActionExtension) UnregisterActionHandler(name string) {
@@ -67,6 +74,29 @@ func TestOtelManager_RegisterAction(t *testing.T) {
 	m.UnregisterAction(action)
 	assert.Equal(t, "osquerybeatreceiver/_agent-component/osquery-default/stream", ext.unregisteredName)
 	assert.Nil(t, ext.handler)
+}
+
+// TestOtelManager_RegisterAction_LogsExtensionError verifies that when the
+// extension rejects a registration (for example because another receiver
+// already registered an action for the same elastic-agent component — see
+// ActionExtension's doc comment), OtelManager.RegisterAction logs the error
+// so it is visible from this beat's own process. RegisterAction itself
+// cannot return an error: its signature is fixed by management.Manager.
+func TestOtelManager_RegisterAction_LogsExtensionError(t *testing.T) {
+	observedCore, observedLogs := observer.New(zapcore.ErrorLevel)
+	logger, err := logp.NewZapLogger(zap.New(observedCore))
+	require.NoError(t, err)
+
+	m := &OtelManager{logger: logger}
+	ext := &fakeActionExtension{registerErr: assert.AnError}
+	m.SetActionExtension("filebeatreceiver/_agent-component/filestream-default/stream-2", ext)
+
+	assert.NotPanics(t, func() { m.RegisterAction(&fakeAction{name: "some-action"}) })
+
+	require.Equal(t, 1, observedLogs.Len(), "the extension's registration error should be logged")
+	logged := observedLogs.All()[0]
+	assert.Contains(t, logged.Message, "failed to register action")
+	assert.Contains(t, logged.Message, assert.AnError.Error())
 }
 
 func TestOtelManager_SetActionExtension_SharesReceiverNameWithDiagnostics(t *testing.T) {

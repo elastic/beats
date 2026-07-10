@@ -27,10 +27,18 @@ type WithDiagnosticExtension interface {
 
 // ActionExtension exposes the ability for beat receivers to register a handler that
 // is invoked when elastic-agent routes a Fleet action to this receiver instance.
+// RegisterActionHandler returns an error if this registration could not be
+// routed safely, for example if another receiver has already registered an
+// action for the same elastic-agent component (see the elasticdiagnostics
+// extension's single_receiver documentation) — the handler is still recorded
+// so that action routing keeps failing loudly rather than succeeding silently
+// against the wrong receiver, but the caller should log the error so it is
+// visible from the beat's own process, not only when Fleet next dispatches
+// an action to it.
 // NOTE: Changing the function signature will require changes to elastic-agent's
 // elasticdiagnostics extension. Proceed with caution.
 type ActionExtension interface {
-	RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error))
+	RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error
 	UnregisterActionHandler(name string)
 }
 
@@ -46,7 +54,7 @@ var _ WithActionExtension = (*OtelManager)(nil)
 
 func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (management.Manager, error) {
 	management.SetUnderAgent(true)
-	return &OtelManager{}, nil
+	return &OtelManager{logger: logger}, nil
 }
 
 // OtelManager is the main manager for managing beatreceivers
@@ -54,6 +62,7 @@ type OtelManager struct {
 	ext          DiagnosticExtension
 	actionExt    ActionExtension
 	receiverName string
+	logger       *logp.Logger
 	stopFn       func()
 	stopOnce     sync.Once
 }
@@ -83,7 +92,9 @@ func (n *OtelManager) Start() error                       { return nil }
 func (n *OtelManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *OtelManager) RegisterAction(action management.Action) {
 	if n.actionExt != nil {
-		n.actionExt.RegisterActionHandler(n.receiverName, action.Execute)
+		if err := n.actionExt.RegisterActionHandler(n.receiverName, action.Execute); err != nil && n.logger != nil {
+			n.logger.Errorf("failed to register action %q for receiver %q: %v", action.Name(), n.receiverName, err)
+		}
 	}
 }
 func (n *OtelManager) UnregisterAction(action management.Action) {
