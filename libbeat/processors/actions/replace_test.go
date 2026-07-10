@@ -311,9 +311,6 @@ func TestReplaceRun(t *testing.T) {
 	}
 }
 
-//go:fix inline
-func ptr[T any](v T) *T { return new(v) }
-
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
 		Field         string
