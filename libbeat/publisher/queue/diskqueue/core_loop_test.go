@@ -1017,16 +1017,6 @@ func TestObserverDeleteSegment(t *testing.T) {
 	assertRegistryUint(t, reg, "queue.removed.bytes", 1234+567, "Deleted bytes should be reported")
 }
 
-//go:fix inline
-func boolRef(b bool) *bool {
-	return new(b)
-}
-
-//go:fix inline
-func segmentIDRef(id segmentID) *segmentID {
-	return new(id)
-}
-
 // Convenience helper that creates a frame that will have the given size on
 // disk after accounting for header / footer size.
 func makeWriteFrameWithSize(size int) *writeFrame {
@@ -1035,11 +1025,6 @@ func makeWriteFrameWithSize(size int) *writeFrame {
 		return nil
 	}
 	return &writeFrame{serialized: make([]byte, size-frameMetadataSize)}
-}
-
-//go:fix inline
-func makeUint32Ptr(value uint32) *uint32 {
-	return new(value)
 }
 
 func segmentWithSize(size int) *queueSegment {
