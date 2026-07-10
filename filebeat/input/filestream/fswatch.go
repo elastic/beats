@@ -159,7 +159,7 @@ func (w *fileWatcher) Run(
 	ignoreInactiveSince time.Time,
 ) {
 	defer close(w.events)
-	defer metrics.CleanupFileScanMetrics()
+	defer metrics.Cleanup()
 
 	// run initial scan before starting regular
 	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
@@ -222,6 +222,7 @@ func (w *fileWatcher) watch(
 
 	newFilesByName := make(map[string]*loginp.FileDescriptor)
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
+	harvesterFiles := make([]loginp.HarvesterFile, 0, len(paths))
 
 	for path, fd := range paths {
 		// srcID is the file identity, it is the same value used to identify
@@ -303,6 +304,11 @@ func (w *fileWatcher) watch(
 				return
 			case w.events <- e:
 			}
+		}
+
+		// We want progress metrics for all files except truncated ones
+		if e.Op != loginp.OpTruncate {
+			harvesterFiles = appendHarvesterFile(harvesterFiles, fd, srcID, now, ignoreOlder, ignoreInactiveSince)
 		}
 
 		// delete from previous state to mark that we've seen the existing file again
@@ -431,12 +437,18 @@ func (w *fileWatcher) watch(
 	// Unmatched-leftover creates: new files left over after both rename
 	// passes are genuinely new.
 	for path, fd := range newFilesByName {
+		srcID := w.getFileIdentity(*fd)
+
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- createEvent(path, *fd, w.getFileIdentity(*fd)):
+		case w.events <- createEvent(path, *fd, srcID):
 			createdCount++
 		}
+
+		// The previous for loop has an early continue for new files,
+		// so we need to collect their metrics here.
+		harvesterFiles = appendHarvesterFile(harvesterFiles, *fd, srcID, now, ignoreOlder, ignoreInactiveSince)
 	}
 
 	w.log.Debugw("File scan complete",
@@ -474,7 +486,32 @@ func (w *fileWatcher) watch(
 		}
 	}
 
+	metrics.UpdateHarvesterBuckets(harvesterFiles)
+
 	w.prev = paths
+}
+
+func appendHarvesterFile(
+	files []loginp.HarvesterFile,
+	fd loginp.FileDescriptor,
+	srcID string,
+	now time.Time,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) []loginp.HarvesterFile {
+	opts := loginp.FileScanOptions{
+		CurrentTime:         now,
+		IgnoreOlder:         ignoreOlder,
+		IgnoreInactiveSince: ignoreInactiveSince,
+	}
+	if fd.GZIP || fd.Info.Size() <= 0 || isFileIgnored(fd, opts) {
+		return files
+	}
+
+	return append(files, loginp.HarvesterFile{
+		ID:   srcID,
+		Size: fd.Info.Size(),
+	})
 }
 
 // isFileIgnored returns true when a file is ignored, no matter the reason.
