@@ -232,10 +232,10 @@ func applyReplacements(filePath string, rules []replacementRule) error {
 	return nil
 }
 
-// RunMakeUpdate runs 'make update' in the repository.
+// RunMakeUpdate runs 'make --silent update' in the repository.
 func RunMakeUpdate() error {
-	fmt.Println("Running 'make update'...")
-	cmd := exec.Command("make", "update")
+	fmt.Println("Running 'make --silent update'...")
+	cmd := exec.Command("make", "--silent", "update")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
