@@ -95,7 +95,7 @@ func (input *kafkaInput) Test(ctx input.TestContext) error {
 
 	var missingTopics []string
 	for _, neededTopic := range input.config.Topics {
-		if !contains(topics, neededTopic) {
+		if !slices.Contains(topics, neededTopic) {
 			missingTopics = append(missingTopics, neededTopic)
 		}
 	}
@@ -468,8 +468,4 @@ func composeMessage(timestamp time.Time, content []byte, kafkaFields mapstr.M, a
 			ackHandler: ackHandler,
 		},
 	}
-}
-
-func contains(elements []string, element string) bool {
-	return slices.Contains(elements, element)
 }

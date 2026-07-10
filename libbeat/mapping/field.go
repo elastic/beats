@@ -222,17 +222,13 @@ func validateAllowedValue(fieldName string, propertyName string, propertyValue s
 	if len(allowedPropertyValues) == 0 {
 		return fmt.Errorf("no %s expected for field '%s', found: %s", propertyName, fieldName, propertyValue)
 	}
-	if !stringsContains(allowedPropertyValues, propertyValue) {
+	if !slices.Contains(allowedPropertyValues, propertyValue) {
 		return fmt.Errorf(
 			"unexpected %s '%s' for field '%s', expected one of: %s",
 			propertyName, propertyValue, fieldName, strings.Join(allowedPropertyValues, ", "),
 		)
 	}
 	return nil
-}
-
-func stringsContains(haystack []string, needle string) bool {
-	return slices.Contains(haystack, needle)
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {
