@@ -679,7 +679,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 			inputUnits = append(inputUnits, unit)
 			healthyInputs[unit.ID()] = unit
 		} else {
-			cm.logger.Errorf("unit %s as an unknown type %+v", unit.ID(), unit.Type())
+			cm.logger.Errorf("unit %s has an unknown type %+v", unit.ID(), unit.Type())
 		}
 	}
 

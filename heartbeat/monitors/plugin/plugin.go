@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -35,7 +36,7 @@ import (
 // to prevent a start/stop cycle for select fields updates
 type HashConfigFunc func(cfg *conf.C) (uint64, error)
 
-type PluginMake func(string, *conf.C) (p Plugin, err error)
+type PluginMake func(string, *conf.C, beat.Info) (p Plugin, err error)
 type PluginUpdate func(*conf.C) (err error)
 
 // PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
@@ -53,6 +54,7 @@ type Plugin struct {
 	DoClose   func() error
 	DoUpdate  PluginUpdate
 	Endpoints int
+	Logger    *logp.Logger
 }
 
 // Close closes the plugin, invoking any DoClose hooks if available.
@@ -73,7 +75,7 @@ func (p Plugin) Update(c *conf.C) error {
 
 // RunWrapped runs the plug-in with the provided wrappers returning a channel of resultant events.
 func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
-	wj := wrappers.WrapCommon(p.Jobs, fields, nil)
+	wj := wrappers.WrapCommon(p.Jobs, fields, nil, p.Logger)
 	results := make(chan *beat.Event)
 
 	var runJob func(j jobs.Job)
@@ -208,6 +210,6 @@ func (r *PluginsReg) MonitorNames() []string {
 	return names
 }
 
-func (e *PluginFactory) Create(cfg *conf.C) (p Plugin, err error) {
-	return e.Make(e.Name, cfg)
+func (e *PluginFactory) Create(cfg *conf.C, info beat.Info) (p Plugin, err error) {
+	return e.Make(e.Name, cfg, info)
 }

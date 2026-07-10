@@ -2262,7 +2262,7 @@ filebeat.inputs:
 
   # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
   #multiline.match: after
 
   # The maximum number of lines that are combined into one event.
@@ -2567,15 +2567,25 @@ filebeat.inputs:
   # if the fingerprints match, then the files are considered equal.
   #file_identity.fingerprint: ~
 
+  # Enhanced Fingerprint behavior. When enabled (the default since 9.5),
+  # files smaller than the configured fingerprint size (prospector.scanner
+  # .fingerprint.offset + length) are tracked using the raw bytes available
+  # so far, instead of being skipped until they grow large enough. Once a
+  # file reaches the fingerprint size it is migrated to the regular SHA-256
+  # fingerprint with no data duplication. Set to false to restore the
+  # pre-9.5 behavior.
+  #file_identity.fingerprint:
+  #  growing: true
+
   # Include file owner name and group name in the event metadata.  This option is not currently supported on Windows.
   #include_file_owner_name: false
   #include_file_owner_group_name: false
 
   # Whether to add log.file.fingerprint to published events. Only takes
-  # effect when file_identity.fingerprint is configured. Defaults to false.
+  # effect when file_identity.fingerprint is configured. Defaults to true.
   # The file path (log.file.path) is always present in events regardless
   # of this setting.
-  #include_file_fingerprint: false
+  #include_file_fingerprint: true
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -2695,7 +2705,7 @@ filebeat.inputs:
 #- type: redis
   #enabled: false
 
-  # List of hosts to pool to retrieve the slow log information.
+  # List of hosts to poll to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
   # How often the input checks for redis slow log.
@@ -2814,6 +2824,19 @@ filebeat.inputs:
 
   # How long to wait before retrying a failed read.
   #consume_backoff: 2s
+
+  # Network timeout for the connection to the brokers (dial, read and write).
+  #timeout: 30s
+
+  # Keep-alive period for active network connections (0 disables it).
+  #keep_alive: 0s
+
+  # Consumer group session timeout. Increase for higher-latency consumers to
+  # avoid spurious rebalances.
+  #session_timeout: 10s
+
+  # How often the consumer sends heartbeats. Must be lower than session_timeout.
+  #heartbeat_interval: 3s
 
   # How long to wait for the minimum number of input bytes while reading.
   #max_wait_time: 250ms

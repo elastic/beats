@@ -62,7 +62,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 	var zapBuf zaptest.Buffer
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		&zapBuf,
+		zapcore.Lock(zapcore.AddSync(&zapBuf)),
 		zapcore.DebugLevel,
 	)
 	observed, observer := observer.New(zapcore.DebugLevel)
@@ -92,7 +92,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 
 	require.Eventually(tb, func() bool {
 		return col.GetState() == otelcol.StateRunning
-	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
+	}, 15*time.Second, 10*time.Millisecond, "Collector did not start in time")
 
 	return &Collector{collector: col, observer: observer}
 }

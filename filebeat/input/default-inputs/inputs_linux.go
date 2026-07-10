@@ -22,16 +22,15 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // inputs that are only supported on linux
 
-func osInputs(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
+func osInputs(info beat.Info, components statestore.States) []v2.Plugin {
 	var plugins []v2.Plugin
 
 	zeroPlugin := v2.Plugin{}
-	if journald := journald.Plugin(log, components); journald != zeroPlugin {
+	if journald := journald.Plugin(info.Logger, components); journald != zeroPlugin {
 		plugins = append(plugins, journald)
 	}
 

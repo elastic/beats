@@ -41,6 +41,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -84,11 +85,11 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("tls", config)
+	p, err := create("tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -324,11 +325,12 @@ func TestLargeResponse(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("largeresp", config)
+	logger := logptest.NewTestingLogger(t, "")
+	p, err := create("largeresp", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logger)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -415,6 +417,8 @@ func TestJsonBody(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, nil))
@@ -440,11 +444,11 @@ func TestJsonBody(t *testing.T) {
 			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
-			p, err := create("largeresp", config)
+			p, err := create("largeresp", config, beat.Info{Logger: logger})
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
-			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logger)[0]
 
 			event := &beat.Event{}
 			_, err = job(event)
@@ -670,11 +674,12 @@ func TestRedirect(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect", config)
+	logger := logptest.NewTestingLogger(t, "")
+	p, err := create("redirect", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logger)[0]
 
 	events, err := jobs.ExecJobAndConts(t, job)
 	require.NoError(t, err)
@@ -702,6 +707,85 @@ func TestRedirect(t *testing.T) {
 	)
 }
 
+// TestRedirectWithTLS is a regression test for
+// https://github.com/elastic/beats/issues/48335.
+//
+// When max_redirects > 0 the HTTP monitor follows redirects with Go's
+// http.Client (the host job) instead of the dial chain. In that path TLS
+// metadata is only exported when the transport populates resp.TLS. A
+// regression in the shared transport made resp.TLS nil for HTTPS connections
+// (the *tls.Conn was wrapped in another net.Conn), so all tls.* fields were
+// silently dropped for redirecting HTTPS endpoints. This test ensures tls.*
+// keeps being exported when following redirects over HTTPS.
+func TestRedirectWithTLS(t *testing.T) {
+	redirectingPaths := map[string]string{
+		"/redirect_one": "/redirect_two",
+		"/redirect_two": "/",
+	}
+	expectedBody := "TargetBody"
+	server := httptest.NewTLSServer(hbtest.RedirectHandler(redirectingPaths, expectedBody))
+	defer server.Close()
+
+	// Parse the server cert so we can both trust it and assert against it.
+	cert, err := x509.ParseCertificate(server.TLS.Certificates[0].Certificate[0])
+	require.NoError(t, err)
+
+	certFile := hbtest.CertToTempFile(t, cert)
+	require.NoError(t, certFile.Close())
+	defer os.Remove(certFile.Name())
+
+	testURL := server.URL + "/redirect_one"
+	configSrc := map[string]interface{}{
+		"urls":                        testURL,
+		"timeout":                     "5s",
+		"check.response.body":         expectedBody,
+		"max_redirects":               10,
+		"ssl.certificate_authorities": certFile.Name(),
+		"ssl.verification_mode":       "full",
+	}
+
+	config, err := conf.NewConfigFrom(configSrc)
+	require.NoError(t, err)
+
+	p, err := create("redirect-tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
+	require.NoError(t, err)
+
+	sched := schedule.MustParse("@every 1s")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
+
+	events, err := jobs.ExecJobAndConts(t, job)
+	require.NoError(t, err)
+	require.Len(t, events, 1)
+	event := events[0]
+
+	testslike.Test(
+		t,
+		lookslike.Compose(
+			hbtest.BaseChecks("", "up", "http"),
+			hbtest.SummaryStateChecks(1, 0),
+			minimalRespondingHTTPChecks(testURL, "text/plain; charset=utf-8", http.StatusOK),
+			// Core regression assertion: TLS certificate metadata must be
+			// present even though redirects were followed over HTTPS.
+			hbtest.TLSCertChecks(cert),
+			lookslike.MustCompile(map[string]interface{}{
+				"tls.established":      true,
+				"tls.version":          isdef.IsString,
+				"tls.version_protocol": isdef.IsString,
+				"tls.cipher":           isdef.IsString,
+				// The redirect/proxy path uses Go's HTTP client rather than the
+				// dial chain, so the handshake duration (along with tcp.*,
+				// resolve.* and monitor.ip) is intentionally not recorded.
+				"tls.rtt.handshake": isdef.KeyMissing,
+				"http.response.redirects": []string{
+					server.URL + redirectingPaths["/redirect_one"],
+					server.URL + redirectingPaths["/redirect_two"],
+				},
+			}),
+		),
+		event.Fields,
+	)
+}
+
 func TestNoHeaders(t *testing.T) {
 	server := httptest.NewServer(hbtest.HelloWorldHandler(200))
 	defer server.Close()
@@ -714,11 +798,11 @@ func TestNoHeaders(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("http", config)
+	p, err := create("http", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -834,7 +918,7 @@ func TestDecodesGzip(t *testing.T) {
 	content, err := evt.Fields.GetValue("http.response.body.content")
 
 	assert.NoError(t, err)
-	assert.Exactly(t, content, "TestEncodingAccept")
+	assert.Exactly(t, "TestEncodingAccept", content)
 }
 
 /*
@@ -857,7 +941,7 @@ func TestNoGzipDecodeWithoutHeader(t *testing.T) {
 	assert.NoError(t, err)
 
 	// doesn't decode gzip text without content header
-	assert.Exactly(t, content, "\x1f\x8b\b\x00\x00\x00\x00\x00\x00\xff\nI-.q\xcdK\xceO\xc9\xccKwLNN-(\x01\x04\x00\x00\xff\xffW\xbeE\x0e\x12\x00\x00\x00")
+	assert.Exactly(t, "\x1f\x8b\b\x00\x00\x00\x00\x00\x00\xff\nI-.q\xcdK\xceO\xc9\xccKwLNN-(\x01\x04\x00\x00\xff\xffW\xbeE\x0e\x12\x00\x00\x00", content)
 }
 
 /* When Heartbeat doesn't request `gzip`, and the server responds with a `gzip` body/header anyway,
@@ -881,7 +965,7 @@ func TestGzipDecodeWithoutRequestHeader(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Heartbeat decoded the `gzip` even without requesting it
-	assert.Exactly(t, content, "TestEncodingAccept")
+	assert.Exactly(t, "TestEncodingAccept", content)
 }
 
 func TestUserAgentInject(t *testing.T) {
@@ -897,11 +981,11 @@ func TestUserAgentInject(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	p, err := create("ua", cfg)
+	p, err := create("ua", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
