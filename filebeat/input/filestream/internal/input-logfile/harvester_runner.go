@@ -31,6 +31,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+// pollGracePeriod bounds how long the waker waits inline for a single Poll
+// (typically a stat()) before moving on to the next due source. It is well
+// above normal stat() latency even under load, so a healthy poll always
+// finishes within it; see pollWithGracePeriod.
+const pollGracePeriod = 100 * time.Millisecond
+
 // permanentHarvesterError marks a harvester setup failure that should degrade
 // the input's status rather than being silently retried on the next scan.
 type permanentHarvesterError struct {
@@ -557,7 +563,7 @@ func (g *harvesterRunner) waker() {
 		g.mu.Unlock()
 
 		for _, state := range due {
-			g.pollParked(state)
+			g.pollWithGracePeriod(state)
 		}
 
 		// If we processed any, loop immediately to pick up sources that became
@@ -653,6 +659,23 @@ func (g *harvesterRunner) popDue(now time.Time) []*sourceState {
 	return due
 }
 
+// pollWithGracePeriod runs pollParked for state, waiting up to pollGracePeriod
+// before giving up so a stuck Poll (e.g. a stat() on an unresponsive network
+// filesystem) can't delay the rest of due. The abandoned poll keeps running in
+// the background, tracked via g.spawn.
+func (g *harvesterRunner) pollWithGracePeriod(state *sourceState) {
+	done := make(chan struct{})
+	g.spawn(func() {
+		g.pollParked(state)
+		close(done)
+	})
+
+	select {
+	case <-done:
+	case <-time.After(pollGracePeriod):
+	}
+}
+
 // pollParked polls one due source and acts on the result: resume (spawn a
 // reader), close (tear down) or re-park. Must be called without holding g.mu.
 func (g *harvesterRunner) pollParked(state *sourceState) {
@@ -680,6 +703,7 @@ func (g *harvesterRunner) pollParked(state *sourceState) {
 	default: // PollPark
 		g.park(state, growBackoff(state.backoff, g.backoff.Init, g.backoff.Max))
 		g.mu.Unlock()
+		g.signalWaker()
 	}
 }
 
