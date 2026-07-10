@@ -41,9 +41,14 @@ func ParseMonitoringPort(logLine string) (int, error) {
 	if len(matches) != 2 {
 		return 0, fmt.Errorf("no monitoring address found in log line: %q", logLine)
 	}
-	_, portStr, err := net.SplitHostPort(matches[1])
+	return portFromHostPort(matches[1])
+}
+
+// portFromHostPort parses the port out of a host:port address logged by a Beat.
+func portFromHostPort(addr string) (int, error) {
+	_, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
-		return 0, fmt.Errorf("could not split host:port from %q: %w", matches[1], err)
+		return 0, fmt.Errorf("could not split host:port from %q: %w", addr, err)
 	}
 	port, err := strconv.Atoi(portStr)
 	if err != nil {

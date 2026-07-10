@@ -166,6 +166,29 @@ func (c *Collector) MonitoringPorts(tb testing.TB, n int) []int {
 	return ports[:n]
 }
 
+// SocketListeningPort waits for a tcp or udp input running inside the collector
+// to log its listening address and returns the ephemeral port it bound to.
+//
+// Configure the input with host: <ip>:0 so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port.
+func (c *Collector) SocketListeningPort(tb testing.TB) int {
+	tb.Helper()
+	var port int
+	require.EventuallyWithT(tb, func(ct *assert.CollectT) {
+		for _, entry := range c.observer.FilterMessageSnippet(integration.SocketListeningSnippet).All() {
+			p, err := integration.ParseSocketListeningPort(entry.Message)
+			if !assert.NoError(ct, err) {
+				continue
+			}
+			port = p
+			return
+		}
+		assert.Fail(ct, "input listening address not logged yet")
+	}, 30*time.Second, 100*time.Millisecond, "collector input did not start listening")
+	return port
+}
+
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		abreceiver.NewFactory(),
