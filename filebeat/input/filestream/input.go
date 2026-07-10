@@ -471,6 +471,9 @@ func (inp *filestream) buildPipeline(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
+	// Only publish the completed SHA-256. A still-growing fingerprint's material
+	// is the raw hex of the file header, not a hash, so publishing it would
+	// expose file content.
 	var fingerprint string
 	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
 		fingerprint = fs.desc.Fingerprint.Sum

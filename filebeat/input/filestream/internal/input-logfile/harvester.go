@@ -30,9 +30,10 @@ type Harvester interface {
 	// Test checks if the Harvester can be started with the given configuration.
 	Test(Source, inputv2.TestContext) error
 	// OpenSession opens or resumes a reading session for the source, keeping the
-	// source's file handle open across read slices. metrics is the shared input
-	// metrics, updated as events are read.
-	OpenSession(ctx inputv2.Context, src Source, cursor Cursor, metrics *Metrics) (HarvesterSession, error)
+	// source's file handle open across read slices. id is the source's current
+	// registry key, used to key harvester progress metrics. metrics is the
+	// shared input metrics, updated as events are read.
+	OpenSession(ctx inputv2.Context, src Source, id string, cursor Cursor, metrics *Metrics) (HarvesterSession, error)
 }
 
 // SliceVerdict is the outcome of a single HarvesterSession.ReadSlice call,

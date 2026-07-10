@@ -1191,7 +1191,7 @@ func (h *fakeHarvester) Name() string                          { return "fake" }
 func (h *fakeHarvester) Test(_ Source, _ v2.TestContext) error { return nil }
 
 func (h *fakeHarvester) OpenSession(
-	_ v2.Context, _ Source, _ Cursor, _ *Metrics,
+	_ v2.Context, _ Source, _ string, _ Cursor, _ *Metrics,
 ) (HarvesterSession, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()

@@ -662,7 +662,7 @@ func (m *mockHarvester) Name() string { return "mock" }
 func (m *mockHarvester) Test(_ Source, _ v2.TestContext) error { return nil }
 
 func (m *mockHarvester) OpenSession(
-	_ v2.Context, _ Source, _ Cursor, _ *Metrics,
+	_ v2.Context, _ Source, _ string, _ Cursor, _ *Metrics,
 ) (HarvesterSession, error) {
 	return nil, nil
 }

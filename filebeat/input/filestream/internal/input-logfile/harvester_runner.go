@@ -406,7 +406,7 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 	state.cursor = makeCursor(resource)
 	state.publisher = &cursorPublisher{canceler: state.ctx.Cancelation, client: client, cursor: &state.cursor}
 
-	session, err := g.harvester.OpenSession(state.ctx, state.src, state.cursor, g.metrics)
+	session, err := g.harvester.OpenSession(state.ctx, state.src, id, state.cursor, g.metrics)
 	if err != nil {
 		_ = client.Close()
 		releaseResource(resource)

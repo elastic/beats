@@ -477,7 +477,7 @@ func TestFilestreamDeleteFileReturnsError(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			sess, err := f.OpenSession(
-				v2Ctx, fs, cur, loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()))
+				v2Ctx, fs, "source-id", cur, loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()))
 			if err != nil {
 				t.Fatalf("OpenSession failed: %v", err)
 			}

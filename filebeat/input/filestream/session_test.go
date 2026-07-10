@@ -30,6 +30,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -302,15 +303,68 @@ func TestFilestream_OpenSession_NotFileSource(t *testing.T) {
 	inp := testFilestream(t, closerConfig{})
 	_, err := inp.OpenSession(
 		input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()},
-		notAFileSource{}, loginp.NewCursorForTest("id", 0, 0), testMetrics(t))
+		notAFileSource{}, "id", loginp.NewCursorForTest("id", 0, 0), testMetrics(t))
 	require.Error(t, err)
 }
 
 func TestFilestream_OpenSession_OpenError(t *testing.T) {
 	inp := testFilestream(t, closerConfig{})
 	src := fileSource{newPath: filepath.Join(t.TempDir(), "does-not-exist"), fileID: "id"}
-	_, err := inp.OpenSession(backgroundCtx(), src, loginp.NewCursorForTest("id", 0, 0), testMetrics(t))
+	_, err := inp.OpenSession(backgroundCtx(), src, "id", loginp.NewCursorForTest("id", 0, 0), testMetrics(t))
 	require.Error(t, err, "opening a missing file should fail")
+}
+
+// TestFilestream_OpenSession_HarvesterOffsetMetric asserts OpenSession
+// registers a harvester ingestion progress offset (keyed by id, the source's
+// registry key) for non-GZIP sources, ReadSlice keeps it in sync with the
+// published offset, and Close cleans it up. GZIP sources are excluded because
+// their progress can't be represented by a plain offset/size comparison.
+func TestFilestream_OpenSession_HarvesterOffsetMetric(t *testing.T) {
+	t.Run("registers, updates, and cleans up the offset", func(t *testing.T) {
+		path := writeTempFile(t, "a\nbc\n")
+		fi, err := os.Stat(path)
+		require.NoError(t, err)
+		inp := testFilestream(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}})
+		metrics := testMetrics(t)
+		src := fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)}}
+
+		sess, err := inp.OpenSession(backgroundCtx(), src, "harvester-id", loginp.NewCursorForTest("id", 0, 0), metrics)
+		require.NoError(t, err)
+		s, ok := sess.(*harvestSession)
+		require.True(t, ok)
+		require.NotNil(t, s.metricsOffset, "a non-GZIP source must register an offset")
+		require.Zero(t, s.metricsOffset.Load())
+
+		verdict, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceDone, verdict)
+		require.EqualValues(t, len("a\nbc\n"), s.metricsOffset.Load(),
+			"the registered offset must track the published offset")
+
+		metrics.UpdateHarvesterBuckets([]loginp.HarvesterFile{{ID: "harvester-id", Size: int64(len("a\nbc\n"))}})
+		require.EqualValues(t, 1, metrics.FilesIngestedPercent100.Get())
+
+		require.NoError(t, s.Close())
+		// A second Close must not double-cleanup (harvesterOffsets keys by
+		// identity, not count, but this guards against a panic on re-entry).
+		require.NoError(t, s.Close())
+	})
+
+	t.Run("GZIP sources are excluded", func(t *testing.T) {
+		path := writeTempFile(t, "a\n")
+		fi, err := os.Stat(path)
+		require.NoError(t, err)
+		inp := testFilestream(t, closerConfig{})
+		metrics := testMetrics(t)
+		src := fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{GZIP: true, Info: file.ExtendFileInfo(fi)}}
+
+		sess, err := inp.OpenSession(backgroundCtx(), src, "gzip-id", loginp.NewCursorForTest("id", 0, 0), metrics)
+		require.NoError(t, err)
+		s, ok := sess.(*harvestSession)
+		require.True(t, ok)
+		assert.Nil(t, s.metricsOffset)
+		assert.Nil(t, s.cleanupMetricsOffset)
+	})
 }
 
 // TestLogFile_Read exercises the non-blocking reader's edge branches directly.

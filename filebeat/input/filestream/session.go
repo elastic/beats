@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 	"slices"
+	"sync/atomic"
 	"time"
 
 	"go.uber.org/zap"
@@ -64,14 +65,23 @@ type harvestSession struct {
 	pendingDelete bool      // a worker must delete the file on the next slice
 	openedAt      time.Time // when the session was opened; for close.reader.after_interval
 	lastData      time.Time // last time a slice read a message; for close_inactive
+
+	// metricsOffset, when non-nil, is the shared atomic the harvester ingestion
+	// progress metrics read from; updated as ReadSlice publishes messages.
+	// cleanupMetricsOffset removes it on Close. Both are nil for GZIP sources:
+	// their progress can't be represented by a plain offset/size comparison.
+	metricsOffset        *atomic.Int64
+	cleanupMetricsOffset func()
 }
 
-// OpenSession opens (or resumes) a reading session for the source. It opens the
-// file handle and detects the encoding once; the reader pipeline is built per
-// slice in ReadSlice. It implements loginp.SessionHarvester.
+// OpenSession opens (or resumes) a reading session for the source. id is the
+// source's current registry key, used to key harvester progress metrics. It
+// opens the file handle and detects the encoding once; the reader pipeline is
+// built per slice in ReadSlice. It implements loginp.SessionHarvester.
 func (inp *filestream) OpenSession(
 	ctx input.Context,
 	src loginp.Source,
+	id string,
 	cursor loginp.Cursor,
 	metrics *loginp.Metrics,
 ) (loginp.HarvesterSession, error) {
@@ -113,6 +123,10 @@ func (inp *filestream) OpenSession(
 	s.file = f
 	s.enc = enc
 	s.readOffset = s.state.Offset
+
+	if !fs.desc.GZIP {
+		s.metricsOffset, s.cleanupMetricsOffset = metrics.RegisterHarvesterOffset(id, s.state.Offset)
+	}
 
 	return s, nil
 }
@@ -204,6 +218,9 @@ func (s *harvestSession) ReadSlice(
 		}
 
 		s.state.Offset += int64(message.Bytes) + int64(message.Offset)
+		if s.metricsOffset != nil {
+			s.metricsOffset.Store(s.state.Offset)
+		}
 
 		if flags, ferr := message.Fields.GetValue("log.flags"); ferr == nil {
 			if flagsList, ok := flags.([]string); ok && slices.Contains(flagsList, "truncated") {
@@ -339,6 +356,9 @@ func (s *harvestSession) Close() error {
 		return nil
 	}
 	s.closed = true
+	if s.cleanupMetricsOffset != nil {
+		s.cleanupMetricsOffset()
+	}
 	if s.file != nil {
 		err := s.file.Close()
 		s.file = nil
