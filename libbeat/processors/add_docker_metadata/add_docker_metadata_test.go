@@ -24,12 +24,9 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-<<<<<<< HEAD
-=======
 	"sync"
-	"sync/atomic"
->>>>>>> e1add6833 (add_docker_metadata: fix data races in lazy cgroup cache init (#51688))
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
