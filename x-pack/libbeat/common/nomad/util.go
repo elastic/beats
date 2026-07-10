@@ -33,17 +33,3 @@ func NewClient(config ClientConfig) (*Client, error) {
 	}
 	return api.NewClient(apiConfig)
 }
-
-// StringToPtr returns the pointer to a string
-//
-//go:fix inline
-func StringToPtr(str string) *string {
-	return new(str)
-}
-
-// BoolToPtr returns the pointer to a boolean
-//
-//go:fix inline
-func BoolToPtr(b bool) *bool {
-	return new(b)
-}
