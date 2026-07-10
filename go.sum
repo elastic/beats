@@ -387,8 +387,8 @@ github.com/elastic/elastic-agent-system-metrics v0.14.4 h1:XGGepNVOxhtfJmanQsgqC
 github.com/elastic/elastic-agent-system-metrics v0.14.4/go.mod h1:NyNMrdqMfznb/Zy8EmIAHlJpX6HuRlNW+bBL9UN7WQY=
 github.com/elastic/elastic-transport-go/v8 v8.8.0 h1:7k1Ua+qluFr6p1jfJjGDl97ssJS/P7cHNInzfxgBQAo=
 github.com/elastic/elastic-transport-go/v8 v8.8.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
-github.com/elastic/entcollect v0.0.0-20260617022524-00a42d67f0df h1:SVO1bpxnpZmVkgzqcLImLkVVWWfFZASPdTYrJ9hWZ6k=
-github.com/elastic/entcollect v0.0.0-20260617022524-00a42d67f0df/go.mod h1:ZcfSL3oNJg0mhiYrWNJnf/NeetQHr7HlkY4iWCjSGWo=
+github.com/elastic/entcollect v0.0.0-20260706024408-4a12ea00f54d h1:Xt7wszp8UIYLhuMIvl4oTA22QGrsjzfxcKVUn59o8QM=
+github.com/elastic/entcollect v0.0.0-20260706024408-4a12ea00f54d/go.mod h1:ZcfSL3oNJg0mhiYrWNJnf/NeetQHr7HlkY4iWCjSGWo=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
 github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3 h1:UyNbxdkQiSfyipwsOCWAlO+ju3xXC61Z4prx/HBTtFk=
@@ -411,8 +411,8 @@ github.com/elastic/go-lumber v0.2.0 h1:BVGh+jq6tmp5ajAQ4QaPLcwC8vYqQ0yzt0tmWfuz7
 github.com/elastic/go-lumber v0.2.0/go.mod h1:HHaWnZamYKWsR9/eZNHqRHob8iQDKnchHmmskT/SKko=
 github.com/elastic/go-perf v0.0.0-20260224073651-af0ee0c731b7 h1:fGi5uudj7m5O1RgQl+bSZmwlqvuUMEi97X7TzWBOMGk=
 github.com/elastic/go-perf v0.0.0-20260224073651-af0ee0c731b7/go.mod h1:ucTo2u8JvFyIPQOaRlX7aVF0d3wwmF1dy/PVp5GUHZI=
-github.com/elastic/go-quark v0.3.0 h1:d4vokx0psEJo+93fnhvWpTJMggPd9rfMJSleoLva4xA=
-github.com/elastic/go-quark v0.3.0/go.mod h1:bO/XIGZBUJGxyiJ9FTsSYn9YlfOTRJnmOP+iBE2FyjA=
+github.com/elastic/go-quark v0.6.0 h1:ESbcnjLheNn3QNSCdwTcqV+z+IRKt5+UQ3LaoKv5DJs=
+github.com/elastic/go-quark v0.6.0/go.mod h1:bO/XIGZBUJGxyiJ9FTsSYn9YlfOTRJnmOP+iBE2FyjA=
 github.com/elastic/go-seccomp-bpf v1.5.0 h1:gJV+U1iP+YC70ySyGUUNk2YLJW5/IkEw4FZBJfW8ZZY=
 github.com/elastic/go-seccomp-bpf v1.5.0/go.mod h1:umdhQ/3aybliBF2jjiZwS492I/TOKz+ZRvsLT3hVe1o=
 github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9 h1:UbquKP8gHTRugCZQ/KoVQrz8XnHzncsrHFfgTa+PfTg=
@@ -429,8 +429,8 @@ github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20 h1:bVZ3kDKa8Tqw9qvNrD
 github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20/go.mod h1:A1DWjF89MFVnxzmzTaMF7CwVy9PDem7DalMkm8RIMoY=
 github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102 h1:HBjzmhV2CkYn0qBDv9DN4/irmJ94xppH3kVL9VgBA8k=
 github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102/go.mod h1:xoTq5saXNyokdlvOhMz+JQGU+RTzTtYzqo1Bc86q3Fs=
-github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6 h1:VgOx6omXIMKozR+R4HhQRT9q1Irm/h13DLtSkejoAJY=
-github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
+github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7 h1:LTx9zlFG3yxjLuxjf/D3NsS06ivZw7L/3TWqjkFe1Ak=
+github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.4 h1:7NRnWJDFjEKpOjnHhtzrPGZWr9EMrYFsLjF4q0Czosk=
 github.com/elastic/gosigar v0.14.4/go.mod h1:tx91Eb3YgFk6y++h88fRAnxic3Si1ZDHooqnJU/hqo8=
 github.com/elastic/mito v1.27.0 h1:FM01Ql1OMx6uL3ogW0LoI8Ruc0O6gzmwLNBV8Zk13Yw=

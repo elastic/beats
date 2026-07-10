@@ -99,7 +99,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 
 	require.Eventually(tb, func() bool {
 		return col.GetState() == otelcol.StateRunning
-	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
+	}, 15*time.Second, 10*time.Millisecond, "Collector did not start in time")
 
 	return c
 }

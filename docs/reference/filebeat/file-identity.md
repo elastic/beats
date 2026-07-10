@@ -58,7 +58,7 @@ Here is the brief high-level comparison of all currently available options:
 | path | Files are never moved or renamed, file names are never re-used. | Simple and fast. | The most unstable option, requires to maintain immutable file paths. |
 | native (default in Filebeat < 9.0) | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device ID` values. No support for network shares, containers or VMs.
 | inode_marker | Same as `native` but `device ID` is changing. | Same as `native` + no dependency on `device ID`. | Can still cause data duplication or data loss due to unstable `inode` values provided by the file system. Also, no support for network shares, containers or VMs. |
-| fingerprint (default in Filebeat >= 9.0) | Files > 64 bytes in size (1 KB is a recommended default). Log files with unique content. | The most stable. Support for any OS, any file system, network shares, containers and VMs. | Slightly higher CPU / memory usage, does not start to ingest files before they reach the required size (1 KB by default). |
+| fingerprint (default in Filebeat >= 9.0) | Log files with unique content.<br><br>{applies_to}`stack: ga 9.5+` Logs files of any size (enhanced fingerprint).<br><br> {applies_to}`stack: ga 9.0-9.4` Logs files larger than the fingerprint size (1 KB by default). | The most stable. Support for any OS, any file system, network shares, containers and VMs.<br><br>{applies_to}`stack: ga 9.5+` Ingests files smaller than the fingerprint size without delay. | Slightly higher CPU / memory usage.<br><br>{applies_to}`stack: ga 9.0-9.4` Only ingests files until they reach the fingerprint size (1 KB by default). |
 
 ### `path`
 
@@ -171,7 +171,7 @@ If necessary, it's possible to move this hashed byte range farther into the file
 
 This file identity covers most of the common use cases, it's OS-agnostic, it supports any file system including network shares, and it ensures that data duplication or data loss are avoided.
 
-However, there is a trade off: using file identity delays ingesting data from files smaller than the required amount of bytes for computing the fingerprint.
+{applies_to}`stack: ga 9.0-9.4` Using this file identity delays ingesting data from files smaller than the amount of bytes required to compute the fingerprint (`offset`+`length`).
 
 For example, Filebeat is running a filestream input with this configuration:
 
@@ -183,8 +183,43 @@ prospector.scanner.fingerprint:
 file_identity.fingerprint: ~
 ```
 
-If a new log file appears, the filestream input would not "see" it until it grows to 1056 bytes (`offset`+`length`).
+If a new log file appears, the filestream input doesn’t register it until it grows to 1056 bytes (`offset`+`length`). Files that don't grow to that size are not ingested.
 
-For some use cases, it might be a requirement to receive data as soon as possible without delays. For other use cases, files would not grow to such sizes at all and would never be ingested. It's important to consider these limitations accordingly.
+{applies_to}`stack: ga 9.5+` This limitation is removed by default. Refer to [Enhanced fingerprint](#file-identity-fingerprint-growing) for details.
 
 The stability of this file identity makes it a recommended and default option.
+
+#### Enhanced fingerprint [file-identity-fingerprint-growing]
+
+```{applies_to}
+stack: ga 9.5.0+
+```
+
+Enhanced fingerprint, controlled by `file_identity.fingerprint.growing`, is enabled by default and lets the filestream input track files that are smaller than the fingerprint size (`offset`+`length`) instead of skipping them until they grow large enough.
+
+While a file is smaller than `offset`+`length`, it is tracked using the raw bytes available from `offset` to the end of the file, and its identity follows the content as the file grows. Once the file reaches `offset`+`length`, its identity becomes the regular SHA-256 fingerprint — byte-for-byte identical to the value the static fingerprint produces for the same bytes — and its registry entry is migrated automatically. No data is re-ingested and no duplicate registry entries are created.
+
+The practical effects are:
+
+* Files smaller than the fingerprint size are ingested without delay.
+* Deployments upgrading to 9.5 keep using their existing fingerprint registry entries. Files already at or above the fingerprint size are not re-ingested.
+* Files smaller than `offset` still cannot be tracked, because there are no bytes to read past the offset.
+
+::::{warning}
+Rolling back from Filebeat 9.5 or later to an earlier version can duplicate events for small files.
+
+The risk is limited to files that the newer Filebeat version had started reading, but that had not yet reached the fingerprint size (`offset` + `length`) before the rollback. 
+
+Earlier Filebeat versions do not understand the tracking information used for those files. After rollback, if one of those files later reaches the fingerprint size, Filebeat treats it as a new file and reads it from the beginning. Any unused registry entries remain until `clean_inactive` removes them.
+
+Files that had already reached the fingerprint size before rollback are not affected.
+::::
+
+You don't need to configure `rotation.external.strategy: copytruncate` when using the `fingerprint` file identity. Because the fingerprint follows the file content, the input detects copytruncate rotation on its own: after the active file is copied to its rotated name and then truncated, the rotated file keeps its identity and offset, while the truncated active file is picked up as a new file. If you do set `rotation.external.strategy: copytruncate` with the `fingerprint` file identity, it is ignored, and enhanced fingerprint remains enabled.
+
+To opt out and restore the pre-9.5 behavior, where files smaller than `offset`+`length` are not ingested until they reach that size, set `growing` to `false`:
+
+```yaml
+file_identity.fingerprint:
+  growing: false
+```
