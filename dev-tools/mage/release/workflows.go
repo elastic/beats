@@ -117,8 +117,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 		return err
 	}
 	testEnvCommitMsg := fmt.Sprintf("[Release] Update test environments for %s", nextRelease)
-	testEnvCommitted, err := repo.CommitAll(testEnvCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
-	if err != nil {
+	if _, err := repo.CommitAll(testEnvCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
@@ -137,10 +136,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 				Labels:    []string{"release version"},
 			},
 		},
-	}
-
-	if testEnvCommitted {
-		branchesToFinalize = append(branchesToFinalize, workflowPR{
+		{
 			branch: testEnvBranch,
 			base:   releaseBranch,
 			opts: PROptions{
@@ -153,9 +149,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 				Reviewers: cfg.ProjectReviewers,
 				Labels:    []string{"release testing"},
 			},
-		})
-	} else {
-		fmt.Println("No test environment changes to commit")
+		},
 	}
 
 	if cfg.DryRun {
@@ -234,8 +228,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 		return err
 	}
 	versionCommitMsg := fmt.Sprintf("[Release] update version")
-	versionCommitted, err := repo.CommitAll(versionCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
-	if err != nil {
+	if _, err := repo.CommitAll(versionCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
@@ -252,8 +245,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 		return err
 	}
 	docsCommitMsg := fmt.Sprintf("docs: update docs")
-	docsCommitted, err := repo.CommitAll(docsCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
-	if err != nil {
+	if _, err := repo.CommitAll(docsCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
@@ -266,14 +258,12 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 		return err
 	}
 	testEnvCommitMsg := fmt.Sprintf("[Release] update test environment")
-	testEnvCommitted, err := repo.CommitAll(testEnvCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail)
-	if err != nil {
+	if _, err := repo.CommitAll(testEnvCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
 
-	branchesToFinalize := make([]workflowPR, 0, 3)
-	if versionCommitted {
-		branchesToFinalize = append(branchesToFinalize, workflowPR{
+	branchesToFinalize := []workflowPR{
+		{
 			branch: versionBranch,
 			base:   releaseBranch,
 			opts: PROptions{
@@ -286,10 +276,8 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 				Reviewers: cfg.ProjectReviewers,
 				Labels:    []string{"release version"},
 			},
-		})
-	}
-	if docsCommitted {
-		branchesToFinalize = append(branchesToFinalize, workflowPR{
+		},
+		{
 			branch: docsBranch,
 			base:   releaseBranch,
 			opts: PROptions{
@@ -302,10 +290,8 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 				Reviewers: cfg.ProjectReviewers,
 				Labels:    []string{"release docs"},
 			},
-		})
-	}
-	if testEnvCommitted {
-		branchesToFinalize = append(branchesToFinalize, workflowPR{
+		},
+		{
 			branch: testEnvBranch,
 			base:   releaseBranch,
 			opts: PROptions{
@@ -318,11 +304,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 				Reviewers: cfg.ProjectReviewers,
 				Labels:    []string{"release testing"},
 			},
-		})
-	}
-
-	if len(branchesToFinalize) == 0 {
-		fmt.Println("No changes to commit for patch release")
+		},
 	}
 
 	if cfg.DryRun {
