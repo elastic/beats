@@ -103,7 +103,7 @@ func ApplyPreset(preset string, userConfig *config.C) ([]string, *config.C, erro
 	for _, key := range userKeys {
 		if strings.HasPrefix(key, "queue.") && presetConfiguresQueue {
 			overridden = append(overridden, key)
-		} else if listContainsStr(presetKeys, key) {
+		} else if slices.Contains(presetKeys, key) {
 			overridden = append(overridden, key)
 		}
 	}
@@ -117,11 +117,6 @@ func ApplyPreset(preset string, userConfig *config.C) ([]string, *config.C, erro
 		return nil, nil, err
 	}
 	return overridden, presetConfig, nil
-}
-
-// TODO: Replace this with slices.Contains once we hit Go 1.21.
-func listContainsStr(list []string, str string) bool {
-	return slices.Contains(list, str)
 }
 
 func listContainsPrefix(list []string, prefix string) bool {
