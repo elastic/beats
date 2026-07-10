@@ -250,18 +250,16 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 	})
 
 	t.Run("a slice budget yields before EOF even though more data remains", func(t *testing.T) {
-		// Enough lines that reading them all would take more than an
-		// effectively-zero budget, without depending on real timing.
 		content := strings.Repeat("line\n", 100)
 		s := newReadSession(t, closerConfig{}, content, 0)
-		s.inp.sliceBudget = time.Nanosecond // expires virtually immediately
+		s.inp.sliceBudget = -time.Hour
 		pub := &countingPublisher{}
 
 		verdict, err := s.ReadSlice(backgroundCtx(), pub)
 		require.NoError(t, err)
 		require.Equal(t, loginp.SliceYield, verdict,
 			"a time-boxed slice must yield so Poll runs, not report done")
-		require.Less(t, len(pub.events), 100, "the budget must cut the slice short before EOF")
+		require.Empty(t, pub.events, "an already-past budget must cut the slice short before any line is read")
 	})
 
 	t.Run("no slice budget reads to EOF regardless of content size", func(t *testing.T) {
@@ -360,6 +358,7 @@ func TestFilestream_OpenSession_HarvesterOffsetMetric(t *testing.T) {
 
 		sess, err := inp.OpenSession(backgroundCtx(), src, "gzip-id", loginp.NewCursorForTest("id", 0, 0), metrics)
 		require.NoError(t, err)
+		defer sess.Close()
 		s, ok := sess.(*harvestSession)
 		require.True(t, ok)
 		assert.Nil(t, s.metricsOffset)

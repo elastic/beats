@@ -52,8 +52,10 @@ func TestLogFileCloseOnEOF(t *testing.T) {
 		f, err := fs.newFile(tc.createFile(t))
 		require.NoError(t, err,
 			"could not create file for reading")
-		defer f.Close()
-		defer os.Remove(f.Name())
+		t.Cleanup(func() {
+			_ = f.Close()
+			_ = os.Remove(f.Name())
+		})
 
 		t.Run(tc.name, func(t *testing.T) {
 			reader, err := newFileReader(

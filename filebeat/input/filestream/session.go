@@ -170,7 +170,8 @@ func (s *harvestSession) ReadSlice(
 	defer r.Close() // keepFileOpen: closes the pipeline, leaves the fd open
 
 	var deadline time.Time
-	if s.inp.sliceBudget > 0 {
+	if s.inp.sliceBudget != 0 {
+		// allows negative for testing, but the waker will never yield a slice with a negative
 		deadline = time.Now().Add(s.inp.sliceBudget)
 	}
 
