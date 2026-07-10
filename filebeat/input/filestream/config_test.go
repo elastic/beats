@@ -300,24 +300,26 @@ func TestNormalizeConfig(t *testing.T) {
 	tcs := []struct {
 		name        string
 		cfg         map[string]interface{}
+		wantErr     string
 		wantEnabled bool
+		wantGrowing bool
 	}{
 		{
-			name: "path identity disables prospector.scanner.fingerprint by default",
+			name: "path identity disables fingerprint",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"path": nil},
 			},
 			wantEnabled: false,
 		},
 		{
-			name: "native identity disables scanner fingerprint by default",
+			name: "native identity disables fingerprint",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"native": nil},
 			},
 			wantEnabled: false,
 		},
 		{
-			name: "explicit scanner fingerprint true is preserved",
+			name: "scanner enabled=true overrides path identity",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"path": nil},
 				"prospector": map[string]interface{}{
@@ -329,7 +331,7 @@ func TestNormalizeConfig(t *testing.T) {
 			wantEnabled: true,
 		},
 		{
-			name: "explicit scanner fingerprint false is preserved",
+			name: "scanner enabled=false overrides fingerprint identity",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"fingerprint": nil},
 				"prospector": map[string]interface{}{
@@ -339,16 +341,18 @@ func TestNormalizeConfig(t *testing.T) {
 				},
 			},
 			wantEnabled: false,
+			wantGrowing: true,
 		},
 		{
-			name: "fingerprint identity keeps default scanner fingerprint",
+			name: "fingerprint identity enables growing",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"fingerprint": nil},
 			},
 			wantEnabled: true,
+			wantGrowing: true,
 		},
 		{
-			name: "non-fingerprint inode_marker disables scanner fingerprint by default",
+			name: "inode_marker identity disables fingerprint",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{
 					"inode_marker": map[string]interface{}{"path": "/logs/.filebeat-marker"},
@@ -357,9 +361,67 @@ func TestNormalizeConfig(t *testing.T) {
 			wantEnabled: false,
 		},
 		{
-			name:        "no file_identity keeps default scanner fingerprint",
+			name:        "default identity enables growing",
 			cfg:         map[string]interface{}{},
 			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "growing=true enables scanner growing",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": true},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "growing=false disables scanner growing",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": false},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
+		{
+			name: "scanner-level growing is ignored",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"growing": false},
+					},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "identity growing overrides scanner-level growing",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": false},
+				},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"growing": true},
+					},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
+		{
+			name: "invalid growing is rejected",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": "not-a-bool"},
+				},
+			},
+			wantErr: "cannot read 'file_identity.fingerprint' config",
 		},
 	}
 
@@ -373,12 +435,22 @@ func TestNormalizeConfig(t *testing.T) {
 				cfg[key] = value
 			}
 			raw := conf.MustNewConfigFrom(cfg)
-			require.NoError(t, raw.Unpack(&c))
+			require.NoError(t, raw.Unpack(&c),
+				"unpack should succeed; rejection happens in normalizeConfig")
 
 			err := normalizeConfig(raw, &c)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr)
+				return
+			}
 			require.NoError(t, err)
 
-			assert.Equal(t, tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled)
+			assert.Equal(t,
+				tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled,
+				"FileWatcher.Scanner.Fingerprint.Enabled did not match")
+			assert.Equal(t,
+				tc.wantGrowing, c.FileWatcher.Scanner.Fingerprint.Growing,
+				"FileWatcher.Scanner.Fingerprint.Growing did not match")
 		})
 	}
 }

@@ -4,14 +4,13 @@
 
 //go:build integration
 
-package integration_test
+package integration
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
+	"strings"
 	"testing"
 	"text/template"
 	"time"
@@ -20,49 +19,88 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
-
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
-const celProgram = `get(state.url).Body.as(body,{"events":[body.decode_json()]})`
+const (
+	tcpInputTestMsg = "tcp-input-otel-e2e-test-event"
+	udpInputTestMsg = "udp-input-otel-e2e-test-event"
+)
 
-func TestCELInputOTelE2E(t *testing.T) {
+func TestTCPInputOTelE2E(t *testing.T) {
+	// TODO: change this to use port from log lines
+	// See https://github.com/elastic/beats/pull/51617
+	otelServerAddr := "127.0.0.1:9042"
+	fbServerAddr := "127.0.0.1:9043"
+
+	runSocketInputOTelE2E(
+		t,
+		"tcp",
+		tcpInputTestMsg,
+		otelServerAddr,
+		fbServerAddr,
+		nettest.RunTCPClient,
+	)
+}
+
+func TestUDPInputOTelE2E(t *testing.T) {
+	// TODO: change this to use port from log lines
+	// See https://github.com/elastic/beats/pull/51617
+	otelServerAddr := "127.0.0.1:9042"
+	fbServerAddr := "127.0.0.1:9043"
+
+	runSocketInputOTelE2E(
+		t,
+		"udp",
+		udpInputTestMsg,
+		otelServerAddr,
+		fbServerAddr,
+		nettest.RunUDPClient,
+	)
+}
+
+type socketClientFn func(t *testing.T, address string, data []string)
+
+func runSocketInputOTelE2E(
+	t *testing.T,
+	inputType, testMessage, otelAddress, fbAddress string,
+	runClient socketClientFn,
+) {
+	t.Helper()
 	integration.EnsureESIsRunning(t)
 
-	celSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"message":"cel-test-event","ip":"10.0.0.1"}`))
-	}))
-	t.Cleanup(celSrv.Close)
+	otelHome := t.TempDir()
 
 	host := integration.GetESURL(t, "http")
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
-	fbNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
 
+	data := []string{testMessage}
+
 	type options struct {
-		Namespace   string
-		ESURL       string
-		Username    string
-		Password    string
-		ResourceURL string
-		Program     string
+		InputType string
+		Index     string
+		ESURL     string
+		Username  string
+		Password  string
+		Host      string
+		PathHome  string
 	}
 
-	celFilebeatConfig := `filebeat.inputs:
-- type: cel
-  id: cel-input-e2e
-  interval: 1s
-  resource.url: {{ .ResourceURL }}
-  program: {{ .Program }}
+	filebeatConfig := `filebeat.inputs:
+- type: {{ .InputType }}
+  id: {{ .InputType }}-input-e2e
+  host: {{ .Host }}
 
 output:
   elasticsearch:
@@ -70,7 +108,7 @@ output:
       - {{ .ESURL }}
     username: {{ .Username }}
     password: {{ .Password }}
-    index: logs-integration-{{ .Namespace }}
+    index: {{ .Index }}
 
 queue.mem.flush.timeout: 0s
 setup.template.enabled: false
@@ -81,7 +119,7 @@ processors:
     - add_kubernetes_metadata: ~
 `
 
-	celOTelConfig := `exporters:
+	otelConfig := `exporters:
     elasticsearch:
         auth:
             authenticator: beatsauth
@@ -90,9 +128,7 @@ processors:
             level: 1
         endpoints:
             - {{ .ESURL }}
-        logs_dynamic_pipeline:
-            enabled: true
-        logs_index: logs-integration-{{ .Namespace }}
+        logs_index: {{ .Index }}
         max_conns_per_host: 1
         password: {{ .Password }}
         retry:
@@ -121,11 +157,9 @@ receivers:
     filebeatreceiver:
         filebeat:
             inputs:
-                - type: cel
-                  id: cel-input-e2e
-                  interval: 1s
-                  resource.url: {{ .ResourceURL }}
-                  program: {{ .Program }}
+                - type: {{ .InputType }}
+                  id: {{ .InputType }}-input-e2e
+                  host: {{ .Host }}
         processors:
             - add_host_metadata: ~
             - add_cloud_metadata: ~
@@ -133,7 +167,7 @@ receivers:
             - add_kubernetes_metadata: ~
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
-        management.otel.enabled: true
+        path.home: {{ .PathHome }}
 service:
     extensions:
         - beatsauth
@@ -148,28 +182,26 @@ service:
             level: none
 `
 
+	optionsValue := options{
+		InputType: inputType,
+		ESURL:     fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:  user,
+		Password:  password,
+		PathHome:  otelHome,
+	}
+
 	var configBuffer bytes.Buffer
-	require.NoError(t, template.Must(template.New("config").Parse(celOTelConfig)).Execute(&configBuffer, options{
-		ESURL:       fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username:    user,
-		Password:    password,
-		ResourceURL: celSrv.URL,
-		Program:     celProgram,
-		Namespace:   otelNamespace,
-	}))
+	optionsValue.Host = otelAddress
+	optionsValue.Index = otelIndex
+	require.NoError(t, template.Must(template.New("config").Parse(otelConfig)).Execute(&configBuffer, optionsValue))
 
 	oteltestcol.New(t, configBuffer.String())
 
 	configBuffer.Reset()
 
-	require.NoError(t, template.Must(template.New("config").Parse(celFilebeatConfig)).Execute(&configBuffer, options{
-		ESURL:       fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username:    user,
-		Password:    password,
-		ResourceURL: celSrv.URL,
-		Program:     celProgram,
-		Namespace:   fbNamespace,
-	}))
+	optionsValue.Host = fbAddress
+	optionsValue.Index = fbIndex
+	require.NoError(t, template.Must(template.New("config").Parse(filebeatConfig)).Execute(&configBuffer, optionsValue))
 
 	filebeat := integration.NewBeat(
 		t,
@@ -180,6 +212,17 @@ service:
 	filebeat.Start()
 	defer filebeat.Stop()
 
+	filebeat.WaitLogsContainsAnyOrder(
+		[]string{
+			"filebeat start running",
+		},
+		20*time.Second,
+		"filebeat did not run",
+	)
+
+	go runClient(t, otelAddress, data)
+	go runClient(t, fbAddress, data)
+
 	es := integration.GetESClient(t, "http")
 
 	t.Cleanup(func() {
@@ -187,13 +230,24 @@ service:
 			otelIndex,
 			fbIndex,
 		})
-		require.NoError(t, err, "failed to delete indices")
+		require.NoError(t, err, "failed to delete data streams")
 	})
 
 	rawQuery := map[string]any{
 		"query": map[string]any{
-			"match_phrase": map[string]any{
-				"input.type": "cel",
+			"bool": map[string]any{
+				"must": []map[string]any{
+					{
+						"match_phrase": map[string]any{
+							"input.type": inputType,
+						},
+					},
+					{
+						"match_phrase": map[string]any{
+							"message": testMessage,
+						},
+					},
+				},
 			},
 		},
 		"sort": []map[string]any{
@@ -226,7 +280,13 @@ service:
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
+		"log.source.address",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+}
+
+// HostAddress returns the host:port address used by net input integration tests.
+func hostAddress(port uint16) string {
+	return fmt.Sprintf("127.0.0.1:%d", port)
 }

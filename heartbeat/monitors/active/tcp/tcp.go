@@ -50,9 +50,9 @@ var debugf = logp.MakeDebug("tcp")
 func create(
 	name string,
 	cfg *conf.C,
-	logger *logp.Logger,
+	info beat.Info,
 ) (p plugin.Plugin, err error) {
-	return createWithResolver(cfg, monitors.NewStdResolver(), logger)
+	return createWithResolver(cfg, monitors.NewStdResolver(), info.Logger)
 }
 
 // Custom resolver is useful for tests against hostnames locally where we don't want to depend on any

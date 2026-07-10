@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
+	"github.com/elastic/beats/v7/packetbeat/npcap"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
@@ -191,6 +192,12 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		if err != nil {
 			return 0, nil, nil, nil, nil, err
 		}
+		// Ensure the DLL is loaded whether Npcap was just installed above
+		// or was already present from a previous run.
+		err = npcap.LoadNpcap()
+		if err != nil {
+			return 0, nil, nil, nil, nil, err
+		}
 	}
 
 	publisher, err := publish.NewTransactionPublisher(
@@ -199,6 +206,7 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		config.IgnoreOutgoing,
 		config.Interfaces[0].File == "",
 		config.Interfaces[0].InternalNetworks,
+		p.logger,
 	)
 	if err != nil {
 		return 0, nil, nil, nil, nil, err
@@ -290,7 +298,7 @@ func setupSniffer(
 		interfaces = append(interfaces, iface)
 	}
 
-	logger.Named("main").Debug("Initializing protocol plugins")
+	logger.Debug("Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
 	var closers []func()
 	for i, iface := range interfaces {

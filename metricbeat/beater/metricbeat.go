@@ -58,6 +58,7 @@ type Metricbeat struct {
 	// Options
 	moduleOptions []module.Option
 	logger        *logp.Logger
+	userAgent     string
 }
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -159,6 +160,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		registry:          registry,
 		paths:             b.Info.Paths,
 		logger:            b.Info.Logger,
+		userAgent:         b.Info.UserAgent,
 		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
 
@@ -327,5 +329,5 @@ func (bt *Metricbeat) Stop() {
 
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
-	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.paths, bt.logger)
+	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.paths, &beat.Info{Logger: bt.logger, Paths: bt.paths, UserAgent: bt.userAgent})
 }

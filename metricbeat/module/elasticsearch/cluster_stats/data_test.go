@@ -97,7 +97,7 @@ func TestMapper(t *testing.T) {
 		URI:          server.URL,
 		SanitizedURI: server.URL,
 		Host:         server.URL,
-	}, logptest.NewTestingLogger(t, ""))
+	}, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	elasticsearch.TestMapperWithHttpHelper(t, "./_meta/test/cluster_stats.*.json",

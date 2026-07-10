@@ -138,21 +138,26 @@ file_selectors:
 }
 
 func createSQSInput(t *testing.T, cfg *conf.C) *sqsReaderInput {
-	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
+	t.Helper()
+	in, err := Plugin(logp.NewLogger(inputName), openTestStatestore(), nil).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	return inputV2.(*sqsReaderInput)
+	return in.(*sqsReaderInput)
 }
 
 func createS3Input(t *testing.T, cfg *conf.C) *s3PollerInput {
-	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
+	t.Helper()
+	in, err := Plugin(logp.NewLogger(inputName), openTestStatestore(), nil).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
+	return in.(*s3PollerInput)
+}
 
-	return inputV2.(*s3PollerInput)
+func createInput(t *testing.T, cfg *conf.C) *sqsReaderInput {
+	t.Helper()
+	return createSQSInput(t, cfg)
 }
 
 func newV2Context() (v2.Context, func()) {
@@ -167,16 +172,15 @@ func newV2Context() (v2.Context, func()) {
 // Creates a default config for Localstack based tests
 func defaultTestConfig(region, queueURL string) config {
 	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		BucketListInterval:  120 * time.Second,
-		BucketListPrefix:    "",
-		SQSWaitTime:         20 * time.Second,
-		SQSMaxReceiveCount:  5,
-		MaxNumberOfMessages: 5,
-		PathStyle:           true,
-		RegionName:          region,
-		QueueURL:            queueURL,
+		APITimeout:         120 * time.Second,
+		VisibilityTimeout:  300 * time.Second,
+		BucketListInterval: 120 * time.Second,
+		BucketListPrefix:   "",
+		SQSWaitTime:        20 * time.Second,
+		SQSMaxReceiveCount: 5,
+		PathStyle:          true,
+		RegionName:         region,
+		QueueURL:           queueURL,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
@@ -246,7 +250,7 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	})
 
 	// Initialize s3Input with the test config
-	s3Input := newSQSReaderInput(config, awsCfg)
+	s3Input := newSQSReaderInput(config, awsCfg, nil)
 	// Run S3 Input with desired context
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {

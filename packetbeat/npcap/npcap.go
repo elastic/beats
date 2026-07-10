@@ -98,6 +98,12 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 		return fmt.Errorf("npcap: failed to install Npcap: %w", err)
 	}
 
+	return nil
+}
+
+// LoadNpcap loads the Npcap/WinPcap DLL into the current process. It is
+// a no-op on non-Windows platforms and is safe to call repeatedly.
+func LoadNpcap() error {
 	return loadWinPCAP()
 }
 
@@ -109,7 +115,7 @@ func Version() string {
 		// have happened due to Npcap not being installed.
 		// The empty string signifies that no installation
 		// exists.
-		recover()
+		_ = recover()
 	}()
 	return pcap.Version()
 }
