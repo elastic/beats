@@ -147,21 +147,11 @@ class Test(BaseTest):
                                         "/../../../../filebeat.test")
 
         # Each pytest-xdist worker gets its own Elasticsearch index so parallel
-        # workers do not delete or read each other's data (every case runs a
-        # delete -> ingest -> search cycle on this index). PYTEST_XDIST_WORKER
-        # is unset outside of parallel runs, leaving the name unchanged.
+        # workers do not delete or read each other's data.
         self.index_name = "test-filebeat-modules"
         worker = os.environ.get("PYTEST_XDIST_WORKER")
         if worker:
-            # Normalise the worker id (e.g. "gw7") to a fixed width. The module
-            # test template uses "<index_name>*" as its index pattern, so if the
-            # worker suffix were variable width the pattern for "gw1" would also
-            # match "gw10"'s index and Elasticsearch would reject the two
-            # templates as overlapping with the same priority. Fixed width means
-            # no worker's index name is a prefix of another's.
-            digits = "".join(ch for ch in worker if ch.isdigit())
-            suffix = f"gw{int(digits):03d}" if digits else worker
-            self.index_name = f"{self.index_name}-{suffix}"
+            self.index_name = f"{worker}-{self.index_name}"
 
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
