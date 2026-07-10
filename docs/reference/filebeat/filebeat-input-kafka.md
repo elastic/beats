@@ -98,7 +98,7 @@ How long to wait before retrying a failed read. Default is 2s.
 
 ### `timeout` [_timeout_2]
 ```{applies_to}
-stack: ga 9.5
+stack: ga 9.3+
 ```
 
 The network timeout for the connection to the Kafka brokers, applied to the dial, read, and write deadlines. Increase this for consumers reading across higher-latency links (for example cross-region or WAN), where a large fetch response may not be fully read within the default deadline. Default is 30s.
@@ -106,7 +106,7 @@ The network timeout for the connection to the Kafka brokers, applied to the dial
 
 ### `keep_alive` [_keep_alive]
 ```{applies_to}
-stack: ga 9.5
+stack: ga 9.3+
 ```
 
 The keep-alive period for the active network connection to the Kafka brokers. Default is 0s (disabled).
@@ -114,7 +114,7 @@ The keep-alive period for the active network connection to the Kafka brokers. De
 
 ### `session_timeout` [_session_timeout]
 ```{applies_to}
-stack: ga 9.5
+stack: ga 9.3+
 ```
 
 The consumer group session timeout. If the broker receives no heartbeat from a consumer within this period, the consumer is removed from the group and a rebalance is triggered. Consumers on higher-latency links may need a larger value to avoid spurious rebalances. Default is 10s.
@@ -122,7 +122,7 @@ The consumer group session timeout. If the broker receives no heartbeat from a c
 
 ### `heartbeat_interval` [_heartbeat_interval]
 ```{applies_to}
-stack: ga 9.5
+stack: ga 9.3+
 ```
 
 How often the consumer sends heartbeats to the broker. This must be lower than `session_timeout`, and is typically set to no more than a third of that value. Default is 3s.
