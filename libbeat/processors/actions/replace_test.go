@@ -311,9 +311,6 @@ func TestReplaceRun(t *testing.T) {
 	}
 }
 
-//go:fix inline
-func ptr[T any](v T) *T { return new(v) }
-
 // TestReplaceFailOnErrorSafety verifies that when FailOnError=true and the
 // field is missing, the event fields are unchanged.
 func TestReplaceFailOnErrorSafety(t *testing.T) {

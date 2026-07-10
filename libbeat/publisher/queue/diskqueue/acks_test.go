@@ -294,11 +294,6 @@ func (dqa *diskQueueACKs) assertACKedSegment(
 	}
 }
 
-//go:fix inline
-func uint32Ref(v uint32) *uint32 {
-	return new(v)
-}
-
 // rf assembles a readFrame with the given parameters and a spoofed
 // queue segment, whose firstFrameID field is set to match the given frame
 // if "first" is true.
