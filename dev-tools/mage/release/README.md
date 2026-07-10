@@ -361,17 +361,22 @@ Review changes with 'git diff'
 
 Some workflows create multiple PRs to separate concerns.
 
-### Patch Release (2 PRs)
+### Patch Release (3 PRs)
 
-**PR #1: Docs and Version**
-- Branch: `update-docs-version-X.Y.Z`
-- Updates: `libbeat/version/version.go`, docs, K8s manifests
-- Labels: `release`, `version`, `docs`
+**PR #1: Version**
+- Branch: `update-version-X.Y.Z`
+- Updates: `libbeat/version/version.go`
+- Labels: `release`, `Team:Automation`, `skip-changelog`
 
-**PR #2: Test Environment**
+**PR #2: Docs**
+- Branch: `update-docs-X.Y.Z`
+- Updates: docs versions, K8s manifests
+- Labels: `docs`, `in progress`, `release`, `Team:Automation`, `skip-changelog`
+
+**PR #3: Test Environment**
 - Branch: `update-testing-env-X.Y.Z`
 - Updates: All docker-compose files
-- Labels: `release`, `testing`
+- Labels: `release`, `Team:Automation`, `skip-changelog`
 
 **Why separate PRs?**
 - Docs/version updates need review by docs team

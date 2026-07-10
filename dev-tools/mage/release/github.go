@@ -67,6 +67,7 @@ func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
 	}
 	if found {
 		fmt.Printf("Open PR already exists #%d: %s\n", existingPR.GetNumber(), existingPR.GetHTMLURL())
+		gh.ensurePRLabels(opts.Owner, opts.Repo, existingPR.GetNumber(), opts.Labels)
 		return existingPR, nil
 	}
 
@@ -94,13 +95,7 @@ func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
 		}
 	}
 
-	// Add labels if specified
-	if len(opts.Labels) > 0 {
-		err = gh.AddLabels(opts.Owner, opts.Repo, pr.GetNumber(), opts.Labels)
-		if err != nil {
-			fmt.Printf("Warning: failed to add labels: %v\n", err)
-		}
-	}
+	gh.ensurePRLabels(opts.Owner, opts.Repo, pr.GetNumber(), opts.Labels)
 
 	fmt.Printf("Created PR #%d: %s\n", pr.GetNumber(), pr.GetHTMLURL())
 	return pr, nil
@@ -129,6 +124,15 @@ func (gh *GitHubClient) FindOpenPR(owner, repo, head, base string) (*github.Pull
 	}
 
 	return prs[0], true, nil
+}
+
+func (gh *GitHubClient) ensurePRLabels(owner, repo string, number int, labels []string) {
+	if len(labels) == 0 {
+		return
+	}
+	if err := gh.AddLabels(owner, repo, number, labels); err != nil {
+		fmt.Printf("Warning: failed to add labels: %v\n", err)
+	}
 }
 
 // AddLabels adds labels to a pull request or issue

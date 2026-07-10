@@ -24,6 +24,12 @@ import (
 	"github.com/google/go-github/v68/github"
 )
 
+// PR label sets match elastic-vault-github-plugin-prod release PRs (e.g. #48155, #49435).
+var (
+	releasePRLabels = []string{"release", "Team:Automation", "skip-changelog"}
+	patchDocsPRLabels = []string{"docs", "in progress", "release", "Team:Automation", "skip-changelog"}
+)
+
 // checkRequirements validates prerequisites before running a release workflow
 func checkRequirements(cfg *ReleaseConfig) error {
 	// Block deprecated releases (6.x, 7.x, 8.x minor releases)
@@ -133,7 +139,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 				Base:      releaseBranch,
 				Body:      nextVersionPRBody(nextRelease, cfg.CurrentRelease),
 				Reviewers: cfg.ProjectReviewers,
-				Labels:    []string{"release version"},
+				Labels:    releasePRLabels,
 			},
 		},
 		{
@@ -147,7 +153,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 				Base:      releaseBranch,
 				Body:      nextTestEnvPRBody(nextRelease, cfg.CurrentRelease),
 				Reviewers: cfg.ProjectReviewers,
-				Labels:    []string{"release testing"},
+				Labels:    releasePRLabels,
 			},
 		},
 	}
@@ -274,7 +280,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 				Base:      releaseBranch,
 				Body:      patchVersionPRBody(cfg.CurrentRelease),
 				Reviewers: cfg.ProjectReviewers,
-				Labels:    []string{"release version"},
+				Labels:    releasePRLabels,
 			},
 		},
 		{
@@ -288,7 +294,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 				Base:      releaseBranch,
 				Body:      patchDocsPRBody(cfg.CurrentRelease),
 				Reviewers: cfg.ProjectReviewers,
-				Labels:    []string{"release docs"},
+				Labels:    patchDocsPRLabels,
 			},
 		},
 		{
@@ -302,7 +308,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 				Base:      releaseBranch,
 				Body:      patchTestEnvPRBody(cfg.CurrentRelease),
 				Reviewers: cfg.ProjectReviewers,
-				Labels:    []string{"release testing"},
+				Labels:    releasePRLabels,
 			},
 		},
 	}
@@ -393,6 +399,7 @@ func finalizePR(repo *GitRepo, gh *GitHubClient, branchName, baseBranch string, 
 		return nil, err
 	}
 	if found {
+		gh.ensurePRLabels(opts.Owner, opts.Repo, existingPR.GetNumber(), opts.Labels)
 		return existingPR, nil
 	}
 
