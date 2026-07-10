@@ -26,6 +26,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -66,23 +68,12 @@ type addDockerMetadata struct {
 	fields          []string
 	sourceProcessor beat.Processor
 
-<<<<<<< HEAD
-	pidFields       []string      // Field names that contain PIDs.
-	cgroups         *common.Cache // Cache of PID (int) to container ids (string).
-	dedot           bool          // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool          // If Docker exists in env, then it is set to true
-=======
 	pidFields       []string                     // Field names that contain PIDs.
 	cgroups         atomic.Pointer[common.Cache] // Cache of PID (int) to container ids (string).
 	cgroupsOnce     sync.Once                    // Guards the lazy initialization of cgroups.
 	dedot           bool                         // If set to true, replace dots in labels with `_`.
-	dockerAvailable atomic.Bool                  // If Docker exists in env, then it is set to true
-	closeRetry      chan struct{}                // Channel to signal the connection retry goroutine to stop
-	waitRetry       sync.WaitGroup
-	closeOnce       sync.Once
-	closeErr        error
-	closed          atomic.Bool // Set by Close so a late cgroupCache skips starting the janitor.
->>>>>>> e1add6833 (add_docker_metadata: fix data races in lazy cgroup cache init (#51688))
+	dockerAvailable bool                         // If Docker exists in env, then it is set to true
+	closed          atomic.Bool                  // Set by Close so a late cgroupCache skips starting the janitor.
 	cgreader        processors.CGReader
 }
 
@@ -250,9 +241,9 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (d *addDockerMetadata) Close() error {
-<<<<<<< HEAD
-	if d.cgroups != nil {
-		d.cgroups.StopJanitor()
+	d.closed.Store(true) // Prevent the janitor from starting.
+	if cgroups := d.cgroups.Load(); cgroups != nil {
+		cgroups.StopJanitor()
 	}
 	// Watcher can be nil if processor failed on creation
 	if d.watcher != nil {
@@ -263,29 +254,6 @@ func (d *addDockerMetadata) Close() error {
 		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
 	}
 	return nil
-=======
-	d.closeOnce.Do(func() {
-		d.closed.Store(true) // Prevent the janitor from starting.
-		if cgroups := d.cgroups.Load(); cgroups != nil {
-			cgroups.StopJanitor()
-		}
-
-		// Stop the retry goroutine, this is safe to call even if the goroutine is not running.
-		close(d.closeRetry)
-		d.waitRetry.Wait()
-
-		// If the watcher is running, stop it.
-		if d.dockerAvailable.Load() && d.watcher != nil {
-			d.watcher.Stop()
-		}
-
-		err := processors.Close(d.sourceProcessor)
-		if err != nil {
-			d.closeErr = fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
-		}
-	})
-	return d.closeErr
->>>>>>> e1add6833 (add_docker_metadata: fix data races in lazy cgroup cache init (#51688))
 }
 
 func (d *addDockerMetadata) String() string {
