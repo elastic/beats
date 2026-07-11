@@ -665,10 +665,12 @@ func (g *harvesterRunner) popDue(now time.Time) []*sourceState {
 // the background, tracked via g.spawn.
 func (g *harvesterRunner) pollWithGracePeriod(state *sourceState) {
 	done := make(chan struct{})
-	g.spawn(func() {
+	if !g.spawn(func() {
 		g.pollParked(state)
 		close(done)
-	})
+	}) {
+		return
+	}
 
 	select {
 	case <-done:
@@ -1071,11 +1073,13 @@ func (g *harvesterRunner) finishRemaining() {
 	}
 }
 
-func (g *harvesterRunner) spawn(fn func()) {
+// spawn runs fn on a new goroutine tracked on g.wg, unless the runner is
+// already closed, in which case it does nothing and returns false.
+func (g *harvesterRunner) spawn(fn func()) bool {
 	g.mu.Lock()
 	if g.closed {
 		g.mu.Unlock()
-		return
+		return false
 	}
 	g.wg.Add(1)
 	g.mu.Unlock()
@@ -1083,6 +1087,7 @@ func (g *harvesterRunner) spawn(fn func()) {
 		defer g.wg.Done()
 		fn()
 	}()
+	return true
 }
 
 func (g *harvesterRunner) signalWaker() {

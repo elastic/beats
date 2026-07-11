@@ -548,6 +548,31 @@ func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	assert.Equal(t, 1, session.pollCount())
 }
 
+// TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed asserts
+// pollWithGracePeriod does not wait out the grace period when the runner is
+// already closed: spawn silently declines to run the closure in that case, so
+// without this check the waker would wait a full pollGracePeriod per due
+// source collected just before shutdown instead of returning immediately —
+// with enough due sources this can exceed stopTimeout and skip
+// finishRemaining's cleanup entirely.
+func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing.T) {
+	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
+	state.session = &fakeSession{pollFn: func(_ int) PollResult {
+		t.Error("Poll must not run once the runner is closed")
+		return PollPark
+	}}
+	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
+	g.mu.Lock()
+	g.states["x"] = state
+	g.closed = true // simulate StopHarvesters having already closed the runner
+	g.mu.Unlock()
+
+	start := time.Now()
+	g.pollWithGracePeriod(state)
+	assert.Less(t, time.Since(start), pollGracePeriod,
+		"pollWithGracePeriod must return immediately, not wait out the grace period, when closed")
+}
+
 // TestHarvesterRunner_ParkCapsDueAtStateCheckInterval asserts park schedules the
 // next poll at min(backoff, stateCheckInterval): once backoff has grown past
 // stateCheckInterval, the source must still be polled at least every
