@@ -64,14 +64,14 @@ type Buffer struct {
 	err   error
 	fixed bool
 
-	// reuse lets doAppend reclaim the wasted front of the backing array (the
-	// space Reset's window slide leaves behind) by compacting unconsumed bytes
-	// back to the front of b.base, instead of reallocating. It is only safe for
-	// buffers that never expose an alias of their backing array that must survive
-	// the next append (e.g. via Collect/Bytes). Opt in with SetReuse; b.base
-	// retains the full array so the slid-off front can be recovered.
-	reuse bool
-	base  []byte
+	// base tracks the full backing array so doAppend can reclaim the front lost
+	// to Reset's window slide by compacting unconsumed bytes back to b.base[0]
+	// instead of reallocating. Every Append copies its input (see doAppend), so
+	// a Buffer never hands out a long-lived alias of its own backing array
+	// through Append itself; callers must still copy anything they get back
+	// from Collect/Bytes/BufferedBytes before it could be overwritten by a
+	// later Append's compaction.
+	base []byte
 
 	// Internal parser state offsets.
 	// Offset is the position a parse might continue to work at when called
@@ -83,14 +83,6 @@ type Buffer struct {
 	//    (2) 0 <= available <= len(data)
 	//    (3) available = len(data) - mark
 	mark, offset, available int
-}
-
-// SetReuse enables backing-array reuse for this buffer. It must only be set on
-// buffers that never hand out a long-lived alias of their backing array (one
-// that must survive the next append), otherwise reuse would overwrite data that
-// is still in use. See the reuse field for details.
-func (b *Buffer) SetReuse(v bool) {
-	b.reuse = v
 }
 
 // Init initializes a zero buffer with some byte slice being retained by the
@@ -144,7 +136,7 @@ func (b *Buffer) Restore(snapshot *Buffer) {
 	b.available = snapshot.available
 }
 
-func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
+func (b *Buffer) doAppend(data []byte) error {
 	if b.fixed {
 		return b.SetError(ErrOperationNotAllowed)
 	}
@@ -152,33 +144,7 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 		return b.err
 	}
 
-	if b.reuse {
-		b.appendReuse(data)
-	} else if len(b.data) == 0 {
-		retain := retainable && cap(data) > newCap
-		if retain {
-			b.data = data
-		} else {
-			if newCap < len(data) {
-				b.data = make([]byte, len(data))
-			} else {
-				b.data = make([]byte, len(data), newCap)
-			}
-			copy(b.data, data)
-		}
-	} else {
-		if newCap > 0 && cap(b.data[b.offset:]) < len(data) {
-			required := cap(b.data) + len(data)
-			if required < newCap {
-				tmp := make([]byte, len(b.data), newCap)
-				copy(tmp, b.data)
-				b.data = tmp
-			}
-		}
-		tBuf := bytes.NewBuffer(b.data)
-		tBuf.Write(data)
-		b.data = tBuf.Bytes()
-	}
+	b.appendReuse(data)
 	b.available += len(data)
 
 	// reset error status (continue parsing)
@@ -189,12 +155,11 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 	return nil
 }
 
-// appendReuse implements doAppend for reuse-enabled buffers. It appends data
-// while reclaiming the front of the backing array that Reset's window slide left
-// behind, so the buffer reallocates only when its content genuinely outgrows the
-// array (amortized), not on every drain. The content always lives at b.data[0:];
-// b.base tracks the full array. Data is always copied, so this never aliases the
-// caller's slice (unlike the retainable Append fast path).
+// appendReuse appends data while reclaiming the front of the backing array
+// that Reset's window slide left behind, so the buffer reallocates only when
+// its content genuinely outgrows the array (amortized), not on every drain.
+// The content always lives at b.data[0:]; b.base tracks the full array. Data
+// is always copied, so this never aliases the caller's slice.
 func (b *Buffer) appendReuse(data []byte) {
 	need := len(b.data) + len(data)
 	switch {
@@ -226,11 +191,7 @@ func (b *Buffer) appendReuse(data []byte) {
 // Append will append the given data to the buffer. If Buffer is fixed
 // ErrOperationNotAllowed will be returned.
 func (b *Buffer) Append(data []byte) error {
-	return b.doAppend(data, true, -1)
-}
-
-func (b *Buffer) AppendWithCapLimits(data []byte, newCap int) error {
-	return b.doAppend(data, true, newCap)
+	return b.doAppend(data)
 }
 
 // Fix marks a buffer as fixed. No more data can be added to the buffer and

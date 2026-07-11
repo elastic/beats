@@ -18,6 +18,7 @@
 package tls
 
 import (
+	"bytes"
 	"crypto/dsa" //nolint:staticcheck // SA1019 Deprecated, but still used. So we have to handle it.
 	"crypto/ecdsa"
 	"crypto/rsa"
@@ -440,13 +441,16 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 		return 0, false
 	}
 
-	bytes := buffer.readBytes(7+randomDataLength, int(sessionIDLength))
-	if len(bytes) != int(sessionIDLength) {
+	sessionIDBytes := buffer.readBytes(7+randomDataLength, int(sessionIDLength))
+	if len(sessionIDBytes) != int(sessionIDLength) {
 		dest.logger.Warn("Not a TLS hello (failed reading session ID)")
 		return 0, false
 	}
-	dest.sessionID = hex.EncodeToString(bytes)
-	dest.random = buffer.readBytes(2, 4+randomDataLength)
+	dest.sessionID = hex.EncodeToString(sessionIDBytes)
+	// readBytes aliases the handshake buffer; clone it so the retained value
+	// can safely outlive the next Append on that buffer once it reuses its
+	// backing array.
+	dest.random = bytes.Clone(buffer.readBytes(2, 4+randomDataLength))
 
 	return helloHeaderLength + randomDataLength + int(sessionIDLength), true
 }
@@ -543,7 +547,12 @@ func parseCertificates(buffer bufferView) (certs []*x509.Certificate) {
 		if len(raw) != int(certLen) {
 			return nil
 		}
-		parsed, err := x509.ParseCertificate(raw)
+		// x509.ParseCertificate does not copy raw: it aliases it directly into
+		// Certificate.Raw/RawTBSCertificate/etc. raw itself aliases the
+		// handshake buffer, so clone it first to let the parsed certificate
+		// safely outlive the next Append on that buffer once it reuses its
+		// backing array.
+		parsed, err := x509.ParseCertificate(bytes.Clone(raw))
 		if err != nil {
 			return nil
 		}

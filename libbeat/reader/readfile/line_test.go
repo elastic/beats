@@ -316,12 +316,15 @@ func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	// read lines
 	var lines [][]byte
 	for range inputLines {
-		bytes, _, err := reader.Next()
+		b, _, err := reader.Next()
 		if err != nil {
 			t.Fatalf("failed to read all lines from test: %v", err)
 		}
 
-		lines = append(lines, bytes)
+		// Copy out before the next Next() call, which may reuse the decode
+		// buffer's backing array (the same contract production consumers like
+		// the harvester's Message.ToEvent follow).
+		lines = append(lines, append([]byte(nil), b...))
 	}
 
 	// validate
@@ -532,11 +535,11 @@ func TestReadWithNonZeroNumberOfBytesAndEOF(t *testing.T) {
 	testReadLines(t, [][]byte{[]byte("Hello world!\n")}, true)
 }
 
-// TestReuseDecodeBufferSafeConsumer verifies that with ReuseDecodeBuffer=true a
-// consumer that copies each line before reading the next (as filestream's
-// harvester does via Message.ToEvent) always sees correct content, even though
-// the decode buffer is reused across reads. It mirrors TestReadRandomLineLengths
-// but for the reuse path with random line lengths exercising grow/compact/reuse.
+// TestReuseDecodeBufferSafeConsumer verifies that a consumer that copies each
+// line before reading the next (as filestream's harvester does via
+// Message.ToEvent) always sees correct content, given the decode buffer's
+// backing array is reused across reads. It mirrors TestReadRandomLineLengths
+// but with random line lengths exercising grow/compact/reuse.
 func TestReuseDecodeBufferSafeConsumer(t *testing.T) {
 	minLength, maxLength, numLines := 1, 40000, 200
 
@@ -561,7 +564,6 @@ func TestReuseDecodeBufferSafeConsumer(t *testing.T) {
 		logptest.NewTestingLogger(t, ""),
 	)
 	require.NoError(t, err)
-	r.enableDecodeBufferReuse() // exercise the reuse path with a safe consumer
 
 	for i := range inputLines {
 		b, _, err := r.Next()

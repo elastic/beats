@@ -825,50 +825,60 @@ func (r *messageReader) Close() error {
 	return nil
 }
 
-// reuseCaseSpec is a parser configuration plus input exercised by the
-// decode-buffer reuse torture test.
+// reuseCaseSpec is a parser configuration, input, and known-correct output
+// exercised by the decode-buffer reuse torture test.
 type reuseCaseSpec struct {
-	name    string
-	parsers []map[string]interface{} // each map has one key: the parser name
-	input   string
+	name     string
+	parsers  []map[string]interface{} // each map has one key: the parser name
+	input    string
+	expected []string
 }
 
 func dockerLogLine(log string) string {
 	return fmt.Sprintf(`{"log":%q,"stream":"stdout","time":"2024-01-01T00:00:00.000000000Z"}`, log) + "\n"
 }
 
-// reuseTortureCases lists the parser configs + inputs exercised by the reuse
-// torture test. Platform-specific parsers (auditd) are appended by an init() in
-// a build-tagged file. TestReuseTortureCoversAllParsers enforces that every
-// supported parser appears here.
+// reuseTortureCases lists the parser configs + inputs + expected output
+// exercised by the reuse torture test. Platform-specific parsers (auditd) are
+// appended by an init() in a build-tagged file. TestReuseTortureCoversAllParsers
+// enforces that every supported parser appears here.
 var reuseTortureCases = []reuseCaseSpec{
-	{"no parsers", nil, "line one\nline two\nline three\n"},
+	{"no parsers", nil, "line one\nline two\nline three\n",
+		[]string{"line one", "line two", "line three"}},
 	{"multiline pattern", []map[string]interface{}{{
 		"multiline": map[string]interface{}{"pattern": "^[[:space:]]", "negate": false, "match": "after"},
-	}}, "head1\n cont1a\n cont1b\nhead2\n cont2a\nhead3\n"},
+	}}, "head1\n cont1a\n cont1b\nhead2\n cont2a\nhead3\n",
+		[]string{"head1\n cont1a\n cont1b", "head2\n cont2a", "head3"}},
 	{"multiline count", []map[string]interface{}{{
 		"multiline": map[string]interface{}{"type": "count", "count_lines": 2},
-	}}, "a1\na2\nb1\nb2\nc1\nc2\n"},
+	}}, "a1\na2\nb1\nb2\nc1\nc2\n",
+		[]string{"a1\na2", "b1\nb2", "c1\nc2"}},
 	{"multiline while", []map[string]interface{}{{
 		"multiline": map[string]interface{}{"type": "while_pattern", "pattern": "^[[:space:]]", "negate": true},
-	}}, "x1\nx2\nx3\n"},
+	}}, "x1\nx2\nx3\n",
+		[]string{"x1\nx2\nx3"}},
 	{"ndjson", []map[string]interface{}{{
 		"ndjson": map[string]interface{}{"keys_under_root": true, "message_key": "log"},
-	}}, dockerLogLine("alpha") + dockerLogLine("beta") + dockerLogLine("gamma")},
+	}}, dockerLogLine("alpha") + dockerLogLine("beta") + dockerLogLine("gamma"),
+		[]string{"alpha", "beta", "gamma"}},
 	{"container docker", []map[string]interface{}{{
 		"container": map[string]interface{}{"stream": "all", "format": "docker"},
-	}}, dockerLogLine("c1\n") + dockerLogLine("c2\n")},
+	}}, dockerLogLine("c1\n") + dockerLogLine("c2\n"),
+		[]string{"c1\n", "c2\n"}},
 	{"container cri partial", []map[string]interface{}{{
 		"container": map[string]interface{}{"stream": "all", "format": "cri"},
 	}}, "2024-01-01T00:00:00.000000000Z stdout P chunk-one \n" +
 		"2024-01-01T00:00:00.000000000Z stdout F chunk-two\n" +
-		"2024-01-01T00:00:00.000000000Z stdout F single\n"},
+		"2024-01-01T00:00:00.000000000Z stdout F single\n",
+		[]string{"chunk-one chunk-two", "single"}},
 	{"syslog", []map[string]interface{}{{
 		"syslog": map[string]interface{}{"format": "auto"},
-	}}, "<13>Oct 11 22:14:15 host app: message one\n<13>Oct 11 22:14:16 host app: message two\n"},
+	}}, "<13>Oct 11 22:14:15 host app: message one\n<13>Oct 11 22:14:16 host app: message two\n",
+		[]string{"message one", "message two"}},
 	{"include_message", []map[string]interface{}{{
 		"include_message": map[string]interface{}{"patterns": []string{"keep"}},
-	}}, "keep one\ndrop two\nkeep three\ndrop four\n"},
+	}}, "keep one\ndrop two\nkeep three\ndrop four\n",
+		[]string{"keep one", "keep three"}},
 }
 
 // requiredReuseParsers are the parser names that must each be exercised by
@@ -888,16 +898,17 @@ func reuseNamespaces(t *testing.T, specs []map[string]interface{}) []config.Name
 	return pc.Parsers
 }
 
-// TestDecodeBufferReuseDoesNotCorrupt is the safety net for enabling decode
-// buffer reuse unconditionally in filestream. For each parser, the messages
-// produced must be byte-for-byte identical whether or not the underlying line
-// reader reuses the array backing each line's Content. A parser that holds a
-// reference into that buffer across reads would corrupt its output under reuse
-// and fail this test. A tiny BufferSize maximizes buffer churn to stress it.
+// TestDecodeBufferReuseDoesNotCorrupt is the safety net for decode buffer
+// reuse, which streambuf.Buffer now always performs. For each parser, the
+// produced messages must match a known-correct golden output even though the
+// line reader reuses the array backing each line's Content across reads. A
+// parser that holds a reference into that buffer across reads would corrupt
+// its output and fail this test. A tiny BufferSize maximizes buffer churn to
+// stress it.
 func TestDecodeBufferReuseDoesNotCorrupt(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
-	readAll := func(t *testing.T, parsers []config.Namespace, input string, reuse bool) []string {
+	readAll := func(t *testing.T, parsers []config.Namespace, input string) []string {
 		t.Helper()
 		c, err := NewConfig(CommonConfig{MaxBytes: 1 << 20, LineTerminator: readfile.AutoLineTerminator}, parsers)
 		require.NoError(t, err)
@@ -918,9 +929,6 @@ func TestDecodeBufferReuseDoesNotCorrupt(t *testing.T) {
 			MaxBytes:   1 << 20,
 		}, logger)
 		require.NoError(t, err)
-		if reuse {
-			er.EnableDecodeBufferReuse()
-		}
 		r := c.Create(readfile.NewStripNewline(er, readfile.LineFeed), logger)
 
 		var out []string
@@ -942,10 +950,8 @@ func TestDecodeBufferReuseDoesNotCorrupt(t *testing.T) {
 	for _, tc := range reuseTortureCases {
 		t.Run(tc.name, func(t *testing.T) {
 			parsers := reuseNamespaces(t, tc.parsers)
-			noReuse := readAll(t, parsers, tc.input, false)
-			withReuse := readAll(t, parsers, tc.input, true)
-			require.NotEmpty(t, noReuse, "test input produced no messages")
-			require.Equal(t, noReuse, withReuse, "decode-buffer reuse changed parser output")
+			out := readAll(t, parsers, tc.input)
+			require.Equal(t, tc.expected, out, "decode-buffer reuse corrupted parser output")
 		})
 	}
 }

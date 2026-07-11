@@ -18,6 +18,7 @@
 package tls
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 
@@ -110,7 +111,10 @@ func ParseExtensions(buffer bufferView, logger *logp.Logger) Extensions {
 			unknown = append(unknown, label)
 		}
 		if saveRaw {
-			result.Raw[ExtensionID(code)] = extBuffer.readBytes(0, extBuffer.length())
+			// readBytes aliases the handshake buffer; clone it so the
+			// retained value can safely outlive the next Append on that
+			// buffer once it reuses its backing array.
+			result.Raw[ExtensionID(code)] = bytes.Clone(extBuffer.readBytes(0, extBuffer.length()))
 		}
 	}
 	if len(unknown) != 0 {

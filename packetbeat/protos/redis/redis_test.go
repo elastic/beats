@@ -257,3 +257,42 @@ func BenchmarkParserArray2Passes(b *testing.B) {
 		st.parser.parse(&st.Buf)
 	}
 }
+
+// BenchmarkParserPipeline simulates a single persistent connection processing
+// many pipelined commands on the same stream (Append/parse/Reset repeated many
+// times), unlike the other benchmarks above which each parse a single message
+// on a freshly allocated stream and so never exercise repeated Reset+Append
+// cycles on one buffer.
+func BenchmarkParserPipeline(b *testing.B) {
+	cmds := [][]byte{noArgsRequest, arrayRequest, arrayResponse}
+
+	st := newStream(time.Now(), nil, logp.NewNopLogger())
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		_ = st.Append(cmds[i%len(cmds)])
+		if st.parser.message == nil {
+			st.parser.message = newMessage(time.Time{})
+		}
+		st.parser.parse(&st.Buf)
+		st.PrepareForNewMessage()
+	}
+}
+
+// BenchmarkParserPipelineFragmented simulates a persistent connection where
+// every message arrives split across two TCP segments (two Append calls
+// before the message completes and the stream is Reset).
+func BenchmarkParserPipelineFragmented(b *testing.B) {
+	st := newStream(time.Now(), nil, logp.NewNopLogger())
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		_ = st.Append(array2PassesPart1)
+		if st.parser.message == nil {
+			st.parser.message = newMessage(time.Time{})
+		}
+		st.parser.parse(&st.Buf)
+
+		_ = st.Append(array2PassesPart2)
+		st.parser.parse(&st.Buf)
+		st.PrepareForNewMessage()
+	}
+}

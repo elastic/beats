@@ -115,7 +115,7 @@ func Test_AppendNil(t *testing.T) {
 	assert.Equal(t, 0, b.Len())
 }
 
-func Test_AppendRetainsBuffer(t *testing.T) {
+func Test_AppendCopiesData(t *testing.T) {
 	d := []byte("test")
 	b := New(nil)
 
@@ -124,7 +124,10 @@ func Test_AppendRetainsBuffer(t *testing.T) {
 	x, _ := b.Collect(1)
 	b.checkInvariants(t)
 	assert.False(t, b.Failed())
-	assert.Equal(t, d[0], x[0])
+	// Append always copies, so mutating the caller's slice afterward must not
+	// be visible through the buffer.
+	assert.NotEqual(t, d[0], x[0])
+	assert.Equal(t, byte('t'), x[0])
 }
 
 func Test_AppendOnFixed(t *testing.T) {
@@ -322,14 +325,13 @@ func Test_CollectWithSuffixFixedNoData(t *testing.T) {
 	assert.Nil(t, d)
 }
 
-// TestReuseAppendCollectCycle exercises the write/collect/reset cycle a line
-// reader performs on a reuse-enabled buffer: append a "line", collect it, copy
-// it out (a safe consumer), reset, repeat with varying sizes. It asserts the
-// collected content is always correct and that the backing array is reused
-// (capacity stabilizes) rather than reallocated on every line.
-func TestReuseAppendCollectCycle(t *testing.T) {
+// TestAppendCollectCycle exercises the write/collect/reset cycle a line reader
+// performs on a buffer: append a "line", collect it, copy it out (a safe
+// consumer), reset, repeat with varying sizes. It asserts the collected
+// content is always correct and that the backing array is reused (capacity
+// stabilizes) rather than reallocated on every line.
+func TestAppendCollectCycle(t *testing.T) {
 	b := New(nil)
-	b.SetReuse(true)
 
 	// Line lengths chosen to grow, shrink, and occasionally exceed the current
 	// capacity so every appendReuse branch (in-place, compact, grow) is hit.
@@ -372,19 +374,5 @@ func TestReuseAppendCollectCycle(t *testing.T) {
 			require.Same(t, &baseAfterMax[:1][0], &b.base[:1][0],
 				"line %d (%d bytes) replaced the backing array", i, n)
 		}
-	}
-}
-
-// TestReuseDisabledUnchanged verifies that without SetReuse the buffer behaves
-// exactly as before (no base tracking, content still correct).
-func TestReuseDisabledUnchanged(t *testing.T) {
-	b := New(nil)
-	for _, s := range []string{"alpha\n", "beta\n", "gamma\n"} {
-		require.NoError(t, b.Append([]byte(s)))
-		got, err := b.Collect(b.Len())
-		require.NoError(t, err)
-		require.Equal(t, s, string(got))
-		b.Reset()
-		require.Nil(t, b.base, "reuse-disabled buffer must not track base")
 	}
 }

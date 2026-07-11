@@ -24,6 +24,8 @@ package memcache
 // init function.
 
 import (
+	"bytes"
+
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -344,7 +346,10 @@ func makeParseBinary(
 
 		if keyLen > 0 {
 			key, _ := buf.Collect(int(keyLen))
-			keys := []memcacheString{{key}}
+			// key aliases the stream buffer; clone it so the retained value
+			// can safely outlive the next Append on this stream once the
+			// buffer reuses its backing array.
+			keys := []memcacheString{{bytes.Clone(key)}}
 			msg.keys = keys
 		}
 
@@ -423,8 +428,11 @@ func parseVersionNumber(parser *parser, buf *streambuf.Buffer) parseResult {
 	}
 
 	// size already checked
-	bytes, _ := buf.Collect(int(msg.bytes))
-	msg.str = memcacheString{bytes}
+	raw, _ := buf.Collect(int(msg.bytes))
+	// raw aliases the stream buffer; clone it so the retained value can
+	// safely outlive the next Append on this stream once the buffer reuses
+	// its backing array.
+	msg.str = memcacheString{bytes.Clone(raw)}
 
 	return parser.yield(buf.BufferConsumed())
 }
@@ -435,15 +443,18 @@ func parseStatResponse(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.contWith(buf, parseStateDataBinary)
 	}
 
-	bytes, _ := buf.Collect(int(msg.bytes))
+	raw, _ := buf.Collect(int(msg.bytes))
 
 	if len(msg.keys) == 0 {
 		return parser.failing(errExpectedKeys)
 	}
 
+	// raw aliases the stream buffer; clone it so the retained value can
+	// safely outlive the next Append on this stream once the buffer reuses
+	// its backing array.
 	msg.stats = append(msg.stats, memcacheStat{
 		msg.keys[0],
-		memcacheString{bytes},
+		memcacheString{bytes.Clone(raw)},
 	})
 	return parser.yield(buf.BufferConsumed())
 }

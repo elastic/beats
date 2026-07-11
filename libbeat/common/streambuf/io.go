@@ -97,7 +97,7 @@ func (b *Buffer) Read(p []byte) (int, error) {
 // Write writes p to the buffer if buffer is not fixed. Returns the number of
 // bytes written or ErrOperationNotAllowed if buffer is fixed.
 func (b *Buffer) Write(p []byte) (int, error) {
-	err := b.doAppend(p, false, -1)
+	err := b.doAppend(p)
 	if err != nil {
 		return 0, b.ioErr()
 	}

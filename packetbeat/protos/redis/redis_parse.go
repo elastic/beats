@@ -330,7 +330,9 @@ func (p *parser) parseSimpleString(buf *streambuf.Buffer) (common.NetString, boo
 		return empty, true, false
 	}
 
-	return common.NetString(line[1:]), true, true
+	// line aliases the stream buffer; clone it so the value can safely outlive
+	// the next Append on this stream once the buffer reuses its backing array.
+	return common.NetString(bytes.Clone(line[1:])), true, true
 }
 
 func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, bool) {
@@ -357,7 +359,10 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 		return common.NetString{}, true, false
 	}
 
-	return common.NetString(content), true, true
+	// content aliases the stream buffer; clone it so the value can safely
+	// outlive the next Append on this stream once the buffer reuses its
+	// backing array.
+	return common.NetString(bytes.Clone(content)), true, true
 }
 
 func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString, bool, bool, bool) {

@@ -28,6 +28,11 @@ func init() {
 		input: "type=SYSCALL msg=audit(1364481363.243:24287): arch=c000003e syscall=2 success=yes exit=0\n" +
 			"type=CWD msg=audit(1364481363.243:24287): cwd=\"/home/user\"\n" +
 			"type=PATH msg=audit(1364481363.243:24287): item=0 name=\"/etc/passwd\"\n",
+		expected: []string{
+			`type=SYSCALL msg=audit(1364481363.243:24287): arch=c000003e syscall=2 success=yes exit=0`,
+			`type=CWD msg=audit(1364481363.243:24287): cwd="/home/user"`,
+			`type=PATH msg=audit(1364481363.243:24287): item=0 name="/etc/passwd"`,
+		},
 	})
 	requiredReuseParsers = append(requiredReuseParsers, "auditd")
 }
