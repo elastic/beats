@@ -411,12 +411,11 @@ func (d *addDockerMetadata) resolveCIDFromSourcePath(logFilePath interface{}) (s
 	if result == nil {
 		return "", nil
 	}
-	v, err := result.GetValue(dockerContainerIDKey)
-	if err != nil {
-		return "", nil
+	if v, err := result.GetValue(dockerContainerIDKey); err == nil {
+		cid, _ := v.(string)
+		return cid, nil
 	}
-	cid, _ := v.(string)
-	return cid, nil
+	return "", nil
 }
 
 // matchFieldCID returns the value of the first field in fields for which get
