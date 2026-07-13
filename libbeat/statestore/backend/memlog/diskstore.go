@@ -196,7 +196,7 @@ func (s *diskstore) tryOpenLog() error {
 			return err
 		}
 
-		s.logFileSize = uint64(info.Size()) //nolint:gosec -- info.Size() is non-negative for a regular file
+		s.logFileSize = uint64(info.Size()) //nolint:gosec // G115: info.Size() is non-negative for a regular file
 	}
 
 	ok = true
