@@ -260,20 +260,20 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 	var cid string
-	var err error
 
 	// Extract CID from the filepath contained in the "log.file.path" field.
 	if d.sourceProcessor != nil {
 		lfp, _ := event.Fields.GetValue("log.file.path")
 		if lfp != nil {
-			event, err = d.sourceProcessor.Run(event)
+			id, err := d.resolveCIDFromSourcePath(lfp)
 			if err != nil {
 				d.log.Debugf("Error while extracting container ID from source path: %v", err)
 				return event, nil
 			}
 
-			if v, err := event.GetValue(dockerContainerIDKey); err == nil {
-				cid, _ = v.(string)
+			if id != "" {
+				cid = id
+				_, _ = event.PutValue(dockerContainerIDKey, cid)
 			}
 		}
 	}
@@ -292,17 +292,14 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	// Lookup CID from the user defined field names.
 	if cid == "" && len(d.fields) > 0 {
-		for _, field := range d.fields {
+		cid = matchFieldCID(d.fields, func(field string) (string, bool) {
 			value, err := event.GetValue(field)
 			if err != nil {
-				continue
+				return "", false
 			}
-
-			if strValue, ok := value.(string); ok {
-				cid = strValue
-				break
-			}
-		}
+			strValue, ok := value.(string)
+			return strValue, ok
+		})
 	}
 
 	if cid == "" {
@@ -319,8 +316,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-// RunPdata enriches the given pcommon.Map directly with Docker container metadata,
-// avoiding the round-trip conversion to/from mapstr.M used by the standard Run path.
+// RunPdata enriches the given pcommon.Map directly with Docker container metadata
 func (d *addDockerMetadata) RunPdata(body pcommon.Map) (bool, error) {
 	if !d.dockerAvailable.Load() {
 		return false, nil
@@ -343,30 +339,21 @@ func (d *addDockerMetadata) RunPdata(body pcommon.Map) (bool, error) {
 	return false, otelmap.MergeMapstrIntoPdata(d.buildContainerMeta(container), body, true)
 }
 
-// resolveCIDFromPdata extracts the container ID from a pcommon.Map using the
-// same three-path strategy as Run: sourceProcessor (log.file.path), PID-based
-// cgroup lookup, and user-defined match fields. It also writes the resolved CID
-// back into body under dockerContainerIDKey when found via the first two paths,
-// mirroring what Run does on the beat.Event.
+// resolveCIDFromPdata extracts the container ID from a pcommon.Map
 func (d *addDockerMetadata) resolveCIDFromPdata(body pcommon.Map) (string, error) {
 	// Extract CID from log.file.path via sourceProcessor.
 	if d.sourceProcessor != nil {
 		if lfpVal, ok := otelmap.GetAtPath("log.file.path", body); ok && lfpVal.Type() == pcommon.ValueTypeStr {
-			miniEvent := &beat.Event{Fields: mapstr.M{"log": mapstr.M{"file": mapstr.M{"path": lfpVal.Str()}}}}
-			result, err := d.sourceProcessor.Run(miniEvent)
+			id, err := d.resolveCIDFromSourcePath(lfpVal.Str())
 			if err != nil {
 				d.log.Debugf("Error while extracting container ID from source path: %v", err)
 				return "", nil
 			}
-			if result != nil {
-				if v, err := result.GetValue(dockerContainerIDKey); err == nil {
-					if cid, _ := v.(string); cid != "" {
-						if err := otelmap.PutAtPath(dockerContainerIDKey, cid, body); err != nil {
-							return "", err
-						}
-						return cid, nil
-					}
+			if id != "" {
+				if err := otelmap.PutAtPath(dockerContainerIDKey, id, body); err != nil {
+					return "", err
 				}
+				return id, nil
 			}
 		}
 	}
@@ -392,13 +379,46 @@ func (d *addDockerMetadata) resolveCIDFromPdata(body pcommon.Map) (string, error
 	}
 
 	// Lookup CID from user-defined match fields.
-	for _, field := range d.fields {
-		if v, ok := otelmap.GetAtPath(field, body); ok && v.Type() == pcommon.ValueTypeStr {
-			return v.Str(), nil
+	cid := matchFieldCID(d.fields, func(field string) (string, bool) {
+		v, ok := otelmap.GetAtPath(field, body)
+		if !ok || v.Type() != pcommon.ValueTypeStr {
+			return "", false
+		}
+		return v.Str(), true
+	})
+
+	return cid, nil
+}
+
+// resolveCIDFromSourcePath runs the configured source processor against a
+// synthetic event carrying only the log.file.path value, returning the
+// container ID
+func (d *addDockerMetadata) resolveCIDFromSourcePath(logFilePath interface{}) (string, error) {
+	miniEvent := &beat.Event{Fields: mapstr.M{"log": mapstr.M{"file": mapstr.M{"path": logFilePath}}}}
+	result, err := d.sourceProcessor.Run(miniEvent)
+	if err != nil {
+		return "", err
+	}
+	if result == nil {
+		return "", nil
+	}
+	v, err := result.GetValue(dockerContainerIDKey)
+	if err != nil {
+		return "", nil
+	}
+	cid, _ := v.(string)
+	return cid, nil
+}
+
+// matchFieldCID returns the value of the first field in fields for which get
+// reports a match.
+func matchFieldCID(fields []string, get func(field string) (string, bool)) string {
+	for _, field := range fields {
+		if v, ok := get(field); ok {
+			return v
 		}
 	}
-
-	return "", nil
+	return ""
 }
 
 func (d *addDockerMetadata) buildContainerMeta(container *docker.Container) mapstr.M {

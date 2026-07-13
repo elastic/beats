@@ -45,6 +45,26 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
+// assertRunPdataEquivalent verifies that RunPdata, given the same input fields
+// used to produce result via Run, enriches a pcommon.Map with identical output.
+func assertRunPdataEquivalent(t *testing.T, p beat.Processor, input, result mapstr.M) {
+	t.Helper()
+
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, input))
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, result))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
+}
+
 type testCGReader struct {
 }
 
@@ -219,18 +239,8 @@ func TestMatchContainer(t *testing.T) {
 		"foo": "container_id",
 	}, result.Fields)
 
-	// RunPdata path: assert Run == RunPdata.
-	pp, ok := p.(processors.PdataProcessor)
-	require.True(t, ok, "processor must implement PdataProcessor")
-	body := pcommon.NewMap()
-	require.NoError(t, otelmap.FromMapstr(body, input))
-	drop, err := pp.RunPdata(body)
-	require.NoError(t, err)
-	require.False(t, drop)
-	legacyNorm := pcommon.NewMap()
-	require.NoError(t, otelmap.FromMapstr(legacyNorm, result.Fields))
-	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
-		"Run and RunPdata must produce identical output")
+	// RunPdata path (match_fields case): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestMatchContainerWithDedot(t *testing.T) {
@@ -311,7 +321,7 @@ func TestMatchSource(t *testing.T) {
 		},
 	}
 
-	result, err := p.Run(&beat.Event{Fields: input})
+	result, err := p.Run(&beat.Event{Fields: input.Clone()})
 	assert.NoError(t, err, "processing an event")
 
 	assert.EqualValues(t, mapstr.M{
@@ -332,6 +342,9 @@ func TestMatchSource(t *testing.T) {
 			},
 		},
 	}, result.Fields)
+
+	// RunPdata path (log.file.path/sourceProcessor case): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestDisableSource(t *testing.T) {
@@ -429,9 +442,12 @@ func TestMatchPIDs(t *testing.T) {
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
-		result, err := p.Run(&beat.Event{Fields: fields})
+		result, err := p.Run(&beat.Event{Fields: fields.Clone()})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (PID/cgroup lookup case): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, fields, result.Fields)
 	})
 
 	t.Run("pid exited and ppid is containerized", func(t *testing.T) {
@@ -443,9 +459,12 @@ func TestMatchPIDs(t *testing.T) {
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
-		result, err := p.Run(&beat.Event{Fields: fields})
+		result, err := p.Run(&beat.Event{Fields: fields.Clone()})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (PID/cgroup lookup case): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, fields, result.Fields)
 	})
 
 	t.Run("cgroup error", func(t *testing.T) {
