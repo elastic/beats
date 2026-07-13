@@ -196,7 +196,7 @@ func (s *diskstore) tryOpenLog() error {
 			return err
 		}
 
-		s.logFileSize = uint64(info.Size())
+		s.logFileSize = uint64(info.Size()) //nolint:gosec -- info.Size() is non-negative for a regular file
 	}
 
 	ok = true
@@ -700,5 +700,5 @@ func readMetaFile(home string) (storeMeta, error) {
 //   - a < b (mod 2^63)
 //   - b > a after an integer rollover that is still within the distance of <2^63-1
 func isTxIDLessEqual(a, b uint64) bool {
-	return int64(a-b) <= 0
+	return a == b || a-b >= 1<<63
 }
