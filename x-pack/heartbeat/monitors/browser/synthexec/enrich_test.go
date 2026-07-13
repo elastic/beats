@@ -6,6 +6,7 @@
 package synthexec
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -321,6 +322,73 @@ func TestEnrichLegacyJourneyDefaultsToBrowser(t *testing.T) {
 		"browser.network",
 		netEvt.Meta[add_data_stream.FieldMetaCustomDataset],
 	)
+}
+
+// TestE2EAPIJourneyAgentOutput drives the exact ndjson the synthetics
+// agent emits for an `apiJourney(...)` (elastic/synthetics#997) through
+// the same decode path production uses (json.Unmarshal into SynthEvent,
+// matching runCmd's json.Decoder) and the real enricher. Unlike the
+// struct-built routing tests above, this pins the on-the-wire contract:
+// the field names/values the agent actually produces must survive into
+// the beat.Event heartbeat ships.
+func TestE2EAPIJourneyAgentOutput(t *testing.T) {
+	// Payloads mirror src/reporters/json.ts: journey/start and journey/end
+	// go through journeyInfo() (emits `type` only for non-browser journeys),
+	// and journey/network_info carries formatNetworkFields()'s ecs under
+	// root_fields, including the API-only `server` block.
+	lines := []string{
+		`{"@timestamp":1000000,"type":"journey/start","package_version":"1.30.0","journey":{"name":"Orders API","id":"orders-api","type":"api"},"payload":{"source":"apiJourney('Orders API', () => {})"}}`,
+		`{"@timestamp":1500000,"type":"journey/network_info","package_version":"1.30.0","journey":{"name":"Orders API","id":"orders-api","type":"api"},"root_fields":{"url":"https://api.example.com/orders","user_agent":{"name":"api","version":""},"http":{"request":{"method":"GET","bytes":42},"response":{"status":200,"mime_type":"application/json","bytes":128}},"server":{"ip":"93.184.216.34","port":443}},"step":{"name":"list orders","index":1,"status":"succeeded"},"payload":{"type":"fetch","is_navigation_request":false,"transfer_size":128}}`,
+		`{"@timestamp":2000000,"type":"journey/end","package_version":"1.30.0","journey":{"name":"Orders API","id":"orders-api","type":"api"},"payload":{"status":"succeeded"}}`,
+	}
+
+	senr := newStreamEnricher(stdfields.StdMonitorFields{ID: "orders-api", Name: "Orders API", Type: "api"})
+
+	evts := make([]*beat.Event, len(lines))
+	for i, line := range lines {
+		var se SynthEvent
+		require.NoErrorf(t, json.Unmarshal([]byte(line), &se), "agent line %d must decode into SynthEvent", i)
+		require.NotEmptyf(t, se.Type, "decoded agent line %d must have a type", i)
+
+		e := &beat.Event{}
+		require.NoErrorf(t, senr.enrich(e, &se), "enriching agent line %d must not error", i)
+		evts[i] = e
+	}
+	startEvt, netEvt, endEvt := evts[0], evts[1], evts[2]
+
+	jType, err := startEvt.Fields.GetValue("synthetics.journey.type")
+	require.NoError(t, err, "journey.type from the agent must propagate")
+	require.Equal(t, "api", jType, "synthetics.journey.type must be api so downstream can distinguish API journeys")
+
+	require.Equal(t,
+		"api.network",
+		netEvt.Meta[add_data_stream.FieldMetaCustomDataset],
+		"apiJourney network events must route to api.network, matching the Fleet integration's api_network data stream",
+	)
+
+	ip, err := netEvt.Fields.GetValue("server.ip")
+	require.NoError(t, err, "API-only server.ip from root_fields must survive enrichment")
+	require.Equal(t, "93.184.216.34", ip, "server.ip must match the agent's captured remote address")
+	port, err := netEvt.Fields.GetValue("server.port")
+	require.NoError(t, err, "API-only server.port from root_fields must survive enrichment")
+	require.EqualValues(t, 443, port, "server.port must match the agent's captured remote port")
+
+	domain, err := netEvt.Fields.GetValue("url.domain")
+	require.NoError(t, err, "the url string in root_fields must be parsed into ECS url.*")
+	require.Equal(t, "api.example.com", domain, "url.domain must be derived from the network event url")
+
+	for _, tc := range []struct {
+		e    *beat.Event
+		want string
+	}{
+		{startEvt, JourneyStart},
+		{netEvt, JourneyNetworkInfo},
+		{endEvt, JourneyEnd},
+	} {
+		st, err := tc.e.Fields.GetValue("synthetics.type")
+		require.NoErrorf(t, err, "synthetics.type must be set for %s", tc.want)
+		require.Equal(t, tc.want, st, "synthetics.type must reflect the agent event type")
+	}
 }
 
 func makeTestJourneyEnricher(sFields stdfields.StdMonitorFields) *journeyEnricher {
