@@ -1554,6 +1554,13 @@ scanner:
 // getFilesViaGlob is the verbatim pre-#48686 filepath.Glob based GetFiles (copied
 // from main, with the receiver passed as an argument). It is the oracle the
 // single-pass walker must match.
+//
+// It deliberately calls the same production getIngestTarget/toFileDescriptor
+// helpers the walker uses, so the parity comparison isolates exactly the changed
+// logic — path enumeration, matching and dedup — and not the per-file ingest-target
+// resolution the two share. A behaviour change in those shared helpers moves both
+// sides together and would not be caught here; that is intended, they are covered
+// by their own tests (e.g. TestGetIngestTarget).
 func getFilesViaGlob(s *fileScanner) map[string]loginp.FileDescriptor {
 	fdByName := map[string]loginp.FileDescriptor{}
 	// used to determine if a symlink resolves in a already known target
@@ -2078,7 +2085,7 @@ func TestWalk(t *testing.T) {
 	collect := func(g *walkGroup) []string {
 		s := &fileScanner{log: logger}
 		var got []string
-		s.walk(g, func(f string) { got = append(got, f) }, func(string) {})
+		s.walk(g, func(f string, _ int) { got = append(got, f) }, func(string) {})
 		return got
 	}
 
@@ -2169,7 +2176,7 @@ func TestWalk(t *testing.T) {
 			root:     base,
 			maxDepth: 2,
 			byDepth:  map[int][]string{2: {filepath.Join(base, "app[", "*.log")}},
-		}, func(f string) { got = append(got, f) }, func(string) {})
+		}, func(f string, _ int) { got = append(got, f) }, func(string) {})
 
 		assert.Empty(t, got, "no file can match a malformed pattern")
 		assert.Equalf(t, 1, strings.Count(buff.String(), "glob match("),

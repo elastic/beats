@@ -365,3 +365,74 @@ func BenchmarkGetFilesMixed(b *testing.B) {
 		s.GetFiles(loginp.FileScanOptions{})
 	}
 }
+
+// collisionFPLen is the fingerprint window used by the identity-collision
+// benchmark: small so files stay tiny, large enough to hold a distinct header.
+const collisionFPLen = 64
+
+// buildCollisionTree creates n ".log" files in a single directory three levels
+// below root (so root/**/*.log resolves them via root/*/*/*.log and scanOrderIndex
+// has to skip the shallower expansions). round(n*ratePercent/100) of the files
+// share their fingerprint header with an earlier file, so they collapse to the
+// same FileID; the rest get distinct headers. Colliding files diverge after the
+// shared header, mirroring the growing-fingerprint case where files share a
+// header while small and split apart as they grow. Whether the shared FileID
+// comes from a completed SHA-256 (as here) or a growing raw prefix does not
+// change the collision hot path (matchedEarlier/scanOrderIndex) being measured.
+func buildCollisionTree(tb testing.TB, root string, n, ratePercent int) {
+	tb.Helper()
+	dir := filepath.Join(root, "a", "b")
+	require.NoError(tb, os.MkdirAll(dir, 0o770))
+
+	collisions := n * ratePercent / 100
+	unique := n - collisions
+	require.Positive(tb, unique, "need at least one distinct header")
+
+	for i := 0; i < n; i++ {
+		k := i
+		if i >= unique {
+			k = (i - unique) % unique // duplicate an earlier file's header
+		}
+		// A collisionFPLen-byte header (the fingerprint window) that is identical
+		// for duplicates, followed by a per-file tail so the files are genuinely
+		// distinct beyond the shared prefix.
+		header := fmt.Sprintf("%0*d", collisionFPLen, k)
+		content := header[:collisionFPLen] + fmt.Sprintf("\n-tail-%d\n", i)
+		p := filepath.Join(dir, fmt.Sprintf("f%05d.log", i))
+		require.NoError(tb, os.WriteFile(p, []byte(content), 0o660))
+	}
+}
+
+// BenchmarkGetFilesIdentityCollision measures GetFiles when many matched files
+// resolve to the same FileID — the case a reviewer flagged for the single-pass
+// scanner: every collision triggers matchedEarlier/scanOrderIndex, which the
+// previous filepath.Glob implementation handled in O(1). Uses a "**" pattern so
+// scanOrderIndex has more than one expansion to test. Counts and collision rates
+// are small on purpose (the concern is per-collision overhead, not tree size).
+func BenchmarkGetFilesIdentityCollision(b *testing.B) {
+	for _, n := range []int{100, 500, 1000} {
+		for _, ratePercent := range []int{10, 25, 50} {
+			b.Run(fmt.Sprintf("n%d/collision%d", n, ratePercent), func(b *testing.B) {
+				base := filepath.Join(b.TempDir(), "root")
+				buildCollisionTree(b, base, n, ratePercent)
+
+				cfg := fileScannerConfig{
+					RecursiveGlob: true,
+					Fingerprint:   fingerprintConfig{Enabled: true, Offset: 0, Length: collisionFPLen},
+				}
+				s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(base, "**", "*.log")}, cfg, CompressionNone)
+				require.NoError(b, err)
+
+				unique := n - n*ratePercent/100
+				got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+				require.Len(b, got, unique, "colliding files must dedup to one per distinct FileID")
+
+				b.ReportAllocs()
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					s.GetFiles(loginp.FileScanOptions{})
+				}
+			})
+		}
+	}
+}
