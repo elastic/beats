@@ -816,12 +816,8 @@ type matchedTarget struct {
 
 // GetFiles returns a map of file descriptors by filenames that match the
 // configured paths.
-//
-// Instead of calling filepath.Glob for every (** expanded) pattern — which
-// materialises the full match list and re-reads shared parent directories once
-// per pattern — it walks each pattern's base directory a single time and filters
-// inline, so excluded files never enter an intermediate slice.
-// See https://github.com/elastic/beats/issues/48686.
+// It walks each pattern's base directory a single time and filters
+// inline, so files are excluded as they're discovered.
 func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics, []string) {
 	if opts.CurrentTime.IsZero() {
 		opts.CurrentTime = time.Now()
@@ -847,10 +843,6 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 		scanMetrics.ScanErrors++
 	}
 
-	// process mirrors the per-match handling of the previous filepath.Glob based
-	// implementation: dedup by name, exclude/include and symlink resolution
-	// (getIngestTarget), descriptor/fingerprint creation (toFileDescriptor) and
-	// dedup by file identity.
 	process := func(filename string, orderIndex int) {
 		scanMetrics.FilesMatched++
 
@@ -914,8 +906,9 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 
 			// The same file is reachable via more than one path. Keep the path
 			// the previous implementation would have kept, so the returned
-			// filename is stable across scans and releases; otherwise the "path"
-			// file identity would change and the file would be re-ingested.
+			// filename is stable across scans and releases; otherwise,
+			//  - the "path" file identity would change and the file could be re-ingested,
+			//  - the fingerprint file identity could choose another file to open.
 			if !s.matchedEarlier(filename, orderIndex, known.name, known.order) {
 				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, known.name, fileID, fileID)
 				return
@@ -936,8 +929,6 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 		}
 	}
 
-	// Literal paths (no glob metacharacter) are matched directly, exactly like
-	// filepath.Glob's base case.
 	for _, lit := range s.literals {
 		if _, err := os.Lstat(lit); err != nil {
 			if isObservationError(err) {
@@ -1045,14 +1036,9 @@ type walkPattern struct {
 }
 
 // walk traverses g.root once and invokes process for every entry matching one of
-// the group's patterns. It mirrors filepath.Glob semantics: entries are matched by
-// name regardless of their type — directories and symlinks are filtered later by
-// getIngestTarget, exactly as with filepath.Glob's match list — symlinked
-// directories are followed (filepath.Glob stats path components with os.Stat),
-// and a directory is only descended into when its name matches the next component
-// of some pattern, the same pruning filepath.Glob gets by resolving patterns
-// component by component. Pattern depth bounds the recursion, which preserves the
-// RecursiveGlobDepth cap and makes symlink cycles safe.
+// the group's patterns. A directory is only descended into when its name matches
+// the next component of some pattern. Pattern depth bounds the recursion, which
+// preserves the RecursiveGlobDepth cap and makes symlink cycles safe.
 func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderIndex int), recordUnobservable func(prefix string)) {
 	// Flatten the group's patterns in ascending depth order rather than map order,
 	// so per-scan malformed-pattern logging and matchLeaf's first-match break are
@@ -1067,8 +1053,7 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 	}
 
 	// badPatterns dedups ErrBadPattern logs: filepath.Match reports a malformed
-	// pattern for every candidate name, but one line per scan is enough (the
-	// previous filepath.Glob implementation logged it once per scan too).
+	// pattern for every candidate name, but one line per scan is enough.
 	badPatterns := map[string]struct{}{}
 	logBadPattern := func(pattern string, err error) {
 		if _, seen := badPatterns[pattern]; !seen {
@@ -1127,8 +1112,8 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 		}
 
 		// With nothing deeper to descend into, entry types are irrelevant, so read
-		// only the names (like filepath.Glob) rather than os.ReadDir, which would
-		// allocate an os.DirEntry per entry.
+		// only the names rather than os.ReadDir, which would allocate an
+		// os.DirEntry per entry.
 		if len(deeper) == 0 {
 			names, err := readDirNames(dir)
 			if err != nil {
@@ -1173,10 +1158,9 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 			full := filepath.Join(dir, e.Name())
 			if !isDir {
-				// Resolve the symlink to decide whether to descend, like
-				// filepath.Glob. A broken symlink cannot be descended into; if it
-				// matched a pattern it was already yielded above, again like
-				// filepath.Glob.
+				// Resolve the symlink to decide whether to descend. A broken
+				// symlink cannot be descended into; if it  matched a pattern it
+				// was already yielded above.
 				info, statErr := os.Stat(full)
 				if statErr != nil {
 					// If we could not stat the target because of an observation
@@ -1200,10 +1184,10 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 	rec(g.root, 0, patterns)
 }
 
-// readDirNames returns the sorted entry names of dir. Like the helper
-// filepath.Glob uses, it reads names only and so avoids the per-entry os.DirEntry
-// allocation of os.ReadDir; the walker uses it for leaf directories, where entry
-// types are not needed. Names are sorted to keep traversal order stable.
+// readDirNames returns the sorted entry names of dir. It reads names only and
+// so avoids the per-entry os.DirEntry allocation of os.ReadDir; the walker uses
+// it for leaf directories, where entry types are not needed. Names are sorted
+// to keep traversal order stable.
 func readDirNames(dir string) ([]string, error) {
 	f, err := os.Open(dir)
 	if err != nil {
@@ -1279,7 +1263,7 @@ func (s *fileScanner) scanOrderIndex(filename string) int {
 }
 
 // matchedEarlier reports whether path a would have been processed before path b by
-// the previous implementation using filepath.Glob. the path matched by the earlier
+// the previous implementation using filepath.Glob. The path matched by the earlier
 // pattern wins; ties are broken comparing path components, mirroring Glob's
 // per-directory sort. Used only to resolve the rare case where two paths resolve
 // to the same file, so the current implementation does not affect which paths

@@ -32,10 +32,10 @@ import (
 )
 
 // TestFileScannerReportsUnobservablePaths is the scanner half of the fd-exhaustion
-// fix (ingest-dev#7108): a directory or file the scan cannot read/stat because of a
-// resource or permission error (not because it is gone) must be reported as an
-// unobservable prefix, and counted in ScanErrors, so the watcher can postpone
-// deleting the files under it.
+// fix: a directory or file the scan cannot read/stat because of a resource or
+// permission error (not because it is gone) must be reported as an unobservable
+// prefix, and counted in ScanErrors, so the watcher can postpone deleting the
+// files under it.
 func TestFileScannerReportsUnobservablePaths(t *testing.T) {
 	if os.Geteuid() == 0 {
 		t.Skip("permission-based test cannot work as root")

@@ -1551,14 +1551,13 @@ scanner:
 	assert.Equal(t, baseline.FilesEmpty, metrics.FilesEmpty.Get(), "files_empty")
 }
 
-// getFilesViaGlob is the verbatim pre-#48686 filepath.Glob based GetFiles (copied
-// from main, with the receiver passed as an argument). It is the oracle the
-// single-pass walker must match.
+// getFilesViaGlob is the verbatim pre-#48686 filepath.Glob based GetFiles. It
+// is the oracle the single-pass walker must match.
 //
 // It deliberately calls the same production getIngestTarget/toFileDescriptor
 // helpers the walker uses, so the parity comparison isolates exactly the changed
 // logic — path enumeration, matching and dedup — and not the per-file ingest-target
-// resolution the two share. A behaviour change in those shared helpers moves both
+// resolution the two share. A behavior change in those shared helpers moves both
 // sides together and would not be caught here; that is intended, they are covered
 // by their own tests (e.g. TestGetIngestTarget).
 func getFilesViaGlob(s *fileScanner) map[string]loginp.FileDescriptor {

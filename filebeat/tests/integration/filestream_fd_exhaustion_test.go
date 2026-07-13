@@ -32,13 +32,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-// TestFilestreamFDExhaustionNoReingest reproduces ingest-dev#7108: when the number
+// TestFilestreamFDExhaustionNoReingest reproduces when the number
 // of harvested files exceeds the process file-descriptor limit, the scanner used
 // to drop the unreadable files from its result, the watcher reported them deleted,
 // clean_removed wiped their registry state, and once descriptors freed up they
 // were rediscovered and re-ingested from offset 0 — duplicating data every cycle.
 //
-// With the fix, files under paths the scan could not observe are not treated as
+// Now, files under paths the scan could not observe are not treated as
 // deleted, so each line is published exactly once.
 func TestFilestreamFDExhaustionNoReingest(t *testing.T) {
 	const (
