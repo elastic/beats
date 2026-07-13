@@ -26,7 +26,7 @@ class AuditbeatXPackTest(MetricbeatTest):
         )
 
     # Adapted from metricbeat.py
-    def check_metricset(self, module, metricset, fields=[], extras={}, errors_allowed=False, warnings_allowed=False):
+    def check_metricset(self, module, metricset, fields=[], extras={}, errors_allowed=False, warnings_allowed=False, max_timeout=20):
         """
         Method to test a metricset for its fields
         """
@@ -39,7 +39,7 @@ class AuditbeatXPackTest(MetricbeatTest):
             "extras": extras,
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=max_timeout)
         proc.check_kill_and_wait()
 
         if not warnings_allowed:
