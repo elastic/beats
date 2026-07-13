@@ -42,8 +42,12 @@ import (
 const (
 	RecursiveGlobDepth           = 8
 	DefaultFingerprintSize int64 = 1024 // 1KB
-	scannerDebugKey              = "scanner"
-	watcherDebugKey              = "file_watcher"
+	// MinFingerprintSize is the smallest allowed fingerprint length (one SHA-256 block).
+	MinFingerprintSize int64 = sha256.BlockSize
+	// MaxFingerprintSize caps fingerprint length; larger values risk exhausting scanner memory.
+	MaxFingerprintSize int64 = 10 * 1024 * 1024 // 10MB
+	scannerDebugKey          = "scanner"
+	watcherDebugKey          = "file_watcher"
 )
 
 var (
@@ -155,7 +159,7 @@ func (w *fileWatcher) Run(
 	ignoreInactiveSince time.Time,
 ) {
 	defer close(w.events)
-	defer metrics.CleanupFileScanMetrics()
+	defer metrics.Cleanup()
 
 	// run initial scan before starting regular
 	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
@@ -202,11 +206,12 @@ func (w *fileWatcher) watch(
 
 	// file identity is updated in GetFiles
 	now := time.Now()
-	paths, scanMetrics := w.scanner.GetFiles(loginp.FileScanOptions{
+	scanOpts := loginp.FileScanOptions{
 		CurrentTime:         now,
 		IgnoreOlder:         ignoreOlder,
 		IgnoreInactiveSince: ignoreInactiveSince,
-	})
+	}
+	paths, scanMetrics := w.scanner.GetFiles(scanOpts)
 	metrics.UpdateFileScanMetrics(scanMetrics)
 
 	// for debugging purposes
@@ -218,12 +223,9 @@ func (w *fileWatcher) watch(
 
 	newFilesByName := make(map[string]*loginp.FileDescriptor)
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
+	harvesterFiles := make([]loginp.HarvesterFile, 0, len(paths))
 
 	for path, fd := range paths {
-		// srcID is the file identity, it is the same value used to identify
-		// the harvester and as registry key for the file's state
-		srcID := w.getFileIdentity(fd)
-
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
@@ -234,46 +236,32 @@ func (w *fileWatcher) watch(
 			continue
 		}
 
-		// If we got notifications about harvesters being closed, update
-		// the state accordingly.
-		//
-		// This is used to prevent a sort of race condition:
-		// When the reader/harvester reaches EOF, it blocks on a backoff,
-		// if during this time [logFile.shouldBeClosed] is called, marks the
-		// file as inactive and closes the reader context, once the backoff
-		// time expires the reader and harvester are closed without ingesting
-		// any more data.
-		//
-		// If the [fileWatcher] sends a write event while the harvester was blocked
-		// no new harvester is started because one is already running, however the
-		// [fileWatcher] updates its internal state and won't send write events until
-		// more data is added to the file.
-		//
-		// This can cause some lines to be missed because the harvester closed
-		// and the write event was lost.
-		//
-		// To prevent this from happening we get notified the offset of the file
-		// (data ingested) when the harvester closes. If we have this data we
-		// update our state to the same as the harvester, therefore starting
-		// a new harvester if needed.
-		w.closedHarvestersMutex.Lock()
-		if size, harvesterClosed := w.closedHarvesters[srcID]; harvesterClosed {
-			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", srcID, size)
-			prevDesc.SetBytesIngested(size)
+		// srcID is the file identity (harvester ID/registry key), resolved lazily via ensureSrcID:
+		// an unchanged, untracked file (gzip, empty, ignore_older) never needs one, saving allocs.
+		var srcID string
+		ensureSrcID := func() string {
+			if srcID == "" { // getFileIdentity never returns ""
+				srcID = w.getFileIdentity(fd)
+			}
+			return srcID
 		}
-		w.closedHarvestersMutex.Unlock()
+
+		// closedHarvesters is empty in the steady state; this reconciliation is usually skipped.
+		if w.hasClosedHarvesters() {
+			w.reconcileClosedHarvester(&prevDesc, ensureSrcID())
+		}
 
 		var e loginp.FSEvent
 		switch {
 		// the new size is smaller, the file was truncated
 		case prevDesc.Info.Size() > fd.Info.Size():
-			e = truncateEvent(path, fd, srcID)
+			e = truncateEvent(path, fd, ensureSrcID())
 			truncatedCount++
 
 		// the size is the same, timestamps are different, the file was touched
 		case prevDesc.Info.Size() == fd.Info.Size() && prevDesc.Info.ModTime() != fd.Info.ModTime():
 			if w.cfg.ResendOnModTime {
-				e = truncateEvent(path, fd, srcID)
+				e = truncateEvent(path, fd, ensureSrcID())
 				truncatedCount++
 			}
 
@@ -281,14 +269,14 @@ func (w *fileWatcher) watch(
 		// If a harvester for this file was closed recently,
 		// we use its state instead of the one we have cached.
 		case prevDesc.SizeOrBytesIngested() < fd.Info.Size():
-			e = writeEvent(path, fd, srcID)
+			e = writeEvent(path, fd, ensureSrcID())
 			writtenCount++
 
 		default:
 			// For the delete feature we need to run the harvester for
 			// files that have not changed until they're deleted.
 			if w.cfg.SendNotChanged {
-				e = notChangedEvent(path, fd, srcID)
+				e = notChangedEvent(path, fd, ensureSrcID())
 			}
 		}
 
@@ -301,12 +289,13 @@ func (w *fileWatcher) watch(
 			}
 		}
 
+		// Record progress metrics for trackable, non-truncated files (tracksHarvesterProgress).
+		if e.Op != loginp.OpTruncate && tracksHarvesterProgress(&fd, scanOpts) {
+			harvesterFiles = append(harvesterFiles, loginp.HarvesterFile{ID: ensureSrcID(), Size: fd.Info.Size()})
+		}
+
 		// delete from previous state to mark that we've seen the existing file again
 		delete(w.prev, path)
-		// Delete used state from closedHarvesters
-		w.closedHarvestersMutex.Lock()
-		delete(w.closedHarvesters, srcID)
-		w.closedHarvestersMutex.Unlock()
 	}
 
 	// Remaining files in the prev map are missing from this scan — either
@@ -320,39 +309,45 @@ func (w *fileWatcher) watch(
 	//   3. Unmatched-leftover emission — anything still in w.prev becomes
 	//      OpDelete, anything still in newFilesByName becomes OpCreate.
 
-	// Exact-FileID rename match: For growing mode, also accumulate the
-	// short-fingerprint index from prev entries that did NOT get an exact
-	// match — they are the candidates for the next (prefix-match) pass.
-	var shortFingerprints *shortFingerprintSet
-	if w.growingFingerprint {
-		shortFingerprints = newShortFingerprintSet()
-	}
-
+	// Exact-FileID rename match.
 	for remainingPath, remainingDesc := range w.prev {
 		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
+		if !renamed {
+			continue
+		}
 
-		switch {
-		// Exact-FileID rename match
-		case renamed:
-			srcID := w.getFileIdentity(remainingDesc)
-			select {
-			case <-ctx.Done():
-				return
-			case w.events <- renamedEvent(
-				remainingPath, newDesc.Filename, *newDesc, srcID):
-				renamedCount++
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- renamedEvent(
+			remainingPath, newDesc.Filename, *newDesc, srcID):
+			renamedCount++
+		}
+
+		delete(newFilesByName, newDesc.Filename)
+		delete(newFilesByID, remainingDesc.FileID())
+		delete(w.prev, remainingPath)
+	}
+
+	// Prefix-match candidates are the still-growing prev entries left after
+	// the exact-match pass (GrowingRaw is empty for completed entries, which
+	// match by their SHA-256 identity instead). The index is only built when
+	// this scan has a new file that could justify a match — a delete-only
+	// scan pays no hashing.
+	var shortFingerprints *shortFingerprintSet
+	if w.growingFingerprint {
+		for _, newDesc := range newFilesByName {
+			if newDesc.Fingerprint.Complete() {
+				shortFingerprints = newShortFingerprintSet()
+				break
 			}
-
-			delete(newFilesByName, newDesc.Filename)
-			delete(newFilesByID, remainingDesc.FileID())
-			delete(w.prev, remainingPath)
-
-		// If it isn't an exact match, make it a candidate for prefix-match.
-		// GrowingRaw keeps only still-growing predecessors in the
-		// index; completed entries match by their SHA-256 identity instead.
-		case w.growingFingerprint:
+		}
+	}
+	if shortFingerprints != nil {
+		for remainingPath, remainingDesc := range w.prev {
 			if raw := remainingDesc.Fingerprint.GrowingRaw(); raw != "" {
-				shortFingerprints.Add(remainingPath, raw, remainingPath)
+				shortFingerprints.AddRaw(remainingPath, raw, remainingPath)
 			}
 		}
 	}
@@ -421,11 +416,18 @@ func (w *fileWatcher) watch(
 	// Unmatched-leftover creates: new files left over after both rename
 	// passes are genuinely new.
 	for path, fd := range newFilesByName {
+		srcID := w.getFileIdentity(*fd)
+
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- createEvent(path, *fd, w.getFileIdentity(*fd)):
+		case w.events <- createEvent(path, *fd, srcID):
 			createdCount++
+		}
+
+		// New files skip the main loop via early continue, so collect their metrics here.
+		if tracksHarvesterProgress(fd, scanOpts) {
+			harvesterFiles = append(harvesterFiles, loginp.HarvesterFile{ID: srcID, Size: fd.Info.Size()})
 		}
 	}
 
@@ -464,7 +466,36 @@ func (w *fileWatcher) watch(
 		}
 	}
 
+	metrics.UpdateHarvesterBuckets(harvesterFiles)
+
 	w.prev = paths
+}
+
+// hasClosedHarvesters reports whether any harvester-close notification awaits reconciliation.
+func (w *fileWatcher) hasClosedHarvesters() bool {
+	w.closedHarvestersMutex.Lock()
+	defer w.closedHarvestersMutex.Unlock()
+	return len(w.closedHarvesters) > 0
+}
+
+// reconcileClosedHarvester folds a recently-closed harvester's ingested offset (from
+// closedHarvesters) into prevDesc so a restarted harvester resumes from the right position.
+// It guards a close-during-backoff race that would otherwise withhold writes and lose lines.
+func (w *fileWatcher) reconcileClosedHarvester(prevDesc *loginp.FileDescriptor, id string) {
+	w.closedHarvestersMutex.Lock()
+	defer w.closedHarvestersMutex.Unlock()
+	size, ok := w.closedHarvesters[id]
+	if !ok {
+		return
+	}
+	w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", id, size)
+	prevDesc.SetBytesIngested(size)
+	delete(w.closedHarvesters, id)
+}
+
+// tracksHarvesterProgress reports whether a file contributes to the harvester progress metrics.
+func tracksHarvesterProgress(fd *loginp.FileDescriptor, opts loginp.FileScanOptions) bool {
+	return !fd.GZIP && fd.Info.Size() > 0 && !isFileIgnored(*fd, opts)
 }
 
 // isFileIgnored returns true when a file is ignored, no matter the reason.
@@ -522,10 +553,10 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 }
 
 // GetFiles runs a one-off enumeration scan for the prospector's Init and
-// TakeOver phases. It is side-effect free: unlike the watch loop it does not
-// advance the scanner's completedFingerprints set, so these pre-watch scans
-// cannot suppress the bridging raw header a still-growing entry needs to
-// migrate its registry key after a restart.
+// TakeOver phases. Unlike the watch loop it does not advance the scanner's
+// completedFingerprints set, so these pre-watch scans cannot suppress the
+// bridging raw header a still-growing entry needs to migrate its registry key
+// after a restart.
 func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
 	return w.scanner.GetFiles(opts)
 }
@@ -588,6 +619,9 @@ type fileScanner struct {
 	// prospector runs in Init/TakeOver cannot suppress the header a
 	// still-growing entry needs to migrate across a restart.
 	completedFingerprints map[string]struct{}
+
+	// lastCount is the number of unique files the previous scan produced.
+	lastCount int
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -600,9 +634,14 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 	}
 
 	if s.cfg.Fingerprint.Enabled {
-		if s.cfg.Fingerprint.Length < sha256.BlockSize {
-			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
+		if s.cfg.Fingerprint.Length < MinFingerprintSize {
+			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, MinFingerprintSize)
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
+		}
+		if s.cfg.Fingerprint.Length > MaxFingerprintSize {
+			s.log.Warnf("fingerprint length %d bytes exceeds the maximum of %d bytes, capping to the maximum",
+				s.cfg.Fingerprint.Length, MaxFingerprintSize)
+			s.cfg.Fingerprint.Length = MaxFingerprintSize
 		}
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d, growing %t",
 			s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length, s.cfg.Fingerprint.Growing)
@@ -665,11 +704,12 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 		opts.CurrentTime = time.Now()
 	}
 
-	fdByName := map[string]loginp.FileDescriptor{}
+	// Pre-size the per-scan maps from the previous scan's count.
+	fdByName := make(map[string]loginp.FileDescriptor, s.lastCount)
 	// used to determine if a symlink resolves in a already known target
-	uniqueIDs := map[string]string{}
+	uniqueIDs := make(map[string]string, s.lastCount)
 	// used to filter out duplicate matches
-	uniqueFiles := map[string]struct{}{}
+	uniqueFiles := make(map[string]struct{}, s.lastCount)
 	scanMetrics := loginp.FileScanMetrics{}
 
 	for _, path := range s.paths {
@@ -740,6 +780,7 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 	}
 
 	scanMetrics.FilesUnique = int64(len(fdByName))
+	s.lastCount = len(fdByName)
 	return fdByName, scanMetrics
 }
 

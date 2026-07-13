@@ -30,6 +30,14 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 )
 
+// contextStopper is an optional extension of beat.Beater for beaters that can
+// respect a context deadline while waiting to reach their ready state. If a
+// beater implements this, Shutdown uses it so the OTel context deadline is not
+// consumed by the ready-state wait before Disconnect is called.
+type contextStopper interface {
+	StopWithContext(ctx context.Context)
+}
+
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
 	beat                *instance.Beat
@@ -38,6 +46,7 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
+	runDone             chan error // receives the error from beater.Run; closed when Run returns
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -121,8 +130,8 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		w.WithOtelFactoryWrapper(otelstatus.StatusReporterFactory(groupReporter))
 	}
 
-	// We go through all extensions to find any that implement the DiagnosticExtension interface.
-	// This is done so that we can register a diagnostic hook to collect beat metrics.
+	// We go through all extensions to find any that implement the DiagnosticExtension or
+	// ActionExtension interfaces.
 	extensions := host.GetExtensions()
 	for _, ext := range extensions {
 		if diagExt, ok := ext.(otelmanager.DiagnosticExtension); ok {
@@ -142,6 +151,15 @@ func (br *BeatReceiver) Start(host component.Host) error {
 					}
 					return data
 				})
+		}
+
+		// This is done so that Fleet actions (e.g. osquery live queries) routed to
+		// elastic-agent can reach this beat receiver instance.
+		if actionExt, ok := ext.(otelmanager.ActionExtension); ok {
+			// if the manager also implements WithActionExtension interface then set the extension.
+			if m, ok := br.beat.Manager.(otelmanager.WithActionExtension); ok {
+				m.SetActionExtension(br.beat.Info.ComponentID, actionExt)
+			}
 		}
 	}
 
@@ -173,12 +191,14 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		br.reporter = rep
 	}
 
-	if err := br.beater.Run(&br.beat.Beat); err != nil {
-		// set beatreceiver status
-		groupReporter.UpdateStatus(status.Failed, err.Error())
-		return fmt.Errorf("beat receiver run error: %w", err)
-	}
-
+	br.runDone = make(chan error, 1)
+	go func() {
+		err := br.beater.Run(&br.beat.Beat)
+		if err != nil {
+			groupReporter.UpdateStatus(status.Failed, err.Error())
+		}
+		br.runDone <- err
+	}()
 	return nil
 }
 
@@ -196,13 +216,28 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	// The Beater owns shutdown sequencing: stop it first so it can close its
 	// inputs and finalize acknowledgments before the pipeline is disconnected.
 	// See https://github.com/elastic/beats/issues/49794.
-	br.beater.Stop()
+	// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
+	// shutdown deadline during their ready-state wait.
+	if cs, ok := br.beater.(contextStopper); ok {
+		cs.StopWithContext(ctx)
+	} else {
+		br.beater.Stop()
+	}
 
 	// Trigger the stop callback. Some beaters (e.g. metricbeat) call
 	// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
 	// static mode) do not. The OtelManager.stopOnce ensures the callback runs
 	// exactly once regardless.
 	br.beat.Manager.Stop()
+
+	// Wait for beater.Run to return before disconnecting the pipeline, so the
+	// beater owns its full shutdown drain and the pipeline is not torn down
+	// while inputs are still active. Bounded by ctx so a hung beater does not
+	// block Shutdown indefinitely.
+	select {
+	case <-br.runDone:
+	case <-ctx.Done():
+	}
 
 	// Now disconnect the publisher pipeline (this waits for outstanding events
 	// to be acknowledged, bounded by the caller's context deadline or the
