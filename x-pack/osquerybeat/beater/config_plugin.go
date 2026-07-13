@@ -49,6 +49,10 @@ type QueryInfo struct {
 	Interval int
 	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
 	PackID string
+	// PackName is the policy-defined human-readable pack name for pack queries; empty for top-level schedule queries.
+	PackName string
+	// QueryName is the query's config map key (pack query name or top-level schedule name).
+	QueryName string
 	// Profile is whether to collect and publish profile for this query.
 	Profile bool
 }
@@ -81,6 +85,11 @@ type ConfigPlugin struct {
 	// Osquery configuration
 	osqueryConfig *config.OsqueryConfig
 
+	// globalProfileEnabled is the fleet-wide profiling default from
+	// elastic_options.profiling.profiling_all. Per-query overrides are resolved into
+	// QueryInfo.Profile at Set() time; this is used for live (ad-hoc) queries.
+	globalProfileEnabled bool
+
 	// onGenerateConfigApplied, if set, is invoked after osqueryd pulls generated config
 	// and pending query metadata is promoted (see GenerateConfig). Used so RRULE
 	// scheduling advances in lockstep with native osqueryd schedule application.
@@ -98,6 +107,9 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
 		log:          log.With("ctx", "config"),
 		queryInfoMap: make(queryInfoMap),
+		// Profiling is enabled by default (see config.ProfilingAllOrDefault); keep the
+		// live/ad-hoc default consistent before the first successful Set() applies policy.
+		globalProfileEnabled: true,
 	}
 
 	return p
@@ -170,6 +182,14 @@ func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
 		return qi.Profile
 	}
 	return false
+}
+
+// GlobalProfileEnabled returns the fleet-wide profiling default applied to queries
+// that do not set their own profile override (notably live ad-hoc queries).
+func (p *ConfigPlugin) GlobalProfileEnabled() bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.globalProfileEnabled
 }
 
 func (p *ConfigPlugin) GetNamespace() string {
@@ -246,6 +266,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
 	namespaces := make(map[string]string)
+	globalProfile := config.GetProfilingEnabled(inputs)
 
 	// Set the members if no errors
 	defer func() {
@@ -256,6 +277,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
 		p.queriesCount = queriesCount
+		p.globalProfileEnabled = globalProfile
 	}()
 
 	// Return if no inputs, all the members will be reset by deferred call above
@@ -275,8 +297,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		osqueryConfig = inputs[0].Osquery
 	}
 
-	// Common code to register query with lookup maps, enforce snapshot and increment queries count
-	registerQuery := func(name, ns string, qi config.Query, packID string) (config.Query, error) {
+	// Common code to register query with lookup maps, enforce snapshot and increment queries count.
+	// queryName is the config map key (pack query name or top-level schedule name); packID/packName
+	// are the pack identifiers for pack queries and empty for top-level schedule queries.
+	registerQuery := func(name, ns string, qi config.Query, packID, packName, queryName string) (config.Query, error) {
 		var ecsm ecs.Mapping
 		ecsm, err = flattenECSMapping(qi.ECSMapping)
 		if err != nil {
@@ -291,7 +315,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
 			PackID:     packID,
-			Profile:    qi.Profile,
+			PackName:   packName,
+			QueryName:  queryName,
+			Profile:    config.ResolveProfiling(globalProfile, qi.Profiling),
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -309,7 +335,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err := config.ValidateQueryScheduleMode(qi); err != nil {
 			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
 		}
-		qi, err = registerQuery(name, p.namespace, qi, "")
+		qi, err = registerQuery(name, p.namespace, qi, "", "", name)
 		if err != nil {
 			return err
 		}
@@ -330,7 +356,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			if err != nil {
 				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
 			}
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID, pack.PackName, name)
 			if err != nil {
 				return err
 			}
@@ -358,10 +384,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Platform:   stream.Platform,
 				Version:    stream.Version,
 				ECSMapping: stream.ECSMapping,
-				Profile:    stream.Profile,
+				Profiling:  stream.Profiling,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name, "", stream.ID)
 			if err != nil {
 				return err
 			}

@@ -2,7 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:deadcode,unused // This code will be used later.
 package cel
 
 import (
@@ -32,14 +31,18 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
+
+var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
 	name          string
@@ -2633,7 +2636,7 @@ func TestInput(t *testing.T) {
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
-				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: userAgent},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
@@ -2760,15 +2763,6 @@ func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing
 		config["resource.url"] = server.URL
 		t.Cleanup(server.Close)
 	}
-}
-
-func newV2Context() (v2.Context, func()) {
-	ctx, cancel := context.WithCancel(context.Background())
-	return v2.Context{
-		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "test_id",
-		Cancelation: ctx,
-	}, cancel
 }
 
 //nolint:errcheck // No point checking errors in test server.
@@ -3030,26 +3024,6 @@ func paginationHandler() http.HandlerFunc {
 			w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","items":[{"foo":"c"}]}`))
 		case 3:
 			w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:03Z","items":[{"foo":"d"}]}`))
-		}
-		count++
-	}
-}
-
-//nolint:errcheck // No point checking errors in test server.
-func paginationArrayHandler() http.HandlerFunc {
-	var count int
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
-		switch count {
-		case 0:
-			w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
-		case 1:
-			if r.URL.Query().Get("page") != "bar" {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(`{"error":"wrong page token value"}`))
-				return
-			}
-			w.Write([]byte(`[{"foo":"bar"}]`))
 		}
 		count++
 	}

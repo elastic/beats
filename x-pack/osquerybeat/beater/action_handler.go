@@ -26,11 +26,11 @@ type actionResultPublisher interface {
 }
 
 type queryResultPublisher interface {
-	Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
 }
 
 type scheduledResponsePublisher interface {
-	PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
+	PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
 }
 
 type queryProfilePublisher interface {
@@ -60,13 +60,30 @@ type namespaceProvider interface {
 	GetNamespace() string
 }
 
+// profileDefaultsProvider exposes the fleet-wide profiling default so live (ad-hoc)
+// queries can resolve it against their optional per-action override.
+type profileDefaultsProvider interface {
+	GlobalProfileEnabled() bool
+}
+
 type actionHandler struct {
-	log       *logp.Logger
-	inputType string
-	publisher actionQueryPublisher
-	queryExec queryExecutor
-	np        namespaceProvider
-	profiles  liveProfileRecorder
+	log             *logp.Logger
+	inputType       string
+	publisher       actionQueryPublisher
+	queryExec       queryExecutor
+	np              namespaceProvider
+	profiles        liveProfileRecorder
+	profileDefaults profileDefaultsProvider
+}
+
+// profileEnabled resolves whether this action should publish a profile, combining the
+// global default with the optional per-action override.
+func (a *actionHandler) profileEnabled(override *bool) bool {
+	var global bool
+	if a.profileDefaults != nil {
+		global = a.profileDefaults.GlobalProfileEnabled()
+	}
+	return config.ResolveProfiling(global, override)
 }
 
 func (a *actionHandler) Name() string {
@@ -128,7 +145,8 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	var before runtimeSnapshot
 	beforeReady := false
-	shouldCollect := ac.Profile || a.profiles != nil
+	publishProfile := a.profileEnabled(ac.Profile)
+	shouldCollect := publishProfile || a.profiles != nil
 	if shouldCollect {
 		snapshot, err := collectRuntimeSnapshot(ctx, a.queryExec)
 		if err != nil {
@@ -153,12 +171,12 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 			if a.profiles != nil {
 				a.profiles.RecordLiveProfile(ac.Query, profile)
 			}
-			if ac.Profile {
+			if publishProfile {
 				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
 			}
 		}
 	} else if shouldCollect && !beforeReady {
-		if ac.Profile {
+		if publishProfile {
 			a.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
 		} else {
 			a.log.Debug("profile storage skipped: pre-query snapshot was not collected")
@@ -172,7 +190,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", duration)
 
-	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", nil, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", "", "", nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }

@@ -105,8 +105,17 @@ func (p *beatProcessor) Start(_ context.Context, _ component.Host) error {
 	return nil
 }
 
+// Shutdown closes every processor that was constructed for this component.
 func (p *beatProcessor) Shutdown(_ context.Context) error {
-	return nil
+	var errs []error
+	for _, proc := range p.processors {
+		if err := processors.Close(proc); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	// Drop the references so a repeated Shutdown does not double-close.
+	p.processors = nil
+	return errors.Join(errs...)
 }
 
 func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {

@@ -234,5 +234,5 @@ var Beatscontainer_2_blob_data3_json = `{
     ]
 }`
 
-//nolint:stylecheck // intentionally indented like this
+//nolint:staticcheck // intentionally indented like this
 var NotFoundErr = errors.New("--------------------------------------------------------------------------------\nRESPONSE 404: 404 Not Found\nERROR CODE UNAVAILABLE\n--------------------------------------------------------------------------------\nresource not found\n--------------------------------------------------------------------------------\n")

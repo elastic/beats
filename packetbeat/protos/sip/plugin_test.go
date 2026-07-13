@@ -126,7 +126,7 @@ func TestMalformedBodyFiends(t *testing.T) {
 	for _, test := range cases {
 		bpf := &pb.Fields{}
 		fields := &ProtocolFields{}
-		populateBodyFields(test.msg, bpf, fields)
+		populateBodyFields(test.msg, bpf, fields, logptest.NewTestingLogger(t, ""), logptest.NewTestingLogger(t, ""))
 	}
 }
 
