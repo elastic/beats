@@ -51,6 +51,9 @@ const (
 	MaxFingerprintSize int64 = 10 * 1024 * 1024 // 10MB
 	scannerDebugKey          = "scanner"
 	watcherDebugKey          = "file_watcher"
+
+	// postponedWarnInterval throttles the "postponing delete detection" warning
+	postponedWarnInterval = 5 * time.Minute
 )
 
 var (
@@ -138,6 +141,10 @@ type fileWatcher struct {
 	closedHarvesters map[string]int64
 	// closedHarvestersMutex controls access to closedHarvesters
 	closedHarvestersMutex sync.Mutex
+
+	// lastPostponedWarn is when the "postponing delete detection" warning was last
+	// emitted.
+	lastPostponedWarn time.Time
 }
 
 // Ensure fileWatcher implements loginp.FSWatcher
@@ -523,10 +530,12 @@ func (w *fileWatcher) watch(
 		harvesterFiles = appendHarvesterFile(harvesterFiles, *fd, srcID, now, ignoreOlder, ignoreInactiveSince)
 	}
 
-	if postponed > 0 {
-		w.log.Warnf("%d previously seen file(s) are under paths this scan could "+
-			"not observe (e.g. file-descriptor exhaustion); postponing their "+
-			"delete detection to avoid re-ingestion", postponed)
+	if postponed > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
+		w.lastPostponedWarn = now
+		w.log.Warnf("some previously seen files could not be observed (e.g. file-descriptor exhaustion)"+
+			"in the last %s, postponing their delete detection to avoid re-ingestion."+
+			"See the filebeat.filestream.scan_errors metric for the current count.",
+			postponedWarnInterval)
 	}
 
 	w.log.Debugw("File scan complete",

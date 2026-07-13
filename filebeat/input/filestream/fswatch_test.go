@@ -2407,6 +2407,44 @@ func newStubWatcher(scanner loginp.FSScanner) *fileWatcher {
 	}
 }
 
+// TestFileWatcherThrottlesPostponedWarning verifies the "postponing delete
+// detection" warning is throttled: consecutive scans that keep postponing files
+// under an unobservable path must log it at most once per postponedWarnInterval,
+// not once per scan.
+func TestFileWatcherThrottlesPostponedWarning(t *testing.T) {
+	base := t.TempDir()
+	a := filepath.Join(base, "a.log")
+	subB := filepath.Join(base, "sub")
+	b := filepath.Join(subB, "b.log")
+	desc := func(path string) loginp.FileDescriptor {
+		return loginp.FileDescriptor{
+			Filename:    path,
+			Fingerprint: completeFP("fp:" + path),
+			Info:        file.ExtendFileInfo(&testFileInfo{name: filepath.Base(path), size: 5}),
+		}
+	}
+	// One healthy scan so B becomes tracked, then three scans that cannot observe
+	// sub/, so B is postponed every time. Being rapid (well within
+	// postponedWarnInterval) they must produce a single warning.
+	s := &queuedScanner{scans: []scanResult{
+		{files: map[string]loginp.FileDescriptor{a: desc(a), b: desc(b)}},
+		{files: map[string]loginp.FileDescriptor{a: desc(a)}, unobservable: []string{subB}},
+		{files: map[string]loginp.FileDescriptor{a: desc(a)}, unobservable: []string{subB}},
+		{files: map[string]loginp.FileDescriptor{a: desc(a)}, unobservable: []string{subB}},
+	}}
+	inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+	w := newStubWatcher(s)
+	w.log = inMemoryLog
+	m := newTestMetrics()
+	for range s.scans {
+		w.watch(t.Context(), m, 0, time.Time{})
+		drainPendingFSEvents(w.events)
+	}
+
+	assert.Equalf(t, 1, strings.Count(buff.String(), "postponing their"),
+		"the postponed-delete warning must be throttled to once per interval, got logs:\n%s", buff.String())
+}
+
 // TestFileWatcherPostponesDeletesUnderUnobservablePaths is the watcher half of the
 // fd-exhaustion fix: a previously seen file under a path the scan
 // could not observe must not be reported deleted, otherwise its registry state is
