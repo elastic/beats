@@ -68,7 +68,7 @@ type preinitFailManager struct {
 	err                error
 }
 
-func (m *preinitFailManager) Enabled() bool { return true }
+func (m *preinitFailManager) Enabled() bool  { return true }
 func (m *preinitFailManager) PreInit() error { return m.err }
 func (m *preinitFailManager) RegisterDiagnosticHook(_, _, _, _ string, _ management.DiagnosticHook) {
 }
