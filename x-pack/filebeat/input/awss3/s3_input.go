@@ -213,9 +213,6 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
-<<<<<<< HEAD
-			err := in.states.AddState(state)
-=======
 			// Finalize the object (backup/delete) after all events are ACKed.
 			// Only successfully processed objects are finalized.
 			if state.Stored {
@@ -224,8 +221,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 				}
 			}
 
-			err := in.registry.AddState(state)
->>>>>>> e3ddd67c0 (Fix: Implement backup_to_bucket_ and delete_after_backup for aws-s3 polling mode (#49734))
+			err := in.states.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure checkpointing (saving completed object state): %s", err.Error()))
