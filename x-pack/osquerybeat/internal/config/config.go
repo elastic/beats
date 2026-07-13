@@ -44,8 +44,12 @@ type StreamConfig struct {
 	Platform   string                 `config:"platform"`    // restrict this query to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
 	Version    string                 `config:"version"`     // only run on osquery versions greater than or equal-to this version string
 	ECSMapping map[string]interface{} `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
-	// Profile enables per-query profiling for this stream (scheduled query metrics). Requires an input stream with dataset osquery_manager.query_profile to publish events.
-	Profile bool `config:"profile" json:"profile,omitempty"`
+	// Profiling is a per-query override for profiling on this stream. When nil the global
+	// elastic_options.profiling.profiling_all default applies (see ResolveProfiling). Published profiles
+	// for live-style paths reflect the osqueryd process while extension queries run (serialized
+	// on the beat client; native osqueryd schedules may still contribute load). Requires an
+	// input stream with dataset osquery_manager.query_profile to publish events.
+	Profiling *bool `config:"profiling" json:"profiling,omitempty"`
 }
 
 type DatastreamConfig struct {
@@ -313,13 +317,25 @@ func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
 	return *inputs[0].Osquery.ElasticOptions.Install
 }
 
-// GetQueryProfileStorageConfig returns live query profile storage settings from the first input if available.
+// GetProfilingEnabled returns the global query profiling default from the first input.
+// This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
+// Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
+func GetProfilingEnabled(inputs []InputConfig) bool {
+	if len(inputs) == 0 || inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.Profiling == nil {
+		return ProfilingConfig{}.ProfilingAllOrDefault()
+	}
+	return inputs[0].Osquery.ElasticOptions.Profiling.ProfilingAllOrDefault()
+}
+
+// GetQueryProfileStorageConfig returns live query profile storage settings
+// (elastic_options.profiling.storage) from the first input if available.
 func GetQueryProfileStorageConfig(inputs []InputConfig) QueryProfileStorageConfig {
 	if len(inputs) == 0 {
 		return QueryProfileStorageConfig{}
 	}
-	if inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.QueryProfileStorage == nil {
+	o := inputs[0].Osquery
+	if o == nil || o.ElasticOptions == nil || o.ElasticOptions.Profiling == nil || o.ElasticOptions.Profiling.Storage == nil {
 		return QueryProfileStorageConfig{}
 	}
-	return *inputs[0].Osquery.ElasticOptions.QueryProfileStorage
+	return *o.ElasticOptions.Profiling.Storage
 }

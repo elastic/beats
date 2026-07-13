@@ -180,6 +180,9 @@ type registryEntry struct {
 	TTL      time.Duration
 	Op       string
 	Removed  bool
+	// FingerprintLen is the value-side growing fingerprint byte length
+	// (meta.fingerprint_len); non-zero only for still-growing entries.
+	FingerprintLen int64
 }
 
 func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[string]string) {
@@ -209,13 +212,14 @@ func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[
 		}
 		// Filestream entry
 		et := registryEntry{
-			Key:      e.Key,
-			Offset:   e.Value.Cursor.Offset,
-			EOF:      e.Value.Cursor.EOF,
-			TTL:      e.Value.TTL,
-			Filename: e.Value.Meta.Source,
-			Removed:  lastOperation == "remove",
-			Op:       lastOperation,
+			Key:            e.Key,
+			Offset:         e.Value.Cursor.Offset,
+			EOF:            e.Value.Cursor.EOF,
+			TTL:            e.Value.TTL,
+			Filename:       e.Value.Meta.Source,
+			Removed:        lastOperation == "remove",
+			Op:             lastOperation,
+			FingerprintLen: e.Value.Meta.FingerprintLen,
 		}
 
 		// Handle the log input entries, they have a different format.
@@ -250,6 +254,12 @@ type entry struct {
 		} `json:"cursor"`
 		Meta struct {
 			Source string `json:"source"`
+			// FingerprintLen is the growing fingerprint's byte length,
+			// persisted in the entry value only while the file is below
+			// threshold (the hash is the registry key). Zero for final
+			// SHA-256 / static entries, so a non-zero value is the marker of
+			// a still-growing entry.
+			FingerprintLen int64 `json:"fingerprint_len"`
 		} `json:"meta"`
 
 		// Log input fields

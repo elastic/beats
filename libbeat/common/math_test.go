@@ -18,6 +18,7 @@
 package common
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,7 +64,7 @@ func TestRound(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.InDelta(t, tc.expected, Round(tc.input, DefaultDecimalPlacesCount), 1e-10, "rounding %v should be %v", tc.input, tc.expected)
+			assert.InDelta(t, tc.expected, Round(tc.input, DefaultDecimalPlacesCount), math.Pow10(-DefaultDecimalPlacesCount), "rounding %v should be %v", tc.input, tc.expected)
 		})
 	}
 }

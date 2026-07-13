@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -446,49 +447,26 @@ var testCases = []struct {
 		},
 		expectedNoFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
 	},
-	// Path containment for enabled tracers is tested in
-	// x-pack/filebeat/input/internal/httplog.TestResolvePathInLogsFor.
-	// The input-level test only verifies that a disabled tracer does
-	// not reject an out-of-tree path (next case below).
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
 	{
 		name: "tracer_disabled_escaping_logs",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			timeNow = func() time.Time {
-				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
-				return t
-			}
-
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
-			t.Cleanup(func() { timeNow = time.Now })
 		},
 		baseConfig: map[string]interface{}{
-			"interval":       1,
-			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
-						"target":  "url.params.$filter",
-						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
-						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
-					},
-				},
-			},
-			"cursor": map[string]interface{}{
-				"timestamp": map[string]interface{}{
-					"value": `[[index .last_response.body "@timestamp"]]`,
-				},
-			},
+			"interval":                1,
+			"request.method":          http.MethodGet,
 			"request.tracer.enabled":  false,
 			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
 		},
-		handler: dateCursorHandler(),
-		expected: []string{
-			`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
-			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
-			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
-		},
+		handler: defaultHandler(http.MethodGet, "", ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name: "pagination",
@@ -1729,7 +1707,10 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected event: %v", got)
 				}
 				cancel()
-				assert.NoError(t, g.Wait())
+				err = g.Wait()
+				if !sameErrorOrContains(err, test.wantErr) {
+					t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
+				}
 				return
 			}
 
@@ -2139,5 +2120,18 @@ func paginationArrayHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`[{"foo":"bar"}]`))
 		}
 		count += 1
+	}
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }

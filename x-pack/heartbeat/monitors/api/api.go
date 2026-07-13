@@ -19,6 +19,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/security"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
 )
 
@@ -26,7 +27,7 @@ func init() {
 	plugin.Register("api", create, "synthetics/api")
 }
 
-func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
+func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error) {
 	// API journeys still run a Node.js child process, so the setuid
 	// constraint that applies to browser monitors applies here too.
 	// They do NOT require GUI libraries, so we deliberately skip the

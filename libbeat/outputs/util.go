@@ -90,10 +90,39 @@ func NetworkClients(netclients []NetworkClient) []Client {
 // The first argument is expected to contain a queue config.Namespace.
 // The queue config is passed to assign the queue factory when
 // elastic-agent reloads the output.
-func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory[publisher.Event], logger *logp.Logger, beatPaths *paths.Path, netclients []NetworkClient) (Group, error) {
+func SuccessNet(cfg config.Namespace,
+	loadbalance bool,
+	batchSize,
+	retry int,
+	encoderFactory queue.EncoderFactory[publisher.Event],
+	logger *logp.Logger,
+	beatPaths *paths.Path,
+	worker int,
+	netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
-		return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NewFailoverClient(netclients))
+		if worker < 1 {
+			worker = 1
+		}
+		if worker == 1 {
+			return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NewFailoverClient(netclients))
+		}
+
+		if len(netclients)%worker != 0 {
+			return Group{}, fmt.Errorf("output worker count (%d) does not match host list (%d network clients)", worker, len(netclients))
+		}
+
+		// This logic is tied to how ReadHostList() duplicates entry
+		numHosts := len(netclients) / worker
+		groupNetClients := make([]NetworkClient, worker)
+		for i := 0; i < worker; i++ {
+			hostClients := make([]NetworkClient, numHosts)
+			for h := 0; h < numHosts; h++ {
+				hostClients[h] = netclients[h*worker+i]
+			}
+			groupNetClients[i] = NewFailoverClient(hostClients)
+		}
+		return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NetworkClients(groupNetClients)...)
 	}
 
 	clients := NetworkClients(netclients)

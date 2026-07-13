@@ -36,20 +36,22 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
-	mst := monitorstate.NewTracker(stateLoader, false)
+func WrapCommon(js []jobs.Job,
+	stdMonFields stdfields.StdMonitorFields,
+	stateLoader monitorstate.StateLoader, logger *logp.Logger) []jobs.Job {
+	mst := monitorstate.NewTracker(stateLoader, false, logger)
 	var wrapped []jobs.Job
 	if !stdMonFields.IsSyntheticsType() || stdMonFields.BadConfig {
-		wrapped = WrapLightweight(js, stdMonFields, mst)
+		wrapped = WrapLightweight(js, stdMonFields, mst, logger)
 	} else {
-		wrapped = WrapBrowser(js, stdMonFields, mst)
+		wrapped = WrapBrowser(js, stdMonFields, mst, logger)
 	}
 	// Wrap just the root jobs with the summarizer
 	// The summarizer itself wraps the continuations in a stateful way
 	for i, j := range wrapped {
 		j := j
 		wrapped[i] = func(event *beat.Event) ([]jobs.Job, error) {
-			s := summarizer.NewSummarizer(j, stdMonFields, mst)
+			s := summarizer.NewSummarizer(j, stdMonFields, mst, logger)
 			return s.Wrap(j)(event)
 		}
 	}
@@ -57,29 +59,29 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoa
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, logger *logp.Logger) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
-		addMonitorMeta(stdMonFields, len(js) > 1),
+		addMonitorMeta(stdMonFields, len(js) > 1, logger),
 	)
 }
 
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, logger *logp.Logger) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
-		addMonitorMeta(stdMonFields, false),
+		addMonitorMeta(stdMonFields, false, logger),
 	)
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(sFields stdfields.StdMonitorFields, hashURLIntoID bool) jobs.JobWrapper {
+func addMonitorMeta(sFields stdfields.StdMonitorFields, hashURLIntoID bool, logger *logp.Logger) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := job(event)
@@ -91,7 +93,7 @@ func addMonitorMeta(sFields stdfields.StdMonitorFields, hashURLIntoID bool) jobs
 			if hashURLIntoID {
 				url, err := event.GetValue("url.full")
 				if err != nil {
-					logp.Error(fmt.Errorf("mandatory url.full key missing: %w", err))
+					logger.Error(fmt.Errorf("mandatory url.full key missing: %w", err))
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
