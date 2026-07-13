@@ -121,8 +121,8 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		w.WithOtelFactoryWrapper(otelstatus.StatusReporterFactory(groupReporter))
 	}
 
-	// We go through all extensions to find any that implement the DiagnosticExtension interface.
-	// This is done so that we can register a diagnostic hook to collect beat metrics.
+	// We go through all extensions to find any that implement the DiagnosticExtension or
+	// ActionExtension interfaces.
 	extensions := host.GetExtensions()
 	for _, ext := range extensions {
 		if diagExt, ok := ext.(otelmanager.DiagnosticExtension); ok {
@@ -142,6 +142,15 @@ func (br *BeatReceiver) Start(host component.Host) error {
 					}
 					return data
 				})
+		}
+
+		// This is done so that Fleet actions (e.g. osquery live queries) routed to
+		// elastic-agent can reach this beat receiver instance.
+		if actionExt, ok := ext.(otelmanager.ActionExtension); ok {
+			// if the manager also implements WithActionExtension interface then set the extension.
+			if m, ok := br.beat.Manager.(otelmanager.WithActionExtension); ok {
+				m.SetActionExtension(br.beat.Info.ComponentID, actionExt)
+			}
 		}
 	}
 
