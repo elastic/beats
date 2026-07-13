@@ -73,12 +73,45 @@ type Query struct {
 type Pack struct {
 	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
 	// If empty, the pack map key (pack name) is used when publishing.
+<<<<<<< HEAD
 	PackID    string           `config:"pack_id,omitempty" json:"pack_id,omitempty"`
 	Discovery []string         `config:"discovery" json:"discovery,omitempty"`
 	Platform  string           `config:"platform" json:"platform,omitempty"`
 	Version   string           `config:"version" json:"version,omitempty"`
 	Shard     int              `config:"shard" json:"shard,omitempty"`
 	Queries   map[string]Query `config:"queries" json:"queries,omitempty"`
+=======
+	PackID string `config:"pack_id,omitempty" json:"pack_id,omitempty"`
+	// PackName is the policy-defined human-readable pack name; emitted as pack_name in
+	// result/response documents alongside pack_id. Optional and not sent to osqueryd.
+	PackName  string   `config:"pack_name,omitempty" json:"-"`
+	Discovery []string `config:"discovery" json:"discovery,omitempty"`
+	Platform  string   `config:"platform" json:"platform,omitempty"`
+	Version   string   `config:"version" json:"version,omitempty"`
+	Shard     int      `config:"shard" json:"shard,omitempty"`
+
+	// DefaultNativeSchedule provides interval and start_date defaults for queries in this pack
+	// that omit them. Omitted from JSON sent to osqueryd. Mutually exclusive at
+	// pack level with an enabled default_rrule_schedule (see ValidatePackScheduleDefaults). When set,
+	// every query in the pack must use native scheduling after merge (ValidatePackQueriesAfterMerge).
+	DefaultNativeSchedule NativeSchedule `config:"default_native_schedule" json:"-"`
+	// DefaultRRuleSchedule provides RRULE defaults for queries that do not define rrule_schedule.
+	// Config key default_rrule_schedule. Omitted from JSON sent to osqueryd.
+	// When enabled, every query in the pack must use rrule_schedule after merge.
+	DefaultRRuleSchedule *RRuleScheduleConfig `config:"default_rrule_schedule,omitempty" json:"-"`
+	// DefaultSpaceID is applied to queries that omit space_id (native and RRULE).
+	DefaultSpaceID string `config:"default_space_id,omitempty" json:"-"`
+	// DefaultPlatform is applied to queries that omit platform. Use this instead
+	// of the native pack platform when the policy expects per-query override semantics.
+	DefaultPlatform string `config:"default_platform,omitempty" json:"-"`
+	// DefaultVersion is applied to queries that omit version. Use this instead
+	// of the native pack version when the policy expects per-query override semantics.
+	DefaultVersion string `config:"default_version,omitempty" json:"-"`
+	// DefaultSnapshot is applied to queries that omit snapshot.
+	DefaultSnapshot *bool `config:"default_snapshot,omitempty" json:"-"`
+
+	Queries map[string]Query `config:"queries" json:"queries,omitempty"`
+>>>>>>> 5d82c7117 (Osquerybeat: emit pack_name and query_name in scheduled query results (#51781))
 }
 
 // > SELECT * FROM osquery_events where type = 'subscriber';
