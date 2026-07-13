@@ -402,9 +402,9 @@ This attribute controls how transient Azure Storage failures are retried. Azure 
 
 The `retry` attribute contains the following sub-attributes:
 
-    1. `max_retries`: The number of times a failed request is retried after the first attempt. A negative value disables retries. Defaults to `3`.
-    2. `initial_retry_delay`: The base delay used for the exponential backoff between attempts. Each subsequent retry waits longer, up to `max_retry_delay`. Defaults to `800ms`.
-    3. `max_retry_delay`: The upper bound on the backoff, so that during a long outage the input keeps retrying at a steady interval instead of drifting towards ever larger waits. Defaults to `60s`.
+* `max_retries`: The number of times a failed request is retried after the first attempt. A negative value disables retries. Defaults to `3`.
+* `initial_retry_delay`: The base delay used for the exponential backoff between attempts. Each subsequent retry waits longer, up to `max_retry_delay`. Defaults to `800ms`.
+* `max_retry_delay`: The upper bound on the backoff, so that during a long outage the input keeps retrying at a steady interval instead of drifting towards ever larger waits. Defaults to `60s`.
 
 Every sub-attribute is optional. Omitting the `retry` attribute (or any of its sub-attributes) keeps the Azure SDK defaults, so existing configurations continue to behave as before. The settings are applied per storage account and, therefore, affect all configured containers.
 
