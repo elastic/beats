@@ -422,7 +422,6 @@ func TestS3Poller(t *testing.T) {
 	})
 }
 
-
 func waitForChannel(t *testing.T, ch <-chan struct{}, timeout time.Duration) {
 	t.Helper()
 	select {
@@ -675,7 +674,7 @@ func Test_S3StateHandling(t *testing.T) {
 			// then - desired state entries
 
 			// state must only contain expected state IDs
-			require.Equal(t, len(test.expectStateIDs), len(s3States.states))
+			require.Len(t, s3States.states, len(test.expectStateIDs))
 			for _, id := range test.expectStateIDs {
 				if s3States.states[id] == nil {
 					t.Errorf("state with ID %s should exist", id)
