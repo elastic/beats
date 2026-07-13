@@ -160,10 +160,8 @@ processors:
 	filebeat.Start()
 	defer filebeat.Stop()
 
-	filebeat.WaitLogsContainsAnyOrder(
-		[]string{
-			"filebeat start running",
-		},
+	filebeat.WaitLogsContains(
+		"filebeat start running",
 		20*time.Second,
 		"filebeat did not run",
 	)
