@@ -181,10 +181,6 @@ func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Conf
 	k.Consumer.Group.Session.Timeout = config.SessionTimeout
 	k.Consumer.Group.Heartbeat.Interval = config.HeartbeatInterval
 
-	// group_instance_id enables Kafka static group membership (KIP-345): a
-	// member that rejoins within session_timeout keeps its partitions instead
-	// of triggering a rebalance. Sarama requires protocol >= 2.3.0 for this, so
-	// fail early with a clear message instead of an opaque k.Validate() error.
 	if config.GroupInstanceID != "" {
 		if !version.IsAtLeast(sarama.V2_3_0_0) {
 			return nil, fmt.Errorf("group_instance_id requires 'version' >= 2.3.0 for static group membership (KIP-345); configured version is %q", config.Version)

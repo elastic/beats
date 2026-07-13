@@ -130,7 +130,7 @@ How often the consumer sends heartbeats to the broker. This must be lower than `
 
 ### `group_instance_id` [_group_instance_id]
 ```{applies_to}
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5+
+stack: ga 9.3+
 ```
 
 A stable identifier that enables Kafka static group membership ([KIP-345](https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances)). When set, a consumer that restarts and rejoins the group within [`session_timeout`](#_session_timeout) is recognized as the same member and keeps its partition assignment, avoiding the rebalances that a rolling restart of multiple instances would otherwise trigger. Requires `version` to be at least `2.3.0`.
