@@ -18,11 +18,13 @@
 package release
 
 import (
+	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
+
+	"golang.org/x/sys/execabs"
 )
 
 var (
@@ -148,7 +150,7 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 	}
 
 	readmeRule := replacementRule{
-		pattern:     regexp.MustCompile(regexp.QuoteMeta("/"+opts.BaseBranch+"/")),
+		pattern:     regexp.MustCompile(regexp.QuoteMeta("/" + opts.BaseBranch + "/")),
 		replacement: "/" + opts.ReleaseBranch + "/",
 	}
 	if err := applyReplacements("README.md", []replacementRule{readmeRule}); err != nil {
@@ -235,7 +237,8 @@ func applyReplacements(filePath string, rules []replacementRule) error {
 // RunMakeUpdate runs 'make --silent update' in the repository.
 func RunMakeUpdate() error {
 	fmt.Println("Running 'make --silent update'...")
-	cmd := exec.Command("make", "--silent", "update")
+	ctx := context.Background()
+	cmd := execabs.CommandContext(ctx, "make", "--silent", "update")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {

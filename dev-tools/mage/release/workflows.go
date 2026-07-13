@@ -26,7 +26,7 @@ import (
 
 // PR label sets match elastic-vault-github-plugin-prod release PRs (e.g. #48155, #49435).
 var (
-	releasePRLabels = []string{"release", "Team:Automation", "skip-changelog"}
+	releasePRLabels   = []string{"release", "Team:Automation", "skip-changelog"}
 	patchDocsPRLabels = []string{"docs", "in progress", "release", "Team:Automation", "skip-changelog"}
 )
 
@@ -233,7 +233,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	if err := UpdateVersion(cfg.CurrentRelease); err != nil {
 		return err
 	}
-	versionCommitMsg := fmt.Sprintf("[Release] update version")
+	versionCommitMsg := "[Release] update version"
 	if _, err := repo.CommitAll(versionCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
@@ -250,7 +250,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	}); err != nil {
 		return err
 	}
-	docsCommitMsg := fmt.Sprintf("docs: update docs")
+	docsCommitMsg := "docs: update docs"
 	if _, err := repo.CommitAll(docsCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
@@ -263,7 +263,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
 		return err
 	}
-	testEnvCommitMsg := fmt.Sprintf("[Release] update test environment")
+	testEnvCommitMsg := "[Release] update test environment"
 	if _, err := repo.CommitAll(testEnvCommitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return err
 	}
