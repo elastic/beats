@@ -172,6 +172,9 @@ func TestNoMatch(t *testing.T) {
 	assert.NoError(t, err, "processing an event")
 
 	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
+
+	// RunPdata path (no CID resolves): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestMatchNoContainer(t *testing.T) {
@@ -190,6 +193,9 @@ func TestMatchNoContainer(t *testing.T) {
 	assert.NoError(t, err, "processing an event")
 
 	assert.Equal(t, mapstr.M{"foo": "garbage"}, result.Fields)
+
+	// RunPdata path (container not found): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestMatchContainer(t *testing.T) {
@@ -420,6 +426,9 @@ func TestMatchPIDs(t *testing.T) {
 		result, err := p.Run(&beat.Event{Fields: input})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (pid is not containerized): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, input, result.Fields)
 	})
 
 	t.Run("pid does not exist", func(t *testing.T) {
@@ -432,6 +441,9 @@ func TestMatchPIDs(t *testing.T) {
 		result, err := p.Run(&beat.Event{Fields: input})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (pid does not exist): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, input, result.Fields)
 	})
 
 	t.Run("pid is containerized", func(t *testing.T) {
@@ -477,6 +489,9 @@ func TestMatchPIDs(t *testing.T) {
 		result, err := p.Run(&beat.Event{Fields: fields})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (cgroup error): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, fields, result.Fields)
 	})
 }
 
@@ -500,6 +515,9 @@ func TestWatcherError(t *testing.T) {
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
+
+	// RunPdata path (docker unavailable): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestConfigValidate(t *testing.T) {
