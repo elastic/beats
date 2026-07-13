@@ -912,14 +912,10 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 		if known, exists := uniqueIDs[fileID]; exists {
 			scanMetrics.FilesNoIngestTarget++
 
-			// The same file (same fingerprint, or device+inode) is reachable via
-			// more than one path — e.g. a hardlink, or a directory reached both
-			// directly and through a symlink. Keep the path the previous
-			// filepath.Glob implementation would have kept, so the returned filename
-			// is stable across scans and releases; otherwise the "path" file identity
-			// would change and the file would be re-ingested. matchedEarlier
-			// reproduces that order (config-path order, then ascending depth) and is
-			// independent of traversal order.
+			// The same file is reachable via more than one path. Keep the path
+			// the previous implementation would have kept, so the returned
+			// filename is stable across scans and releases; otherwise the "path"
+			// file identity would change and the file would be re-ingested.
 			if !s.matchedEarlier(filename, orderIndex, known.name, known.order) {
 				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, known.name, fileID, fileID)
 				return
@@ -1283,10 +1279,11 @@ func (s *fileScanner) scanOrderIndex(filename string) int {
 }
 
 // matchedEarlier reports whether path a would have been processed before path b by
-// the previous filepath.Glob implementation: the path matched by the earlier
+// the previous implementation using filepath.Glob. the path matched by the earlier
 // pattern wins; ties are broken comparing path components, mirroring Glob's
 // per-directory sort. Used only to resolve the rare case where two paths resolve
-// to the same file, so the kept path matches main.
+// to the same file, so the current implementation does not affect which paths
+// are kept, preserving the behavior.
 //
 // aIndex and bIndex are the scan-order indices the walk already computed for each
 // path (the position in s.paths of the pattern it matched). They are authoritative
