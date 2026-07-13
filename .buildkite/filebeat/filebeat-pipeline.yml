@@ -251,6 +251,12 @@ steps:
               context: "filebeat: Go fips140=only Integration Tests"
 
       - label: ":ubuntu: Filebeat: Python Integration Tests"
+        # Run the module fileset tests in parallel across workers. Each xdist
+        # worker uses its own Elasticsearch index; --dist loadgroup keeps all
+        # other (non-module) system tests pinned to a single worker so they
+        # retain their serial semantics.
+        env:
+          PYTEST_ADDOPTS: "-n auto --dist loadgroup"
         command: |
           cd filebeat
           mage pythonIntegTest
@@ -278,6 +284,12 @@ steps:
               context: "filebeat: Python Integration Tests"
 
       - label: ":ubuntu: Filebeat: Log input as Filestream Python Integration Tests"
+        # Run the module fileset tests in parallel across workers. Each xdist
+        # worker uses its own Elasticsearch index; --dist loadgroup keeps all
+        # other (non-module) system tests pinned to a single worker so they
+        # retain their serial semantics.
+        env:
+          PYTEST_ADDOPTS: "-n auto --dist loadgroup"
         command: |
           cd filebeat
           mage PythonIntegTestLogAsFilestream
