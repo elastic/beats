@@ -66,6 +66,8 @@ func newUpdateOp(resource *resource, ts time.Time, delta interface{}) *updateOp 
 }
 
 func (op *updateOp) Key() string {
+	op.resource.stateMutex.Lock()
+	defer op.resource.stateMutex.Unlock()
 	return op.resource.key
 }
 

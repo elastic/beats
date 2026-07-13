@@ -7,6 +7,7 @@ package streaming
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -61,6 +63,57 @@ func TestFollowSession_FirehoseHTTPError(t *testing.T) {
 				t.Error("expected non-nil state on non-hard error")
 			}
 		})
+	}
+}
+
+func TestFollowSession_EmptyDiscoverBody(t *testing.T) {
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// A 200 OK with an empty body, as observed from the CrowdStrike
+		// discover endpoint; Decode returns io.EOF.
+		w.Header().Set("Content-Type", "application/json")
+	}))
+	defer discoverSrv.Close()
+
+	s := newTestStream(t, discoverSrv.URL, discoverSrv.Client())
+	state, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{})
+	if err == nil {
+		t.Fatal("expected error from followSession, got nil")
+	}
+	if want := "discover stream returned an empty body"; !strings.Contains(err.Error(), want) {
+		t.Errorf("followSession() error = %v; want substring %q", err, want)
+	}
+	// The empty body is a transient condition so the retry loop keeps trying
+	// rather than terminating the input.
+	if !errors.Is(err, transientError{}) {
+		t.Errorf("followSession() error = %v; want transientError", err)
+	}
+	if state == nil {
+		t.Error("expected non-nil state on non-hard error")
+	}
+}
+
+func TestFollowSession_DiscoverGETFailureIsTransient(t *testing.T) {
+	// Point at a server that is immediately closed so the discover GET fails
+	// at the connection level.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	client := srv.Client()
+	discoverURL := srv.URL
+	srv.Close()
+
+	s := newTestStream(t, discoverURL, client)
+	state, err := s.followSession(context.Background(), client, map[string]any{})
+	if err == nil {
+		t.Fatal("expected error from followSession, got nil")
+	}
+	// A connection-level GET failure is transient, not input-terminating.
+	if !errors.Is(err, transientError{}) {
+		t.Errorf("followSession() error = %v; want transientError", err)
+	}
+	if errors.Is(err, hardError{}) {
+		t.Errorf("followSession() error = %v; want non-hard error", err)
+	}
+	if state == nil {
+		t.Error("expected non-nil state on non-hard error")
 	}
 }
 
@@ -153,7 +206,7 @@ func newTestStream(t *testing.T, discoverURL string, firehoseClient *http.Client
 
 func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient *http.Client, pub cursor.Publisher) *falconHoseStream {
 	t.Helper()
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, t.Name())
 	reg := monitoring.NewRegistry()
 	m := newInputMetrics(reg, log)
 

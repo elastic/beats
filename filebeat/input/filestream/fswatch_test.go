@@ -22,6 +22,8 @@ package filestream
 import (
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -230,7 +232,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
-				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+				Fingerprint: completeFP("2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a"),
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
@@ -354,7 +356,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
-				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+				Fingerprint: completeFP("2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a"),
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
@@ -1062,7 +1064,7 @@ scanner:
 			expDesc: map[string]loginp.FileDescriptor{
 				normalFilename: {
 					Filename:    normalFilename,
-					Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+					Fingerprint: completeFP("2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[normalFilename],
 						name: normalBasename,
@@ -1070,7 +1072,7 @@ scanner:
 				},
 				normalGZIPFilename: {
 					Filename:    normalGZIPFilename,
-					Fingerprint: "af1ee623faf25c42385da9f1bc222a3ccfd6722d6d6bcdc78538215d479b7ac7",
+					Fingerprint: completeFP("af1ee623faf25c42385da9f1bc222a3ccfd6722d6d6bcdc78538215d479b7ac7"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[normalGZIPFilename],
 						name: normalGZIPBasename,
@@ -1078,7 +1080,7 @@ scanner:
 				},
 				excludedFilename: {
 					Filename:    excludedFilename,
-					Fingerprint: "bd151321c3bbdb44185414a1b56b5649a00206dd4792e7230db8904e43987336",
+					Fingerprint: completeFP("bd151321c3bbdb44185414a1b56b5649a00206dd4792e7230db8904e43987336"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[excludedFilename],
 						name: excludedBasename,
@@ -1086,7 +1088,7 @@ scanner:
 				},
 				excludedIncludedFilename: {
 					Filename:    excludedIncludedFilename,
-					Fingerprint: "bfdb99a65297062658c26dfcea816d76065df2a2da2594bfd9b96e9e405da1c2",
+					Fingerprint: completeFP("bfdb99a65297062658c26dfcea816d76065df2a2da2594bfd9b96e9e405da1c2"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[excludedIncludedFilename],
 						name: excludedIncludedBasename,
@@ -1094,7 +1096,7 @@ scanner:
 				},
 				travelerSymlinkFilename: {
 					Filename:    travelerSymlinkFilename,
-					Fingerprint: "c4058942bffcea08810a072d5966dfa5c06eb79b902bf0011890dd8d22e1a5f8",
+					Fingerprint: completeFP("c4058942bffcea08810a072d5966dfa5c06eb79b902bf0011890dd8d22e1a5f8"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[travelerFilename],
 						name: travelerSymlinkBasename,
@@ -1116,7 +1118,7 @@ scanner:
 			expDesc: map[string]loginp.FileDescriptor{
 				normalFilename: {
 					Filename:    normalFilename,
-					Fingerprint: "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb",
+					Fingerprint: completeFP("ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[normalFilename],
 						name: normalBasename,
@@ -1125,7 +1127,7 @@ scanner:
 				// undersizedFilename got excluded because of the matching fingerprint
 				excludedFilename: {
 					Filename:    excludedFilename,
-					Fingerprint: "9c225a1e6a7df9c869499e923565b93937e88382bb9188145f117195cd41dcd1",
+					Fingerprint: completeFP("9c225a1e6a7df9c869499e923565b93937e88382bb9188145f117195cd41dcd1"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[excludedFilename],
 						name: excludedBasename,
@@ -1133,7 +1135,7 @@ scanner:
 				},
 				excludedIncludedFilename: {
 					Filename:    excludedIncludedFilename,
-					Fingerprint: "7985b2b9750bdd3c76903db408aff3859204d6334279eaf516ecaeb618a218d5",
+					Fingerprint: completeFP("7985b2b9750bdd3c76903db408aff3859204d6334279eaf516ecaeb618a218d5"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[excludedIncludedFilename],
 						name: excludedIncludedBasename,
@@ -1141,7 +1143,7 @@ scanner:
 				},
 				travelerSymlinkFilename: {
 					Filename:    travelerSymlinkFilename,
-					Fingerprint: "da437600754a8eed6c194b7241b078679551c06c7dc89685a9a71be7829ad7e5",
+					Fingerprint: completeFP("da437600754a8eed6c194b7241b078679551c06c7dc89685a9a71be7829ad7e5"),
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[travelerFilename],
 						name: travelerSymlinkBasename,
@@ -1231,6 +1233,25 @@ scanner:
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
+	})
+
+	t.Run("caps a fingerprint larger than the maximum and warns", func(t *testing.T) {
+		cfg := fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  MaxFingerprintSize + 1,
+			},
+		}
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		s, err := newFileScanner(inMemoryLog, paths, cfg, CompressionNone)
+		require.NoError(t, err, "an oversized fingerprint length must be capped, not rejected")
+		assert.Equal(t, MaxFingerprintSize, s.cfg.Fingerprint.Length,
+			"the fingerprint length must be capped to the maximum")
+		assert.Len(t, s.readBuffer, int(MaxFingerprintSize),
+			"the read buffer must be allocated at the capped length, not the configured one")
+		assert.Contains(t, buff.String(), "exceeds the maximum",
+			"capping an oversized fingerprint length must log a warning")
 	})
 
 	t.Run("empty regular files are silently excluded", func(t *testing.T) {
@@ -1377,6 +1398,147 @@ scanner:
 	assert.Equal(t, baseline.FilesEmpty, metrics.FilesEmpty.Get(), "files_empty")
 }
 
+func TestFileWatcherHarvesterMetrics(t *testing.T) {
+	identifier, err := newFingerprintIdentifier(nil, logp.NewNopLogger())
+	require.NoError(t, err, "failed to create fingerprint identifier")
+	fw := &fileWatcher{
+		fileIdentifier:   identifier,
+		sourceIdentifier: mustSourceIdentifier("foo-id"),
+		log:              logp.NewNopLogger(),
+		events:           make(chan loginp.FSEvent, 10),
+	}
+
+	now := time.Now()
+	oldModTime := now.Add(-2 * time.Hour)
+	descriptor := func(name string, size int64, modTime time.Time, gzip bool) loginp.FileDescriptor {
+		return loginp.FileDescriptor{
+			Filename:    name,
+			Fingerprint: loginp.FingerprintID{Sum: name},
+			GZIP:        gzip,
+			Info:        file.ExtendFileInfo(&testFileInfo{name: name, size: size, time: modTime}),
+		}
+	}
+	paths := map[string]loginp.FileDescriptor{
+		"complete":  descriptor("complete", 100, now, false),
+		"near":      descriptor("near", 100, now, false),
+		"lagging":   descriptor("lagging", 100, now, false),
+		"no-active": descriptor("no-active", 100, now, false),
+		"gzip":      descriptor("gzip", 100, now, true),
+		"ignored":   descriptor("ignored", 100, oldModTime, false),
+	}
+	fw.prev = map[string]loginp.FileDescriptor{
+		"complete":  descriptor("complete", 100, now, false),
+		"near":      descriptor("near", 100, now, false),
+		"lagging":   descriptor("lagging", 100, now, false),
+		"no-active": descriptor("no-active", 100, now, false),
+		"gzip":      descriptor("gzip", 100, now, true),
+		"ignored":   descriptor("ignored", 100, oldModTime, false),
+	}
+	fw.scanner = &testFileScanner{files: paths}
+
+	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	// Register some files/offsets, like a harvester would do.
+	completeOffset, cleanupCompleteOffset := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["complete"]), 10)
+	nearOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["near"]), 5)
+	laggingOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["lagging"]), 4)
+	gzipOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["gzip"]), 10)
+	ignoredOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["ignored"]), 10)
+
+	// Make sure the test uses the same atomic update path as harvesters.
+	// Update to the actually expected values, like a harvester would do.
+	completeOffset.Store(100)
+	nearOffset.Store(95)
+	laggingOffset.Store(94)
+	gzipOffset.Store(100)
+	ignoredOffset.Store(100)
+
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
+
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95")
+
+	// Copy paths and 'truncate' one file
+	truncatedPaths := map[string]loginp.FileDescriptor{}
+	for path, fd := range paths {
+		truncatedPaths[path] = fd
+	}
+	truncatedPaths["complete"] = descriptor("complete", 50, now, false)
+	fw.scanner = &testFileScanner{files: truncatedPaths}
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
+
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after truncation")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after truncation")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after truncation")
+
+	// Simulate the harvester restart caused by truncation.
+	cleanupCompleteOffset()
+	_, _ = metrics.RegisterHarvesterOffset(fw.getFileIdentity(truncatedPaths["complete"]), 0)
+
+	// Copy truncatedPaths and make one file older
+	ignoredPaths := map[string]loginp.FileDescriptor{}
+	for path, fd := range truncatedPaths {
+		ignoredPaths[path] = fd
+	}
+	ignoredPaths["near"] = descriptor("near", 100, oldModTime, false)
+	fw.scanner = &testFileScanner{files: ignoredPaths}
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
+
+	// The truncated file from the previous step is now a 'normal file at 50%'
+	// The 'near' file (95% ingested) is ignored because of ignore_older
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after ignored")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after ignored")
+	assert.EqualValues(t, 2, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after ignored")
+
+	// An update with no paths slice effectively removes all files from the
+	// last update from the metrics
+	fw.scanner = &testFileScanner{}
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
+
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after reset")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after reset")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after reset")
+}
+
+func TestFileWatcherRunCleansHarvesterMetricsOnShutdown(t *testing.T) {
+	identifier, err := newFingerprintIdentifier(nil, logp.NewNopLogger())
+	require.NoError(t, err, "failed to create fingerprint identifier")
+
+	now := time.Now()
+	fd := loginp.FileDescriptor{
+		Filename:    "complete",
+		Fingerprint: loginp.FingerprintID{Sum: "complete"},
+		Info:        file.ExtendFileInfo(&testFileInfo{name: "complete", size: 100, time: now}),
+	}
+	paths := map[string]loginp.FileDescriptor{
+		"complete": fd,
+	}
+
+	fw := &fileWatcher{
+		cfg:              fileWatcherConfig{Interval: time.Hour},
+		prev:             map[string]loginp.FileDescriptor{"complete": fd},
+		scanner:          &testFileScanner{files: paths},
+		log:              logp.NewNopLogger(),
+		events:           make(chan loginp.FSEvent, 1),
+		notifyChan:       make(chan loginp.HarvesterStatus, 1),
+		closedHarvesters: map[string]int64{},
+		fileIdentifier:   identifier,
+		sourceIdentifier: mustSourceIdentifier("foo-id"),
+	}
+
+	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	sourceID := fw.getFileIdentity(fd)
+	_, _ = metrics.RegisterHarvesterOffset(sourceID, 100)
+
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	fw.Run(ctx, metrics, time.Hour, time.Time{})
+
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after watcher shutdown")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after watcher shutdown")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after watcher shutdown")
+}
+
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
 	si, err := loginp.NewSourceIdentifier("filestream", inputID)
 	if err != nil {
@@ -1387,19 +1549,31 @@ func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
 	return si
 }
 
+type testFileScanner struct {
+	files map[string]loginp.FileDescriptor
+}
+
+// GetFiles returns s.files and empty metrics.
+func (s *testFileScanner) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	return s.files, loginp.FileScanMetrics{}
+}
+
 const benchmarkFileCount = 1000
 
-func BenchmarkGetFiles(b *testing.B) {
-	dir := b.TempDir()
-	basenameFormat := "file-%d.log"
-
-	for i := 0; i < benchmarkFileCount; i++ {
-		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+// writeBenchmarkFiles creates n log files under dir and returns the glob that matches them.
+func writeBenchmarkFiles(tb testing.TB, dir string, n int) []string {
+	tb.Helper()
+	for i := range n {
+		filename := filepath.Join(dir, fmt.Sprintf("file-%d.log", i))
 		content := fmt.Sprintf("content-%d\n", i)
-		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
-		require.NoError(b, err)
+		require.NoError(tb, os.WriteFile(
+			filename, []byte(strings.Repeat(content, 1024)), 0o644))
 	}
-	paths := []string{filepath.Join(dir, "*.log")}
+	return []string{filepath.Join(dir, "*.log")}
+}
+
+func BenchmarkGetFiles(b *testing.B) {
+	paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
 	cfg := fileScannerConfig{
 		Fingerprint: fingerprintConfig{
 			Enabled: false,
@@ -1415,16 +1589,7 @@ func BenchmarkGetFiles(b *testing.B) {
 }
 
 func BenchmarkGetFilesWithFingerprint(b *testing.B) {
-	dir := b.TempDir()
-	basenameFormat := "file-%d.log"
-
-	for i := 0; i < benchmarkFileCount; i++ {
-		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
-		content := fmt.Sprintf("content-%d\n", i)
-		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
-		require.NoError(b, err)
-	}
-	paths := []string{filepath.Join(dir, "*.log")}
+	paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
 	cfg := fileScannerConfig{
 		Fingerprint: fingerprintConfig{
 			Enabled: true,
@@ -1439,6 +1604,133 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Len(b, files, benchmarkFileCount)
+	}
+}
+
+// BenchmarkGetFilesWithFingerprintGrowing measures repeated scans of stable,
+// above-threshold files. Each GetFiles call is one scan, so b.N iterations model
+// files that have grown past the fingerprint threshold and then sit unchanged
+// across many scans — the scenario the sub-threshold growing benchmarks in
+// BenchmarkFilestream do not exercise.
+//
+// The "static" and "growing" sub-benchmarks fingerprint the identical
+// above-threshold files; their only difference is growing mode. The delta is the
+// per-scan raw-header re-encode that growing mode performs on every completed
+// file to bridge a possible threshold crossing. It calls GetFiles directly
+// without advancing the completedFingerprints set, so it models the UNSUPPRESSED
+// cost — exactly the work the watch loop elides on stable files by tracking
+// completed paths. It therefore quantifies the per-scan cost that suppression
+// removes after a file's first crossing scan.
+func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
+	cases := []struct {
+		name    string
+		growing bool
+	}{
+		{"static", false},
+		{"growing", true},
+	}
+	for _, tc := range cases {
+		b.Run(tc.name, func(b *testing.B) {
+			paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
+			cfg := fileScannerConfig{
+				Fingerprint: fingerprintConfig{
+					Enabled: true,
+					Offset:  0,
+					Length:  1024,
+					Growing: tc.growing,
+				},
+			}
+			s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
+			require.NoError(b, err)
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				files, _ := s.GetFiles(loginp.FileScanOptions{})
+				require.Len(b, files, benchmarkFileCount)
+			}
+		})
+	}
+}
+
+// BenchmarkWatchIdle measures fileWatcher.watch over an unchanged file set: the mostly-idle steady
+// state where allocs/op is the cost of observing nothing changed (identity cache + pre-sized maps).
+func BenchmarkWatchIdle(b *testing.B) {
+	states := []struct {
+		name        string
+		ignoreOlder time.Duration
+		aged        bool
+	}{
+		{"active", 0, false},
+		{"ignored", time.Hour, true},
+	}
+	identities := []struct {
+		name        string
+		fingerprint bool
+		newID       func() fileIdentifier
+	}{
+		{"path", false, func() fileIdentifier { return mustPathIdentifier(false) }},
+		{"fingerprint", true, func() fileIdentifier {
+			fi, _ := newFingerprintIdentifier(nil, nil)
+			return fi
+		}},
+	}
+
+	for _, st := range states {
+		for _, id := range identities {
+			for _, fileCount := range []int{100, 1000, 10000} {
+				b.Run(fmt.Sprintf("%s/%s/%d_files", st.name, id.name, fileCount), func(b *testing.B) {
+					paths := writeBenchmarkFiles(b, b.TempDir(), fileCount)
+
+					if st.aged {
+						// Age every file well past ignoreOlder so it is excluded.
+						old := time.Now().Add(-48 * time.Hour)
+						matches, err := filepath.Glob(paths[0])
+						require.NoError(b, err)
+						for _, m := range matches {
+							require.NoError(b, os.Chtimes(m, old, old))
+						}
+					}
+
+					cfg := defaultFileWatcherConfig()
+					cfg.Scanner.Fingerprint.Enabled = id.fingerprint
+					cfg.Scanner.Fingerprint.Growing = id.fingerprint
+
+					fw, err := newFileWatcher(
+						logp.NewNopLogger(),
+						paths,
+						cfg,
+						CompressionNone,
+						false,
+						id.newID(),
+						mustSourceIdentifier("bench-id"),
+					)
+					require.NoError(b, err)
+
+					// A create event is emitted for every file on the first scan; idle rescans emit
+					// nothing. Drain in the background so watch's sends never block.
+					ctx := b.Context()
+					go func() {
+						for {
+							select {
+							case <-ctx.Done():
+								return
+							case <-fw.events:
+							}
+						}
+					}()
+
+					metrics := newTestMetrics()
+					// Prime w.prev so the benchmarked scans are pure steady state.
+					fw.watch(ctx, metrics, st.ignoreOlder, time.Time{})
+
+					b.ReportAllocs()
+					b.ResetTimer()
+					for b.Loop() {
+						fw.watch(ctx, metrics, st.ignoreOlder, time.Time{})
+					}
+				})
+			}
+		}
 	}
 }
 
@@ -1511,6 +1803,12 @@ func requireEqualDescriptors(t *testing.T, expected, actual loginp.FileDescripto
 	require.Equal(t, expected.Fingerprint, actual.Fingerprint, "Fingerprint")
 	require.Equal(t, expected.Info.Name(), actual.Info.Name(), "Info.Name()")
 	require.Equal(t, expected.Info.Size(), actual.Info.Size(), "Info.Size()")
+}
+
+// completeFP builds the FingerprintID a static (non-growing) fingerprint scan
+// produces: a completed SHA-256 with no retained raw material.
+func completeFP(sum string) loginp.FingerprintID {
+	return loginp.FingerprintID{Sum: sum}
 }
 
 func filenames(m map[string]loginp.FileDescriptor) (result string) {
@@ -1592,6 +1890,195 @@ func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
 		"expected errFileTooSmall, it probably tried to open the file")
 }
 
+// TestToFileDescriptor_GrowingLifecycle tests the Enhanced Fingerprint
+// lifecycle through the scanner:
+//
+//  1. small file (below offset+length) under growing mode → raw-hex
+//     FingerprintID.Raw, Complete=false, no Sum.
+//  2. file grows past threshold → SHA-256 Sum matching the static fingerprint
+//     output for the same bytes, Complete=true, and the raw header carried in
+//     Raw (so the crossing can be prefix-matched against the predecessor).
+//  3. second scan still at threshold via toFileDescriptor → identical
+//     FingerprintID. The per-scan raw-header suppression lives in GetFiles
+//     (exercised by TestGetFiles_GrowingRawSuppression), so a direct
+//     toFileDescriptor call always recomputes Raw.
+//  4. file truncated back below threshold → raw-hex Raw, Complete=false.
+func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "growing.log")
+
+	const length int64 = 1024
+
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  length,
+			Growing: true,
+		},
+	}
+	s, err := newFileScanner(
+		logp.NewNopLogger(), []string{filename}, cfg, CompressionNone)
+	require.NoError(t, err, "could not create file scanner")
+
+	writeFile := func(t *testing.T, n int) {
+		t.Helper()
+		// Use a non-trivial repeating pattern so prefix relationships are
+		// preserved as the file grows.
+		require.NoError(t, os.WriteFile(
+			filename, []byte(strings.Repeat("abcd", n/4+1)[:n]), 0o644))
+	}
+
+	// --- Step 1: small file (200 bytes < 1024) ---
+	writeFile(t, 200)
+	it, err := s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd1, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.False(t, fd1.Fingerprint.Complete(), "step 1: sub-threshold file must not be Complete")
+	assert.Equal(t,
+		hex.EncodeToString([]byte(strings.Repeat("abcd", 51)[:200])),
+		fd1.Fingerprint.Raw,
+		"step 1: Raw should be raw hex of bytes[0:200]")
+	assert.Empty(t, fd1.Fingerprint.Sum, "step 1: no SHA-256 Sum while below threshold")
+
+	// --- Step 2: file grows past threshold (1500 bytes >= 1024) ---
+	writeFile(t, 1500)
+	it, err = s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd2, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.True(t, fd2.Fingerprint.Complete(),
+		"step 2: descriptor must be Complete at/above threshold")
+
+	expectedRawHex := hex.EncodeToString([]byte(strings.Repeat("abcd", 256)[:length]))
+	expectedSHA := sha256.Sum256([]byte(strings.Repeat("abcd", 256)[:length]))
+	assert.Equal(t, hex.EncodeToString(expectedSHA[:]), fd2.Fingerprint.Sum,
+		"step 2: Sum must be SHA-256 of bytes[0:length]")
+	assert.Equal(t, expectedRawHex, fd2.Fingerprint.Raw,
+		"step 2: Raw must be raw hex of the same bytes for bridging the transition")
+
+	// Verify the threshold-transition prefix relationship: the previous raw-hex
+	// (200 bytes) is a prefix of the current completed Raw (1024 bytes). This is
+	// the exact relation SameFile/rename detection rely on via Continues.
+	assert.True(t, fd1.Fingerprint.Continues(fd2.Fingerprint),
+		"step 2: prev raw-hex must be a prefix of the completed Raw")
+
+	// --- Step 3: same file, second scan still at threshold ---
+	it, err = s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd3, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.Equal(t, fd2.Fingerprint, fd3.Fingerprint,
+		"step 3: direct toFileDescriptor recomputes the same FingerprintID "+
+			"(GetFiles-level Raw suppression does not apply here)")
+
+	// --- Step 4: file truncated back below threshold ---
+	writeFile(t, 100)
+	it, err = s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd4, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.False(t, fd4.Fingerprint.Complete(),
+		"step 4: not Complete after truncation back below threshold")
+	assert.NotEmpty(t, fd4.Fingerprint.Raw,
+		"step 4: Raw set to the sub-threshold raw hex")
+	assert.Empty(t, fd4.Fingerprint.Sum,
+		"step 4: no SHA-256 Sum while below threshold")
+}
+
+// TestGetFiles_GrowingRawSuppression verifies the optimization that avoids
+// recomputing the bridging raw header for files that are already complete: the
+// header is emitted on the scan a file crosses the threshold (so the transition
+// can still be prefix-matched) and dropped on subsequent scans of the now-stable
+// file. If the file is truncated back below the threshold the suppression is
+// lifted, and a fresh crossing re-emits the header.
+//
+// GetFiles is pure with respect to the completedFingerprints set; the watch
+// loop is what advances it. The scan helper below reproduces that contract:
+// run GetFiles, then hand the scanner the paths that are now complete, exactly
+// as fileWatcher.watch does. The enumeration scans in the prospector's
+// Init/TakeOver phases deliberately skip that second step, which is why they
+// never suppress the header.
+func TestGetFiles_GrowingRawSuppression(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "growing.log")
+	const length int64 = 1024
+
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  length,
+			Growing: true,
+		},
+	}
+	s, err := newFileScanner(logp.NewNopLogger(), []string{filename}, cfg, CompressionNone)
+	require.NoError(t, err, "could not create file scanner")
+
+	writeFile := func(n int) {
+		require.NoError(t, os.WriteFile(
+			filename, []byte(strings.Repeat("abcd", n/4+1)[:n]), 0o644))
+	}
+	scan := func() loginp.FingerprintID {
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
+		require.Contains(t, files, filename, "file must be scanned")
+		fp := files[filename].Fingerprint
+		// Mirror the watch loop: tell the scanner which paths are now complete
+		// so the next scan can skip recomputing their bridging raw header.
+		completed := map[string]struct{}{}
+		for p, fd := range files {
+			if fd.Fingerprint.Complete() {
+				completed[p] = struct{}{}
+			}
+		}
+		s.completedFingerprints = completed
+		return fp
+	}
+
+	// Sub-threshold: growing, raw-hex carried as the identity.
+	writeFile(200)
+	fp := scan()
+	assert.False(t, fp.Complete(), "sub-threshold file must not be Complete")
+	assert.NotEmpty(t, fp.Raw, "sub-threshold file is identified by its raw header")
+
+	// Crossing scan: Complete, and the bridging raw header is still present so a
+	// growing predecessor can be prefix-matched.
+	writeFile(1500)
+	fp = scan()
+	require.True(t, fp.Complete(), "file must be Complete at/above threshold")
+	assert.NotEmpty(t, fp.Raw, "crossing scan must carry the bridging raw header")
+
+	// Stable scans: still Complete, but the now-redundant raw header is dropped.
+	for range 3 {
+		fp = scan()
+		require.True(t, fp.Complete(), "stable file stays Complete")
+		assert.Empty(t, fp.Raw,
+			"raw header must be suppressed once the file is already complete")
+	}
+
+	// Truncated back below threshold: suppression lifted, raw identity returns.
+	writeFile(200)
+	fp = scan()
+	assert.False(t, fp.Complete(), "truncated file is growing again")
+	assert.NotEmpty(t, fp.Raw, "sub-threshold file carries its raw header again")
+
+	// A fresh crossing re-emits the bridging header (not suppressed by a stale
+	// completed-set entry).
+	writeFile(1500)
+	fp = scan()
+	require.True(t, fp.Complete(), "file is Complete after re-crossing")
+	assert.NotEmpty(t, fp.Raw, "re-crossing must carry the bridging raw header again")
+}
+
 func BenchmarkToFileDescriptor(b *testing.B) {
 	dir := b.TempDir()
 	basename := "created.log"
@@ -1617,7 +2104,7 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		fd, err := s.toFileDescriptor(&it)
 		require.NoError(b, err)
-		require.Equal(b, "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a", fd.Fingerprint)
+		require.Equal(b, "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a", fd.Fingerprint.Sum)
 	}
 }
 

@@ -59,6 +59,8 @@ filebeat.inputs:
     prospector.scanner.exclude_files: ['excluded\.log$']
     ignore_older: 1h
     prospector.scanner.check_interval: 200ms
+    file_identity.fingerprint:
+      growing: false # For FilesNoIngestTarget
 
 path.home: %s
 
