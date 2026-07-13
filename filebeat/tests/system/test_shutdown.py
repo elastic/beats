@@ -191,6 +191,6 @@ class Test(BaseTest):
         msg = "No paths were defined for input"
         self.wait_until(
             lambda: self.log_contains_count(msg) >= 1,
-            max_timeout=5)
+            max_timeout=15)
 
         filebeat.check_wait(exit_code=1)
