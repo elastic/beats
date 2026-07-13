@@ -3,17 +3,11 @@ navigation_title: "winlog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-winlog.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga 9.5+
+  serverless: ga
 ---
 
 # winlog input [filebeat-input-winlog]
-
-
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
 
 Use the `winlog` input to read Windows event logs. It reads from one event log using Windows APIs, filters the events based on user-configured criteria, then sends the event data to the configured outputs. It watches the event log so that new event data is sent in a timely manner. The read position for the event log is persisted to disk to allow the input to resume after restarts.
 

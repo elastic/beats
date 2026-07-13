@@ -5,6 +5,7 @@
 package instance
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -22,6 +23,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -138,4 +141,160 @@ func TestBeatReceiverStartShutdown(t *testing.T) {
 	// consuming and acking while the pipeline was disconnected.
 	assert.Equal(t, int64(npub), acked.Load(),
 		"all published events must be acknowledged by the time Shutdown returns")
+}
+
+// fakeActionDiagExtension implements both otelmanager.DiagnosticExtension and
+// otelmanager.ActionExtension, modeling elastic-agent's elasticdiagnostics
+// extension for the purposes of testing that BeatReceiver.Start wires both
+// into the beat's manager.
+type fakeActionDiagExtension struct {
+	mu                  sync.Mutex
+	registeredDiagName  string
+	registeredActionFor string
+	unregisteredFor     string
+	actionHandler       func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)
+}
+
+func (f *fakeActionDiagExtension) Start(context.Context, component.Host) error { return nil }
+func (f *fakeActionDiagExtension) Shutdown(context.Context) error              { return nil }
+
+func (f *fakeActionDiagExtension) RegisterDiagnosticHook(name, _, _, _ string, _ func() []byte) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.registeredDiagName = name
+}
+
+func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.registeredActionFor = name
+	f.actionHandler = handler
+	return nil
+}
+
+func (f *fakeActionDiagExtension) UnregisterActionHandler(name string) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.unregisteredFor = name
+	f.actionHandler = nil
+}
+
+// fakeExtensionHost is a component.Host exposing a fixed set of extensions.
+type fakeExtensionHost struct {
+	extensions map[component.ID]component.Component
+}
+
+func (h *fakeExtensionHost) GetExtensions() map[component.ID]component.Component {
+	return h.extensions
+}
+
+// fakeAction implements management.Action for exercising OtelManager.RegisterAction.
+type fakeAction struct {
+	name     string
+	executed atomic.Bool
+}
+
+func (a *fakeAction) Name() string { return a.name }
+
+func (a *fakeAction) Execute(_ context.Context, _ map[string]interface{}) (map[string]interface{}, error) {
+	a.executed.Store(true)
+	return map[string]interface{}{"ok": true}, nil
+}
+
+// TestBeatReceiverStart_WiresActionAndDiagnosticExtensions verifies that Start
+// discovers an extension implementing otelmanager.DiagnosticExtension and
+// otelmanager.ActionExtension on the collector host and wires both into the
+// beat's OtelManager, so that Fleet actions (e.g. osquery live queries) routed
+// to elastic-agent can reach this receiver instance.
+func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
+	mb := &mockReceiverBeater{
+		npub:     0,
+		acked:    &atomic.Int64{},
+		initDone: make(chan struct{}),
+		done:     make(chan struct{}),
+	}
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+
+	cfg := map[string]any{
+		"path.home":               t.TempDir(),
+		"management.otel.enabled": true,
+	}
+	defer management.SetUnderAgent(false) // reset global state set by NewBeatForReceiver
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		cfg,
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	// With management.otel.enabled, NewBeatForReceiver's manager factory produces
+	// an *otelmanager.OtelManager.
+	require.IsType(t, &otelmanager.OtelManager{}, b.Manager)
+
+	var rs receiver.Settings
+	rs.Logger = zap.NewNop()
+	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
+
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	ext := &fakeActionDiagExtension{}
+	host := &fakeExtensionHost{extensions: map[component.ID]component.Component{
+		component.MustNewID("elastic_diagnostics"): ext,
+	}}
+
+	startErr := make(chan error, 1)
+	go func() { startErr <- br.Start(host) }()
+
+	select {
+	case <-mb.initDone:
+	case <-time.After(30 * time.Second):
+		t.Fatal("beater did not start")
+	}
+
+	// The diagnostic hook is registered eagerly by Start itself.
+	ext.mu.Lock()
+	assert.Equal(t, "test-receiver", ext.registeredDiagName, "diagnostic hook should be registered under the receiver's component ID")
+	ext.mu.Unlock()
+
+	// The action extension is only set on the manager by Start; the actual
+	// handler is registered once something (e.g. osquerybeat) calls
+	// Manager.RegisterAction, which OtelManager forwards to the extension.
+	act := &fakeAction{name: "osquery"}
+	b.Manager.RegisterAction(act)
+
+	ext.mu.Lock()
+	assert.Equal(t, "test-receiver", ext.registeredActionFor, "action handler should be registered under the receiver's component ID")
+	handler := ext.actionHandler
+	ext.mu.Unlock()
+	require.NotNil(t, handler, "action handler should have been registered with the extension")
+
+	res, err := handler(t.Context(), map[string]interface{}{"id": "abc"})
+	require.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{"ok": true}, res)
+	assert.True(t, act.executed.Load(), "invoking the registered handler should execute the underlying action")
+
+	b.Manager.UnregisterAction(act)
+	ext.mu.Lock()
+	assert.Equal(t, "test-receiver", ext.unregisteredFor)
+	assert.Nil(t, ext.actionHandler)
+	ext.mu.Unlock()
+
+	shutdownDone := make(chan error, 1)
+	go func() { shutdownDone <- br.Shutdown(t.Context()) }()
+	select {
+	case err := <-shutdownDone:
+		require.NoError(t, err, "Shutdown should not error")
+	case <-time.After(30 * time.Second):
+		t.Fatal("Shutdown hung")
+	}
+
+	select {
+	case err := <-startErr:
+		require.NoError(t, err, "beater.Run should return cleanly")
+	case <-time.After(10 * time.Second):
+		t.Fatal("beater.Run did not return after Stop")
+	}
 }
