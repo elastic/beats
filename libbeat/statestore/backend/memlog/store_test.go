@@ -67,6 +67,30 @@ func TestWriteMetaFileAtomic(t *testing.T) {
 	})
 }
 
+// TestOpenStoreRecoversMissingMeta verifies that openStore creates meta.json when
+// the store directory already exists but meta.json is absent — the scenario that
+// arises when the process crashes after MkdirAll but before writeMetaFile on a
+// prior run.
+func TestOpenStoreRecoversMissingMeta(t *testing.T) {
+	dir := t.TempDir()
+	// Simulate a crash after MkdirAll: the directory exists but is empty.
+	storePath := filepath.Join(dir, "store")
+	require.NoError(t, os.Mkdir(storePath, 0o770))
+
+	logger := logptest.NewTestingLogger(t, "")
+	store, err := openStore(logger.Named("test"), storePath, 0o660, 4096, false, func(_ uint64) bool {
+		return false
+	})
+	require.NoError(t, err, "openStore must succeed even when meta.json was missing")
+	store.Close()
+
+	require.FileExists(t, filepath.Join(storePath, metaFileName), "meta.json must be created on recovery")
+
+	meta, err := readMetaFile(storePath)
+	require.NoError(t, err)
+	assert.NoError(t, checkMeta(meta))
+}
+
 func TestRecoverFromCorruption(t *testing.T) {
 	path := t.TempDir()
 
