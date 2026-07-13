@@ -164,7 +164,19 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
+<<<<<<< HEAD
 	paths := w.scanner.GetFiles()
+=======
+	// file identity is updated in GetFiles
+	now := time.Now()
+	scanOpts := loginp.FileScanOptions{
+		CurrentTime:         now,
+		IgnoreOlder:         ignoreOlder,
+		IgnoreInactiveSince: ignoreInactiveSince,
+	}
+	paths, scanMetrics := w.scanner.GetFiles(scanOpts)
+	metrics.UpdateFileScanMetrics(scanMetrics)
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 
 	// for debugging purposes
 	writtenCount := 0
@@ -177,10 +189,6 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
 
 	for path, fd := range paths {
-		// srcID is the file identity, it is the same value used to identify
-		// the harvester and as registry key for the file's state
-		srcID := w.getFileIdentity(fd)
-
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
@@ -191,47 +199,33 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			continue
 		}
 
-		// If we got notifications about harvesters being closed, update
-		// the state accordingly.
-		//
-		// This is used to prevent a sort of race condition:
-		// When the reader/harvester reaches EOF, it blocks on a backoff,
-		// if during this time [logFile.shouldBeClosed] is called, marks the
-		// file as inactive and closes the reader context, once the backoff
-		// time expires the reader and harvester are closed without ingesting
-		// any more data.
-		//
-		// If the [fileWatcher] sends a write event while the harvester was blocked
-		// no new harvester is started because one is already running, however the
-		// [fileWatcher] updates its internal state and won't send write events until
-		// more data is added to the file.
-		//
-		// This can cause some lines to be missed because the harvester closed
-		// and the write event was lost.
-		//
-		// To prevent this from happening we get notified the offset of the file
-		// (data ingested) when the harvester closes. If we have this data we
-		// update our state to the same as the harvester, therefore starting
-		// a new harvester if needed.
-		w.closedHarvestersMutex.Lock()
-		if size, harvesterClosed := w.closedHarvesters[srcID]; harvesterClosed {
-			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", srcID, size)
-			prevDesc.SetBytesIngested(size)
+		// srcID is the file identity (harvester ID/registry key), resolved lazily via ensureSrcID:
+		// an unchanged, untracked file (gzip, empty, ignore_older) never needs one, saving allocs.
+		var srcID string
+		ensureSrcID := func() string {
+			if srcID == "" { // getFileIdentity never returns ""
+				srcID = w.getFileIdentity(fd)
+			}
+			return srcID
 		}
-		w.closedHarvestersMutex.Unlock()
+
+		// closedHarvesters is empty in the steady state; this reconciliation is usually skipped.
+		if w.hasClosedHarvesters() {
+			w.reconcileClosedHarvester(&prevDesc, ensureSrcID())
+		}
 
 		var e loginp.FSEvent
 		switch {
 
 		// the new size is smaller, the file was truncated
 		case prevDesc.Info.Size() > fd.Info.Size():
-			e = truncateEvent(path, fd, srcID)
+			e = truncateEvent(path, fd, ensureSrcID())
 			truncatedCount++
 
 		// the size is the same, timestamps are different, the file was touched
 		case prevDesc.Info.Size() == fd.Info.Size() && prevDesc.Info.ModTime() != fd.Info.ModTime():
 			if w.cfg.ResendOnModTime {
-				e = truncateEvent(path, fd, srcID)
+				e = truncateEvent(path, fd, ensureSrcID())
 				truncatedCount++
 			}
 
@@ -239,8 +233,18 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// If a harvester for this file was closed recently,
 		// we use its state instead of the one we have cached.
 		case prevDesc.SizeOrBytesIngested() < fd.Info.Size():
-			e = writeEvent(path, fd, srcID)
+			e = writeEvent(path, fd, ensureSrcID())
 			writtenCount++
+<<<<<<< HEAD
+=======
+
+		default:
+			// For the delete feature we need to run the harvester for
+			// files that have not changed until they're deleted.
+			if w.cfg.SendNotChanged {
+				e = notChangedEvent(path, fd, ensureSrcID())
+			}
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 		}
 
 		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
@@ -252,12 +256,16 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			}
 		}
 
+<<<<<<< HEAD
+=======
+		// Record progress metrics for trackable, non-truncated files (tracksHarvesterProgress).
+		if e.Op != loginp.OpTruncate && tracksHarvesterProgress(&fd, scanOpts) {
+			harvesterFiles = append(harvesterFiles, loginp.HarvesterFile{ID: ensureSrcID(), Size: fd.Info.Size()})
+		}
+
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 		// delete from previous state to mark that we've seen the existing file again
 		delete(w.prev, path)
-		// Delete used state from closedHarvesters
-		w.closedHarvestersMutex.Lock()
-		delete(w.closedHarvesters, srcID)
-		w.closedHarvestersMutex.Unlock()
 	}
 
 	// remaining files in the prev map are the ones that are missing
@@ -294,6 +302,14 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		case w.events <- createEvent(path, *fd, w.getFileIdentity(*fd)):
 			createdCount++
 		}
+<<<<<<< HEAD
+=======
+
+		// New files skip the main loop via early continue, so collect their metrics here.
+		if tracksHarvesterProgress(fd, scanOpts) {
+			harvesterFiles = append(harvesterFiles, loginp.HarvesterFile{ID: srcID, Size: fd.Info.Size()})
+		}
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 	}
 
 	w.log.Debugw("File scan complete",
@@ -308,6 +324,54 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.prev = paths
 }
 
+<<<<<<< HEAD
+=======
+// hasClosedHarvesters reports whether any harvester-close notification awaits reconciliation.
+func (w *fileWatcher) hasClosedHarvesters() bool {
+	w.closedHarvestersMutex.Lock()
+	defer w.closedHarvestersMutex.Unlock()
+	return len(w.closedHarvesters) > 0
+}
+
+// reconcileClosedHarvester folds a recently-closed harvester's ingested offset (from
+// closedHarvesters) into prevDesc so a restarted harvester resumes from the right position.
+// It guards a close-during-backoff race that would otherwise withhold writes and lose lines.
+func (w *fileWatcher) reconcileClosedHarvester(prevDesc *loginp.FileDescriptor, id string) {
+	w.closedHarvestersMutex.Lock()
+	defer w.closedHarvestersMutex.Unlock()
+	size, ok := w.closedHarvesters[id]
+	if !ok {
+		return
+	}
+	w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", id, size)
+	prevDesc.SetBytesIngested(size)
+	delete(w.closedHarvesters, id)
+}
+
+// tracksHarvesterProgress reports whether a file contributes to the harvester progress metrics.
+func tracksHarvesterProgress(fd *loginp.FileDescriptor, opts loginp.FileScanOptions) bool {
+	return !fd.GZIP && fd.Info.Size() > 0 && !isFileIgnored(*fd, opts)
+}
+
+// isFileIgnored returns true when a file is ignored, no matter the reason.
+func isFileIgnored(
+	fd loginp.FileDescriptor,
+	opts loginp.FileScanOptions,
+) bool {
+	modTime := fd.Info.ModTime()
+
+	if opts.IgnoreOlder > 0 && opts.CurrentTime.Sub(modTime) > opts.IgnoreOlder {
+		return true
+	}
+
+	if !opts.IgnoreInactiveSince.IsZero() && modTime.Sub(opts.IgnoreInactiveSince) <= 0 {
+		return true
+	}
+
+	return false
+}
+
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 // getFileIdentity mimics the same algorithm used by the harvester to generate
 // the file identity to any given file.
 // See 'startHarvester' on internal/input-logfile/harvester.go.
@@ -340,8 +404,18 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
 
+<<<<<<< HEAD
 func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
 	return w.scanner.GetFiles()
+=======
+// GetFiles runs a one-off enumeration scan for the prospector's Init and
+// TakeOver phases. Unlike the watch loop it does not advance the scanner's
+// completedFingerprints set, so these pre-watch scans cannot suppress the
+// bridging raw header a still-growing entry needs to migrate its registry key
+// after a restart.
+func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	return w.scanner.GetFiles(opts)
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 }
 
 type fingerprintConfig struct {
@@ -379,6 +453,22 @@ type fileScanner struct {
 	log              *logp.Logger
 	hasher           hash.Hash
 	readBuffer       []byte
+<<<<<<< HEAD
+=======
+	compression      string
+	// completedFingerprints holds the paths whose fingerprint was already a
+	// final SHA-256 on the previous watch-loop scan (growing mode only). The
+	// bridging raw header is only useful on the scan a file crosses the
+	// threshold, so for paths in this set toFileDescriptor skips recomputing it.
+	// GetFiles itself is pure with respect to this set: only fileWatcher.watch
+	// advances it (after each scan), so the enumeration-only scans the
+	// prospector runs in Init/TakeOver cannot suppress the header a
+	// still-growing entry needs to migrate across a restart.
+	completedFingerprints map[string]struct{}
+
+	// lastCount is the number of unique files the previous scan produced.
+	lastCount int
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig) (*fileScanner, error) {
@@ -449,12 +539,27 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 
 // GetFiles returns a map of file descriptors by filenames that
 // match the configured paths.
+<<<<<<< HEAD
 func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	fdByName := map[string]loginp.FileDescriptor{}
+=======
+func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	if opts.CurrentTime.IsZero() {
+		opts.CurrentTime = time.Now()
+	}
+
+	// Pre-size the per-scan maps from the previous scan's count.
+	fdByName := make(map[string]loginp.FileDescriptor, s.lastCount)
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 	// used to determine if a symlink resolves in a already known target
-	uniqueIDs := map[string]string{}
+	uniqueIDs := make(map[string]string, s.lastCount)
 	// used to filter out duplicate matches
+<<<<<<< HEAD
 	uniqueFiles := map[string]struct{}{}
+=======
+	uniqueFiles := make(map[string]struct{}, s.lastCount)
+	scanMetrics := loginp.FileScanMetrics{}
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
@@ -506,7 +611,13 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 	}
 
+<<<<<<< HEAD
 	return fdByName
+=======
+	scanMetrics.FilesUnique = int64(len(fdByName))
+	s.lastCount = len(fdByName)
+	return fdByName, scanMetrics
+>>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 }
 
 type ingestTarget struct {
