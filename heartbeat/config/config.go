@@ -65,7 +65,9 @@ type Scheduler struct {
 func DefaultConfig(logger *logp.Logger) *Config {
 	limits := map[string]*JobLimit{
 		"browser": {Limit: 2},
-		"api":     {Limit: 2},
+		// API journeys spawn Node but no Chromium, so they run at higher
+		// concurrency than browser. Override with SYNTHETICS_LIMIT_API.
+		"api": {Limit: 8},
 	}
 
 	// Read the env key SYNTHETICS_LIMIT_{TYPE} for each type of monitor to set scaling limits
