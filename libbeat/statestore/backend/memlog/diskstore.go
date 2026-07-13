@@ -29,6 +29,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	agentfile "github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -640,31 +641,35 @@ func checkMeta(meta storeMeta) error {
 
 func writeMetaFile(home string, mode os.FileMode) error {
 	path := filepath.Join(home, metaFileName)
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, mode)
+	f, err := os.CreateTemp(home, metaFileName+".tmp-*")
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating tmp meta file: %w", err)
 	}
+	tmpName := f.Name()
+	defer func() {
+		_ = f.Close()
+		_ = os.Remove(tmpName)
+	}()
 
-	ok := false
-	defer cleanup.IfNot(&ok, func() {
-		f.Close()
-	})
+	if err = f.Chmod(mode); err != nil {
+		return fmt.Errorf("error setting tmp meta file permissions: %w", err)
+	}
 
 	enc := newJSONEncoder(f)
-	err = enc.Encode(storeMeta{
-		Version: storeVersion,
-	})
-	if err != nil {
-		return err
+	if err = enc.Encode(storeMeta{Version: storeVersion}); err != nil {
+		return fmt.Errorf("error encoding meta file: %w", err)
 	}
 
-	if err := f.Sync(); err != nil {
-		return err
+	if err = f.Sync(); err != nil {
+		return fmt.Errorf("error syncing meta file: %w", err)
 	}
 
-	ok = true
-	if err := f.Close(); err != nil {
-		return err
+	if err = f.Close(); err != nil {
+		return fmt.Errorf("error closing tmp meta file: %w", err)
+	}
+
+	if err = agentfile.SafeFileRotate(path, tmpName); err != nil {
+		return fmt.Errorf("error rotating meta file into place: %w", err)
 	}
 
 	trySyncPath(home)
