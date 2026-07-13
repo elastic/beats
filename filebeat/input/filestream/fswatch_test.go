@@ -1139,64 +1139,11 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	}
 }
 
-<<<<<<< HEAD
-=======
-// BenchmarkGetFilesWithFingerprintGrowing measures repeated scans of stable,
-// above-threshold files. Each GetFiles call is one scan, so b.N iterations model
-// files that have grown past the fingerprint threshold and then sit unchanged
-// across many scans — the scenario the sub-threshold growing benchmarks in
-// BenchmarkFilestream do not exercise.
-//
-// The "static" and "growing" sub-benchmarks fingerprint the identical
-// above-threshold files; their only difference is growing mode. The delta is the
-// per-scan raw-header re-encode that growing mode performs on every completed
-// file to bridge a possible threshold crossing. It calls GetFiles directly
-// without advancing the completedFingerprints set, so it models the UNSUPPRESSED
-// cost — exactly the work the watch loop elides on stable files by tracking
-// completed paths. It therefore quantifies the per-scan cost that suppression
-// removes after a file's first crossing scan.
-func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
-	cases := []struct {
-		name    string
-		growing bool
-	}{
-		{"static", false},
-		{"growing", true},
-	}
-	for _, tc := range cases {
-		b.Run(tc.name, func(b *testing.B) {
-			paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
-			cfg := fileScannerConfig{
-				Fingerprint: fingerprintConfig{
-					Enabled: true,
-					Offset:  0,
-					Length:  1024,
-					Growing: tc.growing,
-				},
-			}
-			s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
-			require.NoError(b, err)
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				files, _ := s.GetFiles(loginp.FileScanOptions{})
-				require.Len(b, files, benchmarkFileCount)
-			}
-		})
-	}
-}
-
-// BenchmarkWatchIdle measures fileWatcher.watch over an unchanged file set: the mostly-idle steady
-// state where allocs/op is the cost of observing nothing changed (identity cache + pre-sized maps).
+// BenchmarkWatchIdle measures fileWatcher.watch over an unchanged file set: the mostly-idle
+// steady state where allocs/op is the cost of observing that nothing changed. With the lazy
+// file-identity resolution and pre-sized scan maps, an idle rescan should not allocate a file
+// identity per file.
 func BenchmarkWatchIdle(b *testing.B) {
-	states := []struct {
-		name        string
-		ignoreOlder time.Duration
-		aged        bool
-	}{
-		{"active", 0, false},
-		{"ignored", time.Hour, true},
-	}
 	identities := []struct {
 		name        string
 		fingerprint bool
@@ -1209,66 +1156,51 @@ func BenchmarkWatchIdle(b *testing.B) {
 		}},
 	}
 
-	for _, st := range states {
-		for _, id := range identities {
-			for _, fileCount := range []int{100, 1000, 10000} {
-				b.Run(fmt.Sprintf("%s/%s/%d_files", st.name, id.name, fileCount), func(b *testing.B) {
-					paths := writeBenchmarkFiles(b, b.TempDir(), fileCount)
+	for _, id := range identities {
+		for _, fileCount := range []int{100, 1000, 10000} {
+			b.Run(fmt.Sprintf("%s/%d_files", id.name, fileCount), func(b *testing.B) {
+				paths := writeBenchmarkFiles(b, b.TempDir(), fileCount)
 
-					if st.aged {
-						// Age every file well past ignoreOlder so it is excluded.
-						old := time.Now().Add(-48 * time.Hour)
-						matches, err := filepath.Glob(paths[0])
-						require.NoError(b, err)
-						for _, m := range matches {
-							require.NoError(b, os.Chtimes(m, old, old))
+				cfg := defaultFileWatcherConfig()
+				cfg.Scanner.Fingerprint.Enabled = id.fingerprint
+
+				fw, err := newFileWatcher(
+					logp.NewNopLogger(),
+					paths,
+					cfg,
+					CompressionNone,
+					false,
+					id.newID(),
+					mustSourceIdentifier("bench-id"),
+				)
+				require.NoError(b, err)
+
+				// A create event is emitted for every file on the first scan; idle rescans emit
+				// nothing. Drain in the background so watch's sends never block.
+				ctx := b.Context()
+				go func() {
+					for {
+						select {
+						case <-ctx.Done():
+							return
+						case <-fw.events:
 						}
 					}
+				}()
 
-					cfg := defaultFileWatcherConfig()
-					cfg.Scanner.Fingerprint.Enabled = id.fingerprint
-					cfg.Scanner.Fingerprint.Growing = id.fingerprint
+				// Prime w.prev so the benchmarked scans are pure steady state.
+				fw.watch(ctx)
 
-					fw, err := newFileWatcher(
-						logp.NewNopLogger(),
-						paths,
-						cfg,
-						CompressionNone,
-						false,
-						id.newID(),
-						mustSourceIdentifier("bench-id"),
-					)
-					require.NoError(b, err)
-
-					// A create event is emitted for every file on the first scan; idle rescans emit
-					// nothing. Drain in the background so watch's sends never block.
-					ctx := b.Context()
-					go func() {
-						for {
-							select {
-							case <-ctx.Done():
-								return
-							case <-fw.events:
-							}
-						}
-					}()
-
-					metrics := newTestMetrics()
-					// Prime w.prev so the benchmarked scans are pure steady state.
-					fw.watch(ctx, metrics, st.ignoreOlder, time.Time{})
-
-					b.ReportAllocs()
-					b.ResetTimer()
-					for b.Loop() {
-						fw.watch(ctx, metrics, st.ignoreOlder, time.Time{})
-					}
-				})
-			}
+				b.ReportAllocs()
+				b.ResetTimer()
+				for b.Loop() {
+					fw.watch(ctx)
+				}
+			})
 		}
 	}
 }
 
->>>>>>> c05890c43 (filestream: reduce per-scan allocations (#51863))
 func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *fileWatcher {
 	tmpCfg := struct {
 		Scaner fileWatcherConfig `config:"scanner"`
