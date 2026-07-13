@@ -44,7 +44,7 @@ func (f *fakeT) Failed() bool { return f.failed }
 
 func (f *fakeT) FailNow() {}
 
-func TestCheckFIPSBuildInfo(t *testing.T) {
+func TestRequireFIPSBuildInfo(t *testing.T) {
 	tests := []struct {
 		name     string
 		godebug  string
@@ -67,16 +67,16 @@ func TestCheckFIPSBuildInfo(t *testing.T) {
 			}
 
 			ft := &fakeT{}
-			CheckFIPSBuildInfo(ft, settings)
+			RequireFIPSBuildInfo(ft, settings)
 
 			require.Equal(t, !tc.wantPass, ft.failed, "errors: %v", ft.errors)
 		})
 	}
 }
 
-func TestCheckFIPSBuildInfo_MissingSettings(t *testing.T) {
+func TestRequireFIPSBuildInfo_MissingSettings(t *testing.T) {
 	ft := &fakeT{}
-	CheckFIPSBuildInfo(ft, nil)
+	RequireFIPSBuildInfo(ft, nil)
 
 	require.True(t, ft.failed)
 	require.Len(t, ft.errors, 3, "expected all three markers to be reported missing, got: %v", ft.errors)

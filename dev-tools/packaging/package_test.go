@@ -901,7 +901,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 	info, err := buildinfo.ReadFile(binaryPath)
 	require.NoError(t, err)
 
-	testutils.CheckFIPSBuildInfo(t, info.Settings)
+	testutils.RequireFIPSBuildInfo(t, info.Settings)
 }
 
 // inspector is a file contents inspector. It vets the contents of the file

@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// fipsCheckT is the subset of *testing.T that CheckFIPSBuildInfo needs. It's kept as
+// fipsCheckT is the subset of *testing.T that RequireFIPSBuildInfo needs. It's kept as
 // an interface (rather than *testing.T directly) so this package's own tests can
 // exercise the failure paths with a fake, instead of failing the enclosing test run.
 type fipsCheckT interface {
@@ -34,13 +34,13 @@ type fipsCheckT interface {
 	FailNow()
 }
 
-// CheckFIPSBuildInfo asserts that a binary's build settings (as reported by
+// RequireFIPSBuildInfo asserts that a binary's build settings (as reported by
 // debug/buildinfo) contain the markers of a FIPS-compliant build: the
 // "requirefips" build tag, a GOFIPS140 setting referencing the certified
 // module version, and a DefaultGODEBUG setting that enables fips140=on at
 // runtime. All markers are checked before the test is failed, so a single
 // run reports every missing marker instead of just the first.
-func CheckFIPSBuildInfo(t fipsCheckT, settings []debug.BuildSetting) {
+func RequireFIPSBuildInfo(t fipsCheckT, settings []debug.BuildSetting) {
 	t.Helper()
 
 	var foundTags, foundFIPS, foundFIPSDefault bool
