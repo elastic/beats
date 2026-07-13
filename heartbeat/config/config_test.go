@@ -85,11 +85,11 @@ func TestDefaults(t *testing.T) {
 			911,
 		},
 		{
-			"API default is 8 when nothing is overridden",
+			"API default is 4 when nothing is overridden",
 			"FOO",
 			"bar",
 			"api",
-			8,
+			4,
 		},
 		{
 			"API monitor override",
