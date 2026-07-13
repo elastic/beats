@@ -280,14 +280,10 @@ func TestEnrichSynthEvent(t *testing.T) {
 	}
 }
 
-// API journeys reuse the same enrichment pipeline as browser journeys
-// but route their network events to a separate dataset. Pinning this
-// here keeps the dataset contract observable in a single place and
-// guards against accidentally collapsing api → browser.network.
+// API journeys must route network events to api.network, not browser.network.
 func TestEnrichAPIJourneyDatasetRouting(t *testing.T) {
 	se := newStreamEnricher(stdfields.StdMonitorFields{Type: "api"})
-	// Prime the journey context the way the agent does — journey/start
-	// first, then the network_info events that should inherit the type.
+	// Prime the journey context via journey/start before the network_info event.
 	startEvt := &beat.Event{}
 	require.NoError(t, se.enrich(startEvt, &SynthEvent{
 		Type:    JourneyStart,
@@ -304,9 +300,7 @@ func TestEnrichAPIJourneyDatasetRouting(t *testing.T) {
 	)
 }
 
-// Older synthetics agents (pre-`apiJourney`) don't emit `journey.type`.
-// We must keep treating those as browser to avoid silently dropping
-// dataset routing during a mixed-version rollout.
+// Older agents (pre-apiJourney) omit journey.type; keep treating those as browser.
 func TestEnrichLegacyJourneyDefaultsToBrowser(t *testing.T) {
 	se := newStreamEnricher(stdfields.StdMonitorFields{Type: "browser"})
 	startEvt := &beat.Event{}
@@ -324,18 +318,11 @@ func TestEnrichLegacyJourneyDefaultsToBrowser(t *testing.T) {
 	)
 }
 
-// TestE2EAPIJourneyAgentOutput drives the exact ndjson the synthetics
-// agent emits for an `apiJourney(...)` (elastic/synthetics#997) through
-// the same decode path production uses (json.Unmarshal into SynthEvent,
-// matching runCmd's json.Decoder) and the real enricher. Unlike the
-// struct-built routing tests above, this pins the on-the-wire contract:
-// the field names/values the agent actually produces must survive into
-// the beat.Event heartbeat ships.
+// TestE2EAPIJourneyAgentOutput runs the exact ndjson an apiJourney emits
+// (captured from elastic/synthetics#997) through the production decode path and
+// the enricher, pinning the on-the-wire contract the struct-built tests skip.
 func TestE2EAPIJourneyAgentOutput(t *testing.T) {
-	// Payloads mirror src/reporters/json.ts: journey/start and journey/end
-	// go through journeyInfo() (emits `type` only for non-browser journeys),
-	// and journey/network_info carries formatNetworkFields()'s ecs under
-	// root_fields, including the API-only `server` block.
+	// Shapes mirror the agent's json reporter, including the API-only server block.
 	lines := []string{
 		`{"@timestamp":1000000,"type":"journey/start","package_version":"1.30.0","journey":{"name":"Orders API","id":"orders-api","type":"api"},"payload":{"source":"apiJourney('Orders API', () => {})"}}`,
 		`{"@timestamp":1500000,"type":"journey/network_info","package_version":"1.30.0","journey":{"name":"Orders API","id":"orders-api","type":"api"},"root_fields":{"url":"https://api.example.com/orders","user_agent":{"name":"api","version":""},"http":{"request":{"method":"GET","bytes":42},"response":{"status":200,"mime_type":"application/json","bytes":128}},"server":{"ip":"93.184.216.34","port":443}},"step":{"name":"list orders","index":1,"status":"succeeded"},"payload":{"type":"fetch","is_navigation_request":false,"transfer_size":128}}`,

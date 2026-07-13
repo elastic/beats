@@ -74,9 +74,7 @@ func getLogger() *logp.Logger {
 	defer mtx.Unlock()
 
 	if eventLogger == nil {
-		// Fall back to the global logger if SetLogger was never called.
-		// Tests and production paths call SetLogger during initialization;
-		// this branch only protects against early calls or misconfiguration.
+		// Fall back to the global logger if SetLogger was never called (early/misconfigured paths).
 		return SetLogger(logp.L()) //nolint:forbidigo // intentional fallback before SetLogger is called
 	}
 
@@ -156,8 +154,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 }
 
 func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
-	// Only relevant for lightweight monitors. Synthetics-driven monitors
-	// (browser, api) emit their own network_info events via synthexec.
+	// Synthetics-driven monitors (browser, api) emit their own network_info via synthexec.
 	if stdfields.IsSyntheticsType(monitorType) {
 		return nil
 	}

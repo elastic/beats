@@ -449,10 +449,8 @@ func TestUpdateParams(t *testing.T) {
 	require.NoError(t, e)
 }
 
-// extraArgs must elide browser-only CLI flags when the monitor type is
-// `api`. Forwarding them to a chromium-less journey would either be
-// ignored (best case) or rejected by stricter agent versions, so we
-// pin the contract here.
+// extraArgs must elide browser-only CLI flags for `api` monitors while still
+// forwarding the flags that apply to both types.
 func TestExtraArgsForAPIMonitor(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"type":     "api",
@@ -486,8 +484,7 @@ func TestExtraArgsForAPIMonitor(t *testing.T) {
 	require.Contains(t, args, "--playwright-options", "api journeys must still receive --playwright-options")
 }
 
-// Browser monitors must keep receiving all the existing flags — guards
-// against accidental over-eager filtering in extraArgs.
+// Browser monitors must keep receiving all existing flags (regression guard).
 func TestExtraArgsForBrowserMonitorUnchanged(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"type":        "browser",

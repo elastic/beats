@@ -60,15 +60,13 @@ type StdMonitorFields struct {
 	BadConfig bool
 }
 
-// IsSyntheticsType reports whether the monitor type is one that runs via the
-// embedded synthetics Node.js agent (multi-step journeys) rather than via a
-// Go-side lightweight check. Today this is `browser` and `api`.
+// IsSyntheticsType reports whether the monitor runs via the embedded synthetics
+// Node.js agent (browser, api) rather than a Go-side lightweight check.
 func (s StdMonitorFields) IsSyntheticsType() bool {
 	return IsSyntheticsType(s.Type)
 }
 
-// IsSyntheticsType is the package-level variant of (StdMonitorFields).IsSyntheticsType
-// for callers that only have the raw monitor type string.
+// IsSyntheticsType is the string-based variant of (StdMonitorFields).IsSyntheticsType.
 func IsSyntheticsType(monitorType string) bool {
 	return monitorType == "browser" || monitorType == "api"
 }
