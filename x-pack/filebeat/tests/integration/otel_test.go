@@ -36,10 +36,12 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/features"
+	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -2112,59 +2114,58 @@ type benchPreset struct {
 	eventCountPerRecv int
 }
 
+// presetFields mirrors the subset of elasticsearch.ElasticsearchConfig that
+// elasticsearch.ApplyPreset's preset configs set, so the real preset values
+// can be unpacked directly instead of hand-copied into benchPresets.
+type presetFields struct {
+	BulkMaxSize            int           `config:"bulk_max_size"`
+	Worker                 int           `config:"worker"`
+	QueueMemEvents         int           `config:"queue.mem.events"`
+	QueueMemFlushMinEvents int           `config:"queue.mem.flush.min_events"`
+	QueueMemFlushTimeout   time.Duration `config:"queue.mem.flush.timeout"`
+}
+
+// benchPresetFromName builds a benchPreset from the real preset config
+// applied by elasticsearch.ApplyPreset, keeping the benchmark's queue/batch
+// settings in sync with the actual preset definitions instead of a
+// hand-maintained copy. eventCountPerRecv is picked as the nearest multiple
+// of the preset's min_events/bulk_max_size threshold to targetEventCount, so
+// the benchmark's fixed, bounded event count doesn't leave a leftover
+// partial batch that has to wait out the full flush timeout before the
+// mem-queue (or the exporter's own sending_queue) releases it.
+func benchPresetFromName(name string, targetEventCount int) benchPreset {
+	_, presetCfg, err := esoutput.ApplyPreset(name, config.NewConfig())
+	if err != nil {
+		panic(fmt.Sprintf("unknown benchmark preset %q: %v", name, err))
+	}
+
+	var pf presetFields
+	if err := presetCfg.Unpack(&pf); err != nil {
+		panic(fmt.Sprintf("failed to unpack benchmark preset %q: %v", name, err))
+	}
+
+	eventCountPerRecv := (targetEventCount / pf.QueueMemFlushMinEvents) * pf.QueueMemFlushMinEvents
+
+	return benchPreset{
+		name:                 name,
+		memQueueEvents:       pf.QueueMemEvents,
+		memQueueMinEvents:    pf.QueueMemFlushMinEvents,
+		memQueueFlushTimeout: pf.QueueMemFlushTimeout.String(),
+		maxConnsPerHost:      pf.Worker,
+		expBatchMaxSize:      pf.BulkMaxSize,
+		expBatchMinSize:      pf.BulkMaxSize,
+		expFlushTimeout:      pf.QueueMemFlushTimeout.String(),
+		expNumConsumers:      pf.Worker,
+		expQueueSize:         pf.QueueMemEvents,
+		eventCountPerRecv:    eventCountPerRecv,
+	}
+}
+
 var benchPresets = []benchPreset{
-	{
-		name:                 "throughput",
-		memQueueEvents:       12800,
-		memQueueMinEvents:    1600,
-		memQueueFlushTimeout: "5s",
-		maxConnsPerHost:      4,
-		expBatchMaxSize:      1600,
-		expBatchMinSize:      1600,
-		expFlushTimeout:      "5s",
-		expNumConsumers:      4,
-		expQueueSize:         12800,
-		eventCountPerRecv:    32_000, // 20 x 1600
-	},
-	{
-		name:                 "balanced",
-		memQueueEvents:       3200,
-		memQueueMinEvents:    1600,
-		memQueueFlushTimeout: "10s",
-		maxConnsPerHost:      1,
-		expBatchMaxSize:      1600,
-		expBatchMinSize:      1600,
-		expFlushTimeout:      "10s",
-		expNumConsumers:      1,
-		expQueueSize:         3200,
-		eventCountPerRecv:    32_000, // 20 x 1600
-	},
-	{
-		name:                 "scale",
-		memQueueEvents:       3200,
-		memQueueMinEvents:    1600,
-		memQueueFlushTimeout: "20s",
-		maxConnsPerHost:      1,
-		expBatchMaxSize:      1600,
-		expBatchMinSize:      1600,
-		expFlushTimeout:      "20s",
-		expNumConsumers:      1,
-		expQueueSize:         3200,
-		eventCountPerRecv:    32_000, // 20 x 1600
-	},
-	{
-		name:                 "latency",
-		memQueueEvents:       4100,
-		memQueueMinEvents:    2050,
-		memQueueFlushTimeout: "1s",
-		maxConnsPerHost:      1,
-		expBatchMaxSize:      50,
-		expBatchMinSize:      50,
-		expFlushTimeout:      "1s",
-		expNumConsumers:      1,
-		expQueueSize:         4100,
-		eventCountPerRecv:    32_800, // 16 x 2050
-	},
+	benchPresetFromName("throughput", 32_000),
+	benchPresetFromName("balanced", 32_000),
+	benchPresetFromName("scale", 32_000),
+	benchPresetFromName("latency", 32_000),
 }
 
 // BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full
