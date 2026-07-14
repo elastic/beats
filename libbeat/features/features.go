@@ -40,6 +40,7 @@ type fflags struct {
 	fqdnCallbacks map[string]boolValueOnChangeCallback
 
 	logRunAsFilestream atomic.Bool
+	awsS3V2            atomic.Bool
 }
 
 // UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromConfig is no-op.
@@ -52,6 +53,7 @@ func UpdateFromConfig(c *conf.C) error {
 		Features struct {
 			FQDN               *conf.C `json:"fqdn" yaml:"fqdn" config:"fqdn"`
 			LogRunAsFilestream *conf.C `json:"log_input_run_as_filestream" config:"log_input_run_as_filestream"`
+			AwsS3V2            *conf.C `json:"aws_s3_v2" yaml:"aws_s3_v2" config:"aws_s3_v2"`
 		} `json:"features" yaml:"features" config:"features"`
 	}
 
@@ -62,6 +64,7 @@ func UpdateFromConfig(c *conf.C) error {
 
 	flags.SetFQDNEnabled(parsedFlags.Features.FQDN.Enabled())
 	flags.SetLogInputRunFilestream(parsedFlags.Features.LogRunAsFilestream.Enabled())
+	flags.SetAwsS3V2(parsedFlags.Features.AwsS3V2.Enabled())
 
 	return nil
 }
@@ -119,4 +122,14 @@ func LogInputRunFilestream() bool {
 
 func (f *fflags) SetLogInputRunFilestream(v bool) {
 	f.logRunAsFilestream.Store(v)
+}
+
+// AwsS3V2 reports whether the aws-s3 input should use the V2
+// implementation. Defaults to false (legacy implementation).
+func AwsS3V2() bool {
+	return flags.awsS3V2.Load()
+}
+
+func (f *fflags) SetAwsS3V2(v bool) {
+	f.awsS3V2.Store(v)
 }

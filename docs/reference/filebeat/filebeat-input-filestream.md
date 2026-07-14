@@ -145,6 +145,12 @@ By default, Filebeat is able to track files correctly in the following strategie
 
 However, in case of copytruncate strategy, you should provide additional configuration to Filebeat.
 
+::::{note}
+:applies_to: stack: ga 9.5+
+
+With the default `fingerprint` [file identity](/reference/filebeat/file-identity.md), you don't need `rotation.external.strategy.copytruncate` at all. The fingerprint follows the file content, so the input detects copytruncate rotation on its own. If you set it together with the `fingerprint` file identity, it is ignored.
+::::
+
 
 #### rotation.external.strategy.copytruncate [_rotation_external_strategy_copytruncate]
 
@@ -200,7 +206,9 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 ::::
 
 
-`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile. The downside is that Filebeat will wait until the file reaches 1024 bytes before start ingesting any file.
+`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile.
+
+{applies_to}`stack: ga 9.5+` The [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay. In earlier versions, Filebeat waits until the file reaches 1024 bytes before ingesting it.
 
 ::::{warning}
 Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
@@ -425,11 +433,22 @@ This file identity option uses file fingerprints produced by the [scanner](#file
 ::::
 
 
-Please refer to the [fingerprint configuration for details](#filebeat-input-filestream-scan-fingerprint).
+Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
 
 ```yaml
 file_identity.fingerprint: ~
 ```
+
+    `growing` {applies_to}`stack: ga 9.5.0+`
+  :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
+
+      Set to `false` to restore the pre-9.5 behavior.
+
+      ```yaml
+      file_identity.fingerprint:
+        growing: true
+      ```
+
 
 **`native`**
 :   Differentiates between files using their inodes and device IDs. This is the default file identity in Filebeat versions prior to 9.0.0.
@@ -702,9 +721,9 @@ This option is not supported on Windows.
 
 ### `include_file_fingerprint` [filestream-input-include_file_fingerprint]
 ```yaml {applies_to}
-stack: ga 9.5
+stack: ga 9.5.0
 ```
-Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `false`. The file path (`log.file.path`) is always present in events regardless of this setting.
+Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `true`. The file path (`log.file.path`) is always present in events regardless of this setting.
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
@@ -1352,19 +1371,28 @@ Note: Each metric listed has a corresponding gzip_* counterpart (e.g.,
 the same data but exclusively for GZIP compressed files. The original metrics
 provide the total count, including both plain and GZIP files.
 
-### Harvester Metrics [_harvester_metrics]
-{applies_to}`stack: ga 9.5+`
+### Scanner and harvester metrics [_harvester_metrics]
 
-The `filestream` input also exposes scanner metrics under
+```{applies_to}
+stack: ga 9.5+
+```
+
+The `filestream` input also exposes scanner and harvester progress metrics under
 `.monitoring.metrics.filebeat.filestream` in monitoring logs and under
 `filebeat.filestream` in the `/stats` HTTP endpoint output. These metrics are
 aggregate gauges across all running `filestream` inputs. They are updated after
-each scanner pass and reset when inputs stop.
+each scanner pass and reset when inputs stop. Harvester progress metrics measure
+how much data active plain-file harvesters have read from their files. They do
+not measure output publishing or acknowledgment progress. GZIP files and files
+ignored by `filestream` settings or state are excluded.
 
 | Metric | Description |
 | --- | --- |
 | `files_empty` | Number of matched files that are empty. |
 | `files_ignored` | Number of matched files ignored by `filestream` settings or state, such as `prospector.scanner.exclude_files`, `ignore_older`, or `ignore_inactive`. |
+| `files_ingested_percent_100` | Number of active plain-file harvesters whose read offset is at or beyond the scanner-observed file size. |
+| `files_ingested_percent_95_99` | Number of active plain-file harvesters whose read offset is at least 95% and less than 100% of the scanner-observed file size. |
+| `files_ingested_percent_lt_95` | Number of active plain-file harvesters whose read offset is less than 95% of the scanner-observed file size. |
 | `files_matched` | Number of filesystem path matches returned by the configured `paths` globs before duplicate, ignore, and ingestibility filtering. |
 | `files_no_ingest_target` | Number of matched non-empty files that did not produce an ingest target, such as duplicate matches, files that are too small to fingerprint or symlinks to already known files. |
 | `files_unique` | Number of unique files that produced ingest targets after scanner filtering and de-duplication. |

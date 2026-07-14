@@ -146,7 +146,12 @@ class Test(BaseTest):
         self.filebeat = os.path.abspath(self.working_dir +
                                         "/../../../../filebeat.test")
 
+        # Each pytest-xdist worker gets its own Elasticsearch index so parallel
+        # workers do not delete or read each other's data.
         self.index_name = "test-filebeat-modules"
+        worker = os.environ.get("PYTEST_XDIST_WORKER")
+        if worker:
+            self.index_name = f"{worker}-{self.index_name}"
 
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
