@@ -49,6 +49,10 @@ type QueryInfo struct {
 	Interval int
 	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
 	PackID string
+	// PackName is the policy-defined human-readable pack name for pack queries; empty for top-level schedule queries.
+	PackName string
+	// QueryName is the query's config map key (pack query name or top-level schedule name).
+	QueryName string
 	// Profile is whether to collect and publish profile for this query.
 	Profile bool
 }
@@ -293,8 +297,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		osqueryConfig = inputs[0].Osquery
 	}
 
-	// Common code to register query with lookup maps, enforce snapshot and increment queries count
-	registerQuery := func(name, ns string, qi config.Query, packID string) (config.Query, error) {
+	// Common code to register query with lookup maps, enforce snapshot and increment queries count.
+	// queryName is the config map key (pack query name or top-level schedule name); packID/packName
+	// are the pack identifiers for pack queries and empty for top-level schedule queries.
+	registerQuery := func(name, ns string, qi config.Query, packID, packName, queryName string) (config.Query, error) {
 		var ecsm ecs.Mapping
 		ecsm, err = flattenECSMapping(qi.ECSMapping)
 		if err != nil {
@@ -309,6 +315,8 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
 			PackID:     packID,
+			PackName:   packName,
+			QueryName:  queryName,
 			Profile:    config.ResolveProfiling(globalProfile, qi.Profiling),
 		}
 		namespaces[name] = ns
@@ -327,7 +335,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err := config.ValidateQueryScheduleMode(qi); err != nil {
 			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
 		}
-		qi, err = registerQuery(name, p.namespace, qi, "")
+		qi, err = registerQuery(name, p.namespace, qi, "", "", name)
 		if err != nil {
 			return err
 		}
@@ -348,7 +356,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			if err != nil {
 				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
 			}
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID, pack.PackName, name)
 			if err != nil {
 				return err
 			}
@@ -379,7 +387,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Profiling:  stream.Profiling,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name, "", stream.ID)
 			if err != nil {
 				return err
 			}

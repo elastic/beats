@@ -79,10 +79,8 @@ func NewList(log *logp.Logger) *Processors {
 }
 
 // New creates a list of processors from a list of free user configurations.
+// The logger argument cannot be nil.
 func New(config PluginConfig, logger *logp.Logger) (*Processors, error) {
-	if logger == nil {
-		logger = logp.NewLogger(logName)
-	}
 	procs := NewList(logger)
 
 	// abort closes the processors constructed so far, so a failed list does

@@ -117,29 +117,27 @@ func TestFilestreamIncludeFileFingerprint(t *testing.T) {
 		} `json:"log"`
 	}
 
+	const fingerprintIdentity = "file_identity.fingerprint: ~\n    prospector.scanner:\n      fingerprint.enabled: true"
+
 	tests := []struct {
 		name                   string
-		identityConfig         string
 		includeFileFingerprint string
 		expectFingerprint      bool
 	}{
 		{
 			name:                   "include_file_fingerprint_true",
-			identityConfig:         "file_identity.fingerprint: ~\n    prospector.scanner:\n      fingerprint.enabled: true",
 			includeFileFingerprint: "include_file_fingerprint: true",
 			expectFingerprint:      true,
 		},
 		{
 			name:                   "include_file_fingerprint_false",
-			identityConfig:         "file_identity.fingerprint: ~\n    prospector.scanner:\n      fingerprint.enabled: true",
 			includeFileFingerprint: "include_file_fingerprint: false",
 			expectFingerprint:      false,
 		},
 		{
 			name:                   "include_file_fingerprint_absent",
-			identityConfig:         "file_identity.fingerprint: ~\n    prospector.scanner:\n      fingerprint.enabled: true",
 			includeFileFingerprint: "",
-			expectFingerprint:      false,
+			expectFingerprint:      true,
 		},
 	}
 
@@ -174,7 +172,7 @@ output:
     path: ${path.home}
     filename: "output"
     rotate_on_startup: false
-`, tc.name, logFilePath, tc.identityConfig, tc.includeFileFingerprint)
+`, tc.name, logFilePath, fingerprintIdentity, tc.includeFileFingerprint)
 
 			filebeat.WriteConfigFile(cfg)
 			filebeat.Start()
@@ -186,10 +184,7 @@ output:
 			var failedFilePath []int
 			var failedFingerprint []int
 			for i, event := range events {
-				if tc.expectFingerprint && event.Log.File.Fingerprint == nil {
-					failedFingerprint = append(failedFingerprint, i)
-				}
-				if !tc.expectFingerprint && event.Log.File.Fingerprint != nil {
+				if (event.Log.File.Fingerprint != nil) != tc.expectFingerprint {
 					failedFingerprint = append(failedFingerprint, i)
 				}
 

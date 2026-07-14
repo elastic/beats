@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
+	"github.com/elastic/beats/v7/packetbeat/npcap"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
@@ -188,6 +189,12 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		// the opportunity to not install the DLL if there is no configured
 		// interface.
 		err := installNpcap(p.beat, cfg)
+		if err != nil {
+			return 0, nil, nil, nil, nil, err
+		}
+		// Ensure the DLL is loaded whether Npcap was just installed above
+		// or was already present from a previous run.
+		err = npcap.LoadNpcap()
 		if err != nil {
 			return 0, nil, nil, nil, nil, err
 		}
