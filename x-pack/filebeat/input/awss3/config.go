@@ -190,6 +190,25 @@ func (c *backupConfig) GetBucketName() string {
 	return c.NonAWSBackupToBucketName
 }
 
+// backupPrefixToExclude returns the backup prefix that should be excluded from
+// listing results when the backup destination is the same bucket and the backup
+// prefix falls within the listing scope. Returns "" when no exclusion is needed.
+func (c *config) backupPrefixToExclude() string {
+	if c.BackupConfig.BackupToBucketPrefix == "" {
+		return ""
+	}
+	sameBucket := (c.BackupConfig.BackupToBucketArn != "" &&
+		(c.BackupConfig.BackupToBucketArn == c.BucketARN || c.BackupConfig.BackupToBucketArn == c.AccessPointARN)) ||
+		(c.BackupConfig.NonAWSBackupToBucketName != "" && c.BackupConfig.NonAWSBackupToBucketName == c.NonAWSBucketName)
+	if !sameBucket {
+		return ""
+	}
+	if !strings.HasPrefix(c.BackupConfig.BackupToBucketPrefix, c.BucketListPrefix) {
+		return ""
+	}
+	return c.BackupConfig.BackupToBucketPrefix
+}
+
 // fileSelectorConfig defines reader configuration that applies to a subset
 // of S3 objects whose URL matches the given regex.
 type fileSelectorConfig struct {
