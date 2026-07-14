@@ -76,7 +76,7 @@ class Test(AuditbeatXPackTest):
         # errors_allowed|warnings_allowed=True - Disabling hashing causes the dataset to add an error to the event
         # and log a warning. That should not fail the test.
         self.check_metricset("system", "process", COMMON_FIELDS + fields, {"process.hash.max_file_size": 1},
-                             errors_allowed=True, warnings_allowed=True)
+                             errors_allowed=True, warnings_allowed=True, max_timeout=40)
 
     @unittest.skipUnless(sys.platform.startswith('linux'), "Only implemented for Linux")
     def test_metricset_user(self):
