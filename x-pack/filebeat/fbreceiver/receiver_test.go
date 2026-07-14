@@ -18,10 +18,18 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+<<<<<<< HEAD
+=======
+	"sync"
+	"sync/atomic"
+>>>>>>> 8f4bbab77 (Set shutdown timeout for beat receivers to 5s by default (#51940))
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
+	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
+	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -492,6 +500,293 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	return true
 }
 
+<<<<<<< HEAD
+=======
+func hasInputMetricsFromUnixSocket(t *testing.T, socketPath string, inputID string) error {
+	// skip windows for now
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+
+	client := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", socketPath)
+			},
+		},
+	}
+	defer client.CloseIdleConnections()
+
+	inputsURL, err := url.JoinPath("http://unix", "inputs")
+	if err != nil {
+		return fmt.Errorf("JoinPath failed: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, inputsURL, nil)
+	if err != nil {
+		return fmt.Errorf("error creating request: %w", err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("client.Get failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("io.ReadAll of body failed: %w", err)
+	}
+
+	if len(body) <= 0 {
+		return errors.New("body too short")
+	}
+
+	var inputs []map[string]any
+	if err := json.Unmarshal(body, &inputs); err != nil {
+		return fmt.Errorf("json unmarshal of body failed: %w (body=%q)", err, body)
+	}
+
+	if len(inputs) <= 0 {
+		return errors.New("json array didn't have any entries")
+	}
+
+	for _, input := range inputs {
+		id, _ := input["id"].(string)
+		if id != inputID {
+			continue
+		}
+		return nil
+	}
+
+	return fmt.Errorf("input %q not found in /inputs payload", inputID)
+}
+
+type logGenerator struct {
+	t           *testing.T
+	tmpDir      string
+	f           *os.File
+	sequenceNum int64
+	currentFile string
+	waitReady   func()
+}
+
+func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
+	return &logGenerator{
+		t:      t,
+		tmpDir: tmpDir,
+	}
+}
+
+func (g *logGenerator) Start() {
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+	}
+
+	filePath := filepath.Join(g.tmpDir, "input.log")
+
+	f, err := os.Create(filePath)
+	require.NoError(g.t, err)
+	g.f = f
+	g.currentFile = filePath
+	atomic.StoreInt64(&g.sequenceNum, 0)
+	if g.waitReady != nil {
+		g.waitReady()
+	}
+}
+
+func (g *logGenerator) Stop() {
+	if g.f != nil {
+		require.NoError(g.t, g.f.Close())
+		g.f = nil
+	}
+	if g.currentFile != "" {
+		os.Remove(g.currentFile)
+		g.currentFile = ""
+	}
+}
+
+func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
+	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(atomic.AddInt64(&g.sequenceNum, 1), 10))
+
+	_, err := fmt.Fprintln(g.f, `{"id": "`+id+`", "message": "log message"}`)
+	require.NoError(g.t, err, "failed to write log line to file")
+	require.NoError(g.t, g.f.Sync(), "failed to sync log file")
+
+	return []receivertest.UniqueIDAttrVal{id}
+}
+
+// TestConsumeContract tests the ConsumeLogs contract for otelconsumer.
+//
+// The following scenarios are tested:
+// - Always succeed. We expect all data passed to ConsumeLogs to be delivered.
+// - Random non-permanent error. We expect the batch to be retried.
+// - Random permanent error. We expect the batch to be dropped.
+// - Random error. We expect the batch to be retried or dropped based on the error type.
+func TestConsumeContract(t *testing.T) {
+	defer oteltest.VerifyNoLeaks(t)
+
+	tmpDir := t.TempDir()
+	monitorSocket := genSocketPath(t)
+	const (
+		logsPerTest       = 100
+		filestreamInputID = "filestream-test"
+	)
+
+	gen := newLogGenerator(t, tmpDir)
+	gen.waitReady = func() {
+		require.EventuallyWithT(t, func(c *assert.CollectT) {
+			err := hasInputMetricsFromUnixSocket(t, monitorSocket, filestreamInputID)
+			assert.NoError(c, err, "receiver input metrics are not ready")
+		}, 30*time.Second, 100*time.Millisecond)
+	}
+
+	t.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
+			"processors":              []map[string]any{},
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "filestream",
+						"id":      filestreamInputID,
+						"enabled": true,
+						"paths": []string{
+							filepath.Join(tmpDir, "input.log"),
+						},
+						"file_identity.native": map[string]any{},
+						"prospector": map[string]any{
+							"scanner": map[string]any{
+								"fingerprint.enabled": false,
+								"check_interval":      "0.1s",
+							},
+						},
+						"parsers": []map[string]any{
+							{
+								"ndjson": map[string]any{
+									"document_id": "id",
+								},
+							},
+						},
+					},
+				},
+			},
+			"http.enabled": true,
+			"http.host":    hostFromSocket(monitorSocket),
+			"logging": map[string]any{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": tmpDir,
+			"path.logs": tmpDir,
+		},
+	}
+
+	// Run the contract checker. This will trigger test failures if any problems are found.
+	receivertest.CheckConsumeContract(receivertest.CheckConsumeContractParams{
+		T:             t,
+		Factory:       NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+		Signal:        pipeline.SignalLogs,
+		Config:        cfg,
+		Generator:     gen,
+		GenerateCount: logsPerTest,
+	})
+}
+
+// TestShutdownDrainTimeout is a regression test for the filebeat receiver
+// shutdown drain duration.
+//
+// The slow consumer blocks until the drain context is cancelled, so the
+// elapsed shutdown time equals the drain timeout. We only assert a lower bound
+// (>= receiverPublisherCloseTimeout - 500ms) rather than an upper bound, so
+// the test never flakes due to CI load while still catching any regression that
+// reduces the drain timeout below the expected value.
+func TestShutdownDrainTimeout(t *testing.T) {
+	defer oteltest.VerifyNoLeaks(t)
+
+	tmpDir := t.TempDir()
+	logFile := filepath.Join(tmpDir, "input.log")
+	for range 20 {
+		writeFile(t, logFile, `{"message": "drain timeout test"}`)
+	}
+
+	consumerCalledCh := make(chan struct{})
+	var consumerCalledOnce sync.Once
+	slowConsumer, err := consumer.NewLogs(func(ctx context.Context, _ plog.Logs) error {
+		consumerCalledOnce.Do(func() { close(consumerCalledCh) })
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(30 * time.Second):
+			return nil
+		}
+	})
+	require.NoError(t, err)
+
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":                 "filestream",
+						"enabled":              true,
+						"id":                   "drain-timeout-test",
+						"paths":                []string{logFile},
+						"file_identity.native": map[string]any{},
+						"prospector": map[string]any{
+							"scanner": map[string]any{
+								"check_interval":      "50ms",
+								"fingerprint.enabled": false,
+							},
+						},
+					},
+				},
+			},
+			"path.home": tmpDir,
+			"path.logs": tmpDir,
+			"logging":   map[string]any{"level": "info"},
+		},
+	}
+
+	factory := NewFactoryWithSettings(Settings{Home: tmpDir})
+	var settings receiver.Settings
+	settings.ID = component.NewIDWithName(factory.Type(), "r1")
+	settings.Logger = zap.NewNop()
+
+	r, err := factory.CreateLogs(t.Context(), settings, cfg, slowConsumer)
+	require.NoError(t, err)
+	require.NoError(t, r.Start(t.Context(), componenttest.NewNopHost()))
+
+	// Guard: wait until events are in flight before triggering shutdown.
+	// Without this, shutdown starts before any batches exist and the drain
+	// completes trivially fast, making the test a no-op.
+	select {
+	case <-consumerCalledCh:
+	case <-time.After(30 * time.Second):
+		t.Fatal("ConsumeLogs was never called; events never reached the pipeline")
+	}
+
+	start := time.Now()
+	require.NoError(t, r.Shutdown(t.Context()))
+	elapsed := time.Since(start)
+
+	// Only a lower bound: CI load can make wall-clock time arbitrarily large,
+	// so an upper bound would cause spurious failures on loaded runners.
+	const (
+		receiverPublisherCloseTimeout = 5 * time.Second
+		minExpected                   = receiverPublisherCloseTimeout - 500*time.Millisecond
+	)
+	assert.GreaterOrEqual(t, elapsed, minExpected,
+		"shutdown completed in %v, expected >= %v; was shutdown_timeout injection removed?",
+		elapsed, minExpected)
+}
+
+>>>>>>> 8f4bbab77 (Set shutdown timeout for beat receivers to 5s by default (#51940))
 func TestReceiverHook(t *testing.T) {
 	cfg := Config{
 		Beatconfig: map[string]any{
