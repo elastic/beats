@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 //go:build integration
 
 package elasticsearchstorage
@@ -45,7 +43,7 @@ func newTestExtension(t *testing.T) *elasticStorage {
 		},
 	}
 
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 	require.NoError(t, ext.Start(context.Background(), componenttest.NewNopHost()))
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 	return ext
@@ -72,7 +70,7 @@ func TestESClient_GetMissing(t *testing.T) {
 
 	got, err := c.Get(context.Background(), "no-such-key")
 	require.NoError(t, err)
-	assert.Nil(t, got, "Get on a missing key must return (nil, nil) per the OTel contract")
+	assert.Nil(t, got, "Get on a missing key must return (nil, nil)")
 }
 
 func TestESClient_SetGetRoundTrip_Struct(t *testing.T) {
@@ -100,13 +98,13 @@ func TestESClient_SetGetRoundTrip_Struct(t *testing.T) {
 }
 
 func TestESClient_SetGetRoundTrip_LargeInt(t *testing.T) {
-	// Values exceeding 2^53 lose precision when round-tripped through
-	// float64. The adapter embeds the caller's bytes verbatim under `v`
+	// Values not representable in float64 lose precision when round-tripped
+	// through it. The client embeds the caller's bytes verbatim under `v`
 	// (mapped object/enabled:false), so ES preserves them as-is.
 	ext := newTestExtension(t)
 	c := newTestClient(t, ext)
 
-	const large int64 = 9_000_000_000_000_000_001 // > 2^53
+	const large int64 = 1<<53 + 1
 	in := []byte(fmt.Sprintf(`{"big":%d}`, large))
 	require.NoError(t, c.Set(context.Background(), "big", in))
 
@@ -184,8 +182,6 @@ func TestESClient_Delete(t *testing.T) {
 }
 
 func TestESClient_DeleteMissing_NoOp(t *testing.T) {
-	// OTel contract: "Delete doesn't error if the key doesn't exist - it
-	// just no-ops."
 	ext := newTestExtension(t)
 	c := newTestClient(t, ext)
 
@@ -221,8 +217,7 @@ func TestESClient_Batch(t *testing.T) {
 	c := newTestClient(t, ext)
 	ctx := context.Background()
 
-	// Batch with mixed Set/Get/Delete. The PR 1 implementation runs ops
-	// sequentially; we just verify each one took effect.
+	// Batch with mixed Set/Get/Delete; verify each op took effect.
 	err := c.Batch(ctx,
 		storage.SetOperation("a", []byte(`{"v":1}`)),
 		storage.SetOperation("b", []byte(`{"v":2}`)),

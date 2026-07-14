@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -59,7 +57,7 @@ func captureCreateBody(t *testing.T, buildFlavor string, idx IndexConfig) string
 		},
 		Index: idx,
 	}
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 	require.NoError(t, ext.Start(context.Background(), componenttest.NewNopHost()))
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 

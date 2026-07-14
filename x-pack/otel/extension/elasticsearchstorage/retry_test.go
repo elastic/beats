@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -61,6 +59,16 @@ func TestBackoffDelay(t *testing.T) {
 	assert.LessOrEqual(t, int64(backoffDelay(100, base, max)), int64(max), "must never exceed max or overflow")
 }
 
+func TestRetryConfig_ClampsBaseDelayToMaxDelay(t *testing.T) {
+	// A programmatically-built config can carry base > max (Validate is not
+	// run for it); retryConfig must clamp so backoffDelay never sees it.
+	ext := &elasticStorage{cfg: &Config{
+		Retry: RetryConfig{MaxAttempts: 3, BaseDelay: 10 * time.Second, MaxDelay: 5 * time.Second},
+	}}
+	p := ext.retryConfig()
+	assert.Equal(t, p.maxDelay, p.baseDelay, "base delay must be clamped to max delay")
+}
+
 // newRetryTestExtension stands up an extension whose connection points at srv,
 // with fast, deterministic retry settings so the retry loop can be exercised
 // without a real cluster and without slow backoff.
@@ -74,7 +82,7 @@ func newRetryTestExtension(t *testing.T, srv *httptest.Server) *elasticStorage {
 		},
 		Retry: RetryConfig{MaxAttempts: 5, BaseDelay: time.Millisecond, MaxDelay: 5 * time.Millisecond},
 	}
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 	require.NoError(t, ext.Start(context.Background(), componenttest.NewNopHost()))
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 	return ext
@@ -169,7 +177,7 @@ func TestRequest_RetryStopsOnContextCancel(t *testing.T) {
 		},
 		Retry: RetryConfig{MaxAttempts: 10, BaseDelay: time.Second, MaxDelay: time.Second},
 	}
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 	require.NoError(t, ext.Start(context.Background(), componenttest.NewNopHost()))
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 

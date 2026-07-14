@@ -2,12 +2,11 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 )
@@ -17,6 +16,26 @@ type retryParams struct {
 	maxAttempts int
 	baseDelay   time.Duration
 	maxDelay    time.Duration
+}
+
+// retryConfig resolves the configured retry settings. baseDelay is clamped
+// to maxDelay so backoffDelay never sees base > max.
+func (e *elasticStorage) retryConfig() retryParams {
+	r := e.cfg.Retry
+	p := retryParams{maxAttempts: r.MaxAttempts, baseDelay: r.BaseDelay, maxDelay: r.MaxDelay}
+	if p.maxAttempts <= 0 {
+		p.maxAttempts = 3
+	}
+	if p.baseDelay <= 0 {
+		p.baseDelay = 100 * time.Millisecond
+	}
+	if p.maxDelay <= 0 {
+		p.maxDelay = 5 * time.Second
+	}
+	if p.baseDelay > p.maxDelay {
+		p.baseDelay = p.maxDelay
+	}
+	return p
 }
 
 // request runs an ES request under clientMu with bounded retry on transient
@@ -64,6 +83,9 @@ func (c *esStorageClient) doOnce(method, path string, params map[string]string, 
 	c.ext.clientMu.Lock()
 	defer c.ext.clientMu.Unlock()
 
+	if c.ext.client == nil {
+		return 0, nil, errExtensionClosed
+	}
 	status, b, err := c.ext.client.Request(method, path, "", params, body)
 	var out []byte
 	if len(b) > 0 {
@@ -76,9 +98,10 @@ func (c *esStorageClient) doOnce(method, path string, params map[string]string, 
 // isRetryable reports whether a failed request should be retried. Only
 // transient classes qualify: network errors (no HTTP response, status 0) and
 // 429/502/503/504. Permanent responses (400/401/403/404/409/...) are not
-// retried. A nil error is a success and never retried.
+// retried, and neither is errExtensionClosed — the connection is gone for
+// good after Shutdown. A nil error is a success and never retried.
 func isRetryable(status int, err error) bool {
-	if err == nil {
+	if err == nil || errors.Is(err, errExtensionClosed) {
 		return false
 	}
 	switch status {
@@ -96,6 +119,7 @@ func isRetryable(status int, err error) bool {
 
 // backoffDelay returns the capped exponential backoff for a zero-based
 // attempt: base * 2^attempt, clamped to max (and guarded against overflow).
+// Callers must pass base <= max (retryConfig guarantees this).
 func backoffDelay(attempt int, base, max time.Duration) time.Duration {
 	if attempt < 0 || base <= 0 {
 		return base
@@ -106,9 +130,6 @@ func backoffDelay(attempt int, base, max time.Duration) time.Duration {
 		if d <= 0 || d >= max {
 			return max
 		}
-	}
-	if d > max {
-		return max
 	}
 	return d
 }

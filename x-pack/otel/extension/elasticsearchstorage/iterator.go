@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -19,38 +17,23 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
-// enumeratePageSize is the number of documents fetched per Walk page. Cursor
+// defaultPageSize is the number of documents fetched per Walk page. Cursor
 // stores are tiny, so a single page usually suffices; pagination via PIT +
-// search_after handles the rare larger store without the capped size:1000
-// search baseStore.Each warns about. It is a var (not const) only so tests can
-// shrink it to exercise multi-page pagination cheaply.
-var enumeratePageSize = 1000
+// search_after handles the rare larger store. Tests shrink the client's
+// pageSize field to exercise multi-page pagination cheaply.
+const defaultPageSize = 1000
 
 var _ storage.Walker = (*esStorageClient)(nil)
 
-// Walk implements the upstream storage.Walker interface: it ranges over every
-// key/value pair in the store, invoking fn per entry. It paginates with a
-// point-in-time (PIT) reader plus search_after, so it is not bounded by a
-// single search page.
-//
-// Walk is the only enumeration face the client exposes. It is what the
-// ecosystem reaches: the libbeat otelstorage backend.Store adapter
-// (backend.Store.Each) type-asserts the client to storage.Walker, and OTel
-// receivers that range over storage call Walk directly. There is no separate
-// Each method, because a plain storage.Client caller could never discover one.
-//
-// Locking granularity differs deliberately from lockedStore.Each (which holds
-// clientMu for the whole enumeration): clientMu is held only for each
-// individual ES request (open PIT, each page, close PIT). Pages are decoded
-// into fresh slices under the lock, the lock is released, and only then is fn
-// invoked per entry. This keeps per-request serialization (the safety
-// guarantee) without starving other receivers during a long enumeration.
+// Walk implements [storage.Walker]: it calls fn for every key/value pair in
+// the store, paginating with a point-in-time (PIT) reader plus search_after,
+// so it is not bounded by a single search page.
 //
 // Operations returned by fn are collected and applied in order once ranging
-// finishes (or after fn returns storage.SkipAll). Elasticsearch offers no
-// cross-document transaction, so they are applied best-effort sequentially via
-// the same per-op path as Batch. If fn returns any other error — or ranging
-// itself fails — Walk stops and no collected operations are applied.
+// finishes (or after fn returns [storage.SkipAll]). They are applied
+// sequentially via the same per-op path as Batch, not transactionally. If fn
+// returns any other error — or ranging itself fails — Walk stops and no
+// collected operations are applied.
 func (c *esStorageClient) Walk(ctx context.Context, fn storage.WalkFunc) error {
 	if err := ctx.Err(); err != nil {
 		return err
@@ -58,6 +41,10 @@ func (c *esStorageClient) Walk(ctx context.Context, fn storage.WalkFunc) error {
 	if err := c.checkOpen(); err != nil {
 		return err
 	}
+
+	// clientMu is held only per ES request (inside c.request): each page is
+	// decoded into fresh slices under the lock, then fn runs without it, so
+	// a long enumeration does not starve other users of the connection.
 
 	pitID, ok, err := c.openPIT(ctx)
 	if err != nil {
@@ -93,7 +80,7 @@ func (c *esStorageClient) Walk(ctx context.Context, fn storage.WalkFunc) error {
 			}
 			ops = append(ops, got...)
 		}
-		if len(entries) < enumeratePageSize {
+		if len(entries) < c.pageSize {
 			return c.Batch(ctx, ops...)
 		}
 		searchAfter = nextAfter
@@ -147,7 +134,7 @@ func (c *esStorageClient) closePIT(id string) error {
 // id ES returns with each search response.
 func (c *esStorageClient) searchPage(ctx context.Context, pitID string, after []json.RawMessage) (entries []searchEntry, nextAfter []json.RawMessage, newPIT string, err error) {
 	query := map[string]any{
-		"size":             enumeratePageSize,
+		"size":             c.pageSize,
 		"track_total_hits": false,
 		"query":            map[string]any{"match_all": map[string]any{}},
 		"pit":              map[string]any{"id": pitID, "keep_alive": "1m"},

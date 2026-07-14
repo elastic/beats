@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -12,11 +10,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 
 	"go.opentelemetry.io/collector/component"
-
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
 // indexNamePrefix is the common prefix for storage indices. The legacy
@@ -115,8 +110,8 @@ func sanitizeIndexSuffix(s string) string {
 	b.Grow(len(s))
 	for _, r := range s {
 		switch {
-		case r >= 'a' && r <= 'z',
-			r >= '0' && r <= '9',
+		case 'a' <= r && r <= 'z',
+			'0' <= r && r <= '9',
 			r == '.', r == '_', r == '-':
 			b.WriteRune(r)
 		default:
@@ -173,15 +168,16 @@ func kindString(k component.Kind) string {
 // race-safe. The shard/replica settings are dropped on serverless, where they
 // are not permitted (see indexCreateBody).
 //
-// The mutex is the extension-wide one. Every call that uses the shared
-// *eslegclient.Connection must take it: eslegclient.Connection reuses an
-// internal response buffer and is documented as not safe for concurrent
-// use by multiple goroutines. conn.IsServerless() is queried under the same
-// lock; it is cached after the first call and never touches the mutex itself.
-func ensureIndex(mu *sync.Mutex, conn *eslegclient.Connection, indexName string, idx IndexConfig) error {
-	mu.Lock()
-	defer mu.Unlock()
+// The connection is read and used under the extension's clientMu; see the
+// clientMu documentation on elasticStorage.
+func ensureIndex(ext *elasticStorage, indexName string, idx IndexConfig) error {
+	ext.clientMu.Lock()
+	defer ext.clientMu.Unlock()
 
+	conn := ext.client
+	if conn == nil {
+		return errExtensionClosed
+	}
 	status, body, err := conn.Request("PUT", "/"+indexName, "", nil, indexCreateBody(conn.IsServerless(), idx))
 	if err == nil {
 		return nil

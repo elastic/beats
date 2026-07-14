@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -31,7 +29,7 @@ func isValidESIndexName(s string) bool {
 	}
 	for _, r := range s {
 		switch {
-		case r >= 'A' && r <= 'Z':
+		case 'A' <= r && r <= 'Z':
 			return false
 		case r == '\\', r == '/', r == '*', r == '?', r == '"',
 			r == '<', r == '>', r == '|', r == ',', r == '#', r == ':':

@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -22,9 +20,13 @@ import (
 )
 
 var (
-	// errClientClosed is returned by Get/Set/Delete/Batch/Each after Close
+	// errClientClosed is returned by Get/Set/Delete/Batch/Walk after Close
 	// has been called on the client. Callers can use errors.Is to detect it.
 	errClientClosed = errors.New("elasticsearch_storage: client is closed")
+
+	// errExtensionClosed is returned when an operation reaches the shared
+	// connection after the extension's Shutdown has released it.
+	errExtensionClosed = errors.New("elasticsearch_storage: extension has been shut down")
 
 	// errEmptyKey is returned when a keyed operation is given an empty key.
 	// An empty key would collapse the document path to "/<index>/_doc/",
@@ -33,22 +35,19 @@ var (
 	errEmptyKey = errors.New("elasticsearch_storage: key must not be empty")
 )
 
-// esStorageClient is the OTel storage.Client implementation backed by the
-// single shared *eslegclient.Connection owned by the parent extension. Every
-// method that touches the connection takes the extension's clientMu:
-// eslegclient.Connection is not safe for concurrent use (it reuses an
-// internal response buffer and a body encoder), so serializing on clientMu is
-// what keeps the OTel path, the Access path, and the entcollect path from
-// corrupting each other.
+// esStorageClient implements storage.Client on top of the parent extension's
+// shared connection (ext.client). All requests serialize on ext.clientMu; see
+// the clientMu documentation on elasticStorage.
 type esStorageClient struct {
-	ext   *elasticStorage
-	index string
+	ext      *elasticStorage
+	index    string
+	pageSize int // documents fetched per Walk page
 
-	// ensureMu guards lazy, idempotent index creation. Only success is
+	// ensuredMu guards lazy, idempotent index creation. Only success is
 	// cached, so a transient failure on the first write is retried on the
 	// next one rather than permanently disabling the client.
-	ensureMu sync.Mutex
-	ensured  bool
+	ensuredMu sync.Mutex
+	ensured   bool
 
 	closedMu sync.Mutex
 	closed   bool
@@ -56,9 +55,7 @@ type esStorageClient struct {
 
 var _ storage.Client = (*esStorageClient)(nil)
 
-// Get returns the value for key, or (nil, nil) if the key does not exist —
-// per the OTel storage.Client contract: "Get doesn't error if a key is not
-// found - it just returns nil."
+// Get returns the value for key, or (nil, nil) if the key does not exist.
 func (c *esStorageClient) Get(ctx context.Context, key string) ([]byte, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
@@ -66,8 +63,8 @@ func (c *esStorageClient) Get(ctx context.Context, key string) ([]byte, error) {
 	if err := c.checkOpen(); err != nil {
 		return nil, err
 	}
-	if err := checkKey(key); err != nil {
-		return nil, err
+	if key == "" {
+		return nil, errEmptyKey
 	}
 
 	status, body, err := c.request(ctx, "GET", c.docPath(key), nil, nil)
@@ -90,9 +87,8 @@ func (c *esStorageClient) Get(ctx context.Context, key string) ([]byte, error) {
 }
 
 // Set stores value under key. Arbitrary bytes are accepted: valid JSON is
-// stored verbatim under `v` (enc:json, readable in Kibana, precision and key
-// order preserved); anything else is base64-wrapped (enc:base64). The
-// encoding mode is configurable (see Config.Encoding).
+// stored verbatim under `v`; anything else is base64-wrapped. The encoding
+// mode is configurable (see [Config.Encoding]).
 func (c *esStorageClient) Set(ctx context.Context, key string, value []byte) error {
 	if err := ctx.Err(); err != nil {
 		return err
@@ -100,8 +96,8 @@ func (c *esStorageClient) Set(ctx context.Context, key string, value []byte) err
 	if err := c.checkOpen(); err != nil {
 		return err
 	}
-	if err := checkKey(key); err != nil {
-		return err
+	if key == "" {
+		return errEmptyKey
 	}
 	if err := c.ensureIndex(); err != nil {
 		return err
@@ -127,8 +123,7 @@ func (c *esStorageClient) Set(ctx context.Context, key string, value []byte) err
 	return nil
 }
 
-// Delete removes the value for key. Per OTel contract, deleting a missing
-// key is a no-op (not an error).
+// Delete removes the value for key. Deleting a missing key is a no-op.
 func (c *esStorageClient) Delete(ctx context.Context, key string) error {
 	if err := ctx.Err(); err != nil {
 		return err
@@ -136,8 +131,8 @@ func (c *esStorageClient) Delete(ctx context.Context, key string) error {
 	if err := c.checkOpen(); err != nil {
 		return err
 	}
-	if err := checkKey(key); err != nil {
-		return err
+	if key == "" {
+		return errEmptyKey
 	}
 
 	status, _, err := c.request(ctx, "DELETE", c.docPath(key), c.writeParams(), nil)
@@ -150,13 +145,9 @@ func (c *esStorageClient) Delete(ctx context.Context, key string) error {
 	return nil
 }
 
-// Batch executes the supplied operations sequentially.
-//
-// This keeps the implementation a per-op loop — correct, but one HTTP
-// round-trip per op. A future change may switch to ES _bulk for fewer
-// round-trips. The OTel contract does not require Batch to be transactional,
-// and ES offers no cross-document atomicity even via _bulk, so partial-failure
-// semantics (partial state on error) are unchanged either way.
+// Batch executes the supplied operations sequentially, one request per
+// operation. It is not transactional: an error leaves the operations before
+// it applied.
 func (c *esStorageClient) Batch(ctx context.Context, ops ...*storage.Operation) error {
 	for _, op := range ops {
 		if op == nil {
@@ -180,10 +171,9 @@ func (c *esStorageClient) Batch(ctx context.Context, ops ...*storage.Operation) 
 	return nil
 }
 
-// Close marks the client closed. The shared *eslegclient.Connection is owned
-// by the extension and torn down in Shutdown; closing a client is a
-// "stop using me" signal local to that client, so one client closing cannot
-// take down the shared connection or other clients.
+// Close marks the client closed; subsequent operations return
+// errClientClosed. It does not release the shared connection — call the
+// extension's Shutdown for that.
 func (c *esStorageClient) Close(_ context.Context) error {
 	c.closedMu.Lock()
 	defer c.closedMu.Unlock()
@@ -191,6 +181,10 @@ func (c *esStorageClient) Close(_ context.Context) error {
 	return nil
 }
 
+// checkOpen is a best-effort fail-fast check. An operation racing a
+// concurrent Close may still reach the shared connection; that is safe
+// because Close only marks this client unusable, it does not release the
+// connection.
 func (c *esStorageClient) checkOpen() error {
 	c.closedMu.Lock()
 	defer c.closedMu.Unlock()
@@ -200,19 +194,10 @@ func (c *esStorageClient) checkOpen() error {
 	return nil
 }
 
-// checkKey rejects empty keys before any path is built (see errEmptyKey).
-func checkKey(key string) error {
-	if key == "" {
-		return errEmptyKey
-	}
-	return nil
-}
-
 // docPath returns the ES document path for key. url.PathEscape is used
-// (not QueryEscape) because it is the technically correct escaping for a path
-// segment; it diverges from the legacy baseStore (QueryEscape) only on '+'
-// and space. The OTel client writes to its own indices, distinct from any
-// baseStore index, so there is no cross-path key collision.
+// (not QueryEscape); it diverges from the legacy baseStore (QueryEscape)
+// only on '+' and space. The OTel client writes to its own indices, distinct
+// from any baseStore index, so there is no cross-path key collision.
 func (c *esStorageClient) docPath(key string) string {
 	return fmt.Sprintf("/%s/_doc/%s", c.index, url.PathEscape(key))
 }
@@ -241,12 +226,12 @@ func (c *esStorageClient) writeParams() map[string]string {
 // treated as success) and caches only success, so a transient failure is
 // retried on the next write rather than permanently disabling the client.
 func (c *esStorageClient) ensureIndex() error {
-	c.ensureMu.Lock()
-	defer c.ensureMu.Unlock()
+	c.ensuredMu.Lock()
+	defer c.ensuredMu.Unlock()
 	if c.ensured {
 		return nil
 	}
-	if err := ensureIndex(&c.ext.clientMu, c.ext.client, c.index, c.ext.cfg.Index); err != nil {
+	if err := ensureIndex(c.ext, c.index, c.ext.cfg.Index); err != nil {
 		return err
 	}
 	c.ensured = true

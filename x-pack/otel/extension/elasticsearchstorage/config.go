@@ -12,11 +12,9 @@ import (
 )
 
 // Config holds the extension configuration. The Elasticsearch connection
-// settings (hosts, credentials, TLS, ...) are captured verbatim into
-// ElasticsearchConfig via mapstructure's ",remain" and handed to
-// eslegclient unchanged. The typed fields below are extension-specific
-// knobs; all are optional and default to behaviour that matches the
-// original (pre-knob) client.
+// settings (hosts, credentials, TLS, ...) are captured into
+// ElasticsearchConfig via mapstructure's ",remain"; the typed fields are
+// all optional.
 type Config struct {
 	ElasticsearchConfig map[string]any `mapstructure:",remain"`
 
@@ -56,11 +54,8 @@ type RetryConfig struct {
 	MaxDelay    time.Duration `mapstructure:"max_delay"`    // default 5s
 }
 
-// createDefaultConfig returns the config with the extension-specific knobs
-// populated with their defaults, so the collector surfaces them (e.g. when
-// rendering effective config). The client accessors (encoding(), retryConfig())
-// apply the same defaults at use-time, so a programmatically-constructed config
-// that leaves these unset behaves identically.
+// createDefaultConfig returns the config with the extension-specific values
+// populated with their defaults.
 func createDefaultConfig() component.Config {
 	return &Config{
 		Encoding: "auto",
@@ -80,13 +75,13 @@ func (c *Config) Validate() error {
 	switch c.Encoding {
 	case "", "auto", "json", "bytes":
 	default:
-		return fmt.Errorf("elasticsearch_storage: invalid encoding %q (want \"auto\", \"json\", or \"bytes\")", c.Encoding)
+		return fmt.Errorf(`elasticsearch_storage: invalid encoding %q (want "auto", "json", or "bytes")`, c.Encoding)
 	}
 
 	switch c.Refresh {
 	case "", "false", "true", "wait_for":
 	default:
-		return fmt.Errorf("elasticsearch_storage: invalid refresh %q (want \"true\", \"false\", or \"wait_for\")", c.Refresh)
+		return fmt.Errorf(`elasticsearch_storage: invalid refresh %q (want "true", "false", or "wait_for")`, c.Refresh)
 	}
 
 	if c.Retry.MaxAttempts < 0 {
@@ -97,6 +92,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Retry.MaxDelay < 0 {
 		return fmt.Errorf("elasticsearch_storage: retry.max_delay must be >= 0, got %s", c.Retry.MaxDelay)
+	}
+	if c.Retry.MaxDelay > 0 && c.Retry.BaseDelay > c.Retry.MaxDelay {
+		return fmt.Errorf("elasticsearch_storage: retry.base_delay (%s) must not exceed retry.max_delay (%s)", c.Retry.BaseDelay, c.Retry.MaxDelay)
 	}
 
 	// 0 means "use the default"; only negatives are invalid.

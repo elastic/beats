@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -54,6 +52,12 @@ func TestConfig_Unmarshal_RoutesKnobsAndConnection(t *testing.T) {
 	assert.NotContains(t, cfg.ElasticsearchConfig, "retry")
 
 	require.NoError(t, cfg.Validate())
+}
+
+func TestConfig_Validate_RejectsBaseDelayAboveMaxDelay(t *testing.T) {
+	c := createDefaultConfig().(*Config)
+	c.Retry.BaseDelay = 10 * time.Second // default max_delay is 5s
+	assert.Error(t, c.Validate(), "base_delay above max_delay must be rejected")
 }
 
 func TestConfig_Validate_RejectsNegativeIndexCounts(t *testing.T) {

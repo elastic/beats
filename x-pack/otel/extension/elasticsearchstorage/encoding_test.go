@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package elasticsearchstorage
 
 import (
@@ -59,9 +57,10 @@ func TestEncodeValue_JSONVerbatim_NoReserialization(t *testing.T) {
 }
 
 func TestEncodeValue_LargeInt64_PreservedExactly(t *testing.T) {
-	// A value > 2^53 would lose precision through a float64 round-trip. The
-	// verbatim json branch avoids that.
-	const large int64 = 9_000_000_000_000_000_001
+	// 2^53+1 is the smallest positive integer not representable in float64,
+	// so it would lose precision through a float64 round-trip. The verbatim
+	// json branch avoids that.
+	const large int64 = 1<<53 + 1
 	in := []byte(fmt.Sprintf(`{"big":%d}`, large))
 	got, enc := roundTrip(t, in, "auto")
 	assert.Equal(t, encJSON, enc)

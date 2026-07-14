@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 //go:build integration
 
 package elasticsearchstorage
@@ -42,8 +40,8 @@ func refreshIndex(t *testing.T, ext *elasticStorage, c storage.Client) {
 	require.NoError(t, err)
 }
 
-// walker type-asserts the client to storage.Walker, the single enumeration
-// face the client exposes.
+// walker type-asserts the client to storage.Walker, the only enumeration
+// method the client exposes.
 func walker(t *testing.T, c storage.Client) storage.Walker {
 	t.Helper()
 	w, ok := c.(storage.Walker)
@@ -65,17 +63,15 @@ func TestESClient_Walk_Empty(t *testing.T) {
 }
 
 func TestESClient_Walk_PaginatesAllEntries(t *testing.T) {
-	// Shrink the page size so we exercise multi-page pagination without
-	// writing 1000+ docs.
-	origPageSize := enumeratePageSize
-	enumeratePageSize = 10
-	t.Cleanup(func() { enumeratePageSize = origPageSize })
-
 	ext := newTestExtension(t)
 	ctx := context.Background()
 	c := newTestClientNamed(t, ext, "walk_full")
 
-	n := enumeratePageSize + 5
+	// Shrink the page size so we exercise multi-page pagination without
+	// writing 1000+ docs.
+	c.(*esStorageClient).pageSize = 10
+
+	n := 15
 	want := make(map[string]string, n)
 	for i := 0; i < n; i++ {
 		key := fmt.Sprintf("k-%d", i)
