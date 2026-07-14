@@ -64,9 +64,9 @@ type config struct {
 	// of accepted origins.
 	ResourceOrigins []string `config:"resource_origins"`
 	// UserAgent overrides the default User-Agent header sent on
-	// all outbound HTTP requests (discover, firehose, session
-	// refresh, and OAuth2 token fetch). When empty, the Elastic
-	// Agent's built-in user agent string is used.
+	// all outbound CrowdStrike HTTP requests (discover, firehose,
+	// session refresh, and OAuth2 token fetch). When empty, the
+	// Elastic Agent's built-in user agent string is used.
 	UserAgent string `config:"user_agent"`
 }
 
