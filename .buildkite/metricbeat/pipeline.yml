@@ -243,6 +243,11 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        env:
+          # Print kind's stderr (kind.go discards it unless mage runs verbose) so
+          # the "kind create cluster ... failed with exit code 2" failure surfaces
+          # the actual error under fips140=only.
+          MAGEFILE_VERBOSE: "true"
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
