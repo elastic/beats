@@ -363,6 +363,7 @@ func TestFIPSVerifyServerConnectionDynamicCAs(t *testing.T) {
 	reloader, err := NewCAReloader(
 		[]string{filepath.Join("testdata", "ca.crt")},
 		0,
+		logptest.NewTestingLogger(t, ""),
 	)
 	require.NoError(t, err)
 	require.True(t, reloader.IsDynamic())

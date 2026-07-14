@@ -78,7 +78,7 @@ func WithDisableLegacyPEMSupport(disable bool) CertReloaderOption {
 // NewCertReloader creates a CertReloader for the given cert and key file paths.
 // It performs an initial load of the certificate pair, returning an error if the
 // initial load fails.
-func NewCertReloader(certPath, keyPath string, opts ...CertReloaderOption) (*CertReloader, error) {
+func NewCertReloader(certPath, keyPath string, logger *logp.Logger, opts ...CertReloaderOption) (*CertReloader, error) {
 	if certPath == "" || keyPath == "" {
 		return nil, fmt.Errorf("certificate and key paths must be non-empty")
 	}
@@ -93,7 +93,7 @@ func NewCertReloader(certPath, keyPath string, opts ...CertReloaderOption) (*Cer
 		certPath:       certPath,
 		keyPath:        keyPath,
 		reloadInterval: defaultReloadInterval,
-		log:            logp.NewLogger("tls"),
+		log:            logger.Named("tls"),
 	}
 	for _, opt := range opts {
 		opt(r)

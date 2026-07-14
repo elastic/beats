@@ -31,10 +31,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const logSelector = "tls"
-
 // LoadCertificate will load a certificate from disk and return a tls.Certificate or error
-func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
+func LoadCertificate(config *CertificateConfig, logger *logp.Logger) (*tls.Certificate, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -45,7 +43,7 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 		return nil, nil
 	}
 
-	log := logp.NewLogger(logSelector)
+	log := logger.Named("tls")
 	passphrase, err := config.resolvePassphrase()
 	if err != nil {
 		return nil, err
@@ -157,14 +155,14 @@ func readPEMFile(log *logp.Logger, s, passphrase string, disableLegacy bool) ([]
 }
 
 // LoadCertificateAuthorities read the slice of CAcert and return a Certpool.
-func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
+func LoadCertificateAuthorities(CAs []string, logger *logp.Logger) (*x509.CertPool, []error) {
 	errors := []error{}
 
 	if len(CAs) == 0 {
 		return nil, nil
 	}
 
-	log := logp.NewLogger(logSelector)
+	log := logger.Named("tls")
 	roots := x509.NewCertPool()
 	for _, s := range CAs {
 		r, err := NewPEMReader(s)

@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/testing/certutil"
 )
 
@@ -44,7 +45,7 @@ func TestNewCAReloader_ValidCA(t *testing.T) {
 	dir := t.TempDir()
 	caPath := writeCAFile(t, dir, "ca.pem")
 
-	r, err := NewCAReloader([]string{caPath}, 5*time.Second)
+	r, err := NewCAReloader([]string{caPath}, 5*time.Second, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	pool := r.GetCertPool()
@@ -56,17 +57,17 @@ func TestNewCAReloader_InvalidCA(t *testing.T) {
 	path := filepath.Join(dir, "bad.pem")
 	require.NoError(t, os.WriteFile(path, []byte("not a cert"), 0o600))
 
-	_, err := NewCAReloader([]string{path}, 5*time.Second)
+	_, err := NewCAReloader([]string{path}, 5*time.Second, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
 func TestNewCAReloader_MissingFile(t *testing.T) {
-	_, err := NewCAReloader([]string{"/nonexistent/ca.pem"}, 5*time.Second)
+	_, err := NewCAReloader([]string{"/nonexistent/ca.pem"}, 5*time.Second, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
 func TestNewCAReloader_EmptyPaths(t *testing.T) {
-	_, err := NewCAReloader([]string{}, 5*time.Second)
+	_, err := NewCAReloader([]string{}, 5*time.Second, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
@@ -74,7 +75,7 @@ func TestCAReloader_ReloadsAfterInterval(t *testing.T) {
 	dir := t.TempDir()
 	caPath := writeCAFile(t, dir, "ca.pem")
 
-	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond)
+	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	initialPool := r.GetCertPool()
@@ -95,7 +96,7 @@ func TestCAReloader_InvalidNewCA_KeepsOld(t *testing.T) {
 	dir := t.TempDir()
 	caPath := writeCAFile(t, dir, "ca.pem")
 
-	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond)
+	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	initialPool := r.GetCertPool()
@@ -115,7 +116,7 @@ func TestCAReloader_NoReloadBeforeInterval(t *testing.T) {
 	dir := t.TempDir()
 	caPath := writeCAFile(t, dir, "ca.pem")
 
-	r, err := NewCAReloader([]string{caPath}, 1*time.Hour)
+	r, err := NewCAReloader([]string{caPath}, 1*time.Hour, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	initialPool := r.GetCertPool()
@@ -133,7 +134,7 @@ func TestCAReloader_PartialReloadFailure_UsesSuccessfulCAs(t *testing.T) {
 	caPath1 := writeCAFile(t, dir, "ca1.pem")
 	caPath2 := writeCAFile(t, dir, "ca2.pem")
 
-	r, err := NewCAReloader([]string{caPath1, caPath2}, 100*time.Millisecond)
+	r, err := NewCAReloader([]string{caPath1, caPath2}, 100*time.Millisecond, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	initialPool := r.GetCertPool()
@@ -154,7 +155,7 @@ func TestCAReloader_TotalReloadFailure_KeepsOldPool(t *testing.T) {
 	dir := t.TempDir()
 	caPath := writeCAFile(t, dir, "ca.pem")
 
-	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond)
+	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	initialPool := r.GetCertPool()
@@ -175,7 +176,7 @@ func TestCAReloader_AddTrustedCert_SurvivesReload(t *testing.T) {
 	dir := t.TempDir()
 	caPath := writeCAFile(t, dir, "ca.pem")
 
-	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond)
+	r, err := NewCAReloader([]string{caPath}, 100*time.Millisecond, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	// Generate a separate CA cert and add it via AddTrustedCert.
@@ -207,7 +208,7 @@ func TestCAReloader_AddTrustedCert_Deduplicates(t *testing.T) {
 	dir := t.TempDir()
 	caPath := writeCAFile(t, dir, "ca.pem")
 
-	r, err := NewCAReloader([]string{caPath}, 1*time.Hour)
+	r, err := NewCAReloader([]string{caPath}, 1*time.Hour, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	_, _, pair, err := certutil.NewRootCA()
@@ -232,7 +233,7 @@ func TestCAReloader_InlinePEM(t *testing.T) {
 	require.NoError(t, err)
 
 	// Pass the PEM directly as an inline string (starts with "-").
-	r, err := NewCAReloader([]string{string(pair.Cert)}, 5*time.Second)
+	r, err := NewCAReloader([]string{string(pair.Cert)}, 5*time.Second, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	pool := r.GetCertPool()

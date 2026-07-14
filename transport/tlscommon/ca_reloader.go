@@ -50,7 +50,7 @@ type CAReloader struct {
 // strings are also accepted and will be included on every reload (they never
 // change, but are needed to build a complete pool). An initial load is
 // performed; an error is returned only if no CA could be loaded at all.
-func NewCAReloader(caPaths []string, reloadInterval time.Duration) (*CAReloader, error) {
+func NewCAReloader(caPaths []string, reloadInterval time.Duration, logger *logp.Logger) (*CAReloader, error) {
 	if len(caPaths) == 0 {
 		return nil, fmt.Errorf("at least one CA path must be provided")
 	}
@@ -62,10 +62,10 @@ func NewCAReloader(caPaths []string, reloadInterval time.Duration) (*CAReloader,
 	r := &CAReloader{
 		caPaths:        caPaths,
 		reloadInterval: reloadInterval,
-		log:            logp.NewLogger("tls"),
+		log:            logger.Named("tls"),
 	}
 
-	pool, errs := LoadCertificateAuthorities(r.caPaths)
+	pool, errs := LoadCertificateAuthorities(r.caPaths, logger)
 	if len(errs) == len(r.caPaths) {
 		return nil, fmt.Errorf("initial CA load failed, none of the %d CA(s) could be loaded: %v", len(r.caPaths), errs)
 	}
@@ -96,7 +96,7 @@ func (r *CAReloader) GetCertPool() *x509.CertPool {
 
 	r.nextReload = time.Now().Add(r.reloadInterval)
 
-	pool, errs := LoadCertificateAuthorities(r.caPaths)
+	pool, errs := LoadCertificateAuthorities(r.caPaths, r.log)
 	if len(errs) == len(r.caPaths) {
 		r.log.Warnf("CA reload failed for all %d CA(s), keeping previous pool: %v", len(r.caPaths), errs)
 		return r.pool

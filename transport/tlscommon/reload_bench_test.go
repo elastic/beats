@@ -73,7 +73,7 @@ func BenchmarkCertLoad(b *testing.B) {
 		b.ReportAllocs()
 		var sink *tls.Certificate
 		for i := 0; i < b.N; i++ {
-			cert, err := LoadCertificate(cfg)
+			cert, err := LoadCertificate(cfg, logp.NewNopLogger())
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -86,7 +86,7 @@ func BenchmarkCertLoad(b *testing.B) {
 		b.ReportAllocs()
 		var sink *CertReloader
 		for i := 0; i < b.N; i++ {
-			r, err := NewCertReloader(certPath, keyPath)
+			r, err := NewCertReloader(certPath, keyPath, logp.NewNopLogger())
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -105,7 +105,7 @@ func BenchmarkCAPoolLoad(b *testing.B) {
 		b.ReportAllocs()
 		var sink *staticCertPool
 		for i := 0; i < b.N; i++ {
-			pool, errs := LoadCertificateAuthorities(caPaths)
+			pool, errs := LoadCertificateAuthorities(caPaths, logp.NewNopLogger())
 			if len(errs) > 0 {
 				b.Fatal(errs)
 			}
@@ -118,7 +118,7 @@ func BenchmarkCAPoolLoad(b *testing.B) {
 		b.ReportAllocs()
 		var sink *CAReloader
 		for i := 0; i < b.N; i++ {
-			r, err := NewCAReloader(caPaths, time.Hour)
+			r, err := NewCAReloader(caPaths, time.Hour, logp.NewNopLogger())
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -136,7 +136,7 @@ func BenchmarkLoadTLSConfig(b *testing.B) {
 	dir := b.TempDir()
 	caPath := writeCAFile(b, dir, "ca.pem")
 	certPath, keyPath := writeKeyAndCertFiles(b, dir)
-	logger := logp.NewLogger("bench")
+	logger := logp.NewNopLogger()
 
 	disabled, enabled := false, true
 
@@ -175,7 +175,7 @@ func BenchmarkLoadTLSServerConfig(b *testing.B) {
 	dir := b.TempDir()
 	caPath := writeCAFile(b, dir, "ca.pem")
 	certPath, keyPath := writeKeyAndCertFiles(b, dir)
-	logger := logp.NewLogger("bench")
+	logger := logp.NewNopLogger()
 
 	disabled, enabled := false, true
 
@@ -218,7 +218,7 @@ func BenchmarkLoadTLSServerConfig(b *testing.B) {
 func BenchmarkCertReloader_GetCertificate_WithinInterval(b *testing.B) {
 	dir := b.TempDir()
 	certPath, keyPath := writeKeyAndCertFiles(b, dir)
-	r, err := NewCertReloader(certPath, keyPath, WithReloadInterval(time.Hour))
+	r, err := NewCertReloader(certPath, keyPath, logp.NewNopLogger(), WithReloadInterval(time.Hour))
 	if err != nil {
 		b.Fatalf("creating cert reloader: %v", err)
 	}
@@ -236,7 +236,7 @@ func BenchmarkCertReloader_GetCertificate_WithinInterval(b *testing.B) {
 func BenchmarkCAReloader_GetCertPool_WithinInterval(b *testing.B) {
 	dir := b.TempDir()
 	caPath := writeCAFile(b, dir, "ca.pem")
-	r, err := NewCAReloader([]string{caPath}, time.Hour)
+	r, err := NewCAReloader([]string{caPath}, time.Hour, logp.NewNopLogger())
 	if err != nil {
 		b.Fatalf("creating CA reloader: %v", err)
 	}
@@ -256,7 +256,7 @@ func BenchmarkCAReloader_GetCertPool_WithinInterval(b *testing.B) {
 func BenchmarkCertReloader_GetCertificate_ReloadEveryCall(b *testing.B) {
 	dir := b.TempDir()
 	certPath, keyPath := writeKeyAndCertFiles(b, dir)
-	r, err := NewCertReloader(certPath, keyPath, WithReloadInterval(time.Nanosecond))
+	r, err := NewCertReloader(certPath, keyPath, logp.NewNopLogger(), WithReloadInterval(time.Nanosecond))
 	if err != nil {
 		b.Fatalf("creating cert reloader: %v", err)
 	}
@@ -274,7 +274,7 @@ func BenchmarkCertReloader_GetCertificate_ReloadEveryCall(b *testing.B) {
 func BenchmarkCAReloader_GetCertPool_ReloadEveryCall(b *testing.B) {
 	dir := b.TempDir()
 	caPath := writeCAFile(b, dir, "ca.pem")
-	r, err := NewCAReloader([]string{caPath}, time.Nanosecond)
+	r, err := NewCAReloader([]string{caPath}, time.Nanosecond, logp.NewNopLogger())
 	if err != nil {
 		b.Fatalf("creating CA reloader: %v", err)
 	}
@@ -302,7 +302,7 @@ func BenchmarkTLSConfigMemoryFootprint(b *testing.B) {
 	dir := b.TempDir()
 	caPath := writeCAFile(b, dir, "ca.pem")
 	certPath, keyPath := writeKeyAndCertFiles(b, dir)
-	logger := logp.NewLogger("bench")
+	logger := logp.NewNopLogger()
 	disabled, enabled := false, true
 
 	run := func(b *testing.B, reload CertificateReload) {
@@ -369,7 +369,7 @@ func BenchmarkCertReloader_HeapAfterManyReloadCycles(b *testing.B) {
 	certPath, keyPath := writeKeyAndCertFiles(b, dir)
 
 	for i := 0; i < b.N; i++ {
-		r, err := NewCertReloader(certPath, keyPath, WithReloadInterval(time.Nanosecond))
+		r, err := NewCertReloader(certPath, keyPath, logp.NewNopLogger(), WithReloadInterval(time.Nanosecond))
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -407,7 +407,7 @@ func BenchmarkCAReloader_HeapAfterManyReloadCycles(b *testing.B) {
 	caPath := writeCAFile(b, dir, "ca.pem")
 
 	for i := 0; i < b.N; i++ {
-		r, err := NewCAReloader([]string{caPath}, time.Nanosecond)
+		r, err := NewCAReloader([]string{caPath}, time.Nanosecond, logp.NewNopLogger())
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -453,11 +453,11 @@ func setupBenchEndpoints(b *testing.B, n int) []benchEndpoint {
 		}
 		certPath, keyPath := writeKeyAndCertFiles(b, dir)
 		caPath := writeCAFile(b, dir, "ca.pem")
-		certReloader, err := NewCertReloader(certPath, keyPath, WithReloadInterval(time.Nanosecond))
+		certReloader, err := NewCertReloader(certPath, keyPath, logp.NewNopLogger(), WithReloadInterval(time.Nanosecond))
 		if err != nil {
 			b.Fatalf("creating cert reloader for endpoint %d: %v", i, err)
 		}
-		caReloader, err := NewCAReloader([]string{caPath}, time.Nanosecond)
+		caReloader, err := NewCAReloader([]string{caPath}, time.Nanosecond, logp.NewNopLogger())
 		if err != nil {
 			b.Fatalf("creating CA reloader for endpoint %d: %v", i, err)
 		}

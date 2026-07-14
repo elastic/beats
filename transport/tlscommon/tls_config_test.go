@@ -325,7 +325,7 @@ func TestTrustRootCA_WithCAReloader(t *testing.T) {
 		Bytes: certs["ca"].Raw,
 	}), 0o600))
 
-	reloader, err := NewCAReloader([]string{caPath}, 1*time.Hour)
+	reloader, err := NewCAReloader([]string{caPath}, 1*time.Hour, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	cfg := TLSConfig{
