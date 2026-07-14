@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -267,7 +268,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry(b.Info.Logger, b.Info.Paths))
+			gzipRegistry(b.Info.Logger, b.Info.Paths),
+		)
 	}
 
 	if !fb.moduleRegistry.Empty() {
