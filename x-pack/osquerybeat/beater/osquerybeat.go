@@ -592,7 +592,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
-		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, meta, hits, qi.ECSMapping, nil)
+		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, meta, hits, qi.ECSMapping, nil)
 	}
 
 	if res.Action == "snapshot" {
@@ -630,7 +630,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		}
 	}
 
-	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
+	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
 }
 
 func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]interface{} {
