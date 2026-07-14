@@ -270,10 +270,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
-<<<<<<< HEAD
 
-=======
->>>>>>> 00068f796 (managerEarlyStop before runReady close (#51864))
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
@@ -290,7 +287,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry(b.Info.Logger, b.Info.Paths))
+			gzipRegistry(b.Info.Logger, b.Info.Paths),
+		)
 	}
 
 	if !fb.moduleRegistry.Empty() {
