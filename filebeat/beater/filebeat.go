@@ -306,6 +306,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 	}()
 
+	// Close runReady so that Stop does not block waiting for Run to reach its
+	// ready state, regardless of how Run exits. This must be deferred after
+	// the managerEarlyStop defer above so that it runs first in LIFO order:
+	// managerEarlyStop calls Stop, which waits on runReady.ch, so runReady
+	// must be closed before Stop is called to avoid a 5-second timeout on
+	// every early-exit error path.
+	defer fb.runReady.Close()
+
 	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
