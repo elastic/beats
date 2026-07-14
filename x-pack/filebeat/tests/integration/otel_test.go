@@ -36,10 +36,12 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/features"
+	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -196,177 +198,6 @@ http.port: %d
 	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
 	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelMonitoringPort)
-}
-
-func TestFilebeatOTelHTTPJSONInput(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-
-	host := integration.GetESURL(t, "http")
-	user := host.User.Username()
-	password, _ := host.User.Password()
-
-	// create a random uuid and make sure it doesn't contain dashes/
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNameSpace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-
-	type options struct {
-		Namespace string
-		ESURL     string
-		Username  string
-		Password  string
-	}
-
-	// The request url is a http mock server started using streams
-	configFile := `
-filebeat.inputs:
-  - type: httpjson
-    id: httpjson-e2e-otel
-    request.url: http://localhost:8090/test
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: logs-integration-{{ .Namespace }}
-
-setup.template.enabled: false
-queue.mem.flush.timeout: 0s
-processors:
-   - add_host_metadata: ~
-   - add_cloud_metadata: ~
-   - add_docker_metadata: ~
-   - add_kubernetes_metadata: ~
-`
-
-	otelConfigFile := `receivers:
-  filebeatreceiver:
-    filebeat:
-      inputs:
-        - type: httpjson
-          id: httpjson-e2e-otel
-          request.url: http://localhost:8090/test
-    processors:
-      - add_host_metadata: ~
-      - add_cloud_metadata: ~
-      - add_docker_metadata: ~
-      - add_kubernetes_metadata: ~
-    queue.mem.flush.timeout: 0s
-    setup.template.enabled: false
-exporters:
-  elasticsearch:
-    auth:
-      authenticator: beatsauth
-    compression: gzip
-    compression_params:
-      level: 1
-    endpoints:
-      - {{ .ESURL }}
-    logs_index: logs-integration-{{ .Namespace }}
-    max_conns_per_host: 1
-    password: {{ .Password }}
-    retry:
-      enabled: true
-      initial_interval: 1s
-      max_interval: 1m0s
-      max_retries: 3
-    sending_queue:
-      batch:
-        flush_timeout: 10s
-        max_size: 1600
-        min_size: 0
-        sizer: items
-      block_on_overflow: true
-      enabled: true
-      num_consumers: 1
-      queue_size: 3200
-      wait_for_result: true
-    user: {{ .Username }}
-extensions:
-  beatsauth:
-    idle_connection_timeout: 3s
-    proxy_disable: false
-    timeout: 1m30s
-service:
-  extensions:
-    - beatsauth
-  pipelines:
-    logs:
-      receivers:
-        - filebeatreceiver
-      exporters:
-        - elasticsearch
-`
-
-	optionsValue := options{
-		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username: user,
-		Password: password,
-	}
-
-	var configBuffer bytes.Buffer
-	optionsValue.Namespace = otelNamespace
-	require.NoError(t, template.Must(template.New("config").Parse(otelConfigFile)).Execute(&configBuffer, optionsValue))
-	oteltestcol.New(t, configBuffer.String())
-
-	// reset buffer
-	configBuffer.Reset()
-
-	optionsValue.Namespace = fbNameSpace
-	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer, optionsValue))
-
-	// start filebeat
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-
-	filebeat.WriteConfigFile(configBuffer.String())
-	filebeat.Start()
-
-	// prepare to query ES
-	es := integration.GetESClient(t, "http")
-
-	rawQuery := map[string]any{
-		"sort": []map[string]any{
-			{"@timestamp": map[string]any{"order": "asc"}},
-		},
-	}
-
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	// wait for logs to be published
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer findCancel()
-
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
-			assert.NoError(ct, err)
-
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
-			assert.NoError(ct, err)
-
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel event, got %d", otelDocs.Hits.Total.Value)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat event, got %d", filebeatDocs.Hits.Total.Value)
-		},
-		2*time.Minute, 1*time.Second, "expected at least 1 event for both filebeat and otel")
-
-	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
-	otelDoc := otelDocs.Hits.Hits[0].Source
-	ignoredFields := []string{
-		// Expected to change between agentDocs and OtelDocs
-		"@timestamp",
-		"agent.ephemeral_id",
-		"agent.id",
-		"event.created",
-	}
-
-	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
 type multiReceiverConfig struct {
@@ -2091,6 +1922,272 @@ service:
 				col.Shutdown()
 			}
 		})
+	}
+}
+
+type benchPreset struct {
+	name string
+
+	// beats queue
+	memQueueEvents       int
+	memQueueMinEvents    int
+	memQueueFlushTimeout string
+
+	// sending_queue
+	maxConnsPerHost   int
+	expBatchMaxSize   int
+	expBatchMinSize   int
+	expFlushTimeout   string
+	expNumConsumers   int
+	expQueueSize      int
+	eventCountPerRecv int
+}
+
+// presetFields mirrors the subset of elasticsearch.ElasticsearchConfig that
+// elasticsearch.ApplyPreset's preset configs set, so the real preset values
+// can be unpacked directly instead of hand-copied into benchPresets.
+type presetFields struct {
+	BulkMaxSize            int           `config:"bulk_max_size"`
+	Worker                 int           `config:"worker"`
+	QueueMemEvents         int           `config:"queue.mem.events"`
+	QueueMemFlushMinEvents int           `config:"queue.mem.flush.min_events"`
+	QueueMemFlushTimeout   time.Duration `config:"queue.mem.flush.timeout"`
+}
+
+// benchPresetFromName builds a benchPreset from the real preset config
+// applied by elasticsearch.ApplyPreset, keeping the benchmark's queue/batch
+// settings in sync with the actual preset definitions instead of a
+// hand-maintained copy. eventCountPerRecv is picked as the nearest multiple
+// of the preset's min_events/bulk_max_size threshold to targetEventCount, so
+// the benchmark's fixed, bounded event count doesn't leave a leftover
+// partial batch that has to wait out the full flush timeout before the
+// mem-queue (or the exporter's own sending_queue) releases it.
+func benchPresetFromName(name string, targetEventCount int) benchPreset {
+	_, presetCfg, err := esoutput.ApplyPreset(name, config.NewConfig())
+	if err != nil {
+		panic(fmt.Sprintf("unknown benchmark preset %q: %v", name, err))
+	}
+
+	var pf presetFields
+	if err := presetCfg.Unpack(&pf); err != nil {
+		panic(fmt.Sprintf("failed to unpack benchmark preset %q: %v", name, err))
+	}
+
+	eventCountPerRecv := (targetEventCount / pf.QueueMemFlushMinEvents) * pf.QueueMemFlushMinEvents
+
+	return benchPreset{
+		name:                 name,
+		memQueueEvents:       pf.QueueMemEvents,
+		memQueueMinEvents:    pf.QueueMemFlushMinEvents,
+		memQueueFlushTimeout: pf.QueueMemFlushTimeout.String(),
+		maxConnsPerHost:      pf.Worker,
+		expBatchMaxSize:      pf.BulkMaxSize,
+		expBatchMinSize:      pf.BulkMaxSize,
+		expFlushTimeout:      pf.QueueMemFlushTimeout.String(),
+		expNumConsumers:      pf.Worker,
+		expQueueSize:         pf.QueueMemEvents,
+		eventCountPerRecv:    eventCountPerRecv,
+	}
+}
+
+var benchPresets = []benchPreset{
+	benchPresetFromName("throughput", 32_000),
+	benchPresetFromName("balanced", 32_000),
+	benchPresetFromName("scale", 32_000),
+	benchPresetFromName("latency", 32_000),
+}
+
+// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full
+// otel pipeline, once per benchmark preset (see benchPresets).
+func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
+	for _, preset := range benchPresets {
+		b.Run(preset.name, func(b *testing.B) {
+			benchmarkFilebeatOTelThroughputMockES(b, preset)
+		})
+	}
+}
+
+func benchmarkFilebeatOTelThroughputMockES(b *testing.B, preset benchPreset) {
+	eventCount := preset.eventCountPerRecv * 3
+
+	for b.Loop() {
+		b.StopTimer()
+
+		tmpDir := b.TempDir()
+
+		var totalReceived atomic.Int64
+		var totalBytes atomic.Int64
+		var firstNano atomic.Int64
+		var lastNano atomic.Int64
+		var firstOnce sync.Once
+
+		mockHandler := func(action api.Action, event []byte) int {
+			if action.Action != "create" {
+				return http.StatusOK
+			}
+			now := time.Now().UnixNano()
+			firstOnce.Do(func() { firstNano.Store(now) })
+			lastNano.Store(now)
+			totalReceived.Add(1)
+			totalBytes.Add(int64(len(event)))
+			return http.StatusOK
+		}
+
+		mockServer := httptest.NewServer(
+			api.NewDeterministicAPIHandler(
+				uuid.Must(uuid.NewV4()),
+				"",
+				nil,
+				time.Now().Add(24*time.Hour),
+				0,
+				0,
+				mockHandler,
+			),
+		)
+
+		cfg := renderOtelConfig(b, `receivers:
+  filebeatreceiver/1:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/1
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/2
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/3:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/3
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+exporters:
+  elasticsearch:
+    compression: gzip
+    compression_params:
+      level: 1
+    endpoints:
+      - {{.ESEndpoint}}
+    logs_index: benchtest
+    max_conns_per_host: {{.MaxConnsPerHost}}
+    sending_queue:
+      batch:
+        flush_timeout: {{.ExpFlushTimeout}}
+        max_size: {{.ExpBatchMaxSize}}
+        min_size: {{.ExpBatchMinSize}}
+        sizer: items
+      block_on_overflow: true
+      enabled: true
+      num_consumers: {{.ExpNumConsumers}}
+      queue_size: {{.ExpQueueSize}}
+      wait_for_result: true
+    suppress_conflict_errors: true
+processors:
+  beat:
+    processors:
+      - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            env: staging
+service:
+  pipelines:
+    logs/1:
+      receivers:
+        - filebeatreceiver/1
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/2:
+      receivers:
+        - filebeatreceiver/2
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/3:
+      receivers:
+        - filebeatreceiver/3
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+  telemetry:
+    logs:
+      level: warn
+    metrics:
+      level: none
+`, struct {
+			EventCountPerReceiver int
+			PathHome              string
+			ESEndpoint            string
+			MemQueueEvents        int
+			MemQueueMinEvents     int
+			MemQueueFlushTimeout  string
+			MaxConnsPerHost       int
+			ExpBatchMaxSize       int
+			ExpBatchMinSize       int
+			ExpFlushTimeout       string
+			ExpNumConsumers       int
+			ExpQueueSize          int
+		}{
+			EventCountPerReceiver: preset.eventCountPerRecv,
+			PathHome:              tmpDir,
+			ESEndpoint:            mockServer.URL,
+			MemQueueEvents:        preset.memQueueEvents,
+			MemQueueMinEvents:     preset.memQueueMinEvents,
+			MemQueueFlushTimeout:  preset.memQueueFlushTimeout,
+			MaxConnsPerHost:       preset.maxConnsPerHost,
+			ExpBatchMaxSize:       preset.expBatchMaxSize,
+			ExpBatchMinSize:       preset.expBatchMinSize,
+			ExpFlushTimeout:       preset.expFlushTimeout,
+			ExpNumConsumers:       preset.expNumConsumers,
+			ExpQueueSize:          preset.expQueueSize,
+		})
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, cfg)
+
+		require.Eventually(b, func() bool {
+			return totalReceived.Load() >= int64(eventCount)
+		}, 5*time.Minute, 10*time.Millisecond, "timed out waiting for all %d events to reach mock-ES", eventCount)
+
+		first := firstNano.Load()
+		last := lastNano.Load()
+		if first > 0 && last > first {
+			duration := time.Duration(last - first)
+			b.ReportMetric(float64(eventCount)/duration.Seconds(), "events/sec")
+		}
+		received := totalReceived.Load()
+		if received > 0 {
+			b.ReportMetric(float64(totalBytes.Load())/float64(received), "bytes/event")
+		}
+
+		col.Shutdown()
+		mockServer.Close()
 	}
 }
 

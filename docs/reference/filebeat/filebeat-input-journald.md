@@ -444,6 +444,12 @@ You can use the following translated names in filter expressions to reference jo
 `COREDUMP_USER_UNIT`
 :   `journald.coredump.user_unit`
 
+`MESSAGE`
+:   `message`
+
+`MESSAGE_ID`
+:   `message_id`
+
 `OBJECT_AUDIT_LOGINUID`
 :   `journald.object.audit.login_uid`
 
@@ -451,13 +457,13 @@ You can use the following translated names in filter expressions to reference jo
 :   `journald.object.audit.session`
 
 `OBJECT_CMDLINE`
-:   `journald.object.cmd`
+:   `journald.object.process.command_line`
 
 `OBJECT_COMM`
-:   `journald.object.name`
+:   `journald.object.process.name`
 
 `OBJECT_EXE`
-:   `journald.object.executable`
+:   `journald.object.process.executable`
 
 `OBJECT_GID`
 :   `journald.object.gid`
@@ -480,41 +486,56 @@ You can use the following translated names in filter expressions to reference jo
 `OBJECT_UID`
 :   `journald.object.uid`
 
+`PRIORITY`
+:   `log.syslog.priority`
+
+`SYSLOG_FACILITY`
+:   `log.syslog.facility.code`
+
+`SYSLOG_IDENTIFIER`
+:   `log.syslog.appname`
+
+`SYSLOG_PID`
+:   `log.syslog.procid`
+
+`UNIT`
+:   `journald.unit`
+
 `_AUDIT_LOGINUID`
-:   `process.audit.login_uid`
+:   `journald.audit.login_uid`
 
 `_AUDIT_SESSION`
-:   `process.audit.session`
+:   `journald.audit.session`
 
 `_BOOT_ID`
-:   `host.boot_id`
+:   `journald.host.boot_id`
 
 `_CAP_EFFECTIVE`
-:   `process.capabilites`
+:   `journald.process.capabilities`
 
 `_CMDLINE`
-:   `process.cmd`
+:   `journald.process.command_line`
 
-`_CODE_FILE`
+`CODE_FILE`
 :   `journald.code.file`
 
-`_CODE_FUNC`
+`CODE_FUNC`
 :   `journald.code.func`
 
-`_CODE_LINE`
+`CODE_LINE`
 :   `journald.code.line`
 
 `_COMM`
-:   `process.name`
+:   `journald.process.name`
 
 `_EXE`
-:   `process.executable`
+:   `journald.process.executable`
 
 `_GID`
-:   `process.uid`
+:   `journald.gid`
 
 `_HOSTNAME`
-:   `host.name`
+:   `host.hostname`
 
 `_KERNEL_DEVICE`
 :   `journald.kernel.device`
@@ -525,23 +546,8 @@ You can use the following translated names in filter expressions to reference jo
 `_MACHINE_ID`
 :   `host.id`
 
-`_MESSAGE`
-:   `message`
-
 `_PID`
-:   `process.pid`
-
-`_PRIORITY`
-:   `logs.syslog.priority`
-
-`_SYSLOG_FACILITY`
-:   `logs.syslog.facility.code`
-
-`_SYSLOG_IDENTIFIER`
-:   `logs.syslog.identifier.appname`
-
-`_SYSLOG_PID`
-:   `log.syslog.procid`
+:   `journald.pid`
 
 `_SYSTEMD_CGROUP`
 :   `systemd.cgroup`
@@ -580,7 +586,7 @@ You can use the following translated names in filter expressions to reference jo
 :   `journald.kernel.device_name`
 
 `_UID`
-:   `process.uid`
+:   `journald.uid`
 
 The following translated fields for [Docker](https://docs.docker.com/config/containers/logging/journald/) are also available:
 

@@ -134,6 +134,9 @@ func (l *runLoop[T]) runIteration() {
 		}
 		if force {
 			l.broker.ctxCancel()
+			// The ackLoop will stop, so no further acks fire: unblock any
+			// producer ack-wait channels still open.
+			l.broker.closeProducerAckWaits()
 		}
 
 	case <-l.broker.ctx.Done():
@@ -165,6 +168,10 @@ func (l *runLoop[T]) runIteration() {
 	// completely drained)
 	if l.closing && l.eventCount == 0 {
 		l.broker.ctxCancel()
+		// Drained gracefully: events were acked so most ackWaits closed on
+		// their own, but unblock any producer closed with never-acked (e.g.
+		// dropped) events so it can't strand a waiter.
+		l.broker.closeProducerAckWaits()
 	}
 }
 

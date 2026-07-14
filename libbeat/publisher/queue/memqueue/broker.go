@@ -53,6 +53,21 @@ type broker[T any] struct {
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
+	// ackWaitProducers tracks ack-tracking producers so their ACKWaitChan can
+	// be closed when the broker shuts down — after that the ackLoop delivers no
+	// further acks, so a producer closed with unacknowledged events would
+	// otherwise strand a waiter. Producers remove themselves once fully acked.
+	// Guarded by ackWaitMu.
+	//
+	// Note: this bookkeeping exists to satisfy the queue.Producer.ACKWaitChan
+	// contract for all queue implementations (issue #50103). The standalone
+	// (process) pipeline shutdown does not consume it — it waits on Queue.Done
+	// instead — so today it is exercised mainly by the shared-pool slabqueue
+	// path. It is kept here so the memory queue honors the same interface and
+	// is ready for callers that wait per-producer.
+	ackWaitMu        sync.Mutex
+	ackWaitProducers map[*ackProducer[T]]struct{}
+
 	// The factory used to create an event encoder when creating a producer
 	encoderFactory queue.EncoderFactory[T]
 
@@ -127,8 +142,17 @@ type batch[T any] struct {
 	start, count int
 
 	// batch.Done() sends to doneChan, where ackLoop reads it and handles
-	// acknowledgment / cleanup.
+	// acknowledgment / cleanup. batch.Release() also sends to doneChan
+	// but with batchDoneMsg.cancelled=true; ackLoop captures that flag
+	// here so processACK can skip the producer ACK callback while still
+	// freeing the underlying buffer slots.
 	doneChan chan batchDoneMsg
+
+	// cancelled is set by ackLoop when this batch was Released (abandoned)
+	// rather than Done'd. Read by processACK to skip the producer ACK
+	// callback while still counting the events for deletion from the ring
+	// buffer.
+	cancelled bool
 }
 
 type batchList[T any] struct {
@@ -207,7 +231,7 @@ func newQueue[T any](
 	}
 
 	if logger == nil {
-		logger = logp.NewLogger("memqueue")
+		logger = logp.NewLogger("memqueue") //nolint:forbidigo // fallback logger when the caller does not provide one.
 	} else {
 		logger = logger.Named("memqueue")
 	}
@@ -229,8 +253,10 @@ func newQueue[T any](
 		consumedChan: make(chan batchList[T]),
 		deleteChan:   make(chan int),
 		closingChan:  make(chan struct{}),
+
+		ackWaitProducers: make(map[*ackProducer[T]]struct{}),
 	}
-	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
+	b.ctx, b.ctxCancel = context.WithCancel(context.Background()) //nolint:gosec // G118 false positive: ctxCancel is stored on the broker and called during shutdown.
 
 	b.runLoop = newRunLoop(b, observer)
 	b.ackLoop = newACKLoop(b)
@@ -272,6 +298,36 @@ func (b *broker[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
 		encoder = b.encoderFactory()
 	}
 	return newProducer(b, cfg.ACK, encoder)
+}
+
+// registerProducer adds an ack-tracking producer to the shutdown fan-out set.
+func (b *broker[T]) registerProducer(p *ackProducer[T]) {
+	b.ackWaitMu.Lock()
+	b.ackWaitProducers[p] = struct{}{}
+	b.ackWaitMu.Unlock()
+}
+
+// unregisterProducer removes a producer from the shutdown fan-out set, called
+// once its ackWait has been closed by its own ack accounting.
+func (b *broker[T]) unregisterProducer(p *ackProducer[T]) {
+	b.ackWaitMu.Lock()
+	delete(b.ackWaitProducers, p)
+	b.ackWaitMu.Unlock()
+}
+
+// closeProducerAckWaits closes the ackWait channel of every still-registered
+// producer. Called when the queue is shutting down and the ackLoop will
+// deliver no further acks, so a producer closed with unacknowledged events
+// does not strand a waiter. Snapshots under the lock and closes outside it.
+func (b *broker[T]) closeProducerAckWaits() {
+	b.ackWaitMu.Lock()
+	producers := b.ackWaitProducers
+	b.ackWaitProducers = make(map[*ackProducer[T]]struct{})
+	b.ackWaitMu.Unlock()
+
+	for p := range producers {
+		p.forceCloseAckWait()
+	}
 }
 
 func (b *broker[T]) Get(count int) (queue.Batch[T], error) {
@@ -404,4 +460,26 @@ func (b *batch[T]) FreeEntries() {
 
 func (b *batch[T]) Done() {
 	b.doneChan <- batchDoneMsg{}
+}
+
+// Release signals that the consumer is abandoning this batch — used by the
+// pipeline on shutdown when a batch has been read from the queue but
+// cannot be delivered. It removes the batch from ackLoop's pending list
+// (so subsequent batches' ACKs are not stalled behind it) and frees the
+// in-buffer slots, but does NOT fire producer ACK callbacks. This matches
+// memqueue's existing behaviour for batches abandoned by the consumer
+// not calling Done at all — except by making it explicit we also unblock
+// the ackLoop, which otherwise would sit forever on this batch's
+// doneChan and stall every batch queued behind it.
+//
+// Caller contract — IMPORTANT: see queue.Batch.Release. Release must
+// only be invoked when no further batches from the same producer will
+// be Done()'d; in this repo that means it is only safe from a
+// pipeline-wide shutdown path. Calling Release mid-flight leaves a
+// hole in the producer's ACK accounting (lastACK is not advanced past
+// the abandoned producer IDs by design, so a subsequent Done from the
+// same producer would over-count and falsely advance the input
+// registry).
+func (b *batch[T]) Release() {
+	b.doneChan <- batchDoneMsg{cancelled: true}
 }

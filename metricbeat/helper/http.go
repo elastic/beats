@@ -28,16 +28,12 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 
 	"k8s.io/client-go/transport"
 
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
-
-var userAgent = useragent.UserAgent("Metricbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.
@@ -60,11 +56,15 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	return NewHTTPFromConfig(config, base.HostData(), base.Logger())
+	userAgent := ""
+	if ua, ok := base.Module().(interface{ UserAgent() string }); ok {
+		userAgent = ua.UserAgent()
+	}
+	return NewHTTPFromConfig(config, base.HostData(), base.Logger(), userAgent)
 }
 
 // NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
-func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger) (*HTTP, error) {
+func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger, userAgent string) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
