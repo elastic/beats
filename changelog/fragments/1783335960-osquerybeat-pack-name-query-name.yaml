@@ -17,14 +17,13 @@ summary: Emit pack_name and query_name in osquerybeat scheduled query results
 # this field accommodate a description without length limits.
 # NOTE: This field will be rendered only for breaking-change and known-issue kinds at the moment.
 description: |
-  Scheduled pack queries (both osquery native interval schedules and osquerybeat
-  RRULE schedules) now include two additional fields in their result and response
-  documents: pack_name, taken from the new optional `pack_name` config field on a
-  pack (alongside the existing pack_id), and query_name, taken from the pack's
-  queries config map key. Both fields are only emitted when set. These fields are
-  required by the Osquery Manager dashboards, which group and label scheduled
-  query results by pack and query name; without them the dashboards cannot render
-  those results correctly.
+  Scheduled pack queries now include two additional fields in their result and
+  response documents: pack_name, taken from the new optional `pack_name` config
+  field on a pack (alongside the existing pack_id), and query_name, taken from
+  the pack's queries config map key. Both fields are only emitted when set.
+  These fields are required by the Osquery Manager dashboards, which group and
+  label scheduled query results by pack and query name; without them the
+  dashboards cannot render those results correctly.
 
 # Affected component; a word indicating the component this changeset affects.
 component: osquerybeat

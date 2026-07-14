@@ -43,18 +43,12 @@ type QueryInfo struct {
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
 	Interval int
 	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
-<<<<<<< HEAD
-	PackID  string
-	Profile bool // whether to collect and publish profile for this query
-=======
 	PackID string
 	// PackName is the policy-defined human-readable pack name for pack queries; empty for top-level schedule queries.
 	PackName string
 	// QueryName is the query's config map key (pack query name or top-level schedule name).
 	QueryName string
-	// Profile is whether to collect and publish profile for this query.
-	Profile bool
->>>>>>> 5d82c7117 (Osquerybeat: emit pack_name and query_name in scheduled query results (#51781))
+	Profile   bool // whether to collect and publish profile for this query
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -262,13 +256,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
 			PackID:     packID,
-<<<<<<< HEAD
-			Profile:    qi.Profile,
-=======
 			PackName:   packName,
 			QueryName:  queryName,
-			Profile:    config.ResolveProfiling(globalProfile, qi.Profiling),
->>>>>>> 5d82c7117 (Osquerybeat: emit pack_name and query_name in scheduled query results (#51781))
+			Profile:    qi.Profile,
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -283,14 +273,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
 	for name, qi := range osqueryConfig.Schedule {
-<<<<<<< HEAD
-		qi, err = registerQuery(name, p.namespace, qi, "")
-=======
-		if err := config.ValidateQueryScheduleMode(qi); err != nil {
-			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
-		}
 		qi, err = registerQuery(name, p.namespace, qi, "", "", name)
->>>>>>> 5d82c7117 (Osquerybeat: emit pack_name and query_name in scheduled query results (#51781))
 		if err != nil {
 			return err
 		}
@@ -304,15 +287,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			packID = packName
 		}
 		for name, qi := range pack.Queries {
-<<<<<<< HEAD
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
-=======
-			qi, err = config.MergeQueryWithPackScheduleDefaults(pack, qi)
-			if err != nil {
-				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
-			}
 			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID, pack.PackName, name)
->>>>>>> 5d82c7117 (Osquerybeat: emit pack_name and query_name in scheduled query results (#51781))
 			if err != nil {
 				return err
 			}
