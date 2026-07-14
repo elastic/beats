@@ -120,6 +120,10 @@
       type: group
       description: Data related to the executed script file.
       fields:
+        - name: script_block_hash
+          type: keyword
+          description: SHA-256 hash of the executed script block.
+
         - name: script_block_id
           type: keyword
           description: Id of the executed script block.
