@@ -294,6 +294,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
 	// but it won't start any inputs/output
 	if err := b.Manager.PreInit(); err != nil {
+		fb.runReady.Close()
 		return err
 	}
 
