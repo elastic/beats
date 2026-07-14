@@ -1560,17 +1560,20 @@ func (s *testFileScanner) GetFiles(loginp.FileScanOptions) (map[string]loginp.Fi
 
 const benchmarkFileCount = 1000
 
-func BenchmarkGetFiles(b *testing.B) {
-	dir := b.TempDir()
-	basenameFormat := "file-%d.log"
-
-	for i := 0; i < benchmarkFileCount; i++ {
-		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+// writeBenchmarkFiles creates n log files under dir and returns the glob that matches them.
+func writeBenchmarkFiles(tb testing.TB, dir string, n int) []string {
+	tb.Helper()
+	for i := range n {
+		filename := filepath.Join(dir, fmt.Sprintf("file-%d.log", i))
 		content := fmt.Sprintf("content-%d\n", i)
-		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
-		require.NoError(b, err)
+		require.NoError(tb, os.WriteFile(
+			filename, []byte(strings.Repeat(content, 1024)), 0o644))
 	}
-	paths := []string{filepath.Join(dir, "*.log")}
+	return []string{filepath.Join(dir, "*.log")}
+}
+
+func BenchmarkGetFiles(b *testing.B) {
+	paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
 	cfg := fileScannerConfig{
 		Fingerprint: fingerprintConfig{
 			Enabled: false,
@@ -1586,16 +1589,7 @@ func BenchmarkGetFiles(b *testing.B) {
 }
 
 func BenchmarkGetFilesWithFingerprint(b *testing.B) {
-	dir := b.TempDir()
-	basenameFormat := "file-%d.log"
-
-	for i := 0; i < benchmarkFileCount; i++ {
-		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
-		content := fmt.Sprintf("content-%d\n", i)
-		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
-		require.NoError(b, err)
-	}
-	paths := []string{filepath.Join(dir, "*.log")}
+	paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
 	cfg := fileScannerConfig{
 		Fingerprint: fingerprintConfig{
 			Enabled: true,
@@ -1637,16 +1631,7 @@ func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
 	}
 	for _, tc := range cases {
 		b.Run(tc.name, func(b *testing.B) {
-			dir := b.TempDir()
-			for i := range benchmarkFileCount {
-				filename := filepath.Join(dir, fmt.Sprintf("file-%d.log", i))
-				content := fmt.Sprintf("content-%d\n", i)
-				// ~10KB per file: well above the 1024-byte threshold, so every
-				// file is fingerprinted with a final SHA-256 on every scan.
-				err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
-				require.NoError(b, err)
-			}
-			paths := []string{filepath.Join(dir, "*.log")}
+			paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
 			cfg := fileScannerConfig{
 				Fingerprint: fingerprintConfig{
 					Enabled: true,
@@ -1664,6 +1649,88 @@ func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
 				require.Len(b, files, benchmarkFileCount)
 			}
 		})
+	}
+}
+
+// BenchmarkWatchIdle measures fileWatcher.watch over an unchanged file set: the mostly-idle steady
+// state where allocs/op is the cost of observing nothing changed (identity cache + pre-sized maps).
+func BenchmarkWatchIdle(b *testing.B) {
+	states := []struct {
+		name        string
+		ignoreOlder time.Duration
+		aged        bool
+	}{
+		{"active", 0, false},
+		{"ignored", time.Hour, true},
+	}
+	identities := []struct {
+		name        string
+		fingerprint bool
+		newID       func() fileIdentifier
+	}{
+		{"path", false, func() fileIdentifier { return mustPathIdentifier(false) }},
+		{"fingerprint", true, func() fileIdentifier {
+			fi, _ := newFingerprintIdentifier(nil, nil)
+			return fi
+		}},
+	}
+
+	for _, st := range states {
+		for _, id := range identities {
+			for _, fileCount := range []int{100, 1000, 10000} {
+				b.Run(fmt.Sprintf("%s/%s/%d_files", st.name, id.name, fileCount), func(b *testing.B) {
+					paths := writeBenchmarkFiles(b, b.TempDir(), fileCount)
+
+					if st.aged {
+						// Age every file well past ignoreOlder so it is excluded.
+						old := time.Now().Add(-48 * time.Hour)
+						matches, err := filepath.Glob(paths[0])
+						require.NoError(b, err)
+						for _, m := range matches {
+							require.NoError(b, os.Chtimes(m, old, old))
+						}
+					}
+
+					cfg := defaultFileWatcherConfig()
+					cfg.Scanner.Fingerprint.Enabled = id.fingerprint
+					cfg.Scanner.Fingerprint.Growing = id.fingerprint
+
+					fw, err := newFileWatcher(
+						logp.NewNopLogger(),
+						paths,
+						cfg,
+						CompressionNone,
+						false,
+						id.newID(),
+						mustSourceIdentifier("bench-id"),
+					)
+					require.NoError(b, err)
+
+					// A create event is emitted for every file on the first scan; idle rescans emit
+					// nothing. Drain in the background so watch's sends never block.
+					ctx := b.Context()
+					go func() {
+						for {
+							select {
+							case <-ctx.Done():
+								return
+							case <-fw.events:
+							}
+						}
+					}()
+
+					metrics := newTestMetrics()
+					// Prime w.prev so the benchmarked scans are pure steady state.
+					fw.watch(ctx, metrics, st.ignoreOlder, time.Time{})
+
+					b.ReportAllocs()
+					b.ResetTimer()
+					for b.Loop() {
+						fw.watch(ctx, metrics, st.ignoreOlder, time.Time{})
+					}
+				})
+			}
+		}
 	}
 }
 
