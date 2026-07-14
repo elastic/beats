@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"strings"
 
@@ -51,14 +52,14 @@ func LoadCertificate(config *CertificateConfig, logger *logp.Logger) (*tls.Certi
 
 	certPEM, err := readPEMFile(log, certificate, passphrase, config.DisableLegacyPEMSupport)
 	if err != nil {
-		log.Errorf("Failed reading certificate file %v: %+v", certificate, err)
-		return nil, fmt.Errorf("%w %v", err, certificate)
+		log.Errorf("Failed reading certificate %s: %v", pemSource(certificate), err)
+		return nil, fmt.Errorf("%w (%s)", err, pemSource(certificate))
 	}
 
 	keyPEM, err := readPEMFile(log, key, passphrase, config.DisableLegacyPEMSupport)
 	if err != nil {
-		log.Errorf("Failed reading key file: %+v", err)
-		return nil, fmt.Errorf("%w %v", err, key)
+		log.Errorf("Failed reading key: %v", err)
+		return nil, fmt.Errorf("failed reading key: %w", err)
 	}
 
 	cert, err := tls.X509KeyPair(certPEM, keyPEM)
@@ -67,12 +68,10 @@ func LoadCertificate(config *CertificateConfig, logger *logp.Logger) (*tls.Certi
 		return nil, err
 	}
 
-	// Do not log the key if it was provided as a string in the configuration to avoid
-	// leaking private keys in the debug logs. Log when the key is a file path.
-	if IsPEMString(key) {
-		log.Debugf("Loading certificate: %v with key from PEM string in config", certificate)
+	if isInlinePEM(key) {
+		log.Debug("Loading certificate with key from PEM")
 	} else {
-		log.Debugf("Loading certificate: %v and key %v", certificate, key)
+		log.Debug("Loading certificate with key from file")
 	}
 
 	return &cert, nil
@@ -114,7 +113,7 @@ func readPEMFile(log *logp.Logger, s, passphrase string, disableLegacy bool) ([]
 		}
 
 		switch {
-		case x509.IsEncryptedPEMBlock(block): //nolint: staticcheck // deprecated PKCS#1 PEM encryption
+		case x509.IsEncryptedPEMBlock(block): //nolint:staticcheck // deprecated PKCS#1 PEM encryption
 			if disableLegacy {
 				return nil, fmt.Errorf("encrypted PKCS#1 PEM keys are not supported; convert to PKCS#8")
 			}
@@ -168,7 +167,7 @@ func LoadCertificateAuthorities(CAs []string, logger *logp.Logger) (*x509.CertPo
 		r, err := NewPEMReader(s)
 		if err != nil {
 			log.Errorf("Failed reading CA certificate: %+v", err)
-			errors = append(errors, fmt.Errorf("%w reading %v", err, r))
+			errors = append(errors, fmt.Errorf("%w reading %s", err, pemSource(s)))
 			continue
 		}
 		defer r.Close()
@@ -176,13 +175,13 @@ func LoadCertificateAuthorities(CAs []string, logger *logp.Logger) (*x509.CertPo
 		pemData, err := io.ReadAll(r)
 		if err != nil {
 			log.Errorf("Failed reading CA certificate: %+v", err)
-			errors = append(errors, fmt.Errorf("%w reading %v", err, r))
+			errors = append(errors, fmt.Errorf("%w reading %s", err, pemSource(s)))
 			continue
 		}
 
 		if ok := roots.AppendCertsFromPEM(pemData); !ok {
 			log.Error("Failed to add CA to the cert pool, CA is not a valid PEM document")
-			errors = append(errors, fmt.Errorf("%w adding %v to the list of known CAs", ErrNotACertificate, r))
+			errors = append(errors, fmt.Errorf("%w adding %s to the list of known CAs", ErrNotACertificate, pemSource(s)))
 			continue
 		}
 		log.Debugf("Successfully loaded CA certificate: %v", r)
@@ -229,12 +228,23 @@ type PEMReader struct {
 
 // NewPEMReader returns a new PEMReader.
 func NewPEMReader(certificate string) (*PEMReader, error) {
-	if IsPEMString(certificate) {
+	if isInlinePEM(certificate) {
 		return &PEMReader{reader: io.NopCloser(strings.NewReader(certificate)), debugStr: "inline"}, nil
 	}
 
-	r, err := os.Open(certificate)
+	r, err := os.Open(certificate) //nolint:gosec // certificate is an operator-provided cert/key file path; opening it is the intended behavior
 	if err != nil {
+		// os.Open records the name it tried to open in *fs.PathError.Path
+		// verbatim. Because a malformed inline PEM can be indistinguishable
+		// from a file path (isInlinePEM is only a heuristic), that name may
+		// actually be private key material, so it must never be echoed.
+		// Preserve the *fs.PathError type -- so callers matching on it with
+		// errors.As/errors.Is (e.g. fs.ErrNotExist) keep working -- but drop
+		// the Path component.
+		var pathErr *fs.PathError
+		if errors.As(err, &pathErr) {
+			return nil, &fs.PathError{Op: pathErr.Op, Err: pathErr.Err}
+		}
 		return nil, err
 	}
 	return &PEMReader{reader: r, debugStr: certificate}, nil
@@ -259,4 +269,61 @@ func IsPEMString(s string) bool {
 	// Trim the certificates to make sure we tolerate any yaml weirdness, we assume that the string starts
 	// with "-" and let further validation verifies the PEM format.
 	return strings.HasPrefix(strings.TrimSpace(s), "-")
+}
+
+// base64Alphabet is the standard base64 alphabet (RFC 4648) including the '='
+// padding character. A PEM body stripped of its armor is a run of these
+// characters.
+const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+
+// minInlinePEMBodyLen is the length at or above which a bare, single-line,
+// pure-base64 string with no path separators is treated as inline PEM content
+// rather than a file path. The smallest realistic private-key encoding (an
+// Ed25519 32-byte seed) is 44 base64 characters; RSA/EC keys are far longer. A
+// legitimate file path this long that is also pure base64 with no separator or
+// extension is vanishingly rare.
+const minInlinePEMBodyLen = 44
+
+// isInlinePEM reports whether s is (possibly malformed) inline PEM content
+// rather than a filesystem path. A genuine path is a single line and contains
+// no PEM armor; inline PEM is multi-line and/or contains "-----...-----"
+// delimiters. Surrounding whitespace is trimmed first (consistent with
+// IsPEMString) so a path with a trailing newline -- e.g. from a YAML block
+// scalar -- is not misclassified as inline content. Used to keep key material
+// out of os.Open errors and log lines: a malformed inline key that lost its
+// leading dashes must not be mistaken for a path and handed to os.Open, which
+// would echo the whole blob.
+//
+// Note this cannot be perfectly accurate: a single-line base64 blob containing
+// a '/' is indistinguishable from a long file path, so such a malformed inline
+// key is still classified as a path. Fully removing the ambiguity would require
+// separate configuration options for inline PEM vs. file path, which would be a
+// breaking change.
+func isInlinePEM(s string) bool {
+	trimmed := strings.TrimSpace(s)
+	if IsPEMString(s) ||
+		strings.ContainsAny(trimmed, "\r\n") ||
+		strings.Contains(trimmed, "-----") {
+		return true
+	}
+
+	// A malformed inline PEM can lose all of its armor and line breaks (e.g. a
+	// copy-paste that drops the -----BEGIN/END----- lines), leaving a single
+	// line of base64 that the checks above cannot tell apart from a file path.
+	// Treat a long, pure-base64 string with no path-typical separator
+	// (/, \, ., :) as inline content so it is redacted rather than handed to
+	// os.Open, which would echo the whole blob.
+	return len(trimmed) >= minInlinePEMBodyLen &&
+		strings.Trim(trimmed, base64Alphabet) == "" &&
+		!strings.ContainsAny(trimmed, `/\.:`)
+}
+
+// pemSource returns a log-safe description of s: the file path when s is a
+// path, or a redacted placeholder when s is inline PEM content, so a private
+// key provided inline in the configuration is never written to logs or errors.
+func pemSource(s string) string {
+	if isInlinePEM(s) {
+		return "PEM REDACTED"
+	}
+	return s
 }

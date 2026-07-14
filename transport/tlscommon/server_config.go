@@ -109,7 +109,7 @@ func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig,
 
 	// Skip cert reloading when inline PEMs are used; reloading only makes sense with file paths.
 	if config.Certificate.Certificate != "" && config.CertificateReload.IsEnabled() &&
-		!IsPEMString(config.Certificate.Certificate) && !IsPEMString(config.Certificate.Key) {
+		!isInlinePEM(config.Certificate.Certificate) && !isInlinePEM(config.Certificate.Key) {
 		reloadOpts, err := config.Certificate.reloaderOptions()
 		logFail(err)
 		if config.CertificateReload.ReloadInterval > 0 {

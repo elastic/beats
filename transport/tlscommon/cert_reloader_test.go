@@ -84,6 +84,37 @@ func TestNewCertReloader_EmptyPaths(t *testing.T) {
 	assert.Error(t, err)
 }
 
+// TestNewCertReloader_RejectsInlinePEM ensures inline PEM content — including a
+// malformed blob that lost its leading dashes — is rejected at construction, so
+// a private key can never be stored on the reloader's path fields and later
+// leaked to logs on a reload failure.
+func TestNewCertReloader_RejectsInlinePEM(t *testing.T) {
+	keyPEM, certPEM := makeKeyCertPair(t, blockTypePKCS8, "")
+	dir := t.TempDir()
+	certPath, keyPath := writeKeyAndCertFiles(t, dir)
+
+	// Malformed inline content that does not start with '-' (so the old
+	// IsPEMString guard would have let it through) but is clearly not a path.
+	armoredNoDash := "asdasd-----\n" + body(keyPEM)
+
+	tests := map[string]struct {
+		cert string
+		key  string
+	}{
+		"inline key, leading dashes":      {certPath, keyPEM},
+		"inline cert, leading dashes":     {certPEM, keyPath},
+		"malformed key, no leading dash":  {certPath, armoredNoDash},
+		"malformed cert, no leading dash": {armoredNoDash, keyPath},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			_, err := NewCertReloader(tc.cert, tc.key)
+			require.Error(t, err)
+		})
+	}
+}
+
 func TestCertReloader_ReloadsAfterInterval(t *testing.T) {
 	dir := t.TempDir()
 	certPath, keyPath := writeKeyAndCertFiles(t, dir)

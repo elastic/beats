@@ -82,10 +82,10 @@ func NewCertReloader(certPath, keyPath string, logger *logp.Logger, opts ...Cert
 	if certPath == "" || keyPath == "" {
 		return nil, fmt.Errorf("certificate and key paths must be non-empty")
 	}
-	if IsPEMString(certPath) {
+	if isInlinePEM(certPath) {
 		return nil, fmt.Errorf("certificate must be a file path, not an inline PEM")
 	}
-	if IsPEMString(keyPath) {
+	if isInlinePEM(keyPath) {
 		return nil, fmt.Errorf("key must be a file path, not an inline PEM")
 	}
 
@@ -156,7 +156,7 @@ func (r *CertReloader) getCertificate() (*tls.Certificate, error) {
 
 	cert, err := r.loadKeyPair()
 	if err != nil {
-		r.log.Errorf("Failed to reload TLS certificate from %s and %s, continuing with current certificate: %v", r.certPath, r.keyPath, err)
+		r.log.Errorf("Failed to reload TLS certificate from %s and %s, continuing with current certificate: %v", pemSource(r.certPath), pemSource(r.keyPath), err)
 		return r.cert, nil
 	}
 	r.cert = &cert
