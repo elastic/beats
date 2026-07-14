@@ -8,7 +8,7 @@ applies_to:
 
 # Load ingest pipelines [load-ingest-pipelines]
 
-The ingest pipelines used to parse log lines are set up automatically when you run Filebeat, assuming the {{es}} output is enabled. To disable automatic pipeline loading during normal publishing, set:
+The ingest pipelines used to parse log lines are set up automatically when you run Filebeat, assuming the {{es}} output is enabled. {applies_to}`stack: ga 9.6` To turn off automatic pipeline loading during normal publishing, set:
 
 ```yaml
 setup.pipelines.enabled: false
