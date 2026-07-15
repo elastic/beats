@@ -130,7 +130,7 @@ func (s *store) Has(key string) (bool, error) {
 	return s.base.Has(key)
 }
 
-func (s *store) Get(key string, to interface{}) error {
+func (s *store) Get(key string, to any) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (s *store) Get(key string, to interface{}) error {
 	return s.base.Get(key, to)
 }
 
-func (s *store) Set(key string, value interface{}) error {
+func (s *store) Set(key string, value any) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}

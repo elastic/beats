@@ -38,7 +38,7 @@ type WithDiagnosticExtension interface {
 // NOTE: Changing the function signature will require changes to elastic-agent's
 // elasticdiagnostics extension. Proceed with caution.
 type ActionExtension interface {
-	RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error
+	RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]any) (map[string]any, error)) error
 	UnregisterActionHandler(name string)
 }
 
@@ -105,7 +105,7 @@ func (n *OtelManager) UnregisterAction(action management.Action) {
 		n.actionExt.UnregisterActionHandler(n.receiverName)
 	}
 }
-func (n *OtelManager) SetPayload(map[string]interface{}) {}
+func (n *OtelManager) SetPayload(map[string]any) {}
 func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook management.DiagnosticHook) {
 	if n.ext != nil {
 		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)

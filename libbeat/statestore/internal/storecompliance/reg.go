@@ -95,13 +95,13 @@ func (s *Store) MustHave(key string) bool {
 }
 
 // MustGet fails the test if an error occurred in a call to Get.
-func (s *Store) MustGet(key string, into interface{}) {
+func (s *Store) MustGet(key string, into any) {
 	err := s.Get(key, into)
 	must(s.Registry.T, err, "unexpected error on store/get call")
 }
 
 // MustSet fails the test if an error occurred in a call to Set.
-func (s *Store) MustSet(key string, from interface{}) {
+func (s *Store) MustSet(key string, from any) {
 	err := s.Set(key, from)
 	must(s.Registry.T, err, "unexpected error on store/set call")
 }

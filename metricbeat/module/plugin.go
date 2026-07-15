@@ -34,7 +34,7 @@ type modulePlugin struct {
 const pluginKey = "metricbeat.module"
 
 func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	plugin.MustRegisterLoader(pluginKey, func(ifc any) error {
 		p, ok := ifc.(modulePlugin)
 		if !ok {
 			return errors.New("plugin does not match metricbeat module plugin type")
@@ -60,13 +60,13 @@ func Plugin(
 	module string,
 	factory mb.ModuleFactory,
 	metricsets map[string]mb.MetricSetFactory,
-) map[string][]interface{} {
+) map[string][]any {
 	return plugin.MakePlugin(pluginKey, modulePlugin{module, factory, metricsets})
 }
 
 func MetricSetsPlugin(
 	module string,
 	metricsets map[string]mb.MetricSetFactory,
-) map[string][]interface{} {
+) map[string][]any {
 	return Plugin(module, nil, metricsets)
 }

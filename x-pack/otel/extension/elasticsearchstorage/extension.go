@@ -95,13 +95,13 @@ func (s *lockedStore) Has(key string) (bool, error) {
 	return s.inner.Has(key)
 }
 
-func (s *lockedStore) Get(key string, to interface{}) error {
+func (s *lockedStore) Get(key string, to any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.inner.Get(key, to)
 }
 
-func (s *lockedStore) Set(key string, value interface{}) error {
+func (s *lockedStore) Set(key string, value any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.inner.Set(key, value)

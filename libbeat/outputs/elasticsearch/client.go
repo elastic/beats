@@ -360,9 +360,9 @@ func (client *Client) handleBulkResultError(
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
-func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []interface{}) {
+func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []any) {
 	okEvents := data[:0]
-	bulkItems := make([]interface{}, 0, len(data)*2)
+	bulkItems := make([]any, 0, len(data)*2)
 	for i := range data {
 		if data[i].EncodedEvent == nil {
 			client.log.Error("Elasticsearch output received unencoded publisher.Event")
@@ -393,7 +393,7 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 	return okEvents, bulkItems
 }
 
-func (client *Client) createEventBulkMeta(version version.V, event *encodedEvent) (interface{}, error) {
+func (client *Client) createEventBulkMeta(version version.V, event *encodedEvent) (any, error) {
 	eventType := ""
 	if version.Major < 7 {
 		eventType = defaultEventType
@@ -466,7 +466,7 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 	count := len(events)
 	eventsToRetry := events[:0]
 	stats := bulkResultStats{}
-	for i := 0; i < count; i++ {
+	for i := range count {
 		itemStatus, itemMessage, failureStoreUsed, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
 			// The response json is invalid, mark the remaining events for retry.
