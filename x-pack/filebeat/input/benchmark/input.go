@@ -116,7 +116,7 @@ func runThread(ctx v2.Context, publisher stateless.Publisher, thread uint8, cfg 
 				// don't want to block on filling doPublish channel
 				// so only send as many as it can hold right now
 				numToSend := cap(pubChan) - len(pubChan)
-				for i := 0; i < numToSend; i++ {
+				for range numToSend {
 					pubChan <- true
 				}
 			case <-pubChan:

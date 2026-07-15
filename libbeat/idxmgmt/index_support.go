@@ -20,6 +20,7 @@ package idxmgmt
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"sync/atomic"
 
@@ -373,26 +374,22 @@ func applyLifecycleSettingsToTemplate(
 	// init/copy index settings
 	idxSettings := tmpl.Settings.Index
 	if idxSettings == nil {
-		idxSettings = map[string]interface{}{}
+		idxSettings = map[string]any{}
 	} else {
-		tmp := make(map[string]interface{}, len(idxSettings))
-		for k, v := range idxSettings {
-			tmp[k] = v
-		}
+		tmp := make(map[string]any, len(idxSettings))
+		maps.Copy(tmp, idxSettings)
 		idxSettings = tmp
 	}
 	tmpl.Settings.Index = idxSettings
 
 	if policymgr.Mode() == lifecycle.ILM {
 		// init/copy index.lifecycle settings
-		var lifecycle map[string]interface{}
+		var lifecycle map[string]any
 		if ifcLifecycle := idxSettings["lifecycle"]; ifcLifecycle == nil {
-			lifecycle = map[string]interface{}{}
-		} else if tmp, ok := ifcLifecycle.(map[string]interface{}); ok {
-			lifecycle = make(map[string]interface{}, len(tmp))
-			for k, v := range tmp {
-				lifecycle[k] = v
-			}
+			lifecycle = map[string]any{}
+		} else if tmp, ok := ifcLifecycle.(map[string]any); ok {
+			lifecycle = make(map[string]any, len(tmp))
+			maps.Copy(lifecycle, tmp)
 		} else {
 			return tmpl, errors.New("settings.index.lifecycle must be an object")
 		}

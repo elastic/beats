@@ -46,8 +46,8 @@ func ReadEvents(t *testing.T, path string) []mapstr.M {
 	for _, file := range files {
 		rawFile, err := os.ReadFile(file)
 		require.NoError(t, err)
-		lines := strings.Split(string(rawFile), "\n")
-		for _, line := range lines {
+		lines := strings.SplitSeq(string(rawFile), "\n")
+		for line := range lines {
 			var event = mapstr.M{}
 			// skip newlines that appear at the end of files
 			if len(line) < 2 {
@@ -65,7 +65,7 @@ func ReadEvents(t *testing.T, path string) []mapstr.M {
 // the values map takes keys in the form of keys in the events map, which may be in dot form: "system.cpu.cores", etc.
 // The value for the map should be the expected value, or a `nil` if you merely want to check for the presence of a field.
 // the mode determines if `ValuesExist` must exist in all events, or just one.
-func ValuesExist(t *testing.T, values map[string]interface{}, events []mapstr.M, mode findFieldsMode, info string) {
+func ValuesExist(t *testing.T, values map[string]any, events []mapstr.M, mode findFieldsMode, info string) {
 	for searchKey, val := range values {
 		var foundCount = 0
 		for eventIter, event := range events {

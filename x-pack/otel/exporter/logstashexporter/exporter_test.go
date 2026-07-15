@@ -7,6 +7,7 @@ package logstashexporter
 import (
 	"context"
 	"errors"
+	"maps"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -315,7 +316,7 @@ func TestMakeLogstashWorkers(t *testing.T) {
 	// Test if concurrent calls don't create duplicates
 	var wg sync.WaitGroup
 	results := make([][]internal.Worker, 10)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
@@ -351,10 +352,8 @@ func TestConsumeLogsConcurrency(t *testing.T) {
 	var wg sync.WaitGroup
 	const numConsumers = 10
 	errsChan := make(chan error, numConsumers)
-	for i := 0; i < numConsumers; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range numConsumers {
+		wg.Go(func() {
 			logs := newTestLogs()
 			ok, err := runWithTimeout(clientCtx, func(timeoutCtx context.Context) error {
 				return exp.ConsumeLogs(timeoutCtx, logs)
@@ -364,7 +363,7 @@ func TestConsumeLogsConcurrency(t *testing.T) {
 			} else {
 				errsChan <- err
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -416,9 +415,7 @@ func newExporterWithDefaultsWith(t *testing.T, extraConfig map[string]any) *logs
 	cfg["hosts"] = []string{"localhost:9999"}
 	cfg["max_retries"] = 10
 
-	for k, v := range extraConfig {
-		cfg[k] = v
-	}
+	maps.Copy(cfg, extraConfig)
 
 	exp, err := newLogstashExporter(settings, defaultConfig)
 	require.NoError(t, err)

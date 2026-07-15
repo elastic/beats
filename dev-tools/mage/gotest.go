@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"os"
 	"os/exec"
 	"path"
@@ -148,9 +149,7 @@ func fipsTestEnv() map[string]string {
 	if !FIPSBuild {
 		return env
 	}
-	for k, v := range FIPSConfig.Compile.Env {
-		env[k] = v
-	}
+	maps.Copy(env, FIPSConfig.Compile.Env)
 	return env
 }
 
@@ -282,9 +281,9 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	if modules == "" {
 		log.Printf("Warning: environment variable MODULE is empty: [%s]\n", modules)
 	}
-	moduleArr := strings.Split(modules, ",")
+	moduleArr := strings.SplitSeq(modules, ",")
 
-	for _, module := range moduleArr {
+	for module := range moduleArr {
 		err := goTestIntegrationForSingleModule(ctx, module)
 		if err != nil {
 			return err

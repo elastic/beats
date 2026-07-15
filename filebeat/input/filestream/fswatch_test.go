@@ -1096,7 +1096,7 @@ func BenchmarkGetFiles(b *testing.B) {
 	dir := b.TempDir()
 	basenameFormat := "file-%d.log"
 
-	for i := 0; i < benchmarkFileCount; i++ {
+	for i := range benchmarkFileCount {
 		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
 		content := fmt.Sprintf("content-%d\n", i)
 		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
@@ -1121,7 +1121,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	dir := b.TempDir()
 	basenameFormat := "file-%d.log"
 
-	for i := 0; i < benchmarkFileCount; i++ {
+	for i := range benchmarkFileCount {
 		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
 		content := fmt.Sprintf("content-%d\n", i)
 		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)

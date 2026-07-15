@@ -48,7 +48,6 @@ func TestConfigAcceptValid(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
 			logger := logptest.NewTestingLogger(t, "")
@@ -81,7 +80,6 @@ func TestConfigInvalid(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
@@ -138,7 +136,6 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test.cfg)
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
@@ -232,39 +229,39 @@ func TestBackoffFunc(t *testing.T) {
 
 func TestTopicSelection(t *testing.T) {
 	cases := map[string]struct {
-		cfg   map[string]interface{}
+		cfg   map[string]any
 		event beat.Event
 		want  string
 	}{
 		"topic configured": {
-			cfg:  map[string]interface{}{"topic": "test"},
+			cfg:  map[string]any{"topic": "test"},
 			want: "test",
 		},
 		"topic must keep case": {
-			cfg:  map[string]interface{}{"topic": "Test"},
+			cfg:  map[string]any{"topic": "Test"},
 			want: "Test",
 		},
 		"topics setting": {
-			cfg: map[string]interface{}{
-				"topics": []map[string]interface{}{{"topic": "test"}},
+			cfg: map[string]any{
+				"topics": []map[string]any{{"topic": "test"}},
 			},
 			want: "test",
 		},
 		"topics setting must keep case": {
-			cfg: map[string]interface{}{
-				"topics": []map[string]interface{}{{"topic": "Test"}},
+			cfg: map[string]any{
+				"topics": []map[string]any{{"topic": "Test"}},
 			},
 			want: "Test",
 		},
 		"use event field": {
-			cfg: map[string]interface{}{"topic": "test-%{[field]}"},
+			cfg: map[string]any{"topic": "test-%{[field]}"},
 			event: beat.Event{
 				Fields: mapstr.M{"field": "from-event"},
 			},
 			want: "test-from-event",
 		},
 		"use event field must keep case": {
-			cfg: map[string]interface{}{"topic": "Test-%{[field]}"},
+			cfg: map[string]any{"topic": "Test-%{[field]}"},
 			event: beat.Event{
 				Fields: mapstr.M{"field": "From-Event"},
 			},
