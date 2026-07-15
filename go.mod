@@ -234,12 +234,8 @@ require (
 	github.com/cilium/ebpf v0.21.0
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
-<<<<<<< HEAD
-	github.com/forensicanalysis/fslib v0.15.2
-=======
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
-	github.com/jimlambrt/gldap v0.1.14
->>>>>>> 3de266859 (mod: replace gopkg.in/natefinch/lumberjack.v2 with elastic fork (#51950))
+	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
 	github.com/richardlehane/mscfb v1.0.6
