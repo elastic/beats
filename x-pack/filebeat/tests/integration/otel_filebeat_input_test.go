@@ -24,6 +24,7 @@ import (
 	mqtttestutil "github.com/elastic/beats/v7/filebeat/input/mqtt/testutil"
 	redistestutil "github.com/elastic/beats/v7/filebeat/input/redis/testutil"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	gcsmock "github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/mock"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 
@@ -846,6 +847,414 @@ service:
 		"agent.ephemeral_id",
 		"agent.id",
 		"mqtt.message_id",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+}
+
+func TestCometdInputOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNamespace
+
+	type options struct {
+		Index    string
+		ESURL    string
+		Username string
+		Password string
+	}
+
+	cometdFilebeatConfig := `filebeat.inputs:
+- type: cometd
+  channel_name: /event/LoginEventStream
+  auth.oauth2:
+    client.id: client.id
+    client.secret: client.secret
+    user: user
+    password: password
+    token_url: http://localhost:8080/token
+
+output:
+  elasticsearch:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+    index: {{ .Index }}
+
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
+
+	cometdOTelConfig := `exporters:
+    elasticsearch:
+        auth:
+            authenticator: beatsauth
+        compression: gzip
+        compression_params:
+            level: 1
+        endpoints:
+            - {{ .ESURL }}
+        logs_index: {{ .Index }}
+        max_conns_per_host: 1
+        password: {{ .Password }}
+        retry:
+            enabled: true
+            initial_interval: 1s
+            max_interval: 1m0s
+            max_retries: 3
+        sending_queue:
+            batch:
+                flush_timeout: 10s
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
+        user: {{ .Username }}
+extensions:
+    beatsauth:
+        idle_connection_timeout: 3s
+        proxy_disable: false
+        timeout: 1m30s
+receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - type: cometd
+                  channel_name: /event/LoginEventStream
+                  auth.oauth2:
+                    client.id: client.id
+                    client.secret: client.secret
+                    user: user
+                    password: password
+                    token_url: http://localhost:8080/token
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        management.otel.enabled: true
+service:
+    extensions:
+        - beatsauth
+    pipelines:
+        logs:
+            exporters:
+                - elasticsearch
+            receivers:
+                - filebeatreceiver
+    telemetry:
+        metrics:
+            level: none
+`
+
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.Index = otelIndex
+	require.NoError(t, template.Must(template.New("config").Parse(cometdOTelConfig)).Execute(&configBuffer, optionsValue))
+
+	oteltestcol.New(t, configBuffer.String())
+
+	configBuffer.Reset()
+
+	optionsValue.Index = fbIndex
+	require.NoError(t, template.Must(template.New("config").Parse(cometdFilebeatConfig)).Execute(&configBuffer, optionsValue))
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	t.Cleanup(func() {
+		deleteDataStreamsFromES(t, es, []string{
+			otelIndex,
+			fbIndex,
+		})
+	})
+
+	rawQuery := map[string]any{
+		"query": map[string]any{
+			"match_phrase": map[string]any{
+				"cometd.channel_name": "/event/LoginEventStream",
+			},
+		},
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
+		},
+	}
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
+			defer findCancel()
+
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
+
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
+		},
+		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"event.created",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+}
+
+func TestGCSInputOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	// The GCS client appends /storage/v1/ when alternative_host is set; the
+	// package mock expects paths like /b/<bucket>/o, so strip that prefix.
+	gcsSrv := httptest.NewServer(http.StripPrefix("/storage/v1", gcsmock.GCSServer()))
+	t.Cleanup(gcsSrv.Close)
+
+	otelHome := t.TempDir()
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNamespace
+
+	type options struct {
+		Index    string
+		ESURL    string
+		Username string
+		Password string
+		MockURL  string
+		PathHome string
+	}
+
+	gcsFilebeatConfig := `filebeat.inputs:
+- type: gcs
+  id: gcs-input-e2e
+  project_id: elastic-sa
+  alternative_host: {{ .MockURL }}
+  auth.credentials_json.account_key: '{"type":"service_account"}'
+  poll: false
+  max_workers: 1
+  file_selectors:
+    - regex: '^ata\.json$'
+  buckets:
+    - name: gcs-test-new
+
+output:
+  elasticsearch:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+    index: {{ .Index }}
+
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
+
+	gcsOTelConfig := `exporters:
+    elasticsearch:
+        auth:
+            authenticator: beatsauth
+        compression: gzip
+        compression_params:
+            level: 1
+        endpoints:
+            - {{ .ESURL }}
+        logs_index: {{ .Index }}
+        max_conns_per_host: 1
+        password: {{ .Password }}
+        retry:
+            enabled: true
+            initial_interval: 1s
+            max_interval: 1m0s
+            max_retries: 3
+        sending_queue:
+            batch:
+                flush_timeout: 10s
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
+        user: {{ .Username }}
+extensions:
+    beatsauth:
+        idle_connection_timeout: 3s
+        proxy_disable: false
+        timeout: 1m30s
+receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - type: gcs
+                  id: gcs-input-e2e
+                  project_id: elastic-sa
+                  alternative_host: {{ .MockURL }}
+                  auth.credentials_json.account_key: '{"type":"service_account"}'
+                  poll: false
+                  max_workers: 1
+                  file_selectors:
+                    - regex: '^ata\.json$'
+                  buckets:
+                    - name: gcs-test-new
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        path.home: {{ .PathHome }}
+        management.otel.enabled: true
+service:
+    extensions:
+        - beatsauth
+    pipelines:
+        logs:
+            exporters:
+                - elasticsearch
+            receivers:
+                - filebeatreceiver
+    telemetry:
+        metrics:
+            level: none
+`
+
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+		MockURL:  gcsSrv.URL,
+		PathHome: otelHome,
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.Index = otelIndex
+	require.NoError(t, template.Must(template.New("config").Parse(gcsOTelConfig)).Execute(&configBuffer, optionsValue))
+
+	oteltestcol.New(t, configBuffer.String())
+
+	configBuffer.Reset()
+
+	optionsValue.Index = fbIndex
+	require.NoError(t, template.Must(template.New("config").Parse(gcsFilebeatConfig)).Execute(&configBuffer, optionsValue))
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	t.Cleanup(func() {
+		deleteDataStreamsFromES(t, es, []string{
+			otelIndex,
+			fbIndex,
+		})
+	})
+
+	rawQuery := map[string]any{
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
+					{
+						"match_phrase": map[string]any{
+							"input.type": "gcs",
+						},
+					},
+					{
+						"match_phrase": map[string]any{
+							"gcs.storage.object.name": "ata.json",
+						},
+					},
+				},
+			},
+		},
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
+		},
+	}
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
+			defer findCancel()
+
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
+
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
+		},
+		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"event.created",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
