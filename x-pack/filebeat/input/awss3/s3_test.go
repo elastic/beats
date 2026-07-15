@@ -6,11 +6,14 @@ package awss3
 
 import (
 	"context"
+	"io"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -139,8 +142,9 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   listPrefix,
 			RegionName:         "region",
 		}
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
-			log:             logp.NewLogger(inputName),
+			log:             log,
 			config:          cfg,
 			s3:              mockAPI,
 			pipeline:        pipeline,
@@ -152,6 +156,119 @@ func TestS3Poller(t *testing.T) {
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
+	})
+
+	t.Run("Poll finalizes objects after ACK (backup + delete)", func(t *testing.T) {
+		store := openTestStatestore()
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
+		pipeline := newFakePipeline()
+
+		backupDone := make(chan struct{})
+		deleteDone := make(chan struct{})
+
+		mockAPI.EXPECT().
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(listPrefix)).
+			Times(1).
+			DoAndReturn(func(_, _ string) s3Pager {
+				return mockPager
+			})
+
+		// Poller listing loop calls HasMorePages before and after NextPage.
+		hasMoreCalls := 0
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(2).
+			DoAndReturn(func() bool {
+				hasMoreCalls++
+				return hasMoreCalls == 1
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("key1"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string) (*s3.GetObjectOutput, error) {
+				// A simple text payload that produces at least one event.
+				return &s3.GetObjectOutput{
+					Body: io.NopCloser(strings.NewReader("hello\n")),
+				}, nil
+			})
+
+		mockAPI.EXPECT().
+			CopyObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("backup-bucket"), gomock.Eq("key1"), gomock.Eq("processed/key1")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string, _ string, _ string) (*s3.CopyObjectOutput, error) {
+				close(backupDone)
+				return &s3.CopyObjectOutput{}, nil
+			})
+
+		mockAPI.EXPECT().
+			DeleteObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string) (*s3.DeleteObjectOutput, error) {
+				close(deleteDone)
+				return &s3.DeleteObjectOutput{}, nil
+			})
+
+		backupCfg := backupConfig{
+			NonAWSBackupToBucketName: "backup-bucket",
+			BackupToBucketPrefix:     "processed/",
+			Delete:                   true,
+		}
+
+		cfg := config{
+			NumberOfWorkers:    1,
+			BucketListInterval: pollInterval,
+			BucketARN:          bucket,
+			BucketListPrefix:   listPrefix,
+			BackupConfig:       backupCfg,
+		}
+		log := logptest.NewTestingLogger(t, inputName)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
+		states, err := newStates(nil, store, listPrefix)
+		require.NoError(t, err, "states creation must succeed")
+
+		poller := &s3PollerInput{
+			log:             log,
+			config:          cfg,
+			s3:              mockAPI,
+			pipeline:        pipeline,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
+		}
+
+		poller.runPoll(ctx)
+
+		// Finalization happens asynchronously after ACK; wait until it completes.
+		waitForChannel(t, backupDone, 3*testTimeout)
+		waitForChannel(t, deleteDone, 3*testTimeout)
 	})
 
 	t.Run("restart bucket scan after paging errors", func(t *testing.T) {
@@ -282,8 +399,9 @@ func TestS3Poller(t *testing.T) {
 			RegionName:         "region",
 		}
 
+		log := logptest.NewTestingLogger(t, inputName)
 		poller := &s3PollerInput{
-			log: logp.NewLogger(inputName),
+			log: log,
 			config: config{
 				NumberOfWorkers:    numberOfWorkers,
 				BucketListInterval: pollInterval,
@@ -304,9 +422,19 @@ func TestS3Poller(t *testing.T) {
 	})
 }
 
+func waitForChannel(t *testing.T, ch <-chan struct{}, timeout time.Duration) {
+	t.Helper()
+	select {
+	case <-ch:
+		return
+	case <-time.After(timeout):
+		t.Fatal("timed out waiting for async finalization")
+	}
+}
+
 func Test_S3StateHandling(t *testing.T) {
 	bucket := "bucket"
-	logger := logp.NewLogger(inputName)
+	logger := logptest.NewTestingLogger(t, inputName)
 	fixedTimeNow := time.Now()
 
 	tests := []struct {
@@ -509,6 +637,11 @@ func Test_S3StateHandling(t *testing.T) {
 					eventCallback(beat.Event{})
 					return nil
 				})
+			// FinalizeS3Object is called inside the ACK callback for every successfully
+			// stored object (state.Stored == true). The tests here use an empty
+			// backupConfig so the real implementation is a no-op, but the mock still
+			// needs an expectation to avoid "unexpected call" panics.
+			mockS3ObjectHandler.EXPECT().FinalizeS3Object().AnyTimes().Return(nil)
 
 			store := openTestStatestore()
 			s3States, err := newStates(logger, store, "")
@@ -541,7 +674,7 @@ func Test_S3StateHandling(t *testing.T) {
 			// then - desired state entries
 
 			// state must only contain expected state IDs
-			require.Equal(t, len(test.expectStateIDs), len(s3States.states))
+			require.Len(t, s3States.states, len(test.expectStateIDs))
 			for _, id := range test.expectStateIDs {
 				if s3States.states[id] == nil {
 					t.Errorf("state with ID %s should exist", id)
