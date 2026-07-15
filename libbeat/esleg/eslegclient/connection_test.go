@@ -240,45 +240,47 @@ func BenchmarkExecHTTPRequest(b *testing.B) {
 	}
 }
 
-// TestConnectionTLS tries to connect to a test HTTPS server (pretending
-// to be an Elasticsearch cluster), that deliberately presents TLS options
-// that are not FIPS-compliant.
-// - If the test is running with a FIPS-capable build, the client, being FIPS-
-// capable, should fail the TLS handshake. Concretely, the conn.Connect() method
-// should return an error.
-// - If the test is not running with a FIPS-capable build, the client should
-// complete the TLS handshake successfully. Concretely, the conn.Connect() method
-// should not return an error.
+// TestConnectionTLS connects to a test HTTPS server that presents a 1024-bit
+// RSA certificate, which is below the FIPS 140-3 minimum of 2048 bits.
+// In a FIPS build the handshake must fail; in a non-FIPS build it must succeed.
+// Both "strict" (verifies the full certificate chain) and "none" (skips chain
+// building and inspects only the certificates the peer presents) are covered,
+// since the FIPS key-type restriction must hold on either path.
 func TestConnectionTLS(t *testing.T) {
-	server := startTLSServer(t)
-	defer server.Close()
+	for _, verificationMode := range []string{"strict", "none"} {
+		t.Run(verificationMode, func(t *testing.T) {
+			server := startTLSServer(t)
+			defer server.Close()
 
-	transportSettings := `
+			transportSettings := `
 ssl:
   enabled: true
+  verification_mode: ` + verificationMode + `
 `
 
-	var transport httpcommon.HTTPTransportSettings
-	err := transport.Unpack(cfg.MustNewConfigFrom(transportSettings))
-	require.NoError(t, err)
+			var transport httpcommon.HTTPTransportSettings
+			err := transport.Unpack(cfg.MustNewConfigFrom(transportSettings))
+			require.NoError(t, err)
 
-	transport.TLS.CAs = []string{string(caCertPEM)}
+			transport.TLS.CAs = []string{string(caCertPEM)}
 
-	log := logptest.NewTestingLogger(t, "TestConnectionTLS")
-	conn, err := NewConnection(ConnectionSettings{
-		URL:       server.URL,
-		Transport: transport,
-	}, log)
-	require.NoError(t, err)
+			log := logptest.NewTestingLogger(t, "TestConnectionTLS")
+			conn, err := NewConnection(ConnectionSettings{
+				URL:       server.URL,
+				Transport: transport,
+			}, log)
+			require.NoError(t, err)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	err = conn.Connect(ctx)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			err = conn.Connect(ctx)
 
-	if version.FIPSDistribution {
-		require.ErrorContains(t, err, "tls: internal error")
-	} else {
-		require.NoError(t, err)
+			if version.FIPSDistribution {
+				require.ErrorContains(t, err, "RSA-1024 public key which is not allowed by FIPS 140-3")
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
