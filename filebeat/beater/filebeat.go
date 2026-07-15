@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -270,7 +271,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry(b.Info.Logger, b.Info.Paths))
+			gzipRegistry(b.Info.Logger, b.Info.Paths),
+		)
 	}
 
 	if !fb.moduleRegistry.Empty() {
@@ -588,7 +590,6 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 	return pipelineLoaderFactory
 }
 
-<<<<<<< HEAD
 // fetches all the defined input configuration available at Filebeat startup including external files.
 func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []*conf.C, err error) {
 	if len(config.Inputs) == 0 {
@@ -631,7 +632,8 @@ func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []
 	}
 
 	return inputs, nil
-=======
+}
+
 type closeOnce struct {
 	ch   chan struct{}
 	once sync.Once
@@ -641,5 +643,4 @@ func (coc *closeOnce) Close() {
 	coc.once.Do(func() {
 		close(coc.ch)
 	})
->>>>>>> af686c255 (synchronize filebeat run and shutdown functions (#51800))
 }
