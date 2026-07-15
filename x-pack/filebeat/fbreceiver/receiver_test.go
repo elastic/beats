@@ -568,7 +568,7 @@ type logGenerator struct {
 	t           *testing.T
 	tmpDir      string
 	f           *os.File
-	sequenceNum int64
+	sequenceNum atomic.Int64
 	currentFile string
 	waitReady   func()
 }
@@ -591,7 +591,7 @@ func (g *logGenerator) Start() {
 	require.NoError(g.t, err)
 	g.f = f
 	g.currentFile = filePath
-	atomic.StoreInt64(&g.sequenceNum, 0)
+	g.sequenceNum.Store(0)
 	if g.waitReady != nil {
 		g.waitReady()
 	}
@@ -609,7 +609,7 @@ func (g *logGenerator) Stop() {
 }
 
 func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
-	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(atomic.AddInt64(&g.sequenceNum, 1), 10))
+	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(g.sequenceNum.Add(1), 10))
 
 	_, err := fmt.Fprintln(g.f, `{"id": "`+id+`", "message": "log message"}`)
 	require.NoError(g.t, err, "failed to write log line to file")

@@ -22,9 +22,11 @@ import (
 	"fmt"
 	"go/build"
 	"log"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/josephspurrier/goversioninfo"
@@ -115,9 +117,7 @@ func DefaultBuildArgs() BuildArgs {
 		for _, tag := range FIPSConfig.Compile.Tags {
 			args.ExtraFlags = append(args.ExtraFlags, "-tags="+tag)
 		}
-		for varName, value := range FIPSConfig.Compile.Env {
-			args.Env[varName] = value
-		}
+		maps.Copy(args.Env, FIPSConfig.Compile.Env)
 	}
 
 	return args
@@ -139,12 +139,7 @@ func positionIndependentCodeSupported() bool {
 }
 
 func oneOf(value string, lst ...string) bool {
-	for _, other := range lst {
-		if other == value {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(lst, value)
 }
 
 // DefaultGolangCrossBuildArgs returns the default BuildArgs for use in

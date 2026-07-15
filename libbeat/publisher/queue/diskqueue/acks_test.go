@@ -96,7 +96,7 @@ func TestAddFrames(t *testing.T) {
 					&queuePosition{1, segmentHeaderSize + 150, 2},
 					// This time we crossed a boundary so we should get an ACK for segment
 					// 0 on the notification channel.
-					segmentIDRef(0),
+					new(segmentID(0)),
 				},
 			},
 		},
@@ -140,7 +140,7 @@ func TestAddFrames(t *testing.T) {
 					},
 					frameID(7),
 					&queuePosition{2, segmentHeaderSize + 100, 1},
-					segmentIDRef(1),
+					new(segmentID(1)),
 				},
 				{
 					"Acknowledge the middle frame of segment 2",
@@ -167,7 +167,7 @@ func TestAddFrames(t *testing.T) {
 					&queuePosition{3, segmentHeaderSize + 100, 1},
 					// We advanced from segment 0 to segment 3, so we expect
 					// segmentID 2 on the ACK channel.
-					segmentIDRef(2),
+					new(segmentID(2)),
 				},
 			},
 		},
@@ -184,7 +184,7 @@ func TestAddFrames(t *testing.T) {
 					&queuePosition{10, segmentHeaderSize + 100, 1},
 					// We advanced to segment 10, so we expect segmentID 9 on
 					// the ACK channel.
-					segmentIDRef(9),
+					new(segmentID(9)),
 				},
 			},
 		},
@@ -217,7 +217,7 @@ func TestAddFrames(t *testing.T) {
 					[]*readFrame{
 						{
 							segment: &queueSegment{
-								schemaVersion: uint32Ref(0),
+								schemaVersion: new(uint32(0)),
 							},
 							bytesOnDisk: 100,
 						},
@@ -294,8 +294,9 @@ func (dqa *diskQueueACKs) assertACKedSegment(
 	}
 }
 
+//go:fix inline
 func uint32Ref(v uint32) *uint32 {
-	return &v
+	return new(v)
 }
 
 // rf assembles a readFrame with the given parameters and a spoofed

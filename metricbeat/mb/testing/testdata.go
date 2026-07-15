@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -107,7 +108,7 @@ type DataConfig struct {
 	//     foo: bar
 	//
 	// (notice last two lines)
-	Module map[string]interface{} `yaml:"module"`
+	Module map[string]any `yaml:"module"`
 
 	// OmitDocumentedFieldsCheck is a list of fields that must be omitted from the function that checks if the field
 	// is contained in {metricset}/_meta/fields.yml
@@ -383,7 +384,7 @@ func checkDocumented(data []mapstr.M, omitFields []string) error {
 		return err
 	}
 	documentedFields := fields.GetKeys()
-	keys := map[string]interface{}{}
+	keys := map[string]any{}
 
 	for _, k := range documentedFields {
 		keys[k] = struct{}{}
@@ -399,7 +400,7 @@ func checkDocumented(data []mapstr.M, omitFields []string) error {
 	return nil
 }
 
-func documentedFieldCheck(foundKeys mapstr.M, knownKeys map[string]interface{}, omitFields []string) error {
+func documentedFieldCheck(foundKeys mapstr.M, knownKeys map[string]any, omitFields []string) error {
 	// Sort all found keys to guarantee consistent validation messages
 	sortedFoundKeys := make([]string, 0, len(foundKeys))
 	for k := range foundKeys {
@@ -481,16 +482,14 @@ func omitDocumentedField(field, omitField string) bool {
 }
 
 // getConfig returns config for elasticsearch module
-func getConfig(module, metricSet, url string, config DataConfig) map[string]interface{} {
-	moduleConfig := map[string]interface{}{
+func getConfig(module, metricSet, url string, config DataConfig) map[string]any {
+	moduleConfig := map[string]any{
 		"module":     module,
 		"metricsets": []string{metricSet},
 		"hosts":      []string{url},
 	}
 
-	for k, v := range config.Module {
-		moduleConfig[k] = v
-	}
+	maps.Copy(moduleConfig, config.Module)
 
 	return moduleConfig
 }

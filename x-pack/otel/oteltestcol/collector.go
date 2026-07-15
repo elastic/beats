@@ -82,13 +82,11 @@ func New(tb testing.TB, configYAML string) *Collector {
 		}
 	})
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		ctx, cancel := signal.NotifyContext(tb.Context(), os.Interrupt)
 		defer cancel()
 		assert.NoError(tb, col.Run(ctx))
-	}()
+	})
 
 	require.Eventually(tb, func() bool {
 		return col.GetState() == otelcol.StateRunning

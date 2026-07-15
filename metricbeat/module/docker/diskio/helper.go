@@ -18,6 +18,7 @@
 package diskio
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -183,12 +184,7 @@ func getNewStats(skip []uint64, time time.Time, blkioEntry []container.BlkioStat
 }
 
 func skipDev(major uint64, skipList []uint64) bool {
-	for _, dev := range skipList {
-		if major == dev {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(skipList, major)
 }
 
 func (io *BlkioService) getReadPs(old *BlkioRaw, new *BlkioRaw) float64 {

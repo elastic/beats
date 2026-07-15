@@ -80,8 +80,8 @@ func (d *dropProcessor) String() string                         { return "dropPr
 // "i" matching matchValue, wrapping inner.
 func makeWhenProcessor(t *testing.T, matchValue int, inner beat.Processor) *WhenProcessor {
 	t.Helper()
-	raw, err := conf.NewConfigFrom(map[string]interface{}{
-		"equals": map[string]interface{}{"i": matchValue},
+	raw, err := conf.NewConfigFrom(map[string]any{
+		"equals": map[string]any{"i": matchValue},
 	})
 	require.NoError(t, err)
 	var condConfig conditions.Config
@@ -166,7 +166,7 @@ func TestWhenProcessorPdataLegacyFallbackMetadata(t *testing.T) {
 	require.NoError(t, err)
 	assert.False(t, drop)
 
-	meta, ok := otelmap.ToMapstr(body)["@metadata"].(map[string]interface{})
+	meta, ok := otelmap.ToMapstr(body)["@metadata"].(map[string]any)
 	require.True(t, ok, "@metadata must survive the round-trip as a map")
 	assert.Equal(t, "abc123", meta["_id"], "existing @metadata fields must be preserved")
 	assert.Equal(t, "index", meta["op_type"], "inner processor must have written op_type to @metadata")

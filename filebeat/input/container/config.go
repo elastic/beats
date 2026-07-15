@@ -19,6 +19,7 @@ package container
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -49,10 +50,5 @@ func (c *config) Validate() error {
 }
 
 func stringInSlice(str string, list []string) bool {
-	for _, v := range list {
-		if v == str {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, str)
 }

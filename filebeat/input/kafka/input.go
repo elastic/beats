@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -111,7 +112,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: acker.ConnectionOnly(
-			acker.EventPrivateReporter(func(_ int, events []interface{}) {
+			acker.EventPrivateReporter(func(_ int, events []any) {
 				for _, event := range events {
 					if meta, ok := event.(eventMeta); ok {
 						meta.ackHandler()
@@ -264,7 +265,7 @@ func (c channelCtx) Done() <-chan struct{} {
 func (c channelCtx) Err() error {
 	return c.ctx.Cancelation.Err()
 }
-func (c channelCtx) Value(_ interface{}) interface{} { return nil }
+func (c channelCtx) Value(_ any) any { return nil }
 
 // The group handler for the sarama consumer group interface. In addition to
 // providing the basic consumption callbacks needed by sarama, groupHandler is
@@ -415,7 +416,7 @@ func (l *listFromFieldReader) returnFromBuffer() (reader.Message, error) {
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (l *listFromFieldReader) parseMultipleMessages(bMessage []byte) []string {
-	var obj map[string][]interface{}
+	var obj map[string][]any
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
 		l.log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", l.field), "error", err)
@@ -470,10 +471,5 @@ func composeMessage(timestamp time.Time, content []byte, kafkaFields mapstr.M, a
 }
 
 func contains(elements []string, element string) bool {
-	for _, e := range elements {
-		if e == element {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(elements, element)
 }

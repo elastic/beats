@@ -326,7 +326,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"packetbeat": map[string]any{
 				"interfaces": map[string]any{
 					"device": "lo0",
