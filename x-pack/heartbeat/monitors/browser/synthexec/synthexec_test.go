@@ -20,6 +20,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
@@ -82,7 +83,7 @@ func TestSyntheticsCrosslinkEnv(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.want, syntheticsCrosslinkEnv(tt.traceID, tt.sFields))
+			assert.Equal(t, tt.want, syntheticsCrosslinkEnv(tt.traceID, tt.sFields))
 		})
 	}
 }

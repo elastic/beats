@@ -31,16 +31,6 @@ import (
 
 const debugSelector = "synthexec"
 
-// synthexecLog returns the package logger. It centralizes access to the global
-// logger so the rest of the package doesn't reference logp.L() directly. The
-// synthetics job factory is not handed a *logp.Logger, so threading one through
-// is out of scope for this change.
-//
-//nolint:forbidigo // global logger resolved lazily; logger threading is out of scope here
-func synthexecLog() *logp.Logger {
-	return logp.L()
-}
-
 type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
@@ -229,10 +219,12 @@ func runCmd(
 	// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
 	cmd.Args = append(cmd.Args, "--outfd", "3")
 
-	synthexecLog().Info("Running command: %s in directory: '%s'", cmd, cmd.Dir)
+	//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+	logp.L().Info("Running command: %s in directory: '%s'", cmd, cmd.Dir)
 
 	if stdinStr != nil {
-		synthexecLog().Debug(debugSelector, "Using stdin str %s", *stdinStr)
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Debug(debugSelector, "Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
@@ -247,7 +239,8 @@ func runCmd(
 	go func() {
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
-			synthexecLog().Warn("could not scan stdout events from synthetics: %s", err)
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warn("could not scan stdout events from synthetics: %s", err)
 		}
 
 		wg.Done()
@@ -261,7 +254,8 @@ func runCmd(
 	go func() {
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
-			synthexecLog().Warn("could not scan stderr events from synthetics: %s", err)
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warn("could not scan stderr events from synthetics: %s", err)
 		}
 		wg.Done()
 	}()
@@ -282,7 +276,8 @@ func runCmd(
 				break
 			}
 			if err != nil {
-				synthexecLog().Warnf("error decoding json for test json results: %v", err)
+				//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+				logp.L().Warnf("error decoding json for test json results: %v", err)
 			}
 
 			mpx.writeSynthEvent(&se)
@@ -310,7 +305,8 @@ func runCmd(
 
 	err = <-cmdStarted
 	if err != nil {
-		synthexecLog().Warn("Could not start command %s: %s", cmd, err)
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
 	}
 
@@ -327,7 +323,8 @@ func runCmd(
 
 		err := cmd.Process.Kill()
 		if err != nil {
-			synthexecLog().Warn("could not kill synthetics process: %s", err)
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warn("could not kill synthetics process: %s", err)
 		}
 	}()
 
@@ -335,13 +332,15 @@ func runCmd(
 	go func() {
 		err := <-cmdDone
 		_ = jsonWriter.Close()
-		synthexecLog().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
 		var cmdError *SynthError = nil
 		if err != nil {
 			// err could be generic or it could have been killed by context timeout, log and check context
 			// to decide which error to stream
-			synthexecLog().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
@@ -378,7 +377,8 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	for scanner.Scan() {
 		se, err := transform(scanner.Bytes(), scanner.Text())
 		if err != nil {
-			synthexecLog().Warn("error parsing line: %s for line: %s", err, scanner.Text())
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warn("error parsing line: %s for line: %s", err, scanner.Text())
 			continue
 		}
 		if se != nil {
@@ -387,7 +387,8 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	}
 
 	if scanner.Err() != nil {
-		synthexecLog().Warn("error scanning synthetics runner results %s", scanner.Err())
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Warn("error scanning synthetics runner results %s", scanner.Err())
 		return scanner.Err()
 	}
 
@@ -400,7 +401,8 @@ var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 // lineToSynthEventFactory is a factory that can take a line from the scanner and transform it into a *SynthEvent.
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
 	return func(bytes []byte, text string) (res *SynthEvent, err error) {
-		synthexecLog().Info("%s: %s", typ, text)
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
