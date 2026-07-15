@@ -306,8 +306,8 @@ func (Release) UpdateMergify(version string) error {
 	return release.UpdateMergify(version)
 }
 
-// RunMajorMinor executes the complete major/minor release workflow
-// This creates 1 PR with all version updates
+// RunMajorMinor executes the feature-freeze workflow (ingest-dev prepare-next-release):
+// creates the release branch and 2 PRs bumping to NEXT_RELEASE (version, test-env).
 func (Release) RunMajorMinor() error {
 	cfg, err := release.LoadConfigFromEnv()
 	if err != nil {
@@ -324,15 +324,6 @@ func (Release) RunPatch() error {
 		return err
 	}
 	return release.RunPatchRelease(cfg)
-}
-
-// RunNextRelease executes the next-release workflow (2 PRs onto the release branch)
-func (Release) RunNextRelease() error {
-	cfg, err := release.LoadConfigFromEnv()
-	if err != nil {
-		return err
-	}
-	return release.RunNextRelease(cfg)
 }
 
 // RunChangelog executes the complete changelog workflow

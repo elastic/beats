@@ -28,7 +28,7 @@ This package provides release automation for the Beats project, migrated from Ma
 - Deprecated version checks
 
 **Workflows supported:**
-1. **Major/Minor Release** - Creates release branch + 2 PRs for NEXT_RELEASE (version/docs, test-env)
+1. **Major/Minor Release (feature-freeze)** - Creates release branch + 2 PRs for NEXT_RELEASE (version, test-env). Maps to ingest-dev `prepare-next-release`.
 2. **Patch Release** - Creates up to 3 PRs (version, docs, test-env)
 3. **Changelog** - Generates changelog and creates 1 PR
 
@@ -81,7 +81,7 @@ mage -l | grep release
 You should see:
 ```
 release:runChangelog     Executes the complete changelog workflow
-release:runMajorMinor    Executes the complete major/minor release workflow
+release:runMajorMinor    Feature-freeze workflow (release branch + 2 PRs for NEXT_RELEASE)
 release:runPatch         Executes the complete patch release workflow
 release:updateDocs       Updates version references in documentation and K8s manifests
 release:updateMergify    Updates .mergify.yml backport configuration
@@ -134,20 +134,21 @@ export DRY_RUN="true"
 
 ## Release Workflows
 
-### Major/Minor Release
+### Major/Minor Release (Feature Freeze)
 
-Creates a new major or minor release (e.g., 9.0.0, 9.3.0).
+Runs at a new major or minor version (e.g., 9.0.0, 9.3.0). This is the
+feature-freeze workflow, equivalent to ingest-dev `prepare-next-release` +
+`create-prs-next-release`.
 
 **What it does:**
 1. Validates version and checks for deprecated releases
-2. Creates release branch (e.g., `9.3`)
-3. Creates update branch (e.g., `update-version-9.3.0`)
-4. Updates version in `libbeat/version/version.go`
-5. Updates documentation and K8s manifests
-6. Updates test environment configurations
-7. Commits all changes
-8. Pushes to remote (unless DRY_RUN)
-9. Creates 1 PR (unless DRY_RUN)
+2. Creates release branch from `BASE_BRANCH` (e.g., `9.3`)
+3. Creates version branch `update-version-next-$(NEXT_RELEASE)` (e.g., `9.3.1`)
+4. Updates `libbeat/version/version.go` and `:stack-version:` in docs, then runs `make update`
+5. Creates test-env branch `update-testing-env-next-$(NEXT_RELEASE)`
+6. Updates test environment configurations for `NEXT_RELEASE`
+7. Commits changes on each branch
+8. Pushes release branch and opens 2 PRs (unless DRY_RUN)
 
 **Usage:**
 
@@ -341,19 +342,19 @@ mage release:runMajorMinor
 ```
 === Starting Major/Minor Release Workflow ===
 Creating release branch: 9.3
-Created branch: 9.3
-Checked out branch: 9.3
-Created branch: update-version-9.3.0
-Checked out branch: update-version-9.3.0
-Updating version files...
-Updated version to 9.3.0 in libbeat/version/version.go
-Updated documentation files to version 9.3.0
-Updated test environment files from 9.2.0 to 9.3.0
-Created commit: abc123...
+
+--- Creating PR 1: Version to NEXT_RELEASE ---
+Updated version to 9.3.1 in libbeat/version/version.go
+Updated stack-version to 9.3.1 in libbeat/docs/version.asciidoc
+Running 'make --silent update'...
+
+--- Creating PR 2: Test Environments to NEXT_RELEASE ---
+Updated test environment files (latest=9.3.0, current=9.3.1)
 
 DRY RUN: Skipping push and PR creation
-Branches created: 9.3, update-version-9.3.0
-Review changes with 'git diff'
+Release branch prepared: 9.3
+Branch prepared: update-version-next-9.3.1
+Branch prepared: update-testing-env-next-9.3.1
 ```
 
 ## Multi-PR Workflows

@@ -45,9 +45,10 @@ These values are inferred to reduce manual configuration. You can always overrid
 
 ## Quick Start
 
-### Major/Minor Release (9.3.0)
+### Major/Minor Release / Feature Freeze (9.3.0)
 
-Creates the release branch and 2 PRs for the next patch (e.g. 9.3.0 → PRs for 9.3.1):
+Feature-freeze workflow (`ingest-dev` `prepare-next-release`). Creates the release
+branch and 2 PRs for the next patch (e.g. `9.3.0` → PRs for `9.3.1`):
 
 ```bash
 export CURRENT_RELEASE="9.3.0"
@@ -107,9 +108,8 @@ mage release:runChangelog
 These orchestrate the complete workflow:
 
 ```bash
-mage release:runMajorMinor    # Major/minor release (release branch + 2 PRs)
+mage release:runMajorMinor    # Feature-freeze (release branch + 2 PRs for NEXT_RELEASE)
 mage release:runPatch          # Patch release (up to 3 PRs)
-mage release:runNextRelease    # Alias for major/minor next-release PRs
 mage release:runChangelog      # Changelog workflow (1 PR)
 ```
 

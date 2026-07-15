@@ -67,9 +67,9 @@ func checkRequirements(cfg *ReleaseConfig) error {
 	return nil
 }
 
-// RunMajorMinorRelease executes the feature-freeze workflow:
-// 1. Creates the release branch
-// 2. Opens a version/docs PR for NEXT_RELEASE (prepare-next-release)
+// RunMajorMinorRelease executes the feature-freeze workflow (ingest-dev prepare-next-release):
+// 1. Creates the release branch from BASE_BRANCH
+// 2. Opens a version PR for NEXT_RELEASE (stack-version + make update)
 // 3. Opens a test-environment PR for NEXT_RELEASE
 func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	fmt.Println("=== Starting Major/Minor Release Workflow ===")
@@ -342,11 +342,6 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	}
 
 	return nil
-}
-
-// RunNextRelease executes prepare-next-release only (2 PRs onto the release branch).
-func RunNextRelease(cfg *ReleaseConfig) error {
-	return RunMajorMinorRelease(cfg)
 }
 
 type workflowPR struct {
