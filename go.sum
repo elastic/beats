@@ -433,6 +433,8 @@ github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7 h1:LTx9zlFG3yx
 github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.4 h1:7NRnWJDFjEKpOjnHhtzrPGZWr9EMrYFsLjF4q0Czosk=
 github.com/elastic/gosigar v0.14.4/go.mod h1:tx91Eb3YgFk6y++h88fRAnxic3Si1ZDHooqnJU/hqo8=
+github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab h1:p33sNyLrsWoIoRFL3E6hKajacBbsHuST8xW7y7cxGzY=
+github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab/go.mod h1:t8v3y03G3KubyWgYqe+Jcxj/jDddnkp70743iSYrQiU=
 github.com/elastic/mito v1.27.0 h1:FM01Ql1OMx6uL3ogW0LoI8Ruc0O6gzmwLNBV8Zk13Yw=
 github.com/elastic/mito v1.27.0/go.mod h1:zFVE48AlN/iW7fryFDDPBh3yp1A4KWnkNuwxZt6HQ6A=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6 h1:JVNuBrmOoqLJgp9o68YBMnOrXCzQI3mCppW+suwRSlw=
@@ -1548,8 +1550,6 @@ gopkg.in/inf.v0 v0.9.1 h1:73M5CoZyi3ZLMOyDlQh031Cx6N9NDJ2Vvfl76EDAgDc=
 gopkg.in/inf.v0 v0.9.1/go.mod h1:cWUDdTG/fYaXco+Dcufb5Vnc6Gp2YChqWtbxRZE0mXw=
 gopkg.in/mcuadros/go-syslog.v2 v2.3.0 h1:kcsiS+WsTKyIEPABJBJtoG0KkOS6yzvJ+/eZlhD79kk=
 gopkg.in/mcuadros/go-syslog.v2 v2.3.0/go.mod h1:l5LPIyOOyIdQquNg+oU6Z3524YwrcqEm0aKH+5zpt2U=
-gopkg.in/natefinch/lumberjack.v2 v2.2.1 h1:bBRl1b0OH9s/DuPhuXpNl+VtCaJXFZ5/uEFST95x9zc=
-gopkg.in/natefinch/lumberjack.v2 v2.2.1/go.mod h1:YD8tP3GAjkrDg1eZH7EGmyESg/lsYskCTPBJVb9jqSc=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 h1:uRGJdciOHaEIrze2W8Q3AKkepLTh2hOroT7a+7czfdQ=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWDmTeBkI65Dw0HsyUHuEVlX15mw=
 gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0/go.mod h1:WDnlLJ4WF5VGsH/HVa3CI79GS0ol3YnhVnKP89i0kNg=
