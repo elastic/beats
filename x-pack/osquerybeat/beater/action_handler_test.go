@@ -36,6 +36,10 @@ type mockPublisher struct {
 	idValue    string
 	idFieldKey string
 	responseID string
+	spaceID    string
+	packID     string
+	packName   string
+	queryName  string
 	meta       map[string]interface{}
 	hits       []map[string]interface{}
 	ecsm       ecs.Mapping
@@ -43,11 +47,15 @@ type mockPublisher struct {
 	profile    map[string]interface{}
 }
 
-func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
 	p.idValue = idValue
 	p.idFieldKey = idFieldKey
 	p.responseID = responseID
+	p.spaceID = spaceID
+	p.packID = packID
+	p.packName = packName
+	p.queryName = queryName
 	p.meta = meta
 	p.hits = hits
 	p.ecsm = ecsm

@@ -36,10 +36,12 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/features"
+	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -1897,9 +1899,90 @@ service:
 	}
 }
 
-// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full otel pipeline.
+type benchPreset struct {
+	name string
+
+	// beats queue
+	memQueueEvents       int
+	memQueueMinEvents    int
+	memQueueFlushTimeout string
+
+	// sending_queue
+	maxConnsPerHost   int
+	expBatchMaxSize   int
+	expBatchMinSize   int
+	expFlushTimeout   string
+	expNumConsumers   int
+	expQueueSize      int
+	eventCountPerRecv int
+}
+
+// presetFields mirrors the subset of elasticsearch.ElasticsearchConfig that
+// elasticsearch.ApplyPreset's preset configs set, so the real preset values
+// can be unpacked directly instead of hand-copied into benchPresets.
+type presetFields struct {
+	BulkMaxSize            int           `config:"bulk_max_size"`
+	Worker                 int           `config:"worker"`
+	QueueMemEvents         int           `config:"queue.mem.events"`
+	QueueMemFlushMinEvents int           `config:"queue.mem.flush.min_events"`
+	QueueMemFlushTimeout   time.Duration `config:"queue.mem.flush.timeout"`
+}
+
+// benchPresetFromName builds a benchPreset from the real preset config
+// applied by elasticsearch.ApplyPreset, keeping the benchmark's queue/batch
+// settings in sync with the actual preset definitions instead of a
+// hand-maintained copy. eventCountPerRecv is picked as the nearest multiple
+// of the preset's min_events/bulk_max_size threshold to targetEventCount, so
+// the benchmark's fixed, bounded event count doesn't leave a leftover
+// partial batch that has to wait out the full flush timeout before the
+// mem-queue (or the exporter's own sending_queue) releases it.
+func benchPresetFromName(name string, targetEventCount int) benchPreset {
+	_, presetCfg, err := esoutput.ApplyPreset(name, config.NewConfig())
+	if err != nil {
+		panic(fmt.Sprintf("unknown benchmark preset %q: %v", name, err))
+	}
+
+	var pf presetFields
+	if err := presetCfg.Unpack(&pf); err != nil {
+		panic(fmt.Sprintf("failed to unpack benchmark preset %q: %v", name, err))
+	}
+
+	eventCountPerRecv := (targetEventCount / pf.QueueMemFlushMinEvents) * pf.QueueMemFlushMinEvents
+
+	return benchPreset{
+		name:                 name,
+		memQueueEvents:       pf.QueueMemEvents,
+		memQueueMinEvents:    pf.QueueMemFlushMinEvents,
+		memQueueFlushTimeout: pf.QueueMemFlushTimeout.String(),
+		maxConnsPerHost:      pf.Worker,
+		expBatchMaxSize:      pf.BulkMaxSize,
+		expBatchMinSize:      pf.BulkMaxSize,
+		expFlushTimeout:      pf.QueueMemFlushTimeout.String(),
+		expNumConsumers:      pf.Worker,
+		expQueueSize:         pf.QueueMemEvents,
+		eventCountPerRecv:    eventCountPerRecv,
+	}
+}
+
+var benchPresets = []benchPreset{
+	benchPresetFromName("throughput", 32_000),
+	benchPresetFromName("balanced", 32_000),
+	benchPresetFromName("scale", 32_000),
+	benchPresetFromName("latency", 32_000),
+}
+
+// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full
+// otel pipeline, once per benchmark preset (see benchPresets).
 func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
-	const eventCount = 100_000
+	for _, preset := range benchPresets {
+		b.Run(preset.name, func(b *testing.B) {
+			benchmarkFilebeatOTelThroughputMockES(b, preset)
+		})
+	}
+}
+
+func benchmarkFilebeatOTelThroughputMockES(b *testing.B, preset benchPreset) {
+	eventCount := preset.eventCountPerRecv * 3
 
 	for b.Loop() {
 		b.StopTimer()
@@ -1937,15 +2020,41 @@ func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
 		)
 
 		cfg := renderOtelConfig(b, `receivers:
-  filebeatreceiver:
+  filebeatreceiver/1:
     filebeat:
       inputs:
         - type: benchmark
           enabled: true
-          count: {{.EventCount}}
-    path.home: {{.PathHome}}
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/1
     setup.template.enabled: false
-    queue.mem.flush.timeout: 0s
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/2
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/3:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/3
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
     processors: []
 exporters:
   elasticsearch:
@@ -1955,28 +2064,46 @@ exporters:
     endpoints:
       - {{.ESEndpoint}}
     logs_index: benchtest
-    max_conns_per_host: 4
+    max_conns_per_host: {{.MaxConnsPerHost}}
     sending_queue:
       batch:
-        flush_timeout: 5s
-        max_size: 1600
-        min_size: 0
+        flush_timeout: {{.ExpFlushTimeout}}
+        max_size: {{.ExpBatchMaxSize}}
+        min_size: {{.ExpBatchMinSize}}
         sizer: items
       block_on_overflow: true
       enabled: true
-      num_consumers: 4
-      queue_size: 12800
+      num_consumers: {{.ExpNumConsumers}}
+      queue_size: {{.ExpQueueSize}}
       wait_for_result: true
     suppress_conflict_errors: true
 processors:
   beat:
     processors:
       - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            env: staging
 service:
   pipelines:
-    logs:
+    logs/1:
       receivers:
-        - filebeatreceiver
+        - filebeatreceiver/1
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/2:
+      receivers:
+        - filebeatreceiver/2
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/3:
+      receivers:
+        - filebeatreceiver/3
       processors:
         - beat
       exporters:
@@ -1987,13 +2114,31 @@ service:
     metrics:
       level: none
 `, struct {
-			EventCount int
-			PathHome   string
-			ESEndpoint string
+			EventCountPerReceiver int
+			PathHome              string
+			ESEndpoint            string
+			MemQueueEvents        int
+			MemQueueMinEvents     int
+			MemQueueFlushTimeout  string
+			MaxConnsPerHost       int
+			ExpBatchMaxSize       int
+			ExpBatchMinSize       int
+			ExpFlushTimeout       string
+			ExpNumConsumers       int
+			ExpQueueSize          int
 		}{
-			EventCount: eventCount,
-			PathHome:   tmpDir,
-			ESEndpoint: mockServer.URL,
+			EventCountPerReceiver: preset.eventCountPerRecv,
+			PathHome:              tmpDir,
+			ESEndpoint:            mockServer.URL,
+			MemQueueEvents:        preset.memQueueEvents,
+			MemQueueMinEvents:     preset.memQueueMinEvents,
+			MemQueueFlushTimeout:  preset.memQueueFlushTimeout,
+			MaxConnsPerHost:       preset.maxConnsPerHost,
+			ExpBatchMaxSize:       preset.expBatchMaxSize,
+			ExpBatchMinSize:       preset.expBatchMinSize,
+			ExpFlushTimeout:       preset.expFlushTimeout,
+			ExpNumConsumers:       preset.expNumConsumers,
+			ExpQueueSize:          preset.expQueueSize,
 		})
 
 		b.StartTimer()

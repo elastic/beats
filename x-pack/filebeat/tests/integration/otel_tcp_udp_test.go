@@ -119,41 +119,7 @@ processors:
     - add_kubernetes_metadata: ~
 `
 
-	otelConfig := `exporters:
-    elasticsearch:
-        auth:
-            authenticator: beatsauth
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - {{ .ESURL }}
-        logs_index: {{ .Index }}
-        max_conns_per_host: 1
-        password: {{ .Password }}
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                flush_timeout: 10s
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        user: {{ .Username }}
-extensions:
-    beatsauth:
-        idle_connection_timeout: 3s
-        proxy_disable: false
-        timeout: 1m30s
-receivers:
+	otelConfig := otelElasticsearchExporterYAML + `receivers:
     filebeatreceiver:
         filebeat:
             inputs:
@@ -168,19 +134,7 @@ receivers:
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
         path.home: {{ .PathHome }}
-service:
-    extensions:
-        - beatsauth
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - filebeatreceiver
-    telemetry:
-        metrics:
-            level: none
-`
+` + otelElasticsearchServiceYAML
 
 	optionsValue := options{
 		InputType: inputType,
@@ -226,34 +180,10 @@ service:
 	es := integration.GetESClient(t, "http")
 
 	t.Cleanup(func() {
-		_, err := es.Indices.DeleteDataStream([]string{
-			otelIndex,
-			fbIndex,
-		})
-		require.NoError(t, err, "failed to delete data streams")
+		deleteDataStreamsFromES(t, es, []string{otelIndex, fbIndex})
 	})
 
-	rawQuery := map[string]any{
-		"query": map[string]any{
-			"bool": map[string]any{
-				"must": []map[string]any{
-					{
-						"match_phrase": map[string]any{
-							"input.type": inputType,
-						},
-					},
-					{
-						"match_phrase": map[string]any{
-							"message": testMessage,
-						},
-					},
-				},
-			},
-		},
-		"sort": []map[string]any{
-			{"@timestamp": map[string]any{"order": "asc"}},
-		},
-	}
+	rawQuery := otelE2ERawQueryForInputTypeAndMessage(inputType, testMessage)
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
