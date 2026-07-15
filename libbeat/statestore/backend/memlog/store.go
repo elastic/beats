@@ -50,7 +50,7 @@ type memstore struct {
 }
 
 type entry struct {
-	value map[string]interface{}
+	value map[string]any
 }
 
 // openStore opens a store from the home path.
@@ -169,7 +169,7 @@ func (s *store) Has(key string) (bool, error) {
 }
 
 // Get retrieves and decodes the key-value pair into to.
-func (s *store) Get(key string, to interface{}) error {
+func (s *store) Get(key string, to any) error {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -183,7 +183,7 @@ func (s *store) Get(key string, to interface{}) error {
 // Set inserts or overwrites a key-value pair.
 // If encoding was successful the in-memory state will be updated and a
 // set-operation is logged to the diskstore.
-func (s *store) Set(key string, value interface{}) error {
+func (s *store) Set(key string, value any) error {
 	var tmp mapstr.M
 	if err := typeconv.Convert(&tmp, value); err != nil {
 		return err
@@ -280,6 +280,6 @@ func (s *store) SetID(_ string) {
 	// NOOP
 }
 
-func (e entry) Decode(to interface{}) error {
+func (e entry) Decode(to any) error {
 	return typeconv.Convert(to, e.value)
 }

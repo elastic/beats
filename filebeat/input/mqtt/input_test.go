@@ -168,7 +168,7 @@ func TestNewInput_Run_Wait(t *testing.T) {
 	var inputContext finput.Context
 
 	var messages []mockedMessage
-	for i := 0; i < numMessages; i++ {
+	for range numMessages {
 		messages = append(messages, mockedMessage{
 			duplicate: false,
 			messageID: 1,

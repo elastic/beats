@@ -74,7 +74,6 @@ func (inp *managedInput) Name() string { return inp.input.Name() }
 func (inp *managedInput) Test(ctx input.TestContext) error {
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
-		source := source
 		grp.Go(func() (err error) {
 			return inp.testSource(ctx, source)
 		})
@@ -123,7 +122,6 @@ func (inp *managedInput) Run(
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
-		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
 			inpCtxID := ctx.ID + "::" + source.Name()
@@ -204,10 +202,10 @@ func (inp *managedInput) createSourceID(s Source) string {
 }
 
 func newInputACKHandler(log *logp.Logger) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		var n uint
 		var last int
-		for i := 0; i < len(private); i++ {
+		for i := range private {
 			current := private[i]
 			if current == nil {
 				continue

@@ -203,13 +203,13 @@ func (h *HTTP) FetchScanner() (*bufio.Scanner, error) {
 
 // FetchJSON makes an HTTP request to the configured url and returns the JSON content.
 // This only works if the JSON output needed is in map[string]interface format.
-func (h *HTTP) FetchJSON() (map[string]interface{}, error) {
+func (h *HTTP) FetchJSON() (map[string]any, error) {
 	body, err := h.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 
@@ -52,8 +53,8 @@ func Initialize() {
 		AddAllowedBackwardsCompatibleFlag("c")
 		overwrites = config.SettingFlag(nil, "E", "Configuration overwrite")
 		AddAllowedBackwardsCompatibleFlag("E")
-		defaults = config.MustNewConfigFrom(map[string]interface{}{
-			"path": map[string]interface{}{
+		defaults = config.MustNewConfigFrom(map[string]any{
+			"path": map[string]any{
 				"home":   ".", // to be initialized by beat
 				"config": "${path.home}",
 				"data":   filepath.Join("${path.home}", "data"),
@@ -72,12 +73,7 @@ func Initialize() {
 }
 
 func isAllowedBackwardsCompatibleFlag(f string) bool {
-	for _, existing := range allowedBackwardsCompatibleFlags {
-		if existing == f {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allowedBackwardsCompatibleFlags, f)
 }
 
 func AddAllowedBackwardsCompatibleFlag(f string) {
@@ -185,7 +181,7 @@ func HandleFlags() error {
 // Read reads the configuration from a YAML file into the given interface
 // structure. If path is empty this method reads from the configuration
 // file specified by the '-c' command line flag.
-func Read(out interface{}, path string) error {
+func Read(out any, path string) error {
 	config, err := Load(path, nil)
 	if err != nil {
 		return err

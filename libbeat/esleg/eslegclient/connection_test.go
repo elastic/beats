@@ -169,8 +169,7 @@ func TestUserAgentHeader(t *testing.T) {
 			testCase.connSettings.URL = server.URL
 			conn, err := NewConnection(testCase.connSettings, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
+			ctx := t.Context()
 			require.NoError(t, conn.Connect(ctx), "conn.Connect must not return an error")
 		})
 	}
@@ -271,8 +270,7 @@ ssl:
 	}, log)
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	err = conn.Connect(ctx)
 
 	if version.FIPSDistribution {

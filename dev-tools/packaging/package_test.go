@@ -45,7 +45,6 @@ import (
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
 	"github.com/moby/moby/api/types/container"
-	"github.com/moby/moby/api/types/strslice"
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
@@ -500,8 +499,8 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 		}
 
 		entrypoint := info.Config.Entrypoint[0]
-		if strings.HasPrefix(entrypoint, "/") {
-			entrypoint := strings.TrimPrefix(entrypoint, "/")
+		if after, ok := strings.CutPrefix(entrypoint, "/"); ok {
+			entrypoint := after
 			entry, found := p.Contents[entrypoint]
 			if !found {
 				t.Fatalf("%s entrypoint not found in docker", entrypoint)
@@ -599,7 +598,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 		}
 		imageID := strings.TrimRight(after, "\\n\"}\r\n")
 
-		var caps strslice.StrSlice
+		var caps []string
 		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}

@@ -29,20 +29,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
+//go:fix inline
 func stringp(x string) *string {
-	return &x
+	return new(x)
 }
 
+//go:fix inline
 func float64p(x float64) *float64 {
-	return &x
+	return new(x)
 }
 
+//go:fix inline
 func uint64p(x uint64) *uint64 {
-	return &x
+	return new(x)
 }
 
+//go:fix inline
 func int64p(x int64) *int64 {
-	return &x
+	return new(x)
 }
 
 func TestParseMetricFamiliesMalformedInput(t *testing.T) {
@@ -92,31 +96,31 @@ metric_without_suffix 10
 
 	expected := []*MetricFamily{
 		{
-			Name: stringp("process_cpu_total"),
-			Help: stringp("Some help."),
+			Name: new("process_cpu_total"),
+			Help: new("Some help."),
 			Type: "counter",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("process_cpu_total"),
+					Name:  new("process_cpu_total"),
 					Counter: &Counter{
-						Value: float64p(4.20072246e+06),
+						Value: new(4.20072246e+06),
 					},
 				},
 			},
 		},
 		{
-			Name: stringp("something"),
+			Name: new("something"),
 			Help: nil,
 			Type: "counter",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("something_total"),
+					Name:  new("something_total"),
 					Counter: &Counter{
-						Value: float64p(20),
+						Value: new(float64(20)),
 					},
 				},
 			},
@@ -141,31 +145,31 @@ process_cpu 20
 
 	expected := []*MetricFamily{
 		{
-			Name: stringp("process_cpu_total"),
-			Help: stringp("Some help."),
+			Name: new("process_cpu_total"),
+			Help: new("Some help."),
 			Type: "counter",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("process_cpu_total"),
+					Name:  new("process_cpu_total"),
 					Counter: &Counter{
-						Value: float64p(4.20072246e+06),
+						Value: new(4.20072246e+06),
 					},
 				},
 			},
 		},
 		{
-			Name: stringp("process_cpu"),
+			Name: new("process_cpu"),
 			Help: nil,
 			Type: "counter",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("process_cpu"),
+					Name:  new("process_cpu"),
 					Counter: &Counter{
-						Value: float64p(20),
+						Value: new(float64(20)),
 					},
 				},
 			},
@@ -205,128 +209,128 @@ nginx_sts_server_session_seconds{listen="TCP:8091:127.0.0.1",port="8091",protoco
 
 	expected := []*MetricFamily{
 		{
-			Name: stringp("nginx_sts_server_bytes_total"),
-			Help: stringp("The request/response bytes"),
+			Name: new("nginx_sts_server_bytes_total"),
+			Help: new("The request/response bytes"),
 			Type: "counter",
 			Metric: []*OpenMetric{
 				{
-					Name: stringp("nginx_sts_server_bytes_total"),
+					Name: new("nginx_sts_server_bytes_total"),
 					Label: []*labels.Label{
 						{Name: "direction", Value: "in"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(0)},
+					Counter: &Counter{Value: new(float64(0))},
 				},
 				{
-					Name: stringp("nginx_sts_server_bytes_total"),
+					Name: new("nginx_sts_server_bytes_total"),
 					Label: []*labels.Label{
 						{Name: "direction", Value: "out"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(0)},
+					Counter: &Counter{Value: new(float64(0))},
 				},
 			},
 		},
 		{
-			Name: stringp("nginx_sts_server_connects_total"),
-			Help: stringp("The connects counter"),
+			Name: new("nginx_sts_server_connects_total"),
+			Help: new("The connects counter"),
 			Type: "counter",
 			Metric: []*OpenMetric{
 				{
-					Name: stringp("nginx_sts_server_connects_total"),
+					Name: new("nginx_sts_server_connects_total"),
 					Label: []*labels.Label{
 						{Name: "code", Value: "1xx"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(0)},
+					Counter: &Counter{Value: new(float64(0))},
 				},
 				{
-					Name: stringp("nginx_sts_server_connects_total"),
+					Name: new("nginx_sts_server_connects_total"),
 					Label: []*labels.Label{
 						{Name: "code", Value: "2xx"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(0)},
+					Counter: &Counter{Value: new(float64(0))},
 				},
 				{
-					Name: stringp("nginx_sts_server_connects_total"),
+					Name: new("nginx_sts_server_connects_total"),
 					Label: []*labels.Label{
 						{Name: "code", Value: "3xx"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(0)},
+					Counter: &Counter{Value: new(float64(0))},
 				},
 				{
-					Name: stringp("nginx_sts_server_connects_total"),
+					Name: new("nginx_sts_server_connects_total"),
 					Label: []*labels.Label{
 						{Name: "code", Value: "4xx"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(0)},
+					Counter: &Counter{Value: new(float64(0))},
 				},
 				{
-					Name: stringp("nginx_sts_server_connects_total"),
+					Name: new("nginx_sts_server_connects_total"),
 					Label: []*labels.Label{
 						{Name: "code", Value: "5xx"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(171)},
+					Counter: &Counter{Value: new(float64(171))},
 				},
 				{
-					Name: stringp("nginx_sts_server_connects_total"),
+					Name: new("nginx_sts_server_connects_total"),
 					Label: []*labels.Label{
 						{Name: "code", Value: "total"},
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(171)},
+					Counter: &Counter{Value: new(float64(171))},
 				},
 			},
 		},
 		{
-			Name: stringp("nginx_sts_server_session_seconds_total"),
-			Help: stringp("The session duration time"),
+			Name: new("nginx_sts_server_session_seconds_total"),
+			Help: new("The session duration time"),
 			Type: "counter",
 			Metric: []*OpenMetric{
 				{
-					Name: stringp("nginx_sts_server_session_seconds_total"),
+					Name: new("nginx_sts_server_session_seconds_total"),
 					Label: []*labels.Label{
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Counter: &Counter{Value: float64p(0.016)},
+					Counter: &Counter{Value: new(0.016)},
 				},
 			},
 		},
 		{
-			Name: stringp("nginx_sts_server_session_seconds"),
-			Help: stringp("The average of session duration time in seconds"),
+			Name: new("nginx_sts_server_session_seconds"),
+			Help: new("The average of session duration time in seconds"),
 			Type: "gauge",
 			Metric: []*OpenMetric{
 				{
-					Name: stringp("nginx_sts_server_session_seconds"),
+					Name: new("nginx_sts_server_session_seconds"),
 					Label: []*labels.Label{
 						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
 						{Name: "port", Value: "8091"},
 						{Name: "protocol", Value: "TCP"},
 					},
-					Gauge: &Gauge{Value: float64p(0.000)},
+					Gauge: &Gauge{Value: new(0.000)},
 				},
 			},
 		},
@@ -350,7 +354,7 @@ second_metric 0
 `
 	expected := []*MetricFamily{
 		{
-			Name: stringp("first_metric"),
+			Name: new("first_metric"),
 			Help: nil,
 			Type: "gauge",
 			Unit: nil,
@@ -362,24 +366,24 @@ second_metric 0
 							Value: "value1",
 						},
 					},
-					Name: stringp("first_metric"),
+					Name: new("first_metric"),
 					Gauge: &Gauge{
-						Value: float64p(1),
+						Value: new(float64(1)),
 					},
 				},
 			},
 		},
 		{
-			Name: stringp("second_metric"),
-			Help: stringp("Help for gauge metric."),
+			Name: new("second_metric"),
+			Help: new("Help for gauge metric."),
 			Type: "gauge",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("second_metric"),
+					Name:  new("second_metric"),
 					Gauge: &Gauge{
-						Value: float64p(0),
+						Value: new(float64(0)),
 					},
 				},
 			},
@@ -403,7 +407,7 @@ second_metric 0
 `
 	expected := []*MetricFamily{
 		{
-			Name: stringp("first_metric"),
+			Name: new("first_metric"),
 			Help: nil,
 			Type: "gauge",
 			Unit: nil,
@@ -415,24 +419,24 @@ second_metric 0
 							Value: "value1",
 						},
 					},
-					Name: stringp("first_metric"),
+					Name: new("first_metric"),
 					Gauge: &Gauge{
-						Value: float64p(1),
+						Value: new(float64(1)),
 					},
 				},
 			},
 		},
 		{
-			Name: stringp("second_metric"),
-			Help: stringp("Help for gauge metric."),
+			Name: new("second_metric"),
+			Help: new("Help for gauge metric."),
 			Type: "gauge",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("second_metric"),
+					Name:  new("second_metric"),
 					Gauge: &Gauge{
-						Value: float64p(0),
+						Value: new(float64(0)),
 					},
 				},
 			},
@@ -458,31 +462,31 @@ metric_without_suffix 3
 `
 	expected := []*MetricFamily{
 		{
-			Name: stringp("target"),
+			Name: new("target"),
 			Help: nil,
 			Type: "info",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("target_info"),
+					Name:  new("target_info"),
 					Info: &Info{
-						Value: int64p(1),
+						Value: new(int64(1)),
 					},
 				},
 			},
 		},
 		{
-			Name: stringp("metric_info"),
+			Name: new("metric_info"),
 			Help: nil,
 			Type: "info",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("metric_info"),
+					Name:  new("metric_info"),
 					Info: &Info{
-						Value: int64p(2),
+						Value: new(int64(2)),
 					},
 				},
 			},
@@ -506,22 +510,22 @@ first_metric{label1="value1"} 1
 `
 	expected := []*MetricFamily{
 		{
-			Name: stringp("target_info"),
+			Name: new("target_info"),
 			Help: nil,
 			Type: "unknown",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("target_info"),
+					Name:  new("target_info"),
 					Unknown: &Unknown{
-						Value: float64p(1),
+						Value: new(float64(1)),
 					},
 				},
 			},
 		},
 		{
-			Name: stringp("first_metric"),
+			Name: new("first_metric"),
 			Help: nil,
 			Type: "gauge",
 			Unit: nil,
@@ -533,9 +537,9 @@ first_metric{label1="value1"} 1
 							Value: "value1",
 						},
 					},
-					Name: stringp("first_metric"),
+					Name: new("first_metric"),
 					Gauge: &Gauge{
-						Value: float64p(1),
+						Value: new(float64(1)),
 					},
 				},
 			},
@@ -559,8 +563,8 @@ a{a="foo"} 1.0
 `
 	expected := []*MetricFamily{
 		{
-			Name: stringp("a"),
-			Help: stringp("help"),
+			Name: new("a"),
+			Help: new("help"),
 			Type: "stateset",
 			Unit: nil,
 			Metric: []*OpenMetric{
@@ -571,9 +575,9 @@ a{a="foo"} 1.0
 							Value: "bar",
 						},
 					},
-					Name: stringp("a"),
+					Name: new("a"),
 					Stateset: &Stateset{
-						Value: int64p(0),
+						Value: new(int64(0)),
 					},
 				},
 				{
@@ -583,9 +587,9 @@ a{a="foo"} 1.0
 							Value: "foo",
 						},
 					},
-					Name: stringp("a"),
+					Name: new("a"),
 					Stateset: &Stateset{
-						Value: int64p(1),
+						Value: new(int64(1)),
 					},
 				},
 			},
@@ -613,29 +617,29 @@ summary_metric_impossible 123
 `
 	expected := []*MetricFamily{
 		{
-			Name: stringp("summary_metric"),
+			Name: new("summary_metric"),
 			Help: nil,
 			Type: "summary",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("summary_metric"),
+					Name:  new("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
-						SampleSum:   float64p(234892394),
+						SampleCount: new(uint64(44000)),
+						SampleSum:   new(float64(234892394)),
 						Quantile: []*Quantile{
 							{
-								Quantile: float64p(0.5),
-								Value:    float64p(29735),
+								Quantile: new(0.5),
+								Value:    new(float64(29735)),
 							},
 							{
-								Quantile: float64p(0.9),
-								Value:    float64p(47103),
+								Quantile: new(0.9),
+								Value:    new(float64(47103)),
 							},
 							{
-								Quantile: float64p(0.99),
-								Value:    float64p(50681),
+								Quantile: new(0.99),
+								Value:    new(float64(50681)),
 							},
 						},
 					},
@@ -665,29 +669,29 @@ summary_metric_impossible 123
 `
 	expected := []*MetricFamily{
 		{
-			Name: stringp("summary_metric"),
+			Name: new("summary_metric"),
 			Help: nil,
 			Type: "summary",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("summary_metric"),
+					Name:  new("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
-						SampleSum:   float64p(234892394),
+						SampleCount: new(uint64(44000)),
+						SampleSum:   new(float64(234892394)),
 						Quantile: []*Quantile{
 							{
-								Quantile: float64p(0.5),
-								Value:    float64p(29735),
+								Quantile: new(0.5),
+								Value:    new(float64(29735)),
 							},
 							{
-								Quantile: float64p(0.9),
-								Value:    float64p(47103),
+								Quantile: new(0.9),
+								Value:    new(float64(47103)),
 							},
 							{
-								Quantile: float64p(0.99),
-								Value:    float64p(50681),
+								Quantile: new(0.99),
+								Value:    new(float64(50681)),
 							},
 						},
 					},
@@ -720,8 +724,8 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 # EOF`
 	expected := []*MetricFamily{
 		{
-			Name: stringp("http_server_requests_seconds"),
-			Help: stringp("Duration of HTTP server request handling"),
+			Name: new("http_server_requests_seconds"),
+			Help: new("Duration of HTTP server request handling"),
 			Type: "histogram",
 			Unit: nil,
 			Metric: []*OpenMetric{
@@ -736,19 +740,19 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 							Value: "/actuator/prometheus",
 						},
 					},
-					Name: stringp("http_server_requests_seconds"),
+					Name: new("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
-						SampleSum:        float64p(0.046745444),
+						SampleCount:      new(uint64(1.0)),
+						SampleSum:        new(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
-								UpperBound:      float64p(0.001),
+								CumulativeCount: new(uint64(0)),
+								UpperBound:      new(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
-								UpperBound:      float64p(0.001048576),
+								CumulativeCount: new(uint64(0)),
+								UpperBound:      new(0.001048576),
 							},
 						},
 					},
@@ -779,8 +783,8 @@ http_server_requests_seconds_sum{exception="None",uri="/actuator/prometheus"} 0.
 http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"} 0.046745444`
 	expected := []*MetricFamily{
 		{
-			Name: stringp("http_server_requests_seconds"),
-			Help: stringp("Duration of HTTP server request handling"),
+			Name: new("http_server_requests_seconds"),
+			Help: new("Duration of HTTP server request handling"),
 			Type: "histogram",
 			Unit: nil,
 			Metric: []*OpenMetric{
@@ -795,19 +799,19 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 							Value: "/actuator/prometheus",
 						},
 					},
-					Name: stringp("http_server_requests_seconds"),
+					Name: new("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
-						SampleSum:        float64p(0.046745444),
+						SampleCount:      new(uint64(1.0)),
+						SampleSum:        new(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
-								UpperBound:      float64p(0.001),
+								CumulativeCount: new(uint64(0)),
+								UpperBound:      new(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
-								UpperBound:      float64p(0.001048576),
+								CumulativeCount: new(uint64(0)),
+								UpperBound:      new(0.001048576),
 							},
 						},
 					},
@@ -835,22 +839,22 @@ ggh 99
 # EOF`
 	expected := []*MetricFamily{
 		{
-			Name: stringp("ggh"),
+			Name: new("ggh"),
 			Help: nil,
 			Type: "gaugehistogram",
 			Unit: nil,
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("ggh"),
+					Name:  new("ggh"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: true,
-						SampleCount:      uint64p(2.0),
-						SampleSum:        float64p(1),
+						SampleCount:      new(uint64(2.0)),
+						SampleSum:        new(float64(1)),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(2),
-								UpperBound:      float64p(0.9),
+								CumulativeCount: new(uint64(2)),
+								UpperBound:      new(0.9),
 							},
 						},
 					},
@@ -874,8 +878,8 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0
 # EOF`
 	expected := []*MetricFamily{
 		{
-			Name: stringp("redis_connected_clients"),
-			Help: stringp("Redis connected clients"),
+			Name: new("redis_connected_clients"),
+			Help: new("Redis connected clients"),
 			Type: "unknown",
 			Unit: nil,
 			Metric: []*OpenMetric{
@@ -886,9 +890,9 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0
 							Value: "rough-snowflake-web",
 						},
 					},
-					Name: stringp("redis_connected_clients"),
+					Name: new("redis_connected_clients"),
 					Unknown: &Unknown{
-						Value: float64p(10),
+						Value: new(float64(10)),
 					},
 				},
 			},
@@ -908,8 +912,8 @@ func TestUntypedPrometheus(t *testing.T) {
 redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 	expected := []*MetricFamily{
 		{
-			Name: stringp("redis_connected_clients"),
-			Help: stringp("Redis connected clients"),
+			Name: new("redis_connected_clients"),
+			Help: new("Redis connected clients"),
 			Type: "unknown",
 			Unit: nil,
 			Metric: []*OpenMetric{
@@ -920,9 +924,9 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 							Value: "rough-snowflake-web",
 						},
 					},
-					Name: stringp("redis_connected_clients"),
+					Name: new("redis_connected_clients"),
 					Unknown: &Unknown{
-						Value: float64p(10),
+						Value: new(float64(10)),
 					},
 				},
 			},
@@ -950,15 +954,15 @@ process_cpu_total 4200722.46
 
 	expected := []*MetricFamily{
 		{
-			Name: stringp("process_cpu_total"),
-			Help: stringp("Some help."),
+			Name: new("process_cpu_total"),
+			Help: new("Some help."),
 			Type: "counter",
 			Metric: []*OpenMetric{
 				{
 					Label: []*labels.Label{},
-					Name:  stringp("process_cpu_total"),
+					Name:  new("process_cpu_total"),
 					Counter: &Counter{
-						Value: float64p(4.20072246e+06),
+						Value: new(4.20072246e+06),
 					},
 				},
 			},
