@@ -280,7 +280,6 @@ Arguments:
 2. `current` - New version to use
 
 **Files updated:**
-- `testing/environments/docker/elasticsearch_kerberos/Dockerfile`
 - `testing/environments/latest.yml`
 - `x-pack/metricbeat/docker-compose.yml`
 - `metricbeat/module/logstash/docker-compose.yml`

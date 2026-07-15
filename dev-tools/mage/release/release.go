@@ -164,15 +164,6 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 // UpdateTestEnv updates test environment files.
 // latestVersion maps to LATEST and currentVersion maps to CURRENT in beats.mak update-test-env.
 func UpdateTestEnv(latestVersion, currentVersion string) error {
-	kerberosFile := "testing/environments/docker/elasticsearch_kerberos/Dockerfile"
-	kerberosRule := replacementRule{
-		pattern:     dockerImageTagPattern,
-		replacement: fmt.Sprintf("$1:%s", currentVersion),
-	}
-	if err := applyReplacements(kerberosFile, []replacementRule{kerberosRule}); err != nil {
-		return err
-	}
-
 	latestYmlRule := replacementRule{
 		pattern:     dockerImageTagPattern,
 		replacement: fmt.Sprintf("$1:%s", latestVersion),

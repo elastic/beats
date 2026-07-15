@@ -158,7 +158,6 @@ In DRY_RUN mode:
 | `deploy/kubernetes/filebeat-kubernetes.yaml` | Docker image tag |
 | `deploy/kubernetes/auditbeat-kubernetes.yaml` | Docker image tag |
 | `README.md` | Branch references |
-| `testing/environments/docker/elasticsearch_kerberos/Dockerfile` | Docker image tag |
 | `testing/environments/latest.yml` | Docker image tag |
 | `x-pack/metricbeat/docker-compose.yml` | Docker image tag |
 | `metricbeat/module/logstash/docker-compose.yml` | Docker image tag |
