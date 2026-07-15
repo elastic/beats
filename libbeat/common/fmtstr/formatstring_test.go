@@ -295,20 +295,20 @@ func FuzzParseRawTokens(f *testing.F) {
 		}
 
 		// stringify output and match it with original input
-		var finalOutput string
+		var finalOutput strings.Builder
 		for _, out := range output {
 			switch tok := out.(type) {
 			case string:
-				finalOutput += tok
+				finalOutput.WriteString(tok)
 			case VariableToken:
-				finalOutput += "%{" + string(tok) + "}"
+				finalOutput.WriteString("%{" + string(tok) + "}")
 			default:
 				assert.Fail(t, fmt.Sprintf("unexpected type %T", tok))
 			}
 		}
 
 		// We cannot accurately reconstruct with escaped characters, so we remove them before comparing.
-		assert.Equalf(t, removeEscapes(a), removeEscapes(finalOutput), "unexpected output: %s != %s", a, finalOutput)
+		assert.Equalf(t, removeEscapes(a), removeEscapes(finalOutput.String()), "unexpected output: %s != %s", a, finalOutput.String())
 	})
 }
 

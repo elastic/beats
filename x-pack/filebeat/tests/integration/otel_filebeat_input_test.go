@@ -52,7 +52,7 @@ func TestCELInputOTelE2E(t *testing.T) {
 	fbIndex := "logs-integration-" + fbNamespace
 
 	type options struct {
-		Namespace   string
+		Index       string
 		ESURL       string
 		Username    string
 		Password    string
@@ -73,7 +73,7 @@ output:
       - {{ .ESURL }}
     username: {{ .Username }}
     password: {{ .Password }}
-    index: logs-integration-{{ .Namespace }}
+    index: {{ .Index }}
 
 queue.mem.flush.timeout: 0s
 setup.template.enabled: false
@@ -84,40 +84,8 @@ processors:
     - add_kubernetes_metadata: ~
 `
 
-	celOTelConfig := `exporters:
-    elasticsearch:
-        auth:
-            authenticator: beatsauth
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - {{ .ESURL }}
-        logs_index: logs-integration-{{ .Namespace }}
-        max_conns_per_host: 1
-        password: {{ .Password }}
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                flush_timeout: 10s
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        user: {{ .Username }}
-extensions:
-    beatsauth:
-        idle_connection_timeout: 3s
-        proxy_disable: false
-        timeout: 1m30s
+	celOTelConfig := otelElasticsearchExporterYAML +
+		`
 receivers:
     filebeatreceiver:
         filebeat:
@@ -135,19 +103,7 @@ receivers:
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
         management.otel.enabled: true
-service:
-    extensions:
-        - beatsauth
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - filebeatreceiver
-    telemetry:
-        metrics:
-            level: none
-`
+` + otelElasticsearchServiceYAML
 
 	var configBuffer bytes.Buffer
 	require.NoError(t, template.Must(template.New("config").Parse(celOTelConfig)).Execute(&configBuffer, options{
@@ -156,7 +112,7 @@ service:
 		Password:    password,
 		ResourceURL: celSrv.URL,
 		Program:     celProgram,
-		Namespace:   otelNamespace,
+		Index:       otelIndex,
 	}))
 
 	oteltestcol.New(t, configBuffer.String())
@@ -169,7 +125,7 @@ service:
 		Password:    password,
 		ResourceURL: celSrv.URL,
 		Program:     celProgram,
-		Namespace:   fbNamespace,
+		Index:       fbIndex,
 	}))
 
 	filebeat := integration.NewBeat(
@@ -691,40 +647,7 @@ processors:
     - add_kubernetes_metadata: ~
 `
 
-	mqttOTelConfig := `exporters:
-    elasticsearch:
-        auth:
-            authenticator: beatsauth
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - {{ .ESURL }}
-        logs_index: {{ .Index }}
-        max_conns_per_host: 1
-        password: {{ .Password }}
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                flush_timeout: 10s
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        user: {{ .Username }}
-extensions:
-    beatsauth:
-        idle_connection_timeout: 3s
-        proxy_disable: false
-        timeout: 1m30s
+	mqttOTelConfig := otelElasticsearchExporterYAML + `
 receivers:
     filebeatreceiver:
         filebeat:
@@ -745,19 +668,7 @@ receivers:
         setup.template.enabled: false
         path.home: {{ .PathHome }}
         management.otel.enabled: true
-service:
-    extensions:
-        - beatsauth
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - filebeatreceiver
-    telemetry:
-        metrics:
-            level: none
-`
+` + otelElasticsearchServiceYAML
 
 	optionsValue := options{
 		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
@@ -799,27 +710,7 @@ service:
 		})
 	})
 
-	rawQuery := map[string]any{
-		"query": map[string]any{
-			"bool": map[string]any{
-				"must": []map[string]any{
-					{
-						"match_phrase": map[string]any{
-							"input.type": "mqtt",
-						},
-					},
-					{
-						"match_phrase": map[string]any{
-							"message": mqttInputTestMsg,
-						},
-					},
-				},
-			},
-		},
-		"sort": []map[string]any{
-			{"@timestamp": map[string]any{"order": "asc"}},
-		},
-	}
+	rawQuery := otelE2ERawQueryForInputTypeAndMessage("mqtt", mqttInputTestMsg)
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents

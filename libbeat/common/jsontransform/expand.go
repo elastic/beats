@@ -115,9 +115,9 @@ func mergeObjects(lhs, rhs mapstr.M) error {
 	return nil
 }
 
-func getMap(v interface{}) (map[string]interface{}, bool) {
+func getMap(v any) (map[string]any, bool) {
 	switch v := v.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		return v, true
 	case mapstr.M:
 		return v, true
