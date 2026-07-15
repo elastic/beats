@@ -214,7 +214,7 @@ func TestEventFormatStringErrors(t *testing.T) {
 
 func TestEventFormatStringFromConfig(t *testing.T) {
 	tests := []struct {
-		v        interface{}
+		v        any
 		event    beat.Event
 		expected string
 	}{

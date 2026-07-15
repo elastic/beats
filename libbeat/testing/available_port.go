@@ -49,7 +49,7 @@ func AvailableTCP4Ports(n int) ([]uint16, error) {
 		}
 	}()
 
-	for i := 0; i < n; i++ {
+	for range n {
 		resolved, err := net.ResolveTCPAddr("tcp4", "127.0.0.1:0")
 		if err != nil {
 			return nil, err

@@ -53,9 +53,9 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig() map[string]any {
 	ignoreTypes := append(fs.DefaultIgnoredTypes(resolve.NewTestResolver("")), "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs")
-	return map[string]interface{}{
+	return map[string]any{
 		"module":                  "system",
 		"metricsets":              []string{"filesystem"},
 		"filesystem.ignore_types": ignoreTypes,

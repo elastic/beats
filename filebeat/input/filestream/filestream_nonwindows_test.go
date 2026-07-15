@@ -22,10 +22,12 @@ package filestream
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -33,13 +35,13 @@ import (
 // these tests are separated as one cannot delete/rename files
 // while another process is working with it on Windows
 func TestLogFileRenamed(t *testing.T) {
-	f := createTestLogFile()
+	f := createTestLogFile(t)
 	defer f.Close()
 
 	renamedFile := f.Name() + ".renamed"
 
 	reader, _, err := newFileReader(
-		logptest.NewTestingLogger(t, ""),
+		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
 		context.TODO(),
 		f,
 		readerConfig{},
@@ -57,7 +59,7 @@ func TestLogFileRenamed(t *testing.T) {
 
 	buf := make([]byte, 1024)
 	_, err = reader.Read(buf)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	err = os.Rename(f.Name(), renamedFile)
 	if err != nil {
@@ -71,11 +73,11 @@ func TestLogFileRenamed(t *testing.T) {
 }
 
 func TestLogFileRemoved(t *testing.T) {
-	f := createTestLogFile()
+	f := createTestLogFile(t)
 	defer f.Close()
 
 	reader, _, err := newFileReader(
-		logptest.NewTestingLogger(t, ""),
+		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
 		context.TODO(),
 		f,
 		readerConfig{},
@@ -93,7 +95,7 @@ func TestLogFileRemoved(t *testing.T) {
 
 	buf := make([]byte, 1024)
 	_, err = reader.Read(buf)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	err = os.Remove(f.Name())
 	if err != nil {
@@ -103,4 +105,17 @@ func TestLogFileRemoved(t *testing.T) {
 	err = readUntilError(reader)
 
 	assert.Equal(t, ErrClosed, err)
+}
+
+// createTestLogFile creates a temporary plain-text log file with a few lines of
+// content, wrapped as a filestream File ready to be passed to newFileReader.
+func createTestLogFile(t *testing.T) File {
+	t.Helper()
+	fs := filestream{
+		readerConfig: readerConfig{BufferSize: 512},
+		compression:  CompressionNone,
+	}
+	f, err := fs.newFile(createTestPlainLogFile(t))
+	require.NoError(t, err, "could not create test log file")
+	return f
 }

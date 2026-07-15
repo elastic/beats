@@ -53,26 +53,26 @@ func setupLibraryLogging(logger *logp.Logger) {
 	})
 }
 
-func (l *debugLogger) Println(v ...interface{}) {
+func (l *debugLogger) Println(v ...any) {
 	l.log.Debug(v...)
 }
 
-func (l *debugLogger) Printf(format string, v ...interface{}) {
+func (l *debugLogger) Printf(format string, v ...any) {
 	l.log.Debugf(format, v...)
 }
 
-func (l *errorLogger) Println(v ...interface{}) {
+func (l *errorLogger) Println(v ...any) {
 	l.log.Error(v...)
 }
 
-func (l *errorLogger) Printf(format string, v ...interface{}) {
+func (l *errorLogger) Printf(format string, v ...any) {
 	l.log.Errorf(format, v...)
 }
 
-func (l *warnLogger) Println(v ...interface{}) {
+func (l *warnLogger) Println(v ...any) {
 	l.log.Warn(v...)
 }
 
-func (l *warnLogger) Printf(format string, v ...interface{}) {
+func (l *warnLogger) Printf(format string, v ...any) {
 	l.log.Warnf(format, v...)
 }
