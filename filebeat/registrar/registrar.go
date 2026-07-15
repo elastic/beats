@@ -112,11 +112,9 @@ func (r *Registrar) Start() error {
 		return fmt.Errorf("error loading state: %w", err)
 	}
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		r.Run()
-	}()
+	})
 
 	return nil
 }
