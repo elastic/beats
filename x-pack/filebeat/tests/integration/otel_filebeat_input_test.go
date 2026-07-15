@@ -15,10 +15,8 @@ import (
 	"strings"
 	"testing"
 	"text/template"
-	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	mqtttestutil "github.com/elastic/beats/v7/filebeat/input/mqtt/testutil"
@@ -27,8 +25,6 @@ import (
 	gcsmock "github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/mock"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
-
-	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
 func TestCELInputOTelE2E(t *testing.T) {
@@ -66,23 +62,7 @@ func TestCELInputOTelE2E(t *testing.T) {
   interval: 1s
   resource.url: {{ .ResourceURL }}
   program: {{ .Program }}
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
+` + filebeatOutputYAML
 
 	celOTelConfig := otelElasticsearchExporterYAML +
 		`
@@ -157,24 +137,7 @@ receivers:
 		},
 	}
 
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
-			defer findCancel()
-
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
-
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
-		},
-		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -211,23 +174,7 @@ filebeat.inputs:
   - type: httpjson
     id: httpjson-e2e-otel
     request.url: http://localhost:8090/test
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: logs-integration-{{ .Namespace }}
-
-setup.template.enabled: false
-queue.mem.flush.timeout: 0s
-processors:
-   - add_host_metadata: ~
-   - add_cloud_metadata: ~
-   - add_docker_metadata: ~
-   - add_kubernetes_metadata: ~
-`
+` + filebeatOutputYAML
 
 	otelConfigFile := `receivers:
   filebeatreceiver:
@@ -315,35 +262,13 @@ service:
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
 
-	// prepare to query ES
-	es := integration.GetESClient(t, "http")
-
 	rawQuery := map[string]any{
 		"sort": []map[string]any{
 			{"@timestamp": map[string]any{"order": "asc"}},
 		},
 	}
 
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	// wait for logs to be published
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
-			defer findCancel()
-
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
-			assert.NoError(ct, err)
-
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
-			assert.NoError(ct, err)
-
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel event, got %d", otelDocs.Hits.Total.Value)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat event, got %d", filebeatDocs.Hits.Total.Value)
-		},
-		2*time.Minute, 1*time.Second, "expected at least 1 event for both filebeat and otel")
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -399,23 +324,7 @@ func TestRedisInputOTelE2E(t *testing.T) {
   idle_timeout: 60s
   scan_frequency: 1s
   network: tcp
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
+` + filebeatOutputYAML
 
 	// OTel config
 	redisOTelConfig := `exporters:
@@ -518,8 +427,6 @@ service:
 	filebeat.Start()
 	defer filebeat.Stop()
 
-	es := integration.GetESClient(t, "http")
-
 	t.Cleanup(func() {
 		// delete data streams after the test is done
 		deleteDataStreamsFromES(t, es, []string{
@@ -546,24 +453,7 @@ service:
 		},
 	}
 
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
-			defer findCancel()
-
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
-
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
-		},
-		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -629,23 +519,7 @@ func TestMQTTInputOTelE2E(t *testing.T) {
   topics:
     - {{ .Topic }}
   client_id: {{ .ClientID }}
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
+` + filebeatOutputYAML
 
 	mqttOTelConfig := otelElasticsearchExporterYAML + `
 receivers:
@@ -712,24 +586,7 @@ receivers:
 
 	rawQuery := otelE2ERawQueryForInputTypeAndMessage("mqtt", mqttInputTestMsg)
 
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
-			defer findCancel()
-
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
-
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
-		},
-		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -761,6 +618,7 @@ func TestCometdInputOTelE2E(t *testing.T) {
 		ESURL    string
 		Username string
 		Password string
+		PathHome string
 	}
 
 	cometdFilebeatConfig := `filebeat.inputs:
@@ -772,58 +630,9 @@ func TestCometdInputOTelE2E(t *testing.T) {
     user: user
     password: password
     token_url: http://localhost:8080/token
+` + filebeatOutputYAML
 
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
-
-	cometdOTelConfig := `exporters:
-    elasticsearch:
-        auth:
-            authenticator: beatsauth
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - {{ .ESURL }}
-        logs_index: {{ .Index }}
-        max_conns_per_host: 1
-        password: {{ .Password }}
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                flush_timeout: 10s
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        user: {{ .Username }}
-extensions:
-    beatsauth:
-        idle_connection_timeout: 3s
-        proxy_disable: false
-        timeout: 1m30s
+	cometdOTelConfig := otelElasticsearchExporterYAML + `
 receivers:
     filebeatreceiver:
         filebeat:
@@ -839,24 +648,19 @@ receivers:
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
         management.otel.enabled: true
-service:
-    extensions:
-        - beatsauth
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - filebeatreceiver
-    telemetry:
-        metrics:
-            level: none
-`
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        path.home: {{ .PathHome }}	
+` + otelElasticsearchServiceYAML
 
 	optionsValue := options{
 		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username: user,
 		Password: password,
+		PathHome: t.TempDir(),
 	}
 
 	var configBuffer bytes.Buffer
@@ -899,24 +703,7 @@ service:
 		},
 	}
 
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
-			defer findCancel()
-
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
-
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
-		},
-		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -933,9 +720,14 @@ service:
 func TestGCSInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
-	// The GCS client appends /storage/v1/ when alternative_host is set; the
-	// package mock expects paths like /b/<bucket>/o, so strip that prefix.
-	gcsSrv := httptest.NewServer(http.StripPrefix("/storage/v1", gcsmock.GCSServer()))
+	gcsMock := gcsmock.GCSServer()
+	gcsSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/storage/v1") {
+			http.StripPrefix("/storage/v1", gcsMock).ServeHTTP(w, r)
+			return
+		}
+		gcsMock.ServeHTTP(w, r)
+	}))
 	t.Cleanup(gcsSrv.Close)
 
 	otelHome := t.TempDir()
@@ -971,58 +763,9 @@ func TestGCSInputOTelE2E(t *testing.T) {
     - regex: '^ata\.json$'
   buckets:
     - name: gcs-test-new
+` + filebeatOutputYAML
 
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
-
-	gcsOTelConfig := `exporters:
-    elasticsearch:
-        auth:
-            authenticator: beatsauth
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - {{ .ESURL }}
-        logs_index: {{ .Index }}
-        max_conns_per_host: 1
-        password: {{ .Password }}
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                flush_timeout: 10s
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        user: {{ .Username }}
-extensions:
-    beatsauth:
-        idle_connection_timeout: 3s
-        proxy_disable: false
-        timeout: 1m30s
+	gcsOTelConfig := otelElasticsearchExporterYAML + `
 receivers:
     filebeatreceiver:
         filebeat:
@@ -1047,19 +790,7 @@ receivers:
         setup.template.enabled: false
         path.home: {{ .PathHome }}
         management.otel.enabled: true
-service:
-    extensions:
-        - beatsauth
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - filebeatreceiver
-    telemetry:
-        metrics:
-            level: none
-`
+` + otelElasticsearchServiceYAML
 
 	optionsValue := options{
 		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
@@ -1120,24 +851,7 @@ service:
 		},
 	}
 
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	var err error
-
-	require.EventuallyWithTf(t,
-		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
-			defer findCancel()
-
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
-
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
-			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
-		},
-		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -1145,7 +859,6 @@ service:
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
-		"event.created",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")

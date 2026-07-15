@@ -7,10 +7,15 @@
 package integration
 
 import (
+	"context"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
@@ -20,6 +25,24 @@ func deleteDataStreamsFromES(t *testing.T, es *elasticsearch.Client, dataStreams
 	_, err := es.Indices.DeleteDataStream(dataStreams)
 	require.NoError(t, err, "failed to delete data streams")
 }
+
+const filebeatOutputYAML = `
+output:
+  elasticsearch:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+    index: {{ .Index }}
+
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
 
 const otelElasticsearchExporterYAML = `exporters:
     elasticsearch:
@@ -95,4 +118,30 @@ func otelE2ERawQueryForInputTypeAndMessage(inputType, message string) map[string
 			{"@timestamp": map[string]any{"order": "asc"}},
 		},
 	}
+}
+
+func getFilebeatOTelDocs(t *testing.T, fbIndex, otelIndex string, rawQuery map[string]any) (estools.Documents, estools.Documents) {
+	t.Helper()
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	es := integration.GetESClient(t, "http")
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
+			defer findCancel()
+
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
+
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
+		},
+		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+
+	return filebeatDocs, otelDocs
 }

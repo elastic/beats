@@ -237,23 +237,7 @@ func TestKafkaInputOTelE2E(t *testing.T) {
     - {{ .Topic }}
   group_id: {{ .GroupID }}
   wait_close: 0
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index}}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
+` + filebeatOutputYAML
 
 	kafkaOTelConfig := otelElasticsearchExporterYAML + `receivers:
     filebeatreceiver:
