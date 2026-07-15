@@ -272,10 +272,6 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
-	// Close runReady so that Shutdown doesn't have to wait no
-	// matter how we exit from Run.
-	defer fb.runReady.Close()
-
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
@@ -316,6 +312,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
 	// but it won't start any inputs/output
 	if err := b.Manager.PreInit(); err != nil {
+		fb.runReady.Close()
 		return err
 	}
 
@@ -327,6 +324,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			managerEarlyStop()
 		}
 	}()
+
+	// Close runReady so that Stop does not block waiting for Run to reach its
+	// ready state, regardless of how Run exits. This must be deferred after
+	// the managerEarlyStop defer above so that it runs first in LIFO order:
+	// managerEarlyStop calls Stop, which waits on runReady.ch, so runReady
+	// must be closed before Stop is called to avoid a 5-second timeout on
+	// every early-exit error path.
+	defer fb.runReady.Close()
 
 	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
 	if err := registryMigrator.Run(); err != nil {

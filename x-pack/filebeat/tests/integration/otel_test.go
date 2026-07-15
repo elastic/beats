@@ -36,10 +36,12 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/features"
+	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -544,13 +546,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					}
 
 					// track ingested event
-					found := false
-					for _, existing := range ingestedTestEvents {
-						if existing == eventKey {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(ingestedTestEvents, eventKey)
 					if !found {
 						ingestedTestEvents = append(ingestedTestEvents, eventKey)
 					}
@@ -579,9 +575,9 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			// If requestLevelFailure is true, wrap with request-level failure logic
 			if tt.requestLevelFailure {
 				// Request-level failures: entire HTTP request fails with the specified status code
-				var attemptCount int64
+				var attemptCount atomic.Int64
 				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-					currentAttempt := atomic.AddInt64(&attemptCount, 1)
+					currentAttempt := attemptCount.Add(1)
 
 					// For retryable status codes (429, 503), fail for failuresPerEvent times, then forward to deterministic handler
 					// For non-retryable status codes (400), always fail
@@ -737,13 +733,7 @@ service:
 				// Verify we have the correct events ingested
 				for _, expectedID := range tt.expectedIngestedEventIDs {
 					expectedEventKey := fmt.Sprintf("Line %d", expectedID)
-					found := false
-					for _, ingested := range ingestedTestEvents {
-						if ingested == expectedEventKey {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(ingestedTestEvents, expectedEventKey)
 					assert.True(ct, found, "expected _bulk event %s to be ingested", expectedEventKey)
 				}
 
@@ -1144,13 +1134,11 @@ service:
 
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		// create a log file and keep writing to it until the test finishes.
 		// This is to ensure that the filebeat receiver is continuously processing
 		// new lines and creating new events, which increases the chances of
 		// hitting edge cases that could cause duplicates on restart.
-		defer wg.Done()
 		logFile, err := os.Create(logFilePath)
 		if err != nil {
 			require.NoErrorf(t, err, "could not create file '%s'", logFilePath)
@@ -1172,7 +1160,7 @@ service:
 			writenLines = append(writenLines, msg)
 			i++
 		}
-	}()
+	})
 	t.Cleanup(func() {
 		close(stopChan)
 		wg.Wait()
@@ -1308,11 +1296,11 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	// prepare to query ES
 	roleMappingURL := "http://localhost:9203/_security/role_mapping/kerbrolemapping"
 
-	body := map[string]interface{}{
+	body := map[string]any{
 		"roles":   []string{"superuser"},
 		"enabled": true,
-		"rules": map[string]interface{}{
-			"field": map[string]interface{}{
+		"rules": map[string]any{
+			"field": map[string]any{
 				"username": "beats@elastic",
 			},
 		},
@@ -1499,15 +1487,9 @@ service:
 			assert.Len(ct, ingestedEvents, numTestEvents, "expected all events to be delivered after server starts")
 
 			// Verify we got the expected event content
-			for i := 0; i < numTestEvents; i++ {
+			for i := range numTestEvents {
 				expectedMsg := fmt.Sprintf("Line %d", i)
-				found := false
-				for _, ingested := range ingestedEvents {
-					if ingested == expectedMsg {
-						found = true
-						break
-					}
-				}
+				found := slices.Contains(ingestedEvents, expectedMsg)
 				assert.True(ct, found, "expected to find event: %s", expectedMsg)
 			}
 		}, 30*time.Second, 1*time.Second, "timed out waiting for events to be delivered")
@@ -1542,15 +1524,9 @@ service:
 			defer mu.Unlock()
 			assert.Len(ct, ingestedEvents, totalExpectedEvents, "expected all events (original + additional) to be delivered after server restarts")
 
-			for i := 0; i < totalExpectedEvents; i++ {
+			for i := range totalExpectedEvents {
 				expectedMsg := fmt.Sprintf("Line %d", i)
-				found := false
-				for _, ingested := range ingestedEvents {
-					if ingested == expectedMsg {
-						found = true
-						break
-					}
-				}
+				found := slices.Contains(ingestedEvents, expectedMsg)
 				assert.True(ct, found, "expected to find event: %s", expectedMsg)
 			}
 		}, 30*time.Second, 1*time.Second, "timed out waiting for all events to be delivered")
@@ -1923,9 +1899,90 @@ service:
 	}
 }
 
-// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full otel pipeline.
+type benchPreset struct {
+	name string
+
+	// beats queue
+	memQueueEvents       int
+	memQueueMinEvents    int
+	memQueueFlushTimeout string
+
+	// sending_queue
+	maxConnsPerHost   int
+	expBatchMaxSize   int
+	expBatchMinSize   int
+	expFlushTimeout   string
+	expNumConsumers   int
+	expQueueSize      int
+	eventCountPerRecv int
+}
+
+// presetFields mirrors the subset of elasticsearch.ElasticsearchConfig that
+// elasticsearch.ApplyPreset's preset configs set, so the real preset values
+// can be unpacked directly instead of hand-copied into benchPresets.
+type presetFields struct {
+	BulkMaxSize            int           `config:"bulk_max_size"`
+	Worker                 int           `config:"worker"`
+	QueueMemEvents         int           `config:"queue.mem.events"`
+	QueueMemFlushMinEvents int           `config:"queue.mem.flush.min_events"`
+	QueueMemFlushTimeout   time.Duration `config:"queue.mem.flush.timeout"`
+}
+
+// benchPresetFromName builds a benchPreset from the real preset config
+// applied by elasticsearch.ApplyPreset, keeping the benchmark's queue/batch
+// settings in sync with the actual preset definitions instead of a
+// hand-maintained copy. eventCountPerRecv is picked as the nearest multiple
+// of the preset's min_events/bulk_max_size threshold to targetEventCount, so
+// the benchmark's fixed, bounded event count doesn't leave a leftover
+// partial batch that has to wait out the full flush timeout before the
+// mem-queue (or the exporter's own sending_queue) releases it.
+func benchPresetFromName(name string, targetEventCount int) benchPreset {
+	_, presetCfg, err := esoutput.ApplyPreset(name, config.NewConfig())
+	if err != nil {
+		panic(fmt.Sprintf("unknown benchmark preset %q: %v", name, err))
+	}
+
+	var pf presetFields
+	if err := presetCfg.Unpack(&pf); err != nil {
+		panic(fmt.Sprintf("failed to unpack benchmark preset %q: %v", name, err))
+	}
+
+	eventCountPerRecv := (targetEventCount / pf.QueueMemFlushMinEvents) * pf.QueueMemFlushMinEvents
+
+	return benchPreset{
+		name:                 name,
+		memQueueEvents:       pf.QueueMemEvents,
+		memQueueMinEvents:    pf.QueueMemFlushMinEvents,
+		memQueueFlushTimeout: pf.QueueMemFlushTimeout.String(),
+		maxConnsPerHost:      pf.Worker,
+		expBatchMaxSize:      pf.BulkMaxSize,
+		expBatchMinSize:      pf.BulkMaxSize,
+		expFlushTimeout:      pf.QueueMemFlushTimeout.String(),
+		expNumConsumers:      pf.Worker,
+		expQueueSize:         pf.QueueMemEvents,
+		eventCountPerRecv:    eventCountPerRecv,
+	}
+}
+
+var benchPresets = []benchPreset{
+	benchPresetFromName("throughput", 32_000),
+	benchPresetFromName("balanced", 32_000),
+	benchPresetFromName("scale", 32_000),
+	benchPresetFromName("latency", 32_000),
+}
+
+// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full
+// otel pipeline, once per benchmark preset (see benchPresets).
 func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
-	const eventCount = 100_000
+	for _, preset := range benchPresets {
+		b.Run(preset.name, func(b *testing.B) {
+			benchmarkFilebeatOTelThroughputMockES(b, preset)
+		})
+	}
+}
+
+func benchmarkFilebeatOTelThroughputMockES(b *testing.B, preset benchPreset) {
+	eventCount := preset.eventCountPerRecv * 3
 
 	for b.Loop() {
 		b.StopTimer()
@@ -1963,15 +2020,41 @@ func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
 		)
 
 		cfg := renderOtelConfig(b, `receivers:
-  filebeatreceiver:
+  filebeatreceiver/1:
     filebeat:
       inputs:
         - type: benchmark
           enabled: true
-          count: {{.EventCount}}
-    path.home: {{.PathHome}}
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/1
     setup.template.enabled: false
-    queue.mem.flush.timeout: 0s
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/2
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/3:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/3
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
     processors: []
 exporters:
   elasticsearch:
@@ -1981,28 +2064,46 @@ exporters:
     endpoints:
       - {{.ESEndpoint}}
     logs_index: benchtest
-    max_conns_per_host: 4
+    max_conns_per_host: {{.MaxConnsPerHost}}
     sending_queue:
       batch:
-        flush_timeout: 5s
-        max_size: 1600
-        min_size: 0
+        flush_timeout: {{.ExpFlushTimeout}}
+        max_size: {{.ExpBatchMaxSize}}
+        min_size: {{.ExpBatchMinSize}}
         sizer: items
       block_on_overflow: true
       enabled: true
-      num_consumers: 4
-      queue_size: 12800
+      num_consumers: {{.ExpNumConsumers}}
+      queue_size: {{.ExpQueueSize}}
       wait_for_result: true
     suppress_conflict_errors: true
 processors:
   beat:
     processors:
       - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            env: staging
 service:
   pipelines:
-    logs:
+    logs/1:
       receivers:
-        - filebeatreceiver
+        - filebeatreceiver/1
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/2:
+      receivers:
+        - filebeatreceiver/2
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/3:
+      receivers:
+        - filebeatreceiver/3
       processors:
         - beat
       exporters:
@@ -2013,13 +2114,31 @@ service:
     metrics:
       level: none
 `, struct {
-			EventCount int
-			PathHome   string
-			ESEndpoint string
+			EventCountPerReceiver int
+			PathHome              string
+			ESEndpoint            string
+			MemQueueEvents        int
+			MemQueueMinEvents     int
+			MemQueueFlushTimeout  string
+			MaxConnsPerHost       int
+			ExpBatchMaxSize       int
+			ExpBatchMinSize       int
+			ExpFlushTimeout       string
+			ExpNumConsumers       int
+			ExpQueueSize          int
 		}{
-			EventCount: eventCount,
-			PathHome:   tmpDir,
-			ESEndpoint: mockServer.URL,
+			EventCountPerReceiver: preset.eventCountPerRecv,
+			PathHome:              tmpDir,
+			ESEndpoint:            mockServer.URL,
+			MemQueueEvents:        preset.memQueueEvents,
+			MemQueueMinEvents:     preset.memQueueMinEvents,
+			MemQueueFlushTimeout:  preset.memQueueFlushTimeout,
+			MaxConnsPerHost:       preset.maxConnsPerHost,
+			ExpBatchMaxSize:       preset.expBatchMaxSize,
+			ExpBatchMinSize:       preset.expBatchMinSize,
+			ExpFlushTimeout:       preset.expFlushTimeout,
+			ExpNumConsumers:       preset.expNumConsumers,
+			ExpQueueSize:          preset.expQueueSize,
 		})
 
 		b.StartTimer()

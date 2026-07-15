@@ -77,7 +77,7 @@ func TestRateLimit(t *testing.T) {
 		inEvents = append(inEvents, event)
 	}
 
-	withField := func(in beat.Event, key string, value interface{}) beat.Event {
+	withField := func(in beat.Event, key string, value any) beat.Event {
 		out := in
 		out.Fields = in.Fields.Clone()
 
