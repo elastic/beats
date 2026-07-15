@@ -161,6 +161,9 @@ func TestFilebeatOTelHTTPJSONInput(t *testing.T) {
 	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	fbNameSpace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNameSpace
+
 	type options struct {
 		Namespace string
 		ESURL     string
@@ -426,6 +429,8 @@ service:
 	// 2. Start filebeat standalone mode
 	filebeat.Start()
 	defer filebeat.Stop()
+
+	es := integration.GetESClient(t, "http")
 
 	t.Cleanup(func() {
 		// delete data streams after the test is done
