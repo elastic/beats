@@ -9,9 +9,14 @@ import (
 	"strings"
 	"time"
 
+<<<<<<< HEAD
 	"gopkg.in/natefinch/lumberjack.v2"
 
+=======
+	"github.com/elastic/beats/v7/libbeat/common"
+>>>>>>> 3de266859 (mod: replace gopkg.in/natefinch/lumberjack.v2 with elastic fork (#51950))
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 )
 
 // defaultConfig returns a default configuration.

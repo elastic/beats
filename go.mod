@@ -227,7 +227,6 @@ require (
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.43.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -236,10 +235,21 @@ require (
 	github.com/cilium/ebpf v0.21.0
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
+<<<<<<< HEAD
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/mitchellh/gox v1.0.1
 	github.com/otiai10/copy v1.14.1
+=======
+	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
+	github.com/jimlambrt/gldap v0.1.14
+	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.155.0
+	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
+	github.com/richardlehane/mscfb v1.0.6
+	github.com/rogpeppe/go-internal v1.14.1
+	github.com/twmb/franz-go v1.21.3
+>>>>>>> 3de266859 (mod: replace gopkg.in/natefinch/lumberjack.v2 with elastic fork (#51950))
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.60.0
 	go.opentelemetry.io/collector/component/componenttest v0.154.0
