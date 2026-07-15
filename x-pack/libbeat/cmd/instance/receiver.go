@@ -76,7 +76,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		err := retryer.Retry(ctx, func() error {
 			var err error
 			b.API, err = api.NewWithDefaultRoutes(
-				logp.L().Named("metrics.http"),
+				b.Info.Logger.Named("metrics.http"),
 				b.Config.HTTP,
 				b.Monitoring.InfoRegistry(),
 				b.Monitoring.StateRegistry(),
