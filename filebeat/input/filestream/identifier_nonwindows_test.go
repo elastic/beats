@@ -29,11 +29,8 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-<<<<<<< HEAD:filebeat/input/filestream/identifier_test_non_windows.go
-=======
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> 2a205834d (filebeat: fix misnamed OS-suffixed test files so they actually run (#51853)):filebeat/input/filestream/identifier_nonwindows_test.go
 )
 
 func TestFileIdentifierInodeMarker(t *testing.T) {
