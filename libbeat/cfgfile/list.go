@@ -20,6 +20,7 @@ package cfgfile
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -219,7 +220,7 @@ func (r *RunnerList) Has(hash uint64) bool {
 
 // HashConfig hashes a given config.C
 func HashConfig(c *config.C) (uint64, error) {
-	var config map[string]interface{}
+	var config map[string]any
 	if err := c.Unpack(&config); err != nil {
 		return 0, err
 	}
@@ -228,9 +229,7 @@ func HashConfig(c *config.C) (uint64, error) {
 
 func (r *RunnerList) copyRunnerList() map[uint64]Runner {
 	list := make(map[uint64]Runner, len(r.runners))
-	for k, v := range r.runners {
-		list[k] = v
-	}
+	maps.Copy(list, r.runners)
 	return list
 }
 

@@ -715,13 +715,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					}
 
 					// track ingested event
-					found := false
-					for _, existing := range ingestedTestEvents {
-						if existing == eventKey {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(ingestedTestEvents, eventKey)
 					if !found {
 						ingestedTestEvents = append(ingestedTestEvents, eventKey)
 					}
@@ -750,9 +744,9 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			// If requestLevelFailure is true, wrap with request-level failure logic
 			if tt.requestLevelFailure {
 				// Request-level failures: entire HTTP request fails with the specified status code
-				var attemptCount int64
+				var attemptCount atomic.Int64
 				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-					currentAttempt := atomic.AddInt64(&attemptCount, 1)
+					currentAttempt := attemptCount.Add(1)
 
 					// For retryable status codes (429, 503), fail for failuresPerEvent times, then forward to deterministic handler
 					// For non-retryable status codes (400), always fail
@@ -908,13 +902,7 @@ service:
 				// Verify we have the correct events ingested
 				for _, expectedID := range tt.expectedIngestedEventIDs {
 					expectedEventKey := fmt.Sprintf("Line %d", expectedID)
-					found := false
-					for _, ingested := range ingestedTestEvents {
-						if ingested == expectedEventKey {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(ingestedTestEvents, expectedEventKey)
 					assert.True(ct, found, "expected _bulk event %s to be ingested", expectedEventKey)
 				}
 
@@ -1315,13 +1303,11 @@ service:
 
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		// create a log file and keep writing to it until the test finishes.
 		// This is to ensure that the filebeat receiver is continuously processing
 		// new lines and creating new events, which increases the chances of
 		// hitting edge cases that could cause duplicates on restart.
-		defer wg.Done()
 		logFile, err := os.Create(logFilePath)
 		if err != nil {
 			require.NoErrorf(t, err, "could not create file '%s'", logFilePath)
@@ -1343,7 +1329,7 @@ service:
 			writenLines = append(writenLines, msg)
 			i++
 		}
-	}()
+	})
 	t.Cleanup(func() {
 		close(stopChan)
 		wg.Wait()
@@ -1479,11 +1465,11 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	// prepare to query ES
 	roleMappingURL := "http://localhost:9203/_security/role_mapping/kerbrolemapping"
 
-	body := map[string]interface{}{
+	body := map[string]any{
 		"roles":   []string{"superuser"},
 		"enabled": true,
-		"rules": map[string]interface{}{
-			"field": map[string]interface{}{
+		"rules": map[string]any{
+			"field": map[string]any{
 				"username": "beats@elastic",
 			},
 		},
@@ -1670,15 +1656,9 @@ service:
 			assert.Len(ct, ingestedEvents, numTestEvents, "expected all events to be delivered after server starts")
 
 			// Verify we got the expected event content
-			for i := 0; i < numTestEvents; i++ {
+			for i := range numTestEvents {
 				expectedMsg := fmt.Sprintf("Line %d", i)
-				found := false
-				for _, ingested := range ingestedEvents {
-					if ingested == expectedMsg {
-						found = true
-						break
-					}
-				}
+				found := slices.Contains(ingestedEvents, expectedMsg)
 				assert.True(ct, found, "expected to find event: %s", expectedMsg)
 			}
 		}, 30*time.Second, 1*time.Second, "timed out waiting for events to be delivered")
@@ -1713,15 +1693,9 @@ service:
 			defer mu.Unlock()
 			assert.Len(ct, ingestedEvents, totalExpectedEvents, "expected all events (original + additional) to be delivered after server restarts")
 
-			for i := 0; i < totalExpectedEvents; i++ {
+			for i := range totalExpectedEvents {
 				expectedMsg := fmt.Sprintf("Line %d", i)
-				found := false
-				for _, ingested := range ingestedEvents {
-					if ingested == expectedMsg {
-						found = true
-						break
-					}
-				}
+				found := slices.Contains(ingestedEvents, expectedMsg)
 				assert.True(ct, found, "expected to find event: %s", expectedMsg)
 			}
 		}, 30*time.Second, 1*time.Second, "timed out waiting for all events to be delivered")

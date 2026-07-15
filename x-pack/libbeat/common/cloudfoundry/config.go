@@ -6,6 +6,7 @@ package cloudfoundry
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -62,10 +63,5 @@ func (c *Config) Validate() error {
 }
 
 func anyOf(elems []string, s string) bool {
-	for _, elem := range elems {
-		if s == elem {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(elems, s)
 }

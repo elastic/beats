@@ -78,11 +78,9 @@ func TestClient(t *testing.T) {
 		}
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			client.Publish(beat.Event{})
-		}()
+		})
 
 		client.Close()
 		wg.Wait()
@@ -366,7 +364,7 @@ func TestMonitoring(t *testing.T) {
 			numClients = 42
 		)
 		var config Config
-		err := conf.MustNewConfigFrom(map[string]interface{}{
+		err := conf.MustNewConfigFrom(map[string]any{
 			"queue.mem.events":           maxEvents,
 			"queue.mem.flush.min_events": 1,
 		}).Unpack(&config)
@@ -422,7 +420,7 @@ func TestMonitoring(t *testing.T) {
 func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig) {
 
 	var config Config
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"queue.mem.events":           32,
 		"queue.mem.flush.min_events": 1,
 		"queue.mem.flush.timeout":    time.Millisecond,
