@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -35,7 +34,7 @@ import (
 // these tests are separated as one cannot delete/rename files
 // while another process is working with it on Windows
 func TestLogFileRenamed(t *testing.T) {
-	f := createTestLogFile(t)
+	f := createTestLogFile()
 	defer f.Close()
 
 	renamedFile := f.Name() + ".renamed"
@@ -73,7 +72,7 @@ func TestLogFileRenamed(t *testing.T) {
 }
 
 func TestLogFileRemoved(t *testing.T) {
-	f := createTestLogFile(t)
+	f := createTestLogFile()
 	defer f.Close()
 
 	reader, _, err := newFileReader(
@@ -105,17 +104,4 @@ func TestLogFileRemoved(t *testing.T) {
 	err = readUntilError(reader)
 
 	assert.Equal(t, ErrClosed, err)
-}
-
-// createTestLogFile creates a temporary plain-text log file with a few lines of
-// content, wrapped as a filestream File ready to be passed to newFileReader.
-func createTestLogFile(t *testing.T) File {
-	t.Helper()
-	fs := filestream{
-		readerConfig: readerConfig{BufferSize: 512},
-		compression:  CompressionNone,
-	}
-	f, err := fs.newFile(createTestPlainLogFile(t))
-	require.NoError(t, err, "could not create test log file")
-	return f
 }
