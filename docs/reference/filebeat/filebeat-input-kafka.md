@@ -122,11 +122,7 @@ The keep-alive period for the active network connection to the Kafka brokers. De
 
 ### `session_timeout` [_session_timeout]
 ```{applies_to}
-<<<<<<< HEAD
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
-=======
 stack: ga 9.3+
->>>>>>> d88456082 (Update `applies_to` version for Kafka input settings (#51862))
 ```
 
 The consumer group session timeout. If the broker receives no heartbeat from a consumer within this period, the consumer is removed from the group and a rebalance is triggered. Consumers on higher-latency links may need a larger value to avoid spurious rebalances. Default is 10s.
@@ -134,11 +130,7 @@ The consumer group session timeout. If the broker receives no heartbeat from a c
 
 ### `heartbeat_interval` [_heartbeat_interval]
 ```{applies_to}
-<<<<<<< HEAD
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
-=======
 stack: ga 9.3+
->>>>>>> d88456082 (Update `applies_to` version for Kafka input settings (#51862))
 ```
 
 How often the consumer sends heartbeats to the broker. This must be lower than `session_timeout`, and is typically set to no more than a third of that value. Default is 3s.
