@@ -402,7 +402,7 @@ func (d *addDockerMetadata) resolveCIDFromPdata(body pcommon.Map) (string, error
 // resolveCIDFromSourcePath runs the configured source processor against a
 // synthetic event carrying only the log.file.path value, returning the
 // container ID
-func (d *addDockerMetadata) resolveCIDFromSourcePath(logFilePath interface{}) (string, error) {
+func (d *addDockerMetadata) resolveCIDFromSourcePath(logFilePath any) (string, error) {
 	miniEvent := &beat.Event{Fields: mapstr.M{"log": mapstr.M{"file": mapstr.M{"path": logFilePath}}}}
 	result, err := d.sourceProcessor.Run(miniEvent)
 	if err != nil {
