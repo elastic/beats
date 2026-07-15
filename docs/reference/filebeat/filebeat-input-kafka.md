@@ -98,11 +98,7 @@ How long to wait before retrying a failed read. Default is 2s.
 
 ### `timeout` [_timeout_2]
 ```{applies_to}
-<<<<<<< HEAD
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
-=======
 stack: ga 9.3+
->>>>>>> d88456082 (Update `applies_to` version for Kafka input settings (#51862))
 ```
 
 The network timeout for the connection to the Kafka brokers, applied to the dial, read, and write deadlines. Increase this for consumers reading across higher-latency links (for example cross-region or WAN), where a large fetch response may not be fully read within the default deadline. Default is 30s.
@@ -110,11 +106,7 @@ The network timeout for the connection to the Kafka brokers, applied to the dial
 
 ### `keep_alive` [_keep_alive]
 ```{applies_to}
-<<<<<<< HEAD
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
-=======
 stack: ga 9.3+
->>>>>>> d88456082 (Update `applies_to` version for Kafka input settings (#51862))
 ```
 
 The keep-alive period for the active network connection to the Kafka brokers. Default is 0s (disabled).
