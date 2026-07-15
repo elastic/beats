@@ -61,7 +61,7 @@ func TestMergeHosts(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			mergedCfg := conf.MustNewConfigFrom(map[string]interface{}{})
+			mergedCfg := conf.MustNewConfigFrom(map[string]any{})
 			err := mergeHosts(mergedCfg, test.outCfg, test.reporterCfg)
 			require.NoError(t, err)
 

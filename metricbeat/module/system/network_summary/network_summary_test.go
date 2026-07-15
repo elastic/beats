@@ -46,9 +46,9 @@ func TestMapping(t *testing.T) {
 	}
 
 	exampleOut := mapstr.M{
-		"icmp":     map[string]interface{}{"InAddrMaskReps": uint64(5), "InType3": uint64(835)},
-		"ip":       map[string]interface{}{"DefaultTTL": uint64(64), "InBcastOctets": uint64(431773621), "InBcastPkts": uint64(1686995), "InCEPkts": uint64(0)},
-		"tcp":      map[string]interface{}{"DelayedACKLocked": uint64(111), "DelayedACKLost": uint64(1587), "DelayedACKs": uint64(516004), "MaxConn": int64(-1)},
+		"icmp":     map[string]any{"InAddrMaskReps": uint64(5), "InType3": uint64(835)},
+		"ip":       map[string]any{"DefaultTTL": uint64(64), "InBcastOctets": uint64(431773621), "InBcastPkts": uint64(1686995), "InCEPkts": uint64(0)},
+		"tcp":      map[string]any{"DelayedACKLocked": uint64(111), "DelayedACKLost": uint64(1587), "DelayedACKs": uint64(516004), "MaxConn": int64(-1)},
 		"udp":      map[string]uint64{"IgnoredMulti": 10},
 		"udp_lite": map[string]uint64{"IgnoredMulti": 0}}
 
@@ -64,8 +64,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "system",
 		"metricsets": []string{"network_summary"},
 	}

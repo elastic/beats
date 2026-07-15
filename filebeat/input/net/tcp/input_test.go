@@ -67,15 +67,13 @@ func TestInput(t *testing.T) {
 	metrics := inp.InitMetrics("tcp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
 	c := make(chan netinput.DataMetadata, 2)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		if err := inp.Run(v2Ctx, c, metrics); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}
 		}
-	}()
+	})
 
 	nettest.RequireNetMetricsCount(t, v2Ctx.MetricsRegistry, time.Second, 2, 0, 6)
 
@@ -119,8 +117,7 @@ func BenchmarkInput(b *testing.B) {
 		b.Fatalf("cannot create input: %s", err)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := b.Context()
 
 	v2Ctx := v2.Context{
 		ID:              b.Name(),

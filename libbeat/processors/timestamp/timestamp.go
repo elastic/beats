@@ -115,7 +115,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *processor) tryToTime(value interface{}) (time.Time, error) {
+func (p *processor) tryToTime(value any) (time.Time, error) {
 	switch v := value.(type) {
 	case time.Time:
 		return v, nil
@@ -126,7 +126,7 @@ func (p *processor) tryToTime(value interface{}) (time.Time, error) {
 	}
 }
 
-func (p *processor) parseValue(v interface{}) (time.Time, error) {
+func (p *processor) parseValue(v any) (time.Time, error) {
 	// Try each layout, returning on first success. The parseError and cause
 	// list are only allocated when all layouts fail, keeping the success path
 	// allocation-free.
@@ -152,7 +152,7 @@ func (p *processor) parseValue(v interface{}) (time.Time, error) {
 }
 
 // parseFailure logs the error (if debug is enabled) and returns it.
-func (p *processor) parseFailure(v interface{}, err error) (time.Time, error) {
+func (p *processor) parseFailure(v any, err error) (time.Time, error) {
 	if p.isDebug {
 		if p.IgnoreFailure {
 			p.log.Debugw("(Ignored) Failure parsing time field.", "error", err)
@@ -163,7 +163,7 @@ func (p *processor) parseFailure(v interface{}, err error) (time.Time, error) {
 	return time.Time{}, err
 }
 
-func (p *processor) parseValueByLayout(v interface{}, layout string) (time.Time, error) {
+func (p *processor) parseValueByLayout(v any, layout string) (time.Time, error) {
 	switch layout {
 	case "UNIX":
 		if sec, ok := common.TryToInt(v); ok {
