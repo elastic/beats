@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Recreate Kubernetes metadata watchers after their final metricset owner stops
+component: metricbeat
+issue: https://github.com/elastic/beats/issues/51833
