@@ -38,6 +38,7 @@ type DocsUpdateOptions struct {
 	BaseBranch     string
 	CurrentVersion string
 	ReleaseBranch  string
+	DocBranch      string // if empty, infer per workflow
 }
 
 // UpdateVersion updates the version in libbeat/version/version.go
@@ -75,8 +76,7 @@ func UpdateVersion(newVersion string) error {
 }
 
 // UpdateStackVersion updates only :stack-version: in libbeat/docs/version.asciidoc.
-// Used by prepare-next-release, which does not change :doc-branch: so modules.d
-// files keep pointing at /current/ after make update.
+// Not used by prepare-next-release / PR-D (those only bump version.go + test-env).
 func UpdateStackVersion(newVersion string) error {
 	versionRules := []replacementRule{
 		{
@@ -114,9 +114,12 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 		opts.BaseBranch = opts.ReleaseBranch
 	}
 
-	docBranch := opts.BaseBranch
-	if docBranch == "main" || docBranch == "current" {
-		docBranch = opts.ReleaseBranch
+	docBranch := opts.DocBranch
+	if docBranch == "" {
+		docBranch = opts.BaseBranch
+		if docBranch == "main" || docBranch == "current" {
+			docBranch = opts.ReleaseBranch
+		}
 	}
 
 	versionRules := []replacementRule{
@@ -133,10 +136,10 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 		return err
 	}
 
+	// Matches beats.mak update-docs (heartbeat is updated via make update on ff-release only).
 	k8sFiles := []string{
 		"deploy/kubernetes/metricbeat-kubernetes.yaml",
 		"deploy/kubernetes/filebeat-kubernetes.yaml",
-		"deploy/kubernetes/heartbeat-kubernetes.yaml",
 		"deploy/kubernetes/auditbeat-kubernetes.yaml",
 	}
 	k8sRule := replacementRule{
@@ -227,6 +230,11 @@ func applyReplacements(filePath string, rules []replacementRule) error {
 
 // RunMakeUpdate runs 'make --silent update' in the repository.
 func RunMakeUpdate() error {
+	return runMakeUpdate()
+}
+
+// runMakeUpdate is the default implementation; tests may replace it.
+var runMakeUpdate = func() error {
 	fmt.Println("Running 'make --silent update'...")
 	ctx := context.Background()
 	cmd := execabs.CommandContext(ctx, "make", "--silent", "update")

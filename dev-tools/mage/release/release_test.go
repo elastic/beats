@@ -199,9 +199,10 @@ func TestUpdateDocs(t *testing.T) {
 	if !strings.Contains(string(content), "docker.elastic.co/beats/metricbeat-wolfi:9.4.0") {
 		t.Errorf("K8s file not updated. Got:\n%s", string(content))
 	}
+	// beats.mak update-docs does not touch heartbeat; make update does on ff-release.
 	content, _ = os.ReadFile(heartbeatFile)
-	if !strings.Contains(string(content), "docker.elastic.co/beats/heartbeat-wolfi:9.4.0") {
-		t.Errorf("Heartbeat K8s file not updated. Got:\n%s", string(content))
+	if !strings.Contains(string(content), "docker.elastic.co/beats/heartbeat-wolfi:9.3.0") {
+		t.Errorf("Heartbeat K8s file should remain unchanged by UpdateDocs. Got:\n%s", string(content))
 	}
 }
 
@@ -300,6 +301,127 @@ func TestUpdateDocsDocBranchCurrent(t *testing.T) {
 	}
 	if !strings.Contains(string(content), ":doc-branch: 9.5") {
 		t.Errorf("doc-branch not updated for patch docs. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsDocBranchExplicitMain(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.4.3
+:doc-branch: 9.4
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	// PR-B: ff-release keeps :doc-branch: main for 9.x cumulative docs
+	err = UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     "main",
+		CurrentVersion: "9.5.0",
+		ReleaseBranch:  "9.5",
+		DocBranch:      "main",
+	})
+	if err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.5.0") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: main") {
+		t.Errorf("doc-branch should remain main for ff-release. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsDocBranchExplicitMainNextMinor(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.5.0
+:doc-branch: main
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	readmePath := filepath.Join(tmpDir, "README.md")
+	readmeContent := "# Beats\n\nhttps://github.com/elastic/beats/tree/main/libbeat\n"
+	err = os.WriteFile(readmePath, []byte(readmeContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create README.md: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	// PR-C: prepare-next-dev-minor uses BASE=main RELEASE=main (README no-op).
+	err = UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     "main",
+		CurrentVersion: "9.6.0",
+		ReleaseBranch:  "main",
+		DocBranch:      "main",
+	})
+	if err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.6.0") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: main") {
+		t.Errorf("doc-branch should remain main for next minor docs PR. Got:\n%s", string(content))
+	}
+
+	readme, err := os.ReadFile(readmePath)
+	if err != nil {
+		t.Fatalf("Failed to read README.md: %v", err)
+	}
+	if string(readme) != readmeContent {
+		t.Errorf("README.md should be unchanged when ReleaseBranch equals BaseBranch. Got:\n%s", string(readme))
 	}
 }
 

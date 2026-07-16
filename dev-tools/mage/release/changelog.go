@@ -70,6 +70,10 @@ func PrepareChangelog(fromVersion, toCommit string) error {
 func RunChangelog(cfg *ReleaseConfig) error {
 	fmt.Println("=== Starting Changelog Workflow ===")
 
+	if err := cfg.EnsureLatestRelease(); err != nil {
+		return err
+	}
+
 	// Validate configuration
 	if err := cfg.Validate(); err != nil {
 		return err
@@ -98,14 +102,6 @@ func RunChangelog(cfg *ReleaseConfig) error {
 
 	// Generate changelog
 	fromVersion := cfg.LatestRelease
-	if fromVersion == "" {
-		// For minor releases (e.g., 9.5.0), user must explicitly set LATEST_RELEASE
-		// to the last patch of the previous minor version (e.g., 9.4.3)
-		fmt.Println("WARNING: LATEST_RELEASE not set. For minor releases, please set LATEST_RELEASE explicitly.")
-		fmt.Printf("WARNING: Using current release %s as starting point for changelog.\n", cfg.CurrentRelease)
-		fromVersion = cfg.CurrentRelease
-	}
-
 	if err := PrepareChangelog(fromVersion, cfg.ChangelogToCommit); err != nil {
 		return err
 	}

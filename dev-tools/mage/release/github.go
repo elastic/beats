@@ -20,6 +20,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/google/go-github/v68/github"
@@ -45,16 +46,20 @@ type PROptions struct {
 	Labels    []string
 }
 
-// NewGitHubClient creates a new GitHub API client
+// NewGitHubClient creates a new GitHub API client.
+// An empty token uses unauthenticated public API access (sufficient for reading public releases).
 func NewGitHubClient(token string) *GitHubClient {
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+	var httpClient *http.Client
+	if token != "" {
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		httpClient = oauth2.NewClient(ctx, ts)
+	}
 
 	return &GitHubClient{
-		client: github.NewClient(tc),
+		client: github.NewClient(httpClient),
 		ctx:    ctx,
 	}
 }
@@ -144,6 +149,46 @@ func (gh *GitHubClient) AddLabels(owner, repo string, number int, labels []strin
 
 	fmt.Printf("Added labels to #%d: %v\n", number, labels)
 	return nil
+}
+
+// releasesLookupOwner and releasesLookupRepo are the canonical repo for published Beats releases.
+// Forks typically lack release history, so workflows always resolve LatestRelease from here.
+const (
+	releasesLookupOwner = "elastic"
+	releasesLookupRepo  = "beats"
+)
+
+// LatestReleaseBefore returns the highest published release version with the same major
+// that is strictly less than currentVersion (e.g. current 9.5.0 → 9.4.3).
+func (gh *GitHubClient) LatestReleaseBefore(owner, repo, currentVersion string) (string, error) {
+	versions, err := gh.listReleaseVersions(owner, repo)
+	if err != nil {
+		return "", err
+	}
+	return selectLatestReleaseBefore(versions, currentVersion)
+}
+
+func (gh *GitHubClient) listReleaseVersions(owner, repo string) ([]string, error) {
+	var versions []string
+	opts := &github.ListOptions{PerPage: 100}
+	for {
+		releases, resp, err := gh.client.Repositories.ListReleases(gh.ctx, owner, repo, opts)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list releases for %s/%s: %w", owner, repo, err)
+		}
+		for _, rel := range releases {
+			tag := rel.GetTagName()
+			if tag == "" {
+				continue
+			}
+			versions = append(versions, tag)
+		}
+		if resp.NextPage == 0 {
+			break
+		}
+		opts.Page = resp.NextPage
+	}
+	return versions, nil
 }
 
 // PRConfig holds configuration for a single PR in a multi-PR workflow

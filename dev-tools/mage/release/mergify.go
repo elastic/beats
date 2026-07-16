@@ -20,43 +20,44 @@ package release
 import (
 	"fmt"
 	"os"
-
-	"gopkg.in/yaml.v3"
+	"strings"
 )
 
-// UpdateMergify updates .mergify.yml to add backport configuration for new version
-func UpdateMergify(version string) error {
+// UpdateMergify updates .mergify.yml to add a backport rule for releaseBranch.
+// It is idempotent: existing rules for backport-{releaseBranch} are left unchanged.
+func UpdateMergify(releaseBranch string) error {
 	mergifyFile := ".mergify.yml"
 
-	// Read the file
 	content, err := os.ReadFile(mergifyFile)
 	if err != nil {
 		return fmt.Errorf("failed to read %s: %w", mergifyFile, err)
 	}
 
-	// Parse YAML
-	var config map[string]interface{}
-	err = yaml.Unmarshal(content, &config)
-	if err != nil {
-		return fmt.Errorf("failed to parse %s: %w", mergifyFile, err)
+	labelCondition := fmt.Sprintf("label=backport-%s", releaseBranch)
+	if strings.Contains(string(content), labelCondition) {
+		fmt.Printf("Mergify backport rule for %s already exists in %s\n", releaseBranch, mergifyFile)
+		return nil
 	}
 
-	// Add backport rule for the new version
-	// This is a simplified implementation - the actual logic may need to be more sophisticated
-	// depending on the structure of .mergify.yml
+	ruleName := fmt.Sprintf("backport patches to %s branch", releaseBranch)
+	newRule := fmt.Sprintf(`  - name: %s
+    conditions:
+      - merged
+      - %s
+    actions:
+      backport:
+        branches:
+          - "%s"
+`, ruleName, labelCondition, releaseBranch)
 
-	// For now, we'll just verify we can read/write the file
-	// The actual implementation would add a new backport rule like:
-	// - name: backport patches to 9.3 branch
-	//   conditions:
-	//     - label=backport-v9.3.0
-	//   actions:
-	//     backport:
-	//       branches:
-	//         - "9.3"
+	trimmed := strings.TrimRight(string(content), "\n")
+	updated := trimmed + "\n" + newRule
 
-	fmt.Printf("Mergify update for version %s - implementation pending\n", version)
-	fmt.Println("Note: Manual verification of .mergify.yml may be required")
+	err = os.WriteFile(mergifyFile, []byte(updated), 0644) //nolint:gosec // G703: fixed release tooling path
+	if err != nil {
+		return fmt.Errorf("failed to write %s: %w", mergifyFile, err)
+	}
 
+	fmt.Printf("Added Mergify backport rule for branch %s in %s\n", releaseBranch, mergifyFile)
 	return nil
 }

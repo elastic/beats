@@ -18,6 +18,7 @@
 package release
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -156,5 +157,138 @@ func TestInferReleaseBranch(t *testing.T) {
 				t.Errorf("inferReleaseBranch() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestInferNextProjectMinorVersion(t *testing.T) {
+	tests := []struct {
+		name    string
+		version string
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "9.5.0 to 9.6.0",
+			version: "9.5.0",
+			want:    "9.6.0",
+			wantErr: false,
+		},
+		{
+			name:    "8.15.0 to 8.16.0",
+			version: "8.15.0",
+			want:    "8.16.0",
+			wantErr: false,
+		},
+		{
+			name:    "invalid format",
+			version: "9.5",
+			want:    "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := inferNextProjectMinorVersion(tt.version)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("inferNextProjectMinorVersion() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("inferNextProjectMinorVersion() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInferNextProjectMinorBranch(t *testing.T) {
+	tests := []struct {
+		name    string
+		version string
+		want    string
+	}{
+		{
+			name:    "9.5.0 to 9.6",
+			version: "9.5.0",
+			want:    "9.6",
+		},
+		{
+			name:    "8.15.0 to 8.16",
+			version: "8.15.0",
+			want:    "8.16",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inferNextProjectMinorBranch(tt.version)
+			if got != tt.want {
+				t.Errorf("inferNextProjectMinorBranch() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestReleaseConfigValidateRequiresLatest(t *testing.T) {
+	cfg := &ReleaseConfig{
+		CurrentRelease: "9.5.0",
+		DryRun:         true,
+	}
+	err := cfg.Validate()
+	if err == nil {
+		t.Fatal("expected validation error when LatestRelease is missing")
+	}
+	if !strings.Contains(err.Error(), "LatestRelease") {
+		t.Fatalf("expected LatestRelease error, got: %v", err)
+	}
+
+	cfg.LatestRelease = "9.4.3"
+	if err := cfg.Validate(); err != nil {
+		t.Fatalf("expected validation to pass with LatestRelease set: %v", err)
+	}
+}
+
+func TestEnsureLatestReleaseFromAPI(t *testing.T) {
+	orig := fetchLatestReleaseBefore
+	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
+		if owner != "elastic" || repo != "beats" {
+			t.Errorf("unexpected lookup repo %s/%s", owner, repo)
+		}
+		if current != "9.5.0" {
+			t.Errorf("unexpected current %s", current)
+		}
+		return "9.4.3", nil
+	}
+	t.Cleanup(func() { fetchLatestReleaseBefore = orig })
+
+	cfg := &ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true}
+	if err := cfg.EnsureLatestRelease(); err != nil {
+		t.Fatalf("EnsureLatestRelease failed: %v", err)
+	}
+	if cfg.LatestRelease != "9.4.3" {
+		t.Errorf("LatestRelease = %s, want 9.4.3", cfg.LatestRelease)
+	}
+
+	// Override should not call the API again
+	cfg.LatestRelease = "9.4.2"
+	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
+		t.Fatal("should not fetch when LatestRelease is already set")
+		return "", nil
+	}
+	if err := cfg.EnsureLatestRelease(); err != nil {
+		t.Fatalf("EnsureLatestRelease with override failed: %v", err)
+	}
+	if cfg.LatestRelease != "9.4.2" {
+		t.Errorf("LatestRelease override lost: %s", cfg.LatestRelease)
+	}
+}
+
+func TestInferNextReleaseForMinor(t *testing.T) {
+	got, err := inferNextRelease("9.5.0")
+	if err != nil {
+		t.Fatalf("inferNextRelease() error = %v", err)
+	}
+	if got != "9.5.1" {
+		t.Errorf("inferNextRelease(9.5.0) = %v, want 9.5.1", got)
 	}
 }

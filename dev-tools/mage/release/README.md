@@ -28,7 +28,7 @@ This package provides release automation for the Beats project, migrated from Ma
 - Deprecated version checks
 
 **Workflows supported:**
-1. **Major/Minor Release (feature-freeze)** - Creates release branch + 2 PRs for NEXT_RELEASE (version, test-env). Maps to ingest-dev `prepare-next-release`.
+1. **Major/Minor Release (feature-freeze)** - Creates release branch + 4 grouped PRs (backport+version on main, ff-release, docs+test-env on main, next patch on release branch)
 2. **Patch Release** - Creates up to 3 PRs (version, docs, test-env)
 3. **Changelog** - Generates changelog and creates 1 PR
 
@@ -81,7 +81,7 @@ mage -l | grep release
 You should see:
 ```
 release:runChangelog     Executes the complete changelog workflow
-release:runMajorMinor    Feature-freeze workflow (release branch + 2 PRs for NEXT_RELEASE)
+release:runMajorMinor    Feature-freeze workflow (release branch + 4 grouped PRs)
 release:runPatch         Executes the complete patch release workflow
 release:updateDocs       Updates version references in documentation and K8s manifests
 release:updateMergify    Updates .mergify.yml backport configuration
@@ -104,7 +104,7 @@ All configuration is done via environment variables.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LATEST_RELEASE` | - | Previous release version (for test env updates) |
+| `LATEST_RELEASE` | Auto from GitHub (or patch−1) | Optional override for previous release used in test-env updates |
 | `BASE_BRANCH` | `"main"` | Base branch for PRs |
 | `RELEASE_BRANCH` | Auto-derived from `CURRENT_RELEASE` | Release branch name |
 | `PROJECT_OWNER` | `"elastic"` | GitHub repository owner |
@@ -124,7 +124,7 @@ export GITHUB_TOKEN="ghp_your_token"
 
 # Full configuration
 export CURRENT_RELEASE="9.3.0"
-export LATEST_RELEASE="9.2.0"
+# LATEST_RELEASE is optional; auto-resolved from elastic/beats GitHub releases
 export BASE_BRANCH="main"
 export RELEASE_BRANCH="9.3"
 export GITHUB_TOKEN="ghp_your_token"
@@ -136,39 +136,45 @@ export DRY_RUN="true"
 
 ### Major/Minor Release (Feature Freeze)
 
-Runs at a new major or minor version (e.g., 9.0.0, 9.3.0). This is the
-feature-freeze workflow, equivalent to ingest-dev `prepare-next-release` +
-`create-prs-next-release`.
+Runs at a new major or minor version (e.g., 9.0.0, 9.5.0). This is the
+feature-freeze workflow, equivalent to ingest-dev `prepare-major-minor-release`
+with grouped PRs.
 
 **What it does:**
 1. Validates version and checks for deprecated releases
-2. Creates release branch from `BASE_BRANCH` (e.g., `9.3`)
-3. Creates version branch `update-version-next-$(NEXT_RELEASE)` (e.g., `9.3.1`)
-4. Updates `libbeat/version/version.go` and `:stack-version:` in docs, then runs `make update`
-5. Creates test-env branch `update-testing-env-next-$(NEXT_RELEASE)`
-6. Updates test environment configurations for `NEXT_RELEASE`
-7. Commits changes on each branch
-8. Pushes release branch and opens 2 PRs (unless DRY_RUN)
+2. Creates release branch from `BASE_BRANCH` (e.g., `9.5`)
+3. Prepares **4 grouped PRs** (merge order matters):
+
+| Step | PR | Target | Branch | Changes |
+|------|-----|--------|--------|---------|
+| 1 | PR-A | `main` | `ff-prep-main-X.Y.0` | Mergify backport rule + `version.go` → next minor |
+| 2 | PR-B | release branch | `ff-release-X.Y.0` | ff-release version, docs, test env, `make update` |
+| 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | Docs + test env for next minor |
+| 4 | PR-D | release branch | `ff-prep-next-patch-X.Y.1` | Next patch version + test env |
+
+4. Pushes release branch and opens PRs (unless `DRY_RUN`)
+
+**RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main` → merge PR-D on release branch (after release day).
 
 **Usage:**
 
 ```bash
 # Test first with DRY_RUN
-export CURRENT_RELEASE="9.3.0"
+export CURRENT_RELEASE="9.5.0"
 export GITHUB_TOKEN="ghp_your_token"
 export DRY_RUN=true
 
 mage release:runMajorMinor
 
-# Review changes
-git status
-git diff
-git log
+# Review branches
+git branch | grep -E 'ff-prep|ff-release|9\.5'
 
 # Run for real
 export DRY_RUN=false
 mage release:runMajorMinor
 ```
+
+`LatestRelease` is resolved automatically from published `elastic/beats` GitHub releases (highest same-major version strictly less than `CURRENT_RELEASE`, e.g. `9.5.0` → `9.4.3`). Set `LATEST_RELEASE` only to override.
 
 **Blocked versions:**
 - 6.x minor releases (6.5.0, etc.)
@@ -288,13 +294,13 @@ Arguments:
 
 ### UpdateMergify
 
-Updates `.mergify.yml` for backport configuration:
+Updates `.mergify.yml` to add a backport rule for the release branch:
 
 ```bash
-mage release:updateMergify 9.3
+mage release:updateMergify 9.5
 ```
 
-**Note:** This is currently a placeholder. Manual verification of `.mergify.yml` may be required.
+Idempotent: skips if a `backport-9.5` rule already exists.
 
 ## DRY_RUN Mode
 
@@ -341,20 +347,19 @@ mage release:runMajorMinor
 
 ```
 === Starting Major/Minor Release Workflow ===
-Creating release branch: 9.3
+Creating release branch: 9.5
 
---- Creating PR 1: Version to NEXT_RELEASE ---
-Updated version to 9.3.1 in libbeat/version/version.go
-Updated stack-version to 9.3.1 in libbeat/docs/version.asciidoc
-Running 'make --silent update'...
-
---- Creating PR 2: Test Environments to NEXT_RELEASE ---
-Updated test environment files (latest=9.3.0, current=9.3.1)
+--- Preparing PR-A: backport rule + version 9.6.0 on main ---
+--- Preparing PR-B: ff-release 9.5.0 on 9.5 ---
+--- Preparing PR-C: docs + test env 9.6.0 on main ---
+--- Preparing PR-D: next patch 9.5.1 on 9.5 ---
 
 DRY RUN: Skipping push and PR creation
-Release branch prepared: 9.3
-Branch prepared: update-version-next-9.3.1
-Branch prepared: update-testing-env-next-9.3.1
+Release branch prepared: 9.5
+Branch prepared: ff-prep-main-9.5.0
+Branch prepared: ff-release-9.5.0
+Branch prepared: ff-prep-main-docs-env-9.6.0
+Branch prepared: ff-prep-next-patch-9.5.1
 ```
 
 ## Multi-PR Workflows
