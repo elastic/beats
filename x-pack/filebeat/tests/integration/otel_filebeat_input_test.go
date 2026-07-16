@@ -481,9 +481,6 @@ service:
                 - elasticsearch
             receivers:
                 - filebeatreceiver
-    telemetry:
-        metrics:
-            level: none
 `
 
 	optionsValue := options{

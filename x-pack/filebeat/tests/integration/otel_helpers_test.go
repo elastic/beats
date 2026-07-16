@@ -68,9 +68,6 @@ const otelElasticsearchServiceYAML = `service:
                 - elasticsearch
             receivers:
                 - filebeatreceiver
-    telemetry:
-        metrics:
-            level: none
 `
 
 func otelE2ERawQueryForInputTypeAndMessage(inputType, message string) map[string]any {
