@@ -182,7 +182,7 @@ func (t *tokenBucket) runGC() {
 		// and flag full buckets for deletion.
 		toDelete := make([]uint64, 0)
 		numBucketsBefore := 0
-		t.buckets.Range(func(k, v interface{}) bool {
+		t.buckets.Range(func(k, v any) bool {
 			//nolint:errcheck // ignore
 			key := k.(uint64)
 			//nolint:errcheck // ignore

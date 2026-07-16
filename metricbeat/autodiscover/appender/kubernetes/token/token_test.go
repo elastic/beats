@@ -18,7 +18,6 @@
 package token
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -48,7 +47,7 @@ func TestTokenAppender(t *testing.T) {
 		{
 			event: bus.Event{},
 			result: mapstr.M{
-				"headers": map[string]interface{}{
+				"headers": map[string]any{
 					"Authorization": "Bearer foo bar",
 				},
 			},
@@ -62,8 +61,8 @@ token_path: "test"
 			event: bus.Event{},
 			result: mapstr.M{
 				"module": "prometheus",
-				"hosts":  []interface{}{"1.2.3.4:8080"},
-				"headers": map[string]interface{}{
+				"hosts":  []any{"1.2.3.4:8080"},
+				"headers": map[string]any{
 					"Authorization": "Bearer foo bar",
 				},
 			},
@@ -108,7 +107,7 @@ token_path: "test"
 }
 
 func writeFile(name, message string) {
-	ioutil.WriteFile(name, []byte(message), os.ModePerm)
+	os.WriteFile(name, []byte(message), os.ModePerm)
 }
 
 func deleteFile(name string) {

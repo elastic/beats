@@ -32,7 +32,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"osquerybeat": map[string]any{
 				"inputs": []any{
 					map[string]any{

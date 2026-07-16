@@ -29,8 +29,8 @@ import (
 )
 
 func TestInstrumentationConfig(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"instrumentation": map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"instrumentation": map[string]any{
 			"enabled": "true",
 		},
 	})
@@ -45,8 +45,8 @@ func TestInstrumentationConfig(t *testing.T) {
 }
 
 func TestInstrumentationConfigExplicitHosts(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"instrumentation": map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"instrumentation": map[string]any{
 			"enabled": "true",
 			"hosts":   []string{"localhost:8200"},
 		},
@@ -62,8 +62,8 @@ func TestInstrumentationConfigExplicitHosts(t *testing.T) {
 }
 
 func TestInstrumentationConfigListener(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"instrumentation": map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"instrumentation": map[string]any{
 			"enabled": "true",
 		},
 	})
@@ -89,8 +89,8 @@ func TestAPMTracerDisabledByDefault(t *testing.T) {
 }
 
 func TestInstrumentationDisabled(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"instrumentation": map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"instrumentation": map[string]any{
 			"enabled": "false",
 		},
 	})

@@ -30,7 +30,7 @@ func GetRawFileOrErrorString(res resolve.Resolver, path string) []byte {
 	fullPath := res.ResolveHostFS(path)
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
-		return []byte(fmt.Sprintf("Error fetching data from %s: %s", fullPath, err))
+		return fmt.Appendf(nil, "Error fetching data from %s: %s", fullPath, err)
 	}
 	return data
 }

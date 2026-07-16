@@ -25,6 +25,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"sort"
@@ -1460,9 +1461,7 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 
 	// Copy paths and 'truncate' one file
 	truncatedPaths := map[string]loginp.FileDescriptor{}
-	for path, fd := range paths {
-		truncatedPaths[path] = fd
-	}
+	maps.Copy(truncatedPaths, paths)
 	truncatedPaths["complete"] = descriptor("complete", 50, now, false)
 	fw.scanner = &testFileScanner{files: truncatedPaths}
 	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
@@ -1477,9 +1476,7 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 
 	// Copy truncatedPaths and make one file older
 	ignoredPaths := map[string]loginp.FileDescriptor{}
-	for path, fd := range truncatedPaths {
-		ignoredPaths[path] = fd
-	}
+	maps.Copy(ignoredPaths, truncatedPaths)
 	ignoredPaths["near"] = descriptor("near", 100, oldModTime, false)
 	fw.scanner = &testFileScanner{files: ignoredPaths}
 	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
@@ -1572,6 +1569,18 @@ func writeBenchmarkFiles(tb testing.TB, dir string, n int) []string {
 	return []string{filepath.Join(dir, "*.log")}
 }
 
+// writeBenchmarkDuplicateFiles writes n identical-content files, so every file
+// collides on one fingerprint and GetFiles dedups them to a single winner.
+func writeBenchmarkDuplicateFiles(tb testing.TB, dir string, n int) []string {
+	tb.Helper()
+	content := []byte(strings.Repeat("duplicate-content\n", 1024))
+	for i := range n {
+		filename := filepath.Join(dir, fmt.Sprintf("file-%d.log", i))
+		require.NoError(tb, os.WriteFile(filename, content, 0o644))
+	}
+	return []string{filepath.Join(dir, "*.log")}
+}
+
 func BenchmarkGetFiles(b *testing.B) {
 	paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
 	cfg := fileScannerConfig{
@@ -1621,17 +1630,30 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 // cost — exactly the work the watch loop elides on stable files by tracking
 // completed paths. It therefore quantifies the per-scan cost that suppression
 // removes after a file's first crossing scan.
+//
+// The "duplicates" case gives growing mode identical-content files: they dedup to
+// one winner, so only that winner encodes the bridging raw header.
 func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
 	cases := []struct {
-		name    string
-		growing bool
+		name       string
+		growing    bool
+		duplicates bool
 	}{
-		{"static", false},
-		{"growing", true},
+		{"static", false, false},
+		{"growing", true, false},
+		{"duplicates", true, true},
 	}
 	for _, tc := range cases {
 		b.Run(tc.name, func(b *testing.B) {
-			paths := writeBenchmarkFiles(b, b.TempDir(), benchmarkFileCount)
+			dir := b.TempDir()
+			var paths []string
+			wantLen := benchmarkFileCount
+			if tc.duplicates {
+				paths = writeBenchmarkDuplicateFiles(b, dir, benchmarkFileCount)
+				wantLen = 1
+			} else {
+				paths = writeBenchmarkFiles(b, dir, benchmarkFileCount)
+			}
 			cfg := fileScannerConfig{
 				Fingerprint: fingerprintConfig{
 					Enabled: true,
@@ -1646,7 +1668,7 @@ func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				files, _ := s.GetFiles(loginp.FileScanOptions{})
-				require.Len(b, files, benchmarkFileCount)
+				require.Len(b, files, wantLen)
 			}
 		})
 	}
@@ -1895,13 +1917,10 @@ func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
 //
 //  1. small file (below offset+length) under growing mode → raw-hex
 //     FingerprintID.Raw, Complete=false, no Sum.
-//  2. file grows past threshold → SHA-256 Sum matching the static fingerprint
-//     output for the same bytes, Complete=true, and the raw header carried in
-//     Raw (so the crossing can be prefix-matched against the predecessor).
-//  3. second scan still at threshold via toFileDescriptor → identical
-//     FingerprintID. The per-scan raw-header suppression lives in GetFiles
-//     (exercised by TestGetFiles_GrowingRawSuppression), so a direct
-//     toFileDescriptor call always recomputes Raw.
+//  2. file grows past threshold → SHA-256 Sum, Complete=true, Raw empty;
+//     attachBridgingRaw (mirrored here) then adds the bridging header.
+//  3. second scan at threshold → same Sum and empty Raw; attachBridgingRaw
+//     re-adds the bridging header identically.
 //  4. file truncated back below threshold → raw-hex Raw, Complete=false.
 func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 	dir := t.TempDir()
@@ -1959,8 +1978,13 @@ func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 	expectedSHA := sha256.Sum256([]byte(strings.Repeat("abcd", 256)[:length]))
 	assert.Equal(t, hex.EncodeToString(expectedSHA[:]), fd2.Fingerprint.Sum,
 		"step 2: Sum must be SHA-256 of bytes[0:length]")
+	assert.Empty(t, fd2.Fingerprint.Raw,
+		"step 2: toFileDescriptor alone leaves Raw empty (bridging header attached post-dedup)")
+
+	// Mirror GetFiles: attach the bridging header to the winner descriptor.
+	s.attachBridgingRaw(&fd2)
 	assert.Equal(t, expectedRawHex, fd2.Fingerprint.Raw,
-		"step 2: Raw must be raw hex of the same bytes for bridging the transition")
+		"step 2: attachBridgingRaw must carry raw hex of the same bytes for bridging the transition")
 
 	// Verify the threshold-transition prefix relationship: the previous raw-hex
 	// (200 bytes) is a prefix of the current completed Raw (1024 bytes). This is
@@ -1975,9 +1999,16 @@ func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 	fd3, err := s.toFileDescriptor(&it)
 	require.NoError(t, err, "toFileDescriptor failed")
 
+	assert.True(t, fd3.Fingerprint.Complete(), "step 3: still Complete at threshold")
+	assert.Equal(t, fd2.Fingerprint.Sum, fd3.Fingerprint.Sum,
+		"step 3: Sum is stable across scans")
+	assert.Empty(t, fd3.Fingerprint.Raw,
+		"step 3: toFileDescriptor alone leaves Raw empty; the bridging header is attached post-dedup")
+
+	// After attaching the bridging header the descriptor matches the crossing scan.
+	s.attachBridgingRaw(&fd3)
 	assert.Equal(t, fd2.Fingerprint, fd3.Fingerprint,
-		"step 3: direct toFileDescriptor recomputes the same FingerprintID "+
-			"(GetFiles-level Raw suppression does not apply here)")
+		"step 3: attachBridgingRaw reproduces the same FingerprintID as the crossing scan")
 
 	// --- Step 4: file truncated back below threshold ---
 	writeFile(t, 100)
@@ -1995,12 +2026,24 @@ func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 		"step 4: no SHA-256 Sum while below threshold")
 }
 
-// TestGetFiles_GrowingRawSuppression verifies the optimization that avoids
-// recomputing the bridging raw header for files that are already complete: the
-// header is emitted on the scan a file crosses the threshold (so the transition
-// can still be prefix-matched) and dropped on subsequent scans of the now-stable
-// file. If the file is truncated back below the threshold the suppression is
-// lifted, and a fresh crossing re-emits the header.
+// advanceCompletedFingerprints mirrors fileWatcher.watch: it seeds completedFingerprints
+// from a scan result so the next scan suppresses stable files' bridging headers.
+func advanceCompletedFingerprints(s *fileScanner, files map[string]loginp.FileDescriptor) {
+	completed := map[string]struct{}{}
+	for p, fd := range files {
+		if fd.Fingerprint.Complete() {
+			completed[p] = struct{}{}
+		}
+	}
+	s.completedFingerprints = completed
+}
+
+// TestGetFiles_GrowingRawSuppression verifies that the bridging raw header is not
+// recomputed for files that are already complete: the header is emitted on the scan
+// a file crosses the threshold (so the transition can still be prefix-matched) and
+// dropped on subsequent scans of the now-stable file. If the file is truncated back
+// below the threshold the suppression is lifted, and a fresh crossing re-emits the
+// header.
 //
 // GetFiles is pure with respect to the completedFingerprints set; the watch
 // loop is what advances it. The scan helper below reproduces that contract:
@@ -2032,15 +2075,7 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Contains(t, files, filename, "file must be scanned")
 		fp := files[filename].Fingerprint
-		// Mirror the watch loop: tell the scanner which paths are now complete
-		// so the next scan can skip recomputing their bridging raw header.
-		completed := map[string]struct{}{}
-		for p, fd := range files {
-			if fd.Fingerprint.Complete() {
-				completed[p] = struct{}{}
-			}
-		}
-		s.completedFingerprints = completed
+		advanceCompletedFingerprints(s, files)
 		return fp
 	}
 
@@ -2077,6 +2112,105 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 	fp = scan()
 	require.True(t, fp.Complete(), "file is Complete after re-crossing")
 	assert.NotEmpty(t, fp.Raw, "re-crossing must carry the bridging raw header again")
+}
+
+// TestGetFiles_DuplicateFingerprint checks that among files sharing a fingerprint, only
+// the dedup winner carries the bridging raw header, including after the winner is deleted.
+func TestGetFiles_DuplicateFingerprint(t *testing.T) {
+	dir := t.TempDir()
+	const length int64 = 1024
+	const n = 3
+
+	// Identical, above-threshold content: every file collides on the same Sum.
+	content := []byte(strings.Repeat("abcd", 512)) // 2048 bytes >= length
+	for i := range n {
+		fn := filepath.Join(dir, fmt.Sprintf("dup-%d.log", i))
+		require.NoError(t, os.WriteFile(fn, content, 0o644),
+			"could not write duplicate file")
+	}
+
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  length,
+			Growing: true,
+		},
+	}
+	s, err := newFileScanner(
+		logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+	require.NoError(t, err, "could not create file scanner")
+
+	expectedRawHex := hex.EncodeToString(content[:length])
+
+	scan := func() map[string]loginp.FileDescriptor {
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
+		advanceCompletedFingerprints(s, files)
+		return files
+	}
+
+	// First scan: duplicates dedup to one winner, which carries the bridging header.
+	files := scan()
+	require.Len(t, files, 1, "duplicate-fingerprint files must dedup to a single winner")
+	var winner string
+	for p, fd := range files {
+		winner = p
+		require.True(t, fd.Fingerprint.Complete(), "winner must be Complete")
+		assert.Equal(t, expectedRawHex, fd.Fingerprint.Raw,
+			"first scan: winner carries the bridging raw header")
+	}
+
+	// Second scan: winner now in completedFingerprints, so its header is suppressed.
+	files = scan()
+	require.Len(t, files, 1, "still a single winner")
+	require.Contains(t, files, winner, "same winner across stable scans")
+	assert.Empty(t, files[winner].Fingerprint.Raw,
+		"second scan: winner's bridging raw header is suppressed once complete")
+
+	// Delete the winner: a promoted loser (never in the completed set) carries the header.
+	require.NoError(t, os.Remove(winner), "could not remove the winner file")
+	files = scan()
+	require.Len(t, files, 1, "still a single winner after deleting the previous one")
+	require.NotContains(t, files, winner, "deleted winner must be gone")
+	for _, fd := range files {
+		require.True(t, fd.Fingerprint.Complete(), "promoted winner must be Complete")
+		assert.Equal(t, expectedRawHex, fd.Fingerprint.Raw,
+			"promoted loser must carry the bridging raw header (never in completed set)")
+	}
+}
+
+// TestGetFiles_DuplicateFingerprintAllocBudget asserts only dedup winners encode the bridging raw
+// header; a stray encode is invisible to a behavior test, so bound the growing-vs-static delta.
+func TestGetFiles_DuplicateFingerprintAllocBudget(t *testing.T) {
+	dir := t.TempDir()
+	glob := writeBenchmarkDuplicateFiles(t, dir, benchmarkFileCount)
+
+	measure := func(growing bool) float64 {
+		cfg := fileScannerConfig{Fingerprint: fingerprintConfig{
+			Enabled: true, Offset: 0, Length: 1024, Growing: growing,
+		}}
+		s, err := newFileScanner(logp.NewNopLogger(), glob, cfg, CompressionNone)
+		require.NoError(t, err, "could not create file scanner")
+
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
+		require.Len(t, files, 1, "duplicates must dedup to a single winner")
+
+		// completedFingerprints is never advanced, so the winner re-encodes on every run.
+		return testing.AllocsPerRun(10, func() {
+			_, _ = s.GetFiles(loginp.FileScanOptions{})
+		})
+	}
+
+	growingAllocs := measure(true)
+	staticAllocs := measure(false)
+	delta := growingAllocs - staticAllocs
+
+	// Budget one alloc per file: far below the ~2*benchmarkFileCount per-duplicate cost, above noise.
+	const budget = float64(benchmarkFileCount)
+	assert.Less(t, delta, budget,
+		"growing mode must not re-encode the bridging raw header per dropped "+
+			"duplicate: growing=%.0f static=%.0f delta=%.0f allocs exceeds "+
+			"budget=%.0f", growingAllocs, staticAllocs, delta, budget)
 }
 
 func BenchmarkToFileDescriptor(b *testing.B) {
