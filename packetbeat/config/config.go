@@ -45,6 +45,24 @@ type Config struct {
 	OverwritePipelines bool               `config:"overwrite_pipelines"` // Only used by standalone Packetbeat.
 }
 
+func GetShutDownTimeOut(cfg *conf.C) (time.Duration, error) {
+	timeout := struct {
+		ShutdownTimeout time.Duration `config:"shutdown_timeout"`
+	}{
+		ShutdownTimeout: 0,
+	}
+
+	if err := cfg.Unpack(&timeout); err != nil {
+		return 0, fmt.Errorf("error reading shutdown_timeout: %v", err)
+	}
+
+	if timeout.ShutdownTimeout <= 0 {
+		timeout.ShutdownTimeout = 0
+	}
+	return timeout.ShutdownTimeout, nil
+
+}
+
 // FromStatic initializes a configuration given a config.C
 func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	err := cfg.Unpack(&c)
