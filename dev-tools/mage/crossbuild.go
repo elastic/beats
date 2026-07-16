@@ -193,6 +193,15 @@ func CrossBuild(options ...CrossBuildOption) error {
 		// Make sure the module dependencies are downloaded on the host,
 		// as they will be mounted into the container read-only.
 		mg.Deps(func() error { return gotool.Mod.Download() })
+		if FIPSBuild {
+			// GOFIPS140=v1.0.0 unpacks golang.org/fips140 from GOROOT/lib/fips140
+			// into the module cache on first use. Pre-populate it on the host (as
+			// the host user) before the container mounts the cache read-only.
+			// Any go command triggers fips140.Init(), so list -m is sufficient.
+			mg.Deps(func() error {
+				return sh.RunWith(FIPSConfig.Compile.Env, "go", "list", "-m")
+			})
+		}
 	}
 
 	// Build the magefile for Linux, so we can run it inside the container.
@@ -277,9 +286,6 @@ func CrossBuildImage(platform string) (string, error) {
 	goVersion, err := GoVersion()
 	if err != nil {
 		return "", err
-	}
-	if FIPSBuild {
-		tagSuffix += "-fips"
 	}
 
 	return BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
@@ -584,7 +590,7 @@ func chownPaths(uid, gid int, path string) error {
 			return nil
 		}
 
-		if err := os.Chown(name, uid, gid); err != nil {
+		if err := os.Chown(name, uid, gid); err != nil { //nolint:gosec // paths are controlled build artifacts inside a Docker container, not user input
 			return fmt.Errorf("failed to chown path=%v: %w", name, err)
 		}
 		numFixed++

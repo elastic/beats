@@ -13,12 +13,12 @@ import (
 	"regexp"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 	"github.com/elastic/mito/lib"
 )
 
