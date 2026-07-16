@@ -62,10 +62,14 @@ service:
         - filebeatreceiver
       exporters:
         - kafka
+<<<<<<< HEAD
   telemetry:
     metrics:
       level: none
 `, logFilePath, tmpdir, kafkaBroker, topic)
+=======
+`, logFilePath, tmpdir, kafkaBroker, otelTopic)
+>>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 
 	oteltestcol.New(t, otelCfg)
 

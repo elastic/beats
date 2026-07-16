@@ -35,7 +35,12 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+<<<<<<< HEAD
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
+=======
+	"github.com/elastic/beats/v7/libbeat/features"
+	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+>>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
@@ -54,9 +59,6 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	fbOtelIndex := "logs-integration-" + namespace
 	fbIndex := "logs-filebeat-" + namespace
-
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-	filebeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
 
 	otelCfgFile := `receivers:
   filebeatreceiver:
@@ -83,7 +85,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
     path.home: %s
     http.enabled: true
     http.host: localhost
-    http.port: %d
+    http.port: 0
     management.otel.enabled: true
 exporters:
   debug:
@@ -111,7 +113,8 @@ service:
 `
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
+	otelMonitoringPort := collector.MonitoringPort(t)
 
 	beatsCfgFile := `
 filebeat.inputs:
@@ -138,7 +141,7 @@ processors:
     - add_kubernetes_metadata: ~
 http.enabled: true
 http.host: localhost
-http.port: %d
+http.port: 0
 `
 
 	// start filebeat
@@ -147,11 +150,13 @@ http.port: %d
 		"filebeat",
 		"../../filebeat.test",
 	)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex, filebeatMonitoringPort)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex)
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 	defer filebeat.Stop()
+
+	filebeatMonitoringPort := filebeat.MonitoringPort(30 * time.Second)
 
 	// prepare to query ES
 	es := integration.GetESClient(t, "http")
@@ -195,6 +200,7 @@ http.port: %d
 	assert.Equal(t, "filebeat", otelDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in otel docs")
 	assert.Equal(t, "filebeat", filebeatDoc.Flatten()["agent.type"], "expected agent.type field to be 'filebeat' in filebeat docs")
 	assertMonitoring(t, otelMonitoringPort)
+	assertMonitoring(t, filebeatMonitoringPort)
 }
 
 func TestFilebeatOTelHTTPJSONInput(t *testing.T) {
@@ -369,10 +375,9 @@ service:
 }
 
 type multiReceiverConfig struct {
-	Index          int
-	PathHome       string
-	InputFile      string
-	MonitoringPort int
+	Index     int
+	PathHome  string
+	InputFile string
 }
 
 func renderOtelConfig(tb testing.TB, cfgTemplate string, data any) string {
@@ -445,7 +450,6 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	monitoringPorts := libbeattesting.MustAvailableTCP4Ports(t, 2)
 	otelConfig := struct {
 		Index     string
 		Receivers []multiReceiverConfig
@@ -453,14 +457,12 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		Index: "logs-integration-" + namespace,
 		Receivers: []multiReceiverConfig{
 			{
-				MonitoringPort: int(monitoringPorts[0]),
-				InputFile:      logFilePath,
-				PathHome:       filepath.Join(tmpdir, "r1"),
+				InputFile: logFilePath,
+				PathHome:  filepath.Join(tmpdir, "r1"),
 			},
 			{
-				MonitoringPort: int(monitoringPorts[1]),
-				InputFile:      logFilePath,
-				PathHome:       filepath.Join(tmpdir, "r2"),
+				InputFile: logFilePath,
+				PathHome:  filepath.Join(tmpdir, "r2"),
 			},
 		},
 	}
@@ -483,11 +485,9 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
         - '*'
     queue.mem.flush.timeout: 0s
     path.home: {{$receiver.PathHome}}
-{{if $receiver.MonitoringPort}}
     http.enabled: true
     http.host: localhost
-    http.port: {{$receiver.MonitoringPort}}
-{{end}}
+    http.port: 0
 {{end}}
 exporters:
   debug:
@@ -517,13 +517,11 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, otelConfig)
 
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	oteltestcol.New(t, cfg)
+	collector := oteltestcol.New(t, cfg)
 
 	es := integration.GetESClient(t, "http")
 
@@ -543,8 +541,8 @@ service:
 			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, wantTotalLogs, "expected at least %d events, got %d", wantTotalLogs, otelDocs.Hits.Total.Value)
 		},
 		2*time.Minute, 100*time.Millisecond, "expected at least %d events from multiple receivers", wantTotalLogs)
-	for _, rec := range otelConfig.Receivers {
-		assertMonitoring(t, rec.MonitoringPort)
+	for _, port := range collector.MonitoringPorts(t, len(otelConfig.Receivers)) {
+		assertMonitoring(t, port)
 	}
 }
 
@@ -785,19 +783,17 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			index := "logs-integration-" + namespace
 
 			beatsConfig := struct {
-				Index          string
-				InputFile      string
-				ESEndpoint     string
-				MaxRetries     int
-				MonitoringPort int
-				RetryOnStatus  string
+				Index         string
+				InputFile     string
+				ESEndpoint    string
+				MaxRetries    int
+				RetryOnStatus string
 			}{
-				Index:          index,
-				InputFile:      filepath.Join(t.TempDir(), "log.log"),
-				ESEndpoint:     server.URL,
-				MaxRetries:     tt.maxRetries,
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-				RetryOnStatus:  tt.retryOnStatus,
+				Index:         index,
+				InputFile:     filepath.Join(t.TempDir(), "log.log"),
+				ESEndpoint:    server.URL,
+				MaxRetries:    tt.maxRetries,
+				RetryOnStatus: tt.retryOnStatus,
 			}
 
 			cfg := `receivers:
@@ -817,7 +813,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
     setup.template.enabled: false
     http.enabled: true
     http.host: localhost
-    http.port: {{.MonitoringPort}}
+    http.port: 0
 exporters:
   elasticsearch:
     auth:
@@ -865,14 +861,13 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `
 			var configBuffer bytes.Buffer
 			require.NoError(t,
 				template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, beatsConfig))
 
 			collector := oteltestcol.New(t, configBuffer.String())
+			monitoringPort := collector.MonitoringPort(t)
 			writeEventsToLogFile(t, beatsConfig.InputFile, numTestEvents)
 
 			// Wait for file input to be fully read
@@ -925,7 +920,7 @@ service:
 
 			// Confirm filebeat agreed with our accounting of ingested events
 			require.EventuallyWithT(t, func(ct *assert.CollectT) {
-				address := fmt.Sprintf("http://localhost:%d", beatsConfig.MonitoringPort)
+				address := fmt.Sprintf("http://localhost:%d", monitoringPort)
 				r, err := http.Get(address + "/stats") //nolint:noctx,bodyclose // fine for tests
 				assert.NoError(ct, err)
 				assert.Equal(ct, http.StatusOK, r.StatusCode, "incorrect status code")
@@ -1003,10 +998,10 @@ func TestFileBeatKerberos(t *testing.T) {
           file_identity.native: ~
     queue.mem.flush.timeout: 0s
     management.otel.enabled: true
-    path.home: {{.PathHome}}	
+    path.home: {{.PathHome}}
 extensions:
   beatsauth:
-   kerberos: 
+   kerberos:
      auth_type: "password"
      config_path: "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf"
      username: "beats"
@@ -1023,7 +1018,7 @@ exporters:
     auth:
      authenticator: beatsauth
 service:
-  extensions: 
+  extensions:
   - beatsauth
   pipelines:
     logs:
@@ -1090,9 +1085,6 @@ service:
       exporters:
         - elasticsearch/log
         - debug
-  telemetry:
-    metrics:
-      level: none # Disable collector's own metrics to prevent conflict on port 8888. We don't use those metrics anyway.
 receivers:
   filebeatreceiver:
     filebeat:
@@ -1158,9 +1150,6 @@ service:
       exporters:
         - elasticsearch/log
         - debug
-  telemetry:
-    metrics:
-      level: none # Disable collector's own metrics to prevent conflict on port 8888. We don't use those metrics anyway.
 receivers:
   filebeatreceiver:
     filebeat:
@@ -1259,8 +1248,6 @@ func TestNoDuplicates(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	fbOtelIndex := "logs-integration-" + namespace
 
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
 	otelCfgFile := `receivers:
   filebeatreceiver:
     filebeat:
@@ -1284,7 +1271,7 @@ func TestNoDuplicates(t *testing.T) {
     path.home: %s
     http.enabled: true
     http.host: localhost
-    http.port: %d
+    http.port: 0
     management.otel.enabled: true
 exporters:
   elasticsearch/log:
@@ -1347,7 +1334,7 @@ service:
 		close(stopChan)
 		wg.Wait()
 	})
-	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, otelMonitoringPort, fbOtelIndex))
+	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
 
 	require.EventuallyWithT(t,
 		func(ct *assert.CollectT) {
@@ -1361,8 +1348,13 @@ service:
 		1*time.Minute, 1*time.Second, "expected more than 0 events, got none",
 	)
 
+	// Shutdown blocks until the collector has fully exited, so the restart below
+	// cannot race the previous instance's teardown (the previous version polled
+	// the collector's fixed :8888 telemetry port as an exit signal, which is now
+	// disabled to keep collectors parallel-safe).
 	collector.Shutdown()
 
+<<<<<<< HEAD
 	// wait for 8888 port to be free (an indication that previous collector has exited)
 	require.Eventually(t,
 		func() bool {
@@ -1384,6 +1376,11 @@ service:
 	t.Cleanup(func() {
 		collector.Shutdown()
 	})
+=======
+	// Restart the collector. New registers shutdown via t.Cleanup, so the
+	// returned value is not needed here.
+	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
+>>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 
 	// wait for more docs to be published.
 	require.EventuallyWithTf(t,
@@ -1516,7 +1513,16 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	index := "logs-integration-" + namespace
 
-	serverPort := int(libbeattesting.MustAvailableTCP4Port(t))
+	// Reserve an ephemeral port for the mock Elasticsearch server. The server
+	// is stopped and restarted on the same port to simulate an ES outage, so
+	// the port must be stable: bind to :0 to let the OS choose a free port,
+	// then release it so the mock server can claim it on demand.
+	portListener, err := net.Listen("tcp", "localhost:0") //nolint:noctx // it's okay for testing purposes
+	require.NoError(t, err)
+	portAddr, ok := portListener.Addr().(*net.TCPAddr)
+	require.True(t, ok, "expected *net.TCPAddr from listener")
+	serverPort := portAddr.Port
+	require.NoError(t, portListener.Close())
 	serverURL := fmt.Sprintf("http://localhost:%d", serverPort)
 
 	var ingestedEvents []string
@@ -1561,15 +1567,13 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 	}
 
 	beatsConfig := struct {
-		Index          string
-		InputFile      string
-		ESEndpoint     string
-		MonitoringPort int
+		Index      string
+		InputFile  string
+		ESEndpoint string
 	}{
-		Index:          index,
-		InputFile:      logFilePath,
-		ESEndpoint:     serverURL,
-		MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+		Index:      index,
+		InputFile:  logFilePath,
+		ESEndpoint: serverURL,
 	}
 
 	cfg := `receivers:
@@ -1589,7 +1593,7 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
     setup.template.enabled: false
     http.enabled: true
     http.host: localhost
-    http.port: {{.MonitoringPort}}
+    http.port: 0
 exporters:
   elasticsearch:
     auth:
@@ -1634,8 +1638,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `
 
 	var configBuffer bytes.Buffer
@@ -1770,8 +1772,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, struct {
 		Receivers []multiReceiverConfig
 		InputFile string
@@ -1794,6 +1794,187 @@ service:
 		"receivers must have different diskqueue paths")
 }
 
+<<<<<<< HEAD
+=======
+func TestFilebeatOTelHTTPJSONInputWithElasticStateStore(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	// Enable ES state store for httpjson and cel input types.
+	// Reload must be called to apply the change since the features package
+	// reads the env var only once at init() time.
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test. We call cleanup before setting env because cleanups are called in last added first called order.
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
+	features.ReinitForTest()
+
+	// Mock HTTP server for httpjson input: tracks request count and returns
+	// a JSON response with a published timestamp that the cursor tracks.
+	var requestCount atomic.Int64
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount.Add(1)
+
+		published := parseParams(t, r.RequestURI)
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(response{
+			Message:   "Hello",
+			Published: published.Format(time.RFC3339),
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}))
+	defer testServer.Close()
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+	esURL := fmt.Sprintf("%s://%s", host.Scheme, host.Host)
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	dataIndex := "logs-integration-" + namespace
+	inputID := "httpjson-otel-esstore-" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	pathHome := t.TempDir()
+
+	type configParams struct {
+		ESURL     string
+		Username  string
+		Password  string
+		DataIndex string
+		InputURL  string
+		InputID   string
+		PathHome  string
+	}
+
+	params := configParams{
+		ESURL:     esURL,
+		Username:  user,
+		Password:  password,
+		DataIndex: dataIndex,
+		InputURL:  testServer.URL,
+		InputID:   inputID,
+		PathHome:  pathHome,
+	}
+
+	configTemplate := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: httpjson
+          id: {{ .InputID }}
+          enabled: true
+          interval: 5s
+          request.url: {{ .InputURL }}
+          request.method: GET
+          request.transforms:
+            - set:
+                target: url.params.since
+                value: '[[.cursor.published]]'
+                default: '[[formatDate (now (parseDuration "-24h")) "RFC3339"]]'
+          cursor:
+            published:
+              value: '[[.last_event.published]]'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    storage: elasticsearch_storage
+    path.home: {{ .PathHome }}
+extensions:
+  elasticsearch_storage:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+exporters:
+  elasticsearch/log:
+    endpoints:
+      - {{ .ESURL }}
+    compression: none
+    user: {{ .Username }}
+    password: {{ .Password }}
+    logs_index: {{ .DataIndex }}
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+service:
+  extensions:
+    - elasticsearch_storage
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+  telemetry:
+    logs:
+      level: DEBUG
+`
+
+	var configBuffer bytes.Buffer
+	require.NoError(t, template.Must(template.New("config").Parse(configTemplate)).Execute(&configBuffer, params))
+	configStr := configBuffer.String()
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config:\n%s", configStr)
+		}
+	})
+
+	// Start first collector
+	collector := oteltestcol.New(t, configStr)
+
+	es := integration.GetESClient(t, "http")
+
+	// Wait for data to arrive in ES
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			docs, err := estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+dataIndex+"*")
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, docs.Hits.Total.Value, 1, "expected at least 1 event, got %d", docs.Hits.Total.Value)
+		},
+		2*time.Minute, 1*time.Second, "expected at least 1 event in data index")
+
+	// Verify openStore was called for httpjson input
+	require.Eventually(t, func() bool {
+		return collector.ObservedLogs().FilterMessageSnippet(
+			"input-cursor::openStore: prefix: httpjson inputID: "+inputID).Len() >= 1
+	}, 30*time.Second, 100*time.Millisecond, "expected openStore log for httpjson input")
+
+	// Verify initial store read found 0 keys (first run, no previous state in ES)
+	require.Eventually(t, func() bool {
+		return collector.ObservedLogs().FilterMessageSnippet(
+			"input-cursor store read 0 keys").Len() >= 1
+	}, 30*time.Second, 100*time.Millisecond, "expected initial store read with 0 keys")
+
+	// Wait for at least 2 polling cycles to ensure cursor is persisted to ES
+	require.Eventually(t, func() bool {
+		return requestCount.Load() >= 2
+	}, 60*time.Second, 1*time.Second, "expected at least 2 httpjson poll cycles before restart")
+
+	// Shut down first collector
+	collector.Shutdown()
+
+	// Verify data continues to arrive after restart
+	requestCountBeforeRestart := requestCount.Load()
+
+	// Start second collector with the same config
+	collector2 := oteltestcol.New(t, configStr)
+	t.Cleanup(collector2.Shutdown)
+
+	// Verify cursor was restored from ES: the store should now read 1 key
+	require.Eventually(t, func() bool {
+		return collector2.ObservedLogs().FilterMessageSnippet(
+			"input-cursor store read 1 keys").Len() >= 1
+	}, 60*time.Second, 100*time.Millisecond,
+		"expected store to read 1 key after restart, proving cursor was restored from ES")
+
+	require.Eventually(t, func() bool {
+		return requestCount.Load() > requestCountBeforeRestart
+	}, 60*time.Second, 1*time.Second, "expected httpjson to continue polling after restart")
+}
+
+>>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 func BenchmarkFilebeatOTelCollector(b *testing.B) {
 	numReceivers := 4
 
@@ -1835,8 +2016,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, struct{ Receivers []multiReceiverConfig }{Receivers: receivers})
 
 		b.StartTimer()
@@ -1851,6 +2030,335 @@ service:
 	}
 }
 
+<<<<<<< HEAD
+=======
+func BenchmarkOTelConsumerIncludeMetadata(b *testing.B) {
+	const eventCount = 1000
+
+	for _, tc := range []struct {
+		name            string
+		includeMetadata bool
+	}{
+		{name: "WithoutMetadata", includeMetadata: false},
+		{name: "WithMetadata", includeMetadata: true},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			for b.Loop() {
+				b.StopTimer()
+				tmpDir := b.TempDir()
+
+				cfg := renderOtelConfig(b, `receivers:
+  filebeatreceiver:
+    include_metadata: {{.IncludeMetadata}}
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCount}}
+    path.home: {{.PathHome}}
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+`, struct {
+					PathHome        string
+					EventCount      int
+					IncludeMetadata bool
+				}{
+					PathHome:        tmpDir,
+					EventCount:      eventCount,
+					IncludeMetadata: tc.includeMetadata,
+				})
+
+				b.StartTimer()
+
+				col := oteltestcol.New(b, cfg)
+				require.NotNil(b, col)
+				require.Eventually(b, func() bool {
+					return col.ObservedLogs().
+						FilterMessageSnippet("Publish event").Len() == eventCount
+				}, 30*time.Second, 1*time.Millisecond, "expected all events to be published")
+				col.Shutdown()
+			}
+		})
+	}
+}
+
+type benchPreset struct {
+	name string
+
+	// beats queue
+	memQueueEvents       int
+	memQueueMinEvents    int
+	memQueueFlushTimeout string
+
+	// sending_queue
+	maxConnsPerHost   int
+	expBatchMaxSize   int
+	expBatchMinSize   int
+	expFlushTimeout   string
+	expNumConsumers   int
+	expQueueSize      int
+	eventCountPerRecv int
+}
+
+// presetFields mirrors the subset of elasticsearch.ElasticsearchConfig that
+// elasticsearch.ApplyPreset's preset configs set, so the real preset values
+// can be unpacked directly instead of hand-copied into benchPresets.
+type presetFields struct {
+	BulkMaxSize            int           `config:"bulk_max_size"`
+	Worker                 int           `config:"worker"`
+	QueueMemEvents         int           `config:"queue.mem.events"`
+	QueueMemFlushMinEvents int           `config:"queue.mem.flush.min_events"`
+	QueueMemFlushTimeout   time.Duration `config:"queue.mem.flush.timeout"`
+}
+
+// benchPresetFromName builds a benchPreset from the real preset config
+// applied by elasticsearch.ApplyPreset, keeping the benchmark's queue/batch
+// settings in sync with the actual preset definitions instead of a
+// hand-maintained copy. eventCountPerRecv is picked as the nearest multiple
+// of the preset's min_events/bulk_max_size threshold to targetEventCount, so
+// the benchmark's fixed, bounded event count doesn't leave a leftover
+// partial batch that has to wait out the full flush timeout before the
+// mem-queue (or the exporter's own sending_queue) releases it.
+func benchPresetFromName(name string, targetEventCount int) benchPreset {
+	_, presetCfg, err := esoutput.ApplyPreset(name, config.NewConfig())
+	if err != nil {
+		panic(fmt.Sprintf("unknown benchmark preset %q: %v", name, err))
+	}
+
+	var pf presetFields
+	if err := presetCfg.Unpack(&pf); err != nil {
+		panic(fmt.Sprintf("failed to unpack benchmark preset %q: %v", name, err))
+	}
+
+	eventCountPerRecv := (targetEventCount / pf.QueueMemFlushMinEvents) * pf.QueueMemFlushMinEvents
+
+	return benchPreset{
+		name:                 name,
+		memQueueEvents:       pf.QueueMemEvents,
+		memQueueMinEvents:    pf.QueueMemFlushMinEvents,
+		memQueueFlushTimeout: pf.QueueMemFlushTimeout.String(),
+		maxConnsPerHost:      pf.Worker,
+		expBatchMaxSize:      pf.BulkMaxSize,
+		expBatchMinSize:      pf.BulkMaxSize,
+		expFlushTimeout:      pf.QueueMemFlushTimeout.String(),
+		expNumConsumers:      pf.Worker,
+		expQueueSize:         pf.QueueMemEvents,
+		eventCountPerRecv:    eventCountPerRecv,
+	}
+}
+
+var benchPresets = []benchPreset{
+	benchPresetFromName("throughput", 32_000),
+	benchPresetFromName("balanced", 32_000),
+	benchPresetFromName("scale", 32_000),
+	benchPresetFromName("latency", 32_000),
+}
+
+// BenchmarkFilebeatOTelThroughputMockES measures end-to-end EPS through a full
+// otel pipeline, once per benchmark preset (see benchPresets).
+func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
+	for _, preset := range benchPresets {
+		b.Run(preset.name, func(b *testing.B) {
+			benchmarkFilebeatOTelThroughputMockES(b, preset)
+		})
+	}
+}
+
+func benchmarkFilebeatOTelThroughputMockES(b *testing.B, preset benchPreset) {
+	eventCount := preset.eventCountPerRecv * 3
+
+	for b.Loop() {
+		b.StopTimer()
+
+		tmpDir := b.TempDir()
+
+		var totalReceived atomic.Int64
+		var totalBytes atomic.Int64
+		var firstNano atomic.Int64
+		var lastNano atomic.Int64
+		var firstOnce sync.Once
+
+		mockHandler := func(action api.Action, event []byte) int {
+			if action.Action != "create" {
+				return http.StatusOK
+			}
+			now := time.Now().UnixNano()
+			firstOnce.Do(func() { firstNano.Store(now) })
+			lastNano.Store(now)
+			totalReceived.Add(1)
+			totalBytes.Add(int64(len(event)))
+			return http.StatusOK
+		}
+
+		mockServer := httptest.NewServer(
+			api.NewDeterministicAPIHandler(
+				uuid.Must(uuid.NewV4()),
+				"",
+				nil,
+				time.Now().Add(24*time.Hour),
+				0,
+				0,
+				mockHandler,
+			),
+		)
+
+		cfg := renderOtelConfig(b, `receivers:
+  filebeatreceiver/1:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/1
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/2
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+  filebeatreceiver/3:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCountPerReceiver}}
+    path.home: {{.PathHome}}/3
+    setup.template.enabled: false
+    queue.mem.events: {{.MemQueueEvents}}
+    queue.mem.flush.min_events: {{.MemQueueMinEvents}}
+    queue.mem.flush.timeout: {{.MemQueueFlushTimeout}}
+    processors: []
+exporters:
+  elasticsearch:
+    compression: gzip
+    compression_params:
+      level: 1
+    endpoints:
+      - {{.ESEndpoint}}
+    logs_index: benchtest
+    max_conns_per_host: {{.MaxConnsPerHost}}
+    sending_queue:
+      batch:
+        flush_timeout: {{.ExpFlushTimeout}}
+        max_size: {{.ExpBatchMaxSize}}
+        min_size: {{.ExpBatchMinSize}}
+        sizer: items
+      block_on_overflow: true
+      enabled: true
+      num_consumers: {{.ExpNumConsumers}}
+      queue_size: {{.ExpQueueSize}}
+      wait_for_result: true
+    suppress_conflict_errors: true
+processors:
+  beat:
+    processors:
+      - add_host_metadata: ~
+      - add_fields:
+          target: ""
+          fields:
+            env: staging
+service:
+  pipelines:
+    logs/1:
+      receivers:
+        - filebeatreceiver/1
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/2:
+      receivers:
+        - filebeatreceiver/2
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+    logs/3:
+      receivers:
+        - filebeatreceiver/3
+      processors:
+        - beat
+      exporters:
+        - elasticsearch
+  telemetry:
+    logs:
+      level: warn
+`, struct {
+			EventCountPerReceiver int
+			PathHome              string
+			ESEndpoint            string
+			MemQueueEvents        int
+			MemQueueMinEvents     int
+			MemQueueFlushTimeout  string
+			MaxConnsPerHost       int
+			ExpBatchMaxSize       int
+			ExpBatchMinSize       int
+			ExpFlushTimeout       string
+			ExpNumConsumers       int
+			ExpQueueSize          int
+		}{
+			EventCountPerReceiver: preset.eventCountPerRecv,
+			PathHome:              tmpDir,
+			ESEndpoint:            mockServer.URL,
+			MemQueueEvents:        preset.memQueueEvents,
+			MemQueueMinEvents:     preset.memQueueMinEvents,
+			MemQueueFlushTimeout:  preset.memQueueFlushTimeout,
+			MaxConnsPerHost:       preset.maxConnsPerHost,
+			ExpBatchMaxSize:       preset.expBatchMaxSize,
+			ExpBatchMinSize:       preset.expBatchMinSize,
+			ExpFlushTimeout:       preset.expFlushTimeout,
+			ExpNumConsumers:       preset.expNumConsumers,
+			ExpQueueSize:          preset.expQueueSize,
+		})
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, cfg)
+
+		require.Eventually(b, func() bool {
+			return totalReceived.Load() >= int64(eventCount)
+		}, 5*time.Minute, 10*time.Millisecond, "timed out waiting for all %d events to reach mock-ES", eventCount)
+
+		first := firstNano.Load()
+		last := lastNano.Load()
+		if first > 0 && last > first {
+			duration := time.Duration(last - first)
+			b.ReportMetric(float64(eventCount)/duration.Seconds(), "events/sec")
+		}
+		received := totalReceived.Load()
+		if received > 0 {
+			b.ReportMetric(float64(totalBytes.Load())/float64(received), "bytes/event")
+		}
+
+		col.Shutdown()
+		mockServer.Close()
+	}
+}
+
+>>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 // TestBeatProcessorSharedAcrossPipelines verifies that when the same beat
 // processor component ID is referenced by multiple OTel pipelines, only a
 // single underlying beatProcessor instance is created. This avoids duplicate
@@ -1880,8 +2388,6 @@ func TestBeatProcessorSharedAcrossPipelines(t *testing.T) {
   telemetry:
     logs:
       level: debug
-    metrics:
-      level: none
 receivers:
   filebeatreceiver/1:
     filebeat:
@@ -1948,8 +2454,6 @@ func TestBeatProcessorWhenCondition(t *testing.T) {
   telemetry:
     logs:
       level: debug
-    metrics:
-      level: none
 receivers:
   filebeatreceiver:
     filebeat:
