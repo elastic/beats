@@ -125,9 +125,6 @@ service:
         - filebeatreceiver
       exporters:
         - logstash
-  telemetry:
-    metrics:
-      level: none
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver
@@ -231,9 +228,6 @@ service:
         - filebeatreceiver
       exporters:
         - logstash
-  telemetry:
-    metrics:
-      level: none
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver
