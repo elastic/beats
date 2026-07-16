@@ -522,7 +522,7 @@ func TestServiceEventer_NamespaceWatcher(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			namespaceWatcher := eventer.(*service).namespaceWatcher
+			namespaceWatcher := eventer.(*service).namespaceWatcher //nolint:errcheck // test type assertion
 
 			if test.expectedNil {
 				assert.Nilf(t, namespaceWatcher, test.msg)

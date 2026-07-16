@@ -52,7 +52,7 @@ func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, 
 
 	err := cfg.Unpack(&conf)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack config due to error: %v", err) //nolint:errorlint // legacy error formatting
 	}
 
 	var cond conditions.Condition
@@ -60,7 +60,7 @@ func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, 
 		// Attempt to create a condition. If fails then report error
 		cond, err = conditions.NewCondition(conf.ConditionConfig, logger)
 		if err != nil {
-			return nil, fmt.Errorf("unable to create condition due to error: %v", err)
+			return nil, fmt.Errorf("unable to create condition due to error: %v", err) //nolint:errorlint // legacy error formatting
 		}
 	}
 	appender := tokenAppender{
@@ -87,7 +87,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 	}
 
 	// Check if the condition is met. Attempt to append only if that is the case.
-	if t.Condition == nil || t.Condition.Check(mapstr.M(event)) == true {
+	if t.Condition == nil || t.Condition.Check(mapstr.M(event)) == true { //nolint:staticcheck // explicit bool comparison
 		tok := t.getAuthHeaderFromToken()
 		// If token is empty then just return
 		if tok == "" {

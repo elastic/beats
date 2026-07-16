@@ -48,7 +48,7 @@ func (tea *TestEventAccumulator) Get() []bus.Event {
 func (tea *TestEventAccumulator) WaitForNumEvents(t *testing.T, targetLen int, timeout time.Duration) {
 	start := time.Now()
 
-	for time.Now().Sub(start) < timeout {
+	for time.Now().Sub(start) < timeout { //nolint:staticcheck // legacy timing loop
 		if tea.Len() >= targetLen {
 			return
 		}

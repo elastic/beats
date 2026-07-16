@@ -52,7 +52,7 @@ func NewConfigAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender,
 	config := config{}
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack config appender due to error: %+v", err)
+		return nil, fmt.Errorf("unable to unpack config appender due to error: %+v", err) //nolint:errorlint // keep verbose error formatting
 	}
 
 	var cond conditions.Condition
@@ -88,7 +88,7 @@ func (c *configAppender) Append(event bus.Event) {
 	if !ok {
 		return
 	}
-	if c.condition == nil || c.condition.Check(mapstr.M(event)) == true {
+	if c.condition == nil || c.condition.Check(mapstr.M(event)) == true { //nolint:staticcheck // explicit bool check for readability
 		// Merge the template with all the configs
 		for _, cfg := range cfgs {
 			cf := mapstr.M{}

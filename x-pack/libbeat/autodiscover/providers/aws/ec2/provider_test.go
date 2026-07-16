@@ -26,7 +26,7 @@ func Test_internalBuilder(t *testing.T) {
 	instance := fakeEC2Instance()
 	instances := []*ec2Instance{instance}
 	fetcher := newMockFetcher(instances, nil)
-	log := logp.NewLogger("ec2")
+	log := logp.NewLogger("ec2") //nolint:forbidigo // test setup
 	pBus := bus.New(log, "test")
 
 	cfg := &awsauto.Config{

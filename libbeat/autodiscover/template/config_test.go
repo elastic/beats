@@ -33,7 +33,7 @@ import (
 )
 
 func TestConfigsMapping(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck // legacy test logger setup
 
 	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct": "config",

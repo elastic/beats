@@ -2221,8 +2221,8 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			namespaceWatcher := eventer.(*pod).namespaceWatcher
-			nodeWatcher := eventer.(*pod).nodeWatcher
+			namespaceWatcher := eventer.(*pod).namespaceWatcher //nolint:errcheck // test type assertion
+			nodeWatcher := eventer.(*pod).nodeWatcher           //nolint:errcheck // test type assertion
 
 			if test.expectedNil {
 				assert.Nilf(t, namespaceWatcher, "Namespace "+test.msg)

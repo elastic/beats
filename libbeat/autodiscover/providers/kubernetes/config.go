@@ -105,7 +105,7 @@ func (c *Config) Validate() error {
 
 	default:
 		if c.Scope == "node" {
-			logp.L().Warnf("can not set scope to `node` when using resource %s. resetting scope to `cluster`", c.Resource)
+			logp.L().Warnf("can not set scope to `node` when using resource %s. resetting scope to `cluster`", c.Resource) //nolint:forbidigo // validation fallback logging
 		}
 		c.Scope = "cluster"
 	}
@@ -117,7 +117,7 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged parameters are set and logs a warning
 func (c Config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.Unique && c.Scope != "cluster" {
 		logger.Warn("can only set `unique` when scope is `cluster`")

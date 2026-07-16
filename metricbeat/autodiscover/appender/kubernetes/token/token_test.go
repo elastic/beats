@@ -99,7 +99,7 @@ token_path: "test"
 		assert.Len(t, cfgs, 1)
 
 		out := mapstr.M{}
-		cfgs[0].Unpack(&out)
+		cfgs[0].Unpack(&out) //nolint:errcheck // test assertion follows
 
 		assert.Equal(t, out, test.result)
 		deleteFile("test")
@@ -107,7 +107,7 @@ token_path: "test"
 }
 
 func writeFile(name, message string) {
-	os.WriteFile(name, []byte(message), os.ModePerm)
+	os.WriteFile(name, []byte(message), os.ModePerm) //nolint:errcheck // test helper
 }
 
 func deleteFile(name string) {

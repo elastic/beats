@@ -115,12 +115,12 @@ func NewServiceEventer(
 // OnAdd ensures processing of service objects that are newly created
 func (s *service) OnAdd(obj any) {
 	s.logger.Debugf("Watcher service add: %+v", obj)
-	s.emit(obj.(*kubernetes.Service), "start")
+	s.emit(obj.(*kubernetes.Service), "start") //nolint:errcheck // informer object type is validated
 }
 
 // OnUpdate ensures processing of service objects that are updated
 func (s *service) OnUpdate(obj any) {
-	svc := obj.(*kubernetes.Service)
+	svc := obj.(*kubernetes.Service) //nolint:errcheck // informer object type is validated
 	// Once service is in terminated state, mark it for deletion
 	if svc.GetObjectMeta().GetDeletionTimestamp() != nil {
 		time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(svc, "stop") })
@@ -134,7 +134,7 @@ func (s *service) OnUpdate(obj any) {
 // OnDelete ensures processing of service objects that are deleted
 func (s *service) OnDelete(obj any) {
 	s.logger.Debugf("Watcher service delete: %+v", obj)
-	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(obj.(*kubernetes.Service), "stop") })
+	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(obj.(*kubernetes.Service), "stop") }) //nolint:errcheck // informer object type is validated
 }
 
 // GenerateHints creates hints needed for hints builder
@@ -147,7 +147,7 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 	annotations := make(mapstr.M, 0)
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
+		kubeMeta = rawMeta.(mapstr.M) //nolint:errcheck // type validated by map lookup
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {

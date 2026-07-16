@@ -222,7 +222,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 
 		wg.Go(func() {
 
-			conn, err := net.ListenPacket("udp4", net.JoinHostPort(ip.String(), "0"))
+			conn, err := net.ListenPacket("udp4", net.JoinHostPort(ip.String(), "0")) //nolint:noctx // legacy UDP discovery
 			if err != nil {
 				log.Error(err.Error())
 				return

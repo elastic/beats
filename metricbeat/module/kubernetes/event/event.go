@@ -114,17 +114,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
+		AddFunc: func(obj interface{}) { //nolint:modernize // legacy handler signature
 			m.reportEvent(obj, reporter)
 		},
-		UpdateFunc: func(obj interface{}) {
+		UpdateFunc: func(obj interface{}) { //nolint:modernize // legacy handler signature
 			m.reportEvent(obj, reporter)
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
 	}
 	m.watcher.AddEventHandler(kubernetes.FilteringResourceEventHandler{
-		FilterFunc: func(obj interface{}) bool {
+		FilterFunc: func(obj interface{}) bool { //nolint:modernize // legacy handler signature
 			eve, ok := obj.(*kubernetes.Event)
 			if !ok {
 				m.Logger().Debugf("Error while casting event. Got type: %T", obj)
@@ -154,8 +154,8 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	m.watcher.Stop()
 }
 
-func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) {
-	mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
+func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) { //nolint:modernize // legacy handler signature
+	mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger()) //nolint:errcheck // informer object type is validated
 	event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
 	if m.clusterMeta != nil {
 		event.RootFields.DeepUpdate(m.clusterMeta)
@@ -166,19 +166,19 @@ func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) {
 func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, logger *logp.Logger) mapstr.M {
 	eventMeta := mapstr.M{
 		"timestamp": mapstr.M{
-			"created": kubernetes.Time(&eve.ObjectMeta.CreationTimestamp).UTC(),
+			"created": kubernetes.Time(&eve.CreationTimestamp).UTC(),
 		},
-		"name":             eve.ObjectMeta.GetName(),
-		"namespace":        eve.ObjectMeta.GetNamespace(),
-		"self_link":        eve.ObjectMeta.GetSelfLink(),
-		"generate_name":    eve.ObjectMeta.GetGenerateName(),
-		"uid":              eve.ObjectMeta.GetUID(),
-		"resource_version": eve.ObjectMeta.GetResourceVersion(),
+		"name":             eve.GetName(),
+		"namespace":        eve.GetNamespace(),
+		"self_link":        eve.GetSelfLink(),
+		"generate_name":    eve.GetGenerateName(),
+		"uid":              eve.GetUID(),
+		"resource_version": eve.GetResourceVersion(),
 	}
 
-	if len(eve.ObjectMeta.Labels) != 0 {
-		labels := make(mapstr.M, len(eve.ObjectMeta.Labels))
-		for k, v := range eve.ObjectMeta.Labels {
+	if len(eve.Labels) != 0 {
+		labels := make(mapstr.M, len(eve.Labels))
+		for k, v := range eve.Labels {
 			if dedotConfig.LabelsDedot {
 				label := common.DeDot(k)
 				kubernetes2.ShouldPut(labels, label, v, logger)
@@ -194,9 +194,9 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, log
 		eventMeta["labels"] = labels
 	}
 
-	if len(eve.ObjectMeta.Annotations) != 0 {
-		annotations := make(mapstr.M, len(eve.ObjectMeta.Annotations))
-		for k, v := range eve.ObjectMeta.Annotations {
+	if len(eve.Annotations) != 0 {
+		annotations := make(mapstr.M, len(eve.Annotations))
+		for k, v := range eve.Annotations {
 			if dedotConfig.AnnotationsDedot {
 				annotation := common.DeDot(k)
 				kubernetes2.ShouldPut(annotations, annotation, v, logger)

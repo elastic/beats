@@ -326,7 +326,7 @@ func createWatcher(
 ) (bool, error) {
 
 	// We need to check the node scope to decide on whether a watcher should be updated or not.
-	nodeScope := false
+	nodeScope := false //nolint:staticcheck // scope flag set conditionally below
 	if options.Node != "" {
 		nodeScope = true
 	}
@@ -466,7 +466,7 @@ func addEventHandlersToWatcher(
 		nodeStore.SetNodeMetrics(metrics)
 	}
 
-	clearMetadataCacheFunc := func(obj interface{}) {
+	clearMetadataCacheFunc := func(obj interface{}) { //nolint:modernize // legacy handler signature
 		enrichers := make(map[string]*enricher, len(metaWatcher.enrichers))
 
 		resourceWatchers.lock.Lock()
@@ -475,7 +475,7 @@ func addEventHandlersToWatcher(
 
 		for _, enricher := range enrichers {
 			enricher.Lock()
-			ids := enricher.deleteFunc(obj.(kubernetes.Resource))
+			ids := enricher.deleteFunc(obj.(kubernetes.Resource)) //nolint:errcheck // handler type is validated by informer
 			// update this watcher events by removing all the metadata[id]
 			for _, id := range ids {
 				delete(enricher.metadataCache, id)
@@ -485,7 +485,7 @@ func addEventHandlersToWatcher(
 	}
 
 	metaWatcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
+		AddFunc: func(obj interface{}) { //nolint:modernize // legacy handler signature
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
 				containerMetricsUpdateFunc(res)
@@ -493,7 +493,7 @@ func addEventHandlersToWatcher(
 				nodeMetricsUpdateFunc(res)
 			}
 		},
-		UpdateFunc: func(obj interface{}) {
+		UpdateFunc: func(obj interface{}) { //nolint:modernize // legacy handler signature
 			clearMetadataCacheFunc(obj)
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
@@ -502,7 +502,7 @@ func addEventHandlersToWatcher(
 				nodeMetricsUpdateFunc(res)
 			}
 		},
-		DeleteFunc: func(obj interface{}) {
+		DeleteFunc: func(obj interface{}) { //nolint:modernize // legacy handler signature
 			clearMetadataCacheFunc(obj)
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
@@ -524,7 +524,7 @@ func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWa
 	data, ok := resourceWatchers.metaWatchersMap[resourceName]
 	if ok {
 		contains := false
-		for _, which := range data.metricsetsUsing {
+		for _, which := range data.metricsetsUsing { //nolint:modernize // explicit loop for early break
 			if which == metricsetUsing {
 				contains = true
 				break
@@ -662,7 +662,7 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 	}
 
 	var metaGen metadata.MetaGen
-	if resourceName == PodResource {
+	if resourceName == PodResource { //nolint:staticcheck // resource-specific metadata wiring
 		var nodeWatcher kubernetes.Watcher
 		if nodeMetaWatcher := resourceWatchers.metaWatchersMap[NodeResource]; nodeMetaWatcher != nil {
 			nodeWatcher = (*nodeMetaWatcher).watcher
@@ -932,7 +932,7 @@ func NewContainerMetadataEnricher(
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-			id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
+			id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name) //nolint:staticcheck // explicit metadata accessors
 			ids = append(ids, id)
 		}
 
@@ -1182,9 +1182,9 @@ func (e *enricher) getMetadata(event mapstr.M) mapstr.M {
 func (e *enricher) updateMetadataCacheFromWatcher(key string) {
 	storeKey := getWatcherStoreKeyFromMetadataKey(key)
 	if res, exists, _ := e.watcher.watcher.Store().GetByKey(storeKey); exists {
-		eventMetaMap := e.updateFunc(res.(kubernetes.Resource))
+		eventMetaMap := e.updateFunc(res.(kubernetes.Resource)) //nolint:errcheck // store object type is validated by watcher
 		for k, v := range eventMetaMap {
-			e.metadataCache[k] = v
+			e.metadataCache[k] = v //nolint:modernize // selective cache update
 		}
 	}
 }
@@ -1275,7 +1275,7 @@ func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 // transformReplicaSetMetadata ensures that the PartialObjectMetadata resources we get from a metadata watcher
 // can be correctly interpreted by the update function returned by getEventMetadataFunc.
 // This really just involves adding missing type information.
-func transformReplicaSetMetadata(obj interface{}) (interface{}, error) {
+func transformReplicaSetMetadata(obj interface{}) (interface{}, error) { //nolint:modernize // legacy handler signature
 	old, ok := obj.(*metav1.PartialObjectMetadata)
 	if !ok {
 		return nil, fmt.Errorf("obj of type %T neither a ReplicaSet nor a PartialObjectMetadata", obj)
