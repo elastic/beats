@@ -25,6 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // midBodyLine returns a line from the middle of a PEM block, i.e. real base64
@@ -92,12 +94,13 @@ func TestLoadCertificateDoesNotLeakPEM(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := LoadCertificate(&CertificateConfig{
 				Certificate: tc.certificate,
 				Key:         tc.key,
-			})
+			}, logger)
 			require.Error(t, err)
 
 			msg := err.Error()
@@ -133,11 +136,12 @@ func TestLoadCertificateAuthoritiesDoesNotLeakPEM(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			secret := midBodyLine(t, certPEM)
 
-			_, errs := LoadCertificateAuthorities([]string{tc.ca})
+			_, errs := LoadCertificateAuthorities([]string{tc.ca}, logger)
 			require.NotEmpty(t, errs)
 
 			for _, err := range errs {
@@ -158,7 +162,7 @@ func TestLoadCertificateAuthoritiesDoesNotLeakPEM(t *testing.T) {
 func TestLoadCertificateValidInlinePEM(t *testing.T) {
 	keyPEM, certPEM := makeKeyCertPair(t, blockTypePKCS8, "")
 
-	cert, err := LoadCertificate(&CertificateConfig{Certificate: certPEM, Key: keyPEM})
+	cert, err := LoadCertificate(&CertificateConfig{Certificate: certPEM, Key: keyPEM}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	require.NotNil(t, cert)
 	assert.NotEmpty(t, cert.Certificate)
@@ -170,7 +174,7 @@ func TestLoadCertificateValidInlinePEM(t *testing.T) {
 func TestLoadCertificateMissingFileShowsPath(t *testing.T) {
 	missing := filepath.Join(t.TempDir(), "does-not-exist.pem")
 
-	_, err := LoadCertificate(&CertificateConfig{Certificate: missing, Key: missing})
+	_, err := LoadCertificate(&CertificateConfig{Certificate: missing, Key: missing}, logptest.NewTestingLogger(t, ""))
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), missing, "missing file path should be visible")
 	assert.NotContains(t, err.Error(), "PEM REDACTED", "a real path must not be redacted")
@@ -254,7 +258,7 @@ func TestLoadCertificatePathWithTrailingNewlineIsNotRedacted(t *testing.T) {
 	_, err := LoadCertificate(&CertificateConfig{
 		Certificate: certPath + "\n",
 		Key:         keyPath + "\n",
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.Error(t, err)
 	assert.NotContains(t, err.Error(), "PEM REDACTED",
 		"a file path must not be redacted just because it has a trailing newline")

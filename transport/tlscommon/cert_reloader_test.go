@@ -109,7 +109,7 @@ func TestNewCertReloader_RejectsInlinePEM(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			_, err := NewCertReloader(tc.cert, tc.key)
+			_, err := NewCertReloader(tc.cert, tc.key, logptest.NewTestingLogger(t, ""))
 			require.Error(t, err)
 		})
 	}
