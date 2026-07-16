@@ -107,7 +107,7 @@ condition.equals:
 			assert.Len(t, cfgs, 1)
 
 			out := mapstr.M{}
-			cfgs[0].Unpack(&out)
+			cfgs[0].Unpack(&out) //nolint:errcheck // test assertion follows
 
 			assert.Equal(t, out, test.result)
 		})

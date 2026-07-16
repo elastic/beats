@@ -161,7 +161,7 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 			// The builder base config can configure any of the field values of kubernetes if need be.
 			e["kubernetes"] = kubeMeta
 			if rawAnn, ok := kubeMeta["annotations"]; ok {
-				annotations = rawAnn.(mapstr.M)
+				annotations = rawAnn.(mapstr.M) //nolint:errcheck // type validated by map lookup
 			}
 		}
 	}

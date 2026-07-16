@@ -331,8 +331,8 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 		panic(err)
 	}
 
-	writableKeystore.Store("PASSWORD", []byte(secret))
-	writableKeystore.Save()
+	writableKeystore.Store("PASSWORD", []byte(secret)) //nolint:errcheck // test helper
+	writableKeystore.Save()                            //nolint:errcheck // test helper
 	return keyStore
 }
 

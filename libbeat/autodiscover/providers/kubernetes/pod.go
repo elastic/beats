@@ -215,7 +215,7 @@ func (p *pod) OnAdd(obj any) {
 	defer p.crossUpdate.RUnlock()
 
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
-	p.emit(obj.(*kubernetes.Pod), "start")
+	p.emit(obj.(*kubernetes.Pod), "start") //nolint:errcheck // informer object type is validated
 }
 
 // OnUpdate handles events for pods that have been updated.

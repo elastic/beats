@@ -31,7 +31,7 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddAppender("config", NewConfigAppender)
+	autodiscover.Registry.AddAppender("config", NewConfigAppender) //nolint:errcheck // provider registration
 }
 
 type config struct {

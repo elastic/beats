@@ -61,7 +61,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	labels := map[string]string{"label": "foo"}
 	id, err := testClient.ContainerStart(image, cmd, labels)
 	require.NoError(t, err)
-	defer testClient.ContainerRemove(id)
+	defer testClient.ContainerRemove(id) //nolint:errcheck // test cleanup
 
 	info, err := testClient.ContainerInspect(id)
 	require.NoError(t, err)

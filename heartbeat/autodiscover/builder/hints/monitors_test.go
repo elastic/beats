@@ -215,7 +215,7 @@ func TestGenerateHints(t *testing.T) {
 			hostStrs := []string{}
 			if hostsSlice, ok := config["hosts"].([]interface{}); ok && len(hostsSlice) > 0 {
 				for _, hi := range hostsSlice {
-					hostStrs = append(hostStrs, hi.(string))
+					hostStrs = append(hostStrs, hi.(string)) //nolint:errcheck // test fixture type
 				}
 				sort.Strings(hostStrs)
 				config["hosts"] = hostStrs
