@@ -94,7 +94,7 @@ func TestGCPInputOTelE2E(t *testing.T) {
 		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username:        user,
 		Password:        password,
-		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json",
+		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json", //nolint:gosec // this is test file
 	}
 
 	var configBuffer bytes.Buffer
