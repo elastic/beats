@@ -31,6 +31,8 @@ import (
 
 	"github.com/josephspurrier/goversioninfo"
 	"github.com/magefile/mage/sh"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // BuildArgs are the arguments used for the "build" target and they define how
@@ -115,7 +117,6 @@ func DefaultBuildArgs() BuildArgs {
 		for _, tag := range FIPSConfig.Compile.Tags {
 			args.ExtraFlags = append(args.ExtraFlags, "-tags="+tag)
 		}
-		args.CGO = args.CGO || FIPSConfig.Compile.CGO
 		maps.Copy(args.Env, FIPSConfig.Compile.Env)
 	}
 
@@ -159,8 +160,8 @@ func DefaultGolangCrossBuildArgs() BuildArgs {
 // environment.
 func GolangCrossBuild(params BuildArgs) error {
 	if os.Getenv("GOLANG_CROSSBUILD") != "1" {
-		return errors.New("Use the crossBuild target. golangCrossBuild can " +
-			"only be executed within the golang-crossbuild docker environment.")
+		return errors.New("use the crossBuild target; golangCrossBuild can " +
+			"only be executed within the golang-crossbuild docker environment")
 	}
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
@@ -283,7 +284,7 @@ func MakeWindowsSysoFile() (string, error) {
 		},
 		StringFileInfo: goversioninfo.StringFileInfo{
 			CompanyName:      BeatVendor,
-			ProductName:      strings.Title(BeatName),
+			ProductName:      cases.Title(language.English).String(BeatName),
 			ProductVersion:   version,
 			FileVersion:      version,
 			FileDescription:  BeatDescription,
