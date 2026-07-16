@@ -135,7 +135,7 @@ func (p *pollingDiscoveryV2) worker(ctx context.Context, pipeline beat.Pipeline,
 		client.Close()
 	}()
 
-	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
+	rateLimitWaiter := backoff.NewEqualJitterBackoff(1, 120)
 	for st := range work {
 		if err := p.registry.MarkObjectInFlight(st.Key); err != nil {
 			p.log.Errorf("failed to mark object in-flight: %v", err)
@@ -156,7 +156,7 @@ func (p *pollingDiscoveryV2) worker(ctx context.Context, pipeline beat.Pipeline,
 			if err := p.registry.UnmarkObjectInFlight(st.Key); err != nil {
 				p.log.Errorf("failed to unmark object in-flight: %v", err)
 			}
-			rateLimitWaiter.Wait()
+			rateLimitWaiter.Wait(ctx)
 			continue
 		}
 		rateLimitWaiter.Reset()
@@ -194,7 +194,7 @@ func (p *pollingDiscoveryV2) listObjects(ctx context.Context, workChan chan<- st
 	defer close(workChan)
 
 	isStateValid := p.filterProvider.getApplierFunc()
-	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
+	errorBackoff := backoff.NewEqualJitterBackoff(1, 120)
 	circuitBreaker := 0
 
 	startAfterKey := p.registry.GetStartAfterKey()
@@ -212,7 +212,7 @@ func (p *pollingDiscoveryV2) listObjects(ctx context.Context, workChan chan<- st
 					return nil, numListed, false
 				}
 			}
-			errorBackoff.Wait()
+			errorBackoff.Wait(ctx)
 			continue
 		}
 		circuitBreaker = 0
