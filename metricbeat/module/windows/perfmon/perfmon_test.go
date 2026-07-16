@@ -21,7 +21,6 @@ package perfmon
 
 import (
 	"errors"
-	"strings"
 	"testing"
 	"time"
 
@@ -245,7 +244,7 @@ func TestLongOutputFormat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotZero(t, len(path))
+	assert.NotEmpty(t, path)
 	err = query.AddCounter(path[0], "", "long", false)
 	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
@@ -284,7 +283,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotZero(t, len(path))
+	assert.NotEmpty(t, path)
 	err = query.AddCounter(path[0], "", "float", false)
 	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
@@ -338,7 +337,7 @@ func TestWildcardQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotZero(t, len(values))
+	assert.NotEmpty(t, values)
 	pctKey, err := values[0].MetricSetFields.HasKey("metrics.%_processor_time")
 	if err != nil {
 		t.Fatal(err)
@@ -388,7 +387,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		}
 		instanceString, ok := instance.(string)
 		assert.True(t, ok, "instance should have been a string")
-		assert.False(t, strings.Contains(instanceString, "*"))
+		assert.NotContains(t, instanceString, "*")
 	}
 
 	t.Log(values)
@@ -428,7 +427,7 @@ func TestGroupByInstance(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.EqualValues(t, 1, len(values)) // Assert all metrics have been grouped into a single event
+	assert.Len(t, values, 1) // Assert all metrics have been grouped into a single event
 
 	// Test all keys exist in the event
 	pctKey, err := values[0].MetricSetFields.HasKey("metrics.%_processor_time")
