@@ -22,9 +22,13 @@ import (
 	"fmt"
 	"sync"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -34,6 +38,9 @@ var (
 	ErrPathsAlreadySet  = errors.New("attempt to set paths twice")
 	ErrSetPathsOnClosed = errors.New("attempt to set paths on closed processor")
 )
+
+var _ PdataProcessor = (*SafeProcessor)(nil)
+var _ PdataProcessor = (*safeProcessorWithClose)(nil)
 
 type state = int
 
@@ -76,6 +83,55 @@ func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	default: // proceed
 	}
 	return p.Processor.Run(event)
+}
+
+// RunPdata implements PdataProcessor by delegating to the inner processor's
+// RunPdata when available. If the inner processor does not implement
+// PdataProcessor, it falls back to a legacy round-trip conversion so that
+// SafeProcessor is always transparent for callers checking PdataProcessor
+// support (e.g. buildPdataProcs in beatprocessor).
+func (p *SafeProcessor) RunPdata(body pcommon.Map) (bool, error) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	switch p.state {
+	case stateClosed:
+		return false, ErrClosed
+	case stateInit:
+		if _, ok := p.Processor.(PathSetter); ok {
+			return false, ErrPathsNotSet
+		}
+	default: // proceed
+	}
+	if pp, ok := p.Processor.(PdataProcessor); ok {
+		return pp.RunPdata(body)
+	}
+	// Inner processor is legacy-only: round-trip through mapstr.M.
+	// Mirrors the fallback in WhenProcessor.RunPdata.
+	event := &beat.Event{Fields: otelmap.ToMapstr(body)}
+	if raw, err := event.Fields.GetValue("@metadata"); err == nil {
+		switch m := raw.(type) {
+		case mapstr.M:
+			event.Meta = m
+		case map[string]any:
+			event.Meta = mapstr.M(m)
+		}
+		_ = event.Fields.Delete("@metadata")
+	}
+	out, err := p.Processor.Run(event)
+	if err != nil {
+		return false, err
+	}
+	if out == nil {
+		return true, nil
+	}
+	if len(out.Meta) > 0 {
+		if out.Fields == nil {
+			out.Fields = mapstr.M{}
+		}
+		out.Fields["@metadata"] = out.Meta
+	}
+	body.Clear()
+	return false, otelmap.FromMapstr(body, out.Fields)
 }
 
 // Close makes sure the underlying `Close` function is called only once.
