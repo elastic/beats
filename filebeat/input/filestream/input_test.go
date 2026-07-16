@@ -278,7 +278,7 @@ func TestNewFile(t *testing.T) {
 	testCases := map[string]struct {
 		compression   string
 		filePath      string
-		expectedType  interface{}
+		expectedType  any
 		expectError   bool
 		errorContains string
 		setup         func(t *testing.T, filePath string) *os.File
@@ -479,7 +479,7 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	file, err := os.CreateTemp(dir, "*")
 	require.NoError(t, err)
 	filename := file.Name()
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		fmt.Fprintf(file, "rather mediocre log line message in %s - %d\n", filename, i)
 	}
 	err = file.Close()

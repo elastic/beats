@@ -260,8 +260,7 @@ func (g *harvesterRunner) start() {
 	} else {
 		g.ctx.Logger.Info("starting filestream harvester (unlimited open files)")
 	}
-	g.wg.Add(1)
-	go g.waker()
+	g.wg.Go(g.waker)
 }
 
 func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c }
@@ -545,8 +544,6 @@ func (g *harvesterRunner) promoteLocked() *sourceState {
 // centralises the read backoff and close-condition checks that the per-file
 // harvester ran per file.
 func (g *harvesterRunner) waker() {
-	defer g.wg.Done()
-
 	for {
 		g.mu.Lock()
 		if g.closed {
@@ -574,27 +571,28 @@ func (g *harvesterRunner) waker() {
 
 		wait := g.backoff.Max
 		if hasNext {
-			if d := time.Until(next); d < wait {
-				wait = d
-			}
+			wait = min(wait, time.Until(next))
 		}
-		if wait < 0 {
-			wait = 0
-		}
-		t := time.NewTimer(wait)
+		wait = max(0, wait)
 		select {
 		case <-g.ctx.Cancelation.Done():
-			t.Stop()
 			return
-		case <-t.C:
+		case <-time.After(wait):
 		case <-g.wakerCh:
-			t.Stop()
 		}
 	}
 }
 
-func statusIsActive(s sourceStatus) bool {
+func (s sourceStatus) isActive() bool {
 	return s == statusNew || s == statusRunning || s == statusPolling
+}
+
+// noReader reports whether a source in this status has no goroutine that will
+// tear it down after a cancel: a parked source is skipped by the waker, a
+// waiting source has no reader at all, and a new source's run() finishes it
+// without spawning a reader.
+func (s sourceStatus) noReader() bool {
+	return s == statusParked || s == statusNew || s == statusWaiting
 }
 
 // setStatus transitions state to ns and keeps the active/parked gauge counters in
@@ -609,7 +607,7 @@ func (g *harvesterRunner) setStatus(state *sourceState, ns sourceStatus) {
 		g.nParked--
 	case old == statusWaiting:
 		g.nWaiting--
-	case statusIsActive(old):
+	case old.isActive():
 		g.nActive--
 	}
 	switch {
@@ -617,7 +615,7 @@ func (g *harvesterRunner) setStatus(state *sourceState, ns sourceStatus) {
 		g.nParked++
 	case ns == statusWaiting:
 		g.nWaiting++
-	case statusIsActive(ns):
+	case ns.isActive():
 		g.nActive++
 	}
 	state.status = ns
@@ -739,12 +737,10 @@ func (g *harvesterRunner) Stop(src Source) {
 	if cancel != nil {
 		cancel()
 	}
-	// If the source was parked, queued or still new, no goroutine holds it: a
-	// parked source is skipped by the waker, a queued source has no reader at
-	// all, and a new source's run() will finish it without spawning a reader.
-	// For running/polling, the reader or waker that holds it finishes it after
-	// the cancel.
-	if prev == statusParked || prev == statusNew || prev == statusWaiting {
+	// If no goroutine holds the source (see noReader), tear it down here; for
+	// running/polling, the reader or waker that holds it finishes it after the
+	// cancel.
+	if prev.noReader() {
 		g.finish(state)
 	}
 }
@@ -771,9 +767,9 @@ func (g *harvesterRunner) stopAndWait(state *sourceState) {
 	if cancel != nil {
 		cancel()
 	}
-	// A parked, queued or still-new source has no goroutine that will finish it
-	// (see Stop), so tear it down here; otherwise wait for the holder to do it.
-	if prev == statusParked || prev == statusNew || prev == statusWaiting {
+	// A source with no reader (see noReader) has no goroutine that will finish
+	// it, so tear it down here; otherwise wait for the holder to do it.
+	if prev.noReader() {
 		g.finish(state)
 		return
 	}
@@ -991,10 +987,10 @@ func (g *harvesterRunner) drainAndStop() error {
 	}
 	// Only an actual in-flight drain is worth announcing: if every source already
 	// reached EOF and tore itself down, there is nothing to wait for.
-	draining := len(g.states) > 0
+	hadSources := len(g.states) > 0
 	g.mu.Unlock()
 
-	if draining {
+	if hadSources {
 		g.ctx.Logger.Infof(
 			"input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first",
 			g.readUntilEOF.Timeout)
@@ -1028,7 +1024,7 @@ func (g *harvesterRunner) drainAndStop() error {
 	}
 	g.finishRemaining()
 
-	if draining {
+	if hadSources {
 		if reachedEOF {
 			g.ctx.Logger.Info("read_until_eof enabled, EOF reached. closing input")
 		} else {

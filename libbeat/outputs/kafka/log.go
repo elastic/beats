@@ -26,19 +26,19 @@ type kafkaLogger struct {
 	log *logp.Logger
 }
 
-func (kl kafkaLogger) Print(v ...interface{}) {
+func (kl kafkaLogger) Print(v ...any) {
 	kl.Log("kafka message: %v", v...)
 }
 
-func (kl kafkaLogger) Printf(format string, v ...interface{}) {
+func (kl kafkaLogger) Printf(format string, v ...any) {
 	kl.Log(format, v...)
 }
 
-func (kl kafkaLogger) Println(v ...interface{}) {
+func (kl kafkaLogger) Println(v ...any) {
 	kl.Log("kafka message: %v", v...)
 }
 
-func (kl kafkaLogger) Log(format string, v ...interface{}) {
+func (kl kafkaLogger) Log(format string, v ...any) {
 	warn := false
 	for _, val := range v {
 		if err, ok := val.(sarama.KError); ok {

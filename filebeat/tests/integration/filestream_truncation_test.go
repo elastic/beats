@@ -156,10 +156,7 @@ func assertLastOffset(t *testing.T, path string, offset int) {
 		t.Errorf("expecting offset %d got %d instead", offset, lastEntry.Offset)
 		t.Log("last registry entries:")
 
-		max := len(entries)
-		if max > 10 {
-			max = 10
-		}
+		max := min(len(entries), 10)
 		for _, e := range entries[:max] {
 			t.Logf("%+v\n", e)
 		}

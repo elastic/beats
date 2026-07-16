@@ -103,11 +103,12 @@ type HarvesterGroup interface {
 	StopHarvesters() error
 	// SetObserver sets the observer to get notified when a harvester closes.
 	SetObserver(c chan HarvesterStatus)
-	// Migrate re-keys a running (or pending) harvester's bookkeeping
-	// registration from oldID to next's identity, calling updateStore with the
-	// new key in the same critical section so the registry entry and the
-	// registration move atomically. It is also safe to call when nothing is
-	// registered under oldID: only the store is updated then.
+	// Migrate re-keys a running or pending harvester from oldID to next's
+	// identity and persists the new key via updateStore, so the harvester keeps
+	// running under its new identity without being restarted. It is safe to call
+	// when nothing is registered under oldID, in which case only updateStore
+	// runs. It returns an error if a harvester is already registered under next's
+	// identity.
 	Migrate(oldID string, next Source, updateStore func(newID string) error) error
 }
 
