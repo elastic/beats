@@ -130,14 +130,14 @@ func baseModule(t *testing.T, r *Register, module, metricSet string) BaseMetricS
 	c.Query = QueryParams{"default": "foo"}
 	raw, err := conf.NewConfigFrom(c)
 	require.NoError(t, err)
-	baseModule, err := newBaseModuleFromConfig(raw, logptest.NewTestingLogger(t, ""))
+	baseModule, err := newBaseModuleFromConfig(raw, logptest.NewTestingLogger(t, ""), paths.New())
 	require.NoError(t, err)
 
 	bm := BaseMetricSet{ //nolint:exhaustruct // test only sets fields relevant to light module registration
 		name:         "bar",
 		module:       &baseModule,
 		registration: origRegistration,
-		paths:        paths.New(),
+		paths:        baseModule.Paths,
 	}
 	return bm
 }

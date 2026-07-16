@@ -14,5 +14,5 @@ ech_up $STACK_VERSION
 echo "~~~ Running custom FIPS ECH tests"
 
 pushd $BEAT_PATH
-GOEXPERIMENT=systemcrypto SNAPSHOT=true FIPS=true mage build fipsECHTest
+SNAPSHOT=true FIPS=true mage build fipsECHTest
 popd

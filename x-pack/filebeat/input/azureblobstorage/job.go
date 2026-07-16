@@ -40,6 +40,9 @@ type job struct {
 	blob *azcontainer.BlobItem
 	// azure blob url for the resource
 	blobURL string
+	// downloadRetries bounds how many times a mid-stream read failure is retried
+	// while downloading a blob. A value below 1 lets the SDK apply its default (3).
+	downloadRetries int32
 	// object hash, used in setting event id
 	hash string
 	// flag to denote if object is gzip compressed or not
@@ -62,7 +65,7 @@ type job struct {
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
 func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
-	state *state, src *Source, publisher cursor.Publisher, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
+	state *state, src *Source, downloadRetries int32, publisher cursor.Publisher, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
 ) *job {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
@@ -70,16 +73,17 @@ func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 	}
 
 	return &job{
-		client:    client,
-		blob:      blob,
-		blobURL:   blobURL,
-		hash:      azureObjectHash(src, blob),
-		state:     state,
-		src:       src,
-		publisher: publisher,
-		log:       log,
-		status:    stat,
-		metrics:   metrics,
+		client:          client,
+		blob:            blob,
+		blobURL:         blobURL,
+		downloadRetries: downloadRetries,
+		hash:            azureObjectHash(src, blob),
+		state:           state,
+		src:             src,
+		publisher:       publisher,
+		log:             log,
+		status:          stat,
+		metrics:         metrics,
 	}
 }
 
@@ -160,9 +164,11 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 		j.status.UpdateStatus(status.Degraded, "failed to create a download stream: "+err.Error())
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
-	const maxRetries = 3
+	// The retry policy on the client pipeline already retries the download
+	// request itself; this retry reader additionally recovers from failures that
+	// occur mid-stream, while the body is being read.
 	reader := get.NewRetryReader(ctx, &azblob.RetryReaderOptions{
-		MaxRetries: maxRetries,
+		MaxRetries: j.downloadRetries,
 	})
 	defer func() {
 		err = reader.Close()

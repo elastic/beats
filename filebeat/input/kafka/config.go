@@ -38,6 +38,7 @@ type kafkaInputConfig struct {
 	Hosts                    []string          `config:"hosts" validate:"required"`
 	Topics                   []string          `config:"topics" validate:"required"`
 	GroupID                  string            `config:"group_id" validate:"required"`
+	GroupInstanceID          string            `config:"group_instance_id"`
 	ClientID                 string            `config:"client_id"`
 	Version                  kafka.Version     `config:"version"`
 	InitialOffset            initialOffset     `config:"initial_offset"`
@@ -46,6 +47,10 @@ type kafkaInputConfig struct {
 	WaitClose                time.Duration     `config:"wait_close" validate:"min=0"`
 	MaxWaitTime              time.Duration     `config:"max_wait_time"`
 	IsolationLevel           isolationLevel    `config:"isolation_level"`
+	SessionTimeout           time.Duration     `config:"session_timeout" validate:"min=1"`
+	HeartbeatInterval        time.Duration     `config:"heartbeat_interval" validate:"min=1"`
+	Timeout                  time.Duration     `config:"timeout" validate:"min=1"`
+	KeepAlive                time.Duration     `config:"keep_alive" validate:"min=0"`
 	Fetch                    kafkaFetch        `config:"fetch"`
 	Rebalance                kafkaRebalance    `config:"rebalance"`
 	TLS                      *tlscommon.Config `config:"ssl"`
@@ -118,6 +123,12 @@ func defaultConfig() kafkaInputConfig {
 		WaitClose:      2 * time.Second,
 		MaxWaitTime:    250 * time.Millisecond,
 		IsolationLevel: isolationLevelReadUncommitted,
+		// Consumer group and network timeouts default to sarama's values
+		// so existing configurations are unaffected.
+		SessionTimeout:    10 * time.Second,
+		HeartbeatInterval: 3 * time.Second,
+		Timeout:           30 * time.Second,
+		KeepAlive:         0,
 		Fetch: kafkaFetch{
 			Min:     1,
 			Default: (1 << 20), // 1 MB
@@ -166,6 +177,21 @@ func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Conf
 	k.Consumer.Fetch.Min = config.Fetch.Min
 	k.Consumer.Fetch.Default = config.Fetch.Default
 	k.Consumer.Fetch.Max = config.Fetch.Max
+
+	k.Consumer.Group.Session.Timeout = config.SessionTimeout
+	k.Consumer.Group.Heartbeat.Interval = config.HeartbeatInterval
+
+	if config.GroupInstanceID != "" {
+		if !version.IsAtLeast(sarama.V2_3_0_0) {
+			return nil, fmt.Errorf("group_instance_id requires 'version' >= 2.3.0 for static group membership (KIP-345); configured version is %q", config.Version)
+		}
+		k.Consumer.Group.InstanceId = config.GroupInstanceID
+	}
+
+	k.Net.DialTimeout = config.Timeout
+	k.Net.ReadTimeout = config.Timeout
+	k.Net.WriteTimeout = config.Timeout
+	k.Net.KeepAlive = config.KeepAlive
 
 	k.Consumer.Group.Rebalance.Strategy = config.Rebalance.Strategy.asSaramaStrategy()
 	k.Consumer.Group.Rebalance.Timeout = config.Rebalance.Timeout

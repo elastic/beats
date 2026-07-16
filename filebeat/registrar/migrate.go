@@ -241,7 +241,7 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 		return fmt.Errorf("migration complete but failed to remove original data file: %v: %w", origDataFile, err)
 	}
 
-	if err := os.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
+	if err := safeWriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
 		return fmt.Errorf("failed to update the meta.json file: %w", err)
 	}
 
@@ -290,29 +290,38 @@ func isFile(path string, log *logp.Logger) bool {
 }
 
 func safeWriteFile(path string, data []byte, perm os.FileMode) error {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+	f, err := os.CreateTemp(filepath.Dir(path), filepath.Base(path)+".tmp-*")
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating tmp file: %w", err)
+	}
+	tmpName := f.Name()
+	// Always close and remove the tmp file on error path, errors will be ignored
+	// in the success case
+	defer func() {
+		_ = f.Close()
+		_ = os.Remove(tmpName)
+	}()
+
+	if err = f.Chmod(perm); err != nil {
+		return fmt.Errorf("error setting tmp file permissions: %w", err)
 	}
 
-	for len(data) > 0 {
-		var n int
-		n, err = f.Write(data)
-		if err != nil {
-			break
-		}
-
-		data = data[n:]
+	if _, err = f.Write(data); err != nil {
+		return fmt.Errorf("error writing to tmp file: %w", err)
 	}
 
-	if err == nil {
-		err = f.Sync()
+	if err = f.Sync(); err != nil {
+		return fmt.Errorf("error syncing data to tmp file: %w", err)
 	}
 
-	if err1 := f.Close(); err == nil {
-		err = err1
+	if err = f.Close(); err != nil {
+		return fmt.Errorf("error closing tmp file: %w", err)
 	}
-	return err
+
+	if err = helper.SafeFileRotate(path, tmpName); err != nil {
+		return fmt.Errorf("error moving tmp file to target: %w", err)
+	}
+	return nil
 }
 
 // fixStates cleans up the registry states when updating from an older version
