@@ -256,28 +256,22 @@ resource_origins:
   - "https://firehose.newdomain.com"
 ----
 
-<<<<<<< HEAD:x-pack/filebeat/docs/inputs/input-streaming.asciidoc
-[[program-streaming]]
+[[user-agent-streaming]]
 [float]
-==== `program`
-=======
-
-### `user_agent` [user-agent-streaming]
-```{applies_to}
-stack: ga 9.4+
-```
+==== `user_agent`
 
 An optional string that overrides the default `User-Agent` header sent on all outbound HTTP requests. This only applies when `stream_type` is `crowdstrike`. The header is set on discover, firehose, session refresh, and OAuth2 token requests.
 
 When not set, the Elastic Agent's built-in user agent string is used.
 
-```yaml
+["source","yaml",subs="attributes"]
+----
 user_agent: "Elastic-crowdstrike/4.0.0"
-```
+----
 
-
-### `program` [program-streaming]
->>>>>>> 92632adab (x-pack/filebeat/input/streaming: add configurable User-Agent header (#51822)):docs/reference/filebeat/filebeat-input-streaming.md
+[[program-streaming]]
+[float]
+==== `program`
 
 The CEL program that is executed on each message received. This field should ideally be present but if not the default program given below is used.
 
