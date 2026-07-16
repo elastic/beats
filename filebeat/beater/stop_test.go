@@ -18,11 +18,60 @@
 package beater
 
 import (
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/filebeat/fileset"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// TestRunClosesRunReadyOnPreInitFailure guards against the regression in
+// commit 00068f7 where the defer fb.runReady.Close() was placed after the
+// PreInit call, leaving runReady unclosed when PreInit fails.  An unclosed
+// runReady causes StopWithContext to wait the full five-second timeout.
+func TestRunClosesRunReadyOnPreInitFailure(t *testing.T) {
+	preInitErr := errors.New("preinit failed")
+	fb := &Filebeat{
+		done:           make(chan struct{}),
+		runReady:       &closeOnce{ch: make(chan struct{})},
+		logger:         logp.NewNopLogger(),
+		moduleRegistry: new(fileset.ModuleRegistry),
+	}
+	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewNopLogger()},
+		Manager:    &preinitFailManager{err: preInitErr},
+		Monitoring: beatmonitoring.NewMonitoring(),
+	}
+
+	err := fb.Run(b)
+	require.ErrorIs(t, err, preInitErr)
+
+	select {
+	case <-fb.runReady.ch:
+		// runReady was closed — StopWithContext will not block
+	default:
+		t.Fatal("runReady was not closed after PreInit failure; StopWithContext would wait five seconds")
+	}
+}
+
+// preinitFailManager is a management.Manager stub whose PreInit returns an
+// error.  Only the methods called by Run before PreInit are implemented; any
+// other call panics, catching unexpected code paths during the test.
+type preinitFailManager struct {
+	management.Manager // zero-valued; panics on any unimplemented method
+	err                error
+}
+
+func (m *preinitFailManager) Enabled() bool  { return true }
+func (m *preinitFailManager) PreInit() error { return m.err }
+func (m *preinitFailManager) RegisterDiagnosticHook(_, _, _, _ string, _ management.DiagnosticHook) {
+}
 
 // TestStopWaitsForRunReady proves that Stop does not close the done channel
 // until Run has closed runReady (i.e., reached waitFinished.Wait).
