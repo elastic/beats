@@ -13,7 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestExtensionsDiagnosticsPayload(t *testing.T) {
@@ -51,10 +51,11 @@ func TestExtensionsDiagnosticsPayload(t *testing.T) {
 		{"name": "valid_ext", "version": "1.0", "path": validExt},
 	}
 
-	bt := &osquerybeat{log: logp.NewLogger("ext_diag_test")}
+	bt := &osquerybeat{log: logptest.NewTestingLogger(t, "ext_diag_test")}
 	bt.setExtensionsDiagnostics(config.ExtensionsConfig{
 		Paths:   []string{extDir, missingDir},
 		Timeout: 20,
+		Require: []string{"valid_ext"},
 	}, dataDir)
 	bt.setDiagnosticsQueryExecutor(&mockExecutor{result: loaded})
 
@@ -68,6 +69,9 @@ func TestExtensionsDiagnosticsPayload(t *testing.T) {
 	}
 	if got := payload["extensions_timeout"]; got != 20 {
 		t.Fatalf("expected extensions_timeout 20, got %v", got)
+	}
+	if require, ok := payload["extensions_require"].([]string); !ok || len(require) != 1 || require[0] != "valid_ext" {
+		t.Fatalf("expected extensions_require [valid_ext], got %v", payload["extensions_require"])
 	}
 
 	entries, ok := payload["configured_entries"].([]map[string]interface{})

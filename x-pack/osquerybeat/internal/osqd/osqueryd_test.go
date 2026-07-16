@@ -9,9 +9,10 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
@@ -69,7 +70,7 @@ func TestVerifyAutoloadFileMissing(t *testing.T) {
 
 // TestPrepareAutoloadFile tests possibly different states of the osquery.autoload file and that it is restored into the workable state
 func TestPrepareAutoloadFile(t *testing.T) {
-	validLogger := logp.NewLogger("osqueryd_test")
+	validLogger := logptest.NewTestingLogger(t, "osqueryd_test")
 
 	// Prepare the directory with extension
 	dir := t.TempDir()
@@ -104,7 +105,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 // extension always stays on the first line, and that removing an extension rewrites
 // the file.
 func TestPrepareAutoloadFileWithExtensions(t *testing.T) {
-	validLogger := logp.NewLogger("osqueryd_test")
+	validLogger := logptest.NewTestingLogger(t, "osqueryd_test")
 
 	dir := t.TempDir()
 	mandatoryExtensionPath := filepath.Join(dir, extensionName)
@@ -277,10 +278,112 @@ func TestCollectExtensionBinaries(t *testing.T) {
 		}
 	}
 
-	q := &OSQueryD{log: logp.NewLogger("osqueryd_test")}
+	q := &OSQueryD{log: logptest.NewTestingLogger(t, "osqueryd_test")}
 	// Directory entry plus an overlapping explicit file entry: a is not duplicated.
 	got := q.collectExtensionBinaries([]string{dir, a})
 	if len(got) != 2 || got[0] != a || got[1] != b {
 		t.Fatalf("unexpected collected binaries: %v", got)
+	}
+}
+
+// TestSetExtensionsTimeoutReset verifies that a configured extensions_timeout
+// override is applied and that removing the override (timeout <= 0) reverts to
+// the construction-time default instead of keeping the stale value.
+func TestSetExtensionsTimeoutReset(t *testing.T) {
+	baseTimeout := 5
+
+	osq, err := newOsqueryD("/var/run/foobar", WithExtensionsTimeout(baseTimeout))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	osq.SetExtensions(nil, 30, nil)
+	if diff := cmp.Diff(30, osq.getExtensionsTimeout()); diff != "" {
+		t.Error(diff)
+	}
+
+	// Removing the override reverts to the base timeout.
+	osq.SetExtensions(nil, 0, nil)
+	if diff := cmp.Diff(baseTimeout, osq.getExtensionsTimeout()); diff != "" {
+		t.Error(diff)
+	}
+}
+
+// TestResolveExtensionsSymlink verifies symlinks are rejected everywhere: as a
+// literal entry, as a directory scan candidate, and as a glob match.
+func TestResolveExtensionsSymlink(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("symlink creation requires privileges on windows")
+	}
+
+	dir := t.TempDir()
+	target := filepath.Join(dir, "real.ext")
+	if err := os.WriteFile(target, nil, 0700); err != nil {
+		t.Fatal(err)
+	}
+
+	linkDir := t.TempDir()
+	link := filepath.Join(linkDir, "link.ext")
+	if err := os.Symlink(target, link); err != nil {
+		t.Fatal(err)
+	}
+
+	// Literal symlink entry: entry-level error.
+	results := ResolveExtensions([]string{link})
+	if len(results) != 1 || results[0].Error == "" {
+		t.Fatalf("expected entry error for literal symlink, got: %+v", results)
+	}
+
+	// Directory scan: symlink candidate is recorded as skipped, not followed.
+	results = ResolveExtensions([]string{linkDir})
+	if len(results) != 1 || results[0].Error != "" {
+		t.Fatalf("unexpected results for dir scan: %+v", results)
+	}
+	if len(results[0].Loaded) != 0 {
+		t.Fatalf("expected no loaded binaries, got %v", results[0].Loaded)
+	}
+	if len(results[0].Skipped) != 1 || results[0].Skipped[0].Path != link {
+		t.Fatalf("expected %q skipped, got %v", link, results[0].Skipped)
+	}
+
+	// Glob match: symlink is recorded as skipped.
+	results = ResolveExtensions([]string{filepath.Join(linkDir, "*.ext")})
+	if len(results) != 1 || results[0].Error != "" {
+		t.Fatalf("unexpected results for glob: %+v", results)
+	}
+	if len(results[0].Loaded) != 0 || len(results[0].Skipped) != 1 {
+		t.Fatalf("expected only a skip for the symlink glob match, got: %+v", results[0])
+	}
+}
+
+// TestArgsExtensionsRequire verifies the configured required extension names are
+// rendered into the osqueryd extensions_require flag.
+func TestArgsExtensionsRequire(t *testing.T) {
+	osq, err := newOsqueryD("/var/run/foobar", WithLogger(logptest.NewTestingLogger(t, "osqueryd_test")))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	osq.SetExtensions(nil, 0, []string{"ext_one", "ext_two"})
+
+	args := osq.args(nil)
+	want := "--extensions_require=ext_one,ext_two"
+	found := false
+	for _, a := range args {
+		if a == want {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected %q in osqueryd args, got: %v", want, args)
+	}
+
+	// Clearing require removes the flag.
+	osq.SetExtensions(nil, 0, nil)
+	for _, a := range osq.args(nil) {
+		if strings.HasPrefix(a, "--extensions_require=") {
+			t.Fatalf("expected no extensions_require flag, got: %v", a)
+		}
 	}
 }

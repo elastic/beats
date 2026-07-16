@@ -455,6 +455,9 @@ func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[str
 	if extensions.Timeout > 0 {
 		payload["extensions_timeout"] = extensions.Timeout
 	}
+	if len(extensions.Require) > 0 {
+		payload["extensions_require"] = extensions.Require
+	}
 
 	if dataPath != "" {
 		autoloadPath := osqd.AutoloadPath(dataPath)
@@ -501,9 +504,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 	socketPath := osq.SocketPath()
 
 	// Apply customer-managed extension entries before starting osqueryd so prepare()
-	// writes the autoload file for the current set, and record them for diagnostics.
-	osq.SetExtensions(extensions.PathsOrEmpty(), extensions.Timeout)
+	// writes the autoload file for the current set, and record them for diagnostics
+	// and monitoring metrics.
+	osq.SetExtensions(extensions.PathsOrEmpty(), extensions.Timeout, extensions.Require)
 	bt.setExtensionsDiagnostics(extensions, osq.DataPath())
+	osqdMetrics.updateExtensionCounts(osqd.ResolveExtensions(extensions.PathsOrEmpty()))
 
 	// Create a cache for queries types resolution
 	cache, err := lru.New[string, map[string]string](adhocOsqueriesTypesCacheSize)

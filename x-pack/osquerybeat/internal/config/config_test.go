@@ -430,6 +430,7 @@ func TestGetOsqueryExtensions(t *testing.T) {
 							"extensions": map[string]interface{}{
 								"paths":   []string{"/opt/ext"},
 								"timeout": 15,
+								"require": []string{"my_extension"},
 							},
 						},
 					},
@@ -449,6 +450,9 @@ func TestGetOsqueryExtensions(t *testing.T) {
 		}
 		if len(cfg.Paths) != 1 || cfg.Paths[0] != "/opt/ext" {
 			t.Fatalf("unexpected paths: %v", cfg.Paths)
+		}
+		if len(cfg.Require) != 1 || cfg.Require[0] != "my_extension" {
+			t.Fatalf("unexpected require: %v", cfg.Require)
 		}
 	})
 }

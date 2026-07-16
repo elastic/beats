@@ -118,6 +118,13 @@ type ElasticOptions struct {
 //   - a glob pattern (containing *, ? or [ ]): each match is resolved as a
 //     directory or file per the rules above.
 //
+// Symlinks are rejected (entries, glob matches, and directory contents) so the
+// binary that is validated is the one osqueryd executes.
+//
+// Entries are resolved when osqueryd is (re)started, which happens when the
+// extension configuration (or other osquery options) change. Adding or removing
+// binaries in a configured directory does NOT trigger a reload by itself.
+//
 // osquerybeat never copies these binaries and never writes into the Elastic
 // Agent install tree; it only appends the resolved paths to the osquery
 // extensions autoload file that lives in the runtime data directory. osqueryd
@@ -131,6 +138,11 @@ type ExtensionsConfig struct {
 	// Timeout optionally overrides osquery's extensions_timeout (seconds), the
 	// time osqueryd waits for autoloaded extensions to register.
 	Timeout int `config:"timeout" json:"-"`
+	// Require lists extension names osqueryd must wait for at startup
+	// (osquery's extensions_require); queries do not run until the named
+	// extensions have registered or extensions_timeout elapses. Use this to
+	// avoid "no such table" races against slow-registering extensions.
+	Require []string `config:"require" json:"-"`
 }
 
 // PathsOrEmpty returns the configured extension paths, or an empty slice when no

@@ -53,10 +53,12 @@ type Runner interface {
 	SocketPath() string
 	DataPath() string
 	// SetExtensions configures customer-managed extension entries (directories,
-	// files, or glob patterns) to resolve and autoload, plus an optional
-	// extensions_timeout override (seconds, ignored when <= 0). It must be called
-	// before Run so prepare() writes the autoload file for the desired set on (re)start.
-	SetExtensions(paths []string, timeout int)
+	// files, or glob patterns) to resolve and autoload, an optional
+	// extensions_timeout override (seconds, reset to the default when <= 0), and an
+	// optional list of extension names osqueryd must wait for at startup
+	// (extensions_require). It must be called before Run so prepare() writes the
+	// autoload file for the desired set on (re)start.
+	SetExtensions(paths []string, timeout int, require []string)
 }
 
 type RunnerFactory func(socketPath string, opts ...Option) (Runner, error)
@@ -75,11 +77,18 @@ type OSQueryD struct {
 	extensionsTimeout     int
 	configRefreshInterval int
 
+	// baseExtensionsTimeout is the effective extensions_timeout after construction
+	// options are applied; SetExtensions reverts to it when the configuration no
+	// longer overrides the timeout.
+	baseExtensionsTimeout int
+
 	// extensionEntries holds absolute directories, files, or glob patterns that
 	// are resolved into customer-managed extension binaries appended to the
-	// autoload file after the mandatory Elastic extension.
+	// autoload file after the mandatory Elastic extension. extensionRequire holds
+	// extension names osqueryd must wait for at startup (extensions_require).
 	extMx            sync.Mutex
 	extensionEntries []string
+	extensionRequire []string
 
 	log *logp.Logger
 }
@@ -157,6 +166,10 @@ func newOsqueryD(socketPath string, opts ...Option) (*OSQueryD, error) {
 		opt(q)
 	}
 
+	// Remember the post-options timeout so SetExtensions can revert to it when the
+	// configuration override is removed.
+	q.baseExtensionsTimeout = q.extensionsTimeout
+
 	// The working directory is set to something like ./data/elastic-agent-3afa07/run/osquery-default by the agent
 	// Use the child dir osquery for that, so the full path is resolved to ./data/elastic-agent-3afa07/run/osquery-default/oquery
 	//
@@ -196,15 +209,19 @@ func (q *OSQueryD) DataPath() string {
 }
 
 // SetExtensions updates the customer-managed extension entries (directories, files,
-// or glob patterns) to resolve and an optional extensions_timeout override (seconds,
-// ignored when <= 0). The new set is applied on the next Run (which rewrites the
-// autoload file via prepare()).
-func (q *OSQueryD) SetExtensions(paths []string, timeout int) {
+// or glob patterns) to resolve, an optional extensions_timeout override (seconds,
+// reverts to the construction-time default when <= 0), and the extension names
+// osqueryd must wait for at startup (extensions_require). The new set is applied on
+// the next Run (which rewrites the autoload file via prepare()).
+func (q *OSQueryD) SetExtensions(paths []string, timeout int, require []string) {
 	q.extMx.Lock()
 	defer q.extMx.Unlock()
 	q.extensionEntries = append([]string(nil), paths...)
+	q.extensionRequire = append([]string(nil), require...)
 	if timeout > 0 {
 		q.extensionsTimeout = timeout
+	} else {
+		q.extensionsTimeout = q.baseExtensionsTimeout
 	}
 }
 
@@ -212,6 +229,18 @@ func (q *OSQueryD) getExtensionEntries() []string {
 	q.extMx.Lock()
 	defer q.extMx.Unlock()
 	return append([]string(nil), q.extensionEntries...)
+}
+
+func (q *OSQueryD) getExtensionRequire() []string {
+	q.extMx.Lock()
+	defer q.extMx.Unlock()
+	return append([]string(nil), q.extensionRequire...)
+}
+
+func (q *OSQueryD) getExtensionsTimeout() int {
+	q.extMx.Lock()
+	defer q.extMx.Unlock()
+	return q.extensionsTimeout
 }
 
 // AutoloadPath returns the path of the osquery extensions autoload file within
@@ -400,16 +429,13 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, e
 	existing, err := os.ReadFile(extensionAutoloadPath)
 	switch {
 	case err == nil:
-		// Rewrite only when the desired content differs or an already-listed path
-		// no longer verifies (line 0 must remain the mandatory extension and every
-		// referenced path must exist).
+		// Rewrite only when the desired content differs. The desired content is
+		// freshly computed from the resolved extension set (line 0 is the mandatory
+		// extension by construction), so when it matches there is nothing a rewrite
+		// could fix.
 		if string(existing) == desired {
-			if verr := verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath); verr != nil {
-				log.Debugf("Extensions autoload file %v verification failed, err: %v, create a new one", extensionAutoloadPath, verr)
-			} else {
-				log.Debugf("Extensions autoload file %s is up to date", extensionAutoloadPath)
-				rewrite = false
-			}
+			log.Debugf("Extensions autoload file %s is up to date", extensionAutoloadPath)
+			rewrite = false
 		} else {
 			log.Debugf("Extensions autoload file %s differs from desired content, rewrite it", extensionAutoloadPath)
 		}
@@ -491,11 +517,13 @@ type ExtensionResolveResult struct {
 // ResolveExtensions resolves each configured entry into osquery extension binaries.
 // An entry may be a directory (scanned for files with the platform extension suffix),
 // a specific extension binary file, or a glob pattern whose matches are resolved as
-// directories or files. It reports, per entry, the valid binaries and the ones skipped
-// with a reason. It performs no logging so callers can use it both for autoload
-// preparation and for diagnostics. osqueryd still applies its own safe-permission gate
-// at load time (osquerybeat never passes --allow_unsafe), so unsafe binaries are
-// additionally skipped by osqueryd and surfaced in diagnostics.
+// directories or files. Symlinks are rejected everywhere (entries, glob matches, and
+// directory contents) so the validated file is always the one osqueryd executes.
+// It reports, per entry, the valid binaries and the ones skipped with a reason. It
+// performs no logging so callers can use it both for autoload preparation and for
+// diagnostics. osqueryd still applies its own safe-permission gate at load time
+// (osquerybeat never passes --allow_unsafe), so unsafe binaries are additionally
+// skipped by osqueryd and surfaced in diagnostics.
 func ResolveExtensions(entries []string) []ExtensionResolveResult {
 	if len(entries) == 0 {
 		return nil
@@ -529,16 +557,25 @@ func ResolveExtensions(entries []string) []ExtensionResolveResult {
 
 // resolveExtensionPath resolves a single concrete path (a directory or a file) into
 // extension binaries, appending results to res. When literal is true the path came
-// directly from configuration (so a stat failure is an entry-level error); when false
-// it came from a glob match (so failures are recorded as skips).
+// directly from configuration (so a failure is an entry-level error); when false
+// it came from a glob match (so failures are recorded as skips). Symlinks are
+// rejected: the pre-check must validate the same file osqueryd will execute, and a
+// link retargeted between check and load would bypass it.
 func resolveExtensionPath(path string, literal bool, seen map[string]struct{}, res *ExtensionResolveResult) {
-	fi, err := os.Stat(path)
-	if err != nil {
+	fail := func(reason string) {
 		if literal {
-			res.Error = err.Error()
+			res.Error = reason
 		} else {
-			res.Skipped = append(res.Skipped, ExtensionSkip{Path: path, Reason: err.Error()})
+			res.Skipped = append(res.Skipped, ExtensionSkip{Path: path, Reason: reason})
 		}
+	}
+	fi, err := os.Lstat(path)
+	if err != nil {
+		fail(err.Error())
+		return
+	}
+	if fi.Mode()&os.ModeSymlink != 0 {
+		fail("symlinks are not allowed")
 		return
 	}
 	if fi.IsDir() {
@@ -552,7 +589,7 @@ func resolveExtensionPath(path string, literal bool, seen map[string]struct{}, r
 
 // scanExtensionDir adds every file with the platform extension suffix found directly
 // in dir. os.ReadDir returns entries sorted by name, so the autoload content is
-// deterministic.
+// deterministic. Symlinked candidates are recorded as skipped, not followed.
 func scanExtensionDir(dir string, seen map[string]struct{}, res *ExtensionResolveResult) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -567,7 +604,12 @@ func scanExtensionDir(dir string, seen map[string]struct{}, res *ExtensionResolv
 		if !strings.HasSuffix(e.Name(), suffix) {
 			continue
 		}
-		addExtensionBinary(filepath.Join(dir, e.Name()), seen, res)
+		path := filepath.Join(dir, e.Name())
+		if e.Type()&os.ModeSymlink != 0 {
+			res.Skipped = append(res.Skipped, ExtensionSkip{Path: path, Reason: "symlinks are not allowed"})
+			continue
+		}
+		addExtensionBinary(path, seen, res)
 	}
 }
 
@@ -600,9 +642,10 @@ func extensionFileSuffix() string {
 }
 
 // ValidateExtensionPath performs the beat-side pre-check for a customer-managed
-// extension binary (absolute path, exists, regular file, executable). The
-// ownership/writability safe-permission checks are enforced by osqueryd itself at
-// load time (osquerybeat never passes --allow_unsafe).
+// extension binary (absolute path, exists, regular file — not a symlink —,
+// executable). Symlinks are rejected so the validated file is the one osqueryd
+// executes. The ownership/writability safe-permission checks are enforced by
+// osqueryd itself at load time (osquerybeat never passes --allow_unsafe).
 func ValidateExtensionPath(p string) error {
 	if p == "" {
 		return errors.New("empty path")
@@ -610,9 +653,12 @@ func ValidateExtensionPath(p string) error {
 	if !filepath.IsAbs(p) {
 		return errors.New("path must be absolute")
 	}
-	fi, err := os.Stat(p)
+	fi, err := os.Lstat(p)
 	if err != nil {
 		return err
+	}
+	if fi.Mode()&os.ModeSymlink != 0 {
+		return errors.New("symlinks are not allowed")
 	}
 	if !fi.Mode().IsRegular() {
 		return errors.New("not a regular file")
@@ -697,9 +743,14 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 
 	flags["extensions_socket"] = q.socketPath
 
-	if q.extensionsTimeout > 0 {
-		flags["extensions_timeout"] = q.extensionsTimeout
+	if to := q.getExtensionsTimeout(); to > 0 {
+		flags["extensions_timeout"] = to
+	}
 
+	// Extension names osqueryd must wait for at startup; queries do not run until
+	// the required extensions have registered (or extensions_timeout elapses).
+	if require := q.getExtensionRequire(); len(require) > 0 {
+		flags["extensions_require"] = strings.Join(require, ",")
 	}
 
 	if q.configPlugin != "" {

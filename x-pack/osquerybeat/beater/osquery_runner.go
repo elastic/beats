@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
+	"slices"
 	"sync"
 
 	"go.uber.org/zap/zapcore"
@@ -96,7 +97,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			extensions = newExtensions
 			logLevel = newLogLevel
 			inputCh = make(chan []config.InputConfig, 1)
-			ctx, cn = context.WithCancel(parentCtx)
+			ctx, cn = context.WithCancel(parentCtx) //nolint:gosec // G118: cn is stored and invoked via the cancel() helper
 
 			wg.Go(func() {
 				err := runfn(ctx, flags, extensions, inputCh)
@@ -147,21 +148,16 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 }
 
 // extensionsAreSame reports whether two customer-managed extension configurations
-// are equivalent (same ordered paths and timeout), so the runner only restarts
-// osqueryd when the extension configuration actually changes.
+// are equivalent (same ordered paths, required names, and timeout), so the runner
+// only restarts osqueryd when the extension configuration actually changes.
 func extensionsAreSame(a, b config.ExtensionsConfig) bool {
 	if a.Timeout != b.Timeout {
 		return false
 	}
-	if len(a.Paths) != len(b.Paths) {
+	if !slices.Equal(a.Paths, b.Paths) {
 		return false
 	}
-	for i := range a.Paths {
-		if a.Paths[i] != b.Paths[i] {
-			return false
-		}
-	}
-	return true
+	return slices.Equal(a.Require, b.Require)
 }
 
 func (r *osqueryRunner) Update(ctx context.Context, inputs []config.InputConfig) error {

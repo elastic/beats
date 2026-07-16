@@ -63,6 +63,9 @@ osquerybeat:
 #            # binary in it is autoloaded; files ending in ".ext" on Unix or ".exe" on
 #            # Windows), a specific extension binary file, or a glob pattern (containing
 #            # *, ? or [ ]) whose matches are resolved as directories or files.
+#            # Symlinks are rejected (as entries, glob matches, or directory contents)
+#            # for security: the binary that is validated must be the one osqueryd
+#            # executes, and a retargeted link would bypass that check.
 #            # osquerybeat never copies binaries and never writes into the Elastic Agent
 #            # install directory. Binaries must be owned by the user running osquery and
 #            # not writable by group or others; osqueryd enforces these safe permissions
@@ -70,6 +73,11 @@ osquerybeat:
 #            # executable, or unsafe, without aborting startup. Extension tables are then
 #            # queryable via live and scheduled queries (no autocomplete in the UI, since
 #            # schemas are not pre-generated).
+#            #
+#            # NOTE: entries are resolved when osqueryd is (re)started, which happens
+#            # when this configuration (or other osquery options) change. Adding or
+#            # removing binaries in a configured directory does NOT trigger a reload by
+#            # itself; update the policy or restart the agent to pick up the change.
 #            paths:
 #              - "/opt/osquery-extensions"
 #              - "/opt/custom/my_extension.ext"
@@ -77,6 +85,12 @@ osquerybeat:
 #            # Optional override for osquery's extensions_timeout (seconds), the time
 #            # osqueryd waits for autoloaded extensions to register.
 #            #timeout: 10
+#            # Optional list of extension names osqueryd must wait for at startup
+#            # (osquery's extensions_require). Queries do not run until the named
+#            # extensions have registered (or extensions_timeout elapses), avoiding
+#            # "no such table" races against slow-registering extensions.
+#            #require:
+#            #  - "my_extension"
 #      streams:
 #        - id: "CFDE1EAA-0C6C-4D19-9EEC-45802B2A8C01"
 #          query: "select * from processes"
