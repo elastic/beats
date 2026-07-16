@@ -18,30 +18,43 @@
 package otelconsumer
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
-	"go.opentelemetry.io/collector/client"
-
+	"github.com/gofrs/uuid/v5"
+	"github.com/google/go-cmp/cmp"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/client"
+	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
+	"go.opentelemetry.io/collector/exporter/exportertest"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	agentconfig "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	mockesapi "github.com/elastic/mock-es/pkg/api"
 )
 
 func TestPublish(t *testing.T) {
@@ -66,7 +79,7 @@ func TestPublish(t *testing.T) {
 			logsConsumer: logConsumer,
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
-			retryBackoff: backoff.NewEqualJitterBackoff(1*time.Millisecond, 2*time.Millisecond),
+			retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
 		}
 	}
 
@@ -121,42 +134,40 @@ func TestPublish(t *testing.T) {
 	})
 
 	t.Run("data_stream fields are set on logrecord.Attribute", func(t *testing.T) {
-		dataStreamField := mapstr.M{
+		want := map[string]any{
 			"type":      "logs",
 			"namespace": "not_default",
 			"dataset":   "not_elastic_agent",
 		}
-		event1.Fields["data_stream"] = dataStreamField
+		for _, tc := range []struct {
+			name  string
+			value any
+		}{
+			{"mapstr.M", mapstr.M(want)},
+			{"map[string]any", want},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				event1.Fields["data_stream"] = tc.value
 
-		batch := outest.NewBatch(event1)
-
-		var countLogs int
-		var attributes pcommon.Map
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			countLogs = countLogs + ld.LogRecordCount()
-			for i := 0; i < ld.ResourceLogs().Len(); i++ {
-				resourceLog := ld.ResourceLogs().At(i)
-				for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
-					scopeLog := resourceLog.ScopeLogs().At(j)
-					for k := 0; k < scopeLog.LogRecords().Len(); k++ {
-						LogRecord := scopeLog.LogRecords().At(k)
-						attributes = LogRecord.Attributes()
+				var attributes pcommon.Map
+				oc := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+					for _, rl := range ld.ResourceLogs().All() {
+						for _, sl := range rl.ScopeLogs().All() {
+							for _, record := range sl.LogRecords().All() {
+								attributes = record.Attributes()
+							}
+						}
 					}
+					return nil
+				})
+
+				require.NoError(t, oc.Publish(ctx, outest.NewBatch(event1)))
+				for _, sub := range []string{"dataset", "namespace", "type"} {
+					gotValue, ok := attributes.Get("data_stream." + sub)
+					require.True(t, ok, "data_stream.%s not found on log record attribute", sub)
+					assert.EqualValues(t, want[sub], gotValue.AsRaw())
 				}
-			}
-			return nil
-		})
-
-		err := otelConsumer.Publish(ctx, batch)
-		assert.NoError(t, err)
-		assert.Len(t, batch.Signals, 1)
-		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-
-		subFields := []string{"dataset", "namespace", "type"}
-		for _, subField := range subFields {
-			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
-			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
+			})
 		}
 	})
 
@@ -211,7 +222,6 @@ func TestPublish(t *testing.T) {
 		}
 
 		batch := outest.NewBatch(eventWithDuration)
-
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
 			body := record.Body().Map().AsRaw()
@@ -267,78 +277,26 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
 
-	t.Run("retries are delayed by exponential backoff", func(t *testing.T) {
-		const (
-			initBackoff = 50 * time.Millisecond
-			maxBackoff  = 500 * time.Millisecond
-		)
+	t.Run("retryable errors wait a per-attempt jittered backoff", func(t *testing.T) {
+		const initBackoff = 50 * time.Millisecond
 
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return errors.New("retryable error")
 		})
-		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(initBackoff, maxBackoff)
+		otelConsumer.retry = retryConfig{init: initBackoff, max: 500 * time.Millisecond}
 
-		// Measure the duration of each Publish call. Each call blocks during
-		// backoff Wait(), so elapsed time reflects the actual backoff delay.
-		var durations []time.Duration
-		for range 3 {
+		const margin = 25 * time.Millisecond
+		for range 4 {
 			batch := outest.NewBatch(event1)
 			start := time.Now()
 			err := otelConsumer.Publish(ctx, batch)
-			durations = append(durations, time.Since(start))
+			d := time.Since(start)
 			require.NoError(t, err, "Publish should not return an error")
+			require.Len(t, batch.Signals, 1, "expected exactly one signal from Publish")
 			assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag, "batch should be retried")
+			assert.GreaterOrEqual(t, d, initBackoff, "retry delay should be at least init")
+			assert.Less(t, d, 2*initBackoff+margin, "retry delay should not escalate past ~2*init (got %v)", d)
 		}
-
-		assert.GreaterOrEqual(t, durations[0], initBackoff, "first retry delay should be at least ~init")
-		assert.GreaterOrEqual(t, durations[1], 2*initBackoff, "second retry delay should be at least ~2*init (exponential growth)")
-		assert.GreaterOrEqual(t, durations[2], 4*initBackoff, "third retry delay should be at least ~4*init (exponential growth)")
-	})
-
-	t.Run("backoff resets on success", func(t *testing.T) {
-		const (
-			initBackoff = 50 * time.Millisecond
-			maxBackoff  = 500 * time.Millisecond
-		)
-
-		callCount := 0
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			callCount++
-			if callCount == 3 {
-				return nil
-			}
-			return errors.New("retryable error")
-		})
-		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(initBackoff, maxBackoff)
-
-		// Two failures grow the backoff past init level.
-		batch1 := outest.NewBatch(event1)
-		err := otelConsumer.Publish(ctx, batch1)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchRetry, batch1.Signals[0].Tag, "first batch should be retried")
-
-		batch2 := outest.NewBatch(event1)
-		err = otelConsumer.Publish(ctx, batch2)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchRetry, batch2.Signals[0].Tag, "second batch should be retried")
-
-		// Third call succeeds, triggering backoff Reset().
-		batch3 := outest.NewBatch(event1)
-		err = otelConsumer.Publish(ctx, batch3)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchACK, batch3.Signals[0].Tag, "third batch should be acked")
-
-		// Next failure should use init-level backoff ([init, 2*init) = [50ms, 100ms)),
-		// not the grown level which would be [4*init, 8*init) = [200ms, 400ms).
-		batch4 := outest.NewBatch(event1)
-		start := time.Now()
-		err = otelConsumer.Publish(ctx, batch4)
-		duration := time.Since(start)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchRetry, batch4.Signals[0].Tag, "fourth batch should be retried")
-		// In equal jitter backoff strategy, initial backoff is between initBackoff and 2*initBackoff.
-		const margin = 10 * time.Millisecond
-		assert.Less(t, duration, 2*initBackoff+margin, "after success, backoff should reset to init level, not continue growing (got %v)", duration)
 	})
 
 	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {
@@ -348,7 +306,7 @@ func TestPublish(t *testing.T) {
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return errors.New("retryable error")
 		})
-		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(10*time.Second, 10*time.Second)
+		otelConsumer.retry = retryConfig{init: 10 * time.Second, max: 10 * time.Second}
 
 		publishDone := make(chan struct{})
 		go func() {
@@ -482,9 +440,401 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
+
+	t.Run("includes metadata in the body without mutating the source event", func(t *testing.T) {
+		beatInfo.IncludeMetadata = true
+
+		eventWithMetadata := beat.Event{
+			Meta: mapstr.M{
+				"raw_index": "logs-test",
+				"input_id":  "input-123",
+			},
+			Fields: mapstr.M{
+				"message": "hello world",
+			},
+		}
+
+		batch := outest.NewBatch(eventWithMetadata)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+
+			metadata, ok := body["@metadata"].(map[string]any)
+			require.True(t, ok, "@metadata should be present in the log body")
+			assert.Equal(t, "logs-test", metadata["raw_index"])
+			assert.Equal(t, "input-123", metadata["input_id"])
+			assert.Equal(t, beatInfo.Beat, metadata["beat"])
+			assert.Equal(t, beatInfo.Version, metadata["version"])
+			assert.Equal(t, "_doc", metadata["type"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, mapstr.M{"message": "hello world"}, eventWithMetadata.Fields)
+		assert.Equal(t, mapstr.M{"raw_index": "logs-test", "input_id": "input-123"}, eventWithMetadata.Meta)
+	})
+
+	t.Run("includes metadata with no source meta fields", func(t *testing.T) {
+		beatInfo.IncludeMetadata = true
+
+		eventNoMeta := beat.Event{
+			Fields: mapstr.M{"message": "hello"},
+		}
+
+		batch := outest.NewBatch(eventNoMeta)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+
+			metadata, ok := body["@metadata"].(map[string]any)
+			require.True(t, ok, "@metadata should be present even with nil source meta")
+			assert.Equal(t, beatInfo.Beat, metadata["beat"])
+			assert.Equal(t, beatInfo.Version, metadata["version"])
+			assert.Equal(t, "_doc", metadata["type"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+	})
 }
 
 func checkEventsActive(reg *monitoring.Registry) int64 {
 	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
 	return outputSnapshot.Ints["events.active"]
+}
+
+func TestFillLogRecordFromEventDoesNotError(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+
+	for _, tc := range benchmarkEventCases() {
+		t.Run(tc.name, func(t *testing.T) {
+			pubEvent := publisher.Event{Content: tc.event}
+			logRecord := plog.NewLogRecord()
+			if err := fillLogRecordFromEvent(logRecord, pubEvent, beatInfo, logger, false); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+// TestElasticsearchOutputVsExporterSerialization verifies that Beat events are
+// serialized identically across three paths for every fixture in
+// otelmap.BenchmarkCases:
+//   - Beats Elasticsearch output (go-structform encoder)
+//   - OTel path: otelmap.FromMapstr (direct) -> ES exporter (bodymap)
+func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	timestamp := time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC)
+
+	// Build the Beats ES output once and reuse it across all sub-tests.
+	beatsDocCh := make(chan []byte, 1)
+	beatsSrv := httptest.NewServer(newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		beatsDocCh <- event
+		return http.StatusOK
+	}))
+	t.Cleanup(beatsSrv.Close)
+
+	beatsGroup, err := outputs.Load(
+		testIndexManager{},
+		beat.Info{Name: "testbeat", Version: "0.0.0", Logger: logger},
+		nil,
+		"elasticsearch",
+		agentconfig.MustNewConfigFrom(mapstr.M{"hosts": []string{beatsSrv.URL}}),
+	)
+	require.NoError(t, err)
+	require.Len(t, beatsGroup.Clients, 1)
+	beatsClient, ok := beatsGroup.Clients[0].(outputs.NetworkClient)
+	require.True(t, ok, "ES output client must implement outputs.NetworkClient")
+	beatsEnc := beatsGroup.EncoderFactory()
+
+	setupCtx, setupCancel := context.WithTimeout(t.Context(), 10*time.Second)
+	defer setupCancel()
+	require.NoError(t, beatsClient.Connect(setupCtx))
+
+	for _, tc := range otelmap.BenchmarkCases() {
+		t.Run(tc.Name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer cancel()
+
+			// Strip @timestamp from the fields so both Beats and OTel use
+			// beatEvent.Timestamp as the canonical source, avoiding a conflict
+			// when the bench case has its own @timestamp field.
+			fields := tc.Src.Clone()
+			delete(fields, "@timestamp")
+			beatEvent := beat.Event{Timestamp: timestamp, Fields: fields}
+
+			// ── OTel path: via otelConsumer.Publish (production code path) ────
+			otelDoc := collectOtelDocViaPublish(t, ctx, logger, beatEvent)
+
+			// ── Beats ES output path ──────────────────────────────────────────
+			beatsBatch := outest.NewBatch(beatEvent)
+			encodedEvent, encodedSize := beatsEnc.EncodeEntry(beatsBatch.Events()[0])
+			if encodedSize == 0 {
+				t.Logf("skipping Beats comparison for case %q: EncodeEntry produced no output — Src contains a type unsupported by go-structform", tc.Name)
+				return
+			}
+			beatsBatch.Events()[0] = encodedEvent
+			require.NoError(t, beatsClient.Publish(ctx, beatsBatch))
+
+			var beatsDoc []byte
+			select {
+			case beatsDoc = <-beatsDocCh:
+			case <-ctx.Done():
+				t.Fatal("timed out waiting for Beats ES output to deliver document")
+			}
+			t.Run("beats_vs_otel", func(t *testing.T) {
+				compareJSONValues(t, "beats", "otel", beatsDoc, otelDoc)
+			})
+		})
+	}
+}
+
+// newTestESConsumer creates a fresh mock ES server backed by an ES exporter and
+// returns a consumer.Logs that forwards to it plus a channel that receives each
+// raw JSON document the mock server captures. Both are registered for cleanup on t.
+func newTestESConsumer(t *testing.T, ctx context.Context) (consumer.Logs, <-chan []byte) {
+	t.Helper()
+
+	docCh := make(chan []byte, 1)
+	srv := httptest.NewServer(newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		docCh <- event
+		return http.StatusOK
+	}))
+	t.Cleanup(srv.Close)
+
+	f := elasticsearchexporter.NewFactory()
+	cfg, ok := f.CreateDefaultConfig().(*elasticsearchexporter.Config)
+	require.Truef(t, ok, "elasticsearchexporter config must be *elasticsearchexporter.Config")
+	cfg.Endpoints = []string{srv.URL}
+	qb := cfg.QueueBatchConfig.Get()
+	qb.NumConsumers = 1
+	qb.Batch.Get().FlushTimeout = 50 * time.Millisecond
+
+	esExp, err := f.CreateLogs(ctx, exportertest.NewNopSettings(f.Type()), cfg)
+	require.NoError(t, err)
+	require.NoError(t, esExp.Start(ctx, componenttest.NewNopHost()))
+	t.Cleanup(func() { _ = esExp.Shutdown(context.Background()) })
+
+	logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
+		return esExp.ConsumeLogs(ctx, ld)
+	})
+	require.NoError(t, err)
+	return logConsumer, docCh
+}
+
+// collectOtelDocViaPublish sends beatEvent through the production
+// otelConsumer.Publish path and returns the raw JSON document captured by the
+// mock ES server.
+func collectOtelDocViaPublish(t *testing.T, ctx context.Context, logger *logp.Logger, beatEvent beat.Event) []byte {
+	t.Helper()
+	logConsumer, docCh := newTestESConsumer(t, ctx)
+	oc := &otelConsumer{
+		observer:     outputs.NewNilObserver(),
+		logsConsumer: logConsumer,
+		beatInfo:     beat.Info{Name: "testbeat", Version: "0.0.0"},
+		log:          logger.Named("otelconsumer"),
+		retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+	}
+	require.NoError(t, oc.Publish(ctx, outest.NewBatch(beatEvent)))
+	select {
+	case doc := <-docCh:
+		return doc
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for OTel exporter to deliver document to mock server")
+		return nil
+	}
+}
+
+// compareJSONValues compares two JSON documents for exact equality, preserving
+// number token representation so "2" and "2.0" are distinguishable, while
+// tolerating non-deterministic JSON object key ordering.
+//
+// Decoding with UseNumber stores numbers as json.Number (a string type), so
+// the cmp.Comparer below compares them by their raw text, keeping "2" ≠ "2.0".
+func compareJSONValues(t *testing.T, nameA, nameB string, docA, docB []byte) {
+	t.Helper()
+	a := parseJSONDoc(t, nameA, docA)
+	b := parseJSONDoc(t, nameB, docB)
+	if diff := cmp.Diff(a, b, cmp.Comparer(func(x, y json.Number) bool {
+		return x.String() == y.String()
+	})); diff != "" {
+		t.Errorf("%s vs %s differ (-want +got):\n%s", nameA, nameB, diff)
+	}
+}
+
+func parseJSONDoc(t *testing.T, name string, data []byte) any {
+	t.Helper()
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+	var v any
+	require.NoErrorf(t, dec.Decode(&v), "parse %s JSON: %s", name, data)
+	return v
+}
+
+// newMockES creates a mock-es APIHandler that calls handler for each document
+// in every bulk request.
+func newMockES(t *testing.T, handler func(mockesapi.Action, []byte) int) *mockesapi.APIHandler {
+	t.Helper()
+	return mockesapi.NewDeterministicAPIHandler(
+		uuid.Must(uuid.NewV4()),
+		"",
+		nil,
+		time.Now().Add(time.Hour),
+		0,
+		10,
+		handler,
+	)
+}
+
+func TestSanitizeDataStreamField(t *testing.T) {
+	cases := []struct {
+		name       string
+		input      string
+		disallowed string
+		want       string
+	}{
+		{
+			name:       "clean value unchanged",
+			input:      "http",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "http",
+		},
+		{
+			name:       "uppercase lowercased",
+			input:      "HTTP",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "http",
+		},
+		{
+			name:       "disallowed rune replaced with underscore",
+			input:      "my dataset",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "my_dataset",
+		},
+		{
+			name:       "multiple disallowed runes replaced",
+			input:      "a*b?c",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "a_b_c",
+		},
+		{
+			name:       "value truncated to maxDataStreamBytes",
+			input:      string(make([]byte, 110)),
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       string(make([]byte, 100)),
+		},
+		{
+			name:       "namespace allows hyphen, dataset does not",
+			input:      "my-namespace",
+			disallowed: `\/*?"<>| ,#:`,
+			want:       "my-namespace",
+		},
+		{
+			name:       "dataset treats hyphen as disallowed",
+			input:      "my-dataset",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "my_dataset",
+		},
+	}
+	const maxLength = 100
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := sanitizeDataStreamField(tc.input, tc.disallowed, maxLength)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestFillLogRecordSetsElasticsearchIndex(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+
+	cases := []struct {
+		name      string
+		dsType    string
+		dataset   string
+		namespace string
+		wantIndex string // empty means attribute should not be set
+	}{
+		{
+			name:      "synthetics type sets elasticsearch.index",
+			dsType:    "synthetics",
+			dataset:   "http",
+			namespace: "default",
+			wantIndex: "synthetics-http-default",
+		},
+		{
+			name:      "traces type sets elasticsearch.index",
+			dsType:    "traces",
+			dataset:   "apm.transaction",
+			namespace: "default",
+			wantIndex: "traces-apm.transaction-default",
+		},
+		{
+			name:      "logs type does not set elasticsearch.index",
+			dsType:    "logs",
+			dataset:   "system.syslog",
+			namespace: "default",
+			wantIndex: "",
+		},
+		{
+			name:      "metrics type does not set elasticsearch.index",
+			dsType:    "metrics",
+			dataset:   "system.cpu",
+			namespace: "default",
+			wantIndex: "",
+		},
+		{
+			name:      "synthetics dataset sanitized",
+			dsType:    "synthetics",
+			dataset:   "http monitor",
+			namespace: "my-namespace",
+			wantIndex: "synthetics-http_monitor-my-namespace",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			event := publisher.Event{
+				Content: beat.Event{
+					Fields: mapstr.M{
+						"data_stream": mapstr.M{
+							"type":      tc.dsType,
+							"dataset":   tc.dataset,
+							"namespace": tc.namespace,
+						},
+					},
+				},
+			}
+			logRecord := plog.NewLogRecord()
+			err := fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false)
+			require.NoError(t, err)
+
+			indexAttr, hasIndex := logRecord.Attributes().Get("elasticsearch.index")
+			if tc.wantIndex == "" {
+				assert.False(t, hasIndex, "elasticsearch.index should not be set for type %q", tc.dsType)
+			} else {
+				require.True(t, hasIndex, "elasticsearch.index should be set for type %q", tc.dsType)
+				assert.Equal(t, tc.wantIndex, indexAttr.Str())
+			}
+		})
+	}
+}
+
+// testIndexManager is a minimal outputs.IndexManager that always selects a fixed index name.
+type testIndexManager struct{}
+
+func (testIndexManager) BuildSelector(_ *agentconfig.C) (outputs.IndexSelector, error) {
+	return testIndexSelector{}, nil
+}
+
+type testIndexSelector struct{}
+
+func (testIndexSelector) Select(_ *beat.Event) (string, error) {
+	return "test-index", nil
 }

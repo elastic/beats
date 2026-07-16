@@ -155,7 +155,7 @@ func (m *mockedClient) Disconnect(quiesce uint) {
 	m.disconnectCount++
 }
 
-func (m *mockedClient) Publish(topic string, qos byte, retained bool, payload interface{}) libmqtt.Token {
+func (m *mockedClient) Publish(topic string, qos byte, retained bool, payload any) libmqtt.Token {
 	panic("implement me")
 }
 

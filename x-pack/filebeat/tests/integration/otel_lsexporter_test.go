@@ -34,15 +34,15 @@ import (
 )
 
 type event struct {
-	ID           string                 `json:"id"`
-	Timestamp    string                 `json:"timestamp"`
-	StringField  string                 `json:"string_field"`
-	NumberField  int                    `json:"number_field"`
-	FloatField   float64                `json:"float_field"`
-	BooleanField bool                   `json:"boolean_field"`
-	ArrayField   []interface{}          `json:"array_field"`
-	ObjectField  map[string]interface{} `json:"object_field"`
-	KVField      map[string]interface{} `json:"kv_field"`
+	ID           string         `json:"id"`
+	Timestamp    string         `json:"timestamp"`
+	StringField  string         `json:"string_field"`
+	NumberField  int            `json:"number_field"`
+	FloatField   float64        `json:"float_field"`
+	BooleanField bool           `json:"boolean_field"`
+	ArrayField   []any          `json:"array_field"`
+	ObjectField  map[string]any `json:"object_field"`
+	KVField      map[string]any `json:"kv_field"`
 }
 
 type eventWithID struct {
@@ -126,9 +126,6 @@ service:
         - filebeatreceiver
       exporters:
         - logstash
-  telemetry:
-    metrics:
-      level: none
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver
@@ -233,9 +230,6 @@ service:
         - filebeatreceiver
       exporters:
         - logstash
-  telemetry:
-    metrics:
-      level: none
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver
@@ -274,9 +268,9 @@ func generateEvents(numEvents int) []string {
 	gofakeit.Seed(time.Now().UnixNano())
 
 	events := make([]string, 0, numEvents)
-	for i := 0; i < numEvents; i++ {
+	for range numEvents {
 		// Generate mixed-type array field
-		arrayField := make([]interface{}, 9)
+		arrayField := make([]any, 9)
 		arrayField[0] = gofakeit.Word()
 		arrayField[1] = gofakeit.Int64()
 		arrayField[2] = gofakeit.Float64()
@@ -287,7 +281,7 @@ func generateEvents(numEvents int) []string {
 		arrayField[7] = math.MaxFloat64
 		arrayField[8] = math.SmallestNonzeroFloat64
 
-		kvArrayField := make([]interface{}, 4)
+		kvArrayField := make([]any, 4)
 		kvArrayField[0] = gofakeit.Color()
 		kvArrayField[1] = gofakeit.Number(-100, 100)
 		kvArrayField[2] = gofakeit.Float32Range(0, 50)
@@ -301,19 +295,19 @@ func generateEvents(numEvents int) []string {
 			FloatField:   rand.Float64() * 100,
 			BooleanField: rand.IntN(2) == 0,
 			ArrayField:   arrayField,
-			ObjectField: map[string]interface{}{
+			ObjectField: map[string]any{
 				"nested_key":    "nested_value",
 				"nested_number": gofakeit.Number(1, 1000),
 			},
-			KVField: map[string]interface{}{
+			KVField: map[string]any{
 				"key_string": gofakeit.Word(),
 				"key_number": gofakeit.Number(1, 5000),
 				"key_bool":   rand.IntN(2) == 0,
 				"key_array":  kvArrayField,
-				"key_object": map[string]interface{}{
+				"key_object": map[string]any{
 					"inner1": rand.IntN(2) == 0,
 					"inner2": gofakeit.Float64Range(0, 10),
-					"inner_obj": map[string]interface{}{
+					"inner_obj": map[string]any{
 						"deep_key": gofakeit.HipsterSentence(3),
 						"deep_arr": kvArrayField,
 					},
@@ -348,7 +342,7 @@ func writeEvents(t *testing.T, filepath string, events []string) {
 }
 
 func parseJson(jsonStr string) (mapstr.M, error) {
-	var data map[string]interface{}
+	var data map[string]any
 	if err := json.Unmarshal([]byte(jsonStr), &data); err != nil {
 		return nil, err
 	}
@@ -369,7 +363,7 @@ func compareOutputFiles(t *testing.T, fbFilePath, otelFilePath string, ignoredFi
 	sortEventsByID(otelEvents)
 
 	// compare sorted events
-	for i := 0; i < len(fbEvents); i++ {
+	for i := range fbEvents {
 		fbEvent := fbEvents[i]
 		otelEvent := otelEvents[i]
 

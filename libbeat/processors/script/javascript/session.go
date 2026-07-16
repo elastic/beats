@@ -264,7 +264,7 @@ func init() {
 	// Register mapstr.M as being a simple map[string]any for
 	// treatment within the JS VM.
 	AddSessionHook("_type_mapstr", func(s Session) {
-		s.Runtime().RegisterSimpleMapType(reflect.TypeOf(mapstr.M(nil)),
+		s.Runtime().RegisterSimpleMapType(reflect.TypeFor[mapstr.M](),
 			func(i any) map[string]any {
 				return i.(mapstr.M) //nolint:errcheck //keep behavior for now
 			},

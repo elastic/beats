@@ -23,10 +23,10 @@ import (
 )
 
 // Key type used in the cache.
-type Key interface{}
+type Key any
 
 // Value type held in the cache. Cannot be nil.
-type Value interface{}
+type Value any
 
 // RemovalListener is the callback function type that can be registered with
 // the cache to receive notification of the removal of expired elements.
@@ -178,8 +178,9 @@ func (c *Cache) ReplaceWithTimeout(k Key, v Value, timeout time.Duration) Value 
 // Get the current value associated with a key or nil if the key is not
 // present. The last access time of the element is updated.
 func (c *Cache) Get(k Key) Value {
-	c.RLock()
-	defer c.RUnlock()
+	// Exclusive lock because get() updates the element's last access time on access-expiry caches.
+	c.Lock()
+	defer c.Unlock()
 	v, _ := c.get(k)
 	return v
 }

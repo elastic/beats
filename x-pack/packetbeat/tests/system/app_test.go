@@ -13,6 +13,8 @@ import (
 	"io/fs"
 	"net"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -50,6 +52,24 @@ func TestWindowsNpcapInstaller(t *testing.T) {
 	if !strings.Contains(installedNpcapVersion, NpcapVersion) {
 		t.Errorf("unexpected npcap version installed: want:%s have:%s", NpcapVersion, installedNpcapVersion)
 	}
+
+	// Importing the packetbeat/npcap package must not load wpcap.dll on its own,
+	// since other beats would keep the DLL open and block Npcap upgrades on Windows.
+	// See https://github.com/elastic/elastic-agent/issues/14517.
+	out, err := runWpcapProbe(t)
+	require.NoErrorf(t, err, "wpcap.dll must not be held by a process that only imports the capture code:\n%s", out)
+}
+
+func runWpcapProbe(t testing.TB) (output string, err error) {
+	t.Helper()
+
+	probe := filepath.Join(t.TempDir(), "wpcapprobe.exe")
+	if b, err := exec.CommandContext(t.Context(), "go", "build", "-o", probe, filepath.FromSlash("testdata/wpcapprobe.go")).CombinedOutput(); err != nil {
+		t.Fatalf("failed to build wpcap probe: %v\n%s", err, b)
+	}
+
+	b, err := exec.CommandContext(t.Context(), probe).CombinedOutput()
+	return strings.TrimSpace(string(b)), err
 }
 
 func TestDevices(t *testing.T) {

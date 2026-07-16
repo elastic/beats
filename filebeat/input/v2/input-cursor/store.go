@@ -97,8 +97,8 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor        interface{}
-	pendingCursor interface{}
+	cursor        any
+	pendingCursor any
 }
 
 type (
@@ -115,7 +115,7 @@ type (
 	state struct {
 		TTL     time.Duration
 		Updated time.Time
-		Cursor  interface{}
+		Cursor  any
 	}
 
 	stateInternal struct {
@@ -160,7 +160,7 @@ func (s *store) Release() {
 
 func (s *store) close() {
 	if err := s.persistentStore.Close(); err != nil {
-		s.log.Errorf("Closing registry store did report an error: %+v", err)
+		s.log.Errorf("Closing registry store reported an error: %+v", err)
 	}
 }
 
@@ -252,7 +252,7 @@ func (r *resource) UpdatesReleaseN(n uint) {
 func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 
 // UnpackCursor deserializes the in memory state.
-func (r *resource) UnpackCursor(to interface{}) error {
+func (r *resource) UnpackCursor(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	if r.activeCursorOperations == 0 {

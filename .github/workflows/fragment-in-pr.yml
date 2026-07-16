@@ -3,12 +3,15 @@ name: fragment-in-pr
 on:
   pull_request:
     types: [ labeled, unlabeled, opened, reopened, synchronize ]
+permissions:
+  contents: read
+
 jobs:
   fragments:
     if: "!contains(github.event.pull_request.labels.*.name, 'skip-changelog') && !contains(github.event.pull_request.labels.*.name, 'backport')"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-go@v6
       with:
         go-version-file: .go-version

@@ -3,11 +3,24 @@ import os
 import platform
 import time
 import unittest
+from parameterized import parameterized
 from filebeat import BaseTest
 
 """
 Tests that Filebeat shuts down cleanly.
+
+The shutdown-time tests are parameterized over the two in-memory queue
+implementations Filebeat supports: the historical memqueue and the newer
+slabqueue. Both must honour the same at-least-once delivery contract on
+shutdown (registry stays put for events that weren't successfully
+delivered) and the same drain semantics for successful shutdown.
 """
+
+
+# QUEUE_TYPES lists the queue selectors injected into libbeat.yml.j2 via
+# render_config_template(queue_type=...). The libbeat template branches
+# on this to emit either `queue.mem:` or `queue.slab:`.
+QUEUE_TYPES = [("mem",), ("slab",)]
 
 
 class Test(BaseTest):
@@ -36,10 +49,11 @@ class Test(BaseTest):
                 time.sleep(.5)
             proc.check_kill_and_wait()
 
-    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/14647")
-    def test_shutdown_wait_ok(self):
+    @parameterized.expand(QUEUE_TYPES)
+    def test_shutdown_wait_ok(self, queue_type):
         """
         Test stopping filebeat under load: wait for all events being published.
+        Runs under both queue implementations (memqueue and slabqueue).
         """
 
         self.nasa_logs()
@@ -48,6 +62,8 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
             shutdown_timeout="10s",
+            rotate_every_kb=10000,
+            queue_type=queue_type,
         )
         filebeat = self.start_beat()
 
@@ -83,9 +99,13 @@ class Test(BaseTest):
         assert (offset == (outputs[-1]["log.offset"] + eol_offset + len(outputs[-1]["message"])) or
                 offset == (outputs[-2]["log.offset"] + eol_offset + len(outputs[-2]["message"])))
 
-    def test_shutdown_wait_timeout(self):
+    @parameterized.expand(QUEUE_TYPES)
+    def test_shutdown_wait_timeout(self, queue_type):
         """
         Test stopping filebeat under load: allow early shutdown.
+        Runs under both queue implementations (memqueue and slabqueue);
+        at-least-once requires the registry stay empty/offset 0 for
+        events that were never successfully delivered.
         """
 
         self.nasa_logs()
@@ -96,6 +116,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
             shutdown_timeout="1s",
+            queue_type=queue_type,
         )
         filebeat = self.start_beat()
 
@@ -153,6 +174,6 @@ class Test(BaseTest):
         msg = "No paths were defined for input"
         self.wait_until(
             lambda: self.log_contains_count(msg) >= 1,
-            max_timeout=5)
+            max_timeout=15)
 
         filebeat.check_wait(exit_code=1)

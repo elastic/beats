@@ -80,7 +80,7 @@ func TestCommonPaths(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		var testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+		var testConfig, _ = conf.NewConfigFrom(map[string]any{
 			"field":     test.Field,
 			"separator": test.Separator,
 			"index":     test.Index,
@@ -110,7 +110,7 @@ func TestCommonPaths(t *testing.T) {
 	}
 
 	t.Run("supports a metadata field", func(t *testing.T) {
-		var config, _ = conf.NewConfigFrom(map[string]interface{}{
+		var config, _ = conf.NewConfigFrom(map[string]any{
 			"field":     "field",
 			"separator": "/",
 			"index":     3,

@@ -57,7 +57,7 @@ func (m noopProspector) TakeOver(_ StoreUpdater, _ func(Source) string) error {
 	return nil
 }
 
-func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup) {}
+func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup, _ *Metrics) {}
 
 func (m noopProspector) Test() error {
 	return nil
@@ -82,7 +82,6 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
@@ -433,6 +432,8 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	writeSyncer := zapcore.AddSync(buf)
+	//nolint:forbidigo // This test needs to create a local instance of the
+	// logger and expose the buffer it writes to.
 	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))

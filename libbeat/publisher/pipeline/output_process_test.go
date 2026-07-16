@@ -68,7 +68,7 @@ func TestOutputReload(t *testing.T) {
 
 				logger := logptest.NewTestingLogger(t, "")
 
-				queueFactory, err := queueFactoryForUserConfig(
+				queueFactory, _, err := queueFactoryForUserConfig(
 					"mem",
 					conf.MustNewConfigFrom(fmt.Sprintf("events: %v", numEventsToPublish)),
 					nil)
@@ -82,21 +82,19 @@ func TestOutputReload(t *testing.T) {
 				)
 				require.NoError(t, err)
 				var wg sync.WaitGroup
-				wg.Add(1)
-				go func() {
+				wg.Go(func() {
 					// Our initial controller has no outputs set, so we need
 					// to create the client in a goroutine since any
 					// queueProducer calls will block until the pipeline has an
 					// output.
 					queueProducer := outputController.queueProducer(queue.ProducerConfig{})
 					defer queueProducer.Close()
-					for i := uint(0); i < numEventsToPublish; i++ {
+					for range numEventsToPublish {
 						queueProducer.Publish(publisher.Event{})
 					}
-					wg.Done()
-				}()
+				})
 
-				for i := uint(0); i < numOutputReloads; i++ {
+				for range numOutputReloads {
 					outputClient := ctor(countingPublishFn)
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
@@ -243,7 +241,7 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	const producerCount = 10
 	var remaining atomic.Int64
 	remaining.Store(producerCount)
-	for i := 0; i < producerCount; i++ {
+	for range producerCount {
 		go func() {
 			controller.queueProducer(queue.ProducerConfig{})
 			remaining.Add(-1)

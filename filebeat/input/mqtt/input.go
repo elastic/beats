@@ -218,11 +218,9 @@ func (mi *mqttInput) Run() {
 func (mi *mqttInput) Stop() {
 	mi.logger.Debug("Stop the input.")
 
-	mi.clientDisconnected.Add(1)
-	go func() {
+	mi.clientDisconnected.Go(func() {
 		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds())) //nolint:gosec //can ignore
-		mi.clientDisconnected.Done()
-	}()
+	})
 }
 
 // Wait method stops the input and waits until event processing is finished.

@@ -21,6 +21,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
 	"github.com/elastic/elastic-agent-libs/service"
 )
@@ -50,7 +51,7 @@ func setDestroyLogsOnStop() (bool, error) {
 	return strconv.ParseBool(setting)
 }
 
-func fatal(format string, vs ...interface{}) {
+func fatal(format string, vs ...any) {
 	fmt.Fprintf(os.Stderr, format, vs...)
 	os.Exit(1)
 }
@@ -79,7 +80,7 @@ func main() {
 		fatal("Error fetching hostname: %s", err)
 	}
 
-	pipelines := pipelinemanager.NewPipelineManager(logDestroy, hostname)
+	pipelines := pipelinemanager.NewPipelineManager(logDestroy, hostname, logp.NewLogger("PipelineManager")) //nolint:forbidigo // main entry point creates the root logger for the plugin
 
 	sdkHandler := sdk.NewHandler(`{"Implements": ["LoggingDriver"]}`)
 	// Create handlers for startup and shutdown of the log driver

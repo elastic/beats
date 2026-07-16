@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -34,6 +35,9 @@ import (
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
+
+// ErrKeyGone indicates the registry key does not exist (anymore)
+var ErrKeyGone = errors.New("registry key does not exist")
 
 // sourceStore is a store which can access resources using the Source
 // from an input.
@@ -97,7 +101,7 @@ type resource struct {
 	// stateMutex is used to lock the resource when it is update/read from
 	// multiple go-routines like the ACK handler or the input publishing an
 	// event.
-	// stateMutex is used to access the fields 'stored', 'state', 'internalInSync' and 'version'.
+	// It is used to access the fields 'key', 'stored', 'state', 'internalInSync' and 'version'.
 	stateMutex sync.Mutex
 
 	// stored indicates that the state is available in the registry file. It is false for new entries.
@@ -116,10 +120,10 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor             interface{}
-	pendingCursorValue interface{}
-	pendingUpdate      interface{} // delta value of most recent pending updateOp
-	cursorMeta         interface{}
+	cursor             any
+	pendingCursorValue any
+	pendingUpdate      any // delta value of most recent pending updateOp
+	cursorMeta         any
 }
 
 type (
@@ -136,8 +140,8 @@ type (
 	state struct {
 		TTL     time.Duration
 		Updated time.Time
-		Cursor  interface{}
-		Meta    interface{}
+		Cursor  any
+		Meta    any
 	}
 
 	stateInternal struct {
@@ -189,12 +193,12 @@ func newSourceStore(
 	}
 }
 
-func (s *sourceStore) FindCursorMeta(src Source, v interface{}) error {
+func (s *sourceStore) FindCursorMeta(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.findCursorMeta(key, v)
 }
 
-func (s *sourceStore) UpdateMetadata(src Source, v interface{}) error {
+func (s *sourceStore) UpdateMetadata(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.updateMetadata(key, v)
 }
@@ -204,9 +208,127 @@ func (s *sourceStore) Remove(src Source) error {
 	return s.store.remove(key)
 }
 
-func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
+func (s *sourceStore) ResetCursor(src Source, cur any) error {
 	key := s.identifier.ID(src)
 	return s.store.resetCursor(key, cur)
+}
+
+// IterateOnPrefix iterates over all entries that match this input's prefix.
+// The callback receives the key and cursor metadata for each entry.
+func (s *sourceStore) IterateOnPrefix(fn func(key string, meta any)) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		// MatchesInput is a cheap, lock-free key check, so filter on it first to
+		// avoid locking resources that belong to other inputs.
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		// Take the resource lock once to both check deletion and snapshot
+		// cursorMeta: writers (updateOp.Execute, updateMetadata, UpdateKey) mutate
+		// these while holding only stateMutex, not ephemeralStore.mu, so reading
+		// them without the resource lock would be a data race on the interface value.
+		res.stateMutex.Lock()
+		deleted := res.unsafeIsDeleted()
+		meta := res.cursorMeta
+		res.stateMutex.Unlock()
+		if deleted {
+			continue
+		}
+
+		fn(key, meta)
+	}
+}
+
+// UpdateKey updates an entry from oldKey to newKey with updated metadata.
+// This is used by the growing fingerprint migration (see
+// fileProspector.migrateGrowingFingerprint) to update the registry key when
+// a file's fingerprint grows.
+//
+// This operation updates the key IN PLACE without requiring the resource lock.
+// This is safe because:
+//   - We hold the ephemeral store mutex, preventing concurrent table modifications
+//   - We hold the resource's stateMutex while modifying state fields
+//   - The harvester holding the resource lock continues to work with the same
+//     *resource pointer - only the key field and table entry change
+//   - Cursor updates from the harvester continue to work on the same resource
+func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	res := s.store.ephemeralStore.table[oldKey]
+	if res == nil {
+		return fmt.Errorf("old key %s: %w", oldKey, ErrKeyGone)
+	}
+
+	if res.isDeleted() {
+		return fmt.Errorf("old key %s is deleted: %w", oldKey, ErrKeyGone)
+	}
+
+	// Check if new key already exists
+	if existing := s.store.ephemeralStore.table[newKey]; existing != nil && !existing.isDeleted() {
+		return fmt.Errorf("new key %s already exists", newKey)
+	}
+
+	res.stateMutex.Lock()
+	defer res.stateMutex.Unlock()
+
+	oldKeyValue := res.key
+	oldMeta := res.cursorMeta
+	oldStored := res.stored
+	res.key = newKey
+	res.cursorMeta = meta
+	res.stored = false
+	// The entry belongs to a live, just-scanned file; refresh Updated so the migrated entry is not
+	// immediately eligible for clean_inactive gc.
+	res.internalState.Updated = time.Now()
+
+	// Update the table: remove old entry, add new entry with same resource.
+	s.store.ephemeralStore.table[newKey] = res
+	delete(s.store.ephemeralStore.table, oldKey)
+
+	// Persist the entry under the new key BEFORE removing the old one, so a
+	// crash between the two leaves the state recoverable under newKey. This
+	// mirrors the ordering in UpdateIdentifiers/TakeOver. writeState sets
+	// res.stored=true only on a successful write.
+	s.store.writeState(res)
+	if !res.stored {
+		// The write under newKey failed. Roll back so memory and disk agree on oldKey again.
+		res.key = oldKeyValue
+		res.cursorMeta = oldMeta
+		res.stored = oldStored
+		s.store.ephemeralStore.table[oldKeyValue] = res
+		delete(s.store.ephemeralStore.table, newKey)
+		return fmt.Errorf(
+			"UpdateKey: failed to persist new key %q; keeping old key %q to avoid state loss",
+			newKey, oldKeyValue)
+	}
+
+	// Best-effort cleanup: newKey is already durable and the table is swapped.
+	// Returning an error here can't undo the migration.
+	// See also: UpdateIdentifiers and TakeOver remove the old key the same best-effort way.
+	// The persistent store has no atomic multi-key write, so a crash between the newKey write and
+	// this removal can leave a stale oldKey that later prefix-matches another file.
+	if err := s.store.persistentStore.Remove(oldKeyValue); err != nil {
+		s.store.log.Errorf(
+			"UpdateKey: failed to remove old key %q from persistent store: %v",
+			oldKeyValue, err)
+	}
+
+	return nil
+}
+
+// KeyExists returns true if a non-deleted entry exists for the given key.
+// Unlike FindCursorMeta, this performs no Retain/Release and no deserialization.
+func (s *sourceStore) KeyExists(key string) bool {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+	if res := s.store.ephemeralStore.table[key]; res != nil {
+		return !res.isDeleted()
+	}
+	return false
 }
 
 // CleanIf sets the TTL of a resource if the predicate return true.
@@ -524,7 +646,7 @@ func (s *store) Release() {
 
 func (s *store) close() {
 	if err := s.persistentStore.Close(); err != nil {
-		s.log.Errorf("Closing registry store did report an error: %+v", err)
+		s.log.Errorf("Closing registry store reported an error: %+v", err)
 	}
 }
 
@@ -535,25 +657,28 @@ func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
 }
 
-func (s *store) findCursorMeta(key string, to interface{}) error {
+func (s *store) findCursorMeta(key string, to any) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
-	return typeconv.Convert(to, resource.cursorMeta)
+	defer resource.Release()
+	return resource.UnpackCursorMeta(to)
 }
 
 // updateMetadata updates the cursor metadata in the persistent store.
-func (s *store) updateMetadata(key string, meta interface{}) error {
+func (s *store) updateMetadata(key string, meta any) error {
 	resource := s.ephemeralStore.Find(key, true)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
+	defer resource.Release()
+
+	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
 
 	resource.cursorMeta = meta
-
 	s.writeState(resource)
-	resource.Release()
 	return nil
 }
 
@@ -574,7 +699,7 @@ func (s *store) writeState(r *resource) {
 
 // resetCursor sets the cursor to the value in cur in the persistent store and
 // drops all pending cursor operations.
-func (s *store) resetCursor(key string, cur interface{}) error {
+func (s *store) resetCursor(key string, cur any) error {
 	r := s.ephemeralStore.Find(key, false)
 	if r == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -719,14 +844,16 @@ func (r *resource) UpdatesReleaseN(n uint) {
 func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 
 // UnpackCursor deserializes the in memory state.
-func (r *resource) UnpackCursor(to interface{}) error {
+func (r *resource) UnpackCursor(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.activeCursor())
 }
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
-func (r *resource) UnpackCursorMeta(to interface{}) error {
+func (r *resource) UnpackCursorMeta(to any) error {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.cursorMeta)
 }
 
@@ -768,24 +895,12 @@ func (r *resource) copyInto(dst *resource) {
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {
-	internalState := r.internalState
-
-	// This is required to prevent the cleaner from removing the
-	// entry from the registry immediately.
-	// It still might be removed if the output is blocked for a long
-	// time. If removed the whole file is resent to the output when found/updated.
-	internalState.Updated = time.Now()
-	return &resource{
-		key:                    key,
-		stored:                 r.stored,
-		internalState:          internalState,
-		activeCursorOperations: r.activeCursorOperations,
-		cursor:                 r.cursor,
-		pendingCursorValue:     nil,
-		pendingUpdate:          nil,
-		cursorMeta:             r.cursorMeta,
-		lock:                   unison.MakeMutex(),
+	dst := &resource{
+		key:  key,
+		lock: unison.MakeMutex(),
 	}
+	r.copyInto(dst)
+	return dst
 }
 
 // pendingCursor returns the current published cursor state not yet ACKed.
@@ -793,9 +908,9 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // Note: The stateMutex must be locked when calling pendingCursor.
 //
 //nolint:errcheck // not changing behaviour on this commit
-func (r *resource) pendingCursor() interface{} {
+func (r *resource) pendingCursor() any {
 	if r.pendingUpdate != nil {
-		var tmp interface{}
+		var tmp any
 		typeconv.Convert(&tmp, &r.cursor)
 		typeconv.Convert(&tmp, r.pendingUpdate)
 		r.pendingCursorValue = tmp
@@ -805,7 +920,7 @@ func (r *resource) pendingCursor() interface{} {
 }
 
 // activeCursor
-func (r *resource) activeCursor() interface{} {
+func (r *resource) activeCursor() any {
 	if r.activeCursorOperations != 0 {
 		return r.pendingCursor()
 	}

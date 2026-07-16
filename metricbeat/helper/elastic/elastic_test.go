@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -85,42 +86,42 @@ func (m MockReporterV2) Error(err error) bool {
 func TestFixTimestampField(t *testing.T) {
 	tests := []struct {
 		Name          string
-		OriginalValue map[string]interface{}
-		ExpectedValue map[string]interface{}
+		OriginalValue map[string]any
+		ExpectedValue map[string]any
 	}{
 		{
 			"converts float64s in scientific notation to ints",
-			map[string]interface{}{
+			map[string]any{
 				"foo": 1.571284349e+09,
 			},
-			map[string]interface{}{
+			map[string]any{
 				"foo": 1571284349,
 			},
 		},
 		{
 			"converts regular notation float64s to ints",
-			map[string]interface{}{
+			map[string]any{
 				"foo": float64(1234),
 			},
-			map[string]interface{}{
+			map[string]any{
 				"foo": 1234,
 			},
 		},
 		{
 			"ignores missing fields",
-			map[string]interface{}{
+			map[string]any{
 				"bar": 12345,
 			},
-			map[string]interface{}{
+			map[string]any{
 				"bar": 12345,
 			},
 		},
 		{
 			"leaves strings untouched",
-			map[string]interface{}{
+			map[string]any{
 				"foo": "bar",
 			},
-			map[string]interface{}{
+			map[string]any{
 				"foo": "bar",
 			},
 		},
@@ -202,7 +203,7 @@ func TestConfigureModule(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.initConfig)
-			m, _, err := mb.NewModule(cfg, mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
+			m, _, err := mb.NewModule(cfg, mockRegistry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 			require.NoError(t, err)
 
 			bm, ok := m.(*mb.BaseModule)

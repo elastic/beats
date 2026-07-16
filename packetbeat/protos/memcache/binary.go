@@ -237,7 +237,7 @@ func defBinaryCounterCommand(opcodes []memcacheOpcode, code commandCode) {
 }
 
 func parseBinaryCommand(parser *parser, buf *streambuf.Buffer) parseResult {
-	debug("on binary message")
+	parser.debugf("on binary message")
 
 	if !buf.Avail(memcacheHeaderSize) {
 		return parser.needMore()
@@ -262,20 +262,20 @@ func parseBinaryCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.failing(err)
 	}
 
-	debug("magic: %v", magic)
-	debug("opcode: %v", opcode)
-	debug("extra len: %v", extraLen)
-	debug("key len: %v", keyLen)
+	parser.debugf("magic: %v", magic)
+	parser.debugf("opcode: %v", opcode)
+	parser.debugf("extra len: %v", extraLen)
+	parser.debugf("key len: %v", keyLen)
 
 	totalHeaderLen := memcacheHeaderSize + int(extraLen) + int(keyLen)
-	debug("total header len: %v", totalHeaderLen)
+	parser.debugf("total header len: %v", totalHeaderLen)
 	if !buf.Avail(totalHeaderLen) {
 		return parser.needMore()
 	}
 
 	command := memcacheBinaryCommandTable[memcacheOpcode(opcode)]
 	if command == nil {
-		debug("unknown command")
+		parser.debugf("unknown command")
 		command = binaryUnknownCommand
 	}
 
@@ -384,7 +384,7 @@ func parseDataBinary(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.failing(err)
 	}
 
-	debug("found data message")
+	parser.debugf("found data message")
 	if msg.bytesLost > 0 {
 		msg.countValues++
 	} else {

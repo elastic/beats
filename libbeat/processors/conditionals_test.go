@@ -25,11 +25,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -51,73 +53,75 @@ func TestWhenProcessor(t *testing.T) {
 	type config map[string]any
 
 	tests := []struct {
-		title    string
-		filter   config
-		events   []mapstr.M
-		expected int
+		title  string
+		filter config
+		input  mapstr.M
 	}{
 		{
-			"condition_matches",
-			config{"when.equals.i": 10},
-			[]mapstr.M{{"i": 10}},
-			1,
+			title:  "equals_condition_matches",
+			filter: config{"when.equals.i": 10},
+			input:  mapstr.M{"i": 10},
 		},
 		{
-			"condition_fails",
-			config{"when.equals.i": 11},
-			[]mapstr.M{{"i": 10}},
-			0,
+			title:  "equals_condition_fails",
+			filter: config{"when.equals.i": 11},
+			input:  mapstr.M{"i": 10},
 		},
 		{
-			"no_condition",
-			config{},
-			[]mapstr.M{{"i": 10}},
-			1,
+			title:  "no_condition",
+			filter: config{},
+			input:  mapstr.M{"i": 10},
 		},
 		{
-			"condition_matches",
-			config{"when.has_fields": []string{"i"}},
-			[]mapstr.M{{"i": 10}},
-			1,
+			title:  "has_fields_condition_matches",
+			filter: config{"when.has_fields": []string{"i"}},
+			input:  mapstr.M{"i": 10},
 		},
 		{
-			"condition_fails",
-			config{"when.has_fields": []string{"j"}},
-			[]mapstr.M{{"i": 10}},
-			0,
+			title:  "has_fields_condition_fails",
+			filter: config{"when.has_fields": []string{"j"}},
+			input:  mapstr.M{"i": 10},
 		},
 	}
 
-	for i, test := range tests {
-		t.Logf("run test (%v): %v", i, test.title)
-
-		config, err := conf.NewConfigFrom(test.filter)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		cf := &countFilter{}
-		filter, err := NewConditional(func(_ *conf.C, log *logp.Logger) (beat.Processor, error) {
-			return cf, nil
-		})(config, logptest.NewTestingLogger(t, ""))
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		for _, fields := range test.events {
-			event := &beat.Event{
-				Timestamp: time.Now(),
-				Fields:    fields,
+	for _, test := range tests {
+		t.Run(test.title, func(t *testing.T) {
+			makeFilter := func() beat.Processor {
+				cfg, err := conf.NewConfigFrom(test.filter)
+				require.NoError(t, err)
+				filter, err := NewConditional(func(_ *conf.C, log *logp.Logger) (beat.Processor, error) {
+					return &addFieldsInner{key: "added", value: "yes"}, nil
+				})(cfg, logptest.NewTestingLogger(t, ""))
+				require.NoError(t, err)
+				return filter
 			}
-			_, err := filter.Run(event)
-			if err != nil {
-				t.Error(err)
-			}
-		}
 
-		assert.Equal(t, test.expected, cf.N)
+			// Legacy Run path.
+			out, err := makeFilter().Run(&beat.Event{Timestamp: time.Now(), Fields: test.input.Clone()})
+			require.NoError(t, err)
+			require.NotNil(t, out)
+
+			// RunPdata path. When no condition is configured, NewConditional
+			// returns the inner processor directly, which doesn't implement
+			// PdataProcessor, so fall back to Run for that case.
+			body := pcommon.NewMap()
+			require.NoError(t, otelmap.FromMapstr(body, test.input))
+			filter := makeFilter()
+			if wp, ok := filter.(*WhenProcessor); ok {
+				drop, err := wp.RunPdata(body)
+				require.NoError(t, err)
+				assert.False(t, drop)
+			} else {
+				runOut, err := filter.Run(&beat.Event{Fields: otelmap.ToMapstr(body)})
+				require.NoError(t, err)
+				require.NoError(t, otelmap.FromMapstr(body, runOut.Fields))
+			}
+
+			legacyNorm := pcommon.NewMap()
+			require.NoError(t, otelmap.FromMapstr(legacyNorm, out.Fields))
+			legacyFields := otelmap.ToMapstr(legacyNorm)
+			assert.Equal(t, legacyFields, otelmap.ToMapstr(body), "Run and RunPdata must produce identical output")
+		})
 	}
 }
 
@@ -391,4 +395,49 @@ func requireImplements[T any](t *testing.T, v any) T {
 	require.True(t, ok, "sanity check: expected %T, got %T", expected, v)
 
 	return result
+}
+
+func TestConditionErrorClosesProcessor(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	wrapped := NewConditional(SafeWrap(cons))
+
+	cfg, err := conf.NewConfigFrom(map[string]any{"when": map[string]any{}})
+	require.NoError(t, err)
+
+	_, err = wrapped(cfg, logptest.NewTestingLogger(t, ""))
+	require.Error(t, err, "an empty condition must fail to build")
+	assert.Equal(t, 1, p.closeCount,
+		"the constructed processor must be closed when its condition fails to build")
+}
+
+func TestIfElseThenErrorClosesThenProcessors(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	RegisterPlugin("test-ifelse-close-on-error", cons)
+
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"if":   map[string]any{"equals": map[string]any{"a": "b"}},
+		"then": []any{map[string]any{"test-ifelse-close-on-error": map[string]any{}}},
+		"else": []any{map[string]any{"test-ifelse-does-not-exist": map[string]any{}}},
+	})
+	require.NoError(t, err)
+
+	_, err = NewIfElseThenProcessor(cfg, logptest.NewTestingLogger(t, ""))
+	require.Error(t, err, "building the 'else' list must fail")
+	assert.Equal(t, 1, p.closeCount,
+		"the 'then' processors must be closed when building the 'else' list fails")
+}
+
+func TestNewErrorClosesAlreadyConstructedProcessors(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	RegisterPlugin("test-new-close-on-error", cons)
+
+	first, err := conf.NewConfigFrom(map[string]any{"test-new-close-on-error": map[string]any{}})
+	require.NoError(t, err)
+	second, err := conf.NewConfigFrom(map[string]any{"test-new-does-not-exist": map[string]any{}})
+	require.NoError(t, err)
+
+	_, err = New(PluginConfig{first, second}, logptest.NewTestingLogger(t, ""))
+	require.Error(t, err, "building the processor list must fail")
+	assert.Equal(t, 1, p.closeCount,
+		"the already-constructed processors must be closed when list construction fails partway")
 }

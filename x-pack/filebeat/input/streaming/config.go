@@ -56,6 +56,13 @@ type config struct {
 	// appId request parameter in the FalconHose stream
 	// discovery request.
 	CrowdstrikeAppID string `config:"crowdstrike_app_id"`
+	// ResourceOrigins is an optional allowlist of additional
+	// origins (scheme+host) that may appear in the discover
+	// response's dataFeedURL or refreshActiveSessionURL fields.
+	// By default, resource URLs must share the same registrable
+	// domain as the configured URL. Entries here extend the set
+	// of accepted origins.
+	ResourceOrigins []string `config:"resource_origins"`
 }
 
 type redact struct {
@@ -164,7 +171,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	if c.Program != "" {
-		_, _, err = newProgram(context.Background(), c.Program, root, patterns, logp.NewNopLogger())
+		_, _, err = newProgram(context.Background(), c.Program, root, patterns, "", logp.NewNopLogger())
 		if err != nil {
 			return fmt.Errorf("failed to check program: %w", err)
 		}
@@ -186,6 +193,15 @@ func (c config) Validate() error {
 	if c.Auth.OAuth2.isEnabled() {
 		if c.Auth.OAuth2.AuthStyle != authStyleInHeader && c.Auth.OAuth2.AuthStyle != authStyleInParams && c.Auth.OAuth2.AuthStyle != "" {
 			return fmt.Errorf("unsupported auth style: %s", c.Auth.OAuth2.AuthStyle)
+		}
+	}
+	for i, raw := range c.ResourceOrigins {
+		u, err := url.Parse(raw)
+		if err != nil {
+			return fmt.Errorf("invalid resource_origins[%d]: %w", i, err)
+		}
+		if u.Scheme == "" || u.Host == "" {
+			return fmt.Errorf("resource_origins[%d] must have a scheme and host: %q", i, raw)
 		}
 	}
 	return nil

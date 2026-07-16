@@ -18,7 +18,8 @@
 package status
 
 import (
-	"io/ioutil"
+	"os"
+
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -40,7 +41,7 @@ func testData(t *testing.T) (data []byte) {
 		return
 	}
 
-	data, err = ioutil.ReadFile(filepath.Join(absPath, "/data.json"))
+	data, err = os.ReadFile(filepath.Join(absPath, "/data.json"))
 	if err != nil {
 		t.Fatalf("ReadFile failed: %s", err.Error())
 		return
@@ -77,18 +78,16 @@ func TestFetchDataTCP(t *testing.T) {
 	assert.NoError(t, err)
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		conn, err := listener.Accept()
 		assert.NoError(t, err)
 
 		data := testData(t)
 		conn.Write(data)
 		conn.Close()
-		wg.Done()
-	}()
+	})
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 		"hosts":      []string{"tcp://" + listener.Addr().String()},
@@ -114,7 +113,7 @@ func TestFetchDataHTTP(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 		"hosts":      []string{server.URL},
@@ -137,7 +136,7 @@ func TestFetchDataUnmarshalledError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 		"hosts":      []string{server.URL},
@@ -154,7 +153,7 @@ func TestFetchDataSourceDown(t *testing.T) {
 	}))
 	server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 		"hosts":      []string{server.URL},
@@ -166,7 +165,7 @@ func TestFetchDataSourceDown(t *testing.T) {
 }
 
 func TestConfigError(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 		"hosts":      []string{"unix://127.0.0.1:8080"},
@@ -176,7 +175,7 @@ func TestConfigError(t *testing.T) {
 	_, errs := mbtest.ReportingFetchV2Error(f)
 	assert.NotEmpty(t, errs)
 
-	config = map[string]interface{}{
+	config = map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 		"hosts":      []string{"unknown_url_format"},
@@ -186,7 +185,7 @@ func TestConfigError(t *testing.T) {
 	_, errs = mbtest.ReportingFetchV2Error(f)
 	assert.NotEmpty(t, errs)
 
-	config = map[string]interface{}{
+	config = map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 		"hosts":      []string{"ftp://127.0.0.1:8080"},

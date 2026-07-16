@@ -25,9 +25,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -109,7 +110,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, test.lineTerminator, unlimited, test.collectOnEOF}, logptest.NewTestingLogger(t, ""))
+		reader, err := NewLineReader(io.NopCloser(buffer), Config{codec, 1024, test.lineTerminator, unlimited, test.collectOnEOF}, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal("failed to initialize reader:", err)
 		}
@@ -228,7 +229,7 @@ func TestLineTerminators(t *testing.T) {
 		buffer.Write([]byte("this is my second line"))
 		buffer.Write(nl)
 
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, terminator, unlimited, false}, logptest.NewTestingLogger(t, ""))
+		reader, err := NewLineReader(io.NopCloser(buffer), Config{codec, 1024, terminator, unlimited, false}, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -306,7 +307,7 @@ func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	}
 
 	codec, _ := encoding.Plain(r)
-	reader, err := NewLineReader(ioutil.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited, false}, logptest.NewTestingLogger(t, ""))
+	reader, err := NewLineReader(io.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
@@ -422,7 +423,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	}
 
 	// Create line reader
-	reader, err := NewLineReader(ioutil.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit, false}, logptest.NewTestingLogger(t, ""))
+	reader, err := NewLineReader(io.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
@@ -481,7 +482,7 @@ func TestBufferSize(t *testing.T) {
 	codec, _ := codecFactory(bytes.NewBuffer(nil))
 	bufferSize := 10
 
-	in := ioutil.NopCloser(strings.NewReader(strings.Join(lines, "")))
+	in := io.NopCloser(strings.NewReader(strings.Join(lines, "")))
 	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
@@ -528,4 +529,86 @@ func (r *eofWithNonZeroNumberOfBytesReader) Read(d []byte) (int, error) {
 // Verify handling of the io.Reader returning n > 0 with io.EOF.
 func TestReadWithNonZeroNumberOfBytesAndEOF(t *testing.T) {
 	testReadLines(t, [][]byte{[]byte("Hello world!\n")}, true)
+}
+
+// spinReader feeds an endless stream of non-newline bytes so that
+// LineReader.advance never finds a line terminator and keeps re-reading the
+// LineReader.tempBuffer field in a tight loop.
+//
+// This models the production scenario: the TimeoutReader used by the multiline
+// reader (libbeat/reader/multiline, default multiline.timeout = 5s) runs the
+// inner reader's Next in a background goroutine. That goroutine can still be
+// blocked/looping inside LineReader.Next when the harvester closes the reader
+// chain, which calls LineReader.Close concurrently.
+type spinReader struct {
+	started chan struct{}
+	once    sync.Once
+	closed  atomic.Bool
+}
+
+func (r *spinReader) Read(p []byte) (int, error) {
+	if r.closed.Load() || len(p) == 0 {
+		return 0, io.EOF
+	}
+	// Signal once that the background goroutine is now looping inside Next,
+	// repeatedly reading r.tempBuffer.
+	r.once.Do(func() { close(r.started) })
+	// A non-newline byte keeps advance looping: it never returns a line and
+	// never blocks, so it re-reads r.tempBuffer on every iteration.
+	p[0] = 'a'
+	return 1, nil
+}
+
+func (r *spinReader) Close() error {
+	r.closed.Store(true)
+	return nil
+}
+
+// TestLineReaderCloseRaceWithNext runs LineReader.Close concurrently with an
+// in-flight Next. Close returns r.tempBuffer to a shared sync.Pool and nils the
+// field, while Next may still be reading that field and its backing array in
+// advance/decode.
+func TestLineReaderCloseRaceWithNext(t *testing.T) {
+	codec, err := encoding.Plain(nil)
+	if err != nil {
+		t.Fatalf("failed to create codec: %v", err)
+	}
+
+	in := &spinReader{started: make(chan struct{})}
+
+	r, err := NewLineReader(in, Config{
+		Codec:      codec,
+		BufferSize: 1024,
+		Terminator: LineFeed,
+		MaxBytes:   unlimited,
+	}, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatalf("failed to initialize reader: %v", err)
+	}
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		// Drive Next continuously until it returns an error. Close closes the
+		// source first, so the in-flight Read returns EOF and Next returns
+		// before Close recycles tempBuffer.
+		for {
+			if _, _, err := r.Next(); err != nil {
+				return
+			}
+		}
+	}()
+
+	// Wait until the background goroutine is actively looping inside Next, let it
+	// iterate for a bit, then Close concurrently -- exactly what
+	// TimeoutReader.Close does to a still-running background Next.
+	<-in.started
+	time.Sleep(2 * time.Millisecond)
+	_ = r.Close()
+
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Next goroutine did not return after Close")
+	}
 }
