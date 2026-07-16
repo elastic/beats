@@ -173,7 +173,7 @@ func TestFieldFormatMatcher(t *testing.T) {
 // MetadataIndex return the same result for FieldMatcher, which implements pdataMatcher.
 func TestMetadataIndexPdataFieldMatcherParity(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	cfg, err := config.NewConfigFrom(map[string]interface{}{"lookup_fields": []string{"container.id"}})
+	cfg, err := config.NewConfigFrom(map[string]any{"lookup_fields": []string{"container.id"}})
 	require.NoError(t, err)
 	matcher, err := NewFieldMatcher(*cfg, logger)
 	require.NoError(t, err)
@@ -200,7 +200,7 @@ func TestMetadataIndexPdataFieldMatcherParity(t *testing.T) {
 // which does not implement pdataMatcher, and still returns the correct index.
 func TestMetadataIndexPdataFieldFormatMatcherFallback(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	cfg, err := config.NewConfigFrom(map[string]interface{}{"format": `%{[namespace]}/%{[pod]}`})
+	cfg, err := config.NewConfigFrom(map[string]any{"format": `%{[namespace]}/%{[pod]}`})
 	require.NoError(t, err)
 	matcher, err := NewFieldFormatMatcher(*cfg, logger)
 	require.NoError(t, err)
