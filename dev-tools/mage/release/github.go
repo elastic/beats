@@ -131,13 +131,65 @@ func (gh *GitHubClient) FindOpenPR(owner, repo, head, base string) (*github.Pull
 	return prs[0], true, nil
 }
 
+// mergeLabelDefs are auto-created when missing so FF merge-timing labels can be applied.
+var mergeLabelDefs = map[string]struct {
+	Color       string
+	Description string
+}{
+	mergeLabelFFDay: {
+		Color:       "B60205",
+		Description: "Merge 1st: feature-freeze day (main)",
+	},
+	mergeLabelAfterBranch: {
+		Color:       "D93F0B",
+		Description: "Merge 2nd: ASAP after release branch exists",
+	},
+	mergeLabelAfterImages: {
+		Color:       "FBCA04",
+		Description: "Merge 3rd: after branch exists; may wait on Docker images",
+	},
+	mergeLabelAfterRelease: {
+		Color:       "0E8A16",
+		Description: "Merge 4th: after release day",
+	},
+}
+
 func (gh *GitHubClient) ensurePRLabels(owner, repo string, number int, labels []string) {
 	if len(labels) == 0 {
 		return
 	}
+	for _, label := range labels {
+		if def, ok := mergeLabelDefs[label]; ok {
+			if err := gh.EnsureLabel(owner, repo, label, def.Color, def.Description); err != nil {
+				fmt.Printf("Warning: failed to ensure label %q: %v\n", label, err)
+			}
+		}
+	}
 	if err := gh.AddLabels(owner, repo, number, labels); err != nil {
 		fmt.Printf("Warning: failed to add labels: %v\n", err)
 	}
+}
+
+// EnsureLabel creates a repository label if it does not already exist.
+func (gh *GitHubClient) EnsureLabel(owner, repo, name, color, description string) error {
+	_, resp, err := gh.client.Issues.GetLabel(gh.ctx, owner, repo, name)
+	if err == nil {
+		return nil
+	}
+	if resp == nil || resp.StatusCode != http.StatusNotFound {
+		return fmt.Errorf("failed to get label %q: %w", name, err)
+	}
+
+	_, _, err = gh.client.Issues.CreateLabel(gh.ctx, owner, repo, &github.Label{
+		Name:        github.Ptr(name),
+		Color:       github.Ptr(color),
+		Description: github.Ptr(description),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create label %q: %w", name, err)
+	}
+	fmt.Printf("Created label %q\n", name)
+	return nil
 }
 
 // AddLabels adds labels to a pull request or issue

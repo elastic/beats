@@ -85,7 +85,7 @@ flowchart TD
 | Field | Value |
 |-------|-------|
 | Title | `[Release] Prepare main for 9.5.0 (backport + version 9.6.0)` |
-| Labels | `release`, `impact:critical`, `backport-9.5`, `skip-changelog`, `Team:Automation` |
+| Labels | `release`, `impact:critical`, `backport-9.5`, `skip-changelog`, `Team:Automation`, `merge:1-ff-day` |
 | Body | Merge before release branch work is finalized. Creates `backport-9.5` label. |
 
 **Note:** observability-dev label PR may still be needed separately (out of scope).
@@ -107,7 +107,7 @@ flowchart TD
 | Field | Value |
 |-------|-------|
 | Title | `ff-release: update versions 9.5.0` |
-| Labels | `release`, `docs`, `in progress`, `skip-changelog`, `Team:Automation` |
+| Labels | `release`, `docs`, `in progress`, `skip-changelog`, `Team:Automation`, `merge:2-after-branch` |
 | Body | Merge as soon as `9.5` branch exists. |
 
 Use a single squash commit.
@@ -129,7 +129,7 @@ Use a single squash commit.
 | Field | Value |
 |-------|-------|
 | Title | `[Release] Update docs and test env for 9.6.0` |
-| Labels | `release`, `docs`, `in progress`, `backport-9.5`, `skip-changelog`, `Team:Automation` |
+| Labels | `release`, `docs`, `in progress`, `backport-9.5`, `skip-changelog`, `Team:Automation`, `merge:3-after-images` |
 | Body | Merge after `9.5` branch is created. CI may stay red until Docker images exist. |
 
 ---
@@ -150,7 +150,7 @@ Use a single squash commit.
 | Field | Value |
 |-------|-------|
 | Title | `[Release] Prepare 9.5 for 9.5.1 (version + test env)` |
-| Labels | `release`, `skip-changelog`, `Team:Automation` |
+| Labels | `release`, `skip-changelog`, `Team:Automation`, `merge:4-after-release` |
 | Body | Merge after release of `9.5.0`. |
 
 ---

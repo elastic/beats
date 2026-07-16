@@ -145,14 +145,14 @@ with grouped PRs.
 2. Creates release branch from `BASE_BRANCH` (e.g., `9.5`)
 3. Prepares **4 grouped PRs** (merge order matters):
 
-| Step | PR | Target | Branch | Changes |
-|------|-----|--------|--------|---------|
-| 1 | PR-A | `main` | `ff-prep-main-X.Y.0` | Mergify backport rule + `version.go` → next minor |
-| 2 | PR-B | release branch | `ff-release-X.Y.0` | ff-release version, docs, test env, `make update` |
-| 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | Docs + test env for next minor |
-| 4 | PR-D | release branch | `ff-prep-next-patch-X.Y.1` | Next patch version + test env |
+| Step | PR | Target | Branch | Merge label | Changes |
+|------|-----|--------|--------|-------------|---------|
+| 1 | PR-A | `main` | `ff-prep-main-X.Y.0` | `merge:1-ff-day` | Mergify backport rule + `version.go` → next minor |
+| 2 | PR-B | release branch | `ff-release-X.Y.0` | `merge:2-after-branch` | ff-release version, docs, test env, `make update` |
+| 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | `merge:3-after-images` | Docs + test env for next minor |
+| 4 | PR-D | release branch | `ff-prep-next-patch-X.Y.1` | `merge:4-after-release` | Next patch version + test env |
 
-4. Pushes release branch and opens PRs (unless `DRY_RUN`)
+4. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
 
 **RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main` → merge PR-D on release branch (after release day).
 
@@ -613,10 +613,10 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
 
 ### PRs created but labels not added
 
-**Cause:** Token may lack permissions to add labels.
+**Cause:** Token may lack permissions to add or create labels.
 
 **Solution:**
-- Ensure token has `repo` scope
+- Ensure token has `repo` scope (needed to create the `merge:*` labels on first run)
 - Add labels manually after PR creation
 
 ## Development

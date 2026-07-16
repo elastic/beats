@@ -31,16 +31,32 @@ var (
 	ffReleasePRLabels = []string{"release", "docs", "in progress", "Team:Automation", "skip-changelog"}
 )
 
+// Feature-freeze merge-timing labels (number = RM merge order).
+const (
+	mergeLabelFFDay        = "merge:1-ff-day"
+	mergeLabelAfterBranch  = "merge:2-after-branch"
+	mergeLabelAfterImages  = "merge:3-after-images"
+	mergeLabelAfterRelease = "merge:4-after-release"
+)
+
 func backportLabel(releaseBranch string) string {
 	return fmt.Sprintf("backport-%s", releaseBranch)
 }
 
 func prAMainLabels(releaseBranch string) []string {
-	return []string{"release", "impact:critical", backportLabel(releaseBranch), "skip-changelog", "Team:Automation"}
+	return []string{"release", "impact:critical", backportLabel(releaseBranch), "skip-changelog", "Team:Automation", mergeLabelFFDay}
+}
+
+func prBReleaseLabels() []string {
+	return append(append([]string{}, ffReleasePRLabels...), mergeLabelAfterBranch)
 }
 
 func prCMainLabels(releaseBranch string) []string {
-	return []string{"release", "docs", "in progress", backportLabel(releaseBranch), "skip-changelog", "Team:Automation"}
+	return []string{"release", "docs", "in progress", backportLabel(releaseBranch), "skip-changelog", "Team:Automation", mergeLabelAfterImages}
+}
+
+func prDNextPatchLabels() []string {
+	return append(append([]string{}, releasePRLabels...), mergeLabelAfterRelease)
 }
 
 // checkRequirements validates prerequisites before running a release workflow
@@ -247,7 +263,7 @@ func prepFFRelease(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
 			Base:      cfg.ReleaseBranch,
 			Body:      prBReleaseBody(cfg),
 			Reviewers: cfg.ProjectReviewers,
-			Labels:    ffReleasePRLabels,
+			Labels:    prBReleaseLabels(),
 		},
 	}, nil
 }
@@ -326,7 +342,7 @@ func prepNextPatchOnReleaseBranch(repo *GitRepo, cfg *ReleaseConfig) (workflowPR
 			Base:      cfg.ReleaseBranch,
 			Body:      prDNextPatchBody(cfg),
 			Reviewers: cfg.ProjectReviewers,
-			Labels:    releasePRLabels,
+			Labels:    prDNextPatchLabels(),
 		},
 	}, nil
 }

@@ -153,6 +153,24 @@ func TestMajorMinorPrepBranchNames(t *testing.T) {
 		})
 	}
 
+	casesLabels := []struct {
+		name   string
+		labels []string
+		want   string
+	}{
+		{name: "PR-A", labels: prAMainLabels(cfg.ReleaseBranch), want: mergeLabelFFDay},
+		{name: "PR-B", labels: prBReleaseLabels(), want: mergeLabelAfterBranch},
+		{name: "PR-C", labels: prCMainLabels(cfg.ReleaseBranch), want: mergeLabelAfterImages},
+		{name: "PR-D", labels: prDNextPatchLabels(), want: mergeLabelAfterRelease},
+	}
+	for _, tc := range casesLabels {
+		t.Run(tc.name+" labels", func(t *testing.T) {
+			if !slices.Contains(tc.labels, tc.want) {
+				t.Errorf("%s labels should include %q, got %v", tc.name, tc.want, tc.labels)
+			}
+		})
+	}
+
 	labelsA := prAMainLabels(cfg.ReleaseBranch)
 	if !slices.Contains(labelsA, "backport-9.5") {
 		t.Errorf("PR-A labels should include backport-9.5, got %v", labelsA)
