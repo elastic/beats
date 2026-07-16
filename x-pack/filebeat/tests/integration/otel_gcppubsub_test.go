@@ -68,6 +68,7 @@ func TestGCPInputOTelE2E(t *testing.T) {
   topic: test-topic-foo
   subscription.name:  {{ .Subscription }}
   credentials_file: "{{ .CredentialsFile }}"
+<<<<<<< HEAD
 
 output:
   elasticsearch:
@@ -85,6 +86,9 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
 `
+=======
+` + filebeatOutputYAML
+>>>>>>> 3cdc47246 ([beatreceiver] Add e2e test for cometd and gcs (#51966))
 
 	gcpOTelConfig := `exporters:
     elasticsearch:
@@ -158,7 +162,7 @@ service:
 		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username:        user,
 		Password:        password,
-		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json",
+		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json", //nolint:gosec // this is test file
 	}
 
 	var configBuffer bytes.Buffer
