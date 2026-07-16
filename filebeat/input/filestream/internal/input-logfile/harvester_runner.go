@@ -37,6 +37,13 @@ import (
 // finishes within it; see pollWithGracePeriod.
 const pollGracePeriod = 100 * time.Millisecond
 
+// defaultStuckHarvesterGrace bounds how long StopHarvesters waits for cancelled
+// harvesters to unwind before giving up: a harvester still blocked past it
+// (e.g. stuck in Publish because output backpressure never clears) is left
+// running in the background rather than hanging the input's shutdown forever.
+// Overridable per-runner via the stuckGrace field (kept short in tests).
+const defaultStuckHarvesterGrace = time.Minute
+
 // permanentHarvesterError marks a harvester setup failure that should degrade
 // the input's status rather than being silently retried on the next scan.
 type permanentHarvesterError struct {
@@ -139,12 +146,10 @@ type harvesterRunner struct {
 	// close.reader.after_interval are detected. See park.
 	stateCheckInterval time.Duration
 
-	// stopTimeout bounds how long StopHarvesters waits for harvesters to finish
-	// before giving up: 1 minute, plus readUntilEOF.Timeout (with headroom) when
-	// draining is enabled. A harvester stuck past this (e.g. blocked in Publish
-	// because output backpressure never clears) is left running in the
-	// background rather than hanging the input's shutdown forever.
-	stopTimeout time.Duration
+	// stuckGrace bounds how long StopHarvesters waits for cancelled harvesters to
+	// unwind before leaving a stuck one running in the background; see
+	// defaultStuckHarvesterGrace.
+	stuckGrace time.Duration
 
 	// Observability gauges (nil when no metrics registry is available).
 	mActive  *monitoring.Uint // sources with a reader goroutine
@@ -218,12 +223,6 @@ func newHarvesterRunner(
 	backoff BackoffConfig,
 	stateCheckInterval time.Duration,
 ) *harvesterRunner {
-	stopTimeout := time.Minute
-	if readUntilEOF.Enabled {
-		// headroom just above the readUntilEOF timeout to allow the routine time to finish
-		stopTimeout += readUntilEOF.Timeout + 100*time.Millisecond
-	}
-
 	g := &harvesterRunner{
 		pipeline:           pipeline,
 		harvester:          harvester,
@@ -236,7 +235,7 @@ func newHarvesterRunner(
 		readUntilEOF:       readUntilEOF,
 		backoff:            backoff,
 		stateCheckInterval: stateCheckInterval,
-		stopTimeout:        stopTimeout,
+		stuckGrace:         defaultStuckHarvesterGrace,
 		harvesterLimit:     harvesterLimit,
 		ctx:                ctx,
 		states:             map[string]*sourceState{},
@@ -958,7 +957,7 @@ func (g *harvesterRunner) stopNow() error {
 	g.mu.Unlock()
 
 	g.signalWaker()
-	if err := g.waitBounded(g.stopTimeout); err != nil {
+	if err := g.waitBounded(g.stuckGrace); err != nil {
 		g.ctx.Logger.Errorf("%v; a stuck harvester will keep running in the background", err)
 		return err
 	}
@@ -1001,26 +1000,19 @@ func (g *harvesterRunner) drainAndStop() error {
 		g.run(state) // draining: read to EOF, then finish (not park)
 	}
 
-	// Bound the drain: cancel every source after Timeout so a stuck read or a
-	// blocked output unblocks and tears down.
-	timer := time.AfterFunc(g.readUntilEOF.Timeout, func() {
-		g.mu.Lock()
-		for _, state := range g.states {
-			if state != nil && state.cancel != nil {
-				state.cancel()
-			}
+	// Let the readers drain to EOF on their own, bounded by the configured
+	// Timeout. If they all finish in time the drain completed cleanly.
+	reachedEOF := true
+	if err := g.waitBounded(g.readUntilEOF.Timeout); err != nil {
+		// The drain deadline elapsed: cancel every source to unblock a stuck read
+		// or a blocked output, then allow a fixed grace for those goroutines to
+		// unwind before giving up on any that stay stuck.
+		reachedEOF = false
+		g.cancelAll()
+		if err := g.waitBounded(g.stuckGrace); err != nil {
+			g.ctx.Logger.Errorf("%v; a stuck harvester will keep running in the background", err)
+			return err
 		}
-		g.mu.Unlock()
-	})
-
-	err := g.waitBounded(g.stopTimeout)
-	// Stop reports true only if it cancelled the timer before it fired, i.e. the
-	// drain reached EOF on its own; false means the Timeout elapsed first.
-	reachedEOF := timer.Stop()
-
-	if err != nil {
-		g.ctx.Logger.Errorf("%v; a stuck harvester will keep running in the background", err)
-		return err
 	}
 	g.finishRemaining()
 
@@ -1034,6 +1026,18 @@ func (g *harvesterRunner) drainAndStop() error {
 		}
 	}
 	return nil
+}
+
+// cancelAll cancels every registered source so an in-flight read or a blocked
+// publish unblocks and the reader goroutine can tear the source down.
+func (g *harvesterRunner) cancelAll() {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	for _, state := range g.states {
+		if state != nil && state.cancel != nil {
+			state.cancel()
+		}
+	}
 }
 
 // waitBounded waits for every runner goroutine (readers and the waker) to

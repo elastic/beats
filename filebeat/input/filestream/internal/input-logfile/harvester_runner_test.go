@@ -553,7 +553,7 @@ func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 // already closed: spawn silently declines to run the closure in that case, so
 // without this check the waker would wait a full pollGracePeriod per due
 // source collected just before shutdown instead of returning immediately —
-// with enough due sources this can exceed stopTimeout and skip
+// with enough due sources this can exceed the stuck grace and skip
 // finishRemaining's cleanup entirely.
 func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing.T) {
 	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
@@ -863,7 +863,7 @@ func TestHarvesterRunner_StopHarvestersIdempotent(t *testing.T) {
 }
 
 // TestHarvesterRunner_StopHarvestersTimesOutOnStuckHarvester asserts
-// StopHarvesters gives up and returns an error after stopTimeout instead of
+// StopHarvesters gives up and returns an error after the stuck grace instead of
 // blocking forever when a harvester doesn't exit after cancellation (e.g. stuck
 // in Publish while output backpressure never clears): the input's shutdown must
 // make forward progress, leaving the stuck harvester to finish in the
@@ -878,7 +878,7 @@ func TestHarvesterRunner_StopHarvestersTimesOutOnStuckHarvester(t *testing.T) {
 		},
 	}
 	g := testHarvesterRunner(t, h, 0)
-	g.stopTimeout = 50 * time.Millisecond // short-circuit the real (~1 minute) default for the test
+	g.stuckGrace = 50 * time.Millisecond // short-circuit the real (~1 minute) default for the test
 
 	g.start()
 	src := &testSource{name: "/path/to/test"}
