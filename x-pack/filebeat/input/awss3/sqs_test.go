@@ -89,8 +89,9 @@ func TestSQSReceiver(t *testing.T) {
 					return sqsProcessingResult{
 						keepaliveCancel: func() {},
 						processor: &sqsS3EventProcessor{
-							log: logger,
-							sqs: mockSQS,
+							log:    logger,
+							sqs:    mockSQS,
+							health: newSQSHealth(&statusReporterHelperMock{}, logp.NewNopLogger()),
 						},
 					}
 				})
@@ -102,7 +103,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
 		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.msgHandler = mockMsgHandler
-		sqsReader.status = &statusReporterHelperMock{}
+		sqsReader.health = newSQSHealth(&statusReporterHelperMock{}, logp.NewNopLogger())
 		sqsReader.run(ctx)
 
 		select {
@@ -151,7 +152,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
 		sqsReader.pipeline = &fakePipeline{}
-		sqsReader.status = &statusReporterHelperMock{}
+		sqsReader.health = newSQSHealth(&statusReporterHelperMock{}, logp.NewNopLogger())
 		sqsReader.run(ctx)
 	})
 }

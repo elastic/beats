@@ -610,14 +610,9 @@ type fileScanner struct {
 	hasher           hash.Hash
 	readBuffer       []byte
 	compression      string
-	// completedFingerprints holds the paths whose fingerprint was already a
-	// final SHA-256 on the previous watch-loop scan (growing mode only). The
-	// bridging raw header is only useful on the scan a file crosses the
-	// threshold, so for paths in this set toFileDescriptor skips recomputing it.
-	// GetFiles itself is pure with respect to this set: only fileWatcher.watch
-	// advances it (after each scan), so the enumeration-only scans the
-	// prospector runs in Init/TakeOver cannot suppress the header a
-	// still-growing entry needs to migrate across a restart.
+	// completedFingerprints holds paths already complete on the previous watch scan
+	// (growing mode), so attachBridgingRaw can skip re-encoding their bridging header.
+	// Only fileWatcher.watch advances it, so prospector enumeration can't wrongly suppress it.
 	completedFingerprints map[string]struct{}
 
 	// lastCount is the number of unique files the previous scan produced.
@@ -772,6 +767,7 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 				continue
 			}
 			uniqueIDs[fileID] = fd.Filename
+			s.attachBridgingRaw(&fd)
 			fdByName[filename] = fd
 			if isFileIgnored(fd, opts) {
 				scanMetrics.FilesIgnored++
@@ -863,10 +859,8 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 //   - dataSize <= offset: file is too small to read anything from offset;
 //     return errFileTooSmall.
 //   - dataSize >= offset+length: read bytes[offset:offset+length] and hash
-//     with SHA-256 (FingerprintID.Sum, so Complete() is true). In growing mode
-//     the raw header bytes are also carried in FingerprintID.Raw so the one-time
-//     crossing to the SHA-256 identity can be prefix-matched against a still
-//     growing predecessor.
+//     with SHA-256 (FingerprintID.Sum, so Complete() is true). The growing-mode
+//     bridging raw header is added later by attachBridgingRaw, not here.
 //   - dataSize in (offset, offset+length) under growing mode: read
 //     bytes[offset:dataSize] and carry its hex as FingerprintID.Raw, leaving
 //     Sum empty so Complete() is false.
@@ -1016,21 +1010,18 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		Sum: hex.EncodeToString(s.hasher.Sum(nil)),
 	}
 
-	// In growing mode the raw header is carried alongside the SHA-256 so the
-	// one-time transition to the final identity can be prefix-matched against a
-	// still-growing predecessor (in-place growth or rename+grow). It is only
-	// needed on the scan a file crosses the threshold: a path the watch loop
-	// already saw complete on its previous scan has no growing predecessor left
-	// to bridge, so recomputing the ~2*length-byte hex header every scan would
-	// be wasted work. New and just-crossed paths are absent from
-	// completedFingerprints and get the bridging header.
-	if s.cfg.Fingerprint.Growing {
-		if _, done := s.completedFingerprints[it.filename]; !done {
-			fd.Fingerprint.Raw = hex.EncodeToString(s.readBuffer[:length])
-		}
-	}
-
 	return fd, nil
+}
+
+// attachBridgingRaw sets a complete descriptor's raw header.
+func (s *fileScanner) attachBridgingRaw(fd *loginp.FileDescriptor) {
+	if !s.cfg.Fingerprint.Growing || !fd.Fingerprint.Complete() {
+		return
+	}
+	if _, done := s.completedFingerprints[fd.Filename]; done {
+		return
+	}
+	fd.Fingerprint.Raw = hex.EncodeToString(s.readBuffer[:s.cfg.Fingerprint.Length])
 }
 
 func (s *fileScanner) isFileExcluded(file string) bool {
