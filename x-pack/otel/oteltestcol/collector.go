@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
@@ -42,22 +43,29 @@ import (
 )
 
 type Collector struct {
-	collector *otelcol.Collector
-	observer  *observer.ObservedLogs
+	collector    *otelcol.Collector
+	observer     *observer.ObservedLogs
+	done         chan struct{}
+	shutdownOnce sync.Once
 }
 
 // New creates and starts a new OTel collector for testing.
+//
+// The collector's own telemetry metrics are disabled (see metricsOffConfig) so
+// multiple collectors can run in parallel, e.g. under script/stresstest.sh,
+// without colliding on the fixed Prometheus port.
 func New(tb testing.TB, configYAML string) *Collector {
 	tb.Helper()
 
 	configDir := tb.TempDir()
 	configFile := filepath.Join(configDir, "otel.yaml")
-	err := os.WriteFile(configFile, []byte(configYAML), 0o644)
-	require.NoError(tb, err)
+	require.NoError(tb, os.WriteFile(configFile, []byte(configYAML), 0o644))
 
-	if err != nil {
-		tb.Fatalf("failed to create collector: %v", err)
-	}
+	// Merged after the test config to disable the collector's own telemetry
+	// metrics; kept in a separate file so we don't have to parse/rewrite the
+	// test's YAML.
+	metricsOffFile := filepath.Join(configDir, "metrics-off.yaml")
+	require.NoError(tb, os.WriteFile(metricsOffFile, []byte(metricsOffConfig), 0o644))
 
 	var zapBuf zaptest.Buffer
 	zapCore := zapcore.NewCore(
@@ -68,23 +76,28 @@ func New(tb testing.TB, configYAML string) *Collector {
 	observed, observer := observer.New(zapcore.DebugLevel)
 	core := zapcore.NewTee(zapCore, observed)
 
-	settings := newCollectorSettings("file:"+configFile, core)
+	settings := newCollectorSettings([]string{"file:" + configFile, "file:" + metricsOffFile}, core)
 	col, err := otelcol.NewCollector(settings)
 	require.NoError(tb, err)
 
-	var wg sync.WaitGroup
+	c := &Collector{collector: col, observer: observer, done: make(chan struct{})}
+
 	tb.Cleanup(func() {
-		col.Shutdown()
-		wg.Wait()
+		c.Shutdown()
 
 		if tb.Failed() {
 			tb.Log("OTel Collector logs:\n" + zapBuf.String())
 		}
 	})
 
+<<<<<<< HEAD
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+=======
+	go func() {
+		defer close(c.done)
+>>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 		ctx, cancel := signal.NotifyContext(tb.Context(), os.Interrupt)
 		defer cancel()
 		assert.NoError(tb, col.Run(ctx))
@@ -94,15 +107,92 @@ func New(tb testing.TB, configYAML string) *Collector {
 		return col.GetState() == otelcol.StateRunning
 	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
 
-	return &Collector{collector: col, observer: observer}
+	return c
 }
 
 func (c *Collector) ObservedLogs() *observer.ObservedLogs {
 	return c.observer
 }
 
+// Shutdown stops the collector and blocks until it has fully exited. Blocking
+// lets callers restart a collector that reuses the same path.home (or other
+// resources) without racing the previous instance's teardown. It is safe to
+// call multiple times.
 func (c *Collector) Shutdown() {
-	c.collector.Shutdown()
+	c.shutdownOnce.Do(c.collector.Shutdown)
+	<-c.done
+}
+
+// metricsOffConfig is merged on top of the test config to turn off the
+// collector's own telemetry metrics. The collector otherwise starts a
+// Prometheus reader on a fixed localhost:8888, which collides when collectors
+// run in parallel (e.g. under stresstest.sh). Tests assert on Elasticsearch
+// documents and the per-receiver HTTP monitoring endpoint rather than the
+// collector's own metrics, so disabling them is safe.
+const metricsOffConfig = `service:
+  telemetry:
+    metrics:
+      level: none
+`
+
+// MonitoringPort waits for a single Beat receiver HTTP monitoring server to log
+// its listening address and returns the ephemeral port it bound to.
+//
+// Configure the receiver with `http.host: localhost` and `http.port: 0` so the
+// OS assigns a free port at bind time. Reading the port back from the logs
+// avoids the time-of-check/time-of-use race of pre-allocating a port.
+func (c *Collector) MonitoringPort(tb testing.TB) int {
+	tb.Helper()
+	return c.MonitoringPorts(tb, 1)[0]
+}
+
+// MonitoringPorts waits until at least n Beat receiver HTTP monitoring servers
+// have logged their listening addresses and returns the ephemeral ports they
+// bound to. The ports are returned in the order they were logged; callers that
+// only assert each endpoint works do not need a per-receiver mapping.
+func (c *Collector) MonitoringPorts(tb testing.TB, n int) []int {
+	tb.Helper()
+	var ports []int
+	require.EventuallyWithT(tb, func(ct *assert.CollectT) {
+		seen := make(map[int]struct{})
+		ports = ports[:0]
+		for _, entry := range c.observer.FilterMessageSnippet(integration.MonitoringEndpointSnippet).All() {
+			port, err := integration.ParseMonitoringPort(entry.Message)
+			if !assert.NoError(ct, err) {
+				continue
+			}
+			if _, ok := seen[port]; ok {
+				continue
+			}
+			seen[port] = struct{}{}
+			ports = append(ports, port)
+		}
+		assert.GreaterOrEqualf(ct, len(ports), n, "waiting for %d monitoring endpoints to start", n)
+	}, 30*time.Second, 100*time.Millisecond, "collector monitoring endpoints did not start")
+	return ports[:n]
+}
+
+// SocketListeningPort waits for a tcp or udp input running inside the collector
+// to log its listening address and returns the ephemeral port it bound to.
+//
+// Configure the input with host: <ip>:0 so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port.
+func (c *Collector) SocketListeningPort(tb testing.TB) int {
+	tb.Helper()
+	var port int
+	require.EventuallyWithT(tb, func(ct *assert.CollectT) {
+		for _, entry := range c.observer.FilterMessageSnippet(integration.SocketListeningSnippet).All() {
+			p, err := integration.ParseSocketListeningPort(entry.Message)
+			if !assert.NoError(ct, err) {
+				continue
+			}
+			port = p
+			return
+		}
+		assert.Fail(ct, "input listening address not logged yet")
+	}, 30*time.Second, 100*time.Millisecond, "collector input did not start listening")
+	return port
 }
 
 func getComponent() (otelcol.Factories, error) {
@@ -152,7 +242,9 @@ func getComponent() (otelcol.Factories, error) {
 	}, nil
 }
 
-func newCollectorSettings(filename string, core zapcore.Core) otelcol.CollectorSettings {
+// newCollectorSettings builds the collector settings from the given config
+// URIs, which are resolved and deep-merged in order (later URIs win).
+func newCollectorSettings(uris []string, core zapcore.Core) otelcol.CollectorSettings {
 	return otelcol.CollectorSettings{
 		BuildInfo: component.BuildInfo{
 			Command:     "otel",
@@ -167,7 +259,7 @@ func newCollectorSettings(filename string, core zapcore.Core) otelcol.CollectorS
 		},
 		ConfigProviderSettings: otelcol.ConfigProviderSettings{
 			ResolverSettings: confmap.ResolverSettings{
-				URIs: []string{filename},
+				URIs: uris,
 				ProviderFactories: []confmap.ProviderFactory{
 					fileprovider.NewFactory(),
 				},
