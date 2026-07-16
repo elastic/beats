@@ -18,10 +18,11 @@
 package seccomp
 
 import (
-	"fmt"
-	"runtime"
-
 	"errors"
+	"fmt"
+	"reflect"
+	"runtime"
+	"slices"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -41,25 +42,41 @@ var (
 	registeredPolicy *seccomp.Policy
 )
 
-// MustRegisterPolicy registers a seccomp policy to use instead of the default
-// policy. This can be used to register an application specific seccomp policy
-// that is tailored to the specific system calls that the application requires.
-// It panics if a policy has already been registered or if the given policy
+// MustRegisterPolicy registers an application-specific seccomp policy in place
+// of the default one. Re-registering an identical policy is a no-op, so it is
+// safe to call more than once (e.g. when a component is re-initialized in the
+// same process). It panics if a different policy is already registered or if p
 // is invalid.
 func MustRegisterPolicy(p *seccomp.Policy) {
 	if p == nil {
 		panic(errors.New("seccomp policy cannot be nil"))
 	}
 
-	if registeredPolicy != nil {
-		panic(errors.New("a seccomp policy is already registered"))
-	}
-
 	// Ensure that the policy is valid and usable.
 	if _, err := p.Assemble(); err != nil {
 		panic(fmt.Errorf("failed to register seccomp policy: %w", err))
 	}
+
+	if registeredPolicy != nil && !policiesEqual(registeredPolicy, p) {
+		panic(errors.New("a different seccomp policy is already registered"))
+	}
+
 	registeredPolicy = p
+}
+
+// policiesEqual reports whether a and b would install the same seccomp filter.
+func policiesEqual(a, b *seccomp.Policy) bool {
+	if a.DefaultAction != b.DefaultAction || len(a.Syscalls) != len(b.Syscalls) {
+		return false
+	}
+	for i := range a.Syscalls {
+		if a.Syscalls[i].Action != b.Syscalls[i].Action ||
+			!slices.Equal(a.Syscalls[i].Names, b.Syscalls[i].Names) ||
+			!reflect.DeepEqual(a.Syscalls[i].NamesWithCondtions, b.Syscalls[i].NamesWithCondtions) {
+			return false
+		}
+	}
+	return true
 }
 
 // LoadFilter loads a seccomp system call filter into the kernel for this
