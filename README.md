@@ -21,5 +21,6 @@ Provided packages:
 * `github.com/elastic/elastic-agent-libs/service` utilities to inspect services and collect debug data.
 * `github.com/elastic/elastic-agent-libs/str` the previous `stringset.go` file from `github.com/elastic/beats/v7/libbeat/common`. It provides a string set implementation. 
 * `github.com/elastic/elastic-agent-libs/testing` Testing helpers for network communication and outputs.
+* `github.com/elastic/elastic-agent-libs/testing/fipsscan` Test helper for auditing FIPS 140-3 compliance — scans a binary's dependency tree for forbidden (non-certified) crypto imports and maintains a known-violations allowlist. Requires the `requirefips` build tag.
 * `github.com/elastic/elastic-agent-libs/transport/tlscommon` TLS configuration and validation, CA pinning, etc.
 * `github.com/elastic/elastic-agent-libs/transport` Dialers for testing, TLS, etc.
