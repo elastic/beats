@@ -53,12 +53,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 
 	configDir := tb.TempDir()
 	configFile := filepath.Join(configDir, "otel.yaml")
-<<<<<<< HEAD
-	err := os.WriteFile(configFile, []byte(configYAML), 0644)
-	require.NoError(tb, err)
-=======
 	require.NoError(tb, os.WriteFile(configFile, []byte(configYAML), 0o644))
->>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 
 	// Merged after the test config to disable the collector's own telemetry
 	// metrics; kept in a separate file so we don't have to parse/rewrite the
@@ -89,14 +84,8 @@ func New(tb testing.TB, configYAML string) *Collector {
 		}
 	})
 
-<<<<<<< HEAD
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-=======
 	go func() {
 		defer close(c.done)
->>>>>>> 6497c632a (libbeat/testing: use ephemeral ports to avoid TOCTOU collisions (#51617))
 		ctx, cancel := signal.NotifyContext(tb.Context(), os.Interrupt)
 		defer cancel()
 		assert.NoError(tb, col.Run(ctx))
