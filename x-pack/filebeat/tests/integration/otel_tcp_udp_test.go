@@ -32,33 +32,19 @@ const (
 )
 
 func TestTCPInputOTelE2E(t *testing.T) {
-	// TODO: change this to use port from log lines
-	// See https://github.com/elastic/beats/pull/51617
-	otelServerAddr := "127.0.0.1:9042"
-	fbServerAddr := "127.0.0.1:9043"
-
 	runSocketInputOTelE2E(
 		t,
 		"tcp",
 		tcpInputTestMsg,
-		otelServerAddr,
-		fbServerAddr,
 		nettest.RunTCPClient,
 	)
 }
 
 func TestUDPInputOTelE2E(t *testing.T) {
-	// TODO: change this to use port from log lines
-	// See https://github.com/elastic/beats/pull/51617
-	otelServerAddr := "127.0.0.1:9042"
-	fbServerAddr := "127.0.0.1:9043"
-
 	runSocketInputOTelE2E(
 		t,
 		"udp",
 		udpInputTestMsg,
-		otelServerAddr,
-		fbServerAddr,
 		nettest.RunUDPClient,
 	)
 }
@@ -67,7 +53,7 @@ type socketClientFn func(t *testing.T, address string, data []string)
 
 func runSocketInputOTelE2E(
 	t *testing.T,
-	inputType, testMessage, otelAddress, fbAddress string,
+	inputType, testMessage string,
 	runClient socketClientFn,
 ) {
 	t.Helper()
@@ -190,16 +176,22 @@ service:
 		PathHome:  otelHome,
 	}
 
+	// Bind to an ephemeral port (host ...:0) and read the OS-assigned port back
+	// from the logs. This avoids the time-of-check/time-of-use race of
+	// pre-allocating a fixed port, so the tests stay parallel-safe.
+	ephemeralHost := hostAddress(0)
+
 	var configBuffer bytes.Buffer
-	optionsValue.Host = otelAddress
+	optionsValue.Host = ephemeralHost
 	optionsValue.Index = otelIndex
 	require.NoError(t, template.Must(template.New("config").Parse(otelConfig)).Execute(&configBuffer, optionsValue))
 
-	oteltestcol.New(t, configBuffer.String())
+	col := oteltestcol.New(t, configBuffer.String())
+	otelAddress := hostAddress(col.SocketListeningPort(t))
 
 	configBuffer.Reset()
 
-	optionsValue.Host = fbAddress
+	optionsValue.Host = ephemeralHost
 	optionsValue.Index = fbIndex
 	require.NoError(t, template.Must(template.New("config").Parse(filebeatConfig)).Execute(&configBuffer, optionsValue))
 
@@ -219,6 +211,8 @@ service:
 		20*time.Second,
 		"filebeat did not run",
 	)
+
+	fbAddress := hostAddress(filebeat.SocketListeningPort(20 * time.Second))
 
 	go runClient(t, otelAddress, data)
 	go runClient(t, fbAddress, data)
@@ -286,7 +280,7 @@ service:
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
-// HostAddress returns the host:port address used by net input integration tests.
-func hostAddress(port uint16) string {
+// hostAddress returns the host:port address used by net input integration tests.
+func hostAddress(port int) string {
 	return fmt.Sprintf("127.0.0.1:%d", port)
 }
