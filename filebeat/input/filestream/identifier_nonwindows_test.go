@@ -20,8 +20,8 @@
 package filestream
 
 import (
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,22 +29,24 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFileIdentifierInodeMarker(t *testing.T) {
 	t.Run("inode_marker file identifier", func(t *testing.T) {
 		const markerContents = "unique_marker"
-		markerFile, err := ioutil.TempFile("", "test_file_identifier_inode_marker_identifier")
+		dir := t.TempDir()
+		markerFile, err := os.Create(filepath.Join(dir, "marker"))
 		if err != nil {
 			t.Fatalf("cannot create marker file for test: %v", err)
 		}
-		defer os.Remove(markerFile.Name())
 
 		_, err = markerFile.Write([]byte(markerContents))
 		if err != nil {
 			t.Fatalf("cannot write marker contents to file: %v", err)
 		}
-		markerFile.Sync()
+		require.NoError(t, markerFile.Sync())
 
 		c := conf.MustNewConfigFrom(map[string]interface{}{
 			"identifier": map[string]interface{}{
@@ -57,15 +59,14 @@ func TestFileIdentifierInodeMarker(t *testing.T) {
 		err = c.Unpack(&cfg)
 		require.NoError(t, err)
 
-		identifier, err := newFileIdentifier(cfg.Identifier)
+		identifier, err := newFileIdentifier(cfg.Identifier, "", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, inodeMarkerName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_inode_marker")
+		tmpFile, err := os.Create(filepath.Join(dir, "target"))
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}
-		defer os.Remove(tmpFile.Name())
 
 		fi, err := tmpFile.Stat()
 		if err != nil {
@@ -73,8 +74,8 @@ func TestFileIdentifierInodeMarker(t *testing.T) {
 		}
 
 		fsEvent := loginp.FSEvent{
-			NewPath: tmpFile.Name(),
-			Info:    fi,
+			NewPath:    tmpFile.Name(),
+			Descriptor: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		}
 		src := identifier.GetSource(fsEvent)
 
@@ -86,7 +87,7 @@ func TestFileIdentifierInodeMarker(t *testing.T) {
 		if err != nil {
 			t.Fatalf("cannot write marker contents to file: %v", err)
 		}
-		markerFile.Sync()
+		require.NoError(t, markerFile.Sync())
 
 		src = identifier.GetSource(fsEvent)
 
