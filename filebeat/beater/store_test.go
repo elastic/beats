@@ -121,7 +121,7 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 
 	// Open stores concurrently
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go func(i int) {
 			defer wg.Done()
 			stores[i] = testOpenStore(t, dir)
@@ -140,7 +140,7 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 
 	// Close all concurrently
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go func(i int) {
 			defer wg.Done()
 			stores[i].Close()

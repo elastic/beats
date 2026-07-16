@@ -121,7 +121,7 @@ func generateLogFiles(
 	}
 
 	filenames := make([]string, 0, files)
-	for i := 0; i < files; i++ {
+	for range files {
 		id, err := uuid.NewV4()
 		if err != nil {
 			t.Fatalf("failed to generate a unique filename: %s", err)

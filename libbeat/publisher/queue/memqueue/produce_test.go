@@ -18,7 +18,6 @@
 package memqueue
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -100,8 +99,7 @@ func TestACKWaitAckProducerClosesAfterDrain(t *testing.T) {
 	defer q.Close(true)
 
 	// Drain and ack everything the producer publishes.
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	go func() {
 		for ctx.Err() == nil {
 			b, err := q.Get(64)
@@ -151,8 +149,7 @@ func TestPublishSequentialEntryIDs(t *testing.T) {
 	}, 0, nil)
 	defer q.Close(true)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	go func() {
 		for ctx.Err() == nil {
 			batch, err := q.Get(64)
