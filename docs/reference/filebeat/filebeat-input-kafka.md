@@ -98,7 +98,7 @@ How long to wait before retrying a failed read. Default is 2s.
 
 ### `timeout` [_timeout_2]
 ```{applies_to}
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
+stack: ga 9.3+
 ```
 
 The network timeout for the connection to the Kafka brokers, applied to the dial, read, and write deadlines. Increase this for consumers reading across higher-latency links (for example cross-region or WAN), where a large fetch response may not be fully read within the default deadline. Default is 30s.
@@ -106,7 +106,7 @@ The network timeout for the connection to the Kafka brokers, applied to the dial
 
 ### `keep_alive` [_keep_alive]
 ```{applies_to}
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
+stack: ga 9.3+
 ```
 
 The keep-alive period for the active network connection to the Kafka brokers. Default is 0s (disabled).
@@ -114,7 +114,7 @@ The keep-alive period for the active network connection to the Kafka brokers. De
 
 ### `session_timeout` [_session_timeout]
 ```{applies_to}
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
+stack: ga 9.3+
 ```
 
 The consumer group session timeout. If the broker receives no heartbeat from a consumer within this period, the consumer is removed from the group and a rebalance is triggered. Consumers on higher-latency links may need a larger value to avoid spurious rebalances. Default is 10s.
@@ -122,10 +122,29 @@ The consumer group session timeout. If the broker receives no heartbeat from a c
 
 ### `heartbeat_interval` [_heartbeat_interval]
 ```{applies_to}
-stack: ga 9.3.8+, ga 9.4.4+, ga 9.5
+stack: ga 9.3+
 ```
 
 How often the consumer sends heartbeats to the broker. This must be lower than `session_timeout`, and is typically set to no more than a third of that value. Default is 3s.
+
+
+### `group_instance_id` [_group_instance_id]
+```{applies_to}
+stack: ga 9.3+
+```
+
+A stable identifier that enables Kafka static group membership ([KIP-345](https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances)). When set, a consumer that restarts and rejoins the group within [`session_timeout`](#_session_timeout) is recognized as the same member and keeps its partition assignment, avoiding the rebalances that a rolling restart of multiple instances would otherwise trigger. Requires `version` to be at least `2.3.0`.
+
+Each consumer instance sharing a `group_id` must use a **unique** `group_instance_id`. Two live members with the same value cause the broker to fence one of them. Set `group_instance_id` to a value that is unique to each consumer instance and stable across restarts. The option is unset by default, in which case the consumer uses dynamic membership.
+
+```yaml
+- type: kafka
+  hosts: ["kafka-broker:9092"]
+  topics: ["my-topic"]
+  group_id: "filebeat"
+  version: "2.3.0"
+  group_instance_id: "<unique-instance-id>"
+```
 
 
 ### `max_wait_time` [_max_wait_time]

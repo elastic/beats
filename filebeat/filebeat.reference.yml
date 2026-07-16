@@ -1116,6 +1116,10 @@ filebeat.inputs:
   # How often the consumer sends heartbeats. Must be lower than session_timeout.
   #heartbeat_interval: 3s
 
+  # Static group membership id (KIP-345). Set a unique, stable value per instance
+  # so a restart does not trigger a rebalance. Requires version >= 2.3.0.
+  #group_instance_id: "<unique-instance-id>"
+
   # How long to wait for the minimum number of input bytes while reading.
   #max_wait_time: 250ms
 

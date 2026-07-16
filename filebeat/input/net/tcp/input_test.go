@@ -23,7 +23,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"net"
 	"runtime"
 	"sync"
@@ -33,7 +32,6 @@ import (
 	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -105,11 +103,7 @@ func TestInput(t *testing.T) {
 }
 
 func BenchmarkInput(b *testing.B) {
-	port, err := libbeattesting.AvailableTCP4Port()
-	if err != nil {
-		b.Fatalf("cannot find available port: %s", err)
-	}
-	serverAddr := net.JoinHostPort("localhost", fmt.Sprintf("%d", port))
+	serverAddr := ephemeralTCPAddr(b)
 
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
 		"host":              serverAddr,
@@ -140,8 +134,9 @@ func BenchmarkInput(b *testing.B) {
 		}
 	}()
 
+	var dialer net.Dialer
 	require.EventuallyWithTf(b, func(ct *assert.CollectT) {
-		conn, err := net.Dial("tcp", serverAddr)
+		conn, err := dialer.DialContext(b.Context(), "tcp", serverAddr)
 		require.NoError(ct, err)
 		conn.Close()
 	}, 30*time.Second, 100*time.Millisecond, "waiting for TCP server to start")
@@ -151,7 +146,7 @@ func BenchmarkInput(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			conn, err := net.Dial("tcp", serverAddr)
+			conn, err := dialer.DialContext(b.Context(), "tcp", serverAddr)
 			if err != nil {
 				b.Errorf("cannot create connection: %s", err)
 				continue
@@ -176,4 +171,23 @@ func BenchmarkInput(b *testing.B) {
 			}
 		}
 	})
+}
+
+// ephemeralTCPAddr binds an ephemeral localhost port, immediately releases
+// it, and returns the resolved "host:port" so a caller can configure a
+// server to listen on it.
+//
+// WARNING: racy by design. The port can become unavailable.
+func ephemeralTCPAddr(tb testing.TB) string {
+	tb.Helper()
+	var lc net.ListenConfig
+	l, err := lc.Listen(tb.Context(), "tcp", "localhost:0")
+	if err != nil {
+		tb.Fatalf("cannot bind an ephemeral port: %s", err)
+	}
+	addr := l.Addr().String()
+	if err := l.Close(); err != nil {
+		tb.Fatalf("cannot release ephemeral port %s: %s", addr, err)
+	}
+	return addr
 }
