@@ -512,9 +512,7 @@ func (w *fileWatcher) watch(
 
 	if postponed > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
 		w.lastPostponedWarn = now
-		w.log.Warnf("some previously seen files could not be observed (e.g. file-descriptor exhaustion)"+
-			"in the last %s, postponing their delete detection to avoid re-ingestion."+
-			"See the filebeat.filestream.scan_errors metric for the current count.",
+		w.log.Warnf("some previously seen files could not be observed (e.g. file-descriptor exhaustion) in the last %s, postponing their delete detection to avoid re-ingestion. See the filebeat.filestream.scan_errors metric for the current count.",
 			postponedWarnInterval)
 	}
 
