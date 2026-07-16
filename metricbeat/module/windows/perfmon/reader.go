@@ -279,7 +279,7 @@ func mapCounterPathLabel(namespace string, label string, path string) string {
 		obj[index] = strings.TrimSuffix(obj[index], "_")
 	}
 	label = strings.ToLower(strings.Join(obj, "_"))
-	label = strings.Replace(label, "__", "_", -1)
+	label = strings.ReplaceAll(label, "__", "_")
 	return namespace + "." + label
 }
 

@@ -228,7 +228,7 @@ func TestInput(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 
 			pub := &publisher{}
-			log, buf := logp.NewInMemory("unifiedlogs_test", logp.JSONEncoderConfig())
+			log, buf := logp.NewInMemoryLocal("unifiedlogs_test", logp.JSONEncoderConfig())
 
 			var wg sync.WaitGroup
 			wg.Add(1)
@@ -293,7 +293,7 @@ func TestBackfillAndStream(t *testing.T) {
 	t.Cleanup(cancel)
 
 	pub := &publisher{}
-	log, buf := logp.NewInMemory("unifiedlogs_test", logp.JSONEncoderConfig())
+	log, buf := logp.NewInMemoryLocal("unifiedlogs_test", logp.JSONEncoderConfig())
 
 	var wg sync.WaitGroup
 	wg.Add(1)

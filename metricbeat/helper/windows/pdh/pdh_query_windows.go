@@ -173,7 +173,7 @@ func (q *Query) CollectDataEx(interval uint32, event windows.Handle) error {
 
 // GetFormattedCounterValues returns an array of formatted values for a query.
 func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
-	if q.Counters == nil || len(q.Counters) == 0 {
+	if len(q.Counters) == 0 {
 		return nil, errors.New("no counter list found")
 	}
 	rtn := make(map[string][]CounterValue, len(q.Counters))
