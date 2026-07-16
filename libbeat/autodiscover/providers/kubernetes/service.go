@@ -113,13 +113,13 @@ func NewServiceEventer(
 }
 
 // OnAdd ensures processing of service objects that are newly created
-func (s *service) OnAdd(obj interface{}) {
+func (s *service) OnAdd(obj any) {
 	s.logger.Debugf("Watcher service add: %+v", obj)
 	s.emit(obj.(*kubernetes.Service), "start")
 }
 
 // OnUpdate ensures processing of service objects that are updated
-func (s *service) OnUpdate(obj interface{}) {
+func (s *service) OnUpdate(obj any) {
 	svc := obj.(*kubernetes.Service)
 	// Once service is in terminated state, mark it for deletion
 	if svc.GetObjectMeta().GetDeletionTimestamp() != nil {
@@ -132,7 +132,7 @@ func (s *service) OnUpdate(obj interface{}) {
 }
 
 // OnDelete ensures processing of service objects that are deleted
-func (s *service) OnDelete(obj interface{}) {
+func (s *service) OnDelete(obj any) {
 	s.logger.Debugf("Watcher service delete: %+v", obj)
 	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(obj.(*kubernetes.Service), "stop") })
 }

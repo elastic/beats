@@ -82,7 +82,7 @@ func NewConfigMapper(
 type Event mapstr.M
 
 // GetValue extracts given key from an Event
-func (e Event) GetValue(key string) (interface{}, error) {
+func (e Event) GetValue(key string) (any, error) {
 	val, err := mapstr.M(e).GetValue(key)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (c Mapper) GetConfig(event bus.Event) []*conf.C {
 func ApplyConfigTemplate(event bus.Event, configs []*conf.C, logger *logp.Logger, options ...ucfg.Option) []*conf.C {
 	var result []*conf.C
 	// unpack input
-	vars, err := ucfg.NewFrom(map[string]interface{}{
+	vars, err := ucfg.NewFrom(map[string]any{
 		"data": event,
 	})
 	if err != nil {
@@ -154,7 +154,7 @@ func ApplyConfigTemplate(event bus.Event, configs []*conf.C, logger *logp.Logger
 			continue
 		}
 		// Unpack config to process any vars in the template:
-		var unpacked map[string]interface{}
+		var unpacked map[string]any
 		err = c.Unpack(&unpacked, opts...)
 		if err != nil {
 			logger.Debugf("Configuration template cannot be resolved: %v", err)

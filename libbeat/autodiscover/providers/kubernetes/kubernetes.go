@@ -375,7 +375,7 @@ func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Conte
 	}()
 }
 
-func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+func ShouldPut(event mapstr.M, field string, value any, logger *logp.Logger) {
 	_, err := event.Put(field, value)
 	if err != nil {
 		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)

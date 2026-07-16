@@ -123,11 +123,11 @@ func TestEmitEvent(t *testing.T) {
 				NodeName:      host,
 				NodeID:        "nomad1",
 				Job: &nomad.Job{
-					ID:          nomad.StringToPtr(UUID.String()),
-					Region:      nomad.StringToPtr("global"),
-					Name:        nomad.StringToPtr("my-job"),
-					Type:        nomad.StringToPtr(nomad.JobTypeService),
-					Status:      nomad.StringToPtr(nomad.JobStatusRunning),
+					ID:          new(UUID.String()),
+					Region:      new("global"),
+					Name:        new("my-job"),
+					Type:        new(nomad.JobTypeService),
+					Status:      new(nomad.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -135,7 +135,7 @@ func TestEmitEvent(t *testing.T) {
 					},
 					TaskGroups: []*nomad.TaskGroup{
 						{
-							Name: nomad.StringToPtr("web"),
+							Name: new("web"),
 							Meta: map[string]string{
 								"key1":      "group-value",
 								"group-key": "group.value",
@@ -229,11 +229,11 @@ func TestEmitEvent(t *testing.T) {
 				NodeName:      "",
 				NodeID:        "5456bd7a",
 				Job: &nomad.Job{
-					ID:          nomad.StringToPtr(UUID.String()),
-					Region:      nomad.StringToPtr("global"),
-					Name:        nomad.StringToPtr("my-job"),
-					Type:        nomad.StringToPtr(nomad.JobTypeService),
-					Status:      nomad.StringToPtr(nomad.JobStatusRunning),
+					ID:          new(UUID.String()),
+					Region:      new("global"),
+					Name:        new("my-job"),
+					Type:        new(nomad.JobTypeService),
+					Status:      new(nomad.JobStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -241,7 +241,7 @@ func TestEmitEvent(t *testing.T) {
 					},
 					TaskGroups: []*nomad.TaskGroup{
 						{
-							Name: nomad.StringToPtr("web"),
+							Name: new("web"),
 							Meta: map[string]string{
 								"key1":      "group-value",
 								"group-key": "group.value",
@@ -296,7 +296,6 @@ func TestEmitEvent(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {

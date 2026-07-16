@@ -71,7 +71,7 @@ type config struct {
 	IncludeFileOwnerName      bool `config:"include_file_owner_name"`
 	IncludeFileOwnerGroupName bool `config:"include_file_owner_group_name"`
 	// IncludeFileFingerprint controls whether log.file.fingerprint is added
-	// to published events. Disabled by default.
+	// to published events. Enabled by default.
 	IncludeFileFingerprint bool `config:"include_file_fingerprint"`
 
 	// -1 means that registry will never be cleaned, disabling clean_inactive.
@@ -162,7 +162,7 @@ func defaultConfig() config {
 		ReadUntilEOF:              loginp.DefaultReadUntilEOFConfig(),
 		IncludeFileOwnerName:      false,
 		IncludeFileOwnerGroupName: false,
-		IncludeFileFingerprint:    false,
+		IncludeFileFingerprint:    true,
 		CleanInactive:             -1,
 		CleanRemoved:              true,
 		HarvesterLimit:            0,
@@ -318,12 +318,12 @@ func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 	return nil
 }
 
-func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]interface{} {
-	var cfgs []map[string]interface{}
+func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]any {
+	var cfgs []map[string]any
 
 	for _, id := range duplicates {
 		for _, dupcfgs := range ids[id] {
-			toJson := map[string]interface{}{}
+			toJson := map[string]any{}
 			err := dupcfgs.Unpack(&toJson)
 			if err != nil {
 				toJson[id] = fmt.Sprintf("failed to unpack config: %v", err)

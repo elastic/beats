@@ -60,6 +60,21 @@ func TestRound(t *testing.T) {
 			input:    1234.50005,
 			expected: 1234.5001,
 		},
+		{
+			name:     "keep exact negative half",
+			input:    -0.5,
+			expected: -0.5,
+		},
+		{
+			name:     "truncate negative below midpoint",
+			input:    -0.50004,
+			expected: -0.5,
+		},
+		{
+			name:     "round away from zero at negative midpoint",
+			input:    -0.50005,
+			expected: -0.5001,
+		},
 	}
 
 	for _, tc := range testCases {

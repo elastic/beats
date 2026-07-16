@@ -134,7 +134,7 @@ func (r *WhenProcessor) RunPdata(body pcommon.Map) (bool, error) {
 		switch m := raw.(type) {
 		case mapstr.M:
 			event.Meta = m
-		case map[string]interface{}:
+		case map[string]any:
 			event.Meta = mapstr.M(m)
 		}
 		_ = event.Fields.Delete("@metadata")

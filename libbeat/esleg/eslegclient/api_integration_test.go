@@ -38,7 +38,7 @@ func TestIndex(t *testing.T) {
 
 	conn := getTestingElasticsearch(t)
 
-	body := map[string]interface{}{
+	body := map[string]any{
 		"user":      "test",
 		"post_date": "2009-11-15T14:12:12",
 		"message":   "trying out",
@@ -54,12 +54,12 @@ func TestIndex(t *testing.T) {
 		t.Fatalf("Index() fails: %s", resp)
 	}
 
-	body = map[string]interface{}{
-		"query": map[string]interface{}{
-			"match_all": map[string]interface{}{},
+	body = map[string]any{
+		"query": map[string]any{
+			"match_all": map[string]any{},
 		},
 	}
-	_, result, err := conn.SearchURIWithBody(index, "", nil, map[string]interface{}{})
+	_, result, err := conn.SearchURIWithBody(index, "", nil, map[string]any{})
 	if err != nil {
 		t.Fatalf("SearchUriWithBody() returns an error: %s", err)
 	}
@@ -85,7 +85,7 @@ func TestIndex(t *testing.T) {
 }
 
 func TestIngest(t *testing.T) {
-	type obj map[string]interface{}
+	type obj map[string]any
 
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 

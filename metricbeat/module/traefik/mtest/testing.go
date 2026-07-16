@@ -18,8 +18,8 @@
 package mtest
 
 // GetConfig for Traefik
-func GetConfig(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func GetConfig(metricset string, host string) map[string]any {
+	return map[string]any{
 		"module":     "traefik",
 		"metricsets": []string{metricset},
 		"hosts":      []string{host},
