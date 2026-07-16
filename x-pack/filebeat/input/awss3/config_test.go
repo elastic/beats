@@ -667,7 +667,7 @@ func TestConfig(t *testing.T) {
 			if tc.expectedCfg == nil {
 				t.Fatal("missing expected config in test case")
 			}
-			assert.EqualValues(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.s3AccessPoint, tc.nonAWSS3Bucket), c)
+			assert.Equal(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.s3AccessPoint, tc.nonAWSS3Bucket), c)
 		})
 	}
 }
@@ -787,7 +787,9 @@ func TestS3ConfigModifierHostnameImmutable(t *testing.T) {
 			var o s3.Options
 			c.s3ConfigModifier(&o)
 
+			//nolint:staticcheck // s3ConfigModifier uses the deprecated EndpointResolver; test it as configured
 			require.NotNil(t, o.EndpointResolver, "endpoint resolver should be set when endpoint is configured")
+			//nolint:staticcheck // s3ConfigModifier uses the deprecated EndpointResolver; test it as configured
 			ep, err := o.EndpointResolver.ResolveEndpoint("us-east-1", s3.EndpointResolverOptions{})
 			require.NoError(t, err)
 
