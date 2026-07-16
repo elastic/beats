@@ -156,7 +156,7 @@ func (ts *testSetup) requireDataStreamDoesNotExist(name string) {
 }
 
 func (ts *testSetup) sendTestEvent() {
-	evt := map[string]interface{}{
+	evt := map[string]any{
 		"@timestamp": "2099-11-15T13:12:00",
 		"message":    "my super important message",
 	}
@@ -255,7 +255,7 @@ func TestESLoader_Load(t *testing.T) {
 		setup.mustLoad(nil)
 
 		// Add custom settings
-		setup.config.Settings = TemplateSettings{Source: map[string]interface{}{"enabled": false}}
+		setup.config.Settings = TemplateSettings{Source: map[string]any{"enabled": false}}
 
 		t.Run("disabled", func(t *testing.T) {
 			err := setup.load(nil)
@@ -370,7 +370,7 @@ func TestESLoader_Load(t *testing.T) {
 					assert.Error(t, err)
 				} else {
 					require.NoError(t, err)
-					p, ok := val.(map[string]interface{})
+					p, ok := val.(map[string]any)
 					require.True(t, ok)
 					properties := make([]string, 0, len(p))
 					for k := range p {
@@ -396,7 +396,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{})
 
 	// Try to load invalid template
-	template := map[string]interface{}{"json": "invalid"}
+	template := map[string]any{"json": "invalid"}
 	err := setup.loader.loadTemplate(setup.config.Name, template)
 	assert.Error(t, err)
 	setup.requireTemplateDoesNotExist("")
@@ -500,14 +500,14 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 	require.NotNil(t, response)
 
 	templates, _ := response.GetValue("index_templates")
-	templatesList, _ := templates.([]interface{})
-	templateElem, ok := templatesList[0].(map[string]interface{})
+	templatesList, _ := templates.([]any)
+	templateElem, ok := templatesList[0].(map[string]any)
 	require.True(t, ok)
 
 	return testTemplate{
 		t:      t,
 		client: client,
-		M:      mapstr.M(templateElem["index_template"].(map[string]interface{})), //nolint:errcheck //This is a test file
+		M:      mapstr.M(templateElem["index_template"].(map[string]any)), //nolint:errcheck //This is a test file
 	}
 }
 

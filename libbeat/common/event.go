@@ -108,7 +108,7 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 
 // normalizemMapStringSlice normalizes each individual map[string]interface{} and
 // returns a []mapstr.M.
-func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interface{}, keys ...string) ([]mapstr.M, []error) {
+func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]any, keys ...string) ([]mapstr.M, []error) {
 	var errs []error
 
 	out := make([]mapstr.M, 0, len(maps))
@@ -124,12 +124,12 @@ func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interf
 }
 
 // normalizeSlice normalizes each element of the slice and returns a []interface{}.
-func (e *GenericEventConverter) normalizeSlice(v reflect.Value, keys ...string) (interface{}, []error) {
+func (e *GenericEventConverter) normalizeSlice(v reflect.Value, keys ...string) (any, []error) {
 	var errs []error
-	var sliceValues []interface{}
+	var sliceValues []any
 
 	n := v.Len()
-	for i := 0; i < n; i++ {
+	for i := range n {
 		sliceValue, err := e.normalizeValue(v.Index(i).Interface(), append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
@@ -141,7 +141,7 @@ func (e *GenericEventConverter) normalizeSlice(v reflect.Value, keys ...string) 
 	return sliceValues, errs
 }
 
-func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
+func (e *GenericEventConverter) normalizeValue(value any, keys ...string) (any, []error) {
 	if value == nil {
 		return nil, nil
 	}
@@ -168,7 +168,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 
 	switch value.(type) {
 	case encoding.TextMarshaler:
-		if reflect.ValueOf(value).Kind() == reflect.Ptr && reflect.ValueOf(value).IsNil() {
+		if reflect.ValueOf(value).Kind() == reflect.Pointer && reflect.ValueOf(value).IsNil() {
 			return nil, nil
 		}
 		text, err := value.(encoding.TextMarshaler).MarshalText()
@@ -212,15 +212,15 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		return e.normalizeMap(value.(mapstr.M), keys...)
 	case []mapstr.M:
 		return e.normalizeMapStrSlice(value.([]mapstr.M), keys...)
-	case map[string]interface{}:
-		return e.normalizeMap(value.(map[string]interface{}), keys...)
-	case []map[string]interface{}:
-		return e.normalizeMapStringSlice(value.([]map[string]interface{}), keys...)
+	case map[string]any:
+		return e.normalizeMap(value.(map[string]any), keys...)
+	case []map[string]any:
+		return e.normalizeMapStringSlice(value.([]map[string]any), keys...)
 	default:
 		v := reflect.ValueOf(value)
 
 		switch v.Type().Kind() {
-		case reflect.Ptr:
+		case reflect.Pointer:
 			// Dereference pointers.
 			return e.normalizeValue(followPointer(value), keys...)
 		case reflect.Bool:
@@ -256,7 +256,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 
 // marshalUnmarshal converts an interface to a mapstr.M by marshalling to JSON
 // then unmarshalling the JSON object into a mapstr.M.
-func marshalUnmarshal(in interface{}, out interface{}) error {
+func marshalUnmarshal(in any, out any) error {
 	// Decode and encode as JSON to normalized the types.
 	marshaled, err := json.Marshal(in)
 	if err != nil {
@@ -273,8 +273,8 @@ func marshalUnmarshal(in interface{}, out interface{}) error {
 // followPointer accepts an interface{} and if the interface is a pointer then
 // the value that v points to is returned. If v is not a pointer then v is
 // returned.
-func followPointer(v interface{}) interface{} {
-	if v == nil || reflect.TypeOf(v).Kind() != reflect.Ptr {
+func followPointer(v any) any {
+	if v == nil || reflect.TypeOf(v).Kind() != reflect.Pointer {
 		return v
 	}
 
@@ -304,10 +304,10 @@ func DeDot(s string) string {
 
 // DeDotJSON replaces in keys all . with _
 // This helps when sending data to Elasticsearch to prevent object and key collisions.
-func DeDotJSON(json interface{}) interface{} {
+func DeDotJSON(json any) any {
 	switch json := json.(type) {
-	case map[string]interface{}:
-		result := map[string]interface{}{}
+	case map[string]any:
+		result := map[string]any{}
 		for key, value := range json {
 			result[DeDot(key)] = DeDotJSON(value)
 		}
@@ -318,8 +318,8 @@ func DeDotJSON(json interface{}) interface{} {
 			result[DeDot(key)] = DeDotJSON(value)
 		}
 		return result
-	case []interface{}:
-		result := make([]interface{}, len(json))
+	case []any:
+		result := make([]any, len(json))
 		for i, value := range json {
 			result[i] = DeDotJSON(value)
 		}

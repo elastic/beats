@@ -118,43 +118,43 @@ func TestTracking(t *testing.T) {
 func TestEventPrivateReporter(t *testing.T) {
 	t.Run("dropped event is acked immediately if empty", func(t *testing.T) {
 		var acked int
-		var data []interface{}
-		acker := EventPrivateReporter(func(a int, d []interface{}) { acked, data = a, d })
+		var data []any
+		acker := EventPrivateReporter(func(a int, d []any) { acked, data = a, d })
 		acker.AddEvent(beat.Event{Private: 1}, false)
 		require.Equal(t, 0, acked)
-		require.Equal(t, []interface{}{1}, data)
+		require.Equal(t, []any{1}, data)
 	})
 
 	t.Run("no dropped events", func(t *testing.T) {
 		var acked int
-		var data []interface{}
-		acker := EventPrivateReporter(func(a int, d []interface{}) { acked, data = a, d })
+		var data []any
+		acker := EventPrivateReporter(func(a int, d []any) { acked, data = a, d })
 		acker.AddEvent(beat.Event{Private: 1}, true)
 		acker.AddEvent(beat.Event{Private: 2}, true)
 		acker.AddEvent(beat.Event{Private: 3}, true)
 		acker.ACKEvents(3)
 		require.Equal(t, 3, acked)
-		require.Equal(t, []interface{}{1, 2, 3}, data)
+		require.Equal(t, []any{1, 2, 3}, data)
 	})
 
 	t.Run("private of dropped events is included", func(t *testing.T) {
 		var acked int
-		var data []interface{}
-		acker := EventPrivateReporter(func(a int, d []interface{}) { acked, data = a, d })
+		var data []any
+		acker := EventPrivateReporter(func(a int, d []any) { acked, data = a, d })
 		acker.AddEvent(beat.Event{Private: 1}, true)
 		acker.AddEvent(beat.Event{Private: 2}, false)
 		acker.AddEvent(beat.Event{Private: 3}, true)
 		acker.ACKEvents(2)
 		require.Equal(t, 2, acked)
-		require.Equal(t, []interface{}{1, 2, 3}, data)
+		require.Equal(t, []any{1, 2, 3}, data)
 	})
 }
 
 func TestLastEventPrivateReporter(t *testing.T) {
 	t.Run("dropped event with private is acked immediately if empty", func(t *testing.T) {
 		var acked int
-		var datum interface{}
-		acker := LastEventPrivateReporter(func(a int, d interface{}) { acked, datum = a, d })
+		var datum any
+		acker := LastEventPrivateReporter(func(a int, d any) { acked, datum = a, d })
 		acker.AddEvent(beat.Event{Private: 1}, false)
 		require.Equal(t, 0, acked)
 		require.Equal(t, 1, datum)
@@ -162,15 +162,15 @@ func TestLastEventPrivateReporter(t *testing.T) {
 
 	t.Run("dropped event without private is ignored", func(t *testing.T) {
 		var called bool
-		acker := LastEventPrivateReporter(func(_ int, _ interface{}) { called = true })
+		acker := LastEventPrivateReporter(func(_ int, _ any) { called = true })
 		acker.AddEvent(beat.Event{Private: nil}, false)
 		require.False(t, called)
 	})
 
 	t.Run("no dropped events", func(t *testing.T) {
 		var acked int
-		var data interface{}
-		acker := LastEventPrivateReporter(func(a int, d interface{}) { acked, data = a, d })
+		var data any
+		acker := LastEventPrivateReporter(func(a int, d any) { acked, data = a, d })
 		acker.AddEvent(beat.Event{Private: 1}, true)
 		acker.AddEvent(beat.Event{Private: 2}, true)
 		acker.AddEvent(beat.Event{Private: 3}, true)
