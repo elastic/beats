@@ -91,7 +91,6 @@ var (
 	FIPSConfig struct {
 		Beats   []string `yaml:"beats"`
 		Compile struct {
-			CGO       bool              `yaml:"cgo"`
 			Env       map[string]string `yaml:"env"`
 			Tags      []string          `yaml:"tags"`
 			Platforms []string          `yaml:"platforms"`
@@ -481,7 +480,7 @@ func getBuildVariableSources() *BuildVariableSources {
 
 	panic(fmt.Errorf("magefile must call devtools.SetBuildVariableSources() "+
 		"because it is not an elastic beat (repo=%+v)", repo.RootImportPath))
-} //nolint:typecheck // typecheck linter complains about missing return here, however this is unreachable code with the panic() above
+}
 
 // BuildVariableSources is used to explicitly define what files contain build
 // variables and how to parse the values from that file. This removes ambiguity
