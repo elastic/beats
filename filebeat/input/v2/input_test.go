@@ -168,14 +168,12 @@ func TestPrepareInputMetrics_safeConcurrentPipelineClientCreation(t *testing.T) 
 			// workers, each one with its own client.
 			wg := sync.WaitGroup{}
 			for range 5 {
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
+				wg.Go(func() {
 
 					c, err := wrappedconnector.ConnectWith(beat.ClientConfig{})
 					assert.NoError(t, err, "ConnectWith should not return an error")
 					assert.NotNil(t, c, "client should not be nil")
-				}()
+				})
 			}
 			wg.Wait()
 		})

@@ -85,11 +85,9 @@ func newEventConsumer(
 		done:       make(chan struct{}),
 	}
 
-	c.wg.Add(1)
-	go func() {
-		defer c.wg.Done()
+	c.wg.Go(func() {
 		c.run()
-	}()
+	})
 
 	// Even though we start a goroutine here, we don't include it in the
 	// waitGroup used for shutdown: if the queue itself is not closed yet,

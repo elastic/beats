@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"flag"
 	"go/format"
-	"io/ioutil"
 	"os"
 	"text/template"
 )
@@ -65,19 +64,19 @@ func init() {
 
 func main() {
 	Headers := make(map[string]string)
-	content, err := ioutil.ReadFile("APACHE-LICENSE-2.0-header.txt")
+	content, err := os.ReadFile("APACHE-LICENSE-2.0-header.txt")
 	if err != nil {
 		panic("could not read ASL2 license.")
 	}
 	Headers["ASL2"] = string(content)
 
-	content, err = ioutil.ReadFile("ELASTIC-LICENSE-header.txt")
+	content, err = os.ReadFile("ELASTIC-LICENSE-header.txt")
 	if err != nil {
 		panic("could not read Elastic license.")
 	}
 	Headers["Elastic"] = string(content)
 
-	content, err = ioutil.ReadFile("ELASTIC-LICENSE-2.0-header.txt")
+	content, err = os.ReadFile("ELASTIC-LICENSE-2.0-header.txt")
 	if err != nil {
 		panic("could not read Elastic License 2.0 license.")
 	}
@@ -97,6 +96,6 @@ func main() {
 	if output == "-" {
 		os.Stdout.Write(bs)
 	} else {
-		ioutil.WriteFile(output, bs, 0640)
+		os.WriteFile(output, bs, 0640)
 	}
 }
