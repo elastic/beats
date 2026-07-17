@@ -408,10 +408,8 @@ func createWatcher(
 ) (bool, error) {
 
 	// We need to check the node scope to decide on whether a watcher should be updated or not.
-	nodeScope := false
-	if options.Node != "" {
-		nodeScope = true
-	}
+	nodeScope := options.Node != ""
+
 	// The nodescope for extra watchers node, namespace, replicaset and job should be always false.
 	if extraWatcher {
 		nodeScope = false
@@ -549,7 +547,7 @@ func addEventHandlersToWatcher(
 		nodeStore.SetNodeMetrics(metrics)
 	}
 
-	clearMetadataCacheFunc := func(obj interface{}) {
+	clearMetadataCacheFunc := func(obj any) {
 		resourceWatchers.lock.RLock()
 		enrichers := make([]*enricher, 0, len(metaWatcher.enrichers))
 		for enricher := range metaWatcher.enrichers {
@@ -563,6 +561,7 @@ func addEventHandlersToWatcher(
 				enricher.Unlock()
 				continue
 			}
+			//nolint:errcheck // we know the underlying type implements this interface
 			ids := enricher.deleteFunc(obj.(kubernetes.Resource))
 			// update this watcher events by removing all the metadata[id]
 			for _, id := range ids {
