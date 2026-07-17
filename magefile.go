@@ -316,8 +316,8 @@ func (Release) RunMajorMinor() error {
 	return release.RunMajorMinorRelease(cfg)
 }
 
-// RunPatch executes the complete patch release workflow
-// This creates up to 3 PRs (version, docs, test-env)
+// RunPatch executes the patch release workflow: 4 grouped PRs on the release
+// branch (version, docs, test-env for CURRENT; next-patch prep).
 func (Release) RunPatch() error {
 	cfg, err := release.LoadConfigFromEnv()
 	if err != nil {

@@ -280,7 +280,7 @@ two-PR flow; fold into **PR-D**.
 | Target | Scope |
 |--------|-------|
 | `release:runMajorMinor` | Full FF: push branch + 4 PRs |
-| `release:runPatch` | Unchanged |
+| `release:runPatch` | Patch: 4 PRs (version, docs, test-env, next-patch) |
 | `release:runChangelog` | Unchanged |
 
 Update `dev-tools/mage/release/README.md` with the 4-PR merge-order table and
@@ -391,4 +391,4 @@ git log --oneline -5   # per branch after checkout
 - `beats-version-bump` Buildkite pipeline
 - `release-notes.yml` / `elastic-agent-changelog-tool` (use `release:runChangelog` or GH workflow separately)
 - DRA packaging (`beats-packaging-pipeline`)
-- Grouping patch-release PRs (can follow same pattern later)
+- Kerberos Dockerfile in `UpdateTestEnv` (Makefile listed it, but former elasticmachine PRs never changed it)

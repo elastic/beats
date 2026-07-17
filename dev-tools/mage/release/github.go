@@ -131,7 +131,7 @@ func (gh *GitHubClient) FindOpenPR(owner, repo, head, base string) (*github.Pull
 	return prs[0], true, nil
 }
 
-// mergeLabelDefs are auto-created when missing so FF merge-timing labels can be applied.
+// mergeLabelDefs are auto-created when missing so merge-timing labels can be applied.
 var mergeLabelDefs = map[string]struct {
 	Color       string
 	Description string
@@ -151,6 +151,10 @@ var mergeLabelDefs = map[string]struct {
 	mergeLabelAfterRelease: {
 		Color:       "0E8A16",
 		Description: "Merge 4th: after release day",
+	},
+	mergeLabelBeforeBuild: {
+		Color:       "B60205",
+		Description: "Merge before the final patch release build",
 	},
 }
 

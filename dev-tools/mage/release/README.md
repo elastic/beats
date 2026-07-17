@@ -29,7 +29,7 @@ This package provides release automation for the Beats project, migrated from Ma
 
 **Workflows supported:**
 1. **Major/Minor Release (feature-freeze)** - Creates release branch + 4 grouped PRs (backport+version on main, ff-release, docs+test-env on main, next patch on release branch)
-2. **Patch Release** - Creates up to 3 PRs (version, docs, test-env)
+2. **Patch Release** - Creates 4 grouped PRs on the release branch (version, docs, test-env, next-patch prep)
 3. **Changelog** - Generates changelog and creates 1 PR
 
 ## Prerequisites
@@ -185,35 +185,48 @@ Only 9.x+ minor releases are allowed. Patch releases are allowed for all version
 
 ### Patch Release
 
-Creates a patch release (e.g., 9.2.1) on an existing release branch.
+Creates a patch release (e.g., 9.2.1) on an existing release branch. Equivalent
+to ingest-dev `prepare-patch-release` + `prepare-next-release`, with PRs grouped
+by merge order (4 PRs).
 
 **What it does:**
-1. Validates version
-2. Creates 2 branches:
-   - `update-docs-version-X.Y.Z` - for docs and version
-   - `update-testing-env-X.Y.Z` - for test environment
-3. Makes updates on each branch
-4. Commits changes on each branch
-5. Pushes both branches (unless DRY_RUN)
-6. Creates 2 PRs (unless DRY_RUN):
-   - PR #1: Docs and version updates
-   - PR #2: Test environment updates
+1. Validates version (`LATEST_RELEASE` defaults to patch−1)
+2. Prepares **4 grouped PRs** on the release branch (merge order matters):
+
+| Step | PR | Target | Branch | Merge label | Changes |
+|------|-----|--------|--------|-------------|---------|
+| 1 | PR-A | release branch | `update-version-X.Y.Z` | `merge:1-before-build` | `version.go` → CURRENT |
+| 2 | PR-B | release branch | `update-docs-X.Y.Z` | `merge:1-before-build` | Docs + K8s manifests |
+| 3 | PR-C | release branch | `update-testing-env-X.Y.Z` | `merge:1-before-build` | Test env (`latest.yml` + compose) |
+| 4 | PR-D | release branch | `ff-prep-next-patch-X.Y.(Z+1)` | `merge:4-after-release` | Next patch version + test env |
+
+3. Opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
+
+**RM merge order:** merge PR-A/B/C before the final release build → merge PR-D after release day.
 
 **Usage:**
 
 ```bash
-# Checkout the release branch first
+# Checkout the release branch first (or ensure it exists locally)
 git checkout 9.2
 git pull
 
-# Configure and run
+# Test first with DRY_RUN
 export CURRENT_RELEASE="9.2.1"
-export LATEST_RELEASE="9.2.0"
-export BASE_BRANCH="9.2"
 export GITHUB_TOKEN="ghp_your_token"
+export DRY_RUN=true
 
 mage release:runPatch
+
+# Review branches
+git branch | grep -E 'update-version|update-docs|update-testing-env|ff-prep-next-patch'
+
+# Run for real
+export DRY_RUN=false
+mage release:runPatch
 ```
+
+`LatestRelease` defaults to patch−1 (e.g. `9.2.1` → `9.2.0`). Set `LATEST_RELEASE` only to override.
 
 ### Changelog Workflow
 
@@ -366,27 +379,32 @@ Branch prepared: ff-prep-next-patch-9.5.1
 
 Some workflows create multiple PRs to separate concerns.
 
-### Patch Release (3 PRs)
+### Patch Release (4 PRs)
 
-**PR #1: Version**
+**PR-A: Version**
 - Branch: `update-version-X.Y.Z`
 - Updates: `libbeat/version/version.go`
-- Labels: `release`, `Team:Automation`, `skip-changelog`
+- Labels: `release`, `Team:Automation`, `skip-changelog`, `merge:1-before-build`
 
-**PR #2: Docs**
+**PR-B: Docs**
 - Branch: `update-docs-X.Y.Z`
-- Updates: docs versions, K8s manifests
-- Labels: `docs`, `in progress`, `release`, `Team:Automation`, `skip-changelog`
+- Updates: docs versions, K8s manifests (no heartbeat — matches elasticmachine)
+- Labels: `docs`, `in progress`, `release`, `Team:Automation`, `skip-changelog`, `merge:1-before-build`
 
-**PR #3: Test Environment**
+**PR-C: Test Environment**
 - Branch: `update-testing-env-X.Y.Z`
-- Updates: All docker-compose files
-- Labels: `release`, `Team:Automation`, `skip-changelog`
+- Updates: `latest.yml` + docker-compose defaults
+- Labels: `release`, `Team:Automation`, `skip-changelog`, `merge:1-before-build`
 
-**Why separate PRs?**
-- Docs/version updates need review by docs team
-- Test env updates can be merged independently
-- Allows parallel review and merge
+**PR-D: Next patch prep**
+- Branch: `ff-prep-next-patch-X.Y.(Z+1)`
+- Updates: next patch `version.go` + test env (same as FF PR-D)
+- Labels: `release`, `Team:Automation`, `skip-changelog`, `merge:4-after-release`
+
+**Why separate pre-release PRs?**
+- Docs need review by docs team (`docs` / `in progress` labels)
+- Version and test-env can be reviewed in parallel
+- Next-patch prep must wait until after release day
 
 ### Reviewing Multi-PR Workflows
 

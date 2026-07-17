@@ -177,6 +177,107 @@ func TestMajorMinorPrepBranchNames(t *testing.T) {
 	}
 }
 
+func TestRunPatchReleaseDryRunBranches(t *testing.T) {
+	origMakeUpdate := runMakeUpdate
+	runMakeUpdate = func() error { return nil }
+	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
+
+	tmpDir := setupWorkflowTestRepo(t)
+
+	// Patch workflow starts from an existing release branch.
+	runGit := func(args ...string) {
+		t.Helper()
+		cmd := exec.CommandContext(context.Background(), "git", args...)
+		cmd.Dir = tmpDir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v (%s)", args, err, out)
+		}
+	}
+	runGit("branch", "9.5")
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("failed to get cwd: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("failed to restore cwd: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("failed to chdir: %v", err)
+	}
+
+	cfg := &ReleaseConfig{
+		CurrentRelease: "9.5.1",
+		LatestRelease:  "9.5.0",
+		NextRelease:    "9.5.2",
+		ReleaseBranch:  "9.5",
+		DryRun:         true,
+		GitAuthorName:  "Test User",
+		GitAuthorEmail: "test@example.com",
+	}
+
+	if err := RunPatchRelease(cfg); err != nil {
+		t.Fatalf("RunPatchRelease dry run failed: %v", err)
+	}
+
+	repo, err := OpenRepo(".")
+	if err != nil {
+		t.Fatalf("failed to open repo: %v", err)
+	}
+
+	wantBranches := []string{
+		"9.5",
+		"update-version-9.5.1",
+		"update-docs-9.5.1",
+		"update-testing-env-9.5.1",
+		"ff-prep-next-patch-9.5.2",
+	}
+	for _, branch := range wantBranches {
+		exists, err := repo.BranchExists(branch)
+		if err != nil {
+			t.Fatalf("failed checking branch %s: %v", branch, err)
+		}
+		if !exists {
+			t.Errorf("expected branch %s to exist after dry run", branch)
+		}
+	}
+
+	assertGitShowContains(t, tmpDir, "update-version-9.5.1", "libbeat/version/version.go", `defaultBeatVersion = "9.5.1"`)
+	assertGitShowContains(t, tmpDir, "update-docs-9.5.1", "libbeat/docs/version.asciidoc", ":stack-version: 9.5.1")
+	assertGitShowContains(t, tmpDir, "update-testing-env-9.5.1", "testing/environments/latest.yml", "elasticsearch:9.5.0")
+	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "libbeat/version/version.go", `defaultBeatVersion = "9.5.2"`)
+	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "testing/environments/latest.yml", "elasticsearch:9.5.1")
+}
+
+func TestPatchPrepLabels(t *testing.T) {
+	cases := []struct {
+		name   string
+		labels []string
+		want   string
+	}{
+		{name: "PR-A version", labels: patchVersionPRLabels(), want: mergeLabelBeforeBuild},
+		{name: "PR-B docs", labels: patchDocsPRLabelsWithMerge(), want: mergeLabelBeforeBuild},
+		{name: "PR-C test-env", labels: patchTestEnvPRLabels(), want: mergeLabelBeforeBuild},
+		{name: "PR-D next", labels: prDNextPatchLabels(), want: mergeLabelAfterRelease},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if !slices.Contains(tc.labels, tc.want) {
+				t.Errorf("%s labels should include %q, got %v", tc.name, tc.want, tc.labels)
+			}
+		})
+	}
+
+	docsLabels := patchDocsPRLabelsWithMerge()
+	for _, want := range []string{"docs", "in progress", "release", "Team:Automation", "skip-changelog"} {
+		if !slices.Contains(docsLabels, want) {
+			t.Errorf("docs labels should include %q, got %v", want, docsLabels)
+		}
+	}
+}
+
 func setupWorkflowTestRepo(t *testing.T) string {
 	t.Helper()
 	tmpDir := t.TempDir()
