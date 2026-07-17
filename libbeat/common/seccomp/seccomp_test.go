@@ -25,50 +25,123 @@ import (
 	"github.com/elastic/go-seccomp-bpf"
 )
 
-func TestMustRegisterPolicy(t *testing.T) {
-	policyA := testPolicy(seccomp.ActionErrno, []string{"read", "write"})
-	policyASame := testPolicy(seccomp.ActionErrno, []string{"read", "write"})
-	policyB := testPolicy(seccomp.ActionAllow, []string{"read"})
-
-	t.Run("registers first policy", func(t *testing.T) {
-		resetRegisteredPolicyForTest(t)
-		MustRegisterPolicy(policyA)
-		assert.Same(t, policyA, registeredPolicy, "registered policy pointer")
-	})
-
-	t.Run("re-registering an identical policy is a no-op", func(t *testing.T) {
-		resetRegisteredPolicyForTest(t)
-		MustRegisterPolicy(policyA)
-		assert.NotPanics(t, func() { MustRegisterPolicy(policyASame) })
-	})
-
-	t.Run("panics on a different policy", func(t *testing.T) {
-		resetRegisteredPolicyForTest(t)
-		MustRegisterPolicy(policyA)
-		assert.PanicsWithError(t, "a different seccomp policy is already registered",
-			func() { MustRegisterPolicy(policyB) })
-	})
-
-	t.Run("panics on a nil policy", func(t *testing.T) {
-		resetRegisteredPolicyForTest(t)
-		assert.PanicsWithError(t, "seccomp policy cannot be nil",
-			func() { MustRegisterPolicy(nil) })
-	})
+// registerStep is a single registerPolicy call within a test case.
+type registerStep struct {
+	policy    *seccomp.Policy
+	wantPanic string // empty means the registration must succeed
 }
 
-func resetRegisteredPolicyForTest(t *testing.T) {
-	t.Helper()
-	registeredPolicy = nil
+// TestRegisterPolicy exercises the registration logic through a local pointer,
+// so it never touches the registeredPolicy global.
+func TestRegisterPolicy(t *testing.T) {
+	t.Parallel()
+
+	// Two independently constructed policies that install the same filter.
+	policyA := namesPolicy(seccomp.ActionErrno, seccomp.ActionAllow, "read", "write")
+	policyAIdentical := namesPolicy(seccomp.ActionErrno, seccomp.ActionAllow, "read", "write")
+
+	// Variations on policyA that each install a different filter.
+	policyDifferentDefault := namesPolicy(seccomp.ActionAllow, seccomp.ActionAllow, "read", "write")
+	policyDifferentNames := namesPolicy(seccomp.ActionErrno, seccomp.ActionAllow, "read")
+	policyDifferentGroupAction := namesPolicy(seccomp.ActionErrno, seccomp.ActionTrap, "read", "write")
+
+	// Conditional policies exercising NamesWithCondtions: two identical, one
+	// differing only in the argument value it matches on.
+	policyConditions := conditionPolicy(1)
+	policyConditionsIdentical := conditionPolicy(1)
+	policyConditionsDifferent := conditionPolicy(2)
+
+	const (
+		alreadyRegistered = "a different seccomp policy is already registered"
+		cannotBeNil       = "seccomp policy cannot be nil"
+	)
+
+	tests := []struct {
+		name  string
+		steps []registerStep
+	}{
+		{
+			name:  "re-registering an identical policy is a no-op",
+			steps: []registerStep{{policy: policyA}, {policy: policyAIdentical}},
+		},
+		{
+			name:  "re-registering an identical conditional policy is a no-op",
+			steps: []registerStep{{policy: policyConditions}, {policy: policyConditionsIdentical}},
+		},
+		{
+			name:  "panics on a different default action",
+			steps: []registerStep{{policy: policyA}, {policy: policyDifferentDefault, wantPanic: alreadyRegistered}},
+		},
+		{
+			name:  "panics on different names",
+			steps: []registerStep{{policy: policyA}, {policy: policyDifferentNames, wantPanic: alreadyRegistered}},
+		},
+		{
+			name:  "panics on the same names with a different action",
+			steps: []registerStep{{policy: policyA}, {policy: policyDifferentGroupAction, wantPanic: alreadyRegistered}},
+		},
+		{
+			name:  "panics on different syscall conditions",
+			steps: []registerStep{{policy: policyConditions}, {policy: policyConditionsDifferent, wantPanic: alreadyRegistered}},
+		},
+		{
+			name:  "panics on a nil policy",
+			steps: []registerStep{{policy: nil, wantPanic: cannotBeNil}},
+		},
+		{
+			name: "panics on an invalid policy",
+			steps: []registerStep{{
+				policy:    &seccomp.Policy{DefaultAction: seccomp.ActionErrno},
+				wantPanic: "failed to register seccomp policy: syscalls must not be empty",
+			}},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var current *seccomp.Policy
+			for i, step := range tc.steps {
+				if step.wantPanic != "" {
+					assert.PanicsWithError(t, step.wantPanic,
+						func() { registerPolicy(&current, step.policy) }, "step %d", i)
+					continue
+				}
+				registerPolicy(&current, step.policy)
+				assert.Same(t, step.policy, current, "step %d: stored policy pointer", i)
+			}
+		})
+	}
+
+	// Call MustRegisterPolicy directly
+	assert.PanicsWithError(t, cannotBeNil, func() { MustRegisterPolicy(nil) })
 }
 
-func testPolicy(defaultAction seccomp.Action, names []string) *seccomp.Policy {
+// namesPolicy builds a policy with a single syscall group matching names.
+func namesPolicy(defaultAction, groupAction seccomp.Action, names ...string) *seccomp.Policy {
 	return &seccomp.Policy{
 		DefaultAction: defaultAction,
-		Syscalls: []seccomp.SyscallGroup{
-			{
-				Action: seccomp.ActionAllow,
-				Names:  names,
-			},
-		},
+		Syscalls: []seccomp.SyscallGroup{{
+			Action: groupAction,
+			Names:  names,
+		}},
+	}
+}
+
+// conditionPolicy builds a policy whose single group matches "write" only when
+// its first argument equals value, exercising the NamesWithCondtions field.
+func conditionPolicy(value uint64) *seccomp.Policy {
+	return &seccomp.Policy{
+		DefaultAction: seccomp.ActionErrno,
+		Syscalls: []seccomp.SyscallGroup{{
+			Action: seccomp.ActionAllow,
+			NamesWithCondtions: []seccomp.NameWithConditions{{
+				Name: "write",
+				Conditions: seccomp.ArgumentConditions{{
+					Argument:  0,
+					Operation: seccomp.Equal,
+					Value:     value,
+				}},
+			}},
+		}},
 	}
 }

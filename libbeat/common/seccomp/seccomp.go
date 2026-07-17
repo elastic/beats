@@ -20,7 +20,6 @@ package seccomp
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"runtime"
 	"slices"
 
@@ -48,6 +47,12 @@ var (
 // same process). It panics if a different policy is already registered or if p
 // is invalid.
 func MustRegisterPolicy(p *seccomp.Policy) {
+	registerPolicy(&registeredPolicy, p)
+}
+
+// registerPolicy validates p and stores it in *dst. It panics if p is nil,
+// invalid, or would install a different filter than the policy already in *dst.
+func registerPolicy(dst **seccomp.Policy, p *seccomp.Policy) {
 	if p == nil {
 		panic(errors.New("seccomp policy cannot be nil"))
 	}
@@ -57,26 +62,28 @@ func MustRegisterPolicy(p *seccomp.Policy) {
 		panic(fmt.Errorf("failed to register seccomp policy: %w", err))
 	}
 
-	if registeredPolicy != nil && !policiesEqual(registeredPolicy, p) {
+	if *dst != nil && !policiesEqual(*dst, p) {
 		panic(errors.New("a different seccomp policy is already registered"))
 	}
 
-	registeredPolicy = p
+	*dst = p
 }
 
 // policiesEqual reports whether a and b would install the same seccomp filter.
 func policiesEqual(a, b *seccomp.Policy) bool {
-	if a.DefaultAction != b.DefaultAction || len(a.Syscalls) != len(b.Syscalls) {
+	if a.DefaultAction != b.DefaultAction {
 		return false
 	}
-	for i := range a.Syscalls {
-		if a.Syscalls[i].Action != b.Syscalls[i].Action ||
-			!slices.Equal(a.Syscalls[i].Names, b.Syscalls[i].Names) ||
-			!reflect.DeepEqual(a.Syscalls[i].NamesWithCondtions, b.Syscalls[i].NamesWithCondtions) {
-			return false
-		}
-	}
-	return true
+	return slices.EqualFunc(a.Syscalls, b.Syscalls, func(x, y seccomp.SyscallGroup) bool {
+		return x.Action == y.Action &&
+			slices.Equal(x.Names, y.Names) &&
+			slices.EqualFunc(x.NamesWithCondtions, y.NamesWithCondtions, nameWithConditionsEqual)
+	})
+}
+
+// nameWithConditionsEqual reports whether two conditional syscall matches are equal.
+func nameWithConditionsEqual(a, b seccomp.NameWithConditions) bool {
+	return a.Name == b.Name && slices.Equal(a.Conditions, b.Conditions)
 }
 
 // LoadFilter loads a seccomp system call filter into the kernel for this
