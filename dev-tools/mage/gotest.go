@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"os"
 	"os/exec"
 	"path"
@@ -148,9 +149,7 @@ func fipsTestEnv() map[string]string {
 	if !FIPSBuild {
 		return env
 	}
-	for k, v := range FIPSConfig.Compile.Env {
-		env[k] = v
-	}
+	maps.Copy(env, FIPSConfig.Compile.Env)
 	return env
 }
 
