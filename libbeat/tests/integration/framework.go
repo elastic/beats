@@ -651,6 +651,48 @@ func (b *BeatProc) WaitLogsContainsAnyOrder(msgs []string, timeout time.Duration
 	)
 }
 
+// MonitoringPort waits for the Beat's HTTP monitoring server to log its
+// listening address and returns the ephemeral port it bound to.
+//
+// Configure the Beat with `http.port: 0` so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port.
+func (b *BeatProc) MonitoringPort(timeout time.Duration) int {
+	return b.portFromLog(timeout, MonitoringEndpointSnippet, ParseMonitoringPort,
+		"Beat monitoring endpoint did not log its listening address")
+}
+
+// SocketListeningPort waits for a tcp or udp input to log its listening address
+// and returns the ephemeral port it bound to.
+//
+// Configure the input with host: <ip>:0 so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port.
+func (b *BeatProc) SocketListeningPort(timeout time.Duration) int {
+	return b.portFromLog(timeout, SocketListeningSnippet, ParseSocketListeningPort,
+		"input did not log its listening address")
+}
+
+// portFromLog polls the Beat's logs until a line containing snippet appears and
+// parse can extract a port from it, then returns that port.
+func (b *BeatProc) portFromLog(timeout time.Duration, snippet string, parse func(string) (int, error), failMsg string) int {
+	b.t.Helper()
+	var port int
+	require.Eventuallyf(b.t, func() bool {
+		line := b.GetLogLine(snippet)
+		if line == "" {
+			return false
+		}
+		p, err := parse(line)
+		if err != nil {
+			return false
+		}
+		port = p
+		return true
+	}, timeout, 100*time.Millisecond, failMsg)
+	return port
+}
+
 // WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
 // resets the log offset.
 func (b *BeatProc) WaitLogsContainsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {

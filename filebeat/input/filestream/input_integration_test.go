@@ -1327,17 +1327,9 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	integration.WriteLogFile(t, logFilePath, 50, false)
 
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	// The duration used to configure the input need to obey
-	// the following restrictions:
-	//  - Backoff needs to be longer than the prospector and close check
-	//    interval, as well as the inactive timeout so we can have a
-	//    a harvester failing to start because there is one blocked on
-	//    its backoff.
-	//  - Close check interval needs to be smaller than the prospector
-	//    check interval
-	//  - Inactive timeout needs to me as small as possible so the reader
-	//    context is closed due to inactivity while the reader is waiting
-	//    on its backoff.
+	// Close check interval needs to be smaller than the prospector check
+	// interval. Inactive timeout should be shorter than backoff so the
+	// reader context is cancelled while waiting on backoff.
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
