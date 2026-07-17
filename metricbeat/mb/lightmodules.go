@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -59,12 +60,7 @@ func (s *LightModulesSource) HasModule(moduleName string) bool {
 		s.log.Errorf("Failed to get list of light module names: %v", err)
 		return false
 	}
-	for _, name := range names {
-		if name == moduleName {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(names, moduleName)
 }
 
 // DefaultMetricSets list the default metricsets for a given module
@@ -108,12 +104,7 @@ func (s *LightModulesSource) HasMetricSet(moduleName, metricSetName string) bool
 		return false
 	}
 
-	for _, name := range moduleConfig.MetricSets {
-		if name == metricSetName {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(moduleConfig.MetricSets, metricSetName)
 }
 
 // MetricSetRegistration obtains a registration for a light metric set

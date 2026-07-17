@@ -6,7 +6,8 @@ package syncgateway
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
+
 	"net/http"
 )
 
@@ -14,7 +15,7 @@ func CreateTestMuxer() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.Handle("/_expvar", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		input, _ := ioutil.ReadFile("../_meta/testdata/expvar.282c.json")
+		input, _ := os.ReadFile("../_meta/testdata/expvar.282c.json")
 		_, err := w.Write(input)
 		if err != nil {
 			fmt.Println("error writing response on mock server")
@@ -24,8 +25,8 @@ func CreateTestMuxer() *http.ServeMux {
 	return mux
 }
 
-func GetConfig(metricsets []string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func GetConfig(metricsets []string, host string) map[string]any {
+	return map[string]any{
 		"module":     "syncgateway",
 		"metricsets": metricsets,
 		"hosts":      []string{host},

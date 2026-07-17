@@ -133,6 +133,6 @@ type badgerLogger struct {
 }
 
 // Warningf logs a message at the warning level.
-func (l badgerLogger) Warningf(format string, args ...interface{}) {
+func (l badgerLogger) Warningf(format string, args ...any) {
 	l.Warnf(format, args...)
 }

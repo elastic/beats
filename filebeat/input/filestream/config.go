@@ -314,12 +314,12 @@ func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 	return nil
 }
 
-func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]interface{} {
-	var cfgs []map[string]interface{}
+func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]any {
+	var cfgs []map[string]any
 
 	for _, id := range duplicates {
 		for _, dupcfgs := range ids[id] {
-			toJson := map[string]interface{}{}
+			toJson := map[string]any{}
 			err := dupcfgs.Unpack(&toJson)
 			if err != nil {
 				toJson[id] = fmt.Sprintf("failed to unpack config: %v", err)

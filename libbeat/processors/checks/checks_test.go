@@ -42,12 +42,12 @@ func (m *mockProcessor) String() string {
 
 func TestRequiredFields(t *testing.T) {
 	tests := map[string]struct {
-		Config   map[string]interface{}
+		Config   map[string]any
 		Required []string
 		Valid    bool
 	}{
 		"one required field present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"required_field": nil,
 				"not_required":   nil,
 			},
@@ -57,7 +57,7 @@ func TestRequiredFields(t *testing.T) {
 			Valid: true,
 		},
 		"two required field present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"required_field":         nil,
 				"another_required_field": nil,
 				"not_required":           nil,
@@ -69,7 +69,7 @@ func TestRequiredFields(t *testing.T) {
 			Valid: true,
 		},
 		"one required field present and one missing in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"required_field": nil,
 				"not_required":   nil,
 			},
@@ -90,12 +90,12 @@ func TestRequiredFields(t *testing.T) {
 
 func TestAllowedFields(t *testing.T) {
 	tests := map[string]struct {
-		Config  map[string]interface{}
+		Config  map[string]any
 		Allowed []string
 		Valid   bool
 	}{
 		"one allowed field present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"allowed_field": nil,
 			},
 			Allowed: []string{
@@ -104,7 +104,7 @@ func TestAllowedFields(t *testing.T) {
 			Valid: true,
 		},
 		"two allowed field present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"allowed_field":         nil,
 				"another_allowed_field": nil,
 			},
@@ -115,7 +115,7 @@ func TestAllowedFields(t *testing.T) {
 			Valid: true,
 		},
 		"one allowed field present and one not allowed is present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"allowed_field": nil,
 				"not_allowed":   nil,
 			},
@@ -135,12 +135,12 @@ func TestAllowedFields(t *testing.T) {
 
 func TestMutuallyExclusiveRequiredFields(t *testing.T) {
 	tests := map[string]struct {
-		Config            map[string]interface{}
+		Config            map[string]any
 		MutuallyExclusive []string
 		Valid             bool
 	}{
 		"one mutually exclusive field is present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"first_option": nil,
 			},
 			MutuallyExclusive: []string{
@@ -150,7 +150,7 @@ func TestMutuallyExclusiveRequiredFields(t *testing.T) {
 			Valid: true,
 		},
 		"two mutually exclusive field is present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"first_option":  nil,
 				"second_option": nil,
 			},
@@ -161,7 +161,7 @@ func TestMutuallyExclusiveRequiredFields(t *testing.T) {
 			Valid: false,
 		},
 		"no mutually exclusive field is present in the configuration": {
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"third_option": nil,
 			},
 			MutuallyExclusive: []string{
@@ -182,7 +182,7 @@ func TestMutuallyExclusiveRequiredFields(t *testing.T) {
 func runTest(
 	t *testing.T,
 	check func(fields ...string) func(*conf.C) error,
-	config map[string]interface{},
+	config map[string]any,
 	fields []string,
 	valid bool,
 ) {

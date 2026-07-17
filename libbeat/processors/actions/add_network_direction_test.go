@@ -58,7 +58,7 @@ func TestNetworkDirection(t *testing.T) {
 					"destination": tt.Destination,
 				},
 			}
-			p, err := NewAddNetworkDirection(conf.MustNewConfigFrom(map[string]interface{}{
+			p, err := NewAddNetworkDirection(conf.MustNewConfigFrom(map[string]any{
 				"source":            "source",
 				"destination":       "destination",
 				"target":            "direction",
@@ -89,7 +89,7 @@ func TestNetworkDirection(t *testing.T) {
 				"destination": "8.8.8.8",
 			},
 		}
-		p, err := NewAddNetworkDirection(conf.MustNewConfigFrom(map[string]interface{}{
+		p, err := NewAddNetworkDirection(conf.MustNewConfigFrom(map[string]any{
 			"source":            "source",
 			"destination":       "destination",
 			"target":            "@metadata.direction",

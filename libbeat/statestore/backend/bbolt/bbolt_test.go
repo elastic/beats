@@ -242,7 +242,7 @@ func TestStoreCompactionOnStart(t *testing.T) {
 	store, err := reg.Access("test")
 	require.NoError(t, err)
 
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		require.NoError(t, store.Set("key", map[string]any{"i": i}))
 	}
 	require.NoError(t, store.Close())
@@ -587,7 +587,7 @@ func TestCleanupOnStartRemovesTempFiles(t *testing.T) {
 	require.NoError(t, s.Close())
 
 	// Plant fake leftover temp files that simulate a crashed compaction.
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		f, err := os.CreateTemp(dir, tempDbPrefix)
 		require.NoError(t, err)
 		require.NoError(t, f.Close())
@@ -626,7 +626,7 @@ func TestCleanupExpiredBatching(t *testing.T) {
 	defer s.Close()
 
 	// Insert 10 keys that will all expire.
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		require.NoError(t, s.Set(fmt.Sprintf("key-%02d", i), map[string]any{"i": i}))
 	}
 
@@ -639,7 +639,7 @@ func TestCleanupExpiredBatching(t *testing.T) {
 	require.NoError(t, s.cleanupExpired())
 
 	// Verify all expired keys are gone.
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		has, err := s.Has(fmt.Sprintf("key-%02d", i))
 		require.NoError(t, err)
 		assert.False(t, has, "expired key-%02d should be removed", i)

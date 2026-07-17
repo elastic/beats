@@ -117,7 +117,7 @@ func NewRegistryBridge(settings component.TelemetrySettings, receiverID string, 
 	if inputsRegistry != nil {
 		snapshot := monitoring.CollectStructSnapshot(inputsRegistry, monitoring.Full, false)
 		for _, entry := range snapshot {
-			data, ok := entry.(map[string]interface{})
+			data, ok := entry.(map[string]any)
 			if !ok {
 				continue
 			}
@@ -484,7 +484,7 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 	for _, entry := range snapshot {
 		// Each input sub-registry is collected as a map[string]interface{}.
 		// Skip any unexpected non-map entries defensively.
-		data, ok := entry.(map[string]interface{})
+		data, ok := entry.(map[string]any)
 		if !ok {
 			continue
 		}
@@ -538,7 +538,7 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 
 // toInt64Value converts a monitoring snapshot value to int64. Returns false for
 // non-numeric types.
-func toInt64Value(v interface{}) (int64, bool) {
+func toInt64Value(v any) (int64, bool) {
 	switch n := v.(type) {
 	case int64:
 		return n, true

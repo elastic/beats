@@ -36,13 +36,13 @@ type appendProcessor struct {
 }
 
 type appendProcessorConfig struct {
-	Fields            []string      `config:"fields"`
-	TargetField       string        `config:"target_field"`
-	Values            []interface{} `config:"values"`
-	IgnoreMissing     bool          `config:"ignore_missing"`
-	IgnoreEmptyValues bool          `config:"ignore_empty_values"`
-	FailOnError       bool          `config:"fail_on_error"`
-	AllowDuplicate    bool          `config:"allow_duplicate"`
+	Fields            []string `config:"fields"`
+	TargetField       string   `config:"target_field"`
+	Values            []any    `config:"values"`
+	IgnoreMissing     bool     `config:"ignore_missing"`
+	IgnoreEmptyValues bool     `config:"ignore_empty_values"`
+	FailOnError       bool     `config:"fail_on_error"`
+	AllowDuplicate    bool     `config:"allow_duplicate"`
 }
 
 func init() {
@@ -97,8 +97,8 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.Event) error {
-	var arr []interface{}
+func (f *appendProcessor) appendValues(target string, fields []string, values []any, event *beat.Event) error {
+	var arr []any
 
 	// get the existing value of target field
 	targetVal, err := event.GetValue(target)
@@ -149,7 +149,7 @@ func (f *appendProcessor) String() string {
 }
 
 // this function will remove all the empty strings and nil values from the array
-func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
+func cleanEmptyValues(dirtyArr []any) (cleanArr []any) {
 	for _, val := range dirtyArr {
 		if val == "" || val == nil {
 			continue
@@ -160,8 +160,8 @@ func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
 }
 
 // this function will remove all the duplicate values from the array
-func removeDuplicates(dirtyArr []interface{}) (cleanArr []interface{}) {
-	set := make(map[interface{}]bool, 0)
+func removeDuplicates(dirtyArr []any) (cleanArr []any) {
+	set := make(map[any]bool, 0)
 	for _, val := range dirtyArr {
 		valType := reflect.TypeOf(val)
 		if valType == nil || valType.Comparable() {

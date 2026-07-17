@@ -317,7 +317,7 @@ func (*dummyModule) Config() mb.ModuleConfig {
 	return mb.ModuleConfig{}
 }
 
-func (*dummyModule) UnpackConfig(interface{}) error {
+func (*dummyModule) UnpackConfig(any) error {
 	return nil
 }
 func (dummyModule) UpdateStatus(_ status.Status, _ string)    {}
