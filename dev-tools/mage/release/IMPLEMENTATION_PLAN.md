@@ -280,7 +280,7 @@ two-PR flow; fold into **PR-D**.
 | Target | Scope |
 |--------|-------|
 | `release:runMajorMinor` | Full FF: push branch + 4 PRs |
-| `release:runPatch` | Patch: 4 PRs (version, docs, test-env, next-patch) |
+| `release:runPatch` | Patch: 2 PRs (before-build version+docs+env, next-patch) |
 | `release:runChangelog` | Unchanged |
 
 Update `dev-tools/mage/release/README.md` with the 4-PR merge-order table and

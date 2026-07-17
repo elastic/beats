@@ -229,9 +229,7 @@ func TestRunPatchReleaseDryRunBranches(t *testing.T) {
 
 	wantBranches := []string{
 		"9.5",
-		"update-version-9.5.1",
-		"update-docs-9.5.1",
-		"update-testing-env-9.5.1",
+		"patch-release-9.5.1",
 		"ff-prep-next-patch-9.5.2",
 	}
 	for _, branch := range wantBranches {
@@ -244,9 +242,9 @@ func TestRunPatchReleaseDryRunBranches(t *testing.T) {
 		}
 	}
 
-	assertGitShowContains(t, tmpDir, "update-version-9.5.1", "libbeat/version/version.go", `defaultBeatVersion = "9.5.1"`)
-	assertGitShowContains(t, tmpDir, "update-docs-9.5.1", "libbeat/docs/version.asciidoc", ":stack-version: 9.5.1")
-	assertGitShowContains(t, tmpDir, "update-testing-env-9.5.1", "testing/environments/latest.yml", "elasticsearch:9.5.0")
+	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "libbeat/version/version.go", `defaultBeatVersion = "9.5.1"`)
+	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "libbeat/docs/version.asciidoc", ":stack-version: 9.5.1")
+	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "testing/environments/latest.yml", "elasticsearch:9.5.0")
 	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "libbeat/version/version.go", `defaultBeatVersion = "9.5.2"`)
 	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "testing/environments/latest.yml", "elasticsearch:9.5.1")
 }
@@ -257,10 +255,8 @@ func TestPatchPrepLabels(t *testing.T) {
 		labels []string
 		want   string
 	}{
-		{name: "PR-A version", labels: patchVersionPRLabels(), want: mergeLabelBeforeBuild},
-		{name: "PR-B docs", labels: patchDocsPRLabelsWithMerge(), want: mergeLabelBeforeBuild},
-		{name: "PR-C test-env", labels: patchTestEnvPRLabels(), want: mergeLabelBeforeBuild},
-		{name: "PR-D next", labels: prDNextPatchLabels(), want: mergeLabelAfterRelease},
+		{name: "PR-A before-build", labels: patchBeforeBuildPRLabels(), want: mergeLabelBeforeBuild},
+		{name: "PR-B next", labels: prDNextPatchLabels(), want: mergeLabelAfterRelease},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -270,10 +266,10 @@ func TestPatchPrepLabels(t *testing.T) {
 		})
 	}
 
-	docsLabels := patchDocsPRLabelsWithMerge()
+	beforeBuild := patchBeforeBuildPRLabels()
 	for _, want := range []string{"docs", "in progress", "release", "Team:Automation", "skip-changelog"} {
-		if !slices.Contains(docsLabels, want) {
-			t.Errorf("docs labels should include %q, got %v", want, docsLabels)
+		if !slices.Contains(beforeBuild, want) {
+			t.Errorf("before-build labels should include %q, got %v", want, beforeBuild)
 		}
 	}
 }

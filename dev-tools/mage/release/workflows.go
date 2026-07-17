@@ -64,16 +64,9 @@ func prDNextPatchLabels() []string {
 	return append(append([]string{}, releasePRLabels...), mergeLabelAfterRelease)
 }
 
-func patchVersionPRLabels() []string {
-	return append(append([]string{}, releasePRLabels...), mergeLabelBeforeBuild)
-}
-
-func patchDocsPRLabelsWithMerge() []string {
+func patchBeforeBuildPRLabels() []string {
+	// Same label set as ff-release / former docs PR (includes docs + in progress).
 	return append(append([]string{}, patchDocsPRLabels...), mergeLabelBeforeBuild)
-}
-
-func patchTestEnvPRLabels() []string {
-	return append(append([]string{}, releasePRLabels...), mergeLabelBeforeBuild)
 }
 
 // checkRequirements validates prerequisites before running a release workflow
@@ -327,7 +320,7 @@ func prepMainDocsAndTestEnv(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, erro
 
 func prepNextPatchOnReleaseBranch(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
 	branch := fmt.Sprintf("ff-prep-next-patch-%s", cfg.NextRelease)
-	fmt.Printf("\n--- Preparing PR-D: next patch %s on %s ---\n", cfg.NextRelease, cfg.ReleaseBranch)
+	fmt.Printf("\n--- Preparing next-patch prep: %s on %s ---\n", cfg.NextRelease, cfg.ReleaseBranch)
 
 	if err := repo.EnsureBranchFrom(cfg.ReleaseBranch, branch); err != nil {
 		return workflowPR{}, err
@@ -396,10 +389,8 @@ Merge after release of %s.
 }
 
 // RunPatchRelease executes the patch release workflow on an existing release branch:
-// 1. Opens PR-A (version bump for CURRENT_RELEASE)
-// 2. Opens PR-B (docs for CURRENT_RELEASE)
-// 3. Opens PR-C (test env for CURRENT_RELEASE)
-// 4. Opens PR-D (next patch prep — same as FF PR-D / prepare-next-release)
+// 1. Opens PR-A (version + docs + test env for CURRENT_RELEASE — before build)
+// 2. Opens PR-B (next patch prep — same as FF PR-D / prepare-next-release)
 func RunPatchRelease(cfg *ReleaseConfig) error {
 	fmt.Println("=== Starting Patch Release Workflow ===")
 
@@ -424,24 +415,16 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 		cfg.ReleaseBranch = inferReleaseBranch(cfg.CurrentRelease)
 	}
 
-	prA, err := prepPatchVersion(repo, cfg)
+	prA, err := prepPatchBeforeBuild(repo, cfg)
 	if err != nil {
 		return err
 	}
-	prB, err := prepPatchDocs(repo, cfg)
-	if err != nil {
-		return err
-	}
-	prC, err := prepPatchTestEnv(repo, cfg)
-	if err != nil {
-		return err
-	}
-	prD, err := prepNextPatchOnReleaseBranch(repo, cfg)
+	prB, err := prepNextPatchOnReleaseBranch(repo, cfg)
 	if err != nil {
 		return err
 	}
 
-	branchesToFinalize := []workflowPR{prA, prB, prC, prD}
+	branchesToFinalize := []workflowPR{prA, prB}
 
 	if cfg.DryRun {
 		fmt.Println("\nDRY RUN: Skipping push and PR creation")
@@ -475,42 +458,14 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	return nil
 }
 
-func prepPatchVersion(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
-	branch := fmt.Sprintf("update-version-%s", cfg.CurrentRelease)
-	fmt.Printf("\n--- Preparing PR-A: version %s on %s ---\n", cfg.CurrentRelease, cfg.ReleaseBranch)
+func prepPatchBeforeBuild(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
+	branch := fmt.Sprintf("patch-release-%s", cfg.CurrentRelease)
+	fmt.Printf("\n--- Preparing PR-A: patch-release %s on %s ---\n", cfg.CurrentRelease, cfg.ReleaseBranch)
 
 	if err := repo.EnsureBranchFrom(cfg.ReleaseBranch, branch); err != nil {
 		return workflowPR{}, err
 	}
 	if err := UpdateVersion(cfg.CurrentRelease); err != nil {
-		return workflowPR{}, err
-	}
-	commitMsg := "[Release] update version"
-	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
-		return workflowPR{}, err
-	}
-
-	return workflowPR{
-		branch: branch,
-		base:   cfg.ReleaseBranch,
-		opts: PROptions{
-			Owner:     cfg.ProjectOwner,
-			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("[Release] update version %s", cfg.CurrentRelease),
-			Head:      branch,
-			Base:      cfg.ReleaseBranch,
-			Body:      patchVersionPRBody(cfg.CurrentRelease),
-			Reviewers: cfg.ProjectReviewers,
-			Labels:    patchVersionPRLabels(),
-		},
-	}, nil
-}
-
-func prepPatchDocs(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
-	branch := fmt.Sprintf("update-docs-%s", cfg.CurrentRelease)
-	fmt.Printf("\n--- Preparing PR-B: docs %s on %s ---\n", cfg.CurrentRelease, cfg.ReleaseBranch)
-
-	if err := repo.EnsureBranchFrom(cfg.ReleaseBranch, branch); err != nil {
 		return workflowPR{}, err
 	}
 	if err := UpdateDocsWithOptions(DocsUpdateOptions{
@@ -520,38 +475,10 @@ func prepPatchDocs(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
 	}); err != nil {
 		return workflowPR{}, err
 	}
-	commitMsg := "docs: update docs"
-	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
-		return workflowPR{}, err
-	}
-
-	return workflowPR{
-		branch: branch,
-		base:   cfg.ReleaseBranch,
-		opts: PROptions{
-			Owner:     cfg.ProjectOwner,
-			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("docs: update docs versions %s", cfg.CurrentRelease),
-			Head:      branch,
-			Base:      cfg.ReleaseBranch,
-			Body:      patchDocsPRBody(cfg.CurrentRelease),
-			Reviewers: cfg.ProjectReviewers,
-			Labels:    patchDocsPRLabelsWithMerge(),
-		},
-	}, nil
-}
-
-func prepPatchTestEnv(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
-	branch := fmt.Sprintf("update-testing-env-%s", cfg.CurrentRelease)
-	fmt.Printf("\n--- Preparing PR-C: test env %s on %s ---\n", cfg.CurrentRelease, cfg.ReleaseBranch)
-
-	if err := repo.EnsureBranchFrom(cfg.ReleaseBranch, branch); err != nil {
-		return workflowPR{}, err
-	}
 	if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
 		return workflowPR{}, err
 	}
-	commitMsg := "[Release] update test environment"
+	commitMsg := fmt.Sprintf("[Release] Prepare patch %s (version + docs + test env)", cfg.CurrentRelease)
 	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return workflowPR{}, err
 	}
@@ -562,12 +489,12 @@ func prepPatchTestEnv(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
 		opts: PROptions{
 			Owner:     cfg.ProjectOwner,
 			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("[Release] Update test environments for %s", cfg.CurrentRelease),
+			Title:     fmt.Sprintf("[Release] Prepare patch %s (version + docs + test env)", cfg.CurrentRelease),
 			Head:      branch,
 			Base:      cfg.ReleaseBranch,
-			Body:      patchTestEnvPRBody(cfg.CurrentRelease),
+			Body:      patchBeforeBuildPRBody(cfg.CurrentRelease),
 			Reviewers: cfg.ProjectReviewers,
-			Labels:    patchTestEnvPRLabels(),
+			Labels:    patchBeforeBuildPRLabels(),
 		},
 	}, nil
 }
@@ -578,25 +505,15 @@ type workflowPR struct {
 	opts   PROptions
 }
 
-func patchDocsPRBody(currentRelease string) string {
-	return fmt.Sprintf(`Updates docs versions to %s.
+func patchBeforeBuildPRBody(currentRelease string) string {
+	return fmt.Sprintf(`Prepares the release branch for patch %s.
+
+- Bumps libbeat/version/version.go to %s
+- Updates docs versions and K8s manifests
+- Updates test environments
 
 Merge before the final Release build.
-`, currentRelease)
-}
-
-func patchVersionPRBody(currentRelease string) string {
-	return fmt.Sprintf(`Updates version to %s.
-
-Merge before the final Release build.
-`, currentRelease)
-}
-
-func patchTestEnvPRBody(currentRelease string) string {
-	return fmt.Sprintf(`Updates test environments for %s.
-
-Merge before the final Release build.
-`, currentRelease)
+`, currentRelease, currentRelease)
 }
 
 // finalizePR pushes a branch when it has new commits and creates or reuses an open PR.
