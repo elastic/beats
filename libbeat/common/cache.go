@@ -178,8 +178,9 @@ func (c *Cache) ReplaceWithTimeout(k Key, v Value, timeout time.Duration) Value 
 // Get the current value associated with a key or nil if the key is not
 // present. The last access time of the element is updated.
 func (c *Cache) Get(k Key) Value {
-	c.RLock()
-	defer c.RUnlock()
+	// Exclusive lock because get() updates the element's last access time on access-expiry caches.
+	c.Lock()
+	defer c.Unlock()
 	v, _ := c.get(k)
 	return v
 }
@@ -239,24 +240,39 @@ func (c *Cache) Size() int {
 // CleanUp() method.
 func (c *Cache) StartJanitor(interval time.Duration) {
 	ticker := time.NewTicker(interval)
-	c.janitorQuit = make(chan struct{})
-	go func() {
+	quit := make(chan struct{})
+
+	c.Lock()
+	oldQuit := c.janitorQuit
+	c.janitorQuit = quit
+	c.Unlock()
+
+	if oldQuit != nil {
+		close(oldQuit)
+	}
+
+	go func(quit <-chan struct{}) {
 		for {
 			select {
 			case <-ticker.C:
 				c.CleanUp()
-			case <-c.janitorQuit:
+			case <-quit:
 				ticker.Stop()
 				return
 			}
 		}
-	}()
+	}(quit)
 }
 
 // StopJanitor stops the goroutine created by StartJanitor.
 func (c *Cache) StopJanitor() {
-	if c.janitorQuit != nil {
-		close(c.janitorQuit)
+	c.Lock()
+	quit := c.janitorQuit
+	c.janitorQuit = nil
+	c.Unlock()
+
+	if quit != nil {
+		close(quit)
 	}
 }
 

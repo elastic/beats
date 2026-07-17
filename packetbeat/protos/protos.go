@@ -76,6 +76,13 @@ func validatePorts(ports []int) error {
 	return nil
 }
 
+// PluginCloser is an optional interface that protocol plugins can implement
+// to release resources (e.g. stop cache janitor goroutines) when the
+// protocol is no longer needed.
+type PluginCloser interface {
+	Close()
+}
+
 type Protocols interface {
 	BpfFilter(withVlans bool, withICMP bool) string
 	GetTCP(proto Protocol) TCPPlugin
@@ -91,13 +98,25 @@ type ProtocolsStruct struct {
 	all map[Protocol]protocolInstance
 	tcp map[Protocol]TCPPlugin
 	udp map[Protocol]UDPPlugin
+
+	logger *logp.Logger
 }
 
-func NewProtocols() *ProtocolsStruct {
+type loggerAwarePlugin interface {
+	SetLogger(*logp.Logger)
+}
+
+func NewProtocols(loggers ...*logp.Logger) *ProtocolsStruct {
+	var logger *logp.Logger
+	if len(loggers) > 0 {
+		logger = loggers[0]
+	}
+
 	return &ProtocolsStruct{
-		all: map[Protocol]protocolInstance{},
-		tcp: map[Protocol]TCPPlugin{},
-		udp: map[Protocol]UDPPlugin{},
+		all:    map[Protocol]protocolInstance{},
+		tcp:    map[Protocol]TCPPlugin{},
+		udp:    map[Protocol]UDPPlugin{},
+		logger: logger,
 	}
 }
 
@@ -115,9 +134,9 @@ func (s ProtocolsStruct) Init(test bool, pub reporterFactory, watch *procs.Proce
 }
 
 func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
-	if len(cfgs) != 0 {
+	if len(cfgs) != 0 && s.logger != nil {
 		// TODO: https://github.com/elastic/ingest-dev/issues/6000
-		logp.NewLogger("").Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
+		s.logger.Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
 	}
 
 	for proto := range protocolSyms {
@@ -194,6 +213,9 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 		logp.Err("Failed to register protocol plugin: %v", err)
 		return err
 	}
+	if loggerAware, ok := inst.(loggerAwarePlugin); ok && s.logger != nil {
+		loggerAware.SetLogger(s.logger.Named(name))
+	}
 
 	s.register(proto, client, inst)
 	return nil
@@ -267,21 +289,30 @@ func (s ProtocolsStruct) GetAllUDP() map[Protocol]UDPPlugin {
 	return s.udp
 }
 
+// Close releases resources held by all registered protocol plugins.
+// Plugins that implement PluginCloser will have their Close method called.
+func (s ProtocolsStruct) Close() {
+	for _, inst := range s.all {
+		if closer, ok := inst.plugin.(PluginCloser); ok {
+			closer.Close()
+		}
+	}
+}
+
 // BpfFilter returns a Berkeley Packer Filter (BFP) expression that
 // will match against packets for the registered protocols. If with_vlans is
 // true the filter will match against both IEEE 802.1Q VLAN encapsulated
 // and unencapsulated packets
 func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	// Sort the protocol IDs so that the return value is consistent.
-	protos := make([]int, 0, len(s.all))
+	protos := make([]Protocol, 0, len(s.all))
 	for proto := range s.all {
-		protos = append(protos, int(proto))
+		protos = append(protos, proto)
 	}
-	sort.Ints(protos)
+	sort.Slice(protos, func(i, j int) bool { return protos[i] < protos[j] })
 
 	var expressions []string
-	for _, key := range protos {
-		proto := Protocol(key)
+	for _, proto := range protos {
 		plugin := s.all[proto].plugin
 		for _, port := range plugin.GetPorts() {
 			hasTCP := false

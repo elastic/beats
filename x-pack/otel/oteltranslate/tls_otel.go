@@ -6,7 +6,6 @@ package oteltranslate
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -25,22 +24,6 @@ var tlsVersions = map[uint16]string{
 	tls.VersionTLS11: "1.1",
 	tls.VersionTLS12: "1.2",
 	tls.VersionTLS13: "1.3",
-}
-
-func validateUnsupportedConfig(output *config.C) error {
-
-	if sslConfig, err := output.Child("ssl", -1); err == nil {
-		if reloadCfg, err := sslConfig.Child("restart_on_cert_change", -1); err == nil {
-			if reloadCfg.HasField("enabled") {
-				return fmt.Errorf("ssl.restart_on_cert_change.enabled is currently not supported: %w", errors.ErrUnsupported)
-			} else if reloadCfg.HasField("period") {
-				return fmt.Errorf("ssl.restart_on_cert_change.period is currently not supported: %w", errors.ErrUnsupported)
-			}
-		}
-
-	}
-
-	return nil
 }
 
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
@@ -66,9 +49,10 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 		}, nil
 	}
 
-	// throw error if unsupported tls config is set
-	if err := validateUnsupportedConfig(output); err != nil {
-		return nil, err
+	// Certificate hot-reload was introduced after this branch was cut. Disable it
+	// by default so it does not activate silently in a patch release.
+	if tlsCfg.TLS.CertificateReload.Enabled == nil {
+		tlsCfg.TLS.CertificateReload.Enabled = new(false)
 	}
 
 	tlscfg := tlsCfg.TLS

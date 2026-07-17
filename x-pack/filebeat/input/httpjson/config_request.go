@@ -12,10 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 )
 
 type retryConfig struct {
@@ -123,17 +122,18 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 type requestConfig struct {
-	URL                    *urlConfig       `config:"url" validate:"required"`
-	Method                 string           `config:"method" validate:"required"`
-	Body                   *mapstr.M        `config:"body"`
-	EncodeAs               string           `config:"encode_as"`
-	Retry                  retryConfig      `config:"retry"`
-	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
-	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
-	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
-	RateLimit              *rateLimitConfig `config:"rate_limit"`
-	KeepAlive              keepAlive        `config:"keep_alive"`
-	Transforms             transformsConfig `config:"transforms"`
+	URL                      *urlConfig       `config:"url" validate:"required"`
+	Method                   string           `config:"method" validate:"required"`
+	Body                     *mapstr.M        `config:"body"`
+	EncodeAs                 string           `config:"encode_as"`
+	Retry                    retryConfig      `config:"retry"`
+	RedirectForwardHeaders   bool             `config:"redirect.forward_headers"`
+	RedirectHeadersBanList   []string         `config:"redirect.headers_ban_list"`
+	RedirectSensitiveHeaders []string         `config:"redirect.sensitive_headers"`
+	RedirectMaxRedirects     int              `config:"redirect.max_redirects"`
+	RateLimit                *rateLimitConfig `config:"rate_limit"`
+	KeepAlive                keepAlive        `config:"keep_alive"`
+	Transforms               transformsConfig `config:"transforms"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 

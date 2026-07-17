@@ -46,7 +46,7 @@ RUN for iter in {1..10}; do \
     (exit $exit_code)
 {{- end }}
 
-{{- if contains .from "ubi-minimal" }}
+{{- if and (contains .from "ubi") (contains .from "minimal") }}
 RUN for iter in {1..10}; do \
         microdnf -y update && \
         microdnf -y install findutils shadow-utils && \
@@ -144,7 +144,7 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-        apk add --no-interactive --no-progress --no-cache nodejs-22=22.22.2-r0 npm=11.12.0-r1 glib dbus-glib libatk-1.0 \
+        apk add --no-interactive --no-progress --no-cache nodejs-22=22.23.1-r0 npm=11.18.0-r0 glib libatk-1.0 \
         libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxfixes libxrandr libxkbcommon pango alsa-lib \
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
@@ -183,7 +183,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=22.22.2
+ENV NODE_VERSION=22.23.1
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -208,10 +208,10 @@ RUN cd /usr/share/heartbeat/.node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
 
-# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 11.14.0
-# Bootstrap npm 11.14.1 from a downloaded copy to avoid npm 10.x self-replacement failures
-RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-11.14.1.tgz | tar xz -C /tmp \
-    && node /tmp/package/bin/npm-cli.js install -g npm@11.14.1 \
+# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 11.18.0
+# Bootstrap npm 11.18.0 from a downloaded copy to avoid npm 10.x self-replacement failures
+RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-11.18.0.tgz | tar xz -C /tmp \
+    && node /tmp/package/bin/npm-cli.js install -g npm@11.18.0 \
     && rm -rf /tmp/package
 
 # Install synthetics as a regular user, installing npm deps as root doesn't work

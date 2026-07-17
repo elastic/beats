@@ -54,7 +54,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 	var (
 		claim  dpop.ClaimerFunc
 		key    crypto.Signer
-		method jwt.SigningMethod
+		method = jwt.SigningMethodRS256
 	)
 	if o.DPoPKeyPEM != "" {
 		claim = func() *jwt.RegisteredClaims {
@@ -73,7 +73,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode dpop signer: %w", err)
 		}
-		cli, err := dpop.NewTokenClient(claim, key, jwt.SigningMethodRS256, nil)
+		cli, err := dpop.NewTokenClient(claim, key, method, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to make token client: %w", err)
 		}
@@ -124,6 +124,10 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
+	if ts.token != nil && ts.token.Valid() {
+		return ts.token, nil
+	}
+
 	var oktaJWT string
 	var err error
 	if ts.oktaJWKPEM != "" {
@@ -139,6 +143,7 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 		return nil, fmt.Errorf("error exchanging Okta JWT for bearer token: %w", err)
 
 	}
+	ts.token = token
 
 	return token, nil
 }
