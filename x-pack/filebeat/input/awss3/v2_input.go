@@ -108,7 +108,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, awsCfg awssdk.C
 	probeACK := newAWSACKHandler()
 	probeClient, err := createPipelineClient(pipeline, probeACK)
 	if err != nil {
-		health.UpdateStatus(status.Degraded, fmt.Sprintf("Pipeline connection failed: %s", err))
+		health.SetWorkerError(err)
 		<-ctx.Done()
 		return nil
 	}
