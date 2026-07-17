@@ -489,13 +489,11 @@ func setSameAsProcess(process *types.Process) {
 // This is a globally unique identifier for the process.
 func calculateEntityIDv1(pid uint32, startTime time.Time) string {
 	return base64.StdEncoding.EncodeToString(
-		[]byte(
-			fmt.Sprintf("%d__%s__%d__%d",
-				pidNsInode,
-				bootID,
-				uint64(pid),
-				uint64(startTime.Unix()), //nolint:gosec // process start times are always positive
-			),
+		fmt.Appendf(nil, "%d__%s__%d__%d",
+			pidNsInode,
+			bootID,
+			uint64(pid),
+			uint64(startTime.Unix()), //nolint:gosec // process start times are always positive)
 		),
 	)
 }
