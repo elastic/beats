@@ -20,6 +20,8 @@ package util
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -27,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 
@@ -59,6 +62,12 @@ const (
 	podBName                  = "pod-b"
 	informerTestContainerName = "container"
 )
+
+type constructorRollbackMetricSet struct {
+	mb.BaseMetricSet
+}
+
+func (*constructorRollbackMetricSet) Fetch(mb.ReporterV2) {}
 
 func TestWatchOptions(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "test")
@@ -630,33 +639,57 @@ func TestEnricherTracksAndReleasesExactExtraWatchers(t *testing.T) {
 	resourceWatchers.lock.RUnlock()
 }
 
-func TestEnricherConstructorRollbackReleasesRegisteredWatchers(t *testing.T) {
+func TestNewResourceMetadataEnricherRollsBackRegisteredWatchers(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	metricsRepo := NewMetricsRepo()
-	client := k8sfake.NewSimpleClientset()
-	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
-	log := logptest.NewTestingLogger(t, selector)
-	config := &kubernetesConfig{
-		SyncPeriod:          time.Second,
-		AddResourceMetadata: resourceMetadataConfig(t, false, false, false, false),
-	}
-	e := newMetadataEnricher("state_service", ServiceResource, config, log)
+	kubeConfigPath := filepath.Join(t.TempDir(), "kubeconfig")
+	require.NoError(t, os.WriteFile(kubeConfigPath, []byte(`
+apiVersion: v1
+kind: Config
+clusters:
+  - name: test
+    cluster:
+      server: https://127.0.0.1:1
+      insecure-skip-tls-verify: true
+contexts:
+  - name: test
+    context:
+      cluster: test
+      user: test
+current-context: test
+users:
+  - name: test
+    user:
+      token: test
+`), 0o600))
 
-	require.NoError(
-		t,
-		createAllWatchers(client, metadataClient, e, false, config, log, resourceWatchers, metricsRepo),
-		"primary watcher registration must succeed before the simulated constructor failure",
-	)
-	commonConfig, err := conf.NewConfigFrom(&metadata.Config{})
-	require.NoError(t, err, "common metadata config must be valid")
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers, nil)
-	require.Error(t, err, "service metadata generator must fail without a namespace watcher")
+	const moduleName = "constructor_rollback_test"
+	registry := mb.NewRegister()
+	require.NoError(t, registry.AddModule(moduleName, mb.DefaultModuleFactory))
 
-	releaseWatcherOwnership(e, resourceWatchers)
+	var enricher Enricher
+	registry.MustAddMetricSet(moduleName, "state_service", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		enricher = NewResourceMetadataEnricher(base, metricsRepo, resourceWatchers, false)
+		return &constructorRollbackMetricSet{BaseMetricSet: base}, nil
+	})
+
+	// Service watcher registration succeeds, then metadata generator creation
+	// fails because Namespace metadata is disabled. The constructor must roll
+	// back the provisional Service watcher ownership before returning.
+	mbtest.NewMetricSetWithRegistry(t, map[string]any{
+		"module":       moduleName,
+		"metricsets":   []string{"state_service"},
+		"add_metadata": true,
+		"kube_config":  kubeConfigPath,
+		"add_resource_metadata": map[string]any{
+			"namespace": map[string]any{"enabled": false},
+		},
+	}, registry)
+
+	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
 	resourceWatchers.lock.RLock()
 	require.Empty(t, resourceWatchers.metaWatchersMap, "constructor rollback must evict an unstarted final-owner watcher")
 	resourceWatchers.lock.RUnlock()
-	require.Empty(t, e.watchedResources, "constructor rollback must clear recorded ownership")
 }
 
 func TestClusterScopedConstructorRollbackDoesNotUpgradeNodeScopedOwner(t *testing.T) {
