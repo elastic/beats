@@ -15,6 +15,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
+	libbeatinstance "github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
@@ -82,6 +83,25 @@ type: "log"`)
 		require.NoError(t, err)
 		assert.False(t, log.AllowDeprecatedUse(cfg))
 	})
+}
+
+func TestNewBeatForReceiverDoesNotSetPacketbeatShutdownTimeout(t *testing.T) {
+	cfg := map[string]any{
+		"packetbeat": map[string]any{},
+		"path.home":  t.TempDir(),
+	}
+
+	_, err := NewBeatForReceiver(
+		libbeatinstance.Settings{Name: "packetbeat"},
+		cfg,
+		consumertest.NewNop(),
+		"testcomponent",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err)
+
+	assert.NotContains(t, cfg["packetbeat"], "shutdown_timeout",
+		"packetbeat must retain its own shutdown timeout semantics")
 }
 
 func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
