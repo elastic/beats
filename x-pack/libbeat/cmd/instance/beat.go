@@ -98,14 +98,18 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// Set the default shutdown timeout to 5s. The beat default is 1s, which can be too short for the otel pipeline.
-	switch beatSection := receiverConfig[b.Info.Beat].(type) {
-	case map[string]any:
-		if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
-			beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
-		}
-	case nil:
-		receiverConfig[b.Info.Beat] = map[string]any{
-			"shutdown_timeout": receiverPublisherCloseTimeout.String(),
+	// Packetbeat is excluded because its shutdown_timeout has different semantics.
+	// See https://github.com/elastic/beats/issues/52031
+	if b.Info.Beat != "packetbeat" {
+		switch beatSection := receiverConfig[b.Info.Beat].(type) {
+		case map[string]any:
+			if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
+				beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
+			}
+		case nil:
+			receiverConfig[b.Info.Beat] = map[string]any{
+				"shutdown_timeout": receiverPublisherCloseTimeout.String(),
+			}
 		}
 	}
 

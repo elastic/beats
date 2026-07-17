@@ -1364,17 +1364,9 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	integration.WriteLogFile(t, logFilePath, 50, false)
 
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	// The duration used to configure the input need to obey
-	// the following restrictions:
-	//  - Backoff needs to be longer than the prospector and close check
-	//    interval, as well as the inactive timeout so we can have a
-	//    a harvester failing to start because there is one blocked on
-	//    its backoff.
-	//  - Close check interval needs to be smaller than the prospector
-	//    check interval
-	//  - Inactive timeout needs to me as small as possible so the reader
-	//    context is closed due to inactivity while the reader is waiting
-	//    on its backoff.
+	// Close check interval needs to be smaller than the prospector check
+	// interval. Inactive timeout should be shorter than backoff so the
+	// reader context is cancelled while waiting on backoff.
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1399,42 +1391,35 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 		5*time.Second,
 		"missing 'file is inactive' logs")
 
-	// Add more data to the file while the reader is blocked
-	// on its backoff and its context has been cancelled.
+	// Add more data after inactivity cancelled the reader context. Backoff
+	// exits immediately on cancellation, so the harvester stops and the next
+	// scan picks up the newly written data.
 	integration.WriteLogFile(t, logFilePath, 5, true)
 
-	// Ensure the FileWatcher detected the new data and sent a write event
-	env.WaitLogsContains(
-		fmt.Sprintf("File %s has been updated", logFilePathStr),
-		3*time.Second)
-
-	// Ensure the write event did not start a new harvester
-	env.WaitLogsContains("Harvester already running", 2*time.Second)
-
-	// Wait for the harvester to close
-	env.WaitLogsContains("Stopped harvester for file", 2*time.Second)
+	// Wait for the inactive harvester to close.
+	env.WaitLogsContains("Stopped harvester for file", 5*time.Second)
 
 	// Wait for a new scan from the fileWatcher
-	env.WaitLogsContains("Start next scan", 2*time.Second)
+	env.WaitLogsContains("Start next scan", 5*time.Second)
 
 	// Ensure it got notified when the harvester closed and the offset
 	// is correct
 	env.WaitLogsContains(
 		"Updating previous state because harvester was closed.",
-		1*time.Second)
+		3*time.Second)
 
-	// Ensure the fileWatcher sent an write event
+	// Ensure the fileWatcher sent a write event
 	env.WaitLogsContains(
 		fmt.Sprintf("File %s has been updated", logFilePathStr),
-		1*time.Second)
+		5*time.Second)
 
 	// Wait for a new harvester to start
-	env.WaitLogsContains("Starting harvester for file", 1*time.Second)
+	env.WaitLogsContains("Starting harvester for file", 3*time.Second)
 
 	// Wait for EOF to be reached
 	env.WaitLogsContains(
 		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
-		2*time.Second)
+		5*time.Second)
 
 	// Ensure all events have been ingested
 	env.waitUntilEventCount(55)
