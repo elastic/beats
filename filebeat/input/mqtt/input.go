@@ -203,7 +203,7 @@ func (c channelCtx) Err() error {
 	}
 }
 
-func (c channelCtx) Value(_ interface{}) interface{} { return nil }
+func (c channelCtx) Value(_ any) any { return nil }
 
 // Run method starts the mqtt input and processing.
 // The mqtt client starts in auto-connect mode (with connection retries and resuming topic subscriptions).
