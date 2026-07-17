@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
+	"github.com/elastic/beats/v7/packetbeat/npcap"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
@@ -177,6 +178,12 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		if err != nil {
 			return 0, nil, nil, nil, nil, err
 		}
+		// Ensure the DLL is loaded whether Npcap was just installed above
+		// or was already present from a previous run.
+		err = npcap.LoadNpcap()
+		if err != nil {
+			return 0, nil, nil, nil, nil, err
+		}
 	}
 
 	publisher, err := publish.NewTransactionPublisher(
@@ -270,6 +277,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 
 	logp.Debug("main", "Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
+	var closers []func()
 	for i, iface := range interfaces {
 		protocols := protos.NewProtocols()
 		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
@@ -277,13 +285,14 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}
 		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
+		closers = append(closers, protocols.Close)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
 		}
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(id, false, "", decoders, interfaces, reporter)
+	return sniffer.New(id, false, "", decoders, interfaces, reporter, closers...)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
