@@ -55,6 +55,16 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 	}
 
 	bp.pdataProcs = buildPdataProcs(bp.processors)
+	if bp.pdataProcs == nil && len(bp.processors) > 0 {
+		var legacy []string
+		for _, p := range bp.processors {
+			if _, ok := p.(processors.PdataProcessor); !ok {
+				legacy = append(legacy, p.String())
+			}
+		}
+		bp.logger.Warn("pdata fast path disabled: processor(s) lack RunPdata, falling back to legacy round-trip per event",
+			zap.Strings("legacy_processors", legacy))
+	}
 
 	return bp, nil
 }
