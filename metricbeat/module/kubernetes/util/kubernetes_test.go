@@ -520,7 +520,7 @@ func TestEnricherStopUsesPointerOwnershipAndEvictsFinalWatcher(t *testing.T) {
 	require.True(t, resourceWatchers.metaWatchersMap[PodResource].started, "watcher must start")
 	resourceWatchers.lock.Unlock()
 
-	// Call stop twice to assert it's idempotency.
+	// Call stop twice to assert its idempotency.
 	first.Stop(resourceWatchers)
 	first.Stop(resourceWatchers)
 	resourceWatchers.lock.Lock()
@@ -642,30 +642,11 @@ func TestEnricherTracksAndReleasesExactExtraWatchers(t *testing.T) {
 func TestNewResourceMetadataEnricherRollsBackRegisteredWatchers(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	metricsRepo := NewMetricsRepo()
-	kubeConfigPath := writeTestKubeConfig(t)
-
-	const moduleName = "constructor_rollback_test"
-	registry := mb.NewRegister()
-	require.NoError(t, registry.AddModule(moduleName, mb.DefaultModuleFactory))
-
-	var enricher Enricher
-	registry.MustAddMetricSet(moduleName, "state_service", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
-		enricher = NewResourceMetadataEnricher(base, metricsRepo, resourceWatchers, false)
-		return &constructorRollbackMetricSet{BaseMetricSet: base}, nil
-	})
 
 	// Service watcher registration succeeds, then metadata generator creation
 	// fails because Namespace metadata is disabled. The constructor must roll
 	// back the provisional Service watcher ownership before returning.
-	mbtest.NewMetricSetWithRegistry(t, map[string]any{
-		"module":       moduleName,
-		"metricsets":   []string{"state_service"},
-		"add_metadata": true,
-		"kube_config":  kubeConfigPath,
-		"add_resource_metadata": map[string]any{
-			"namespace": map[string]any{"enabled": false},
-		},
-	}, registry)
+	enricher := newFailingStateServiceEnricher(t, metricsRepo, resourceWatchers, false)
 
 	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
 	resourceWatchers.lock.RLock()
@@ -692,28 +673,10 @@ func TestNewResourceMetadataEnricherRollbackDoesNotUpgradeNodeScopedOwner(t *tes
 	funcs := mockFuncs{}
 	nodeScoped := buildTestMetadataEnricherWithScope("service", ServiceResource, resourceWatchers, config, &funcs, log, true)
 
-	const moduleName = "scope_rollback_test"
-	registry := mb.NewRegister()
-	require.NoError(t, registry.AddModule(moduleName, mb.DefaultModuleFactory))
-
-	var enricher Enricher
-	registry.MustAddMetricSet(moduleName, "state_service", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
-		enricher = NewResourceMetadataEnricher(base, metricsRepo, resourceWatchers, false)
-		return &constructorRollbackMetricSet{BaseMetricSet: base}, nil
-	})
-
 	// The cluster-scoped constructor prepares a replacement for the existing
 	// node-scoped watcher, then fails because Namespace metadata is disabled.
 	// Its real rollback path must discard that provisional replacement.
-	mbtest.NewMetricSetWithRegistry(t, map[string]any{
-		"module":       moduleName,
-		"metricsets":   []string{"state_service"},
-		"add_metadata": true,
-		"kube_config":  writeTestKubeConfig(t),
-		"add_resource_metadata": map[string]any{
-			"namespace": map[string]any{"enabled": false},
-		},
-	}, registry)
+	enricher := newFailingStateServiceEnricher(t, metricsRepo, resourceWatchers, false)
 
 	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
 	resourceWatchers.lock.RLock()
@@ -1424,6 +1387,36 @@ func configureRealInformerTestEnricher(e *enricher, container bool) {
 		}
 		e.isPod = true
 	}
+}
+
+func newFailingStateServiceEnricher(
+	t *testing.T,
+	metricsRepo *MetricsRepo,
+	resourceWatchers *Watchers,
+	nodeScope bool,
+) Enricher {
+	t.Helper()
+
+	const moduleName = "constructor_rollback_test"
+	registry := mb.NewRegister()
+	require.NoError(t, registry.AddModule(moduleName, mb.DefaultModuleFactory))
+
+	var enricher Enricher
+	registry.MustAddMetricSet(moduleName, "state_service", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		enricher = NewResourceMetadataEnricher(base, metricsRepo, resourceWatchers, nodeScope)
+		return &constructorRollbackMetricSet{BaseMetricSet: base}, nil
+	})
+
+	mbtest.NewMetricSetWithRegistry(t, map[string]any{
+		"module":       moduleName,
+		"metricsets":   []string{"state_service"},
+		"add_metadata": true,
+		"kube_config":  writeTestKubeConfig(t),
+		"add_resource_metadata": map[string]any{
+			"namespace": map[string]any{"enabled": false},
+		},
+	}, registry)
+	return enricher
 }
 
 func writeTestKubeConfig(t *testing.T) string {
