@@ -34,7 +34,7 @@ import (
 func TestFieldMatcher(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
-	testCfg := map[string]interface{}{
+	testCfg := map[string]any{
 		"lookup_fields": []string{},
 	}
 	fieldCfg, err := config.NewConfigFrom(testCfg)
@@ -68,7 +68,7 @@ func TestFieldMatcher(t *testing.T) {
 
 func TestFieldMatcherRegex(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	testCfg := map[string]interface{}{
+	testCfg := map[string]any{
 		"lookup_fields": []string{"foo"},
 		"regex_pattern": "(?!)",
 	}
@@ -123,7 +123,7 @@ func TestFieldMatcherRegex(t *testing.T) {
 func TestFieldFormatMatcher(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
-	testCfg := map[string]interface{}{}
+	testCfg := map[string]any{}
 	fieldCfg, err := config.NewConfigFrom(testCfg)
 
 	assert.NoError(t, err)

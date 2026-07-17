@@ -91,7 +91,7 @@ func (c *Converter) Convert(entryFields map[string]any) mapstr.M {
 	return withECSEnrichment(fields)
 }
 
-func convertValue(fc Conversion, value any) (interface{}, error) {
+func convertValue(fc Conversion, value any) (any, error) {
 	if fc.IsInteger {
 		strValue, isString := value.(string)
 		if !isString {
