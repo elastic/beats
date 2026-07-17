@@ -225,7 +225,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{}, paths.New())
 		sqsReader.log = log.Named("sqs")
-		sqsReader.status = &statusReporterHelperMock{}
+		sqsReader.health = newSQSHealth(&statusReporterHelperMock{}, logp.NewNopLogger())
 		sqsReader.pipeline = newFakePipeline()
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
 		sqsReader.sqs, err = newConstantSQS()

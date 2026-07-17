@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -26,6 +27,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/icholy/digest"
+	"go.opentelemetry.io/otel/attribute"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -1503,56 +1505,22 @@ var inputTests = []struct {
 		},
 		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
 	},
-	// Path containment for enabled tracers is tested in
-	// x-pack/filebeat/input/internal/httplog.TestResolvePathInLogsFor.
-	// The input-level test only verifies that a disabled tracer does
-	// not reject an out-of-tree path (next case below).
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
 	{
-		name: "tracer_disabled_escaping_logs",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-			server := httptest.NewServer(h)
-			config["resource.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
+		name:   "tracer_disabled_escaping_logs",
+		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state": map[string]interface{}{
-				"fake_now": "2002-10-02T15:00:00Z",
-			},
-			"program": `
-	// Use terse non-standard check for presence of timestamp. The standard
-	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
-	(!is_error(state.cursor.timestamp) ?
-		state.cursor.timestamp
-	:
-		timestamp(state.fake_now)-duration('10m')
-	).as(time_cursor,
-	string(state.url).parse_url().with_replace({
-		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
-	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
-		"events": [event],
-		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
-		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
-		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
-
-		// Just for testing, cycle this back into the next state.
-		"fake_now": state.fake_now
-	}))
-	`,
+			"program":                  `bytes(get(state.url).Body).as(body, {"events": [body.decode_json()]})`,
 		},
-		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
-			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
-		},
-		wantCursor: []map[string]interface{}{
-			{"timestamp": "2002-10-02T15:00:00Z"},
-			{"timestamp": "2002-10-02T15:00:01Z"},
-			{"timestamp": "2002-10-02T15:00:02Z"},
-		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -1996,7 +1964,14 @@ var inputTests = []struct {
 	})
 	`,
 		},
-		handler: oauth2Handler,
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf("unexpected UA: %s", r.UserAgent())))
+				return
+			}
+			oauth2Handler(w, r)
+		},
 		want: []map[string]interface{}{
 			{"hello": "world"},
 		},
@@ -2215,7 +2190,7 @@ var inputTests = []struct {
 			},
 		},
 		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
 		want: []map[string]interface{}{{
 			"message": map[string]interface{}{
 				"value": "division by zero",
@@ -2237,7 +2212,7 @@ var inputTests = []struct {
 			},
 		},
 		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2265,13 +2240,13 @@ var inputTests = []struct {
 		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
 		prepare: func() error {
 			// Make a file that the configuration should delete.
-			err := os.MkdirAll("failure_dumps", 0o700)
+			err := os.MkdirAll(filepath.Join("cel", "failure_dumps"), 0o700)
 			if err != nil {
 				return err
 			}
-			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+			return os.WriteFile(filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
 		},
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2375,7 +2350,7 @@ func TestInput(t *testing.T) {
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
-	err := os.RemoveAll("failure_dumps")
+	err := os.RemoveAll(filepath.Join("cel", "failure_dumps"))
 	if err != nil {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
@@ -2463,7 +2438,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
-			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+			if !sameErrorOrContains(err, test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantFile != "" {
@@ -3068,5 +3043,67 @@ func TestRedactor(t *testing.T) {
 				t.Errorf("unexpected redaction:\n--- got\n--- want\n%s", cmp.Diff(got, test.wantRedact))
 			}
 		})
+	}
+}
+
+func TestGetResourceAttributesIncludesInputType(t *testing.T) {
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("input_type should be set from input name: got %q, want %q", got, want)
+	}
+}
+
+func TestGetResourceAttributesInputTypeCannotBeOverridden(t *testing.T) {
+	t.Setenv("OTEL_RESOURCE_ATTRIBUTES", "input_type=httpjson,deployment.environment=production")
+
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("built-in input_type should not be overridden from OTEL_RESOURCE_ATTRIBUTES: got %q, want %q", got, want)
+	}
+	if got, want := attrsMap["deployment.environment"], "production"; got != want {
+		t.Errorf("custom resource attributes from OTEL_RESOURCE_ATTRIBUTES should still be included: got %q, want %q", got, want)
+	}
+}
+
+func toResourceAttributeMap(attrs []attribute.KeyValue) map[string]string {
+	result := make(map[string]string, len(attrs))
+	for _, attr := range attrs {
+		result[string(attr.Key)] = attr.Value.AsString()
+	}
+	return result
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }
