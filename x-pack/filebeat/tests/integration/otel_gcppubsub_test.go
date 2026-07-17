@@ -68,23 +68,7 @@ func TestGCPInputOTelE2E(t *testing.T) {
   topic: test-topic-foo
   subscription.name:  {{ .Subscription }}
   credentials_file: "{{ .CredentialsFile }}"
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index }}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
+` + filebeatOutputYAML
 
 	gcpOTelConfig := otelElasticsearchExporterYAML + `receivers:
     filebeatreceiver:
@@ -110,7 +94,7 @@ processors:
 		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username:        user,
 		Password:        password,
-		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json",
+		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json", //nolint:gosec // this is test file
 	}
 
 	var configBuffer bytes.Buffer
