@@ -991,7 +991,7 @@ func TestRealInformerIsRecreatedAfterFinalOwnerStops(t *testing.T) {
 	require.Equal(t, "b", containerLabel, "container event must be enriched from the fresh informer")
 }
 
-func TestConcurrentInvalidationAndEnrichmentAcrossGenerations(t *testing.T) {
+func TestConcurrentInvalidationAndEnrichmentBeforeWatcherRecreation(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	log := logptest.NewTestingLogger(t, selector)
 	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
@@ -1021,6 +1021,7 @@ func TestConcurrentInvalidationAndEnrichmentAcrossGenerations(t *testing.T) {
 			resourceWatchers,
 			config,
 			func(resource kubernetes.Resource) map[string]mapstr.M {
+				//nolint:errcheck // we know the type
 				deployment := resource.(*kubernetes.Deployment)
 				return map[string]mapstr.M{
 					join(deployment.Namespace, deployment.Name): {
@@ -1044,22 +1045,20 @@ func TestConcurrentInvalidationAndEnrichmentAcrossGenerations(t *testing.T) {
 
 	first, firstWatcher := createGeneration()
 	var workers sync.WaitGroup
-	workers.Add(2)
-	go func() {
-		defer workers.Done()
+	workers.Go(func() {
 		for range 100 {
 			firstWatcher.handler.OnUpdate(resource)
 		}
-	}()
-	go func() {
-		defer workers.Done()
+	})
+	workers.Go(func() {
 		for range 100 {
 			first.Enrich([]mapstr.M{{
 				"name":           resource.Name,
 				mb.ModuleDataKey: mapstr.M{"namespace": resource.Namespace},
 			}})
 		}
-	}()
+	})
+
 	workers.Wait()
 	first.Stop(resourceWatchers)
 
