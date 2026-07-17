@@ -82,6 +82,7 @@ type BaseModule struct {
 	rawConfig      *conf.C
 	statusReporter status.StatusReporter
 	Logger         *logp.Logger
+	Paths          *paths.Path
 }
 
 func (m *BaseModule) String() string {
@@ -425,7 +426,7 @@ func (q QueryParams) String() (s string) {
 				u.Add(k, fmt.Sprintf("%v", innerValue))
 			}
 		} else {
-			//nil values in YAML shouldn't be stringified anyhow
+			// nil values in YAML shouldn't be stringified anyhow
 			if v == nil {
 				u.Add(k, "")
 			} else {
