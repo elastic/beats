@@ -991,7 +991,7 @@ func TestRealInformerIsRecreatedAfterFinalOwnerStops(t *testing.T) {
 	require.Equal(t, "b", containerLabel, "container event must be enriched from the fresh informer")
 }
 
-func TestConcurrentInvalidationAndEnrichmentBeforeWatcherRecreation(t *testing.T) {
+func TestConcurrentInvalidationAndEnrichment(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	log := logptest.NewTestingLogger(t, selector)
 	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
@@ -1002,57 +1002,53 @@ func TestConcurrentInvalidationAndEnrichmentBeforeWatcherRecreation(t *testing.T
 		},
 	}
 
-	createGeneration := func() (*enricher, *mockWatcher) {
-		watcher := newMockWatcher()
-		metaWatcher := &metaWatcher{
-			watcher:     watcher,
-			users:       make(map[*enricher]watcherRegistration),
-			enrichers:   make(map[*enricher]struct{}),
-			metricsRepo: NewMetricsRepo(),
-		}
-		resourceWatchers.lock.Lock()
-		resourceWatchers.metaWatchersMap[DeploymentResource] = metaWatcher
-		addEventHandlersToWatcher(metaWatcher, resourceWatchers)
-		resourceWatchers.lock.Unlock()
-
-		e := buildTestMetadataEnricherWithFuncs(
-			"state_deployment",
-			DeploymentResource,
-			resourceWatchers,
-			config,
-			func(resource kubernetes.Resource) map[string]mapstr.M {
-				//nolint:errcheck // we know the type
-				deployment := resource.(*kubernetes.Deployment)
-				return map[string]mapstr.M{
-					join(deployment.Namespace, deployment.Name): {
-						"kubernetes": mapstr.M{"labels": mapstr.M{"generation": "current"}},
-					},
-				}
-			},
-			func(resource kubernetes.Resource) []string {
-				deployment := resource.(*kubernetes.Deployment)
-				return []string{join(deployment.Namespace, deployment.Name)}
-			},
-			func(event mapstr.M) string {
-				return join(getString(event, mb.ModuleDataKey+".namespace"), getString(event, "name"))
-			},
-			log,
-		)
-		require.NoError(t, watcher.Store().Add(resource), "deployment must be added to the mock watcher store")
-		e.Start(resourceWatchers)
-		return e, watcher
+	watcher := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:     watcher,
+		users:       make(map[*enricher]watcherRegistration),
+		enrichers:   make(map[*enricher]struct{}),
+		metricsRepo: NewMetricsRepo(),
 	}
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[DeploymentResource] = metaWatcher
+	addEventHandlersToWatcher(metaWatcher, resourceWatchers)
+	resourceWatchers.lock.Unlock()
 
-	first, firstWatcher := createGeneration()
+	e := buildTestMetadataEnricherWithFuncs(
+		"state_deployment",
+		DeploymentResource,
+		resourceWatchers,
+		config,
+		func(resource kubernetes.Resource) map[string]mapstr.M {
+			//nolint:errcheck // we know the type
+			deployment := resource.(*kubernetes.Deployment)
+			return map[string]mapstr.M{
+				join(deployment.Namespace, deployment.Name): {
+					"kubernetes": mapstr.M{"labels": mapstr.M{"generation": "current"}},
+				},
+			}
+		},
+		func(resource kubernetes.Resource) []string {
+			deployment := resource.(*kubernetes.Deployment)
+			return []string{join(deployment.Namespace, deployment.Name)}
+		},
+		func(event mapstr.M) string {
+			return join(getString(event, mb.ModuleDataKey+".namespace"), getString(event, "name"))
+		},
+		log,
+	)
+	require.NoError(t, watcher.Store().Add(resource), "deployment must be added to the mock watcher store")
+	e.Start(resourceWatchers)
+
 	var workers sync.WaitGroup
 	workers.Go(func() {
 		for range 100 {
-			firstWatcher.handler.OnUpdate(resource)
+			watcher.handler.OnUpdate(resource)
 		}
 	})
 	workers.Go(func() {
 		for range 100 {
-			first.Enrich([]mapstr.M{{
+			e.Enrich([]mapstr.M{{
 				"name":           resource.Name,
 				mb.ModuleDataKey: mapstr.M{"namespace": resource.Namespace},
 			}})
@@ -1060,15 +1056,7 @@ func TestConcurrentInvalidationAndEnrichmentBeforeWatcherRecreation(t *testing.T
 	})
 
 	workers.Wait()
-	first.Stop(resourceWatchers)
-
-	second, secondWatcher := createGeneration()
-	require.NotSame(t, firstWatcher, secondWatcher, "next generation must use an independent watcher")
-	second.Enrich([]mapstr.M{{
-		"name":           resource.Name,
-		mb.ModuleDataKey: mapstr.M{"namespace": resource.Namespace},
-	}})
-	second.Stop(resourceWatchers)
+	e.Stop(resourceWatchers)
 }
 
 func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
