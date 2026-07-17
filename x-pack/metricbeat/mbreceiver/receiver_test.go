@@ -325,7 +325,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"metricbeat": map[string]any{
 				"modules": []map[string]any{
 					{

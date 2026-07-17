@@ -25,7 +25,7 @@ import (
 )
 
 type matcherMap map[string]match.Matcher
-type rawMap map[string]interface{}
+type rawMap map[string]any
 
 // Matcher is a Condition that works with beat's internal notion of a string matcher.
 type Matcher struct {
@@ -39,7 +39,7 @@ type Matcher struct {
 // The compiler function will take those fields and compile them.
 func NewMatcherCondition(
 	name string,
-	fields map[string]interface{},
+	fields map[string]any,
 	compile func(string) (match.Matcher, error),
 	logger *logp.Logger,
 ) (condition Matcher, err error) {
@@ -88,7 +88,7 @@ func (c Matcher) Check(event ValuesMap) bool {
 				return false
 			}
 
-		case []interface{}, []string:
+		case []any, []string:
 			if !matcher.MatchAnyString(v) {
 				return false
 			}
