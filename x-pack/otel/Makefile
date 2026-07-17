@@ -10,7 +10,7 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 build-otel-distro-ci:
 	go install go.opentelemetry.io/collector/cmd/builder@$(OCB_VERSION)
 	mv $$(go env GOPATH)/bin/builder $$(go env GOPATH)/bin/ocb
-	RACE=1 mage buildOtelDistro
+	PATH="$$(go env GOPATH)/bin:$$PATH" RACE=1 mage buildOtelDistro
 	go version -m ./distributions/beats-otel-collector/_build/beats-otel-collector | grep -q 'race=true'
 	timeout 30s mage runOtelDistro > /tmp/collector.log 2>&1 || true
 	echo "--- Collector output (errors below are expected if external services are unavailable)"
