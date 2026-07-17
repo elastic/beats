@@ -152,7 +152,7 @@ func (m *MetricSet) fetchCPUInfo() []byte {
 // copyFieldsOrDefault copies the field specified by key to the given map. It will
 // overwrite the key if it exists. It will update the map with a default value if
 // the key does not exist in the source map.
-func copyFieldsOrDefault(from, to mapstr.M, key, newkey string, value interface{}) error {
+func copyFieldsOrDefault(from, to mapstr.M, key, newkey string, value any) error {
 	v, err := from.GetValue(key)
 	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		_, err = to.Put(newkey, value)

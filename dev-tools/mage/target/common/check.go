@@ -23,17 +23,17 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-var checkDeps []interface{}
+var checkDeps []any
 
 // RegisterCheckDeps registers dependencies of the Check target.
-func RegisterCheckDeps(deps ...interface{}) {
+func RegisterCheckDeps(deps ...any) {
 	checkDeps = append(checkDeps, deps...)
 }
 
 // Check formats code, updates generated content, check for common errors, and
 // checks for any modified files.
 func Check() {
-	deps := make([]interface{}, 0, len(checkDeps)+2)
+	deps := make([]any, 0, len(checkDeps)+2)
 	deps = append(deps, devtools.Format)
 	deps = append(deps, checkDeps...)
 	deps = append(deps, devtools.Check)

@@ -31,7 +31,7 @@ type inputPlugin struct {
 const pluginKey = "filebeat.input"
 
 func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	plugin.MustRegisterLoader(pluginKey, func(ifc any) error {
 		p, ok := ifc.(inputPlugin)
 		if !ok {
 			return errors.New("plugin does not match filebeat input plugin type")
@@ -50,6 +50,6 @@ func init() {
 func Plugin(
 	module string,
 	factory Factory,
-) map[string][]interface{} {
+) map[string][]any {
 	return plugin.MakePlugin(pluginKey, inputPlugin{module, factory})
 }

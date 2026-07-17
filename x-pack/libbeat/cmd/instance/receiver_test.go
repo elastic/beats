@@ -152,7 +152,7 @@ type fakeActionDiagExtension struct {
 	registeredDiagName  string
 	registeredActionFor string
 	unregisteredFor     string
-	actionHandler       func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)
+	actionHandler       func(ctx context.Context, params map[string]any) (map[string]any, error)
 }
 
 func (f *fakeActionDiagExtension) Start(context.Context, component.Host) error { return nil }
@@ -164,7 +164,7 @@ func (f *fakeActionDiagExtension) RegisterDiagnosticHook(name, _, _, _ string, _
 	f.registeredDiagName = name
 }
 
-func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error {
+func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]any) (map[string]any, error)) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.registeredActionFor = name
@@ -196,9 +196,9 @@ type fakeAction struct {
 
 func (a *fakeAction) Name() string { return a.name }
 
-func (a *fakeAction) Execute(_ context.Context, _ map[string]interface{}) (map[string]interface{}, error) {
+func (a *fakeAction) Execute(_ context.Context, _ map[string]any) (map[string]any, error) {
 	a.executed.Store(true)
-	return map[string]interface{}{"ok": true}, nil
+	return map[string]any{"ok": true}, nil
 }
 
 // TestBeatReceiverStart_WiresActionAndDiagnosticExtensions verifies that Start
@@ -271,9 +271,9 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	ext.mu.Unlock()
 	require.NotNil(t, handler, "action handler should have been registered with the extension")
 
-	res, err := handler(t.Context(), map[string]interface{}{"id": "abc"})
+	res, err := handler(t.Context(), map[string]any{"id": "abc"})
 	require.NoError(t, err)
-	assert.Equal(t, map[string]interface{}{"ok": true}, res)
+	assert.Equal(t, map[string]any{"ok": true}, res)
 	assert.True(t, act.executed.Load(), "invoking the registered handler should execute the underlying action")
 
 	b.Manager.UnregisterAction(act)

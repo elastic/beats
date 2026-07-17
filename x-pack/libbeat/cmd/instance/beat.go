@@ -97,6 +97,18 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 	}
 
+	// Set the default shutdown timeout to 5s. The beat default is 1s, which can be too short for the otel pipeline.
+	switch beatSection := receiverConfig[b.Info.Beat].(type) {
+	case map[string]any:
+		if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
+			beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
+		}
+	case nil:
+		receiverConfig[b.Info.Beat] = map[string]any{
+			"shutdown_timeout": receiverPublisherCloseTimeout.String(),
+		}
+	}
+
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("error converting receiver config to ucfg: %w", err)

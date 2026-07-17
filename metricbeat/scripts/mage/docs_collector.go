@@ -23,6 +23,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"text/template"
@@ -77,7 +78,7 @@ type versionData struct {
 	Removed    string
 }
 
-func writeTemplate(filename string, t *template.Template, args interface{}) error {
+func writeTemplate(filename string, t *template.Template, args any) error {
 	fd, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("error opening file at %s: %w", filename, err)
@@ -112,7 +113,7 @@ var funcMap = template.FuncMap{
 	"serverlessLifecycle": func(appliesTo string) string {
 		lifecycleOrder := []string{"preview", "beta", "ga", "deprecated", "removed"}
 		latestIdx := -1
-		for _, part := range strings.Split(appliesTo, ",") {
+		for part := range strings.SplitSeq(appliesTo, ",") {
 			fields := strings.Fields(strings.TrimSpace(part))
 			if len(fields) == 0 {
 				continue
@@ -375,11 +376,8 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		}
 
 		var isDefault = false
-		for _, defaultMsName := range defaultMetricSets {
-			if defaultMsName == metricsetName {
-				isDefault = true
-				break
-			}
+		if slices.Contains(defaultMetricSets, metricsetName) {
+			isDefault = true
 		}
 
 		ms := metricsetData{

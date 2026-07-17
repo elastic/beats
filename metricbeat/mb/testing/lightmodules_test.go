@@ -22,7 +22,6 @@ package testing
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -104,7 +103,7 @@ func TestDataLightModuleWithProcessors(t *testing.T) {
 	assert.Empty(t, errs)
 	assert.NotEmpty(t, events)
 
-	dir, err := ioutil.TempDir("", "_meta-*")
+	dir, err := os.MkdirTemp("", "_meta-*")
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
 
@@ -128,7 +127,7 @@ func TestDataLightModuleWithProcessors(t *testing.T) {
 		}
 	}
 
-	d, err := ioutil.ReadFile(dataPath)
+	d, err := os.ReadFile(dataPath)
 	require.NoError(t, err)
 
 	err = json.Unmarshal(d, &event)
