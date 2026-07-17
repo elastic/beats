@@ -22,7 +22,6 @@ var skipBinaries = []string{
 	module + "/x-pack/filebeat/processors/decode_cef/cef/cmd/cef2json",         // developer tool, not shipped
 	module + "/x-pack/heartbeat/monitors/browser/synthexec/testcmd",            // test helper, not shipped
 	module + "/x-pack/metricbeat/scripts/msetlists",                            // code-generation script, not shipped
-	module + "/x-pack/osquerybeat/ext/osquery-extension",                       // osquery extension, ships separately from the beat binary
 	module + "/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists/generate", // code-generation script, not shipped
 }
 
