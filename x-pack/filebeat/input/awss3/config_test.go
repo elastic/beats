@@ -733,7 +733,7 @@ func TestIsValidAccessPointARN(t *testing.T) {
 }
 
 func TestS3ConfigModifierHostnameImmutable(t *testing.T) {
-	const endpoint = "https://obs.sa-brazil-1.myhuaweicloud.com"
+	const endpoint = "https://obs.example.com"
 
 	testCases := []struct {
 		name             string
@@ -743,11 +743,11 @@ func TestS3ConfigModifierHostnameImmutable(t *testing.T) {
 		wantUsePathStyle bool
 	}{
 		{
-			// Non-AWS S3-compatible storage (e.g. Huawei OBS) with the default
-			// path_style: false must keep the hostname mutable so the SDK can
-			// use virtual-hosted addressing.
+			// Non-AWS S3-compatible storage with the default path_style: false
+			// must keep the hostname mutable so the SDK can use virtual-hosted
+			// addressing.
 			name:             "non-AWS bucket keeps hostname mutable",
-			config:           config{NonAWSBucketName: "bucket-cts-organization", RegionName: "sa-brazil-1"},
+			config:           config{NonAWSBucketName: "my-non-aws-bucket", RegionName: "us-east-1"},
 			pathStyle:        false,
 			wantImmutable:    false,
 			wantUsePathStyle: false,
@@ -757,7 +757,7 @@ func TestS3ConfigModifierHostnameImmutable(t *testing.T) {
 			// but the decision is delegated to UsePathStyle rather than forced
 			// via HostnameImmutable.
 			name:             "non-AWS bucket with path_style true",
-			config:           config{NonAWSBucketName: "bucket-cts-organization", RegionName: "sa-brazil-1"},
+			config:           config{NonAWSBucketName: "my-non-aws-bucket", RegionName: "us-east-1"},
 			pathStyle:        true,
 			wantImmutable:    false,
 			wantUsePathStyle: true,
