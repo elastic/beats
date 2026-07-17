@@ -12,9 +12,8 @@ import (
 	"net/textproto"
 	"strings"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/lumberjack"
 )
 
 // Available providers for CRC validation (use lowercase)

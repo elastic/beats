@@ -82,17 +82,17 @@ func TestValidate(t *testing.T) {
 		errorString string
 	}{
 		"Empty config": {
-			c:           &Config{Beatconfig: map[string]interface{}{}},
+			c:           &Config{Beatconfig: map[string]any{}},
 			hasError:    true,
 			errorString: "configuration is required",
 		},
 		"No heartbeat section": {
-			c:           &Config{Beatconfig: map[string]interface{}{"other": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"other": map[string]any{}}},
 			hasError:    true,
 			errorString: "configuration key 'heartbeat' is required",
 		},
 		"Valid config": {
-			c:           &Config{Beatconfig: map[string]interface{}{"heartbeat": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"heartbeat": map[string]any{}}},
 			hasError:    false,
 			errorString: "",
 		},

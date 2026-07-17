@@ -380,7 +380,7 @@ func (conn *Connection) Request(
 	method, path string,
 	pipeline string,
 	params map[string]string,
-	body interface{},
+	body any,
 ) (int, []byte, error) {
 
 	url := addToURL(conn.URL, path, pipeline, params)
@@ -392,7 +392,7 @@ func (conn *Connection) Request(
 // RequestURL sends a request with the connection object to an alternative url
 func (conn *Connection) RequestURL(
 	method, url string,
-	body interface{},
+	body any,
 ) (int, []byte, error) {
 
 	if body == nil {
@@ -465,7 +465,7 @@ func (conn *Connection) getVersion() error {
 }
 
 // LoadJSON creates a PUT request based on a JSON document.
-func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
+func (conn *Connection) LoadJSON(path string, json map[string]any) ([]byte, error) {
 	status, body, err := conn.Request("PUT", path, "", nil, json)
 	if err != nil {
 		return body, fmt.Errorf("couldn't load json. Error: %w", err)

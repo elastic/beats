@@ -27,11 +27,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.2
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.73.0
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.51.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.296.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.304.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.45.4
 	github.com/aws/aws-sdk-go-v2/service/iam v1.42.1
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.38.4
-	github.com/aws/aws-sdk-go-v2/service/rds v1.117.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.118.2
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.26.5
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.103.0
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.7
@@ -89,7 +89,7 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/hashicorp/nomad/api v0.0.0-20260324203407-b27b0c2e019a
+	github.com/hashicorp/nomad/api v0.0.0-20260528135333-5b027732945f
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
 	github.com/insomniacslk/dhcp v0.0.0-20251020182700-175e84fbb167
 	github.com/jonboulle/clockwork v0.2.2
@@ -171,11 +171,11 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.9.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.3-0.20260423154939-e990715f9426
-	github.com/elastic/elastic-agent-libs v0.45.0
+	github.com/elastic/elastic-agent-libs v0.46.1
 	github.com/elastic/elastic-agent-system-metrics v0.14.4
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
-	github.com/elastic/go-quark v0.3.0
+	github.com/elastic/go-quark v0.6.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/mito v1.27.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
@@ -201,7 +201,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.155.0
 	github.com/pierrec/lz4/v4 v4.1.27
 	github.com/pkg/xattr v0.4.9
-	github.com/prometheus/prometheus v0.311.2-0.20260410083055-07c6232d159b
+	github.com/prometheus/prometheus v0.312.0
 	github.com/shirou/gopsutil/v4 v4.26.5
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.16
@@ -226,7 +226,6 @@ require (
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.44.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -237,6 +236,7 @@ require (
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/entcollect v0.0.0-20260706024408-4a12ea00f54d
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
+	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
 	github.com/jimlambrt/gldap v0.1.14
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.155.0
@@ -373,13 +373,13 @@ require (
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-openapi/jsonpointer v0.22.5 // indirect
+	github.com/go-openapi/jsonpointer v0.23.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.5 // indirect
 	github.com/go-openapi/swag v0.25.5 // indirect
 	github.com/go-openapi/swag/cmdutils v0.25.5 // indirect
 	github.com/go-openapi/swag/conv v0.25.5 // indirect
 	github.com/go-openapi/swag/fileutils v0.25.5 // indirect
-	github.com/go-openapi/swag/jsonname v0.25.5 // indirect
+	github.com/go-openapi/swag/jsonname v0.26.0 // indirect
 	github.com/go-openapi/swag/jsonutils v0.25.5 // indirect
 	github.com/go-openapi/swag/loading v0.25.5 // indirect
 	github.com/go-openapi/swag/mangling v0.25.5 // indirect
@@ -572,6 +572,6 @@ replace (
 	github.com/dop251/goja => github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3
-	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
+	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
 )
