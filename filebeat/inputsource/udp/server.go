@@ -69,6 +69,9 @@ func (u *Server) createConn() (net.PacketConn, error) {
 
 	u.localaddress = listener.LocalAddr().String()
 
+	// Log the bound address so an ephemeral (host ...:0) port can be discovered.
+	u.logger.Infof("Started listening for UDP connection on: %s", u.localaddress)
+
 	return listener, err
 }
 
