@@ -126,9 +126,6 @@ service:
         - filebeatreceiver
       exporters:
         - logstash
-  telemetry:
-    metrics:
-      level: none
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver
@@ -175,6 +172,7 @@ service:
 		"log.file.path",
 		// only present in beats receivers
 		"log.file.device_id",
+		"log.file.fingerprint",
 	}
 
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
@@ -232,9 +230,6 @@ service:
         - filebeatreceiver
       exporters:
         - logstash
-  telemetry:
-    metrics:
-      level: none
 `, inputFilePath, testCaseName, tmpdir)
 
 	// Start OTel collector with filebeatreceiver

@@ -22,8 +22,11 @@ import (
 	"regexp"
 	"slices"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -86,6 +89,35 @@ func (m *Matchers) MetadataIndex(event mapstr.M) string {
 	}
 
 	// No index returned
+	return ""
+}
+
+// pdataMatcher is an optional interface a Matcher can implement to avoid a
+// full pcommon.Map→mapstr.M conversion when looking up the metadata index.
+type pdataMatcher interface {
+	MetadataIndexPdata(body pcommon.Map) string
+}
+
+// MetadataIndexPdata is the pdata-native counterpart of MetadataIndex. For
+// each matcher that implements pdataMatcher the lookup is done directly on the
+// pcommon.Map; the mapstr.M conversion is performed lazily and only once for
+// matchers that do not implement the interface.
+func (m *Matchers) MetadataIndexPdata(body pcommon.Map) string {
+	var fallback mapstr.M
+	for _, matcher := range m.matchers {
+		if pm, ok := matcher.(pdataMatcher); ok {
+			if index := pm.MetadataIndexPdata(body); index != "" {
+				return index
+			}
+		} else {
+			if fallback == nil {
+				fallback = otelmap.ToMapstr(body)
+			}
+			if index := matcher.MetadataIndex(fallback); index != "" {
+				return index
+			}
+		}
+	}
 	return ""
 }
 
@@ -154,6 +186,28 @@ func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 		}
 	}
 
+	return ""
+}
+
+func (f *FieldMatcher) MetadataIndexPdata(body pcommon.Map) string {
+	for _, field := range f.MatchFields {
+		v, ok := otelmap.GetAtPath(field, body)
+		if !ok || v.Type() != pcommon.ValueTypeStr {
+			continue
+		}
+		fieldValue := v.Str()
+		if f.Regexp == nil {
+			return fieldValue
+		}
+		matches := f.Regexp.FindStringSubmatch(fieldValue)
+		if matches == nil {
+			continue
+		}
+		key := matches[f.Regexp.SubexpIndex(regexKeyGroupName)]
+		if key != "" {
+			return key
+		}
+	}
 	return ""
 }
 
