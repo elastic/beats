@@ -15,8 +15,8 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
-	libbeatinstance "github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/filebeat/input/log"
+	libbeatinstance "github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
