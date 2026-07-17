@@ -106,7 +106,7 @@ processors:
         management.otel.enabled: true
 ` + otelElasticsearchServiceYAML
 
-	optionsValue := options{
+	optionsValue := options{ //nolint:gosec // G101 false positive: test ES credentials from test cluster
 		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username:        user,
 		Password:        password,

@@ -24,7 +24,7 @@ import (
 )
 
 func TestFollowSession_FirehoseHTTPError(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck // legacy test logger setup
 
 	tests := []struct {
 		name       string
@@ -118,7 +118,7 @@ func TestFollowSession_DiscoverGETFailureIsTransient(t *testing.T) {
 }
 
 func TestFollowSession_NonObjectMessage(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck // legacy test logger setup
 
 	validEvent := `{"metadata":{"eventType":"TestEvent","offset":1},"event":{"TestField":"value"}}`
 

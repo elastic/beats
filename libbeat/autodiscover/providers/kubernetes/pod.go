@@ -228,8 +228,8 @@ func (p *pod) OnUpdate(obj any) {
 
 func (p *pod) unlockedUpdate(obj any) {
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
-	p.emit(obj.(*kubernetes.Pod), "stop")
-	p.emit(obj.(*kubernetes.Pod), "start")
+	p.emit(obj.(*kubernetes.Pod), "stop")  //nolint:errcheck // informer object type is validated
+	p.emit(obj.(*kubernetes.Pod), "start") //nolint:errcheck // informer object type is validated
 }
 
 // OnDelete stops pod objects that are deleted.
@@ -238,7 +238,7 @@ func (p *pod) OnDelete(obj any) {
 	defer p.crossUpdate.RUnlock()
 
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
-	p.emit(obj.(*kubernetes.Pod), "stop")
+	p.emit(obj.(*kubernetes.Pod), "stop") //nolint:errcheck // informer object type is validated
 }
 
 // GenerateHints creates hints needed for hints builder.
