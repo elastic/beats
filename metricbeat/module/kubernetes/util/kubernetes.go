@@ -105,8 +105,8 @@ type metaWatcher struct {
 	watcher kubernetes.Watcher // watcher responsible for watching a specific resource
 	started bool               // true if watcher has started, false otherwise
 
-	users       map[*enricher]watcherRegistration // enrichers that own this shared watcher's lifetime and their requested scope
-	enrichers   map[*enricher]struct{}            // enrichers invalidated by this watcher's resource events
+	users       map[*enricher]watcherRegistration // enrichers that use this watcher/need it alive
+	enrichers   map[*enricher]struct{}            // enrichers that use this watcher as their primary source
 	metricsRepo *MetricsRepo                      // used to update container metrics derived from metadata, like resource limits
 
 	nodeScope      bool               // whether the active watcher watches resources in the current node or the whole cluster

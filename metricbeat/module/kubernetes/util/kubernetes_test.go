@@ -511,6 +511,7 @@ func TestEnricherStopUsesPointerOwnershipAndEvictsFinalWatcher(t *testing.T) {
 	require.True(t, resourceWatchers.metaWatchersMap[PodResource].started, "watcher must start")
 	resourceWatchers.lock.Unlock()
 
+	// Call stop twice to assert it's idempotency.
 	first.Stop(resourceWatchers)
 	first.Stop(resourceWatchers)
 	resourceWatchers.lock.Lock()
@@ -538,9 +539,14 @@ func TestPodAndContainerEnrichersShareWatcherByPointer(t *testing.T) {
 	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
+	// Both metricsets enrich kubelet events from Pod API objects, so their
+	// distinct enrichers intentionally share the same PodResource watcher.
 	pod := buildTestMetadataEnricher("pod", PodResource, resourceWatchers, config, &funcs, log)
 	container := buildTestMetadataEnricher("container", PodResource, resourceWatchers, config, &funcs, log)
 
+	// Starting either owner starts their shared watcher; using pod here is
+	// arbitrary. Stopping container then simulates one metricset shutting down
+	// while pod still needs the watcher, so the watcher must remain running.
 	pod.Start(resourceWatchers)
 	container.Stop(resourceWatchers)
 	resourceWatchers.lock.RLock()
@@ -549,6 +555,7 @@ func TestPodAndContainerEnrichersShareWatcherByPointer(t *testing.T) {
 	resourceWatchers.lock.RUnlock()
 	require.Equal(t, 0, watcher.stopCalls, "container release must not stop pod's watcher")
 
+	// Pod is now the final owner, so releasing it must stop the watcher.
 	pod.Stop(resourceWatchers)
 	require.Equal(t, 1, watcher.stopCalls, "final pod release must stop the watcher")
 }
