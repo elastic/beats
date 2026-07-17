@@ -642,26 +642,7 @@ func TestEnricherTracksAndReleasesExactExtraWatchers(t *testing.T) {
 func TestNewResourceMetadataEnricherRollsBackRegisteredWatchers(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	metricsRepo := NewMetricsRepo()
-	kubeConfigPath := filepath.Join(t.TempDir(), "kubeconfig")
-	require.NoError(t, os.WriteFile(kubeConfigPath, []byte(`
-apiVersion: v1
-kind: Config
-clusters:
-  - name: test
-    cluster:
-      server: https://127.0.0.1:1
-      insecure-skip-tls-verify: true
-contexts:
-  - name: test
-    context:
-      cluster: test
-      user: test
-current-context: test
-users:
-  - name: test
-    user:
-      token: test
-`), 0o600))
+	kubeConfigPath := writeTestKubeConfig(t)
 
 	const moduleName = "constructor_rollback_test"
 	registry := mb.NewRegister()
@@ -692,11 +673,9 @@ users:
 	resourceWatchers.lock.RUnlock()
 }
 
-func TestClusterScopedConstructorRollbackDoesNotUpgradeNodeScopedOwner(t *testing.T) {
+func TestNewResourceMetadataEnricherRollbackDoesNotUpgradeNodeScopedOwner(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	metricsRepo := NewMetricsRepo()
-	client := k8sfake.NewSimpleClientset()
-	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
 	active := newMockWatcher()
 	active.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{})
 	metaWatcher := &metaWatcher{
@@ -706,28 +685,37 @@ func TestClusterScopedConstructorRollbackDoesNotUpgradeNodeScopedOwner(t *testin
 		enrichers: make(map[*enricher]struct{}),
 		nodeScope: true,
 	}
-	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+	resourceWatchers.metaWatchersMap[ServiceResource] = metaWatcher
 
-	config := &kubernetesConfig{
-		SyncPeriod:          time.Second,
-		AddResourceMetadata: resourceMetadataConfig(t, false, false, false, false),
-	}
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
-	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
-	provisional := newMetadataEnricher("state_pod", PodResource, config, log)
-	require.NoError(
-		t,
-		createAllWatchers(client, metadataClient, provisional, false, config, log, resourceWatchers, metricsRepo),
-		"provisional cluster-scoped watcher registration must succeed",
-	)
-	resourceWatchers.lock.RLock()
-	require.NotNil(t, metaWatcher.restartWatcher, "provisional cluster-scoped registration must prepare a replacement")
-	require.False(t, metaWatcher.users[provisional].committed, "constructor registration must remain provisional before initialization succeeds")
-	resourceWatchers.lock.RUnlock()
+	nodeScoped := buildTestMetadataEnricherWithScope("service", ServiceResource, resourceWatchers, config, &funcs, log, true)
 
-	releaseWatcherOwnership(provisional, resourceWatchers)
+	const moduleName = "scope_rollback_test"
+	registry := mb.NewRegister()
+	require.NoError(t, registry.AddModule(moduleName, mb.DefaultModuleFactory))
 
+	var enricher Enricher
+	registry.MustAddMetricSet(moduleName, "state_service", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		enricher = NewResourceMetadataEnricher(base, metricsRepo, resourceWatchers, false)
+		return &constructorRollbackMetricSet{BaseMetricSet: base}, nil
+	})
+
+	// The cluster-scoped constructor prepares a replacement for the existing
+	// node-scoped watcher, then fails because Namespace metadata is disabled.
+	// Its real rollback path must discard that provisional replacement.
+	mbtest.NewMetricSetWithRegistry(t, map[string]any{
+		"module":       moduleName,
+		"metricsets":   []string{"state_service"},
+		"add_metadata": true,
+		"kube_config":  writeTestKubeConfig(t),
+		"add_resource_metadata": map[string]any{
+			"namespace": map[string]any{"enabled": false},
+		},
+	}, registry)
+
+	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
 	resourceWatchers.lock.RLock()
 	require.Nil(t, metaWatcher.restartWatcher, "rolling back the last cluster-scoped registration must discard its pending replacement")
 	require.True(t, metaWatcher.nodeScope, "rollback must preserve the active node-scoped watcher's scope")
@@ -1449,6 +1437,30 @@ func configureRealInformerTestEnricher(e *enricher, container bool) {
 		}
 		e.isPod = true
 	}
+}
+
+func writeTestKubeConfig(t *testing.T) string {
+	path := filepath.Join(t.TempDir(), "kubeconfig")
+	require.NoError(t, os.WriteFile(path, []byte(`
+apiVersion: v1
+kind: Config
+clusters:
+  - name: test
+    cluster:
+      server: https://127.0.0.1:1
+      insecure-skip-tls-verify: true
+contexts:
+  - name: test
+    context:
+      cluster: test
+      user: test
+current-context: test
+users:
+  - name: test
+    user:
+      token: test
+`), 0o600))
+	return path
 }
 
 func buildTestMetadataEnricher(
