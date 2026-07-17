@@ -257,8 +257,8 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 
 		verdict, err := s.ReadSlice(backgroundCtx(), pub)
 		require.NoError(t, err)
-		require.Equal(t, loginp.SliceYield, verdict,
-			"a time-boxed slice must yield so Poll runs, not report done")
+		require.Equal(t, loginp.SliceBudget, verdict,
+			"a time-boxed slice with data remaining must report SliceBudget, not SliceYield or done")
 		require.Empty(t, pub.events, "an already-past budget must cut the slice short before any line is read")
 	})
 

@@ -333,43 +333,60 @@ func (g *harvesterRunner) readOnce(state *sourceState) {
 		}
 	}
 
-	before := state.session.Offset()
-	verdict, err := state.session.ReadSlice(state.ctx, state.publisher)
-	after := state.session.Offset()
+	for {
+		before := state.session.Offset()
+		verdict, err := state.session.ReadSlice(state.ctx, state.publisher)
+		after := state.session.Offset()
 
-	g.mu.Lock()
-	if state.status == statusClosing || state.finished {
-		g.mu.Unlock()
-		g.finish(state)
-		return
-	}
-
-	if err != nil || verdict == SliceDone {
-		g.mu.Unlock()
-		if err != nil {
-			state.ctx.Logger.Debugf("Harvester stopped with error: %v", err)
+		g.mu.Lock()
+		if state.status == statusClosing || state.finished {
+			g.mu.Unlock()
+			g.finish(state)
+			return
 		}
-		g.finish(state)
-		return
-	}
 
-	// SliceYield: caught up to EOF. During a read_until_eof shutdown the source
-	// has now been drained, so tear it down instead of parking it.
-	if g.draining {
+		if err != nil || verdict == SliceDone {
+			g.mu.Unlock()
+			if err != nil {
+				state.ctx.Logger.Debugf("Harvester stopped with error: %v", err)
+			}
+			g.finish(state)
+			return
+		}
+
+		if verdict == SliceBudget {
+			// The slice budget elapsed but the file still has data. While draining
+			// keep reading in this goroutine so the drain reaches EOF (bounded by
+			// the drain-timeout cancel).
+			if g.draining {
+				g.mu.Unlock()
+				continue
+			}
+			g.park(state, 0)
+			g.mu.Unlock()
+			g.signalWaker()
+			return
+		}
+
+		// SliceYield: caught up to EOF. During a read_until_eof shutdown the source
+		// has now been drained, so tear it down instead of parking it.
+		if g.draining {
+			g.mu.Unlock()
+			g.finish(state)
+			return
+		}
+
+		// Park for the waker and exit the goroutine. A slice that made progress resets
+		// the backoff; one that read nothing grows it.
+		if after > before {
+			g.park(state, g.backoff.Init)
+		} else {
+			g.park(state, growBackoff(state.backoff, g.backoff.Init, g.backoff.Max))
+		}
 		g.mu.Unlock()
-		g.finish(state)
+		g.signalWaker()
 		return
 	}
-
-	// Park for the waker and exit the goroutine. A slice that made progress resets
-	// the backoff; one that read nothing grows it.
-	if after > before {
-		g.park(state, g.backoff.Init)
-	} else {
-		g.park(state, growBackoff(state.backoff, g.backoff.Init, g.backoff.Max))
-	}
-	g.mu.Unlock()
-	g.signalWaker()
 }
 
 // currentResource atomically returns state's current registration key and the

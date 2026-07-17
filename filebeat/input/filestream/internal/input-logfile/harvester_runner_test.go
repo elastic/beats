@@ -1134,6 +1134,53 @@ func TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop(t *testing.T) {
 	require.True(t, h.lastSession().isClosed())
 }
 
+// TestHarvesterRunner_ReadUntilEOFDrainsPastBudgetYields asserts that during a
+// read_until_eof drain a source whose slice time budget keeps elapsing with data
+// still available (SliceBudget) is read all the way to EOF instead of being torn
+// down at the first budget yield. This guards the data-loss regression where a
+// budget yield was indistinguishable from an EOF yield, cutting the drain short
+// mid-file so the remaining events were never shipped.
+func TestHarvesterRunner_ReadUntilEOFDrainsPastBudgetYields(t *testing.T) {
+	const eofRead = 5 // read 1 parks; reads 2..4 yield on budget with data left; read 5 hits EOF
+	var reads atomic.Int64
+	h := &fakeHarvester{
+		readFn: func(call int, _ v2.Context) (SliceVerdict, error) {
+			reads.Add(1)
+			switch {
+			case call == 1:
+				return SliceYield, nil // first read: caught up to EOF, park
+			case call < eofRead:
+				return SliceBudget, nil // draining: budget elapsed, data still available
+			default:
+				return SliceDone, nil // EOF reached: drain complete
+			}
+		},
+		pollFn: func(int) PollResult { return PollPark }, // waker keeps it parked until the stop
+	}
+	g := testHarvesterRunnerEOF(t, h, 0, ReadUntilEOFConfig{Enabled: true, Timeout: 5 * time.Second})
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	requireEventually(t, func() bool {
+		s, ok := g.statusOf(id)
+		return ok && s == statusParked
+	}, "source should park after its first read")
+	require.Equal(t, int64(1), reads.Load(), "only the initial read happens before draining")
+
+	require.NoError(t, g.StopHarvesters())
+
+	require.Equal(t, int64(eofRead), reads.Load(),
+		"the drain must keep reading past budget yields until EOF, not stop at the first budget yield")
+	require.False(t, g.hasID(id))
+	require.True(t, h.lastSession().isClosed())
+}
+
 // TestHarvesterRunner_NoDrainWhenDisabled asserts that with read_until_eof
 // disabled a parked source is torn down on stop without an extra read.
 func TestHarvesterRunner_NoDrainWhenDisabled(t *testing.T) {
@@ -1342,7 +1389,7 @@ func (s *fakeSession) ReadSlice(ctx v2.Context, _ Publisher) (SliceVerdict, erro
 
 	// A yielding read models having consumed available data, so advance the
 	// offset: the runner uses progress to pick the park backoff.
-	if err == nil && verdict == SliceYield {
+	if err == nil && (verdict == SliceYield || verdict == SliceBudget) {
 		s.mu.Lock()
 		s.offset++
 		s.mu.Unlock()

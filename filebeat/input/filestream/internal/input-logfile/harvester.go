@@ -44,6 +44,11 @@ const (
 	// SliceYield means no data is currently available (the read would block);
 	// the reader parks the source until the waker sees new data.
 	SliceYield SliceVerdict = iota
+	// SliceBudget means the slice's time budget elapsed while data was still
+	// available. The source is not caught up: the reader resumes it promptly
+	// instead of parking, and during a read_until_eof drain it keeps reading
+	// toward EOF rather than being torn down mid-file.
+	SliceBudget
 	// SliceDone means a terminal condition was reached (EOF on a closeable
 	// file, truncation, error or cancellation); the source is torn down.
 	SliceDone
@@ -71,8 +76,9 @@ const (
 // single goroutine operates a session at a time (one reader per source).
 type HarvesterSession interface {
 	// ReadSlice reads from the source and publishes events until there is no
-	// data currently available (SliceYield) or a terminal condition is reached
-	// (SliceDone).
+	// data currently available (SliceYield), the slice's time budget elapsed
+	// with data still available (SliceBudget), or a terminal condition is
+	// reached (SliceDone).
 	ReadSlice(ctx inputv2.Context, p Publisher) (SliceVerdict, error)
 	// Poll is called by the runner's waker for a parked session to decide
 	// whether to resume reading, keep parking, or close (inactive/removed/

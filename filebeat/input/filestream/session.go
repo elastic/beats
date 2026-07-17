@@ -132,7 +132,8 @@ func (inp *filestream) OpenSession(
 }
 
 // ReadSlice reads and publishes events until the file has no data currently
-// available (SliceYield) or a terminal condition is reached (SliceDone). It
+// available (SliceYield), the slice's time budget elapsed with data still
+// available (SliceBudget), or a terminal condition is reached (SliceDone). It
 // implements loginp.HarvesterSession.
 func (s *harvestSession) ReadSlice(
 	ctx input.Context,
@@ -179,7 +180,7 @@ func (s *harvestSession) ReadSlice(
 		if !deadline.IsZero() && time.Now().After(deadline) {
 			s.readOffset = logReader.ReadOffset()
 			s.log.Debugf("Slice time budget reached: %s; yielding.", s.src.newPath)
-			return loginp.SliceYield, nil
+			return loginp.SliceBudget, nil
 		}
 
 		message, err := r.Next()
