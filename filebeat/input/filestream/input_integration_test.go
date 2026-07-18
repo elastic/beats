@@ -1426,10 +1426,10 @@ func TestHarvesterLimitCyclesThroughFiles(t *testing.T) {
 	inp := env.mustCreateInput(cfg)
 
 	var want []string
-	for f := 0; f < numFiles; f++ {
+	for f := range numFiles {
 		name := fmt.Sprintf("multi-%02d.log", f)
 		var content []byte
-		for l := 0; l < linesPerFile; l++ {
+		for l := range linesPerFile {
 			line := fmt.Sprintf("file%02d-line%d", f, l)
 			want = append(want, line)
 			content = append(content, []byte(line+"\n")...)
@@ -1481,7 +1481,7 @@ func TestHarvesterGZIP(t *testing.T) {
 	inp := env.mustCreateInput(cfg)
 
 	var want []string
-	for i := 0; i < 20; i++ {
+	for i := range 20 {
 		want = append(want, fmt.Sprintf("gzip line %02d", i))
 	}
 	var plain bytes.Buffer

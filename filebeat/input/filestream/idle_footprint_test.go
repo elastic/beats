@@ -57,7 +57,7 @@ func benchmarkIdleFootprint(b *testing.B, fileCount, linesPerFile int) {
 	logger := logp.NewNopLogger()
 
 	dir := b.TempDir()
-	for i := 0; i < fileCount; i++ {
+	for range fileCount {
 		generateFile(b, dir, linesPerFile)
 	}
 	wantEvents := int64(fileCount * linesPerFile)

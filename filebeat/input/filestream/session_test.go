@@ -492,7 +492,7 @@ type countingPublisher struct {
 	err    error
 }
 
-func (p *countingPublisher) Publish(e beat.Event, _ interface{}) error {
+func (p *countingPublisher) Publish(e beat.Event, _ any) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.err != nil {
