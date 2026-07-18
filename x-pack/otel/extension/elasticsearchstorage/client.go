@@ -99,7 +99,7 @@ func (c *esStorageClient) Set(ctx context.Context, key string, value []byte) err
 	if key == "" {
 		return errEmptyKey
 	}
-	if err := c.ensureIndex(); err != nil {
+	if err := c.ensureIndex(ctx); err != nil {
 		return err
 	}
 
@@ -223,15 +223,16 @@ func (c *esStorageClient) writeParams() map[string]string {
 
 // ensureIndex lazily creates the storage index on first write. It is
 // idempotent (a concurrent creator's "resource_already_exists_exception" is
-// treated as success) and caches only success, so a transient failure is
-// retried on the next write rather than permanently disabling the client.
-func (c *esStorageClient) ensureIndex() error {
+// treated as success) and caches only success, so a failure that survives
+// the retrying transport is re-attempted on the next write rather than
+// permanently disabling the client.
+func (c *esStorageClient) ensureIndex(ctx context.Context) error {
 	c.ensuredMu.Lock()
 	defer c.ensuredMu.Unlock()
 	if c.ensured {
 		return nil
 	}
-	if err := ensureIndex(c.ext, c.index, c.ext.cfg.Index); err != nil {
+	if err := c.createIndex(ctx); err != nil {
 		return err
 	}
 	c.ensured = true

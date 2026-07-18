@@ -75,7 +75,7 @@ func TestRetryConfig_ClampsBaseDelayToMaxDelay(t *testing.T) {
 func newRetryTestExtension(t *testing.T, srv *httptest.Server) *elasticStorage {
 	t.Helper()
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{srv.URL},
 			"username": "elastic",
 			"password": "changeme",
@@ -126,6 +126,35 @@ func TestRequest_RetriesTransientThenSucceeds(t *testing.T) {
 	assert.Equal(t, int64(3), docAttempts.Load(), "expected 2 failures + 1 success")
 }
 
+// TestRequest_IndexCreateRetriedThenSucceeds drives Set against a server that
+// returns 503 twice on the index create (PUT /<index>) before acknowledging,
+// and asserts the create goes through the same retry loop as document writes.
+func TestRequest_IndexCreateRetriedThenSucceeds(t *testing.T) {
+	var createAttempts atomic.Int64
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.Method == http.MethodGet && r.URL.Path == "/":
+			_, _ = io.WriteString(w, `{"version":{"number":"8.10.0","build_flavor":"default"},"name":"fake"}`)
+		case r.Method == http.MethodPut && !strings.Contains(r.URL.Path, "/_doc/"):
+			if createAttempts.Add(1) <= 2 {
+				http.Error(w, `{"error":"unavailable"}`, http.StatusServiceUnavailable)
+				return
+			}
+			_, _ = io.WriteString(w, `{"acknowledged":true}`)
+		default: // document write and anything else
+			_, _ = io.WriteString(w, `{}`)
+		}
+	}))
+	defer srv.Close()
+
+	ext := newRetryTestExtension(t, srv)
+	c := retryTestClient(t, ext)
+
+	require.NoError(t, c.Set(context.Background(), "k", []byte(`{"a":1}`)),
+		"Set must succeed after transient 503s on index creation are retried")
+	assert.Equal(t, int64(3), createAttempts.Load(), "expected 2 failed creates + 1 success")
+}
+
 // TestRequest_PermanentErrorNotRetried asserts a 400 on the document write is
 // returned immediately without retrying.
 func TestRequest_PermanentErrorNotRetried(t *testing.T) {
@@ -170,7 +199,7 @@ func TestRequest_RetryStopsOnContextCancel(t *testing.T) {
 
 	// Long backoff so the cancel wins the race deterministically.
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{srv.URL},
 			"username": "elastic",
 			"password": "changeme",

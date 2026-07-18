@@ -73,7 +73,7 @@ func TestESClient_Walk_PaginatesAllEntries(t *testing.T) {
 
 	n := 15
 	want := make(map[string]string, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		key := fmt.Sprintf("k-%d", i)
 		val := fmt.Sprintf(`{"i":%d}`, i)
 		want[key] = val

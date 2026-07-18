@@ -5,6 +5,7 @@
 package elasticsearchstorage
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -162,31 +163,28 @@ func kindString(k component.Kind) string {
 	}
 }
 
-// ensureIndex creates the storage index with the fixed mapping if it does
-// not already exist. The 400 "resource_already_exists_exception" response is
-// treated as success, so concurrent GetClient calls for the same index are
-// race-safe. The shard/replica settings are dropped on serverless, where they
-// are not permitted (see indexCreateBody).
+// createIndex creates the client's storage index with the fixed mapping if
+// it does not already exist. The 400 "resource_already_exists_exception"
+// response is treated as success, so concurrent creators for the same index
+// are race-safe. The shard/replica settings are dropped on serverless, where
+// they are not permitted (see indexCreateBody).
 //
-// The connection is read and used under the extension's clientMu; see the
-// clientMu documentation on elasticStorage.
-func ensureIndex(ext *elasticStorage, indexName string, idx IndexConfig) error {
-	ext.clientMu.Lock()
-	defer ext.clientMu.Unlock()
-
-	conn := ext.client
-	if conn == nil {
-		return errExtensionClosed
+// The request goes through the client's retrying transport, so a transient
+// failure on index creation is retried the same way as a document write.
+func (c *esStorageClient) createIndex(ctx context.Context) error {
+	serverless, err := c.ext.isServerless()
+	if err != nil {
+		return err
 	}
-	status, body, err := conn.Request("PUT", "/"+indexName, "", nil, indexCreateBody(conn.IsServerless(), idx))
+	status, body, err := c.request(ctx, "PUT", "/"+c.index, nil, indexCreateBody(serverless, c.ext.cfg.Index))
 	if err == nil {
 		return nil
 	}
 	// PUT /<index> returns 400 with "resource_already_exists_exception" when
-	// the index is already there — treat as success so two GetClient calls
-	// for the same id don't fight.
+	// the index is already there — treat as success so two creators for the
+	// same identity don't fight.
 	if status == http.StatusBadRequest && strings.Contains(string(body), "resource_already_exists_exception") {
 		return nil
 	}
-	return fmt.Errorf("creating storage index %q: %w", indexName, err)
+	return fmt.Errorf("creating storage index %q: %w", c.index, err)
 }

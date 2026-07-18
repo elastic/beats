@@ -50,7 +50,7 @@ func captureCreateBody(t *testing.T, buildFlavor string, idx IndexConfig) string
 	defer srv.Close()
 
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{srv.URL},
 			"username": "elastic",
 			"password": "changeme",

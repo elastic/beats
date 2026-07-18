@@ -105,6 +105,18 @@ func (e *elasticStorage) GetClient(ctx context.Context, kind component.Kind, id 
 	}, nil
 }
 
+// isServerless reports whether the connected cluster is Elastic Cloud
+// Serverless, reading the shared connection under clientMu. The answer is
+// cached by the connection after the first call.
+func (e *elasticStorage) isServerless() (bool, error) {
+	e.clientMu.Lock()
+	defer e.clientMu.Unlock()
+	if e.client == nil {
+		return false, errExtensionClosed
+	}
+	return e.client.IsServerless(), nil
+}
+
 func (e *elasticStorage) Close() error {
 	// no-op. Client will be close in Shutdown
 	return nil

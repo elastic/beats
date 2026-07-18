@@ -36,7 +36,7 @@ func newTestExtension(t *testing.T) *elasticStorage {
 	pass, _ := esURL.User.Password()
 
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
 			"username": user,
 			"password": pass,
@@ -298,7 +298,7 @@ func TestGetClient_MultiReceiver_Concurrent(t *testing.T) {
 
 	const numClients = 8
 	clients := make([]storage.Client, numClients)
-	for i := 0; i < numClients; i++ {
+	for i := range numClients {
 		id := component.MustNewIDWithName("test_storage", fmt.Sprintf("mr_%d", i))
 		c, err := ext.GetClient(ctx, component.KindReceiver, id, "")
 		require.NoError(t, err)
@@ -308,12 +308,10 @@ func TestGetClient_MultiReceiver_Concurrent(t *testing.T) {
 
 	var wg sync.WaitGroup
 	errs := make([]error, numClients)
-	for i := 0; i < numClients; i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
+	for i := range numClients {
+		wg.Go(func() {
 			val := []byte(fmt.Sprintf(`{"who":%d}`, i))
-			for j := 0; j < 20; j++ {
+			for range 20 {
 				if err := clients[i].Set(ctx, "k", val); err != nil {
 					errs[i] = err
 					return
@@ -328,7 +326,7 @@ func TestGetClient_MultiReceiver_Concurrent(t *testing.T) {
 					return
 				}
 			}
-		}(i)
+		})
 	}
 	wg.Wait()
 	for i, err := range errs {

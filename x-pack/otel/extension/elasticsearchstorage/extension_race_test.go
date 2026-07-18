@@ -323,7 +323,7 @@ func TestElasticStorage_Shutdown_Concurrent_Race(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{srv.URL},
 			"username": "elastic",
 			"password": "changeme",
@@ -348,9 +348,7 @@ func TestElasticStorage_Shutdown_Concurrent_Race(t *testing.T) {
 	for i, oc := range clients {
 		key := fmt.Sprintf("cursor-%d", i)
 		val := []byte(fmt.Sprintf(`{"cursor":null,"n":%d}`, i))
-		wg.Add(1)
-		go func(oc storage.Client) {
-			defer wg.Done()
+		wg.Go(func() {
 			for {
 				select {
 				case <-stop:
@@ -365,7 +363,7 @@ func TestElasticStorage_Shutdown_Concurrent_Race(t *testing.T) {
 					return nil, nil
 				})
 			}
-		}(oc)
+		})
 	}
 
 	// Let traffic build up, then shut down underneath it.

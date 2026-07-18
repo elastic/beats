@@ -42,7 +42,7 @@ func (e *elasticStorage) retryConfig() retryParams {
 // failures. The returned body is a fresh copy, safe to use after the
 // connection's response buffer is reused by a later request. Callers MUST NOT
 // hold clientMu.
-func (c *esStorageClient) request(ctx context.Context, method, path string, params map[string]string, body interface{}) (int, []byte, error) {
+func (c *esStorageClient) request(ctx context.Context, method, path string, params map[string]string, body any) (int, []byte, error) {
 	rc := c.ext.retryConfig()
 
 	// extDone lets a slow retry backoff be interrupted when the extension's
@@ -79,7 +79,7 @@ func (c *esStorageClient) request(ctx context.Context, method, path string, para
 
 // doOnce performs a single request under clientMu, copying the response body
 // out before releasing the lock (the connection reuses its response buffer).
-func (c *esStorageClient) doOnce(method, path string, params map[string]string, body interface{}) (int, []byte, error) {
+func (c *esStorageClient) doOnce(method, path string, params map[string]string, body any) (int, []byte, error) {
 	c.ext.clientMu.Lock()
 	defer c.ext.clientMu.Unlock()
 
@@ -125,7 +125,7 @@ func backoffDelay(attempt int, base, max time.Duration) time.Duration {
 		return base
 	}
 	d := base
-	for i := 0; i < attempt; i++ {
+	for range attempt {
 		d *= 2
 		if d <= 0 || d >= max {
 			return max
