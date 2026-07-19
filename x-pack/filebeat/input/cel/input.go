@@ -784,7 +784,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 			"limit", *s.cfg.MaxExecutions,
 			"next_eval_time", start.Add(s.cfg.Interval),
 		)
-		s.health.UpdateStatus(status.Degraded, msg)
 		execSpan.SetStatus(codes.Unset, msg)
 		return result, nil
 	}
