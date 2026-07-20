@@ -31,6 +31,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -119,7 +120,7 @@ func configure(
 		return nil, nil, err
 	}
 
-	if err := normalizeConfig(cfg, &c); err != nil {
+	if err := normalizeConfig(cfg, &c, log); err != nil {
 		return nil, nil, err
 	}
 
@@ -172,46 +173,42 @@ func configure(
 	return prospector, filestream, nil
 }
 
-// normalizeConfig reconciles filestream defaults with file_identity semantics.
-// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
-// identities should turn it off unless the user explicitly sets it.
+// normalizeConfig reconciles filestream defaults with file_identity semantics:
 //
-// For the fingerprint identity it reads the user-facing
-// `file_identity.fingerprint.growing` flag — the only public knob for growing
-// mode — and propagates it to the scanner's fingerprint config so the
-// scanner-side computation honours growing mode. Any value set under
-// `prospector.scanner.fingerprint.growing` in YAML is silently ignored.
-//
-// When file_identity is omitted, the default identity is the fingerprint
-// identity (see newFileIdentifier), so the same growing default is applied.
-func normalizeConfig(cfg *conf.C, c *config) error {
-	if c.FileIdentity == nil {
-		// Default (no file_identity): the fingerprint identity is used, so
-		// apply its growing default just like the explicit branch below.
-		c.FileWatcher.Scanner.Fingerprint.Growing = defaultFingerprintIdentityConfig().Growing
-		return nil
-	}
+//   - Scanner fingerprinting is derived from the file identity: enabled for
+//     fingerprint (the default), disabled otherwise. The deprecated
+//     'prospector.scanner.fingerprint.enabled' setting is ignored and a
+//     warning is logged when it contradicts the derived value. The
+//     fingerprint identity needs scanner fingerprints: without them every
+//     file gets the same empty fingerprint ID and collapses into a single
+//     registry entry, silently losing data.
+//   - 'file_identity.fingerprint.growing' is the only user-facing knob for
+//     growing mode and is propagated to the scanner config. Any value set
+//     under 'prospector.scanner.fingerprint.growing' is silently ignored.
+func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
+	fingerprintIdentity := usesFingerprintIdentity(c.FileIdentity)
 
-	name := c.FileIdentity.Name()
-	if name == fingerprintName {
+	if fingerprintIdentity {
 		fingerprintCfg := defaultFingerprintIdentityConfig()
-		if sub := c.FileIdentity.Config(); sub != nil {
-			if err := sub.Unpack(&fingerprintCfg); err != nil {
+		if c.FileIdentity != nil && c.FileIdentity.Config() != nil {
+			if err := c.FileIdentity.Config().Unpack(&fingerprintCfg); err != nil {
 				return fmt.Errorf("cannot read 'file_identity.fingerprint' config: %w", err)
 			}
 		}
-		// file_identity.fingerprint is the ONLY user-facing config for
-		// growing mode. Propagate to the scanner config.
 		c.FileWatcher.Scanner.Fingerprint.Growing = fingerprintCfg.Growing
-		return nil
 	}
 
-	hasScannerFingerprint, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
-	if err != nil {
-		return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
-	}
-	if !hasScannerFingerprint {
-		c.FileWatcher.Scanner.Fingerprint.Enabled = false
+	if c.FileWatcher.Scanner.Fingerprint.Enabled != fingerprintIdentity {
+		set, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
+		}
+		if set {
+			logger.Named("filestream").Warn(cfgwarn.Deprecate("",
+				"'prospector.scanner.fingerprint.enabled' is deprecated and ignored: scanner "+
+					"fingerprinting is enabled if and only if the 'fingerprint' file identity is used"))
+		}
+		c.FileWatcher.Scanner.Fingerprint.Enabled = fingerprintIdentity
 	}
 
 	return nil
