@@ -7,7 +7,6 @@ package awss3
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -183,7 +182,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{}, logp.NewNopLogger())
 		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logptest.NewTestingLogger(t, inputName), func(_ beat.Event) {})
 		require.Error(t, err)
-		assert.True(t, errors.Is(err, errS3DownloadFailed), "expected errS3DownloadFailed")
+		assert.ErrorIs(t, err, errS3DownloadFailed, "expected errS3DownloadFailed")
 	})
 
 	t.Run("s3 object streaming error results in errS3DownloadFailed error", func(t *testing.T) {
@@ -252,7 +251,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logptest.NewTestingLogger(t, inputName), func(event beat.Event) {
 			events = append(events, event)
 		})
-		assert.Equal(t, 2, len(events))
+		assert.Len(t, events, 2)
 		require.NoError(t, err)
 	})
 
@@ -343,7 +342,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 }
 
 func TestProcessObjectMetricCollection(t *testing.T) {
-	logger := logp.NewLogger("testing-s3-processor-metrics")
+	logger := logptest.NewTestingLogger(t, "testing-s3-processor-metrics")
 
 	tests := []struct {
 		name        string
@@ -403,7 +402,7 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 			require.Equal(t, uint64(0), metricRecorder.s3ObjectsInflight.Get())
 
 			values := metricRecorder.s3ObjectSizeInBytes.Values()
-			require.Equal(t, 1, len(values))
+			require.Len(t, values, 1)
 
 			// since we processed a single object, total and current process size is same
 			require.Equal(t, test.objectSize, values[0])
@@ -446,7 +445,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 
 	if !expectErr {
 		require.NoError(t, err)
-		assert.Equal(t, numEvents, len(events))
+		assert.Len(t, events, numEvents)
 	} else {
 		require.Error(t, err)
 	}

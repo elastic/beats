@@ -47,13 +47,13 @@ type s3ObjectProcessor struct {
 	s3ObjHash     string
 	s3RequestURL  string
 
-	s3Metadata map[string]interface{} // S3 object metadata.
+	s3Metadata map[string]any // S3 object metadata.
 }
 
 type s3DownloadedObject struct {
 	body        io.ReadCloser
 	contentType string
-	metadata    map[string]interface{}
+	metadata    map[string]any
 }
 
 const (
@@ -505,7 +505,7 @@ func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 	// other HTTP headers.
 	const userMetaPrefix = "x-amz-meta-"
 
-	allMeta := map[string]interface{}{}
+	allMeta := map[string]any{}
 
 	// Get headers using AWS SDK struct tags.
 	fields := reflect.TypeOf(resp).Elem()
@@ -529,7 +529,7 @@ func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 
 		v := values.Field(i)
 		switch v.Kind() {
-		case reflect.Ptr:
+		case reflect.Pointer:
 			if v.IsNil() {
 				continue
 			}
