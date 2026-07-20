@@ -194,7 +194,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	if len(prs) == 0 {
 		fmt.Println("No PRs created (release already up to date)")
 	}
-	fmt.Println("\nNote: Release notes PR should be created separately using release:runChangelog")
+	fmt.Println("\nNote: Release notes PR should be created separately via .github/workflows/release-notes.yml")
 
 	return nil
 }
@@ -453,7 +453,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	if len(prs) == 0 {
 		fmt.Println("No PRs created (release already up to date)")
 	}
-	fmt.Println("\nNote: Release notes PR should be created separately using release:runChangelog")
+	fmt.Println("\nNote: Release notes PR should be created separately via .github/workflows/release-notes.yml")
 
 	return nil
 }

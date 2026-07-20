@@ -325,13 +325,3 @@ func (Release) RunPatch() error {
 	}
 	return release.RunPatchRelease(cfg)
 }
-
-// RunChangelog executes the complete changelog workflow
-// This generates changelog and creates 1 PR
-func (Release) RunChangelog() error {
-	cfg, err := release.LoadConfigFromEnv()
-	if err != nil {
-		return err
-	}
-	return release.RunChangelog(cfg)
-}

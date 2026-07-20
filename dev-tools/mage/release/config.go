@@ -49,9 +49,6 @@ type ReleaseConfig struct {
 
 	// Operational flags
 	DryRun bool
-
-	// Changelog configuration
-	ChangelogToCommit string
 }
 
 // LoadConfigFromEnv loads release configuration from environment variables
@@ -95,8 +92,7 @@ func LoadConfigFromEnv() (*ReleaseConfig, error) {
 		GitHubToken:       os.Getenv("GITHUB_TOKEN"),
 		GitAuthorName:     getEnvOrDefault("GIT_AUTHOR_NAME", "github-actions[bot]"),
 		GitAuthorEmail:    getEnvOrDefault("GIT_AUTHOR_EMAIL", "github-actions[bot]@users.noreply.github.com"),
-		DryRun:            getEnvOrDefault("DRY_RUN", "false") == "true",
-		ChangelogToCommit: getEnvOrDefault("CHANGELOG_TO_COMMIT", "HEAD"),
+		DryRun: getEnvOrDefault("DRY_RUN", "false") == "true",
 	}
 
 	// Parse reviewers (comma-separated)
