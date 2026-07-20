@@ -32,7 +32,7 @@ func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) er
 
 func (mb *metricbeatReceiver) Shutdown(ctx context.Context) error {
 	mb.Logger.Info("stopping metricbeat receiver")
-	if err := mb.BeatReceiver.Shutdown(); err != nil {
+	if err := mb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
 	mb.wg.Wait()
