@@ -84,7 +84,7 @@ flowchart TD
 
 | Field | Value |
 |-------|-------|
-| Title | `[Release] Prepare main for 9.5.0 (backport + version 9.6.0)` |
+| Title | `[Release] Prepare main for 9.6.0 and mergify backport-9.5` |
 | Labels | `release`, `impact:critical`, `backport-9.5`, `skip-changelog`, `Team:Automation`, `merge:1-ff-day` |
 | Body | Merge before release branch work is finalized. Creates `backport-9.5` label. |
 

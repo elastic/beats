@@ -212,7 +212,7 @@ func prepMainBackportAndVersion(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, 
 	if err := UpdateVersion(cfg.NextProjectMinorVersion); err != nil {
 		return workflowPR{}, err
 	}
-	commitMsg := fmt.Sprintf("[Release] Prepare main for %s (backport + version %s)", cfg.CurrentRelease, cfg.NextProjectMinorVersion)
+	commitMsg := fmt.Sprintf("[Release] Prepare main for %s and mergify backport-%s", cfg.NextProjectMinorVersion, cfg.ReleaseBranch)
 	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return workflowPR{}, err
 	}
@@ -223,7 +223,7 @@ func prepMainBackportAndVersion(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, 
 		opts: PROptions{
 			Owner:     cfg.ProjectOwner,
 			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("[Release] Prepare main for %s (backport + version %s)", cfg.CurrentRelease, cfg.NextProjectMinorVersion),
+			Title:     fmt.Sprintf("[Release] Prepare main for %s and mergify backport-%s", cfg.NextProjectMinorVersion, cfg.ReleaseBranch),
 			Head:      branch,
 			Base:      cfg.BaseBranch,
 			Body:      prAMainBody(cfg),
