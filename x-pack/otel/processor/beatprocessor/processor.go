@@ -70,8 +70,7 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 }
 
 // buildPdataProcs returns a typed slice of PdataProcessor when every proc in
-// the list implements the interface, or nil if any one does not. A nil return
-// causes ConsumeLogs to take the legacy round-trip path for the whole chain.
+// the list implements the interface, or nil if any one does not.
 func buildPdataProcs(procs []beat.Processor) []processors.PdataProcessor {
 	pdataProcs := make([]processors.PdataProcessor, 0, len(procs))
 	for _, p := range procs {
@@ -179,7 +178,7 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 }
 
 // consumeLogRecordPdata runs all processors directly on the log record's
-// pcommon.Map body with zero pdata↔mapstr conversions. It is only called when
+// pcommon.Map body, with no round-trip to mapstr. It is only called when
 // every processor in the chain implements processors.PdataProcessor.
 func (p *beatProcessor) consumeLogRecordPdata(logRecord plog.LogRecord) (bool, error) {
 	body := logRecord.Body().Map()

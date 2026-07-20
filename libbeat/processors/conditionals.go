@@ -131,8 +131,7 @@ var _ PdataProcessor = (*ClosingWhenPdataProcessor)(nil)
 
 // WhenPdataProcessor is like WhenProcessor but is only created when the inner
 // processor implements PdataProcessor. It delegates RunPdata directly to the
-// inner, preserving the all-or-nothing guarantee in buildPdataProcs: no
-// round-trip fallback for legacy-only inner processors.
+// inner processor.
 type WhenPdataProcessor struct {
 	WhenProcessor
 	pdataInner PdataProcessor

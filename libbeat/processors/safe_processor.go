@@ -66,9 +66,7 @@ type safeProcessorWithClose struct {
 
 // safePdataProcessorWithClose extends safeProcessorWithClose with a pdata fast
 // path. It is only created by SafeWrap when the inner processor implements both
-// Closer and PdataProcessor, preserving the all-or-nothing guarantee in
-// buildPdataProcs: a chain where any processor lacks RunPdata will not produce
-// a safePdataProcessorWithClose and buildPdataProcs will return nil.
+// Closer and PdataProcessor.
 type safePdataProcessorWithClose struct {
 	safeProcessorWithClose
 	pdataProc PdataProcessor

@@ -187,8 +187,7 @@ func TestWhenProcessorPdataParityConditionTrue(t *testing.T) {
 
 // TestWhenLegacyInnerNoPdataPath verifies that NewConditionRule returns a
 // *WhenProcessor (not *WhenPdataProcessor) when the inner processor does not
-// implement PdataProcessor, preserving the all-or-nothing guarantee in
-// buildPdataProcs.
+// implement PdataProcessor.
 func TestWhenLegacyInnerNoPdataPath(t *testing.T) {
 	raw, err := conf.NewConfigFrom(map[string]any{
 		"equals": map[string]any{"i": 10},
