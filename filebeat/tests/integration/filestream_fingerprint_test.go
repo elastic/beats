@@ -319,9 +319,9 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	filebeat.Stop()
 
 	// Registry shape: the plain files crossed the threshold and are now keyed by
-	// a final SHA-256 entry (no meta.fingerprint); the gzipped files stayed
+	// a final SHA-256 entry (no meta.fingerprint_len); the gzipped files stayed
 	// below the threshold (fingerprint is computed on decompressed content) and
-	// remain growing (raw-hex) entries.
+	// remain growing entries.
 	assertSingleSHA256RegistryEntry(t, tempDir, file1)
 	assertSingleSHA256RegistryEntry(t, tempDir, file2)
 	assertSingleSHA256RegistryEntry(t, tempDir, file3)
@@ -946,8 +946,8 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	filebeat.Stop()
 
 	// Registry state: largeFile keyed by the same SHA-256 from the static
-	// phase (no extra entries on upgrade); smallFile keyed by raw-hex with a
-	// non-empty meta.fingerprint (still growing, below threshold).
+	// phase (no extra entries on upgrade); smallFile keyed by the bounded hash
+	// with a non-zero meta.fingerprint_len (still growing, below threshold).
 	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
 	assertGrowingRegistryEntry(t, tempDir, smallFile)
 }
@@ -1611,7 +1611,7 @@ func TestFilestreamEnhancedFingerprint_RenameBelowThresholdAcrossRestartKeepRemo
 //
 // Two files exist from the start:
 //   - smallGz: decompressed ~250 bytes → below threshold → growing tracking
-//     (raw-hex registry key with a non-empty meta.fingerprint).
+//     (bounded-hash registry key with a non-zero meta.fingerprint_len).
 //   - largeGz: decompressed ~1500 bytes → above threshold → SHA-256 tracking.
 //
 // Both must be ingested completely under growing mode.
@@ -1748,9 +1748,9 @@ type fingerprintRegistryEntry struct {
 	removed     bool   // true if the latest op for this key was "remove"
 	// growing is true while the entry is in the growing phase. With the
 	// bounded-key optimization the key part is always a 64-char hash (so its
-	// length no longer distinguishes growing from final); the raw-hex
-	// fingerprint lives in the value (Meta.Fingerprint) and a non-empty value
-	// is the marker of a still-growing entry.
+	// length no longer distinguishes growing from final); the growing
+	// fingerprint's byte length lives in the value (Meta.FingerprintLen) and
+	// a non-zero value is the marker of a still-growing entry.
 	growing bool
 }
 
@@ -1783,7 +1783,7 @@ func readFingerprintRegistry(t *testing.T, tempDir string) map[string]fingerprin
 			fingerprint: fp,
 			source:      source,
 			removed:     e.Op == "remove",
-			growing:     e.Fingerprint != "",
+			growing:     e.FingerprintLen > 0,
 		}
 	}
 	return state
@@ -1834,8 +1834,8 @@ func assertFingerprintMigratedToSHA256(t *testing.T, homeDir, filePath string) {
 			continue
 		}
 		// With the bounded-key optimization the growing key is also 64 chars,
-		// so we classify by the value-side marker (Meta.Fingerprint), not key
-		// length.
+		// so we classify by the value-side marker (Meta.FingerprintLen), not
+		// key length.
 		if e.growing {
 			activeGrowing = append(activeGrowing, e.key)
 		} else {
@@ -1881,7 +1881,7 @@ func assertSingleSHA256RegistryEntry(t *testing.T, tempDir, filePath string) {
 
 // assertGrowingRegistryEntry asserts that the file has exactly one active
 // fingerprint entry still in the growing phase. Growing is identified by a
-// non-empty Meta.Fingerprint (see fingerprintRegistryEntry.growing), not by
+// non-zero Meta.FingerprintLen (see fingerprintRegistryEntry.growing), not by
 // key length: with the bounded-key optimization a growing key is also 64
 // chars. Used to verify that a small file below the configured threshold is
 // tracked under growing mode (and would migrate to SHA-256 if it ever grew

@@ -264,10 +264,7 @@ func (f *Log) wait() bool {
 // incBackoff increases the backoff up to MaxBackoff.
 func (f *Log) incBackoff() {
 	if f.backoff < f.config.MaxBackoff {
-		f.backoff = f.backoff * time.Duration(f.config.BackoffFactor)
-		if f.backoff > f.config.MaxBackoff {
-			f.backoff = f.config.MaxBackoff
-		}
+		f.backoff = min(f.backoff*time.Duration(f.config.BackoffFactor), f.config.MaxBackoff)
 	}
 }
 

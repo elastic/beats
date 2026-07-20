@@ -19,10 +19,10 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/lumberjack"
 )
 
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")

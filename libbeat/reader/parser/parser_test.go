@@ -39,15 +39,15 @@ import (
 
 func TestParsersConfigSuffix(t *testing.T) {
 	tests := map[string]struct {
-		parsers        map[string]interface{}
+		parsers        map[string]any
 		expectedSuffix string
 		expectedError  string
 	}{
 		"parsers with no suffix config": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"container": map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"container": map[string]any{
 							"stream": "all",
 						},
 					},
@@ -55,10 +55,10 @@ func TestParsersConfigSuffix(t *testing.T) {
 			},
 		},
 		"parsers with correct suffix config": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"container": map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"container": map[string]any{
 							"stream": "stdout",
 						},
 					},
@@ -67,15 +67,15 @@ func TestParsersConfigSuffix(t *testing.T) {
 			expectedSuffix: "stdout",
 		},
 		"parsers with multiple suffix config": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"container": map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"container": map[string]any{
 							"stream": "stdout",
 						},
 					},
-					map[string]interface{}{
-						"container": map[string]interface{}{
+					map[string]any{
+						"container": map[string]any{
 							"stream": "stderr",
 						},
 					},
@@ -86,7 +86,6 @@ func TestParsersConfigSuffix(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
@@ -109,21 +108,21 @@ func TestParsersConfigSuffix(t *testing.T) {
 func TestParsersConfigAndReading(t *testing.T) {
 	tests := map[string]struct {
 		lines            string
-		parsers          map[string]interface{}
+		parsers          map[string]any
 		expectedMessages []string
 		expectedError    string
 	}{
 		"no parser, no error": {
 			lines:            "line 1\nline 2\n",
-			parsers:          map[string]interface{}{},
+			parsers:          map[string]any{},
 			expectedMessages: []string{"line 1\n", "line 2\n"},
 		},
 		"correct multiline parser": {
 			lines: "line 1.1\nline 1.2\nline 1.3\nline 2.1\nline 2.2\nline 2.3\n",
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"multiline": map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"multiline": map[string]any{
 							"type":        "count",
 							"count_lines": 3,
 						},
@@ -142,16 +141,16 @@ func TestParsersConfigAndReading(t *testing.T) {
 {"log":" lines","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 {"log":"[log] In total there should be 3 events\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 `,
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"keys_under_root": true,
 							"message_key":     "log",
 						},
 					},
-					map[string]interface{}{
-						"multiline": map[string]interface{}{
+					map[string]any{
+						"multiline": map[string]any{
 							"match":   "after",
 							"negate":  true,
 							"pattern": "^\\[log\\]",
@@ -166,9 +165,9 @@ func TestParsersConfigAndReading(t *testing.T) {
 			},
 		},
 		"non existent parser configuration": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
 						"no_such_parser": nil,
 					},
 				},
@@ -176,10 +175,10 @@ func TestParsersConfigAndReading(t *testing.T) {
 			expectedError: ErrNoSuchParser.Error(),
 		},
 		"invalid multiline parser configuration is caught before parser creation": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"multiline": map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"multiline": map[string]any{
 							"match": "after",
 						},
 					},
@@ -188,16 +187,16 @@ func TestParsersConfigAndReading(t *testing.T) {
 			expectedError: multiline.ErrMissingPattern.Error(),
 		},
 		"ndjson with syslog": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
 					{
-						"ndjson": map[string]interface{}{
+						"ndjson": map[string]any{
 							"keys_under_root": true,
 							"message_key":     "log",
 						},
 					},
 					{
-						"syslog": map[string]interface{}{
+						"syslog": map[string]any{
 							"format":   "auto",
 							"timezone": "Local",
 						},
@@ -214,10 +213,10 @@ func TestParsersConfigAndReading(t *testing.T) {
 			},
 		},
 		"multiline syslog": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
 					{
-						"multiline": map[string]interface{}{
+						"multiline": map[string]any{
 							"match":        "after",
 							"negate":       true,
 							"pattern":      "^<\\d{1,3}>",
@@ -225,7 +224,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 						},
 					},
 					{
-						"syslog": map[string]interface{}{
+						"syslog": map[string]any{
 							"format": "rfc5424",
 						},
 					},
@@ -260,15 +259,15 @@ func TestParsersConfigAndReading(t *testing.T) {
 			},
 		},
 		"syslog multiline": {
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
 					{
-						"syslog": map[string]interface{}{
+						"syslog": map[string]any{
 							"format": "rfc5424",
 						},
 					},
 					{
-						"multiline": map[string]interface{}{
+						"multiline": map[string]any{
 							"match":        "after",
 							"pattern":      "^\\s",
 							"skip_newline": true, // This option is set since testReader does not strip newlines when splitting lines.
@@ -309,7 +308,6 @@ func TestParsersConfigAndReading(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
@@ -339,14 +337,14 @@ func TestParsersConfigAndReading(t *testing.T) {
 func TestJSONParsersWithFields(t *testing.T) {
 	tests := map[string]struct {
 		message         reader.Message
-		config          map[string]interface{}
+		config          map[string]any
 		expectedMessage reader.Message
 	}{
 		"no postprocessor, no processing": {
 			message: reader.Message{
 				Content: []byte("line 1"),
 			},
-			config: map[string]interface{}{},
+			config: map[string]any{},
 			expectedMessage: reader.Message{
 				Content: []byte("line 1"),
 			},
@@ -356,10 +354,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte("{\"key\":\"value\"}"),
 				Fields:  mapstr.M{},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target": "",
 						},
 					},
@@ -377,10 +375,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte("{\"key\":\"value\"}"),
 				Fields:  mapstr.M{},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target": "kubernetes.audit",
 						},
 					},
@@ -402,10 +400,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte("{\"key\":\"value\"}"),
 				Fields:  mapstr.M{},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target": "kubernetes",
 						},
 					},
@@ -425,10 +423,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
 				Fields:  mapstr.M{},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target":      "",
 							"document_id": "my-id-field",
 						},
@@ -453,10 +451,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 					"other-key": "other-value",
 				},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target":         "",
 							"overwrite_keys": true,
 						},
@@ -476,10 +474,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": "test"}`),
 				Fields:  mapstr.M{},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target":         "",
 							"overwrite_keys": true,
 							"add_error_key":  true,
@@ -517,10 +515,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": 5}`),
 				Fields:  mapstr.M{},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target":         "",
 							"overwrite_keys": true,
 							"add_error_key":  true,
@@ -561,10 +559,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": {"hello": "shouldn't work"}}`),
 				Fields:  mapstr.M{},
 			},
-			config: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+			config: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"target":         "",
 							"overwrite_keys": true,
 							"add_error_key":  true,
@@ -604,7 +602,6 @@ func TestJSONParsersWithFields(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(test.config)
 			var parsersConfig testParsersConfig
@@ -624,7 +621,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 func TestContainerParser(t *testing.T) {
 	tests := map[string]struct {
 		lines            string
-		parsers          map[string]interface{}
+		parsers          map[string]any
 		expectedMessages []reader.Message
 	}{
 		"simple docker lines": {
@@ -633,10 +630,10 @@ func TestContainerParser(t *testing.T) {
 {"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
 {"log":"patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n","stream":"stdout","time":"2016-03-02T22:59:04.626534779Z"}
 `,
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"container": map[string]interface{}{},
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"container": map[string]any{},
 					},
 				},
 			},
@@ -670,10 +667,10 @@ func TestContainerParser(t *testing.T) {
 		"CRI docker lines": {
 			lines: `2017-09-12T22:32:21.212861448Z stdout F 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
 `,
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"container": map[string]interface{}{
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"container": map[string]any{
 							"format": "cri",
 						},
 					},
@@ -693,10 +690,10 @@ func TestContainerParser(t *testing.T) {
 "log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
 {"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
 `,
-			parsers: map[string]interface{}{
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"container": map[string]interface{}{},
+			parsers: map[string]any{
+				"parsers": []map[string]any{
+					map[string]any{
+						"container": map[string]any{},
 					},
 				},
 			},
@@ -719,7 +716,6 @@ func TestContainerParser(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
@@ -742,10 +738,10 @@ func TestContainerParser(t *testing.T) {
 }
 
 func TestParserIncludeMessages(t *testing.T) {
-	parserConfig := map[string]interface{}{
-		"parsers": []map[string]interface{}{
+	parserConfig := map[string]any{
+		"parsers": []map[string]any{
 			{
-				"include_message": map[string]interface{}{
+				"include_message": map[string]any{
 					"patterns": []string{"^INCLUDE"},
 				},
 			},

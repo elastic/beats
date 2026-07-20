@@ -62,7 +62,7 @@ func TestNew_SameConfigReturnsSameInstance(t *testing.T) {
 		created.Add(1)
 		return &fakeProcessor{}, nil
 	})
-	cfg := config.MustNewConfigFrom(map[string]interface{}{"key": "value"})
+	cfg := config.MustNewConfigFrom(map[string]any{"key": "value"})
 
 	p1, err := constructor(cfg, nil)
 	require.NoError(t, err)
@@ -80,9 +80,9 @@ func TestNew_DifferentConfigsReturnDifferentInstances(t *testing.T) {
 		return &fakeProcessor{}, nil
 	})
 
-	pA, err := constructor(config.MustNewConfigFrom(map[string]interface{}{"key": "A"}), nil)
+	pA, err := constructor(config.MustNewConfigFrom(map[string]any{"key": "A"}), nil)
 	require.NoError(t, err)
-	pB, err := constructor(config.MustNewConfigFrom(map[string]interface{}{"key": "B"}), nil)
+	pB, err := constructor(config.MustNewConfigFrom(map[string]any{"key": "B"}), nil)
 	require.NoError(t, err)
 
 	assert.Equal(t, int32(2), created.Load())
@@ -128,7 +128,7 @@ func TestSharedProcessor_CloseUnderlyingWhenLastUserGone(t *testing.T) {
 		t.Run(fmt.Sprintf("users=%d closes=%d", tc.users, tc.closesBeforeStop), func(t *testing.T) {
 			fp := &fakeProcessor{}
 			constructor := shared.New(newFakeConstructor(fp))
-			cfg := config.MustNewConfigFrom(map[string]interface{}{"k": "v"})
+			cfg := config.MustNewConfigFrom(map[string]any{"k": "v"})
 
 			procs := make([]beat.Processor, tc.users)
 			for i := range procs {
@@ -156,13 +156,12 @@ func TestNew_ConcurrentSameConfig_NoRace(t *testing.T) {
 		created.Add(1)
 		return &fakeProcessor{}, nil
 	})
-	cfg := config.MustNewConfigFrom(map[string]interface{}{"concurrent": true})
+	cfg := config.MustNewConfigFrom(map[string]any{"concurrent": true})
 
 	results := make([]beat.Processor, goroutines)
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
-		i := i
+	for i := range goroutines {
 		go func() {
 			defer wg.Done()
 			p, err := constructor(cfg, nil)
@@ -189,8 +188,7 @@ func TestSharedProcessor_ConcurrentRun_NoRace(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
-		i := i
+	for i := range goroutines {
 		go func() {
 			defer wg.Done()
 			out, err := proc.Run(newEvent(i))
@@ -211,7 +209,7 @@ func TestSharedProcessor_ConcurrentClose_NoRace(t *testing.T) {
 	const users = 20
 	fp := &fakeProcessor{}
 	constructor := shared.New(newFakeConstructor(fp))
-	cfg := config.MustNewConfigFrom(map[string]interface{}{"cc": true})
+	cfg := config.MustNewConfigFrom(map[string]any{"cc": true})
 
 	procs := make([]beat.Processor, users)
 	for i := range procs {
@@ -222,8 +220,7 @@ func TestSharedProcessor_ConcurrentClose_NoRace(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(users)
-	for i := 0; i < users; i++ {
-		i := i
+	for i := range users {
 		go func() {
 			defer wg.Done()
 			if err := processors.Close(procs[i]); err != nil {
@@ -251,8 +248,7 @@ func TestSharedProcessor_ConcurrentRunAndClose_NoRace(t *testing.T) {
 
 	var runWg sync.WaitGroup
 	runWg.Add(runners)
-	for i := 0; i < runners; i++ {
-		i := i
+	for i := range runners {
 		go func() {
 			defer runWg.Done()
 			for {
@@ -268,8 +264,7 @@ func TestSharedProcessor_ConcurrentRunAndClose_NoRace(t *testing.T) {
 
 	var closeWg sync.WaitGroup
 	closeWg.Add(closers)
-	for i := 0; i < closers; i++ {
-		i := i
+	for i := range closers {
 		go func() {
 			defer closeWg.Done()
 			if err := processors.Close(procs[i+1]); err != nil {

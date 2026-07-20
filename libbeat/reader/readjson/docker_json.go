@@ -153,8 +153,8 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	partial := false
 	if p.criflags {
 		// currently only P(artial) or F(ull) are available
-		tags := bytes.Split(log[i], []byte{':'})
-		for _, tag := range tags {
+		tags := bytes.SplitSeq(log[i], []byte{':'})
+		for tag := range tags {
 			if len(tag) == 1 && tag[0] == 'P' {
 				partial = true
 			}

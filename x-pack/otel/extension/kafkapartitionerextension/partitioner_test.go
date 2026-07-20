@@ -216,7 +216,7 @@ func TestRandomPartitioner(t *testing.T) {
 			"random": map[string]any{},
 		})
 
-		for i := 0; i < 50; i++ {
+		for i := range 50 {
 			part := tp.Partition(makeJSONRecord(t, map[string]any{"i": i}), numPartitions)
 			assert.GreaterOrEqual(t, part, 0)
 			assert.Less(t, part, numPartitions)
@@ -233,7 +233,7 @@ func TestRoundRobinPartitioner(t *testing.T) {
 
 		seen := make(map[int]bool)
 
-		for i := 0; i < numPartitions*4; i++ {
+		for i := range numPartitions * 4 {
 			part := tp.Partition(makeJSONRecord(t, map[string]any{"i": i}), numPartitions)
 
 			assert.GreaterOrEqual(t, part, 0)

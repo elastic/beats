@@ -122,7 +122,7 @@ func newFileReader(
 		closeRenamed:       closerConfig.OnStateChange.Renamed,
 		offset:             offset,
 		lastTimeRead:       time.Now(),
-		backoff:            backoff.NewExpBackoff(canceler.Done(), config.Backoff.Init, config.Backoff.Max),
+		backoff:            backoff.NewExpBackoff(config.Backoff.Init, config.Backoff.Max),
 		backoffInit:        config.Backoff.Init,
 		readerCtx:          readerCtx,
 		tg:                 tg,
@@ -206,7 +206,7 @@ func (f *logFile) SetReadDeadline(t time.Time) bool {
 // the remaining time so the deadline is honored precisely.
 func (f *logFile) waitForData() bool {
 	if f.readDeadline.IsZero() {
-		f.backoff.Wait()
+		f.backoff.Wait(f.readerCtx)
 		return true
 	}
 
