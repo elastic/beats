@@ -92,6 +92,31 @@ func TestS3ObjectProcessor(t *testing.T) {
 		testProcessS3Object(t, "testdata/log.ndjson", "application/x-ndjson", 2)
 	})
 
+	t.Run("ndjson parser without message_key is not dropped in readFile", func(t *testing.T) {
+		// Regression test: an ndjson parser without a message_key moves the
+		// decoded data into the event fields and clears the content. When the
+		// object's content-type routes it through readFile (i.e. it is not
+		// application/json or application/x-ndjson), the events must still be
+		// published from their fields rather than silently dropped.
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{}}
+		sel.ReaderConfig.InitDefaults()
+
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			"parsers": []map[string]interface{}{
+				{"ndjson": map[string]interface{}{}},
+			},
+		})
+		require.NoError(t, cfg.Unpack(&sel.ReaderConfig.Parsers))
+
+		events := testProcessS3Object(t, "testdata/log.ndjson", "text/plain", 2, sel)
+		require.Len(t, events, 2)
+
+		// The decoded JSON must be present on the published events' fields.
+		got, err := events[0].GetValue("message")
+		require.NoError(t, err)
+		assert.Equal(t, "error making http request", got)
+	})
+
 	t.Run("configured content-type", func(t *testing.T) {
 		sel := fileSelectorConfig{ReaderConfig: readerConfig{ContentType: contentTypeJSON}}
 		testProcessS3Object(t, "testdata/multiline.json", "application/octet-stream", 2, sel)

@@ -394,7 +394,11 @@ func (p *s3ObjectProcessor) readFile(r io.Reader, logger *logp.Logger) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
-		if len(message.Content) > 0 {
+		// Publish when the reader produced content OR fields. A parser such as
+		// ndjson without a message_key clears message.Content and moves the
+		// decoded data into message.Fields; guarding on Content alone silently
+		// drops those events.
+		if len(message.Content) > 0 || len(message.Fields) > 0 {
 			event := p.createEvent(string(message.Content), offset)
 			event.Fields.DeepUpdate(message.Fields)
 			offset += int64(message.Bytes)
