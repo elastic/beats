@@ -5,15 +5,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51444
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777530175
@@ -25,13 +18,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
+        - https://github.com/elastic/beats/pull/51206
       issue:
         - https://github.com/elastic/beats/issues/40447
       impact: ""
@@ -45,15 +32,8 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51709
+      issue: []
       impact: ""
       action: ""
       timestamp: 1779368469
@@ -65,15 +45,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51551
+      issue: []
       impact: ""
       action: ""
       timestamp: 1782167932
@@ -85,15 +58,8 @@ entries:
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51564
+      issue: []
       impact: ""
       action: ""
       timestamp: 1782246918
@@ -105,15 +71,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51613
+      issue: []
       impact: ""
       action: ""
       timestamp: 1782376956
@@ -126,15 +85,8 @@ entries:
         When the filestream copytruncate prospector sorts rotated files using a date format, `dateSorter.GetTs` sliced the file path by the format length without checking the path was long enough. A path shorter than the configured date format triggered a "slice bounds out of range" panic inside a prospector goroutine, crashing the process. GetTs now returns a zero time for paths shorter than the format, mirroring the existing parse-failure path.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51606
+      issue: []
       impact: ""
       action: ""
       timestamp: 1782459050
@@ -161,15 +113,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51756
+      issue: []
       impact: ""
       action: ""
       timestamp: 1782697626
@@ -181,15 +126,8 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51671
+      issue: []
       impact: ""
       action: ""
       timestamp: 1782832304
@@ -202,15 +140,8 @@ entries:
         When a filestream harvester was closed before ingesting anything (for example while still in its initial backoff), it reported an ingested offset of 0. The file watcher could not distinguish this genuine 0 from "no offset reported", so it fell back to the file size and never emitted a write event. As a result no new harvester was started and the file's contents were never ingested, causing silent data loss. The reported offset of 0 is now honored, so a new harvester is started and the file is ingested.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51697
+      issue: []
       impact: ""
       action: ""
       timestamp: 1782902506
@@ -223,13 +154,7 @@ entries:
         The `azure-blob-storage` input now exposes a `retry` configuration block (`max_retries`, `initial_retry_delay` and `max_retry_delay`) that tunes the Azure SDK retry policy. Because the policy lives in the client request pipeline, it now covers blob listing (pagination) in addition to downloads; previously a transient error such as an HTTP 503 `ServerBusy` during listing could exhaust the small, non-configurable default retries and stop the input. The settings apply per storage account. Defaults are unchanged when the block is omitted. Additionally, when polling is enabled, a transient blob-listing failure that outlives the retries (503, 429 or a network timeout) is now non-fatal: the input is marked degraded and retries on the next poll interval instead of exiting, so longer outages are ridden out. Permanent failures such as a missing container still stop the input.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
+        - https://github.com/elastic/beats/pull/51787
       issue:
         - https://github.com/elastic/beats/issues/44629
       impact: ""
@@ -243,15 +168,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51727
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783070100
@@ -263,15 +181,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51844
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783070200
@@ -288,15 +199,8 @@ entries:
         DEGRADED on the first transient failure.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51729
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783081692
@@ -308,15 +212,8 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51742
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783323647
@@ -328,15 +225,8 @@ entries:
       description: ""
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51762
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783323813
@@ -348,15 +238,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51753
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783323892
@@ -368,15 +251,8 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51750
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783324408
@@ -395,15 +271,8 @@ entries:
         failures from bad credentials, still honour the configured attempt limit.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51763
+      issue: []
       impact: ""
       action: ""
       timestamp: 1783326685
@@ -428,13 +297,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
+        - https://github.com/elastic/beats/pull/51884
       issue:
         - https://github.com/elastic/beats/issues/46672
       impact: ""
@@ -448,15 +311,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50853
-        - https://github.com/elastic/beats/pull/51800
-        - https://github.com/elastic/beats/pull/51864
-        - https://github.com/elastic/beats/pull/51915
-        - https://github.com/elastic/beats/pull/52010
-        - https://github.com/elastic/beats/pull/52033
-        - https://github.com/elastic/beats/pull/52041
-      issue:
-        - https://github.com/elastic/beats/issues/52002
+        - https://github.com/elastic/beats/pull/51955
+      issue: []
       impact: ""
       action: ""
       timestamp: 1784080439
