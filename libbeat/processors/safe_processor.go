@@ -71,6 +71,7 @@ type safeProcessorWithClose struct {
 // a safePdataProcessorWithClose and buildPdataProcs will return nil.
 type safePdataProcessorWithClose struct {
 	safeProcessorWithClose
+	pdataProc PdataProcessor
 }
 
 // Run delegates to the underlying processor. Returns ErrClosed if the processor
@@ -106,7 +107,7 @@ func (p *safePdataProcessorWithClose) RunPdata(body pcommon.Map) (bool, error) {
 		}
 	default: // proceed
 	}
-	return p.Processor.(PdataProcessor).RunPdata(body)
+	return p.pdataProc.RunPdata(body)
 }
 
 // Close makes sure the underlying `Close` function is called only once.
@@ -188,6 +189,7 @@ func SafeWrap(constructor Constructor) Constructor {
 				safeProcessorWithClose: safeProcessorWithClose{
 					SafeProcessor: SafeProcessor{Processor: processor},
 				},
+				pdataProc: processor.(PdataProcessor),
 			}, nil
 		}
 		return &safeProcessorWithClose{

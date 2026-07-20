@@ -46,10 +46,11 @@ var _ processors.PdataProcessor = (*sharedPdataProcessorWithClose)(nil)
 // buildPdataProcs.
 type sharedPdataProcessorWithClose struct {
 	*sharedProcessorWithClose
+	pdataProc processors.PdataProcessor
 }
 
 func (p *sharedPdataProcessorWithClose) RunPdata(body pcommon.Map) (bool, error) {
-	return p.Processor.(processors.PdataProcessor).RunPdata(body)
+	return p.pdataProc.RunPdata(body)
 }
 
 // New wraps a processor constructor to return a shared processor.
@@ -75,8 +76,8 @@ func New(constructor processors.Constructor) processors.Constructor {
 		defer sharedProcessorMu.Unlock()
 		if p, ok := sharedProcessors[hash]; ok {
 			p.refCount++
-			if _, ok := p.Processor.(processors.PdataProcessor); ok {
-				return &sharedPdataProcessorWithClose{p}, nil
+			if pp, ok := p.Processor.(processors.PdataProcessor); ok {
+				return &sharedPdataProcessorWithClose{p, pp}, nil
 			}
 			return p, nil
 		}
@@ -93,8 +94,8 @@ func New(constructor processors.Constructor) processors.Constructor {
 
 		sw := &sharedProcessorWithClose{Processor: proc, hash: hash, sharedProcessors: sharedProcessors, sharedProcessorMu: sharedProcessorMu, refCount: 1}
 		sharedProcessors[hash] = sw
-		if _, ok := proc.(processors.PdataProcessor); ok {
-			return &sharedPdataProcessorWithClose{sw}, nil
+		if pp, ok := proc.(processors.PdataProcessor); ok {
+			return &sharedPdataProcessorWithClose{sw, pp}, nil
 		}
 		return sw, nil
 	}

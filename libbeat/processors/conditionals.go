@@ -81,11 +81,11 @@ func NewConditionRule(
 
 	switch {
 	case isCloser && isPdata:
-		return &ClosingWhenPdataProcessor{WhenPdataProcessor{WhenProcessor{cond, p}}}, nil
+		return &ClosingWhenPdataProcessor{WhenPdataProcessor{WhenProcessor{cond, p}, p.(PdataProcessor)}}, nil
 	case isCloser:
 		return &ClosingWhenProcessor{WhenProcessor{cond, p}}, nil
 	case isPdata:
-		return &WhenPdataProcessor{WhenProcessor{cond, p}}, nil
+		return &WhenPdataProcessor{WhenProcessor{cond, p}, p.(PdataProcessor)}, nil
 	default:
 		return &WhenProcessor{cond, p}, nil
 	}
@@ -135,6 +135,7 @@ var _ PdataProcessor = (*ClosingWhenPdataProcessor)(nil)
 // round-trip fallback for legacy-only inner processors.
 type WhenPdataProcessor struct {
 	WhenProcessor
+	pdataInner PdataProcessor
 }
 
 // RunPdata evaluates the condition on the pdata body and, if it passes,
@@ -144,7 +145,7 @@ func (r *WhenPdataProcessor) RunPdata(body pcommon.Map) (bool, error) {
 	if !r.condition.Check(otelmap.PdataValuesMap{M: body}) {
 		return false, nil
 	}
-	return r.p.(PdataProcessor).RunPdata(body)
+	return r.pdataInner.RunPdata(body)
 }
 
 // ClosingWhenPdataProcessor is like WhenPdataProcessor but adds Close for
