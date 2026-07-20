@@ -26,7 +26,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -41,8 +41,9 @@ import (
 
 // makeOsqConfig returns a receiver Config for integration tests.
 // pathHome must be unique per receiver to isolate osqueryd state.
-// monitorPort is the TCP port for the beats HTTP monitoring server.
-func makeOsqConfig(pathHome string, monitorPort int) *osqreceiver.Config {
+// http.port is set to 0 so the OS assigns an ephemeral port; read it back
+// from the beat logs via monitoringPortsFromLogs after the receiver starts.
+func makeOsqConfig(pathHome string) *osqreceiver.Config {
 	return &osqreceiver.Config{
 		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
@@ -63,11 +64,36 @@ func makeOsqConfig(pathHome string, monitorPort int) *osqreceiver.Config {
 			},
 			"http.enabled":            true,
 			"http.host":               "localhost",
-			"http.port":               monitorPort,
+			"http.port":               0,
 			"management.otel.enabled": true,
 			"path.home":               pathHome,
 		},
 	}
+}
+
+// monitoringPortsFromLogs scans the observer logs and returns n unique ports
+// extracted from "Metrics endpoint listening on:" log lines. It waits up to
+// timeout for the ports to appear, failing the test if they do not.
+func monitoringPortsFromLogs(t *testing.T, zapLogs *observer.ObservedLogs, n int, timeout time.Duration) []int {
+	t.Helper()
+	var ports []int
+	require.EventuallyWithT(t, func(ct *assert.CollectT) {
+		seen := make(map[int]struct{})
+		ports = ports[:0]
+		for _, entry := range zapLogs.FilterMessageSnippet(integration.MonitoringEndpointSnippet).All() {
+			port, err := integration.ParseMonitoringPort(entry.Message)
+			if err != nil {
+				continue
+			}
+			if _, ok := seen[port]; ok {
+				continue
+			}
+			seen[port] = struct{}{}
+			ports = append(ports, port)
+		}
+		assert.GreaterOrEqualf(ct, len(ports), n, "waiting for %d monitoring endpoints to start", n)
+	}, timeout, 100*time.Millisecond, "monitoring ports not found in logs after %s", timeout)
+	return ports[:n]
 }
 
 // makeReceiverSettings builds receiver.Settings with an observed logger teed into
@@ -143,14 +169,12 @@ func TestNewReceiver(t *testing.T) {
 	ensureOsquerydAvailable(t)
 	defer oteltest.VerifyNoLeaks(t)
 
-	monitorPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
 	factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: t.TempDir()})
 	observedCore, zapLogs := observer.New(zapcore.DebugLevel)
 
 	rec, logsPtr, mu := startReceiver(t,
 		factory, "r1",
-		makeOsqConfig(t.TempDir(), monitorPort),
+		makeOsqConfig(t.TempDir()),
 		observedCore,
 		componenttest.NewNopHost(),
 	)
@@ -192,6 +216,7 @@ func TestNewReceiver(t *testing.T) {
 	// Verify monitoring endpoint once, outside the poll loop.
 	// http.Get inside EventuallyWithT creates a new persistent connection on every
 	// iteration and leaves read/write goroutines behind that trip VerifyNoLeaks.
+	monitorPort := monitoringPortsFromLogs(t, zapLogs, 1, 30*time.Second)[0]
 	monitoringGet(t, monitorPort)
 
 	require.NoError(t, rec.Shutdown(t.Context()))
@@ -203,16 +228,13 @@ func TestMultipleReceivers(t *testing.T) {
 
 	factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: t.TempDir()})
 
-	port1 := int(libbeattesting.MustAvailableTCP4Port(t))
-	port2 := int(libbeattesting.MustAvailableTCP4Port(t))
-
 	// Shared core: all log lines from both receivers land in one ObservedLogs
 	// so we can verify per-receiver isolation by filtering on otelcol.component.id.
 	sharedCore, zapLogs := observer.New(zapcore.DebugLevel)
 	host := componenttest.NewNopHost()
 
-	r1, logs1, mu1 := startReceiver(t, factory, "r1", makeOsqConfig(t.TempDir(), port1), sharedCore, host)
-	r2, logs2, mu2 := startReceiver(t, factory, "r2", makeOsqConfig(t.TempDir(), port2), sharedCore, host)
+	r1, logs1, mu1 := startReceiver(t, factory, "r1", makeOsqConfig(t.TempDir()), sharedCore, host)
+	r2, logs2, mu2 := startReceiver(t, factory, "r2", makeOsqConfig(t.TempDir()), sharedCore, host)
 
 	t.Cleanup(func() {
 		if t.Failed() {
@@ -270,8 +292,9 @@ func TestMultipleReceivers(t *testing.T) {
 	}, 2*time.Minute, time.Second, "expected both receivers to produce events")
 
 	// Verify monitoring endpoints once, outside the poll loop.
-	monitoringGet(t, port1)
-	monitoringGet(t, port2)
+	for _, port := range monitoringPortsFromLogs(t, zapLogs, 2, 30*time.Second) {
+		monitoringGet(t, port)
+	}
 
 	require.NoError(t, r1.Shutdown(t.Context()))
 	require.NoError(t, r2.Shutdown(t.Context()))
@@ -281,12 +304,11 @@ func TestReceiverStatus(t *testing.T) {
 	ensureOsquerydAvailable(t)
 	defer oteltest.VerifyNoLeaks(t)
 
-	monitorPort := int(libbeattesting.MustAvailableTCP4Port(t))
 	factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: t.TempDir()})
 	observedCore, zapLogs := observer.New(zapcore.DebugLevel)
 	host := &oteltest.MockHost{}
 
-	rec, _, _ := startReceiver(t, factory, "r1", makeOsqConfig(t.TempDir(), monitorPort), observedCore, host)
+	rec, _, _ := startReceiver(t, factory, "r1", makeOsqConfig(t.TempDir()), observedCore, host)
 
 	t.Cleanup(func() {
 		if t.Failed() {

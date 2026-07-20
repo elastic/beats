@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
@@ -101,9 +100,6 @@ func TestOsquerybeatOtelE2E(t *testing.T) {
 	otelIndex := "logs-integration-" + namespace
 	osqIndex := "logs-osquery_manager.result-" + namespace
 
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-	osqMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
 	es := integration.GetESClient(t, "http")
 	t.Cleanup(func() {
 		_, err := es.Indices.DeleteDataStream([]string{otelIndex, osqIndex})
@@ -127,7 +123,7 @@ func TestOsquerybeatOtelE2E(t *testing.T) {
     path.home: %s
     http.enabled: true
     http.host: localhost
-    http.port: %d
+    http.port: 0
     management.otel.enabled: true
 exporters:
   elasticsearch/log:
@@ -148,9 +144,10 @@ service:
         - osquerybeatreceiver
       exporters:
         - elasticsearch/log
-`, t.TempDir(), otelMonitoringPort, esURL, esUser, esPass, otelIndex)
+`, t.TempDir(), esURL, esUser, esPass, otelIndex)
 
-	oteltestcol.New(t, otelCfg)
+	collector := oteltestcol.New(t, otelCfg)
+	otelMonitoringPort := collector.MonitoringPort(t)
 
 	osqBeatCfg := fmt.Sprintf(`osquerybeat:
   inputs:
@@ -172,13 +169,15 @@ queue.mem.flush.timeout: 0s
 setup.template.enabled: false
 http.enabled: true
 http.host: localhost
-http.port: %d
-`, namespace, host.Host, esUser, esPass, osqMonitoringPort)
+http.port: 0
+`, namespace, host.Host, esUser, esPass)
 
 	osquerybeat := integration.NewBeat(t, "osquerybeat", "../../osquerybeat.test")
 	osquerybeat.WriteConfigFile(osqBeatCfg)
 	osquerybeat.Start()
 	defer osquerybeat.Stop()
+
+	osqMonitoringPort := osquerybeat.MonitoringPort(30 * time.Second)
 
 	// Sort by @timestamp ascending so Hits[0] is always the earliest document,
 	// giving a deterministic result even if the query fires more than once.
@@ -263,23 +262,14 @@ func TestOsquerybeatOtelMultipleReceiversE2E(t *testing.T) {
 	index := "logs-integration-" + namespace
 
 	type receiverEntry struct {
-		id             int
-		monitoringPort int
-		pathHome       string
+		id       int
+		pathHome string
 	}
 
 	tmpDir := t.TempDir()
 	receivers := []receiverEntry{
-		{
-			id:             0,
-			monitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-			pathHome:       filepath.Join(tmpDir, "r0"),
-		},
-		{
-			id:             1,
-			monitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-			pathHome:       filepath.Join(tmpDir, "r1"),
-		},
+		{id: 0, pathHome: filepath.Join(tmpDir, "r0")},
+		{id: 1, pathHome: filepath.Join(tmpDir, "r1")},
 	}
 
 	es := integration.GetESClient(t, "http")
@@ -312,7 +302,7 @@ func TestOsquerybeatOtelMultipleReceiversE2E(t *testing.T) {
     path.home: %s
     http.enabled: true
     http.host: localhost
-    http.port: %d
+    http.port: 0
     management.otel.enabled: true
   osquerybeatreceiver/1:
     osquerybeat:
@@ -335,7 +325,7 @@ func TestOsquerybeatOtelMultipleReceiversE2E(t *testing.T) {
     path.home: %s
     http.enabled: true
     http.host: localhost
-    http.port: %d
+    http.port: 0
     management.otel.enabled: true
 exporters:
   elasticsearch/log:
@@ -358,11 +348,11 @@ service:
       exporters:
         - elasticsearch/log
 `,
-		receivers[0].pathHome, receivers[0].monitoringPort,
-		receivers[1].pathHome, receivers[1].monitoringPort,
+		receivers[0].pathHome,
+		receivers[1].pathHome,
 		esURL, esUser, esPass, index)
 
-	oteltestcol.New(t, otelCfg)
+	collector := oteltestcol.New(t, otelCfg)
 
 	queryForReceiver := func(id string) map[string]any {
 		return map[string]any{
@@ -425,7 +415,7 @@ service:
 	oteltest.AssertMapsEqual(t, r0Doc, r1Doc, ignoredFields,
 		"expected documents from both receivers to have the same schema")
 
-	for _, r := range receivers {
-		assertMonitoring(t, r.monitoringPort)
+	for _, port := range collector.MonitoringPorts(t, 2) {
+		assertMonitoring(t, port)
 	}
 }
