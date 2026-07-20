@@ -1,0 +1,30 @@
+{{- define "depInfo" -}}
+{{- range $i, $dep := . }}
+{{ "-" | line }}
+Dependency : {{ $dep.Name }}
+Version: {{ $dep.Version }}
+Licence type (autodetected): {{ $dep.LicenceType }}
+{{ "-" | line }}
+
+{{ $dep | licenceText }}
+{{ end }}
+{{- end -}}
+
+Elastic Agent System Metrics
+Copyright 2022-{{ currentYear }} Elasticsearch BV
+
+This product includes software developed by The Apache Software
+Foundation (http://www.apache.org/).
+
+{{ "=" | line }}
+Third party libraries used by the Elastic Agent System Metrics:
+{{ "=" | line }}
+
+{{ template "depInfo" .Direct }}
+
+{{ if .Indirect }}
+{{ "=" | line }}
+Indirect dependencies
+
+{{ template "depInfo" .Indirect -}}
+{{- end}}
