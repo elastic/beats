@@ -344,11 +344,7 @@ func makeESClient(
 	)
 
 	// ES client backoff
-	connectDelay := backoff.NewEqualJitterBackoff(
-		context.Background().Done(),
-		wait,
-		wait,
-	)
+	connectDelay := backoff.NewEqualJitterBackoff(wait, wait)
 
 	// Overriding the default ES request timeout:
 	// Higher values of timeouts cannot be applied on the SAAS Service
@@ -369,13 +365,13 @@ func makeESClient(
 	clientInfo.Beat = "Heartbeat"
 	clientInfo.Logger = logger
 
-	for i := 0; i < attempts; i++ {
+	for range attempts {
 		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, clientInfo)
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil
 		} else {
-			connectDelay.Wait()
+			connectDelay.Wait(ctx)
 		}
 	}
 
