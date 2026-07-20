@@ -217,7 +217,7 @@ func mcfgFromConfig(cfg *conf.C) (*ModuleConfig, error) {
 		return nil, err
 	}
 
-	var dict map[string]interface{}
+	var dict map[string]any
 
 	err = cfg.Unpack(&dict)
 	if err != nil {
@@ -431,13 +431,14 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 		for _, proc := range missing {
 			missingPlugins = append(missingPlugins, proc.Plugin)
 		}
-		errorMsg := fmt.Sprintf("this module requires the following Elasticsearch plugins: %s. "+
+		var errorMsg strings.Builder
+		errorMsg.WriteString(fmt.Sprintf("this module requires the following Elasticsearch plugins: %s. "+
 			"You can install them by running the following commands on all the Elasticsearch nodes:",
-			strings.Join(missingPlugins, ", "))
+			strings.Join(missingPlugins, ", ")))
 		for _, plugin := range missingPlugins {
-			errorMsg += fmt.Sprintf("\n    sudo bin/elasticsearch-plugin install %s", plugin)
+			errorMsg.WriteString(fmt.Sprintf("\n    sudo bin/elasticsearch-plugin install %s", plugin))
 		}
-		return errors.New(errorMsg)
+		return errors.New(errorMsg.String())
 	}
 
 	return nil

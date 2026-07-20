@@ -368,7 +368,7 @@ func (r *channelContext) Err() error {
 		return nil
 	}
 }
-func (r *channelContext) Value(key interface{}) interface{} { return nil }
+func (r *channelContext) Value(key any) any { return nil }
 
 type reporterV2 struct {
 	*eventReporter

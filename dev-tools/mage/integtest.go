@@ -20,6 +20,7 @@ package mage
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -233,9 +234,7 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 		insideIntegrationTestEnvVar: "true",
 		"GOFLAGS":                   "-mod=readonly",
 	}
-	for name, value := range passInEnv {
-		env[name] = value
-	}
+	maps.Copy(env, passInEnv)
 	passThroughEnvs(env, passThroughEnvVars...)
 	passThroughEnvs(env, defaultPassthroughEnvVars...)
 	if mg.Verbose() {

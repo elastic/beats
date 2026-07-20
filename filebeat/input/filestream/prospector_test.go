@@ -88,7 +88,6 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
@@ -159,7 +158,6 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
@@ -450,7 +448,6 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
@@ -501,12 +498,10 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		p.Run(ctx, testStore, hg)
 
-		wg.Done()
-	}()
+	})
 
 	// The prospector must persist the size of the file to the state
 	// as the offset, so when the file is updated only the new
@@ -553,7 +548,6 @@ func TestProspectorDeletedFile(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
@@ -785,7 +779,7 @@ type mockMetadataUpdater struct {
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
 	return &mockMetadataUpdater{
-		table: make(map[string]interface{}),
+		table: make(map[string]any),
 	}
 }
 
@@ -868,7 +862,7 @@ type mockUnpackValue struct {
 	key string
 }
 
-func (u *mockUnpackValue) UnpackCursorMeta(to interface{}) error {
+func (u *mockUnpackValue) UnpackCursorMeta(to any) error {
 	return typeconv.Convert(to, u.fileMeta)
 }
 
@@ -999,7 +993,7 @@ type testFileInfo struct {
 	name string
 	size int64
 	time time.Time
-	sys  interface{}
+	sys  any
 }
 
 func (t *testFileInfo) Name() string       { return t.name }
@@ -1007,7 +1001,7 @@ func (t *testFileInfo) Size() int64        { return t.size }
 func (t *testFileInfo) Mode() os.FileMode  { return 0 }
 func (t *testFileInfo) ModTime() time.Time { return t.time }
 func (t *testFileInfo) IsDir() bool        { return false }
-func (t *testFileInfo) Sys() interface{}   { return t.sys }
+func (t *testFileInfo) Sys() any           { return t.sys }
 
 func createTestFileDescriptor() loginp.FileDescriptor {
 	return createTestFileDescriptorWithInfo(&testFileInfo{})

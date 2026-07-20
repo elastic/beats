@@ -35,14 +35,14 @@ import (
 
 type noopLogger struct{}
 
-func (n noopLogger) Errorf(string, ...interface{}) {}
+func (n noopLogger) Errorf(string, ...any) {}
 
 type testLogger struct {
 	mu sync.Mutex
 	b  strings.Builder
 }
 
-func (tl *testLogger) Errorf(format string, args ...interface{}) {
+func (tl *testLogger) Errorf(format string, args ...any) {
 	tl.mu.Lock()
 	defer tl.mu.Unlock()
 	fmt.Fprintf(&tl.b, format, args...)
@@ -210,7 +210,7 @@ func TestGroup_Go(t *testing.T) {
 
 		done := make(chan struct{})
 		var runningCounter atomic.Int64
-		for i := 0; i < limit; i++ {
+		for range limit {
 			err := g.Go(func(context.Context) error {
 				runningCounter.Add(1)
 				defer runningCounter.Add(-1)
@@ -365,7 +365,7 @@ func TestGroup_Stop(t *testing.T) {
 		// Establish a baseline before the loop.
 		baseline := runtime.NumGoroutine()
 
-		for i := 0; i < iterations; i++ {
+		for i := range iterations {
 			g := NewGroup(1, time.Millisecond, noopLogger{}, "")
 
 			taskRunning := make(chan struct{})

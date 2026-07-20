@@ -68,7 +68,7 @@ func newBatch(retryer retryer, original queue.Batch[publisher.Event], ttl int) *
 
 	count := original.Count()
 	events := make([]publisher.Event, 0, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		events = append(events, original.Entry(i))
 	}
 	original.FreeEntries()

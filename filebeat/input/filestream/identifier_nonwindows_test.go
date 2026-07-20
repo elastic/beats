@@ -48,9 +48,9 @@ func TestFileIdentifierInodeMarker(t *testing.T) {
 		}
 		require.NoError(t, markerFile.Sync())
 
-		c := conf.MustNewConfigFrom(map[string]interface{}{
-			"identifier": map[string]interface{}{
-				"inode_marker": map[string]interface{}{
+		c := conf.MustNewConfigFrom(map[string]any{
+			"identifier": map[string]any{
+				"inode_marker": map[string]any{
 					"path": markerFile.Name(),
 				},
 			},

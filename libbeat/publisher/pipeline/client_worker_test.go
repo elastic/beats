@@ -67,7 +67,7 @@ func TestMakeClientWorker(t *testing.T) {
 				worker := makeClientWorker(workQueue, client, logger, nil)
 				defer worker.Close()
 
-				for i := uint(0); i < numBatches; i++ {
+				for range numBatches {
 					batch := randomBatch(50, 150).withRetryer(retryer)
 					numEvents += uint64(len(batch.Events()))
 					workQueue <- batch
@@ -120,7 +120,7 @@ func TestReplaceClientWorker(t *testing.T) {
 
 				var batches []publisher.Batch
 				var numEvents int
-				for i := uint(0); i < numBatches; i++ {
+				for i := range numBatches {
 					batch := randomBatch(
 						minEventsInBatch, maxEventsInBatch,
 					).withRetryer(retryer)
@@ -130,14 +130,12 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				var wg sync.WaitGroup
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
+				wg.Go(func() {
 					for _, batch := range batches {
 						t.Logf("publish batch: %v", batch.(*mockBatch).events[0].Content.Private)
 						workQueue <- batch
 					}
-				}()
+				})
 
 				// Publish at least 1 batch worth of events but no more than 20% events
 				publishLimit := uint64(math.Max(minEventsInBatch, float64(numEvents)*0.2))
@@ -234,7 +232,7 @@ func TestMakeClientTracer(t *testing.T) {
 	worker := makeClientWorker(workQueue, client, logger, recorder.Tracer)
 	defer worker.Close()
 
-	for i := 0; i < numBatches; i++ {
+	for range numBatches {
 		batch := randomBatch(10, 15).withRetryer(retryer)
 		numEvents += uint64(len(batch.Events()))
 		workQueue <- batch
@@ -269,20 +267,20 @@ type bufLogger struct {
 	mu    sync.RWMutex
 }
 
-func (l *bufLogger) Debug(vs ...interface{})              { l.report("DEBUG", vs) }
-func (l *bufLogger) Debugf(fmt string, vs ...interface{}) { l.reportf("DEBUG ", fmt, vs) }
+func (l *bufLogger) Debug(vs ...any)              { l.report("DEBUG", vs) }
+func (l *bufLogger) Debugf(fmt string, vs ...any) { l.reportf("DEBUG ", fmt, vs) }
 
-func (l *bufLogger) Info(vs ...interface{})              { l.report("INFO", vs) }
-func (l *bufLogger) Infof(fmt string, vs ...interface{}) { l.reportf("INFO", fmt, vs) }
+func (l *bufLogger) Info(vs ...any)              { l.report("INFO", vs) }
+func (l *bufLogger) Infof(fmt string, vs ...any) { l.reportf("INFO", fmt, vs) }
 
-func (l *bufLogger) Error(vs ...interface{})              { l.report("ERROR", vs) }
-func (l *bufLogger) Errorf(fmt string, vs ...interface{}) { l.reportf("ERROR", fmt, vs) }
+func (l *bufLogger) Error(vs ...any)              { l.report("ERROR", vs) }
+func (l *bufLogger) Errorf(fmt string, vs ...any) { l.reportf("ERROR", fmt, vs) }
 
-func (l *bufLogger) report(level string, vs []interface{}) {
+func (l *bufLogger) report(level string, vs []any) {
 	str := strings.TrimRight(strings.Repeat("%v ", len(vs)), " ")
 	l.reportf(level, str, vs)
 }
-func (l *bufLogger) reportf(level, str string, vs []interface{}) {
+func (l *bufLogger) reportf(level, str string, vs []any) {
 	str = level + ": " + str
 	line := fmt.Sprintf(str, vs...)
 
