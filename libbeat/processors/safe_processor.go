@@ -173,7 +173,7 @@ func SafeWrap(constructor Constructor) Constructor {
 			return nil, err
 		}
 		_, isCloser := processor.(Closer)
-		_, isPdata := processor.(PdataProcessor)
+		pdataProc, isPdata := processor.(PdataProcessor)
 
 		// if the processor does not implement `Closer` it does not need a wrap
 		if !isCloser {
@@ -189,7 +189,7 @@ func SafeWrap(constructor Constructor) Constructor {
 				safeProcessorWithClose: safeProcessorWithClose{
 					SafeProcessor: SafeProcessor{Processor: processor},
 				},
-				pdataProc: processor.(PdataProcessor),
+				pdataProc: pdataProc,
 			}, nil
 		}
 		return &safeProcessorWithClose{

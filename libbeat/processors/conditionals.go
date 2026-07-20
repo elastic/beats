@@ -77,15 +77,15 @@ func NewConditionRule(
 	}
 
 	_, isCloser := p.(Closer)
-	_, isPdata := p.(PdataProcessor)
+	pdataInner, isPdata := p.(PdataProcessor)
 
 	switch {
 	case isCloser && isPdata:
-		return &ClosingWhenPdataProcessor{WhenPdataProcessor{WhenProcessor{cond, p}, p.(PdataProcessor)}}, nil
+		return &ClosingWhenPdataProcessor{WhenPdataProcessor{WhenProcessor{cond, p}, pdataInner}}, nil
 	case isCloser:
 		return &ClosingWhenProcessor{WhenProcessor{cond, p}}, nil
 	case isPdata:
-		return &WhenPdataProcessor{WhenProcessor{cond, p}, p.(PdataProcessor)}, nil
+		return &WhenPdataProcessor{WhenProcessor{cond, p}, pdataInner}, nil
 	default:
 		return &WhenProcessor{cond, p}, nil
 	}
