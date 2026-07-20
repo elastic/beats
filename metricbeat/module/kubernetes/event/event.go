@@ -114,17 +114,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) { //nolint:modernize // legacy handler signature
+		AddFunc: func(obj any) {
 			m.reportEvent(obj, reporter)
 		},
-		UpdateFunc: func(obj interface{}) { //nolint:modernize // legacy handler signature
+		UpdateFunc: func(obj any) {
 			m.reportEvent(obj, reporter)
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
 	}
 	m.watcher.AddEventHandler(kubernetes.FilteringResourceEventHandler{
-		FilterFunc: func(obj interface{}) bool { //nolint:modernize // legacy handler signature
+		FilterFunc: func(obj any) bool {
 			eve, ok := obj.(*kubernetes.Event)
 			if !ok {
 				m.Logger().Debugf("Error while casting event. Got type: %T", obj)
@@ -154,7 +154,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	m.watcher.Stop()
 }
 
-func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) { //nolint:modernize // legacy handler signature
+func (m *MetricSet) reportEvent(obj any, reporter mb.PushReporterV2) {
 	mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger()) //nolint:errcheck // informer object type is validated
 	event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
 	if m.clusterMeta != nil {
@@ -166,7 +166,7 @@ func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) { /
 func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, logger *logp.Logger) mapstr.M {
 	eventMeta := mapstr.M{
 		"timestamp": mapstr.M{
-			"created": kubernetes.Time(&eve.CreationTimestamp).UTC(),
+			"created": kubernetes.Time(&eve.ObjectMeta.CreationTimestamp).UTC(),
 		},
 		"name":             eve.GetName(),
 		"namespace":        eve.GetNamespace(),

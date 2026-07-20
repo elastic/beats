@@ -369,7 +369,7 @@ func makeESClient(
 	clientInfo.Beat = "Heartbeat"
 	clientInfo.Logger = logger
 
-	for i := 0; i < attempts; i++ {
+	for range attempts {
 		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, clientInfo)
 		if err == nil {
 			connectDelay.Reset()

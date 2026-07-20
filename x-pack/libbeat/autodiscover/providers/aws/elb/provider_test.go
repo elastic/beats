@@ -64,7 +64,7 @@ func (tea *testEventAccumulator) waitForNumEvents(t *testing.T, targetLen int, t
 }
 
 func Test_internalBuilder(t *testing.T) {
-	log := logp.NewLogger("elb") //nolint:forbidigo // test setup
+	log := logp.NewLogger("elb")
 	lbl := fakeLbl()
 	lbls := []*lbListener{lbl}
 	fetcher := newMockFetcher(lbls, nil)

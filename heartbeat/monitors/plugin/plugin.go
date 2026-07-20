@@ -123,7 +123,7 @@ func statsForPlugin(pluginName string) RegistryRecorder {
 }
 
 func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	plugin.MustRegisterLoader(pluginKey, func(ifc any) error {
 		p, ok := ifc.(PluginFactory)
 		if !ok {
 			return errors.New("plugin does not match monitor plugin type")

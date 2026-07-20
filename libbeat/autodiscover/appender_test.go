@@ -40,7 +40,7 @@ func newFakeAppender(_ *conf.C, _ *logp.Logger) (Appender, error) {
 func TestAppenderRegistry(t *testing.T) {
 	// Add a new builder
 	reg := NewRegistry()
-	reg.AddAppender("fake", newFakeAppender) //nolint:errcheck // test registration
+	reg.AddAppender("fake", newFakeAppender)
 
 	// Check if that appender is available in registry
 	b := reg.GetAppender("fake")
@@ -60,7 +60,7 @@ func TestAppenderRegistry(t *testing.T) {
 	assert.NotNil(t, appender)
 
 	// Attempt to build using an array of configs
-	Registry.AddAppender("fake", newFakeAppender) //nolint:errcheck // test registration
+	Registry.AddAppender("fake", newFakeAppender)
 	cfgs := []*conf.C{cfg}
 	appenders, err := NewAppenders(cfgs)
 	assert.NoError(t, err)

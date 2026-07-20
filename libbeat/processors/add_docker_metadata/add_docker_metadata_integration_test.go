@@ -61,7 +61,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	labels := map[string]string{"label": "foo"}
 	id, err := testClient.ContainerStart(image, cmd, labels)
 	require.NoError(t, err)
-	defer testClient.ContainerRemove(id) //nolint:errcheck // test cleanup
+	defer testClient.ContainerRemove(id)
 
 	info, err := testClient.ContainerInspect(id)
 	require.NoError(t, err)
@@ -70,9 +70,8 @@ func TestAddDockerMetadata(t *testing.T) {
 	config, err := config.NewConfigFrom(map[string]any{
 		"match_fields": []string{"cid"},
 	})
-	require.NoError(t, err)
 	watcherConstructor := newWatcherWith(client)
-	processor, err := buildDockerMetadataProcessor(logp.L(), config, watcherConstructor) //nolint:forbidigo // integration test setup
+	processor, err := buildDockerMetadataProcessor(logp.L(), config, watcherConstructor)
 	require.NoError(t, err)
 
 	t.Run("match container by container id", func(t *testing.T) {

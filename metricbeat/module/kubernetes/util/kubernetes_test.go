@@ -104,7 +104,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap)) //nolint:testifylint // legacy assertion style
+	require.Len(t, resourceWatchers.metaWatchersMap, 1)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
@@ -124,7 +124,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap)) //nolint:testifylint // legacy assertion style
+	require.Len(t, resourceWatchers.metaWatchersMap, 1)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
@@ -142,7 +142,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 2, len(resourceWatchers.metaWatchersMap)) //nolint:testifylint // legacy assertion style
+	require.Len(t, resourceWatchers.metaWatchersMap, 2)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[DeploymentResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	resourceWatchers.lock.Unlock()
@@ -410,7 +410,7 @@ func TestCreateAllWatchers(t *testing.T) {
 		metricsRepo)
 	require.Error(t, err)
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 0, len(resourceWatchers.metaWatchersMap)) //nolint:testifylint // legacy assertion style
+	require.Empty(t, resourceWatchers.metaWatchersMap)
 	resourceWatchers.lock.Unlock()
 
 	// Start watcher for a resource that requires other resources, should start all the watchers
@@ -431,7 +431,7 @@ func TestCreateAllWatchers(t *testing.T) {
 	// Check that all the required watchers are in the map
 	resourceWatchers.lock.Lock()
 	// we add 1 to the expected result to represent the resource itself
-	require.Equal(t, len(extras)+1, len(resourceWatchers.metaWatchersMap)) //nolint:testifylint // legacy assertion style
+	require.Len(t, resourceWatchers.metaWatchersMap, len(extras)+1)
 	for _, extra := range extras {
 		require.NotNil(t, resourceWatchers.metaWatchersMap[extra])
 	}
@@ -493,7 +493,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 
 	log := logptest.NewTestingLogger(t, "test")
 
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{ //nolint:modernize // legacy test fixture
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{
 		"enabled": true,
 	})
 	require.NoError(t, err)
@@ -579,7 +579,7 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{ //nolint:modernize // legacy test fixture
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{
 		"enabled": true,
 	})
 	require.NoError(t, err)
@@ -1034,7 +1034,7 @@ type mockWatcher struct {
 
 func newMockWatcher() *mockWatcher {
 	return &mockWatcher{
-		store: cache.NewStore(func(obj interface{}) (string, error) { //nolint:modernize // legacy cache key func
+		store: cache.NewStore(func(obj any) (string, error) {
 			objName, err := cache.ObjectToName(obj)
 			if err != nil {
 				return "", err

@@ -32,7 +32,7 @@ type protocolPlugin struct {
 const pluginKey = "packetbeat.protocol"
 
 func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	plugin.MustRegisterLoader(pluginKey, func(ifc any) error {
 		p, ok := ifc.(protocolPlugin)
 		if !ok {
 			return errors.New("plugin does not match protocol plugin type")
@@ -43,6 +43,6 @@ func init() {
 	})
 }
 
-func Plugin(name string, p protos.ProtocolPlugin) map[string][]interface{} {
+func Plugin(name string, p protos.ProtocolPlugin) map[string][]any {
 	return plugin.MakePlugin(pluginKey, protocolPlugin{name, p})
 }

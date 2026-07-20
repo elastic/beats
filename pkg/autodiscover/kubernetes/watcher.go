@@ -97,7 +97,7 @@ type watcher struct {
 	client       kubernetes.Interface
 	informer     cache.SharedInformer
 	store        cache.Store
-	queue        workqueue.Interface //nolint:staticcheck // client-go workqueue API
+	queue        workqueue.Interface
 	ctx          context.Context
 	stop         context.CancelFunc
 	handler      ResourceEventHandler
@@ -138,7 +138,7 @@ func NewNamedWatcherWithInformer(
 	opts WatchOptions,
 ) (Watcher, error) {
 	var store cache.Store
-	var queue workqueue.Interface //nolint:staticcheck // client-go workqueue API
+	var queue workqueue.Interface
 	var cachedObject runtime.Object
 
 	store = informer.GetStore()

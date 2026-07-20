@@ -33,7 +33,7 @@ import (
 )
 
 func TestConfigsMapping(t *testing.T) {
-	logp.TestingSetup() //nolint:staticcheck // legacy test logger setup
+	logp.TestingSetup()
 
 	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct": "config",
@@ -331,8 +331,8 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 		panic(err)
 	}
 
-	writableKeystore.Store("PASSWORD", []byte(secret)) //nolint:errcheck // test helper
-	writableKeystore.Save()                            //nolint:errcheck // test helper
+	writableKeystore.Store("PASSWORD", []byte(secret))
+	writableKeystore.Save()
 	return keyStore
 }
 

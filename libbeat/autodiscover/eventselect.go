@@ -38,7 +38,7 @@ func (q queryConfigFrom) CreateConfig(e bus.Event) ([]*config.C, error) {
 	fieldName := string(q)
 	config, ok := e[fieldName].([]*config.C)
 	if !ok {
-		return nil, fmt.Errorf("Event field '%v' does not contain a valid configuration object", fieldName) //nolint:staticcheck // error message format
+		return nil, fmt.Errorf("Event field '%v' does not contain a valid configuration object", fieldName)
 	}
 	return config, nil
 }

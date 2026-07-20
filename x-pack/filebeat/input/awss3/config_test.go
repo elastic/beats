@@ -666,7 +666,7 @@ func TestConfig(t *testing.T) {
 			if tc.expectedCfg == nil {
 				t.Fatal("missing expected config in test case")
 			}
-			assert.EqualValues(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.s3AccessPoint, tc.nonAWSS3Bucket), c)
+			assert.Equal(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.s3AccessPoint, tc.nonAWSS3Bucket), c)
 		})
 	}
 }

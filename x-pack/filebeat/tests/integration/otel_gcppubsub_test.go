@@ -90,11 +90,11 @@ func TestGCPInputOTelE2E(t *testing.T) {
         management.otel.enabled: true
 ` + otelElasticsearchServiceYAML
 
-	optionsValue := options{ //nolint:gosec // G101 false positive: test ES credentials from test cluster
+	optionsValue := options{
 		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username:        user,
 		Password:        password,
-		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json",
+		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json", //nolint:gosec // this is test file
 	}
 
 	var configBuffer bytes.Buffer

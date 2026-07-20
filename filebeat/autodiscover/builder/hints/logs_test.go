@@ -640,7 +640,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
+								"dissect": mapstr.M{
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -659,7 +659,7 @@ func TestGenerateHints(t *testing.T) {
 					"close_timeout": "true",
 					"processors": []any{
 						map[string]any{
-							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
+							"dissect": map[string]any{
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
@@ -689,7 +689,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
+								"dissect": mapstr.M{
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -714,7 +714,7 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 						map[string]any{
-							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
+							"dissect": map[string]any{
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
@@ -1292,7 +1292,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
+								"dissect": mapstr.M{
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -1311,7 +1311,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 				"close_timeout": "true",
 				"processors": []any{
 					map[string]any{
-						"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
+						"dissect": map[string]any{
 							"tokenizer": "%{key1} %{key2}",
 						},
 					},

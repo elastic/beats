@@ -101,11 +101,9 @@ func (p *pollingDiscoveryV2) poll(ctx context.Context, pipeline beat.Pipeline) {
 	workChan := make(chan state)
 
 	for range p.numWorkers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			p.worker(pollCtx, pipeline, workChan, pollCancel)
-		}()
+		})
 	}
 
 	ids, _, ok := p.listObjects(pollCtx, workChan)
