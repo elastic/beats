@@ -243,13 +243,8 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event, snap bool) (mb.Event, 
 	// the file. When quark is running on kprobes, there are
 	// limitations concerning the full path of the filename, in
 	// those cases, the path won't start with a slash.
-<<<<<<< HEAD
-	if uint64(process.Proc.MntInonum) == ms.selfMntNsIno && len(process.Filename) > 0 && process.Filename[0] == '/' {
-		hashes, err := ms.cachedHasher.HashFile(process.Filename)
-=======
 	if process.Proc.MntInonum == ms.selfMntNsIno && len(process.Exe) > 0 && process.Exe[0] == '/' {
 		hashes, err := ms.cachedHasher.HashFile(process.Exe)
->>>>>>> 25a0b3742 (auditbeat: Update to quark 0.6.0 (#51767))
 		if err != nil {
 			processErr = fmt.Errorf("failed to hash executable %v for PID %v: %w",
 				process.Exe, process.Pid, err)
