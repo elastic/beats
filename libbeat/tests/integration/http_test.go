@@ -66,7 +66,7 @@ output.console:
 	body, err := io.ReadAll(r.Body)
 	_ = r.Body.Close()
 	require.NoError(t, err)
-	var m map[string]interface{}
+	var m map[string]any
 	err = json.Unmarshal(body, &m)
 
 	require.NoError(t, err)

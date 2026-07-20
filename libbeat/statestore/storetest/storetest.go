@@ -47,16 +47,16 @@ type MemoryStore struct {
 type MapStore struct {
 	mu     sync.RWMutex
 	closed bool
-	Table  map[string]interface{}
+	Table  map[string]any
 }
 
 type valueUnpacker struct {
-	from interface{}
+	from any
 }
 
 // CreateValueDecoder creates a backend.ValueDecoder that can be used to unpack
 // an value into a custom go type.
-func CreateValueDecoder(v interface{}) backend.ValueDecoder {
+func CreateValueDecoder(v any) backend.ValueDecoder {
 	return valueUnpacker{v}
 }
 
@@ -97,7 +97,7 @@ func (m *MemoryStore) Close() error { return nil }
 
 func (s *MapStore) init() {
 	if s.Table == nil {
-		s.Table = map[string]interface{}{}
+		s.Table = map[string]any{}
 	}
 }
 
@@ -142,7 +142,7 @@ func (s *MapStore) Has(key string) (bool, error) {
 
 // Get returns a key value pair from the store. An error is returned if the
 // store has been closed, the key is unknown, or an decoding error occurred.
-func (s *MapStore) Get(key string, into interface{}) error {
+func (s *MapStore) Get(key string, into any) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if s.closed {
@@ -160,7 +160,7 @@ func (s *MapStore) Get(key string, into interface{}) error {
 // Set inserts or overwrites a key-value pair.
 // An error is returned if the store is marked as closed or the value being
 // passed in can not be encoded.
-func (s *MapStore) Set(key string, from interface{}) error {
+func (s *MapStore) Set(key string, from any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.closed {
@@ -168,7 +168,7 @@ func (s *MapStore) Set(key string, from interface{}) error {
 	}
 
 	s.init()
-	var tmp interface{}
+	var tmp any
 	if err := typeconv.Convert(&tmp, from); err != nil {
 		return err
 	}
@@ -210,7 +210,7 @@ func (s *MapStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) err
 	return nil
 }
 
-func (d valueUnpacker) Decode(to interface{}) error {
+func (d valueUnpacker) Decode(to any) error {
 	return typeconv.Convert(to, d.from)
 }
 

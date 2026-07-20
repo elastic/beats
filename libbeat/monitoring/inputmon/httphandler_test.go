@@ -77,7 +77,6 @@ func TestHandler(t *testing.T) {
 	t.Logf("http://%s", s.Listener.Addr().String())
 
 	for _, tc := range testCases {
-		tc := tc
 		if tc.method == "" {
 			tc.method = http.MethodGet
 		}
@@ -114,7 +113,7 @@ func TestHandler(t *testing.T) {
 func BenchmarkHandlers(b *testing.B) {
 	reg := monitoring.NewRegistry()
 	log := logptest.NewTestingLogger(b, "")
-	for i := 0; i < 1000; i++ {
+	for i := range 1000 {
 		reg := NewMetricsRegistry("id-"+strconv.Itoa(i), "foo", reg, log)
 		monitoring.NewInt(reg, "gauge").Set(int64(i))
 	}

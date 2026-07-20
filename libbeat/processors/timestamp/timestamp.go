@@ -115,7 +115,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *processor) tryToTime(value interface{}) (time.Time, error) {
+func (p *processor) tryToTime(value any) (time.Time, error) {
 	switch v := value.(type) {
 	case time.Time:
 		return v, nil
@@ -126,7 +126,7 @@ func (p *processor) tryToTime(value interface{}) (time.Time, error) {
 	}
 }
 
-func (p *processor) parseValue(v interface{}) (time.Time, error) {
+func (p *processor) parseValue(v any) (time.Time, error) {
 	detailedErr := &parseError{}
 
 	for _, layout := range p.Layouts {
@@ -155,7 +155,7 @@ func (p *processor) parseValue(v interface{}) (time.Time, error) {
 	return time.Time{}, detailedErr
 }
 
-func (p *processor) parseValueByLayout(v interface{}, layout string) (time.Time, error) {
+func (p *processor) parseValueByLayout(v any, layout string) (time.Time, error) {
 	switch layout {
 	case "UNIX":
 		if sec, ok := common.TryToInt(v); ok {

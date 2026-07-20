@@ -62,7 +62,7 @@ func init() {
 
 	// Allow overriding via PACKAGES.
 	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
-		for _, pkgtype := range strings.Split(packageTypes, ",") {
+		for pkgtype := range strings.SplitSeq(packageTypes, ",") {
 			var p PackageType
 			err := p.UnmarshalText([]byte(pkgtype))
 			if err != nil {
@@ -182,13 +182,22 @@ func CrossBuild(options ...CrossBuildOption) error {
 		// Make sure the module dependencies are downloaded on the host,
 		// as they will be mounted into the container read-only.
 		mg.Deps(func() error { return gotool.Mod.Download() })
+		if FIPSBuild {
+			// GOFIPS140=v1.0.0 unpacks golang.org/fips140 from GOROOT/lib/fips140
+			// into the module cache on first use. Pre-populate it on the host (as
+			// the host user) before the container mounts the cache read-only.
+			// Any go command triggers fips140.Init(), so list -m is sufficient.
+			mg.Deps(func() error {
+				return sh.RunWith(FIPSConfig.Compile.Env, "go", "list", "-m")
+			})
+		}
 	}
 
 	// Build the magefile for Linux, so we can run it inside the container.
 	mg.Deps(buildMage)
 
 	log.Println("crossBuild: Platform list =", params.Platforms)
-	var deps []interface{}
+	var deps []any
 	for _, buildPlatform := range params.Platforms {
 		if !buildPlatform.Flags.CanCrossBuild() {
 			return fmt.Errorf("unsupported cross build platform %v", buildPlatform.Name)
@@ -264,9 +273,6 @@ func CrossBuildImage(platform string) (string, error) {
 	goVersion, err := GoVersion()
 	if err != nil {
 		return "", err
-	}
-	if FIPSBuild {
-		tagSuffix += "-fips"
 	}
 
 	return BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
@@ -488,7 +494,7 @@ func gitAlternateObjectDirMounts(objectsDir, containerObjectsDir string, alterna
 	var mounts []dockerVolumeMount
 	seen := map[string]struct{}{}
 
-	for _, line := range strings.Split(string(alternates), "\n") {
+	for line := range strings.SplitSeq(string(alternates), "\n") {
 		alternate := strings.TrimSpace(line)
 		if alternate == "" || strings.HasPrefix(alternate, "#") {
 			continue
@@ -571,7 +577,7 @@ func chownPaths(uid, gid int, path string) error {
 			return nil
 		}
 
-		if err := os.Chown(name, uid, gid); err != nil {
+		if err := os.Chown(name, uid, gid); err != nil { //nolint:gosec // paths are controlled build artifacts inside a Docker container, not user input
 			return fmt.Errorf("failed to chown path=%v: %w", name, err)
 		}
 		numFixed++

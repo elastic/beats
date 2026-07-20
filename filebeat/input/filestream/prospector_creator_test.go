@@ -43,7 +43,6 @@ func TestCreateProspector(t *testing.T) {
 			},
 		}
 		for name, test := range testCases {
-			test := test
 			t.Run(name, func(t *testing.T) {
 				c := config{
 					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],

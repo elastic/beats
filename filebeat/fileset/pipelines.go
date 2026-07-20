@@ -34,8 +34,8 @@ type PipelineLoaderFactory func() (PipelineLoader, error)
 // PipelineLoader is a subset of the Elasticsearch client API capable of loading
 // the pipelines.
 type PipelineLoader interface {
-	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
-	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
+	LoadJSON(path string, json map[string]any) ([]byte, error)
+	Request(method, path string, pipeline string, params map[string]string, body any) (int, []byte, error)
 	GetVersion() version.V
 	IsServerless() bool
 }
@@ -114,7 +114,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 	return nil
 }
 
-func LoadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, overwrite bool, log *logp.Logger) error {
+func LoadPipeline(esClient PipelineLoader, pipelineID string, content map[string]any, overwrite bool, log *logp.Logger) error {
 	path := makeIngestPipelinePath(pipelineID)
 	if !overwrite {
 		status, _, _ := esClient.Request("GET", path, "", nil, nil)

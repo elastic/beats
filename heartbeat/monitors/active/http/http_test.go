@@ -57,7 +57,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	btesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
@@ -610,10 +609,14 @@ func TestHTTPSx509Auth(t *testing.T) {
 
 func TestConnRefusedJob(t *testing.T) {
 	ip := "127.0.0.1"
-	port, err := btesting.AvailableTCP4Port()
+	var lc net.ListenConfig
+	l, err := lc.Listen(t.Context(), "tcp", net.JoinHostPort(ip, "0"))
 	require.NoError(t, err)
+	addr, ok := l.Addr().(*net.TCPAddr)
+	require.True(t, ok, "expected *net.TCPAddr from listener")
+	require.NoError(t, l.Close())
 
-	url := fmt.Sprintf("http://%s:%d", ip, port)
+	url := fmt.Sprintf("http://%s:%d", ip, addr.Port)
 	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
@@ -621,7 +624,7 @@ func TestConnRefusedJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(addr.Port))),
 			urlChecks(url),
 		)),
 		event.Fields,
@@ -633,7 +636,7 @@ func TestUnreachableJob(t *testing.T) {
 	// See: https://tools.ietf.org/html/rfc6890
 	ip := "203.0.113.1"
 	// Port 80 is sometimes omitted in logs a non-standard one is easier to validate
-	port := uint16(1234)
+	const port = 1234
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
 	event := sendSimpleTLSRequest(t, url, false)
@@ -643,7 +646,7 @@ func TestUnreachableJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(port))),
 			urlChecks(url),
 		)),
 		event.Fields,

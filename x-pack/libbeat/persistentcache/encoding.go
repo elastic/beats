@@ -12,8 +12,8 @@ import (
 )
 
 type codec interface {
-	Decode([]byte, interface{}) error
-	Encode(interface{}) ([]byte, error)
+	Decode([]byte, any) error
+	Encode(any) ([]byte, error)
 }
 
 type jsonCodec struct{}
@@ -23,12 +23,12 @@ func newJSONCodec() *jsonCodec {
 }
 
 // Encode encodes an object in json format.
-func (*jsonCodec) Encode(v interface{}) ([]byte, error) {
+func (*jsonCodec) Encode(v any) ([]byte, error) {
 	return json.Marshal(v)
 }
 
 // Decode decodes an object from its json representation.
-func (*jsonCodec) Decode(d []byte, v interface{}) error {
+func (*jsonCodec) Decode(d []byte, v any) error {
 	return json.Unmarshal(d, v)
 }
 
@@ -41,7 +41,7 @@ func newCBORCodec() *cborCodec {
 }
 
 // Encode encodes an object in cbor format.
-func (c *cborCodec) Encode(v interface{}) ([]byte, error) {
+func (c *cborCodec) Encode(v any) ([]byte, error) {
 	var buf bytes.Buffer
 	enc := ugorjicodec.NewEncoder(&buf, &c.handle)
 	err := enc.Encode(v)
@@ -49,7 +49,7 @@ func (c *cborCodec) Encode(v interface{}) ([]byte, error) {
 }
 
 // Decode decodes an object from its cbor representation.
-func (c *cborCodec) Decode(d []byte, v interface{}) error {
+func (c *cborCodec) Decode(d []byte, v any) error {
 	dec := ugorjicodec.NewDecoder(bytes.NewReader(d), &c.handle)
 	return dec.Decode(v)
 }

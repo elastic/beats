@@ -38,7 +38,7 @@ type DbClient struct {
 }
 
 type sqlRow interface {
-	Scan(dest ...interface{}) error
+	Scan(dest ...any) error
 	Next() bool
 	Columns() ([]string, error)
 	Err() error
@@ -86,9 +86,9 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 		cols[k] = strings.ToLower(v)
 	}
 
-	vals := make([]interface{}, len(cols))
-	for i := 0; i < len(cols); i++ {
-		vals[i] = new(interface{})
+	vals := make([]any, len(cols))
+	for i := range cols {
+		vals[i] = new(any)
 	}
 
 	rr := make([]mapstr.M, 0)
@@ -102,7 +102,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 		r := mapstr.M{}
 
 		for i, c := range cols {
-			value := getValue(vals[i].(*interface{})) //nolint:errcheck // getValue does not return an error. Each element is guaranteed to be *interface{}.
+			value := getValue(vals[i].(*any)) //nolint:errcheck // getValue does not return an error. Each element is guaranteed to be *interface{}.
 			r.Put(c, value)
 		}
 
@@ -131,7 +131,7 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 
 	for rows.Next() {
 		var key string
-		var val interface{}
+		var val any
 		err := rows.Scan(&key, &val)
 		if err != nil {
 			d.logger.Debug(fmt.Errorf("error trying to scan rows: %w", err))
@@ -149,7 +149,6 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 	r := mapstr.M{}
 
 	for key, value := range data {
-		value := value
 		value = getValue(&value)
 		r.Put(key, value)
 	}
@@ -168,13 +167,13 @@ func ReplaceUnderscores(ms mapstr.M) mapstr.M {
 	return dotMap
 }
 
-func getValue(pval *interface{}) interface{} {
+func getValue(pval *any) any {
 	if pval == nil {
 		return nil
 	}
 
 	switch v := (*pval).(type) {
-	case nil, bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, string, []interface{}:
+	case nil, bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, string, []any:
 		return v
 	case []byte:
 		return string(v)

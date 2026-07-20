@@ -242,11 +242,9 @@ func (r *LineReader) advance() error {
 	r.inBuffer.Reset()
 
 	// Continue scanning input buffer from last position + 1
-	r.inOffset = idx + 1 - sz
-	if r.inOffset < 0 {
+	r.inOffset = max(idx+1-sz,
 		// Fix inOffset if newline has encoding > 8bits + firl line has been decoded
-		r.inOffset = 0
-	}
+		0)
 
 	return err
 }

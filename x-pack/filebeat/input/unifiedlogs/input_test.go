@@ -39,7 +39,7 @@ type publisher struct {
 	cursors []*time.Time
 }
 
-func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+func (p *publisher) Publish(e beat.Event, cursor any) error {
 	p.m.Lock()
 	defer p.m.Unlock()
 
@@ -218,7 +218,6 @@ func TestInput(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.skip != nil && tc.skip(t) {
 				return

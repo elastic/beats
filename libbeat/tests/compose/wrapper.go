@@ -29,6 +29,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -358,7 +359,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 		}
 		for _, container := range listResult.Items {
 			serviceName, ok := container.Labels[labelComposeService]
-			if !ok || !contains(serviceNames, serviceName) {
+			if !ok || !slices.Contains(serviceNames, serviceName) {
 				// Service is not defined in current docker compose file, ignore it
 				continue
 			}
@@ -387,7 +388,7 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 	for _, c := range listResult.Items {
 		container := wrapperContainer{info: c}
 		serviceName, ok := container.info.Labels[labelComposeService]
-		if !ok || contains(except, serviceName) {
+		if !ok || slices.Contains(except, serviceName) {
 			continue
 		}
 

@@ -22,6 +22,7 @@ package filestream
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -39,7 +40,7 @@ func TestLogFileRenamed(t *testing.T) {
 	renamedFile := f.Name() + ".renamed"
 
 	reader, _, err := newFileReader(
-		logptest.NewTestingLogger(t, ""),
+		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
 		context.TODO(),
 		f,
 		readerConfig{},
@@ -57,7 +58,7 @@ func TestLogFileRenamed(t *testing.T) {
 
 	buf := make([]byte, 1024)
 	_, err = reader.Read(buf)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	err = os.Rename(f.Name(), renamedFile)
 	if err != nil {
@@ -75,7 +76,7 @@ func TestLogFileRemoved(t *testing.T) {
 	defer f.Close()
 
 	reader, _, err := newFileReader(
-		logptest.NewTestingLogger(t, ""),
+		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
 		context.TODO(),
 		f,
 		readerConfig{},
@@ -93,7 +94,7 @@ func TestLogFileRemoved(t *testing.T) {
 
 	buf := make([]byte, 1024)
 	_, err = reader.Read(buf)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	err = os.Remove(f.Name())
 	if err != nil {

@@ -20,7 +20,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/lumberjack"
 )
 
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")

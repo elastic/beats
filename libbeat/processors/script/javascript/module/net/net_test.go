@@ -54,7 +54,7 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	for ip, typ := range map[string]interface{}{
+	for ip, typ := range map[string]any{
 		"192.168.0.1":        "ipv4",
 		"::ffff:192.168.0.1": "ipv4",
 		"2001:0db8:0000:0000:0000:ff00:0042:8329": "ipv6",

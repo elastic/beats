@@ -62,9 +62,6 @@ service:
         - filebeatreceiver
       exporters:
         - kafka
-  telemetry:
-    metrics:
-      level: none
 `, logFilePath, tmpdir, kafkaBroker, topic)
 
 	oteltestcol.New(t, otelCfg)

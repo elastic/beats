@@ -30,12 +30,12 @@ import (
 
 func TestParser(t *testing.T) {
 	tests := map[string]struct {
-		config                 map[string]interface{}
+		config                 map[string]any
 		input                  []reader.Message
 		expectedMessageContent [][]byte
 	}{
 		"keep all messages": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"patterns": []string{"this matches*"},
 			},
 			input: []reader.Message{
@@ -52,7 +52,7 @@ func TestParser(t *testing.T) {
 			},
 		},
 		"keep all messages with multiple patterns": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"patterns": []string{"this matches*", "should match as well*"},
 			},
 			input: []reader.Message{
@@ -69,7 +69,7 @@ func TestParser(t *testing.T) {
 			},
 		},
 		"keep one message": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"patterns": []string{"this matches*"},
 			},
 			input: []reader.Message{
