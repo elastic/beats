@@ -65,7 +65,7 @@ func createFiles(t *testing.T, count int) (created []string) {
 
 	tmp := t.TempDir()
 
-	for i := 0; i < count; i++ {
+	for range count {
 		file, err := os.CreateTemp(tmp, "file-*")
 		require.NoError(t, err)
 		_, err = file.WriteString(file.Name())

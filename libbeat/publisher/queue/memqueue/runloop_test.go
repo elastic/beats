@@ -52,7 +52,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go rl.runIteration()
@@ -91,7 +91,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go rl.runIteration()

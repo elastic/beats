@@ -92,9 +92,9 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 					Type: "elasticsearch",
 					Name: "elasticsearch",
 					Source: integration.RequireNewStruct(t,
-						map[string]interface{}{
+						map[string]any{
 							"type":                 "elasticsearch",
-							"hosts":                []interface{}{"http://localhost:9200"},
+							"hosts":                []any{"http://localhost:9200"},
 							"username":             "admin",
 							"password":             "testing",
 							"protocol":             "http",
@@ -116,10 +116,10 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 					Streams: []*proto.Stream{
 						{
 							Id: "log-input-1",
-							Source: integration.RequireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]any{
 								"enabled": true,
 								"type":    "log",
-								"paths":   []interface{}{logFilePath},
+								"paths":   []any{logFilePath},
 							}),
 						},
 					},
@@ -138,9 +138,9 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 					Type: "elasticsearch",
 					Name: "elasticsearch",
 					Source: integration.RequireNewStruct(t,
-						map[string]interface{}{
+						map[string]any{
 							"type":                 "elasticsearch",
-							"hosts":                []interface{}{"http://localhost:9200"},
+							"hosts":                []any{"http://localhost:9200"},
 							"username":             "admin",
 							"password":             "testing",
 							"protocol":             "http",
@@ -162,10 +162,10 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 					Streams: []*proto.Stream{
 						{
 							Id: "log-input-2",
-							Source: integration.RequireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]any{
 								"enabled": true,
 								"type":    "log",
-								"paths":   []interface{}{logFilePath},
+								"paths":   []any{logFilePath},
 							}),
 						},
 					},
@@ -271,7 +271,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 				Type: "logstash",
 				Name: "logstash",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"type":    "logstash",
 						"invalid": "configuration",
 					}),
@@ -292,7 +292,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 				Streams: []*proto.Stream{
 					{
 						Id: "log-input",
-						Source: integration.RequireNewStruct(t, map[string]interface{}{
+						Source: integration.RequireNewStruct(t, map[string]any{
 							"enabled": true,
 							"type":    "log",
 							"paths":   "/tmp/foo",
@@ -360,7 +360,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "filestream-input-id",
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id":      "filestream-stream-input-id",
 						"enabled": true,
 						"type":    "filestream",
@@ -384,7 +384,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "filestream-input-id",
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id":      "filestream-stream-input-id",
 						"enabled": true,
 						"type":    "filestream",
@@ -406,9 +406,9 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 			Type: "elasticsearch",
 			Name: "elasticsearch",
 			Source: integration.RequireNewStruct(t,
-				map[string]interface{}{
+				map[string]any{
 					"type":     "elasticsearch",
-					"hosts":    []interface{}{"http://localhost:9200"},
+					"hosts":    []any{"http://localhost:9200"},
 					"username": "admin",
 					"password": "testing",
 					"protocol": "http",
@@ -428,7 +428,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 			Type: "logstash",
 			Name: "logstash",
 			Source: integration.RequireNewStruct(t,
-				map[string]interface{}{
+				map[string]any{
 					"type":    "logstash",
 					"invalid": "configuration",
 				}),
@@ -550,10 +550,10 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 				Streams: []*proto.Stream{
 					{
 						Id: "log-input-1",
-						Source: integration.RequireNewStruct(t, map[string]interface{}{
+						Source: integration.RequireNewStruct(t, map[string]any{
 							"enabled": true,
 							"type":    "log",
-							"paths":   []interface{}{logFilePath},
+							"paths":   []any{logFilePath},
 						}),
 					},
 				},
@@ -924,9 +924,9 @@ func outputUnitES(t *testing.T, id int) *proto.UnitExpected {
 			Type: "elasticsearch",
 			Name: fmt.Sprintf("elasticsearch-%d", id),
 			Source: integration.RequireNewStruct(t,
-				map[string]interface{}{
+				map[string]any{
 					"type":                 "elasticsearch",
-					"hosts":                []interface{}{"http://localhost:9200"},
+					"hosts":                []any{"http://localhost:9200"},
 					"username":             "admin",
 					"password":             "testing",
 					"protocol":             "http",

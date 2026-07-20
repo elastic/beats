@@ -68,7 +68,7 @@ var secdTestEvent = &beat.Event{
 			"ppid":     1,
 			"state":    "running",
 			"username": "monica",
-			"keywords": []interface{}{"foo", "bar"},
+			"keywords": []any{"foo", "bar"},
 		},
 		"tags":  []string{"auditbeat", "prod", "security"},
 		"type":  "process",
@@ -140,7 +140,7 @@ func TestCombinedCondition(t *testing.T) {
 	config := Config{
 		OR: []Config{
 			{
-				Range: &Fields{fields: map[string]interface{}{
+				Range: &Fields{fields: map[string]any{
 					"http.code.gte": 100,
 					"http.code.lt":  300,
 				}},
@@ -148,12 +148,12 @@ func TestCombinedCondition(t *testing.T) {
 			{
 				AND: []Config{
 					{
-						Equals: &Fields{fields: map[string]interface{}{
+						Equals: &Fields{fields: map[string]any{
 							"status": 200,
 						}},
 					},
 					{
-						Equals: &Fields{fields: map[string]interface{}{
+						Equals: &Fields{fields: map[string]any{
 							"type": "http",
 						}},
 					},

@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -74,6 +75,7 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
+	runReady                 *closeOnce
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
@@ -156,6 +158,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	fb := &Filebeat{
 		done:           make(chan struct{}),
+		runReady:       &closeOnce{ch: make(chan struct{})},
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 		pluginFactory:  plugins,
@@ -248,10 +251,10 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
-<<<<<<< HEAD
+	// Close runReady so that Shutdown doesn't have to wait no
+	// matter how we exit from Run.
+	defer fb.runReady.Close()
 
-=======
->>>>>>> 00068f796 (managerEarlyStop before runReady close (#51864))
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
@@ -268,7 +271,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry(b.Info.Logger, b.Info.Paths))
+			gzipRegistry(b.Info.Logger, b.Info.Paths),
+		)
 	}
 
 	if !fb.moduleRegistry.Empty() {
@@ -512,6 +516,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
+	// Safe for Shutdown to be called
+	fb.runReady.Close()
 	waitFinished.Wait()
 
 	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters
@@ -559,9 +565,24 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 // Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
+	fb.StopWithContext(context.Background())
+}
+
+// StopWithContext is like Stop but respects ctx when waiting for Run to reach
+// its ready state, so the caller's deadline is not consumed by the wait.
+func (fb *Filebeat) StopWithContext(ctx context.Context) {
 	fb.logger.Info("Stopping filebeat")
 
-	// Stop Filebeat
+	// Wait for Run to reach waitFinished.Wait() before closing done, so that
+	// Stop is never delivered before the beater is ready to handle it.
+	select {
+	case <-fb.runReady.ch:
+	case <-ctx.Done():
+		fb.logger.Warn("Context cancelled waiting for Run to reach ready state; stopping anyway")
+	case <-time.After(5 * time.Second):
+		fb.logger.Warn("Timed out waiting for Run to reach ready state; stopping anyway")
+	}
+
 	fb.stopOnce.Do(func() { close(fb.done) })
 }
 
@@ -619,4 +640,15 @@ func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []
 	}
 
 	return inputs, nil
+}
+
+type closeOnce struct {
+	ch   chan struct{}
+	once sync.Once
+}
+
+func (coc *closeOnce) Close() {
+	coc.once.Do(func() {
+		close(coc.ch)
+	})
 }

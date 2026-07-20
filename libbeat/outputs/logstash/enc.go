@@ -25,13 +25,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func makeLogstashEventEncoder(log *logp.Logger, info beat.Info, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
+func makeLogstashEventEncoder(log *logp.Logger, info beat.Info, escapeHTML bool, index string) func(any) ([]byte, error) {
 	enc := json.New(info.Version, json.Config{
 		Pretty:     false,
 		EscapeHTML: escapeHTML,
 	})
 	index = strings.ToLower(index)
-	return func(event interface{}) (d []byte, err error) {
+	return func(event any) (d []byte, err error) {
 		d, err = enc.Encode(index, event.(*beat.Event))
 		if err != nil {
 			log.Debugf("Failed to encode event: %v", event)

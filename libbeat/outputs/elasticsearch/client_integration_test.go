@@ -46,7 +46,7 @@ import (
 
 func TestClientPublishEvent(t *testing.T) {
 	index := "beat-int-pub-single-event"
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"index": index,
 	}
 
@@ -61,10 +61,10 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 	}
 
 	index := "beat-int-pub-single-event-behind-kerb"
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"hosts": kerberosURL,
 		"index": index,
-		"kerberos": map[string]interface{}{
+		"kerberos": map[string]any{
 			"auth_type":   "password",
 			"config_path": "testdata/krb5.conf",
 			"username":    "beats",
@@ -76,7 +76,7 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 	testPublishEvent(t, index, cfg)
 }
 
-func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
+func testPublishEvent(t *testing.T, index string, cfg map[string]any) {
 	registry := monitoring.NewRegistry()
 	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
 
@@ -116,7 +116,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 }
 
 func TestClientPublishEventWithPipeline(t *testing.T) {
-	type obj map[string]interface{}
+	type obj map[string]any
 
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
@@ -197,15 +197,15 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 }
 
 func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
-	type obj map[string]interface{}
+	type obj map[string]any
 
 	index := "beat-int-test-dli-index"
 	deadletterIndex := "beat-int-test-dli-dead-letter-index"
 
 	output, client := connectTestEs(t, obj{
 		"index": index,
-		"non_indexable_policy": map[string]interface{}{
-			"dead_letter_index": map[string]interface{}{
+		"non_indexable_policy": map[string]any{
+			"dead_letter_index": map[string]any{
 				"index": deadletterIndex,
 			},
 		},
@@ -257,7 +257,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 }
 
 func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
-	type obj map[string]interface{}
+	type obj map[string]any
 
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"
@@ -340,7 +340,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func TestClientPublishTracer(t *testing.T) {
 	index := "beat-apm-tracer-test"
-	output, client := connectTestEs(t, map[string]interface{}{
+	output, client := connectTestEs(t, map[string]any{
 		"index": index,
 	}, nil)
 
@@ -378,12 +378,12 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
 }
 
-func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outputs.Client, *Client) {
+func connectTestEs(t *testing.T, cfg any, stats outputs.Observer) (outputs.Client, *Client) {
 	t.Helper()
 	if stats == nil {
 		stats = outputs.NewNilObserver()
 	}
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"hosts":            eslegtest.GetEsHost(),
 		"username":         eslegtest.GetUser(),
 		"password":         eslegtest.GetPass(),
@@ -406,7 +406,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	logger := logptest.NewTestingLogger(t, "elasticsearch", zap.AddCallerSkip(1))
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
-	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
+	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]any{"setup.ilm.enabled": "false"}))
 	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)
@@ -431,7 +431,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, host string) error {
-	_, client := connectTestEs(t, map[string]interface{}{
+	_, client := connectTestEs(t, map[string]any{
 		"hosts":    host,
 		"username": "admin",
 		"password": "testing",
@@ -439,11 +439,11 @@ func setupRoleMapping(t *testing.T, host string) error {
 
 	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
 
-	status, _, err := client.conn.RequestURL("POST", roleMappingURL, map[string]interface{}{
+	status, _, err := client.conn.RequestURL("POST", roleMappingURL, map[string]any{
 		"roles":   []string{"superuser"},
 		"enabled": true,
-		"rules": map[string]interface{}{
-			"field": map[string]interface{}{
+		"rules": map[string]any{
+			"field": map[string]any{
 				"username": "beats@elastic",
 			},
 		},

@@ -68,7 +68,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 
 	tests := []struct {
 		name             string
-		cfg              map[string]interface{}
+		cfg              map[string]any
 		framing          streaming.FramingType
 		delimiter        []byte
 		splitFunc        bufio.SplitFunc
@@ -77,7 +77,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 	}{
 		{
 			name:             "NewLine",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte("\n"),
 			expectedMessages: expectedMessages,
@@ -85,7 +85,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "NewLineWithCR",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte("\r\n"),
 			expectedMessages: expectedMessages,
@@ -93,7 +93,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "CustomDelimiter",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte(";"),
 			expectedMessages: expectedMessages,
@@ -101,7 +101,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "MultipleCharsCustomDelimiter",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte("<END>"),
 			expectedMessages: expectedMessages,
@@ -109,7 +109,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "SingleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte(";"),
 			expectedMessages: []string{"hello"},
@@ -117,7 +117,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "MultipleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte("<END>"),
 			expectedMessages: []string{"hello"},
@@ -125,7 +125,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "NewLineMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte("\n"),
 			expectedMessages: []string{"hello"},
@@ -133,7 +133,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "NewLineLargeMessagePayload",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte("\n"),
 			expectedMessages: largeMessages,
@@ -141,7 +141,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "CustomLargeMessagePayload",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte(";"),
 			expectedMessages: largeMessages,
@@ -149,7 +149,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:             "ReadRandomLargePayload",
-			cfg:              map[string]interface{}{},
+			cfg:              map[string]any{},
 			framing:          streaming.FramingDelimiter,
 			delimiter:        []byte("\n"),
 			expectedMessages: []string{randomGeneratedText},
@@ -159,7 +159,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 			name:      "MaxReadBufferReachedUserConfigured",
 			framing:   streaming.FramingDelimiter,
 			delimiter: []byte("\n"),
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"max_message_size": 50000,
 			},
 			expectedMessages: []string{},
@@ -169,7 +169,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 			name:      "MaxBufferSizeSet",
 			framing:   streaming.FramingDelimiter,
 			delimiter: []byte("\n"),
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"max_message_size": 66 * 1024,
 			},
 			expectedMessages: extraLargeMessages,
@@ -179,7 +179,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 			name:      "rfc6587 framing non-transparent",
 			framing:   streaming.FramingRFC6587,
 			delimiter: []byte("\n"),
-			cfg:       map[string]interface{}{},
+			cfg:       map[string]any{},
 			expectedMessages: []string{
 				"<9> message 0",
 				"<6> msg 1",
@@ -189,7 +189,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:      "rfc6587 framing octet",
-			cfg:       map[string]interface{}{},
+			cfg:       map[string]any{},
 			framing:   streaming.FramingRFC6587,
 			delimiter: []byte("\n"),
 			expectedMessages: []string{
@@ -201,7 +201,7 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 		},
 		{
 			name:      "rfc6587 framing octet embedded newline",
-			cfg:       map[string]interface{}{},
+			cfg:       map[string]any{},
 			framing:   streaming.FramingRFC6587,
 			delimiter: []byte("\n"),
 			expectedMessages: []string{
@@ -278,7 +278,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	to := func(message []byte, mt inputsource.NetworkMetadata) {
 		ch <- &info{message: string(message), mt: mt}
 	}
-	cfg, err := conf.NewConfigFrom(map[string]interface{}{"host": "127.0.0.1:0"})
+	cfg, err := conf.NewConfigFrom(map[string]any{"host": "127.0.0.1:0"})
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -301,7 +301,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	defer server.Stop()
 
 	samples := generateMessages(eventsCount, 1024)
-	for w := 0; w < workers; w++ {
+	for range workers {
 		go func() {
 			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
 			assert.NoError(t, err)

@@ -34,7 +34,7 @@ func (c Cursor) IsNew() bool { return c.resource.IsNew() }
 // Unpack deserialized the cursor state into to. Unpack fails if no pointer is
 // given, or if the structure to points to is not compatible with the document
 // stored.
-func (c Cursor) Unpack(to interface{}) error {
+func (c Cursor) Unpack(to any) error {
 	if c.IsNew() {
 		return nil
 	}

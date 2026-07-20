@@ -48,7 +48,7 @@ func Package() error {
 	// platforms := updateWithDarwinUniversal(Platforms)
 	platforms := Platforms
 
-	var tasks []interface{}
+	var tasks []any
 	for _, target := range platforms {
 		for _, pkg := range Packages {
 
@@ -106,7 +106,7 @@ func Package() error {
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
 				spec.Snapshot = Snapshot
-				spec.evalContext = map[string]interface{}{
+				spec.evalContext = map[string]any{
 					"GOOS":          target.GOOS(),
 					"GOARCH":        target.GOARCH(),
 					"GOARM":         target.GOARM(),
@@ -160,7 +160,7 @@ func getIronbankContextName() string {
 	version, _ := BeatQualifiedVersion()
 	ironbankBinaryName := "{{.Name}}-ironbank-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}-docker-build-context"
 	// TODO: get the name of the project
-	outputDir, _ := Expand(ironbankBinaryName, map[string]interface{}{
+	outputDir, _ := Expand(ironbankBinaryName, map[string]any{
 		"Name":    BeatName,
 		"Version": version,
 	})
@@ -177,7 +177,7 @@ func prepareIronbankBuild() error {
 
 	templatesDir := filepath.Join(beatsDir, "dev-tools", "packaging", "templates", "ironbank", BeatName)
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"MajorMinor": BeatMajorMinorVersion(),
 	}
 
@@ -254,12 +254,7 @@ func isPackageTypeSelected(pkgType PackageType) bool {
 		return true
 	}
 
-	for _, t := range SelectedPackageTypes {
-		if t == pkgType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(SelectedPackageTypes, pkgType)
 }
 
 type packageBuilder struct {

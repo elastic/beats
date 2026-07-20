@@ -377,7 +377,7 @@ func (r *channelContext) Err() error {
 		return nil
 	}
 }
-func (r *channelContext) Value(key interface{}) interface{} { return nil }
+func (r *channelContext) Value(key any) any { return nil }
 
 // reporterV1 wraps V2 to provide a v1 interface.
 type reporterV1 struct {

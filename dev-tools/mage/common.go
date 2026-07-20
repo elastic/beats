@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"net/http"
 	"os"
 	"os/exec"
@@ -53,13 +54,13 @@ import (
 )
 
 // Expand expands the given Go text/template string.
-func Expand(in string, args ...map[string]interface{}) (string, error) {
+func Expand(in string, args ...map[string]any) (string, error) {
 	return expandTemplate("inline", in, FuncMap, EnvMap(args...))
 }
 
 // MustExpand expands the given Go text/template string. It panics if there is
 // an error.
-func MustExpand(in string, args ...map[string]interface{}) string {
+func MustExpand(in string, args ...map[string]any) string {
 	out, err := Expand(in, args...)
 	if err != nil {
 		panic(err)
@@ -69,19 +70,19 @@ func MustExpand(in string, args ...map[string]interface{}) string {
 
 // ExpandFile expands the Go text/template read from src and writes the output
 // to dst.
-func ExpandFile(src, dst string, args ...map[string]interface{}) error {
+func ExpandFile(src, dst string, args ...map[string]any) error {
 	return expandFile(src, dst, EnvMap(args...))
 }
 
 // MustExpandFile expands the Go text/template read from src and writes the
 // output to dst. It panics if there is an error.
-func MustExpandFile(src, dst string, args ...map[string]interface{}) {
+func MustExpandFile(src, dst string, args ...map[string]any) {
 	if err := ExpandFile(src, dst, args...); err != nil {
 		panic(err)
 	}
 }
 
-func expandTemplate(name, tmpl string, funcs template.FuncMap, args ...map[string]interface{}) (string, error) {
+func expandTemplate(name, tmpl string, funcs template.FuncMap, args ...map[string]any) (string, error) {
 	t := template.New(name).Option("missingkey=error")
 	if len(funcs) > 0 {
 		t = t.Funcs(funcs)
@@ -106,7 +107,7 @@ func expandTemplate(name, tmpl string, funcs template.FuncMap, args ...map[strin
 	return buf.String(), nil
 }
 
-func joinMaps(args ...map[string]interface{}) map[string]interface{} {
+func joinMaps(args ...map[string]any) map[string]any {
 	switch len(args) {
 	case 0:
 		return nil
@@ -114,16 +115,14 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 		return args[0]
 	}
 
-	out := map[string]interface{}{}
+	out := map[string]any{}
 	for _, m := range args {
-		for k, v := range m {
-			out[k] = v
-		}
+		maps.Copy(out, m)
 	}
 	return out
 }
 
-func expandFile(src, dst string, args ...map[string]interface{}) error {
+func expandFile(src, dst string, args ...map[string]any) error {
 	tmplData, err := os.ReadFile(src)
 	if err != nil {
 		return fmt.Errorf("failed reading from template %v: %w", src, err)
@@ -599,7 +598,7 @@ func numParallel() int {
 // ParallelCtx runs the given functions in parallel with an upper limit set
 // based on GOMAXPROCS. The provided ctx is passed to the functions (if they
 // accept it as a param).
-func ParallelCtx(ctx context.Context, fns ...interface{}) {
+func ParallelCtx(ctx context.Context, fns ...any) {
 	var fnWrappers []func(context.Context) error
 	for _, f := range fns {
 		fnWrapper := funcTypeWrap(f)
@@ -644,12 +643,12 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 
 // Parallel runs the given functions in parallel with an upper limit set based
 // on GOMAXPROCS.
-func Parallel(fns ...interface{}) {
+func Parallel(fns ...any) {
 	ParallelCtx(context.TODO(), fns...)
 }
 
 // funcTypeWrap wraps a valid FuncType to FuncContextError
-func funcTypeWrap(fn interface{}) func(context.Context) error {
+func funcTypeWrap(fn any) func(context.Context) error {
 	switch f := fn.(type) {
 	case func():
 		return func(context.Context) error {
@@ -948,9 +947,9 @@ func ListMatchingEnvVars(prefixes ...string) []string {
 	for _, v := range os.Environ() {
 		for _, prefix := range prefixes {
 			if strings.HasPrefix(v, prefix) {
-				eqIdx := strings.Index(v, "=")
-				if eqIdx != -1 {
-					vars = append(vars, v[:eqIdx])
+				before, _, ok := strings.Cut(v, "=")
+				if ok {
+					vars = append(vars, before)
 				}
 				break
 			}
@@ -1001,8 +1000,8 @@ func ReadGLIBCRequirement(elfFile string) (*SemanticVersion, error) {
 
 	versionSet := map[SemanticVersion]struct{}{}
 	for _, sym := range symbols {
-		if strings.HasPrefix(sym.Version, "GLIBC_") {
-			semver, err := NewSemanticVersion(strings.TrimPrefix(sym.Version, "GLIBC_"))
+		if after, ok := strings.CutPrefix(sym.Version, "GLIBC_"); ok {
+			semver, err := NewSemanticVersion(after)
 			if err != nil {
 				continue
 			}

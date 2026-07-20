@@ -273,7 +273,7 @@ paths:
 
 type setOp struct {
 	key   string
-	value interface{}
+	value any
 }
 type state struct {
 	key   string
@@ -288,7 +288,7 @@ type storeMock struct {
 	states  []state
 }
 
-func (s *storeMock) Set(key string, value interface{}) error {
+func (s *storeMock) Set(key string, value any) error {
 	s.set = append(s.set, setOp{key: key, value: value})
 	return nil
 }
@@ -317,7 +317,7 @@ type mockValueDecoder struct {
 	value mapstr.M
 }
 
-func (vd mockValueDecoder) Decode(to interface{}) error {
+func (vd mockValueDecoder) Decode(to any) error {
 	toMap, ok := to.(*mapstr.M)
 	if !ok || toMap == nil {
 		panic("wrong value type for the mock value decoder")
