@@ -82,8 +82,8 @@ func TestFetchConntrackModuleNotLoaded(t *testing.T) {
 	require.Empty(t, events)
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "linux",
 		"metricsets": []string{"conntrack"},
 		"hostfs":     "./_meta/testdata",

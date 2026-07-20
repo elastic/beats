@@ -30,7 +30,7 @@ import (
 
 // parseGeoConfig converts the map into a GeoConfig.
 // Going through go-ucfg we test the config to struct transform / validation.
-func parseConfig(t *testing.T, configMap map[string]interface{}) GeoConfig {
+func parseConfig(t *testing.T, configMap map[string]any) GeoConfig {
 	config, err := config.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
@@ -42,7 +42,7 @@ func parseConfig(t *testing.T, configMap map[string]interface{}) GeoConfig {
 }
 
 func TestConfigGeoEnabled(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"name":             "yerevan-am",
 		"location":         "40.177200, 44.503490",
 		"continent_name":   "Asia",
@@ -65,7 +65,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 }
 
 func TestPartialGeo(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"name":      "yerevan-am",
 		"city_name": "  ",
 	}

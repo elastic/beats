@@ -33,12 +33,12 @@ var maskList = MakeStringSet(
 	"proxy-authorization",
 )
 
-func applyLoggingMask(c interface{}) {
+func applyLoggingMask(c any) {
 	switch cfg := c.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		for k, v := range cfg {
 			if maskList.Has(strings.ToLower(k)) {
-				if arr, ok := v.([]interface{}); ok {
+				if arr, ok := v.([]any); ok {
 					for i := range arr {
 						arr[i] = "xxxxx"
 					}
@@ -50,7 +50,7 @@ func applyLoggingMask(c interface{}) {
 			}
 		}
 
-	case []interface{}:
+	case []any:
 		for _, elem := range cfg {
 			applyLoggingMask(elem)
 		}
