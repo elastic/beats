@@ -1,6 +1,11 @@
 # Beats Release Automation
 
-Comprehensive guide for Beats release automation using mage.
+Operator and developer guide for Beats release automation using mage.
+
+Release managers should start with the root
+[`RELEASE.md`](../../../RELEASE.md) (what runs when, what PRs are produced,
+merge order). This file covers how to configure, run, and debug the mage
+targets.
 
 ## Table of Contents
 
@@ -18,7 +23,7 @@ Comprehensive guide for Beats release automation using mage.
 
 ## Overview
 
-This package provides release automation for the Beats project, migrated from Makefile to mage for better type safety, testing, and maintainability.
+This package provides release automation for the Beats project via mage.
 
 **Key features:**
 - Pure Go implementation
