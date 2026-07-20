@@ -26,7 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -46,7 +45,7 @@ func TestRunClosesRunReadyOnPreInitFailure(t *testing.T) {
 	b := &beat.Beat{
 		Info:       beat.Info{Logger: logp.NewNopLogger()},
 		Manager:    &preinitFailManager{err: preInitErr},
-		Monitoring: beatmonitoring.NewMonitoring(),
+		Monitoring: beat.NewMonitoring(),
 	}
 
 	err := fb.Run(b)
