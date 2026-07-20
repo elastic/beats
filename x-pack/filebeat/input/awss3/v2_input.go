@@ -67,22 +67,26 @@ func (in *inputV2) Run(inputCtx v2.Context, pipeline beat.Pipeline) error {
 	ctx := v2.GoContextFromCanceler(inputCtx.Cancelation)
 
 	if in.config.QueueURL != "" {
-		err = in.runSQS(ctx, log, st, awsCfg, pipeline, inputCtx)
+		err = in.runSQS(ctx, log, awsCfg, pipeline, inputCtx)
 	} else {
+		st.UpdateStatus(status.Starting, "Input starting")
 		err = in.runPolling(ctx, log, st, awsCfg, pipeline, inputCtx)
+		if err == nil {
+			st.UpdateStatus(status.Stopped, "Input execution ended")
+		}
 	}
 
 	log.Info("aws-s3 V2 input stopping")
-	if err == nil {
-		st.UpdateStatus(status.Stopped, "Input execution ended")
-	}
 	return err
 }
 
-func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.StatusReporter, awsCfg awssdk.Config, pipeline beat.Pipeline, inputCtx v2.Context) error {
+func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, awsCfg awssdk.Config, pipeline beat.Pipeline, inputCtx v2.Context) error {
+	health := newSQSHealth(inputCtx, log.Named("health"))
+	health.UpdateStatus(status.Starting, "Input starting")
+
 	region := in.resolveSQSRegion(awsCfg)
 	if region == "" {
-		st.UpdateStatus(status.Failed, "Cannot determine SQS region")
+		health.UpdateStatus(status.Failed, "Cannot determine SQS region")
 		return fmt.Errorf("region not specified and failed to get AWS region from queue_url: %w", errBadQueueURL)
 	}
 	awsCfg.Region = region
@@ -104,7 +108,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 	probeACK := newAWSACKHandler()
 	probeClient, err := createPipelineClient(pipeline, probeACK)
 	if err != nil {
-		st.UpdateStatus(status.Degraded, fmt.Sprintf("Pipeline connection failed: %s", err))
+		health.SetWorkerError(err)
 		<-ctx.Done()
 		return nil
 	}
@@ -118,7 +122,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 
 	script, err := newScriptFromConfig(log.Named("sqs_script"), in.config.SQSScript, in.path)
 	if err != nil {
-		st.UpdateStatus(status.Failed, fmt.Sprintf("Script init failed: %s", err))
+		health.UpdateStatus(status.Failed, fmt.Sprintf("Script init failed: %s", err))
 		return fmt.Errorf("failed to initialize SQS script: %w", err)
 	}
 
@@ -132,7 +136,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 		Processor:         processor,
 		Metrics:           metrics,
 		Log:               log.Named("sqs"),
-		Status:            st,
+		Health:            health,
 	})
 
 	co := newConcurrencyObserver(concurrencyObserverConfig{
@@ -145,7 +149,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 	// Start queue depth monitor.
 	go messageCountMonitor{sqs: sqsAPI, metrics: metrics}.run(ctx)
 
-	st.UpdateStatus(status.Running, "Input is running")
+	health.UpdateStatus(status.Running, "Input is running")
 
 	// Worker pool bounded by number_of_workers. The adaptive controller
 	// observes per-publish latency and records effective concurrency; actual
@@ -167,6 +171,7 @@ func (in *inputV2) runSQS(ctx context.Context, log *logp.Logger, st status.Statu
 	})
 
 	wg.Wait()
+	health.UpdateStatus(status.Stopped, "Input execution ended")
 	return nil
 }
 

@@ -2,10 +2,10 @@
   {
     "@timestamp": "2020-05-07T08:14:44.489Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File Delete archived (rule: FileDelete)",
+      "action": "FileDelete (File Delete archived)",
       "category": [
         "file"
       ],
@@ -89,10 +89,10 @@
   {
     "@timestamp": "2020-05-07T07:27:18.722Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File Delete archived (rule: FileDelete)",
+      "action": "FileDelete (File Delete archived)",
       "category": [
         "file"
       ],
@@ -172,10 +172,10 @@
   {
     "@timestamp": "2020-05-12T06:48:27.084Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File Delete archived (rule: FileDelete)",
+      "action": "FileDelete (File Delete archived)",
       "category": [
         "file"
       ],
