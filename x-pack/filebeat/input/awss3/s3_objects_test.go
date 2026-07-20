@@ -67,10 +67,10 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		// Unfortunately the config structs for the parser package are not
 		// exported to use config parsing.
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
-			"parsers": []map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
+			"parsers": []map[string]any{
 				{
-					"multiline": map[string]interface{}{
+					"multiline": map[string]any{
 						"pattern": "^<Event",
 						"negate":  true,
 						"match":   "after",
@@ -100,9 +100,9 @@ func TestS3ObjectProcessor(t *testing.T) {
 		sel := fileSelectorConfig{ReaderConfig: readerConfig{}}
 		sel.ReaderConfig.InitDefaults()
 
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
-			"parsers": []map[string]interface{}{
-				{"ndjson": map[string]interface{}{}},
+		cfg := conf.MustNewConfigFrom(map[string]any{
+			"parsers": []map[string]any{
+				{"ndjson": map[string]any{}},
 			},
 		})
 		require.NoError(t, cfg.Unpack(&sel.ReaderConfig.Parsers))
