@@ -42,8 +42,7 @@ var _ processors.PdataProcessor = (*sharedPdataProcessorWithClose)(nil)
 
 // sharedPdataProcessorWithClose extends sharedProcessorWithClose with the
 // pdata fast path. It is only created by New when the inner processor
-// implements PdataProcessor, preserving the all-or-nothing guarantee in
-// buildPdataProcs.
+// implements PdataProcessor.
 type sharedPdataProcessorWithClose struct {
 	*sharedProcessorWithClose
 	pdataProc processors.PdataProcessor
