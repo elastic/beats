@@ -33,7 +33,7 @@ type Message struct {
 	Offset  int       // total number of bytes read and discarded prior to generate the message
 	Fields  mapstr.M  // optional fields that can be added by reader
 	Meta    mapstr.M  // deprecated
-	Private interface{}
+	Private any
 }
 
 // IsEmpty returns true in case the message is empty

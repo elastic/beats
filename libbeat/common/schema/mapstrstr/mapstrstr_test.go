@@ -29,7 +29,7 @@ import (
 )
 
 func TestConversions(t *testing.T) {
-	input := map[string]interface{}{
+	input := map[string]any{
 		"testString":     "hello",
 		"testInt":        "42",
 		"testBool":       "true",
@@ -80,7 +80,7 @@ func TestKeyInErrors(t *testing.T) {
 	cases := []struct {
 		Description string
 		Schema      s.Schema
-		Input       map[string]interface{}
+		Input       map[string]any
 		Expected    string
 	}{
 		{
@@ -92,7 +92,7 @@ func TestKeyInErrors(t *testing.T) {
 					},
 				},
 			},
-			map[string]interface{}{},
+			map[string]any{},
 			`C`,
 		},
 		{
@@ -102,7 +102,7 @@ func TestKeyInErrors(t *testing.T) {
 					"bool": Bool("testBool"),
 				},
 			},
-			map[string]interface{}{
+			map[string]any{
 				"testBool": "foo",
 			},
 			`testBool`,
@@ -112,7 +112,7 @@ func TestKeyInErrors(t *testing.T) {
 			s.Schema{
 				"root": Str("Root"),
 			},
-			map[string]interface{}{},
+			map[string]any{},
 			`Root`,
 		},
 	}

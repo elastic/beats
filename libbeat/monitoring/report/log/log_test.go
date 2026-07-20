@@ -124,11 +124,9 @@ func TestZeroPeriodSkipsLogging(t *testing.T) {
 		registries: map[string]*monitoring.Registry{},
 	}
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		r.snapshotLoop()
-	}()
+	})
 
 	// The goroutine should exit immediately when Period == 0.
 	exited := make(chan struct{})
@@ -157,7 +155,7 @@ func TestZeroPeriodSkipsLogging(t *testing.T) {
 func TestZeroPeriodConfig(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
-	cfg, err := conf.NewConfigFrom(map[string]interface{}{
+	cfg, err := conf.NewConfigFrom(map[string]any{
 		"period": "0s",
 	})
 	if err != nil {
@@ -177,7 +175,7 @@ func TestZeroPeriodConfig(t *testing.T) {
 	assert.Equal(t, time.Duration(0), reporter.Period)
 }
 
-func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
+func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {

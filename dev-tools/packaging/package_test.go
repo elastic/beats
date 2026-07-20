@@ -498,8 +498,8 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 		}
 
 		entrypoint := info.Config.Entrypoint[0]
-		if strings.HasPrefix(entrypoint, "/") {
-			entrypoint := strings.TrimPrefix(entrypoint, "/")
+		if after, ok := strings.CutPrefix(entrypoint, "/"); ok {
+			entrypoint := after
 			entry, found := p.Contents[entrypoint]
 			if !found {
 				t.Fatalf("%s entrypoint not found in docker", entrypoint)

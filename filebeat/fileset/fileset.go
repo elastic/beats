@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -51,7 +52,7 @@ type Fileset struct {
 	fcfg        *FilesetConfig
 	modulePath  string
 	manifest    *manifest
-	vars        map[string]interface{}
+	vars        map[string]any
 	pipelineIDs []string
 	logger      *logp.Logger
 	beatPaths   *paths.Path
@@ -59,7 +60,7 @@ type Fileset struct {
 
 type pipeline struct {
 	id       string
-	contents map[string]interface{}
+	contents map[string]any
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -116,10 +117,10 @@ func (fs *Fileset) Read(info beat.Info) error {
 // manifest structure is the representation of the manifest.yml file from the
 // fileset.
 type manifest struct {
-	ModuleVersion  string                   `config:"module_version"`
-	Vars           []map[string]interface{} `config:"var"`
-	IngestPipeline []string                 `config:"ingest_pipeline"`
-	Input          string                   `config:"input"`
+	ModuleVersion  string           `config:"module_version"`
+	Vars           []map[string]any `config:"var"`
+	IngestPipeline []string         `config:"ingest_pipeline"`
+	Input          string           `config:"input"`
 	Requires       struct {
 		Processors []ProcessorRequirement `config:"processors"`
 	} `config:"requires"`
@@ -160,9 +161,9 @@ func (fs *Fileset) readManifest() (*manifest, error) {
 }
 
 // evaluateVars resolves the fileset variables.
-func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) {
+func (fs *Fileset) evaluateVars(info beat.Info) (map[string]any, error) {
 	var err error
-	vars := map[string]interface{}{}
+	vars := map[string]any{}
 	vars["builtin"], err = fs.getBuiltinVars(info)
 	if err != nil {
 		return nil, err
@@ -180,7 +181,7 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 		value := vals["default"]
 
 		// evaluate OS specific vars
-		osVals, exists := vals["os"].(map[string]interface{})
+		osVals, exists := vals["os"].(map[string]any)
 		if exists {
 			osVal, exists := osVals[runtime.GOOS]
 			if exists {
@@ -195,20 +196,16 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 	}
 
 	// overrides from the config
-	for name, val := range fs.fcfg.Var {
-		vars[name] = val
-	}
+	maps.Copy(vars, fs.fcfg.Var)
 
 	return vars, nil
 }
 
 // turnOffElasticsearchVars re-evaluates the variables that have `min_elasticsearch_version`
 // set.
-func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion version.V) (map[string]interface{}, error) {
-	retVars := map[string]interface{}{}
-	for key, val := range vars {
-		retVars[key] = val
-	}
+func (fs *Fileset) turnOffElasticsearchVars(vars map[string]any, esVersion version.V) (map[string]any, error) {
+	retVars := map[string]any{}
+	maps.Copy(retVars, vars)
 
 	if !esVersion.IsValid() {
 		return vars, errors.New("unknown Elasticsearch version")
@@ -221,7 +218,7 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 			return nil, fmt.Errorf("variable doesn't have a string 'name' key")
 		}
 
-		minESVersion, ok := vals["min_elasticsearch_version"].(map[string]interface{})
+		minESVersion, ok := vals["min_elasticsearch_version"].(map[string]any)
 		if ok {
 			versionString, ok := minESVersion["version"].(string)
 			if ok {
@@ -245,12 +242,12 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 
 // resolveVariable considers the value as a template so it can refer to built-in variables
 // as well as other variables defined before them.
-func resolveVariable(vars map[string]interface{}, value interface{}) (interface{}, error) {
+func resolveVariable(vars map[string]any, value any) (any, error) {
 	switch v := value.(type) {
 	case string:
 		return ApplyTemplate(vars, v, false)
-	case []interface{}:
-		transformed := []interface{}{}
+	case []any:
+		transformed := []any{}
 		for _, val := range v {
 			s, ok := val.(string)
 			if ok {
@@ -271,7 +268,7 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 // ApplyTemplate applies a Golang text/template. If specialDelims is set to true,
 // the delimiters are set to `{<` and `>}` instead of `{{` and `}}`. These are easier to use
 // in pipeline definitions.
-func ApplyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
+func ApplyTemplate(vars map[string]any, templateString string, specialDelims bool) (string, error) {
 	tpl := template.New("text").Option("missingkey=error")
 	if specialDelims {
 		tpl = tpl.Delims("{<", ">}")
@@ -295,14 +292,14 @@ func ApplyTemplate(vars map[string]interface{}, templateString string, specialDe
 	return buf.String(), nil
 }
 
-func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error) {
-	builtinVars, ok := vars["builtin"].(map[string]interface{})
+func getTemplateFunctions(vars map[string]any) (template.FuncMap, error) {
+	builtinVars, ok := vars["builtin"].(map[string]any)
 	if !ok {
 		return nil, fmt.Errorf("error fetching built-in vars as a dictionary")
 	}
 
 	return template.FuncMap{
-		"inList": func(collection []interface{}, item string) bool {
+		"inList": func(collection []any, item string) bool {
 			for _, h := range collection {
 				if reflect.DeepEqual(item, h) {
 					return true
@@ -310,7 +307,7 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 			}
 			return false
 		},
-		"tojson": func(v interface{}) (string, error) {
+		"tojson": func(v any) (string, error) {
 			var buf strings.Builder
 			enc := json.NewEncoder(&buf)
 			enc.SetEscapeHTML(false)
@@ -331,7 +328,7 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 
 // getBuiltinVars computes the supported built in variables and groups them
 // in a dictionary
-func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error) {
+func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]any, error) {
 	osHost, err := os.Hostname()
 	if err != nil || len(osHost) == 0 {
 		return nil, fmt.Errorf("Error getting the hostname: %w", err)
@@ -343,7 +340,7 @@ func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error
 		domain = split[1]
 	}
 
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"prefix":      info.IndexPrefix,
 		"hostname":    hostname,
 		"domain":      domain,
@@ -456,7 +453,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 			return nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %w", err)
 		}
 
-		var content map[string]interface{}
+		var content map[string]any
 		switch extension := strings.ToLower(filepath.Ext(path)); extension {
 		case ".json":
 			if err = json.Unmarshal([]byte(encodedString), &content); err != nil {
@@ -471,7 +468,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 				return nil, fmt.Errorf("failed to sanitize the YAML pipeline file: %s: %w", path, err)
 			}
 			var ok bool
-			content, ok = newContent.(map[string]interface{})
+			content, ok = newContent.(map[string]any)
 			if !ok {
 				return nil, errors.New("cannot convert newContent to map[string]interface{}")
 			}
@@ -495,10 +492,10 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 // yaml.Unmarshal, to maps of string keys, as expected by the json encoder
 // that will be used when delivering the pipeline to Elasticsearch.
 // Will return an error when something other than a string is used as a key.
-func FixYAMLMaps(elem interface{}) (_ interface{}, err error) {
+func FixYAMLMaps(elem any) (_ any, err error) {
 	switch v := elem.(type) {
-	case map[interface{}]interface{}:
-		result := make(map[string]interface{}, len(v))
+	case map[any]any:
+		result := make(map[string]any, len(v))
 		for key, value := range v {
 			keyS, ok := key.(string)
 			if !ok {
@@ -509,13 +506,13 @@ func FixYAMLMaps(elem interface{}) (_ interface{}, err error) {
 			}
 		}
 		return result, nil
-	case map[string]interface{}:
+	case map[string]any:
 		for key, value := range v {
 			if v[key], err = FixYAMLMaps(value); err != nil {
 				return nil, err
 			}
 		}
-	case []interface{}:
+	case []any:
 		for idx, value := range v {
 			if v[idx], err = FixYAMLMaps(value); err != nil {
 				return nil, err

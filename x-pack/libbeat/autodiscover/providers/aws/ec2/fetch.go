@@ -96,7 +96,7 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 
 	// Limit concurrency against the AWS API by creating a pool of objects
 	// This is hard coded for now. The concurrency limit of 10 was set semi-arbitrarily.
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		ir.taskPool.Put(nil)
 	}
 

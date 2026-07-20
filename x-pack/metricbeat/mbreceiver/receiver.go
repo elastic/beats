@@ -21,14 +21,12 @@ type metricbeatReceiver struct {
 }
 
 func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	mb.wg.Add(1)
-	go func() {
-		defer mb.wg.Done()
+	mb.wg.Go(func() {
 		mb.Logger.Info("starting metricbeat receiver")
 		if err := mb.BeatReceiver.Start(host); err != nil {
 			mb.Logger.Error("error starting metricbeat receiver", zap.Error(err))
 		}
-	}()
+	})
 	return nil
 }
 
