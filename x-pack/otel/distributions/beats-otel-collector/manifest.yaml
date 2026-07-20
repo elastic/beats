@@ -48,15 +48,6 @@ processors:
     import: github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor
 
 exporters:
-<<<<<<< HEAD
-  - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.155.0
-  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.155.0
-  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.155.0
-  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.155.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.155.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.155.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.155.0
-=======
   - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.156.0
   - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.156.0
   - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.156.0
@@ -66,7 +57,6 @@ exporters:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.156.0
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter
->>>>>>> 1ef5cafd1 ( chore: update OTel Collector dependencies to `v0.156.0`/`v1.62.0` (#52033))
 
 providers:
   - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.62.0
