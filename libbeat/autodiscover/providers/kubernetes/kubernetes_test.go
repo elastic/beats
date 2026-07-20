@@ -130,7 +130,7 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	nodeNames := make([]string, numberNodes)
 	var leaseDuration time.Duration
 	var retryPeriod time.Duration
-	for i := 0; i < numberNodes; i++ {
+	for i := range numberNodes {
 		nodeName := "node-" + fmt.Sprint(i)
 		nodeNames[i] = nodeName
 		cfg.Node = nodeName

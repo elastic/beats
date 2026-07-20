@@ -32,8 +32,8 @@ type config struct {
 
 func (c *config) setDefaults() error {
 	if c.Algorithm.Name() == "" {
-		cfg, err := cfg.NewConfigFrom(map[string]interface{}{
-			"token_bucket": map[string]interface{}{},
+		cfg, err := cfg.NewConfigFrom(map[string]any{
+			"token_bucket": map[string]any{},
 		})
 
 		if err != nil {

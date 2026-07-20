@@ -535,7 +535,7 @@ func readDataFile(path string, fn func(string, mapstr.M)) error {
 	}
 	defer f.Close()
 
-	var states []map[string]interface{}
+	var states []map[string]any
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&states); err != nil {
 		return fmt.Errorf("%w: %w", ErrCorruptStore, err)

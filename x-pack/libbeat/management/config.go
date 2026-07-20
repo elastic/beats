@@ -21,7 +21,7 @@ type Config struct {
 
 // ConfigBlock stores a piece of config from central management
 type ConfigBlock struct {
-	Raw map[string]interface{}
+	Raw map[string]any
 }
 
 // ConfigBlocksWithType is a list of config blocks with the same type

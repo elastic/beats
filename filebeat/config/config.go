@@ -22,6 +22,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"time"
 
@@ -170,10 +171,5 @@ func (config *Config) ListEnabledInputs() []string {
 // IsInputEnabled returns true if the plugin name is enabled.
 func (config *Config) IsInputEnabled(name string) bool {
 	enabledInputs := config.ListEnabledInputs()
-	for _, input := range enabledInputs {
-		if name == input {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(enabledInputs, name)
 }

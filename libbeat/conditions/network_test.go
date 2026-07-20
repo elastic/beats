@@ -106,7 +106,7 @@ network:
 func TestNetworkCreate(t *testing.T) {
 	t.Run("all options", func(t *testing.T) {
 		c, err := NewCondition(&Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"ipv4_ip":                      "192.168.10.1/16",
 				"ipv6_ip":                      "fd00::/8",
 				"loopback_ip":                  "loopback",
@@ -128,7 +128,7 @@ func TestNetworkCreate(t *testing.T) {
 
 	t.Run("invalid keyword", func(t *testing.T) {
 		_, err := NewCondition(&Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"invalid": "loop-back",
 			},
 		}, logptest.NewTestingLogger(t, ""))
@@ -137,7 +137,7 @@ func TestNetworkCreate(t *testing.T) {
 
 	t.Run("bad cidr", func(t *testing.T) {
 		_, err := NewCondition(&Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"bad_cidr": "127.0/8",
 			},
 		}, logptest.NewTestingLogger(t, ""))
@@ -146,7 +146,7 @@ func TestNetworkCreate(t *testing.T) {
 
 	t.Run("bad type", func(t *testing.T) {
 		_, err := NewCondition(&Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"bad_type": 1,
 			},
 		}, logptest.NewTestingLogger(t, ""))
@@ -157,7 +157,7 @@ func TestNetworkCreate(t *testing.T) {
 func TestNetworkCheck(t *testing.T) {
 	t.Run("match loopback", func(t *testing.T) {
 		testConfig(t, true, httpResponseTestEvent, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"ip": "127.0.0.0/8",
 			},
 		})
@@ -165,7 +165,7 @@ func TestNetworkCheck(t *testing.T) {
 
 	t.Run("negative match", func(t *testing.T) {
 		testConfig(t, false, httpResponseTestEvent, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"ip": "192.168.0.0/16",
 			},
 		})
@@ -173,7 +173,7 @@ func TestNetworkCheck(t *testing.T) {
 
 	t.Run("wrong field value type", func(t *testing.T) {
 		testConfig(t, false, httpResponseTestEvent, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"status": "unicast",
 			},
 		})
@@ -181,7 +181,7 @@ func TestNetworkCheck(t *testing.T) {
 
 	t.Run("multiple fields match", func(t *testing.T) {
 		testConfig(t, true, httpResponseTestEvent, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"client_ip": "loopback",
 				"ip":        "127.0.0.0/24",
 			},
@@ -190,7 +190,7 @@ func TestNetworkCheck(t *testing.T) {
 
 	t.Run("multiple IPs field single match", func(t *testing.T) {
 		testConfig(t, true, httpResponseEventIPList, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"host.ip": "10.1.0.0/24",
 			},
 		})
@@ -198,7 +198,7 @@ func TestNetworkCheck(t *testing.T) {
 
 	t.Run("multiple IPs field negative match", func(t *testing.T) {
 		testConfig(t, false, httpResponseEventIPList, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"host.ip": "127.0.0.0/24",
 			},
 		})
@@ -207,7 +207,7 @@ func TestNetworkCheck(t *testing.T) {
 	// Multiple conditions are treated as an implicit AND.
 	t.Run("multiple fields negative match", func(t *testing.T) {
 		testConfig(t, false, httpResponseTestEvent, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"client_ip": "multicast",
 				"ip":        "127.0.0.0/24",
 			},
@@ -216,7 +216,7 @@ func TestNetworkCheck(t *testing.T) {
 
 	t.Run("field not present", func(t *testing.T) {
 		testConfig(t, false, httpResponseTestEvent, &Config{
-			Network: map[string]interface{}{
+			Network: map[string]any{
 				"does_not_exist": "multicast",
 			},
 		})
@@ -224,24 +224,24 @@ func TestNetworkCheck(t *testing.T) {
 
 	t.Run("multiple values match", func(t *testing.T) {
 		testConfig(t, true, httpResponseTestEvent, &Config{
-			Network: map[string]interface{}{
-				"client_ip": []interface{}{"public", "loopback"},
+			Network: map[string]any{
+				"client_ip": []any{"public", "loopback"},
 			},
 		})
 	})
 
 	t.Run("multiple values multiple IPs match", func(t *testing.T) {
 		testConfig(t, true, httpResponseEventIPList, &Config{
-			Network: map[string]interface{}{
-				"host.ip": []interface{}{"10.1.0.0/24", "127.0.0.0/24"},
+			Network: map[string]any{
+				"host.ip": []any{"10.1.0.0/24", "127.0.0.0/24"},
 			},
 		})
 	})
 
 	t.Run("multiple values multiple IPs no match", func(t *testing.T) {
 		testConfig(t, false, httpResponseEventIPList, &Config{
-			Network: map[string]interface{}{
-				"host.ip": []interface{}{"12.1.0.0/24", "127.0.0.0/24"},
+			Network: map[string]any{
+				"host.ip": []any{"12.1.0.0/24", "127.0.0.0/24"},
 			},
 		})
 	})
@@ -300,7 +300,7 @@ func TestNetworkContains(t *testing.T) {
 
 func BenchmarkNetworkCondition(b *testing.B) {
 	c, err := NewCondition(&Config{
-		Network: map[string]interface{}{
+		Network: map[string]any{
 			"ip": "192.168.0.1/16",
 		},
 	}, logp.NewNopLogger())

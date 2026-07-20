@@ -85,14 +85,14 @@ func handleSimpleConfig(raw *proto.UnitExpectedConfig) (map[string]any, error) {
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
 // that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
-func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
+func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]any, error) {
 	// If there are no streams, we fall into the 'simple input config' case,
 	// this means the key configuration values are on the root level instead of
 	// an element in the `streams` array.
 	if raw.GetStreams() == nil {
 		streamSource, err := handleSimpleConfig(raw)
 		if err != nil {
-			return []map[string]interface{}{}, err
+			return []map[string]any{}, err
 		}
 
 		// Create stream rules with all the defaults and an empty streams struct.
@@ -101,9 +101,9 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 			return nil, fmt.Errorf("error creating stream rules for a simple config (empty streams array): %w", err)
 		}
 
-		return []map[string]interface{}{streamSource}, nil
+		return []map[string]any{streamSource}, nil
 	}
-	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
+	inputs := make([]map[string]any, len(raw.GetStreams()))
 
 	for iter, stream := range raw.GetStreams() {
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
@@ -119,7 +119,7 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 }
 
 // CreateReloadConfigFromInputs turns a raw input/module list into the ConfigWithMeta type used by the reloader interface
-func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.ConfigWithMeta, error) {
+func CreateReloadConfigFromInputs(raw []map[string]any) ([]*reload.ConfigWithMeta, error) {
 	// format for the reloadable list needed bythe cm.Reload() method
 	configList := make([]*reload.ConfigWithMeta, len(raw))
 
@@ -138,7 +138,7 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 // ===========
 
 // convinence method for wrapping all the stream transformations needed by the shipper and other inputs
-func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]interface{}, error) {
+func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]any, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]any, error) {
 
 	streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
 
@@ -173,12 +173,12 @@ func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]in
 
 // Emulates the InjectAgentInfoRule and InjectHeadersRule ast rules
 // adds processors for agent-related metadata
-func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentInfo) (map[string]interface{}, error) {
+func injectAgentInfoRule(inputs map[string]any, agentInfo *client.AgentInfo) (map[string]any, error) {
 	// upstream API can sometimes return a nil agent info
 	if agentInfo == nil {
 		return inputs, nil
 	}
-	var processors []interface{}
+	var processors []any
 
 	processors = append(processors, generateAddFieldsProcessor(
 		mapstr.M{"id": agentInfo.ID, "snapshot": agentInfo.Snapshot, "version": agentInfo.Version},
@@ -193,27 +193,27 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 }
 
 // injectGlobalProcesssors re-injects any global processors into the individual streams
-func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[string]interface{}) map[string]interface{} {
+func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[string]any) map[string]any {
 	rootMap := expected.GetSource().AsMap()
 	globalProcFound, ok := rootMap["processors"]
 	if !ok {
 		return stream
 	}
-	globalList, ok := globalProcFound.([]interface{})
+	globalList, ok := globalProcFound.([]any)
 	if !ok {
 		return stream
 	}
 	// copy global processors to ensure that each stream gets its own copy
 	// if the stream doesn't have any processors it will take the slice as the new value
 	// without copying its possible that the processors appended to the streams will be shared
-	newProcs := prependProcessors(stream, append([]interface{}{}, globalList...))
+	newProcs := prependProcessors(stream, append([]any{}, globalList...))
 	stream["processors"] = newProcs
 	return stream
 }
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
 // this adds the `index` field, based on the data_stream info we get from the config
-func injectIndexStream(defaultDataStreamType string, expected *proto.UnitExpectedConfig, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
+func injectIndexStream(defaultDataStreamType string, expected *proto.UnitExpectedConfig, streamExpected *proto.Stream, stream map[string]any) map[string]any {
 	streamType, dataset, namespace := metadataFromDatastreamValues(defaultDataStreamType, expected, streamExpected)
 	index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
 	stream["index"] = index
@@ -222,12 +222,12 @@ func injectIndexStream(defaultDataStreamType string, expected *proto.UnitExpecte
 
 // injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
 // this adds a variety of processors for metadata related to the dataset and input config.
-func injectStreamProcessors(expected *proto.UnitExpectedConfig, defaultDataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}, defaultProcessors []mapstr.M) (map[string]interface{}, error) {
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, defaultDataStreamType string, streamExpected *proto.Stream, stream map[string]any, defaultProcessors []mapstr.M) (map[string]any, error) {
 	// 1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
 	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(defaultDataStreamType, expected, streamExpected)
 
-	var processors = []interface{}{}
+	var processors = []any{}
 
 	for _, p := range defaultProcessors {
 		if len(p) == 0 {
@@ -299,12 +299,12 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 
 // prependProcessors takes an existing input or stream-level config, extracts any existing processors in the config,
 // and appends them to a new list of configs. Mostly a helper to deal with all the typecasting
-func prependProcessors(existingConfig map[string]interface{}, newProcs []interface{}) []interface{} {
+func prependProcessors(existingConfig map[string]any, newProcs []any) []any {
 	currentProcs, ok := existingConfig["processors"]
 	if !ok {
 		return newProcs
 	}
-	currentList, ok := currentProcs.([]interface{})
+	currentList, ok := currentProcs.([]any)
 	if !ok {
 		return newProcs
 	}

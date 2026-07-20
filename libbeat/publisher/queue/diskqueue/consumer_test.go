@@ -35,7 +35,7 @@ func TestQueueGetObserver(t *testing.T) {
 			output: make(chan *readFrame, eventCount),
 		},
 	}
-	for i := 0; i < eventCount; i++ {
+	for range eventCount {
 		dq.readerLoop.output <- &readFrame{bytesOnDisk: 123}
 	}
 	_, err := dq.Get(eventCount)

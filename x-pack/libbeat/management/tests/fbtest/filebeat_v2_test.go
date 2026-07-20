@@ -45,10 +45,10 @@ func TestFilebeat(t *testing.T) {
 				Dataset: "system.syslog",
 				Type:    "logs",
 			},
-			Source: tests.RequireNewStruct(map[string]interface{}{
-				"paths":         []interface{}{"./testdata/messages"},
-				"exclude_files": []interface{}{".gz$"},
-				"multiline": map[string]interface{}{
+			Source: tests.RequireNewStruct(map[string]any{
+				"paths":         []any{"./testdata/messages"},
+				"exclude_files": []any{".gz$"},
+				"multiline": map[string]any{
 					"pattern": `^\s`,
 					"match":   "after",
 				},
@@ -60,10 +60,10 @@ func TestFilebeat(t *testing.T) {
 				Dataset: "system.auth",
 				Type:    "logs",
 			},
-			Source: tests.RequireNewStruct(map[string]interface{}{
-				"paths":         []interface{}{"./testdata/secure*"},
-				"exclude_files": []interface{}{".gz$"},
-				"multiline": map[string]interface{}{
+			Source: tests.RequireNewStruct(map[string]any{
+				"paths":         []any{"./testdata/secure*"},
+				"exclude_files": []any{".gz$"},
+				"multiline": map[string]any{
 					"pattern": `^\s`,
 					"match":   "after",
 				},
@@ -103,7 +103,7 @@ func TestFilebeat(t *testing.T) {
 	t.Logf("Reading events...")
 	events := tests.ReadEvents(t, outPath)
 	// Look for processors
-	expectedMetaValuesSyslog := map[string]interface{}{
+	expectedMetaValuesSyslog := map[string]any{
 		// Processors created by
 		"@metadata.input_id":    "logfile-system-default-system",
 		"@metadata.stream_id":   "logfile-system.syslog-default-system",
@@ -114,7 +114,7 @@ func TestFilebeat(t *testing.T) {
 	}
 	tests.ValuesExist(t, expectedMetaValuesSyslog, events, tests.ONCE, "expectedMetaValuesSyslog")
 
-	expectedMetaValuesAuth := map[string]interface{}{
+	expectedMetaValuesAuth := map[string]any{
 		// Processors created by
 		"@metadata.input_id":  "logfile-system-default-system",
 		"@metadata.stream_id": "logfile-system.auth-default-system",
@@ -123,7 +123,7 @@ func TestFilebeat(t *testing.T) {
 	}
 	tests.ValuesExist(t, expectedMetaValuesAuth, events, tests.ONCE, "expectedMetaValuesAuth")
 
-	expectedLogValues := map[string]interface{}{
+	expectedLogValues := map[string]any{
 		"log.file.path": nil,
 		"message":       nil,
 	}
