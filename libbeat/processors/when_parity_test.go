@@ -101,6 +101,19 @@ func (d *pdataDropProcessor) Run(_ *beat.Event) (*beat.Event, error) { return ni
 func (d *pdataDropProcessor) RunPdata(_ pcommon.Map) (bool, error)   { return true, nil }
 func (d *pdataDropProcessor) String() string                         { return "pdataDropProcessor" }
 
+// closingPdataProcessor implements Run, RunPdata, and Close.
+type closingPdataProcessor struct {
+	pdataAddFieldsInner
+	closed bool
+}
+
+func (c *closingPdataProcessor) Close() error {
+	c.closed = true
+	return nil
+}
+
+func (c *closingPdataProcessor) String() string { return "closingPdataProcessor" }
+
 // makeWhenPdataProcessor builds a WhenPdataProcessor with an equals condition
 // on field "i" matching matchValue, wrapping a pdata-capable inner.
 func makeWhenPdataProcessor(t *testing.T, matchValue int, inner beat.Processor) *WhenPdataProcessor {
@@ -193,6 +206,34 @@ func TestWhenLegacyInnerNoPdataPath(t *testing.T) {
 
 	_, isPdata := proc.(PdataProcessor)
 	assert.False(t, isPdata, "*WhenProcessor must not implement PdataProcessor")
+}
+
+// TestClosingWhenPdataProcessorConstruction verifies that NewConditionRule
+// returns a *ClosingWhenPdataProcessor when the inner implements both
+// PdataProcessor and Closer, and that Close is forwarded to the inner.
+func TestClosingWhenPdataProcessorConstruction(t *testing.T) {
+	raw, err := conf.NewConfigFrom(map[string]any{
+		"equals": map[string]any{"i": 10},
+	})
+	require.NoError(t, err)
+	var condConfig conditions.Config
+	require.NoError(t, raw.Unpack(&condConfig))
+
+	inner := &closingPdataProcessor{pdataAddFieldsInner: pdataAddFieldsInner{key: "added", value: "yes"}}
+	proc, err := NewConditionRule(condConfig, inner, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	_, ok := proc.(*ClosingWhenPdataProcessor)
+	require.True(t, ok, "expected *ClosingWhenPdataProcessor when inner implements both PdataProcessor and Closer")
+
+	_, isPdata := proc.(PdataProcessor)
+	assert.True(t, isPdata, "*ClosingWhenPdataProcessor must implement PdataProcessor")
+
+	_, isCloser := proc.(Closer)
+	assert.True(t, isCloser, "*ClosingWhenPdataProcessor must implement Closer")
+
+	require.NoError(t, Close(proc))
+	assert.True(t, inner.closed, "Close must be forwarded to the inner processor")
 }
 
 // TestWhenProcessorPdataParityDrop verifies that when the inner processor
