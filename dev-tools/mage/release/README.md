@@ -12,7 +12,7 @@ Comprehensive guide for Beats release automation using mage.
 - [Individual Commands](#individual-commands)
 - [DRY_RUN Mode](#dry_run-mode)
 - [Multi-PR Workflows](#multi-pr-workflows)
-- [Changelog Workflow](#changelog-workflow)
+- [Release Notes](#release-notes)
 - [FAQ](#faq)
 - [Troubleshooting](#troubleshooting)
 
@@ -21,7 +21,7 @@ Comprehensive guide for Beats release automation using mage.
 This package provides release automation for the Beats project, migrated from Makefile to mage for better type safety, testing, and maintainability.
 
 **Key features:**
-- Pure Go implementation (except changelog - uses Python beats-changelog)
+- Pure Go implementation
 - Comprehensive testing (>60% coverage)
 - DRY_RUN mode for safe testing
 - Multi-PR workflow support
@@ -30,16 +30,16 @@ This package provides release automation for the Beats project, migrated from Ma
 **Workflows supported:**
 1. **Major/Minor Release (feature-freeze)** - Creates release branch + 4 grouped PRs (backport+version on main, ff-release, docs+test-env on main, next patch on release branch)
 2. **Patch Release** - Creates 2 grouped PRs on the release branch (version+docs+test-env before build; next-patch prep after release)
-3. **Changelog** - Generates changelog and creates 1 PR
+
+Release notes are handled separately via `.github/workflows/release-notes.yml`.
 
 ## Prerequisites
 
 ### Required Tools
 
-- **Go** 1.22 or later
+- **Go** 1.26 or later
 - **Git** 2.30 or later
 - **GitHub CLI** (optional, for advanced usage)
-- **Python** 3.8+ with beats-changelog package (for changelog workflows only)
 
 ### GitHub Token
 
@@ -55,20 +55,6 @@ Store it securely:
 export GITHUB_TOKEN="ghp_your_token_here"
 ```
 
-### Python Setup (Changelog Only)
-
-If you need to run changelog workflows:
-
-```bash
-# Install beats-changelog package
-pip install ./release_scripts/beats-changelog
-
-# Or use a virtual environment
-python -m venv venv
-source venv/bin/activate
-pip install ./release_scripts/beats-changelog
-```
-
 ## Installation
 
 The release automation is built into the Beats mage targets. No separate installation needed.
@@ -80,7 +66,6 @@ mage -l | grep release
 
 You should see:
 ```
-release:runChangelog     Executes the complete changelog workflow
 release:runMajorMinor    Feature-freeze workflow (release branch + 4 grouped PRs)
 release:runPatch         Executes the complete patch release workflow
 release:updateDocs       Updates version references in documentation and K8s manifests
@@ -104,16 +89,15 @@ All configuration is done via environment variables.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LATEST_RELEASE` | Auto from GitHub (or patch−1) | Optional override for previous release used in test-env updates |
 | `BASE_BRANCH` | `"main"` | Base branch for PRs |
-| `RELEASE_BRANCH` | Auto-derived from `CURRENT_RELEASE` | Release branch name |
 | `PROJECT_OWNER` | `"elastic"` | GitHub repository owner |
 | `PROJECT_REPO` | `"beats"` | GitHub repository name |
 | `PROJECT_REVIEWERS` | `"elastic/elastic-agent-release"` | Comma-separated reviewers |
 | `DRY_RUN` | `"false"` | Set to `"true"` for testing |
 | `GIT_AUTHOR_NAME` | `"github-actions[bot]"` | Git commit author name |
 | `GIT_AUTHOR_EMAIL` | `"github-actions[bot]@users.noreply.github.com"` | Git commit author email |
-| `CHANGELOG_TO_COMMIT` | `"HEAD"` | Commit to generate changelog to |
+
+`LatestRelease`, `NextRelease`, and `ReleaseBranch` are always inferred from `CURRENT_RELEASE` (and GitHub releases for minor versions). They are not configurable via environment variables.
 
 ### Example Configuration
 
@@ -124,9 +108,7 @@ export GITHUB_TOKEN="ghp_your_token"
 
 # Full configuration
 export CURRENT_RELEASE="9.3.0"
-# LATEST_RELEASE is optional; auto-resolved from elastic/beats GitHub releases
 export BASE_BRANCH="main"
-export RELEASE_BRANCH="9.3"
 export GITHUB_TOKEN="ghp_your_token"
 export PROJECT_REVIEWERS="elastic/elastic-agent-release,user1,user2"
 export DRY_RUN="true"
@@ -174,7 +156,7 @@ export DRY_RUN=false
 mage release:runMajorMinor
 ```
 
-`LatestRelease` is resolved automatically from published `elastic/beats` GitHub releases (highest same-major version strictly less than `CURRENT_RELEASE`, e.g. `9.5.0` → `9.4.3`). Set `LATEST_RELEASE` only to override.
+`LatestRelease` is resolved automatically from published `elastic/beats` GitHub releases (highest same-major version strictly less than `CURRENT_RELEASE`, e.g. `9.5.0` → `9.4.3`).
 
 **Blocked versions:**
 - 6.x minor releases (6.5.0, etc.)
@@ -190,7 +172,7 @@ to ingest-dev `prepare-patch-release` + `prepare-next-release`, with PRs grouped
 by merge order (2 PRs).
 
 **What it does:**
-1. Validates version (`LATEST_RELEASE` defaults to patch−1)
+1. Validates version (`LatestRelease` defaults to patch−1)
 2. Prepares **2 grouped PRs** on the release branch (merge order matters):
 
 | Step | PR | Target | Branch | Merge label | Changes |
@@ -224,34 +206,7 @@ export DRY_RUN=false
 mage release:runPatch
 ```
 
-`LatestRelease` defaults to patch−1 (e.g. `9.2.1` → `9.2.0`). Set `LATEST_RELEASE` only to override.
-
-### Changelog Workflow
-
-Generates changelog entries and creates a PR.
-
-**What it does:**
-1. Creates branch `prepare-changelog-X.Y.Z`
-2. Runs `beats-changelog` Python tool
-3. Generates changelog entries
-4. Commits changes
-5. Pushes to remote (unless DRY_RUN)
-6. Creates 1 PR (unless DRY_RUN)
-
-**Prerequisites:**
-- Python with beats-changelog package installed
-- `beats-changelog` command available in PATH
-
-**Usage:**
-
-```bash
-export CURRENT_RELEASE="9.3.0"
-export LATEST_RELEASE="9.2.0"
-export RELEASE_BRANCH="9.3"
-export GITHUB_TOKEN="ghp_your_token"
-
-mage release:runChangelog
-```
+`LatestRelease` defaults to patch−1 (e.g. `9.2.1` → `9.2.0`).
 
 ## Individual Commands
 
@@ -412,60 +367,16 @@ gh pr review 12346 --approve
 gh pr merge 12346
 ```
 
-## Changelog Workflow
+## Release Notes
 
-The changelog workflow integrates with the Python `beats-changelog` package.
+Release notes are **not** produced by mage. Use the
+[Generate release notes](../../../.github/workflows/release-notes.yml)
+workflow (`.github/workflows/release-notes.yml`), which calls
+`elastic-agent-changelog-tool`.
 
-### Prerequisites
-
-Install beats-changelog:
-
-```bash
-# Option 1: System-wide
-pip install ./release_scripts/beats-changelog
-
-# Option 2: Virtual environment
-python -m venv venv
-source venv/bin/activate
-pip install ./release_scripts/beats-changelog
-
-# Verify installation
-which beats-changelog
-beats-changelog --help
-```
-
-### Running the Workflow
-
-```bash
-export CURRENT_RELEASE="9.3.0"
-export LATEST_RELEASE="9.2.0"
-export RELEASE_BRANCH="9.3"
-export GITHUB_TOKEN="ghp_your_token"
-export CHANGELOG_TO_COMMIT="HEAD"  # Or specific commit
-
-mage release:runChangelog
-```
-
-### What Gets Updated
-
-The workflow runs:
-```bash
-beats-changelog split --from vX.Y.Z --to <commit>
-```
-
-And updates:
-- `CHANGELOG.asciidoc`
-- `CHANGELOG.next.asciidoc`
-- `libbeat/docs/release.asciidoc`
-
-### Manual Changelog Generation
-
-If you need to generate changelog manually:
-
-```bash
-cd release_scripts/beats-changelog
-beats-changelog split --from v9.2.0 --to HEAD
-```
+Dispatch with the build-candidate commit SHA and version (for example
+`9.3.7`). That produces the `Add Beats X.Y.Z release notes` PR used in
+current releases.
 
 ## FAQ
 
@@ -575,16 +486,6 @@ export DRY_RUN=true
 **Solution:**
 - Only patch releases allowed for these versions
 - Use 9.x or later for minor releases
-
-### Error: "beats-changelog not found in PATH"
-
-**Cause:** Python beats-changelog package not installed.
-
-**Solution:**
-```bash
-pip install ./release_scripts/beats-changelog
-which beats-changelog
-```
 
 ### Error: "failed to push"
 

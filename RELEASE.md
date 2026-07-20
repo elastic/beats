@@ -4,19 +4,15 @@ Quick reference guide for Beats release automation using mage.
 
 ## Prerequisites
 
-- Go 1.22+
+- Go 1.26+
 - Git
 - GitHub token with repo permissions
-- Python with beats-changelog package (for changelog workflows)
 
 ## Environment Variables
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `CURRENT_RELEASE` | Yes | - | Version to release (e.g., "9.3.0") |
-| `LATEST_RELEASE` | No | Auto-inferred | Previous release version (auto-inferred as patch - 1) |
-| `NEXT_RELEASE` | No | Auto-inferred | Next release version (auto-inferred as patch + 1) |
-| `RELEASE_BRANCH` | No | Auto-inferred | Release branch name (auto-inferred as major.minor, e.g., "9.3") |
 | `GITHUB_TOKEN` | Yes* | - | GitHub API token (*not required in DRY_RUN mode) |
 | `BASE_BRANCH` | No | "main" | Base branch for PRs |
 | `PROJECT_OWNER` | No | "elastic" | GitHub repository owner |
@@ -25,23 +21,14 @@ Quick reference guide for Beats release automation using mage.
 | `DRY_RUN` | No | "false" | Set to "true" for testing without push/PR |
 | `GIT_AUTHOR_NAME` | No | "github-actions[bot]" | Git commit author name |
 | `GIT_AUTHOR_EMAIL` | No | "github-actions[bot]@users.noreply.github.com" | Git commit author email |
-| `CHANGELOG_TO_COMMIT` | No | "HEAD" | Commit to generate changelog to |
 
 ## Auto-Inference
 
-The following values are automatically inferred from `CURRENT_RELEASE` and can be overridden by setting the corresponding environment variable:
+The following values are automatically inferred from `CURRENT_RELEASE` (no env overrides):
 
-- **LATEST_RELEASE**: Calculated as `CURRENT_RELEASE` with patch version decremented by 1
-  - Example: `9.3.4` → `9.3.3`
-  - Note: For `.0` minor releases, set `LATEST_RELEASE` explicitly when running patch or changelog workflows
-
-- **NEXT_RELEASE**: Calculated as `CURRENT_RELEASE` with patch version incremented by 1
-  - Example: `9.3.4` → `9.3.5`
-
-- **RELEASE_BRANCH**: Extracted major.minor from `CURRENT_RELEASE`
-  - Example: `9.3.4` → `9.3`
-
-These values are inferred to reduce manual configuration. You can always override them by setting the environment variable explicitly.
+- **LatestRelease**: For patch releases, `CURRENT_RELEASE` with patch decremented by 1 (e.g. `9.3.4` → `9.3.3`). For minor releases (`.0`), resolved from published `elastic/beats` GitHub releases.
+- **NextRelease**: `CURRENT_RELEASE` with patch incremented by 1 (e.g. `9.3.4` → `9.3.5`)
+- **ReleaseBranch**: major.minor from `CURRENT_RELEASE` (e.g. `9.3.4` → `9.3`)
 
 ## Quick Start
 
@@ -79,27 +66,14 @@ export CURRENT_RELEASE="9.2.1"
 export BASE_BRANCH="9.2"
 export GITHUB_TOKEN="ghp_your_token"
 
-# LATEST_RELEASE and RELEASE_BRANCH are auto-inferred from CURRENT_RELEASE
-# LATEST_RELEASE will be 9.2.0 (patch - 1)
-# RELEASE_BRANCH will be 9.2 (major.minor)
-
 mage release:runPatch
 ```
 
-### Changelog Workflow
+### Release Notes
 
-Generates changelog and creates 1 PR:
-
-```bash
-export CURRENT_RELEASE="9.3.1"
-export GITHUB_TOKEN="ghp_your_token"
-
-# LATEST_RELEASE and RELEASE_BRANCH are auto-inferred
-# LATEST_RELEASE will be 9.3.0 (patch - 1)
-# RELEASE_BRANCH will be 9.3 (major.minor)
-
-mage release:runChangelog
-```
+Release notes are generated separately via
+[`.github/workflows/release-notes.yml`](.github/workflows/release-notes.yml)
+(`elastic-agent-changelog-tool`), not by mage.
 
 ## Available Commands
 
@@ -108,9 +82,8 @@ mage release:runChangelog
 These orchestrate the complete workflow:
 
 ```bash
-mage release:runMajorMinor    # Feature-freeze (release branch + 2 PRs for NEXT_RELEASE)
+mage release:runMajorMinor    # Feature-freeze (release branch + 2 PRs for next patch)
 mage release:runPatch          # Patch release (up to 3 PRs)
-mage release:runChangelog      # Changelog workflow (1 PR)
 ```
 
 ### Individual File Update Commands
@@ -163,7 +136,6 @@ In DRY_RUN mode:
 | `metricbeat/module/logstash/docker-compose.yml` | Docker image tag |
 | `metricbeat/docker-compose.yml` | Docker image tag |
 | `.mergify.yml` | Backport configuration |
-| `CHANGELOG.asciidoc` | Changelog entries |
 
 ## Troubleshooting
 

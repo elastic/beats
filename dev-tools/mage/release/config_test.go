@@ -269,17 +269,17 @@ func TestEnsureLatestReleaseFromAPI(t *testing.T) {
 		t.Errorf("LatestRelease = %s, want 9.4.3", cfg.LatestRelease)
 	}
 
-	// Override should not call the API again
+	// Already-resolved LatestRelease should not call the API again
 	cfg.LatestRelease = "9.4.2"
 	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
 		t.Fatal("should not fetch when LatestRelease is already set")
 		return "", nil
 	}
 	if err := cfg.EnsureLatestRelease(); err != nil {
-		t.Fatalf("EnsureLatestRelease with override failed: %v", err)
+		t.Fatalf("EnsureLatestRelease with existing LatestRelease failed: %v", err)
 	}
 	if cfg.LatestRelease != "9.4.2" {
-		t.Errorf("LatestRelease override lost: %s", cfg.LatestRelease)
+		t.Errorf("LatestRelease changed unexpectedly: %s", cfg.LatestRelease)
 	}
 }
 

@@ -82,21 +82,6 @@ func LoadConfigFromEnv() (*ReleaseConfig, error) {
 	}
 	nextProjectMinorBranch := inferNextProjectMinorBranch(currentRelease)
 
-	// Allow environment variables to override inferred values
-	if envLatest := os.Getenv("LATEST_RELEASE"); envLatest != "" {
-		latestRelease = envLatest
-	}
-	if envNext := os.Getenv("NEXT_RELEASE"); envNext != "" {
-		nextRelease = envNext
-	}
-	if envBranch := os.Getenv("RELEASE_BRANCH"); envBranch != "" {
-		releaseBranch = envBranch
-	}
-	if envNextMinor := os.Getenv("NEXT_PROJECT_MINOR_VERSION"); envNextMinor != "" {
-		nextProjectMinorVersion = envNextMinor
-		nextProjectMinorBranch = inferReleaseBranch(envNextMinor)
-	}
-
 	cfg := &ReleaseConfig{
 		CurrentRelease:          currentRelease,
 		LatestRelease:           latestRelease,
@@ -217,7 +202,7 @@ var fetchLatestReleaseBefore = func(token, owner, repo, current string) (string,
 }
 
 // EnsureLatestRelease sets LatestRelease when unset by querying elastic/beats releases.
-// LATEST_RELEASE env (loaded into LatestRelease) remains an optional override.
+// Patch releases typically already have LatestRelease from patch−1 inference.
 func (c *ReleaseConfig) EnsureLatestRelease() error {
 	if c.LatestRelease != "" {
 		return nil
@@ -242,7 +227,7 @@ func (c *ReleaseConfig) Validate() error {
 	}
 
 	if c.LatestRelease == "" {
-		return fmt.Errorf("LatestRelease is required (set LATEST_RELEASE or resolve via EnsureLatestRelease)")
+		return fmt.Errorf("LatestRelease is required (resolve via EnsureLatestRelease)")
 	}
 
 	if !c.DryRun && c.GitHubToken == "" {
