@@ -277,7 +277,7 @@ type PdataValuesMap struct {
 
 // GetValue retrieves the value at the given dotted key path and returns it as
 // a Go primitive (string, int64, float64, bool, []interface{}, or map[string]interface{}).
-func (p PdataValuesMap) GetValue(key string) (interface{}, error) {
+func (p PdataValuesMap) GetValue(key string) (any, error) {
 	v, ok := GetAtPath(key, p.M)
 	if !ok {
 		return nil, mapstr.ErrKeyNotFound
@@ -288,26 +288,26 @@ func (p PdataValuesMap) GetValue(key string) (interface{}, error) {
 // GetAtPath retrieves the value at a dotted key path (e.g. "cloud.instance.id")
 // from m, traversing nested maps as needed.
 func GetAtPath(key string, m pcommon.Map) (pcommon.Value, bool) {
-	dot := strings.IndexByte(key, '.')
-	if dot < 0 {
+	before, after, ok0 := strings.Cut(key, ".")
+	if !ok0 {
 		return m.Get(key)
 	}
-	parent, ok := m.Get(key[:dot])
+	parent, ok := m.Get(before)
 	if !ok || parent.Type() != pcommon.ValueTypeMap {
 		return pcommon.Value{}, false
 	}
-	return GetAtPath(key[dot+1:], parent.Map())
+	return GetAtPath(after, parent.Map())
 }
 
 // PutAtPath encodes val at a dotted key path (e.g. "cloud.instance.id") in m,
 // creating intermediate maps as needed. Existing intermediate maps are
 // preserved (not replaced).
 func PutAtPath(key string, val any, m pcommon.Map) error {
-	dot := strings.IndexByte(key, '.')
-	if dot < 0 {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
 		return putIntoMap(key, val, m)
 	}
-	head, rest := key[:dot], key[dot+1:]
+	head, rest := before, after
 	if existing, ok := m.Get(head); ok && existing.Type() == pcommon.ValueTypeMap {
 		return PutAtPath(rest, val, existing.Map())
 	}
@@ -369,7 +369,7 @@ func fromReflective(dst pcommon.Value, value any) error {
 func fromReflectiveSlice(dst pcommon.Slice, ref reflect.Value) error {
 	n := ref.Len()
 	dst.EnsureCapacity(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if err := FromValue(dst.AppendEmpty(), ref.Index(i).Interface()); err != nil {
 			return err
 		}

@@ -68,15 +68,13 @@ func TestInput(t *testing.T) {
 	metrics := inp.InitMetrics("tcp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
 	c := make(chan netinput.DataMetadata, 2)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		if err := inp.Run(v2Ctx, c, metrics); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}
 		}
-	}()
+	})
 
 	// Allow the UDP server to start
 	runtime.Gosched()
@@ -136,15 +134,13 @@ func TestInputOversizedDatagram(t *testing.T) {
 	metrics := inp.InitMetrics("udp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
 	c := make(chan netinput.DataMetadata, 10)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		if err := inp.Run(v2Ctx, c, metrics); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}
 		}
-	}()
+	})
 
 	// Allow the UDP server to start
 	runtime.Gosched()

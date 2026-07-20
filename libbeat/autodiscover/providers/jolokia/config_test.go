@@ -28,24 +28,24 @@ import (
 func TestInterfaceConfigsUnpack(t *testing.T) {
 	cases := []struct {
 		Description string
-		Config      map[string]interface{}
+		Config      map[string]any
 		Valid       bool
 	}{
 		{
 			Description: "interface without name",
-			Config:      map[string]interface{}{},
+			Config:      map[string]any{},
 			Valid:       false,
 		},
 		{
 			Description: "interface with empty name",
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"name": "",
 			},
 			Valid: false,
 		},
 		{
 			Description: "interface with zero interval",
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"name":     "br0",
 				"interval": "0s",
 			},
@@ -53,7 +53,7 @@ func TestInterfaceConfigsUnpack(t *testing.T) {
 		},
 		{
 			Description: "valid interface",
-			Config: map[string]interface{}{
+			Config: map[string]any{
 				"name":     "br0",
 				"interval": "100s",
 			},
@@ -77,7 +77,7 @@ func TestInterfaceConfigsUnpack(t *testing.T) {
 }
 
 func TestDefaultConfigUnpack(t *testing.T) {
-	rawConfig, err := config.NewConfigFrom(map[string]interface{}{})
+	rawConfig, err := config.NewConfigFrom(map[string]any{})
 	assert.NoError(t, err)
 	config := defaultConfig()
 	err = rawConfig.Unpack(&config)
@@ -87,8 +87,8 @@ func TestDefaultConfigUnpack(t *testing.T) {
 }
 
 func TestConfigUnpackEmptyInterfaces(t *testing.T) {
-	rawConfig, err := config.NewConfigFrom(map[string]interface{}{
-		"interfaces": []interface{}{},
+	rawConfig, err := config.NewConfigFrom(map[string]any{
+		"interfaces": []any{},
 	})
 	assert.NoError(t, err)
 	config := defaultConfig()
