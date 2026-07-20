@@ -117,7 +117,7 @@ func TestAnnotatorRun_ConcurrentRace(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			event := containerEvent(containerID)
@@ -145,7 +145,7 @@ func TestAnnotatorRun_ConcurrentRace_CacheWrite(t *testing.T) {
 	wg.Add(goroutines * 2)
 
 	// Half of the goroutines read via Run.
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			_, _ = processor.Run(containerEvent(containerID))
@@ -153,7 +153,7 @@ func TestAnnotatorRun_ConcurrentRace_CacheWrite(t *testing.T) {
 	}
 
 	// Half write via the cache directly (simulating the watcher callbacks).
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			processor.cache.set(containerID, meta)
@@ -168,7 +168,7 @@ func TestAnnotatorRun_ConcurrentRace_CacheWrite(t *testing.T) {
 func TestAnnotatorRun_EachEventAnnotatedIndependently(t *testing.T) {
 	const goroutines = 50
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"container.id"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -180,7 +180,7 @@ func TestAnnotatorRun_EachEventAnnotatedIndependently(t *testing.T) {
 	}
 	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		cid := fmt.Sprintf("cid-%d", i)
 		processor.cache.set(cid, metaMap(cid))
 	}
@@ -230,8 +230,7 @@ func TestAnnotatorRun_MutatingOneResultDoesNotAffectOthers(t *testing.T) {
 	events := make([]*beat.Event, goroutines)
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
-		i := i
+	for i := range goroutines {
 		go func() {
 			defer wg.Done()
 			out, err := processor.Run(containerEvent(containerID))
@@ -276,8 +275,7 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(readers + writers)
 
-	for i := 0; i < readers; i++ {
-		i := i
+	for i := range readers {
 		go func() {
 			defer wg.Done()
 			out, err := processor.Run(containerEvent(containerID))
@@ -289,7 +287,7 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 		}()
 	}
 
-	for i := 0; i < writers; i++ {
+	for range writers {
 		go func() {
 			defer wg.Done()
 			// Write a completely different metadata map to the same key.
@@ -324,7 +322,7 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 func TestAnnotatorRun_SharedWrapper_EventIndependenceUnderConcurrency(t *testing.T) {
 	const goroutines = 60
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"container.id"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -357,8 +355,7 @@ func TestAnnotatorRun_SharedWrapper_EventIndependenceUnderConcurrency(t *testing
 	results := make([]result, goroutines)
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
-		i := i
+	for i := range goroutines {
 		cid := fmt.Sprintf("ev-%d", i)
 		go func() {
 			defer wg.Done()

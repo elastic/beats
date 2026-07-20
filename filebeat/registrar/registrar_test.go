@@ -133,9 +133,8 @@ func TestRunConcurrentShutdownAndBatch(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			for i := 0; i < iterations; i++ {
+			for i := range iterations {
 				logger := logptest.NewTestingLogger(t, "")
 				memBackend := storetest.NewMemoryStoreBackend()
 				stateStore := &testStateStore{registry: statestore.NewRegistry(memBackend)}

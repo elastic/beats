@@ -25,6 +25,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"sort"
@@ -1460,9 +1461,7 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 
 	// Copy paths and 'truncate' one file
 	truncatedPaths := map[string]loginp.FileDescriptor{}
-	for path, fd := range paths {
-		truncatedPaths[path] = fd
-	}
+	maps.Copy(truncatedPaths, paths)
 	truncatedPaths["complete"] = descriptor("complete", 50, now, false)
 	fw.scanner = &testFileScanner{files: truncatedPaths}
 	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
@@ -1477,9 +1476,7 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 
 	// Copy truncatedPaths and make one file older
 	ignoredPaths := map[string]loginp.FileDescriptor{}
-	for path, fd := range truncatedPaths {
-		ignoredPaths[path] = fd
-	}
+	maps.Copy(ignoredPaths, truncatedPaths)
 	ignoredPaths["near"] = descriptor("near", 100, oldModTime, false)
 	fw.scanner = &testFileScanner{files: ignoredPaths}
 	fw.watch(t.Context(), metrics, time.Hour, time.Time{})

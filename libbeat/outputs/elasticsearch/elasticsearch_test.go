@@ -82,17 +82,17 @@ func TestGlobalConnectCallbacksManagement(t *testing.T) {
 
 func TestPipelineSelection(t *testing.T) {
 	cases := map[string]struct {
-		cfg   map[string]interface{}
+		cfg   map[string]any
 		event beat.Event
 		want  string
 	}{
 		"no pipline configured": {},
 		"pipeline configured": {
-			cfg:  map[string]interface{}{"pipeline": "test"},
+			cfg:  map[string]any{"pipeline": "test"},
 			want: "test",
 		},
 		"pipeline must be lowercase": {
-			cfg:  map[string]interface{}{"pipeline": "Test"},
+			cfg:  map[string]any{"pipeline": "Test"},
 			want: "test",
 		},
 		"pipeline via event meta": {
@@ -104,14 +104,14 @@ func TestPipelineSelection(t *testing.T) {
 			want:  "test",
 		},
 		"pipelines setting": {
-			cfg: map[string]interface{}{
-				"pipelines": []map[string]interface{}{{"pipeline": "test"}},
+			cfg: map[string]any{
+				"pipelines": []map[string]any{{"pipeline": "test"}},
 			},
 			want: "test",
 		},
 		"pipelines setting must be lowercase": {
-			cfg: map[string]interface{}{
-				"pipelines": []map[string]interface{}{{"pipeline": "Test"}},
+			cfg: map[string]any{
+				"pipelines": []map[string]any{{"pipeline": "Test"}},
 			},
 			want: "test",
 		},

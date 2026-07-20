@@ -318,15 +318,15 @@ func (k *kubernetesAnnotator) init(ctx context.Context, config kubeAnnotatorConf
 		indexers := NewIndexers(config.Indexers, metaGen)
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
+			AddFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(indexers, pod)
 			},
-			UpdateFunc: func(obj interface{}) {
+			UpdateFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(indexers, pod)
 			},
-			DeleteFunc: func(obj interface{}) {
+			DeleteFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(indexers, pod)
 			},
