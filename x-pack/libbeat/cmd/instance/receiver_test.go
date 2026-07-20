@@ -346,12 +346,10 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 
 	// Reproduce the async wrapper pattern used by all beat receivers.
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		// Swallow the error, exactly as the wrapper receivers do.
 		_ = br.Start(componenttest.NewNopHost())
-	}()
+	})
 	// Wait for the goroutine to complete. Start has failed and returned; on the
 	// buggy path runDone is still nil at this point.
 	wg.Wait()
