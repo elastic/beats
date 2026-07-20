@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix request tracer path validation for cel, httpjson, http_endpoint, and entityanalytics inputs when filebeat runs as an OTel receiver.
-component: filebeat

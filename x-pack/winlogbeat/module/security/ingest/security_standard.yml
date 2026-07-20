@@ -957,6 +957,7 @@ processors:
         if (tDescs.length == 0) {
           return;
         }
+        Collections.sort(tDescs);
         ctx.winlog.event_data.put("TicketOptionsDescription", tDescs);
   - script:
       lang: painless
@@ -1053,7 +1054,9 @@ processors:
             !["4768", "4769", "4770", "4771"].contains(ctx.event.code)) {
           return;
         }
-        ctx.winlog.event_data.put("StatusDescription", params[ctx.winlog.event_data.Status]);
+        def status = ctx.winlog.event_data.Status;
+        def key = status.length() > 2 ? "0x" + status.substring(2).toUpperCase() : status;
+        ctx.winlog.event_data.put("StatusDescription", params[key]);
   - script:
       lang: painless
       ignore_failure: false
@@ -4134,11 +4137,17 @@ processors:
         }
 
         void splitSidList(def sids, def params, def ctx) {
-          ArrayList al = new ArrayList();
-          def sidList = sids.splitOnToken(" ");
+          def parts = /\s+/.split(sids);
+          ArrayList sidList = new ArrayList();
+          for (def p : parts) {
+            if (p.length() > 0) {
+              sidList.add(p);
+            }
+          }
           ctx.winlog.event_data.put("SidList", sidList);
-          for (def i = 0; i < sidList.length; i++ ) {
-            al.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", "").replace(" ",""), params));
+          ArrayList al = new ArrayList();
+          for (def s : sidList) {
+            al.add(translateSID(s.replace("%", "").replace("{", "").replace("}", ""), params));
           }
           ctx.winlog.event_data.put("SidListDesc", al);
         }

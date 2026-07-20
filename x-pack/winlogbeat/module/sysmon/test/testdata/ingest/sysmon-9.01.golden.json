@@ -2,10 +2,10 @@
   {
     "@timestamp": "2019-03-18T16:57:37.933Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Sysmon config state changed",
+      "action": "ServiceConfigurationChange",
       "category": [
         "configuration"
       ],
@@ -54,7 +54,7 @@
   {
     "@timestamp": "2019-03-18T16:57:38.011Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Sysmon service state changed",
@@ -111,10 +111,10 @@
   {
     "@timestamp": "2019-03-18T16:57:37.949Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process Create (rule: ProcessCreate)",
+      "action": "Process creation",
       "category": [
         "process"
       ],
@@ -215,10 +215,10 @@
   {
     "@timestamp": "2019-03-18T16:57:37.964Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process Create (rule: ProcessCreate)",
+      "action": "Process creation",
       "category": [
         "process"
       ],
@@ -322,10 +322,10 @@
   {
     "@timestamp": "2019-03-18T16:57:38.981Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process terminated (rule: ProcessTerminate)",
+      "action": "Process terminated",
       "category": [
         "process"
       ],
@@ -380,10 +380,10 @@
   {
     "@timestamp": "2019-03-18T16:57:38.981Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process terminated (rule: ProcessTerminate)",
+      "action": "Process terminated",
       "category": [
         "process"
       ],
@@ -438,10 +438,10 @@
   {
     "@timestamp": "2019-03-18T16:57:39.012Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process Create (rule: ProcessCreate)",
+      "action": "Process creation",
       "category": [
         "process"
       ],
@@ -549,10 +549,10 @@
       "port": 53
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -635,10 +635,10 @@
       "port": 53
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -722,10 +722,10 @@
       "port": 443
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -809,10 +809,10 @@
       "port": 443
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -896,10 +896,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -983,10 +983,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1068,10 +1068,10 @@
       "port": 5355
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1155,10 +1155,10 @@
       "port": 5355
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1241,10 +1241,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1326,10 +1326,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1411,10 +1411,10 @@
       "port": 5355
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1497,10 +1497,10 @@
       "port": 5355
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1583,10 +1583,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1669,10 +1669,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1755,10 +1755,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1841,10 +1841,10 @@
       "port": 137
     },
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Network connection detected (rule: NetworkConnect)",
+      "action": "Network connection",
       "category": [
         "network"
       ],
@@ -1923,10 +1923,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.350Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process terminated (rule: ProcessTerminate)",
+      "action": "Process terminated",
       "category": [
         "process"
       ],
@@ -1981,10 +1981,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.364Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process terminated (rule: ProcessTerminate)",
+      "action": "Process terminated",
       "category": [
         "process"
       ],
@@ -2039,10 +2039,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.387Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File creation time changed (rule: FileCreateTime)",
+      "action": "A process changed a file creation time",
       "category": [
         "file"
       ],
@@ -2107,10 +2107,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File creation time changed (rule: FileCreateTime)",
+      "action": "A process changed a file creation time",
       "category": [
         "file"
       ],
@@ -2175,10 +2175,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File creation time changed (rule: FileCreateTime)",
+      "action": "A process changed a file creation time",
       "category": [
         "file"
       ],
@@ -2243,10 +2243,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File creation time changed (rule: FileCreateTime)",
+      "action": "A process changed a file creation time",
       "category": [
         "file"
       ],
@@ -2311,10 +2311,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "Process terminated (rule: ProcessTerminate)",
+      "action": "Process terminated",
       "category": [
         "process"
       ],
@@ -2369,10 +2369,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File creation time changed (rule: FileCreateTime)",
+      "action": "A process changed a file creation time",
       "category": [
         "file"
       ],
@@ -2437,10 +2437,10 @@
   {
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File creation time changed (rule: FileCreateTime)",
+      "action": "A process changed a file creation time",
       "category": [
         "file"
       ],

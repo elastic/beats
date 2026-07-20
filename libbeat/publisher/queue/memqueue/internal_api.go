@@ -45,4 +45,13 @@ type getRequest[T any] struct {
 	responseChan chan *batch[T] // channel to send response to
 }
 
-type batchDoneMsg struct{}
+// batchDoneMsg is the message sent on a batch's doneChan. The cancelled
+// flag distinguishes a successful completion (set by batch.Done — fire
+// ACK callbacks) from an abandonment (set by batch.Release — remove the
+// batch from pendingBatches and signal deleteChan, but do NOT fire ACK
+// callbacks). The latter exists so the pipeline can reclaim queue-side
+// resources at shutdown without telling input ackers that abandoned
+// events were delivered.
+type batchDoneMsg struct {
+	cancelled bool
+}

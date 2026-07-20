@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:35:25.5153959Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "deleted-user-account",
@@ -79,7 +79,7 @@
   {
     "@timestamp": "2019-09-06T13:35:29.6900555Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "deleted-user-account",

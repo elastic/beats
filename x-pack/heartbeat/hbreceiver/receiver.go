@@ -21,20 +21,18 @@ type heartbeatReceiver struct {
 }
 
 func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	hb.wg.Add(1)
-	go func() {
-		defer hb.wg.Done()
+	hb.wg.Go(func() {
 		hb.Logger.Info("starting heartbeat receiver")
 		if err := hb.BeatReceiver.Start(host); err != nil {
 			hb.Logger.Error("error starting heartbeat receiver", zap.Error(err))
 		}
-	}()
+	})
 	return nil
 }
 
 func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
 	hb.Logger.Info("stopping heartbeat receiver")
-	if err := hb.BeatReceiver.Shutdown(); err != nil {
+	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
 	hb.wg.Wait()

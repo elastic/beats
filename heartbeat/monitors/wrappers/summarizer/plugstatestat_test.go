@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,11 +34,12 @@ import (
 // This is what lets synthetics monitors propagate the check group to the runner
 // as the APM trace id so journey executions can be cross-linked with APM data.
 func TestStateStatusPluginBeforeEachEventSetsCheckGroup(t *testing.T) {
-	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+	logger := logptest.NewTestingLogger(t, "")
+	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false, logger)
 	sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "browser", MaxAttempts: 1}
 
 	t.Run("browser", func(t *testing.T) {
-		p := NewBrowserStateStatusplugin(tracker, sf)
+		p := NewBrowserStateStatusplugin(tracker, sf, logger)
 		event := &beat.Event{Fields: mapstr.M{}}
 		p.BeforeEachEvent(event)
 		cg, err := event.GetValue("monitor.check_group")
@@ -46,7 +48,7 @@ func TestStateStatusPluginBeforeEachEventSetsCheckGroup(t *testing.T) {
 	})
 
 	t.Run("lightweight", func(t *testing.T) {
-		p := NewLightweightStateStatusPlugin(tracker, sf)
+		p := NewLightweightStateStatusPlugin(tracker, sf, logger)
 		event := &beat.Event{Fields: mapstr.M{}}
 		p.BeforeEachEvent(event)
 		cg, err := event.GetValue("monitor.check_group")

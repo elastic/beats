@@ -64,7 +64,7 @@ func TestHitToEvent(t *testing.T) {
 
 	for i := 0; i < maxMask; i++ {
 		p := genParams(i)
-		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", p.meta, p.hit, p.ecsm, p.reqData)
+		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", "", "", p.meta, p.hit, p.ecsm, p.reqData)
 
 		if p.index != "" {
 			diff := cmp.Diff(p.index, ev.Meta[events.FieldMetaRawIndex])
@@ -186,6 +186,40 @@ func TestActionResultToEvent(t *testing.T) {
 				}
 			  }`),
 		},
+		{
+			name: "successful with space id",
+			req: toMap(t, `{
+				"data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"input_type": "osquery",
+				"space_id": "production",
+				"type": "INPUT_ACTION"
+			}`),
+			res: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"count": 1,
+				"started_at": "2024-04-18T19:39:39.532125Z"
+			} `),
+			want: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"action_response": {
+					"osquery": {
+						"count": 1
+					}
+				},
+				"action_id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"started_at": "2024-04-18T19:39:39.532125Z",
+				"action_input_type": "osquery",
+				"action_data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"space_id": "production"
+			}`),
+		},
 	}
 
 	for _, tc := range tests {
@@ -209,6 +243,8 @@ func TestHitToEvent_SpaceID(t *testing.T) {
 		uuid.Must(uuid.NewV4()).String(),
 		spaceID,
 		"",
+		"",
+		"",
 		nil,
 		map[string]interface{}{"foo": "bar"},
 		nil,
@@ -230,6 +266,8 @@ func TestHitToEvent_PackID(t *testing.T) {
 		uuid.Must(uuid.NewV4()).String(),
 		"",
 		packID,
+		"",
+		"",
 		nil,
 		map[string]interface{}{"foo": "bar"},
 		nil,
@@ -238,6 +276,58 @@ func TestHitToEvent_PackID(t *testing.T) {
 
 	if diff := cmp.Diff(packID, ev.Fields["pack_id"]); diff != "" {
 		t.Error(diff)
+	}
+}
+
+func TestHitToEvent_PackNameAndQueryName(t *testing.T) {
+	packName := "My Pack"
+	queryName := "processes"
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"sched-123",
+		"schedule_id",
+		uuid.Must(uuid.NewV4()).String(),
+		"",
+		"pack-xyz",
+		packName,
+		queryName,
+		nil,
+		map[string]interface{}{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if diff := cmp.Diff(packName, ev.Fields["pack_name"]); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(queryName, ev.Fields["query_name"]); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"action-123",
+		"action_id",
+		uuid.Must(uuid.NewV4()).String(),
+		"",
+		"",
+		"",
+		"",
+		nil,
+		map[string]interface{}{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if _, ok := ev.Fields["pack_name"]; ok {
+		t.Error(`expected no "pack_name" field when packName is empty`)
+	}
+	if _, ok := ev.Fields["query_name"]; ok {
+		t.Error(`expected no "query_name" field when queryName is empty`)
 	}
 }
 

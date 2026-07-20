@@ -38,9 +38,13 @@ type BrowserStateStatusPlugin struct {
 	cssp *commonSSP
 }
 
-func NewBrowserStateStatusplugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *BrowserStateStatusPlugin {
+func NewBrowserStateStatusplugin(
+	stateTracker *monitorstate.Tracker,
+	sf stdfields.StdMonitorFields,
+	logger *logp.Logger,
+) *BrowserStateStatusPlugin {
 	return &BrowserStateStatusPlugin{
-		cssp: newCommonSSP(stateTracker, sf),
+		cssp: newCommonSSP(stateTracker, sf, logger),
 	}
 }
 
@@ -83,12 +87,18 @@ func (ssp *BrowserStateStatusPlugin) BeforeEachEvent(event *beat.Event) {
 // LightweightStateStatusPlugin encapsulates the writing of the primary fields used by the summary,
 // those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
 type LightweightStateStatusPlugin struct {
-	cssp *commonSSP
+	cssp   *commonSSP
+	logger *logp.Logger
 }
 
-func NewLightweightStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *LightweightStateStatusPlugin {
+func NewLightweightStateStatusPlugin(
+	stateTracker *monitorstate.Tracker,
+	sf stdfields.StdMonitorFields,
+	logger *logp.Logger,
+) *LightweightStateStatusPlugin {
 	return &LightweightStateStatusPlugin{
-		cssp: newCommonSSP(stateTracker, sf),
+		cssp:   newCommonSSP(stateTracker, sf, logger),
+		logger: logger,
 	}
 }
 
@@ -130,13 +140,13 @@ type commonSSP struct {
 	stateTracker *monitorstate.Tracker
 	sf           stdfields.StdMonitorFields
 	checkGroup   string
+	logger       *logp.Logger
 }
 
-func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *commonSSP {
+func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields, logger *logp.Logger) *commonSSP {
 	uu, err := uuid.NewV1()
 	if err != nil {
-		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
+		logger.Errorf("could not create v1 UUID for retry group: %s", err)
 	}
 	js := jobsummary.NewJobSummary(1, sf.MaxAttempts, uu.String())
 	return &commonSSP{
@@ -144,6 +154,7 @@ func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFie
 		stateTracker: stateTracker,
 		sf:           sf,
 		checkGroup:   uu.String(),
+		logger:       logger,
 	}
 }
 
@@ -197,8 +208,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 
 	eventext.MergeEventFields(event, fields)
 
-	//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-	logp.L().Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
+	ssp.logger.Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
 		return RetryBeforeSummary

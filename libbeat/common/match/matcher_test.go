@@ -24,7 +24,7 @@ import (
 )
 
 func TestMatchers(t *testing.T) {
-	typeOf := func(v interface{}) reflect.Type {
+	typeOf := func(v any) reflect.Type {
 		return reflect.TypeOf(v)
 	}
 
@@ -288,7 +288,7 @@ func TestMatchers(t *testing.T) {
 }
 
 func TestExactMatchers(t *testing.T) {
-	typeOf := func(v interface{}) reflect.Type {
+	typeOf := func(v any) reflect.Type {
 		return reflect.TypeOf(v)
 	}
 

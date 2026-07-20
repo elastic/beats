@@ -69,7 +69,7 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 		server.Start()
 		defer server.Close()
 
-		config := map[string]interface{}{
+		config := map[string]any{
 			"module":     module,
 			"metricsets": []string{metricset},
 			"hosts":      []string{server.URL},

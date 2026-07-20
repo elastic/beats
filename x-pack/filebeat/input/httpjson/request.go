@@ -304,9 +304,16 @@ type requestFactory struct {
 	chainResponseProcessor *responseProcessor
 	saveFirstResponse      bool
 	log                    *logp.Logger
+	userAgent              string
+
+	// originURL and allowedOrigins constrain the URL that transforms
+	// can produce. When originURL is non-nil, newHTTPRequest validates
+	// the post-transform URL against originURL and allowedOrigins.
+	originURL      *url.URL
+	allowedOrigins []*url.URL
 }
 
-func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
+func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry, userAgent string) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, stat, log)
@@ -317,6 +324,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 		body:              config.Request.Body,
 		transforms:        ts,
 		log:               log,
+		userAgent:         userAgent,
 		encoder:           registeredEncoders[config.Request.EncodeAs],
 		saveFirstResponse: config.Response.SaveFirstResponse,
 	}
@@ -335,6 +343,14 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 		}
 	}
 	rfs = append(rfs, rf)
+	var chainAllowedOrigins []*url.URL
+	for _, s := range config.Response.PaginationAllowedHosts {
+		u, err := url.Parse(s)
+		if err != nil {
+			continue // already validated by responseConfig.Validate
+		}
+		chainAllowedOrigins = append(chainAllowedOrigins, u)
+	}
 	for _, ch := range config.Chain {
 		var rf *requestFactory
 		// chain calls requestFactory object
@@ -347,18 +363,24 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
+			stepURL := ch.Step.Request.URL.URL
 			rf = &requestFactory{
-				url:                    *ch.Step.Request.URL.URL,
+				url:                    *stepURL,
 				method:                 ch.Step.Request.Method,
 				body:                   ch.Step.Request.Body,
 				transforms:             ts,
 				log:                    log,
+				userAgent:              userAgent,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.Step.Replace,
 				replaceWith:            ch.Step.ReplaceWith,
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.Step.Replace == "" {
+				rf.originURL = stepURL
+				rf.allowedOrigins = chainAllowedOrigins
 			}
 			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
 				rf.user = ch.Step.Auth.Basic.User
@@ -374,12 +396,14 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
+			whileURL := ch.While.Request.URL.URL
 			rf = &requestFactory{
-				url:                    *ch.While.Request.URL.URL,
+				url:                    *whileURL,
 				method:                 ch.While.Request.Method,
 				body:                   ch.While.Request.Body,
 				transforms:             ts,
 				log:                    log,
+				userAgent:              userAgent,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.While.Replace,
 				replaceWith:            ch.While.ReplaceWith,
@@ -387,6 +411,10 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.While.Replace == "" {
+				rf.originURL = whileURL
+				rf.allowedOrigins = chainAllowedOrigins
 			}
 			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
 				rf.user = ch.While.Auth.Basic.User
@@ -441,6 +469,16 @@ func (rf *requestFactory) newHTTPRequest(ctx context.Context, trCtx *transformCo
 		return nil, err
 	}
 
+	if rf.originURL != nil {
+		target := trReq.url()
+		if !allowedOrigin(rf.originURL, rf.allowedOrigins, &target) {
+			return nil, fmt.Errorf(
+				"pagination URL origin %q does not match configured origin %q",
+				target.Host, rf.originURL.Host,
+			)
+		}
+	}
+
 	var body []byte
 	if rf.method == http.MethodPost {
 		if rf.encoder != nil {
@@ -480,7 +518,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 
 	header := http.Header{}
 	header.Set("Accept", "application/json")
-	header.Set("User-Agent", userAgent)
+	header.Set("User-Agent", rf.userAgent)
 	req.setHeader(header)
 
 	var err error
@@ -502,6 +540,52 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	rf.log.Debugw("new request", "req", redact{value: mapstrM(req), fields: []string{"header.Authorization"}})
 
 	return req, nil
+}
+
+// allowedOrigin returns true if target shares the same origin as base,
+// or if it matches any of the additional allowed origins. An allowed
+// origin only matches when the target also does not downgrade from the
+// base scheme, so an HTTP entry in the allowlist cannot bypass HTTPS
+// enforcement on the configured request URL.
+func allowedOrigin(base *url.URL, allowed []*url.URL, target *url.URL) bool {
+	if sameOrigin(base, target) {
+		return true
+	}
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	for _, a := range allowed {
+		if sameOrigin(a, target) {
+			return true
+		}
+	}
+	return false
+}
+
+// sameOrigin returns true when target shares the same origin (scheme,
+// hostname, and port) as base. HTTPS-to-HTTP downgrades are rejected
+// explicitly; scheme upgrades also fail because the default ports
+// differ (80 vs 443). Explicit default ports are normalised so that
+// https://example.com and https://example.com:443 are the same origin.
+func sameOrigin(base, target *url.URL) bool {
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	return base.Hostname() == target.Hostname() && portOrDefault(base) == portOrDefault(target)
+}
+
+func portOrDefault(u *url.URL) string {
+	if p := u.Port(); p != "" {
+		return p
+	}
+	switch u.Scheme {
+	case "https":
+		return "443"
+	case "http":
+		return "80"
+	default:
+		return ""
+	}
 }
 
 type requester struct {

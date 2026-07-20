@@ -62,6 +62,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/go-concert/timed"
 
@@ -79,11 +80,11 @@ type TestModule struct {
 
 func (m *TestModule) Name() string                              { return m.ModName }
 func (m *TestModule) Config() mb.ModuleConfig                   { return m.ModConfig }
-func (m *TestModule) UnpackConfig(to interface{}) error         { return m.RawConfig.Unpack(to) }
+func (m *TestModule) UnpackConfig(to any) error                 { return m.RawConfig.Unpack(to) }
 func (m *TestModule) UpdateStatus(_ status.Status, _ string)    {}
 func (m *TestModule) SetStatusReporter(_ status.StatusReporter) {}
 
-func NewTestModule(t testing.TB, config interface{}) *TestModule {
+func NewTestModule(t testing.TB, config any) *TestModule {
 	c, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
@@ -95,13 +96,13 @@ func NewTestModule(t testing.TB, config interface{}) *TestModule {
 // NewMetricSet instantiates a new MetricSet using the given configuration.
 // The ModuleFactory and MetricSetFactory are obtained from the global
 // Registry.
-func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
+func NewMetricSet(t testing.TB, config any) mb.MetricSet {
 	return NewMetricSetWithRegistry(t, config, mb.Registry)
 }
 
 // NewMetricSetWithRegistry instantiates a new MetricSet using the given configuration.
 // The ModuleFactory and MetricSetFactory are obtained from the passed in registry.
-func NewMetricSetWithRegistry(t testing.TB, config interface{}, registry *mb.Register) mb.MetricSet {
+func NewMetricSetWithRegistry(t testing.TB, config any, registry *mb.Register) mb.MetricSet {
 	metricsets := NewMetricSetsWithRegistry(t, config, registry)
 
 	if len(metricsets) != 1 {
@@ -117,18 +118,18 @@ func NewMetricSetWithRegistry(t testing.TB, config interface{}, registry *mb.Reg
 
 // NewMetricSets instantiates a list of new MetricSets using the given
 // module configuration.
-func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
+func NewMetricSets(t testing.TB, config any) []mb.MetricSet {
 	return NewMetricSetsWithRegistry(t, config, mb.Registry)
 }
 
 // NewMetricSetsWithRegistry instantiates a list of new MetricSets using the given
 // module configuration and provided registry.
-func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Register) []mb.MetricSet {
+func NewMetricSetsWithRegistry(t testing.TB, config any, registry *mb.Register) []mb.MetricSet {
 	c, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, metricsets, err := mb.NewModule(c, registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	m, metricsets, err := mb.NewModule(c, registry, beat.Info{Paths: paths.New(), UserAgent: "test", Logger: logptest.NewTestingLogger(t, "")})
 	if err != nil {
 		t.Fatal("failed to create new MetricSet", err)
 	}
@@ -141,13 +142,13 @@ func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Re
 
 // NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
-func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetricSetV2 {
+func NewReportingMetricSetV2(t testing.TB, config any) mb.ReportingMetricSetV2 {
 	return NewReportingMetricSetV2WithRegistry(t, config, mb.Registry)
 }
 
 // NewReportingMetricSetV2WithRegistry returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
-func NewReportingMetricSetV2WithRegistry(t testing.TB, config interface{}, registry *mb.Register) mb.ReportingMetricSetV2 {
+func NewReportingMetricSetV2WithRegistry(t testing.TB, config any, registry *mb.Register) mb.ReportingMetricSetV2 {
 	metricSet := NewMetricSetWithRegistry(t, config, registry)
 
 	reportingMetricSetV2, ok := metricSet.(mb.ReportingMetricSetV2)
@@ -160,7 +161,7 @@ func NewReportingMetricSetV2WithRegistry(t testing.TB, config interface{}, regis
 
 // NewReportingMetricSetV2Error returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
-func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.ReportingMetricSetV2Error {
+func NewReportingMetricSetV2Error(t testing.TB, config any) mb.ReportingMetricSetV2Error {
 	metricSet := NewMetricSet(t, config)
 
 	reportingMetricSetV2Error, ok := metricSet.(mb.ReportingMetricSetV2Error)
@@ -172,7 +173,7 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 }
 
 // NewReportingMetricSetV2Errors returns an array of new ReportingMetricSetV2 instances.
-func NewReportingMetricSetV2Errors(t testing.TB, config interface{}) []mb.ReportingMetricSetV2Error {
+func NewReportingMetricSetV2Errors(t testing.TB, config any) []mb.ReportingMetricSetV2Error {
 	metricSets := NewMetricSets(t, config)
 	reportingMetricSets := make([]mb.ReportingMetricSetV2Error, 0, len(metricSets))
 	for _, metricSet := range metricSets {
@@ -189,7 +190,7 @@ func NewReportingMetricSetV2Errors(t testing.TB, config interface{}) []mb.Report
 
 // NewReportingMetricSetV2WithContext returns a new ReportingMetricSetV2WithContext instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
-func NewReportingMetricSetV2WithContext(t testing.TB, config interface{}) mb.ReportingMetricSetV2WithContext {
+func NewReportingMetricSetV2WithContext(t testing.TB, config any) mb.ReportingMetricSetV2WithContext {
 	metricSet := NewMetricSet(t, config)
 
 	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSetV2WithContext)
@@ -307,7 +308,7 @@ func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) (
 // NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
-func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
+func NewPushMetricSetV2(t testing.TB, config any) mb.PushMetricSetV2 {
 	metricSet := NewMetricSet(t, config)
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
@@ -321,7 +322,7 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 // NewPushMetricSetV2WithRegistry instantiates a new PushMetricSetV2 using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // passed in the registry.
-func NewPushMetricSetV2WithRegistry(t testing.TB, config interface{}, registry *mb.Register) mb.PushMetricSetV2 {
+func NewPushMetricSetV2WithRegistry(t testing.TB, config any, registry *mb.Register) mb.PushMetricSetV2 {
 	metricSet := NewMetricSetWithRegistry(t, config, registry)
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
@@ -335,7 +336,7 @@ func NewPushMetricSetV2WithRegistry(t testing.TB, config interface{}, registry *
 // NewPushMetricSetV2WithContext instantiates a new PushMetricSetV2WithContext
 // using the given configuration. The ModuleFactory and MetricSetFactory are
 // obtained from the global Registry.
-func NewPushMetricSetV2WithContext(t testing.TB, config interface{}) mb.PushMetricSetV2WithContext {
+func NewPushMetricSetV2WithContext(t testing.TB, config any) mb.PushMetricSetV2WithContext {
 	metricSet := NewMetricSet(t, config)
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2WithContext)

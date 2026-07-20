@@ -57,7 +57,7 @@ func (e *ErrorClosed) Operation() string { return e.operation }
 
 // Error creates a descriptive error string.
 func (e *ErrorClosed) Error() string {
-	return fmt.Sprintf("can not executed %v operation on closed store '%v'", e.operation, e.name)
+	return fmt.Sprintf("cannot execute %v operation on closed store '%v'", e.operation, e.name)
 }
 
 // ErrorOperation is returned when a generic store operation failed.

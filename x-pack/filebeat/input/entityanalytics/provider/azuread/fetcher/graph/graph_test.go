@@ -20,7 +20,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/lumberjack"
 )
 
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
@@ -175,6 +175,32 @@ var mfaResponse2 = apiMFAResponse{
 	},
 }
 
+var signInActivityResponse1 = apiSignInActivityResponse{
+	Users: []signInActivityAPI{
+		{
+			ID: "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+			SignInActivity: &signInActivityDetails{
+				LastSignInDateTime:               "2024-01-15T08:00:00Z",
+				LastSignInRequestId:              "req-id-1",
+				LastNonInteractiveSignInDateTime: "2024-01-15T08:30:00Z",
+			},
+		},
+	},
+}
+
+var signInActivityResponse2 = apiSignInActivityResponse{
+	Users: []signInActivityAPI{
+		{
+			ID: "d897d560-3d17-4dae-81b3-c898fe82bf84",
+			SignInActivity: &signInActivityDetails{
+				LastSignInDateTime:               "2024-01-14T10:00:00Z",
+				LastSignInRequestId:              "req-id-2",
+				LastNonInteractiveSignInDateTime: "2024-01-14T11:00:00Z",
+			},
+		},
+	},
+}
+
 var groupsResponse1 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
@@ -298,6 +324,29 @@ func (s *testServer) setup(t *testing.T) {
 		case "test":
 			groupsResponse2.DeltaLink = "http://" + s.addr + "/groups/delta?$deltatoken=test"
 			data, err = json.Marshal(&groupsResponse2)
+		default:
+			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
+		}
+		require.NoError(t, err)
+
+		_, err = w.Write(data)
+		require.NoError(t, err)
+	})
+
+	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+
+		var data []byte
+		var err error
+
+		skipToken := r.URL.Query().Get("$skiptoken")
+		switch skipToken {
+		case "":
+			signInActivityResponse1.NextLink = "http://" + s.addr + "/users?$skiptoken=test"
+			data, err = json.Marshal(&signInActivityResponse1)
+		case "test":
+			signInActivityResponse2.NextLink = ""
+			data, err = json.Marshal(&signInActivityResponse2)
 		default:
 			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
 		}
@@ -631,6 +680,47 @@ func TestGraph_UserMFADetails(t *testing.T) {
 
 	require.NoError(t, gotErr)
 	require.Equal(t, wantMFA, gotMFA)
+}
+
+func TestGraph_UserSignInActivity(t *testing.T) {
+	var testSrv testServer
+	testSrv.setup(t)
+	defer testSrv.srv.Close()
+
+	wantSignInActivity := map[uuid.UUID]*fetcher.SignInActivityDetails{
+		uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+			LastSignInDateTime:               "2024-01-15T08:00:00Z",
+			LastSignInRequestId:              "req-id-1",
+			LastNonInteractiveSignInDateTime: "2024-01-15T08:30:00Z",
+		},
+		uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+			LastSignInDateTime:               "2024-01-14T10:00:00Z",
+			LastSignInRequestId:              "req-id-2",
+			LastNonInteractiveSignInDateTime: "2024-01-14T11:00:00Z",
+		},
+	}
+
+	rawConf := graphConf{
+		APIEndpoint: "http://" + testSrv.addr,
+	}
+	if *trace {
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
+	c, err := config.NewConfigFrom(&rawConf)
+	require.NoError(t, err)
+	auth := mock.New(mock.DefaultTokenValue)
+
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	gotSignInActivity, gotErr := f.UserSignInActivity(ctx)
+
+	require.NoError(t, gotErr)
+	require.Equal(t, wantSignInActivity, gotSignInActivity)
 }
 
 var formatQueryTests = []struct {

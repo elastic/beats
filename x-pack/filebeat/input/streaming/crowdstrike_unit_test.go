@@ -7,23 +7,23 @@ package streaming
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 )
 
 func TestFollowSession_FirehoseHTTPError(t *testing.T) {
-	logp.TestingSetup()
-
 	tests := []struct {
 		name       string
 		statusCode int
@@ -42,10 +42,9 @@ func TestFollowSession_FirehoseHTTPError(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			discoverResp := discoverResponse(t, srv.URL+"/firehose")
 			discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprint(w, discoverResp)
+				fmt.Fprint(w, discoverResponse(t, srv.URL+"/firehose", srv.URL+"/refresh"))
 			}))
 			defer discoverSrv.Close()
 
@@ -65,9 +64,58 @@ func TestFollowSession_FirehoseHTTPError(t *testing.T) {
 	}
 }
 
-func TestFollowSession_NonObjectMessage(t *testing.T) {
-	logp.TestingSetup()
+func TestFollowSession_EmptyDiscoverBody(t *testing.T) {
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// A 200 OK with an empty body, as observed from the CrowdStrike
+		// discover endpoint; Decode returns io.EOF.
+		w.Header().Set("Content-Type", "application/json")
+	}))
+	defer discoverSrv.Close()
 
+	s := newTestStream(t, discoverSrv.URL, discoverSrv.Client())
+	state, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{})
+	if err == nil {
+		t.Fatal("expected error from followSession, got nil")
+	}
+	if want := "discover stream returned an empty body"; !strings.Contains(err.Error(), want) {
+		t.Errorf("followSession() error = %v; want substring %q", err, want)
+	}
+	// The empty body is a transient condition so the retry loop keeps trying
+	// rather than terminating the input.
+	if !errors.Is(err, transientError{}) {
+		t.Errorf("followSession() error = %v; want transientError", err)
+	}
+	if state == nil {
+		t.Error("expected non-nil state on non-hard error")
+	}
+}
+
+func TestFollowSession_DiscoverGETFailureIsTransient(t *testing.T) {
+	// Point at a server that is immediately closed so the discover GET fails
+	// at the connection level.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	client := srv.Client()
+	discoverURL := srv.URL
+	srv.Close()
+
+	s := newTestStream(t, discoverURL, client)
+	state, err := s.followSession(context.Background(), client, map[string]any{})
+	if err == nil {
+		t.Fatal("expected error from followSession, got nil")
+	}
+	// A connection-level GET failure is transient, not input-terminating.
+	if !errors.Is(err, transientError{}) {
+		t.Errorf("followSession() error = %v; want transientError", err)
+	}
+	if errors.Is(err, hardError{}) {
+		t.Errorf("followSession() error = %v; want non-hard error", err)
+	}
+	if state == nil {
+		t.Error("expected non-nil state on non-hard error")
+	}
+}
+
+func TestFollowSession_NonObjectMessage(t *testing.T) {
 	validEvent := `{"metadata":{"eventType":"TestEvent","offset":1},"event":{"TestField":"value"}}`
 
 	tests := []struct {
@@ -104,10 +152,9 @@ func TestFollowSession_NonObjectMessage(t *testing.T) {
 			}))
 			defer firehoseSrv.Close()
 
-			discoverResp := discoverResponse(t, firehoseSrv.URL+"/firehose")
 			discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprint(w, discoverResp)
+				fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
 			}))
 			defer discoverSrv.Close()
 
@@ -125,7 +172,130 @@ func TestFollowSession_NonObjectMessage(t *testing.T) {
 	}
 }
 
-func discoverResponse(t *testing.T, feedURL string) string {
+func TestUserAgentTransport(t *testing.T) {
+	const want = "Elastic-crowdstrike/4.0.0"
+
+	var got string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Get("User-Agent")
+	}))
+	defer srv.Close()
+
+	cli := srv.Client()
+	cli.Transport = userAgentTransport{ua: want, base: cli.Transport}
+
+	// http.Client.Do sets "Go-http-client/1.1" before RoundTrip;
+	// the transport must overwrite it.
+	req, err := http.NewRequestWithContext(t.Context(), "GET", srv.URL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := cli.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+
+	if got != want {
+		t.Errorf("User-Agent = %q; want %q", got, want)
+	}
+}
+
+func TestFollowSession_UserAgent(t *testing.T) {
+	const want = "Elastic-crowdstrike/4.0.0"
+
+	type requestRecord struct {
+		path      string
+		userAgent string
+	}
+	var (
+		mu       sync.Mutex
+		requests []requestRecord
+	)
+	record := func(r *http.Request) {
+		mu.Lock()
+		requests = append(requests, requestRecord{path: r.URL.Path, userAgent: r.Header.Get("User-Agent")})
+		mu.Unlock()
+	}
+
+	firehoseSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		record(r)
+		switch {
+		case strings.HasPrefix(r.URL.Path, "/firehose"):
+			// Send one event then EOF to end the session cleanly.
+			fmt.Fprintln(w, `{"metadata":{"eventType":"Test","offset":1},"event":{"field":"value"}}`)
+		case strings.HasPrefix(r.URL.Path, "/refresh"):
+			w.WriteHeader(http.StatusOK)
+		}
+	}))
+	defer firehoseSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		record(r)
+		w.Header().Set("Content-Type", "application/json")
+		// refreshActiveSessionInterval is short but refreshSessionWait
+		// clamps to a 15s floor, so no refresh fires during the test.
+		resp := map[string]any{
+			"resources": []map[string]any{
+				{
+					"dataFeedURL": firehoseSrv.URL + "/firehose",
+					"sessionToken": map[string]any{
+						"token":      "test-token",
+						"expiration": "2099-01-01T00:00:00Z",
+					},
+					"refreshActiveSessionURL":      firehoseSrv.URL + "/refresh",
+					"refreshActiveSessionInterval": 1,
+				},
+			},
+			"meta": map[string]any{},
+		}
+		b, _ := json.Marshal(resp)
+		_, _ = w.Write(b)
+	}))
+	defer discoverSrv.Close()
+
+	// Build clients wrapped with the userAgentTransport, matching the
+	// production wiring in NewFalconHoseFollower.
+	authClient := discoverSrv.Client()
+	authClient.Transport = userAgentTransport{ua: want, base: authClient.Transport}
+	plainClient := firehoseSrv.Client()
+	plainClient.Transport = userAgentTransport{ua: want, base: plainClient.Transport}
+
+	pub := new(countingPublisher)
+	s := newTestStreamWithPublisher(t, discoverSrv.URL, plainClient, pub)
+
+	state := map[string]any{}
+	_, err := s.followSession(context.Background(), authClient, state)
+	if err != nil {
+		t.Fatalf("followSession() unexpected error: %v", err)
+	}
+
+	// Check that the discover and firehose requests carried the custom
+	// User-Agent. We don't assert on refresh because the goroutine may
+	// or may not fire within the test window.
+	mu.Lock()
+	defer mu.Unlock()
+	var sawDiscover, sawFirehose bool
+	for _, r := range requests {
+		if r.userAgent != want {
+			t.Errorf("request to %s had User-Agent = %q; want %q", r.path, r.userAgent, want)
+		}
+		switch {
+		case r.path == "/" || r.path == "":
+			sawDiscover = true
+		case strings.HasPrefix(r.path, "/firehose"):
+			sawFirehose = true
+		}
+	}
+	if !sawDiscover {
+		t.Error("no discover request recorded")
+	}
+	if !sawFirehose {
+		t.Error("no firehose request recorded")
+	}
+}
+
+func discoverResponse(t *testing.T, feedURL, refreshURL string) string {
 	t.Helper()
 	resp := map[string]any{
 		"resources": []map[string]any{
@@ -135,7 +305,7 @@ func discoverResponse(t *testing.T, feedURL string) string {
 					"token":      "test-token",
 					"expiration": "2099-01-01T00:00:00Z",
 				},
-				"refreshActiveSessionURL":      "http://localhost/refresh",
+				"refreshActiveSessionURL":      refreshURL,
 				"refreshActiveSessionInterval": 1800,
 			},
 		},
@@ -155,7 +325,7 @@ func newTestStream(t *testing.T, discoverURL string, firehoseClient *http.Client
 
 func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient *http.Client, pub cursor.Publisher) *falconHoseStream {
 	t.Helper()
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, t.Name())
 	reg := monitoring.NewRegistry()
 	m := newInputMetrics(reg, log)
 
@@ -165,7 +335,7 @@ func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient
 			"events": [body],
 			?"cursor": body.?metadata.optMap(m, {"offset": m.offset}),
 		})
-	`, root, nil, log)
+	`, root, nil, "", log)
 	if err != nil {
 		t.Fatalf("failed to compile CEL program: %v", err)
 	}
