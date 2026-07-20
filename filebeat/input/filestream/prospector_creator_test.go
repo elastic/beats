@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestCreateProspector(t *testing.T) {
@@ -45,20 +45,19 @@ func TestCreateProspector(t *testing.T) {
 		}
 		for name, test := range testCases {
 			t.Run(name, func(t *testing.T) {
-				c := config{
-					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
-				}
-				p, _ := newProspector(c, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
+				c := defaultConfig()
+				c.IgnoreInactive = ignoreInactiveSettings[test.ignore_inactive_since]
+				p, err := newProspector(c, logptest.NewTestingLogger(t, ""), mustSourceIdentifier("foo-id"))
+				require.NoError(t, err)
 				fileProspector := p.(*fileProspector) //nolint:errcheck // we know the type
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
 			})
 		}
 	})
-	t.Run("file watcher and file identity compatibility", func(t *testing.T) {
+	t.Run("accepts every scanner fingerprint and file identity combination", func(t *testing.T) {
 		cases := []struct {
 			name   string
 			cfgStr string
-			err    string
 		}{
 			{
 				name: "returns no error for a fully default config",
@@ -75,7 +74,7 @@ prospector.scanner.fingerprint.enabled: true
 `,
 			},
 			{
-				name: "returns no error when fingerprint and other identity is configured",
+				name: "returns no error when deprecated scanner fingerprint contradicts the identity",
 				cfgStr: `
 paths: ['some']
 file_identity.path: ~
@@ -83,34 +82,76 @@ prospector.scanner.fingerprint.enabled: true
 `,
 			},
 			{
-				name: "returns error when fingerprint is disabled but fingerprint identity is configured",
+				name: "returns no error when the scanner fingerprint is disabled with fingerprint identity",
 				cfgStr: `
 paths: ['some']
 file_identity.fingerprint: ~
 prospector.scanner.fingerprint.enabled: false
 `,
-				err: "fingerprint file identity can be used only when fingerprint is enabled in the scanner",
+			},
+			{
+				name: "returns no error when the scanner fingerprint is disabled with omitted file identity",
+				cfgStr: `
+paths: ['some']
+prospector.scanner.fingerprint.enabled: false
+`,
 			},
 		}
 
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
+				logger := logptest.NewTestingLogger(t, "")
 				c, err := conf.NewConfigWithYAML([]byte(tc.cfgStr), tc.cfgStr)
 				require.NoError(t, err)
 
 				cfg := defaultConfig()
 				err = c.Unpack(&cfg)
 				require.NoError(t, err)
+				require.NoError(t, normalizeConfig(c, &cfg, logger))
 
-				_, err = newProspector(cfg, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
-				if tc.err == "" {
-					require.NoError(t, err)
-					return
-				}
-
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.err)
+				_, err = newProspector(cfg, logger, mustSourceIdentifier("foo-id"))
+				require.NoError(t, err)
 			})
+		}
+	})
+
+	t.Run("derives scanner fingerprinting from the identity when normalization is bypassed", func(t *testing.T) {
+		// The fingerprint identity without scanner fingerprints would
+		// silently collapse all files into one empty-fingerprint registry
+		// entry, so newProspector cannot trust the unpacked value.
+		cases := []struct {
+			cfgStr      string
+			wantEnabled bool
+		}{
+			{cfgStr: `
+paths: ['some']
+prospector.scanner.fingerprint.enabled: false
+`, wantEnabled: true},
+			{cfgStr: `
+paths: ['some']
+file_identity.fingerprint: ~
+prospector.scanner.fingerprint.enabled: false
+`, wantEnabled: true},
+			{cfgStr: `
+paths: ['some']
+file_identity.native: ~
+prospector.scanner.fingerprint.enabled: true
+`, wantEnabled: false},
+		}
+		for _, tc := range cases {
+			c, err := conf.NewConfigWithYAML([]byte(tc.cfgStr), tc.cfgStr)
+			require.NoError(t, err)
+
+			cfg := defaultConfig()
+			require.NoError(t, c.Unpack(&cfg))
+
+			p, err := newProspector(cfg, logptest.NewTestingLogger(t, ""), mustSourceIdentifier("foo-id"))
+			require.NoError(t, err)
+			fp, ok := p.(*fileProspector)
+			require.True(t, ok, "expected the standard file prospector, got %T", p)
+			watcher, ok := fp.filewatcher.(*fileWatcher)
+			require.True(t, ok, "expected the filestream file watcher, got %T", fp.filewatcher)
+			assert.Equal(t, tc.wantEnabled, watcher.cfg.Scanner.Fingerprint.Enabled, tc.cfgStr)
 		}
 	})
 
@@ -134,10 +175,10 @@ prospector.scanner.fingerprint.enabled: false
 
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
+				logger := logptest.NewTestingLogger(t, "")
 				cfgStr := fmt.Sprintf(`
 paths: ['some']
 %s
-prospector.scanner.fingerprint.enabled: true
 rotation.external.strategy.copytruncate:
   suffix_regex: '\.\d$'
 `, tc.fileIdentity)
@@ -147,9 +188,9 @@ rotation.external.strategy.copytruncate:
 
 				cfg := defaultConfig()
 				require.NoError(t, c.Unpack(&cfg), "test config must unpack into filestream config")
-				require.NoError(t, normalizeConfig(c, &cfg), "normalizeConfig must succeed")
+				require.NoError(t, normalizeConfig(c, &cfg, logger), "normalizeConfig must succeed")
 
-				p, err := newProspector(cfg, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
+				p, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"))
 				require.NoError(t, err, "creating the prospector must succeed")
 
 				if tc.wantCopyTruncate {

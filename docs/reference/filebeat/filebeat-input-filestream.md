@@ -411,7 +411,7 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
-In 9.x, scanner fingerprinting is enabled by default. When you explicitly configure a non-fingerprint `file_identity` (for example `native`, `path`, or `inode_marker`) and do not explicitly set `prospector.scanner.fingerprint.enabled`, Filebeat automatically disables scanner fingerprinting for that input.
+Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default when `file_identity` is omitted) and disables it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored; Filebeat logs a warning if its value contradicts the configured `file_identity`.
 
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
@@ -429,7 +429,7 @@ $$$filebeat-input-filestream-file-identity-fingerprint$$$
 :   The default behavior of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
 
 ::::{warning}
-This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint), which are enabled by default in 9.x. If you explicitly disable scanner fingerprinting, this file identity will not work. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint), which is enabled automatically when this file identity is used. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 ::::
 
 
@@ -1210,6 +1210,8 @@ Following are some scenarios where this can happen:
 
     Depending on a mounting approach, the device ID (which is also used for comparing files) might change after a reboot.
 
+The scanner computes fingerprints when the [`fingerprint` file identity](#filebeat-input-filestream-file-identity-fingerprint) (the default) is used and skips them for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored.
+
 
 **Configuration**
 
@@ -1222,7 +1224,6 @@ Normally, log lines contain timestamps and other unique fields that should be ab
 
 ```yaml
 fingerprint:
-  enabled: false
   offset: 0
   length: 1024
 ```

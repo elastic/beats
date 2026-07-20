@@ -52,8 +52,8 @@ type fingerprintIdentifier struct {
 
 // newFingerprintIdentifier constructs the fingerprint file identifier. The
 // `file_identity.fingerprint` sub-config (e.g. `growing`) is consumed and
-// validated later by normalizeConfig; the identifier itself does not
-// currently need those values at runtime.
+// validated by normalizeConfig; the identifier itself does not currently
+// need those values at runtime.
 func newFingerprintIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error) {
 	return &fingerprintIdentifier{}, nil
 }

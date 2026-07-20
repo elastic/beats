@@ -82,6 +82,11 @@ func (f fileSource) LogPath() string {
 	return f.oldPath
 }
 
+// usesFingerprintIdentity reports whether ns selects the fingerprint file identity (the default).
+func usesFingerprintIdentity(ns *conf.Namespace) bool {
+	return ns == nil || ns.Name() == fingerprintName
+}
+
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {
