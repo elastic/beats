@@ -79,37 +79,58 @@ func LoggingWithOutputs(beatName string, cfg *config.C, outputs ...zapcore.Core)
 	return logp.ConfigureWithOutputs(config, outputs...)
 }
 
-// LoggingWithTypedOutputsLocal applies some defaults and returns a logger instance
+// LoggingWithTypedOutputsLocal applies some defaults and returns a local logger instance
+// that also routes typed log entries to a separate output.
 func LoggingWithTypedOutputsLocal(beatName string, cfg, typedCfg *config.C, logKey, kind string, outputs ...zapcore.Core) (*logp.Logger, error) {
-	config := logp.DefaultConfig(environment)
-	config.Beat = beatName
+	logpConfig, typedLogpConfig, err := buildTypedOutputConfigs(beatName, cfg, typedCfg)
+	if err != nil {
+		return nil, err
+	}
+	return logp.ConfigureWithTypedOutputLocal(logpConfig, typedLogpConfig, logKey, kind, outputs...)
+}
+
+// LoggingWithTypedOutputsNonGlobal is identical to LoggingWithTypedOutputsLocal but does not
+// mutate the global logger, making it safe for creating component-specific loggers.
+func LoggingWithTypedOutputsNonGlobal(beatName string, cfg, typedCfg *config.C, logKey, kind string, outputs ...zapcore.Core) (*logp.Logger, error) {
+	logpConfig, typedLogpConfig, err := buildTypedOutputConfigs(beatName, cfg, typedCfg)
+	if err != nil {
+		return nil, err
+	}
+	return logp.ConfigureWithTypedOutputNonGlobal(logpConfig, typedLogpConfig, logKey, kind, outputs...)
+}
+
+// buildTypedOutputConfigs prepares the logging configuration for writing regular log entries
+// and typed event entries to separate outputs.
+func buildTypedOutputConfigs(beatName string, cfg, typedCfg *config.C) (logp.Config, logp.Config, error) {
+	logpConfig := logp.DefaultConfig(environment)
+	logpConfig.Beat = beatName
 	if cfg != nil {
-		if err := cfg.Unpack(&config); err != nil {
-			return nil, err
+		if err := cfg.Unpack(&logpConfig); err != nil {
+			return logp.Config{}, logp.Config{}, err
 		}
 	}
 
-	applyFlags(&config)
+	applyFlags(&logpConfig)
 
 	typedLogpConfig := logp.DefaultEventConfig(environment)
 	defaultName := typedLogpConfig.Files.Name
 	typedLogpConfig.Beat = beatName
 	if typedCfg != nil {
 		if err := typedCfg.Unpack(&typedLogpConfig); err != nil {
-			return nil, fmt.Errorf("cannot unpack typed output config: %w", err)
+			return logp.Config{}, logp.Config{}, fmt.Errorf("cannot unpack typed output config: %w", err)
 		}
 	}
 
 	// Make sure we're always running on the same log level
-	typedLogpConfig.Level = config.Level
-	typedLogpConfig.Selectors = config.Selectors
+	typedLogpConfig.Level = logpConfig.Level
+	typedLogpConfig.Selectors = logpConfig.Selectors
 
 	// If the name has not been configured, make it {beatName}-events-data
 	if typedLogpConfig.Files.Name == defaultName {
 		typedLogpConfig.Files.Name = beatName + "-events-data"
 	}
 
-	return logp.ConfigureWithTypedOutputLocal(config, typedLogpConfig, logKey, kind, outputs...)
+	return logpConfig, typedLogpConfig, nil
 }
 
 func applyFlags(cfg *logp.Config) {

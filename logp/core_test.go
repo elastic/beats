@@ -793,6 +793,44 @@ func TestConfigureWithCore(t *testing.T) {
 	})
 }
 
+func TestConfigureWithTypedOutputNonGlobal(t *testing.T) {
+	t.Run("does not mutate global logger", func(t *testing.T) {
+		globalCore, globalLogs := observer.New(zapcore.InfoLevel)
+		err := ConfigureWithCore(Config{}, globalCore)
+		require.NoError(t, err)
+
+		globalBefore := loadLogger()
+
+		defaultCfg := Config{Level: InfoLevel, toIODiscard: true}
+		typedCfg := Config{Level: InfoLevel, toIODiscard: true}
+
+		logger, err := ConfigureWithTypedOutputNonGlobal(defaultCfg, typedCfg, "log.type", "event")
+		require.NoError(t, err)
+		require.NotNil(t, logger)
+
+		assert.Same(t, globalBefore, loadLogger(), "ConfigureWithTypedOutputNonGlobal must not replace the global logger")
+
+		Info("from global logger")
+		require.Equal(t, 1, globalLogs.Len())
+		assert.Equal(t, "from global logger", globalLogs.All()[0].Message)
+	})
+
+	t.Run("returns a working logger", func(t *testing.T) {
+		defaultObserver, defaultLogs := observer.New(zapcore.InfoLevel)
+
+		defaultCfg := Config{Level: InfoLevel, toIODiscard: true}
+		typedCfg := Config{Level: InfoLevel, toIODiscard: true}
+
+		logger, err := ConfigureWithTypedOutputNonGlobal(defaultCfg, typedCfg, "log.type", "event", defaultObserver)
+		require.NoError(t, err)
+		require.NotNil(t, logger)
+
+		logger.Info("test message")
+		require.Equal(t, 1, defaultLogs.Len())
+		assert.Equal(t, "test message", defaultLogs.All()[0].Message)
+	})
+}
+
 func strField(key, val string) zapcore.Field {
 	return zapcore.Field{Type: zapcore.StringType, Key: key, String: val}
 }
