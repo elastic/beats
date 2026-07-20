@@ -50,7 +50,7 @@ func init() {
 type QuarkMetricSet struct {
 	MetricSet
 	queue        *quark.Queue // Quark runtime state
-	selfMntNsIno uint64       // Mnt inode from current process
+	selfMntNsIno uint32       // Mnt inode from current process
 	cachedHasher *hasher.CachedHasher
 }
 
