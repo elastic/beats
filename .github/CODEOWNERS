@@ -61,13 +61,8 @@ changelog/fragments/
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
-<<<<<<< HEAD
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
-/libbeat/management @elastic/elastic-agent-control-plane
-=======
-/libbeat/docs/processors-list.asciidoc @elastic/ski-docs
 /libbeat/management @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
->>>>>>> 6a6b93979 (CODEOWNERS: Control Plane: Add data plane as co-owner (#52070))
 /libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
 /libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
 /libbeat/processors/cache/ @elastic/security-service-integrations
@@ -126,11 +121,6 @@ changelog/fragments/
 /tools/ @elastic/elastic-agent-data-plane
 /winlogbeat/ @elastic/sec-windows-platform
 /x-pack/auditbeat/ @elastic/sec-linux-platform
-<<<<<<< HEAD
-/x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
-=======
-/x-pack/auditbeat/abreceiver/ @elastic/elastic-agent-data-plane
->>>>>>> 6a6b93979 (CODEOWNERS: Control Plane: Add data plane as co-owner (#52070))
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations
