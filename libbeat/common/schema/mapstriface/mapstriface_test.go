@@ -34,7 +34,7 @@ func TestConversions(t *testing.T) {
 
 	cTs := common.Time{}
 
-	input := map[string]interface{}{
+	input := map[string]any{
 		"testString":          "hello",
 		"testInt":             42,
 		"testIntFromFloat":    42.2,
@@ -45,11 +45,11 @@ func TestConversions(t *testing.T) {
 		"testJsonNumber":      json.Number("3910564293633576924"),
 		"testJsonNumberFloat": json.Number("43.7"),
 		"testBool":            true,
-		"testObj": map[string]interface{}{
+		"testObj": map[string]any{
 			"testObjString": "hello, object",
 		},
-		"rawObject": map[string]interface{}{
-			"nest1": map[string]interface{}{
+		"rawObject": map[string]any{
+			"nest1": map[string]any{
 				"nest2": "world",
 			},
 		},
@@ -113,8 +113,8 @@ func TestConversions(t *testing.T) {
 		"test_obj_2": mapstr.M{
 			"test": "hello, object",
 		},
-		"test_nested": map[string]interface{}{
-			"nest1": map[string]interface{}{
+		"test_nested": map[string]any{
+			"nest1": map[string]any{
 				"nest2": "world",
 			},
 		},
@@ -128,14 +128,14 @@ func TestConversions(t *testing.T) {
 func TestOptionalField(t *testing.T) {
 	cases := []struct {
 		Description string
-		Input       map[string]interface{}
+		Input       map[string]any
 		Schema      s.Schema
 		Expected    mapstr.M
 		ExpectError bool
 	}{
 		{
 			"missing optional field",
-			map[string]interface{}{
+			map[string]any{
 				"testString": "hello",
 				"testInt":    42,
 			},
@@ -152,7 +152,7 @@ func TestOptionalField(t *testing.T) {
 		},
 		{
 			"wrong format in optional field",
-			map[string]interface{}{
+			map[string]any{
 				"testInt": "hello",
 			},
 			s.Schema{
@@ -178,7 +178,7 @@ func TestFullFieldPathInErrors(t *testing.T) {
 	cases := []struct {
 		Description string
 		Schema      s.Schema
-		Input       map[string]interface{}
+		Input       map[string]any
 		Expected    string
 	}{
 		{
@@ -190,9 +190,9 @@ func TestFullFieldPathInErrors(t *testing.T) {
 					}),
 				}),
 			},
-			map[string]interface{}{
-				"A": map[string]interface{}{
-					"B": map[string]interface{}{},
+			map[string]any{
+				"A": map[string]any{
+					"B": map[string]any{},
 				},
 			},
 			`A.B.C`,
@@ -204,8 +204,8 @@ func TestFullFieldPathInErrors(t *testing.T) {
 					"test_bool": Bool("testBool"),
 				}),
 			},
-			map[string]interface{}{
-				"testDict": map[string]interface{}{
+			map[string]any{
+				"testDict": map[string]any{
 					"testBool": "foo",
 				},
 			},
@@ -218,8 +218,8 @@ func TestFullFieldPathInErrors(t *testing.T) {
 					"test_dict": Dict("testDict", s.Schema{}),
 				}),
 			},
-			map[string]interface{}{
-				"testDict": map[string]interface{}{
+			map[string]any{
+				"testDict": map[string]any{
 					"testDict": "foo",
 				},
 			},
@@ -232,7 +232,7 @@ func TestFullFieldPathInErrors(t *testing.T) {
 					"test_dict": Dict("testDict", s.Schema{}),
 				}),
 			},
-			map[string]interface{}{},
+			map[string]any{},
 			`rootDict`,
 		},
 	}
@@ -257,15 +257,15 @@ func TestFullFieldPathInErrors(t *testing.T) {
 func TestNestedFieldPaths(t *testing.T) {
 	cases := []struct {
 		Description string
-		Input       map[string]interface{}
+		Input       map[string]any
 		Schema      s.Schema
 		Expected    mapstr.M
 		ExpectError bool
 	}{
 		{
 			"nested values",
-			map[string]interface{}{
-				"root": map[string]interface{}{
+			map[string]any{
+				"root": map[string]any{
 					"foo":   "bar",
 					"float": 4.5,
 					"int":   4,
@@ -288,7 +288,7 @@ func TestNestedFieldPaths(t *testing.T) {
 		},
 		{
 			"not really nested values, path contains dots",
-			map[string]interface{}{
+			map[string]any{
 				"root.foo": "bar",
 			},
 			s.Schema{
@@ -301,9 +301,9 @@ func TestNestedFieldPaths(t *testing.T) {
 		},
 		{
 			"nested dict",
-			map[string]interface{}{
-				"root": map[string]interface{}{
-					"dict": map[string]interface{}{
+			map[string]any{
+				"root": map[string]any{
+					"dict": map[string]any{
 						"foo": "bar",
 					},
 				},

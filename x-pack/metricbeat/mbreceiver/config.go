@@ -9,7 +9,7 @@ import "fmt"
 // Config is config settings for metricbeat receiver.  The structure of
 // which is the same as the metricbeat.yml configuration file.
 type Config struct {
-	Beatconfig map[string]interface{} `mapstructure:",remain"`
+	Beatconfig map[string]any `mapstructure:",remain"`
 }
 
 // Validate checks if the configuration in valid

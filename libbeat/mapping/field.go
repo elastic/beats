@@ -20,6 +20,7 @@ package mapping
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -110,7 +111,7 @@ type VersionizedString struct {
 	Value      string `config:"value"`
 }
 
-type DynamicType struct{ Value interface{} }
+type DynamicType struct{ Value any }
 
 func (d *DynamicType) Unpack(s string) error {
 	switch s {
@@ -128,10 +129,10 @@ func (d *DynamicType) Unpack(s string) error {
 
 type Analyzer struct {
 	Name       string
-	Definition interface{}
+	Definition any
 }
 
-func (a *Analyzer) Unpack(v interface{}) error {
+func (a *Analyzer) Unpack(v any) error {
 	var m mapstr.M
 	switch v := v.(type) {
 	case string:
@@ -139,7 +140,7 @@ func (a *Analyzer) Unpack(v interface{}) error {
 		return nil
 	case mapstr.M:
 		m = v
-	case map[string]interface{}:
+	case map[string]any:
 		m = mapstr.M(v)
 	default:
 		return fmt.Errorf("'%v' is invalid analyzer setting", v)
@@ -223,22 +224,13 @@ func validateAllowedValue(fieldName string, propertyName string, propertyValue s
 	if len(allowedPropertyValues) == 0 {
 		return fmt.Errorf("no %s expected for field '%s', found: %s", propertyName, fieldName, propertyValue)
 	}
-	if !stringsContains(allowedPropertyValues, propertyValue) {
+	if !slices.Contains(allowedPropertyValues, propertyValue) {
 		return fmt.Errorf(
 			"unexpected %s '%s' for field '%s', expected one of: %s",
 			propertyName, propertyValue, fieldName, strings.Join(allowedPropertyValues, ", "),
 		)
 	}
 	return nil
-}
-
-func stringsContains(haystack []string, needle string) bool {
-	for _, v := range haystack {
-		if v == needle {
-			return true
-		}
-	}
-	return false
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {

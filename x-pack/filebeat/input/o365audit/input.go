@@ -97,7 +97,7 @@ func (inp *o365input) Name() string { return pluginName }
 
 func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 	tenantID := src.(*stream).tenantID
-	auth, err := inp.config.NewTokenProvider(tenantID)
+	auth, err := inp.config.NewTokenProvider(tenantID, ctx.Logger)
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func (inp *o365input) run(v2ctx v2.Context, stream *stream, cursor cursor.Cursor
 	log := v2ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
 	ctx := ctxtool.FromCanceller(v2ctx.Cancelation)
 
-	tokenProvider, err := inp.config.NewTokenProvider(stream.tenantID)
+	tokenProvider, err := inp.config.NewTokenProvider(stream.tenantID, log)
 	if err != nil {
 		return err
 	}

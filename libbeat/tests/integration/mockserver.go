@@ -111,7 +111,7 @@ func doesStateMatch(
 	return observed.FeaturesIdx == expected.FeaturesIdx
 }
 
-func RequireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
+func RequireNewStruct(t *testing.T, v map[string]any) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
 		require.NoError(t, err, "could not convert map[string]interface{} into structpb")

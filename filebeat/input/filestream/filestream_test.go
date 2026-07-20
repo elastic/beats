@@ -20,7 +20,7 @@ package filestream
 import (
 	"context"
 	"io"
-	"io/ioutil"
+
 	"os"
 	"path/filepath"
 	"testing"
@@ -57,7 +57,6 @@ func TestLogFileTimedClosing(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		f := createTestLogFile()
 		defer f.Close()
@@ -116,7 +115,7 @@ func TestLogFileTruncated(t *testing.T) {
 }
 
 func createTestLogFile() *os.File {
-	f, err := ioutil.TempFile("", "filestream_reader_test")
+	f, err := os.CreateTemp("", "filestream_reader_test")
 	if err != nil {
 		panic(err)
 	}

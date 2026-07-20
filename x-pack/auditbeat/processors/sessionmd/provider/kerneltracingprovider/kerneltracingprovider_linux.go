@@ -88,8 +88,8 @@ func readPIDNsInode() (uint64, error) {
 // NewProvider returns a new instance of kerneltracingprovider
 func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER | quark.QQ_NO_SNAPSHOT
-	qq, err := quark.OpenQueue(attr, 64)
+	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER
+	qq, err := quark.OpenQueue(attr)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %w", err)
 	}
@@ -111,12 +111,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 		defer qq.Close()
 		for ctx.Err() == nil {
 			p.qqMtx.Lock()
-			events, err := qq.GetEvents()
+			// We just drive quark to populate the cache, not interested in the events
+			_, ok := qq.GetEvent()
 			p.qqMtx.Unlock()
-			if err != nil {
-				logger.Errorw("get events from quark, no more process enrichment from this processor will be done", "error", err)
-				break
-			}
+			// Is it time to update stats?
 			if time.Since(lastUpdate) > time.Second*5 {
 				p.qqMtx.Lock()
 				metrics := qq.Stats()
@@ -130,7 +128,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				lastUpdate = time.Now()
 			}
 
-			if len(events) == 0 {
+			// Quark is idle, Block for a bit
+			if !ok {
 				err = qq.Block()
 				if err != nil {
 					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
@@ -257,13 +256,13 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Minor: proc.Proc.TtyMinor,
 	})
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	ret := types.Process{
 		PID:              proc.Pid,
 		Start:            &start,
-		Name:             basename(proc.Filename),
-		Executable:       proc.Filename,
+		Name:             basename(proc.Exe),
+		Executable:       proc.Exe,
 		Args:             proc.Cmdline,
 		WorkingDirectory: proc.Cwd,
 		Interactive:      &interactive,
@@ -281,10 +280,10 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	if ok {
 		ret.Group.Name = groupname
 	}
-	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor)
-	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor)
+	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor) //nolint:gosec // tty major/minor numbers fit in uint16
+	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor) //nolint:gosec // tty major/minor numbers fit in uint16
 	if proc.Exit.Valid {
-		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess))
+		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess)) //nolint:gosec // ExitTimeProcess is a nanosecond timestamp that fits in int64
 		ret.ExitCode = proc.Exit.ExitCode
 		ret.End = &end
 	}
@@ -313,7 +312,7 @@ func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
@@ -322,8 +321,8 @@ func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 	egid := proc.Proc.Egid
 	process.Parent.PID = proc.Pid
 	process.Parent.Start = &start
-	process.Parent.Name = basename(proc.Filename)
-	process.Parent.Executable = proc.Filename
+	process.Parent.Name = basename(proc.Exe)
+	process.Parent.Executable = proc.Exe
 	process.Parent.Args = proc.Cmdline
 	process.Parent.WorkingDirectory = proc.Cwd
 	process.Parent.Interactive = &interactive
@@ -347,7 +346,7 @@ func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -357,8 +356,8 @@ func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	egid := proc.Proc.Egid
 	process.GroupLeader.PID = proc.Pid
 	process.GroupLeader.Start = &start
-	process.GroupLeader.Name = basename(proc.Filename)
-	process.GroupLeader.Executable = proc.Filename
+	process.GroupLeader.Name = basename(proc.Exe)
+	process.GroupLeader.Executable = proc.Exe
 	process.GroupLeader.Args = proc.Cmdline
 	process.GroupLeader.WorkingDirectory = proc.Cwd
 	process.GroupLeader.Interactive = &interactive
@@ -382,7 +381,7 @@ func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -392,8 +391,8 @@ func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	egid := proc.Proc.Egid
 	process.SessionLeader.PID = proc.Pid
 	process.SessionLeader.Start = &start
-	process.SessionLeader.Name = basename(proc.Filename)
-	process.SessionLeader.Executable = proc.Filename
+	process.SessionLeader.Name = basename(proc.Exe)
+	process.SessionLeader.Executable = proc.Exe
 	process.SessionLeader.Args = proc.Cmdline
 	process.SessionLeader.WorkingDirectory = proc.Cwd
 	process.SessionLeader.Interactive = &interactive
@@ -417,7 +416,7 @@ func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -490,13 +489,11 @@ func setSameAsProcess(process *types.Process) {
 // This is a globally unique identifier for the process.
 func calculateEntityIDv1(pid uint32, startTime time.Time) string {
 	return base64.StdEncoding.EncodeToString(
-		[]byte(
-			fmt.Sprintf("%d__%s__%d__%d",
-				pidNsInode,
-				bootID,
-				uint64(pid),
-				uint64(startTime.Unix()),
-			),
+		fmt.Appendf(nil, "%d__%s__%d__%d",
+			pidNsInode,
+			bootID,
+			uint64(pid),
+			uint64(startTime.Unix()), //nolint:gosec // process start times are always positive
 		),
 	)
 }

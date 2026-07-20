@@ -210,7 +210,7 @@ func NewPodEventer(
 }
 
 // OnAdd ensures processing of pod objects that are newly added.
-func (p *pod) OnAdd(obj interface{}) {
+func (p *pod) OnAdd(obj any) {
 	p.crossUpdate.RLock()
 	defer p.crossUpdate.RUnlock()
 
@@ -219,21 +219,21 @@ func (p *pod) OnAdd(obj interface{}) {
 }
 
 // OnUpdate handles events for pods that have been updated.
-func (p *pod) OnUpdate(obj interface{}) {
+func (p *pod) OnUpdate(obj any) {
 	p.crossUpdate.RLock()
 	defer p.crossUpdate.RUnlock()
 
 	p.unlockedUpdate(obj)
 }
 
-func (p *pod) unlockedUpdate(obj interface{}) {
+func (p *pod) unlockedUpdate(obj any) {
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "stop")
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
 // OnDelete stops pod objects that are deleted.
-func (p *pod) OnDelete(obj interface{}) {
+func (p *pod) OnDelete(obj any) {
 	p.crossUpdate.RLock()
 	defer p.crossUpdate.RUnlock()
 

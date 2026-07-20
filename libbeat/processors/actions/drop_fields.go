@@ -20,6 +20,7 @@ package actions
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"errors"
@@ -75,8 +76,8 @@ func newDropFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 	// Parse regexp containing fields and removes them from initial config
 	regexpFields := make([]match.Matcher, 0)
-	for i := len(configFields) - 1; i >= 0; i-- {
-		field := configFields[i]
+	for i, v := range slices.Backward(configFields) {
+		field := v
 		if strings.HasPrefix(field, "/") && strings.HasSuffix(field, "/") && len(field) > 2 {
 			configFields = append(configFields[:i], configFields[i+1:]...)
 

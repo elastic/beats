@@ -133,11 +133,9 @@ func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 		r.registries[ns] = reg
 	}
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		r.snapshotLoop()
-	}()
+	})
 	return r, nil
 }
 
@@ -252,8 +250,8 @@ func snapshotLen(s monitoring.FlatSnapshot) int {
 	return len(s.Bools) + len(s.Floats) + len(s.Ints) + len(s.Strings)
 }
 
-func toKeyValuePairs(snaps map[string]monitoring.FlatSnapshot) []interface{} {
-	args := []interface{}{logp.Namespace("monitoring")}
+func toKeyValuePairs(snaps map[string]monitoring.FlatSnapshot) []any {
+	args := []any{logp.Namespace("monitoring")}
 
 	for name, snap := range snaps {
 		data := make(mapstr.M, snapshotLen(snap))
