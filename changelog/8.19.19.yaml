@@ -1,0 +1,465 @@
+version: 8.19.19
+entries:
+    - kind: enhancement
+      summary: Optimize filestream logger performance
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1777530175
+      file:
+        name: 1777530175-orestisfl-reduce-harvester-logger-clones.yaml
+        checksum: 1c039070dd9aa735b5bf6c1aec223b4c7db3fd2d
+    - kind: bug-fix
+      summary: Filestream now defers shutdown until it reaches EOF or a configurable timeout. The new read_until_eof option (enabled by default) lets users opt out.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/40447
+      impact: ""
+      action: ""
+      timestamp: 1778068402
+      file:
+        name: 1778068402-filestream-read-until-eof.yaml
+        checksum: 24985b630752c7b99d9939b33ca5003f7117534d
+    - kind: bug-fix
+      summary: Fix race condition during metricset closure
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1779368469
+      file:
+        name: 1779368469-fix-race-mb.yaml
+        checksum: a0942ca68e719128c7513cfbbff1df940f80c683
+    - kind: bug-fix
+      summary: Validate that HTTPJSON pagination URLs share the configured request URL origin.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1782167932
+      file:
+        name: 1782167932-httpjson-pagination-origin-validation.yaml
+        checksum: 301be1c5d0aa2ccfa089a56cf86398f6246da962
+    - kind: bug-fix
+      summary: Fix a rare crash when osquery restarts after a configuration change
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1782246918
+      file:
+        name: 1782246918-fix-osquerybeat-runner-cancel-data-race.yaml
+        checksum: 7c5bc40f8e39c0ca169253003d1c0317e8a535b2
+    - kind: bug-fix
+      summary: Fix Filebeat duplicating events after a normal shutdown caused by a race in the registrar
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1782376956
+      file:
+        name: 1782376956-fix-filebeat-duplicating-events-after-a-normal-shutdown-caused-by-a-race-in-the-registrar.yaml
+        checksum: aafa4e2e9d03fbffd3a028c3f90593cf1bcee26a
+    - kind: bug-fix
+      summary: Avoid slice-bounds panic when sorting copytruncate rotated files by date
+      description: |
+        When the filestream copytruncate prospector sorts rotated files using a date format, `dateSorter.GetTs` sliced the file path by the format length without checking the path was long enough. A path shorter than the configured date format triggered a "slice bounds out of range" panic inside a prospector goroutine, crashing the process. GetTs now returns a zero time for paths shorter than the format, mirroring the existing parse-failure path.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1782459050
+      file:
+        name: 1782459050-fix-filestream-copytruncate-date-sorter-panic.yaml
+        checksum: a6905d37f5a8f70326bf1e6da981f03105bd7a94
+    - kind: bug-fix
+      summary: Fix registry corruption issue with multiple metricbeat receivers.
+      description: |
+        Change paths definition from global paths to per beat instance paths.  Without this multiple metricbeat receivers could use the same data store.
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/51591
+      issue:
+        - https://github.com/elastic/elastic-agent/issues/15154
+      impact: ""
+      action: ""
+      timestamp: 1782499306
+      file:
+        name: 1782499306-remove-global-paths-from-metricbeat.yaml
+        checksum: 0ffe1f4f67925689d994dc6b0341991889385ce9
+    - kind: bug-fix
+      summary: Fix type loss in HTTP JSON template transform handling.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1782697626
+      file:
+        name: 1782697626-i19811-httpjson.yaml
+        checksum: f5d113ec8dcc3cc3d73e56b5e2c4f34653f24eeb
+    - kind: other
+      summary: Bump Node.js to 22.23.1 and npm to 11.18.0 in the Heartbeat synthetics Docker image.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1782832304
+      file:
+        name: 1782832304-bump-heartbeat-nodejs-22.23-npm-11.18.yaml
+        checksum: a34c97a99077aa54a8a97e421c7764e89fbb11c2
+    - kind: bug-fix
+      summary: Fix filestream data loss when a harvester closes before ingesting any data
+      description: |
+        When a filestream harvester was closed before ingesting anything (for example while still in its initial backoff), it reported an ingested offset of 0. The file watcher could not distinguish this genuine 0 from "no offset reported", so it fell back to the file size and never emitted a write event. As a result no new harvester was started and the file's contents were never ingested, causing silent data loss. The reported offset of 0 is now honored, so a new harvester is started and the file is ingested.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1782902506
+      file:
+        name: 1782902506-fix-filestream-offset-0-harvester-close.yaml
+        checksum: 4e0162f0819026c2b9c0640987d2154bbc5d13a2
+    - kind: enhancement
+      summary: Add a configurable retry policy to the Azure Blob Storage input.
+      description: |
+        The `azure-blob-storage` input now exposes a `retry` configuration block (`max_retries`, `initial_retry_delay` and `max_retry_delay`) that tunes the Azure SDK retry policy. Because the policy lives in the client request pipeline, it now covers blob listing (pagination) in addition to downloads; previously a transient error such as an HTTP 503 `ServerBusy` during listing could exhaust the small, non-configurable default retries and stop the input. The settings apply per storage account. Defaults are unchanged when the block is omitted. Additionally, when polling is enabled, a transient blob-listing failure that outlives the retries (503, 429 or a network timeout) is now non-fatal: the input is marked degraded and retries on the next poll interval instead of exiting, so longer outages are ridden out. Permanent failures such as a missing container still stop the input.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/44629
+      impact: ""
+      action: ""
+      timestamp: 1783054266
+      file:
+        name: 1783054266-azureblobstorage-configurable-retries.yaml
+        checksum: f467e74d3ff416caec3f367a95f68f39d835d036
+    - kind: bug-fix
+      summary: Fix goroutine leak when processor construction fails.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783070100
+      file:
+        name: 1783070100-close-processors-on-construction-errors.yaml
+        checksum: 6bef0c70d07fc8850ff53ef5906a99666aa8c4a1
+    - kind: bug-fix
+      summary: fix data races in the add_docker_metadata cache initialization
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783070200
+      file:
+        name: 1783070200-fix-add-docker-metadata-cgroup-cache-races.yaml
+        checksum: c3324d9849e8d4bd83193bfef21eb283cb7c597c
+    - kind: bug-fix
+      summary: Fix CrowdStrike streaming input retry cap so max_attempts and infinite_retries are honoured.
+      description: |
+        Fix the CrowdStrike streaming input retry loop so a configured max_attempts
+        greater than 10 and infinite_retries are no longer silently capped at the
+        unconfigured default of 10. The empty-body case from the discover endpoint is
+        now reported as a distinct transient error, and the input no longer reports
+        DEGRADED on the first transient failure.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783081692
+      file:
+        name: 1783081692-fix-crowdstrike-streaming-retry-cap.yaml
+        checksum: d356cf72c853d04c6e2632aef2e0c3fb62c161d7
+    - kind: bug-fix
+      summary: Fix a data race in the rate_limit processor when configured with fields and run concurrently.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783323647
+      file:
+        name: 1783323647-ratelimit-fields-data-race.yaml
+        checksum: 98a3f0c489de323bf85a55165c053cd3c225c8ef
+    - kind: bug-fix
+      summary: Fix data races in the add_session_metadata kernel_tracing provider backoff accounting
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783323813
+      file:
+        name: 1783323813-fix-add-session-metadata-kerneltracing-backoff-race.yaml
+        checksum: c2b3fd537e4f56de51b91267c9422f0843b77a62
+    - kind: bug-fix
+      summary: Close Beat processors on beat OTel processor shutdown to avoid leaking resources on collector reloads.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783323892
+      file:
+        name: 1783323892-beatprocessor-close-on-shutdown.yaml
+        checksum: 88a7b87ad1976db5024165215424eef3db9d7084
+    - kind: bug-fix
+      summary: Fix a startup data race in the add_kubernetes_metadata processor
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783324408
+      file:
+        name: 1783324408-fix-add-kubernetes-metadata-async-init-race.yaml
+        checksum: c1d556f05d1e9cd090a1e713db71a81b45eddcee
+    - kind: bug-fix
+      summary: Make the CrowdStrike streaming input self-heal from transient discover failures.
+      description: |
+        Transient connection-level failures from the CrowdStrike discover endpoint
+        (an empty 200 body, network errors and timeouts) are now retried indefinitely
+        with capped back-off instead of counting toward max_attempts and terminating
+        the input, so the input self-heals once the upstream recovers rather than
+        needing an agent restart. Termination is reserved for genuine hard errors
+        (origin mismatch, publish failure); other soft errors, including OAuth auth
+        failures from bad credentials, still honour the configured attempt limit.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1783326685
+      file:
+        name: 1783326685-crowdstrike-streaming-self-heal-transient.yaml
+        checksum: bb7102166aeafd0ee6d6dde6a24422c1f8cdb619
+    - kind: bug-fix
+      summary: Prevent Filebeat startup failure when meta.json is left empty after migration
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51791
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783441656
+      file:
+        name: 1783441656-make-creation-of-meta.json-atomic.yaml
+        checksum: 6d3d74e8fc87eaf131907894ce82f36d74789ed3
+    - kind: bug-fix
+      summary: Fix aws-s3 input not performing backup_to_bucket and delete_after_backup in polling mode
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/46672
+      impact: ""
+      action: ""
+      timestamp: 1783515049
+      file:
+        name: 1783515049-fix-s3-poller-backup-delete.yaml
+        checksum: 2df3c8e53330d4c6e1c39f5210ed6ca23cbee077
+    - kind: bug-fix
+      summary: Fix goroutine leak in request trace logging infrastructure.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50853
+        - https://github.com/elastic/beats/pull/51800
+        - https://github.com/elastic/beats/pull/51864
+        - https://github.com/elastic/beats/pull/51915
+        - https://github.com/elastic/beats/pull/52010
+        - https://github.com/elastic/beats/pull/52033
+        - https://github.com/elastic/beats/pull/52041
+      issue:
+        - https://github.com/elastic/beats/issues/52002
+      impact: ""
+      action: ""
+      timestamp: 1784080439
+      file:
+        name: 1784080439-49092-lumberjack.yaml
+        checksum: 5f66e838b3ec7c9b489b61a8a9c08b1316092e4a
