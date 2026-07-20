@@ -16,8 +16,6 @@
 // under the License.
 
 //go:build integration && (linux || darwin || windows)
-// +build integration
-// +build linux darwin windows
 
 package docker
 

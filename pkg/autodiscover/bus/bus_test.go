@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:forbidigo // tests verify bus behavior with the global logger
 package bus
 
 import (
