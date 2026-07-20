@@ -292,6 +292,16 @@ func (r *readerAdapter) Close() error {
 	return r.r.Close()
 }
 
+// SetReadDeadline delegates to the underlying journal reader if it honors
+// deadlines, letting the multiline timeout be enforced synchronously without a
+// goroutine (see reader.DeadlineSetter).
+func (r *readerAdapter) SetReadDeadline(t time.Time) bool {
+	if d, ok := r.r.(reader.DeadlineSetter); ok {
+		return d.SetReadDeadline(t)
+	}
+	return false
+}
+
 func (r *readerAdapter) Next() (reader.Message, error) {
 	data, err := r.r.Next(r.canceler)
 	if err != nil {

@@ -133,6 +133,12 @@ func (r *JSONReader) Close() error {
 	return r.reader.Close()
 }
 
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+// It is promoted to JSONParser through the embedded JSONReader.
+func (r *JSONReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(r.reader, t)
+}
+
 func createJSONError(message string) mapstr.M {
 	return mapstr.M{"message": message, "type": "json"}
 }

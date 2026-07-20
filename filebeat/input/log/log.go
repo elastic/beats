@@ -18,12 +18,13 @@
 package log
 
 import (
+	"errors"
 	"io"
-	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -37,6 +38,14 @@ type Log struct {
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
+
+	// readDeadline bounds how long Read waits for new data at EOF before
+	// returning reader.ErrReadDeadline. Zero means no deadline. It is set and read
+	// only by the harvester read goroutine (via SetReadDeadline before Read), so
+	// it needs no synchronization. deadlineTimer is reused across waits to avoid a
+	// per-wait allocation.
+	readDeadline  time.Time
+	deadlineTimer *time.Timer
 }
 
 // NewLog creates a new log instance to read log sources
@@ -48,7 +57,7 @@ func NewLog(
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
 		var err error
-		offset, err = seeker.Seek(0, os.SEEK_CUR)
+		offset, err = seeker.Seek(0, io.SeekCurrent)
 		if err != nil {
 			return nil, err
 		}
@@ -109,14 +118,27 @@ func (f *Log) Read(buf []byte) (int, error) {
 		}
 
 		f.logger.Debugf("End of file reached: %s; Backoff now.", f.fs.Name())
-		f.wait()
+		if !f.wait() {
+			return totalN, reader.ErrReadDeadline
+		}
 	}
+}
+
+// SetReadDeadline bounds how long Read waits for new data at EOF before
+// returning reader.ErrReadDeadline. A zero time clears the deadline. Log honors
+// it (its EOF wait is a cancellable sleep), so it returns true; this lets the
+// multiline timeout reader bound the wait synchronously without a goroutine. It
+// is called by the harvester read goroutine before a read, so it needs no
+// synchronization with Read.
+func (f *Log) SetReadDeadline(t time.Time) bool {
+	f.readDeadline = t
+	return true
 }
 
 // errorChecks determines the cause for EOF errors, and how the EOF event should be handled
 // based on the config options.
 func (f *Log) errorChecks(err error) error {
-	if err != io.EOF {
+	if !errors.Is(err, io.EOF) {
 		f.logger.Errorf("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
 		return err
 	}
@@ -193,15 +215,54 @@ func (f *Log) checkFileDisappearedErrors() error {
 	return nil
 }
 
-func (f *Log) wait() {
-	// Wait before trying to read file again. File reached EOF.
-	select {
-	case <-f.done:
-		return
-	case <-time.After(f.backoff):
+// wait blocks before retrying a read after EOF. It returns false if a read
+// deadline (set via SetReadDeadline) elapses first, telling Read to return
+// reader.ErrReadDeadline. Without a deadline it uses the normal exponential
+// backoff; with one it polls bounded by the remaining time so the deadline is
+// honored. The block is a cancellable sleep, so no goroutine is needed to bound it.
+func (f *Log) wait() bool {
+	if f.readDeadline.IsZero() {
+		select {
+		case <-f.done:
+			return true
+		case <-time.After(f.backoff):
+		}
+		f.incBackoff()
+		return true
 	}
 
-	// Increment backoff up to maxBackoff
+	remaining := time.Until(f.readDeadline)
+	if remaining <= 0 {
+		return false
+	}
+	wait := f.backoff
+	atDeadline := false
+	if wait <= 0 || wait >= remaining {
+		wait, atDeadline = remaining, true
+	}
+
+	// Reuse the timer across waits to avoid a per-wait allocation. Go 1.23+ (see
+	// go.mod) makes Reset/Stop safe without draining the channel.
+	if f.deadlineTimer == nil {
+		f.deadlineTimer = time.NewTimer(0)
+		f.deadlineTimer.Stop()
+	}
+	f.deadlineTimer.Reset(wait)
+	select {
+	case <-f.done:
+		f.deadlineTimer.Stop()
+		return true
+	case <-f.deadlineTimer.C:
+		if atDeadline {
+			return false
+		}
+	}
+	f.incBackoff()
+	return true
+}
+
+// incBackoff increases the backoff up to MaxBackoff.
+func (f *Log) incBackoff() {
 	if f.backoff < f.config.MaxBackoff {
 		f.backoff = min(f.backoff*time.Duration(f.config.BackoffFactor), f.config.MaxBackoff)
 	}
