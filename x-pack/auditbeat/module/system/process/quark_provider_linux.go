@@ -67,11 +67,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch self mount inode: %w", err)
 	}
-<<<<<<< HEAD
-	qm.selfMntNsIno = ino64
-=======
 	qm.selfMntNsIno = uint32(ino64) //nolint:gosec // mount namespace inodes fit in uint32
->>>>>>> 25a0b3742 (auditbeat: Update to quark 0.6.0 (#51767))
 	qm.cachedHasher, err = hasher.NewFileHasherWithCache(qm.config.HasherConfig, 4096)
 	if err != nil {
 		return nil, fmt.Errorf("can't create hash cache: %w", err)
@@ -204,11 +200,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event, snap bool) (mb.Event, 
 
 	// Ids
 	event.RootFields.Put("process.parent.pid", process.Proc.Ppid)
-<<<<<<< HEAD
-	startTime := time.Unix(0, int64(process.Proc.TimeBoot)) //nolint:gosec // 292 billion years is enough
-=======
 	startTime := time.Unix(0, int64(process.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
->>>>>>> 25a0b3742 (auditbeat: Update to quark 0.6.0 (#51767))
 	if ms.HostID() != "" {
 		// TODO unify with sessionview and guarantee loss of precision
 		event.RootFields.Put("process.entity_id",

@@ -198,21 +198,9 @@ func drainFirstOfPid(t *testing.T, qq *quark.Queue, pid int) quark.Event {
 	start := time.Now()
 
 	for {
-<<<<<<< HEAD
-		qevs, err := qq.GetEvents()
-		require.NoError(t, err)
-		for _, qev := range qevs {
-			if !wantedEvent(qev) {
-				continue
-			}
-			if int(qev.Process.Pid) == pid {
-				return qev
-			}
-=======
 		qev, ok := qq.GetEvent()
 		if ok && wantedEvent(qev) && qev.Process.Pid == uint32(pid) { //nolint:gosec // PID values fit in uint32
 			return qev
->>>>>>> 25a0b3742 (auditbeat: Update to quark 0.6.0 (#51767))
 		}
 		if time.Since(start) > time.Second {
 			break
@@ -234,14 +222,8 @@ func firstEventOfPid(t *testing.T, events []mb.Event, pid int) mb.Event {
 	for _, event := range events {
 		pid2, err := event.RootFields.GetValue("process.pid")
 		require.NoError(t, err)
-<<<<<<< HEAD
-		x, ok := pid2.(uint32)
-		require.True(t, ok)
-		if x == uint32(pid) { //nolint:gosec // pid in kernel is 32bit
-=======
 		pid2u32, ok := pid2.(uint32)
 		if ok && pid2u32 == uint32(pid) { //nolint:gosec // PID values fit in uint32
->>>>>>> 25a0b3742 (auditbeat: Update to quark 0.6.0 (#51767))
 			return event
 		}
 	}
@@ -276,17 +258,10 @@ func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 			"process.name":                          qp.Comm,
 			"process.args":                          qp.Cmdline,
 			"process.args_count":                    len(qp.Cmdline),
-<<<<<<< HEAD
-			"process.pid":                           uint32(os.Getpid()), //nolint:gosec // pid in kernel is 32bit
-			"process.executable":                    exe,
-			"process.parent.pid":                    uint32(os.Getppid()),                  //nolint:gosec // pid in kernel is 32bit
-			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)), //nolint:gosec // 292 billion years is enough
-=======
 			"process.pid":                           uint32(os.Getpid()), //nolint:gosec // PID values fit in uint32
 			"process.executable":                    exe,
 			"process.parent.pid":                    uint32(os.Getppid()), //nolint:gosec // PID values fit in uint32
 			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
->>>>>>> 25a0b3742 (auditbeat: Update to quark 0.6.0 (#51767))
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
 			"user.effective.id":                     uint32(0),
@@ -346,17 +321,10 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb
 			"process.name":                          "true",
 			"process.args":                          []string{"/usr/bin/true"},
 			"process.args_count":                    1,
-<<<<<<< HEAD
-			"process.pid":                           uint32(cmd.Process.Pid), //nolint:gosec // pid in kernel is 32bit
-			"process.executable":                    "/bin/true",
-			"process.parent.pid":                    uint32(os.Getpid()),                   //nolint:gosec // pid in kernel is 32bit
-			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)), //nolint:gosec // 292 billion years is enough
-=======
 			"process.pid":                           uint32(cmd.Process.Pid), //nolint:gosec // PID values fit in uint32
 			"process.executable":                    "/usr/bin/true",
 			"process.parent.pid":                    uint32(os.Getpid()),                   //nolint:gosec // PID values fit in uint32
 			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)), //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
->>>>>>> 25a0b3742 (auditbeat: Update to quark 0.6.0 (#51767))
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
 			"user.effective.id":                     uint32(0),
