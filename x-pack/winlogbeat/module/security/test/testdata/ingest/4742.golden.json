@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-12-18T16:22:12.3425087Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "changed-computer-account",
@@ -54,8 +54,8 @@
         "HomePath": "-",
         "LogonHours": "-",
         "NewUACList": [
-          "USER_PASSWORD_NOT_REQUIRED",
-          "USER_WORKSTATION_TRUST_ACCOUNT"
+          "USER_WORKSTATION_TRUST_ACCOUNT",
+          "USER_PASSWORD_NOT_REQUIRED"
         ],
         "NewUacValue": "0x84",
         "OldUacValue": "0x85",

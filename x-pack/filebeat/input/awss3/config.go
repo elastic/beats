@@ -305,8 +305,11 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 		//nolint:staticcheck // haven't migrated to the new interface yet
 		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint,
 			func(e *awssdk.Endpoint) {
-				// The S3 hostname is immutable in bucket polling mode, mutable otherwise.
-				e.HostnameImmutable = (c.getBucketARN() != "")
+				// The S3 hostname is immutable only for AWS bucket/access-point
+				// polling. For non-AWS S3-compatible storage the hostname must
+				// stay mutable so the SDK can honor path_style (virtual-hosted
+				// addressing when path_style is false).
+				e.HostnameImmutable = (c.getBucketARN() != "" && c.NonAWSBucketName == "")
 			})
 	}
 	o.UsePathStyle = c.PathStyle

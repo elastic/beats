@@ -32,7 +32,7 @@ import (
 
 // ecsVersion is the expected ECS version for testing purposes.
 // Change this when ECS version is bumped.
-const ecsVersion = "1.12.0"
+const ecsVersion = "8.17.0"
 
 func TestSimulate(t *testing.T) {
 	const (
@@ -92,6 +92,7 @@ func TestSimulate(t *testing.T) {
 		"powershell_operational",
 		"routing",
 		"security",
+		"security_standard",
 		"sysmon",
 	}
 	if len(loaded) != len(wantPipelines) {
