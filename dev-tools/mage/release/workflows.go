@@ -360,8 +360,8 @@ Prepares %s for the %s feature freeze.
 - Adds Mergify backport rule for branch %s (label %s)
 - Bumps libbeat/version/version.go to %s (next minor)
 
-**Merge:** before release branch work is finalized (%s).
-`, cfg.CurrentRelease, cfg.BaseBranch, cfg.CurrentRelease, cfg.ReleaseBranch, backportLabel(cfg.ReleaseBranch), cfg.NextProjectMinorVersion, mergeLabelFFDay)
+**Merge:** before release branch work is finalized.
+`, cfg.CurrentRelease, cfg.BaseBranch, cfg.CurrentRelease, cfg.ReleaseBranch, backportLabel(cfg.ReleaseBranch), cfg.NextProjectMinorVersion)
 }
 
 func prBReleaseBody(cfg *ReleaseConfig) string {
@@ -369,8 +369,8 @@ func prBReleaseBody(cfg *ReleaseConfig) string {
 
 Feature-freeze release branch updates for %s (version, docs, test env, make update).
 
-**Merge:** as soon as the %s branch exists (%s).
-`, cfg.CurrentRelease, cfg.CurrentRelease, cfg.ReleaseBranch, mergeLabelAfterBranch)
+**Merge:** as soon as the %s branch exists.
+`, cfg.CurrentRelease, cfg.CurrentRelease, cfg.ReleaseBranch)
 }
 
 func prCMainBody(cfg *ReleaseConfig) string {
@@ -378,8 +378,8 @@ func prCMainBody(cfg *ReleaseConfig) string {
 
 Updates documentation and test environment on %s for the next minor %s.
 
-**Merge:** after the %s branch is created (%s). CI may stay red until Docker images exist.
-`, cfg.CurrentRelease, cfg.BaseBranch, cfg.NextProjectMinorVersion, cfg.ReleaseBranch, mergeLabelAfterImages)
+**Merge:** after the %s branch is created. CI may stay red until Docker images exist.
+`, cfg.CurrentRelease, cfg.BaseBranch, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)
 }
 
 func prDNextPatchBody(cfg *ReleaseConfig) string {
@@ -390,8 +390,8 @@ Updates the %s branch after release of %s (former update-version + update-test-e
 - Bumps libbeat/version/version.go to %s
 - Updates test environments so stack tags point at %s
 
-**Merge:** after the release of %s (%s).
-`, cfg.CurrentRelease, cfg.ReleaseBranch, cfg.CurrentRelease, cfg.NextRelease, cfg.CurrentRelease, cfg.CurrentRelease, mergeLabelAfterRelease)
+**Merge:** after the release of %s.
+`, cfg.CurrentRelease, cfg.ReleaseBranch, cfg.CurrentRelease, cfg.NextRelease, cfg.CurrentRelease, cfg.CurrentRelease)
 }
 
 // ensureMajorMinorCurrentReleaseMatchesBase checks out BASE_BRANCH
@@ -565,8 +565,8 @@ Updates docs versions to %s (former prepare-patch-release docs PR).
 - Does **not** bump libbeat/version/version.go (already %s on the release branch)
 - Does **not** update test environments (that happens after release)
 
-**Merge:** before the final Release build (%s).
-`, currentRelease, currentRelease, currentRelease, mergeLabelBeforeBuild)
+**Merge:** before the final Release build.
+`, currentRelease, currentRelease, currentRelease)
 }
 
 func finalizeWorkflowPRs(repo *GitRepo, gh *GitHubClient, items []workflowPR) ([]workflowPRResult, error) {
