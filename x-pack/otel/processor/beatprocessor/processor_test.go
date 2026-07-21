@@ -403,7 +403,7 @@ func TestConsumeLogsDropViaPdataProcessor(t *testing.T) {
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty().Body().SetEmptyMap()
 
-	processedLogs, err := bp.ConsumeLogs(context.Background(), logs)
+	processedLogs, err := bp.ConsumeLogs(t.Context(), logs)
 	require.NoError(t, err)
 	assert.Equal(t, 0, countLogRecords(processedLogs), "dropped log record must be removed")
 }
@@ -419,7 +419,7 @@ func TestConsumeLogsDropViaLegacyProcessor(t *testing.T) {
 	logs := plog.NewLogs()
 	logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty().Body().SetEmptyMap()
 
-	processedLogs, err := bp.ConsumeLogs(context.Background(), logs)
+	processedLogs, err := bp.ConsumeLogs(t.Context(), logs)
 	require.NoError(t, err)
 	assert.Equal(t, 0, countLogRecords(processedLogs), "dropped log record must be removed")
 }
