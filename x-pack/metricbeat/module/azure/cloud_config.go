@@ -8,6 +8,7 @@ package azure
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 )
@@ -46,9 +47,7 @@ func BuildCloudConfig(config Config) cloud.Configuration {
 	// Deep-copy the services map: the SDK's predefined configurations are
 	// package-level globals shared by the whole process and must not be mutated.
 	services := make(map[cloud.ServiceName]cloud.ServiceConfiguration, len(base.Services))
-	for name, svc := range base.Services {
-		services[name] = svc
-	}
+	maps.Copy(services, base.Services)
 
 	resourceManager := services[cloud.ResourceManager]
 	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != DefaultBaseURI {

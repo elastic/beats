@@ -331,11 +331,7 @@ func (service *MonitorService) QueryResources(
 	service.log.Infof("QueryResources to be called. length of resources is %d", len(resourceIDs))
 	// call the query resources client passing 50 resourceIDs at a time
 	for i := 0; i < len(resourceIDs); i += BatchApiResourcesLimit {
-		end := i + BatchApiResourcesLimit
-
-		if end > len(resourceIDs) {
-			end = len(resourceIDs)
-		}
+		end := min(i+BatchApiResourcesLimit, len(resourceIDs))
 		r, err := queryResourceClient.QueryResources(
 			service.context,
 			subscriptionID,
@@ -381,11 +377,7 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 	}
 
 	for i := 0; i < len(metricNames); i += metricNameLimit {
-		end := i + metricNameLimit
-
-		if end > len(metricNames) {
-			end = len(metricNames)
-		}
+		end := min(i+metricNameLimit, len(metricNames))
 
 		metricNames := strings.Join(metricNames[i:end], ",")
 
