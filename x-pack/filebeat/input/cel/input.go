@@ -732,7 +732,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					"limit", *cfg.MaxExecutions,
 					"next_eval_time", start.Add(cfg.Interval),
 				)
-				health.UpdateStatus(status.Degraded, msg)
 				execSpan.SetStatus(codes.Unset, msg)
 				execSpan.End()
 				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
