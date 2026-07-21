@@ -155,7 +155,9 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_for_platform(SYSTEM_CPU, cpu)
         else:
             host_cpu = evt.get("host", {}).get("cpu")
-            self.assertIsNotNone(host_cpu, "Expected 'system.cpu' or 'host.cpu' in event, got: {}".format(sorted(evt.keys())))
+            self.assertIsNotNone(
+                host_cpu,
+                "Expected 'system.cpu' or 'host.cpu' in event, got: {}".format(sorted(evt.keys())))
             self.assertCountEqual(self.de_dot(
                 SYSTEM_CPU_HOST_FIELDS), host_cpu.keys())
 
