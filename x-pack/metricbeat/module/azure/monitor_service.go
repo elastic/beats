@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
@@ -28,9 +27,10 @@ import (
 )
 
 type queryResourceClientConfig struct {
-	endpoint   string
-	credential azcore.TokenCredential
-	options    *azmetrics.ClientOptions
+	endpoint                string
+	resourceManagerEndpoint string
+	credential              azcore.TokenCredential
+	options                 *azmetrics.ClientOptions
 }
 
 // MonitorService service wrapper to the azure sdk for go
@@ -52,23 +52,16 @@ const (
 
 // NewService instantiates the Azure monitoring service
 func NewService(config Config, logger *logp.Logger) (*MonitorService, error) {
-	cloudServicesConfig := cloud.AzurePublic.Services
-
-	resourceManagerConfig := cloudServicesConfig[cloud.ResourceManager]
-
-	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != DefaultBaseURI {
-		resourceManagerConfig.Endpoint = config.ResourceManagerEndpoint
-	}
-
-	if config.ResourceManagerAudience != "" {
-		resourceManagerConfig.Audience = config.ResourceManagerAudience
-	}
-
 	clientOptions := policy.ClientOptions{
-		Cloud: cloud.Configuration{
-			Services:                     cloudServicesConfig,
-			ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-		},
+		Cloud: BuildCloudConfig(config),
+	}
+
+	if config.EnableBatchApi {
+		// Fail at setup time, not at query time, if the batch API is not
+		// available for the configured cloud.
+		if _, err := metricsBatchEndpoint(config.ResourceManagerEndpoint, ""); err != nil {
+			return nil, err
+		}
 	}
 
 	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret,
@@ -108,7 +101,8 @@ func NewService(config Config, logger *logp.Logger) (*MonitorService, error) {
 	}
 
 	queryResourceClientConfig := queryResourceClientConfig{
-		credential: credential,
+		resourceManagerEndpoint: config.ResourceManagerEndpoint,
+		credential:              credential,
 		options: &azmetrics.ClientOptions{
 			ClientOptions: clientOptions,
 		},
@@ -321,7 +315,11 @@ func (service *MonitorService) QueryResources(
 
 	resp := []azmetrics.MetricData{}
 
-	service.queryResourceClientConfig.endpoint = fmt.Sprintf("https://%s.metrics.monitor.azure.com", location)
+	endpoint, err := metricsBatchEndpoint(service.queryResourceClientConfig.resourceManagerEndpoint, location)
+	if err != nil {
+		return nil, err
+	}
+	service.queryResourceClientConfig.endpoint = endpoint
 	queryResourceClient, err := azmetrics.NewClient(
 		service.queryResourceClientConfig.endpoint,
 		service.queryResourceClientConfig.credential,

@@ -1,0 +1,10 @@
+kind: bug-fix
+summary: Fix Azure module authentication on sovereign clouds (Government, China)
+description: >-
+  The Azure module now derives the full cloud configuration (ARM token
+  audience, metrics batch API endpoint and audience) from
+  resource_manager_endpoint. Previously the monitor metricset silently ignored
+  resource_manager_audience, always requesting public-cloud tokens, the billing
+  metricset mutated the SDK's global cloud configuration, and the metrics
+  batch API endpoint was hardcoded to the public cloud.
+component: metricbeat

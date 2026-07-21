@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption"
@@ -49,25 +48,8 @@ type UsageService struct {
 
 // NewService builds a new UsageService using the given config.
 func NewService(config azure.Config, logger *logp.Logger) (*UsageService, error) {
-	cloudServicesConfig := cloud.AzurePublic.Services
-
-	resourceManagerConfig := cloudServicesConfig[cloud.ResourceManager]
-
-	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != azure.DefaultBaseURI {
-		resourceManagerConfig.Endpoint = config.ResourceManagerEndpoint
-	}
-
-	if config.ResourceManagerAudience != "" {
-		resourceManagerConfig.Audience = config.ResourceManagerAudience
-	}
-
-	cloudServicesConfig[cloud.ResourceManager] = resourceManagerConfig
-
 	clientOptions := policy.ClientOptions{
-		Cloud: cloud.Configuration{
-			Services:                     cloudServicesConfig,
-			ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-		},
+		Cloud: azure.BuildCloudConfig(config),
 	}
 
 	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret, &azidentity.ClientSecretCredentialOptions{
