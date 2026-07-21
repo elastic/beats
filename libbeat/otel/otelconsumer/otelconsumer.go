@@ -132,8 +132,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
-			bo := backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
-			if !bo.Wait() {
+			bo := backoff.NewEqualJitterBackoff(out.retry.init, out.retry.max)
+			if !bo.Wait(ctx) {
 				batch.Cancelled()
 				return nil
 			}
