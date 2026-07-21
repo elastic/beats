@@ -34,11 +34,11 @@ import (
 // these tests are separated as one cannot delete/rename files
 // while another process is working with it on Windows
 
-// TestLogFileRenamed verifies the harvester-refactor contract for a renamed
-// file: logFile no longer detects the rename itself (that moved to the session's
-// Poll, driven by the waker). An already-open reader keeps draining its open
-// descriptor and returns ErrWouldBlock at EOF even with OnStateChange.Renamed
-// configured; it only closes (ErrClosed) once its reader context is cancelled.
+// TestLogFileRenamed verifies that renaming an open file does not close its
+// logFile reader: logFile does not act on OnStateChange, so the reader keeps
+// reading its open descriptor and reports ErrWouldBlock at EOF even with
+// OnStateChange.Renamed configured. It closes (ErrClosed) only once its reader
+// context is cancelled.
 func TestLogFileRenamed(t *testing.T) {
 	f := createTestLogFile(t)
 	defer f.Close()
@@ -81,11 +81,11 @@ func TestLogFileRenamed(t *testing.T) {
 		"a cancelled reader context must return ErrClosed")
 }
 
-// TestLogFileRemoved verifies the harvester-refactor contract for a removed
-// file: like a rename, logFile does not detect the removal itself. On a
-// non-Windows system the open descriptor stays valid, so the reader keeps
-// returning ErrWouldBlock at EOF even with OnStateChange.Removed configured, and
-// only closes (ErrClosed) once its reader context is cancelled.
+// TestLogFileRemoved verifies that removing an open file does not close its
+// logFile reader. On a non-Windows system the open descriptor stays valid, so
+// the reader keeps reading and reports ErrWouldBlock at EOF even with
+// OnStateChange.Removed configured. It closes (ErrClosed) only once its reader
+// context is cancelled.
 func TestLogFileRemoved(t *testing.T) {
 	f := createTestLogFile(t)
 	defer f.Close()

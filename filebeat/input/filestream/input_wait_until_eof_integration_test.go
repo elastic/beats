@@ -173,13 +173,11 @@ func TestWaitUntilEOF_gzipFile(t *testing.T) {
 		waitEOFTimeout, 1*time.Second)
 }
 
-// TestWaitUntilEOF_fileDeletedDuringReadUntilEOF deletes the file after
-// readUntilEOF mode has started, and asserts the reader continues to drain
-// the fd to EOF — the Linux fd-still-readable semantic. It runs with
-// close.on_state_change.removed=true to also exercise 'periodicStateCheck'
-// must have been stopped by startReadUntilEOF before the deletion, otherwise it
-// would cancel the swapped-in readerCtx when it next ticked and the readUntilEOF
-// mode would be aborted before reading the remaining bytes.
+// TestWaitUntilEOF_fileDeletedDuringReadUntilEOF deletes the file after the
+// read_until_eof drain has started and asserts the reader continues to drain the
+// fd to EOF (the Linux fd-still-readable semantic). It runs with
+// close.on_state_change.removed=true to confirm that detecting the removal does
+// not abort the drain before the remaining bytes are read.
 //
 // Restricted to non-Windows because Windows file-deletion semantics
 // (sharing modes, delete-on-close) differ.
@@ -314,17 +312,15 @@ func TestWaitUntilEOF_timeout(t *testing.T) {
 		"unexpected number of events published")
 }
 
-// TestWaitUntilEOF_sliceBudgetDrainsToEOF is the regression test for the
-// read_until_eof + sliceBudget data loss: when a slice's time budget is active
-// (here via harvester_limit) a drain slice that yields on its budget with data
-// still unread must keep reading to EOF, not tear the source down mid-file.
+// TestWaitUntilEOF_sliceBudgetDrainsToEOF verifies that, with a slice time
+// budget active (here via harvester_limit), a read_until_eof drain slice that
+// yields on its budget with data still unread keeps reading to EOF instead of
+// tearing the source down mid-file, so every event is published.
 //
 // The reader is deterministically forced to yield on budget rather than at EOF:
 // it is blocked in Publish (SetAllowedEvents(1)) when the input is cancelled and
 // the drain begins, then held there past its 1ms budget deadline before being
 // unblocked, so the resumed slice reports SliceBudget with events still unread.
-// Before the fix that budget yield was indistinguishable from an EOF yield and
-// the drain stopped after the first two events; the fix must publish all of them.
 func TestWaitUntilEOF_sliceBudgetDrainsToEOF(t *testing.T) {
 	prefix := strings.Repeat("a", 1024)
 	events := 10

@@ -172,7 +172,8 @@ func (s *harvestSession) ReadSlice(
 
 	var deadline time.Time
 	if s.inp.sliceBudget != 0 {
-		// allows negative for testing, but the waker will never yield a slice with a negative
+		// A negative budget makes the deadline already past, so the slice yields on
+		// its first budget check without reading.
 		deadline = time.Now().Add(s.inp.sliceBudget)
 	}
 

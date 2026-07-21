@@ -698,10 +698,8 @@ func TestHarvesterRunner_MigrateRekeysRunningSource(t *testing.T) {
 
 // TestHarvesterRunner_MigrateThenStartNextIsNoop asserts that once Migrate has
 // re-keyed a running source, a follow-up Start for the new identity is a no-op
-// instead of spawning a duplicate harvester for the same file. This is the
-// scenario behind https://github.com/elastic/beats/pull/51801: a migration
-// racing with harvester startup used to leave a stale reservation that a
-// follow-up Start would fill with a second harvester.
+// instead of spawning a duplicate harvester for the same file
+// (see https://github.com/elastic/beats/pull/51801).
 func TestHarvesterRunner_MigrateThenStartNextIsNoop(t *testing.T) {
 	h := &fakeHarvester{readFn: blockUntilCancelled}
 	g := testHarvesterRunner(t, h, 0)
@@ -1137,9 +1135,7 @@ func TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop(t *testing.T) {
 // TestHarvesterRunner_ReadUntilEOFDrainsPastBudgetYields asserts that during a
 // read_until_eof drain a source whose slice time budget keeps elapsing with data
 // still available (SliceBudget) is read all the way to EOF instead of being torn
-// down at the first budget yield. This guards the data-loss regression where a
-// budget yield was indistinguishable from an EOF yield, cutting the drain short
-// mid-file so the remaining events were never shipped.
+// down at the first budget yield.
 func TestHarvesterRunner_ReadUntilEOFDrainsPastBudgetYields(t *testing.T) {
 	const eofRead = 5 // read 1 parks; reads 2..4 yield on budget with data left; read 5 hits EOF
 	var reads atomic.Int64

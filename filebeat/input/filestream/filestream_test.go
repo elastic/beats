@@ -229,8 +229,8 @@ func TestLogFileNonBlocking(t *testing.T) {
 }
 
 // readWithTimeout runs reader.Read in a goroutine and fails the test if it does
-// not return within timeout, turning a blocking regression into a clear failure
-// instead of a hung test.
+// not return within timeout, so a blocking Read fails clearly instead of hanging
+// the test.
 func readWithTimeout(t *testing.T, reader *logFile, buf []byte, timeout time.Duration) (int, error) {
 	t.Helper()
 	type result struct {

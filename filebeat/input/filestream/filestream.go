@@ -42,12 +42,12 @@ var (
 
 // logFile is a non-blocking reader over a single open file.
 //
-// The file handle is owned by the harvester session, so Close does NOT close
-// it, and the close-on-state-change conditions (inactive/removed/renamed and
-// close-after-interval) are evaluated by the scheduler's waker rather than by a
-// per-file monitor goroutine. logFile therefore only reports end of data: io.EOF
-// when close_on_eof (or a GZIP file) reaches the end, ErrFileTruncate when the
-// file shrank, or ErrWouldBlock when an active file has nothing to read yet.
+// The file handle is owned by the harvester session, so Close does NOT close it.
+// The close-on-state-change conditions (inactive/removed/renamed and
+// close-after-interval) are evaluated by the harvester runner's waker, so logFile
+// only reports end of data: io.EOF when close_on_eof (or a GZIP file) reaches the
+// end, ErrFileTruncate when the file shrank, or ErrWouldBlock when an active file
+// has nothing to read yet.
 type logFile struct {
 	file      File
 	log       *logp.Logger

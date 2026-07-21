@@ -41,7 +41,6 @@ const pollGracePeriod = 100 * time.Millisecond
 // harvesters to unwind before giving up: a harvester still blocked past it
 // (e.g. stuck in Publish because output backpressure never clears) is left
 // running in the background rather than hanging the input's shutdown forever.
-// Overridable per-runner via the stuckGrace field (kept short in tests).
 const defaultStuckHarvesterGrace = time.Minute
 
 // permanentHarvesterError marks a harvester setup failure that should degrade
@@ -556,9 +555,9 @@ func (g *harvesterRunner) promoteLocked() *sourceState {
 // waker evaluates parked sources as they come due: it resumes those with new
 // data (by spawning a reader), re-parks those still idle, and tears down those
 // that hit a close condition. It pops only due sources from the parked min-heap
-// (rather than scanning every source) and sleeps until the next one is due. It
-// centralises the read backoff and close-condition checks that the per-file
-// harvester ran per file.
+// (rather than scanning every source) and sleeps until the next one is due. It is
+// the single goroutine that applies the read backoff and the close-condition
+// checks for every parked source.
 func (g *harvesterRunner) waker() {
 	for {
 		g.mu.Lock()
