@@ -763,7 +763,7 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 			fileID := fd.FileID()
 			if knownFilename, exists := uniqueIDs[fileID]; exists {
 				scanMetrics.FilesNoIngestTarget++
-				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
+				s.log.Warnf("%q points to an already known ingest target %q. Skipping", fd.Filename, knownFilename)
 				continue
 			}
 			uniqueIDs[fileID] = fd.Filename
