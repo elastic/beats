@@ -237,8 +237,6 @@ require (
 	github.com/elastic/entcollect v0.0.0-20260706024408-4a12ea00f54d
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
-	github.com/go-git/go-git/v5 v5.17.0
-	github.com/google/go-github/v68 v68.0.0
 	github.com/jimlambrt/gldap v0.1.14
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.155.0
@@ -284,22 +282,10 @@ require (
 )
 
 require (
-	dario.cat/mergo v1.0.2 // indirect
-	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/cenkalti/backoff/v6 v6.0.0 // indirect
-	github.com/cloudflare/circl v1.6.3 // indirect
-	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
-	github.com/go-git/go-billy/v5 v5.8.0 // indirect
-	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
+	github.com/elazarl/goproxy v1.7.2 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
-	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/pjbgf/sha1cd v0.3.2 // indirect
-	github.com/skeema/knownhosts v1.3.1 // indirect
-	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
-	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
 
 require (

@@ -25,8 +25,14 @@ targets.
 
 This package provides release automation for the Beats project via mage.
 
+It lives in a **nested Go module** (`dev-tools/mage/release/go.mod`) so tooling
+dependencies (`go-git`, `go-github`, and their transitive tree) stay out of the
+root Beats `go.mod` and `NOTICE.txt`. Root mage targets invoke
+`go run -C ./dev-tools/mage/release ./cmd/beats-release …`.
+
 **Key features:**
 - Pure Go implementation
+- Nested module isolation for release-only dependencies
 - Comprehensive testing (>60% coverage)
 - DRY_RUN mode for safe testing
 - Multi-PR workflow support
@@ -62,7 +68,9 @@ export GITHUB_TOKEN="ghp_your_token_here"
 
 ## Installation
 
-The release automation is built into the Beats mage targets. No separate installation needed.
+The release automation is built into the Beats mage targets. No separate
+installation is needed. Mage shells out to the nested-module CLI; Go downloads
+that module's dependencies on first run.
 
 Verify it's available:
 ```bash
@@ -532,18 +540,23 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
 
 ## Development
 
+This directory is its own Go module. Always run `go` commands from here (or with
+`-C ./dev-tools/mage/release` from the repo root). Do not add release tooling
+dependencies to the root `go.mod`.
+
 ### Running Tests
 
 ```bash
 cd dev-tools/mage/release
-go test -v
+go test ./...
 ```
 
 ### Test Coverage
 
 ```bash
-go test -cover
-go test -coverprofile=coverage.out
+cd dev-tools/mage/release
+go test -cover ./...
+go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
 ```
 
@@ -551,11 +564,26 @@ Target coverage:
 - Overall: >60%
 - Core functions: >80%
 
+### CLI (optional)
+
+Mage is the supported entry point. For local debugging you can call the CLI
+directly from the repo root:
+
+```bash
+go run -C ./dev-tools/mage/release ./cmd/beats-release help
+BEATS_REPO_ROOT=$PWD go run -C ./dev-tools/mage/release ./cmd/beats-release run-major-minor
+```
+
+`BEATS_REPO_ROOT` is set automatically by mage. When calling `go run -C` by
+hand, set it (or rely on walking up to the root `go.mod`) so file and git
+operations run against the Beats checkout, not the nested module directory.
+
 ### Adding New Workflows
 
 1. Add workflow function in `workflows.go`
 2. Add tests in `workflows_test.go`
-3. Add mage target in `magefile.go`
+3. Expose a subcommand in `cmd/beats-release/main.go` and a mage target in
+   root `magefile.go` (thin `go run` wrapper)
 4. Update documentation
 
 ## Support
