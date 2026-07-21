@@ -39,6 +39,25 @@ type DocsUpdateOptions struct {
 	CurrentVersion string
 	ReleaseBranch  string
 	DocBranch      string // if empty, infer per workflow
+	// IncludeHeartbeat adds deploy/kubernetes/heartbeat-kubernetes.yaml.
+	// Patch docs PRs include it (former bot); FF update-docs leaves it to make update.
+	IncludeHeartbeat bool
+}
+
+var defaultBeatVersionPattern = regexp.MustCompile(`const defaultBeatVersion = "([^"]+)"`)
+
+// ReadBeatVersion returns defaultBeatVersion from libbeat/version/version.go.
+func ReadBeatVersion() (string, error) {
+	versionFile := "libbeat/version/version.go"
+	content, err := os.ReadFile(versionFile)
+	if err != nil {
+		return "", fmt.Errorf("failed to read %s: %w", versionFile, err)
+	}
+	match := defaultBeatVersionPattern.FindSubmatch(content)
+	if match == nil {
+		return "", fmt.Errorf("version pattern not found in %s", versionFile)
+	}
+	return string(match[1]), nil
 }
 
 // UpdateVersion updates the version in libbeat/version/version.go
@@ -50,17 +69,13 @@ func UpdateVersion(newVersion string) error {
 		return fmt.Errorf("failed to read %s: %w", versionFile, err)
 	}
 
-	// Pattern: const defaultBeatVersion = "X.Y.Z"
-	pattern := regexp.MustCompile(`const defaultBeatVersion = ".*"`)
 	replacement := fmt.Sprintf(`const defaultBeatVersion = "%s"`, newVersion)
-	targetLine := replacement
-
-	if strings.Contains(string(content), targetLine) {
+	if strings.Contains(string(content), replacement) {
 		fmt.Printf("Version already set to %s in %s\n", newVersion, versionFile)
 		return nil
 	}
 
-	newContent := pattern.ReplaceAllString(string(content), replacement)
+	newContent := defaultBeatVersionPattern.ReplaceAllString(string(content), replacement)
 
 	if newContent == string(content) {
 		return fmt.Errorf("version pattern not found in %s", versionFile)
@@ -136,11 +151,14 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 		return err
 	}
 
-	// Matches beats.mak update-docs (heartbeat is updated via make update on ff-release only).
+	// Matches beats.mak update-docs (heartbeat via make update on FF; included explicitly for patch docs).
 	k8sFiles := []string{
 		"deploy/kubernetes/metricbeat-kubernetes.yaml",
 		"deploy/kubernetes/filebeat-kubernetes.yaml",
 		"deploy/kubernetes/auditbeat-kubernetes.yaml",
+	}
+	if opts.IncludeHeartbeat {
+		k8sFiles = append(k8sFiles, "deploy/kubernetes/heartbeat-kubernetes.yaml")
 	}
 	k8sRule := replacementRule{
 		pattern:     k8sImageVersionPattern,

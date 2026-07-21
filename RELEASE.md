@@ -73,15 +73,22 @@ merge PR-D after release day.
 
 ## What a patch release produces
 
-Runs on the existing release branch and opens **2 grouped PRs**:
+Runs on the existing release branch and opens **2 grouped PRs**.
+
+`CURRENT_RELEASE` must already match `libbeat/version/version.go` on the release
+branch (set by the previous release's after-release / prepare-next-release PR).
+The workflow fails fast if they differ.
 
 | Order | PR | Target | Merge label | Purpose |
 |-------|-----|--------|-------------|---------|
-| 1 | PR-A | release branch | `merge:1-before-build` | version + docs + test env → current patch |
-| 2 | PR-B | release branch | `merge:4-after-release` | Next patch version + test env (after release day) |
+| 1 | PR-A | release branch | `merge:1-before-build` | Docs + K8s → current patch (no `version.go` / test-env bump) |
+| 2 | PR-B | release branch | `merge:4-after-release` | Next patch `version.go` + test env (after release day) |
+
+Titles are prefixed with `[Release <CURRENT_RELEASE>]` so the release being cut
+is obvious; PR-B also names the next patch version in the title.
 
 **RM merge order:** merge PR-A before the final release build → merge PR-B after
-release day.
+release day. Release notes stay on the separate GitHub Actions workflow.
 
 ## Release manager checklist
 

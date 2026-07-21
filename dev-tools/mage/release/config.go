@@ -87,12 +87,12 @@ func LoadConfigFromEnv() (*ReleaseConfig, error) {
 		NextProjectMinorBranch:  nextProjectMinorBranch,
 		BaseBranch:              getEnvOrDefault("BASE_BRANCH", "main"),
 		ReleaseBranch:           releaseBranch,
-		ProjectOwner:      getEnvOrDefault("PROJECT_OWNER", "elastic"),
-		ProjectRepo:       getEnvOrDefault("PROJECT_REPO", "beats"),
-		GitHubToken:       os.Getenv("GITHUB_TOKEN"),
-		GitAuthorName:     getEnvOrDefault("GIT_AUTHOR_NAME", "github-actions[bot]"),
-		GitAuthorEmail:    getEnvOrDefault("GIT_AUTHOR_EMAIL", "github-actions[bot]@users.noreply.github.com"),
-		DryRun: getEnvOrDefault("DRY_RUN", "false") == "true",
+		ProjectOwner:            getEnvOrDefault("PROJECT_OWNER", "elastic"),
+		ProjectRepo:             getEnvOrDefault("PROJECT_REPO", "beats"),
+		GitHubToken:             os.Getenv("GITHUB_TOKEN"),
+		GitAuthorName:           getEnvOrDefault("GIT_AUTHOR_NAME", "github-actions[bot]"),
+		GitAuthorEmail:          getEnvOrDefault("GIT_AUTHOR_EMAIL", "github-actions[bot]@users.noreply.github.com"),
+		DryRun:                  getEnvOrDefault("DRY_RUN", "false") == "true",
 	}
 
 	// Parse reviewers (comma-separated)

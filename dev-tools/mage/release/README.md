@@ -40,7 +40,7 @@ root Beats `go.mod` and `NOTICE.txt`. Root mage targets invoke
 
 **Workflows supported:**
 1. **Major/Minor Release (feature-freeze)** - Creates release branch + 4 grouped PRs (backport+version on main, ff-release, docs+test-env on main, next patch on release branch)
-2. **Patch Release** - Creates 2 grouped PRs on the release branch (version+docs+test-env before build; next-patch prep after release)
+2. **Patch Release** - Creates 2 grouped PRs on the release branch (docs before build; next-patch version + test-env after release)
 
 Release notes are handled separately via `.github/workflows/release-notes.yml`.
 
@@ -180,20 +180,31 @@ Only 9.x+ minor releases are allowed. Patch releases are allowed for all version
 
 ### Patch Release
 
-Creates a patch release (e.g., 9.2.1) on an existing release branch. Equivalent
+Creates a patch release (e.g., 9.4.1) on an existing release branch. Equivalent
 to ingest-dev `prepare-patch-release` + `prepare-next-release`, with PRs grouped
 by merge order (2 PRs).
 
+**`CURRENT_RELEASE` meaning:** the patch being released (already present in
+`libbeat/version/version.go` on the release branch after the previous cycle's
+prepare-next-release). Example: releasing 9.4.1 → `CURRENT_RELEASE=9.4.1` while
+branch `9.4` already has `defaultBeatVersion = "9.4.1"`. The workflow refuses to
+run if they do not match (avoids off-by-one double bumps).
+
 **What it does:**
-1. Validates version (`LatestRelease` defaults to patch−1)
+1. Validates version (`LatestRelease` defaults to patch−1) and aligns
+   `CURRENT_RELEASE` with `version.go` on the release branch
 2. Prepares **2 grouped PRs** on the release branch (merge order matters):
 
 | Step | PR | Target | Branch | Merge label | Changes |
 |------|-----|--------|--------|-------------|---------|
-| 1 | PR-A | release branch | `patch-release-X.Y.Z` | `merge:1-before-build` | version + docs + test env → CURRENT |
-| 2 | PR-B | release branch | `ff-prep-next-patch-X.Y.(Z+1)` | `merge:4-after-release` | Next patch version + test env |
+| 1 | PR-A | release branch | `patch-release-X.Y.Z` | `merge:1-before-build` | docs + K8s (incl. heartbeat) → CURRENT only |
+| 2 | PR-B | release branch | `ff-prep-next-patch-X.Y.(Z+1)` | `merge:4-after-release` | `version.go` → NEXT + test-env tags → CURRENT |
+
+Aligned with former elasticmachine outputs (e.g. docs [#50567](https://github.com/elastic/beats/pull/50567),
+version+test-env [#50568](https://github.com/elastic/beats/pull/50568)+[#50569](https://github.com/elastic/beats/pull/50569)).
 
 3. Opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
+   Titles use `[Release <CURRENT_RELEASE>] …` and bodies state when to merge.
 
 **RM merge order:** merge PR-A before the final release build → merge PR-B after release day.
 
@@ -347,19 +358,22 @@ Some workflows create multiple PRs to separate concerns.
 
 ### Patch Release (2 PRs)
 
-**PR-A: Before build (version + docs + test env)**
+**PR-A: Before build (docs only)**
 - Branch: `patch-release-X.Y.Z`
-- Updates: `version.go`, docs/K8s manifests, test env (`latest.yml` + compose)
+- Title: `[Release X.Y.Z] Update docs versions X.Y.Z`
+- Updates: docs/K8s manifests (including heartbeat); does **not** touch `version.go` or test-env
 - Labels: `docs`, `in progress`, `release`, `Team:Automation`, `skip-changelog`, `merge:1-before-build`
 
-**PR-B: Next patch prep**
+**PR-B: Next patch prep (after release)**
 - Branch: `ff-prep-next-patch-X.Y.(Z+1)`
-- Updates: next patch `version.go` + test env (same as FF PR-D)
+- Title: `[Release X.Y.Z] Prepare next X.Y.(Z+1) (version + test env)`
+- Updates: next patch `version.go` + test env tags → CURRENT (same as FF PR-D)
 - Labels: `release`, `Team:Automation`, `skip-changelog`, `merge:4-after-release`
 
 **Why two PRs?**
-- Before-build updates share the same merge timing (mirrors FF PR-B grouping)
-- Next-patch prep must wait until after release day
+- Docs must land before the final release build
+- Version bump to the *next* patch and test-env advancement must wait until after release day
+- `CURRENT_RELEASE` must already match `version.go` on the release branch
 
 ### Reviewing Multi-PR Workflows
 

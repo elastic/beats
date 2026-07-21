@@ -60,6 +60,14 @@ const defaultBeatVersion = "9.3.0"
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
+	got, err := ReadBeatVersion()
+	if err != nil {
+		t.Fatalf("ReadBeatVersion failed: %v", err)
+	}
+	if got != "9.3.0" {
+		t.Fatalf("ReadBeatVersion = %q, want 9.3.0", got)
+	}
+
 	// Test updating version
 	err = UpdateVersion("9.4.0")
 	if err != nil {
@@ -74,6 +82,14 @@ const defaultBeatVersion = "9.3.0"
 
 	if !strings.Contains(string(content), `const defaultBeatVersion = "9.4.0"`) {
 		t.Errorf("Version not updated correctly. Got:\n%s", string(content))
+	}
+
+	got, err = ReadBeatVersion()
+	if err != nil {
+		t.Fatalf("ReadBeatVersion after update failed: %v", err)
+	}
+	if got != "9.4.0" {
+		t.Fatalf("ReadBeatVersion after update = %q, want 9.4.0", got)
 	}
 }
 
@@ -301,6 +317,57 @@ func TestUpdateDocsDocBranchCurrent(t *testing.T) {
 	}
 	if !strings.Contains(string(content), ":doc-branch: 9.5") {
 		t.Errorf("doc-branch not updated for patch docs. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsIncludeHeartbeat(t *testing.T) {
+	tmpDir := t.TempDir()
+	for _, dir := range []string{"libbeat/docs", "deploy/kubernetes"} {
+		if err := os.MkdirAll(filepath.Join(tmpDir, dir), 0755); err != nil {
+			t.Fatalf("Failed to create dir %s: %v", dir, err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "libbeat/docs/version.asciidoc"), []byte(`:stack-version: 9.4.0
+:doc-branch: 9.4
+`), 0644); err != nil {
+		t.Fatalf("Failed to write version.asciidoc: %v", err)
+	}
+	heartbeat := filepath.Join(tmpDir, "deploy/kubernetes/heartbeat-kubernetes.yaml")
+	if err := os.WriteFile(heartbeat, []byte("image: docker.elastic.co/beats/heartbeat-wolfi:9.4.0\n"), 0644); err != nil {
+		t.Fatalf("Failed to write heartbeat yaml: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("Docs: /9.4/\n"), 0644); err != nil {
+		t.Fatalf("Failed to write README: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get cwd: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore cwd: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to chdir: %v", err)
+	}
+
+	if err := UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:       "9.4",
+		CurrentVersion:   "9.4.1",
+		ReleaseBranch:    "9.4",
+		IncludeHeartbeat: true,
+	}); err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(heartbeat)
+	if err != nil {
+		t.Fatalf("Failed to read heartbeat yaml: %v", err)
+	}
+	if !strings.Contains(string(content), "heartbeat-wolfi:9.4.1") {
+		t.Errorf("heartbeat image not updated. Got:\n%s", string(content))
 	}
 }
 

@@ -184,7 +184,8 @@ func TestRunPatchReleaseDryRunBranches(t *testing.T) {
 
 	tmpDir := setupWorkflowTestRepo(t)
 
-	// Patch workflow starts from an existing release branch.
+	// Patch workflow starts from an existing release branch whose version.go
+	// already equals CURRENT_RELEASE (set by the previous prepare-next-release).
 	runGit := func(args ...string) {
 		t.Helper()
 		cmd := exec.CommandContext(context.Background(), "git", args...)
@@ -194,6 +195,30 @@ func TestRunPatchReleaseDryRunBranches(t *testing.T) {
 		}
 	}
 	runGit("branch", "9.5")
+	runGit("checkout", "9.5")
+	versionPath := filepath.Join(tmpDir, "libbeat/version/version.go")
+	if err := os.WriteFile(versionPath, []byte(`package version
+
+const defaultBeatVersion = "9.5.1"
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.go: %v", err)
+	}
+	docsPath := filepath.Join(tmpDir, "libbeat/docs/version.asciidoc")
+	if err := os.WriteFile(docsPath, []byte(`:stack-version: 9.5.0
+:doc-branch: 9.5
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.asciidoc: %v", err)
+	}
+	latestPath := filepath.Join(tmpDir, "testing/environments/latest.yml")
+	if err := os.WriteFile(latestPath, []byte(`services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
+`), 0644); err != nil {
+		t.Fatalf("failed to seed latest.yml: %v", err)
+	}
+	runGit("add", ".")
+	runGit("commit", "-m", "seed 9.5 branch at 9.5.1")
+	runGit("checkout", "main")
 
 	origDir, err := os.Getwd()
 	if err != nil {
@@ -242,11 +267,71 @@ func TestRunPatchReleaseDryRunBranches(t *testing.T) {
 		}
 	}
 
+	// PR-A: docs only — version.go and test-env unchanged from release branch.
 	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "libbeat/version/version.go", `defaultBeatVersion = "9.5.1"`)
 	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "libbeat/docs/version.asciidoc", ":stack-version: 9.5.1")
 	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "testing/environments/latest.yml", "elasticsearch:9.5.0")
+	// PR-B: next version + test-env advanced to the just-released CURRENT.
 	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "libbeat/version/version.go", `defaultBeatVersion = "9.5.2"`)
 	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "testing/environments/latest.yml", "elasticsearch:9.5.1")
+}
+
+func TestRunPatchReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
+	origMakeUpdate := runMakeUpdate
+	runMakeUpdate = func() error { return nil }
+	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
+
+	tmpDir := setupWorkflowTestRepo(t)
+	runGit := func(args ...string) {
+		t.Helper()
+		cmd := exec.CommandContext(context.Background(), "git", args...)
+		cmd.Dir = tmpDir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v (%s)", args, err, out)
+		}
+	}
+	runGit("branch", "9.5")
+	runGit("checkout", "9.5")
+	if err := os.WriteFile(filepath.Join(tmpDir, "libbeat/version/version.go"), []byte(`package version
+
+const defaultBeatVersion = "9.5.1"
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.go: %v", err)
+	}
+	runGit("add", ".")
+	runGit("commit", "-m", "seed version 9.5.1")
+	runGit("checkout", "main")
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("failed to get cwd: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("failed to restore cwd: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("failed to chdir: %v", err)
+	}
+
+	cfg := &ReleaseConfig{
+		CurrentRelease: "9.5.0", // off-by-one vs branch
+		LatestRelease:  "9.4.3",
+		NextRelease:    "9.5.1",
+		ReleaseBranch:  "9.5",
+		DryRun:         true,
+		GitAuthorName:  "Test User",
+		GitAuthorEmail: "test@example.com",
+	}
+
+	err = RunPatchRelease(cfg)
+	if err == nil {
+		t.Fatal("expected RunPatchRelease to fail when CURRENT_RELEASE mismatches branch version")
+	}
+	if !strings.Contains(err.Error(), "does not match version on branch") {
+		t.Fatalf("unexpected error: %v", err)
+	}
 }
 
 func TestPatchPrepLabels(t *testing.T) {
@@ -271,6 +356,39 @@ func TestPatchPrepLabels(t *testing.T) {
 		if !slices.Contains(beforeBuild, want) {
 			t.Errorf("before-build labels should include %q, got %v", want, beforeBuild)
 		}
+	}
+}
+
+func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
+	cfg := &ReleaseConfig{
+		CurrentRelease:          "9.4.1",
+		LatestRelease:           "9.4.0",
+		NextRelease:             "9.4.2",
+		NextProjectMinorVersion: "9.5.0",
+		ReleaseBranch:           "9.4",
+	}
+
+	bodies := []string{
+		prAMainBody(cfg),
+		prBReleaseBody(cfg),
+		prCMainBody(cfg),
+		prDNextPatchBody(cfg),
+		patchBeforeBuildPRBody(cfg.CurrentRelease),
+	}
+	for i, body := range bodies {
+		if !strings.Contains(body, "## [Release 9.4.1]") {
+			t.Errorf("body %d missing [Release 9.4.1] header:\n%s", i, body)
+		}
+		if !strings.Contains(body, "**Merge:**") {
+			t.Errorf("body %d missing Merge guidance:\n%s", i, body)
+		}
+	}
+
+	if !strings.Contains(prDNextPatchBody(cfg), "9.4.2") {
+		t.Error("next-patch body should mention next version 9.4.2")
+	}
+	if !strings.Contains(patchBeforeBuildPRBody(cfg.CurrentRelease), "Does **not** bump libbeat/version/version.go") {
+		t.Error("patch before-build body should clarify version.go is not bumped")
 	}
 }
 
