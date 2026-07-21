@@ -26,6 +26,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"github.com/google/go-github/v68/github"
 )
 
 func TestRunMajorMinorReleaseDryRunBranches(t *testing.T) {
@@ -456,6 +458,30 @@ func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
 	}
 	if !strings.Contains(patchBeforeBuildPRBody(cfg.CurrentRelease), "Does **not** bump libbeat/version/version.go") {
 		t.Error("patch before-build body should clarify version.go is not bumped")
+	}
+}
+
+func TestFormatWorkflowPRLine(t *testing.T) {
+	withPR := workflowPRResult{
+		item: workflowPR{branch: "patch-release-9.3.1", base: "9.3"},
+		pr: &github.PullRequest{
+			HTMLURL: github.Ptr("https://github.com/elastic/beats/pull/42"),
+			State:   github.Ptr("open"),
+		},
+	}
+	got := formatWorkflowPRLine(1, withPR)
+	want := "PR 1: https://github.com/elastic/beats/pull/42 (open)"
+	if got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+
+	skipped := workflowPRResult{
+		item: workflowPR{branch: "patch-release-9.3.1", base: "9.3"},
+	}
+	got = formatWorkflowPRLine(1, skipped)
+	want = "PR 1: skipped (no related open/merged PR for patch-release-9.3.1 → 9.3)"
+	if got != want {
+		t.Fatalf("got %q, want %q", got, want)
 	}
 }
 

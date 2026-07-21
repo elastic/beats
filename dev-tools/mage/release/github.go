@@ -108,27 +108,130 @@ func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
 
 // FindOpenPR returns an open pull request for the given head and base branches, if one exists.
 func (gh *GitHubClient) FindOpenPR(owner, repo, head, base string) (*github.PullRequest, bool, error) {
+	prs, err := gh.listPRsByHeadBase(owner, repo, head, base, "open")
+	if err != nil {
+		return nil, false, err
+	}
+	if len(prs) == 0 {
+		return nil, false, nil
+	}
+	return prs[0], true, nil
+}
+
+// FindRelatedPR returns the best matching PR for head→base (open preferred, then
+// merged, then closed). When none match by head/base, it falls back to an exact
+// title match against the same base branch so already-merged release PRs still resolve.
+func (gh *GitHubClient) FindRelatedPR(owner, repo, head, base, title string) (*github.PullRequest, bool, error) {
+	prs, err := gh.listPRsByHeadBase(owner, repo, head, base, "all")
+	if err != nil {
+		return nil, false, err
+	}
+	if pr := pickRelatedPR(prs); pr != nil {
+		return pr, true, nil
+	}
+	if title == "" {
+		return nil, false, nil
+	}
+	return gh.findPRByExactTitle(owner, repo, base, title)
+}
+
+func (gh *GitHubClient) listPRsByHeadBase(owner, repo, head, base, state string) ([]*github.PullRequest, error) {
 	headQuery := head
 	if !strings.Contains(head, ":") {
 		headQuery = fmt.Sprintf("%s:%s", owner, head)
 	}
 
 	prs, _, err := gh.client.PullRequests.List(gh.ctx, owner, repo, &github.PullRequestListOptions{
-		State: "open",
+		State: state,
 		Head:  headQuery,
 		Base:  base,
 		ListOptions: github.ListOptions{
-			PerPage: 1,
+			PerPage: 30,
 		},
 	})
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to list pull requests: %w", err)
+		return nil, fmt.Errorf("failed to list pull requests: %w", err)
 	}
-	if len(prs) == 0 {
-		return nil, false, nil
+	return prs, nil
+}
+
+func (gh *GitHubClient) findPRByExactTitle(owner, repo, base, title string) (*github.PullRequest, bool, error) {
+	query := fmt.Sprintf(`repo:%s/%s is:pr base:%s "%s" in:title`, owner, repo, base, title)
+	result, _, err := gh.client.Search.Issues(gh.ctx, query, &github.SearchOptions{
+		Sort:  "updated",
+		Order: "desc",
+		ListOptions: github.ListOptions{
+			PerPage: 10,
+		},
+	})
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to search pull requests by title: %w", err)
 	}
 
-	return prs[0], true, nil
+	var matches []*github.PullRequest
+	for _, issue := range result.Issues {
+		if !issue.IsPullRequest() {
+			continue
+		}
+		if issue.GetTitle() != title {
+			continue
+		}
+		pr, _, err := gh.client.PullRequests.Get(gh.ctx, owner, repo, issue.GetNumber())
+		if err != nil {
+			return nil, false, fmt.Errorf("failed to get pull request #%d: %w", issue.GetNumber(), err)
+		}
+		matches = append(matches, pr)
+	}
+	if pr := pickRelatedPR(matches); pr != nil {
+		return pr, true, nil
+	}
+	return nil, false, nil
+}
+
+// pickRelatedPR prefers open PRs, then merged, then other closed PRs.
+func pickRelatedPR(prs []*github.PullRequest) *github.PullRequest {
+	var open, merged, closed *github.PullRequest
+	for _, pr := range prs {
+		if pr == nil {
+			continue
+		}
+		switch {
+		case pr.GetState() == "open":
+			if open == nil {
+				open = pr
+			}
+		case pr.GetMerged() || pr.MergedAt != nil:
+			if merged == nil {
+				merged = pr
+			}
+		default:
+			if closed == nil {
+				closed = pr
+			}
+		}
+	}
+	if open != nil {
+		return open
+	}
+	if merged != nil {
+		return merged
+	}
+	return closed
+}
+
+// prDisplayState returns a short state label for workflow summaries.
+func prDisplayState(pr *github.PullRequest) string {
+	if pr == nil {
+		return "unknown"
+	}
+	if pr.GetMerged() || pr.MergedAt != nil {
+		return "merged"
+	}
+	state := pr.GetState()
+	if state == "" {
+		return "unknown"
+	}
+	return state
 }
 
 // mergeLabelDefs are auto-created when missing so merge-timing labels can be applied.

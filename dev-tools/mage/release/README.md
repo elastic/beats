@@ -403,10 +403,14 @@ Some workflows create multiple PRs to separate concerns.
 ### Reviewing Multi-PR Workflows
 
 ```bash
-# After running the workflow, you'll see:
+# After running the workflow, you'll see every expected PR slot:
 === Patch Release Workflow Complete ===
-PR 1: https://github.com/elastic/beats/pull/12345
-PR 2: https://github.com/elastic/beats/pull/12346
+PR 1: https://github.com/elastic/beats/pull/12345 (open)
+PR 2: https://github.com/elastic/beats/pull/12346 (open)
+
+# Re-runs still list both slots. Already-merged work shows as merged:
+# PR 1: https://github.com/elastic/beats/pull/12345 (merged)
+# PR 2: https://github.com/elastic/beats/pull/12346 (open)
 
 # Review each PR
 gh pr view 12345

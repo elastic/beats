@@ -180,28 +180,17 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	}
 
 	gh := NewGitHubClient(cfg.GitHubToken)
-	var prs []*github.PullRequest
-	for i, item := range branchesToFinalize {
-		pr, err := finalizePR(repo, gh, item.branch, item.base, item.opts)
-		if err != nil {
-			return fmt.Errorf("failed to finalize PR %d/%d: %w", i+1, len(branchesToFinalize), err)
-		}
-		if pr != nil {
-			prs = append(prs, pr)
-		}
+	results, err := finalizeWorkflowPRs(repo, gh, branchesToFinalize)
+	if err != nil {
+		return err
 	}
 
 	fmt.Printf("\n=== Major/Minor Release Workflow Complete ===\n")
 	fmt.Printf("Release branch created: %s\n", releaseBranch)
-	for i, pr := range prs {
-		fmt.Printf("PR %d: %s\n", i+1, pr.GetHTMLURL())
-	}
-	if len(prs) == 0 {
-		fmt.Println("No PRs created (release already up to date)")
-	}
+	printWorkflowPRResults(results)
 	fmt.Println("\nNote: Release notes PR should be created separately via .github/workflows/release-notes.yml")
 
-	warnEnsureReleaseIssueTracker(cfg, prs)
+	warnEnsureReleaseIssueTracker(cfg, prsFromWorkflowResults(results))
 	return nil
 }
 
@@ -483,27 +472,16 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	}
 
 	gh := NewGitHubClient(cfg.GitHubToken)
-	var prs []*github.PullRequest
-	for i, item := range branchesToFinalize {
-		pr, err := finalizePR(repo, gh, item.branch, item.base, item.opts)
-		if err != nil {
-			return fmt.Errorf("failed to finalize PR %d/%d: %w", i+1, len(branchesToFinalize), err)
-		}
-		if pr != nil {
-			prs = append(prs, pr)
-		}
+	results, err := finalizeWorkflowPRs(repo, gh, branchesToFinalize)
+	if err != nil {
+		return err
 	}
 
 	fmt.Printf("\n=== Patch Release Workflow Complete ===\n")
-	for i, pr := range prs {
-		fmt.Printf("PR %d: %s\n", i+1, pr.GetHTMLURL())
-	}
-	if len(prs) == 0 {
-		fmt.Println("No PRs created (release already up to date)")
-	}
+	printWorkflowPRResults(results)
 	fmt.Println("\nNote: Release notes PR should be created separately via .github/workflows/release-notes.yml")
 
-	warnEnsureReleaseIssueTracker(cfg, prs)
+	warnEnsureReleaseIssueTracker(cfg, prsFromWorkflowResults(results))
 	return nil
 }
 
@@ -573,6 +551,11 @@ type workflowPR struct {
 	opts   PROptions
 }
 
+type workflowPRResult struct {
+	item workflowPR
+	pr   *github.PullRequest
+}
+
 func patchBeforeBuildPRBody(currentRelease string) string {
 	return fmt.Sprintf(`## [Release %s]
 
@@ -586,7 +569,47 @@ Updates docs versions to %s (former prepare-patch-release docs PR).
 `, currentRelease, currentRelease, currentRelease, mergeLabelBeforeBuild)
 }
 
+func finalizeWorkflowPRs(repo *GitRepo, gh *GitHubClient, items []workflowPR) ([]workflowPRResult, error) {
+	results := make([]workflowPRResult, 0, len(items))
+	for i, item := range items {
+		pr, err := finalizePR(repo, gh, item.branch, item.base, item.opts)
+		if err != nil {
+			return results, fmt.Errorf("failed to finalize PR %d/%d: %w", i+1, len(items), err)
+		}
+		results = append(results, workflowPRResult{item: item, pr: pr})
+	}
+	return results, nil
+}
+
+func printWorkflowPRResults(results []workflowPRResult) {
+	for i, result := range results {
+		fmt.Println(formatWorkflowPRLine(i+1, result))
+	}
+}
+
+func prsFromWorkflowResults(results []workflowPRResult) []*github.PullRequest {
+	var prs []*github.PullRequest
+	for _, result := range results {
+		if result.pr != nil {
+			prs = append(prs, result.pr)
+		}
+	}
+	return prs
+}
+
+func formatWorkflowPRLine(index int, result workflowPRResult) string {
+	if result.pr != nil {
+		return fmt.Sprintf("PR %d: %s (%s)", index, result.pr.GetHTMLURL(), prDisplayState(result.pr))
+	}
+	return fmt.Sprintf(
+		"PR %d: skipped (no related open/merged PR for %s → %s)",
+		index, result.item.branch, result.item.base,
+	)
+}
+
 // finalizePR pushes a branch when it has new commits and creates or reuses an open PR.
+// When the branch has nothing new to push, it still resolves a related open or merged PR
+// so workflow summaries always list every expected slot.
 func finalizePR(repo *GitRepo, gh *GitHubClient, branchName, baseBranch string, opts PROptions) (*github.PullRequest, error) {
 	if err := repo.CheckoutBranch(branchName); err != nil {
 		return nil, err
@@ -607,6 +630,14 @@ func finalizePR(repo *GitRepo, gh *GitHubClient, branchName, baseBranch string, 
 	}
 	if !ahead {
 		fmt.Printf("No new commits on %s compared to %s; skipping push and PR creation\n", branchName, baseBranch)
+		related, found, err := gh.FindRelatedPR(opts.Owner, opts.Repo, opts.Head, opts.Base, opts.Title)
+		if err != nil {
+			return nil, err
+		}
+		if found {
+			fmt.Printf("Related PR #%d (%s): %s\n", related.GetNumber(), prDisplayState(related), related.GetHTMLURL())
+			return related, nil
+		}
 		return nil, nil
 	}
 
