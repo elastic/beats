@@ -412,7 +412,7 @@ func TestLogFile_readUntilEOFAfterReaderCtxCancel(t *testing.T) {
 	buf := make([]byte, 16)
 	n, err := reader.Read(buf)
 	require.NoError(t, err, "first Read must succeed")
-	require.Positive(t, n, 0, "first Read must return data")
+	require.Positive(t, n, "first Read must return data")
 
 	// 2. Simulate something else cancelling the reader. closeIfTimeout
 	//    (close.reader.after_interval) and periodicStateCheck

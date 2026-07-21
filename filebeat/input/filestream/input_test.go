@@ -192,7 +192,7 @@ func generateContainerFile(t testing.TB, dir string, lineCount int) string {
 	file, err := os.CreateTemp(dir, "*")
 	require.NoError(t, err)
 	filename := file.Name()
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		fmt.Fprintf(file,
 			`{"log":"rather mediocre container log line %d\n","stream":"stdout","time":"2024-01-01T00:00:00.000000000Z"}`+"\n",
 			i)
@@ -209,7 +209,7 @@ func generateMultilineFile(t testing.TB, dir string, eventCount, linesPerEvent i
 	file, err := os.CreateTemp(dir, "*")
 	require.NoError(t, err)
 	filename := file.Name()
-	for i := 0; i < eventCount; i++ {
+	for i := range eventCount {
 		fmt.Fprintf(file, "ERROR event %d failed in %s\n", i, filename)
 		for j := 1; j < linesPerEvent; j++ {
 			fmt.Fprintf(file, "\tat com.example.Service.call(Service.java:%d) line %d\n", j, i)

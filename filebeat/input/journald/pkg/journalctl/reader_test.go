@@ -62,7 +62,7 @@ func TestEventWithNonStringData(t *testing.T) {
 				SetReadDeadlineFunc: func(time.Time) bool { return true },
 			}
 			r := Reader{
-				logger: logp.L(),
+				logger: logptest.NewTestingLogger(t, ""),
 				jctl:   &mock,
 			}
 
