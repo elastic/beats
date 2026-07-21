@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix type loss in HTTP JSON template transform handling.
-component: filebeat
