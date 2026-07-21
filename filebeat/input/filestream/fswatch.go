@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -936,25 +937,27 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 
 	scanMetrics.FilesUnique = int64(len(fdByName))
 
+	// prefixes is returned to the watcher, so it is built unconditionally.
 	var prefixes []string
 	if len(unobservable) > 0 {
-		prefixes = make([]string, 0, len(unobservable))
-		for p := range unobservable {
-			prefixes = append(prefixes, p)
-		}
-		slices.Sort(prefixes)
-
-		sample := prefixes
-		maxSamples := 5
-		if len(sample) > maxSamples {
-			sample = sample[:maxSamples]
-		}
-		s.log.Debugf("scan could not observe %d path(s) (permissions or file-descriptor exhaustion); first %d: %v",
-			len(prefixes), len(sample), sample)
+		prefixes = slices.Sorted(maps.Keys(unobservable))
+		s.debugLogUnobservable(prefixes)
 	}
 
 	s.lastCount = len(fdByName)
 	return fdByName, scanMetrics, prefixes
+}
+
+// debugLogUnobservable logs a sample of the path prefixes a scan could not
+// observe (permissions or file-descriptor exhaustion). prefixes must be sorted.
+func (s *fileScanner) debugLogUnobservable(prefixes []string) {
+	if !s.log.IsDebug() {
+		return
+	}
+	const maxSamples = 5
+	sample := prefixes[:min(len(prefixes), maxSamples)]
+	s.log.Debugf("scan could not observe %d path(s) (permissions or file-descriptor exhaustion); first %d: %v",
+		len(prefixes), len(sample), sample)
 }
 
 // walkGroup is a set of (absolute, ** expanded) glob patterns that share the same
