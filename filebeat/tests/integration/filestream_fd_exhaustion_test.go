@@ -65,7 +65,7 @@ exec %[2]q "$@"
 
 	// One unique line per file, written before we lower the fd limit.
 	wantLines := make(map[string]int, numFiles)
-	for i := 0; i < numFiles; i++ {
+	for i := range numFiles {
 		line := fmt.Sprintf("fd-exhaustion-line-%03d", i)
 		wantLines[line] = 0
 		require.NoError(t,
@@ -108,13 +108,19 @@ logging.level: debug
 		require.GreaterOrEqual(collect, len(seen), numFiles, "not all files were ingested")
 	}, 90*time.Second, time.Second, "not all files were ingested")
 
-	// Let several close_inactive/check_interval cycles elapse. Without the fix the
-	// files would be re-discovered and re-ingested during these cycles.
-	time.Sleep(8 * time.Second)
-	filebeat.Stop()
-
-	assert.NotEmpty(t, filebeat.GetLogLine("scan could not observe"),
+	// Exhaustion must actually happen, otherwise the test does not reproduce the
+	// issue. The watcher logs this (throttled) warning the first time it postpones
+	// deletes because the scan could not observe some paths.
+	filebeat.WaitLogsContains("postponing their delete detection", 30*time.Second,
 		"test must exercise scanner fd-exhaustion, otherwise it does not reproduce the issue")
+
+	// Then wait for two fully-observed scans after the exhaustion above — the window
+	// in which the buggy version wiped registry state and re-ingested from offset 0.
+	filebeat.WaitLogsContains(`"postponed":0`, 30*time.Second,
+		fmt.Sprintf("no fully-observed scan #%d after fd exhaustion", i+1))
+	filebeat.WaitLogsContains(`"postponed":0`, 30*time.Second,
+		fmt.Sprintf("no fully-observed scan #%d after fd exhaustion", i+1))
+	filebeat.Stop()
 
 	counts := make(map[string]int, numFiles)
 	for _, e := range integration.GetEventsFromFileOutput[msgEvent](filebeat, 0, false) {

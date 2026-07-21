@@ -771,7 +771,7 @@ func pathsCanOverlap(paths []string) bool {
 	for i, p := range paths {
 		comps[i] = strings.Split(p, sep)
 	}
-	for i := 0; i < len(comps); i++ {
+	for i := range len(comps) {
 		for j := i + 1; j < len(comps); j++ {
 			// Different segment counts can never match the same path: a wildcard
 			// does not cross the separator and there is no "**" left after
