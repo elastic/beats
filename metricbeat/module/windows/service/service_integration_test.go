@@ -40,7 +40,7 @@ type Win32Service struct {
 }
 
 func TestData(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "windows",
 		"metricsets": []string{"service"},
 	}
