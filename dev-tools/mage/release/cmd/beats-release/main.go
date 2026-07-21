@@ -86,6 +86,15 @@ func run(args []string) error {
 			return err
 		}
 		return release.RunPatchRelease(cfg)
+	case "ensure-issue-tracker":
+		if len(rest) != 0 {
+			return fmt.Errorf("usage: beats-release ensure-issue-tracker")
+		}
+		cfg, err := release.LoadConfigFromEnv()
+		if err != nil {
+			return err
+		}
+		return release.EnsureReleaseIssueTracker(cfg, nil)
 	case "help", "-h", "--help":
 		fmt.Print(usage())
 		return nil
@@ -103,8 +112,9 @@ Commands:
   update-mergify <version>
   run-major-minor
   run-patch
+  ensure-issue-tracker
 
-Environment for run-major-minor / run-patch: see RELEASE.md and
+Environment for run-major-minor / run-patch / ensure-issue-tracker: see RELEASE.md and
 dev-tools/mage/release/README.md (CURRENT_RELEASE, DRY_RUN, GITHUB_TOKEN, …).
 `) + "\n"
 }

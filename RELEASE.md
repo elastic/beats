@@ -11,6 +11,7 @@ For commands, environment variables, file lists, and troubleshooting, see
 |-----------|---------------|---------|
 | Feature freeze / major or minor release | `X.Y.0` (e.g. `9.5.0`) | `mage release:runMajorMinor` |
 | Patch release on an existing branch | `X.Y.Z` with `Z > 0` (e.g. `9.2.1`) | `mage release:runPatch` |
+| Refresh the Beats release checklist issue only | any `CURRENT_RELEASE` | `mage release:ensureIssueTracker` |
 
 Minor feature-freeze releases for 6.x, 7.x, and 8.x are blocked. Patch releases
 are allowed for all supported versions.
@@ -96,13 +97,20 @@ is obvious; PR-B also names the next patch version in the title.
 **RM merge order:** merge PR-A before the final release build → merge PR-B after
 release day. Release notes stay on the separate GitHub Actions workflow.
 
+Both `runMajorMinor` and `runPatch` finish by ensuring a Beats issue titled
+`[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists (create or update).
+The issue links https://github.com/elastic/ingest-dev/issues/8866 and lists
+related Beats PRs with label `release` for that version. Re-run anytime with
+`mage release:ensureIssueTracker`.
+
 ## Release manager checklist
 
 1. Set `CURRENT_RELEASE` (and `BASE_BRANCH` for patches).
 2. Run with `DRY_RUN=true` and review branches / `git diff`.
-3. Re-run with `DRY_RUN=false` to push and open PRs.
+3. Re-run with `DRY_RUN=false` to push and open PRs (also creates/updates the release issue tracker).
 4. Merge PRs in label order (`merge:1-…` before `merge:2-…`, and so on).
 5. Generate release notes via the separate GitHub Actions workflow when needed.
+6. Optionally re-run `mage release:ensureIssueTracker` if more `release`-labeled PRs appear later.
 
 ## More detail
 

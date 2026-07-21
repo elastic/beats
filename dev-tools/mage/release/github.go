@@ -207,6 +207,114 @@ func (gh *GitHubClient) AddLabels(owner, repo string, number int, labels []strin
 	return nil
 }
 
+// FindIssueByTitle finds an issue with an exact title match (open preferred over closed).
+func (gh *GitHubClient) FindIssueByTitle(owner, repo, title string) (*github.Issue, bool, error) {
+	query := fmt.Sprintf(`repo:%s/%s is:issue in:title "%s"`, owner, repo, title)
+	result, _, err := gh.client.Search.Issues(gh.ctx, query, &github.SearchOptions{
+		Sort:  "updated",
+		Order: "desc",
+		ListOptions: github.ListOptions{
+			PerPage: 20,
+		},
+	})
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to search issues for title %q: %w", title, err)
+	}
+
+	var closedMatch *github.Issue
+	for _, issue := range result.Issues {
+		if issue.IsPullRequest() {
+			continue
+		}
+		if issue.GetTitle() != title {
+			continue
+		}
+		if issue.GetState() == "open" {
+			return issue, true, nil
+		}
+		if closedMatch == nil {
+			closedMatch = issue
+		}
+	}
+	if closedMatch != nil {
+		return closedMatch, true, nil
+	}
+	return nil, false, nil
+}
+
+// CreateIssue creates a repository issue with the given labels.
+func (gh *GitHubClient) CreateIssue(owner, repo, title, body string, labels []string) (*github.Issue, error) {
+	req := &github.IssueRequest{
+		Title: github.Ptr(title),
+		Body:  github.Ptr(body),
+	}
+	if len(labels) > 0 {
+		req.Labels = &labels
+	}
+	issue, _, err := gh.client.Issues.Create(gh.ctx, owner, repo, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create issue %q: %w", title, err)
+	}
+	return issue, nil
+}
+
+// UpdateIssueBody replaces the body of an existing issue.
+func (gh *GitHubClient) UpdateIssueBody(owner, repo string, number int, body string) error {
+	_, _, err := gh.client.Issues.Edit(gh.ctx, owner, repo, number, &github.IssueRequest{
+		Body: github.Ptr(body),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to update issue #%d body: %w", number, err)
+	}
+	return nil
+}
+
+// ListReleaseLabeledPRsForVersion returns Beats PRs with label "release" whose title
+// mentions the exact version. Open and recently updated closed/merged PRs are included.
+func (gh *GitHubClient) ListReleaseLabeledPRsForVersion(owner, repo, version string) ([]*github.PullRequest, error) {
+	query := fmt.Sprintf(`repo:%s/%s is:pr label:release "%s"`, owner, repo, version)
+	opts := &github.SearchOptions{
+		Sort:  "updated",
+		Order: "desc",
+		ListOptions: github.ListOptions{
+			PerPage: 100,
+		},
+	}
+
+	var prs []*github.PullRequest
+	seen := map[int]struct{}{}
+	for {
+		result, resp, err := gh.client.Search.Issues(gh.ctx, query, opts)
+		if err != nil {
+			return nil, fmt.Errorf("failed to search release PRs for %s: %w", version, err)
+		}
+		for _, issue := range result.Issues {
+			if !issue.IsPullRequest() {
+				continue
+			}
+			if !versionMentioned(issue.GetTitle(), version) {
+				continue
+			}
+			num := issue.GetNumber()
+			if _, ok := seen[num]; ok {
+				continue
+			}
+			seen[num] = struct{}{}
+			prs = append(prs, &github.PullRequest{
+				Number:  github.Ptr(num),
+				HTMLURL: github.Ptr(issue.GetHTMLURL()),
+				Title:   github.Ptr(issue.GetTitle()),
+				State:   github.Ptr(issue.GetState()),
+			})
+		}
+		if resp == nil || resp.NextPage == 0 {
+			break
+		}
+		opts.Page = resp.NextPage
+	}
+	return prs, nil
+}
+
 // releasesLookupOwner and releasesLookupRepo are the canonical repo for published Beats releases.
 // Forks typically lack release history, so workflows always resolve LatestRelease from here.
 const (

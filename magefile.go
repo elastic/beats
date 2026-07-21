@@ -327,7 +327,13 @@ func (Release) RunMajorMinor() error {
 }
 
 // RunPatch executes the patch release workflow: 2 PRs on the release branch
-// (version+docs+test-env before build; next-patch prep after release).
+// (docs before build; next-patch version + test-env after release).
 func (Release) RunPatch() error {
 	return runReleaseTool("run-patch")
+}
+
+// EnsureIssueTracker creates or updates the Beats release checklist issue for
+// CURRENT_RELEASE, linking related Beats PRs labeled "release".
+func (Release) EnsureIssueTracker() error {
+	return runReleaseTool("ensure-issue-tracker")
 }

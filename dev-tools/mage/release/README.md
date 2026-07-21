@@ -79,12 +79,13 @@ mage -l | grep release
 
 You should see:
 ```
-release:runMajorMinor    Feature-freeze workflow (release branch + 4 grouped PRs)
-release:runPatch         Executes the complete patch release workflow
-release:updateDocs       Updates version references in documentation and K8s manifests
-release:updateMergify    Updates .mergify.yml backport configuration
-release:updateTestEnv    Updates docker-compose.yml files with new versions
-release:updateVersion    Updates the version in libbeat/version/version.go
+release:ensureIssueTracker  Creates/updates the Beats release checklist issue for CURRENT_RELEASE
+release:runMajorMinor       Feature-freeze workflow (release branch + 4 grouped PRs)
+release:runPatch            Executes the complete patch release workflow
+release:updateDocs          Updates version references in documentation and K8s manifests
+release:updateMergify       Updates .mergify.yml backport configuration
+release:updateTestEnv       Updates docker-compose.yml files with new versions
+release:updateVersion       Updates the version in libbeat/version/version.go
 ```
 
 ## Configuration
@@ -152,6 +153,7 @@ with grouped PRs.
 Titles use `[Release <CURRENT_RELEASE>] …` (e.g. `[Release 9.4.0] Update version to 9.4.1 and test environments`).
 
 5. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
+6. Ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs (linked to https://github.com/elastic/ingest-dev/issues/8866).
 
 **RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main` → merge PR-D on release branch (after release day).
 
@@ -209,6 +211,7 @@ version+test-env [#50568](https://github.com/elastic/beats/pull/50568)+[#50569](
 
 3. Opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
    Titles use `[Release <CURRENT_RELEASE>] …` and bodies state when to merge.
+4. Ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs.
 
 **RM merge order:** merge PR-A before the final release build → merge PR-B after release day.
 
@@ -239,6 +242,23 @@ mage release:runPatch
 ## Individual Commands
 
 For manual updates or testing individual steps.
+
+### EnsureIssueTracker
+
+Creates or updates the Beats release checklist issue for `CURRENT_RELEASE`:
+
+- Title: `[RELEASE <version>] Instructions & Checklist`
+- Links the global ingest tracker: https://github.com/elastic/ingest-dev/issues/8866
+- Lists Beats PRs with label `release` whose title mentions that version
+- Idempotent: missing PR links are appended; existing checklist checkboxes are preserved
+
+```bash
+export CURRENT_RELEASE="9.4.1"
+export GITHUB_TOKEN="ghp_your_token"
+mage release:ensureIssueTracker
+```
+
+Also runs automatically at the end of `runMajorMinor` and `runPatch`.
 
 ### UpdateVersion
 
