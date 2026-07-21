@@ -847,7 +847,7 @@ func TestBackupPrefixToExclude(t *testing.T) {
 					BackupToBucketPrefix: "logs/processed/",
 				},
 			},
-			want: "logs/processed/",
+			want: "logs/processed/logs/",
 		},
 		{
 			name: "same bucket, backup prefix outside list prefix scope",

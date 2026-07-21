@@ -190,9 +190,11 @@ func (c *backupConfig) GetBucketName() string {
 	return c.NonAWSBackupToBucketName
 }
 
-// backupPrefixToExclude returns the backup prefix that should be excluded from
-// listing results when the backup destination is the same bucket and the backup
-// prefix falls within the listing scope. Returns "" when no exclusion is needed.
+// backupPrefixToExclude returns the key prefix that should be excluded from
+// listing results to avoid reprocessing Filebeat-created backup objects. The
+// backup key is constructed as backupPrefix + originalKey, and all source keys
+// start with listPrefix, so the common prefix of all backups is
+// backupPrefix + listPrefix. Returns "" when no exclusion is needed.
 func (c *config) backupPrefixToExclude() string {
 	if c.BackupConfig.BackupToBucketPrefix == "" {
 		return ""
@@ -203,10 +205,11 @@ func (c *config) backupPrefixToExclude() string {
 	if !sameBucket {
 		return ""
 	}
-	if !strings.HasPrefix(c.BackupConfig.BackupToBucketPrefix, c.BucketListPrefix) {
+	generatedBackupPrefix := c.BackupConfig.BackupToBucketPrefix + c.BucketListPrefix
+	if !strings.HasPrefix(generatedBackupPrefix, c.BucketListPrefix) {
 		return ""
 	}
-	return c.BackupConfig.BackupToBucketPrefix
+	return generatedBackupPrefix
 }
 
 // fileSelectorConfig defines reader configuration that applies to a subset
