@@ -333,7 +333,7 @@ func TestConsumeLogsPdataFastPath(t *testing.T) {
 	lr.Body().SetEmptyMap()
 	lr.Body().Map().PutStr("message", "hello")
 
-	_, err := bp.ConsumeLogs(context.Background(), logs)
+	_, err := bp.ConsumeLogs(t.Context(), logs)
 	require.NoError(t, err)
 
 	assert.False(t, runCalled, "Run must not be called when pdataProcs fast path is active")
@@ -376,7 +376,7 @@ func TestConsumeLogsAllOrNothingFallback(t *testing.T) {
 	lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
 	lr.Body().SetEmptyMap()
 
-	_, err := bp.ConsumeLogs(context.Background(), logs)
+	_, err := bp.ConsumeLogs(t.Context(), logs)
 	require.NoError(t, err)
 
 	assert.False(t, runPdataCalled, "RunPdata must not be called when chain falls back to legacy path")
@@ -439,7 +439,7 @@ func TestConsumeLogsErrorFromProcessorKeepsRecord(t *testing.T) {
 	lr.Body().SetEmptyMap()
 	lr.Body().Map().PutStr("message", "hello")
 
-	processedLogs, err := bp.ConsumeLogs(context.Background(), logs)
+	processedLogs, err := bp.ConsumeLogs(t.Context(), logs)
 	require.NoError(t, err, "ConsumeLogs itself must not fail on a per-record processing error")
 	assert.Equal(t, 1, countLogRecords(processedLogs), "a processing error must not drop the log record")
 }
@@ -466,7 +466,7 @@ func TestConsumeLogsMetadataRoundTripThroughLegacyProcessor(t *testing.T) {
 	lr.Body().SetEmptyMap()
 	lr.Body().Map().PutEmptyMap("@metadata").PutStr("pipeline", "original")
 
-	_, err := bp.ConsumeLogs(context.Background(), logs)
+	_, err := bp.ConsumeLogs(t.Context(), logs)
 	require.NoError(t, err)
 
 	metadataVal, found := lr.Body().Map().Get("@metadata")
