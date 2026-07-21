@@ -44,7 +44,7 @@ type Config struct {
 	ShutdownTimeout    time.Duration      `config:"shutdown_timeout"`
 	OverwritePipelines bool               `config:"overwrite_pipelines"` // Only used by standalone Packetbeat.
 
-	// publish timeout. For internal use only
+	// For internal use only
 	PublishTimeout time.Duration `config:"publish_timeout"`
 }
 
