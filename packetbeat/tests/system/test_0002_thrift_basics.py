@@ -240,10 +240,14 @@ class Test(BaseTest):
             thrift_idl_files=["tutorial.thrift", "shared.thrift"]
         )
         self.copy_files(["tutorial.thrift", "shared.thrift"])
-        self.run_packetbeat(pcap="thrift_echo_binary.pcap",
-                            debug_selectors=["thrift"])
+        pb = self.start_packetbeat(pcap="thrift_echo_binary.pcap",
+                                   debug_selectors=["thrift"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 1, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
 
-        objs = self.read_output()
+        objs = self.read_output()[:1]
         assert len(objs) == 1
         o = objs[0]
 

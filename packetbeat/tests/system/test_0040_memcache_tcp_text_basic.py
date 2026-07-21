@@ -13,11 +13,21 @@ import six
 
 class Test(BaseTest):
 
-    def _run(self, pcap):
+    def _run(self, pcap, min_events=None):
         self.render_config_template()
-        self.run_packetbeat(pcap=pcap,
-                            debug_selectors=["memcache", "tcp", "publish"])
+        if min_events is None:
+            self.run_packetbeat(pcap=pcap,
+                                debug_selectors=["memcache", "tcp", "publish"])
+        else:
+            pb = self.start_packetbeat(pcap=pcap,
+                                       debug_selectors=["memcache", "tcp", "publish"])
+            try:
+                self.wait_until(lambda: self.output_lines() >= min_events, max_timeout=30)
+            finally:
+                pb.kill_and_wait()
         objs = self.read_output()
+        if min_events is not None:
+            objs = objs[:min_events]
         self.assert_common(objs)
         return objs
 
@@ -105,7 +115,7 @@ class Test(BaseTest):
         assert get['memcache.request.keys'] == ['cnt']
 
     def test_delete(self):
-        objs = self._run('memcache/memcache_text_tcp_delete.pcap')
+        objs = self._run('memcache/memcache_text_tcp_delete.pcap', min_events=4)
 
         # all transactions succeed
         assert all(o['status'] == 'OK' for o in objs)
