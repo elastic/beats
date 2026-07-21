@@ -14,7 +14,7 @@ entries:
         name: 1777530175-orestisfl-reduce-harvester-logger-clones.yaml
         checksum: 1c039070dd9aa735b5bf6c1aec223b4c7db3fd2d
     - kind: bug-fix
-      summary: Filestream now defers shutdown until it reaches EOF or a configurable timeout. The new read_until_eof option (enabled by default) lets users opt out.
+      summary: Filestream now defers shutdown until it reaches EOF or a configurable timeout. The new `read_until_eof` option (enabled by default) lets you opt out.
       description: ""
       component: filebeat
       pr:
@@ -28,7 +28,7 @@ entries:
         name: 1778068402-filestream-read-until-eof.yaml
         checksum: 24985b630752c7b99d9939b33ca5003f7117534d
     - kind: enhancement
-      summary: Add an input_type resource attribute to CEL input OTel metrics for consistent filtering across custom and HTTP client metrics.
+      summary: Add an `input_type` resource attribute to CEL input OTel metrics for consistent filtering across custom and HTTP client metrics.
       description: ""
       component: filebeat
       pr:
@@ -41,7 +41,7 @@ entries:
         name: 1778632723-filebeat-otel-input-type-resource-attribute.yaml
         checksum: 0114fa6359b27702278d0488979520b2a08891d6
     - kind: bug-fix
-      summary: Fix race condition during metricset closure
+      summary: Fix a race condition during metricset closure
       description: ""
       component: metricbeat
       pr:
@@ -55,8 +55,6 @@ entries:
         checksum: a0942ca68e719128c7513cfbbff1df940f80c683
     - kind: enhancement
       summary: Add consumer-group and network timeout options to the Filebeat Kafka input.
-      description: |
-        The Filebeat Kafka input now exposes the `session_timeout`, `heartbeat_interval`, `timeout` and `keep_alive` options, which are passed through to the underlying Sarama consumer (`Consumer.Group.Session.Timeout`, `Consumer.Group.Heartbeat.Interval` and the `Net` dial/read/write timeouts). Previously these were pinned to Sarama's defaults with no way to override them, which prevented tuning consumers that read across higher-latency (cross-region/WAN) links. Defaults are unchanged.
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51173
@@ -69,7 +67,7 @@ entries:
         name: 1781034715-filebeat-kafka-input-consumer-timeouts.yaml
         checksum: ff8fc1cdb6c1fec5f6a4248cd7974f8fb26580ef
     - kind: bug-fix
-      summary: Fix missing state_service and state_storageclass events when kube-state-metrics denylists *_created
+      summary: Fix missing `state_service` and `state_storageclass` events when `kube-state-metrics` denylists `*_created`.
       description: ""
       component: metricbeat
       pr:
@@ -109,7 +107,7 @@ entries:
         name: 1781782084-use-native-go-for-linux-fips-builds.yaml
         checksum: a0d19fe8ee561496dba68dd092d48ed3a7e7060a
     - kind: feature
-      summary: 'Add sign-in activity enrichment for Azure AD users via enrich_with: sign_in_activity'
+      summary: 'Add sign-in activity enrichment for Azure AD users via `enrich_with: sign_in_activity`'
       description: ""
       component: filebeat
       pr:
@@ -148,7 +146,7 @@ entries:
         name: 1782164854-crowdstrike-streaming-validate-resource-origins.yaml
         checksum: f93db205ade7d2d5e75d261e7845a22982d42792
     - kind: bug-fix
-      summary: Use constant-time comparison for http_endpoint basic auth and secret header validation.
+      summary: Use constant-time comparison for `http_endpoint` basic auth and secret header validation.
       description: ""
       component: filebeat
       pr:
@@ -174,7 +172,7 @@ entries:
         name: 1782167932-httpjson-pagination-origin-validation.yaml
         checksum: 301be1c5d0aa2ccfa089a56cf86398f6246da962
     - kind: bug-fix
-      summary: Fix a rare crash when osquery restarts after a configuration change
+      summary: Fix a rare crash when Osquery restarts after a configuration change
       description: ""
       component: osquerybeat
       pr:
@@ -187,15 +185,7 @@ entries:
         name: 1782246918-fix-osquerybeat-runner-cancel-data-race.yaml
         checksum: 7c5bc40f8e39c0ca169253003d1c0317e8a535b2
     - kind: bug-fix
-      summary: Fix data race in the elasticsearch_storage OTel extension.
-      description: |
-        The `elasticsearch_storage` OTel extension shared a single
-        `eslegclient.Connection` across every store returned from both the
-        `backend.Registry` (`Access`) and `entcollect.Registry` (`Store`)
-        factories, but that connection is not thread-safe.  The extension now
-        wraps every returned store — on both factory paths — in a locking
-        proxy that serializes the full `Marshal → execRequest → HTTP.Do` path
-        on a per-extension mutex, preventing the buffer races.
+      summary: Fix data race in the `elasticsearch_storage` OTel extension.
       component: elastic-agent
       pr:
         - https://github.com/elastic/beats/pull/51501
@@ -220,7 +210,7 @@ entries:
         name: 1782376956-fix-filebeat-duplicating-events-after-a-normal-shutdown-caused-by-a-race-in-the-registrar.yaml
         checksum: aafa4e2e9d03fbffd3a028c3f90593cf1bcee26a
     - kind: enhancement
-      summary: Upgrade github.com/elastic/go-lumber to v0.2.0.
+      summary: Upgrade `github.com/elastic/go-lumber` to v0.2.0.
       description: ""
       component: filebeat
       pr:
@@ -234,8 +224,6 @@ entries:
         checksum: ac33b77de6f462e73e3793efc15fedcf47789adb
     - kind: bug-fix
       summary: Avoid slice-bounds panic when sorting copytruncate rotated files by date
-      description: |
-        When the filestream copytruncate prospector sorts rotated files using a date format, `dateSorter.GetTs` sliced the file path by the format length without checking the path was long enough. A path shorter than the configured date format triggered a "slice bounds out of range" panic inside a prospector goroutine, crashing the process. GetTs now returns a zero time for paths shorter than the format, mirroring the existing parse-failure path.
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51570
@@ -248,8 +236,6 @@ entries:
         checksum: a6905d37f5a8f70326bf1e6da981f03105bd7a94
     - kind: bug-fix
       summary: Fix registry corruption issue with multiple metricbeat receivers.
-      description: |
-        Change paths definition from global paths to per beat instance paths.  Without this multiple metricbeat receivers could use the same data store.
       component: elastic-agent
       pr:
         - https://github.com/elastic/beats/pull/51591
@@ -289,8 +275,6 @@ entries:
         checksum: a34c97a99077aa54a8a97e421c7764e89fbb11c2
     - kind: bug-fix
       summary: Fix filestream data loss when a harvester closes before ingesting any data
-      description: |
-        When a filestream harvester was closed before ingesting anything (for example while still in its initial backoff), it reported an ingested offset of 0. The file watcher could not distinguish this genuine 0 from "no offset reported", so it fell back to the file size and never emitted a write event. As a result no new harvester was started and the file's contents were never ingested, causing silent data loss. The reported offset of 0 is now honored, so a new harvester is started and the file is ingested.
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51675
@@ -303,8 +287,6 @@ entries:
         checksum: 4e0162f0819026c2b9c0640987d2154bbc5d13a2
     - kind: enhancement
       summary: Add a configurable retry policy to the Azure Blob Storage input.
-      description: |
-        The `azure-blob-storage` input now exposes a `retry` configuration block (`max_retries`, `initial_retry_delay` and `max_retry_delay`) that tunes the Azure SDK retry policy. Because the policy lives in the client request pipeline, it now covers blob listing (pagination) in addition to downloads; previously a transient error such as an HTTP 503 `ServerBusy` during listing could exhaust the small, non-configurable default retries and stop the input. The settings apply per storage account. Defaults are unchanged when the block is omitted. Additionally, when polling is enabled, a transient blob-listing failure that outlives the retries (503, 429 or a network timeout) is now non-fatal: the input is marked degraded and retries on the next poll interval instead of exiting, so longer outages are ridden out. Permanent failures such as a missing container still stop the input.
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51701
@@ -330,7 +312,7 @@ entries:
         name: 1783070100-close-processors-on-construction-errors.yaml
         checksum: 6bef0c70d07fc8850ff53ef5906a99666aa8c4a1
     - kind: bug-fix
-      summary: fix data races in the add_docker_metadata cache initialization
+      summary: fix data races in the `add_docker_metadata` cache initialization
       description: ""
       component: all
       pr:
@@ -344,12 +326,6 @@ entries:
         checksum: c3324d9849e8d4bd83193bfef21eb283cb7c597c
     - kind: bug-fix
       summary: Fix CrowdStrike streaming input retry cap so max_attempts and infinite_retries are honoured.
-      description: |
-        Fix the CrowdStrike streaming input retry loop so a configured max_attempts
-        greater than 10 and infinite_retries are no longer silently capped at the
-        unconfigured default of 10. The empty-body case from the discover endpoint is
-        now reported as a distinct transient error, and the input no longer reports
-        DEGRADED on the first transient failure.
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51712
@@ -361,9 +337,7 @@ entries:
         name: 1783081692-fix-crowdstrike-streaming-retry-cap.yaml
         checksum: d356cf72c853d04c6e2632aef2e0c3fb62c161d7
     - kind: bug-fix
-      summary: Load the Npcap wpcap.dll lazily to avoid blocking Npcap upgrades on Windows
-      description: |
-        On Windows, importing gopacket/pcap loaded wpcap.dll in the package init, so every Beat that links Packetbeat's capture code held the DLL open even when it never captured traffic. This stopped Packetbeat from replacing wpcap.dll while upgrading Npcap and the install failed. The DLL is now loaded lazily, only when Packetbeat needs it.
+      summary: Load the Npcap `wpcap.dll` lazily to avoid blocking Npcap upgrades on Windows.
       component: packetbeat
       pr:
         - https://github.com/elastic/beats/pull/51716
@@ -376,9 +350,7 @@ entries:
         name: 1783113269-fix-packetbeat-lazy-load-wpcap-dll.yaml
         checksum: 6ca81c676c7d94c1af189ef195fb88b50c8f3c71
     - kind: bug-fix
-      summary: Fix winlog input crash and event loss during shutdown
-      description: |
-        The winlog input could crash with a native access violation (0xc0000005) during shutdown when the event log was closed while a Read was still rendering an event. The event log was closed asynchronously from a context-cancellation callback on a different goroutine than the read loop, so closing freed the native Windows Event Log handles (subscription, render contexts and publisher metadata) while in-flight EvtRender/EvtFormatMessage calls were still using them. The crash restarted the component and dropped in-flight events. The event log is now closed on the same goroutine as the read loop, after it has stopped, eliminating the race.
+      summary: Fix `winlog` input crash and event loss during shutdown
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51728
@@ -390,7 +362,7 @@ entries:
         name: 1783321186-fix-winlog-shutdown-render-crash.yaml
         checksum: c3dbb91d50c9b4dbd7fe82e6abeadf42349541f8
     - kind: bug-fix
-      summary: Fix a data race in the rate_limit processor when configured with fields and run concurrently.
+      summary: Fix a data race in the `rate_limit` processor when configured with fields and run concurrently.
       description: ""
       component: libbeat
       pr:
@@ -403,7 +375,7 @@ entries:
         name: 1783323647-ratelimit-fields-data-race.yaml
         checksum: 98a3f0c489de323bf85a55165c053cd3c225c8ef
     - kind: bug-fix
-      summary: Fix data races in the add_session_metadata kernel_tracing provider backoff accounting
+      summary: Fix data races in the backoff accounting of the `add_session_metadata` processor's `kernel_tracing` provider.
       description: ""
       component: auditbeat
       pr:
@@ -416,7 +388,7 @@ entries:
         name: 1783323813-fix-add-session-metadata-kerneltracing-backoff-race.yaml
         checksum: c2b3fd537e4f56de51b91267c9422f0843b77a62
     - kind: bug-fix
-      summary: Close Beat processors on beat OTel processor shutdown to avoid leaking resources on collector reloads.
+      summary: Close Beat processors on Beat OTel processor shutdown to avoid leaking resources on collector reloads.
       description: ""
       component: all
       pr:
@@ -429,7 +401,7 @@ entries:
         name: 1783323892-beatprocessor-close-on-shutdown.yaml
         checksum: 88a7b87ad1976db5024165215424eef3db9d7084
     - kind: bug-fix
-      summary: Fix a startup data race in the add_kubernetes_metadata processor
+      summary: Fix a startup data race in the `add_kubernetes_metadata` processor
       description: ""
       component: libbeat
       pr:
@@ -443,14 +415,6 @@ entries:
         checksum: c1d556f05d1e9cd090a1e713db71a81b45eddcee
     - kind: bug-fix
       summary: Make the CrowdStrike streaming input self-heal from transient discover failures.
-      description: |
-        Transient connection-level failures from the CrowdStrike discover endpoint
-        (an empty 200 body, network errors and timeouts) are now retried indefinitely
-        with capped back-off instead of counting toward max_attempts and terminating
-        the input, so the input self-heals once the upstream recovers rather than
-        needing an agent restart. Termination is reserved for genuine hard errors
-        (origin mismatch, publish failure); other soft errors, including OAuth auth
-        failures from bad credentials, still honour the configured attempt limit.
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51737
@@ -462,15 +426,7 @@ entries:
         name: 1783326685-crowdstrike-streaming-self-heal-transient.yaml
         checksum: bb7102166aeafd0ee6d6dde6a24422c1f8cdb619
     - kind: bug-fix
-      summary: Emit pack_name and query_name in osquerybeat scheduled query results
-      description: |
-        Scheduled pack queries now include two additional fields in their result and
-        response documents: pack_name, taken from the new optional `pack_name` config
-        field on a pack (alongside the existing pack_id), and query_name, taken from
-        the pack's queries config map key. Both fields are only emitted when set.
-        These fields are required by the Osquery Manager dashboards, which group and
-        label scheduled query results by pack and query name; without them the
-        dashboards cannot render those results correctly.
+      summary: Emit `pack_name` and `query_name` in Osquerybeat scheduled query results.
       component: osquerybeat
       pr:
         - https://github.com/elastic/beats/pull/51781
@@ -483,8 +439,6 @@ entries:
         checksum: 86b8f63eb4d22cdd3fcfddde8f3780eb4cff6682
     - kind: enhancement
       summary: Add `group_instance_id` (KIP-345 static group membership) to the Filebeat Kafka input.
-      description: |
-        The Filebeat Kafka input now exposes `group_instance_id`, wired to Sarama's `Consumer.Group.InstanceId`. Setting a stable, unique id per consumer instance enables Kafka static group membership (KIP-345): a member that restarts and rejoins within `session_timeout` is recognized as the same member, avoiding the rebalance storms that dynamic membership causes during rolling restarts of multi-replica deployments. Requires `version` >= 2.3.0. Unset by default, so existing behavior is unchanged.
       component: filebeat
       pr:
         - https://github.com/elastic/beats/pull/51772
@@ -497,7 +451,7 @@ entries:
         name: 1783416326-filebeat-kafka-group-instance-id.yaml
         checksum: b4e83f58d4c40ed0cb821a7031f61b6d7e988b51
     - kind: bug-fix
-      summary: Prevent Filebeat startup failure when meta.json is left empty after migration
+      summary: Prevent Filebeat startup failure when `meta.json` is left empty after migration
       description: ""
       component: filebeat
       pr:
@@ -523,7 +477,7 @@ entries:
         name: 1783461968-filebeat-sync-run-and-shutdown-functions.yaml
         checksum: ec0b857df9dfb4307ee8a939bfc35b03785729ae
     - kind: bug-fix
-      summary: Fix aws-s3 input not performing backup_to_bucket and delete_after_backup in polling mode
+      summary: Fix `aws-s3` input not performing `backup_to_bucket` and `delete_after_backup` in polling mode
       description: ""
       component: filebeat
       pr:
@@ -537,7 +491,7 @@ entries:
         name: 1783515049-fix-s3-poller-backup-delete.yaml
         checksum: 2df3c8e53330d4c6e1c39f5210ed6ca23cbee077
     - kind: bug-fix
-      summary: Prevent statestore startup failure when meta.json is left empty after an unclean shutdown
+      summary: Prevent statestore startup failure when `meta.json` is left empty after an unclean shutdown
       description: ""
       component: libbeat
       pr:
@@ -550,7 +504,7 @@ entries:
         name: 1783957443-statestore-atomic-create-meta.json.yaml
         checksum: 1e507904f5ef0c6aa605cf1458abe4ae3bb1c3d7
     - kind: bug-fix
-      summary: update elastic-agent-libs to v0.46.1
+      summary: update `elastic-agent-libs` to v0.46.1
       description: Fixed an issue where malformed TLS keys could be printed in the error logs during loading failures.
       component: all
       pr:
