@@ -672,6 +672,7 @@ func writeMetaFile(home string, mode os.FileMode) error {
 		return fmt.Errorf("error rotating meta file into place: %w", err)
 	}
 
+	trySyncPath(home)
 	return nil
 }
 
