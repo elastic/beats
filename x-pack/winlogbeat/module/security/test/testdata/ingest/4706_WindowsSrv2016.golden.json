@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-07-27T09:42:48.3690009Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "domain-trust-added",

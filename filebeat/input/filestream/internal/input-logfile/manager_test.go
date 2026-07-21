@@ -48,6 +48,10 @@ func (s *testSource) Name() string {
 	return s.name
 }
 
+func (s *testSource) LogPath() string {
+	return s.name
+}
+
 type noopProspector struct{}
 
 func (m noopProspector) Init(_, _ StoreUpdater, _ func(Source) string) error {

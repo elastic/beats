@@ -83,6 +83,8 @@ type InputManager struct {
 // the source in the persistent state store.
 type Source interface {
 	Name() string
+	// LogPath returns the path used in logs.
+	LogPath() string
 }
 
 var errNoInputRunner = errors.New("no input runner available")

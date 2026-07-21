@@ -488,7 +488,7 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 	}
 	if _, exists := g.states[srcID]; exists {
 		g.mu.Unlock()
-		ctx.Logger.Debugf("Harvester already running for %s", srcID)
+		ctx.Logger.Debugf("Harvester already running for file %q", src.LogPath())
 		return
 	}
 
@@ -500,7 +500,7 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 	// for propagation.
 	hctx, cancel := context.WithCancel(context.Background())
 	ctx.Cancelation = hctx
-	ctx.Logger = ctx.Logger.With("source_file", srcID)
+	ctx.Logger = ctx.Logger.With("source_file", src.LogPath())
 
 	state := &sourceState{
 		srcID:  srcID,
@@ -518,7 +518,7 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 		g.setStatus(state, statusWaiting)
 		g.waiting = append(g.waiting, state)
 		g.mu.Unlock()
-		ctx.Logger.Debugf("harvester_limit (%d) reached, queueing %s", g.harvesterLimit, srcID)
+		ctx.Logger.Debugf("harvester_limit (%d) reached, queueing file %q", g.harvesterLimit, src.LogPath())
 		return
 	}
 

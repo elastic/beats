@@ -505,7 +505,8 @@ func (p *countingPublisher) Publish(e beat.Event, _ any) error {
 // notAFileSource is a loginp.Source that is not a fileSource.
 type notAFileSource struct{}
 
-func (notAFileSource) Name() string { return "not-a-file" }
+func (notAFileSource) Name() string    { return "not-a-file" }
+func (notAFileSource) LogPath() string { return "not-a-file" }
 
 // fakeFile is a File whose Stat/Seek/Read can be programmed, to exercise error
 // and edge branches that a real file does not reach.
