@@ -173,6 +173,12 @@ func TestEnsureReleaseIssueTrackerDryRun(t *testing.T) {
 	}
 }
 
+func TestWarnEnsureReleaseIssueTrackerDoesNotPanicOnError(t *testing.T) {
+	// Missing CURRENT_RELEASE makes EnsureReleaseIssueTracker fail; the warn wrapper
+	// must swallow the error so release workflows stay successful.
+	warnEnsureReleaseIssueTracker(&ReleaseConfig{}, nil)
+}
+
 func TestPrURLsFromPullRequestsSkipsNil(t *testing.T) {
 	got := prURLsFromPullRequests([]*github.PullRequest{
 		nil,

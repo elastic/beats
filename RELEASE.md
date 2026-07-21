@@ -100,8 +100,9 @@ release day. Release notes stay on the separate GitHub Actions workflow.
 Both `runMajorMinor` and `runPatch` finish by ensuring a Beats issue titled
 `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists (create or update).
 The issue links https://github.com/elastic/ingest-dev/issues/8866 and lists
-related Beats PRs with label `release` for that version. Re-run anytime with
-`mage release:ensureIssueTracker`.
+related Beats PRs with label `release` for that version. That step is
+**best-effort**: a tracker failure is logged as a warning and does not fail the
+release workflow. Re-run anytime with `mage release:ensureIssueTracker`.
 
 ## Release manager checklist
 

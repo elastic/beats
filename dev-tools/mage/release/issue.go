@@ -35,10 +35,21 @@ var (
 	prURLNumberRE    = regexp.MustCompile(`https://github\.com/[^/]+/[^/]+/pull/(\d+)`)
 )
 
+// warnEnsureReleaseIssueTracker runs EnsureReleaseIssueTracker but never fails the
+// caller. Release workflows use this so a tracker outage cannot abort PR creation.
+func warnEnsureReleaseIssueTracker(cfg *ReleaseConfig, workflowPRs []*github.PullRequest) {
+	if err := EnsureReleaseIssueTracker(cfg, workflowPRs); err != nil {
+		fmt.Printf("Warning: ensure release issue tracker failed (release workflow continues): %v\n", err)
+		fmt.Println("Re-run with: mage release:ensureIssueTracker")
+	}
+}
+
 // EnsureReleaseIssueTracker creates or updates the Beats release checklist issue for
 // cfg.CurrentRelease. It links related Beats PRs (workflow PRs plus open/merged PRs
 // with label "release" that mention the same version). Updates are idempotent: missing
 // PR links are appended; existing checklist and checkbox state are preserved.
+// Standalone mage release:ensureIssueTracker surfaces errors; runMajorMinor/runPatch
+// wrap this with warnEnsureReleaseIssueTracker so failures are non-blocking.
 func EnsureReleaseIssueTracker(cfg *ReleaseConfig, workflowPRs []*github.PullRequest) error {
 	if cfg == nil {
 		return fmt.Errorf("release config is required")

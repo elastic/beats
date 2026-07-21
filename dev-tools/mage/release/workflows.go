@@ -168,7 +168,8 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 		for _, item := range branchesToFinalize {
 			fmt.Printf("Branch prepared: %s\n", item.branch)
 		}
-		return EnsureReleaseIssueTracker(cfg, nil)
+		warnEnsureReleaseIssueTracker(cfg, nil)
+		return nil
 	}
 
 	if err := repo.CheckoutBranch(releaseBranch); err != nil {
@@ -200,10 +201,7 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	}
 	fmt.Println("\nNote: Release notes PR should be created separately via .github/workflows/release-notes.yml")
 
-	if err := EnsureReleaseIssueTracker(cfg, prs); err != nil {
-		return fmt.Errorf("ensure release issue tracker: %w", err)
-	}
-
+	warnEnsureReleaseIssueTracker(cfg, prs)
 	return nil
 }
 
@@ -480,7 +478,8 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 		for _, item := range branchesToFinalize {
 			fmt.Printf("Branch prepared: %s\n", item.branch)
 		}
-		return EnsureReleaseIssueTracker(cfg, nil)
+		warnEnsureReleaseIssueTracker(cfg, nil)
+		return nil
 	}
 
 	gh := NewGitHubClient(cfg.GitHubToken)
@@ -504,10 +503,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	}
 	fmt.Println("\nNote: Release notes PR should be created separately via .github/workflows/release-notes.yml")
 
-	if err := EnsureReleaseIssueTracker(cfg, prs); err != nil {
-		return fmt.Errorf("ensure release issue tracker: %w", err)
-	}
-
+	warnEnsureReleaseIssueTracker(cfg, prs)
 	return nil
 }
 

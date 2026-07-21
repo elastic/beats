@@ -153,7 +153,7 @@ with grouped PRs.
 Titles use `[Release <CURRENT_RELEASE>] …` (e.g. `[Release 9.4.0] Update version to 9.4.1 and test environments`).
 
 5. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
-6. Ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs (linked to https://github.com/elastic/ingest-dev/issues/8866).
+6. Best-effort: ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs (linked to https://github.com/elastic/ingest-dev/issues/8866). Failures are warnings only.
 
 **RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main` → merge PR-D on release branch (after release day).
 
@@ -211,7 +211,7 @@ version+test-env [#50568](https://github.com/elastic/beats/pull/50568)+[#50569](
 
 3. Opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
    Titles use `[Release <CURRENT_RELEASE>] …` and bodies state when to merge.
-4. Ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs.
+4. Best-effort: ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs. Failures are warnings only.
 
 **RM merge order:** merge PR-A before the final release build → merge PR-B after release day.
 
@@ -251,6 +251,7 @@ Creates or updates the Beats release checklist issue for `CURRENT_RELEASE`:
 - Links the global ingest tracker: https://github.com/elastic/ingest-dev/issues/8866
 - Lists Beats PRs with label `release` whose title mentions that version
 - Idempotent: missing PR links are appended; existing checklist checkboxes are preserved
+- When invoked from `runMajorMinor` / `runPatch`, failures are warnings only (non-blocking). The standalone target still returns an error.
 
 ```bash
 export CURRENT_RELEASE="9.4.1"
