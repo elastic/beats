@@ -27,7 +27,6 @@ import (
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/go-git/go-git/v5/plumbing/storer"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
@@ -205,6 +204,8 @@ func (g *GitRepo) CommitAll(message, authorName, authorEmail string) (bool, erro
 }
 
 // HasCommitsAheadOf reports whether HEAD has commits not reachable from baseBranch.
+// Equal or behind returns false; ahead or diverged returns true.
+// A missing base branch is treated as ahead (true).
 func (g *GitRepo) HasCommitsAheadOf(baseBranch string) (bool, error) {
 	headRef, err := g.repo.Head()
 	if err != nil {
@@ -223,29 +224,30 @@ func (g *GitRepo) HasCommitsAheadOf(baseBranch string) (bool, error) {
 		return false, nil
 	}
 
-	commitIter, err := g.repo.Log(&git.LogOptions{From: headRef.Hash()})
+	headCommit, err := g.repo.CommitObject(headRef.Hash())
 	if err != nil {
-		return false, fmt.Errorf("failed to walk commits: %w", err)
+		return false, fmt.Errorf("failed to get HEAD commit: %w", err)
 	}
-	defer commitIter.Close()
+	baseCommit, err := g.repo.CommitObject(baseRef.Hash())
+	if err != nil {
+		return false, fmt.Errorf("failed to get base commit %s: %w", baseBranch, err)
+	}
 
-	foundBase := false
-	err = commitIter.ForEach(func(c *object.Commit) error {
-		if c.Hash == baseRef.Hash() {
-			foundBase = true
-			return storer.ErrStop
-		}
-		return nil
-	})
-	if err != nil && !errors.Is(err, storer.ErrStop) {
+	// HEAD has commits not on base iff HEAD is not a merge-base of (HEAD, base).
+	// Behind/equal: merge-base is HEAD. Ahead/diverged: merge-base is not HEAD.
+	bases, err := headCommit.MergeBase(baseCommit)
+	if err != nil {
 		return false, fmt.Errorf("failed to compare commits with %s: %w", baseBranch, err)
 	}
-
-	if foundBase {
+	if len(bases) == 0 {
 		return true, nil
 	}
-
-	return headRef.Hash() != baseRef.Hash(), nil
+	for _, mb := range bases {
+		if mb.Hash == headRef.Hash() {
+			return false, nil
+		}
+	}
+	return true, nil
 }
 
 // Push pushes the current branch to the remote
