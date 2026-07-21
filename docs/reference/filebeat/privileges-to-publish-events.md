@@ -18,7 +18,9 @@ When using ILM, turn off the ILM setup check in the Filebeat config file before 
 setup.ilm.check_exists: false
 ```
 
-When using modules, Filebeat checks for ingest pipelines and loads them when it connects to {{es}}. {applies_to}`stack: ga 9.6` To skip this runtime pipeline check after the required pipelines have been loaded, or when pipelines are managed separately, set:
+When using modules, Filebeat checks for ingest pipelines and loads them when it connects to {{es}}.
+
+{applies_to}`stack: ga 9.6` To skip this runtime pipeline check after the required pipelines have been loaded, or when pipelines are managed separately, set:
 
 ```yaml
 setup.pipelines.enabled: false
@@ -37,7 +39,7 @@ To grant the required privileges:
     | --- | --- | --- |
     | Cluster | `monitor` | Retrieve cluster details (e.g. version) |
     | Cluster | `read_ilm` | Read the ILM policy when connecting to clusters that support ILM.Not needed when `setup.ilm.check_exists` is `false`. |
-    | Cluster | `read_pipeline` | Check for ingest pipelines used by modules. Needed when using modules unless `setup.pipelines.enabled` is `false`. {applies_to}`stack: ga 9.6` |
+    | Cluster | `read_pipeline` | Check for ingest pipelines used by modules. Needed when using modules except when `setup.pipelines.enabled` is `false`. {applies_to}`stack: ga 9.6` |
     | Index | `create_doc` on `filebeat-*` indices | Write events into {{es}} |
     | Index | `auto_configure` on `filebeat-*` indices | Update the datastream mapping. Consider either disabling entirely or adding therule `-{{beat_default_index_prefix}}-*` to the cluster settings[action.auto_create_index](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-create)to prevent unwanted indices creations from the agents. |
 

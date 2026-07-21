@@ -8,13 +8,15 @@ applies_to:
 
 # Load ingest pipelines [load-ingest-pipelines]
 
-The ingest pipelines used to parse log lines are set up automatically when you run Filebeat, assuming the {{es}} output is enabled. {applies_to}`stack: ga 9.6` To turn off automatic pipeline loading during normal publishing, set:
+The ingest pipelines used to parse log lines are set up automatically when you run Filebeat, assuming the {{es}} output is enabled.
+
+{applies_to}`stack: ga 9.6` To turn off automatic pipeline loading during normal publishing, set:
 
 ```yaml
 setup.pipelines.enabled: false
 ```
 
-Use this setting only when the required pipelines have already been loaded or are managed separately. If you’re sending events to {{ls}} you need to load the ingest pipelines manually. To do this, run the `setup` command with the `--pipelines` option specified.  You also need to enable the modules and filesets, this can be accomplished several ways.
+Use this setting only when the required pipelines have already been loaded or are managed separately. If you’re sending events to {{ls}}, you need to load the ingest pipelines manually. To do this, run the `setup` command with the `--pipelines` option specified. You also need to enable the modules and filesets using one of the following methods.
 
 First you can use the `--modules` option to enable the module, and the `-M` option to enable the fileset.  For example, the following command loads the access pipeline from the nginx module.
 

@@ -18,7 +18,9 @@ When using ILM, turn off the ILM setup check in the Packetbeat config file befor
 setup.ilm.check_exists: false
 ```
 
-Packetbeat checks for ingest pipelines and loads them when it connects to {{es}}. {applies_to}`stack: ga 9.6` To skip this runtime pipeline check after the required pipelines have been loaded, or when pipelines are managed separately, set:
+Packetbeat checks for ingest pipelines and loads them when it connects to {{es}}.
+
+{applies_to}`stack: ga 9.6` To skip this runtime pipeline check after the required pipelines have been loaded, or when pipelines are managed separately, set:
 
 ```yaml
 setup.pipelines.enabled: false
