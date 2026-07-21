@@ -41,6 +41,25 @@ func TestRunMajorMinorReleaseDryRunBranches(t *testing.T) {
 
 	tmpDir := setupWorkflowTestRepo(t)
 
+	// Feature freeze expects BASE_BRANCH version.go to already equal CURRENT_RELEASE
+	// (set by the previous cycle's next-minor bump on main).
+	runGit := func(args ...string) {
+		t.Helper()
+		cmd := exec.CommandContext(context.Background(), "git", args...)
+		cmd.Dir = tmpDir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v (%s)", args, err, out)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "libbeat/version/version.go"), []byte(`package version
+
+const defaultBeatVersion = "9.5.0"
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.go: %v", err)
+	}
+	runGit("add", ".")
+	runGit("commit", "-m", "seed main at 9.5.0")
+
 	origDir, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("failed to get cwd: %v", err)
@@ -56,6 +75,7 @@ func TestRunMajorMinorReleaseDryRunBranches(t *testing.T) {
 
 	cfg := &ReleaseConfig{
 		CurrentRelease:          "9.5.0",
+		LatestRelease:           "9.4.3",
 		NextRelease:             "9.5.1",
 		NextProjectMinorVersion: "9.6.0",
 		NextProjectMinorBranch:  "9.6",
@@ -102,6 +122,53 @@ func TestRunMajorMinorReleaseDryRunBranches(t *testing.T) {
 	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.1", "libbeat/version/version.go", `defaultBeatVersion = "9.5.1"`)
 	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.1", "libbeat/docs/version.asciidoc", ":stack-version: 9.4.3")
 	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.1", "testing/environments/latest.yml", "elasticsearch:9.5.0")
+}
+
+func TestRunMajorMinorReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
+	origMakeUpdate := runMakeUpdate
+	runMakeUpdate = func() error { return nil }
+	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
+
+	origFetch := fetchLatestReleaseBefore
+	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
+		return "9.4.3", nil
+	}
+	t.Cleanup(func() { fetchLatestReleaseBefore = origFetch })
+
+	tmpDir := setupWorkflowTestRepo(t) // version.go is 9.4.3
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("failed to get cwd: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("failed to restore cwd: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("failed to chdir: %v", err)
+	}
+
+	cfg := &ReleaseConfig{
+		CurrentRelease:          "9.5.0", // off-by-one vs main
+		LatestRelease:           "9.4.3",
+		NextRelease:             "9.5.1",
+		NextProjectMinorVersion: "9.6.0",
+		BaseBranch:              "main",
+		ReleaseBranch:           "9.5",
+		DryRun:                  true,
+		GitAuthorName:           "Test User",
+		GitAuthorEmail:          "test@example.com",
+	}
+
+	err = RunMajorMinorRelease(cfg)
+	if err == nil {
+		t.Fatal("expected RunMajorMinorRelease to fail when CURRENT_RELEASE mismatches main version")
+	}
+	if !strings.Contains(err.Error(), "does not match version on main") {
+		t.Fatalf("unexpected error: %v", err)
+	}
 }
 
 func assertGitShowContains(t *testing.T, dir, branch, file, want string) {
@@ -389,6 +456,30 @@ func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
 	}
 	if !strings.Contains(patchBeforeBuildPRBody(cfg.CurrentRelease), "Does **not** bump libbeat/version/version.go") {
 		t.Error("patch before-build body should clarify version.go is not bumped")
+	}
+}
+
+func TestMajorMinorPRTitles(t *testing.T) {
+	cfg := &ReleaseConfig{
+		CurrentRelease:          "9.4.0",
+		NextRelease:             "9.4.1",
+		NextProjectMinorVersion: "9.5.0",
+		ReleaseBranch:           "9.4",
+		BaseBranch:              "main",
+	}
+	cases := []struct {
+		name  string
+		title string
+	}{
+		{"PR-A", fmt.Sprintf("[Release %s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)},
+		{"PR-B", fmt.Sprintf("[Release %s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease)},
+		{"PR-C", fmt.Sprintf("[Release %s] Update docs and test environment for %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion)},
+		{"PR-D", fmt.Sprintf("[Release %s] Update version to %s and test environments", cfg.CurrentRelease, cfg.NextRelease)},
+	}
+	for _, tc := range cases {
+		if !strings.HasPrefix(tc.title, "[Release 9.4.0] ") {
+			t.Errorf("%s title missing release header: %s", tc.name, tc.title)
+		}
 	}
 }
 

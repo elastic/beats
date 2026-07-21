@@ -59,7 +59,13 @@ mage release:runPatch
 ## What feature freeze produces
 
 Creates the release branch (e.g. `9.5` from `main`) and opens **4 grouped PRs**.
-Merge order matters; labels encode timing:
+
+`CURRENT_RELEASE` must already match `libbeat/version/version.go` on `BASE_BRANCH`
+(set by the previous cycle's next-minor version bump). The workflow fails fast if
+they differ.
+
+Merge order matters; labels encode timing. Titles are prefixed with
+`[Release <CURRENT_RELEASE>]`.
 
 | Order | PR | Target | Merge label | Purpose |
 |-------|-----|--------|-------------|---------|

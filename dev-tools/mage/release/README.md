@@ -137,8 +137,10 @@ with grouped PRs.
 
 **What it does:**
 1. Validates version and checks for deprecated releases
-2. Creates release branch from `BASE_BRANCH` (e.g., `9.5`)
-3. Prepares **4 grouped PRs** (merge order matters):
+2. Requires `CURRENT_RELEASE` to match `libbeat/version/version.go` on
+   `BASE_BRANCH` before cutting the release branch
+3. Creates release branch from `BASE_BRANCH` (e.g., `9.5`)
+4. Prepares **4 grouped PRs** (merge order matters):
 
 | Step | PR | Target | Branch | Merge label | Changes |
 |------|-----|--------|--------|-------------|---------|
@@ -147,7 +149,9 @@ with grouped PRs.
 | 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | `merge:3-after-images` | Docs + test env for next minor |
 | 4 | PR-D | release branch | `ff-prep-next-patch-X.Y.1` | `merge:4-after-release` | Next patch version + test env |
 
-4. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
+Titles use `[Release <CURRENT_RELEASE>] …` (e.g. `[Release 9.4.0] Update version to 9.4.1 and test environments`).
+
+5. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
 
 **RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main` → merge PR-D on release branch (after release day).
 
