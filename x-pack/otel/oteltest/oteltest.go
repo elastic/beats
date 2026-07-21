@@ -246,6 +246,8 @@ func VerifyNoLeaks(t *testing.T) {
 		// loop on first use and never stops it, since a real heartbeat process
 		// runs the loop forever. See heartbeat/monitors/active/icmp/stdloop.go.
 		goleak.IgnoreAnyFunction("github.com/elastic/beats/v7/heartbeat/monitors/active/icmp.(*stdICMPLoop).runICMPRecv"),
+		// On macOS, cgo-based DNS lookups (res_nsearch) can outlive the test on slow CI networking.
+		goleak.IgnoreAnyFunction("net.cgoResSearch"),
 	}
 
 	goleak.VerifyNone(t, skipped...)
