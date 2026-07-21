@@ -99,18 +99,10 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 	return BeatReceiver{
-<<<<<<< HEAD
-		beat:   b,
-		beater: beater,
-		Logger: b.Info.Logger,
-=======
-		beat:                b,
-		beater:              beater,
-		Logger:              b.Info.Logger,
-		bridge:              bridge,
-		releaseSystemBridge: releaseSystem,
-		runDone:             make(chan error, 1),
->>>>>>> 16aa64e0e (Fix beat receiver Shutdown hanging when Start fails before the beater is launched (#52106))
+		beat:    b,
+		beater:  beater,
+		Logger:  b.Info.Logger,
+		runDone: make(chan error, 1),
 	}, nil
 }
 
