@@ -246,6 +246,14 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 		[]byte(generateLines("gzip header line", 1)), gziptest.CorruptNone)
 	require.NoError(t, os.WriteFile(file4, headerGZ, 0644), "failed to write gzipped file")
 
+	// The scanner reports the colliding duplicates by path only, never by the
+	// raw fingerprint material.
+	filebeat.WaitLogsContains(
+		"points to an already known ingest target",
+		10*time.Second,
+		"expected the duplicate ingest targets to be reported",
+	)
+
 	// With growing_fingerprint, small files ARE ingested immediately (unlike regular fingerprint)
 	// Due to collision (same content = same fingerprint), only ONE file's entry is created
 	// but events ARE published. We wait for EOF on the first detected file.
@@ -315,6 +323,13 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	// 21 (previous) + 3 files × 20 new lines = 81 events.
 	filebeat.WaitPublishedEvents(15*time.Second, 81)
 
+	// Harvester logs identify files by path in the source_file field.
+	filebeat.WaitLogsContainsFromBeginning(
+		`"source_file":"`+strings.ReplaceAll(file1, `\`, `\\`)+`"`,
+		10*time.Second,
+		"harvester logs must carry the file path in source_file",
+	)
+
 	// ===== Phase 4: Stop Filebeat =====
 	filebeat.Stop()
 
@@ -327,6 +342,12 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	assertSingleSHA256RegistryEntry(t, tempDir, file3)
 	assertGrowingRegistryEntry(t, tempDir, file4)
 	assertGrowingRegistryEntry(t, tempDir, file5)
+
+	// The raw fingerprint material (hex of the file content, here the shared
+	// header all growing raws start with) and the removed state-id field must
+	// never appear in the logs.
+	assertLogsDoNotContain(t, tempDir, hex.EncodeToString([]byte(headerContent)))
+	assertLogsDoNotContain(t, tempDir, `"state-id"`)
 }
 
 // TestFilestreamGrowingFingerprint_update_while_stopped verifies growing
@@ -1896,4 +1917,20 @@ func assertGrowingRegistryEntry(t *testing.T, tempDir, filePath string) {
 	assert.Empty(t, final,
 		"expected no active final entries for %q; got a final entry — file is treated as final, not growing",
 		filePath)
+}
+
+// assertLogsDoNotContain fails if s is found anywhere in the Filebeat logs.
+func assertLogsDoNotContain(t *testing.T, tempDir, s string) {
+	t.Helper()
+	glob := filepath.Join(tempDir, fmt.Sprintf("filebeat-%d*.ndjson", time.Now().Year()))
+	files, err := filepath.Glob(glob)
+	require.NoError(t, err, "failed to glob log files")
+	require.NotEmpty(t, files, "no filebeat log file found")
+	for _, f := range files {
+		data, err := os.ReadFile(f)
+		require.NoErrorf(t, err, "failed to read log file %q", f)
+		if strings.Contains(string(data), s) {
+			t.Errorf("log file %q must not contain %q", f, s)
+		}
+	}
 }
