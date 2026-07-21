@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Do not mark the CEL input's health as degraded when the maximum executions is exceeded.
+component: filebeat
