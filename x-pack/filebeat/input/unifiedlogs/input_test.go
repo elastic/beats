@@ -54,7 +54,7 @@ func (p *publisher) Publish(e beat.Event, cursor any) error {
 }
 
 func TestInput(t *testing.T) {
-	archivePath, err := openArchive()
+	archivePath, err := openArchive(t)
 	require.NoError(t, err)
 	t.Cleanup(func() { os.RemoveAll(archivePath) })
 
@@ -144,7 +144,7 @@ func TestInput(t *testing.T) {
 			name: "With end date",
 			skip: func(t *testing.T) bool {
 				const sequoiaPrefix = "15."
-				version, err := exec.Command("sw_vers", "-productVersion").CombinedOutput()
+				version, err := exec.CommandContext(t.Context(), "sw_vers", "-productVersion").CombinedOutput()
 				if err != nil {
 					t.Fatalf("failed to get macOS version: %v", err)
 					return true
@@ -265,7 +265,7 @@ func TestInput(t *testing.T) {
 }
 
 func TestBackfillAndStream(t *testing.T) {
-	archivePath, err := openArchive()
+	archivePath, err := openArchive(t)
 	require.NoError(t, err)
 	t.Cleanup(func() { os.RemoveAll(archivePath) })
 
@@ -287,7 +287,8 @@ func TestBackfillAndStream(t *testing.T) {
 	expectedLogStreamCmd := "/usr/bin/log stream --style ndjson --info --debug --backtrace --signpost --mach-continuous-time"
 
 	_, cursorInput := newCursorInput(cfg)
-	input := cursorInput.(*input)
+	input, ok := cursorInput.(*input)
+	require.True(t, ok, "cursorInput is not *input")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
@@ -390,11 +391,11 @@ func eventsAndCursorAssertN(n int) func(collect *assert.CollectT, events []beat.
 	}
 }
 
-func openArchive() (string, error) {
-	return extractTarGz(path.Join("testdata", "test.logarchive.tar.gz"))
+func openArchive(t *testing.T) (string, error) {
+	return extractTarGz(t, path.Join("testdata", "test.logarchive.tar.gz"))
 }
 
-func extractTarGz(tarGzPath string) (string, error) {
+func extractTarGz(t *testing.T, tarGzPath string) (string, error) {
 	// Create a temporary directory
 	tempDir, err := os.MkdirTemp("", "extracted-*")
 	if err != nil {
@@ -402,7 +403,7 @@ func extractTarGz(tarGzPath string) (string, error) {
 	}
 
 	// Use the 'tar' command to extract the .tar.gz file
-	cmd := exec.Command("tar", "-xzf", tarGzPath, "-C", tempDir)
+	cmd := exec.CommandContext(t.Context(), "tar", "-xzf", tarGzPath, "-C", tempDir)
 
 	// Run the command
 	if err := cmd.Run(); err != nil {
@@ -414,6 +415,6 @@ func extractTarGz(tarGzPath string) (string, error) {
 
 func testMetricsRegistry() *monitoring.Registry {
 	reg := inputmon.NewMetricsRegistry(
-		"", "", monitoring.NewRegistry(), logp.NewLogger("test"))
+		"", "", monitoring.NewRegistry(), logp.NewNopLogger())
 	return reg
 }
