@@ -12,23 +12,13 @@ def pretty(*k, **kw):
 
 class Test(BaseTest):
 
-    def _run(self, pcap, min_events=None):
+    def _run(self, pcap):
         self.render_config_template(
             memcache_udp_transaction_timeout=10
         )
-        if min_events is None:
-            self.run_packetbeat(pcap=pcap,
-                                debug_selectors=["memcache", "udp", "publish"])
-        else:
-            pb = self.start_packetbeat(pcap=pcap,
-                                       debug_selectors=["memcache", "udp", "publish"])
-            try:
-                self.wait_until(lambda: self.output_lines() >= min_events, max_timeout=30)
-            finally:
-                pb.kill_and_wait()
+        self.run_packetbeat(pcap=pcap,
+                            debug_selectors=["memcache", "udp", "publish"])
         objs = self.read_output()
-        if min_events is not None:
-            objs = objs[:min_events]
         self.assert_common(objs)
         return objs
 
@@ -44,7 +34,7 @@ class Test(BaseTest):
         assert all(o['memcache.protocol_type'] == 'binary' for o in objs)
 
     def test_store(self):
-        objs = self._run("memcache/memcache_bin_udp_single_store.pcap", min_events=1)
+        objs = self._run("memcache/memcache_bin_udp_single_store.pcap")
 
         # all transactions succeed
         assert all(o['status'] == 'OK' for o in objs)
@@ -62,7 +52,7 @@ class Test(BaseTest):
         assert set['memcache.request.quiet']
 
     def test_multi_store(self):
-        objs = self._run("memcache/memcache_bin_udp_multi_store.pcap", min_events=3)
+        objs = self._run("memcache/memcache_bin_udp_multi_store.pcap")
 
         # all transactions succeed
         assert all(o['status'] == 'OK' for o in objs)
@@ -77,7 +67,7 @@ class Test(BaseTest):
         assert all(o['memcache.request.quiet'] for o in six.itervalues(sets))
 
     def test_delete(self):
-        objs = self._run('memcache/memcache_bin_udp_delete.pcap', min_events=2)
+        objs = self._run('memcache/memcache_bin_udp_delete.pcap')
 
         # all transactions succeed
         assert all(o['status'] == 'OK' for o in objs)
@@ -100,7 +90,7 @@ class Test(BaseTest):
         assert delete['memcache.request.quiet']
 
     def test_counter_ops(self):
-        objs = self._run('memcache/memcache_bin_udp_counter_ops.pcap', min_events=3)
+        objs = self._run('memcache/memcache_bin_udp_counter_ops.pcap')
 
         # all transactions succeed
         assert all(o['status'] == 'OK' for o in objs)

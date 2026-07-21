@@ -49,14 +49,10 @@ class Test(BaseTest):
             thrift_send_request=True,
             thrift_send_response=True,
         )
-        pb = self.start_packetbeat(pcap="thrift_tutorial.pcap",
-                                   debug_selectors=["thrift"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="thrift_tutorial.pcap",
+                            debug_selectors=["thrift"])
 
-        objs = self.read_output()[:17]
+        objs = self.read_output()
 
         self.tutorial_asserts(objs)
 
@@ -73,14 +69,10 @@ class Test(BaseTest):
         self.render_config_template(
             thrift_ports=[9090],
         )
-        pb = self.start_packetbeat(pcap="thrift_tutorial.pcap",
-                                   debug_selectors=["thrift"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="thrift_tutorial.pcap",
+                            debug_selectors=["thrift"])
 
-        objs = self.read_output()[:17]
+        objs = self.read_output()
 
         self.tutorial_asserts(objs)
 
@@ -92,14 +84,10 @@ class Test(BaseTest):
             thrift_ports=[9090],
             thrift_transport_type="framed"
         )
-        pb = self.start_packetbeat(pcap="thrift_tutorial_framed_transport.pcap",
-                                   debug_selectors=["thrift"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="thrift_tutorial_framed_transport.pcap",
+                            debug_selectors=["thrift"])
 
-        objs = self.read_output()[:17]
+        objs = self.read_output()
 
         self.tutorial_asserts(objs)
 
@@ -109,14 +97,10 @@ class Test(BaseTest):
             thrift_idl_files=["tutorial.thrift", "shared.thrift"]
         )
         self.copy_files(["tutorial.thrift", "shared.thrift"])
-        pb = self.start_packetbeat(pcap="thrift_tutorial.pcap",
-                                   debug_selectors=["thrift"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="thrift_tutorial.pcap",
+                            debug_selectors=["thrift"])
 
-        objs = self.read_output()[:17]
+        objs = self.read_output()
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])
         assert all([o["thrift.service"] == "Calculator" or
@@ -168,14 +152,10 @@ class Test(BaseTest):
         )
 
         self.copy_files(["ThriftTest.thrift"])
-        pb = self.start_packetbeat(pcap="thrift_integration.pcap",
-                                   debug_selectors=["thrift"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 26, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="thrift_integration.pcap",
+                            debug_selectors=["thrift"])
 
-        objs = self.read_output()[:26]
+        objs = self.read_output()
         assert len(objs) == 26
         assert all([o["type"] == "thrift" for o in objs])
         assert all([o["thrift.service"] == "ThriftTest" for o in objs])
@@ -240,14 +220,10 @@ class Test(BaseTest):
             thrift_idl_files=["tutorial.thrift", "shared.thrift"]
         )
         self.copy_files(["tutorial.thrift", "shared.thrift"])
-        pb = self.start_packetbeat(pcap="thrift_echo_binary.pcap",
-                                   debug_selectors=["thrift"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 1, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="thrift_echo_binary.pcap",
+                            debug_selectors=["thrift"])
 
-        objs = self.read_output()[:1]
+        objs = self.read_output()
         assert len(objs) == 1
         o = objs[0]
 

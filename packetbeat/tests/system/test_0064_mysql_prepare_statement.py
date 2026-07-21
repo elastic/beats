@@ -7,14 +7,10 @@ class Test(BaseTest):
         self.render_config_template(
             mysql_ports=[3307]
         )
-        pb = self.start_packetbeat(pcap="mysql_prepare_statement.pcap",
-                                   debug_selectors=["mysql,publish"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 2, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="mysql_prepare_statement.pcap",
+                            debug_selectors=["mysql,publish"])
 
-        objs = self.read_output()[:2]
+        objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])
         assert all([o["server.port"] == 3307 for o in objs])
         assert len(objs) == 2

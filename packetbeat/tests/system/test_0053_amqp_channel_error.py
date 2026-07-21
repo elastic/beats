@@ -7,14 +7,10 @@ class Test(BaseTest):
         self.render_config_template(
             amqp_ports=[5672],
         )
-        pb = self.start_packetbeat(pcap="amqp_channel_error.pcap",
-                                   debug_selectors=["amqp,tcp,publish"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 3, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="amqp_channel_error.pcap",
+                            debug_selectors=["amqp,tcp,publish"])
 
-        objs = self.read_output()[:3]
+        objs = self.read_output()
         assert all([o["type"] == "amqp" for o in objs])
         assert len(objs) == 3
 

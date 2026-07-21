@@ -282,15 +282,11 @@ class Test(BaseTest):
             }]
         )
 
-        pb = self.start_packetbeat(pcap="http_minitwit.pcap",
-                                   debug_selectors=["http", "httpdetailed"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 3, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+                            debug_selectors=["http", "httpdetailed"])
         objs = self.read_output(
             required_fields=["@timestamp", "type"],
-        )[:3]
+        )
 
         assert len(objs) == 3
         assert all([o["type"] == "http" for o in objs])
@@ -317,15 +313,11 @@ class Test(BaseTest):
             }]
         )
 
-        pb = self.start_packetbeat(pcap="http_minitwit.pcap",
-                                   debug_selectors=["http", "httpdetailed"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 3, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+                            debug_selectors=["http", "httpdetailed"])
         objs = self.read_output(
             required_fields=["@timestamp", "type"],
-        )[:3]
+        )
 
         assert len(objs) == 3
         assert all([o["type"] == "http" for o in objs])

@@ -8,14 +8,10 @@ class Test(BaseTest):
             thrift_ports=[9090],
             thrift_transport_type="framed"
         )
-        pb = self.start_packetbeat(pcap="ipv6_thrift.pcap",
-                                   debug_selectors=["thrift", "ip"])
-        try:
-            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
-        finally:
-            pb.kill_and_wait()
+        self.run_packetbeat(pcap="ipv6_thrift.pcap",
+                            debug_selectors=["thrift", "ip"])
 
-        objs = self.read_output()[:17]
+        objs = self.read_output()
 
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])

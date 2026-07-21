@@ -76,8 +76,7 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 		h.pcapHandle = nil
 
 		h.loopCount++
-		// maxLoopCount 0 means loop forever (see -l flag help).
-		if h.maxLoopCount > 0 && h.loopCount >= h.maxLoopCount {
+		if h.loopCount >= h.maxLoopCount {
 			return data, ci, err
 		}
 
