@@ -18,6 +18,7 @@
 package beat
 
 import (
+	"os"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,6 +27,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+// EnvHostName is the environment variable that overrides hostname detection when set.
+const EnvHostName = "ELASTIC_AGENT_HOSTNAME"
 
 // Info stores a beats instance meta data.
 type Info struct {
@@ -51,6 +55,10 @@ type Info struct {
 }
 
 func (i Info) FQDNAwareHostname(useFQDN bool) string {
+	if override := os.Getenv(EnvHostName); override != "" {
+		return override
+	}
+
 	if useFQDN {
 		return i.FQDN
 	}

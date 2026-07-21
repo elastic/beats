@@ -29,8 +29,9 @@ func TestFQDNAwareHostname(t *testing.T) {
 		FQDN:     "foo.bar.internal",
 	}
 	cases := map[string]struct {
-		useFQDN bool
-		want    string
+		useFQDN  bool
+		envValue string
+		want     string
 	}{
 		"fqdn_flag_enabled": {
 			useFQDN: true,
@@ -40,10 +41,23 @@ func TestFQDNAwareHostname(t *testing.T) {
 			useFQDN: false,
 			want:    "foo",
 		},
+		"env_override_takes_precedence_over_fqdn": {
+			useFQDN:  true,
+			envValue: "my-node",
+			want:     "my-node",
+		},
+		"env_override_takes_precedence_over_hostname": {
+			useFQDN:  false,
+			envValue: "my-node",
+			want:     "my-node",
+		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
+			if tc.envValue != "" {
+				t.Setenv(EnvHostName, tc.envValue)
+			}
 			got := info.FQDNAwareHostname(tc.useFQDN)
 			require.Equal(t, tc.want, got)
 		})
