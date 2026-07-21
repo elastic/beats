@@ -99,14 +99,30 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 	return BeatReceiver{
+<<<<<<< HEAD
 		beat:   b,
 		beater: beater,
 		Logger: b.Info.Logger,
+=======
+		beat:                b,
+		beater:              beater,
+		Logger:              b.Info.Logger,
+		bridge:              bridge,
+		releaseSystemBridge: releaseSystem,
+		runDone:             make(chan error, 1),
+>>>>>>> 16aa64e0e (Fix beat receiver Shutdown hanging when Start fails before the beater is launched (#52106))
 	}, nil
 }
 
 // BeatReceiver.Start() starts the beat receiver.
-func (br *BeatReceiver) Start(host component.Host) error {
+func (br *BeatReceiver) Start(host component.Host) (retErr error) {
+	// If Start returns an error before the beater.Run goroutine is launched,
+	// signal runDone so that a concurrent Shutdown does not block forever on it.
+	defer func() {
+		if retErr != nil {
+			br.runDone <- retErr
+		}
+	}()
 	var groupReporter otelstatus.RunnerReporter
 	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
 		groupReporter = otelstatus.NewGroupStatusReporter(host)
@@ -145,7 +161,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	})
 
-	br.runDone = make(chan error, 1)
 	go func() {
 		err := br.beater.Run(&br.beat.Beat)
 		if err != nil {
