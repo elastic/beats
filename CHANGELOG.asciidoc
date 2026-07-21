@@ -3,6 +3,69 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.19 relnotes
+
+[[release-notes-8.19.19]]
+=== Beats version 8.19.19
+
+https://github.com/elastic/beats/compare/v8.19.18\...v8.19.19[View commits]
+
+[discrete]
+[[enhancements-8.19.19]]
+==== Enhancements
+
+**Filebeat**
+
+* Optimize filestream logger performance. https://github.com/elastic/beats/pull/51444[#51444] 
+* Add a configurable retry policy to the Azure Blob Storage input. https://github.com/elastic/beats/pull/51787[#51787] https://github.com/elastic/beats/issues/44629[#44629]
+
+[discrete]
+[[bug-fixes-8.19.19]]
+==== Bug fixes
+
+**All**
+
+* Fix goroutine leak when processor construction fails. https://github.com/elastic/beats/pull/51727[#51727] 
+* Fix data races in the `add_docker_metadata` cache initialization. https://github.com/elastic/beats/pull/51844[#51844]  
+* Close Beat processors on Beat OTel processor shutdown to avoid leaking resources on collector reloads. https://github.com/elastic/beats/pull/51753[#51753]  
+
+**Auditbeat**
+
+* Fix data races in the backoff accounting of the `add_session_metadata` processor's `kernel_tracing` provider. https://github.com/elastic/beats/pull/51762[#51762]  
+
+**Elastic agent**
+
+* Fix registry corruption issue with multiple Metricbeat receivers. https://github.com/elastic/beats/pull/51591[#51591] https://github.com/elastic/elastic-agent/issues/15154[#15154] 
+
+**Filebeat**
+
+* Filestream now defers shutdown until it reaches EOF or a configurable timeout. The new `read_until_eof` option (enabled by default) lets you opt out. https://github.com/elastic/beats/pull/51206[#51206] https://github.com/elastic/beats/issues/40447[#40447] 
+* Validate that HTTPJSON pagination URLs share the configured request URL origin. https://github.com/elastic/beats/pull/51551[#51551] 
+* Fix Filebeat duplicating events after a normal shutdown caused by a race in the registrar. https://github.com/elastic/beats/pull/51613[#51613] 
+* Avoid slice-bounds panic when sorting copytruncate rotated files by date. https://github.com/elastic/beats/pull/51606[#51606] 
+* Fix type loss in HTTP JSON template transform handling. https://github.com/elastic/beats/pull/51756[#51756] 
+* Fix filestream data loss when a harvester closes before ingesting any data. https://github.com/elastic/beats/pull/51697[#51697] 
+* Fix CrowdStrike streaming input retry cap so `max_attempts` and `infinite_retries` are honored. https://github.com/elastic/beats/pull/51729[#51729]  
+* Make the CrowdStrike streaming input self-heal from transient discover failures. https://github.com/elastic/beats/pull/51763[#51763] 
+* Prevent Filebeat startup failure when `meta.json` is left empty after migration. https://github.com/elastic/beats/pull/51791[#51791]  
+* Fix `aws-s3` input not performing `backup_to_bucket` and `delete_after_backup` in polling mode. https://github.com/elastic/beats/pull/51884[#51884] https://github.com/elastic/beats/issues/46672[#46672] 
+* Fix goroutine leak in request trace logging infrastructure. https://github.com/elastic/beats/pull/51955[#51955] 
+
+**Libbeat**
+
+* Fix a data race in the `rate_limit` processor when configured with fields and run concurrently. https://github.com/elastic/beats/pull/51742[#51742]  
+* Fix a startup data race in the `add_kubernetes_metadata` processor. https://github.com/elastic/beats/pull/51750[#51750]  
+
+**Metricbeat**
+
+* Fix a race condition during metricset closure. https://github.com/elastic/beats/pull/51709[#51709]  
+
+**Osquerybeat**
+
+* Fix a rare crash when Osquery restarts after a configuration change. https://github.com/elastic/beats/pull/51564[#51564]  
+
+// end 8.19.19 relnotes
+
 // begin 8.19.18 relnotes
 
 [[release-notes-8.19.18]]
