@@ -364,13 +364,17 @@ func filterLogCmdLine(buf []byte, cmd, cmdPrefix string) string {
 	for scanner.Scan() {
 		text := scanner.Text()
 		parts := strings.Split(text, "\t")
-		if len(parts) != 4 {
+		// Console log format: time\tlevel\tlogger[\tcaller]\tmessage
+		// The caller field is optional, so the message may be at parts[3] or parts[4].
+		if len(parts) < 4 {
 			continue
 		}
 
-		trimmed := strings.TrimPrefix(parts[3], cmdPrefix)
-		if strings.HasPrefix(trimmed, cmd) {
-			return trimmed
+		for _, part := range parts[3:] {
+			trimmed := strings.TrimPrefix(part, cmdPrefix)
+			if trimmed != part && strings.HasPrefix(trimmed, cmd) {
+				return trimmed
+			}
 		}
 	}
 	return ""
