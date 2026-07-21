@@ -28,7 +28,7 @@ summary: Bump npm to 12.0.1 in the Heartbeat synthetics Docker image.
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component:
+component: heartbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
