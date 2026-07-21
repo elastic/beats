@@ -813,139 +813,174 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 		opts.CurrentTime = time.Now()
 	}
 
-	// Pre-size the per-scan maps from the previous scan's count.
-	fdByName := make(map[string]loginp.FileDescriptor, s.lastCount)
-	// used to determine if a symlink resolves in a already known target
-	uniqueIDs := make(map[string]matchedTarget, s.lastCount)
-	// used to filter out duplicate matches
-	uniqueFiles := make(map[string]struct{}, s.lastCount)
-	scanMetrics := loginp.FileScanMetrics{}
-
-	// unobservable collects path prefixes the scan could not read/stat/open due
-	// to a resource or permission error (e.g. file-descriptor exhaustion) rather
-	// than the path being gone. The watcher uses them to postpone delete detection
-	// so a transient failure does not wipe registry state and re-ingest files.
-	unobservable := map[string]struct{}{}
-	recordUnobservable := func(path string) {
-		if _, ok := unobservable[path]; ok {
-			return
-		}
-		unobservable[path] = struct{}{}
-		scanMetrics.ScanErrors++
-	}
-
-	process := func(filename string, orderIndex int) {
-		scanMetrics.FilesMatched++
-
-		// in case multiple globs match on the same file we filter out duplicates
-		if _, knownFile := uniqueFiles[filename]; knownFile {
-			scanMetrics.FilesNoIngestTarget++
-			return
-		}
-		uniqueFiles[filename] = struct{}{}
-
-		it, err := s.getIngestTarget(filename)
-		if err != nil {
-			if errors.Is(err, errFileEmpty) {
-				scanMetrics.FilesEmpty++
-				return
-			}
-
-			s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
-			if errors.Is(err, errFileIgnored) {
-				scanMetrics.FilesIgnored++
-				return
-			}
-
-			// A stat/lstat that failed for a reason other than the file being
-			// gone (e.g. EMFILE) means we could not observe this path this scan.
-			if isObservationError(err) {
-				recordUnobservable(filename)
-			}
-			scanMetrics.FilesNoIngestTarget++
-			return
-		}
-
-		fd, err := s.toFileDescriptor(&it)
-		if errors.Is(err, errFileTooSmall) {
-			scanMetrics.FilesNoIngestTarget++
-			if s.smallFilesWarned.CompareAndSwap(false, true) {
-				s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
-					"least %d in size for ingestion to start. To change this "+
-					"behaviour set 'prospector.scanner.fingerprint.length' and "+
-					"'prospector.scanner.fingerprint.offset'. "+
-					"Enable debug logging to see all file names of delayed files.",
-					s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
-			}
-			s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
-			return
-		}
-		if err != nil {
-			scanMetrics.FilesNoIngestTarget++
-			// Fingerprinting opens the file; under fd exhaustion the open fails
-			// with EMFILE, which is an observation failure, not a missing file.
-			if isObservationError(err) {
-				recordUnobservable(filename)
-			}
-			s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
-			return
-		}
-
-		fileID := fd.FileID()
-		if known, exists := uniqueIDs[fileID]; exists {
-			scanMetrics.FilesNoIngestTarget++
-
-			// The same file is reachable via more than one path. Keep the path
-			// the previous implementation would have kept, so the returned
-			// filename is stable across scans and releases; otherwise,
-			//  - the "path" file identity would change and the file could be re-ingested,
-			//  - the fingerprint file identity could choose another file to open.
-			if !s.matchedEarlier(filename, orderIndex, known.name, known.order) {
-				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, known.name, fileID, fileID)
-				return
-			}
-			s.log.Debugf("%q supersedes already matched ingest target %q for the same file", filename, known.name)
-			// the superseded descriptor was already counted as ignored if it
-			// matched the ignore options; take that back so FilesIgnored counts
-			// only the descriptors actually returned
-			if oldFd, ok := fdByName[known.name]; ok && isFileIgnored(oldFd, opts) {
-				scanMetrics.FilesIgnored--
-			}
-			delete(fdByName, known.name)
-		}
-		uniqueIDs[fileID] = matchedTarget{name: filename, order: orderIndex}
-		s.attachBridgingRaw(&fd)
-		fdByName[filename] = fd
-		if isFileIgnored(fd, opts) {
-			scanMetrics.FilesIgnored++
-		}
-	}
+	st := s.newScanState(opts)
 
 	for _, lit := range s.literals {
 		if _, err := os.Lstat(lit); err != nil {
 			if isObservationError(err) {
-				recordUnobservable(lit)
+				st.recordUnobservable(lit)
 			}
 			continue
 		}
-		process(lit, s.pathIndex[lit])
+		st.process(lit, s.pathIndex[lit])
 	}
 
 	for _, g := range s.walkGroups {
-		s.walk(g, process, recordUnobservable)
+		s.walk(g, st.process, st.recordUnobservable)
 	}
 
-	scanMetrics.FilesUnique = int64(len(fdByName))
+	st.metrics.FilesUnique = int64(len(st.fdByName))
 
 	// prefixes is returned to the watcher, so it is built unconditionally.
 	var prefixes []string
-	if len(unobservable) > 0 {
-		prefixes = slices.Sorted(maps.Keys(unobservable))
+	if len(st.unobservable) > 0 {
+		prefixes = slices.Sorted(maps.Keys(st.unobservable))
 		s.debugLogUnobservable(prefixes)
 	}
 
-	s.lastCount = len(fdByName)
-	return fdByName, scanMetrics, prefixes
+	s.lastCount = len(st.fdByName)
+	return st.fdByName, st.metrics, prefixes
+}
+
+// scanState is the mutable state of a single GetFiles scan. process and
+// recordUnobservable mutate it as the literal paths and the directory walk yield
+// entries.
+type scanState struct {
+	s    *fileScanner
+	opts loginp.FileScanOptions
+
+	// fdByName holds the descriptors GetFiles will return, keyed by filename.
+	fdByName map[string]loginp.FileDescriptor
+	// uniqueIDs maps a file identity to the path that claimed it, used to detect
+	// when a symlink or a second glob resolves to an already-known target.
+	uniqueIDs map[string]matchedTarget
+	// uniqueFiles holds filenames already processed, used to filter duplicate
+	// matches when multiple globs match the same file.
+	uniqueFiles map[string]struct{}
+	// unobservable collects path prefixes the scan could not read/stat/open due
+	// to a resource or permission error (e.g. file-descriptor exhaustion) rather
+	// than the path being gone. The watcher uses them to postpone delete detection
+	// so a transient failure does not wipe registry state and re-ingest files.
+	unobservable map[string]struct{}
+
+	metrics loginp.FileScanMetrics
+}
+
+// newScanState allocates the per-scan maps, pre-sized from the previous scan's
+// returned count.
+func (s *fileScanner) newScanState(opts loginp.FileScanOptions) *scanState {
+	return &scanState{
+		s:            s,
+		opts:         opts,
+		fdByName:     make(map[string]loginp.FileDescriptor, s.lastCount),
+		uniqueIDs:    make(map[string]matchedTarget, s.lastCount),
+		uniqueFiles:  make(map[string]struct{}, s.lastCount),
+		unobservable: map[string]struct{}{},
+	}
+}
+
+// recordUnobservable marks path as a prefix the scan could not observe, counting
+// it once. Passed to walk as the recordUnobservable callback.
+func (st *scanState) recordUnobservable(path string) {
+	if _, ok := st.unobservable[path]; ok {
+		return
+	}
+	st.unobservable[path] = struct{}{}
+	st.metrics.ScanErrors++
+}
+
+// process evaluates one matched filename: it filters duplicates, builds an ingest
+// target and file descriptor, resolves file-identity collisions against paths
+// already matched this scan, and records the descriptor (or the relevant metric)
+// in the scan state. orderIndex is the position in s.paths of the pattern that
+// matched filename, used to resolve identity collisions deterministically.
+// Passed to walk as the process callback.
+func (st *scanState) process(filename string, orderIndex int) {
+	s, opts := st.s, st.opts
+	st.metrics.FilesMatched++
+
+	// in case multiple globs match on the same file we filter out duplicates
+	if _, knownFile := st.uniqueFiles[filename]; knownFile {
+		st.metrics.FilesNoIngestTarget++
+		return
+	}
+	st.uniqueFiles[filename] = struct{}{}
+
+	it, err := s.getIngestTarget(filename)
+	if err != nil {
+		if errors.Is(err, errFileEmpty) {
+			st.metrics.FilesEmpty++
+			return
+		}
+
+		s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+		if errors.Is(err, errFileIgnored) {
+			st.metrics.FilesIgnored++
+			return
+		}
+
+		// A stat/lstat that failed for a reason other than the file being
+		// gone (e.g. EMFILE) means we could not observe this path this scan.
+		if isObservationError(err) {
+			st.recordUnobservable(filename)
+		}
+		st.metrics.FilesNoIngestTarget++
+		return
+	}
+
+	fd, err := s.toFileDescriptor(&it)
+	if errors.Is(err, errFileTooSmall) {
+		st.metrics.FilesNoIngestTarget++
+		if s.smallFilesWarned.CompareAndSwap(false, true) {
+			s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
+				"least %d in size for ingestion to start. To change this "+
+				"behaviour set 'prospector.scanner.fingerprint.length' and "+
+				"'prospector.scanner.fingerprint.offset'. "+
+				"Enable debug logging to see all file names of delayed files.",
+				s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
+		}
+		s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
+		return
+	}
+	if err != nil {
+		st.metrics.FilesNoIngestTarget++
+		// Fingerprinting opens the file; under fd exhaustion the open fails
+		// with EMFILE, which is an observation failure, not a missing file.
+		if isObservationError(err) {
+			st.recordUnobservable(filename)
+		}
+		s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
+		return
+	}
+
+	fileID := fd.FileID()
+	if known, exists := st.uniqueIDs[fileID]; exists {
+		st.metrics.FilesNoIngestTarget++
+
+		// The same file is reachable via more than one path. Keep the path
+		// the previous implementation would have kept, so the returned
+		// filename is stable across scans and releases; otherwise,
+		//  - the "path" file identity would change and the file could be re-ingested,
+		//  - the fingerprint file identity could choose another file to open.
+		if !s.matchedEarlier(filename, orderIndex, known.name, known.order) {
+			s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, known.name, fileID, fileID)
+			return
+		}
+		s.log.Debugf("%q supersedes already matched ingest target %q for the same file", filename, known.name)
+		// the superseded descriptor was already counted as ignored if it
+		// matched the ignore options; take that back so FilesIgnored counts
+		// only the descriptors actually returned
+		if oldFd, ok := st.fdByName[known.name]; ok && isFileIgnored(oldFd, opts) {
+			st.metrics.FilesIgnored--
+		}
+		delete(st.fdByName, known.name)
+	}
+	st.uniqueIDs[fileID] = matchedTarget{name: filename, order: orderIndex}
+	s.attachBridgingRaw(&fd)
+	st.fdByName[filename] = fd
+	if isFileIgnored(fd, opts) {
+		st.metrics.FilesIgnored++
+	}
 }
 
 // debugLogUnobservable logs a sample of the path prefixes a scan could not
