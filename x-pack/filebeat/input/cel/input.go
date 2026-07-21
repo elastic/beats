@@ -628,7 +628,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			budget--
 			if budget <= 0 {
 				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
-				health.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
 				return nil
 			}
 		}
