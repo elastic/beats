@@ -16,8 +16,6 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer/consumertest"
-	"go.opentelemetry.io/collector/receiver"
-	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
@@ -99,11 +97,7 @@ func TestBeatReceiverStartShutdown(t *testing.T) {
 	)
 	require.NoError(t, err, "building the receiver beat should succeed")
 
-	var rs receiver.Settings
-	rs.Logger = zap.NewNop()
-	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
-
-	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	br, err := NewBeatReceiver(t.Context(), b, creator)
 	require.NoError(t, err, "creating the beat receiver should succeed")
 
 	// Start blocks in beater.Run, so run it in a goroutine.
@@ -234,11 +228,7 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	// an *otelmanager.OtelManager.
 	require.IsType(t, &otelmanager.OtelManager{}, b.Manager)
 
-	var rs receiver.Settings
-	rs.Logger = zap.NewNop()
-	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
-
-	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	br, err := NewBeatReceiver(t.Context(), b, creator)
 	require.NoError(t, err, "creating the beat receiver should succeed")
 
 	ext := &fakeActionDiagExtension{}
@@ -337,11 +327,7 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	)
 	require.NoError(t, err, "building the receiver beat should succeed")
 
-	var rs receiver.Settings
-	rs.Logger = zap.NewNop()
-	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
-
-	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	br, err := NewBeatReceiver(t.Context(), b, creator)
 	require.NoError(t, err, "creating the beat receiver should succeed")
 
 	// Reproduce the async wrapper pattern used by all beat receivers.
