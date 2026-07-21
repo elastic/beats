@@ -12,8 +12,8 @@ import (
 )
 
 type Config struct {
-	BeatAuthConfig  map[string]interface{} `mapstructure:",remain"`
-	ContinueOnError bool                   `mapstructure:"continue_on_error"`
+	BeatAuthConfig  map[string]any `mapstructure:",remain"`
+	ContinueOnError bool           `mapstructure:"continue_on_error"`
 }
 
 type BeatsAuthConfig struct {

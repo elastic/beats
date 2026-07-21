@@ -24,15 +24,19 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -42,6 +46,26 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
+
+// assertRunPdataEquivalent verifies that RunPdata, given the same input fields
+// used to produce result via Run, enriches a pcommon.Map with identical output.
+func assertRunPdataEquivalent(t *testing.T, p beat.Processor, input, result mapstr.M) {
+	t.Helper()
+
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, input))
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, result))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
+}
 
 type testCGReader struct {
 }
@@ -150,6 +174,9 @@ func TestNoMatch(t *testing.T) {
 	assert.NoError(t, err, "processing an event")
 
 	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
+
+	// RunPdata path (no CID resolves): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestMatchNoContainer(t *testing.T) {
@@ -168,6 +195,9 @@ func TestMatchNoContainer(t *testing.T) {
 	assert.NoError(t, err, "processing an event")
 
 	assert.Equal(t, mapstr.M{"foo": "garbage"}, result.Fields)
+
+	// RunPdata path (container not found): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestMatchContainer(t *testing.T) {
@@ -192,10 +222,9 @@ func TestMatchContainer(t *testing.T) {
 		}, nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := mapstr.M{
-		"foo": "container_id",
-	}
-	result, err := p.Run(&beat.Event{Fields: input})
+	input := mapstr.M{"foo": "container_id"}
+
+	result, err := p.Run(&beat.Event{Fields: input.Clone()})
 	assert.NoError(t, err, "processing an event")
 
 	assert.EqualValues(t, mapstr.M{
@@ -217,6 +246,9 @@ func TestMatchContainer(t *testing.T) {
 		},
 		"foo": "container_id",
 	}, result.Fields)
+
+	// RunPdata path (match_fields case): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestMatchContainerWithDedot(t *testing.T) {
@@ -297,7 +329,7 @@ func TestMatchSource(t *testing.T) {
 		},
 	}
 
-	result, err := p.Run(&beat.Event{Fields: input})
+	result, err := p.Run(&beat.Event{Fields: input.Clone()})
 	assert.NoError(t, err, "processing an event")
 
 	assert.EqualValues(t, mapstr.M{
@@ -318,6 +350,9 @@ func TestMatchSource(t *testing.T) {
 			},
 		},
 	}, result.Fields)
+
+	// RunPdata path (log.file.path/sourceProcessor case): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestDisableSource(t *testing.T) {
@@ -393,6 +428,9 @@ func TestMatchPIDs(t *testing.T) {
 		result, err := p.Run(&beat.Event{Fields: input})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (pid is not containerized): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, input, result.Fields)
 	})
 
 	t.Run("pid does not exist", func(t *testing.T) {
@@ -405,6 +443,9 @@ func TestMatchPIDs(t *testing.T) {
 		result, err := p.Run(&beat.Event{Fields: input})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (pid does not exist): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, input, result.Fields)
 	})
 
 	t.Run("pid is containerized", func(t *testing.T) {
@@ -415,9 +456,12 @@ func TestMatchPIDs(t *testing.T) {
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
-		result, err := p.Run(&beat.Event{Fields: fields})
+		result, err := p.Run(&beat.Event{Fields: fields.Clone()})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (PID/cgroup lookup case): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, fields, result.Fields)
 	})
 
 	t.Run("pid exited and ppid is containerized", func(t *testing.T) {
@@ -429,9 +473,12 @@ func TestMatchPIDs(t *testing.T) {
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
-		result, err := p.Run(&beat.Event{Fields: fields})
+		result, err := p.Run(&beat.Event{Fields: fields.Clone()})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (PID/cgroup lookup case): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, fields, result.Fields)
 	})
 
 	t.Run("cgroup error", func(t *testing.T) {
@@ -444,7 +491,88 @@ func TestMatchPIDs(t *testing.T) {
 		result, err := p.Run(&beat.Event{Fields: fields})
 		assert.NoError(t, err, "processing an event")
 		assert.EqualValues(t, expected, result.Fields)
+
+		// RunPdata path (cgroup error): assert Run == RunPdata.
+		assertRunPdataEquivalent(t, p, fields, result.Fields)
 	})
+}
+
+func TestMatchPIDsConcurrent(t *testing.T) {
+	containerID := "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b"
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), config.NewConfig(), MockWatcherFactory(
+		map[string]*docker.Container{
+			containerID: {
+				ID:    containerID,
+				Image: "image",
+				Name:  "name",
+			},
+		},
+		nil,
+	))
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+	t.Cleanup(func() {
+		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	})
+
+	// Concurrent Run calls on a shared processor must not race on the lazily
+	// initialized cgroup cache.
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+	for range 10 {
+		wg.Go(func() {
+			<-start
+
+			fields := mapstr.M{}
+			fields.Put("process.pid", 1000)
+
+			result, err := p.Run(&beat.Event{Fields: fields})
+			if !assert.NoError(t, err, "processing an event") {
+				return
+			}
+			cid, err := result.Fields.GetValue("container.id")
+			assert.NoError(t, err, "getting container.id")
+			assert.Equal(t, containerID, cid)
+		})
+	}
+	close(start)
+	wg.Wait()
+}
+
+// TestCloseBeforeCgroupCacheNoJanitorLeak covers Close running before the lazy cgroup cache is
+// initialized. A later cgroupCache call (as a late Run would trigger) must not start a janitor
+// goroutine that Close can no longer stop.
+func TestCloseBeforeCgroupCacheNoJanitorLeak(t *testing.T) {
+	containerID := "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b"
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), config.NewConfig(), MockWatcherFactory(
+		map[string]*docker.Container{
+			containerID: {
+				ID:    containerID,
+				Image: "image",
+				Name:  "name",
+			},
+		},
+		nil,
+	))
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+	d := p.(*addDockerMetadata)
+
+	assert.NoError(t, processors.Close(p), "closing processor")
+	assert.Nil(t, d.cgroups.Load(), "cgroups should be nil, the cache was never initialized before Close")
+
+	// Stop any janitor a regression would start so it does not affect other tests.
+	t.Cleanup(func() {
+		if c := d.cgroups.Load(); c != nil {
+			c.StopJanitor()
+		}
+	})
+
+	// Baseline after Close, once all processor goroutines have stopped.
+	goroutinesChecker := resources.NewGoroutinesChecker()
+	goroutinesChecker.FinalizationTimeout = 2 * time.Second
+
+	d.cgroupCache()
+
+	goroutinesChecker.Check(t)
 }
 
 func TestWatcherError(t *testing.T) {
@@ -467,6 +595,9 @@ func TestWatcherError(t *testing.T) {
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
+
+	// RunPdata path (docker unavailable): assert Run == RunPdata.
+	assertRunPdataEquivalent(t, p, input, result.Fields)
 }
 
 func TestConfigValidate(t *testing.T) {

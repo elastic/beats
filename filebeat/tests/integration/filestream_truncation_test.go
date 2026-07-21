@@ -160,10 +160,7 @@ func assertLastOffset(t *testing.T, path string, offset int) {
 		t.Errorf("expecting offset %d got %d instead", offset, lastEntry.Offset)
 		t.Log("last registry entries:")
 
-		max := len(entries)
-		if max > 10 {
-			max = 10
-		}
+		max := min(len(entries), 10)
 		for _, e := range entries[:max] {
 			t.Logf("%+v\n", e)
 		}
@@ -180,9 +177,9 @@ type registryEntry struct {
 	TTL      time.Duration
 	Op       string
 	Removed  bool
-	// Fingerprint is the value-side raw-hex growing fingerprint (meta.fingerprint);
-	// non-empty only for still-growing entries.
-	Fingerprint string
+	// FingerprintLen is the value-side growing fingerprint byte length
+	// (meta.fingerprint_len); non-zero only for still-growing entries.
+	FingerprintLen int64
 }
 
 func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[string]string) {
@@ -212,14 +209,14 @@ func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[
 		}
 		// Filestream entry
 		et := registryEntry{
-			Key:         e.Key,
-			Offset:      e.Value.Cursor.Offset,
-			EOF:         e.Value.Cursor.EOF,
-			TTL:         e.Value.TTL,
-			Filename:    e.Value.Meta.Source,
-			Removed:     lastOperation == "remove",
-			Op:          lastOperation,
-			Fingerprint: e.Value.Meta.Fingerprint,
+			Key:            e.Key,
+			Offset:         e.Value.Cursor.Offset,
+			EOF:            e.Value.Cursor.EOF,
+			TTL:            e.Value.TTL,
+			Filename:       e.Value.Meta.Source,
+			Removed:        lastOperation == "remove",
+			Op:             lastOperation,
+			FingerprintLen: e.Value.Meta.FingerprintLen,
 		}
 
 		// Handle the log input entries, they have a different format.
@@ -254,11 +251,12 @@ type entry struct {
 		} `json:"cursor"`
 		Meta struct {
 			Source string `json:"source"`
-			// Fingerprint is the raw-hex growing fingerprint, persisted in the
-			// entry value only while the file is below threshold (bounded-key
-			// optimization). Empty for final SHA-256 / static entries, so a
-			// non-empty value is the marker of a still-growing entry.
-			Fingerprint string `json:"fingerprint"`
+			// FingerprintLen is the growing fingerprint's byte length,
+			// persisted in the entry value only while the file is below
+			// threshold (the hash is the registry key). Zero for final
+			// SHA-256 / static entries, so a non-zero value is the marker of
+			// a still-growing entry.
+			FingerprintLen int64 `json:"fingerprint_len"`
 		} `json:"meta"`
 
 		// Log input fields

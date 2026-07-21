@@ -97,8 +97,8 @@ func TestFileIdentifier(t *testing.T) {
 	})
 
 	t.Run("path identifier", func(t *testing.T) {
-		c := conf.MustNewConfigFrom(map[string]interface{}{
-			"identifier": map[string]interface{}{
+		c := conf.MustNewConfigFrom(map[string]any{
+			"identifier": map[string]any{
 				"path": nil,
 			},
 		})
@@ -144,8 +144,8 @@ func TestFileIdentifier(t *testing.T) {
 	})
 
 	t.Run("fingerprint identifier", func(t *testing.T) {
-		c := conf.MustNewConfigFrom(map[string]interface{}{
-			"identifier": map[string]interface{}{
+		c := conf.MustNewConfigFrom(map[string]any{
+			"identifier": map[string]any{
 				"fingerprint": nil,
 			},
 		})
@@ -229,12 +229,48 @@ func TestFingerprintIDKey(t *testing.T) {
 	})
 }
 
-// TestGrowingRawFingerprint verifies the value-side helper: the raw fingerprint
-// is persisted (in fileMeta.Fingerprint) only while the file is still growing.
-func TestGrowingRawFingerprint(t *testing.T) {
-	raw := "41414141"
-	assert.Equal(t, raw, (loginp.FingerprintID{Raw: raw}).GrowingRaw(),
-		"a growing descriptor must persist its raw fingerprint for prefix matching")
-	assert.Empty(t, (loginp.FingerprintID{Raw: raw, Sum: raw}).GrowingRaw(),
-		"a completed descriptor must not persist a raw fingerprint (keeps the entry byte-identical to static)")
+// TestGrowingFingerprintHelpers verifies the growing-phase helpers
+func TestGrowingFingerprintHelpers(t *testing.T) {
+	const raw = "41414141"
+
+	testCases := []struct {
+		name        string
+		fp          loginp.FingerprintID
+		wantRaw     string
+		wantByteLen int64
+	}{
+		{
+			name:        "growing descriptor exposes raw material and its byte length",
+			fp:          loginp.FingerprintID{Raw: raw},
+			wantRaw:     raw,
+			wantByteLen: 4,
+		},
+		{
+			name:        "completed descriptor (raw and sum) exposes neither",
+			fp:          loginp.FingerprintID{Raw: raw, Sum: raw},
+			wantRaw:     "",
+			wantByteLen: 0,
+		},
+		{
+			name:        "completed descriptor (sum only) exposes neither",
+			fp:          loginp.FingerprintID{Sum: raw},
+			wantRaw:     "",
+			wantByteLen: 0,
+		},
+		{
+			name:        "empty descriptor exposes neither",
+			fp:          loginp.FingerprintID{},
+			wantRaw:     "",
+			wantByteLen: 0,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.wantRaw, tc.fp.GrowingRaw(),
+				"GrowingRaw must expose raw material only while the file is still growing")
+			assert.Equal(t, tc.wantByteLen, tc.fp.GrowingByteLen(),
+				"GrowingByteLen must report the growing material's byte length, or 0 once complete")
+		})
+	}
 }

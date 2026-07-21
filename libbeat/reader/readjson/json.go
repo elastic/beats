@@ -67,7 +67,7 @@ func NewJSONParser(r reader.Reader, cfg *ParserConfig, logger *logp.Logger) *JSO
 // decodeJSON unmarshals the text parameter into a MapStr and
 // returns the new text column if one was requested.
 func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
-	var jsonFields map[string]interface{}
+	var jsonFields map[string]any
 
 	err := unmarshal(text, &jsonFields)
 	if err != nil || jsonFields == nil {
@@ -105,7 +105,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 
 // unmarshal is equivalent with json.Unmarshal but it converts numbers
 // to int64 where possible, instead of using always float64.
-func unmarshal(text []byte, fields *map[string]interface{}) error {
+func unmarshal(text []byte, fields *map[string]any) error {
 	dec := gojson.NewDecoder(bytes.NewReader(text))
 	dec.UseNumber()
 	err := dec.Decode(fields)

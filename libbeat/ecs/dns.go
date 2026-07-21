@@ -95,7 +95,7 @@ type Dns struct {
 	// answer objects must contain the `data` key. If more information is
 	// available, map as much of it to ECS as possible, and add any additional
 	// fields to the answer objects as custom fields.
-	Answers []map[string]interface{} `ecs:"answers"`
+	Answers []map[string]any `ecs:"answers"`
 
 	// The domain name to which this resource record pertains.
 	// If a chain of CNAME is being resolved, each answer's `name` should be

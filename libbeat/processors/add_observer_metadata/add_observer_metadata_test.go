@@ -35,7 +35,7 @@ func TestConfigDefault(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := cfg.NewConfigFrom(map[string]any{})
 	assert.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
@@ -57,7 +57,7 @@ func TestOverwriteFalse(t *testing.T) {
 		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := cfg.NewConfigFrom(map[string]any{})
 	require.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
@@ -75,7 +75,7 @@ func TestOverwriteTrue(t *testing.T) {
 		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{"overwrite": true})
+	testConfig, err := cfg.NewConfigFrom(map[string]any{"overwrite": true})
 	require.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
@@ -93,7 +93,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{
+	testConfig, err := cfg.NewConfigFrom(map[string]any{
 		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
@@ -118,7 +118,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"geo.name":             "yerevan-am",
 		"geo.location":         "40.177200, 44.503490",
 		"geo.continent_name":   "Asia",
@@ -150,7 +150,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{}
+	config := map[string]any{}
 
 	testConfig, err := cfg.NewConfigFrom(config)
 	require.NoError(t, err)
