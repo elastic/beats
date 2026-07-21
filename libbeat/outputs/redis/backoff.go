@@ -33,7 +33,6 @@ type backoffClient struct {
 
 	reason failReason
 
-	done    chan struct{}
 	backoff b.Backoff
 }
 
@@ -52,12 +51,9 @@ const (
 )
 
 func newBackoffClient(client *client, init, max time.Duration) *backoffClient {
-	done := make(chan struct{})
-	backoff := b.NewEqualJitterBackoff(done, init, max)
 	return &backoffClient{
 		client:  client,
-		done:    done,
-		backoff: backoff,
+		backoff: b.NewEqualJitterBackoff(init, max),
 	}
 }
 
@@ -66,7 +62,7 @@ func (b *backoffClient) Connect(ctx context.Context) error {
 	if err != nil {
 		// give the client a chance to promote an internal error to a network error.
 		b.updateFailReason(err)
-		b.backoff.Wait()
+		b.backoff.Wait(ctx)
 	} else if b.reason != failRedis { // Only reset backoff duration if failure was due to IO errors.
 		b.resetFail()
 	}
@@ -75,9 +71,7 @@ func (b *backoffClient) Connect(ctx context.Context) error {
 }
 
 func (b *backoffClient) Close() error {
-	err := b.client.Close()
-	close(b.done)
-	return err
+	return b.client.Close()
 }
 
 func (b *backoffClient) Publish(ctx context.Context, batch publisher.Batch) error {
@@ -85,7 +79,7 @@ func (b *backoffClient) Publish(ctx context.Context, batch publisher.Batch) erro
 	if err != nil {
 		b.client.Close()
 		b.updateFailReason(err)
-		b.backoff.Wait()
+		b.backoff.Wait(ctx)
 	} else {
 		b.resetFail()
 	}
