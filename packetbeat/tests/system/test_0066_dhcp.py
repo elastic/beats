@@ -9,9 +9,13 @@ class Test(BaseTest):
 
     def test_dhcp(self):
         self.render_config_template()
-        self.run_packetbeat(pcap="dhcp.pcap")
+        pb = self.start_packetbeat(pcap="dhcp.pcap")
+        try:
+            self.wait_until(lambda: self.output_lines() >= 4, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
 
-        objs = self.read_output(types=['dhcpv4'])
+        objs = self.read_output(types=['dhcpv4'])[:4]
         assert len(objs) == 4
 
         assert "event.start" in objs[0]

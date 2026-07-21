@@ -92,11 +92,17 @@ class BaseTest(TestCase):
                          config="packetbeat.yml",
                          output=None,
                          extra_args=[],
-                         debug_selectors=[]):
+                         debug_selectors=[],
+                         pcap=None,
+                         real_time=False):
         """
         Starts packetbeat and returns the process handle. The
         caller is responsible for stopping / waiting for the
         Proc instance.
+
+        When pcap is set, Packetbeat reads that file in a loop (-l 0) so the
+        caller can wait_until(output_lines) and then kill_and_wait, instead of
+        racing an EOF self-exit that can drop unflushed events.
         """
         if output is None:
             output = "packetbeat-" + self.today + ".ndjson"
@@ -113,6 +119,14 @@ class BaseTest(TestCase):
             args += [
                 "--test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
             ]
+
+        if pcap is not None:
+            if not real_time:
+                args.append("-t")
+            args.extend([
+                "-l", "0",
+                "-I", os.path.join(self.beat_path, "tests/system/pcaps", pcap),
+            ])
 
         if extra_args:
             args.extend(extra_args)

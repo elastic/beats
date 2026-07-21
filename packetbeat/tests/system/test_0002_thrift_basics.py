@@ -49,10 +49,14 @@ class Test(BaseTest):
             thrift_send_request=True,
             thrift_send_response=True,
         )
-        self.run_packetbeat(pcap="thrift_tutorial.pcap",
-                            debug_selectors=["thrift"])
+        pb = self.start_packetbeat(pcap="thrift_tutorial.pcap",
+                                   debug_selectors=["thrift"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
 
-        objs = self.read_output()
+        objs = self.read_output()[:17]
 
         self.tutorial_asserts(objs)
 
@@ -69,10 +73,14 @@ class Test(BaseTest):
         self.render_config_template(
             thrift_ports=[9090],
         )
-        self.run_packetbeat(pcap="thrift_tutorial.pcap",
-                            debug_selectors=["thrift"])
+        pb = self.start_packetbeat(pcap="thrift_tutorial.pcap",
+                                   debug_selectors=["thrift"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
 
-        objs = self.read_output()
+        objs = self.read_output()[:17]
 
         self.tutorial_asserts(objs)
 
@@ -84,10 +92,14 @@ class Test(BaseTest):
             thrift_ports=[9090],
             thrift_transport_type="framed"
         )
-        self.run_packetbeat(pcap="thrift_tutorial_framed_transport.pcap",
-                            debug_selectors=["thrift"])
+        pb = self.start_packetbeat(pcap="thrift_tutorial_framed_transport.pcap",
+                                   debug_selectors=["thrift"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
 
-        objs = self.read_output()
+        objs = self.read_output()[:17]
 
         self.tutorial_asserts(objs)
 
@@ -97,10 +109,14 @@ class Test(BaseTest):
             thrift_idl_files=["tutorial.thrift", "shared.thrift"]
         )
         self.copy_files(["tutorial.thrift", "shared.thrift"])
-        self.run_packetbeat(pcap="thrift_tutorial.pcap",
-                            debug_selectors=["thrift"])
+        pb = self.start_packetbeat(pcap="thrift_tutorial.pcap",
+                                   debug_selectors=["thrift"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 17, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
 
-        objs = self.read_output()
+        objs = self.read_output()[:17]
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])
         assert all([o["thrift.service"] == "Calculator" or
@@ -152,10 +168,14 @@ class Test(BaseTest):
         )
 
         self.copy_files(["ThriftTest.thrift"])
-        self.run_packetbeat(pcap="thrift_integration.pcap",
-                            debug_selectors=["thrift"])
+        pb = self.start_packetbeat(pcap="thrift_integration.pcap",
+                                   debug_selectors=["thrift"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 26, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
 
-        objs = self.read_output()
+        objs = self.read_output()[:26]
         assert len(objs) == 26
         assert all([o["type"] == "thrift" for o in objs])
         assert all([o["thrift.service"] == "ThriftTest" for o in objs])

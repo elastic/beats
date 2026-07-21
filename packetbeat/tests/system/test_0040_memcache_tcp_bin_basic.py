@@ -107,7 +107,15 @@ class Test(BaseTest):
                 noop['memcache.response.opaque'])
 
     def test_counter_ops(self):
-        objs = self._run('memcache/memcache_bin_tcp_counter_ops.pcap')
+        self.render_config_template()
+        pb = self.start_packetbeat(pcap='memcache/memcache_bin_tcp_counter_ops.pcap',
+                                   debug_selectors=["memcache", "tcp", "publish"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 5, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
+        objs = self.read_output()[:5]
+        self.assert_common(objs)
 
         # all transactions succeed
         assert all(o['status'] == 'OK' for o in objs)

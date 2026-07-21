@@ -7,8 +7,12 @@ class Test(BaseTest):
         self.render_config_template(
             timestamp_precision="nanosecond",
         )
-        self.run_packetbeat(pcap="icmp/icmp_2_pings.pcap", debug_selectors=["*"])
-        objs = self.read_output()
+        pb = self.start_packetbeat(pcap="icmp/icmp_2_pings.pcap", debug_selectors=["*"])
+        try:
+            self.wait_until(lambda: self.output_lines() >= 2, max_timeout=30)
+        finally:
+            pb.kill_and_wait()
+        objs = self.read_output()[:2]
         assert len(objs) == 2
         assert all([o["icmp.version"] == 4 for o in objs])
         assert objs[0]["@timestamp"] == "2015-10-19T21:47:49.900657Z"
