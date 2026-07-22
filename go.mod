@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.26.4
+go 1.26.5
 
 require (
 	cloud.google.com/go/bigquery v1.77.0
@@ -234,7 +234,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.21.0
 	github.com/coder/websocket v1.8.14
-	github.com/elastic/entcollect v0.0.0-20260706024408-4a12ea00f54d
+	github.com/elastic/entcollect v0.0.0-20260720203654-e61fb8788d9a
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
 	github.com/jimlambrt/gldap v0.1.14
