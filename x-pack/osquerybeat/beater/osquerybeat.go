@@ -808,8 +808,8 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
 }
 
-func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]interface{} {
-	m := map[string]interface{}{
+func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]any {
+	m := map[string]any{
 		"type":                     typ,
 		"calendar_type":            res.CalendarTime,
 		"unix_time":                res.UnixTime,
@@ -827,7 +827,7 @@ func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 	if b.Manager != nil {
-		b.Manager.SetPayload(map[string]interface{}{
+		b.Manager.SetPayload(map[string]any{
 			"osquery_version": bt.osqueryVersion,
 			"osquery_source":  bt.osquerySource,
 		})
