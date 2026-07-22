@@ -39,6 +39,7 @@ steps:
         - github_commit_status:
             context: "deploy/k8s checks"
 
+## See exact k8's version supported by kindest here https://hub.docker.com/r/kindest/node/tags
     - label: "K8S Test/K8S version: {{matrix}}"
       matrix:
         - "v1.36.1"
