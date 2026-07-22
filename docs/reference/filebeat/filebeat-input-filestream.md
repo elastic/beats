@@ -411,7 +411,7 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
-Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default when `file_identity` is omitted) and disables it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored; Filebeat logs a warning if its value contradicts the configured `file_identity`.
+Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default when `file_identity` is omitted) and deactivates it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored. Filebeat logs a warning if its value contradicts the configured `file_identity`.
 
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
