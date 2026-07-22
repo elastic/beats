@@ -246,7 +246,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 	if err != nil {
 		return nil, err
 	}
-	if override := os.Getenv("ELASTIC_AGENT_HOSTNAME"); override != "" {
+	if override := os.Getenv(beat.EnvHostName); override != "" {
 		hostname = override
 	}
 
