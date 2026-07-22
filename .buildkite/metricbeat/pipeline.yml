@@ -170,6 +170,8 @@ steps:
 
       - label: ":ubuntu: Metricbeat: Go Integration Tests (Module)"
         command: |
+          set -euo pipefail
+          SKIP_KIND_CLUSTER=true source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat
@@ -230,6 +232,8 @@ steps:
 
       - label: ":ubuntu: Metricbeat: Go fips140=only Integration Tests (Module)"
         command: |
+          set -euo pipefail
+          SKIP_KIND_CLUSTER=true source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
           cd metricbeat
           mage goFIPSOnlyIntegTest
         retry:
@@ -259,7 +263,7 @@ steps:
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
-          .buildkite/scripts/install_kind.sh
+          SKIP_KIND_CLUSTER=true source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat

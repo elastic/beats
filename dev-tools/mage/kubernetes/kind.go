@@ -24,6 +24,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -120,13 +121,16 @@ nodes:
 		args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
 	}
 
-	_, err = sh.Exec(
-		map[string]string{},
-		stdOut,
-		stdErr,
-		"kind",
-		args...,
-	)
+	err = withGODEBUGWithoutFIPS140(func() error {
+		_, err := sh.Exec(
+			map[string]string{},
+			stdOut,
+			stdErr,
+			"kind",
+			args...,
+		)
+		return err
+	})
 	if err != nil {
 		return err
 	}
@@ -147,22 +151,64 @@ func (m *KindIntegrationTestStep) Teardown(env map[string]string) error {
 	name, created := env["KIND_CLUSTER"]
 	_, keepUp := os.LookupEnv("KIND_SKIP_DELETE")
 	if created && !keepUp {
-		_, err := sh.Exec(
-			env,
-			stdOut,
-			stdErr,
-			"kind",
-			"delete",
-			"cluster",
-			"--name",
-			name,
-		)
+		err := withGODEBUGWithoutFIPS140(func() error {
+			_, err := sh.Exec(
+				env,
+				stdOut,
+				stdErr,
+				"kind",
+				"delete",
+				"cluster",
+				"--name",
+				name,
+			)
+			return err
+		})
 		if err != nil {
 			return err
 		}
 		delete(env, "KIND_CLUSTER")
 	}
 	return nil
+}
+
+// withGODEBUGWithoutFIPS140 temporarily removes fips140=* from GODEBUG while fn
+// runs, then restores the previous value. Kind is a non-FIPS Go binary and fails
+// under GODEBUG=fips140=only (used by FIPS integ tests).
+func withGODEBUGWithoutFIPS140(fn func() error) error {
+	orig, had := os.LookupEnv("GODEBUG")
+	defer func() {
+		if !had {
+			_ = os.Unsetenv("GODEBUG")
+			return
+		}
+		_ = os.Setenv("GODEBUG", orig)
+	}()
+
+	cleaned := removeGODEBUGKey(orig, "fips140")
+	if cleaned == "" {
+		_ = os.Unsetenv("GODEBUG")
+	} else {
+		_ = os.Setenv("GODEBUG", cleaned)
+	}
+	return fn()
+}
+
+func removeGODEBUGKey(godebug, key string) string {
+	if godebug == "" {
+		return ""
+	}
+	prefix := key + "="
+	parts := strings.Split(godebug, ",")
+	kept := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p == "" || strings.HasPrefix(p, prefix) {
+			continue
+		}
+		kept = append(kept, p)
+	}
+	return strings.Join(kept, ",")
 }
 
 func envKubeConfigExists(env map[string]string, envVar string) bool {
