@@ -79,7 +79,7 @@ func (p *processor) Start() {
 		p.flows.Start()
 	}
 	p.wg.Add(1)
-	go func() {
+	p.wg.Go(func() {
 		defer p.wg.Done()
 
 		p.UpdateStatus(status.Running, "running packetbeat processor")
@@ -90,7 +90,7 @@ func (p *processor) Start() {
 			return
 		}
 		p.err <- nil
-	}()
+	})
 }
 
 func (p *processor) Stop() {
@@ -343,7 +343,7 @@ func configID(config *conf.C) (string, error) {
 		return tmp.ID, nil
 	}
 
-	var h map[string]interface{}
+	var h map[string]any
 	_ = config.Unpack(&h)
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {

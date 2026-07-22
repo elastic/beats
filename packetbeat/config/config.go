@@ -56,7 +56,7 @@ func GetShutDownTimeOut(cfg *conf.C) (time.Duration, error) {
 	}
 
 	if err := cfg.Unpack(&timeout); err != nil {
-		return 0, fmt.Errorf("error reading shutdown_timeout: %v", err)
+		return 0, fmt.Errorf("error reading shutdown_timeout: %w", err)
 	}
 
 	if timeout.ShutdownTimeout <= 0 {
