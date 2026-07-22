@@ -453,23 +453,23 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 // the per-path pre-check result, the current autoload file contents, and the
 // extensions osqueryd actually loaded (via the osquery_extensions table). This makes
 // load failures (missing binary, unsafe permissions) visible in agent diagnostics.
-func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[string]interface{} {
+func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[string]any {
 	bt.diagMx.RLock()
 	extensions := bt.diagExtensions
 	dataPath := bt.diagOsqueryData
 	qe := bt.diagQueryExec
 	bt.diagMx.RUnlock()
 
-	payload := map[string]interface{}{
+	payload := map[string]any{
 		"generated_at":       time.Now().UTC().Format(time.RFC3339Nano),
 		"unsupported_notice": "Custom extensions are not developed, validated, or supported by Elastic. Customers are fully responsible for security, maintenance, and stability.",
 	}
 
 	resolved := osqd.ResolveExtensions(extensions.Paths)
-	entries := make([]map[string]interface{}, 0, len(resolved))
+	entries := make([]map[string]any, 0, len(resolved))
 	loadedCount := 0
 	for _, res := range resolved {
-		entry := map[string]interface{}{"entry": res.Entry}
+		entry := map[string]any{"entry": res.Entry}
 		if res.Error != "" {
 			entry["status"] = "error"
 			entry["reason"] = res.Error
@@ -478,9 +478,9 @@ func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[str
 			entry["loaded"] = res.Loaded
 			loadedCount += len(res.Loaded)
 			if len(res.Skipped) > 0 {
-				skipped := make([]map[string]interface{}, 0, len(res.Skipped))
+				skipped := make([]map[string]any, 0, len(res.Skipped))
 				for _, s := range res.Skipped {
-					skipped = append(skipped, map[string]interface{}{"path": s.Path, "reason": s.Reason})
+					skipped = append(skipped, map[string]any{"path": s.Path, "reason": s.Reason})
 				}
 				entry["skipped"] = skipped
 			}
@@ -504,7 +504,7 @@ func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[str
 			payload["autoload_error"] = err.Error()
 		} else {
 			entries := []string{}
-			for _, l := range strings.Split(strings.TrimRight(string(content), "\n"), "\n") {
+			for l := range strings.SplitSeq(strings.TrimRight(string(content), "\n"), "\n") {
 				if l != "" {
 					entries = append(entries, l)
 				}
