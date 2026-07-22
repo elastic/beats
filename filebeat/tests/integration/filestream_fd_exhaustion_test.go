@@ -117,9 +117,9 @@ logging.level: debug
 	// Then wait for two fully-observed scans after the exhaustion above — the window
 	// in which the buggy version wiped registry state and re-ingested from offset 0.
 	filebeat.WaitLogsContains(`"postponed":0`, 30*time.Second,
-		fmt.Sprintf("no fully-observed scan #%d after fd exhaustion", i+1))
+		"no fully-observed scan #1 after fd exhaustion")
 	filebeat.WaitLogsContains(`"postponed":0`, 30*time.Second,
-		fmt.Sprintf("no fully-observed scan #%d after fd exhaustion", i+1))
+		"no fully-observed scan #2 after fd exhaustion")
 	filebeat.Stop()
 
 	counts := make(map[string]int, numFiles)

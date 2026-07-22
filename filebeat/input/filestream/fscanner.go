@@ -396,7 +396,7 @@ func (st *scanState) process(filename string, orderIndex int) {
 		//  - the "path" file identity would change and the file could be re-ingested,
 		//  - the fingerprint file identity could choose another file to open.
 		if !s.matchedEarlier(filename, orderIndex, known.name, known.order) {
-			s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, known.name, fileID, fileID)
+			s.log.Warnf("%q points to an already known ingest target %q. Skipping", fd.Filename, known.name)
 			return
 		}
 		s.log.Debugf("%q supersedes already matched ingest target %q for the same file", filename, known.name)
