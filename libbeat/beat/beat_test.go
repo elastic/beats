@@ -22,6 +22,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -48,7 +49,7 @@ func (tm testManager) SetStopCallback(_ func())             {}
 func (tm testManager) CheckRawConfig(_ *config.C) error     { return nil }
 func (tm testManager) RegisterAction(_ management.Action)   {}
 func (tm testManager) UnregisterAction(_ management.Action) {}
-func (tm testManager) SetPayload(_ map[string]interface{})  {}
+func (tm testManager) SetPayload(_ map[string]any)          {}
 func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ management.DiagnosticHook) {
 }
 
@@ -130,4 +131,49 @@ func TestUserAgentString(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSetupPipelinesEnabled(t *testing.T) {
+	tests := []struct {
+		name string
+		cfg  *config.C
+		want bool
+	}{
+		{
+			name: "nil config defaults to enabled",
+			want: true,
+		},
+		{
+			name: "missing config defaults to enabled",
+			cfg:  config.NewConfig(),
+			want: true,
+		},
+		{
+			name: "explicitly enabled",
+			cfg: mustNewConfigFrom(t, map[string]interface{}{
+				"setup.pipelines.enabled": true,
+			}),
+			want: true,
+		},
+		{
+			name: "explicitly disabled",
+			cfg: mustNewConfigFrom(t, map[string]interface{}{
+				"setup.pipelines.enabled": false,
+			}),
+			want: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, SetupPipelinesEnabled(test.cfg), "unexpected setup.pipelines.enabled value")
+		})
+	}
+}
+
+func mustNewConfigFrom(t *testing.T, from map[string]interface{}) *config.C {
+	t.Helper()
+	cfg, err := config.NewConfigFrom(from)
+	require.NoError(t, err, "failed to create test config")
+	return cfg
 }

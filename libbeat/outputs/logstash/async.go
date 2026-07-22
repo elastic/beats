@@ -104,7 +104,7 @@ func newAsyncClient(
 func makeClientFactory(
 	queueSize int,
 	timeout time.Duration,
-	enc func(interface{}) ([]byte, error),
+	enc func(any) ([]byte, error),
 	compressLvl int,
 ) func(net.Conn) (*v2.AsyncClient, error) {
 	return func(conn net.Conn) (*v2.AsyncClient, error) {
@@ -220,7 +220,7 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	if c.client == nil {
 		return errors.New("connection closed")
 	}
-	window := make([]interface{}, len(events))
+	window := make([]any, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
 	}

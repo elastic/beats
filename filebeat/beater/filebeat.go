@@ -291,7 +291,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			gzipRegistry(b.Info.Logger, b.Info.Paths))
 	}
 
-	if !fb.moduleRegistry.Empty() {
+	if !fb.moduleRegistry.Empty() && beat.SetupPipelinesEnabled(b.BeatConfig) {
 		err = fb.loadModulesPipelines(b)
 		if err != nil {
 			return err
@@ -312,6 +312,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
 	// but it won't start any inputs/output
 	if err := b.Manager.PreInit(); err != nil {
+		fb.runReady.Close()
 		return err
 	}
 
@@ -451,11 +452,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// the context.
 	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
 	defer cancelPipelineFactoryCtx()
-	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
-	} else {
-		if !b.Manager.Enabled() {
-			fb.logger.Warn(pipelinesWarning)
+	if beat.SetupPipelinesEnabled(b.BeatConfig) {
+		if b.Config.Output.Name() == "elasticsearch" {
+			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
+		} else {
+			if !b.Manager.Enabled() {
+				fb.logger.Warn(pipelinesWarning)
+			}
 		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)

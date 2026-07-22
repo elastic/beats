@@ -1,9 +1,0 @@
-kind: feature
-
-summary: "Add sign-in activity enrichment for Azure AD users via enrich_with: sign_in_activity"
-
-component: filebeat
-
-#pr: https://github.com/elastic/beats/pull/XXXXX
-
-#issue: https://github.com/elastic/integrations/issues/19552

@@ -11,7 +11,6 @@
 package wintest_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -33,7 +32,7 @@ import (
 
 // ecsVersion is the expected ECS version for testing purposes.
 // Change this when ECS version is bumped.
-const ecsVersion = "1.12.0"
+const ecsVersion = "8.17.0"
 
 func TestSimulate(t *testing.T) {
 	const (
@@ -74,8 +73,7 @@ func TestSimulate(t *testing.T) {
 	}
 	defer conn.Close()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatalf("unexpected error making connection: %v", err)
@@ -94,6 +92,7 @@ func TestSimulate(t *testing.T) {
 		"powershell_operational",
 		"routing",
 		"security",
+		"security_standard",
 		"sysmon",
 	}
 	if len(loaded) != len(wantPipelines) {

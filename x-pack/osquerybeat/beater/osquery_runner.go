@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
+	"slices"
 	"sync"
 
 	"go.uber.org/zap/zapcore"
@@ -29,12 +30,13 @@ func newOsqueryRunner(log *logp.Logger) *osqueryRunner {
 	return r
 }
 
-type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error
+type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error
 
 // Run manages osqueryd lifecycle, processes inputs changes, restarts osquery if needed
 func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) error {
 	var (
-		flags osqd.Flags
+		flags      osqd.Flags
+		extensions config.ExtensionsConfig
 
 		ctx context.Context
 		cn  context.CancelFunc
@@ -66,6 +68,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 	process := func(inputs []config.InputConfig) {
 		lastKnownInputs = inputs
 		newFlags := config.GetOsqueryOptions(inputs)
+		newExtensions := config.GetOsqueryExtensions(inputs)
 		newLogLevel := zapcore.LevelOf(r.log.Core())
 
 		// cn is cleared by the spawned goroutine's cancel() on exit, so guard it with mx.
@@ -73,8 +76,9 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		running := cn != nil
 		mx.Unlock()
 
-		// If Osqueryd is running and flags are different or log level changed: stop osquery
-		if running && (!osqd.FlagsAreSame(flags, newFlags) || logLevel != newLogLevel) {
+		// If Osqueryd is running and flags, log level, or the customer-managed extensions
+		// changed: stop osquery so it is restarted with the new autoload file.
+		if running && (!osqd.FlagsAreSame(flags, newFlags) || logLevel != newLogLevel || !extensionsAreSame(extensions, newExtensions)) {
 			r.log.Info("Osquery is running and options changed, stop osqueryd")
 
 			// Cancel context
@@ -90,12 +94,13 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			r.log.Info("Start osqueryd")
 
 			flags = newFlags
+			extensions = newExtensions
 			logLevel = newLogLevel
 			inputCh = make(chan []config.InputConfig, 1)
-			ctx, cn = context.WithCancel(parentCtx)
+			ctx, cn = context.WithCancel(parentCtx) //nolint:gosec // G118: cn is stored and invoked via the cancel() helper
 
 			wg.Go(func() {
-				err := runfn(ctx, flags, inputCh)
+				err := runfn(ctx, flags, extensions, inputCh)
 
 				// Reset cancellable
 				cancel()
@@ -140,6 +145,19 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			return parentCtx.Err()
 		}
 	}
+}
+
+// extensionsAreSame reports whether two customer-managed extension configurations
+// are equivalent (same ordered paths, required names, and timeout), so the runner
+// only restarts osqueryd when the extension configuration actually changes.
+func extensionsAreSame(a, b config.ExtensionsConfig) bool {
+	if a.Timeout != b.Timeout {
+		return false
+	}
+	if !slices.Equal(a.Paths, b.Paths) {
+		return false
+	}
+	return slices.Equal(a.Require, b.Require)
 }
 
 func (r *osqueryRunner) Update(ctx context.Context, inputs []config.InputConfig) error {

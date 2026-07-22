@@ -39,7 +39,7 @@ type config struct {
 	// program. If it has a cursor field, that field will
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
-	State map[string]interface{} `config:"state"`
+	State map[string]any `config:"state"`
 	// Auth is the authentication config for connection.
 	Auth authConfig `config:"auth"`
 	// URL is the websocket url to connect to.
@@ -63,6 +63,11 @@ type config struct {
 	// domain as the configured URL. Entries here extend the set
 	// of accepted origins.
 	ResourceOrigins []string `config:"resource_origins"`
+	// UserAgent overrides the default User-Agent header sent on
+	// all outbound CrowdStrike HTTP requests (discover, firehose,
+	// session refresh, and OAuth2 token fetch). When empty, the
+	// Elastic Agent's built-in user agent string is used.
+	UserAgent string `config:"user_agent"`
 }
 
 type redact struct {

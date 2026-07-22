@@ -152,8 +152,8 @@ func (p BuildPlatform) GOARCH() string {
 // GOARM returns the ARM version.
 func (p BuildPlatform) GOARM() string {
 	arch := p.Arch()
-	if strings.HasPrefix(arch, "armv") {
-		return strings.TrimPrefix(arch, "armv")
+	if after, ok := strings.CutPrefix(arch, "armv"); ok {
+		return after
 	}
 	return ""
 }
@@ -287,10 +287,10 @@ func newPlatformExpression(expr string) (*platformExpression, error) {
 	// Parse the expression.
 	words := strings.FieldsFunc(expr, isSeparator)
 	for _, w := range words {
-		if strings.HasPrefix(w, "+") {
-			pe.Add = append(pe.Add, strings.TrimPrefix(w, "+"))
-		} else if strings.HasPrefix(w, "!") {
-			pe.Remove = append(pe.Remove, strings.TrimPrefix(w, "!"))
+		if after, ok := strings.CutPrefix(w, "+"); ok {
+			pe.Add = append(pe.Add, after)
+		} else if after, ok := strings.CutPrefix(w, "!"); ok {
+			pe.Remove = append(pe.Remove, after)
 		} else if w == "xbuild" {
 			pe.SelectCrossBuild = true
 		} else {

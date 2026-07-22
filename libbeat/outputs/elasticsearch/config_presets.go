@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -35,9 +36,9 @@ const (
 )
 
 var presetConfigs = map[string]*config.C{
-	presetNone:   config.MustNewConfigFrom(map[string]interface{}{}),
-	presetCustom: config.MustNewConfigFrom(map[string]interface{}{}),
-	presetBalanced: config.MustNewConfigFrom(map[string]interface{}{
+	presetNone:   config.MustNewConfigFrom(map[string]any{}),
+	presetCustom: config.MustNewConfigFrom(map[string]any{}),
+	presetBalanced: config.MustNewConfigFrom(map[string]any{
 		"bulk_max_size":              1600,
 		"worker":                     1,
 		"queue.mem.events":           3200,
@@ -46,7 +47,7 @@ var presetConfigs = map[string]*config.C{
 		"compression_level":          1,
 		"idle_connection_timeout":    3 * time.Second,
 	}),
-	presetThroughput: config.MustNewConfigFrom(map[string]interface{}{
+	presetThroughput: config.MustNewConfigFrom(map[string]any{
 		"bulk_max_size":              1600,
 		"worker":                     4,
 		"queue.mem.events":           12800,
@@ -55,7 +56,7 @@ var presetConfigs = map[string]*config.C{
 		"compression_level":          1,
 		"idle_connection_timeout":    15 * time.Second,
 	}),
-	presetScale: config.MustNewConfigFrom(map[string]interface{}{
+	presetScale: config.MustNewConfigFrom(map[string]any{
 		"bulk_max_size":              1600,
 		"worker":                     1,
 		"queue.mem.events":           3200,
@@ -66,7 +67,7 @@ var presetConfigs = map[string]*config.C{
 		"backoff.init":               5 * time.Second,
 		"backoff.max":                300 * time.Second,
 	}),
-	presetLatency: config.MustNewConfigFrom(map[string]interface{}{
+	presetLatency: config.MustNewConfigFrom(map[string]any{
 		"bulk_max_size":              50,
 		"worker":                     1,
 		"queue.mem.events":           4100,
@@ -102,7 +103,7 @@ func ApplyPreset(preset string, userConfig *config.C) ([]string, *config.C, erro
 	for _, key := range userKeys {
 		if strings.HasPrefix(key, "queue.") && presetConfiguresQueue {
 			overridden = append(overridden, key)
-		} else if listContainsStr(presetKeys, key) {
+		} else if slices.Contains(presetKeys, key) {
 			overridden = append(overridden, key)
 		}
 	}
@@ -116,16 +117,6 @@ func ApplyPreset(preset string, userConfig *config.C) ([]string, *config.C, erro
 		return nil, nil, err
 	}
 	return overridden, presetConfig, nil
-}
-
-// TODO: Replace this with slices.Contains once we hit Go 1.21.
-func listContainsStr(list []string, str string) bool {
-	for _, s := range list {
-		if s == str {
-			return true
-		}
-	}
-	return false
 }
 
 func listContainsPrefix(list []string, prefix string) bool {
@@ -155,7 +146,7 @@ func listContainsPrefix(list []string, prefix string) bool {
 // It would be nice to not have to do this (perhaps config.Namespace.Unpack
 // should strip the extra prefix somehow when it extracts the config subtree?)
 func flattenedKeysForConfig(cfg *config.C) ([]string, error) {
-	rawMap := make(map[string]interface{})
+	rawMap := make(map[string]any)
 	err := cfg.Unpack(rawMap)
 	if err != nil {
 		return nil, err

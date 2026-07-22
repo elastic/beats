@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -152,7 +153,7 @@ type fakeActionDiagExtension struct {
 	registeredDiagName  string
 	registeredActionFor string
 	unregisteredFor     string
-	actionHandler       func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)
+	actionHandler       func(ctx context.Context, params map[string]any) (map[string]any, error)
 }
 
 func (f *fakeActionDiagExtension) Start(context.Context, component.Host) error { return nil }
@@ -164,7 +165,7 @@ func (f *fakeActionDiagExtension) RegisterDiagnosticHook(name, _, _, _ string, _
 	f.registeredDiagName = name
 }
 
-func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error {
+func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]any) (map[string]any, error)) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.registeredActionFor = name
@@ -196,9 +197,9 @@ type fakeAction struct {
 
 func (a *fakeAction) Name() string { return a.name }
 
-func (a *fakeAction) Execute(_ context.Context, _ map[string]interface{}) (map[string]interface{}, error) {
+func (a *fakeAction) Execute(_ context.Context, _ map[string]any) (map[string]any, error) {
 	a.executed.Store(true)
-	return map[string]interface{}{"ok": true}, nil
+	return map[string]any{"ok": true}, nil
 }
 
 // TestBeatReceiverStart_WiresActionAndDiagnosticExtensions verifies that Start
@@ -271,9 +272,9 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	ext.mu.Unlock()
 	require.NotNil(t, handler, "action handler should have been registered with the extension")
 
-	res, err := handler(t.Context(), map[string]interface{}{"id": "abc"})
+	res, err := handler(t.Context(), map[string]any{"id": "abc"})
 	require.NoError(t, err)
-	assert.Equal(t, map[string]interface{}{"ok": true}, res)
+	assert.Equal(t, map[string]any{"ok": true}, res)
 	assert.True(t, act.executed.Load(), "invoking the registered handler should execute the underlying action")
 
 	b.Manager.UnregisterAction(act)
@@ -296,5 +297,72 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 		require.NoError(t, err, "beater.Run should return cleanly")
 	case <-time.After(10 * time.Second):
 		t.Fatal("beater.Run did not return after Stop")
+	}
+}
+
+// mockStorageBeater is a minimal Beater that also implements
+// backend.WithESStateStoreExtension so that BeatReceiver.Start's storage
+// preflight path is exercised.
+type mockStorageBeater struct {
+	mockReceiverBeater
+}
+
+func (m *mockStorageBeater) WithESStateStoreExtension(_ backend.Registry) {}
+
+// TestBeatReceiverStartFailureShutdownDoesNotHang is a regression test for the
+// nil-runDone hang.
+func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
+	mb := &mockStorageBeater{
+		mockReceiverBeater: mockReceiverBeater{
+			acked:    &atomic.Int64{},
+			initDone: make(chan struct{}),
+			done:     make(chan struct{}),
+		},
+	}
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+
+	cfg := map[string]any{
+		"path.home": t.TempDir(),
+		// Reference a storage extension that will not be present in the host.
+		// This causes BeatReceiver.Start to return an error before launching
+		// beater.Run, leaving runDone nil on the buggy path.
+		"storage": "elasticsearch_storage/missing",
+	}
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		cfg,
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	var rs receiver.Settings
+	rs.Logger = zap.NewNop()
+	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
+
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	// Reproduce the async wrapper pattern used by all beat receivers.
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		// Swallow the error, exactly as the wrapper receivers do.
+		_ = br.Start(componenttest.NewNopHost())
+	})
+	// Wait for the goroutine to complete. Start has failed and returned; on the
+	// buggy path runDone is still nil at this point.
+	wg.Wait()
+
+	// Shutdown must complete promptly even though Start failed before launching
+	// beater.Run. Use t.Context() (no deadline during test execution) so that a
+	// nil runDone would block indefinitely — a bounded context would mask the
+	// bug by releasing the select via ctx.Done().
+	done := make(chan error, 1)
+	go func() { done <- br.Shutdown(t.Context()) }()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
 	}
 }

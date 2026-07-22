@@ -1,0 +1,9 @@
+kind: enhancement
+summary: Wire SQS health status aggregation into the v2 aws-s3 input path.
+description: |
+  Apply the sqsHealth aggregator (from the legacy SQS path) to the v2 SQS
+  input. The v2 path now has the same health reporting semantics: transient
+  failures stay Running, sustained failures degrade with condition-specific
+  messages, and context cancellation from shutdown is suppressed.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/51692

@@ -190,6 +190,28 @@ func (c *backupConfig) GetBucketName() string {
 	return c.NonAWSBackupToBucketName
 }
 
+// backupPrefixToExclude returns the key prefix that should be excluded from
+// listing results to avoid reprocessing Filebeat-created backup objects. The
+// backup key is constructed as backupPrefix + originalKey, and all source keys
+// start with listPrefix, so the common prefix of all backups is
+// backupPrefix + listPrefix. Returns "" when no exclusion is needed.
+func (c *config) backupPrefixToExclude() string {
+	if c.BackupConfig.BackupToBucketPrefix == "" {
+		return ""
+	}
+	sameBucket := (c.BackupConfig.BackupToBucketArn != "" &&
+		(c.BackupConfig.BackupToBucketArn == c.BucketARN || c.BackupConfig.BackupToBucketArn == c.AccessPointARN)) ||
+		(c.BackupConfig.NonAWSBackupToBucketName != "" && c.BackupConfig.NonAWSBackupToBucketName == c.NonAWSBucketName)
+	if !sameBucket {
+		return ""
+	}
+	generatedBackupPrefix := c.BackupConfig.BackupToBucketPrefix + c.BucketListPrefix
+	if !strings.HasPrefix(generatedBackupPrefix, c.BucketListPrefix) {
+		return ""
+	}
+	return generatedBackupPrefix
+}
+
 // fileSelectorConfig defines reader configuration that applies to a subset
 // of S3 objects whose URL matches the given regex.
 type fileSelectorConfig struct {
@@ -232,12 +254,12 @@ func (rc *readerConfig) Validate() error {
 }
 
 type scriptConfig struct {
-	Source            string                 `config:"source"`                               // Inline script to execute.
-	File              string                 `config:"file"`                                 // Source file.
-	Files             []string               `config:"files"`                                // Multiple source files.
-	Params            map[string]interface{} `config:"params"`                               // Parameters to pass to script.
-	Timeout           time.Duration          `config:"timeout" validate:"min=0"`             // Execution timeout.
-	MaxCachedSessions int                    `config:"max_cached_sessions" validate:"min=0"` // Max. number of cached VM sessions.
+	Source            string         `config:"source"`                               // Inline script to execute.
+	File              string         `config:"file"`                                 // Source file.
+	Files             []string       `config:"files"`                                // Multiple source files.
+	Params            map[string]any `config:"params"`                               // Parameters to pass to script.
+	Timeout           time.Duration  `config:"timeout" validate:"min=0"`             // Execution timeout.
+	MaxCachedSessions int            `config:"max_cached_sessions" validate:"min=0"` // Max. number of cached VM sessions.
 }
 
 // Validate returns an error if one (and only one) option is not set.
@@ -305,8 +327,11 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 		//nolint:staticcheck // haven't migrated to the new interface yet
 		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint,
 			func(e *awssdk.Endpoint) {
-				// The S3 hostname is immutable in bucket polling mode, mutable otherwise.
-				e.HostnameImmutable = (c.getBucketARN() != "")
+				// The S3 hostname is immutable only for AWS bucket/access-point
+				// polling. For non-AWS S3-compatible storage the hostname must
+				// stay mutable so the SDK can honor path_style (virtual-hosted
+				// addressing when path_style is false).
+				e.HostnameImmutable = (c.getBucketARN() != "" && c.NonAWSBucketName == "")
 			})
 	}
 	o.UsePathStyle = c.PathStyle
