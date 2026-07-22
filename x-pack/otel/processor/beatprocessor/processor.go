@@ -33,6 +33,7 @@ var allowedProcessors = []string{
 	"add_host_metadata",
 	"add_kubernetes_metadata",
 	"detect_mime_type",
+	"drop_fields",
 }
 
 type beatProcessor struct {
