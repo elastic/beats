@@ -20,6 +20,10 @@ package actions
 import (
 	"testing"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -27,6 +31,28 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func assertMimeTypeRunPdataEquivalent(t *testing.T, p beat.Processor, inputFields mapstr.M) {
+	t.Helper()
+	pp, ok := p.(interface {
+		RunPdata(pcommon.Map) (bool, error)
+	})
+	require.True(t, ok, "processor must implement RunPdata")
+
+	observed, err := p.Run(&beat.Event{Fields: inputFields.Clone()})
+	require.NoError(t, err)
+
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, inputFields))
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	assert.False(t, drop)
+
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, observed.Fields))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
+}
 
 func TestMimeTypeFromTo(t *testing.T) {
 	evt := beat.Event{
@@ -44,6 +70,9 @@ func TestMimeTypeFromTo(t *testing.T) {
 	enriched, err := observed.Fields.GetValue("bar.baz.zoiks")
 	require.NoError(t, err)
 	require.Equal(t, "text/plain; charset=utf-8", enriched)
+
+	// RunPdata parity.
+	assertMimeTypeRunPdataEquivalent(t, p, evt.Fields)
 }
 
 func TestMimeTypeFromToMetadata(t *testing.T) {
@@ -83,4 +112,7 @@ func TestMimeTypeTestNoMatch(t *testing.T) {
 	require.NoError(t, err)
 	hasKey, _ := observed.Fields.HasKey("bar.baz.zoiks")
 	require.False(t, hasKey)
+
+	// RunPdata parity.
+	assertMimeTypeRunPdataEquivalent(t, p, evt.Fields)
 }

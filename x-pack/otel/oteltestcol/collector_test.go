@@ -15,7 +15,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func TestNew(t *testing.T) {
+func TestFilebeatReceiver(t *testing.T) {
 	cfg := `receivers:
   filebeatreceiver:
     filebeat:
@@ -28,6 +28,14 @@ func TestNew(t *testing.T) {
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_host_metadata:
+          when.not.contains.tags: forwarded
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
 exporters:
   debug:
     verbosity: detailed
@@ -36,6 +44,8 @@ service:
     logs:
       receivers:
         - filebeatreceiver
+      processors:
+        - beat
       exporters:
         - debug
   telemetry:
@@ -52,6 +62,10 @@ service:
 			FilterMessageSnippet("Publish event").
 			FilterMessageSnippet(`"message": "test message"`).Len() == 1
 	}, 30*time.Second, 100*time.Millisecond, "Expected debug log with test message not found")
+
+	require.Equal(t, 0,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
+		"all Filebeat global processors must implement RunPdata")
 }
 
 func TestAuditbeatReceiver(t *testing.T) {
@@ -68,6 +82,12 @@ func TestAuditbeatReceiver(t *testing.T) {
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
 exporters:
   debug:
     verbosity: detailed
@@ -76,6 +96,8 @@ service:
     logs:
       receivers:
         - auditbeatreceiver
+      processors:
+        - beat
       exporters:
         - debug
   telemetry:
@@ -91,6 +113,10 @@ service:
 		return col.ObservedLogs().
 			FilterMessageSnippet("Skipping metrics logging").Len() > 0
 	}, 30*time.Second, 100*time.Millisecond, "Expected auditbeat receiver to start and initialize the metric reporter")
+
+	require.Equal(t, 0,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
+		"all Auditbeat global processors must implement RunPdata")
 }
 
 func TestHeartbeatReceiver(t *testing.T) {
@@ -130,6 +156,10 @@ service:
 		return col.ObservedLogs().
 			FilterMessageSnippet("Skipping metrics logging").Len() > 0
 	}, 30*time.Second, 100*time.Millisecond, "Expected heartbeat receiver to start and initialize the metric reporter")
+
+	require.Equal(t, 0,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
+		"pdata fast path must not be disabled (heartbeat has no global processors)")
 }
 
 // TestOsquerybeatReceiverRegistered verifies that the osquerybeat receiver
@@ -137,6 +167,8 @@ service:
 // requires the osqueryd binary to run a full pipeline, so this test starts the
 // collector with a filebeatreceiver pipeline while the osquerybeat factory is
 // registered in the component list, confirming it can coexist without errors.
+// The beatprocessor is configured with Osquerybeat's global processors to verify
+// the pdata fast path is active.
 func TestOsquerybeatReceiverRegistered(t *testing.T) {
 	cfg := `receivers:
   filebeatreceiver:
@@ -150,6 +182,11 @@ func TestOsquerybeatReceiverRegistered(t *testing.T) {
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
 exporters:
   debug:
     verbosity: detailed
@@ -158,6 +195,8 @@ service:
     logs:
       receivers:
         - filebeatreceiver
+      processors:
+        - beat
       exporters:
         - debug
   telemetry:
@@ -174,6 +213,10 @@ service:
 			FilterMessageSnippet("Publish event").
 			FilterMessageSnippet(`"message": "osqtest message"`).Len() == 1
 	}, 30*time.Second, 100*time.Millisecond, "Expected collector to start with osquerybeat receiver registered")
+
+	require.Equal(t, 0,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
+		"all Osquerybeat global processors must implement RunPdata")
 }
 
 func TestPacketbeatReceiver(t *testing.T) {
@@ -194,6 +237,22 @@ func TestPacketbeatReceiver(t *testing.T) {
     logging:
       level: debug
     queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - drop_fields:
+          when.contains.tags: forwarded
+          fields: [host]
+      - add_host_metadata:
+          when.not.contains.tags: forwarded
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - detect_mime_type:
+          field: http.request.body.content
+          target: http.request.mime_type
+      - detect_mime_type:
+          field: http.response.body.content
+          target: http.response.mime_type
 exporters:
   debug:
     verbosity: detailed
@@ -202,6 +261,8 @@ service:
     logs:
       receivers:
         - packetbeatreceiver
+      processors:
+        - beat
       exporters:
         - debug
   telemetry:
@@ -217,6 +278,10 @@ service:
 		return col.ObservedLogs().
 			FilterMessageSnippet("Skipping metrics logging").Len() > 0
 	}, 30*time.Second, 100*time.Millisecond, "Expected packetbeat receiver to start and initialize the metric reporter")
+
+	require.Equal(t, 0,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
+		"all Packetbeat global processors must implement RunPdata")
 }
 
 func TestNewRespectsTelemetryLogsLevel(t *testing.T) {

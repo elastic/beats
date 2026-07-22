@@ -109,7 +109,8 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 		}
 
 		switch processorName {
-		case "add_host_metadata", "add_cloud_metadata", "add_docker_metadata", "add_kubernetes_metadata", "add_fields":
+		case "add_host_metadata", "add_cloud_metadata", "add_docker_metadata", "add_kubernetes_metadata", "add_fields",
+			"drop_fields", "detect_mime_type":
 		default:
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
