@@ -151,6 +151,18 @@ func TestCreateProcessor(t *testing.T) {
 		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
 	})
 
+	t.Run("valid detect_mime_type processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"detect_mime_type": map[string]any{
+				"field":  "http.request.body.content",
+				"target": "http.request.mime_type",
+			},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "detect_mime_type", processor.String()[:len("detect_mime_type")])
+	})
+
 	t.Run("when condition is honored and processor is skipped when condition is false", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_fields": map[string]any{
