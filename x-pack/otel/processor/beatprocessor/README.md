@@ -24,6 +24,7 @@ Here are the currently supported processors:
 - [detect_mime_type]
 - [drop_fields]
 
+
 ## Default processors in Beat receivers
 
 The Beat receivers have a set of default processors that are included when the `processors` option is not specified.
