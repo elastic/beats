@@ -18,13 +18,18 @@
 package util
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 
@@ -34,6 +39,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
+	clientfeatures "k8s.io/client-go/features"
+	clientfeaturestesting "k8s.io/client-go/features/testing"
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
@@ -50,6 +57,17 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 )
+
+const (
+	podBName                  = "pod-b"
+	informerTestContainerName = "container"
+)
+
+type constructorRollbackMetricSet struct {
+	mb.BaseMetricSet
+}
+
+func (*constructorRollbackMetricSet) Fetch(mb.ReporterV2) {}
 
 func TestWatchOptions(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "test")
@@ -87,6 +105,7 @@ func TestCreateWatcher(t *testing.T) {
 
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
+	namespaceEnricher := newMetadataEnricher("state_namespace", NamespaceResource, config, log)
 
 	created, err := createWatcher(
 		NamespaceResource,
@@ -98,6 +117,7 @@ func TestCreateWatcher(t *testing.T) {
 		metricsRepo,
 		config.Namespace,
 		false,
+		namespaceEnricher,
 		logptest.NewTestingLogger(t, ""),
 	)
 	require.True(t, created)
@@ -118,6 +138,7 @@ func TestCreateWatcher(t *testing.T) {
 		metricsRepo,
 		config.Namespace,
 		true,
+		newMetadataEnricher("state_deployment", DeploymentResource, config, log),
 		logptest.NewTestingLogger(t, ""),
 	)
 	require.False(t, created)
@@ -137,7 +158,9 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false, logptest.NewTestingLogger(t, ""))
+		false,
+		newMetadataEnricher("state_deployment", DeploymentResource, config, log),
+		logptest.NewTestingLogger(t, ""))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -148,104 +171,20 @@ func TestCreateWatcher(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 }
 
-func TestAddToMetricsetsUsing(t *testing.T) {
-	resourceWatchers := NewWatchers()
-	metricsRepo := NewMetricsRepo()
+func TestWatcherUserPointerIdentity(t *testing.T) {
+	metaWatcher := &metaWatcher{users: make(map[*enricher]watcherRegistration)}
+	first := &enricher{metricsetName: "pod"}
+	second := &enricher{metricsetName: "pod"}
 
-	client := k8sfake.NewSimpleClientset()
-	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
-	config := &kubernetesConfig{
-		Namespace:  "test-ns",
-		SyncPeriod: time.Minute,
-		Node:       "test-node",
-	}
-	log := logptest.NewTestingLogger(t, "test")
+	require.True(t, addWatcherUser(metaWatcher, first, true), "first pointer must acquire ownership")
+	require.True(t, addWatcherUser(metaWatcher, second, false), "second pointer with the same name must acquire ownership")
+	require.False(t, addWatcherUser(metaWatcher, first, false), "the same pointer must not acquire ownership twice")
+	require.Len(t, metaWatcher.users, 2, "ownership must be keyed by pointer identity")
+	require.True(t, metaWatcher.users[first].nodeScope, "first pointer's scope must be preserved")
+	require.False(t, metaWatcher.users[second].nodeScope, "second pointer's scope must be preserved")
 
-	options, err := getWatchOptions(config, false, client, log)
-	require.NoError(t, err)
-
-	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(
-		DeploymentResource,
-		&kubernetes.Deployment{},
-		*options, client,
-		metadataClient,
-		resourceWatchers,
-		metricsRepo,
-		config.Namespace,
-		false, logptest.NewTestingLogger(t, ""))
-	require.True(t, created)
-	require.NoError(t, err)
-
-	resourceWatchers.lock.Lock()
-	require.NotNil(t, resourceWatchers.metaWatchersMap[DeploymentResource].watcher)
-	require.Equal(t, []string{}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-
-	metricsetDeployment := "state_deployment"
-	addToMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	resourceWatchers.lock.Lock()
-	require.Equal(t, []string{metricsetDeployment}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-
-	metricsetContainer := "container"
-	addToMetricsetsUsing(DeploymentResource, metricsetContainer, resourceWatchers)
-	resourceWatchers.lock.Lock()
-	require.Equal(t, []string{metricsetDeployment, metricsetContainer}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-}
-
-func TestRemoveFromMetricsetsUsing(t *testing.T) {
-	resourceWatchers := NewWatchers()
-	metricsRepo := NewMetricsRepo()
-
-	client := k8sfake.NewSimpleClientset()
-	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
-	config := &kubernetesConfig{
-		Namespace:  "test-ns",
-		SyncPeriod: time.Minute,
-		Node:       "test-node",
-	}
-	log := logptest.NewTestingLogger(t, "test")
-
-	options, err := getWatchOptions(config, false, client, log)
-	require.NoError(t, err)
-
-	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(
-		DeploymentResource,
-		&kubernetes.Deployment{},
-		*options,
-		client,
-		metadataClient,
-		resourceWatchers,
-		metricsRepo,
-		config.Namespace,
-		false,
-		logptest.NewTestingLogger(t, ""),
-	)
-	require.True(t, created)
-	require.NoError(t, err)
-
-	metricsetDeployment := "state_deployment"
-	metricsetPod := "state_pod"
-	addToMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	addToMetricsetsUsing(DeploymentResource, metricsetPod, resourceWatchers)
-
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
-	removed, size := removeFromMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	require.True(t, removed)
-	require.Equal(t, 1, size)
-
-	removed, size = removeFromMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	require.False(t, removed)
-	require.Equal(t, 1, size)
-
-	removed, size = removeFromMetricsetsUsing(DeploymentResource, metricsetPod, resourceWatchers)
-	require.True(t, removed)
-	require.Equal(t, 0, size)
+	require.False(t, removeWatcherUser(metaWatcher, first), "one pointer remains")
+	require.True(t, removeWatcherUser(metaWatcher, second), "the final pointer was removed")
 }
 
 func TestWatcherContainerMetrics(t *testing.T) {
@@ -284,11 +223,11 @@ func TestWatcherContainerMetrics(t *testing.T) {
 
 	watcher := newMockWatcher()
 	metaWatcher := &metaWatcher{
-		watcher:         watcher,
-		started:         false,
-		metricsetsUsing: []string{"pod"},
-		enrichers:       make(map[string]*enricher),
-		metricsRepo:     metricsRepo,
+		watcher:     watcher,
+		started:     false,
+		users:       make(map[*enricher]watcherRegistration),
+		enrichers:   make(map[*enricher]struct{}),
+		metricsRepo: metricsRepo,
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 	addEventHandlersToWatcher(metaWatcher, resourceWatchers)
@@ -345,11 +284,11 @@ func TestWatcherNodeMetrics(t *testing.T) {
 
 	watcher := newMockWatcher()
 	metaWatcher := &metaWatcher{
-		watcher:         watcher,
-		started:         false,
-		metricsetsUsing: []string{"pod"},
-		enrichers:       make(map[string]*enricher),
-		metricsRepo:     metricsRepo,
+		watcher:     watcher,
+		started:     false,
+		users:       make(map[*enricher]watcherRegistration),
+		enrichers:   make(map[*enricher]struct{}),
+		metricsRepo: metricsRepo,
 	}
 	resourceWatchers.metaWatchersMap[NodeResource] = metaWatcher
 	addEventHandlersToWatcher(metaWatcher, resourceWatchers)
@@ -401,8 +340,7 @@ func TestCreateAllWatchers(t *testing.T) {
 	err := createAllWatchers(
 		client,
 		metadataClient,
-		"does-not-exist",
-		"does-not-exist",
+		newMetadataEnricher("does-not-exist", "does-not-exist", config, log),
 		false,
 		config,
 		log,
@@ -419,8 +357,7 @@ func TestCreateAllWatchers(t *testing.T) {
 	err = createAllWatchers(
 		client,
 		metadataClient,
-		metricsetPod,
-		PodResource,
+		newMetadataEnricher(metricsetPod, PodResource, config, log),
 		false,
 		config,
 		log,
@@ -469,8 +406,7 @@ func TestCreateMetaGen(t *testing.T) {
 	err = createAllWatchers(
 		client,
 		metadataClient,
-		metricsetDeployment,
-		DeploymentResource,
+		newMetadataEnricher(metricsetDeployment, DeploymentResource, config, log),
 		false,
 		config,
 		log,
@@ -514,7 +450,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	// For pod:
 	metricsetPod := "pod"
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers, nil)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -522,8 +458,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	err = createAllWatchers(
 		client,
 		metadataClient,
-		metricsetPod,
-		PodResource,
+		newMetadataEnricher(metricsetPod, PodResource, config, log),
 		false,
 		config,
 		log,
@@ -531,11 +466,11 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 		metricsRepo)
 	require.NoError(t, err)
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers, nil)
 	require.NoError(t, err)
 
 	// For service:
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers, nil)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -544,8 +479,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	err = createAllWatchers(
 		client,
 		metadataClient,
-		metricsetService,
-		ServiceResource,
+		newMetadataEnricher(metricsetService, ServiceResource, config, log),
 		false,
 		config,
 		log,
@@ -553,162 +487,539 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 		metricsRepo)
 	require.NoError(t, err)
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers, nil)
 	require.NoError(t, err)
 }
 
-func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
+func TestEnricherStopUsesPointerOwnershipAndEvictsFinalWatcher(t *testing.T) {
 	resourceWatchers := NewWatchers()
-
-	metricsetNamespace := "state_namespace"
-	metricsetDeployment := "state_deployment"
-
+	watcher := newMockWatcher()
 	resourceWatchers.lock.Lock()
-	resourceWatchers.metaWatchersMap[NamespaceResource] = &metaWatcher{
-		watcher:         &mockWatcher{},
-		started:         false,
-		metricsetsUsing: []string{metricsetNamespace, metricsetDeployment},
-		enrichers:       make(map[string]*enricher),
-	}
-	resourceWatchers.metaWatchersMap[DeploymentResource] = &metaWatcher{
-		watcher:         &mockWatcher{},
-		started:         true,
-		metricsetsUsing: []string{metricsetDeployment},
-		enrichers:       make(map[string]*enricher),
+	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
+		watcher:   watcher,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
 	}
 	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
-		"enabled": true,
-	})
-	require.NoError(t, err)
 	config := &kubernetesConfig{
-		Namespace:  "test-ns",
-		SyncPeriod: time.Minute,
-		Node:       "test-node",
-		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
-			CronJob:    false,
-			Deployment: false,
-			Namespace:  namespaceConfig,
+		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
+	}
+	log := logptest.NewTestingLogger(t, selector)
+	first := buildTestMetadataEnricher("pod", PodResource, resourceWatchers, config, &funcs, log)
+	second := buildTestMetadataEnricher("pod", PodResource, resourceWatchers, config, &funcs, log)
+
+	resourceWatchers.lock.Lock()
+	require.Len(t, resourceWatchers.metaWatchersMap[PodResource].users, 2, "same-name enrichers must both own the watcher")
+	require.Len(t, resourceWatchers.metaWatchersMap[PodResource].enrichers, 2, "same-name enrichers must both receive invalidation")
+	resourceWatchers.lock.Unlock()
+
+	first.Start(resourceWatchers)
+	resourceWatchers.lock.Lock()
+	require.True(t, resourceWatchers.metaWatchersMap[PodResource].started, "watcher must start")
+	resourceWatchers.lock.Unlock()
+
+	// Call stop twice to assert its idempotency.
+	first.Stop(resourceWatchers)
+	first.Stop(resourceWatchers)
+	resourceWatchers.lock.Lock()
+	require.Contains(t, resourceWatchers.metaWatchersMap, PodResource, "remaining pointer must retain the watcher")
+	require.Len(t, resourceWatchers.metaWatchersMap[PodResource].users, 1, "only the second pointer remains")
+	resourceWatchers.lock.Unlock()
+	require.Equal(t, 0, watcher.stopCalls, "idempotent non-final stop must not stop the shared watcher")
+
+	second.Stop(resourceWatchers)
+	resourceWatchers.lock.Lock()
+	require.NotContains(t, resourceWatchers.metaWatchersMap, PodResource, "final owner must evict the watcher")
+	resourceWatchers.lock.Unlock()
+	require.Equal(t, 1, watcher.stopCalls, "final owner must stop the watcher exactly once")
+}
+
+func TestPodAndContainerEnrichersShareWatcherByPointer(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	watcher := newMockWatcher()
+	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
+		watcher:   watcher,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	log := logptest.NewTestingLogger(t, selector)
+	funcs := mockFuncs{}
+	// Both metricsets enrich kubelet events from Pod API objects, so their
+	// distinct enrichers intentionally share the same PodResource watcher.
+	pod := buildTestMetadataEnricher("pod", PodResource, resourceWatchers, config, &funcs, log)
+	container := buildTestMetadataEnricher("container", PodResource, resourceWatchers, config, &funcs, log)
+
+	// Starting either owner starts their shared watcher; using pod here is
+	// arbitrary. Stopping container then simulates one metricset shutting down
+	// while pod still needs the watcher, so the watcher must remain running.
+	pod.Start(resourceWatchers)
+	container.Stop(resourceWatchers)
+	resourceWatchers.lock.RLock()
+	require.Contains(t, resourceWatchers.metaWatchersMap, PodResource, "pod pointer must retain the shared watcher")
+	require.Len(t, resourceWatchers.metaWatchersMap[PodResource].users, 1, "only pod ownership remains")
+	resourceWatchers.lock.RUnlock()
+	require.Equal(t, 0, watcher.stopCalls, "container release must not stop pod's watcher")
+
+	// Pod is now the final owner, so releasing it must stop the watcher.
+	pod.Stop(resourceWatchers)
+	require.Equal(t, 1, watcher.stopCalls, "final pod release must stop the watcher")
+}
+
+func TestEnricherTracksAndReleasesExactExtraWatchers(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
+	client := k8sfake.NewSimpleClientset()
+	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
+	log := logptest.NewTestingLogger(t, selector)
+
+	firstConfig := &kubernetesConfig{
+		Node:                "test-node",
+		SyncPeriod:          time.Second,
+		AddResourceMetadata: resourceMetadataConfig(t, true, false, true, false),
+	}
+	first := newMetadataEnricher("pod", PodResource, firstConfig, log)
+	require.NoError(
+		t,
+		createAllWatchers(client, metadataClient, first, true, firstConfig, log, resourceWatchers, metricsRepo),
+		"first enricher watcher registration must succeed",
+	)
+	commitWatcherOwnership(first, resourceWatchers)
+
+	secondConfig := &kubernetesConfig{
+		SyncPeriod:          time.Second,
+		AddResourceMetadata: resourceMetadataConfig(t, false, true, false, false),
+	}
+	second := newMetadataEnricher("pod", PodResource, secondConfig, log)
+	require.NoError(
+		t,
+		createAllWatchers(client, metadataClient, second, false, secondConfig, log, resourceWatchers, metricsRepo),
+		"second enricher watcher registration must succeed",
+	)
+	commitWatcherOwnership(second, resourceWatchers)
+
+	require.ElementsMatch(
+		t,
+		[]string{PodResource, NodeResource, ReplicaSetResource},
+		first.watchedResources,
+		"first enricher must record only its successful watcher dependencies",
+	)
+	require.ElementsMatch(
+		t,
+		[]string{PodResource, NamespaceResource},
+		second.watchedResources,
+		"second enricher must record only its successful watcher dependencies",
+	)
+
+	resourceWatchers.lock.RLock()
+	require.Len(t, resourceWatchers.metaWatchersMap[PodResource].users, 2, "both pointers own the shared pod watcher")
+	require.Len(t, resourceWatchers.metaWatchersMap[PodResource].enrichers, 2, "pod events invalidate both pod metadata caches")
+	require.True(t, resourceWatchers.metaWatchersMap[PodResource].users[first].nodeScope, "primary watcher must retain the enricher's node scope")
+	require.False(t, resourceWatchers.metaWatchersMap[NodeResource].users[first].nodeScope, "extra node watcher must be cluster scoped")
+	require.False(t, resourceWatchers.metaWatchersMap[ReplicaSetResource].users[first].nodeScope, "extra ReplicaSet watcher must be cluster scoped")
+	require.Empty(t, resourceWatchers.metaWatchersMap[NodeResource].enrichers, "node dependency must not invalidate pod caches")
+	require.Empty(t, resourceWatchers.metaWatchersMap[NamespaceResource].enrichers, "namespace dependency must not invalidate pod caches")
+	require.Empty(t, resourceWatchers.metaWatchersMap[ReplicaSetResource].enrichers, "ReplicaSet dependency must not invalidate pod caches")
+	resourceWatchers.lock.RUnlock()
+
+	first.Stop(resourceWatchers)
+	resourceWatchers.lock.RLock()
+	require.Contains(t, resourceWatchers.metaWatchersMap, PodResource, "second enricher still owns the pod watcher")
+	require.Contains(t, resourceWatchers.metaWatchersMap, NamespaceResource, "second enricher still owns its namespace watcher")
+	require.NotContains(t, resourceWatchers.metaWatchersMap, NodeResource, "first enricher's node watcher must be evicted")
+	require.NotContains(t, resourceWatchers.metaWatchersMap, ReplicaSetResource, "first enricher's ReplicaSet watcher must be evicted")
+	resourceWatchers.lock.RUnlock()
+
+	second.Stop(resourceWatchers)
+	resourceWatchers.lock.RLock()
+	require.Empty(t, resourceWatchers.metaWatchersMap, "all exact dependencies must be evicted after their final owners exit")
+	resourceWatchers.lock.RUnlock()
+}
+
+func TestNewResourceMetadataEnricherRollsBackRegisteredWatchers(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
+
+	// Service watcher registration succeeds, then metadata generator creation
+	// fails because Namespace metadata is disabled. The constructor must roll
+	// back the provisional Service watcher ownership before returning.
+	enricher := newFailingStateServiceEnricher(t, metricsRepo, resourceWatchers, false)
+
+	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
+	resourceWatchers.lock.RLock()
+	require.Empty(t, resourceWatchers.metaWatchersMap, "constructor rollback must evict an unstarted final-owner watcher")
+	resourceWatchers.lock.RUnlock()
+}
+
+func TestNewResourceMetadataEnricherRollbackDoesNotUpgradeNodeScopedOwner(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
+	active := newMockWatcher()
+	active.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{})
+	metaWatcher := &metaWatcher{
+		watcher:   active,
+		started:   true,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+		nodeScope: true,
+	}
+	resourceWatchers.metaWatchersMap[ServiceResource] = metaWatcher
+
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	log := logptest.NewTestingLogger(t, selector)
+	funcs := mockFuncs{}
+	nodeScoped := buildTestMetadataEnricherWithScope("service", ServiceResource, resourceWatchers, config, &funcs, log, true)
+
+	// The cluster-scoped constructor prepares a replacement for the existing
+	// node-scoped watcher, then fails because Namespace metadata is disabled.
+	// Its real rollback path must discard that provisional replacement.
+	enricher := newFailingStateServiceEnricher(t, metricsRepo, resourceWatchers, false)
+
+	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
+	resourceWatchers.lock.RLock()
+	require.Nil(t, metaWatcher.restartWatcher, "rolling back the last cluster-scoped registration must discard its pending replacement")
+	require.True(t, metaWatcher.nodeScope, "rollback must preserve the active node-scoped watcher's scope")
+	resourceWatchers.lock.RUnlock()
+
+	nodeScoped.Start(resourceWatchers)
+	require.Equal(t, 0, active.stopCalls, "remaining node-scoped owner must not stop the active watcher")
+	require.Same(t, active, metaWatcher.watcher, "remaining node-scoped owner must keep the active watcher")
+
+	nodeScoped.Stop(resourceWatchers)
+}
+
+func TestPendingScopeUpgradeRetainedForCommittedClusterScopedOwner(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	active := newMockWatcher()
+	pending := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:        active,
+		started:        true,
+		users:          make(map[*enricher]watcherRegistration),
+		enrichers:      make(map[*enricher]struct{}),
+		nodeScope:      true,
+		restartWatcher: pending,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	log := logptest.NewTestingLogger(t, selector)
+	funcs := mockFuncs{}
+	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
+	firstClusterScoped := buildTestMetadataEnricher("state_pod", PodResource, resourceWatchers, config, &funcs, log)
+	secondClusterScoped := buildTestMetadataEnricher("state_container", PodResource, resourceWatchers, config, &funcs, log)
+
+	firstClusterScoped.Stop(resourceWatchers)
+	resourceWatchers.lock.RLock()
+	require.Same(t, pending, metaWatcher.restartWatcher, "another committed cluster-scoped owner must retain the pending replacement")
+	resourceWatchers.lock.RUnlock()
+
+	secondClusterScoped.Stop(resourceWatchers)
+	resourceWatchers.lock.RLock()
+	require.Nil(t, metaWatcher.restartWatcher, "the last cluster-scoped owner must discard the pending replacement")
+	require.True(t, metaWatcher.nodeScope, "discarding a pending replacement must preserve the active watcher scope")
+	resourceWatchers.lock.RUnlock()
+
+	nodeScoped.Stop(resourceWatchers)
+}
+
+func TestConcurrentNodeScopedStartDoesNotApplyProvisionalScopeUpgrade(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	active := newMockWatcher()
+	pending := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:   active,
+		started:   true,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+		nodeScope: true,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	log := logptest.NewTestingLogger(t, selector)
+	funcs := mockFuncs{}
+	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
+	provisional := newMetadataEnricher("state_pod", PodResource, config, log)
+
+	resourceWatchers.lock.Lock()
+	metaWatcher.restartWatcher = pending
+	registerWatcherUser(PodResource, metaWatcher, provisional, true, false)
+	started := make(chan struct{})
+	go func() {
+		nodeScoped.Start(resourceWatchers)
+		close(started)
+	}()
+	resourceWatchers.lock.Unlock()
+	<-started
+
+	require.Equal(t, 0, pending.startCalls, "Start must not apply a scope change required only by a provisional owner")
+	require.Equal(t, 0, active.stopCalls, "Start must leave the active watcher uninterrupted")
+	require.Same(t, pending, metaWatcher.restartWatcher, "the provisional owner's replacement must remain available during construction")
+
+	releaseWatcherOwnership(provisional, resourceWatchers)
+	nodeScoped.Stop(resourceWatchers)
+}
+
+func TestFailedScopeUpgradeLeavesActiveWatcherRunning(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	active := newMockWatcher()
+	pending := newMockWatcher()
+	pending.startErr = fmt.Errorf("replacement start failed")
+	metaWatcher := &metaWatcher{
+		watcher:        active,
+		started:        true,
+		users:          make(map[*enricher]watcherRegistration),
+		enrichers:      make(map[*enricher]struct{}),
+		nodeScope:      true,
+		restartWatcher: pending,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	log := logptest.NewTestingLogger(t, selector)
+	funcs := mockFuncs{}
+	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
+	clusterScoped := buildTestMetadataEnricher("state_pod", PodResource, resourceWatchers, config, &funcs, log)
+
+	clusterScoped.Start(resourceWatchers)
+	require.Equal(t, 1, pending.startCalls, "pending replacement must be attempted")
+	require.Equal(t, 0, active.stopCalls, "failed replacement must not stop the active watcher")
+	require.Same(t, active, metaWatcher.watcher, "failed replacement must not replace the active watcher")
+	require.Same(t, pending, metaWatcher.restartWatcher, "failed replacement must remain pending")
+	require.True(t, metaWatcher.nodeScope, "failed replacement must preserve the active watcher scope")
+	require.True(t, metaWatcher.started, "failed replacement must preserve active watcher state")
+
+	clusterScoped.Stop(resourceWatchers)
+	nodeScoped.Stop(resourceWatchers)
+}
+
+func TestNodeScopeRestartWatcherLifecycle(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	active := newMockWatcher()
+	replacement := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:        active,
+		started:        true,
+		users:          make(map[*enricher]watcherRegistration),
+		enrichers:      make(map[*enricher]struct{}),
+		nodeScope:      true,
+		restartWatcher: replacement,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	log := logptest.NewTestingLogger(t, selector)
+	funcs := mockFuncs{}
+	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
+	clusterScoped := buildTestMetadataEnricher("state_pod", PodResource, resourceWatchers, config, &funcs, log)
+
+	clusterScoped.Start(resourceWatchers)
+	require.Equal(t, 1, active.stopCalls, "scope upgrade must stop the old active watcher")
+	require.Equal(t, 1, replacement.startCalls, "scope upgrade must start the pending cluster-scoped watcher")
+	require.Same(t, replacement, metaWatcher.watcher, "replacement must become the active watcher")
+	require.Nil(t, metaWatcher.restartWatcher, "successful scope upgrade must clear the pending watcher")
+
+	clusterScoped.Stop(resourceWatchers)
+	require.Equal(t, 0, replacement.stopCalls, "node-scoped owner must retain the replacement watcher")
+	nodeScoped.Stop(resourceWatchers)
+	require.Equal(t, 1, replacement.stopCalls, "final owner must stop the active replacement watcher")
+	resourceWatchers.lock.RLock()
+	require.NotContains(t, resourceWatchers.metaWatchersMap, PodResource, "final owner must evict the scope-upgraded watcher")
+	resourceWatchers.lock.RUnlock()
+}
+
+func TestFinalOwnerEvictionDiscardsPendingRestartWatcher(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	active := newMockWatcher()
+	pending := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:        active,
+		started:        true,
+		users:          make(map[*enricher]watcherRegistration),
+		enrichers:      make(map[*enricher]struct{}),
+		nodeScope:      true,
+		restartWatcher: pending,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	log := logptest.NewTestingLogger(t, selector)
+	funcs := mockFuncs{}
+	e := buildTestMetadataEnricher("state_pod", PodResource, resourceWatchers, config, &funcs, log)
+
+	e.Stop(resourceWatchers)
+	require.Equal(t, 1, active.stopCalls, "final owner must stop only the active watcher")
+	require.Equal(t, 0, pending.stopCalls, "unstarted pending replacement must be discarded without stopping")
+	resourceWatchers.lock.RLock()
+	require.NotContains(t, resourceWatchers.metaWatchersMap, PodResource, "watcher with a pending replacement must still be evicted")
+	resourceWatchers.lock.RUnlock()
+}
+
+func TestRealInformerIsRecreatedAfterFinalOwnerStops(t *testing.T) {
+	clientfeaturestesting.SetFeatureDuringTest(t, clientfeatures.WatchListClient, false)
+
+	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
+	client := k8sfake.NewSimpleClientset()
+	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
+	log := logptest.NewTestingLogger(t, selector)
+	config := &kubernetesConfig{
+		Namespace:           "default",
+		SyncPeriod:          5 * time.Second,
+		AddResourceMetadata: resourceMetadataConfig(t, false, false, false, false),
+	}
+
+	createGeneration := func() (*enricher, *enricher, kubernetes.Watcher) {
+		pod := newMetadataEnricher("pod", PodResource, config, log)
+		require.NoError(
+			t,
+			createAllWatchers(client, metadataClient, pod, false, config, log, resourceWatchers, metricsRepo),
+			"pod watcher creation must succeed",
+		)
+		configureRealInformerTestEnricher(pod, false)
+		commitWatcherOwnership(pod, resourceWatchers)
+
+		container := newMetadataEnricher("container", PodResource, config, log)
+		require.NoError(
+			t,
+			createAllWatchers(client, metadataClient, container, false, config, log, resourceWatchers, metricsRepo),
+			"container watcher sharing must succeed",
+		)
+		configureRealInformerTestEnricher(container, true)
+		commitWatcherOwnership(container, resourceWatchers)
+
+		return pod, container, pod.watcher.watcher
+	}
+
+	podA, containerA, watcherA := createGeneration()
+	t.Cleanup(func() {
+		podA.Stop(resourceWatchers)
+		containerA.Stop(resourceWatchers)
+	})
+	podA.Start(resourceWatchers)
+	containerA.Start(resourceWatchers)
+	_, err := client.CoreV1().Pods("default").Create(context.Background(), informerTestPod("pod-a", "a"), metav1.CreateOptions{})
+	require.NoError(t, err, "generation-A pod creation must succeed")
+	require.Eventually(t, func() bool {
+		_, exists, getErr := watcherA.Store().GetByKey("default/pod-a")
+		return getErr == nil && exists
+	}, 5*time.Second, 10*time.Millisecond, "generation-A informer must observe pod A")
+
+	podA.Stop(resourceWatchers)
+	containerA.Stop(resourceWatchers)
+	resourceWatchers.lock.RLock()
+	require.NotContains(t, resourceWatchers.metaWatchersMap, PodResource, "generation-A final owner must evict the stopped watcher")
+	resourceWatchers.lock.RUnlock()
+
+	podB, containerB, watcherB := createGeneration()
+	t.Cleanup(func() {
+		podB.Stop(resourceWatchers)
+		containerB.Stop(resourceWatchers)
+	})
+	require.NotEqual(t, watcherA, watcherB, "generation B must receive a fresh watcher and informer lifecycle")
+	podB.Start(resourceWatchers)
+	containerB.Start(resourceWatchers)
+	_, err = client.CoreV1().Pods("default").Create(context.Background(), informerTestPod("pod-b", "b"), metav1.CreateOptions{})
+	require.NoError(t, err, "generation-B pod creation must succeed")
+	require.Eventually(t, func() bool {
+		_, exists, getErr := watcherB.Store().GetByKey("default/pod-b")
+		return getErr == nil && exists
+	}, 5*time.Second, 10*time.Millisecond, "fresh generation-B informer must observe pod B")
+
+	podEvents := []mapstr.M{{
+		"name": podBName,
+		mb.ModuleDataKey: mapstr.M{
+			"namespace": "default",
+		},
+	}}
+	podB.Enrich(podEvents)
+	podLabel, err := podEvents[0].GetValue(mb.ModuleDataKey + ".labels.generation")
+	require.NoError(t, err, "pod event must contain generation-B labels")
+	require.Equal(t, "b", podLabel, "pod event must be enriched from the fresh informer")
+
+	containerEvents := []mapstr.M{{
+		"name": informerTestContainerName,
+		mb.ModuleDataKey: mapstr.M{
+			"namespace": "default",
+			"pod":       mapstr.M{"name": podBName},
+		},
+	}}
+	containerB.Enrich(containerEvents)
+	containerLabel, err := containerEvents[0].GetValue(mb.ModuleDataKey + ".labels.generation")
+	require.NoError(t, err, "container event must contain generation-B labels")
+	require.Equal(t, "b", containerLabel, "container event must be enriched from the fresh informer")
+}
+
+func TestConcurrentInvalidationAndEnrichment(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	log := logptest.NewTestingLogger(t, selector)
+	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	resource := &kubernetes.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "deployment",
+			Namespace: "default",
 		},
 	}
 
-	log := logptest.NewTestingLogger(t, selector)
-
-	enricherNamespace := buildMetadataEnricher(
-		metricsetNamespace,
-		NamespaceResource,
-		resourceWatchers,
-		config,
-		funcs.update,
-		funcs.delete,
-		funcs.index,
-		log,
-	)
+	watcher := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:     watcher,
+		users:       make(map[*enricher]watcherRegistration),
+		enrichers:   make(map[*enricher]struct{}),
+		metricsRepo: NewMetricsRepo(),
+	}
 	resourceWatchers.lock.Lock()
-	watcher := resourceWatchers.metaWatchersMap[NamespaceResource]
-	require.False(t, watcher.started)
+	resourceWatchers.metaWatchersMap[DeploymentResource] = metaWatcher
+	addEventHandlersToWatcher(metaWatcher, resourceWatchers)
 	resourceWatchers.lock.Unlock()
 
-	enricherNamespace.Start(resourceWatchers)
-	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.metaWatchersMap[NamespaceResource]
-	require.True(t, watcher.started)
-	resourceWatchers.lock.Unlock()
-
-	// Stopping should not stop the watcher because it is still being used by deployment metricset
-	enricherNamespace.Stop(resourceWatchers)
-	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.metaWatchersMap[NamespaceResource]
-	require.True(t, watcher.started)
-	require.Equal(t, []string{metricsetDeployment}, watcher.metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-
-	// Stopping the deployment watcher should stop now both watchers
-	enricherDeployment := buildMetadataEnricher(
-		metricsetDeployment,
+	e := buildTestMetadataEnricherWithFuncs(
+		"state_deployment",
 		DeploymentResource,
 		resourceWatchers,
 		config,
-		funcs.update,
-		funcs.delete,
-		funcs.index,
+		func(resource kubernetes.Resource) map[string]mapstr.M {
+			//nolint:errcheck // we know the type
+			deployment := resource.(*kubernetes.Deployment)
+			return map[string]mapstr.M{
+				join(deployment.Namespace, deployment.Name): {
+					"kubernetes": mapstr.M{"labels": mapstr.M{"generation": "current"}},
+				},
+			}
+		},
+		func(resource kubernetes.Resource) []string {
+			deployment := resource.(*kubernetes.Deployment)
+			return []string{join(deployment.Namespace, deployment.Name)}
+		},
+		func(event mapstr.M) string {
+			return join(getString(event, mb.ModuleDataKey+".namespace"), getString(event, "name"))
+		},
 		log,
 	)
-	enricherDeployment.Stop(resourceWatchers)
+	require.NoError(t, watcher.Store().Add(resource), "deployment must be added to the mock watcher store")
+	e.Start(resourceWatchers)
 
-	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.metaWatchersMap[NamespaceResource]
+	var workers sync.WaitGroup
+	workers.Go(func() {
+		for range 100 {
+			watcher.handler.OnUpdate(resource)
+		}
+	})
+	workers.Go(func() {
+		for range 100 {
+			e.Enrich([]mapstr.M{{
+				"name":           resource.Name,
+				mb.ModuleDataKey: mapstr.M{"namespace": resource.Namespace},
+			}})
+		}
+	})
 
-	require.False(t, watcher.started)
-	require.Equal(t, []string{}, watcher.metricsetsUsing)
-
-	watcher = resourceWatchers.metaWatchersMap[DeploymentResource]
-	require.False(t, watcher.started)
-	require.Equal(t, []string{}, watcher.metricsetsUsing)
-
-	resourceWatchers.lock.Unlock()
-}
-
-func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
-	resourceWatchers := NewWatchers()
-
-	metricsetPod := "pod"
-	metricsetStatePod := "state_pod"
-
-	resourceWatchers.lock.Lock()
-	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
-		watcher:         &mockWatcher{},
-		started:         false,
-		metricsetsUsing: []string{metricsetStatePod, metricsetPod},
-		enrichers:       make(map[string]*enricher),
-	}
-	resourceWatchers.lock.Unlock()
-
-	funcs := mockFuncs{}
-	config := &kubernetesConfig{
-		Namespace:  "test-ns",
-		SyncPeriod: time.Minute,
-		Node:       "test-node",
-		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
-			CronJob:    false,
-			Deployment: false,
-		},
-	}
-
-	log := logptest.NewTestingLogger(t, selector)
-	enricherPod := buildMetadataEnricher(metricsetPod, PodResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index, log)
-	resourceWatchers.lock.Lock()
-	watcher := resourceWatchers.metaWatchersMap[PodResource]
-	require.False(t, watcher.started)
-	resourceWatchers.lock.Unlock()
-
-	enricherPod.Start(resourceWatchers)
-	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.metaWatchersMap[PodResource]
-	require.True(t, watcher.started)
-	resourceWatchers.lock.Unlock()
-
-	// Stopping should not stop the watcher because it is still being used by state_pod metricset
-	enricherPod.Stop(resourceWatchers)
-	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.metaWatchersMap[PodResource]
-	require.True(t, watcher.started)
-	require.Equal(t, []string{metricsetStatePod}, watcher.metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-
-	// Stopping the state_pod watcher should stop pod watcher
-	enricherStatePod := buildMetadataEnricher(metricsetStatePod, PodResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index, log)
-	enricherStatePod.Stop(resourceWatchers)
-
-	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.metaWatchersMap[PodResource]
-	require.False(t, watcher.started)
-	require.Equal(t, []string{}, watcher.metricsetsUsing)
-	resourceWatchers.lock.Unlock()
+	workers.Wait()
+	e.Stop(resourceWatchers)
 }
 
 func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
@@ -717,11 +1028,11 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 
 	resourceWatchers.lock.Lock()
 	watcher := &metaWatcher{
-		watcher:         newMockWatcher(),
-		started:         false,
-		metricsetsUsing: []string{"pod"},
-		enrichers:       make(map[string]*enricher),
-		metricsRepo:     metricsRepo,
+		watcher:     newMockWatcher(),
+		started:     false,
+		users:       make(map[*enricher]watcherRegistration),
+		enrichers:   make(map[*enricher]struct{}),
+		metricsRepo: metricsRepo,
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = watcher
 	addEventHandlersToWatcher(watcher, resourceWatchers)
@@ -756,8 +1067,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	metricset := "pod"
 	log := logptest.NewTestingLogger(t, selector)
 
-	enricher := buildMetadataEnricher(metricset, PodResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index, log)
+	enricher := buildTestMetadataEnricher(metricset, PodResource, resourceWatchers, config, &funcs, log)
 	resourceWatchers.lock.Lock()
 	wData := resourceWatchers.metaWatchersMap[PodResource]
 	mockW, ok := wData.watcher.(*mockWatcher)
@@ -833,8 +1143,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 
 	enricher.Stop(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.metaWatchersMap[PodResource]
-	require.False(t, watcher.started)
+	require.NotContains(t, resourceWatchers.metaWatchersMap, PodResource, "final owner must evict the watcher")
 	resourceWatchers.lock.Unlock()
 }
 
@@ -847,10 +1156,10 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 		watcher: &mockWatcher{
 			store: cache.NewStore(cache.MetaNamespaceKeyFunc),
 		},
-		started:         false,
-		metricsetsUsing: []string{"replicaset"},
-		enrichers:       make(map[string]*enricher),
-		metricsRepo:     metricsRepo,
+		started:     false,
+		users:       make(map[*enricher]watcherRegistration),
+		enrichers:   make(map[*enricher]struct{}),
+		metricsRepo: metricsRepo,
 	}
 	resourceWatchers.metaWatchersMap[ReplicaSetResource] = watcher
 	addEventHandlersToWatcher(watcher, resourceWatchers)
@@ -920,8 +1229,16 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 		return id
 	}
 
-	enricher := buildMetadataEnricher(metricset, ReplicaSetResource, resourceWatchers, config,
-		updateFunc, deleteFunc, indexFunc, log)
+	enricher := buildTestMetadataEnricherWithFuncs(
+		metricset,
+		ReplicaSetResource,
+		resourceWatchers,
+		config,
+		updateFunc,
+		deleteFunc,
+		indexFunc,
+		log,
+	)
 
 	enricher.Start(resourceWatchers)
 	resourceWatchers.lock.Lock()
@@ -974,7 +1291,7 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 
 	enricher.Stop(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	require.False(t, watcher.started)
+	require.NotContains(t, resourceWatchers.metaWatchersMap, ReplicaSetResource, "final owner must evict the watcher")
 	resourceWatchers.lock.Unlock()
 }
 
@@ -988,6 +1305,230 @@ func TestGetWatcherStoreKeyFromMetadataKey(t *testing.T) {
 	t.Run("container", func(t *testing.T) {
 		assert.Equal(t, "namespace/pod", getWatcherStoreKeyFromMetadataKey("namespace/pod/container"))
 	})
+}
+
+func resourceMetadataConfig(t *testing.T, node, namespace, deployment, cronJob bool) *metadata.AddResourceMetadataConfig {
+	t.Helper()
+	nodeConfig, err := conf.NewConfigFrom(map[string]interface{}{"enabled": node})
+	require.NoError(t, err, "node metadata config must be valid")
+	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{"enabled": namespace})
+	require.NoError(t, err, "namespace metadata config must be valid")
+	return &metadata.AddResourceMetadataConfig{
+		Node:       nodeConfig,
+		Namespace:  namespaceConfig,
+		Deployment: deployment,
+		CronJob:    cronJob,
+	}
+}
+
+func informerTestPod(name, generation string) *v1.Pod {
+	return &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: "default",
+			UID:       types.UID(name),
+			Labels:    map[string]string{"generation": generation},
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{{Name: informerTestContainerName}},
+		},
+	}
+}
+
+func configureRealInformerTestEnricher(e *enricher, container bool) {
+	e.Lock()
+	defer e.Unlock()
+
+	e.updateFunc = func(resource kubernetes.Resource) map[string]mapstr.M {
+		pod := resource.(*kubernetes.Pod)
+		eventMetadata := func() mapstr.M {
+			return mapstr.M{
+				"kubernetes": mapstr.M{
+					"labels": mapstr.M{"generation": pod.Labels["generation"]},
+					"pod": mapstr.M{
+						"name": pod.Name,
+						"uid":  string(pod.UID),
+					},
+				},
+			}
+		}
+
+		if container {
+			result := make(map[string]mapstr.M, len(pod.Spec.Containers))
+			for _, podContainer := range pod.Spec.Containers {
+				result[join(pod.Namespace, pod.Name, podContainer.Name)] = eventMetadata()
+			}
+			return result
+		}
+		return map[string]mapstr.M{join(pod.Namespace, pod.Name): eventMetadata()}
+	}
+	e.deleteFunc = func(resource kubernetes.Resource) []string {
+		pod := resource.(*kubernetes.Pod)
+		if container {
+			ids := make([]string, 0, len(pod.Spec.Containers))
+			for _, podContainer := range pod.Spec.Containers {
+				ids = append(ids, join(pod.Namespace, pod.Name, podContainer.Name))
+			}
+			return ids
+		}
+		return []string{join(pod.Namespace, pod.Name)}
+	}
+	if container {
+		e.index = func(event mapstr.M) string {
+			return join(
+				getString(event, mb.ModuleDataKey+".namespace"),
+				getString(event, mb.ModuleDataKey+".pod.name"),
+				getString(event, "name"),
+			)
+		}
+	} else {
+		e.index = func(event mapstr.M) string {
+			return join(getString(event, mb.ModuleDataKey+".namespace"), getString(event, "name"))
+		}
+		e.isPod = true
+	}
+}
+
+func newFailingStateServiceEnricher(
+	t *testing.T,
+	metricsRepo *MetricsRepo,
+	resourceWatchers *Watchers,
+	nodeScope bool,
+) Enricher {
+	t.Helper()
+
+	const moduleName = "constructor_rollback_test"
+	registry := mb.NewRegister()
+	require.NoError(t, registry.AddModule(moduleName, mb.DefaultModuleFactory))
+
+	var enricher Enricher
+	registry.MustAddMetricSet(moduleName, "state_service", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		enricher = NewResourceMetadataEnricher(base, metricsRepo, resourceWatchers, nodeScope)
+		return &constructorRollbackMetricSet{BaseMetricSet: base}, nil
+	})
+
+	mbtest.NewMetricSetWithRegistry(t, map[string]any{
+		"module":       moduleName,
+		"metricsets":   []string{"state_service"},
+		"add_metadata": true,
+		"kube_config":  writeTestKubeConfig(t),
+		"add_resource_metadata": map[string]any{
+			"namespace": map[string]any{"enabled": false},
+		},
+	}, registry)
+	return enricher
+}
+
+func writeTestKubeConfig(t *testing.T) string {
+	path := filepath.Join(t.TempDir(), "kubeconfig")
+	require.NoError(t, os.WriteFile(path, []byte(`
+apiVersion: v1
+kind: Config
+clusters:
+  - name: test
+    cluster:
+      server: https://127.0.0.1:1
+      insecure-skip-tls-verify: true
+contexts:
+  - name: test
+    context:
+      cluster: test
+      user: test
+current-context: test
+users:
+  - name: test
+    user:
+      token: test
+`), 0o600))
+	return path
+}
+
+func buildTestMetadataEnricher(
+	metricsetName string,
+	resourceName string,
+	resourceWatchers *Watchers,
+	config *kubernetesConfig,
+	funcs *mockFuncs,
+	log *logp.Logger,
+) *enricher {
+	return buildTestMetadataEnricherWithScope(
+		metricsetName,
+		resourceName,
+		resourceWatchers,
+		config,
+		funcs,
+		log,
+		false,
+	)
+}
+
+func buildTestMetadataEnricherWithScope(
+	metricsetName string,
+	resourceName string,
+	resourceWatchers *Watchers,
+	config *kubernetesConfig,
+	funcs *mockFuncs,
+	log *logp.Logger,
+	nodeScope bool,
+) *enricher {
+	return buildTestMetadataEnricherWithFuncsAndScope(
+		metricsetName,
+		resourceName,
+		resourceWatchers,
+		config,
+		funcs.update,
+		funcs.delete,
+		funcs.index,
+		log,
+		nodeScope,
+	)
+}
+
+func buildTestMetadataEnricherWithFuncs(
+	metricsetName string,
+	resourceName string,
+	resourceWatchers *Watchers,
+	config *kubernetesConfig,
+	updateFunc func(kubernetes.Resource) map[string]mapstr.M,
+	deleteFunc func(kubernetes.Resource) []string,
+	indexFunc func(mapstr.M) string,
+	log *logp.Logger,
+) *enricher {
+	return buildTestMetadataEnricherWithFuncsAndScope(
+		metricsetName,
+		resourceName,
+		resourceWatchers,
+		config,
+		updateFunc,
+		deleteFunc,
+		indexFunc,
+		log,
+		false,
+	)
+}
+
+func buildTestMetadataEnricherWithFuncsAndScope(
+	metricsetName string,
+	resourceName string,
+	resourceWatchers *Watchers,
+	config *kubernetesConfig,
+	updateFunc func(kubernetes.Resource) map[string]mapstr.M,
+	deleteFunc func(kubernetes.Resource) []string,
+	indexFunc func(mapstr.M) string,
+	log *logp.Logger,
+	nodeScope bool,
+) *enricher {
+	e := newMetadataEnricher(metricsetName, resourceName, config, log)
+	e.updateFunc = updateFunc
+	e.deleteFunc = deleteFunc
+	e.index = indexFunc
+
+	resourceWatchers.lock.Lock()
+	metaWatcher := resourceWatchers.metaWatchersMap[resourceName]
+	registerWatcherUser(resourceName, metaWatcher, e, true, nodeScope)
+	resourceWatchers.lock.Unlock()
+	commitWatcherOwnership(e, resourceWatchers)
+	return e
 }
 
 type mockFuncs struct {
@@ -1028,8 +1569,11 @@ func (f *mockFuncs) index(m mapstr.M) string {
 }
 
 type mockWatcher struct {
-	handler kubernetes.ResourceEventHandler
-	store   cache.Store
+	handler    kubernetes.ResourceEventHandler
+	store      cache.Store
+	startCalls int
+	stopCalls  int
+	startErr   error
 }
 
 func newMockWatcher() *mockWatcher {
@@ -1049,11 +1593,12 @@ func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
 }
 
 func (m *mockWatcher) Start() error {
-	return nil
+	m.startCalls++
+	return m.startErr
 }
 
 func (m *mockWatcher) Stop() {
-
+	m.stopCalls++
 }
 
 func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {

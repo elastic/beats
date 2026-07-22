@@ -20,7 +20,6 @@ package util
 import (
 	"errors"
 	"fmt"
-	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -87,6 +86,8 @@ type enricher struct {
 	isPod         bool
 	config        *kubernetesConfig
 	log           *logp.Logger
+
+	watchedResources []string
 }
 
 type nilEnricher struct{}
@@ -95,16 +96,20 @@ func (*nilEnricher) Start(*Watchers)   {}
 func (*nilEnricher) Stop(*Watchers)    {}
 func (*nilEnricher) Enrich([]mapstr.M) {}
 
+type watcherRegistration struct {
+	nodeScope bool
+	committed bool
+}
+
 type metaWatcher struct {
 	watcher kubernetes.Watcher // watcher responsible for watching a specific resource
 	started bool               // true if watcher has started, false otherwise
 
-	metricsetsUsing []string // list of metricsets using this shared watcher(e.g. pod, container, state_pod)
+	users       map[*enricher]watcherRegistration // enrichers that use this watcher/need it alive
+	enrichers   map[*enricher]struct{}            // enrichers that use this watcher as their primary source
+	metricsRepo *MetricsRepo                      // used to update container metrics derived from metadata, like resource limits
 
-	enrichers   map[string]*enricher // map of enrichers using this watcher. The key is the metricset name. Each metricset has its own enricher
-	metricsRepo *MetricsRepo         // used to update container metrics derived from metadata, like resource limits
-
-	nodeScope      bool               // whether this watcher should watch for resources in current node or in whole cluster
+	nodeScope      bool               // whether the active watcher watches resources in the current node or the whole cluster
 	restartWatcher kubernetes.Watcher // whether this watcher needs a restart. Only relevant in leader nodes due to metricsets with different nodescope(pod, state_pod)
 }
 
@@ -306,6 +311,82 @@ func isNamespaced(resourceName string) bool {
 	return true
 }
 
+// addWatcherUser adds a provisional enricher as a watcher lifetime owner.
+// The resource watcher registry must be locked by the caller.
+func addWatcherUser(metaWatcher *metaWatcher, e *enricher, nodeScope bool) bool {
+	if _, exists := metaWatcher.users[e]; exists {
+		return false
+	}
+	metaWatcher.users[e] = watcherRegistration{nodeScope: nodeScope}
+	return true
+}
+
+// removeWatcherUser removes an enricher as a watcher lifetime owner and
+// reports whether the watcher has no remaining owners.
+// The resource watcher registry must be locked by the caller.
+func removeWatcherUser(metaWatcher *metaWatcher, e *enricher) bool {
+	delete(metaWatcher.users, e)
+	return len(metaWatcher.users) == 0
+}
+
+// hasClusterScopedUser reports whether any owner, provisional or committed,
+// still requires a pending cluster-wide replacement.
+// The resource watcher registry must be locked by the caller.
+func hasClusterScopedUser(metaWatcher *metaWatcher) bool {
+	for _, registration := range metaWatcher.users {
+		if !registration.nodeScope {
+			return true
+		}
+	}
+	return false
+}
+
+// hasCommittedClusterScopedUser reports whether a pending cluster-wide
+// replacement may be activated.
+// The resource watcher registry must be locked by the caller.
+func hasCommittedClusterScopedUser(metaWatcher *metaWatcher) bool {
+	for _, registration := range metaWatcher.users {
+		if registration.committed && !registration.nodeScope {
+			return true
+		}
+	}
+	return false
+}
+
+// registerWatcherUser records ownership of one exact watched resource.
+// The resource watcher registry must be locked by the caller.
+func registerWatcherUser(resourceName string, metaWatcher *metaWatcher, e *enricher, primary, nodeScope bool) {
+	if addWatcherUser(metaWatcher, e, nodeScope) {
+		e.watchedResources = append(e.watchedResources, resourceName)
+	}
+	if primary {
+		e.watcher = metaWatcher
+	}
+}
+
+// commitWatcherOwnership publishes a fully initialized enricher to Start and
+// watcher event handlers.
+func commitWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
+	resourceWatchers.lock.Lock()
+	defer resourceWatchers.lock.Unlock()
+
+	for _, resourceName := range e.watchedResources {
+		metaWatcher := resourceWatchers.metaWatchersMap[resourceName]
+		if metaWatcher == nil {
+			continue
+		}
+		registration, owned := metaWatcher.users[e]
+		if !owned {
+			continue
+		}
+		registration.committed = true
+		metaWatcher.users[e] = registration
+		if resourceName == e.resourceName {
+			metaWatcher.enrichers[e] = struct{}{}
+		}
+	}
+}
+
 // createWatcher creates a watcher for a specific resource if not already created and stores it in the resourceWatchers map.
 // resourceName is the key in the resourceWatchers map where the created watcher gets stored.
 // options are the watch options for a specific watcher.
@@ -322,6 +403,7 @@ func createWatcher(
 	metricsRepo *MetricsRepo,
 	namespace string,
 	extraWatcher bool,
+	e *enricher,
 	logger *logp.Logger,
 ) (bool, error) {
 
@@ -344,7 +426,7 @@ func createWatcher(
 
 	// If the watcher exists, exit
 	if ok {
-		if resourceMetaWatcher.nodeScope != nodeScope && resourceMetaWatcher.nodeScope {
+		if resourceMetaWatcher.nodeScope && !nodeScope && resourceMetaWatcher.restartWatcher == nil {
 			// It might happen that the watcher already exists, but is only being used to monitor the resources
 			// of a single node(e.g. created by pod metricset). In that case, we need to check if we are trying to create a new watcher that will track
 			// the resources of whole cluster(e.g. in case of state_pod metricset).
@@ -362,8 +444,8 @@ func createWatcher(
 			// update the handler of the restartWatcher to match the current watcher's handler.
 			restartWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
 			resourceMetaWatcher.restartWatcher = restartWatcher
-			resourceMetaWatcher.nodeScope = nodeScope
 		}
+		registerWatcherUser(resourceName, resourceMetaWatcher, e, !extraWatcher, nodeScope)
 		return false, nil
 	}
 	// Watcher doesn't exist, create it
@@ -397,15 +479,16 @@ func createWatcher(
 	}
 
 	resourceMetaWatcher = &metaWatcher{
-		watcher:         watcher,
-		started:         false, // not started yet
-		enrichers:       make(map[string]*enricher),
-		metricsRepo:     metricsRepo,
-		metricsetsUsing: make([]string, 0),
-		restartWatcher:  nil,
-		nodeScope:       nodeScope,
+		watcher:        watcher,
+		started:        false, // not started yet
+		users:          make(map[*enricher]watcherRegistration),
+		enrichers:      make(map[*enricher]struct{}),
+		metricsRepo:    metricsRepo,
+		restartWatcher: nil,
+		nodeScope:      nodeScope,
 	}
 	resourceWatchers.metaWatchersMap[resourceName] = resourceMetaWatcher
+	registerWatcherUser(resourceName, resourceMetaWatcher, e, !extraWatcher, nodeScope)
 
 	// Add event handlers to the watcher. The only action we need to do here is invalidate the enricher cache.
 	addEventHandlersToWatcher(resourceMetaWatcher, resourceWatchers)
@@ -467,14 +550,19 @@ func addEventHandlersToWatcher(
 	}
 
 	clearMetadataCacheFunc := func(obj interface{}) {
-		enrichers := make(map[string]*enricher, len(metaWatcher.enrichers))
-
-		resourceWatchers.lock.Lock()
-		maps.Copy(enrichers, metaWatcher.enrichers)
-		resourceWatchers.lock.Unlock()
+		resourceWatchers.lock.RLock()
+		enrichers := make([]*enricher, 0, len(metaWatcher.enrichers))
+		for enricher := range metaWatcher.enrichers {
+			enrichers = append(enrichers, enricher)
+		}
+		resourceWatchers.lock.RUnlock()
 
 		for _, enricher := range enrichers {
 			enricher.Lock()
+			if enricher.deleteFunc == nil {
+				enricher.Unlock()
+				continue
+			}
 			ids := enricher.deleteFunc(obj.(kubernetes.Resource))
 			// update this watcher events by removing all the metadata[id]
 			for _, id := range ids {
@@ -515,62 +603,19 @@ func addEventHandlersToWatcher(
 	})
 }
 
-// addToMetricsetsUsing adds metricset identified by metricsetUsing to the list of resources using the shared watcher
-// identified by resourceName. The caller of this function should not be holding the lock.
-func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWatchers *Watchers) {
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
-	data, ok := resourceWatchers.metaWatchersMap[resourceName]
-	if ok {
-		contains := false
-		for _, which := range data.metricsetsUsing {
-			if which == metricsetUsing {
-				contains = true
-				break
-			}
-		}
-		// add this resource to the list of resources using it
-		if !contains {
-			data.metricsetsUsing = append(data.metricsetsUsing, metricsetUsing)
-		}
-	}
-}
-
-// removeFromMetricsetsUsing removes the metricset from the list of resources using the shared watcher.
-// It returns true if element was removed and new size of array.
-// The cache should be locked when called.
-func removeFromMetricsetsUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
-	data, ok := resourceWatchers.metaWatchersMap[resourceName]
-	removed := false
-	if ok {
-		newIndex := 0
-		for i, which := range data.metricsetsUsing {
-			if which == notUsingName {
-				removed = true
-			} else {
-				data.metricsetsUsing[newIndex] = data.metricsetsUsing[i]
-				newIndex++
-			}
-		}
-		data.metricsetsUsing = data.metricsetsUsing[:newIndex]
-		return removed, len(data.metricsetsUsing)
-	}
-	return removed, 0
-}
-
 // createAllWatchers creates all the watchers required by a metricset
 func createAllWatchers(
 	client k8sclient.Interface,
 	metadataClient k8sclientmeta.Interface,
-	metricsetName string,
-	resourceName string,
+	e *enricher,
 	nodeScope bool,
 	config *kubernetesConfig,
 	log *logp.Logger,
 	resourceWatchers *Watchers,
 	metricsRepo *MetricsRepo,
 ) error {
+	metricsetName := e.metricsetName
+	resourceName := e.resourceName
 	res := getResource(resourceName)
 	if res == nil {
 		return fmt.Errorf("resource for name %s does not exist. Watcher cannot be created", resourceName)
@@ -583,14 +628,12 @@ func createAllWatchers(
 	// Create the main watcher for the given resource.
 	// For example pod metricset's main watcher will be pod watcher.
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
-	created, err := createWatcher(resourceName, res, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, false, log)
+	created, err := createWatcher(resourceName, res, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, false, e, log)
 	if err != nil {
 		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, metricsetName, err)
 	} else if created {
 		log.Debugf("Created watcher %s successfully, created by %s.", resourceName, metricsetName)
 	}
-	// add this metricset to the ones using the watcher
-	addToMetricsetsUsing(resourceName, metricsetName, resourceWatchers)
 
 	// Create any extra watchers required by this resource
 	// For example pod requires also namespace and node watcher and possibly replicaset and job watcher.
@@ -598,15 +641,13 @@ func createAllWatchers(
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
-			created, err = createWatcher(extra, extraRes, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, true, log)
+			created, err = createWatcher(extra, extraRes, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, true, e, log)
 			if err != nil {
 				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, metricsetName, err)
 			} else {
 				if created {
 					log.Debugf("Created watcher %s successfully, created by %s.", extra, metricsetName)
 				}
-				// add this metricset to the ones using the extra watchers
-				addToMetricsetsUsing(extra, metricsetName, resourceWatchers)
 			}
 		} else {
 			log.Errorf("Resource for name %s does not exist. Watcher cannot be created.", extra)
@@ -647,7 +688,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 // createMetadataGenSpecific creates and returns the metadata generator for a specific resource - pod or service
 // A metaGen struct implements a MetaGen interface and is designed to utilize the necessary watchers to collect(Generate) metadata for a specific resource.
 func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
-	resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
+	resourceName string, resourceWatchers *Watchers, e *enricher) (metadata.MetaGen, error) {
 
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
@@ -657,8 +698,11 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		return nil, fmt.Errorf("could not create the metadata generator, as the watcher for %s does not exist", resourceName)
 	}
 	mainWatcher := (*resourceMetaWatcher).watcher
-	if (*resourceMetaWatcher).restartWatcher != nil {
-		mainWatcher = (*resourceMetaWatcher).restartWatcher
+	if e != nil {
+		if registration, owned := resourceMetaWatcher.users[e]; owned &&
+			!registration.nodeScope && resourceMetaWatcher.nodeScope && resourceMetaWatcher.restartWatcher != nil {
+			mainWatcher = resourceMetaWatcher.restartWatcher
+		}
 	}
 
 	var metaGen metadata.MetaGen
@@ -698,6 +742,16 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 
 	// Should never reach this part, as this function is only for service or pod resources
 	return metaGen, fmt.Errorf("failed to create a metadata generator for resource %s", resourceName)
+}
+
+func newMetadataEnricher(metricsetName, resourceName string, config *kubernetesConfig, log *logp.Logger) *enricher {
+	return &enricher{
+		metadataCache: make(map[string]mapstr.M),
+		metricsetName: metricsetName,
+		resourceName:  resourceName,
+		config:        config,
+		log:           log,
+	}
 }
 
 // NewResourceMetadataEnricher returns a metadata enricher for a given resource
@@ -742,9 +796,11 @@ func NewResourceMetadataEnricher(
 
 	metricsetName := base.Name()
 	resourceName := getResourceName(metricsetName)
+	enricher := newMetadataEnricher(metricsetName, resourceName, config, log)
 	// Create all watchers needed for this metricset
-	err = createAllWatchers(client, metadataClient, metricsetName, resourceName, nodeScope, config, log, resourceWatchers, metricsRepo)
+	err = createAllWatchers(client, metadataClient, enricher, nodeScope, config, log, resourceWatchers, metricsRepo)
 	if err != nil {
+		releaseWatcherOwnership(enricher, resourceWatchers)
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
 	}
@@ -763,11 +819,12 @@ func NewResourceMetadataEnricher(
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
-		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
+		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers, enricher)
 	} else {
 		generalMetaGen, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	}
 	if err != nil {
+		releaseWatcherOwnership(enricher, resourceWatchers)
 		log.Errorf("Error trying to create the metadata generators: %s", err)
 		return &nilEnricher{}
 	}
@@ -810,20 +867,16 @@ func NewResourceMetadataEnricher(
 		return id
 	}
 
-	// create a metadata enricher for this metricset
-	enricher := buildMetadataEnricher(
-		metricsetName,
-		resourceName,
-		resourceWatchers,
-		config,
-		updateFunc,
-		deleteFunc,
-		indexFunc,
-		log)
+	enricher.Lock()
+	enricher.updateFunc = updateFunc
+	enricher.deleteFunc = deleteFunc
+	enricher.index = indexFunc
 	if resourceName == PodResource {
 		enricher.isPod = true
 	}
+	enricher.Unlock()
 
+	commitWatcherOwnership(enricher, resourceWatchers)
 	return enricher
 }
 
@@ -862,9 +915,11 @@ func NewContainerMetadataEnricher(
 	}
 
 	metricsetName := base.Name()
+	enricher := newMetadataEnricher(metricsetName, PodResource, config, log)
 
-	err = createAllWatchers(client, metadataClient, metricsetName, PodResource, nodeScope, config, log, resourceWatchers, metricsRepo)
+	err = createAllWatchers(client, metadataClient, enricher, nodeScope, config, log, resourceWatchers, metricsRepo)
 	if err != nil {
+		releaseWatcherOwnership(enricher, resourceWatchers)
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
 	}
@@ -878,8 +933,9 @@ func NewContainerMetadataEnricher(
 		log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
 	}
 
-	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
+	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers, enricher)
 	if err != nil {
+		releaseWatcherOwnership(enricher, resourceWatchers)
 		log.Errorf("Error trying to create the metadata generators: %s", err)
 		return &nilEnricher{}
 	}
@@ -943,17 +999,13 @@ func NewContainerMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, mb.ModuleDataKey+".pod.name"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(
-		metricsetName,
-		PodResource,
-		resourceWatchers,
-		config,
-		updateFunc,
-		deleteFunc,
-		indexFunc,
-		log,
-	)
+	enricher.Lock()
+	enricher.updateFunc = updateFunc
+	enricher.deleteFunc = deleteFunc
+	enricher.index = indexFunc
+	enricher.Unlock()
 
+	commitWatcherOwnership(enricher, resourceWatchers)
 	return enricher
 }
 
@@ -1006,60 +1058,44 @@ func join(fields ...string) string {
 	return strings.Join(fields, resourceMetadataKeySeparator)
 }
 
-// buildMetadataEnricher builds and returns a metadata enricher for a given metricset.
-// It appends the new enricher to the watcher.enrichers map for the given resource watcher.
-// It also updates the add, update and delete event handlers of the watcher in order to retrieve
-// the metadata of all enrichers associated to that watcher.
-func buildMetadataEnricher(
-	metricsetName string,
-	resourceName string,
-	resourceWatchers *Watchers,
-	config *kubernetesConfig,
-	updateFunc func(kubernetes.Resource) map[string]mapstr.M,
-	deleteFunc func(kubernetes.Resource) []string,
-	indexFunc func(e mapstr.M) string,
-	log *logp.Logger) *enricher {
-
-	enricher := &enricher{
-		metadataCache: map[string]mapstr.M{},
-		index:         indexFunc,
-		updateFunc:    updateFunc,
-		deleteFunc:    deleteFunc,
-		resourceName:  resourceName,
-		metricsetName: metricsetName,
-		config:        config,
-		log:           log,
-	}
-
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
-	// Check if a watcher for this resource already exists.
-	resourceMetaWatcher := resourceWatchers.metaWatchersMap[resourceName]
-	if resourceMetaWatcher != nil {
-		// Append the new enricher to watcher's enrichers map.
-		resourceMetaWatcher.enrichers[metricsetName] = enricher
-		enricher.watcher = resourceMetaWatcher
-	}
-
-	return enricher
-}
-
 // Start starts all the watchers associated with a given enricher's resource.
 func (e *enricher) Start(resourceWatchers *Watchers) {
+	var watcherToStop kubernetes.Watcher
+
 	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
+
+	if len(e.watchedResources) == 0 {
+		resourceWatchers.lock.Unlock()
+		return
+	}
+
+	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
+	if resourceMetaWatcher == nil {
+		resourceWatchers.lock.Unlock()
+		return
+	}
+	registration, owned := resourceMetaWatcher.users[e]
+	if !owned || !registration.committed {
+		resourceWatchers.lock.Unlock()
+		return
+	}
 
 	// Each resource may require multiple watchers. Firstly, we start the
 	// extra watchers as they are a dependency for the main resource watcher
 	// For example a pod watcher requires namespace and node watcher to be started
 	// first.
-	extras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
-	for _, extra := range extras {
-		extraWatcherMeta := resourceWatchers.metaWatchersMap[extra]
-		if extraWatcherMeta != nil && !extraWatcherMeta.started {
+	for _, resourceName := range e.watchedResources {
+		if resourceName == e.resourceName {
+			continue
+		}
+		extraWatcherMeta := resourceWatchers.metaWatchersMap[resourceName]
+		if extraWatcherMeta == nil {
+			continue
+		}
+		extraRegistration, extraOwned := extraWatcherMeta.users[e]
+		if extraOwned && extraRegistration.committed && !extraWatcherMeta.started {
 			if err := extraWatcherMeta.watcher.Start(); err != nil {
-				e.log.Warnf("Error starting %s watcher: %s", extra, err)
+				e.log.Warnf("Error starting %s watcher: %s", resourceName, err)
 			} else {
 				extraWatcherMeta.started = true
 			}
@@ -1067,59 +1103,73 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 	}
 
 	// Start the main watcher if not already started.
-	// If there is a restartWatcher defined, stop the old watcher if started and start the restartWatcher.
-	// restartWatcher replaces the old watcher and resourceMetaWatcher.restartWatcher is set to nil.
-	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
-	if resourceMetaWatcher != nil {
-		if resourceMetaWatcher.restartWatcher != nil {
-			if resourceMetaWatcher.started {
-				resourceMetaWatcher.watcher.Stop()
-			}
-			if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
-				e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
-			} else {
-				resourceMetaWatcher.watcher = resourceMetaWatcher.restartWatcher
-				resourceMetaWatcher.restartWatcher = nil
-				resourceMetaWatcher.started = true
-			}
+	// A pending cluster-wide replacement can be activated only after at least
+	// one cluster-scoped owner has completed construction. Start it before
+	// stopping the active watcher so a failed replacement does not interrupt
+	// metadata collection.
+	if resourceMetaWatcher.restartWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
+		if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
+			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
 		} else {
-			if !resourceMetaWatcher.started {
-				if err := resourceMetaWatcher.watcher.Start(); err != nil {
-					e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
-				} else {
-					resourceMetaWatcher.started = true
-				}
+			if resourceMetaWatcher.started {
+				watcherToStop = resourceMetaWatcher.watcher
 			}
+			resourceMetaWatcher.watcher = resourceMetaWatcher.restartWatcher
+			resourceMetaWatcher.restartWatcher = nil
+			resourceMetaWatcher.nodeScope = false
+			resourceMetaWatcher.started = true
 		}
+	} else if !resourceMetaWatcher.started {
+		if err := resourceMetaWatcher.watcher.Start(); err != nil {
+			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
+		} else {
+			resourceMetaWatcher.started = true
+		}
+	}
+	resourceWatchers.lock.Unlock()
+
+	if watcherToStop != nil {
+		watcherToStop.Stop()
 	}
 }
 
-// Stop removes the enricher's metricset as a user of the associated watchers.
-// If no metricset is using the watchers anymore, the watcher gets stopped.
-func (e *enricher) Stop(resourceWatchers *Watchers) {
+// releaseWatcherOwnership releases all exact watcher dependencies registered by
+// an enricher. It is shared by normal shutdown and constructor rollback.
+func releaseWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
+	var watchersToStop []kubernetes.Watcher
+
 	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
-	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
-	if resourceMetaWatcher != nil && resourceMetaWatcher.started {
-		_, size := removeFromMetricsetsUsing(e.resourceName, e.metricsetName, resourceWatchers)
-		if size == 0 {
-			resourceMetaWatcher.watcher.Stop()
-			resourceMetaWatcher.started = false
+	for _, resourceName := range e.watchedResources {
+		metaWatcher := resourceWatchers.metaWatchersMap[resourceName]
+		if metaWatcher == nil {
+			continue
 		}
-	}
+		if _, owned := metaWatcher.users[e]; !owned {
+			continue
+		}
 
-	extras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
-	for _, extra := range extras {
-		extraMetaWatcher := resourceWatchers.metaWatchersMap[extra]
-		if extraMetaWatcher != nil && extraMetaWatcher.started {
-			_, size := removeFromMetricsetsUsing(extra, e.metricsetName, resourceWatchers)
-			if size == 0 {
-				extraMetaWatcher.watcher.Stop()
-				extraMetaWatcher.started = false
+		delete(metaWatcher.enrichers, e)
+		if removeWatcherUser(metaWatcher, e) {
+			delete(resourceWatchers.metaWatchersMap, resourceName)
+			if metaWatcher.started {
+				metaWatcher.started = false
+				watchersToStop = append(watchersToStop, metaWatcher.watcher)
 			}
+		} else if metaWatcher.restartWatcher != nil && !hasClusterScopedUser(metaWatcher) {
+			metaWatcher.restartWatcher = nil
 		}
 	}
+	e.watchedResources = nil
+	resourceWatchers.lock.Unlock()
+
+	for _, watcher := range watchersToStop {
+		watcher.Stop()
+	}
+}
+
+// Stop releases all watcher ownership held by the enricher.
+func (e *enricher) Stop(resourceWatchers *Watchers) {
+	releaseWatcherOwnership(e, resourceWatchers)
 }
 
 // Enrich enriches events with metadata saved in the enricher.metadata map
