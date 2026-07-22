@@ -223,7 +223,7 @@ func (c *Client) close() {
 // Current implementation of osqueryd RPC returns the error when the long running query times out, but this timeout is a transport timeout,
 // that doesn't cancel the query execution itself.
 // This also makes the client RPC unusable until the long running query finishes, returning errors for each subsequent query.
-func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error) {
+func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error) {
 	c.mx.Lock()
 	defer c.mx.Unlock()
 
@@ -272,7 +272,7 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 
 // ResolveResult types for a give query
 // The API is public to allow resolution of scheduled queries results captured by custom logger plugin
-func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]interface{}, error) {
+func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]any, error) {
 	c.mx.Lock()
 	defer c.mx.Unlock()
 	if c.cli == nil {
@@ -288,7 +288,7 @@ func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[strin
 	return c.resolveResult(ctx, sql, hits)
 }
 
-func (c *Client) resolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]interface{}, error) {
+func (c *Client) resolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]any, error) {
 	// Get column types
 	colTypes, err := c.queryColumnTypes(ctx, sql)
 	if err != nil {
@@ -324,8 +324,8 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 	return colTypes, nil
 }
 
-func resolveTypes(hits []map[string]string, colTypes map[string]string) []map[string]interface{} {
-	resolved := make([]map[string]interface{}, 0, len(hits))
+func resolveTypes(hits []map[string]string, colTypes map[string]string) []map[string]any {
+	resolved := make([]map[string]any, 0, len(hits))
 	for _, hit := range hits {
 		res := resolveHitTypes(hit, colTypes)
 		resolved = append(resolved, res)
@@ -335,8 +335,8 @@ func resolveTypes(hits []map[string]string, colTypes map[string]string) []map[st
 
 // Best effort to convert value types and replace values in the
 // If type conversion fails the value is preserved as string
-func resolveHitTypes(hit, colTypes map[string]string) map[string]interface{} {
-	m := make(map[string]interface{})
+func resolveHitTypes(hit, colTypes map[string]string) map[string]any {
+	m := make(map[string]any)
 	for k, v := range hit {
 		t, ok := colTypes[k]
 		if ok {
