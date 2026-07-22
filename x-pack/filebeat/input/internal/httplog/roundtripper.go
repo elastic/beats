@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -155,18 +156,22 @@ func SanitizeFileName(name string) string {
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
 // responses to the provided logger. Transaction creation is logged to log.
-func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, log *logp.Logger) *LoggingRoundTripper {
+// Header names matching strings in sensitive are not logged.
+func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, sensitive []string, log *logp.Logger) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
-		transport:  next,
-		maxBodyLen: maxBodyLen,
-		txLog:      logger,
-		txBaseID:   newID(),
-		log:        log,
+		sensitiveHeaders: sensitive,
+		transport:        next,
+		maxBodyLen:       maxBodyLen,
+		txLog:            logger,
+		txBaseID:         newID(),
+		log:              log,
 	}
 }
 
 // LoggingRoundTripper is an http.RoundTripper that logs requests and responses.
 type LoggingRoundTripper struct {
+	sensitiveHeaders []string
+
 	transport   http.RoundTripper
 	maxBodyLen  int           // The maximum length of a body. Longer bodies will be truncated.
 	txLog       *zap.Logger   // Destination logger.
@@ -226,7 +231,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		)
 	}
 
-	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen)
+	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen, rt.sensitiveHeaders)
 
 	resp, err := rt.transport.RoundTrip(req)
 	if err != nil {
@@ -251,7 +256,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(body)),
 		zap.Int("http.response.body.bytes", len(body)),
 		zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
-		zap.Any("http.response.header", resp.Header),
+		zap.Any("http.response.header", redactHeaders(resp.Header, rt.sensitiveHeaders)),
 	)
 	switch len(errorsMessages) {
 	case 0:
@@ -284,12 +289,13 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 //	http.request.header
 //
 // Additional fields in extra will also be logged.
-func LogRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) *http.Request {
-	req, _, _ = logRequest(log, req, maxBodyLen, extra...)
+// Header names matching strings in sensitive are not logged.
+func LogRequest(log *zap.Logger, req *http.Request, sensitive []string, maxBodyLen int, extra ...zapcore.Field) *http.Request {
+	req, _, _ = logRequest(log, req, maxBodyLen, nil, extra...)
 	return req
 }
 
-func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
+func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, sensitive []string, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
 	reqParts := append([]zapcore.Field{
 		zap.String("url.original", req.URL.String()),
 		zap.String("url.scheme", req.URL.Scheme),
@@ -298,7 +304,7 @@ func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zap
 		zap.String("url.port", req.URL.Port()),
 		zap.String("url.query", req.URL.RawQuery),
 		zap.String("http.request.method", req.Method),
-		zap.Any("http.request.header", req.Header),
+		zap.Any("http.request.header", redactHeaders(req.Header, sensitive)),
 		zap.String("user_agent.original", req.Header.Get("User-Agent")),
 	}, extra...)
 
@@ -355,6 +361,17 @@ func newID() string {
 	var data [8]byte
 	binary.LittleEndian.PutUint64(data[:], uint64(time.Now().UnixNano()))
 	return base32.HexEncoding.WithPadding(base32.NoPadding).EncodeToString(data[:])
+}
+
+func redactHeaders(h http.Header, sensitive []string) http.Header {
+	if len(sensitive) == 0 {
+		return h
+	}
+	h = maps.Clone(h)
+	for _, s := range sensitive {
+		delete(h, s)
+	}
+	return h
 }
 
 // copyBody is derived from drainBody in net/http/httputil/dump.go

@@ -5,6 +5,7 @@
 package cel
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -45,19 +46,20 @@ var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints
 var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
-	name          string
-	remote        bool
-	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
-	handler       http.HandlerFunc
-	config        map[string]interface{}
-	time          func() time.Time
-	persistCursor map[string]interface{}
-	want          []map[string]interface{}
-	wantCursor    []map[string]interface{}
-	wantErr       error
-	prepare       func() error
-	wantFile      string
-	wantNoFile    string
+	name                string
+	remote              bool
+	server              func(*testing.T, http.HandlerFunc, map[string]interface{})
+	handler             http.HandlerFunc
+	config              map[string]interface{}
+	time                func() time.Time
+	persistCursor       map[string]interface{}
+	want                []map[string]interface{}
+	wantCursor          []map[string]interface{}
+	wantErr             error
+	prepare             func() error
+	wantFile            string
+	wantNoFile          string
+	wantTraceNotContain []string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
@@ -2223,6 +2225,130 @@ var inputTests = []struct {
 		},
 	},
 
+	// Auth header sanitization in trace logs.
+	{
+		name: "trace_sanitize_basic_auth",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"auth.basic.user":          "test_client",
+			"auth.basic.password":      "secret_password",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_basic_auth.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+	{
+		name: "trace_sanitize_token_auth",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"auth.token.type":          "Token",
+			"auth.token.value":         "sssh_super_secret_token",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_token_auth.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+	{
+		name: "trace_sanitize_oauth2",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			config["auth.oauth2.token_url"] = s.URL + "/token"
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                  1,
+			"auth.oauth2.client.id":     "a_client_id",
+			"auth.oauth2.client.secret": "a_client_secret",
+			"auth.oauth2.endpoint_params": map[string]interface{}{
+				"param1": "v1",
+			},
+			"auth.oauth2.scopes":       []string{"scope1", "scope2"},
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	post(state.url, '', '').Body.as(body, {
+		"events": body.decode_json()
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf("unexpected UA: %s", r.UserAgent())))
+				return
+			}
+			oauth2Handler(w, r)
+		},
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_oauth2.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+
 	// Multi-step requests.
 	{
 		name:   "simple_multistep_GET_request",
@@ -2661,6 +2787,17 @@ func TestInput(t *testing.T) {
 				}
 				if len(paths) != 0 {
 					t.Errorf("unexpected files found: %v", paths)
+				}
+			}
+			if len(test.wantTraceNotContain) > 0 && test.wantFile != "" {
+				traceData, err := os.ReadFile(filepath.Join(tempDir, test.wantFile))
+				if err != nil {
+					t.Fatalf("failed to read trace file for content check: %v", err)
+				}
+				for _, s := range test.wantTraceNotContain {
+					if bytes.Contains(traceData, []byte(s)) {
+						t.Errorf("trace log must not contain %q", s)
+					}
 				}
 			}
 			if test.wantErr != nil {
