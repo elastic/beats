@@ -564,3 +564,257 @@ func TestMergeMapstrIntoPdata(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAtPath(t *testing.T) {
+	tests := []struct {
+		name  string
+		build func() pcommon.Map
+		key   string
+		want  any
+		found bool
+	}{
+		{
+			name: "simple key found",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("foo", "bar")
+				return m
+			},
+			key:   "foo",
+			want:  "bar",
+			found: true,
+		},
+		{
+			name: "simple key not found",
+			build: func() pcommon.Map {
+				return pcommon.NewMap()
+			},
+			key:   "foo",
+			found: false,
+		},
+		{
+			name: "nested path found",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutEmptyMap("a").PutStr("b", "val")
+				return m
+			},
+			key:   "a.b",
+			want:  "val",
+			found: true,
+		},
+		{
+			name: "nested path leaf missing",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutEmptyMap("a").PutStr("c", "val")
+				return m
+			},
+			key:   "a.b",
+			found: false,
+		},
+		{
+			name: "nested path intermediate not a map",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("a", "not-a-map")
+				return m
+			},
+			key:   "a.b",
+			found: false,
+		},
+		{
+			name: "literal dotted key found before path navigation",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("a.b", "literal")
+				return m
+			},
+			key:   "a.b",
+			want:  "literal",
+			found: true,
+		},
+		{
+			name: "deep nested path",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutEmptyMap("a").PutEmptyMap("b").PutStr("c", "deep")
+				return m
+			},
+			key:   "a.b.c",
+			want:  "deep",
+			found: true,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			m := tc.build()
+			v, ok := GetAtPath(tc.key, m)
+			assert.Equal(t, tc.found, ok)
+			if tc.found {
+				assert.Equal(t, tc.want, v.AsRaw())
+			}
+		})
+	}
+}
+
+func TestDeleteAtPath(t *testing.T) {
+	tests := []struct {
+		name    string
+		build   func() pcommon.Map
+		key     string
+		deleted bool
+		wantRaw map[string]any
+	}{
+		{
+			name: "simple key deleted",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("foo", "bar")
+				m.PutStr("baz", "qux")
+				return m
+			},
+			key:     "foo",
+			deleted: true,
+			wantRaw: map[string]any{"baz": "qux"},
+		},
+		{
+			name: "simple key not found",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("foo", "bar")
+				return m
+			},
+			key:     "missing",
+			deleted: false,
+			wantRaw: map[string]any{"foo": "bar"},
+		},
+		{
+			name: "nested path deleted",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				inner := m.PutEmptyMap("a")
+				inner.PutStr("b", "val")
+				inner.PutStr("c", "keep")
+				return m
+			},
+			key:     "a.b",
+			deleted: true,
+			wantRaw: map[string]any{"a": map[string]any{"c": "keep"}},
+		},
+		{
+			name: "nested path intermediate missing",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("foo", "bar")
+				return m
+			},
+			key:     "a.b",
+			deleted: false,
+			wantRaw: map[string]any{"foo": "bar"},
+		},
+		{
+			name: "nested path intermediate not a map",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("a", "not-a-map")
+				return m
+			},
+			key:     "a.b",
+			deleted: false,
+			wantRaw: map[string]any{"a": "not-a-map"},
+		},
+		{
+			name: "literal dotted key deleted before path navigation",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("a.b", "literal")
+				m.PutStr("c", "keep")
+				return m
+			},
+			key:     "a.b",
+			deleted: true,
+			wantRaw: map[string]any{"c": "keep"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			m := tc.build()
+			ok := DeleteAtPath(tc.key, m)
+			assert.Equal(t, tc.deleted, ok)
+			assert.Equal(t, tc.wantRaw, m.AsRaw())
+		})
+	}
+}
+
+func TestFlattenKeys(t *testing.T) {
+	tests := []struct {
+		name  string
+		build func() pcommon.Map
+		want  []string
+	}{
+		{
+			name: "empty map",
+			build: func() pcommon.Map {
+				return pcommon.NewMap()
+			},
+			want: []string{},
+		},
+		{
+			name: "flat keys",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("a", "1")
+				m.PutStr("b", "2")
+				return m
+			},
+			want: []string{"a", "b"},
+		},
+		{
+			name: "nested map: children before parent",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutEmptyMap("a").PutStr("b", "val")
+				return m
+			},
+			want: []string{"a.b", "a"},
+		},
+		{
+			name: "deeply nested: children before each parent",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutEmptyMap("a").PutEmptyMap("b").PutStr("c", "val")
+				return m
+			},
+			want: []string{"a.b.c", "a.b", "a"},
+		},
+		{
+			name: "literal dotted key returned as-is",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				m.PutStr("a.b", "val")
+				return m
+			},
+			want: []string{"a.b"},
+		},
+		{
+			name: "multiple subtrees",
+			build: func() pcommon.Map {
+				m := pcommon.NewMap()
+				inner := m.PutEmptyMap("a")
+				inner.PutStr("x", "1")
+				inner.PutStr("y", "2")
+				m.PutStr("b", "3")
+				return m
+			},
+			want: []string{"a.x", "a.y", "a", "b"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			m := tc.build()
+			got := FlattenKeys(m)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
