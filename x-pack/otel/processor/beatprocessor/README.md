@@ -22,6 +22,7 @@ Here are the currently supported processors:
 - [add_host_metadata]
 - [add_kubernetes_metadata]
 - [detect_mime_type]
+- [drop_fields]
 
 ## Default processors in Beat receivers
 
@@ -209,6 +210,20 @@ processors:
 
 You can configure the processor using the options supported by the [detect_mime_type] processor.
 
+## Using the `drop_fields` processor
+
+To use the [drop_fields] processor, configure the processor as follows:
+
+```yaml
+processors:
+  beat:
+    processors:
+      - drop_fields:
+          fields: ["field.to.drop"]
+```
+
+You can configure the processor using the options supported by the [drop_fields] processor.
+
 [Beat processors]: https://www.elastic.co/docs/reference/beats/filebeat/filtering-enhancing-data#using-processors
 [Filebeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/filebeat/fbreceiver
 [Metricbeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/metricbeat/mbreceiver
@@ -218,5 +233,6 @@ You can configure the processor using the options supported by the [detect_mime_
 [add_host_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-host-metadata
 [add_kubernetes_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata
 [detect_mime_type]: https://www.elastic.co/docs/reference/beats/filebeat/detect-mime-type
+[drop_fields]: https://www.elastic.co/docs/reference/beats/filebeat/drop-fields
 [indexers]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_indexers
 [matchers]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_matchers
