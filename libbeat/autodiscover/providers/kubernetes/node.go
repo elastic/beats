@@ -147,13 +147,6 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta mapstr.M
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-<<<<<<< HEAD
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(mapstr.M)
-=======
 		kubeMeta, ok = rawMeta.(mapstr.M)
 		if ok {
 			// The builder base config can configure any of the field values of kubernetes if need be.
@@ -161,7 +154,6 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 			if rawAnn, ok := kubeMeta["annotations"]; ok {
 				annotations = rawAnn.(mapstr.M) //nolint:errcheck // type validated by map lookup
 			}
->>>>>>> cf032f423 (chore: import autodiscover repository (#51804))
 		}
 	}
 	if host, ok := event["host"]; ok {

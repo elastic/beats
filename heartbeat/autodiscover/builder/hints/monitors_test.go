@@ -23,13 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/logp"
-=======
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> cf032f423 (chore: import autodiscover repository (#51804))
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
