@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"go.opentelemetry.io/collector/component"
 
@@ -27,6 +28,17 @@ import (
 	"go.opentelemetry.io/collector/processor"
 	"go.uber.org/zap"
 )
+
+// allowedProcessors is the list of Beat processor names that may be configured
+// in the OTel Beat processor.
+var allowedProcessors = []string{
+	"add_cloud_metadata",
+	"add_docker_metadata",
+	"add_fields",
+	"add_host_metadata",
+	"add_kubernetes_metadata",
+	"detect_mime_type",
+}
 
 type beatProcessor struct {
 	logger     *zap.Logger
@@ -83,6 +95,7 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
 		}
 
+<<<<<<< HEAD
 		var constructor processors.Constructor
 
 		switch processorName {
@@ -97,6 +110,9 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 		case "add_kubernetes_metadata":
 			constructor = add_kubernetes_metadata.New
 		default:
+=======
+		if !slices.Contains(allowedProcessors, processorName) {
+>>>>>>> d38842a90 (feat: add `detect_mime_type` processor to OTel Beat processor (#52131))
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
 
