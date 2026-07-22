@@ -98,9 +98,10 @@ func TestReceiverHook(t *testing.T) {
 		},
 	}
 
-	// For osquerybeatreceiver, we expect 2 hooks: one for beat metrics and one for
-	// scheduled query profiles registered by osquerybeat.registerDiagnosticHooks.
-	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
+	// For osquerybeatreceiver, we expect 3 hooks: one for beat metrics, one for
+	// scheduled query profiles, and one for customer-managed extensions,
+	// all registered by osquerybeat.registerDiagnosticHooks.
+	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 3)
 }
 
 func TestReceiverStatus(t *testing.T) {
