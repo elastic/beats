@@ -23,8 +23,6 @@ import (
 	"go.uber.org/zap"
 )
 
-<<<<<<< HEAD
-=======
 // allowedProcessors is the list of Beat processor names that may be configured
 // in the OTel Beat processor.
 var allowedProcessors = []string{
@@ -37,7 +35,6 @@ var allowedProcessors = []string{
 	"drop_fields",
 }
 
->>>>>>> 5188361d1 (feat: add `drop_fields` processor to OTel Beat processor (#52221))
 type beatProcessor struct {
 	logger     *zap.Logger
 	processors []beat.Processor

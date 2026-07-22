@@ -151,8 +151,6 @@ func TestCreateProcessor(t *testing.T) {
 		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
 	})
 
-<<<<<<< HEAD
-=======
 	t.Run("valid detect_mime_type processor config returns processor", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"detect_mime_type": map[string]any{
@@ -176,7 +174,6 @@ func TestCreateProcessor(t *testing.T) {
 		assert.Equal(t, "drop_fields", processor.String()[:len("drop_fields")])
 	})
 
->>>>>>> 5188361d1 (feat: add `drop_fields` processor to OTel Beat processor (#52221))
 	t.Run("when condition is honored and processor is skipped when condition is false", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_fields": map[string]any{

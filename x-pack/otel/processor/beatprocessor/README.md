@@ -21,11 +21,8 @@ Here are the currently supported processors:
 - [add_fields]
 - [add_host_metadata]
 - [add_kubernetes_metadata]
-<<<<<<< HEAD
-=======
 - [detect_mime_type]
 - [drop_fields]
->>>>>>> 5188361d1 (feat: add `drop_fields` processor to OTel Beat processor (#52221))
 
 ## Default processors in Beat receivers
 
@@ -198,8 +195,6 @@ You can configure the Kubernetes metadata enrichment using the options supported
 Note that you need to explicitly configure at least one [indexer][indexers] and at least one [matcher][matchers] for the enrichment to work.
 In the example above, the `container` indexer and the `logs_path` matcher are configured.
 
-<<<<<<< HEAD
-=======
 ## Using the `detect_mime_type` processor
 
 To use the [detect_mime_type] processor, configure the processor as follows:
@@ -229,7 +224,6 @@ processors:
 
 You can configure the processor using the options supported by the [drop_fields] processor.
 
->>>>>>> 5188361d1 (feat: add `drop_fields` processor to OTel Beat processor (#52221))
 [Beat processors]: https://www.elastic.co/docs/reference/beats/filebeat/filtering-enhancing-data#using-processors
 [Filebeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/filebeat/fbreceiver
 [Metricbeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/metricbeat/mbreceiver
@@ -238,10 +232,7 @@ You can configure the processor using the options supported by the [drop_fields]
 [add_fields]: https://www.elastic.co/docs/reference/beats/filebeat/add-fields
 [add_host_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-host-metadata
 [add_kubernetes_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata
-<<<<<<< HEAD
-=======
 [detect_mime_type]: https://www.elastic.co/docs/reference/beats/filebeat/detect-mime-type
 [drop_fields]: https://www.elastic.co/docs/reference/beats/filebeat/drop-fields
->>>>>>> 5188361d1 (feat: add `drop_fields` processor to OTel Beat processor (#52221))
 [indexers]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_indexers
 [matchers]: https://www.elastic.co/docs/reference/beats/filebeat/add-kubernetes-metadata#_matchers
