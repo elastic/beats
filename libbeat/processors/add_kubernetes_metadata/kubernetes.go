@@ -30,13 +30,6 @@ import (
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
-=======
-	"go.opentelemetry.io/collector/pdata/pcommon"
-
->>>>>>> cf032f423 (chore: import autodiscover repository (#51804))
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
