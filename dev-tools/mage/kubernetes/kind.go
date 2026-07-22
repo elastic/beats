@@ -172,43 +172,21 @@ func (m *KindIntegrationTestStep) Teardown(env map[string]string) error {
 	return nil
 }
 
-// withGODEBUGWithoutFIPS140 temporarily removes fips140=* from GODEBUG while fn
-// runs, then restores the previous value. Kind is a non-FIPS Go binary and fails
-// under GODEBUG=fips140=only (used by FIPS integ tests).
+// withGODEBUGWithoutFIPS140 temporarily unsets GODEBUG while fn runs when it
+// contains fips140=only, then restores the previous value. Kind is a non-FIPS
+// Go binary and fails under GODEBUG=fips140=only (used by FIPS integ tests).
 func withGODEBUGWithoutFIPS140(fn func() error) error {
 	orig, had := os.LookupEnv("GODEBUG")
+	if !had || !strings.Contains(orig, "fips140=only") {
+		return fn()
+	}
+
 	defer func() {
-		if !had {
-			_ = os.Unsetenv("GODEBUG")
-			return
-		}
 		_ = os.Setenv("GODEBUG", orig)
 	}()
 
-	cleaned := removeGODEBUGKey(orig, "fips140")
-	if cleaned == "" {
-		_ = os.Unsetenv("GODEBUG")
-	} else {
-		_ = os.Setenv("GODEBUG", cleaned)
-	}
+	_ = os.Unsetenv("GODEBUG")
 	return fn()
-}
-
-func removeGODEBUGKey(godebug, key string) string {
-	if godebug == "" {
-		return ""
-	}
-	prefix := key + "="
-	parts := strings.Split(godebug, ",")
-	kept := make([]string, 0, len(parts))
-	for _, p := range parts {
-		p = strings.TrimSpace(p)
-		if p == "" || strings.HasPrefix(p, prefix) {
-			continue
-		}
-		kept = append(kept, p)
-	}
-	return strings.Join(kept, ",")
 }
 
 func envKubeConfigExists(env map[string]string, envVar string) bool {
