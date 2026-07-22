@@ -31,9 +31,9 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -522,7 +522,7 @@ func TestServiceEventer_NamespaceWatcher(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			namespaceWatcher := eventer.(*service).namespaceWatcher
+			namespaceWatcher := eventer.(*service).namespaceWatcher //nolint:errcheck // test type assertion
 
 			if test.expectedNil {
 				assert.Nilf(t, namespaceWatcher, test.msg)
