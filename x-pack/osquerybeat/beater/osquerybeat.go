@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -396,7 +397,7 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
 			defer cancel()
 
-			payload := map[string]interface{}{
+			payload := map[string]any{
 				"generated_at": time.Now().UTC().Format(time.RFC3339Nano),
 			}
 
@@ -406,12 +407,10 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			if err != nil {
 				payload["error"] = err.Error()
 			} else {
-				for key, value := range scheduledPayload {
-					payload[key] = value
-				}
+				maps.Copy(payload, scheduledPayload)
 			}
 
-			liveProfiles := []map[string]interface{}{}
+			liveProfiles := []map[string]any{}
 			if bt.liveProfiles != nil {
 				liveProfiles = bt.liveProfiles.List()
 			}
@@ -765,7 +764,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	responseID := uuid.Must(uuid.NewV4()).String()
 	runTime := time.Unix(res.UnixTime, 0)
 	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
-	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
+	publishResolved := func(resultType, action string, hits []map[string]any) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
 		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, meta, hits, qi.ECSMapping, nil)

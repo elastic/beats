@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -293,11 +294,9 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	if err != nil {
 		return err
 	}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		_ = q.logOSQueryOutput(ctx, stdout)
-	}()
+	})
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -318,20 +317,16 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 
 	// Capture stderr for error messages
 	// Log stderr line-by-line at error level for better visibility
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		_ = q.logOSQueryOutput(ctx, stderr)
-	}()
+	})
 
 	finished := make(chan error, 1)
 
 	// Wait on osqueryd exit
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		finished <- cmd.Wait()
-	}()
+	})
 
 	select {
 	case err = <-finished:
@@ -728,9 +723,7 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	}
 
 	// Copy protected flags, protected keys overwrite the user keys
-	for k, v := range protectedFlags {
-		flags[k] = v
-	}
+	maps.Copy(flags, protectedFlags)
 
 	flags["pidfile"] = q.resolveDataPath(flags.GetString("pidfile"))
 	flags["database_path"] = q.resolveDataPath(flags.GetString("database_path"))
@@ -829,8 +822,7 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	iterate := func(key string, fn func(name string)) {
 		if tablesValue, ok := userFlags[key]; ok {
 			if tablesString, ok := tablesValue.(string); ok {
-				tables := strings.Split(tablesString, ",")
-				for _, table := range tables {
+				for table := range strings.SplitSeq(tablesString, ",") {
 					name := strings.TrimSpace(table)
 					if name == "" {
 						continue

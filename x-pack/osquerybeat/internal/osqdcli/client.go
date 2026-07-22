@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"strconv"
 	"sync"
@@ -316,9 +317,7 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 
 		colTypes = make(map[string]string)
 		for _, m := range exres.Response {
-			for k, v := range m {
-				colTypes[k] = v
-			}
+			maps.Copy(colTypes, m)
 		}
 		c.cache.Add(sql, colTypes)
 	}
