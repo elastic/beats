@@ -254,10 +254,15 @@ require (
 	go.opentelemetry.io/collector/service v0.155.0
 	go.opentelemetry.io/otel/sdk/metric v1.44.0
 	go.uber.org/goleak v1.3.0
+	sigs.k8s.io/kind v0.32.0
 )
 
 require (
+	al.essio.dev/pkg/shellescape v1.5.1 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/cenkalti/backoff/v6 v6.0.0 // indirect
+	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
+	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/twmb/franz-go v1.21.3 // indirect
 	go.opentelemetry.io/collector/exporter v1.61.0 // indirect
