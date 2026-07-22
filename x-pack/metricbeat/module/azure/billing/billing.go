@@ -16,6 +16,16 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+const (
+	// defaultUsageLookback is the usage query window when billing_usage_lookback is unset.
+	// It matches the original hardcoded behaviour: query the single previous full UTC day.
+	defaultUsageLookback = 24 * time.Hour
+
+	// defaultForecastWindow is the forecast query window when billing_forecast_window is unset.
+	// It matches the original hardcoded behaviour: 30 days forward from the forecast start date.
+	defaultForecastWindow = 30 * 24 * time.Hour
+)
+
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
 // the MetricSet for each host defined in the module's configuration. After the
@@ -42,9 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
-	if err != nil {
-		return nil, err
-	}
+	applyBillingDefaults(&config)
 	// instantiate monitor client
 	billingClient, err := NewClient(config, base.Logger())
 	if err != nil {
@@ -55,6 +63,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		client:        billingClient,
 		log:           base.Logger().Named("azure billing"),
 	}, nil
+}
+
+// applyBillingDefaults fills in default values for billing-specific duration
+// config fields that were not explicitly set by the user.
+func applyBillingDefaults(cfg *azure.Config) {
+	if cfg.BillingUsageLookback == 0 {
+		cfg.BillingUsageLookback = defaultUsageLookback
+	}
+	if cfg.BillingForecastWindow == 0 {
+		cfg.BillingForecastWindow = defaultForecastWindow
+	}
 }
 
 // TimeIntervalOptions represents the options used to retrieve the billing data.
@@ -76,8 +95,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// reference time used to calculate usage and forecast time intervals.
 	referenceTime := time.Now()
 
-	usageStart, usageEnd := usageIntervalFrom(referenceTime)
-	forecastStart, forecastEnd := forecastIntervalFrom(referenceTime)
+	usageStart, usageEnd := usageIntervalFrom(referenceTime, m.client.Config.BillingUsageLookback)
+	forecastStart, forecastEnd := forecastIntervalFrom(referenceTime, m.client.Config.BillingForecastWindow)
 
 	timeIntervalOptions := TimeIntervalOptions{
 		usageStart:    usageStart,
@@ -110,31 +129,35 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-// usageIntervalFrom returns the start/end times (UTC) of the usage period given the `reference` time.
+// usageIntervalFrom returns the start/end times (UTC) of the usage period given the
+// reference time and a lookback duration.
 //
-// Currently, the usage period is the start/end time (00:00:00->23:59:59 UTC) of the day before the reference time.
+// The usage period ends at start-of-today minus one second (i.e. yesterday 23:59:59 UTC)
+// and starts lookback duration before that.
 //
-// For example, if the reference time is 2007-01-09 09:41:00Z, the usage period is:
+// For example, with reference 2007-01-09 09:41:00Z and a 24h lookback, the usage period is:
 //
 //	2007-01-08 00:00:00Z -> 2007-01-08 23:59:59Z
-func usageIntervalFrom(reference time.Time) (time.Time, time.Time) {
-	beginningOfDay := reference.UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
-	endOfDay := beginningOfDay.Add(time.Hour * 24).Add(time.Second * (-1))
-	return beginningOfDay, endOfDay
+//
+// With a 72h lookback it covers the three previous full days:
+//
+//	2007-01-06 00:00:00Z -> 2007-01-08 23:59:59Z
+func usageIntervalFrom(reference time.Time, lookback time.Duration) (time.Time, time.Time) {
+	startOfToday := reference.UTC().Truncate(24 * time.Hour)
+	return startOfToday.Add(-lookback), startOfToday.Add(-time.Second)
 }
 
-// forecastIntervalFrom returns the start/end times (UTC) of the forecast period, given the `reference` time.
+// forecastIntervalFrom returns the start/end times (UTC) of the forecast period given the
+// reference time and a window duration.
 //
-// Currently, the forecast period is the start/end times (00:00:00->23:59:59 UTC) of the current month relative to the
-// reference time.
+// The forecast period always starts at reference minus 2 days (00:00:00 UTC) and extends
+// forward for the given window duration.
 //
-// For example, if the reference time is 2007-01-09 09:41:00Z, the forecast period is:
-// The forecast data is fetched from current day - 2 and for next 30 days.
+// For example, with reference 2007-01-09 09:41:00Z and a 30-day (720h) window:
 //
-//	2007-01-07T00:00:00Z -> 2007-02-05:59:59Z
-func forecastIntervalFrom(reference time.Time) (time.Time, time.Time) {
-	referenceUTC := reference.UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
-	forecastStartDate := time.Date(referenceUTC.Year(), referenceUTC.Month(), referenceUTC.Day(), 0, 0, 0, 0, time.UTC)
-	forecastEndDate := forecastStartDate.AddDate(0, 0, 0).Add(-1*time.Second).AddDate(0, 0, 30)
-	return forecastStartDate, forecastEndDate
+//	2007-01-07T00:00:00Z -> 2007-02-05T23:59:59Z
+func forecastIntervalFrom(reference time.Time, window time.Duration) (time.Time, time.Time) {
+	forecastStart := reference.UTC().Truncate(24 * time.Hour).Add(-48 * time.Hour)
+	forecastEnd := forecastStart.Add(window).Add(-time.Second)
+	return forecastStart, forecastEnd
 }
