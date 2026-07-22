@@ -63,9 +63,61 @@ service:
 			FilterMessageSnippet(`"message": "test message"`).Len() == 1
 	}, 30*time.Second, 100*time.Millisecond, "Expected debug log with test message not found")
 
-	require.Equal(t, 0,
-		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
-		"all Filebeat global processors must implement RunPdata")
+	require.Empty(t,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").All(),
+		"all Filebeat global processors must implement RunPdata — pdata fast path must be active")
+}
+
+func TestMetricbeatReceiver(t *testing.T) {
+	cfg := `receivers:
+  metricbeatreceiver:
+    metricbeat:
+      max_start_delay: 0s
+      modules:
+        - module: system
+          enabled: true
+          period: 1s
+          metricsets:
+            - cpu
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - metricbeatreceiver
+      processors:
+        - beat
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+	col := New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Skipping metrics logging").Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "Expected metricbeat receiver to start and initialize the metric reporter")
+
+	require.Empty(t,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").All(),
+		"all Metricbeat global processors must implement RunPdata — pdata fast path must be active")
 }
 
 func TestAuditbeatReceiver(t *testing.T) {
@@ -114,9 +166,9 @@ service:
 			FilterMessageSnippet("Skipping metrics logging").Len() > 0
 	}, 30*time.Second, 100*time.Millisecond, "Expected auditbeat receiver to start and initialize the metric reporter")
 
-	require.Equal(t, 0,
-		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
-		"all Auditbeat global processors must implement RunPdata")
+	require.Empty(t,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").All(),
+		"all Auditbeat global processors must implement RunPdata — pdata fast path must be active")
 }
 
 func TestHeartbeatReceiver(t *testing.T) {
@@ -157,8 +209,8 @@ service:
 			FilterMessageSnippet("Skipping metrics logging").Len() > 0
 	}, 30*time.Second, 100*time.Millisecond, "Expected heartbeat receiver to start and initialize the metric reporter")
 
-	require.Equal(t, 0,
-		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
+	require.Empty(t,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").All(),
 		"pdata fast path must not be disabled (heartbeat has no global processors)")
 }
 
@@ -214,9 +266,9 @@ service:
 			FilterMessageSnippet(`"message": "osqtest message"`).Len() == 1
 	}, 30*time.Second, 100*time.Millisecond, "Expected collector to start with osquerybeat receiver registered")
 
-	require.Equal(t, 0,
-		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
-		"all Osquerybeat global processors must implement RunPdata")
+	require.Empty(t,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").All(),
+		"all Osquerybeat global processors must implement RunPdata — pdata fast path must be active")
 }
 
 func TestPacketbeatReceiver(t *testing.T) {
@@ -279,9 +331,9 @@ service:
 			FilterMessageSnippet("Skipping metrics logging").Len() > 0
 	}, 30*time.Second, 100*time.Millisecond, "Expected packetbeat receiver to start and initialize the metric reporter")
 
-	require.Equal(t, 0,
-		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").Len(),
-		"all Packetbeat global processors must implement RunPdata")
+	require.Empty(t,
+		col.ObservedLogs().FilterMessageSnippet("pdata fast path disabled").All(),
+		"all Packetbeat global processors must implement RunPdata — pdata fast path must be active")
 }
 
 func TestNewRespectsTelemetryLogsLevel(t *testing.T) {
