@@ -200,7 +200,7 @@ func TestGenerateHints(t *testing.T) {
 
 		m := heartbeatHints{
 			config: defaultConfig(),
-			logger: logp.L(),
+			logger: logp.L(), //nolint:forbidigo // test helper
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Len(t, cfgs, test.len, test.message)
