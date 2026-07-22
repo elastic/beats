@@ -13,22 +13,23 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix test_cpu KeyError when host.cpu field is absent on macOS
+summary: Fix aws-s3 input silently dropping events when a parser clears the message content
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# impact:
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# action:
+description: >
+  A parser can move the decoded data into the event fields and clear the
+  content, for example an ndjson parser configured without a message_key. When
+  such an object was read through the readFile path (any content-type other than
+  application/json or application/x-ndjson), the input dropped every event with
+  no error logged, because it only published when the message content was
+  non-empty. Events are now published when either the content or the fields are
+  populated.
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: metricbeat
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -36,7 +37,7 @@ component: metricbeat
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-# pr: https://github.com/owner/repo/1234
+pr: https://github.com/elastic/beats/pull/52077
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
