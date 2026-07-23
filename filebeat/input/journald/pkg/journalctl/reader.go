@@ -131,40 +131,46 @@ func maybeAddBootAll(args []string, supportsBootAll bool) []string {
 	return append(args, "--boot", "all")
 }
 
-// journalctlSupportsBootAll reports whether `--boot all` should be used.
-// On any detection failure, it safely falls back to false.
-func journalctlSupportsBootAll(logger *logp.Logger, factory JctlFactory) bool {
+// Minimum systemd/journalctl versions required by optional CLI capabilities.
+const (
+	// `--boot all` was introduced in systemd v242.
+	minVersionBootAll = 242
+	// `--facility` was introduced in systemd v245.
+	minVersionFacility = 245
+)
+
+// journalctlVersion returns the systemd version of the installed journalctl
+// binary by parsing the first line of `journalctl --version`.
+// On any detection failure it returns 0 and a non-nil error, callers must
+// treat this as a version that supports none of the optional capabilities.
+func journalctlVersion(logger *logp.Logger, factory JctlFactory) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	jctl, err := factory(ctx, logger, "--version")
 	if err != nil {
-		logger.Warnf("cannot call journalctl to get its version: %s. Omitting '--boot all'", err)
-		return false
+		return 0, fmt.Errorf("cannot call journalctl to get its version: %w", err)
 	}
 
 	defer jctl.Kill() //nolint:errcheck // there is nothing we can do with this error
 
 	out, err := jctl.Next(ctx)
 	if err != nil {
-		logger.Warnf("cannot read journalctl output: %s", err)
-		return false
+		return 0, fmt.Errorf("cannot read journalctl output: %w", err)
 	}
 	// first line: "systemd 239 (239-82.el8_10.2)"
 	firstLine := strings.SplitN(string(out), "\n", 2)[0]
 	fields := strings.Fields(firstLine)
 	if len(fields) < 2 {
-		logger.Warnf("journalctl version invalid format: %q", strings.TrimSpace(string(out)))
-		return false
+		return 0, fmt.Errorf("journalctl version invalid format: %q", strings.TrimSpace(string(out)))
 	}
 
 	version, err := strconv.Atoi(fields[1])
 	if err != nil {
-		logger.Warnf("cannot convert journalctl version to int: %s", err)
-		return false
+		return 0, fmt.Errorf("cannot convert journalctl version to int: %w", err)
 	}
 
 	logger.Debugf("journalctl version: %d", version)
-	return version >= 242
+	return version, nil
 }
 
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
@@ -269,11 +275,26 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
+	version, err := journalctlVersion(logger, newJctl)
+	if err != nil {
+		logger.Warnf("cannot detect journalctl version, assuming an old version: %s", err)
+	}
+	supportsBootAll := version >= minVersionBootAll
+	supportsFacility := version >= minVersionFacility
+
+	if len(facilities) > 0 && !supportsFacility {
+		logger.Warnf("journalctl does not support '--facility' (it requires systemd >= %d), using SYSLOG_FACILITY matches instead", minVersionFacility)
+	}
 	for _, facility := range facilities {
-		args = append(args, "--facility", fmt.Sprintf("%d", facility))
+		if supportsFacility {
+			args = append(args, "--facility", fmt.Sprintf("%d", facility))
+		} else {
+			// Matches on the same field are ORed by journalctl, which is
+			// the same semantics as repeated `--facility` flags.
+			args = append(args, fmt.Sprintf("SYSLOG_FACILITY=%d", facility))
+		}
 	}
 
-	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
 	extraArgs := handleSeekAndCursor(mode, since, cursor, supportsBootAll)
 
 	r := Reader{
