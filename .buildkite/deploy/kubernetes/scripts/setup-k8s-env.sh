@@ -19,7 +19,9 @@ asdf install kind "$ASDF_KIND_VERSION"
 # Used by metricbeat integ tests that create their own cluster via mage.
 if [[ "${SKIP_KIND_CLUSTER:-}" == "true" ]]; then
   echo "~~~ Skipping kind cluster setup (SKIP_KIND_CLUSTER=true)"
-else
+ exit 0 # or return
+fi
+
   echo "~~~ Setting up kind"
   max_retries=3
   timeout=5
