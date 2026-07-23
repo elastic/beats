@@ -20,12 +20,16 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
+	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -699,6 +703,95 @@ func TestConsumeContract(t *testing.T) {
 		Generator:     gen,
 		GenerateCount: logsPerTest,
 	})
+}
+
+// TestShutdownDrainTimeout is a regression test for the filebeat receiver
+// shutdown drain duration.
+//
+// The slow consumer blocks until the drain context is cancelled, so the
+// elapsed shutdown time equals the drain timeout. We only assert a lower bound
+// (>= receiverPublisherCloseTimeout - 500ms) rather than an upper bound, so
+// the test never flakes due to CI load while still catching any regression that
+// reduces the drain timeout below the expected value.
+func TestShutdownDrainTimeout(t *testing.T) {
+	defer oteltest.VerifyNoLeaks(t)
+
+	tmpDir := t.TempDir()
+	logFile := filepath.Join(tmpDir, "input.log")
+	for range 20 {
+		writeFile(t, logFile, `{"message": "drain timeout test"}`)
+	}
+
+	consumerCalledCh := make(chan struct{})
+	var consumerCalledOnce sync.Once
+	slowConsumer, err := consumer.NewLogs(func(ctx context.Context, _ plog.Logs) error {
+		consumerCalledOnce.Do(func() { close(consumerCalledCh) })
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(30 * time.Second):
+			return nil
+		}
+	})
+	require.NoError(t, err)
+
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":                 "filestream",
+						"enabled":              true,
+						"id":                   "drain-timeout-test",
+						"paths":                []string{logFile},
+						"file_identity.native": map[string]any{},
+						"prospector": map[string]any{
+							"scanner": map[string]any{
+								"check_interval":      "50ms",
+								"fingerprint.enabled": false,
+							},
+						},
+					},
+				},
+			},
+			"path.home": tmpDir,
+			"path.logs": tmpDir,
+			"logging":   map[string]any{"level": "info"},
+		},
+	}
+
+	factory := NewFactoryWithSettings(Settings{Home: tmpDir})
+	var settings receiver.Settings
+	settings.ID = component.NewIDWithName(factory.Type(), "r1")
+	settings.Logger = zap.NewNop()
+
+	r, err := factory.CreateLogs(t.Context(), settings, cfg, slowConsumer)
+	require.NoError(t, err)
+	require.NoError(t, r.Start(t.Context(), componenttest.NewNopHost()))
+
+	// Guard: wait until events are in flight before triggering shutdown.
+	// Without this, shutdown starts before any batches exist and the drain
+	// completes trivially fast, making the test a no-op.
+	select {
+	case <-consumerCalledCh:
+	case <-time.After(30 * time.Second):
+		t.Fatal("ConsumeLogs was never called; events never reached the pipeline")
+	}
+
+	start := time.Now()
+	require.NoError(t, r.Shutdown(t.Context()))
+	elapsed := time.Since(start)
+
+	// Only a lower bound: CI load can make wall-clock time arbitrarily large,
+	// so an upper bound would cause spurious failures on loaded runners.
+	const (
+		receiverPublisherCloseTimeout = 5 * time.Second
+		minExpected                   = receiverPublisherCloseTimeout - 500*time.Millisecond
+	)
+	assert.GreaterOrEqual(t, elapsed, minExpected,
+		"shutdown completed in %v, expected >= %v; was shutdown_timeout injection removed?",
+		elapsed, minExpected)
 }
 
 func TestReceiverHook(t *testing.T) {
