@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.26.4
+go 1.26.5
 
 require (
 	cloud.google.com/go/bigquery v1.75.0
@@ -175,7 +175,7 @@ require (
 	github.com/elastic/elastic-agent-system-metrics v0.14.4
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
-	github.com/elastic/go-quark v0.3.0
+	github.com/elastic/go-quark v0.6.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/mito v1.25.1
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
