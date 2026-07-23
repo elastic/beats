@@ -63,7 +63,7 @@ func TestEventWithNonStringData(t *testing.T) {
 				KillFunc: func() error { return nil },
 			}
 			r := Reader{
-				logger: logp.L(),
+				logger: logp.NewNopLogger(),
 				jctl:   &mock,
 			}
 
