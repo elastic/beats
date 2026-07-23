@@ -55,6 +55,7 @@ steps:
       - label: ":ubuntu: x-pack/otel: Build OTel Collector Distribution"
         key: "x-pack-otel-mandatory-build-distro"
         command: |
+<<<<<<< HEAD
           go install go.opentelemetry.io/collector/cmd/builder@v0.155.0
           mv $(go env GOPATH)/bin/builder $(go env GOPATH)/bin/ocb
           cd x-pack/otel
@@ -65,6 +66,9 @@ steps:
           cat /tmp/collector.log
           echo "---"
           grep -q "Starting beats-otel-collector" /tmp/collector.log
+=======
+          make -C x-pack/otel build-otel-distro-ci
+>>>>>>> 5f5ba2288 (ci: move Build OTel Collector Distribution to a makefile goal (#52041))
         retry:
           automatic:
             - limit: 1
