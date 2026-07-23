@@ -287,9 +287,9 @@ func TestS3Poller(t *testing.T) {
 		backupDone := make(chan struct{})
 
 		mockAPI.EXPECT().
-			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("")).
 			Times(1).
-			DoAndReturn(func(_, _, _ string) s3Pager {
+			DoAndReturn(func(_, _ string) s3Pager {
 				return mockPager
 			})
 
@@ -364,8 +364,8 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, "", cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
-		require.NoError(t, err, "registry creation must succeed")
+		states, err := newStates(nil, store, "")
+		require.NoError(t, err, "states creation must succeed")
 
 		poller := &s3PollerInput{
 			log:             log,
@@ -373,11 +373,10 @@ func TestS3Poller(t *testing.T) {
 			s3:              mockAPI,
 			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
-			registry:        registry,
+			states:          states,
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
-			strategy:        newPollingStrategy(cfg.LexicographicalOrdering, log),
 			status:          &statusReporterHelperMock{},
 		}
 
