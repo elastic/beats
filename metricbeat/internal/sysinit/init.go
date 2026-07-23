@@ -25,11 +25,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var hostfsCLI = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")
 
-var once sync.Once
+var hostFSMu sync.Mutex
 
 // A wrapper library that allows us to deal with the more complex HostFS setter logic required for legacy metricbeat code.
 // This will serve as a generic init function for either the system or linux module.
@@ -56,38 +57,39 @@ func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
 		return fleetInit(base, hostfs, userSet)
 	}
-	return metricbeatInit(base, hostfs)
+	return metricbeatInit(base, hostfs, userSet)
+}
+
+// applyHostFS applies the resolved hostfs path to process-global state.
+// It must be called on every module creation, including when hostfs is unset
+// (resolved path "/"), so reloads clear a previously configured HostFS.
+func applyHostFS(path string, logger *logp.Logger) {
+	hostFSMu.Lock()
+	defer hostFSMu.Unlock()
+	InitModule(path, logger)
 }
 
 func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module, error) {
-	once.Do(func() {
-		InitModule(modulepath, base.Logger)
-	})
-
-	// The multiple invocations here might seem buggy, but we're dealing with a case were agent's config schemea (local, per-datastream) must mesh with the global HostFS scheme used by some libraries
-	// Strictly speaking, we can't guarantee that agent will send consistent HostFS config values across all datastreams, as it treats a global value as per-datastream.
-	if moduleSet {
-		InitModule(modulepath, base.Logger)
-	}
+	// Always re-apply HostFS, including the default "/", so removing hostfs on
+	// reload resets process-global HOST_* env vars and gosigar.Procd.
+	// Agent treats HostFS as per-datastream while libraries use process globals;
+	// last apply wins if values differ across streams.
+	applyHostFS(modulepath, base.Logger)
 
 	return &Module{BaseModule: base, HostFS: modulepath, UserSetHostFS: moduleSet}, nil
 }
 
 // Deal with the legacy configs available to metricbeat
-func metricbeatInit(base mb.BaseModule, modulePath string) (mb.Module, error) {
-	var hostfs = modulePath
-	var userSet bool
+func metricbeatInit(base mb.BaseModule, modulePath string, userSet bool) (mb.Module, error) {
+	hostfs := modulePath
 	// allow the CLI to override other settings
 	if hostfsCLI != nil && *hostfsCLI != "" {
 		hostfs = *hostfsCLI
 		userSet = true
 	}
 
-	once.Do(func() {
-		InitModule(hostfs, base.Logger)
-	})
+	applyHostFS(hostfs, base.Logger)
 	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
-
 }
 
 // A user can supply either `system.hostfs` or `hostfs`.

@@ -1,0 +1,10 @@
+kind: bug-fix
+summary: Fix hostfs not resetting process globals when unset on system metrics reload
+description: >
+  When hostfs was configured under system/metrics and later removed on reload,
+  HOST_PROC/HOST_SYS/HOST_ETC and gosigar.Procd kept the previous values because
+  InitModule was only called when hostfs was set. HostFS is now re-applied on
+  every module creation, including the default path when unset.
+component: metricbeat
+issues:
+  - https://github.com/elastic/beats/issues/51954
