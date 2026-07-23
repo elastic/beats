@@ -31,6 +31,12 @@ func initCache(previousCache map[string]mapstr.M, previousSeconds int64) {
 func getNodeStatsForNode(nodeIndex int64) mapstr.M {
 	return mapstr.M{
 		"indices": mapstr.M{
+			"docs": mapstr.M{
+				"count": 100 + nodeIndex,
+			},
+			"store": mapstr.M{
+				"size_in_bytes": 200 + nodeIndex,
+			},
 			"indexing": mapstr.M{
 				"index_failed":         10 + nodeIndex,
 				"index_total":          20 + nodeIndex,
@@ -43,6 +49,10 @@ func getNodeStatsForNode(nodeIndex int64) mapstr.M {
 			"search": mapstr.M{
 				"query_time_in_millis": 70 + nodeIndex,
 				"query_total":          40 + nodeIndex,
+			},
+			"bulk": mapstr.M{
+				"total_size_in_bytes": 300 + nodeIndex,
+				"total_operations":    400 + nodeIndex,
 			},
 		},
 	}
@@ -68,6 +78,10 @@ func TestEnrichNodeStatsWithoutCache(t *testing.T) {
 	require.Nil(t, nodeStatsNode1["index_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["merge_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["search_rate_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_docs_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_operations_per_second"])
 	require.Nil(t, nodeStatsNode1["index_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["merge_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["search_latency_in_millis"])
@@ -87,6 +101,10 @@ func TestEnrichNodeStatsWithoutCachedValues(t *testing.T) {
 	require.Nil(t, nodeStatsNode1["index_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["merge_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["search_rate_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_docs_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_operations_per_second"])
 	require.Nil(t, nodeStatsNode1["index_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["merge_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["search_latency_in_millis"])
@@ -106,6 +124,10 @@ func TestEnrichNodeStatsWithCachedValues(t *testing.T) {
 		nodeStats["indices.merges.total_time_in_millis"] = getValue(&nodeStats, "indices.merges.total_time_in_millis") + 40
 		nodeStats["indices.search.query_total"] = getValue(&nodeStats, "indices.search.query_total") + 60
 		nodeStats["indices.search.query_time_in_millis"] = getValue(&nodeStats, "indices.search.query_time_in_millis") + 120
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") + 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") + 20
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
 
 		nodeStatsMap[key] = nodeStats
 	}
@@ -124,6 +146,10 @@ func TestEnrichNodeStatsWithCachedValues(t *testing.T) {
 		require.EqualValues(t, 3, nodeStats["index_failed_rate_per_second"])
 		require.EqualValues(t, 4, nodeStats["merge_rate_per_second"])
 		require.EqualValues(t, 6, nodeStats["search_rate_per_second"])
+		require.EqualValues(t, 1, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 2, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
 		// latencies
 		require.EqualValues(t, 0.5, nodeStats["index_latency_in_millis"])
 		require.EqualValues(t, 1, nodeStats["merge_latency_in_millis"])
@@ -169,6 +195,12 @@ func TestEnrichNodeStatsSearchLatencyClampsToInterval(t *testing.T) {
 			"index latency below interval should not be clamped")
 		require.InDelta(t, 10, nodeStats["merge_latency_in_millis"], 0.01,
 			"merge latency below interval should not be clamped")
+
+		// No increments for ingest/bulk counters → rates are zero
+		require.EqualValues(t, 0, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 0, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_operations_per_second"])
 	}
 }
 
@@ -192,6 +224,10 @@ func TestEnrichNodeStatsWithCachedValuesWithNoChange(t *testing.T) {
 		require.EqualValues(t, 0, nodeStats["index_failed_rate_per_second"])
 		require.EqualValues(t, 0, nodeStats["merge_rate_per_second"])
 		require.EqualValues(t, 0, nodeStats["search_rate_per_second"])
+		require.EqualValues(t, 0, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 0, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_operations_per_second"])
 		// latencies
 		require.EqualValues(t, 0, nodeStats["index_latency_in_millis"])
 		require.EqualValues(t, 0, nodeStats["merge_latency_in_millis"])
@@ -221,6 +257,10 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 		nodeStats["indices.merges.total_time_in_millis"] = getValue(&nodeStats, "indices.merges.total_time_in_millis") + 40
 		nodeStats["indices.search.query_total"] = getValue(&nodeStats, "indices.search.query_total") + 60
 		nodeStats["indices.search.query_time_in_millis"] = getValue(&nodeStats, "indices.search.query_time_in_millis") + 120
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") + 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") + 20
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
 
 		nodeStatsMap[key] = nodeStats
 	}
@@ -244,6 +284,10 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 		require.EqualValues(t, 3, nodeStats["index_failed_rate_per_second"])
 		require.EqualValues(t, 4, nodeStats["merge_rate_per_second"])
 		require.EqualValues(t, 6, nodeStats["search_rate_per_second"])
+		require.EqualValues(t, 1, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 2, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
 
 		// latencies
 		if key == "node2" {
@@ -270,6 +314,10 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 		nodeStats["indices.merges.total_time_in_millis"] = getValue(&nodeStats, "indices.merges.total_time_in_millis") + 40
 		nodeStats["indices.search.query_total"] = getValue(&nodeStats, "indices.search.query_total") + 60
 		nodeStats["indices.search.query_time_in_millis"] = getValue(&nodeStats, "indices.search.query_time_in_millis") + 120
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") + 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") + 20
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
 
 		nodeStatsMap[key] = nodeStats
 	}
@@ -295,6 +343,10 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			require.EqualValues(t, 3, nodeStats["index_failed_rate_per_second"])
 			require.EqualValues(t, 4, nodeStats["merge_rate_per_second"])
 			require.EqualValues(t, 6, nodeStats["search_rate_per_second"])
+			require.EqualValues(t, 1, nodeStats["ingest_docs_per_second"])
+			require.EqualValues(t, 2, nodeStats["ingest_bytes_per_second"])
+			require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
+			require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
 			// latencies
 			require.EqualValues(t, 0.5, nodeStats["index_latency_in_millis"])
 			require.EqualValues(t, 1, nodeStats["merge_latency_in_millis"])
@@ -305,6 +357,10 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			require.Nil(t, nodeStats["index_rate_per_second"])
 			require.Nil(t, nodeStats["merge_rate_per_second"])
 			require.Nil(t, nodeStats["search_rate_per_second"])
+			require.Nil(t, nodeStats["ingest_docs_per_second"])
+			require.Nil(t, nodeStats["ingest_bytes_per_second"])
+			require.Nil(t, nodeStats["bulk_bytes_per_second"])
+			require.Nil(t, nodeStats["bulk_operations_per_second"])
 			require.Nil(t, nodeStats["index_latency_in_millis"])
 			require.Nil(t, nodeStats["merge_latency_in_millis"])
 			require.Nil(t, nodeStats["search_latency_in_millis"])
