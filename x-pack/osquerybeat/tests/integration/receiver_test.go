@@ -39,6 +39,49 @@ import (
 // build tag and rely on ensureOsquerydAvailable (defined in otel_test.go) to skip
 // when osqueryd is absent.
 
+// nopActionExtension implements component.Component and the otelmanager.ActionExtension
+// interface (RegisterActionHandler/UnregisterActionHandler) with no-op handlers.
+// BeatReceiver.Start type-asserts each host extension against ActionExtension; when
+// it finds one, it calls OtelManager.SetActionExtension so that subsequent calls to
+// OtelManager.RegisterAction (e.g. osquerybeat's "osquery" action) succeed instead
+// of logging "no registered action extension" and returning.
+type nopActionExtension struct{}
+
+func (nopActionExtension) Start(context.Context, component.Host) error { return nil }
+func (nopActionExtension) Shutdown(context.Context) error              { return nil }
+func (nopActionExtension) RegisterActionHandler(_ string, _ func(context.Context, map[string]any) (map[string]any, error)) error {
+	return nil
+}
+func (nopActionExtension) UnregisterActionHandler(_ string) {}
+
+// actionExtensionHost wraps a component.Host and overrides GetExtensions to expose a
+// nopActionExtension under the "elastic_diagnostics" ID, satisfying the ActionExtension
+// wiring in BeatReceiver.Start without changing any other host behaviour.
+type actionExtensionHost struct {
+	component.Host
+}
+
+func (h actionExtensionHost) GetExtensions() map[component.ID]component.Component {
+	return map[component.ID]component.Component{
+		component.MustNewID("elastic_diagnostics"): nopActionExtension{},
+	}
+}
+
+// mockActionHost combines oteltest.MockHost (status-event tracking + Report) with the
+// action-extension wiring required by BeatReceiver.Start. TestReceiverStatus needs both:
+// it checks the final componentstatus.StatusOK event via GetEvent, and it needs the
+// receiver to initialise the OtelManager's action-dispatch path so that osquerybeat's
+// "osquery" action registration succeeds.
+type mockActionHost struct {
+	*oteltest.MockHost
+}
+
+func (h *mockActionHost) GetExtensions() map[component.ID]component.Component {
+	return map[component.ID]component.Component{
+		component.MustNewID("elastic_diagnostics"): nopActionExtension{},
+	}
+}
+
 // makeOsqConfig returns a receiver Config for integration tests.
 // pathHome must be unique per receiver to isolate osqueryd state.
 // http.port is set to 0 so the OS assigns an ephemeral port; read it back
@@ -176,7 +219,7 @@ func TestNewReceiver(t *testing.T) {
 		factory, "r1",
 		makeOsqConfig(t.TempDir()),
 		observedCore,
-		componenttest.NewNopHost(),
+		actionExtensionHost{componenttest.NewNopHost()},
 	)
 
 	t.Cleanup(func() {
@@ -231,7 +274,7 @@ func TestMultipleReceivers(t *testing.T) {
 	// Shared core: all log lines from both receivers land in one ObservedLogs
 	// so we can verify per-receiver isolation by filtering on otelcol.component.id.
 	sharedCore, zapLogs := observer.New(zapcore.DebugLevel)
-	host := componenttest.NewNopHost()
+	host := actionExtensionHost{componenttest.NewNopHost()}
 
 	r1, logs1, mu1 := startReceiver(t, factory, "r1", makeOsqConfig(t.TempDir()), sharedCore, host)
 	r2, logs2, mu2 := startReceiver(t, factory, "r2", makeOsqConfig(t.TempDir()), sharedCore, host)
@@ -306,7 +349,7 @@ func TestReceiverStatus(t *testing.T) {
 
 	factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: t.TempDir()})
 	observedCore, zapLogs := observer.New(zapcore.DebugLevel)
-	host := &oteltest.MockHost{}
+	host := &mockActionHost{MockHost: &oteltest.MockHost{}}
 
 	rec, _, _ := startReceiver(t, factory, "r1", makeOsqConfig(t.TempDir()), observedCore, host)
 
