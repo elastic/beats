@@ -218,6 +218,10 @@ func (inp *journald) Run(
 		return wrappedErr
 	}
 
+	// Let the reader report Degraded when journalctl gets stuck in a
+	// crash/restart loop and Running when it recovers.
+	reader.SetStatusReporter(ctx)
+
 	defer reader.Close()
 
 	parser := inp.Parsers.Create(
