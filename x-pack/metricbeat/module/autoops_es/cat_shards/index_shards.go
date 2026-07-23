@@ -16,24 +16,24 @@ type Shard struct {
 	state     string
 
 	// optional; set if state != "UNASSIGNED"
-	docs                        *int64
-	store                       *int64
-	segments_count              *int64
-	search_query_total          *int64
-	search_query_time           *int64
-	indexing_index_total        *int64
-	indexing_index_time         *int64
-	indexing_index_failed       *int64
-	merges_total                *int64
-	merges_total_time           *int64
-	get_missing_time            *int64
-	get_missing_total           *int64
-	bulk_total_size_in_bytes    *int64
-	bulk_total_operations       *int64
+	docs                         *int64
+	store                        *int64
+	segments_count               *int64
+	search_query_total           *int64
+	search_query_time            *int64
+	indexing_index_total         *int64
+	indexing_index_time          *int64
+	indexing_index_failed        *int64
+	merges_total                 *int64
+	merges_total_time            *int64
+	get_missing_time             *int64
+	get_missing_total            *int64
+	bulk_total_size_in_bytes     *int64
+	bulk_total_operations        *int64
 	total_data_set_size_in_bytes *int64
-	dense_vector_count          *int64
-	unassigned_reason           *string
-	unassigned_details          *string
+	dense_vector_count           *int64
+	unassigned_reason            *string
+	unassigned_details           *string
 }
 
 type AssignedShard struct {

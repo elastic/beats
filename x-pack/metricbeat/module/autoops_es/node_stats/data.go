@@ -227,7 +227,7 @@ type ClusterStateMasterNode struct {
 }
 
 type NodesStats struct {
-	Nodes map[string]map[string]interface{} `json:"nodes"`
+	Nodes map[string]map[string]any `json:"nodes"`
 }
 
 // Get the elected master node's ID

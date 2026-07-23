@@ -879,8 +879,8 @@ func TestEnrichNodeIndexShardsIngestAndBulkRatesWithCachedValues(t *testing.T) {
 	nodeIndexShardsMap := getNodeIndexShardsWithIngestBulk()
 
 	for key, nodeIndexShards := range nodeIndexShardsMap {
-		*nodeIndexShards.DocsCount += 10           // delta=10 → 10/10 = 1/s
-		*nodeIndexShards.SizeInBytes += 20         // delta=20 → 20/10 = 2/s
+		*nodeIndexShards.DocsCount += 10             // delta=10 → 10/10 = 1/s
+		*nodeIndexShards.SizeInBytes += 20           // delta=20 → 20/10 = 2/s
 		*nodeIndexShards.BulkTotalSizeInBytes += 100 // delta=100 → 100/10 = 10/s
 		*nodeIndexShards.BulkTotalOperations += 50   // delta=50 → 50/10 = 5/s
 

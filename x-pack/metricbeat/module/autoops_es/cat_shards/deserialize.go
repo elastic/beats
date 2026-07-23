@@ -64,7 +64,7 @@ func deserializeShard(jsonShard JSONShard) Shard {
 	shard.search_query_total = toInt64(jsonShard.SearchQueryTotal)
 	shard.bulk_total_size_in_bytes = toInt64(jsonShard.BulkTotalSizeInBytes)
 	shard.bulk_total_operations = toInt64(jsonShard.BulkTotalOperations)
-	shard.total_data_set_size_in_bytes = toInt64(jsonShard.DatasetSize)
+	shard.total_data_set_size_in_bytes = toInt64(jsonShard.TotalDataSetSizeInBytes)
 	shard.dense_vector_count = toInt64(jsonShard.DenseVectorCount)
 
 	return shard
