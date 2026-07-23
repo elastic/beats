@@ -25,8 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -616,7 +616,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -635,7 +635,7 @@ func TestGenerateHints(t *testing.T) {
 					"close_timeout": "true",
 					"processors": []any{
 						map[string]any{
-							"dissect": map[string]any{
+							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
@@ -665,7 +665,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -690,7 +690,7 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 						map[string]any{
-							"dissect": map[string]any{
+							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
@@ -1194,7 +1194,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -1213,7 +1213,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 				"close_timeout": "true",
 				"processors": []any{
 					map[string]any{
-						"dissect": map[string]any{
+						"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 							"tokenizer": "%{key1} %{key2}",
 						},
 					},
