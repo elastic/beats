@@ -41,6 +41,7 @@ import (
 )
 
 type processor struct {
+<<<<<<< HEAD
 	wg              sync.WaitGroup
 	publisher       *publish.TransactionPublisher
 	flows           *flows.Flows
@@ -56,6 +57,26 @@ func newProcessor(shutdownTimeout time.Duration, publisher *publish.TransactionP
 		sniffer:         sniffer,
 		err:             err,
 		shutdownTimeout: shutdownTimeout,
+=======
+	wg             sync.WaitGroup
+	publisher      *publish.TransactionPublisher
+	flows          *flows.Flows
+	sniffer        *sniffer.Sniffer
+	err            chan error
+	statusMu       sync.RWMutex
+	status         status.StatusReporter
+	publishTimeout time.Duration
+}
+
+func newProcessor(publishTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error, status status.StatusReporter) *processor {
+	return &processor{
+		publisher:      publisher,
+		flows:          flows,
+		sniffer:        sniffer,
+		err:            err,
+		status:         status,
+		publishTimeout: publishTimeout,
+>>>>>>> 663f45459 ([beatreceiver][packetbeat] Delegate shutdown_timeout logic to libbeat (#52005))
 	}
 }
 
@@ -68,7 +89,7 @@ func (p *processor) Start() {
 		p.flows.Start()
 	}
 	p.wg.Add(1)
-	go func() {
+	p.wg.Go(func() {
 		defer p.wg.Done()
 
 		err := p.sniffer.Run()
@@ -77,7 +98,7 @@ func (p *processor) Start() {
 			return
 		}
 		p.err <- nil
-	}()
+	})
 }
 
 func (p *processor) Stop() {
@@ -86,11 +107,13 @@ func (p *processor) Stop() {
 		p.flows.Stop()
 	}
 	p.wg.Wait()
-	// wait for shutdownTimeout to let the publisher flush
+
+	// wait for publish timeout to let the publisher flush
 	// whatever pending events
-	if p.shutdownTimeout > 0 {
-		time.Sleep(p.shutdownTimeout)
+	if p.publishTimeout > 0 {
+		time.Sleep(p.publishTimeout)
 	}
+
 	p.publisher.Stop()
 }
 
@@ -111,6 +134,22 @@ func newProcessorFactory(name string, err chan error, beat *beat.Beat, configura
 	}
 }
 
+<<<<<<< HEAD
+=======
+// / CreateWithReporter functions the same as Create, but also accepts a StatusReporter.
+func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, cfg *conf.C, statusReporter status.StatusReporter) (cfgfile.Runner, error) {
+	if statusReporter == nil {
+		statusReporter = noopReporter{}
+	}
+	statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
+	publishTimeout, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, statusReporter)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
+	}
+	return newProcessor(publishTimeout, publisher, flows, sniffer, errChan, statusReporter), nil
+}
+
+>>>>>>> 663f45459 ([beatreceiver][packetbeat] Delegate shutdown_timeout logic to libbeat (#52005))
 // Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
 func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	config, err := p.configurator(cfg)
@@ -174,7 +213,11 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		return nil, err
 	}
 
+<<<<<<< HEAD
 	return newProcessor(config.ShutdownTimeout, publisher, flows, sniffer, p.err), nil
+=======
+	return config.PublishTimeout, publisher, flows, sniffer, p.err, nil
+>>>>>>> 663f45459 ([beatreceiver][packetbeat] Delegate shutdown_timeout logic to libbeat (#52005))
 }
 
 // setupFlows returns a *flows.Flows that will publish to the provided pipeline,
@@ -279,7 +322,7 @@ func configID(config *conf.C) (string, error) {
 		return tmp.ID, nil
 	}
 
-	var h map[string]interface{}
+	var h map[string]any
 	_ = config.Unpack(&h)
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
