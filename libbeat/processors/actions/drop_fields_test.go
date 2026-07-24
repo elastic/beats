@@ -20,7 +20,10 @@ package actions
 import (
 	"testing"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	config2 "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
@@ -46,10 +49,22 @@ func TestDropFieldRun(t *testing.T) {
 			Fields: []string{"field"},
 		}
 
+		inputFields := event.Fields.Clone()
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
 		assert.Equal(t, mapstr.M{}, newEvent.Fields)
 		assert.Equal(t, event.Meta, newEvent.Meta)
+
+		// RunPdata parity: same input must produce the same result.
+		body := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(body, inputFields))
+		drop, err := p.RunPdata(body)
+		require.NoError(t, err)
+		assert.False(t, drop)
+		legacyNorm := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(legacyNorm, newEvent.Fields))
+		assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+			"Run and RunPdata must produce identical output")
 	})
 
 	t.Run("Do not drop mandatory fields", func(t *testing.T) {
@@ -73,10 +88,28 @@ func TestDropFieldRun(t *testing.T) {
 			Fields: []string{"@metadata.meta_field"},
 		}
 
+		inputMeta := event.Meta.Clone()
+		inputFields := event.Fields.Clone()
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
 		assert.Equal(t, mapstr.M{}, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
+
+		// RunPdata parity: @metadata is a nested map in the pdata body.
+		body := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(body, inputFields))
+		require.NoError(t, otelmap.FromMapstr(body.PutEmptyMap("@metadata"), inputMeta))
+		drop, err := p.RunPdata(body)
+		require.NoError(t, err)
+		assert.False(t, drop)
+		expectedFields := newEvent.Fields.Clone()
+		if len(inputMeta) > 0 {
+			expectedFields["@metadata"] = newEvent.Meta
+		}
+		legacyNorm := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(legacyNorm, expectedFields))
+		assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+			"Run and RunPdata must produce identical output")
 	})
 
 	t.Run("supports a regexp field", func(t *testing.T) {
@@ -102,6 +135,7 @@ func TestDropFieldRun(t *testing.T) {
 			Fields:       []string{},
 		}
 
+		inputFields := event.Fields.Clone()
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
 		assert.Equal(t, mapstr.M{
@@ -109,6 +143,17 @@ func TestDropFieldRun(t *testing.T) {
 				"subfield_1": "sf_1_value",
 			},
 		}, newEvent.Fields)
+
+		// RunPdata parity.
+		body := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(body, inputFields))
+		drop, err := p.RunPdata(body)
+		require.NoError(t, err)
+		assert.False(t, drop)
+		legacyNorm := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(legacyNorm, newEvent.Fields))
+		assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+			"Run and RunPdata must produce identical output")
 	})
 }
 
