@@ -62,7 +62,7 @@ func TestEventWithNonStringData(t *testing.T) {
 				KillFunc: func() error { return nil },
 			}
 			r := Reader{
-				logger: logp.NewNopLogger(),
+				logger: logptest.NewTestingLogger(t, ""),
 				jctl:   &mock,
 			}
 
@@ -326,7 +326,7 @@ func TestFacilityArgs(t *testing.T) {
 			}
 
 			r, err := New(
-				logp.NewNopLogger(),
+				logptest.NewTestingLogger(t, ""),
 				t.Context(),
 				nil,
 				nil,
