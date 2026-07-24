@@ -4,6 +4,20 @@ notify:
         - "#ingest-notifications"
       message: "<!subteam^S01LS4S14FP|agent-team> Version bump to ${NEW_VERSION} — ${BUILDKITE_BUILD_URL}"
     if: (build.branch == 'main' || build.branch =~ /^[0-9]+\.[0-9x]+\$/) && (build.state == 'passed' || build.state == 'failed')
+  - slack:
+      channels:
+        - "#ingest-notifications"
+      message: |
+        <!subteam^S01LS4S14FP|agent-team>
+        🚦 Pipeline waiting for approval 🚦
+        Repo: `${REPO}`
+
+        Ready to fetch DRA artifacts - please unblock when ready.
+        New version: `${NEW_VERSION}`
+        Branch: `${BRANCH}`
+        Workflow: `${WORKFLOW}`
+        ${BUILDKITE_BUILD_URL}
+    if: build.state == "blocked"
 
 steps:
   # Phase 3: trigger ingest-dev release automation for this repository only.
@@ -45,11 +59,23 @@ steps:
         REVIEWERS: "elastic/elastic-agent-release"
         DEV_ISSUE_URL: "https://github.com/elastic/dev/issues/0"
 
-  - label: "Fetch DRA Artifacts"
-    key: fetch-dra-artifacts
+  - block: "Ready to fetch for DRA artifacts?"
+    prompt: |
+      Unblock when your team is ready to proceed.
+
+      Trigger parameters:
+      - NEW_VERSION: ${NEW_VERSION}
+      - BRANCH: ${BRANCH}
+      - WORKFLOW: ${WORKFLOW}
+    key: block-get-dra-artifacts
+    blocked_state: running
     depends_on:
       - bump-version-minor-major
       - bump-version-patch
+
+  - label: "Fetch DRA Artifacts"
+    key: fetch-dra-artifacts
+    depends_on: block-get-dra-artifacts
     agents:
       image: docker.elastic.co/release-eng/wolfi-build-essential-release-eng:latest
       cpu: 250m
