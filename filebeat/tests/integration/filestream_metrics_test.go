@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -50,12 +51,34 @@ func TestFilestreamScannerMetrics(t *testing.T) {
 	oldTime := time.Now().Add(-2 * time.Hour)
 	require.NoError(t, os.Chtimes(oldLog, oldTime, oldTime), "failed to age old log")
 
+	paths := []string{filepath.Join(tempDir, "*.log")}
+
+	// Where filesystem permissions actually block reads (not Windows, not root),
+	// add a literal path into an unreadable directory so the scan hits an
+	// observation error and reports scan_errors. It sits under its own directory
+	// (not matched by the *.log glob), so the other counts are unaffected.
+	expectScanErrors := int64(0)
+	if runtime.GOOS != "windows" && os.Geteuid() != 0 {
+		blockedDir := filepath.Join(tempDir, "blocked")
+		require.NoError(t, os.MkdirAll(blockedDir, 0o770), "failed to create blocked dir")
+		require.NoError(t, os.WriteFile(filepath.Join(blockedDir, "blocked.log"), []byte("blocked\n"), 0o640),
+			"failed to write blocked log")
+		require.NoError(t, os.Chmod(blockedDir, 0), "failed to make dir unreadable")
+		t.Cleanup(func() { _ = os.Chmod(blockedDir, 0o770) }) // let TempDir cleanup remove it
+		paths = append(paths, filepath.Join(blockedDir, "blocked.log"))
+		expectScanErrors = 1
+	}
+
+	pathsYAML := ""
+	for _, p := range paths {
+		pathsYAML += "\n      - " + p
+	}
+
 	cfg := fmt.Sprintf(`
 filebeat.inputs:
   - type: filestream
     id: "test-filestream-scanner-metrics"
-    paths:
-      - %s
+    paths:%s
     prospector.scanner.exclude_files: ['excluded\.log$']
     ignore_older: 1h
     prospector.scanner.check_interval: 200ms
@@ -76,7 +99,7 @@ logging:
   metrics:
     enabled: true
     period: 1s
-`, filepath.Join(tempDir, "*.log"), tempDir)
+`, pathsYAML, tempDir)
 
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
@@ -89,14 +112,16 @@ logging:
 		FilesNoIngestTarget int64 `config:"files_no_ingest_target"`
 		FilesIgnored        int64 `config:"files_ignored"`
 		FilesEmpty          int64 `config:"files_empty"`
+		ScanErrors          int64 `config:"scan_errors"`
 	}
 
 	expect := fileScanMetrics{
-		FilesMatched:        5, // All files the input is monitoring
-		FilesUnique:         2, // Unique, non-ignored files
-		FilesNoIngestTarget: 1, // Empty files are counted separately
-		FilesIgnored:        2, // Old and inactive files are ignored
-		FilesEmpty:          1, // Empty files matched by the scanner
+		FilesMatched:        5,                // All files the input is monitoring
+		FilesUnique:         2,                // Unique, non-ignored files
+		FilesNoIngestTarget: 1,                // Empty files are counted separately
+		FilesIgnored:        2,                // Old and inactive files are ignored
+		FilesEmpty:          1,                // Empty files matched by the scanner
+		ScanErrors:          expectScanErrors, // 1 where an unreadable path was added, else 0
 	}
 
 	require.Eventually(

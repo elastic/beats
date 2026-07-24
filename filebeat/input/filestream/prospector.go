@@ -178,7 +178,7 @@ func (p *fileProspector) Init(
 	globalStore loginp.StoreUpdater,
 	newID func(loginp.Source) string,
 ) error {
-	files, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
+	files, _, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
 
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
@@ -319,7 +319,7 @@ func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID fun
 		return nil
 	}
 
-	files, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
+	files, _, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.TakeOverState) (string, any) {
