@@ -20,6 +20,7 @@ package memcache
 // Generic memcache parser types and helper functions for use by binary and text parser protocol parsers.
 
 import (
+	"bytes"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
@@ -163,7 +164,10 @@ func (p *parser) contWithShallow(
 func (p *parser) appendMessageData(data []byte) {
 	msg := p.message
 	if p.config.maxValues != 0 {
-		msg.data = memcacheData{data}
+		// data aliases the stream buffer; clone it so the retained value can
+		// safely outlive the next Append on this stream once the buffer
+		// reuses its backing array.
+		msg.data = memcacheData{bytes.Clone(data)}
 		if len(msg.data.data) > p.config.maxBytesPerValue {
 			msg.data.data = msg.data.data[0:p.config.maxBytesPerValue]
 		}

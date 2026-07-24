@@ -62,6 +62,14 @@ func (r *EOFLookaheadReader) Next() (reader.Message, error) {
 	currentMsg := r.nextMsg
 	currentErr := r.nextErr
 
+	// The lookahead read below may reuse the buffer backing currentMsg.Content
+	// (the line reader reuses its decode buffer across reads). Copy currentMsg's
+	// Content out before reading the next message so the message we return is not
+	// corrupted by that read.
+	if len(currentMsg.Content) > 0 {
+		currentMsg.Content = append([]byte(nil), currentMsg.Content...)
+	}
+
 	// lookahead
 	r.nextMsg, r.nextErr = r.reader.Next()
 

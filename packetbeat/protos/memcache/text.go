@@ -445,6 +445,12 @@ func doParseTextCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.failing(err)
 	}
 
+	// line aliases the stream buffer; clone it once here so command,
+	// args, keys and every other field derived from it below can safely
+	// outlive the next Append on this stream once the buffer reuses its
+	// backing array.
+	line = bytes.Clone(line)
+
 	msg := parser.message
 	command, args, err := splitCommandAndArgs(line)
 	if err != nil {

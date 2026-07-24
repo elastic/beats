@@ -34,6 +34,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -68,6 +69,16 @@ type logFile struct {
 
 	backoff backoff.Backoff
 	tg      *unison.TaskGroup
+
+	// readDeadline bounds how long Read waits for new data at EOF before
+	// returning reader.ErrReadDeadline. Zero means no deadline. It is set and
+	// read only by the harvester goroutine (via SetReadDeadline before Read), so
+	// it needs no synchronization. backoffInit is the poll interval used while a
+	// deadline is active (the deadline window is short, so a fixed poll is fine).
+	// deadlineTimer is reused across polls to avoid a per-poll allocation.
+	readDeadline  time.Time
+	backoffInit   time.Duration
+	deadlineTimer *time.Timer
 
 	readUntilEOFOnce sync.Once
 }
@@ -112,6 +123,7 @@ func newFileReader(
 		offset:             offset,
 		lastTimeRead:       time.Now(),
 		backoff:            backoff.NewExpBackoff(config.Backoff.Init, config.Backoff.Max),
+		backoffInit:        config.Backoff.Init,
 		readerCtx:          readerCtx,
 		tg:                 tg,
 	}
@@ -161,7 +173,9 @@ func (f *logFile) Read(buf []byte) (int, error) {
 		}
 
 		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())
-		f.backoff.Wait(f.readerCtx)
+		if !f.waitForData() {
+			return totalN, reader.ErrReadDeadline
+		}
 	}
 
 	// `f.isInactive` is set in a different goroutine, however it is the same
@@ -174,6 +188,53 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	}
 
 	return 0, ErrClosed
+}
+
+// SetReadDeadline bounds how long Read waits for new data at EOF before
+// returning reader.ErrReadDeadline. A zero time clears the deadline. logFile
+// always honors the deadline, so it returns true. It is called by the harvester
+// goroutine before a read, so it needs no synchronization with Read.
+func (f *logFile) SetReadDeadline(t time.Time) bool {
+	f.readDeadline = t
+	return true
+}
+
+// waitForData backs off after EOF until more data may be available. It returns
+// false if a read deadline (set via SetReadDeadline) elapses first, telling Read
+// to return reader.ErrReadDeadline. Without a deadline it uses the normal
+// exponential backoff; with one it polls at a fixed short interval bounded by
+// the remaining time so the deadline is honored precisely.
+func (f *logFile) waitForData() bool {
+	if f.readDeadline.IsZero() {
+		f.backoff.Wait(f.readerCtx)
+		return true
+	}
+
+	remaining := time.Until(f.readDeadline)
+	if remaining <= 0 {
+		return false
+	}
+
+	wait := f.backoffInit
+	atDeadline := false
+	if wait <= 0 || wait >= remaining {
+		wait, atDeadline = remaining, true
+	}
+
+	// Reuse the timer across polls to avoid a per-poll allocation.
+	if f.deadlineTimer == nil {
+		f.deadlineTimer = time.NewTimer(0)
+		f.deadlineTimer.Stop()
+	}
+	f.deadlineTimer.Reset(wait)
+	select {
+	case <-f.readerCtx.Done():
+		// Cancellation is handled by the Read loop condition.
+		f.deadlineTimer.Stop()
+		return true
+	case <-f.deadlineTimer.C:
+		return !atDeadline
+	}
 }
 
 func (f *logFile) startFileMonitoringIfNeeded() {

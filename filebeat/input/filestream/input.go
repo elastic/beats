@@ -543,8 +543,7 @@ func (inp *filestream) open(
 	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
 	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
-	var r reader.Reader
-	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
+	encReader, err := readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      encoding,
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
@@ -554,6 +553,7 @@ func (inp *filestream) open(
 		return nil, nil, truncated, err
 	}
 
+	var r reader.Reader = encReader
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
 	// Only publish the completed SHA-256. A still-growing fingerprint's material

@@ -342,7 +342,59 @@ func (h *groupHandler) createReader(claim sarama.ConsumerGroupClaim) reader.Read
 	}
 }
 
+// deadlineReceiver receives from a Kafka message channel with an optional read
+// deadline. It is embedded by the message readers so the multiline timeout can
+// be enforced synchronously (no goroutine). A non-blocking fast path avoids
+// touching a timer when a message is already buffered, and the slow path reuses
+// a single timer so there is no per-Next allocation.
+type deadlineReceiver struct {
+	deadline time.Time // bounds the wait for the next message; set via SetReadDeadline
+	timer    *time.Timer
+}
+
+// SetReadDeadline bounds how long the next receive waits for a message. A zero
+// time clears it. The receive is a channel operation, so deadlines are always
+// honored; it returns true to let the multiline timeout reader avoid a goroutine.
+func (d *deadlineReceiver) SetReadDeadline(t time.Time) bool {
+	d.deadline = t
+	return true
+}
+
+// recv returns the next message from ch. With a non-zero deadline it returns
+// timedOut=true if no message arrives in time, so callers can surface
+// reader.ErrReadDeadline instead of blocking.
+func (d *deadlineReceiver) recv(ch <-chan *sarama.ConsumerMessage) (msg *sarama.ConsumerMessage, ok bool, timedOut bool) {
+	if d.deadline.IsZero() {
+		msg, ok = <-ch
+		return msg, ok, false
+	}
+
+	// Fast path: a message is already buffered, so no timer is needed.
+	select {
+	case msg, ok = <-ch:
+		return msg, ok, false
+	default:
+	}
+
+	// Slow path: arm the reused timer and wait. Reusing it avoids a per-Next
+	// allocation; Go 1.23+ makes Reset/Stop safe without draining the channel.
+	if d.timer == nil {
+		d.timer = time.NewTimer(0)
+		d.timer.Stop()
+	}
+	d.timer.Reset(time.Until(d.deadline))
+	select {
+	case msg, ok = <-ch:
+		d.timer.Stop()
+		return msg, ok, false
+	case <-d.timer.C:
+		return nil, false, true
+	}
+}
+
 type recordReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	log          *logp.Logger
@@ -353,7 +405,10 @@ func (m *recordReader) Close() error {
 }
 
 func (m *recordReader) Next() (reader.Message, error) {
-	msg, ok := <-m.claim.Messages()
+	msg, ok, timedOut := m.recv(m.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}
@@ -366,6 +421,8 @@ func (m *recordReader) Next() (reader.Message, error) {
 }
 
 type listFromFieldReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	buffer       []reader.Message
@@ -382,7 +439,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 		return l.returnFromBuffer()
 	}
 
-	msg, ok := <-l.claim.Messages()
+	msg, ok, timedOut := l.recv(l.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}

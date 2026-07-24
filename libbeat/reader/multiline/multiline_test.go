@@ -297,6 +297,10 @@ func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {
 			break
 		}
 
+		// Content may alias the decode buffer's backing array (e.g. a
+		// pass-through single-line message), so copy it out before the next
+		// Next() call, which may reuse that array.
+		message.Content = append([]byte(nil), message.Content...)
 		messages = append(messages, message)
 	}
 

@@ -238,7 +238,15 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			continue
 		}
 
-		// Handle multiline messages, join partial lines
+		// Handle multiline messages, join partial lines.
+		// This line will be joined with the following ones, so copy it out of the
+		// decode buffer first: the reads below reuse that buffer, which would
+		// otherwise corrupt the bytes we accumulate here. Each subsequent chunk is
+		// appended (and thereby copied) before the next read, so this is the only
+		// place that needs to detach from the buffer.
+		if p.partial && logLine.Partial {
+			message.Content = append([]byte(nil), message.Content...)
+		}
 		truncated := false
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
@@ -308,4 +316,9 @@ func stripNewLineWin(msg *reader.Message) {
 
 func (p *DockerJSONReader) Close() error {
 	return p.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *DockerJSONReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
 }

@@ -18,10 +18,12 @@
 package parser
 
 import (
+	"errors"
+	"fmt"
 	"io"
-
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -817,4 +819,205 @@ func (r *messageReader) Close() error {
 	r.message = reader.Message{}
 	r.read = false
 	return nil
+}
+
+// reuseCaseSpec is a parser configuration, input, and known-correct output
+// exercised by the decode-buffer reuse torture test.
+type reuseCaseSpec struct {
+	name     string
+	parsers  []map[string]interface{} // each map has one key: the parser name
+	input    string
+	expected []string
+}
+
+func dockerLogLine(log string) string {
+	return fmt.Sprintf(`{"log":%q,"stream":"stdout","time":"2024-01-01T00:00:00.000000000Z"}`, log) + "\n"
+}
+
+// reuseTortureCases lists the parser configs + inputs + expected output
+// exercised by the reuse torture test. Platform-specific parsers (auditd) are
+// appended by an init() in a build-tagged file. TestReuseTortureCoversAllParsers
+// enforces that every supported parser appears here.
+var reuseTortureCases = []reuseCaseSpec{
+	{"no parsers", nil, "line one\nline two\nline three\n",
+		[]string{"line one", "line two", "line three"}},
+	{"multiline pattern", []map[string]interface{}{{
+		"multiline": map[string]interface{}{"pattern": "^[[:space:]]", "negate": false, "match": "after"},
+	}}, "head1\n cont1a\n cont1b\nhead2\n cont2a\nhead3\n",
+		[]string{"head1\n cont1a\n cont1b", "head2\n cont2a", "head3"}},
+	{"multiline count", []map[string]interface{}{{
+		"multiline": map[string]interface{}{"type": "count", "count_lines": 2},
+	}}, "a1\na2\nb1\nb2\nc1\nc2\n",
+		[]string{"a1\na2", "b1\nb2", "c1\nc2"}},
+	{"multiline while", []map[string]interface{}{{
+		"multiline": map[string]interface{}{"type": "while_pattern", "pattern": "^[[:space:]]", "negate": true},
+	}}, "x1\nx2\nx3\n",
+		[]string{"x1\nx2\nx3"}},
+	{"ndjson", []map[string]interface{}{{
+		"ndjson": map[string]interface{}{"keys_under_root": true, "message_key": "log"},
+	}}, dockerLogLine("alpha") + dockerLogLine("beta") + dockerLogLine("gamma"),
+		[]string{"alpha", "beta", "gamma"}},
+	{"container docker", []map[string]interface{}{{
+		"container": map[string]interface{}{"stream": "all", "format": "docker"},
+	}}, dockerLogLine("c1\n") + dockerLogLine("c2\n"),
+		[]string{"c1\n", "c2\n"}},
+	{"container cri partial", []map[string]interface{}{{
+		"container": map[string]interface{}{"stream": "all", "format": "cri"},
+	}}, "2024-01-01T00:00:00.000000000Z stdout P chunk-one \n" +
+		"2024-01-01T00:00:00.000000000Z stdout F chunk-two\n" +
+		"2024-01-01T00:00:00.000000000Z stdout F single\n",
+		[]string{"chunk-one chunk-two", "single"}},
+	{"syslog", []map[string]interface{}{{
+		"syslog": map[string]interface{}{"format": "auto"},
+	}}, "<13>Oct 11 22:14:15 host app: message one\n<13>Oct 11 22:14:16 host app: message two\n",
+		[]string{"message one", "message two"}},
+	{"include_message", []map[string]interface{}{{
+		"include_message": map[string]interface{}{"patterns": []string{"keep"}},
+	}}, "keep one\ndrop two\nkeep three\ndrop four\n",
+		[]string{"keep one", "keep three"}},
+}
+
+// requiredReuseParsers are the parser names that must each be exercised by
+// reuseTortureCases. auditd is appended on linux by the build-tagged init().
+var requiredReuseParsers = []string{"multiline", "ndjson", "container", "syslog", "include_message"}
+
+func reuseNamespaces(t *testing.T, specs []map[string]interface{}) []config.Namespace {
+	t.Helper()
+	if len(specs) == 0 {
+		return nil
+	}
+	cfg := config.MustNewConfigFrom(map[string]interface{}{"parsers": specs})
+	var pc struct {
+		Parsers []config.Namespace `config:"parsers"`
+	}
+	require.NoError(t, cfg.Unpack(&pc))
+	return pc.Parsers
+}
+
+// TestDecodeBufferReuseDoesNotCorrupt is the safety net for decode buffer
+// reuse, which streambuf.Buffer now always performs. For each parser, the
+// produced messages must match a known-correct golden output even though the
+// line reader reuses the array backing each line's Content across reads. A
+// parser that holds a reference into that buffer across reads would corrupt
+// its output and fail this test. A tiny BufferSize maximizes buffer churn to
+// stress it.
+func TestDecodeBufferReuseDoesNotCorrupt(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	readAll := func(t *testing.T, parsers []config.Namespace, input string) []string {
+		t.Helper()
+		c, err := NewConfig(CommonConfig{MaxBytes: 1 << 20, LineTerminator: readfile.AutoLineTerminator}, parsers)
+		require.NoError(t, err)
+
+		encF, _ := encoding.FindEncoding("")
+		sr := strings.NewReader(input)
+		enc, err := encF(sr)
+		require.NoError(t, err)
+		// Wrap the source so it honors read deadlines, mirroring filestream's file
+		// reader. This makes the multiline timeout reader use its synchronous,
+		// goroutine-free path (the path used in production), which is the one that
+		// must be safe under decode-buffer reuse.
+		// Tiny BufferSize forces frequent reads and thus maximal decode-buffer reuse.
+		er, err := readfile.NewEncodeReader(deadlineNopCloser{io.NopCloser(sr)}, readfile.Config{
+			Codec:      enc,
+			BufferSize: 4,
+			Terminator: readfile.LineFeed,
+			MaxBytes:   1 << 20,
+		}, logger)
+		require.NoError(t, err)
+		r := c.Create(readfile.NewStripNewline(er, readfile.LineFeed), logger)
+
+		var out []string
+		for {
+			msg, err := r.Next()
+			if msg.Bytes > 0 || len(msg.Content) > 0 {
+				out = append(out, string(msg.Content)) // copy + retain, like the harvester
+			}
+			if err != nil {
+				if !errors.Is(err, io.EOF) {
+					require.NoError(t, err)
+				}
+				break
+			}
+		}
+		return out
+	}
+
+	for _, tc := range reuseTortureCases {
+		t.Run(tc.name, func(t *testing.T) {
+			parsers := reuseNamespaces(t, tc.parsers)
+			out := readAll(t, parsers, tc.input)
+			require.Equal(t, tc.expected, out, "decode-buffer reuse corrupted parser output")
+		})
+	}
+}
+
+// TestReuseTortureCoversAllParsers enforces that every supported parser is
+// exercised by the decode-buffer reuse torture test, so a newly added parser
+// cannot silently skip the safety net.
+func TestReuseTortureCoversAllParsers(t *testing.T) {
+	covered := map[string]bool{}
+	for _, c := range reuseTortureCases {
+		for _, m := range c.parsers {
+			for name := range m {
+				covered[name] = true
+			}
+		}
+	}
+	for _, name := range requiredReuseParsers {
+		require.Truef(t, covered[name],
+			"parser %q is not exercised by TestDecodeBufferReuseDoesNotCorrupt; add a case to reuseTortureCases", name)
+	}
+
+	// Guard the requiredReuseParsers list against drift: an unknown parser must
+	// be rejected, confirming NewConfig's accepted set is enumerable here.
+	_, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator},
+		reuseNamespaces(t, []map[string]interface{}{{"definitely_not_a_parser": map[string]interface{}{}}}))
+	require.ErrorIs(t, err, ErrNoSuchParser)
+}
+
+// deadlineNopCloser makes an io.ReadCloser honor read deadlines (trivially: an
+// in-memory source never blocks, so the deadline never fires), so tests can
+// exercise the synchronous, goroutine-free timeout path used in production.
+type deadlineNopCloser struct{ io.ReadCloser }
+
+func (deadlineNopCloser) SetReadDeadline(time.Time) bool { return true }
+
+// deadlineMockReader is a reader.Reader that records whether SetReadDeadline was
+// forwarded to it.
+type deadlineMockReader struct{ gotDeadline bool }
+
+func (m *deadlineMockReader) Next() (reader.Message, error) { return reader.Message{}, io.EOF }
+func (m *deadlineMockReader) Close() error                  { return nil }
+func (m *deadlineMockReader) SetReadDeadline(time.Time) bool {
+	m.gotDeadline = true
+	return true
+}
+
+// TestParsersForwardReadDeadline ensures every parser that can sit below
+// multiline forwards SetReadDeadline to the reader it wraps. The multiline
+// timeout is enforced synchronously via read deadlines (no goroutine); a parser
+// that fails to forward the deadline would leave multiline unable to time out,
+// so it would block forever waiting for the source. This guards against that by
+// asserting the deadline reaches the wrapped source through each parser.
+func TestParsersForwardReadDeadline(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	for _, tc := range reuseTortureCases {
+		// "no parsers" has nothing to wrap; multiline hosts the timeout itself and
+		// is never positioned below another reader's deadline.
+		if len(tc.parsers) == 0 || strings.HasPrefix(tc.name, "multiline") {
+			continue
+		}
+		t.Run(tc.name, func(t *testing.T) {
+			parsers := reuseNamespaces(t, tc.parsers)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1 << 20, LineTerminator: readfile.AutoLineTerminator}, parsers)
+			require.NoError(t, err)
+
+			mock := &deadlineMockReader{}
+			p := c.Create(mock, logger)
+			ok := reader.SetReadDeadline(p, time.Now().Add(time.Second))
+			require.Truef(t, ok, "parser chain %q did not forward SetReadDeadline to its source", tc.name)
+			require.Truef(t, mock.gotDeadline, "parser chain %q did not call SetReadDeadline on its source", tc.name)
+		})
+	}
 }

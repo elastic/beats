@@ -29,8 +29,10 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -48,6 +50,14 @@ type journalctl struct {
 	// can stop even if nobody is reading from the dataChan.
 	stopCh   chan struct{}
 	stopOnce sync.Once
+
+	// deadline bounds how long Next waits for the next entry before returning
+	// reader.ErrReadDeadline. Zero means no deadline. Set/read by the consuming
+	// goroutine only (via SetReadDeadline before Next), so it needs no locking.
+	deadline time.Time
+	// timer is reused across Next calls to avoid a per-call allocation when a
+	// deadline is set. Owned by the consuming goroutine.
+	timer *time.Timer
 }
 
 // NewFactory returns a function that instantiates [journalctl].
@@ -60,7 +70,7 @@ type journalctl struct {
 // The returned type is an interface to allow mocking for testing
 func NewFactory(chroot, journalctlPath string) JctlFactory {
 	return func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
-		//nolint:noctx // we use the canceller to correctly stop the process
+		//nolint:noctx,gosec // we use the canceller to stop the process; journalctlPath is operator-configured, not user input
 		cmd := exec.Command(journalctlPath, args...)
 
 		if chroot != "" {
@@ -204,19 +214,60 @@ func (j *journalctl) Kill() error {
 // exited unexpectedly, then `err` is non-nil, `finished` is false and an empty
 // byte array is returned.
 func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
+	if j.deadline.IsZero() {
+		select {
+		case <-cancel.Done():
+			return []byte{}, ErrCancelled
+		case d, open := <-j.dataChan:
+			return j.handleData(d, open)
+		}
+	}
+
+	// Fast path: an entry is already available, so no timer is needed.
 	select {
 	case <-cancel.Done():
 		return []byte{}, ErrCancelled
 	case d, open := <-j.dataChan:
-		if !open {
-			// Wait for the process to exit, so we can read the exit code.
-			j.waitDone.Wait()
-			return []byte{},
-				fmt.Errorf(
-					"no more data to read, journalctl exited unexpectedly, exit code: %d",
-					j.cmd.ProcessState.ExitCode())
-		}
-
-		return d, nil
+		return j.handleData(d, open)
+	default:
 	}
+
+	// Slow path: arm the reused timer and wait.
+	if j.timer == nil {
+		j.timer = time.NewTimer(0)
+		j.timer.Stop()
+	}
+	j.timer.Reset(time.Until(j.deadline))
+	select {
+	case <-cancel.Done():
+		return []byte{}, ErrCancelled
+	case <-j.timer.C:
+		return []byte{}, reader.ErrReadDeadline
+	case d, open := <-j.dataChan:
+		j.timer.Stop()
+		return j.handleData(d, open)
+	}
+}
+
+// SetReadDeadline bounds how long Next waits for the next entry before
+// returning reader.ErrReadDeadline. A zero time clears it. journalctl honors
+// deadlines (its read is a channel receive), so it returns true; this lets the
+// multiline timeout reader avoid a goroutine.
+func (j *journalctl) SetReadDeadline(t time.Time) bool {
+	j.deadline = t
+	return true
+}
+
+// handleData turns a dataChan receive into the Next return values. open is false
+// when the channel was closed (journalctl exited).
+func (j *journalctl) handleData(d []byte, open bool) ([]byte, error) {
+	if !open {
+		// Wait for the process to exit, so we can read the exit code.
+		j.waitDone.Wait()
+		return []byte{},
+			fmt.Errorf(
+				"no more data to read, journalctl exited unexpectedly, exit code: %d",
+				j.cmd.ProcessState.ExitCode())
+	}
+	return d, nil
 }

@@ -136,6 +136,87 @@ paths:
 			})
 		}
 	})
+
+	b.Run("multiline", func(b *testing.B) {
+		const eventCount = 2000
+		const linesPerEvent = 5 // 1 header + 4 continuation lines = 10k lines total
+		filename := generateMultilineFile(b, b.TempDir(), eventCount, linesPerEvent)
+		cfg := fmt.Sprintf(`
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true
+parsers:
+  - multiline:
+      type: pattern
+      pattern: '^[[:space:]]'
+      negate: false
+      match: after
+paths:
+    - %s
+`, filename)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			runFilestreamBenchmark(b, logger, fmt.Sprintf("multiline-%d", i), cfg, eventCount)
+		}
+	})
+
+	b.Run("container", func(b *testing.B) {
+		const lineCount = 10_000
+		filename := generateContainerFile(b, b.TempDir(), lineCount)
+		cfg := fmt.Sprintf(`
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true
+parsers:
+  - container:
+      stream: all
+      format: docker
+paths:
+    - %s
+`, filename)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			runFilestreamBenchmark(b, logger, fmt.Sprintf("container-%d", i), cfg, lineCount)
+		}
+	})
+}
+
+// generateContainerFile writes lineCount complete (non-partial) Docker-JSON log
+// lines, the common container-logging case.
+func generateContainerFile(t testing.TB, dir string, lineCount int) string {
+	t.Helper()
+	file, err := os.CreateTemp(dir, "*")
+	require.NoError(t, err)
+	filename := file.Name()
+	for i := 0; i < lineCount; i++ {
+		fmt.Fprintf(file,
+			`{"log":"rather mediocre container log line %d\n","stream":"stdout","time":"2024-01-01T00:00:00.000000000Z"}`+"\n",
+			i)
+	}
+	require.NoError(t, file.Close())
+	return filename
+}
+
+// generateMultilineFile writes eventCount stack-trace-like events, each a header
+// line followed by linesPerEvent-1 whitespace-indented continuation lines, so a
+// `^[[:space:]]` multiline pattern groups each event into one message.
+func generateMultilineFile(t testing.TB, dir string, eventCount, linesPerEvent int) string {
+	t.Helper()
+	file, err := os.CreateTemp(dir, "*")
+	require.NoError(t, err)
+	filename := file.Name()
+	for i := 0; i < eventCount; i++ {
+		fmt.Fprintf(file, "ERROR event %d failed in %s\n", i, filename)
+		for j := 1; j < linesPerEvent; j++ {
+			fmt.Fprintf(file, "\tat com.example.Service.call(Service.java:%d) line %d\n", j, i)
+		}
+	}
+	require.NoError(t, file.Close())
+	return filename
 }
 
 func filestreamBenchCfg(path string, fingerprint, growing bool) string {

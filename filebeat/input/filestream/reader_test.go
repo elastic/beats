@@ -21,12 +21,64 @@ import (
 	"compress/gzip"
 	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+// TestEOFLookaheadReaderDecodeBufferReuse verifies that EOFLookaheadReader,
+// which buffers one message and reads ahead, is not corrupted by the
+// underlying line reader's decode-buffer reuse. The lookahead read must not
+// corrupt the buffered message. EOFLookaheadReader is on the gzip read path.
+func TestEOFLookaheadReaderDecodeBufferReuse(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	input := "alpha\nbravo\ncharlie\ndelta\necho\n"
+
+	type out struct {
+		content string
+		eof     bool
+	}
+
+	encF, _ := encoding.FindEncoding("")
+	sr := strings.NewReader(input)
+	enc, err := encF(sr)
+	require.NoError(t, err)
+	er, err := readfile.NewEncodeReader(io.NopCloser(sr), readfile.Config{
+		Codec:      enc,
+		BufferSize: 3, // tiny => frequent reads => maximal buffer reuse
+		Terminator: readfile.LineFeed,
+		MaxBytes:   1 << 20,
+	}, logger)
+	require.NoError(t, err)
+	var r reader.Reader = readfile.NewStripNewline(er, readfile.LineFeed)
+	r = NewEOFLookaheadReader(r, io.EOF)
+
+	var res []out
+	for {
+		m, err := r.Next()
+		if m.Bytes > 0 || len(m.Content) > 0 {
+			res = append(res, out{content: string(m.Content), eof: m.Private == io.EOF}) //nolint:errorlint // m.Private is interface{}; identity check, not error unwrapping
+		}
+		if err != nil {
+			break
+		}
+	}
+
+	require.Equal(t, []out{
+		{content: "alpha", eof: false},
+		{content: "bravo", eof: false},
+		{content: "charlie", eof: false},
+		{content: "delta", eof: false},
+		{content: "echo", eof: true},
+	}, res, "decode-buffer reuse corrupted EOFLookaheadReader output")
+}
 
 type readerResponse struct {
 	msg     string

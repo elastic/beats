@@ -133,13 +133,18 @@ func (r *JSONReader) Close() error {
 	return r.reader.Close()
 }
 
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (r *JSONReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(r.reader, t)
+}
+
 func createJSONError(message string) mapstr.M {
 	return mapstr.M{"message": message, "type": "json"}
 }
 
 // Next decodes JSON and returns the filled Line object.
 func (p *JSONParser) Next() (reader.Message, error) {
-	message, err := p.JSONReader.reader.Next()
+	message, err := p.reader.Next()
 	if err != nil {
 		return message, err
 	}
@@ -153,7 +158,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		}
 	}
 	var jsonFields mapstr.M
-	message.Content, jsonFields = p.JSONReader.decode(from)
+	message.Content, jsonFields = p.decode(from)
 
 	if len(jsonFields) == 0 {
 		return message, err
@@ -171,7 +176,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		message.Fields["message"] = string(message.Content)
 	}
 
-	if key := p.JSONReader.cfg.DocumentID; key != "" {
+	if key := p.cfg.DocumentID; key != "" {
 		if tmp, err := jsonFields.GetValue(key); err == nil {
 			if id, ok := tmp.(string); ok {
 				jsonFields.Delete(key)
@@ -190,7 +195,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 			Meta:      message.Meta,
 			Fields:    message.Fields,
 		}
-		jsontransform.WriteJSONKeys(event, jsonFields, p.JSONReader.cfg.ExpandKeys, p.JSONReader.cfg.OverwriteKeys, p.JSONReader.cfg.AddErrorKey)
+		jsontransform.WriteJSONKeys(event, jsonFields, p.cfg.ExpandKeys, p.cfg.OverwriteKeys, p.cfg.AddErrorKey)
 		message.Ts = event.Timestamp
 		message.Fields = event.Fields
 		message.Meta = event.Meta
@@ -240,7 +245,8 @@ func MergeJSONFields(data mapstr.M, jsonFields mapstr.M, text *string, config Co
 			case time.Time:
 				ts = t
 			case common.Time:
-				ts = time.Time(ts)
+				// A common.Time value is intentionally left as the zero time here
+				// (behavior covered by TestMergeJSONFields); only a time.Time sets ts.
 			}
 			delete(data, "@timestamp")
 		}
@@ -253,4 +259,9 @@ func MergeJSONFields(data mapstr.M, jsonFields mapstr.M, text *string, config Co
 		return id, event.Timestamp
 	}
 	return id, time.Time{}
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *JSONParser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
 }

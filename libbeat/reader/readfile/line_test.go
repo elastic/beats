@@ -315,12 +315,15 @@ func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	// read lines
 	var lines [][]byte
 	for range inputLines {
-		bytes, _, err := reader.Next()
+		b, _, err := reader.Next()
 		if err != nil {
 			t.Fatalf("failed to read all lines from test: %v", err)
 		}
 
-		lines = append(lines, bytes)
+		// Copy out before the next Next() call, which may reuse the decode
+		// buffer's backing array (the same contract production consumers like
+		// the harvester's Message.ToEvent follow).
+		lines = append(lines, append([]byte(nil), b...))
 	}
 
 	// validate
@@ -529,6 +532,45 @@ func (r *eofWithNonZeroNumberOfBytesReader) Read(d []byte) (int, error) {
 // Verify handling of the io.Reader returning n > 0 with io.EOF.
 func TestReadWithNonZeroNumberOfBytesAndEOF(t *testing.T) {
 	testReadLines(t, [][]byte{[]byte("Hello world!\n")}, true)
+}
+
+// TestReuseDecodeBufferSafeConsumer verifies that a consumer that copies each
+// line before reading the next (as filestream's harvester does via
+// Message.ToEvent) always sees correct content, given the decode buffer's
+// backing array is reused across reads. It mirrors TestReadRandomLineLengths
+// but with random line lengths exercising grow/compact/reuse.
+func TestReuseDecodeBufferSafeConsumer(t *testing.T) {
+	minLength, maxLength, numLines := 1, 40000, 200
+
+	var inputLines [][]byte
+	var inputStream []byte
+	for i := 0; i < numLines; i++ {
+		n := rand.Intn(maxLength-minLength) + minLength
+		line := make([]byte, n+1)
+		for j := 0; j < n; j++ {
+			line[j] = byte(rand.Intn('z'-'A') + 'A')
+		}
+		line[n] = '\n'
+		inputLines = append(inputLines, line)
+		inputStream = append(inputStream, line...)
+	}
+
+	buffer := bytes.NewBuffer(inputStream)
+	codec, _ := encoding.Plain(buffer)
+	r, err := NewLineReader(
+		io.NopCloser(buffer),
+		Config{codec, 1024, LineFeed, unlimited, false},
+		logptest.NewTestingLogger(t, ""),
+	)
+	require.NoError(t, err)
+
+	for i := range inputLines {
+		b, _, err := r.Next()
+		require.NoError(t, err, "line %d", i)
+		// Safe consumer: copy out before the next Next() may reuse the buffer.
+		got := append([]byte(nil), b...)
+		require.Equal(t, inputLines[i], got, "line %d content mismatch", i)
+	}
 }
 
 // spinReader feeds an endless stream of non-newline bytes so that

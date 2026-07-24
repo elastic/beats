@@ -21,6 +21,7 @@ package kafka
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -28,6 +29,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestNewInputDone(t *testing.T) {
@@ -52,4 +54,51 @@ func AssertNotStartedInputCanBeDone(t *testing.T, configMap *conf.C) {
 
 	_, err = Plugin(logp.NewNopLogger()).Manager.Create(config)
 	require.NoError(t, err)
+}
+
+func TestDeadlineReceiver(t *testing.T) {
+	t.Run("no deadline blocks until a message arrives", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage, 1)
+		ch <- &sarama.ConsumerMessage{Value: []byte("x")}
+		var d deadlineReceiver
+		msg, ok, timedOut := d.recv(ch)
+		require.True(t, ok)
+		require.False(t, timedOut)
+		require.Equal(t, []byte("x"), msg.Value)
+	})
+
+	t.Run("fast path returns a buffered message without arming the timer", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage, 1)
+		ch <- &sarama.ConsumerMessage{Value: []byte("y")}
+		var d deadlineReceiver
+		d.SetReadDeadline(time.Now().Add(time.Hour))
+		msg, ok, timedOut := d.recv(ch)
+		require.True(t, ok)
+		require.False(t, timedOut)
+		require.Equal(t, []byte("y"), msg.Value)
+		require.Nil(t, d.timer, "fast path must not allocate a timer")
+	})
+
+	t.Run("times out on an empty channel", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage)
+		var d deadlineReceiver
+		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		_, _, timedOut := d.recv(ch)
+		require.True(t, timedOut)
+	})
+
+	t.Run("reuses a single timer across slow-path calls", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage)
+		var d deadlineReceiver
+		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		_, _, timedOut := d.recv(ch)
+		require.True(t, timedOut)
+		first := d.timer
+		require.NotNil(t, first)
+
+		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		_, _, timedOut = d.recv(ch)
+		require.True(t, timedOut)
+		require.Same(t, first, d.timer, "the timer must be reused, not reallocated")
+	})
 }
