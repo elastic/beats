@@ -106,10 +106,12 @@ type config struct {
 func (c config) Validate() error {
 	// Facilities are passed to journalctl as SYSLOG_FACILITY=N matches,
 	// which journalctl does not range-check (unlike its `--facility` flag),
-	// so an out-of-range value would silently match nothing.
+	// so an out-of-range value would silently match nothing. The accepted
+	// range mirrors `--facility`, which allows up to LOG_FACMASK >> 3 (127)
+	// even though only 0-23 are standardized.
 	for _, facility := range c.Facilities {
-		if facility < 0 || facility > 23 {
-			return fmt.Errorf("facility %d is invalid, it must be in the range 0-23", facility)
+		if facility < 0 || facility > 127 {
+			return fmt.Errorf("facility %d is invalid, it must be in the range 0-127", facility)
 		}
 	}
 

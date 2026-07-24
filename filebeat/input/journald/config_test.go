@@ -70,7 +70,7 @@ func TestConfigValidateFacilities(t *testing.T) {
 	}{
 		{
 			name: "valid facilities",
-			yaml: "facilities: [0, 4, 23]",
+			yaml: "facilities: [0, 4, 23, 127]",
 		},
 		{
 			name:    "negative facility",
@@ -78,9 +78,9 @@ func TestConfigValidateFacilities(t *testing.T) {
 			wantErr: "facility -1 is invalid",
 		},
 		{
-			name:    "facility above 23",
-			yaml:    "facilities: [24]",
-			wantErr: "facility 24 is invalid",
+			name:    "facility above 127",
+			yaml:    "facilities: [128]",
+			wantErr: "facility 128 is invalid",
 		},
 	}
 
