@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix DPoP resource client signing method assignment in CEL and HTTP JSON input.
-component: filebeat

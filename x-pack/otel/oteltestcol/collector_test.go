@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func TestNew(t *testing.T) {
@@ -215,4 +217,48 @@ service:
 		return col.ObservedLogs().
 			FilterMessageSnippet("Skipping metrics logging").Len() > 0
 	}, 30*time.Second, 100*time.Millisecond, "Expected packetbeat receiver to start and initialize the metric reporter")
+}
+
+func TestNewRespectsTelemetryLogsLevel(t *testing.T) {
+	cfg := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "test message"
+          count: 1
+    processors: ~
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: none
+`
+	col := New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessage("Logs").
+			FilterField(zap.Int("log records", 1)).Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "expected debug exporter to log the processed event")
+
+	require.Equal(t, 0, col.ObservedLogs().FilterLevelExact(zapcore.DebugLevel).Len(),
+		"debug logs should not be observed when telemetry.logs.level is info")
+	require.Positive(t, col.ObservedLogs().FilterLevelExact(zapcore.InfoLevel).Len(),
+		"info logs should be observed when telemetry.logs.level is info")
 }
