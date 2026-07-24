@@ -5,6 +5,7 @@
 package nomad
 
 import (
+	"maps"
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -84,14 +85,10 @@ func (g *metaGenerator) GroupMeta(job *Job) []mapstr.M {
 	for _, group := range job.TaskGroups {
 		meta := make(map[string]string, len(job.Meta))
 
-		for k, v := range job.Meta {
-			meta[k] = v
-		}
+		maps.Copy(meta, job.Meta)
 
 		// override with the meta values from the group
-		for k, v := range group.Meta {
-			meta[k] = v
-		}
+		maps.Copy(meta, group.Meta)
 
 		group.Meta = meta
 
@@ -151,13 +148,9 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []mapstr.M {
 
 		joinMeta := make(map[string]string, len(group.Meta))
 
-		for k, v := range group.Meta {
-			joinMeta[k] = v
-		}
+		maps.Copy(joinMeta, group.Meta)
 
-		for k, v := range task.Meta {
-			joinMeta[k] = v
-		}
+		maps.Copy(joinMeta, task.Meta)
 
 		meta := mapstr.M{
 			"name": task.Name,

@@ -47,6 +47,21 @@ func TestInitResourcesForBatch(t *testing.T) {
 		assert.Error(t, err, "failed to retrieve resources: invalid resource query")
 		m.AssertExpectations(t)
 	})
+	t.Run("does not panic when all resource configs return an empty list", func(t *testing.T) {
+		client := NewMockBatchClient(logger)
+		client.Config = resourceQueryConfig
+		m := &MockService{}
+		// empty list + nil error: the "no resources of this type exist" path
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*armresources.GenericResourceExpanded{}, nil)
+		client.AzureMonitorService = m
+
+		err := client.InitResources(mockConcurrentMapResourceMetrics)
+		require.NoError(t, err)
+
+		// The closer goroutine launched by InitResources runs asynchronously and
+		// will panic on close(nil) if the channels were never initialized.
+		time.Sleep(100 * time.Millisecond)
+	})
 }
 
 func TestGetMetricsInBatch(t *testing.T) {
@@ -99,7 +114,7 @@ func TestGetMetricsInBatch(t *testing.T) {
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		results := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr)
-		assert.Equal(t, len(results), 0)
+		assert.Empty(t, results, "expected no metric values when QueryResources returns an error")
 		m.AssertExpectations(t)
 	})
 
@@ -169,12 +184,12 @@ func TestGetMetricsInBatch(t *testing.T) {
 		mr := MockReporterV2{}
 
 		metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr)
-		require.Equal(t, len(metricValues), 1)
-		require.Equal(t, len(metricValues[0].Values), 1)
+		require.Len(t, metricValues, 1, "expected exactly one metric value group")
+		require.Len(t, metricValues[0].Values, 1, "expected exactly one value in the metric group")
 
-		assert.Equal(t, *metricValues[0].Values[0].avg, 1.0)
-		assert.Equal(t, *metricValues[0].Values[0].max, 2.0)
-		assert.Equal(t, *metricValues[0].Values[0].min, 3.0)
+		assert.InDelta(t, 1.0, *metricValues[0].Values[0].avg, 0.0001)
+		assert.InDelta(t, 2.0, *metricValues[0].Values[0].max, 0.0001)
+		assert.InDelta(t, 3.0, *metricValues[0].Values[0].min, 0.0001)
 
 		m.AssertExpectations(t)
 	})

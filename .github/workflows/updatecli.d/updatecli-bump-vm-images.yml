@@ -61,6 +61,7 @@ targets:
         - .buildkite/auditbeat/auditbeat-pipeline.yml
         - .buildkite/filebeat/filebeat-pipeline.yml
         - .buildkite/heartbeat/heartbeat-pipeline.yml
+        - .buildkite/ironbank-validation.yml
         - .buildkite/libbeat/pipeline.libbeat.yml
         - .buildkite/metricbeat/pipeline.yml
         - .buildkite/packetbeat/pipeline.packetbeat.yml

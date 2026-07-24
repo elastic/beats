@@ -108,7 +108,7 @@ func packageWithArgs(args PackageArgs) error {
 			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first")
 	}
 
-	var tasks []interface{}
+	var tasks []any
 	for _, target := range platforms {
 		for _, pkg := range Packages {
 
@@ -166,7 +166,7 @@ func packageWithArgs(args PackageArgs) error {
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
 				spec.Snapshot = snapshot
-				spec.evalContext = map[string]interface{}{
+				spec.evalContext = map[string]any{
 					"GOOS":          target.GOOS(),
 					"GOARCH":        target.GOARCH(),
 					"GOARM":         target.GOARM(),
@@ -220,7 +220,7 @@ func getIronbankContextName() string {
 	version, _ := BeatQualifiedVersion()
 	ironbankBinaryName := "{{.Name}}-ironbank-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}-docker-build-context"
 	// TODO: get the name of the project
-	outputDir, _ := Expand(ironbankBinaryName, map[string]interface{}{
+	outputDir, _ := Expand(ironbankBinaryName, map[string]any{
 		"Name":    BeatName,
 		"Version": version,
 	})
@@ -237,7 +237,7 @@ func prepareIronbankBuild() error {
 
 	templatesDir := filepath.Join(beatsDir, "dev-tools", "packaging", "templates", "ironbank", BeatName)
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"MajorMinor": BeatMajorMinorVersion(),
 	}
 
@@ -314,12 +314,7 @@ func isPackageTypeSelected(pkgType PackageType, selected []PackageType) bool {
 		return true
 	}
 
-	for _, t := range selected {
-		if t == pkgType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(selected, pkgType)
 }
 
 type packageBuilder struct {

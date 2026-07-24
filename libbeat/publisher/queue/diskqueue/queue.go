@@ -232,6 +232,7 @@ func NewQueue(
 			reading:          initialSegments,
 			acked:            ackedSegments,
 			nextID:           nextSegmentID,
+			nextReadFrameID:  frameID(nextReadPosition.frameIndex),
 			nextReadPosition: nextReadPosition.byteIndex,
 		},
 
@@ -290,5 +291,6 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer[publisher
 		config:  cfg,
 		encoder: newEventEncoder(SerializationCBOR),
 		done:    make(chan struct{}),
+		ackWait: make(chan struct{}),
 	}
 }

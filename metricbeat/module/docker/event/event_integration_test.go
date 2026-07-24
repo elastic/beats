@@ -26,14 +26,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -42,7 +41,7 @@ func TestData(t *testing.T) {
 
 	ms := mbtest.NewPushMetricSetV2WithContext(t, getConfig())
 	var events []mb.Event
-	done := make(chan interface{})
+	done := make(chan any)
 	go func() {
 		events = mbtest.RunPushMetricSetV2WithContext(30*time.Second, 1, ms)
 		close(done)
@@ -79,15 +78,17 @@ func createEvent(t *testing.T) {
 	}
 	defer c.Close()
 
-	resp, err := c.ContainerCreate(context.Background(), &container.Config{
-		Image: "busybox",
-		Cmd:   []string{"echo", "foo"},
-	}, nil, nil, nil, "")
+	resp, err := c.ContainerCreate(context.Background(), client.ContainerCreateOptions{
+		Config: &container.Config{
+			Image: "busybox",
+			Cmd:   []string{"echo", "foo"},
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
+	_, err = c.ContainerRemove(context.Background(), resp.ID, client.ContainerRemoveOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func pullBusyboxImage(t *testing.T) {
 	}
 	defer c.Close()
 
-	reader, err := c.ImagePull(t.Context(), "busybox", image.PullOptions{})
+	reader, err := c.ImagePull(t.Context(), "busybox", client.ImagePullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,8 +112,8 @@ func pullBusyboxImage(t *testing.T) {
 	reader.Close()
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "docker",
 		"metricsets": []string{"event"},
 		"hosts":      []string{"unix:///var/run/docker.sock"},

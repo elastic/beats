@@ -28,7 +28,6 @@ import (
 	"compress/gzip"
 	"context"
 	"debug/buildinfo"
-	"debug/elf"
 	"errors"
 	"flag"
 	"fmt"
@@ -42,12 +41,12 @@ import (
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/testing/testutils"
 )
 
 const (
@@ -598,7 +597,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef strin
 		ctx, cancel := dockerTestContext(t)
 		defer cancel()
 
-		dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		dockerClient, err := client.New(client.FromEnv)
 		if err != nil {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
@@ -616,37 +615,36 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef strin
 			}
 		}
 
-		var caps strslice.StrSlice
+		var caps []string
 		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}
 
 		createResp, err := dockerClient.ContainerCreate(ctx,
-			&container.Config{
-				Image: imageID,
-			},
-			&container.HostConfig{
-				CapAdd: caps,
-			},
-			nil,
-			nil,
-			"")
+			client.ContainerCreateOptions{
+				Config: &container.Config{
+					Image: imageID,
+				},
+				HostConfig: &container.HostConfig{
+					CapAdd: caps,
+				},
+			})
 		if err != nil {
 			t.Fatalf("error creating container from image: %s", err)
 		}
 		defer func() {
-			err := dockerClient.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			_, err := dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})
 			if err != nil {
 				t.Errorf("error removing container: %s", err)
 			}
 		}()
 
-		err = dockerClient.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		_, err = dockerClient.ContainerStart(ctx, createResp.ID, client.ContainerStartOptions{})
 		if err != nil {
 			t.Fatalf("failed to start container: %s", err)
 		}
 		defer func() {
-			err := dockerClient.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			_, err := dockerClient.ContainerStop(ctx, createResp.ID, client.ContainerStopOptions{})
 			if err != nil {
 				t.Errorf("error stopping container: %s", err)
 			}
@@ -665,7 +663,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef strin
 				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
 				return
 			case <-ticker.C:
-				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 				if err != nil {
 					t.Logf("could not get logs: %s", err)
 				}
@@ -704,9 +702,9 @@ func loadDockerImageFromArchive(ctx context.Context, dockerClient *client.Client
 	if err != nil {
 		return "", err
 	}
-	defer loadResp.Body.Close()
+	defer loadResp.Close()
 
-	loadRespBody, err := io.ReadAll(loadResp.Body)
+	loadRespBody, err := io.ReadAll(loadResp)
 	if err != nil {
 		return "", fmt.Errorf("failed to read image load response: %w", err)
 	}
@@ -903,42 +901,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 	info, err := buildinfo.ReadFile(binaryPath)
 	require.NoError(t, err)
 
-	foundTags := false
-	foundExperiment := false
-	for _, setting := range info.Settings {
-		switch setting.Key {
-		case "-tags":
-			foundTags = true
-			require.Contains(t, setting.Value, "requirefips")
-			continue
-		case "GOEXPERIMENT":
-			foundExperiment = true
-			require.Contains(t, setting.Value, "systemcrypto")
-			continue
-		}
-	}
-
-	require.True(t, foundTags, "Did not find -tags within binary version information")
-	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
-
-	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
-	f, err := elf.Open(binaryPath)
-	require.NoError(t, err, "unable to open ELF file")
-
-	symbols, err := f.Symbols()
-	if err != nil {
-		t.Logf("no symbols present in %q: %v", binaryPath, err)
-		return
-	}
-
-	hasOpenSSL := false
-	for _, symbol := range symbols {
-		if strings.Contains(symbol.Name, "OpenSSL_version") {
-			hasOpenSSL = true
-			break
-		}
-	}
-	require.True(t, hasOpenSSL, "unable to find OpenSSL_version symbol")
+	testutils.RequireFIPSBuildInfo(t, info.Settings)
 }
 
 // inspector is a file contents inspector. It vets the contents of the file

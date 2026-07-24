@@ -115,3 +115,84 @@ func TestCacheHit(t *testing.T) {
 	require.EqualValues(t, 1, *data.IndexRatePerSecond)
 	require.EqualValues(t, 0.1, *data.IndexLatencyInMillis)
 }
+
+func clampedCacheWithInterval(nowMillis, prevMillis int64) EnrichedCache[cachedObject] {
+	return EnrichedCache[cachedObject]{
+		Enrichers: []EnrichedType[cachedObject]{
+			// RATE: no MaxValueMillis — must not be affected by clamping
+			{
+				CalculateValue: CalculateRate,
+				ConvertTime:    MillisToSeconds,
+				GetTime:        UseTimestamp[*cachedObject],
+				GetValue:       func(obj *cachedObject) int64 { return *obj.IndexingTotal },
+				IsUsable:       func(obj *cachedObject) bool { return obj.IndexingTotal != nil },
+				WriteValue:     func(obj *cachedObject, value float64) { obj.IndexRatePerSecond = &value },
+			},
+			// LATENCY: MaxValueMillis clamps to the sampling interval
+			{
+				CalculateValue: CalculateLatency,
+				ConvertTime:    UseTimeInMillis,
+				GetTime:        func(obj *cachedObject, _ int64) int64 { return *obj.IndexingTotalTime },
+				GetValue:       func(obj *cachedObject) int64 { return *obj.IndexingTotal },
+				IsUsable: func(obj *cachedObject) bool {
+					return obj.IndexingTotal != nil && obj.IndexingTotalTime != nil
+				},
+				WriteValue:     func(obj *cachedObject, value float64) { obj.IndexLatencyInMillis = &value },
+				MaxValueMillis: SamplingIntervalMillis[cachedObject],
+			},
+		},
+		NewTimestamp:      nowMillis,
+		PreviousTimestamp: prevMillis,
+		PreviousCache:     map[string]cachedObject{},
+	}
+}
+
+func TestClampAppliesWhenLatencyExceedsInterval(t *testing.T) {
+	nowMillis := time.Now().UnixMilli()
+	// 16 second sampling interval
+	clampCache := clampedCacheWithInterval(nowMillis, nowMillis-16_000)
+
+	// 3 ops with cumulative time 126 000 ms → raw latency = 42 000 ms/op
+	// interval is 16 000 ms → must be clamped to 16 000
+	prev := object(10, 1_000)
+	data := object(13, 127_000)
+
+	EnrichObject(&data, &prev, clampCache)
+
+	require.NotNil(t, data.IndexLatencyInMillis, "latency should be written")
+	require.EqualValues(t, 16_000, *data.IndexLatencyInMillis, "latency should be clamped to the sampling interval")
+}
+
+func TestClampNoOpWhenLatencyBelowInterval(t *testing.T) {
+	nowMillis := time.Now().UnixMilli()
+	// 16 second sampling interval
+	clampCache := clampedCacheWithInterval(nowMillis, nowMillis-16_000)
+
+	// 3 ops with cumulative time 4 000 ms → raw latency ≈ 1 333 ms/op, well below 16 000 ms
+	prev := object(10, 1_000)
+	data := object(13, 5_000)
+
+	EnrichObject(&data, &prev, clampCache)
+
+	require.NotNil(t, data.IndexLatencyInMillis, "latency should be written")
+	expected := 4_000.0 / 3.0
+	require.InDelta(t, expected, *data.IndexLatencyInMillis, 0.01, "latency below interval should not be clamped")
+}
+
+func TestClampDoesNotAffectRates(t *testing.T) {
+	nowMillis := time.Now().UnixMilli()
+	// 16 second sampling interval
+	clampCache := clampedCacheWithInterval(nowMillis, nowMillis-16_000)
+
+	// 3 ops with cumulative time 126 000 ms → latency clamped; rate = 3/16 ops/s unaffected
+	prev := object(10, 1_000)
+	data := object(13, 127_000)
+
+	EnrichObject(&data, &prev, clampCache)
+
+	require.NotNil(t, data.IndexRatePerSecond, "rate should be written")
+	require.InDelta(t, 3.0/16.0, *data.IndexRatePerSecond, 0.0001, "rate should not be affected by latency clamping")
+
+	require.NotNil(t, data.IndexLatencyInMillis, "latency should be written")
+	require.EqualValues(t, 16_000, *data.IndexLatencyInMillis, "latency should still be clamped")
+}

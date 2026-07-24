@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -44,6 +45,7 @@ type patternReader struct {
 	reader       reader.Reader
 	pred         matcher
 	flushMatcher *match.Matcher
+	stateMu      sync.Mutex
 	state        func(*patternReader) (reader.Message, error)
 	logger       *logp.Logger
 	msgBuffer    *messageBuffer
@@ -62,7 +64,7 @@ const (
 type matcher func(last, current []byte) bool
 
 var (
-	sigMultilineTimeout = errors.New("multiline timeout")
+	errSigMultilineTimeout = errors.New("multiline timeout")
 )
 
 func newMultilinePatternReader(
@@ -89,7 +91,7 @@ func newMultilinePatternReader(
 	}
 
 	if tout > 0 {
-		r = readfile.NewTimeoutReader(r, sigMultilineTimeout, tout)
+		r = readfile.NewTimeoutReader(r, errSigMultilineTimeout, tout)
 	}
 
 	pr := &patternReader{
@@ -128,7 +130,13 @@ func setupPatternMatcher(config *Config) (matcher, error) {
 
 // Next returns next multi-line event.
 func (pr *patternReader) Next() (reader.Message, error) {
-	return pr.state(pr)
+	return pr.loadState()(pr)
+}
+
+func (pr *patternReader) loadState() func(*patternReader) (reader.Message, error) {
+	pr.stateMu.Lock()
+	defer pr.stateMu.Unlock()
+	return pr.state
 }
 
 func (pr *patternReader) readFirst() (reader.Message, error) {
@@ -136,7 +144,7 @@ func (pr *patternReader) readFirst() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// no lines buffered -> ignore timeout
-			if err == sigMultilineTimeout {
+			if errors.Is(err, errSigMultilineTimeout) {
 				continue
 			}
 
@@ -162,7 +170,7 @@ func (pr *patternReader) readNext() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// handle multiline timeout signal
-			if err == sigMultilineTimeout {
+			if errors.Is(err, errSigMultilineTimeout) {
 				// no lines buffered -> ignore timeout
 				if pr.msgBuffer.isEmpty() {
 					continue
@@ -209,7 +217,7 @@ func (pr *patternReader) readNext() (reader.Message, error) {
 		if pr.flushMatcher != nil {
 			endPatternReached := (pr.flushMatcher.Match(message.Content))
 
-			if endPatternReached == true {
+			if endPatternReached {
 				// return collected multiline event and
 				// empty buffer for new multiline event
 				pr.msgBuffer.addLine(message)
@@ -253,6 +261,8 @@ func (pr *patternReader) resetState() {
 
 // setState sets state to the given function
 func (pr *patternReader) setState(next func(pr *patternReader) (reader.Message, error)) {
+	pr.stateMu.Lock()
+	defer pr.stateMu.Unlock()
 	pr.state = next
 }
 

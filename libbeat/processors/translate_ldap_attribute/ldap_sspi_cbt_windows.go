@@ -285,6 +285,10 @@ func newLDAPGSSAPIClientWithCBT(secChannelBindings []byte) (*ldapGSSAPIClientCBT
 	return &ldapGSSAPIClientCBT{creds: creds, cbt: secChannelBindings}, nil
 }
 
+func (c *ldapGSSAPIClientCBT) InitSecContextWithOptions(target string, token []byte, _ []int) ([]byte, bool, error) {
+	return c.InitSecContext(target, token)
+}
+
 func (c *ldapGSSAPIClientCBT) InitSecContext(target string, token []byte) ([]byte, bool, error) {
 	sspiFlags := uint32(sspi.ISC_REQ_INTEGRITY | sspi.ISC_REQ_CONFIDENTIALITY | sspi.ISC_REQ_MUTUAL_AUTH)
 

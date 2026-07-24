@@ -18,6 +18,7 @@
 package testing
 
 import (
+	"context"
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -59,6 +60,10 @@ func (c FakeConnector) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 // Connect calls the ConnectFunc with an empty configuration.
 func (c FakeConnector) Connect() (beat.Client, error) {
 	return c.ConnectWith(beat.ClientConfig{})
+}
+
+func (FakeConnector) Disconnect(ctx context.Context) error {
+	return nil
 }
 
 // Publish calls PublishFunc, if PublishFunc is not nil.

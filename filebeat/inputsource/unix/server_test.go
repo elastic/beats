@@ -82,73 +82,73 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		cfg              map[string]interface{}
+		cfg              map[string]any
 		expectedMessages []string
 		messageSent      string
 	}{
 		{
 			name:             "NewLine",
-			cfg:              map[string]interface{}{"line_delimiter": "\n"},
+			cfg:              map[string]any{"line_delimiter": "\n"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\n"),
 		},
 		{
 			name:             "NewLineWithCR",
-			cfg:              map[string]interface{}{"line_delimiter": "\r\n"},
+			cfg:              map[string]any{"line_delimiter": "\r\n"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\r\n"),
 		},
 		{
 			name:             "CustomDelimiter",
-			cfg:              map[string]interface{}{"line_delimiter": ";"},
+			cfg:              map[string]any{"line_delimiter": ";"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, ";"),
 		},
 		{
 			name:             "MultipleCharsCustomDelimiter",
-			cfg:              map[string]interface{}{"line_delimiter": "<END>"},
+			cfg:              map[string]any{"line_delimiter": "<END>"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "<END>"),
 		},
 		{
 			name:             "SingleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{"line_delimiter": ";"},
+			cfg:              map[string]any{"line_delimiter": ";"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "MultipleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{"line_delimiter": "<END>"},
+			cfg:              map[string]any{"line_delimiter": "<END>"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{"line_delimiter": "\n"},
+			cfg:              map[string]any{"line_delimiter": "\n"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineLargeMessagePayload",
-			cfg:              map[string]interface{}{"line_delimiter": "\n"},
+			cfg:              map[string]any{"line_delimiter": "\n"},
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, "\n"),
 		},
 		{
 			name:             "CustomLargeMessagePayload",
-			cfg:              map[string]interface{}{"line_delimiter": ";"},
+			cfg:              map[string]any{"line_delimiter": ";"},
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, ";"),
 		},
 		{
 			name:             "ReadRandomLargePayload",
-			cfg:              map[string]interface{}{"line_delimiter": "\n"},
+			cfg:              map[string]any{"line_delimiter": "\n"},
 			expectedMessages: []string{randomGeneratedText},
 			messageSent:      randomGeneratedText,
 		},
 		{
 			name: "MaxReadBufferReachedUserConfigured",
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"line_delimiter":   "\n",
 				"max_message_size": 50000,
 			},
@@ -157,7 +157,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 		},
 		{
 			name: "MaxBufferSizeSet",
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"line_delimiter":   "\n",
 				"max_message_size": 66 * 1024,
 			},
@@ -232,7 +232,7 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 	require.NoError(t, err)
 
 	path := filepath.Join(os.TempDir(), "test.sock")
-	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]any{
 		"path":           path,
 		"group":          group.Name,
 		"mode":           "0740",
@@ -267,7 +267,7 @@ func TestSocketCleanup(t *testing.T) {
 	require.NoError(t, err)
 	defer mockStaleSocket.Close()
 
-	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]any{
 		"path":           path,
 		"line_delimiter": "\n",
 	})
@@ -291,7 +291,7 @@ func TestSocketCleanupRefusal(t *testing.T) {
 	require.NoError(t, f.Close())
 	defer os.Remove(path)
 
-	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]any{
 		"path":           path,
 		"line_delimiter": "\n",
 	})
@@ -325,7 +325,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 			to := func(message []byte, mt inputsource.NetworkMetadata) {
 				ch <- &info{message: string(message), mt: mt}
 			}
-			cfg, err := conf.NewConfigFrom(map[string]interface{}{
+			cfg, err := conf.NewConfigFrom(map[string]any{
 				"path":           path,
 				"line_delimiter": "\n",
 				"socket_type":    socketType,
@@ -350,7 +350,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 			defer server.Stop()
 
 			samples := generateMessages(eventsCount, 1024)
-			for w := 0; w < workers; w++ {
+			for range workers {
 				if socketType == "stream" {
 					go sendOverUnixStream(t, path, samples)
 				} else if socketType == "datagram" {

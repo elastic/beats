@@ -48,9 +48,14 @@ func (l *ackLoop[T]) run() {
 			// New batches have been generated, add them to the pending list
 			l.pendingBatches.concat(&chanList)
 
-		case <-nextBatchChan:
-			// The oldest outstanding batch has been acknowledged, advance our
-			// position as much as we can.
+		case msg := <-nextBatchChan:
+			// The oldest outstanding batch has been acknowledged (or
+			// released via batch.Release); record whether it was a
+			// cancellation so processACK can skip the producer ACK
+			// callback. Advance our position as much as we can.
+			if head := l.pendingBatches.front(); head != nil {
+				head.cancelled = msg.cancelled
+			}
 			l.handleBatchSig()
 		}
 	}
@@ -88,7 +93,8 @@ func (l *ackLoop[T]) collectAcked() batchList[T] {
 	for !l.pendingBatches.empty() && !done {
 		acks := l.pendingBatches.front()
 		select {
-		case <-acks.doneChan:
+		case msg := <-acks.doneChan:
+			acks.cancelled = msg.cancelled
 			ackedBatches.append(l.pendingBatches.pop())
 
 		default:
@@ -109,6 +115,18 @@ func (l *ackLoop[T]) processACK(lst batchList[T], N int) {
 	lst.reverse()
 	for !lst.empty() {
 		batch := lst.pop()
+
+		// Cancelled batches (released via batch.Release rather than
+		// Done) are abandoned by the consumer: their events still
+		// need to be deleted from the buffer (they're counted in N
+		// above), but no producer ACK callback should fire because
+		// the events were never successfully delivered.
+		if batch.cancelled {
+			for i := batch.count - 1; i >= 0; i-- {
+				batch.rawEntry(i).producer = nil
+			}
+			continue
+		}
 
 		// Traverse entries from last to first, so we can acknowledge the most recent
 		// ones first and skip subsequent producer callbacks.

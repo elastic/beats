@@ -1,0 +1,206 @@
+[
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "format": "raw",
+        "kernel": "3.10.0-1062.9.1.el7.x86_64",
+        "node": "localhost.localdomain",
+        "op": "start",
+        "pid": "1643",
+        "record_type": "DAEMON_START",
+        "result": "success",
+        "sequence": "4686",
+        "ses": "4294967295",
+        "subj_domain": "auditd_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "ver": "2.8.5"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "audit_backlog_limit": "8192",
+        "auid": "4294967295",
+        "node": "localhost.localdomain",
+        "old": "64",
+        "record_type": "CONFIG_CHANGE",
+        "result": "success",
+        "sequence": "4",
+        "ses": "4294967295",
+        "subj_domain": "unconfined_service_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "audit_failure": "1",
+        "auid": "4294967295",
+        "node": "localhost.localdomain",
+        "old": "1",
+        "record_type": "CONFIG_CHANGE",
+        "result": "success",
+        "sequence": "5",
+        "ses": "4294967295",
+        "subj_domain": "unconfined_service_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd",
+        "exe": "/usr/lib/systemd/systemd",
+        "node": "localhost.localdomain",
+        "pid": "1",
+        "record_type": "SERVICE_START",
+        "result": "success",
+        "sequence": "6",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "unit": "auditd"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd-update-utmp",
+        "exe": "/usr/lib/systemd/systemd-update-utmp",
+        "node": "localhost.localdomain",
+        "pid": "1667",
+        "record_type": "SYSTEM_BOOT",
+        "result": "success",
+        "sequence": "7",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd",
+        "exe": "/usr/lib/systemd/systemd",
+        "node": "localhost.localdomain",
+        "pid": "1",
+        "record_type": "SERVICE_START",
+        "result": "success",
+        "sequence": "8",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "unit": "systemd-update-utmp"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd",
+        "exe": "/usr/lib/systemd/systemd",
+        "node": "localhost.localdomain",
+        "pid": "1",
+        "record_type": "SERVICE_START",
+        "result": "success",
+        "sequence": "9",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "unit": "rngd"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd",
+        "exe": "/usr/lib/systemd/systemd",
+        "node": "localhost.localdomain",
+        "pid": "1",
+        "record_type": "SERVICE_START",
+        "result": "success",
+        "sequence": "10",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "unit": "irqbalance"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd",
+        "exe": "/usr/lib/systemd/systemd",
+        "node": "localhost.localdomain",
+        "pid": "1",
+        "record_type": "SERVICE_START",
+        "result": "success",
+        "sequence": "11",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "unit": "abrtd"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd",
+        "exe": "/usr/lib/systemd/systemd",
+        "node": "localhost.localdomain",
+        "pid": "1",
+        "record_type": "SERVICE_START",
+        "result": "success",
+        "sequence": "12",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "unit": "abrt-xorg"
+      }
+    }
+  }
+]

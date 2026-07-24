@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"maps"
 	"net/http"
 	"strings"
 
@@ -69,7 +70,7 @@ func (conn *Connection) Bulk(
 	ctx context.Context,
 	index, docType string,
 	header http.Header,
-	params map[string]string, body []interface{},
+	params map[string]string, body []any,
 ) (int, BulkResponse, error) {
 	if len(body) == 0 {
 		return 0, nil, nil
@@ -170,7 +171,7 @@ func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResponse, e
 	return status, BulkResponse(resp), err
 }
 
-func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {
+func bulkEncode(log *logp.Logger, out BulkWriter, body []any) error {
 	for _, obj := range body {
 		if err := out.AddRaw(obj); err != nil {
 			log.Debugf("Failed to encode message: %v %s", obj, err)
@@ -189,13 +190,9 @@ func mergeParams(m1, m2 map[string]string) map[string]string {
 	}
 	merged := make(map[string]string, len(m1)+len(m2))
 
-	for k, v := range m1 {
-		merged[k] = v
-	}
+	maps.Copy(merged, m1)
 
-	for k, v := range m2 {
-		merged[k] = v
-	}
+	maps.Copy(merged, m2)
 
 	return merged
 }

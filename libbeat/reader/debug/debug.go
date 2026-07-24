@@ -153,10 +153,7 @@ func summarizeBufferInfo(idx int, buf []byte) (int, []byte) {
 		relativePos = offsetStart
 	}
 
-	endAt := idx + offsetEnd
-	if endAt >= len(buf) {
-		endAt = len(buf)
-	}
+	endAt := min(idx+offsetEnd, len(buf))
 	surround := buf[startAt:endAt]
 	return relativePos, surround
 }

@@ -1,0 +1,268 @@
+[
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "dst": "192.168.0.0",
+        "dst_prefixlen": "16",
+        "op": "SPD-delete",
+        "record_type": "MAC_IPSEC_EVENT",
+        "result": "success",
+        "sequence": "18877201",
+        "ses": "4294967295",
+        "src": "192.168.2.0",
+        "src_prefixlen": "24"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "9",
+        "a1": "7f564b2672a0",
+        "a2": "b8",
+        "a3": "0",
+        "arch": "x86_64",
+        "auid": "4294967295",
+        "comm": "charon",
+        "egid": "0",
+        "euid": "0",
+        "exe": "/usr/libexec/strongswan/charon (deleted)",
+        "exit": "184",
+        "fsgid": "0",
+        "fsuid": "0",
+        "gid": "0",
+        "items": "0",
+        "pid": "1281",
+        "ppid": "1240",
+        "record_type": "SYSCALL",
+        "result": "success",
+        "sequence": "18877199",
+        "ses": "4294967295",
+        "sgid": "0",
+        "suid": "0",
+        "syscall": "sendto",
+        "tty": "(none)",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "700",
+        "cmd": "/usr/lib64/nagios/plugins/check_asterisk_sip_peers -p 202",
+        "cwd": "/",
+        "pid": "4151",
+        "record_type": "USER_CMD",
+        "result": "success",
+        "sequence": "19600329",
+        "ses": "11988",
+        "uid": "497"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "addr": "216.160.83.61",
+        "auid": "4294967295",
+        "cipher": "chacha20-poly1305@openssh.com",
+        "direction": "from-server",
+        "exe": "/usr/sbin/sshd",
+        "ksize": "512",
+        "laddr": "10.142.0.2",
+        "lport": "22",
+        "op": "start",
+        "pfs": "curve25519-sha256@libssh.org",
+        "pid": "1298",
+        "record_type": "CRYPTO_SESSION",
+        "result": "success",
+        "rport": "63927",
+        "sequence": "406",
+        "ses": "4294967295",
+        "spid": "1299",
+        "subj_category": "c0.c1023",
+        "subj_domain": "sshd_t",
+        "subj_level": "s0-s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "suid": "74",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "1000",
+        "comm": "bash",
+        "data": "ehecho test\rvim /etc/pam.d/password-auth-ac\rman pam_tty_audit\rman pam.d\rvim /etc\u0001sudo \u0005/pamd.sy.m.d/sy\t-a\ta-a\t\rman pam\rtgrep sys/var/lo\tg/me\ts\t | grep pam_tty\rgrep pam_tty /var/log/mes\t\r\u001b[A\u0001sudo \rsudo su\r",
+        "major": "136",
+        "minor": "0",
+        "pid": "27930",
+        "record_type": "TTY",
+        "sequence": "1065565",
+        "ses": "762",
+        "uid": "1000"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "proctitle": "bash",
+        "record_type": "PROCTITLE",
+        "sequence": "194438"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "proctitle": "sshd: burn [priv]",
+        "record_type": "PROCTITLE",
+        "sequence": "194440"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "1000",
+        "comm": "yum",
+        "exe": "/usr/bin/python2.7",
+        "gpg_res": "1",
+        "key_enforce": "0",
+        "pid": "3157",
+        "record_type": "SOFTWARE_UPDATE",
+        "result": "success",
+        "root_dir": "/",
+        "sequence": "785",
+        "ses": "3",
+        "subj_category": "c0.c1023",
+        "subj_domain": "unconfined_t",
+        "subj_level": "s0-s0",
+        "subj_role": "unconfined_r",
+        "subj_user": "unconfined_u",
+        "sw": "gcc-4.8.5-39.el7.x86_64",
+        "sw_type": "rpm",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd-update-utmp",
+        "exe": "/usr/lib/systemd/systemd-update-utmp",
+        "pid": "678",
+        "record_type": "SYSTEM_BOOT",
+        "result": "success",
+        "sequence": "5",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "comm": "systemd-update-utmp",
+        "exe": "/usr/lib/systemd/systemd-update-utmp",
+        "pid": "4440",
+        "record_type": "SYSTEM_SHUTDOWN",
+        "result": "success",
+        "sequence": "1163",
+        "ses": "4294967295",
+        "subj_domain": "init_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "top",
+        "argc": "1",
+        "record_type": "EXECVE",
+        "sequence": "579393"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "record_type": "SYSCALL",
+        "sequence": "579398"
+      }
+    },
+    "error": {
+      "message": "error extracting auditd data fields: failed to parse arch: strconv.ParseInt: parsing \"x86_64\": invalid syntax"
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "name": "mymodule",
+        "record_type": "KERN_MODULE",
+        "sequence": "579397"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "100",
+        "exe": "/usr/bin/dockerd-current",
+        "op": "create",
+        "pid": "1431",
+        "reason": "api",
+        "record_type": "VIRT_CONTROL",
+        "result": "success",
+        "sequence": "145",
+        "ses": "3",
+        "subj_domain": "container_runtime_t",
+        "subj_level": "s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "user": "root"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "exe": "/usr/sbin/libvirtd",
+        "img-ctx": "system_u:object_r:svirt_image_t:s0:c444,c977",
+        "model": "selinux",
+        "pid": "5637",
+        "record_type": "VIRT_MACHINE_ID",
+        "result": "success",
+        "sequence": "23118",
+        "ses": "4294967295",
+        "subj_category": "c0.c1023",
+        "subj_domain": "virtd_t",
+        "subj_level": "s0-s0",
+        "subj_role": "system_r",
+        "subj_user": "system_u",
+        "uid": "0",
+        "uuid": "5501263b-181d-47ed-ab03-a6066f3d26bf",
+        "virt": "kvm",
+        "vm": "rhel-work3",
+        "vm-ctx": "system_u:system_r:svirt_t:s0:c444,c977"
+      }
+    }
+  }
+]

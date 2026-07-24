@@ -41,6 +41,21 @@ var MFAResponse = map[uuid.UUID]*fetcher.MFARegistrationDetails{
 	},
 }
 
+// SignInActivityResponse is the set of sign-in activity details returned by the mock fetcher.
+// Keys are the UUIDs of users in UserResponse.
+var SignInActivityResponse = map[uuid.UUID]*fetcher.SignInActivityDetails{
+	uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+		LastSignInDateTime:               "2024-01-15T08:00:00Z",
+		LastSignInRequestId:              "req-id-1",
+		LastNonInteractiveSignInDateTime: "2024-01-15T08:30:00Z",
+	},
+	uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+		LastSignInDateTime:               "2024-01-14T10:00:00Z",
+		LastSignInRequestId:              "req-id-2",
+		LastNonInteractiveSignInDateTime: "2024-01-14T11:00:00Z",
+	},
+}
+
 var (
 	GroupDeltaLinkResponse  = "group-delta-link"
 	UserDeltaLinkResponse   = "user-delta-link"
@@ -192,6 +207,11 @@ func (f *mock) Devices(ctx context.Context, _ string) ([]*fetcher.Device, string
 // UserMFADetails returns a fixed set of MFA registration details.
 func (f *mock) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFARegistrationDetails, error) {
 	return MFAResponse, nil
+}
+
+// UserSignInActivity returns a fixed set of sign-in activity details.
+func (f *mock) UserSignInActivity(ctx context.Context) (map[uuid.UUID]*fetcher.SignInActivityDetails, error) {
+	return SignInActivityResponse, nil
 }
 
 // SetLogger is not used for this implementation.

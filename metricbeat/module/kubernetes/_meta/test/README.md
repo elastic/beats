@@ -25,7 +25,11 @@ After that, you should have a kube-state-metrics pod running. In order to fetch 
 kubectl port-forward svc/kube-state-metrics 8080
 ```
 
-Then you can fetch the metrics from `localhost:8080/metrics` and then save it to a new `./KSM/ksm.vx.xx.x.plain` file.
+Then you can fetch the metrics from the url provided
+
+```bash
+curl -k https://localhost:8080/metrics > `./KSM/ksm.vx.xx.x.plain`
+```
 
 To generate and check the expectation files, you can run the following commands:
 

@@ -1,43 +1,28 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2026-01-31T00:26:10.412Z",
     "event": {
         "dataset": "iis.application_pool",
-        "duration": 115000,
-        "module": "iis"
+        "module": "iis",
+        "duration": 32222100
     },
     "iis": {
         "application_pool": {
-            "name": "test.local",
-            "net_clr": {
-                "total_exceptions_thrown": 0,
-                "finallys_per_sec": 0,
-                "exceptions_thrown_per_sec": 0,
-                "locks_and_threads": {
-                    "current_queue_length": 0,
-                    "contention_rate_per_sec": 0
-                },
-                "memory": {
-                    "gen_2_heap_size": 0,
-                    "large_object_heap_size": 0,
-                    "gen_1_heap_size": 0,
-                    "gen_1_collections": 0,
-                    "gen_0_heap_size": 0,
-                    "bytes_in_all_heaps": 0,
-                    "total_committed_bytes": 0,
-                    "gen_0_collections": 0,
-                    "gen_2_collections": 0,
-                    "allocated_bytes_per_sec": 0,
-                    "time_in_gc_perc": 0
-                },
-                "filters_per_sec": 0,
-                "throw_to_catch_depth_per_sec": 0
-            },
+            "name": "DefaultAppPool",
             "process": {
-                "handle_count": 532,
-                "private_byte": 35258368,
-                "thread_count": 29,
-                "virtual_bytes": 667226112,
-                "working_set": 36044800
+                "working_set": 19296256,
+                "virtual_bytes": 2203429777408,
+                "page_faults_per_sec": 0,
+                "io_write_operations_per_sec": 0.500673761687841,
+                "private_bytes": 6021120,
+                "thread_count": 22,
+                "handle_count": 239,
+                "cpu_usage_perc": 1.5646088737165276,
+                "io_read_operations_per_sec": 0.500673761687841
+            },
+            "host": {
+                "cpu": {
+                    "count": 16
+                }
             }
         }
     },
@@ -46,7 +31,7 @@
         "period": 10000
     },
     "process": {
-        "pid": 748
+        "pid": 24056
     },
     "service": {
         "type": "iis"

@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-07-28T13:22:18.7993488Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "permissions-changed",

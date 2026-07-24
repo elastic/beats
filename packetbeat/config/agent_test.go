@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestAgentInputNormalization(t *testing.T) {
@@ -85,7 +86,7 @@ streams:
       type: logs
 `)
 	require.NoError(t, err)
-	config, err := NewAgentConfig(cfg)
+	config, err := NewAgentConfig(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	require.Equal(t, config.Flows.Timeout, "10s")

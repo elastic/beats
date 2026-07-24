@@ -2,10 +2,10 @@
   {
     "@timestamp": "2022-01-24T05:12:34.328Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File Delete logged (rule: FileDeleteDetected)",
+      "action": "FileDeleteDetected (File Delete logged)",
       "category": [
         "file"
       ],
@@ -84,10 +84,10 @@
   {
     "@timestamp": "2022-01-24T05:12:51.031Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
-      "action": "File Delete logged (rule: FileDeleteDetected)",
+      "action": "FileDeleteDetected (File Delete logged)",
       "category": [
         "file"
       ],

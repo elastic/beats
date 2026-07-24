@@ -42,9 +42,6 @@ mage docker:composeBuild
 # Bring up all containers, wait until they are healthy, and put them in the background.
 mage docker:composeUp
 
-# Build the test binary
-mage buildSystemTestBinary
-
 # Run all integration tests.
 go test ./filebeat/...  -tags integration
 
@@ -57,7 +54,7 @@ mage docker:composeDown
 
 Go tests support generating sample events to be used as fixtures.
 
-This generation can be perfomed running `go test --data`. This functionality is supported by packetbeat and Metricbeat.
+This generation can be performed by running `go test --data`. This functionality is supported by packetbeat and Metricbeat.
 
 In Metricbeat, run the command from within a module like this: `go test --tags integration,azure --data --run "TestData"`. Make sure to add the relevant tags (`integration` is common then add module and metricset specific tags).
 

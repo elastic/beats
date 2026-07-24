@@ -46,9 +46,9 @@ func (c *conf) Validate() error {
 
 	for _, v := range c.EnrichWith {
 		switch strings.ToLower(v) {
-		case "mfa", "none":
+		case "mfa", "none", "sign_in_activity":
 		default:
-			return fmt.Errorf("enrich_with value %q is not supported; valid values are 'mfa' and 'none'", v)
+			return fmt.Errorf("enrich_with value %q is not supported; valid values are 'mfa', 'none' and 'sign_in_activity'", v)
 		}
 	}
 
@@ -84,6 +84,15 @@ func (c *conf) wantDevices() bool {
 func (c *conf) wantMFA() bool {
 	for _, v := range c.EnrichWith {
 		if strings.ToLower(v) == "mfa" {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *conf) wantSignInActivity() bool {
+	for _, v := range c.EnrichWith {
+		if strings.ToLower(v) == "sign_in_activity" {
 			return true
 		}
 	}

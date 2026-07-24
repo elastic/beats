@@ -153,12 +153,12 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
 
-func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
 	for _, hit := range hits {
-		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, meta, hit, ecsm, reqData)
+		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
 	p.log.Infof("%d events sent to index %s", len(hits), index)
@@ -201,7 +201,7 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 // PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
 // Includes schedule_execution_count;
 // native uses 1 + (run_time - start_date) / interval).
-func (p *Publisher) PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
+func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -226,6 +226,12 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, spaceID, respon
 	}
 	if packID != "" {
 		fields["pack_id"] = packID
+	}
+	if packName != "" {
+		fields["pack_name"] = packName
+	}
+	if queryName != "" {
+		fields["query_name"] = queryName
 	}
 	if spaceID != "" {
 		fields["space_id"] = spaceID
@@ -291,7 +297,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 }
 
 func actionResultToEvent(req, res map[string]interface{}) map[string]interface{} {
-	m := make(map[string]interface{}, 8)
+	m := make(map[string]interface{}, 9)
 
 	copyKey := func(key string, src, dst map[string]interface{}) {
 		if v, ok := src[key]; ok {
@@ -322,6 +328,8 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 	if v, ok := req["data"]; ok {
 		m["action_data"] = v
 	}
+
+	copyKey("space_id", req, m)
 
 	return m
 }
@@ -363,7 +371,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 	return procs, nil
 }
 
-func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, packID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
+func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
 	var fields mapstr.M
 
 	if len(ecsm) > 0 {
@@ -412,6 +420,12 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 	}
 	if packID != "" {
 		event.Fields["pack_id"] = packID
+	}
+	if packName != "" {
+		event.Fields["pack_name"] = packName
+	}
+	if queryName != "" {
+		event.Fields["query_name"] = queryName
 	}
 	if index != "" {
 		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}

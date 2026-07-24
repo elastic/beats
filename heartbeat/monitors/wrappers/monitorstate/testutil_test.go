@@ -36,7 +36,7 @@ import (
 // Helpers for tests here and elsewhere
 
 func IntegESLoader(t *testing.T, esc *eslegclient.Connection, indexPattern string, location *config.LocationWithID) StateLoader {
-	return MakeESLoader(esc, indexPattern, location)
+	return MakeESLoader(esc, indexPattern, location, logptest.NewTestingLogger(t, ""))
 }
 
 func IntegES(t *testing.T) (esc *eslegclient.Connection) {

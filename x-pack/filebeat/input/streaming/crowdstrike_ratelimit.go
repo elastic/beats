@@ -6,6 +6,7 @@ package streaming
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -25,6 +26,7 @@ var _ http.RoundTripper = (*rateLimitTransport)(nil)
 // unauthorized requests.
 type rateLimitTransport struct {
 	base     http.RoundTripper
+	timeout  time.Duration // per-request timeout applied via context
 	maxRetry int
 	wait     time.Duration // default wait when Retry-After is absent
 	log      *logp.Logger
@@ -32,6 +34,12 @@ type rateLimitTransport struct {
 }
 
 func (t *rateLimitTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.timeout > 0 {
+		ctx, cancel := context.WithTimeout(req.Context(), t.timeout)
+		defer cancel()
+		req = req.WithContext(ctx)
+	}
+
 	// Buffer the body so POST requests (token endpoint) can be replayed.
 	var body []byte
 	if req.Body != nil {

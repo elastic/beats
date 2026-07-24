@@ -84,7 +84,7 @@ func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	return e.plugin.Manager
 }
 
-func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Input {
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
@@ -331,6 +331,19 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	return c, nil
 }
 
+func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, c := range pc.clients {
+		if err := c.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
 	if !blocking {
 		return config.EventListener
@@ -340,7 +353,7 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 }
 
 func blockingACKer(starter context.Context) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		for starter.Err() == nil {
 		}
 	})

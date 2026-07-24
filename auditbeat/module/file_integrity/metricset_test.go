@@ -37,6 +37,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+// testPaths returns a *paths.Path whose Data directory is dataDir.
+func testPaths(dataDir string) *paths.Path {
+	p := paths.New()
+	p.Data = dataDir
+	return p
+}
+
 func TestData(t *testing.T) {
 	dir := t.TempDir()
 
@@ -453,15 +460,7 @@ func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
 type expectedEvents []expectedEvent
 
 func (e expectedEvents) validate(t *testing.T) {
-	store, err := os.CreateTemp("", "bucket")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
-	defer os.Remove(store.Name())
-
-	ds := datastore.New(store.Name(), 0o644)
-	bucket, err := ds.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -726,15 +725,7 @@ func TestEventFailedHash(t *testing.T) {
 }
 
 func TestEventDelete(t *testing.T) {
-	store, err := os.CreateTemp("", "bucket")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
-	defer os.Remove(store.Name())
-
-	ds := datastore.New(store.Name(), 0o644)
-	bucket, err := ds.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()))
 	if err != nil {
 		t.Fatal(err)
 	}

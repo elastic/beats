@@ -20,6 +20,7 @@ package task
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -38,7 +39,7 @@ type Group struct {
 }
 
 type Logger interface {
-	Errorf(format string, args ...interface{})
+	Errorf(format string, args ...any)
 }
 
 // NewGroup returns a new task group which will run tasks on a goroutine. See
@@ -56,7 +57,7 @@ type Logger interface {
 func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errPrefix string) *Group {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	var logErr = func(error) {}
+	logErr := func(error) {}
 	if log != nil {
 		var format string
 		if errPrefix == "" {
@@ -72,7 +73,7 @@ func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errPrefix str
 
 	var sem *semaphore.Weighted
 	if limit > 0 {
-		sem = semaphore.NewWeighted(int64(limit))
+		sem = semaphore.NewWeighted(int64(min(limit, math.MaxInt64)))
 	}
 
 	return &Group{
@@ -95,9 +96,7 @@ func (g *Group) Go(fn func(context.Context) error) error {
 		return fmt.Errorf("task group is closed: %w", err)
 	}
 
-	g.wg.Add(1)
-	go func() {
-		defer g.wg.Done()
+	g.wg.Go(func() {
 
 		if g.sem != nil {
 			err := g.sem.Acquire(g.ctx, 1)
@@ -115,7 +114,7 @@ func (g *Group) Go(fn func(context.Context) error) error {
 		if err != nil {
 			g.logErr(err)
 		}
-	}()
+	})
 
 	return nil
 }
@@ -129,7 +128,7 @@ func (g *Group) Stop() error {
 	done := make(chan struct{})
 	go func() {
 		g.wg.Wait()
-		done <- struct{}{}
+		close(done)
 	}()
 
 	timeout, cancel := context.WithTimeout(context.Background(), g.stopTimeout)

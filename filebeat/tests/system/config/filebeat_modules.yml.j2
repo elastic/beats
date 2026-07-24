@@ -10,6 +10,7 @@ filebeat.registry:
 filebeat.overwrite_pipelines: true
 
 path.logs: {{ beat.working_dir }}
+path.data: {{ beat.working_dir }}/data
 
 filebeat.config.modules:
   path: {{ beat.working_dir + '/modules.d/*.yml' }}

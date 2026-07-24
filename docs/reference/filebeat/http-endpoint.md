@@ -46,11 +46,14 @@ The HTTP endpoint has the following configuration settings:
 `http.pprof.mutex_profile_rate`
 :   (Optional) `mutex_profile_rate` controls the fraction of mutex contention events that are reported in the mutex profile available from `/debug/pprof/mutex`. On average 1/rate events are reported. To turn off profiling entirely, pass rate 0. The default value is 0.
 
+`http.debug.state_inspector.enabled`
+:   (Optional) Enable the state store inspector. **This is an internal debugging tool for Elastic engineers, not a supported product feature.** It has no authentication, may expose sensitive data (file paths, S3 object keys, AWS account identifiers, hostnames), and may be changed or removed in any release without notice. Deleting state entries can cause duplicate processing, gaps in ingestion, or data loss. If you must enable it, bind `http.host` to a loopback address, Unix socket, or Windows named pipe, and disable it again when done. Default is `false`. See [State Inspector](#state-inspector) for details.
+
 This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
 
 You can query a unix socket using the `cURL` command and the `--unix-socket` flag.
 
-```js
+```sh
 curl -XGET --unix-socket '/var/run/filebeat.sock' 'http:/stats/?pretty'
 ```
 
@@ -59,11 +62,11 @@ curl -XGET --unix-socket '/var/run/filebeat.sock' 'http:/stats/?pretty'
 
 `/` provides basic info from the Filebeat. Example:
 
-```js
+```sh
 curl -XGET 'localhost:5066/?pretty'
 ```
 
-```js subs=true
+```json subs=true
 {
   "beat": "filebeat",
   "hostname": "example.lan",
@@ -78,11 +81,11 @@ curl -XGET 'localhost:5066/?pretty'
 
 `/stats` reports internal metrics. Example:
 
-```js
+```sh
 curl -XGET 'localhost:5066/stats?pretty'
 ```
 
-```js
+```json
 {
   "beat": {
     "cpu": {
@@ -195,9 +198,37 @@ The actual output may contain more metrics specific to Filebeat
 
 A request may optionally specify a `type` query parameter to request metrics for a specific type of input. And `pretty` may be included to have the returned JSON be pretty formatted.
 
-```js
+```sh
 curl 'http://localhost:5066/inputs/'
 curl 'http://localhost:5066/inputs/?pretty'
 curl 'http://localhost:5066/inputs/?type=aws-s3&pretty'
 ```
 
+
+## State Inspector [state-inspector]
+
+```{applies_to}
+stack: preview 9.5
+```
+
+::::{warning}
+**Internal debugging tool — not a supported product feature.** This is intended for use by Elastic engineers during development and troubleshooting. It has no authentication and may be changed or removed in any release without notice.
+
+The state store may contain sensitive information such as source file paths, S3 object keys, AWS account identifiers, and source hostnames, all of which will be returned to any client that can reach the endpoint. Deleting state entries can cause duplicate processing, gaps in ingestion, or data loss; for active inputs, deletes may be transient and silently overwritten by the in-memory registrar.
+
+If you must enable this for troubleshooting, bind `http.host` to a loopback address (`127.0.0.1`), a Unix socket, or a Windows named pipe, and disable it again as soon as you are done.
+::::
+
+These endpoints are only available when `http.debug.state_inspector.enabled` is set to `true`. Filebeat exposes its input registry through this endpoint.
+
+`/debug/state-inspector/states` returns a JSON array of all key-value pairs in the internal state store. `/debug/state-inspector/states.html` serves a browser UI for the same data.
+
+```sh
+curl -XGET 'localhost:5066/debug/state-inspector/states?pretty'
+```
+
+To permanently delete a specific state entry:
+
+```sh
+curl -XDELETE 'localhost:5066/debug/state-inspector/states/<key>'
+```

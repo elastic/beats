@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -243,7 +244,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, 
 	// make a pipeline
 	pipe := &mockPipeline{}
 	// pass it to the factory
-	f, sched, closeFactory := setupFactoryAndSched(location, stateLoader)
+	f, sched, closeFactory := setupFactoryAndSched(t, location, stateLoader)
 	conf, err := config.NewConfigFrom(monitorConfig)
 	require.NoError(t, err)
 	err = conf.Unpack(&mtr.StdFields)
@@ -270,7 +271,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, 
 	return mtr, err
 }
 
-func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func setupFactoryAndSched(t *testing.T, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
@@ -284,6 +285,7 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
+		Logger:          logptest.NewTestingLogger(t, ""),
 	}
 
 	sched = scheduler.Create(
@@ -292,6 +294,7 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		time.Local,
 		nil,
 		true,
+		logptest.NewTestingLogger(t, ""),
 	)
 
 	return monitors.NewFactory(monitors.FactoryParams{

@@ -291,7 +291,7 @@ metricbeat.modules:
   enabled: true
 
   # If set to true, replace dots in labels with `_`.
-  #labels.dedot: false
+  #labels.dedot: true
 
   # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
   # podman: false
@@ -432,7 +432,7 @@ metricbeat.modules:
   #paths:
   #  - path: "/foo"
   #    namespace: "foo"
-  #    fields: # added to the the response in root. overwrites existing fields
+  #    fields: # added to the response in root. overwrites existing fields
   #      key: "value"
 
 #------------------------------- Jolokia Module -------------------------------
@@ -651,9 +651,9 @@ metricbeat.modules:
   metricsets:
     - event
   period: 10s
-  # Skip events older than Metricbeat's statup time is enabled by default.
+  # Skipping events older than Metricbeat's startup time is enabled by default.
   # Setting to false the skip_older setting will stop filtering older events.
-  # This setting is also useful went Event's timestamps are not populated properly.
+  # This setting is also useful when events' timestamps are not populated properly.
   #skip_older: false
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
@@ -1306,7 +1306,7 @@ metricbeat.modules:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"

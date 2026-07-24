@@ -8,11 +8,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-go@v6
+    - uses: actions/setup-go@v7
       with:
         go-version-file: .go-version
 
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@v7
       with:
         cache: "pip"
         python-version-file: .python-version

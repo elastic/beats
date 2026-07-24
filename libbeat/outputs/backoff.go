@@ -28,34 +28,28 @@ import (
 )
 
 type backoffClient struct {
-	client NetworkClient
-
-	done           chan struct{}
+	client         NetworkClient
 	connectBackoff backoff.Backoff
 	publishBackoff backoff.Backoff
 }
 
 // WithBackoff wraps a NetworkClient, adding exponential backoff support to a network client if connection/publishing failed.
 func WithBackoff(client NetworkClient, init, max time.Duration) NetworkClient {
-	done := make(chan struct{})
 	return &backoffClient{
 		client:         client,
-		done:           done,
-		connectBackoff: backoff.NewEqualJitterBackoff(done, init, max),
-		publishBackoff: backoff.NewEqualJitterBackoff(done, init, max),
+		connectBackoff: backoff.NewEqualJitterBackoff(init, max),
+		publishBackoff: backoff.NewEqualJitterBackoff(init, max),
 	}
 }
 
 func (b *backoffClient) Connect(ctx context.Context) error {
 	err := b.client.Connect(ctx)
-	backoff.WaitOnError(b.connectBackoff, err)
+	backoff.WaitOnError(ctx, b.connectBackoff, err)
 	return err
 }
 
 func (b *backoffClient) Close() error {
-	err := b.client.Close()
-	close(b.done)
-	return err
+	return b.client.Close()
 }
 
 func (b *backoffClient) Publish(ctx context.Context, batch publisher.Batch) error {
@@ -63,7 +57,7 @@ func (b *backoffClient) Publish(ctx context.Context, batch publisher.Batch) erro
 	if err != nil {
 		b.client.Close()
 	}
-	backoff.WaitOnError(b.publishBackoff, err)
+	backoff.WaitOnError(ctx, b.publishBackoff, err)
 	return err
 }
 

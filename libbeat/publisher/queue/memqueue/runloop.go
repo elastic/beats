@@ -134,6 +134,9 @@ func (l *runLoop[T]) runIteration() {
 		}
 		if force {
 			l.broker.ctxCancel()
+			// The ackLoop will stop, so no further acks fire: unblock any
+			// producer ack-wait channels still open.
+			l.broker.closeProducerAckWaits()
 		}
 
 	case <-l.broker.ctx.Done():
@@ -165,6 +168,10 @@ func (l *runLoop[T]) runIteration() {
 	// completely drained)
 	if l.closing && l.eventCount == 0 {
 		l.broker.ctxCancel()
+		// Drained gracefully: events were acked so most ackWaits closed on
+		// their own, but unblock any producer closed with never-acked (e.g.
+		// dropped) events so it can't strand a waiter.
+		l.broker.closeProducerAckWaits()
 	}
 }
 
@@ -193,16 +200,13 @@ func (l *runLoop[T]) getRequestShouldBlock(req *getRequest[T]) bool {
 // Respond to the given get request without blocking or waiting for more events
 func (l *runLoop[T]) handleGetReply(req *getRequest[T]) {
 	eventsAvailable := l.eventCount - l.consumedCount
-	batchSize := req.entryCount
-	if eventsAvailable < batchSize {
-		batchSize = eventsAvailable
-	}
+	batchSize := min(eventsAvailable, req.entryCount)
 
 	startIndex := l.bufPos + l.consumedCount
 	batch := newBatch(l.broker, startIndex, batchSize)
 
 	batchBytes := 0
-	for i := 0; i < batchSize; i++ {
+	for i := range batchSize {
 		batchBytes += batch.rawEntry(i).eventSize
 	}
 
@@ -215,7 +219,7 @@ func (l *runLoop[T]) handleGetReply(req *getRequest[T]) {
 
 func (l *runLoop[T]) handleDelete(count int) {
 	byteCount := 0
-	for i := 0; i < count; i++ {
+	for i := range count {
 		entry := l.broker.buf[(l.bufPos+i)%len(l.broker.buf)]
 		byteCount += entry.eventSize
 	}

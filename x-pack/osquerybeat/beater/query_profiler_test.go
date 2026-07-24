@@ -99,6 +99,14 @@ func TestBuildLiveQueryProfile(t *testing.T) {
 	if profileErr["exit"].(int64) != 1 {
 		t.Errorf("exit on error = %v, want 1", profileErr["exit"])
 	}
+
+	rruleProf := buildRuntimeQueryProfile("rrule", "SELECT 2", before, after, duration, nil)
+	if rruleProf["source"] != "rrule" {
+		t.Errorf("source = %v, want rrule", rruleProf["source"])
+	}
+	if rruleProf["query"] != "SELECT 2" {
+		t.Errorf("query = %v, want SELECT 2", rruleProf["query"])
+	}
 }
 
 func TestDiagnosticsErrorJSON(t *testing.T) {

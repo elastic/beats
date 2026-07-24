@@ -21,7 +21,6 @@ package mqtt
 
 import (
 	"fmt"
-	"os"
 	"sync"
 	"testing"
 	"time"
@@ -31,6 +30,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/mqtt/testutil"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -43,12 +43,7 @@ const (
 	waitTimeout = 30 * time.Second
 )
 
-var (
-	hostPort = fmt.Sprintf("tcp://%s:%s",
-		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"), //nolint:misspell //required
-		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))      //nolint:misspell //required
-	topic = fmt.Sprintf("topic-%d", time.Now().UnixNano())
-)
+var topic = fmt.Sprintf("topic-%d", time.Now().UnixNano())
 
 type eventCaptor struct {
 	c         chan struct{}
@@ -82,14 +77,11 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 }
 
 func TestInput(t *testing.T) {
-
-	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
-		"hosts":  []string{hostPort},
+		"hosts":  []string{testutil.HostPort()},
 		"topics": []string{topic},
 	})
 
-	// Route input events through our captor instead of sending through ES.
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
@@ -100,25 +92,20 @@ func TestInput(t *testing.T) {
 		return channel.SubOutlet(captor), nil
 	})
 
-	// Mock the context.
 	inputContext := input.Context{
 		Done:     make(chan struct{}),
 		BeatDone: make(chan struct{}),
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	// Setup the input
 	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
-	// Run the input.
 	input.Run()
 
-	// Create Publisher
-	publisher := createPublisher(t)
+	publisher := testutil.CreatePublisher(t, "mqtt-integration-pub")
 
-	// Verify that event has been received
 	verifiedCh := make(chan struct{})
 	defer close(verifiedCh)
 
@@ -132,19 +119,6 @@ func TestInput(t *testing.T) {
 	require.Equal(t, message, val)
 }
 
-func createPublisher(t *testing.T) libmqtt.Client {
-	clientOptions := libmqtt.NewClientOptions().
-		SetClientID("emitter").
-		SetAutoReconnect(false).
-		SetConnectRetry(false).
-		AddBroker(hostPort)
-	client := libmqtt.NewClient(clientOptions)
-	token := client.Connect()
-	require.True(t, token.WaitTimeout(waitTimeout))
-	require.NoError(t, token.Error())
-	return client
-}
-
 func emitInputData(t *testing.T, verifiedCh <-chan struct{}, publisher libmqtt.Client) {
 	go func() {
 		ticker := time.NewTicker(time.Second)
@@ -155,17 +129,8 @@ func emitInputData(t *testing.T, verifiedCh <-chan struct{}, publisher libmqtt.C
 			case <-verifiedCh:
 				return
 			case <-ticker.C:
-				token := publisher.Publish(topic, 1, false, []byte(message))
-				require.True(t, token.WaitTimeout(waitTimeout))
-				require.NoError(t, token.Error())
+				testutil.PublishMessage(t, publisher, topic, message)
 			}
 		}
 	}()
-}
-
-func getOrDefault(s, defaultString string) string {
-	if s == "" {
-		return defaultString
-	}
-	return s
 }

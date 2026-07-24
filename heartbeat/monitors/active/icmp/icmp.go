@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -31,7 +32,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -44,10 +44,11 @@ func init() {
 func create(
 	name string,
 	commonConfig *conf.C,
+	info beat.Info,
 ) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
 	if err != nil {
-		logp.Warn("Failed to initialize ICMP loop %v", err)
+		info.Logger.Warnf("Failed to initialize ICMP loop %v", err)
 		return plugin.Plugin{}, err
 	}
 

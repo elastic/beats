@@ -63,6 +63,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
 			PathPrefix:               container.PathPrefix,
+			Retry:                    in.config.Retry,
 		}
 
 		st := newState()
@@ -79,7 +80,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			cancel()
 		}()
 
-		serviceClient, credential, err := fetchServiceClientAndCreds(in.config, in.serviceURL, log)
+		serviceClient, credential, err := fetchServiceClientAndCreds(in.config, currentSource.Retry, in.serviceURL, log)
 		if err != nil {
 			return err
 		}

@@ -18,6 +18,7 @@
 package stress
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -62,22 +63,21 @@ func RunTests(
 
 	log := logp.L()
 
+	info.Paths = paths.New()
+	info.Paths.Home = "."
+	info.Paths.Config = "."
+	info.Paths.Data = "."
+	info.Paths.Logs = "."
+
 	processing, err := processing.MakeDefaultSupport(false, nil)(info, log, cfg)
 	if err != nil {
 		return err
 	}
 
-	beatPaths := paths.New()
-	beatPaths.Home = "."
-	beatPaths.Config = "."
-	beatPaths.Data = "."
-	beatPaths.Logs = "."
-
 	pipelineSettings := pipeline.Settings{
 		WaitClose:     0,
 		WaitCloseMode: pipeline.NoWaitOnClose,
 		Processors:    processing,
-		Paths:         beatPaths,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(info,
@@ -99,7 +99,7 @@ func RunTests(
 	}
 	defer func() {
 		log.Info("Stop pipeline")
-		pipeline.Close()
+		pipeline.Disconnect(context.Background())
 		log.Info("pipeline closed")
 	}()
 
@@ -131,9 +131,7 @@ func RunTests(
 }
 
 func withWG(wg *sync.WaitGroup, fn func()) {
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		fn()
-	}()
+	})
 }

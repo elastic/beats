@@ -1,0 +1,46 @@
+[
+  {
+    "auditd": {
+      "log": {
+        "record_type": "EXECVE",
+        "sequence": "5009988"
+      }
+    },
+    "error": {
+      "message": "error extracting auditd data fields: argc key not found"
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "record_type": "EXECVE",
+        "sequence": "5009988"
+      }
+    },
+    "error": {
+      "message": "error extracting auditd data fields: argc key not found"
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "record_type": "EXECVE",
+        "sequence": "5009988"
+      }
+    },
+    "error": {
+      "message": "error extracting auditd data fields: argc key not found"
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "record_type": "EXECVE",
+        "sequence": "9381969"
+      }
+    },
+    "error": {
+      "message": "error extracting auditd data fields: argc key not found"
+    }
+  }
+]

@@ -12,6 +12,9 @@ type EnrichedType[T any] struct {
 	GetValue       func(*T) int64
 	IsUsable       func(*T) bool
 	WriteValue     func(*T, float64)
+	// If set, the calculated value is clamped to min(calculated, MaxValueMillis(cache)).
+	// Used to ensure latency cannot exceed the sampling interval.
+	MaxValueMillis func(cache EnrichedCache[T]) float64
 }
 
 type EnrichedCache[T any] struct {
@@ -25,6 +28,11 @@ type EnrichedCache[T any] struct {
 
 func CalculateLatency(timeDiff float64, valueDiff int64) float64 {
 	return timeDiff / float64(valueDiff)
+}
+
+// SamplingIntervalMillis returns the wall-clock milliseconds between the previous and current sample.
+func SamplingIntervalMillis[T any](cache EnrichedCache[T]) float64 {
+	return float64(cache.NewTimestamp - cache.PreviousTimestamp)
 }
 
 func CalculateRate(timeDiff float64, valueDiff int64) float64 {
@@ -69,6 +77,12 @@ func EnrichObject[T any](obj *T, prevObj *T, cache EnrichedCache[T]) {
 			// either being zero means there's no measurable value exists
 			if timeDiff > 0 && valueDiff > 0 {
 				calculated = enricher.CalculateValue(timeDiff, valueDiff)
+			}
+
+			if enricher.MaxValueMillis != nil {
+				if maxV := enricher.MaxValueMillis(cache); maxV > 0 && calculated > maxV {
+					calculated = maxV
+				}
 			}
 
 			enricher.WriteValue(obj, calculated)

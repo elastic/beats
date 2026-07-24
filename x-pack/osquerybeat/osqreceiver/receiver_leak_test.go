@@ -78,12 +78,12 @@ func startAndStopReceiver(t *testing.T, factory receiver.Factory, consumer consu
 	rec, err := factory.CreateLogs(t.Context(), receiverSettings, config, consumer)
 	require.NoError(t, err)
 	require.NoError(t, rec.Start(t.Context(), componenttest.NewNopHost()))
-	// Wait for the osquerybeat receiver to start running. The "Starting metrics
+	// Wait for the osquerybeat receiver to start running. The "Skipping metrics
 	// logging" message is emitted by the metric reporter inside BeatReceiver.Start,
 	// after the reporter is created, ensuring it is safe to call Shutdown.
 	if !assert.Eventually(t,
 		func() bool {
-			return observedLogs.FilterMessageSnippet("Starting metrics logging").Len() >= 1
+			return observedLogs.FilterMessageSnippet("Skipping metrics logging").Len() >= 1
 		},
 		60*time.Second,
 		1*time.Second,

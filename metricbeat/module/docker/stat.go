@@ -18,7 +18,7 @@
 package docker
 
 import (
-	"github.com/docker/docker/api/types/container"
+	"github.com/moby/moby/api/types/container"
 )
 
 // Types don't need build constraints, unlike the docker.Client code, which is linux-only.

@@ -6,11 +6,15 @@ package azureblobstorage
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net"
+	"net/http"
 	"slices"
 	"sort"
 	"sync"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	azruntime "github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
@@ -21,6 +25,37 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/timed"
 )
+
+// transientListStatusCodes are the HTTP status codes treated as transient when
+// listing blobs. They mirror the Azure SDK's own retryable set, so an error
+// carrying one of these means the SDK already exhausted its per-request retries
+// on a throttling or availability blip that is likely to clear on its own.
+var transientListStatusCodes = map[int]bool{
+	http.StatusRequestTimeout:      true, // 408
+	http.StatusTooManyRequests:     true, // 429
+	http.StatusInternalServerError: true, // 500
+	http.StatusBadGateway:          true, // 502
+	http.StatusServiceUnavailable:  true, // 503
+	http.StatusGatewayTimeout:      true, // 504
+}
+
+// isTransientListError reports whether a blob-listing failure is transient and
+// therefore safe to ride out by retrying on the next poll, as opposed to a
+// permanent failure (e.g. a missing container or an auth error) that will not
+// resolve on its own and should stop the input.
+func isTransientListError(err error) bool {
+	var respErr *azcore.ResponseError
+	if errors.As(err, &respErr) {
+		return transientListStatusCodes[respErr.StatusCode]
+	}
+	// A network timeout (the request could not reach the service in time) is
+	// also transient.
+	var netErr net.Error
+	if errors.As(err, &netErr) {
+		return netErr.Timeout()
+	}
+	return false
+}
 
 // limiter, is used to limit the number of goroutines from blowing up the stack
 type limiter struct {
@@ -113,7 +148,25 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	for pager.More() {
 		resp, err := pager.NextPage(ctx)
 		if err != nil {
+			// A cancelled context means the input is shutting down; propagate it
+			// so the scheduler loop exits cleanly without counting it as an error.
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
 			s.metrics.errorsTotal.Inc()
+			// When polling, a *transient* listing failure must not kill the
+			// input. This covers throttling (HTTP 503 ServerBusy, 429) or a brief
+			// network timeout that outlived the SDK's own per-request retries.
+			// Mark the input Degraded and let schedule() retry on the next poll
+			// interval so a longer outage is ridden out instead of permanently
+			// stopping the input. Permanent failures (e.g. a missing container or
+			// an auth error) will not resolve on their own, so they still stop
+			// the input.
+			if s.src.Poll && isTransientListError(err) {
+				s.log.Warnw("transient failure while listing blobs; will retry on the next poll interval", "error", err)
+				s.status.UpdateStatus(status.Degraded, "transient failure listing blobs (will retry on next poll): "+err.Error())
+				return nil
+			}
 			s.status.UpdateStatus(status.Failed, "failed to fetch next page during pagination: "+err.Error())
 			return err
 		}
@@ -139,7 +192,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				containerName: s.src.ContainerName,
 			}
 
-			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.log)
+			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.src.Retry, s.log)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
@@ -147,7 +200,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				return err
 			}
 
-			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.status, s.metrics, s.log)
+			job := newJob(blobClient, v, blobURL, s.state, s.src, s.src.Retry.MaxRetries, s.publisher, s.status, s.metrics, s.log)
 			jobs = append(jobs, job)
 		}
 
@@ -191,6 +244,16 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		if len(jobs) != 0 {
 			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].name(), jobs[len(jobs)-1].name())
 		}
+	}
+
+	// A successful listing pass is itself a recovery signal. When jobs are
+	// scheduled they report Running as they publish events, but a poll that
+	// lists cleanly yet schedules no jobs (no new blobs, or everything filtered
+	// out or already past the checkpoint) would otherwise leave the input stuck
+	// in a Degraded state set by an earlier transient listing failure. Report
+	// Running here so the input recovers even on an empty poll.
+	if s.src.Poll && numJobs == 0 {
+		s.status.UpdateStatus(status.Running, "")
 	}
 
 	return nil

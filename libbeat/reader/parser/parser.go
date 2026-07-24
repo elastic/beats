@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/auditd"
 	"github.com/elastic/beats/v7/libbeat/reader/filter"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -129,6 +130,13 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing include_message parser config: %w", err)
 			}
+		case "auditd":
+			config := auditd.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing auditd parser config: %w", err)
+			}
 		default:
 			return nil, fmt.Errorf("%s: %w", name, ErrNoSuchParser)
 		}
@@ -190,6 +198,14 @@ func (c *Config) Create(in reader.Reader, log *logp.Logger) Parser {
 				return p
 			}
 			p = filter.NewParser(p, &config, log)
+		case "auditd":
+			config := auditd.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return p
+			}
+			p = auditd.NewParser(p, config, log)
 		default:
 			return p
 		}

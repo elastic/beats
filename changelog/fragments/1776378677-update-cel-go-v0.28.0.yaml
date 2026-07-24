@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Update cel-go to v0.28.0, fixing runtime error location reporting.
-component: filebeat

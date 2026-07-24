@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Summarizer produces summary events (with summary.* and other asssociated fields).
@@ -40,6 +41,7 @@ type Summarizer struct {
 	retryDelay     time.Duration
 	plugins        []SummarizerPlugin
 	startedAt      time.Time
+	logger         *logp.Logger
 }
 
 func (s Summarizer) beforeEachEvent(event *beat.Event) {
@@ -76,7 +78,7 @@ type SummarizerPlugin interface {
 	BeforeRetry()
 }
 
-func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
+func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker, logger *logp.Logger) *Summarizer {
 	s := &Summarizer{
 		rootJob:        rootJob,
 		contsRemaining: 1,
@@ -85,6 +87,7 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 		sf:             sf,
 		retryDelay:     time.Second,
 		startedAt:      time.Now(),
+		logger:         logger,
 	}
 	s.setupPlugins()
 	return s
@@ -97,14 +100,14 @@ func (s *Summarizer) setupPlugins() {
 		s.plugins = []SummarizerPlugin{
 			DropBrowserExtraEvents{},
 			&BrowserDurationPlugin{},
-			&BrowserURLPlugin{},
-			NewBrowserStateStatusplugin(s.mst, s.sf),
+			&BrowserURLPlugin{logger: s.logger},
+			NewBrowserStateStatusplugin(s.mst, s.sf, s.logger),
 			NewBrowserErrPlugin(),
 		}
 	} else {
 		s.plugins = []SummarizerPlugin{
 			&LightweightDurationPlugin{},
-			NewLightweightStateStatusPlugin(s.mst, s.sf),
+			NewLightweightStateStatusPlugin(s.mst, s.sf, s.logger),
 			NewLightweightErrPlugin(),
 		}
 	}

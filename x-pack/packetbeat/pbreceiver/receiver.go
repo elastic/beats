@@ -21,20 +21,18 @@ type packetbeatReceiver struct {
 }
 
 func (pb *packetbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	pb.wg.Add(1)
-	go func() {
-		defer pb.wg.Done()
+	pb.wg.Go(func() {
 		pb.Logger.Info("starting packetbeat receiver")
 		if err := pb.BeatReceiver.Start(host); err != nil {
 			pb.Logger.Error("error starting packetbeat receiver", zap.Error(err))
 		}
-	}()
+	})
 	return nil
 }
 
 func (pb *packetbeatReceiver) Shutdown(ctx context.Context) error {
 	pb.Logger.Info("stopping packetbeat receiver")
-	if err := pb.BeatReceiver.Shutdown(); err != nil {
+	if err := pb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping packetbeat receiver: %w", err)
 	}
 	pb.wg.Wait()

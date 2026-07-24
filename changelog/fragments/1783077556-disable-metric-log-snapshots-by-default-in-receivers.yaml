@@ -1,0 +1,8 @@
+# REQUIRED
+kind: enhancement
+
+# REQUIRED
+summary: Disable periodic metrics logging (`logging.metrics`) by default when a beat runs as an OTel Collector receiver.
+
+# REQUIRED
+component: beats

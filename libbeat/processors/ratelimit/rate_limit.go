@@ -68,6 +68,8 @@ func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("could not set default configuration: %w", err)
 	}
 
+	sort.Strings(config.Fields)
+
 	algoConfig := algoConfig{
 		limit:  config.Limit,
 		config: *config.Algorithm.Config(),
@@ -127,7 +129,6 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 		return 0, nil
 	}
 
-	sort.Strings(p.config.Fields)
 	values := make([]string, len(p.config.Fields))
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)
