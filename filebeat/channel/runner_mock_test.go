@@ -89,9 +89,7 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 	})
 
 	t.Run("close processor groups", func(t *testing.T) {
-		// Every client must close its processor group: repeated Close must be
-		// tolerated, and unreleased references would keep the processors (and
-		// their background goroutines) alive past the owners' shutdown.
+		// Close every processor group to release shared references.
 		for _, c := range r.cfgs {
 			require.NoError(t, c.Processing.Processor.Close())
 		}

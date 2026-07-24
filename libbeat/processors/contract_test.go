@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Black-box contracts for public processor construction and lifecycle behavior.
-
 package processors_test
 
 import (
@@ -58,7 +56,6 @@ func contractUniqueID(name string) string {
 type contractProcSnapshot struct {
 	closed             bool
 	closeCount         int
-	runCount           int
 	runsAfterClose     int
 	runsBeforeSetPaths int
 	setPathsCount      int
@@ -76,7 +73,6 @@ type contractProcState struct {
 	mu                 sync.Mutex
 	closed             bool
 	closeCount         int
-	runCount           int
 	runsAfterClose     int
 	runsBeforeSetPaths int
 	setPathsCount      int
@@ -86,7 +82,6 @@ type contractProcState struct {
 
 func (p *contractProcState) Run(event *beat.Event) (*beat.Event, error) {
 	p.mu.Lock()
-	p.runCount++
 	if p.closed {
 		p.runsAfterClose++
 		p.mu.Unlock()
@@ -123,7 +118,6 @@ func (p *contractProcState) snapshot() contractProcSnapshot {
 	return contractProcSnapshot{
 		closed:             p.closed,
 		closeCount:         p.closeCount,
-		runCount:           p.runCount,
 		runsAfterClose:     p.runsAfterClose,
 		runsBeforeSetPaths: p.runsBeforeSetPaths,
 		setPathsCount:      p.setPathsCount,

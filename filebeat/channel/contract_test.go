@@ -15,9 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Black-box contracts for per-client processors constructed through
-// RunnerFactoryWithCommonInputSettings.
-
 package channel_test
 
 import (
