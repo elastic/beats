@@ -6,6 +6,7 @@ package elasticsearchstorage
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -17,25 +18,28 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
+	"go.opentelemetry.io/collector/extension/xextension/storage"
 )
 
 var (
 	_ extension.Extension = (*elasticStorage)(nil)
 	_ backend.Registry    = (*elasticStorage)(nil)
 	_ backend.Store       = (*lockedStore)(nil)
+	_ storage.Extension   = (*elasticStorage)(nil)
 )
 
 type elasticStorage struct {
 	cfg    *Config
 	ctx    context.Context
 	logger *logp.Logger
-	client *eslegclient.Connection
 
-	// clientMu serializes every operation that goes through client. The
-	// connection (and its body encoder + response buffer) is documented as
-	// not thread-safe, so all stores returned by Access must share this lock
-	// and hold it for the full Marshal → execRequest → HTTP.Do path.
+	// clientMu guards client and serializes every operation that goes
+	// through it. The connection (and its body encoder + response buffer) is
+	// documented as not thread-safe, so all stores returned by Access must
+	// share this lock and hold it for the full Marshal → execRequest →
+	// HTTP.Do path. Shutdown sets client to nil under this lock.
 	clientMu sync.Mutex
+	client   *eslegclient.Connection
 }
 
 func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
@@ -47,25 +51,70 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 	if err != nil {
 		return err
 	}
+	e.clientMu.Lock()
 	e.client = client
+	e.clientMu.Unlock()
 	e.ctx = ctx
 	return nil
 }
 
+// Shutdown closes the shared connection and sets client to nil so a
+// GetClient or Access after Shutdown fails instead of handing out a store
+// backed by a closed connection.
 func (e *elasticStorage) Shutdown(ctx context.Context) error {
 	e.clientMu.Lock()
 	defer e.clientMu.Unlock()
 	if e.client == nil {
 		return nil
 	}
-	return e.client.Close()
+	err := e.client.Close()
+	e.client = nil
+	return err
 }
 
 func (e *elasticStorage) Access(name string) (backend.Store, error) {
+	e.clientMu.Lock()
+	defer e.clientMu.Unlock()
+	if e.client == nil {
+		return nil, fmt.Errorf("elasticsearch_storage: Access called before Start or after Shutdown")
+	}
 	return &lockedStore{
 		inner: es.NewStore(e.ctx, e.logger, e.client, name),
 		mu:    &e.clientMu,
 	}, nil
+}
+
+// GetClient implements storage.Extension: it hands an OTel component a
+// storage.Client scoped to a per-identity Elasticsearch index. The index is
+// created lazily on the first write, so a transient ES outage while a
+// receiver acquires its client does not stop the receiver from starting.
+// All clients share the extension's single connection and clientMu.
+func (e *elasticStorage) GetClient(ctx context.Context, kind component.Kind, id component.ID, storageName string) (storage.Client, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	e.clientMu.Lock()
+	defer e.clientMu.Unlock()
+	if e.client == nil {
+		return nil, fmt.Errorf("elasticsearch_storage: GetClient called before Start or after Shutdown")
+	}
+	return &esStorageClient{
+		ext:      e,
+		index:    composeIndexName(kind, id, storageName),
+		pageSize: defaultPageSize,
+	}, nil
+}
+
+// isServerless reports whether the connected cluster is Elastic Cloud
+// Serverless, reading the shared connection under clientMu. The answer is
+// cached by the connection after the first call.
+func (e *elasticStorage) isServerless() (bool, error) {
+	e.clientMu.Lock()
+	defer e.clientMu.Unlock()
+	if e.client == nil {
+		return false, errExtensionClosed
+	}
+	return e.client.IsServerless(), nil
 }
 
 func (e *elasticStorage) Close() error {
