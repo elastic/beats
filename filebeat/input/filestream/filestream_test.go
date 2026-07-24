@@ -29,6 +29,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
@@ -409,7 +412,7 @@ func TestLogFile_readUntilEOFAfterReaderCtxCancel(t *testing.T) {
 	buf := make([]byte, 16)
 	n, err := reader.Read(buf)
 	require.NoError(t, err, "first Read must succeed")
-	require.Positive(t, n, 0, "first Read must return data")
+	require.Positive(t, n, "first Read must return data")
 
 	// 2. Simulate something else cancelling the reader. closeIfTimeout
 	//    (close.reader.after_interval) and periodicStateCheck
@@ -547,4 +550,50 @@ func readUntilError(reader *logFile) error {
 		_, err = reader.Read(buf)
 	}
 	return err
+}
+
+// TestLogFileReadDeadline verifies the end-to-end multiline-timeout mechanism on
+// a real logFile: the EncodeReader forwards a deadline down to the logFile, and
+// logFile.Read returns reader.ErrReadDeadline when the deadline elapses at EOF
+// (rather than blocking in backoff). This is the path the multiline timeout
+// relies on; without it multiline would never flush a pending event at EOF.
+func TestLogFileReadDeadline(t *testing.T) {
+	fs := filestream{readerConfig: readerConfig{BufferSize: 512}, compression: CompressionAuto}
+	f, err := fs.newFile(createTestPlainLogFile(t))
+	require.NoError(t, err, "could not create file for reading")
+	defer f.Close()
+	defer os.Remove(f.Name())
+
+	lf, _, err := newFileReader(logp.NewNopLogger(), context.TODO(), f, readerConfig{}, closerConfig{}, false)
+	require.NoError(t, err)
+
+	// The EncodeReader (LineReader) must forward the deadline to the logFile.
+	codec, _ := encoding.Plain(lf)
+	enc, err := readfile.NewEncodeReader(lf, readfile.Config{
+		Codec:      codec,
+		BufferSize: 512,
+		Terminator: readfile.LineFeed,
+		MaxBytes:   1 << 20,
+	}, logp.NewNopLogger())
+	require.NoError(t, err)
+
+	deadline := time.Now().Add(time.Hour)
+	require.True(t, reader.SetReadDeadline(enc, deadline),
+		"deadline must reach the log file through the encode reader")
+	require.Equal(t, deadline, lf.readDeadline)
+
+	// Drain the file content (a generous deadline keeps the data reads from
+	// timing out), then a short deadline at EOF must surface ErrReadDeadline.
+	buf := make([]byte, 512)
+	lf.SetReadDeadline(time.Now().Add(2 * time.Second))
+	n, err := lf.Read(buf)
+	require.NoError(t, err)
+	require.Positive(t, n)
+
+	lf.SetReadDeadline(time.Now().Add(50 * time.Millisecond))
+	start := time.Now()
+	_, err = lf.Read(buf)
+	require.ErrorIs(t, err, reader.ErrReadDeadline)
+	require.GreaterOrEqual(t, time.Since(start), 40*time.Millisecond,
+		"Read returned before the deadline elapsed")
 }
