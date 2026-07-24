@@ -32,12 +32,12 @@ type builderPlugin struct {
 const pluginKey = "libbeat.autodiscover.builder"
 
 // Plugin accepts a BuilderConstructor to be registered as a plugin
-func Plugin(name string, b autodiscover.BuilderConstructor) map[string][]interface{} {
+func Plugin(name string, b autodiscover.BuilderConstructor) map[string][]any {
 	return p.MakePlugin(pluginKey, builderPlugin{name, b})
 }
 
 func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	p.MustRegisterLoader(pluginKey, func(ifc any) error {
 		b, ok := ifc.(builderPlugin)
 		if !ok {
 			return errors.New("plugin does not match builder plugin type")

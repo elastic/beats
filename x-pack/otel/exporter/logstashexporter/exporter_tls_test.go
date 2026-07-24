@@ -45,14 +45,14 @@ func TestLumberjackConnection(t *testing.T) {
 		name              string
 		hostname          string // hostname used in exporter config
 		serverTLSOption   *serverTLSOption
-		buildClientConfig func() map[string]interface{}
+		buildClientConfig func() map[string]any
 	}{
 		{
 			name:            "plain connection",
 			hostname:        "localhost",
 			serverTLSOption: nil,
-			buildClientConfig: func() map[string]interface{} {
-				return map[string]interface{}{}
+			buildClientConfig: func() map[string]any {
+				return map[string]any{}
 			},
 		},
 		{
@@ -63,8 +63,8 @@ func TestLumberjackConnection(t *testing.T) {
 				CommonName:     "whatever",
 				DNSNames:       []string{"whatever"},
 			},
-			buildClientConfig: func() map[string]interface{} {
-				return map[string]interface{}{
+			buildClientConfig: func() map[string]any {
+				return map[string]any{
 					"ssl.certificate_authorities": []string{invalidCAFile},
 					"ssl.verification_mode":       "none",
 				}
@@ -78,8 +78,8 @@ func TestLumberjackConnection(t *testing.T) {
 				CommonName:     "dont-care",
 				DNSNames:       []string{"whatever"},
 			},
-			buildClientConfig: func() map[string]interface{} {
-				return map[string]interface{}{
+			buildClientConfig: func() map[string]any {
+				return map[string]any{
 					"ssl.certificate_authorities": []string{caFile},
 					"ssl.verification_mode":       "certificate",
 				}
@@ -92,8 +92,8 @@ func TestLumberjackConnection(t *testing.T) {
 				ClientAuthType: tls.RequestClientCert,
 				CommonName:     "localhost",
 			},
-			buildClientConfig: func() map[string]interface{} {
-				return map[string]interface{}{
+			buildClientConfig: func() map[string]any {
+				return map[string]any{
 					"ssl.certificate_authorities": []string{caFile},
 					"ssl.verification_mode":       "full",
 				}
@@ -106,8 +106,8 @@ func TestLumberjackConnection(t *testing.T) {
 				ClientAuthType: tls.RequestClientCert,
 				DNSNames:       []string{"localhost"},
 			},
-			buildClientConfig: func() map[string]interface{} {
-				return map[string]interface{}{
+			buildClientConfig: func() map[string]any {
+				return map[string]any{
 					"ssl.certificate_authorities": []string{caFile},
 					"ssl.verification_mode":       "strict",
 				}
@@ -120,9 +120,9 @@ func TestLumberjackConnection(t *testing.T) {
 				ClientAuthType: tls.RequireAndVerifyClientCert,
 				DNSNames:       []string{"localhost"},
 			},
-			buildClientConfig: func() map[string]interface{} {
+			buildClientConfig: func() map[string]any {
 				clientCertificate, clientKey := oteltest.GetClientCerts(t, caCert, "")
-				return map[string]interface{}{
+				return map[string]any{
 					"ssl.certificate_authorities": []string{caFile},
 					"ssl.certificate":             clientCertificate,
 					"ssl.key":                     clientKey,
@@ -136,9 +136,9 @@ func TestLumberjackConnection(t *testing.T) {
 				ClientAuthType: tls.RequireAndVerifyClientCert,
 				DNSNames:       []string{"localhost"},
 			},
-			buildClientConfig: func() map[string]interface{} {
+			buildClientConfig: func() map[string]any {
 				clientCertificate, clientKey := oteltest.GetClientCerts(t, caCert, testPassphrase)
-				return map[string]interface{}{
+				return map[string]any{
 					"ssl.certificate_authorities": []string{caFile},
 					"ssl.certificate":             clientCertificate,
 					"ssl.key":                     clientKey,
@@ -154,8 +154,8 @@ func TestLumberjackConnection(t *testing.T) {
 				AddCAToLeaf:    true,
 				DNSNames:       []string{"localhost"},
 			},
-			buildClientConfig: func() map[string]interface{} {
-				return map[string]interface{}{
+			buildClientConfig: func() map[string]any {
+				return map[string]any{
 					"ssl.ca_trusted_fingerprint": tlscommontest.GetCertFingerprint(caCert.Leaf),
 				}
 			},
@@ -207,7 +207,7 @@ func testWithLumberjackServer(t *testing.T, hostname string, tlsConfig *tls.Conf
 
 		events := batch.Events
 		assert.Len(t, events, 1)
-		msg, ok := events[0].(map[string]interface{})
+		msg, ok := events[0].(map[string]any)
 		assert.True(t, ok)
 		assert.Equal(t, "test log message", msg["value"])
 	}

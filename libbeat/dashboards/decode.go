@@ -103,15 +103,15 @@ func decodeEmbeddableConfig(o mapstr.M, logger *logp.Logger) mapstr.M {
 		return o
 	}
 
-	if panels, ok := p.([]interface{}); ok {
+	if panels, ok := p.([]any); ok {
 		for i, pan := range panels {
-			if panel, ok := pan.(map[string]interface{}); ok {
+			if panel, ok := pan.(map[string]any); ok {
 				panelObj := mapstr.M(panel)
 				embedded, err := panelObj.GetValue("embeddableConfig")
 				if err != nil {
 					continue
 				}
-				if embeddedConfig, ok := embedded.(map[string]interface{}); ok {
+				if embeddedConfig, ok := embedded.(map[string]any); ok {
 					embeddedConfigObj := mapstr.M(embeddedConfig)
 					panelObj.Put("embeddableConfig", decodeObject(embeddedConfigObj, logger))
 					panels[i] = panelObj
@@ -130,7 +130,7 @@ func decodeValue(data mapstr.M, key string) error {
 		return err
 	}
 	s := v.(string)
-	var d interface{}
+	var d any
 	err = json.Unmarshal([]byte(s), &d)
 	if err != nil {
 		return fmt.Errorf("error decoding %s: %v", key, err)

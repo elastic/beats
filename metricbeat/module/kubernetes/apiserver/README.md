@@ -69,7 +69,7 @@
 In order to support a new Kubernetes releases you'll have to generate new expectation files for this module in `_meta/test`. For that, start by deploying a new kubernetes cluster on the required Kubernetes version, for example:
 
 ```bash
-kind create cluster --image kindest/node:v1.32.0
+kind create cluster --image kindest/node:v1.36.1
 ```
 
 After that, you can apply the [`kubernetes.yml`](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/kubernetes.yml) file from the root of the kubernetes module:

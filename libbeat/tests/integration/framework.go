@@ -192,14 +192,12 @@ func (b *BeatProc) Start(args ...string) {
 	var done atomic.Bool
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for !done.Load() {
 				b.startBeat()
 				b.waitBeatToExit()
 			}
-		}()
+		})
 	} else {
 		b.startBeat()
 	}

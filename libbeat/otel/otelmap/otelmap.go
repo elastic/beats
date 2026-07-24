@@ -277,7 +277,7 @@ type PdataValuesMap struct {
 
 // GetValue retrieves the value at the given dotted key path and returns it as
 // a Go primitive (string, int64, float64, bool, []interface{}, or map[string]interface{}).
-func (p PdataValuesMap) GetValue(key string) (interface{}, error) {
+func (p PdataValuesMap) GetValue(key string) (any, error) {
 	v, ok := GetAtPath(key, p.M)
 	if !ok {
 		return nil, mapstr.ErrKeyNotFound
@@ -287,31 +287,79 @@ func (p PdataValuesMap) GetValue(key string) (interface{}, error) {
 
 // GetAtPath retrieves the value at a dotted key path (e.g. "cloud.instance.id")
 // from m, traversing nested maps as needed.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.GetValue behaviour for keys stored flat), then falls back
+// to path navigation.
 func GetAtPath(key string, m pcommon.Map) (pcommon.Value, bool) {
-	dot := strings.IndexByte(key, '.')
-	if dot < 0 {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
 		return m.Get(key)
 	}
-	parent, ok := m.Get(key[:dot])
+	if v, found := m.Get(key); found {
+		return v, true
+	}
+	parent, ok := m.Get(before)
 	if !ok || parent.Type() != pcommon.ValueTypeMap {
 		return pcommon.Value{}, false
 	}
-	return GetAtPath(key[dot+1:], parent.Map())
+	return GetAtPath(after, parent.Map())
 }
 
 // PutAtPath encodes val at a dotted key path (e.g. "cloud.instance.id") in m,
 // creating intermediate maps as needed. Existing intermediate maps are
 // preserved (not replaced).
 func PutAtPath(key string, val any, m pcommon.Map) error {
-	dot := strings.IndexByte(key, '.')
-	if dot < 0 {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
 		return putIntoMap(key, val, m)
 	}
-	head, rest := key[:dot], key[dot+1:]
+	head, rest := before, after
 	if existing, ok := m.Get(head); ok && existing.Type() == pcommon.ValueTypeMap {
 		return PutAtPath(rest, val, existing.Map())
 	}
 	return PutAtPath(rest, val, m.PutEmptyMap(head))
+}
+
+// DeleteAtPath removes the value at a dotted key path (e.g. "cloud.instance.id")
+// from m, traversing nested maps as needed. Returns false if the path did not exist.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.Delete behaviour for keys stored flat), then falls back
+// to path navigation.
+func DeleteAtPath(key string, m pcommon.Map) bool {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
+		return m.Remove(key)
+	}
+	if m.Remove(key) {
+		return true
+	}
+	parent, ok := m.Get(before)
+	if !ok || parent.Type() != pcommon.ValueTypeMap {
+		return false
+	}
+	return DeleteAtPath(after, parent.Map())
+}
+
+// FlattenKeys returns all key paths in m as dotted strings (e.g. "cloud.instance.id"),
+// including intermediate map keys. This mirrors the behaviour of mapstr.M.FlattenKeys:
+// children are listed before their parent map key.
+func FlattenKeys(m pcommon.Map) []string {
+	out := make([]string, 0, m.Len())
+	flattenPdataKeys("", m, &out)
+	return out
+}
+
+func flattenPdataKeys(prefix string, m pcommon.Map, out *[]string) {
+	for k, v := range m.All() {
+		fullKey := k
+		if prefix != "" {
+			fullKey = prefix + "." + k
+		}
+		if v.Type() == pcommon.ValueTypeMap {
+			flattenPdataKeys(fullKey, v.Map(), out)
+		}
+		*out = append(*out, fullKey)
+	}
 }
 
 // FormatTimestamp renders t in the layout the elasticsearchexporter's
@@ -369,7 +417,7 @@ func fromReflective(dst pcommon.Value, value any) error {
 func fromReflectiveSlice(dst pcommon.Slice, ref reflect.Value) error {
 	n := ref.Len()
 	dst.EnsureCapacity(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if err := FromValue(dst.AppendEmpty(), ref.Index(i).Interface()); err != nil {
 			return err
 		}

@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Pass configured HTTP transport to Okta minimal-state provider for TLS support.
+component: filebeat

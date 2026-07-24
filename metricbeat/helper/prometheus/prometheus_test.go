@@ -1222,8 +1222,8 @@ func generateStateContainerMetrics(containers, infosPerContainer int) string {
 	var buf bytes.Buffer
 	buf.WriteString("# HELP kube_pod_container_info Information about a container in a pod.\n")
 	buf.WriteString("# TYPE kube_pod_container_info gauge\n")
-	for i := 0; i < containers; i++ {
-		for j := 0; j < infosPerContainer; j++ {
+	for i := range containers {
+		for j := range infosPerContainer {
 			fmt.Fprintf(&buf,
 				"kube_pod_container_info{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\",image=\"img-%d:%d\"} 1\n",
 				i%10, i, i, i, j)
@@ -1231,14 +1231,14 @@ func generateStateContainerMetrics(containers, infosPerContainer int) string {
 	}
 	buf.WriteString("# HELP kube_pod_container_status_ready Describes whether the containers readiness check succeeded.\n")
 	buf.WriteString("# TYPE kube_pod_container_status_ready gauge\n")
-	for i := 0; i < containers; i++ {
+	for i := range containers {
 		fmt.Fprintf(&buf,
 			"kube_pod_container_status_ready{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\"} 1\n",
 			i%10, i, i)
 	}
 	buf.WriteString("# HELP kube_pod_container_status_running Describes whether the container is in running state.\n")
 	buf.WriteString("# TYPE kube_pod_container_status_running gauge\n")
-	for i := 0; i < containers; i++ {
+	for i := range containers {
 		fmt.Fprintf(&buf,
 			"kube_pod_container_status_running{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\"} 1\n",
 			i%10, i, i)

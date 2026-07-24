@@ -35,15 +35,15 @@ import (
 const processorTimeCounter = `\Processor Information(_Total)\% Processor Time`
 
 func TestData(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
 		"period":     "10s",
-		"perfmon.queries": []map[string]interface{}{
+		"perfmon.queries": []map[string]any{
 			{
 				"object":   "Processor Information",
 				"instance": []string{"_Total"},
-				"counters": []map[string]interface{}{
+				"counters": []map[string]any{
 					{
 						"name":  "% Processor Time",
 						"field": "processor.time.total.pct",
@@ -66,14 +66,14 @@ func TestData(t *testing.T) {
 }
 
 func TestCounterWithNoInstanceName(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
 		"period":     "10s",
-		"perfmon.queries": []map[string]interface{}{
+		"perfmon.queries": []map[string]any{
 			{
 				"object": "UDPv4",
-				"counters": []map[string]interface{}{
+				"counters": []map[string]any{
 					{
 						"name": "Datagrams Sent/sec",
 					},
@@ -115,7 +115,7 @@ func TestQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		err = q.CollectData()
 		if err != nil {
 			t.Fatal(err)

@@ -56,7 +56,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{srv.URL},
 			"username": "elastic",
 			"password": "changeme",
@@ -64,8 +64,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 	}
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	require.NoError(t, ext.Start(ctx, componenttest.NewNopHost()))
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
@@ -77,7 +76,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 	)
 
 	stores := make([]backend.Store, numStores)
-	for i := 0; i < numStores; i++ {
+	for i := range numStores {
 		s, err := ext.Access(fmt.Sprintf("stream-%d", i))
 		require.NoError(t, err)
 		stores[i] = s
@@ -96,14 +95,12 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 		}
 	}
 
-	for i := 0; i < numStores; i++ {
+	for i := range numStores {
 		s := stores[i]
 		key := fmt.Sprintf("cursor-%d", i)
-		for w := 0; w < writersPerStore; w++ {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				for j := 0; j < opsPerStore; j++ {
+		for range writersPerStore {
+			wg.Go(func() {
+				for range opsPerStore {
 					if err := s.Set(key, map[string]any{
 						"cursor":  nil,
 						"ttl":     0,
@@ -113,11 +110,9 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 						return
 					}
 				}
-			}()
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				for j := 0; j < opsPerStore; j++ {
+			})
+			wg.Go(func() {
+				for range opsPerStore {
 					if err := s.Each(func(string, backend.ValueDecoder) (bool, error) {
 						return true, nil
 					}); err != nil {
@@ -125,7 +120,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 						return
 					}
 				}
-			}()
+			})
 		}
 	}
 
@@ -159,7 +154,7 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{srv.URL},
 			"username": "elastic",
 			"password": "changeme",
@@ -167,8 +162,7 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 	}
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	require.NoError(t, ext.Start(ctx, componenttest.NewNopHost()))
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
@@ -187,7 +181,7 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 
 	beatStores := make([]backend.Store, numStores)
 	entStores := make([]entcollect.Store, numStores)
-	for i := 0; i < numStores; i++ {
+	for i := range numStores {
 		bs, err := ext.Access(fmt.Sprintf("stream-%d", i))
 		require.NoError(t, err)
 		beatStores[i] = bs
@@ -207,16 +201,14 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 		}
 	}
 
-	for i := 0; i < numStores; i++ {
+	for i := range numStores {
 		bs := beatStores[i]
 		es := entStores[i]
 		key := fmt.Sprintf("cursor-%d", i)
 
 		// Access path: Set + Each, same shape as the original test.
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < opsPerStore; j++ {
+		wg.Go(func() {
+			for range opsPerStore {
 				if err := bs.Set(key, map[string]any{
 					"cursor":  nil,
 					"ttl":     0,
@@ -226,11 +218,9 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 					return
 				}
 			}
-		}()
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < opsPerStore; j++ {
+		})
+		wg.Go(func() {
+			for range opsPerStore {
 				if err := bs.Each(func(string, backend.ValueDecoder) (bool, error) {
 					return true, nil
 				}); err != nil {
@@ -238,16 +228,14 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 					return
 				}
 			}
-		}()
+		})
 
 		// Store path: same op pattern via entcollect.Store. These
 		// goroutines do not hold clientMu in the current code, so
 		// they race against the Access goroutines on the shared
 		// eslegclient.Connection.
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < opsPerStore; j++ {
+		wg.Go(func() {
+			for range opsPerStore {
 				if err := es.Set(key, map[string]any{
 					"cursor":  nil,
 					"ttl":     0,
@@ -257,11 +245,9 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 					return
 				}
 			}
-		}()
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < opsPerStore; j++ {
+		})
+		wg.Go(func() {
+			for range opsPerStore {
 				if err := es.Each(func(string, func(any) error) (bool, error) {
 					return true, nil
 				}); err != nil {
@@ -269,7 +255,7 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 					return
 				}
 			}
-		}()
+		})
 	}
 
 	wg.Wait()

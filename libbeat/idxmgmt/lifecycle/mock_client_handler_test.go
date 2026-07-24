@@ -30,11 +30,11 @@ type mockHandler struct {
 
 type onCall struct {
 	name    string
-	args    []interface{}
-	returns []interface{}
+	args    []any
+	returns []any
 }
 
-func (c onCall) Return(values ...interface{}) onCall {
+func (c onCall) Return(values ...any) onCall {
 	c.returns = values
 	return c
 }
@@ -92,6 +92,6 @@ func (h *mockHandler) CheckExists() bool {
 	return args.Bool(0)
 }
 
-func makeOnCall(name string, args ...interface{}) onCall {
+func makeOnCall(name string, args ...any) onCall {
 	return onCall{name: name, args: args}
 }

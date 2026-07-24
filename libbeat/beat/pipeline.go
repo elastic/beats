@@ -151,7 +151,7 @@ type ProcessingConfig struct {
 
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
-	Private interface{}
+	Private any
 }
 
 // ClientListener provides access to internal client events.

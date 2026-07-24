@@ -97,8 +97,8 @@ func TestFileIdentifier(t *testing.T) {
 	})
 
 	t.Run("path identifier", func(t *testing.T) {
-		c := conf.MustNewConfigFrom(map[string]interface{}{
-			"identifier": map[string]interface{}{
+		c := conf.MustNewConfigFrom(map[string]any{
+			"identifier": map[string]any{
 				"path": nil,
 			},
 		})
@@ -144,8 +144,8 @@ func TestFileIdentifier(t *testing.T) {
 	})
 
 	t.Run("fingerprint identifier", func(t *testing.T) {
-		c := conf.MustNewConfigFrom(map[string]interface{}{
-			"identifier": map[string]interface{}{
+		c := conf.MustNewConfigFrom(map[string]any{
+			"identifier": map[string]any{
 				"fingerprint": nil,
 			},
 		})

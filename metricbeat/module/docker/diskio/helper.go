@@ -18,6 +18,7 @@
 package diskio
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -165,7 +166,7 @@ func getNewStats(skip []uint64, time time.Time, blkioEntry []container.BlkioStat
 
 		// certain devices, like software raid and device-mapper devices, will just control and re-report the disks
 		// under them in the hierarchy. We want to skip them, lest we merely duplicate the metrics.
-		if skipDev(myEntry.Major, skip) {
+		if slices.Contains(skip, myEntry.Major) {
 			continue
 		}
 		// These op value strings can either be Capitalized or lowercase, depending on the platform.
@@ -180,15 +181,6 @@ func getNewStats(skip []uint64, time time.Time, blkioEntry []container.BlkioStat
 	}
 
 	return stats
-}
-
-func skipDev(major uint64, skipList []uint64) bool {
-	for _, dev := range skipList {
-		if major == dev {
-			return true
-		}
-	}
-	return false
 }
 
 func (io *BlkioService) getReadPs(old *BlkioRaw, new *BlkioRaw) float64 {

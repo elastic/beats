@@ -86,42 +86,42 @@ func (m MockReporterV2) Error(err error) bool {
 func TestFixTimestampField(t *testing.T) {
 	tests := []struct {
 		Name          string
-		OriginalValue map[string]interface{}
-		ExpectedValue map[string]interface{}
+		OriginalValue map[string]any
+		ExpectedValue map[string]any
 	}{
 		{
 			"converts float64s in scientific notation to ints",
-			map[string]interface{}{
+			map[string]any{
 				"foo": 1.571284349e+09,
 			},
-			map[string]interface{}{
+			map[string]any{
 				"foo": 1571284349,
 			},
 		},
 		{
 			"converts regular notation float64s to ints",
-			map[string]interface{}{
+			map[string]any{
 				"foo": float64(1234),
 			},
-			map[string]interface{}{
+			map[string]any{
 				"foo": 1234,
 			},
 		},
 		{
 			"ignores missing fields",
-			map[string]interface{}{
+			map[string]any{
 				"bar": 12345,
 			},
-			map[string]interface{}{
+			map[string]any{
 				"bar": 12345,
 			},
 		},
 		{
 			"leaves strings untouched",
-			map[string]interface{}{
+			map[string]any{
 				"foo": "bar",
 			},
-			map[string]interface{}{
+			map[string]any{
 				"foo": "bar",
 			},
 		},

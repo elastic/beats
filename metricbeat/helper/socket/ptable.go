@@ -140,7 +140,7 @@ func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
 	// Filter out not owned processes
 	k := 0
 	euid := uint64(os.Geteuid())
-	for i := 0; i < len(procs); i++ {
+	for i := range procs {
 		p, err := t.fs.Proc(procs[i].PID)
 		if err != nil {
 			continue

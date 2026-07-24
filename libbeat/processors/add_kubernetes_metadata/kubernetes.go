@@ -34,8 +34,6 @@ import (
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -44,6 +42,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/shared"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 )
 
 const (
@@ -318,15 +318,15 @@ func (k *kubernetesAnnotator) init(ctx context.Context, config kubeAnnotatorConf
 		indexers := NewIndexers(config.Indexers, metaGen)
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
+			AddFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(indexers, pod)
 			},
-			UpdateFunc: func(obj interface{}) {
+			UpdateFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(indexers, pod)
 			},
-			DeleteFunc: func(obj interface{}) {
+			DeleteFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(indexers, pod)
 			},

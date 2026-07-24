@@ -38,7 +38,7 @@ type Range struct {
 }
 
 // NewRangeCondition builds a new Range from a map of ranges.
-func NewRangeCondition(config map[string]interface{}, log *logp.Logger) (c Range, err error) {
+func NewRangeCondition(config map[string]any, log *logp.Logger) (c Range, err error) {
 	c = Range{logger: log, rangemap: make(map[string]rangeValue)}
 
 	updateRangeValue := func(key string, op string, value float64) error {

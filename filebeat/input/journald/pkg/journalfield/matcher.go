@@ -22,6 +22,7 @@ package journalfield
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -97,10 +98,8 @@ func (b MatcherBuilder) Build(in string) (Matcher, error) {
 	}
 
 	for journalKey, eventField := range conversions {
-		for _, name := range eventField.Names {
-			if elems[0] == name {
-				return Matcher{journalKey + "=" + elems[1]}, nil
-			}
+		if slices.Contains(eventField.Names, elems[0]) {
+			return Matcher{journalKey + "=" + elems[1]}, nil
 		}
 	}
 

@@ -11,7 +11,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
-func GetConfigFromEnv(t *testing.T) map[string]interface{} {
+func GetConfigFromEnv(t *testing.T) map[string]any {
 	t.Helper()
 
 	shardID, err := uuid.NewV4()
@@ -19,7 +19,7 @@ func GetConfigFromEnv(t *testing.T) map[string]interface{} {
 		t.Fatalf("Unable to create a random shard ID: %v", err)
 	}
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"api_address":   lookupEnv(t, "CLOUDFOUNDRY_API_ADDRESS"),
 		"client_id":     lookupEnv(t, "CLOUDFOUNDRY_CLIENT_ID"),
 		"client_secret": lookupEnv(t, "CLOUDFOUNDRY_CLIENT_SECRET"),
@@ -47,7 +47,7 @@ func lookupEnv(t *testing.T, name string) string {
 	return value
 }
 
-func optionalConfig(config map[string]interface{}, key string, envVar string) {
+func optionalConfig(config map[string]any, key string, envVar string) {
 	if value, ok := os.LookupEnv(envVar); ok {
 		config[key] = value
 	}
