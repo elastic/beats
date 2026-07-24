@@ -19,8 +19,45 @@ notify:
         ${BUILDKITE_BUILD_URL}
     if: build.state == "blocked"
 
+env:
+  ASDF_MAGE_VERSION: "1.15.0"
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
 steps:
-  # TODO: replace this block step by real version bump logic
+  # BRANCH is major.minor (e.g. 9.4 for a 9.4.0 minor release, 9.3 for a 9.3.3 patch).
+  - label: "Bump version minor"
+    key: bump-version-minor
+    if: build.env("WORKFLOW") == "minor"
+    agents:
+      image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+      cpu: "4000m"
+      memory: "8Gi"
+      useCustomGlobalHooks: true
+    env:
+      CURRENT_RELEASE: "${NEW_VERSION}"
+    plugins:
+      - elastic/vault-github-token#v0.2.1: ~
+    command:
+      - mage release:runMajorMinor
+    timeout_in_minutes: 60
+
+  - label: "Bump version patch"
+    key: bump-version-patch
+    if: build.env("WORKFLOW") == "patch"
+    agents:
+      image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+      cpu: "4000m"
+      memory: "8Gi"
+      useCustomGlobalHooks: true
+    env:
+      CURRENT_RELEASE: "${NEW_VERSION}"
+      BASE_BRANCH: "${BRANCH}"
+    plugins:
+      - elastic/vault-github-token#v0.2.1: ~
+    command:
+      - mage release:runPatch
+    timeout_in_minutes: 60
+
   - block: "Ready to fetch for DRA artifacts?"
     prompt: |
       Unblock when your team is ready to proceed.
