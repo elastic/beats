@@ -1,0 +1,509 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package release
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/google/go-github/v68/github"
+	"golang.org/x/oauth2"
+)
+
+// GitHubClient wraps the GitHub API client
+type GitHubClient struct {
+	client *github.Client
+	ctx    context.Context
+}
+
+// PROptions holds options for creating a pull request
+type PROptions struct {
+	Owner     string
+	Repo      string
+	Title     string
+	Head      string
+	Base      string
+	Body      string
+	Draft     bool
+	Reviewers []string
+	Labels    []string
+}
+
+// NewGitHubClient creates a new GitHub API client.
+// An empty token uses unauthenticated public API access (sufficient for reading public releases).
+func NewGitHubClient(token string) *GitHubClient {
+	ctx := context.Background()
+	var httpClient *http.Client
+	if token != "" {
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		httpClient = oauth2.NewClient(ctx, ts)
+	}
+
+	return &GitHubClient{
+		client: github.NewClient(httpClient),
+		ctx:    ctx,
+	}
+}
+
+// CreatePR creates a pull request, or returns an existing open PR with the same head and base.
+func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
+	existingPR, found, err := gh.FindOpenPR(opts.Owner, opts.Repo, opts.Head, opts.Base)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		fmt.Printf("Open PR already exists #%d: %s\n", existingPR.GetNumber(), existingPR.GetHTMLURL())
+		gh.ensurePRLabels(opts.Owner, opts.Repo, existingPR.GetNumber(), opts.Labels)
+		return existingPR, nil
+	}
+
+	newPR := &github.NewPullRequest{
+		Title: &opts.Title,
+		Head:  &opts.Head,
+		Base:  &opts.Base,
+		Body:  &opts.Body,
+		Draft: &opts.Draft,
+	}
+
+	pr, _, err := gh.client.PullRequests.Create(gh.ctx, opts.Owner, opts.Repo, newPR)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create PR: %w", err)
+	}
+
+	// Add reviewers if specified
+	if len(opts.Reviewers) > 0 {
+		reviewersReq := github.ReviewersRequest{
+			Reviewers: opts.Reviewers,
+		}
+		_, _, err = gh.client.PullRequests.RequestReviewers(gh.ctx, opts.Owner, opts.Repo, pr.GetNumber(), reviewersReq)
+		if err != nil {
+			fmt.Printf("Warning: failed to add reviewers: %v\n", err)
+		}
+	}
+
+	gh.ensurePRLabels(opts.Owner, opts.Repo, pr.GetNumber(), opts.Labels)
+
+	fmt.Printf("Created PR #%d: %s\n", pr.GetNumber(), pr.GetHTMLURL())
+	return pr, nil
+}
+
+// FindOpenPR returns an open pull request for the given head and base branches, if one exists.
+func (gh *GitHubClient) FindOpenPR(owner, repo, head, base string) (*github.PullRequest, bool, error) {
+	prs, err := gh.listPRsByHeadBase(owner, repo, head, base, "open")
+	if err != nil {
+		return nil, false, err
+	}
+	if len(prs) == 0 {
+		return nil, false, nil
+	}
+	return prs[0], true, nil
+}
+
+// FindRelatedPR returns the best matching PR for head→base (open preferred, then
+// merged, then closed). When none match by head/base, it falls back to an exact
+// title match against the same base branch so already-merged release PRs still resolve.
+func (gh *GitHubClient) FindRelatedPR(owner, repo, head, base, title string) (*github.PullRequest, bool, error) {
+	prs, err := gh.listPRsByHeadBase(owner, repo, head, base, "all")
+	if err != nil {
+		return nil, false, err
+	}
+	if pr := pickRelatedPR(prs); pr != nil {
+		return pr, true, nil
+	}
+	if title == "" {
+		return nil, false, nil
+	}
+	return gh.findPRByExactTitle(owner, repo, base, title)
+}
+
+func (gh *GitHubClient) listPRsByHeadBase(owner, repo, head, base, state string) ([]*github.PullRequest, error) {
+	headQuery := head
+	if !strings.Contains(head, ":") {
+		headQuery = fmt.Sprintf("%s:%s", owner, head)
+	}
+
+	prs, _, err := gh.client.PullRequests.List(gh.ctx, owner, repo, &github.PullRequestListOptions{
+		State: state,
+		Head:  headQuery,
+		Base:  base,
+		ListOptions: github.ListOptions{
+			PerPage: 30,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list pull requests: %w", err)
+	}
+	return prs, nil
+}
+
+func (gh *GitHubClient) findPRByExactTitle(owner, repo, base, title string) (*github.PullRequest, bool, error) {
+	query := fmt.Sprintf(`repo:%s/%s is:pr base:%s "%s" in:title`, owner, repo, base, title)
+	result, _, err := gh.client.Search.Issues(gh.ctx, query, &github.SearchOptions{
+		Sort:  "updated",
+		Order: "desc",
+		ListOptions: github.ListOptions{
+			PerPage: 10,
+		},
+	})
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to search pull requests by title: %w", err)
+	}
+
+	var matches []*github.PullRequest
+	for _, issue := range result.Issues {
+		if !issue.IsPullRequest() {
+			continue
+		}
+		if issue.GetTitle() != title {
+			continue
+		}
+		pr, _, err := gh.client.PullRequests.Get(gh.ctx, owner, repo, issue.GetNumber())
+		if err != nil {
+			return nil, false, fmt.Errorf("failed to get pull request #%d: %w", issue.GetNumber(), err)
+		}
+		matches = append(matches, pr)
+	}
+	if pr := pickRelatedPR(matches); pr != nil {
+		return pr, true, nil
+	}
+	return nil, false, nil
+}
+
+// pickRelatedPR prefers open PRs, then merged, then other closed PRs.
+func pickRelatedPR(prs []*github.PullRequest) *github.PullRequest {
+	var open, merged, closed *github.PullRequest
+	for _, pr := range prs {
+		if pr == nil {
+			continue
+		}
+		switch {
+		case pr.GetState() == "open":
+			if open == nil {
+				open = pr
+			}
+		case pr.GetMerged() || pr.MergedAt != nil:
+			if merged == nil {
+				merged = pr
+			}
+		default:
+			if closed == nil {
+				closed = pr
+			}
+		}
+	}
+	if open != nil {
+		return open
+	}
+	if merged != nil {
+		return merged
+	}
+	return closed
+}
+
+// prDisplayState returns a short state label for workflow summaries.
+func prDisplayState(pr *github.PullRequest) string {
+	if pr == nil {
+		return "unknown"
+	}
+	if pr.GetMerged() || pr.MergedAt != nil {
+		return "merged"
+	}
+	state := pr.GetState()
+	if state == "" {
+		return "unknown"
+	}
+	return state
+}
+
+// mergeLabelDefs are auto-created when missing so merge-timing labels can be applied.
+var mergeLabelDefs = map[string]struct {
+	Color       string
+	Description string
+}{
+	mergeLabelFFDay: {
+		Color:       "B60205",
+		Description: "Merge 1st: feature-freeze day (main)",
+	},
+	mergeLabelAfterBranch: {
+		Color:       "D93F0B",
+		Description: "Merge 2nd: ASAP after release branch exists",
+	},
+	mergeLabelAfterImages: {
+		Color:       "FBCA04",
+		Description: "Merge 3rd: after branch exists; may wait on Docker images",
+	},
+	mergeLabelAfterRelease: {
+		Color:       "0E8A16",
+		Description: "Merge 4th: after release day",
+	},
+	mergeLabelBeforeBuild: {
+		Color:       "B60205",
+		Description: "Merge before the final patch release build",
+	},
+}
+
+func (gh *GitHubClient) ensurePRLabels(owner, repo string, number int, labels []string) {
+	if len(labels) == 0 {
+		return
+	}
+	for _, label := range labels {
+		if def, ok := mergeLabelDefs[label]; ok {
+			if err := gh.EnsureLabel(owner, repo, label, def.Color, def.Description); err != nil {
+				fmt.Printf("Warning: failed to ensure label %q: %v\n", label, err)
+			}
+		}
+	}
+	if err := gh.AddLabels(owner, repo, number, labels); err != nil {
+		fmt.Printf("Warning: failed to add labels: %v\n", err)
+	}
+}
+
+// EnsureLabel creates a repository label if it does not already exist.
+func (gh *GitHubClient) EnsureLabel(owner, repo, name, color, description string) error {
+	_, resp, err := gh.client.Issues.GetLabel(gh.ctx, owner, repo, name)
+	if err == nil {
+		return nil
+	}
+	if resp == nil || resp.StatusCode != http.StatusNotFound {
+		return fmt.Errorf("failed to get label %q: %w", name, err)
+	}
+
+	_, _, err = gh.client.Issues.CreateLabel(gh.ctx, owner, repo, &github.Label{
+		Name:        github.Ptr(name),
+		Color:       github.Ptr(color),
+		Description: github.Ptr(description),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create label %q: %w", name, err)
+	}
+	fmt.Printf("Created label %q\n", name)
+	return nil
+}
+
+// AddLabels adds labels to a pull request or issue
+func (gh *GitHubClient) AddLabels(owner, repo string, number int, labels []string) error {
+	_, _, err := gh.client.Issues.AddLabelsToIssue(gh.ctx, owner, repo, number, labels)
+	if err != nil {
+		return fmt.Errorf("failed to add labels: %w", err)
+	}
+
+	fmt.Printf("Added labels to #%d: %v\n", number, labels)
+	return nil
+}
+
+// FindIssueByTitle finds an issue with an exact title match (open preferred over closed).
+func (gh *GitHubClient) FindIssueByTitle(owner, repo, title string) (*github.Issue, bool, error) {
+	query := fmt.Sprintf(`repo:%s/%s is:issue in:title "%s"`, owner, repo, title)
+	result, _, err := gh.client.Search.Issues(gh.ctx, query, &github.SearchOptions{
+		Sort:  "updated",
+		Order: "desc",
+		ListOptions: github.ListOptions{
+			PerPage: 20,
+		},
+	})
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to search issues for title %q: %w", title, err)
+	}
+
+	var closedMatch *github.Issue
+	for _, issue := range result.Issues {
+		if issue.IsPullRequest() {
+			continue
+		}
+		if issue.GetTitle() != title {
+			continue
+		}
+		if issue.GetState() == "open" {
+			return issue, true, nil
+		}
+		if closedMatch == nil {
+			closedMatch = issue
+		}
+	}
+	if closedMatch != nil {
+		return closedMatch, true, nil
+	}
+	return nil, false, nil
+}
+
+// CreateIssue creates a repository issue with the given labels.
+func (gh *GitHubClient) CreateIssue(owner, repo, title, body string, labels []string) (*github.Issue, error) {
+	req := &github.IssueRequest{
+		Title: github.Ptr(title),
+		Body:  github.Ptr(body),
+	}
+	if len(labels) > 0 {
+		req.Labels = &labels
+	}
+	issue, _, err := gh.client.Issues.Create(gh.ctx, owner, repo, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create issue %q: %w", title, err)
+	}
+	return issue, nil
+}
+
+// UpdateIssueBody replaces the body of an existing issue.
+func (gh *GitHubClient) UpdateIssueBody(owner, repo string, number int, body string) error {
+	_, _, err := gh.client.Issues.Edit(gh.ctx, owner, repo, number, &github.IssueRequest{
+		Body: github.Ptr(body),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to update issue #%d body: %w", number, err)
+	}
+	return nil
+}
+
+// ListReleaseLabeledPRsForVersion returns Beats PRs with label "release" whose title
+// mentions the exact version. Open and recently updated closed/merged PRs are included.
+func (gh *GitHubClient) ListReleaseLabeledPRsForVersion(owner, repo, version string) ([]*github.PullRequest, error) {
+	query := fmt.Sprintf(`repo:%s/%s is:pr label:release "%s"`, owner, repo, version)
+	opts := &github.SearchOptions{
+		Sort:  "updated",
+		Order: "desc",
+		ListOptions: github.ListOptions{
+			PerPage: 100,
+		},
+	}
+
+	var prs []*github.PullRequest
+	seen := map[int]struct{}{}
+	for {
+		result, resp, err := gh.client.Search.Issues(gh.ctx, query, opts)
+		if err != nil {
+			return nil, fmt.Errorf("failed to search release PRs for %s: %w", version, err)
+		}
+		for _, issue := range result.Issues {
+			if !issue.IsPullRequest() {
+				continue
+			}
+			if !versionMentioned(issue.GetTitle(), version) {
+				continue
+			}
+			num := issue.GetNumber()
+			if _, ok := seen[num]; ok {
+				continue
+			}
+			seen[num] = struct{}{}
+			prs = append(prs, &github.PullRequest{
+				Number:  github.Ptr(num),
+				HTMLURL: github.Ptr(issue.GetHTMLURL()),
+				Title:   github.Ptr(issue.GetTitle()),
+				State:   github.Ptr(issue.GetState()),
+			})
+		}
+		if resp == nil || resp.NextPage == 0 {
+			break
+		}
+		opts.Page = resp.NextPage
+	}
+	return prs, nil
+}
+
+// releasesLookupOwner and releasesLookupRepo are the canonical repo for published Beats releases.
+// Forks typically lack release history, so workflows always resolve LatestRelease from here.
+const (
+	releasesLookupOwner = "elastic"
+	releasesLookupRepo  = "beats"
+)
+
+// LatestReleaseBefore returns the highest published release version with the same major
+// that is strictly less than currentVersion (e.g. current 9.5.0 → 9.4.3).
+func (gh *GitHubClient) LatestReleaseBefore(owner, repo, currentVersion string) (string, error) {
+	versions, err := gh.listReleaseVersions(owner, repo)
+	if err != nil {
+		return "", err
+	}
+	return selectLatestReleaseBefore(versions, currentVersion)
+}
+
+func (gh *GitHubClient) listReleaseVersions(owner, repo string) ([]string, error) {
+	var versions []string
+	opts := &github.ListOptions{PerPage: 100}
+	for {
+		releases, resp, err := gh.client.Repositories.ListReleases(gh.ctx, owner, repo, opts)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list releases for %s/%s: %w", owner, repo, err)
+		}
+		for _, rel := range releases {
+			tag := rel.GetTagName()
+			if tag == "" {
+				continue
+			}
+			versions = append(versions, tag)
+		}
+		if resp.NextPage == 0 {
+			break
+		}
+		opts.Page = resp.NextPage
+	}
+	return versions, nil
+}
+
+// PRConfig holds configuration for a single PR in a multi-PR workflow
+type PRConfig struct {
+	BranchName string
+	Title      string
+	Body       string
+	Labels     []string
+	Base       string // Optional: if empty, uses cfg.BaseBranch or cfg.ReleaseBranch
+}
+
+// CreateMultiplePRs creates multiple PRs in sequence
+// This is a Beats-specific function for workflows that create 2-3 PRs
+func CreateMultiplePRs(cfg *ReleaseConfig, prConfigs []PRConfig) ([]*github.PullRequest, error) {
+	gh := NewGitHubClient(cfg.GitHubToken)
+
+	var prs []*github.PullRequest
+	for i, prCfg := range prConfigs {
+		// Determine base branch: use PRConfig.Base if set, otherwise use ReleaseBranch if set, otherwise BaseBranch
+		baseBranch := prCfg.Base
+		if baseBranch == "" {
+			if cfg.ReleaseBranch != "" {
+				baseBranch = cfg.ReleaseBranch
+			} else {
+				baseBranch = cfg.BaseBranch
+			}
+		}
+
+		opts := PROptions{
+			Owner:     cfg.ProjectOwner,
+			Repo:      cfg.ProjectRepo,
+			Title:     prCfg.Title,
+			Head:      prCfg.BranchName,
+			Base:      baseBranch,
+			Body:      prCfg.Body,
+			Draft:     false,
+			Reviewers: cfg.ProjectReviewers,
+			Labels:    prCfg.Labels,
+		}
+
+		pr, err := gh.CreatePR(opts)
+		if err != nil {
+			return prs, fmt.Errorf("failed to create PR %d/%d: %w", i+1, len(prConfigs), err)
+		}
+
+		prs = append(prs, pr)
+	}
+
+	fmt.Printf("Successfully created %d PRs\n", len(prs))
+	return prs, nil
+}
