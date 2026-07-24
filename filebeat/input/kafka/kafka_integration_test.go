@@ -18,6 +18,40 @@
 // This file was contributed to by generative AI
 //go:build integration
 
+// # Running integration tests
+//
+// These tests require a running Kafka broker. The easiest way is to use the
+// pre-built Docker image from testing/environments/docker/kafka.
+//
+// ## Start Kafka (standalone, outside docker-compose)
+//
+//	docker build -t beats-kafka-test ../../testing/environments/docker/kafka
+//	docker run -d --name beats-kafka-test \
+//	    -e KAFKA_ADVERTISED_HOST=localhost \
+//	    -p 9092:9092 -p 9093:9093 -p 9094:9094 -p 2181:2181 \
+//	    beats-kafka-test
+//
+// IMPORTANT: -e KAFKA_ADVERTISED_HOST=localhost is required when running
+// outside docker-compose. Without it the broker advertises "kafka:9092" for
+// inter-broker communication, which cannot be resolved on the host, causing all
+// external connections to fail.
+//
+// Wait for the container to become healthy (Kafka is ready when the healthcheck passes):
+//
+//	until docker inspect --format='{{.State.Health.Status}}' beats-kafka-test | grep -q healthy; do sleep 2; done
+//
+// ## Run the tests
+//
+//	KAFKA_HOST=localhost KAFKA_PORT=9094 go test -v -tags integration ./input/kafka/ -timeout 5m
+//
+// To run a specific test:
+//
+//	KAFKA_HOST=localhost KAFKA_PORT=9094 go test -v -tags integration -run TestInputWithStickyRebalanceStrategy ./input/kafka/
+//
+// ## Teardown
+//
+//	docker rm -f beats-kafka-test
+
 package kafka
 
 import (
@@ -580,4 +614,65 @@ func newV2Context() (v2.Context, func()) {
 		ID:          "test_id",
 		Cancelation: ctx,
 	}, cancel
+}
+
+// TestInputWithStickyRebalanceStrategy verifies that the Kafka input
+// successfully consumes all messages when rebalance.strategy is "sticky".
+func TestInputWithStickyRebalanceStrategy(t *testing.T) {
+	testTopic := createReadyTestTopic(t)
+	groupID := fmt.Sprintf("sticky-filebeat-%d", rand.Int())
+
+	messages := []testMessage{
+		{message: "sticky-1"},
+		{message: "sticky-2"},
+		{message: "sticky-3"},
+	}
+	for _, m := range messages {
+		writeToKafkaTopic(t, testTopic, m.message, m.headers)
+	}
+
+	config := conf.MustNewConfigFrom(mapstr.M{
+		"hosts":              getTestKafkaHost(),
+		"topics":             []string{testTopic},
+		"group_id":           groupID,
+		"wait_close":         0,
+		"rebalance.strategy": "sticky",
+	})
+
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	input, cancel := run(t, config, client)
+
+	timeout := time.After(30 * time.Second)
+	for range messages {
+		select {
+		case event := <-events:
+			v, err := event.Fields.GetValue("message")
+			require.NoError(t, err)
+			_, ok := v.(string)
+			require.True(t, ok, "could not get message text from event")
+			meta, ok := event.Private.(eventMeta)
+			require.True(t, ok, "could not get eventMeta")
+			meta.ackHandler()
+		case <-timeout:
+			t.Fatal("timeout waiting for incoming events")
+		}
+	}
+
+	<-time.After(2 * time.Second)
+
+	cancel()
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+
+	assertOffset(t, groupID, testTopic, int64(len(messages)))
 }
