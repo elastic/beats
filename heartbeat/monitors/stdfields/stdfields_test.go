@@ -72,7 +72,10 @@ func TestIsSyntheticsType(t *testing.T) {
 		want        bool
 	}{
 		{"browser", true},
+		{"synthetic", true},
+		{"synthetics/synthetic", true},
 		{"api", true},
+		{"synthetics/api", true},
 		{"http", false},
 		{"tcp", false},
 		{"icmp", false},

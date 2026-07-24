@@ -10,10 +10,12 @@ package api
 
 import (
 	"fmt"
+	"os"
 	"syscall"
 
 	"github.com/elastic/elastic-agent-libs/config"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -21,12 +23,20 @@ import (
 )
 
 func init() {
-	plugin.Register("api", create, "synthetics/api")
+	// Reuse browser's params-insensitive config hash so Fleet parameter pushes
+	// don't trigger unnecessary monitor stop/restarts.
+	plugin.RegisterWithHashFunc("api", browser.HashConfig, create, "synthetics/api")
 }
 
 func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error) {
-	// API journeys still spawn a Node.js child process (setuid guard applies) but
-	// need no GUI libs, so we skip browser's ELASTIC_SYNTHETICS_CAPABLE gate.
+	// API journeys don't launch Chromium, but they run the same Node.js
+	// synthetics agent as browser monitors, which is only present where
+	// ELASTIC_SYNTHETICS_CAPABLE is set. Gate on it like browser does.
+	if os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") != "true" {
+		return plugin.Plugin{}, ecserr.NewNotSyntheticsCapableError()
+	}
+
+	// We do not use user.Current() which does not reflect setuid changes!
 	if syscall.Geteuid() == 0 && security.NodeChildProcCred == nil {
 		return plugin.Plugin{}, fmt.Errorf("api monitors cannot be run as root")
 	}

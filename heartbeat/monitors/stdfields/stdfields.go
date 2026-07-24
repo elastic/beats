@@ -67,8 +67,17 @@ func (s StdMonitorFields) IsSyntheticsType() bool {
 }
 
 // IsSyntheticsType is the string-based variant of (StdMonitorFields).IsSyntheticsType.
+// It matches the canonical plugin names and every registered alias, since a
+// monitor's configured `type` may be any of them (see plugin.Register calls in
+// the browser and api packages).
 func IsSyntheticsType(monitorType string) bool {
-	return monitorType == "browser" || monitorType == "api"
+	switch monitorType {
+	case "browser", "synthetic", "synthetics/synthetic",
+		"api", "synthetics/api":
+		return true
+	default:
+		return false
+	}
 }
 
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {

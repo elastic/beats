@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	plugin.RegisterWithHashFunc("browser", hashConfig, create, "synthetic", "synthetics/synthetic")
+	plugin.RegisterWithHashFunc("browser", HashConfig, create, "synthetic", "synthetics/synthetic")
 }
 
 func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error) {

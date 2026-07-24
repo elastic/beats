@@ -9,10 +9,10 @@ description: |
   synthexec runtime with browser monitors but skip browser-only CLI
   flags (`--sandbox`, `--screenshots`, `--throttling`) and emit network
   events to a dedicated `synthetics.api.network` dataset. Requires
-  `@elastic/synthetics >= <TBD>`, which introduces the `apiJourney(...)`
+  `@elastic/synthetics >= 1.25.0`, which introduces the `apiJourney(...)`
   DSL.
 
 component: heartbeat
 
-# pr: https://github.com/elastic/beats/pull/<TBD>
+# pr: https://github.com/elastic/beats/pull/50802
 # issue: https://github.com/elastic/synthetics/pull/997

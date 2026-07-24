@@ -71,9 +71,10 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// hashConfig generates a unit config hash, excluding params
-// field which can be dynamically updated
-func hashConfig(cfg *config.C) (uint64, error) {
+// HashConfig generates a unit config hash, excluding params
+// field which can be dynamically updated. Exported so the sibling
+// api plugin can register with the same params-insensitive hash.
+func HashConfig(cfg *config.C) (uint64, error) {
 	if cfg == nil {
 		return 0, fmt.Errorf("nil config")
 	}
