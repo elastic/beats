@@ -291,7 +291,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 // Additional fields in extra will also be logged.
 // Header names matching strings in sensitive are not logged.
 func LogRequest(log *zap.Logger, req *http.Request, sensitive []string, maxBodyLen int, extra ...zapcore.Field) *http.Request {
-	req, _, _ = logRequest(log, req, maxBodyLen, nil, extra...)
+	req, _, _ = logRequest(log, req, maxBodyLen, sensitive, extra...)
 	return req
 }
 
