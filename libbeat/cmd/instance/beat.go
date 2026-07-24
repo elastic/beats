@@ -246,6 +246,9 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 	if err != nil {
 		return nil, err
 	}
+	if override := os.Getenv(beat.EnvHostName); override != "" {
+		hostname = override
+	}
 
 	fields, err := asset.GetFields(name)
 	if err != nil {

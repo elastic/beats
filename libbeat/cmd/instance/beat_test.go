@@ -70,6 +70,14 @@ func TestNewInstance(t *testing.T) {
 	assert.Equal(t, "testbeat", b.Info.IndexPrefix)
 }
 
+func TestNewBeatHostnameEnvOverride(t *testing.T) {
+	t.Setenv(beat.EnvHostName, "my-node")
+	b, err := NewBeat("testbeat", "testidx", "0.9", false, nil)
+	require.NoError(t, err)
+	assert.Equal(t, "my-node", b.Info.Hostname)
+	assert.Equal(t, "my-node", b.Info.Name)
+}
+
 func TestNewInstanceUUID(t *testing.T) {
 	b, err := NewBeat("testbeat", "", "0.9", false, nil)
 	if err != nil {
