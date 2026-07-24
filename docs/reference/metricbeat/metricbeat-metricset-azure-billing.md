@@ -39,6 +39,15 @@ This metricset allows users to retrieve usage details and forecast information o
 
 If none of the 2 options are entered then the subscription ID will be used as scope.
 
+`billing_usage_lookback`
+:   (*duration*, default: `24h`) How far back to query usage data on each fetch. Azure Cost Management
+    data is documented to be updated for up to 72 hours after a billing period closes, so increasing
+    this to `72h` ensures that late cost corrections from Azure are re-queried and ingested.
+
+`billing_forecast_window`
+:   (*duration*, default: `720h`) The length of the forecast period, counted forward from the forecast
+    start date (reference time minus 2 days). Defaults to 30 days (`720h`).
+
 ## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-azure.md) section.

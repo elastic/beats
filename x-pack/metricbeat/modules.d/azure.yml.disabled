@@ -104,6 +104,11 @@
 #  tenant_id: '${AZURE_TENANT_ID:""}'
 #  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 #  refresh_list_interval: 600s
+#  # How far back to query usage data on each fetch (default 24h). Azure Cost Management data
+#  # can be updated for up to 72 hours, so set this to 72h to capture late cost corrections.
+#  billing_usage_lookback: 72h
+#  # Length of the forecast period (default 720h / 30 days).
+#  billing_forecast_window: 720h
 
 #- module: azure
 #  metricsets:

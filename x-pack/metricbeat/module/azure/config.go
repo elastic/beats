@@ -49,6 +49,12 @@ type Config struct {
 	// specific to billing
 	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
+	// BillingUsageLookback controls how far back (as a duration) the billing metricset
+	// queries usage data. Defaults to 24h (previous full day). Increase to 72h to capture
+	// Azure's documented up-to-72h cost data updates.
+	BillingUsageLookback time.Duration `config:"billing_usage_lookback"`
+	// BillingForecastWindow controls the length of the forecast period. Defaults to 720h (30 days).
+	BillingForecastWindow time.Duration `config:"billing_forecast_window"`
 	// Use BatchApi for metric values collection
 	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
 	// DefaultTimeGrain sets the default time interval when the resource config
