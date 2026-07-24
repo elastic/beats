@@ -1,0 +1,338 @@
+[
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.033,
+    "PhysicalID": 0,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.027,
+    "PhysicalID": 0,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.038,
+    "PhysicalID": 0,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.516,
+    "PhysicalID": 0,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.04,
+    "PhysicalID": 0,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.048,
+    "PhysicalID": 0,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2199.974,
+    "PhysicalID": 1,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.037,
+    "PhysicalID": 1,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.025,
+    "PhysicalID": 1,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.01,
+    "PhysicalID": 1,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.038,
+    "PhysicalID": 1,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.042,
+    "PhysicalID": 1,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1911.118,
+    "PhysicalID": 2,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1479.972,
+    "PhysicalID": 2,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1970.264,
+    "PhysicalID": 2,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1996.097,
+    "PhysicalID": 2,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1788.272,
+    "PhysicalID": 2,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2005.072,
+    "PhysicalID": 2,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1658.085,
+    "PhysicalID": 3,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1855.222,
+    "PhysicalID": 3,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2068.635,
+    "PhysicalID": 3,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1806.426,
+    "PhysicalID": 3,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2100.647,
+    "PhysicalID": 3,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.108,
+    "PhysicalID": 3,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.44,
+    "PhysicalID": 0,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.029,
+    "PhysicalID": 0,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2201.393,
+    "PhysicalID": 0,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.01,
+    "PhysicalID": 0,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.038,
+    "PhysicalID": 0,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.079,
+    "PhysicalID": 0,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.04,
+    "PhysicalID": 1,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.098,
+    "PhysicalID": 1,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.07,
+    "PhysicalID": 1,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.038,
+    "PhysicalID": 1,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.581,
+    "PhysicalID": 1,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.017,
+    "PhysicalID": 1,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1591.751,
+    "PhysicalID": 2,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1956.531,
+    "PhysicalID": 2,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1853.526,
+    "PhysicalID": 2,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2125.556,
+    "PhysicalID": 2,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1545.681,
+    "PhysicalID": 2,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2050.233,
+    "PhysicalID": 2,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2160.31,
+    "PhysicalID": 3,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2089.592,
+    "PhysicalID": 3,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2200.121,
+    "PhysicalID": 3,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 2105.117,
+    "PhysicalID": 3,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1984.419,
+    "PhysicalID": 3,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Xeon(R) CPU E5-4607 0 @ 2.20GHz",
+    "ModelNumber": "45",
+    "Mhz": 1924.644,
+    "PhysicalID": 3,
+    "CoreID": 5
+  }
+]

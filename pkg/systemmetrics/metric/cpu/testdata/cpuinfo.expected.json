@@ -1,0 +1,114 @@
+[
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 6
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 7
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2534.854,
+    "PhysicalID": 0,
+    "CoreID": 0
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 1
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 2
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 3
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2673.889,
+    "PhysicalID": 0,
+    "CoreID": 4
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 5
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 6
+  },
+  {
+    "ModelName": "Intel(R) Core(TM) i9-10885H CPU @ 2.40GHz",
+    "ModelNumber": "165",
+    "Mhz": 2400,
+    "PhysicalID": 0,
+    "CoreID": 7
+  }
+]
