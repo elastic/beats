@@ -562,6 +562,7 @@ func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 }
 
 type fingerprintConfig struct {
+	// Enabled is deprecated and ignored; newProspector derives it from the file identity.
 	Enabled bool  `config:"enabled"`
 	Offset  int64 `config:"offset"`
 	Length  int64 `config:"length"`
@@ -593,8 +594,6 @@ func defaultFileScannerConfig() fileScannerConfig {
 			Enabled: true,
 			Offset:  0,
 			Length:  DefaultFingerprintSize,
-			// false by default: the file identity config will set it to true if
-			// fingerprint is used
 			Growing: false,
 		},
 	}

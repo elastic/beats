@@ -48,21 +48,21 @@ filebeat.inputs:
     enabled: true
     paths:
       - %s
-    prospector.scanner.fingerprint.enabled: false
+    file_identity.native: ~
 
   - type: filestream
     id: input-2
     enabled: true
     paths:
       - %s
-    prospector.scanner.fingerprint.enabled: false
+    file_identity.native: ~
 
   - type: filestream
     id: input-3
     enabled: true
     paths:
       - %s
-    prospector.scanner.fingerprint.enabled: false
+    file_identity.native: ~
 
 # Global cache processor - shared by ALL inputs.
 # Tests that SetPaths works correctly when multiple inputs connect.

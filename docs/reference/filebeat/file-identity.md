@@ -159,7 +159,7 @@ Users specify a path by setting `file_identity.inode_marker.path`. This path lea
 
 The most stable file identity implementation at the moment. This file identity is default since Filebeat version 9.0.
 
-This file identity uses file fingerprints produced by the scanner component of the filestream input. Scanner fingerprinting is enabled by default in 9.x. If you explicitly disable it with `prospector.scanner.fingerprint.enabled: false`, this file identity cannot be used.
+This file identity uses file fingerprints produced by the scanner component of the filestream input. Scanner fingerprinting is enabled automatically when this file identity is used. It is deactivated for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored. Filebeat logs a warning if its value contradicts the configured `file_identity`.
 
 In the context of the filestream input, fingerprint is a hash string computed from a part of the file content.
 
@@ -177,7 +177,6 @@ For example, Filebeat is running a filestream input with this configuration:
 
 ```yaml
 prospector.scanner.fingerprint:
-  enabled: true
   offset: 32   # e.g. the first 32 bytes are always identical in every file, we skip them
   length: 1024 # strong guarantee of uniqueness
 file_identity.fingerprint: ~
