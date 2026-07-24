@@ -37,8 +37,10 @@ steps:
       CURRENT_RELEASE: "${NEW_VERSION}"
     plugins:
       - elastic/vault-github-token#v0.2.1: ~
-    command:
-      - mage release:runMajorMinor
+    command: |
+      set -euo pipefail
+      make mage
+      mage release:runMajorMinor
     timeout_in_minutes: 60
 
   - label: "Bump version patch"
@@ -54,8 +56,10 @@ steps:
       BASE_BRANCH: "${BRANCH}"
     plugins:
       - elastic/vault-github-token#v0.2.1: ~
-    command:
-      - mage release:runPatch
+    command: |
+      set -euo pipefail
+      make mage
+      mage release:runPatch
     timeout_in_minutes: 60
 
   - block: "Ready to fetch for DRA artifacts?"
