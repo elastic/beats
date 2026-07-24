@@ -252,19 +252,16 @@ func fakeJournalctl(t *testing.T, version int) string {
 
 func TestJournalctlVersion(t *testing.T) {
 	tests := []struct {
-		name         string
-		version      int
-		invalidPath  bool
-		wantErr      bool
-		wantBootAll  bool
-		wantFacility bool
+		name        string
+		version     int
+		invalidPath bool
+		wantErr     bool
+		wantBootAll bool
 	}{
-		{name: "v239 (RHEL8) gets no optional flags", version: 239},
+		{name: "v239 (RHEL8) does not get --boot all", version: 239},
 		{name: "v241 does not get --boot all", version: 241},
-		{name: "v242 gets --boot all but not --facility", version: 242, wantBootAll: true},
-		{name: "v244 does not get --facility", version: 244, wantBootAll: true},
-		{name: "v245 gets --boot all and --facility", version: 245, wantBootAll: true, wantFacility: true},
-		{name: "v250 gets --boot all and --facility", version: 250, wantBootAll: true, wantFacility: true},
+		{name: "v242 gets --boot all", version: 242, wantBootAll: true},
+		{name: "v250 gets --boot all", version: 250, wantBootAll: true},
 		{name: "invalid binary path falls back safely", invalidPath: true, wantErr: true},
 	}
 
@@ -285,40 +282,20 @@ func TestJournalctlVersion(t *testing.T) {
 			if gotBootAll := got >= minVersionBootAll; gotBootAll != tc.wantBootAll {
 				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, gotBootAll)
 			}
-			if gotFacility := got >= minVersionFacility; gotFacility != tc.wantFacility {
-				t.Errorf("version %d: wantFacility=%v but got=%v", tc.version, tc.wantFacility, gotFacility)
-			}
 		})
 	}
 }
 
 func TestFacilityArgs(t *testing.T) {
-	tests := []struct {
-		name    string
-		version int
-		want    []string
-		notWant []string
-	}{
-		{
-			name:    "journalctl >= 245 uses --facility",
-			version: 245,
-			want:    []string{"--facility 4", "--facility 10"},
-			notWant: []string{"SYSLOG_FACILITY"},
-		},
-		{
-			name:    "journalctl < 245 falls back to SYSLOG_FACILITY matches",
-			version: 239,
-			want:    []string{"SYSLOG_FACILITY=4", "SYSLOG_FACILITY=10"},
-			notWant: []string{"--facility"},
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
+	// Facilities are always passed as SYSLOG_FACILITY matches regardless of
+	// the journalctl version: `--facility` only exists on journalctl >= 245
+	// and is implemented as exactly these matches.
+	for _, version := range []int{239, 250} {
+		t.Run(fmt.Sprintf("version %d", version), func(t *testing.T) {
 			f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
 				return &JctlMock{
 					NextFunc: func(canceler input.Canceler) ([]byte, error) {
-						ret := fmt.Sprintf("systemd %d (%d-test)\n+PAM +AUDIT", tc.version, tc.version)
+						ret := fmt.Sprintf("systemd %d (%d-test)\n+PAM +AUDIT", version, version)
 						return []byte(ret), nil
 					},
 					KillFunc: func() error { return nil },
@@ -344,15 +321,13 @@ func TestFacilityArgs(t *testing.T) {
 			}
 
 			argsStr := strings.Join(r.args, " ")
-			for _, want := range tc.want {
+			for _, want := range []string{"SYSLOG_FACILITY=4", "SYSLOG_FACILITY=10"} {
 				if !strings.Contains(argsStr, want) {
 					t.Errorf("expected %q in args %q", want, argsStr)
 				}
 			}
-			for _, notWant := range tc.notWant {
-				if strings.Contains(argsStr, notWant) {
-					t.Errorf("did not expect %q in args %q", notWant, argsStr)
-				}
+			if strings.Contains(argsStr, "--facility") {
+				t.Errorf("did not expect \"--facility\" in args %q", argsStr)
 			}
 		})
 	}

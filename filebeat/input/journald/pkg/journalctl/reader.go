@@ -135,8 +135,6 @@ func maybeAddBootAll(args []string, supportsBootAll bool) []string {
 const (
 	// `--boot all` was introduced in systemd v242.
 	minVersionBootAll = 242
-	// `--facility` was introduced in systemd v245.
-	minVersionFacility = 245
 )
 
 // journalctlVersion returns the systemd version of the installed journalctl
@@ -280,19 +278,13 @@ func New(
 		logger.Warnf("cannot detect journalctl version, assuming an old version: %s", err)
 	}
 	supportsBootAll := version >= minVersionBootAll
-	supportsFacility := version >= minVersionFacility
 
-	if len(facilities) > 0 && !supportsFacility {
-		logger.Warnf("journalctl does not support '--facility' (it requires systemd >= %d), using SYSLOG_FACILITY matches instead", minVersionFacility)
-	}
+	// SYSLOG_FACILITY matches are used instead of `--facility` because the
+	// flag only exists on journalctl >= 245 and is implemented as exactly
+	// these matches. Matches on the same field are ORed by journalctl, which
+	// is the same semantics as repeated `--facility` flags.
 	for _, facility := range facilities {
-		if supportsFacility {
-			args = append(args, "--facility", fmt.Sprintf("%d", facility))
-		} else {
-			// Matches on the same field are ORed by journalctl, which is
-			// the same semantics as repeated `--facility` flags.
-			args = append(args, fmt.Sprintf("SYSLOG_FACILITY=%d", facility))
-		}
+		args = append(args, fmt.Sprintf("SYSLOG_FACILITY=%d", facility))
 	}
 
 	extraArgs := handleSeekAndCursor(mode, since, cursor, supportsBootAll)
