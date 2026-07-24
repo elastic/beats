@@ -60,9 +60,6 @@ func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	return metricbeatInit(base, hostfs, userSet)
 }
 
-// applyHostFS applies the resolved hostfs path to process-global state.
-// It must be called on every module creation, including when hostfs is unset
-// (resolved path "/"), so reloads clear a previously configured HostFS.
 func applyHostFS(path string, logger *logp.Logger) {
 	hostFSMu.Lock()
 	defer hostFSMu.Unlock()
@@ -70,10 +67,6 @@ func applyHostFS(path string, logger *logp.Logger) {
 }
 
 func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module, error) {
-	// Always re-apply HostFS, including the default "/", so removing hostfs on
-	// reload resets process-global HOST_* env vars and gosigar.Procd.
-	// Agent treats HostFS as per-datastream while libraries use process globals;
-	// last apply wins if values differ across streams.
 	applyHostFS(modulepath, base.Logger)
 
 	return &Module{BaseModule: base, HostFS: modulepath, UserSetHostFS: moduleSet}, nil
