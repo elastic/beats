@@ -38,7 +38,6 @@ steps:
     plugins:
       - elastic/vault-github-token#v0.2.1: ~
     command: |
-      set -euo pipefail
       make mage
       mage release:runMajorMinor
     timeout_in_minutes: 60
@@ -57,7 +56,6 @@ steps:
     plugins:
       - elastic/vault-github-token#v0.2.1: ~
     command: |
-      set -euo pipefail
       make mage
       mage release:runPatch
     timeout_in_minutes: 60
