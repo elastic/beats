@@ -99,6 +99,10 @@ var (
 					"total_size_bytes": c.Int("total_size_bytes", s.IgnoreAllErrors),
 				}, c.DictOptional),
 			}, c.DictOptional),
+			"bulk": c.Dict("bulk", s.Schema{
+				"total_size_in_bytes": c.Int("total_size_in_bytes", s.IgnoreAllErrors),
+				"total_operations":    c.Int("total_operations", s.IgnoreAllErrors),
+			}, c.DictOptional),
 		}, c.DictOptional),
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
@@ -223,7 +227,7 @@ type ClusterStateMasterNode struct {
 }
 
 type NodesStats struct {
-	Nodes map[string]map[string]interface{} `json:"nodes"`
+	Nodes map[string]map[string]any `json:"nodes"`
 }
 
 // Get the elected master node's ID
