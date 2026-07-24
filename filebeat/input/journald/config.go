@@ -26,13 +26,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
@@ -120,7 +118,13 @@ func (c config) Validate() error {
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration
 // from 7.x to allow old config to remain compatible.
-type bwcIncludeMatches journalfield.IncludeMatches
+type bwcIncludeMatches struct {
+	journalfield.IncludeMatches
+
+	// legacyFormat records that the deprecated 7.x array format was used,
+	// so a deprecation warning can be logged once a logger is available.
+	legacyFormat bool
+}
 
 func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 	// Handle 7.x config format in a backwards compatible manner. Old format:
@@ -131,16 +135,11 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 			return err
 		}
 		im.Matches = append(im.Matches, matches...)
-
-		includeMatchesWarnOnce.Do(func() {
-			// TODO: use a local logger here
-			logp.NewLogger("journald").Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
-				"include_matches config to the new more expressive format."))
-		})
+		im.legacyFormat = true
 		return nil
 	}
 
-	return c.Unpack((*journalfield.IncludeMatches)(im))
+	return c.Unpack(&im.IncludeMatches)
 }
 
 func defaultConfig() config {
