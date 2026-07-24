@@ -269,8 +269,12 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
+	// SYSLOG_FACILITY matches are used instead of `--facility` because the
+	// flag only exists on journalctl >= 245 and is implemented as exactly
+	// these matches. Matches on the same field are ORed by journalctl, which
+	// is the same semantics as repeated `--facility` flags.
 	for _, facility := range facilities {
-		args = append(args, "--facility", fmt.Sprintf("%d", facility))
+		args = append(args, fmt.Sprintf("SYSLOG_FACILITY=%d", facility))
 	}
 
 	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
