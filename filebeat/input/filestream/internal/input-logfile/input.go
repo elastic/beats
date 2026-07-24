@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
@@ -43,6 +42,8 @@ type managedInput struct {
 	cleanTimeout           time.Duration
 	harvesterLimit         uint64
 	readUntilEOF           ReadUntilEOFConfig
+	backoff                BackoffConfig
+	stateCheckInterval     time.Duration
 }
 
 // Name is required to implement the v2.Input interface
@@ -66,36 +67,30 @@ func (inp *managedInput) Run(
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
-	// Setup cancellation using a custom cancel context. All workers will be
+	// Setup cancellation using a custom cancel context. All harvesters will be
 	// stopped if one failed badly by returning an error.
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
 	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
-	harvesterGroupStopTimeout := time.Minute // magic number
-	if inp.readUntilEOF.Enabled {
-		// keep the magic alive
-		harvesterGroupStopTimeout +=
-			inp.readUntilEOF.Timeout + 100*time.Millisecond
-	}
-	hg := &defaultHarvesterGroup{
-		pipeline:     pipeline,
-		readers:      newReaderGroup(),
-		cleanTimeout: inp.cleanTimeout,
-		harvester:    inp.harvester,
-		readUntilEOF: inp.readUntilEOF,
-		store:        groupStore,
-		ackCH:        inp.ackCH,
-		identifier:   inp.sourceIdentifier,
-		tg: task.NewGroup(
-			inp.harvesterLimit,
-			harvesterGroupStopTimeout,
-			ctx.Logger,
-			"harvester"),
-		metrics: metrics,
-		inputID: inp.id,
-	}
+
+	hg := newHarvesterRunner(
+		ctx,
+		inp.harvesterLimit,
+		pipeline,
+		inp.harvester,
+		inp.cleanTimeout,
+		groupStore,
+		inp.ackCH,
+		inp.sourceIdentifier,
+		metrics,
+		inp.id,
+		inp.readUntilEOF,
+		inp.backoff,
+		inp.stateCheckInterval,
+	)
+	hg.start()
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
