@@ -119,6 +119,14 @@ func TestFromMapstrSliceDouble(t *testing.T) {
 	assert.Equal(t, map[string]any{"slice": want}, dst.AsRaw())
 }
 
+func TestFloat32ToFloat64(t *testing.T) {
+	// direct bit-pattern widening, not a decimal round-trip: float32(3.14)
+	// does not have an exact float64 representation, so widening it must
+	// produce the same "noisy" digits float64(float32(3.14)) does, not the
+	// shortest decimal string that reads back as 3.14.
+	assert.Equal(t, float64(float32(3.14)), float32ToFloat64(3.14))
+}
+
 func TestFromMapstrBool(t *testing.T) {
 	tests := map[string]struct {
 		mapstr_val  any

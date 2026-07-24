@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"math"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
@@ -511,14 +510,12 @@ func isFloat64WholeNumber(f float64) bool {
 	return frac == 0 && -preciseMax <= f && f <= preciseMax
 }
 
-// float32ToFloat64 converts a float32 to float64 using the float32's shortest
-// decimal representation. This matches the Beats go-structform encoder, which
-// serializes float32 values at float32 precision (e.g. float32(3.14) → "3.14",
-// not "3.140000104904175"). Skipping this round-trip causes observable divergence
-// between the beats ES output path and the OTel path for the same float32 input.
+// float32ToFloat64 widens a float32 to float64 by direct bit-pattern
+// conversion. This matches the current Beats go-structform encoder (see
+// OnFloat32 in elastic/go-structform), which also converts via float64(v)
+// rather than round-tripping through a decimal string.
 func float32ToFloat64(v float32) float64 {
-	f64, _ := strconv.ParseFloat(strconv.FormatFloat(float64(v), 'g', -1, 32), 64)
-	return f64
+	return float64(v)
 }
 
 func setFloat32Value(dst pcommon.Value, v float32) {
