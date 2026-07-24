@@ -387,7 +387,7 @@ func (h *handler) logRequest(txID string, r *http.Request, status int, respBody 
 	h.log.Debugw("new request trace transaction", "id", txID)
 	// Limit request logging body size to 10kiB.
 	const maxBodyLen = 10 * (1 << 10)
-	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, maxBodyLen, extra...)
+	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, []string{"Authorization"}, maxBodyLen, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}
