@@ -5,10 +5,16 @@
 package httplog
 
 import (
+	"bytes"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -495,6 +501,81 @@ func TestCleanTraceFilesNonexistent(t *testing.T) {
 
 	log := logptest.NewTestingLogger(t, "test")
 	CleanTraceFiles(primary, log)
+}
+
+func TestLogRequestRedactsSensitiveHeaders(t *testing.T) {
+	tests := []struct {
+		name        string
+		headers     http.Header
+		sensitive   []string
+		wantAbsent  []string
+		wantPresent []string
+	}{
+		{
+			name: "authorization_redacted",
+			headers: http.Header{
+				"Authorization": []string{"Bearer secret-token"},
+				"Content-Type":  []string{"application/json"},
+			},
+			sensitive:   []string{"Authorization"},
+			wantAbsent:  []string{"Authorization", "secret-token"},
+			wantPresent: []string{"Content-Type", "application/json"},
+		},
+		{
+			name: "multiple_sensitive_headers",
+			headers: http.Header{
+				"Authorization": []string{"Basic dXNlcjpwYXNz"},
+				"X-Api-Key":     []string{"key-12345"},
+				"Accept":        []string{"*/*"},
+			},
+			sensitive:   []string{"Authorization", "X-Api-Key"},
+			wantAbsent:  []string{"dXNlcjpwYXNz", "key-12345"},
+			wantPresent: []string{"Accept"},
+		},
+		{
+			name: "no_sensitive_headers",
+			headers: http.Header{
+				"Authorization": []string{"Bearer visible"},
+				"Content-Type":  []string{"text/plain"},
+			},
+			sensitive:   nil,
+			wantAbsent:  nil,
+			wantPresent: []string{"Authorization", "visible"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			core := zapcore.NewCore(
+				zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+				zapcore.AddSync(&buf),
+				zap.DebugLevel,
+			)
+			logger := zap.New(core)
+
+			req, err := http.NewRequest(http.MethodGet, "http://example.com/test", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			req.Header = tt.headers
+
+			LogRequest(logger, req, tt.sensitive, 1024)
+			logger.Sync()
+
+			output := buf.String()
+			for _, s := range tt.wantAbsent {
+				if strings.Contains(output, s) {
+					t.Errorf("log output must not contain %q", s)
+				}
+			}
+			for _, s := range tt.wantPresent {
+				if !strings.Contains(output, s) {
+					t.Errorf("log output must contain %q", s)
+				}
+			}
+		})
+	}
 }
 
 func sameError(a, b error) bool {
