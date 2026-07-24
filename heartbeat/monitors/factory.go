@@ -332,12 +332,9 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		procs.AddProcessor(addfields.NewAddFields(obsFields, true, true))
 	}
 
-	// always use synthetics data streams for browser monitors, there is no good reason not to
-	// the default `heartbeat` data stream won't split out network and screenshot data.
-	// at some point we should make all monitors use the `synthetics` datastreams and retire
-	// the heartbeat one, but browser is the only beta one, and it would be a breaking change
-	// to do so otherwise.
-	if monitorType == "browser" && settings.DataStream == nil {
+	// Synthetics-driven monitors (browser, api) use the synthetics data streams so
+	// network/screenshot/api-network sub-streams split out; the default heartbeat one can't.
+	if stdfields.IsSyntheticsType(monitorType) && settings.DataStream == nil {
 		settings.DataStream = &add_data_stream.DataStream{}
 	}
 

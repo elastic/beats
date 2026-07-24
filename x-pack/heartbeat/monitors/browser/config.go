@@ -30,6 +30,8 @@ type Config struct {
 	Params    map[string]interface{} `config:"params"`
 	RawConfig *config.C
 	Source    *source.Source `config:"source"`
+	// Type is the monitor type ("browser" or "api"); used to shape the CLI invocation.
+	Type string `config:"type"`
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`
 	// Id is optional for lightweight checks but required for browsers
@@ -42,6 +44,12 @@ type Config struct {
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
 	Timeout           time.Duration                 `config:"timeout"`
+}
+
+// IsAPI reports whether this is the `api` monitor type, which reuses the
+// browser pipeline but filters out browser-only CLI flags.
+func (c *Config) IsAPI() bool {
+	return c.Type == "api"
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")
@@ -63,9 +71,10 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// hashConfig generates a unit config hash, excluding params
-// field which can be dynamically updated
-func hashConfig(cfg *config.C) (uint64, error) {
+// HashConfig generates a unit config hash, excluding params
+// field which can be dynamically updated. Exported so the sibling
+// api plugin can register with the same params-insensitive hash.
+func HashConfig(cfg *config.C) (uint64, error) {
 	if cfg == nil {
 		return 0, fmt.Errorf("nil config")
 	}

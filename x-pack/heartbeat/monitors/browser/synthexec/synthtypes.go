@@ -96,6 +96,7 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		u, e := url.Parse(se.URL)
 		if e != nil {
 			_, _ = m.Put("url", mapstr.M{"full": se.URL})
+			//nolint:forbidigo // ToMap has no logger handle; matches the pre-existing pattern in this package.
 			logp.L().Warnf("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
 			_, _ = m.Put("url", wraputil.URLFields(u))
@@ -213,18 +214,26 @@ type Journey struct {
 	Name string   `json:"name"`
 	ID   string   `json:"id"`
 	Tags []string `json:"tags"`
+	// Type is the journey kind ("browser" or "api"), emitted by the agent on
+	// journey/start|end. Empty for older agents; treat absence as "browser".
+	Type string `json:"type"`
+}
+
+// IsAPI reports whether this journey came from an apiJourney(...) declaration.
+func (j *Journey) IsAPI() bool {
+	return j != nil && j.Type == "api"
 }
 
 func (j Journey) ToMap() mapstr.M {
-	if len(j.Tags) > 0 {
-		return mapstr.M{
-			"name": j.Name,
-			"id":   j.ID,
-			"tags": j.Tags,
-		}
-	}
-	return mapstr.M{
+	m := mapstr.M{
 		"name": j.Name,
 		"id":   j.ID,
 	}
+	if len(j.Tags) > 0 {
+		m["tags"] = j.Tags
+	}
+	if j.Type != "" {
+		m["type"] = j.Type
+	}
+	return m
 }

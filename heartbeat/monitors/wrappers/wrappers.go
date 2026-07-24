@@ -41,7 +41,7 @@ func WrapCommon(js []jobs.Job,
 	stateLoader monitorstate.StateLoader, logger *logp.Logger) []jobs.Job {
 	mst := monitorstate.NewTracker(stateLoader, false, logger)
 	var wrapped []jobs.Job
-	if stdMonFields.Type != "browser" || stdMonFields.BadConfig {
+	if !stdMonFields.IsSyntheticsType() || stdMonFields.BadConfig {
 		wrapped = WrapLightweight(js, stdMonFields, mst, logger)
 	} else {
 		wrapped = WrapBrowser(js, stdMonFields, mst, logger)
