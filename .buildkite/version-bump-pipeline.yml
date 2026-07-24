@@ -20,7 +20,45 @@ notify:
     if: build.state == "blocked"
 
 steps:
-  # TODO: replace this block step by real version bump logic
+  # Phase 3: trigger ingest-dev release automation for this repository only.
+  # Orchestrator env: NEW_VERSION, BRANCH, REPO, WORKFLOW (patch|minor|major).
+  - trigger: ingest-dev-pipeline-release-minor-major
+    key: bump-version-minor-major
+    label: ":rocket: Trigger ingest-dev minor/major release"
+    if: build.env("WORKFLOW") == "minor" || build.env("WORKFLOW") == "major"
+    build:
+      branch: "main"
+      message: "Version bump beats to ${NEW_VERSION} (${WORKFLOW})"
+      meta_data:
+        REPOSITORY: "beats"
+        RELEASE_TYPE: "${WORKFLOW}"
+        CURRENT_RELEASE: "${NEW_VERSION}"
+        DRY_RUN: "false"
+        DISABLE_DEV_ISSUE: "true"
+        DISABLE_NOTIFICATIONS: "false"
+        DISABLE_BRANCH_CREATION: "false"
+        DISABLE_PREPARE_NEXT: "false"
+        REVIEWERS: "elastic/elastic-agent-release"
+        DEV_ISSUE_URL: "https://github.com/elastic/dev/issues/0"
+
+  - trigger: ingest-dev-pipeline-release-patch
+    key: bump-version-patch
+    label: ":rocket: Trigger ingest-dev patch release"
+    if: build.env("WORKFLOW") == "patch"
+    build:
+      branch: "main"
+      message: "Version bump beats to ${NEW_VERSION} (patch)"
+      meta_data:
+        REPOSITORY: "beats"
+        CURRENT_RELEASE: "${NEW_VERSION}"
+        DRY_RUN: "false"
+        DISABLE_DEV_ISSUE: "true"
+        DISABLE_NOTIFICATIONS: "false"
+        DISABLE_RELEASE_PREPARE: "false"
+        DISABLE_PREPARE_NEXT: "false"
+        REVIEWERS: "elastic/elastic-agent-release"
+        DEV_ISSUE_URL: "https://github.com/elastic/dev/issues/0"
+
   - block: "Ready to fetch for DRA artifacts?"
     prompt: |
       Unblock when your team is ready to proceed.
@@ -31,6 +69,9 @@ steps:
       - WORKFLOW: ${WORKFLOW}
     key: block-get-dra-artifacts
     blocked_state: running
+    depends_on:
+      - bump-version-minor-major
+      - bump-version-patch
 
   - label: "Fetch DRA Artifacts"
     key: fetch-dra-artifacts
