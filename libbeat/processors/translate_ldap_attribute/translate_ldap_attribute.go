@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
@@ -54,6 +55,10 @@ type processor struct {
 	client *ldapClient
 	log    *logp.Logger
 
+	// description stores the processor's String output. It must remain lock-free because the logger
+	// evaluates this Stringer while client initialization is running.
+	description atomic.Value // stores string
+
 	clientMu          sync.Mutex
 	clientErr         error
 	nextClientAttempt time.Time
@@ -73,8 +78,14 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 	p := &processor{config: c}
+	p.storeDescription(c)
 	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
 	return p, nil
+}
+
+func (p *processor) storeDescription(c config) {
+	p.description.Store(fmt.Sprintf("translate_ldap_attribute=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_search_attribute=%s, ldap_mapped_attribute=%s]",
+		c.Field, c.LDAPAddress, c.LDAPBaseDN, c.LDAPBindUser, c.LDAPSearchAttribute, c.LDAPMappedAttribute))
 }
 
 // newClient creates a new LDAP client by discovering and connecting to available servers.
@@ -134,8 +145,8 @@ func newClient(c config, log *logp.Logger) (*ldapClient, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("translate_ldap_attribute=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_search_attribute=%s, ldap_mapped_attribute=%s]",
-		p.Field, p.LDAPAddress, p.LDAPBaseDN, p.LDAPBindUser, p.LDAPSearchAttribute, p.LDAPMappedAttribute)
+	description, _ := p.description.Load().(string)
+	return description
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
@@ -283,6 +294,7 @@ func (p *processor) ensureClient() (*ldapClient, error) {
 	p.client = client
 	p.LDAPBaseDN = client.baseDN
 	p.LDAPAddress = client.address
+	p.storeDescription(p.config)
 	p.clientErr = nil
 	p.nextClientAttempt = time.Time{}
 	return client, nil
