@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -102,6 +103,15 @@ type osquerybeat struct {
 	osquerydFactory          osqd.RunnerFactory
 	executablePath           func() (string, error)
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
+
+	// osqueryDataPath is the resolved osqueryd data directory, captured at
+	// New() time. Capturing it here (during CreateLogs) rather than in Run()
+	// prevents a race when multiple receivers are created concurrently: the
+	// libbeat paths package has global state, and a second receiver's
+	// CreateLogs call can overwrite it before the first receiver's Run()
+	// goroutine reads it, causing both osqueryd instances to share the same
+	// pidfile and kill each other.
+	osqueryDataPath string
 }
 
 type osquerybeatPublisher interface {
@@ -137,6 +147,11 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		qp:                   newQueryProfiler(log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
+		// Resolve the osqueryd data path now, while b.Info.Paths still reflects
+		// this specific receiver's configuration. Run() is called in a goroutine
+		// and may execute after a concurrently-started receiver has overwritten
+		// the global paths state.
+		osqueryDataPath: b.Info.Paths.Resolve(paths.Data, "osquery"),
 	}
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
@@ -207,6 +222,29 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Watch input configuration updates
 	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
+	// Apply the OTel status factory wrapper and report Running for each
+	// configured input. This must happen before the osqueryd setup so that
+	// status events reach the host even in environments where osqueryd is
+	// unavailable. The pattern mirrors heartbeat, which wraps its monitor
+	// factory before loading monitors. osquerybeat drives the shim factory
+	// manually because it does not use cfgfile runner management.
+	if bt.otelStatusFactoryWrapper != nil {
+		factory := bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
+		for i := range bt.config.Inputs {
+			rawCfg, cfgErr := conf.NewConfigFrom(&bt.config.Inputs[i])
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to build config for input %d: %v", i, cfgErr)
+				continue
+			}
+			runner, cfgErr := factory.Create(b.Publisher, rawCfg)
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to create status runner for input %d: %v", i, cfgErr)
+				continue
+			}
+			runner.Start()
+		}
+	}
+
 	// Create socket path
 	socketPath, cleanupFn, err := osqd.CreateSocketPath()
 	if err != nil {
@@ -229,6 +267,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
+		osqd.WithDataPath(bt.osqueryDataPath),
 	}
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
@@ -247,6 +286,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		b.Manager.UpdateStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
 		return err
 	}
+
+	// Register diagnostic hooks before any operation that may fail so that
+	// hooks are always available regardless of whether osqueryd is reachable.
+	bt.registerDiagnosticHooks(b)
 
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
@@ -281,9 +324,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
-	// Ensure that all the hooks and actions are ready before starting the Manager
-	// to receive configuration.
-	bt.registerDiagnosticHooks(b)
 	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
@@ -357,7 +397,7 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
 			defer cancel()
 
-			payload := map[string]interface{}{
+			payload := map[string]any{
 				"generated_at": time.Now().UTC().Format(time.RFC3339Nano),
 			}
 
@@ -367,12 +407,10 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			if err != nil {
 				payload["error"] = err.Error()
 			} else {
-				for key, value := range scheduledPayload {
-					payload[key] = value
-				}
+				maps.Copy(payload, scheduledPayload)
 			}
 
-			liveProfiles := []map[string]interface{}{}
+			liveProfiles := []map[string]any{}
 			if bt.liveProfiles != nil {
 				liveProfiles = bt.liveProfiles.List()
 			}
@@ -415,23 +453,23 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 // the per-path pre-check result, the current autoload file contents, and the
 // extensions osqueryd actually loaded (via the osquery_extensions table). This makes
 // load failures (missing binary, unsafe permissions) visible in agent diagnostics.
-func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[string]interface{} {
+func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[string]any {
 	bt.diagMx.RLock()
 	extensions := bt.diagExtensions
 	dataPath := bt.diagOsqueryData
 	qe := bt.diagQueryExec
 	bt.diagMx.RUnlock()
 
-	payload := map[string]interface{}{
+	payload := map[string]any{
 		"generated_at":       time.Now().UTC().Format(time.RFC3339Nano),
 		"unsupported_notice": "Custom extensions are not developed, validated, or supported by Elastic. Customers are fully responsible for security, maintenance, and stability.",
 	}
 
 	resolved := osqd.ResolveExtensions(extensions.Paths)
-	entries := make([]map[string]interface{}, 0, len(resolved))
+	entries := make([]map[string]any, 0, len(resolved))
 	loadedCount := 0
 	for _, res := range resolved {
-		entry := map[string]interface{}{"entry": res.Entry}
+		entry := map[string]any{"entry": res.Entry}
 		if res.Error != "" {
 			entry["status"] = "error"
 			entry["reason"] = res.Error
@@ -440,9 +478,9 @@ func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[str
 			entry["loaded"] = res.Loaded
 			loadedCount += len(res.Loaded)
 			if len(res.Skipped) > 0 {
-				skipped := make([]map[string]interface{}, 0, len(res.Skipped))
+				skipped := make([]map[string]any, 0, len(res.Skipped))
 				for _, s := range res.Skipped {
-					skipped = append(skipped, map[string]interface{}{"path": s.Path, "reason": s.Reason})
+					skipped = append(skipped, map[string]any{"path": s.Path, "reason": s.Reason})
 				}
 				entry["skipped"] = skipped
 			}
@@ -466,7 +504,7 @@ func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[str
 			payload["autoload_error"] = err.Error()
 		} else {
 			entries := []string{}
-			for _, l := range strings.Split(strings.TrimRight(string(content), "\n"), "\n") {
+			for l := range strings.SplitSeq(strings.TrimRight(string(content), "\n"), "\n") {
 				if l != "" {
 					entries = append(entries, l)
 				}
@@ -726,7 +764,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	responseID := uuid.Must(uuid.NewV4()).String()
 	runTime := time.Unix(res.UnixTime, 0)
 	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
-	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
+	publishResolved := func(resultType, action string, hits []map[string]any) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
 		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, meta, hits, qi.ECSMapping, nil)
@@ -770,8 +808,8 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
 }
 
-func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]interface{} {
-	m := map[string]interface{}{
+func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]any {
+	m := map[string]any{
 		"type":                     typ,
 		"calendar_type":            res.CalendarTime,
 		"unix_time":                res.UnixTime,
@@ -789,7 +827,7 @@ func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 	if b.Manager != nil {
-		b.Manager.SetPayload(map[string]interface{}{
+		b.Manager.SetPayload(map[string]any{
 			"osquery_version": bt.osqueryVersion,
 			"osquery_source":  bt.osquerySource,
 		})
