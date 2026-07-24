@@ -193,14 +193,14 @@ processors:
 			assert.NoError(ct, err)
 			otelFound := assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
 			if resendOnMiss && !otelFound {
-				runClient(t, otelAddress, data)
+				go runClient(t, otelAddress, data)
 			}
 
 			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
 			assert.NoError(ct, err)
 			filebeatFound := assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
 			if resendOnMiss && !filebeatFound {
-				runClient(t, fbAddress, data)
+				go runClient(t, fbAddress, data)
 			}
 		},
 		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
