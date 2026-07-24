@@ -90,6 +90,13 @@ func makeOsqConfig(pathHome string) *osqreceiver.Config {
 	return &osqreceiver.Config{
 		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
+			// NewBeatForReceiver defaults logging.metrics.period to 0 (disabled)
+			// because periodic snapshots are redundant under OTel telemetry.
+			// The integration tests wait for "Starting metrics logging every 30s"
+			// as a startup signal, so we override the default here.
+			"logging.metrics": map[string]any{
+				"period": "30s",
+			},
 			"osquerybeat": map[string]any{
 				"inputs": []any{
 					map[string]any{
