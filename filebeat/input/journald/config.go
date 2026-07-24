@@ -22,6 +22,7 @@
 package journald
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -100,6 +101,21 @@ type config struct {
 	// it defaults to `journalctl`, which assumes that the `journalctl`
 	// binary is available in the system's `PATH` environment variable.
 	JournalctlPath string `config:"journalctl_path"`
+}
+
+// Validate checks the configuration. It is called by go-ucfg when
+// the configuration is unpacked.
+func (c config) Validate() error {
+	// Facilities are passed to journalctl as SYSLOG_FACILITY=N matches,
+	// which journalctl does not range-check (unlike its `--facility` flag),
+	// so an out-of-range value would silently match nothing.
+	for _, facility := range c.Facilities {
+		if facility < 0 || facility > 23 {
+			return fmt.Errorf("facility %d is invalid, it must be in the range 0-23", facility)
+		}
+	}
+
+	return nil
 }
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration

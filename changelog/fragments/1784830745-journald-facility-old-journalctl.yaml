@@ -1,0 +1,6 @@
+kind: bug-fix
+summary: >-
+  Fix the journald input failing to collect any events on systems with
+  journalctl older than 245 (e.g. RHEL 8) when facility filters are
+  configured, by using SYSLOG_FACILITY matches instead of `--facility`
+component: filebeat
