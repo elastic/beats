@@ -270,7 +270,6 @@ func TestFacilityArgs(t *testing.T) {
 				"",
 				0,
 				"",
-				false,
 				f)
 			if err != nil {
 				t.Fatalf("did not expect an error when calling New: %s", err)
