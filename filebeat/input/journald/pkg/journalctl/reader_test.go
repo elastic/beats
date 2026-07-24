@@ -250,19 +250,18 @@ func fakeJournalctl(t *testing.T, version int) string {
 	return path
 }
 
-func TestJournalctlVersion(t *testing.T) {
+func TestJournalctlSupportsBootAll(t *testing.T) {
 	tests := []struct {
 		name        string
 		version     int
 		invalidPath bool
-		wantErr     bool
 		wantBootAll bool
 	}{
-		{name: "v239 (RHEL8) does not get --boot all", version: 239},
-		{name: "v241 does not get --boot all", version: 241},
+		{name: "v239 (RHEL8) does not get --boot all", version: 239, wantBootAll: false},
+		{name: "v241 does not get --boot all", version: 241, wantBootAll: false},
 		{name: "v242 gets --boot all", version: 242, wantBootAll: true},
 		{name: "v250 gets --boot all", version: 250, wantBootAll: true},
-		{name: "invalid binary path falls back safely", invalidPath: true, wantErr: true},
+		{name: "invalid binary path falls back safely", invalidPath: true, wantBootAll: false},
 	}
 
 	for _, tc := range tests {
@@ -275,12 +274,9 @@ func TestJournalctlVersion(t *testing.T) {
 			}
 
 			logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "..", "..", "build"))
-			got, err := journalctlVersion(logger.Logger, NewFactory("", path))
-			if tc.wantErr != (err != nil) {
-				t.Fatalf("wantErr=%v, got error: %v", tc.wantErr, err)
-			}
-			if gotBootAll := got >= minVersionBootAll; gotBootAll != tc.wantBootAll {
-				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, gotBootAll)
+			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
+			if got != tc.wantBootAll {
+				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
 			}
 		})
 	}
