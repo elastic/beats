@@ -260,7 +260,15 @@ func newSaramaConfig(log *logp.Logger, config *KafkaConfig) (*sarama.Config, err
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
-		config.Sasl.ConfigureSarama(k)
+		if err := config.Sasl.ConfigureSarama(k); err != nil {
+			return nil, err
+		}
+
+	case strings.ToUpper(config.Sasl.SaslMechanism) == sarama.SASLTypeOAuth:
+		k.Net.SASL.Enable = true
+		if err := config.Sasl.ConfigureSarama(k); err != nil {
+			return nil, err
+		}
 	}
 
 	// configure metadata update properties

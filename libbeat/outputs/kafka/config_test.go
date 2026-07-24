@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -91,6 +92,53 @@ func TestConfigInvalid(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestConfigOAUTHBEARER(t *testing.T) {
+	t.Run("valid config enables SASL and sets a token provider", func(t *testing.T) {
+		c := config.MustNewConfigFrom(mapstr.M{
+			"topic":                 "foo",
+			"sasl.mechanism":        "OAUTHBEARER",
+			"sasl.credentials_path": "/var/run/secrets/tokens/kafka.jwt",
+			"sasl.extensions": mapstr.M{
+				"logicalCluster": "lkc-abc123",
+				"identityPoolId": "pool-xyz789",
+			},
+		})
+		logger := logptest.NewTestingLogger(t, "")
+		if err := c.SetString("hosts", 0, "localhost"); err != nil {
+			t.Fatalf("could not set 'hosts' on config: %s", err)
+		}
+		cfg, err := ReadConfig(c)
+		if err != nil {
+			t.Fatalf("Can not create test configuration: %v", err)
+		}
+		sc, err := newSaramaConfig(logger, cfg)
+		if err != nil {
+			t.Fatalf("Failure creating sarama config: %v", err)
+		}
+		assert.True(t, sc.Net.SASL.Enable, "SASL should be enabled")
+		assert.Equal(t, sarama.SASLMechanism(sarama.SASLTypeOAuth), sc.Net.SASL.Mechanism)
+		assert.NotNil(t, sc.Net.SASL.TokenProvider, "token provider should be set for OAUTHBEARER")
+	})
+
+	t.Run("missing credentials_path is an error", func(t *testing.T) {
+		c := config.MustNewConfigFrom(mapstr.M{
+			"topic":          "foo",
+			"sasl.mechanism": "OAUTHBEARER",
+		})
+		logger := logptest.NewTestingLogger(t, "")
+		if err := c.SetString("hosts", 0, "localhost"); err != nil {
+			t.Fatalf("could not set 'hosts' on config: %s", err)
+		}
+		cfg, err := ReadConfig(c)
+		if err != nil {
+			t.Fatalf("Can not create test configuration: %v", err)
+		}
+		if _, err := newSaramaConfig(logger, cfg); err == nil {
+			t.Fatal("expected an error when sasl.credentials_path is not set for OAUTHBEARER")
+		}
+	})
 }
 
 func TestConfigUnderElasticAgent(t *testing.T) {
