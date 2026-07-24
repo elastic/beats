@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
@@ -475,13 +476,13 @@ func TestExtraArgsForAPIMonitor(t *testing.T) {
 	require.NoError(t, err)
 	args := sj.extraArgs(false)
 
-	require.NotContains(t, args, "--sandbox", "api journeys must not receive --sandbox")
-	require.NotContains(t, args, "--screenshots", "api journeys must not receive --screenshots")
-	require.NotContains(t, args, "--no-throttling", "api journeys must not receive --no-throttling")
-	require.NotContains(t, args, "--throttling", "api journeys must not receive --throttling")
+	assert.NotContains(t, args, "--sandbox", "api journeys must not receive --sandbox")
+	assert.NotContains(t, args, "--screenshots", "api journeys must not receive --screenshots")
+	assert.NotContains(t, args, "--no-throttling", "api journeys must not receive --no-throttling")
+	assert.NotContains(t, args, "--throttling", "api journeys must not receive --throttling")
 
-	require.Contains(t, args, "--ignore-https-errors", "api journeys must still honor --ignore-https-errors")
-	require.Contains(t, args, "--playwright-options", "api journeys must still receive --playwright-options")
+	assert.Contains(t, args, "--ignore-https-errors", "api journeys must still honor --ignore-https-errors")
+	assert.Contains(t, args, "--playwright-options", "api journeys must still receive --playwright-options")
 }
 
 // Browser monitors must keep receiving all existing flags (regression guard).
@@ -505,7 +506,7 @@ func TestExtraArgsForBrowserMonitorUnchanged(t *testing.T) {
 	require.NoError(t, err)
 	args := sj.extraArgs(false)
 
-	require.Contains(t, args, "--sandbox")
-	require.Contains(t, args, "--screenshots")
-	require.Contains(t, args, "--no-throttling")
+	assert.Contains(t, args, "--sandbox")
+	assert.Contains(t, args, "--screenshots")
+	assert.Contains(t, args, "--no-throttling")
 }

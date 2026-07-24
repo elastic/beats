@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -83,8 +84,8 @@ func TestIsSyntheticsType(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.monitorType, func(t *testing.T) {
-			require.Equal(t, c.want, IsSyntheticsType(c.monitorType))
-			require.Equal(t, c.want, StdMonitorFields{Type: c.monitorType}.IsSyntheticsType())
+			assert.Equal(t, c.want, IsSyntheticsType(c.monitorType))
+			assert.Equal(t, c.want, StdMonitorFields{Type: c.monitorType}.IsSyntheticsType())
 		})
 	}
 }

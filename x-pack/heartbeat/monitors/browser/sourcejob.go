@@ -88,7 +88,7 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 	// TODO: Just pass stdfields in to remove second deserialize
 	if err != nil {
 		//nolint:forbidigo // StdFields() has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
-		logp.L().Warnf("Could not deserialize monitor fields for browser, this should never happen: %s", err)
+		logp.L().Warnf("Could not deserialize monitor fields for %q monitor, this should never happen: %s", sj.browserCfg.Type, err)
 	}
 	return sFields
 }
@@ -219,10 +219,6 @@ func (sj *SourceJob) jobs() []jobs.Job {
 		}
 	}
 	return []jobs.Job{j}
-}
-
-func (sj *SourceJob) plugin() plugin.Plugin {
-	return sj.Plugin()
 }
 
 // Plugin exposes the SourceJob as a monitor plugin. Exported so the `api`
