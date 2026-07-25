@@ -79,7 +79,7 @@ func TestStartStop(t *testing.T) {
 	var startCounter, stopCounter atomic.Int64
 
 	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
-	for i := 0; i < fakeRunnersNum; i++ {
+	for i := range fakeRunnersNum {
 		runners = append(runners, &fakeRunner{
 			id:           i,
 			startCounter: &startCounter,
@@ -98,7 +98,7 @@ func TestStartStop(t *testing.T) {
 
 func TestDiagnosticsUnsupported(t *testing.T) {
 	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
-	for i := 0; i < fakeRunnersNum; i++ {
+	for i := range fakeRunnersNum {
 		runners = append(runners, &fakeRunner{
 			id:           i,
 			startCounter: &atomic.Int64{},
@@ -119,7 +119,7 @@ func TestDiagnosticsUnsupported(t *testing.T) {
 
 func TestDiagosticsSupported(t *testing.T) {
 	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
-	for i := 0; i < fakeRunnersNum; i++ {
+	for i := range fakeRunnersNum {
 		runners = append(runners, &fakeRunnerDiag{
 			id: i,
 		})
@@ -134,7 +134,7 @@ func TestDiagosticsSupported(t *testing.T) {
 
 func TestString(t *testing.T) {
 	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
-	for i := 0; i < fakeRunnersNum; i++ {
+	for i := range fakeRunnersNum {
 		runners = append(runners, &fakeRunner{
 			id: i,
 		})

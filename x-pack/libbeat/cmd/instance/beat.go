@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -73,10 +72,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// begin code similar to configure
-	if err = plugin.Initialize(); err != nil {
-		return nil, fmt.Errorf("error initializing plugins: %w", err)
-	}
-
 	b.InputQueueSize = settings.InputQueueSize
 
 	cfOpts := []ucfg.Option{
@@ -95,6 +90,22 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	if receiverConfig["output"] != nil {
 		logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
+	}
+
+	// Set the default shutdown timeout to 5s. The beat default is 1s, which can be too short for the otel pipeline.
+	// Packetbeat is excluded because its shutdown_timeout has different semantics.
+	// See https://github.com/elastic/beats/issues/52031
+	if b.Info.Beat != "packetbeat" {
+		switch beatSection := receiverConfig[b.Info.Beat].(type) {
+		case map[string]any:
+			if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
+				beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
+			}
+		case nil:
+			receiverConfig[b.Info.Beat] = map[string]any{
+				"shutdown_timeout": receiverPublisherCloseTimeout.String(),
+			}
+		}
 	}
 
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)

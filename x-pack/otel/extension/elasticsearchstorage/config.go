@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	ElasticsearchConfig map[string]interface{} `mapstructure:",remain"`
+	ElasticsearchConfig map[string]any `mapstructure:",remain"`
 }
 
 func createDefaultConfig() component.Config {

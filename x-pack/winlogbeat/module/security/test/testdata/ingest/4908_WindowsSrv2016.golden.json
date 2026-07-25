@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-08-19T06:07:25.0461779Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "special-group-table-changed",

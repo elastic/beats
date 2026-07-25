@@ -269,8 +269,12 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
+	// SYSLOG_FACILITY matches are used instead of `--facility` because the
+	// flag only exists on journalctl >= 245 and is implemented as exactly
+	// these matches. Matches on the same field are ORed by journalctl, which
+	// is the same semantics as repeated `--facility` flags.
 	for _, facility := range facilities {
-		args = append(args, "--facility", fmt.Sprintf("%d", facility))
+		args = append(args, fmt.Sprintf("SYSLOG_FACILITY=%d", facility))
 	}
 
 	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
@@ -285,7 +289,7 @@ func New(
 		canceler:        canceler,
 		jctlFactory:     newJctl,
 		supportsBootAll: supportsBootAll,
-		backoff:         backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
+		backoff:         backoff.NewExpBackoff(100*time.Millisecond, 2*time.Second),
 	}
 
 	if err := r.newJctl(extraArgs...); err != nil {
@@ -349,9 +353,9 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	// will return true next time it's called making us to
 	// wait in case jouranlctl crashes in less than 5s.
 	if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
-		r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
+		r.backoff = backoff.NewExpBackoff(100*time.Millisecond, 2*time.Second)
 	} else {
-		r.backoff.Wait()
+		r.backoff.Wait(input.GoContextFromCanceler(cancel))
 	}
 
 	var extraArgs []string

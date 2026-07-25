@@ -372,12 +372,3 @@ type containerServiceInfo struct {
 func (i *containerServiceInfo) Name() string {
 	return i.ServiceName()
 }
-
-func contains(list []string, item string) bool {
-	for _, i := range list {
-		if item == i {
-			return true
-		}
-	}
-	return false
-}

@@ -12,6 +12,9 @@ on:
         type: string
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   build-release-notes:
     uses: elastic/elastic-agent-changelog-tool/.github/workflows/generate-release-notes.yml@main

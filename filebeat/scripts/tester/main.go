@@ -262,13 +262,13 @@ func testPipeline(esURL, path string, logs []string, verbose, simulateVerbose bo
 	return nil
 }
 
-func readPipeline(path string) (map[string]interface{}, error) {
-	d, err := ioutil.ReadFile(path)
+func readPipeline(path string) (map[string]any, error) {
+	d, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var p map[string]interface{}
+	var p map[string]any
 	err = json.Unmarshal(d, &p)
 	if err != nil {
 		return nil, err
@@ -277,7 +277,7 @@ func readPipeline(path string) (map[string]interface{}, error) {
 	return p, nil
 }
 
-func runSimulate(url string, pipeline map[string]interface{}, logs []string, verbose bool) (*http.Response, error) {
+func runSimulate(url string, pipeline map[string]any, logs []string, verbose bool) (*http.Response, error) {
 	var sources []mapstr.M
 	now := time.Now().UTC()
 	for _, l := range logs {
@@ -349,7 +349,7 @@ func getDocErrors(r mapstr.M, simulateVerbose bool) ([]mapstr.M, error) {
 		return nil, err
 	}
 
-	docs := d.([]interface{})
+	docs := d.([]any)
 	if simulateVerbose {
 		return getErrorsSimulateVerbose(docs)
 	}
@@ -357,10 +357,10 @@ func getDocErrors(r mapstr.M, simulateVerbose bool) ([]mapstr.M, error) {
 	return getRegularErrors(docs)
 }
 
-func getRegularErrors(docs []interface{}) ([]mapstr.M, error) {
+func getRegularErrors(docs []any) ([]mapstr.M, error) {
 	var errors []mapstr.M
 	for _, d := range docs {
-		dd := d.(map[string]interface{})
+		dd := d.(map[string]any)
 		doc := mapstr.M(dd)
 		hasError, err := doc.HasKey("doc._source.error")
 		if err != nil {
@@ -374,20 +374,20 @@ func getRegularErrors(docs []interface{}) ([]mapstr.M, error) {
 	return errors, nil
 }
 
-func getErrorsSimulateVerbose(docs []interface{}) ([]mapstr.M, error) {
+func getErrorsSimulateVerbose(docs []any) ([]mapstr.M, error) {
 	var errors []mapstr.M
 	for _, d := range docs {
-		pr := d.(map[string]interface{})
+		pr := d.(map[string]any)
 		p := mapstr.M(pr)
 
 		rr, err := p.GetValue("processor_results")
 		if err != nil {
 			return nil, err
 		}
-		res := rr.([]interface{})
+		res := rr.([]any)
 		hasError := false
 		for _, r := range res {
-			rres := r.(map[string]interface{})
+			rres := r.(map[string]any)
 			result := mapstr.M(rres)
 			hasError, _ = result.HasKey("error")
 			if hasError {

@@ -30,7 +30,7 @@ import (
 
 func TestRegxpCreate(t *testing.T) {
 	config := Config{
-		Regexp: &Fields{fields: map[string]interface{}{
+		Regexp: &Fields{fields: map[string]any{
 			"proc.name": "58gdhsga-=kw++w00",
 		}},
 	}
@@ -40,7 +40,7 @@ func TestRegxpCreate(t *testing.T) {
 
 func TestContainsMultiFieldPositiveMatch(t *testing.T) {
 	testConfig(t, true, secdTestEvent, &Config{
-		Contains: &Fields{fields: map[string]interface{}{
+		Contains: &Fields{fields: map[string]any{
 			"proc.name":     "sec",
 			"proc.username": "monica",
 		}},
@@ -49,7 +49,7 @@ func TestContainsMultiFieldPositiveMatch(t *testing.T) {
 
 func TestContainsMultiFieldNegativeMatch(t *testing.T) {
 	testConfig(t, false, secdTestEvent, &Config{
-		Contains: &Fields{fields: map[string]interface{}{
+		Contains: &Fields{fields: map[string]any{
 			"type":      "process",
 			"proc.name": "secddd",
 		}},
@@ -58,7 +58,7 @@ func TestContainsMultiFieldNegativeMatch(t *testing.T) {
 
 func TestContainsSingleFieldPositiveMatch(t *testing.T) {
 	testConfig(t, true, secdTestEvent, &Config{
-		Contains: &Fields{fields: map[string]interface{}{
+		Contains: &Fields{fields: map[string]any{
 			"proc.keywords": "bar",
 		}},
 	})
@@ -66,7 +66,7 @@ func TestContainsSingleFieldPositiveMatch(t *testing.T) {
 
 func TestContainsArrayOfStringPositiveMatch(t *testing.T) {
 	testConfig(t, true, secdTestEvent, &Config{
-		Contains: &Fields{fields: map[string]interface{}{
+		Contains: &Fields{fields: map[string]any{
 			"tags": "prod",
 		}},
 	})
@@ -76,19 +76,19 @@ func TestRegexpCondition(t *testing.T) {
 
 	configs := []Config{
 		{
-			Regexp: &Fields{fields: map[string]interface{}{
+			Regexp: &Fields{fields: map[string]any{
 				"source": "apache2/error.*",
 			}},
 		},
 
 		{
-			Regexp: &Fields{fields: map[string]interface{}{
+			Regexp: &Fields{fields: map[string]any{
 				"source": "apache2/access.*",
 			}},
 		},
 
 		{
-			Regexp: &Fields{fields: map[string]interface{}{
+			Regexp: &Fields{fields: map[string]any{
 				"source":  "apache2/error.*",
 				"message": "[client 1.2.3.4]",
 			}},

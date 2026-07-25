@@ -635,6 +635,14 @@ func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
 	if diff := cmp.Diff(queryPeriod, qi.Interval); diff != "" {
 		t.Error(diff)
 	}
+	// query_name for a top-level scheduled query is the schedule config map key.
+	if diff := cmp.Diff(queryName, qi.QueryName); diff != "" {
+		t.Error(diff)
+	}
+	// Top-level schedule queries do not belong to a pack.
+	if diff := cmp.Diff("", qi.PackName); diff != "" {
+		t.Error(diff)
+	}
 }
 
 func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
@@ -644,6 +652,7 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	const (
 		packName    = "my-pack"
 		packID      = "pack-uuid-123"
+		packLabel   = "My Pack"
 		queryName   = "uptime_query"
 		querySQL    = "select * from uptime"
 		queryPeriod = 60
@@ -659,7 +668,8 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 			Osquery: &config.OsqueryConfig{
 				Packs: map[string]config.Pack{
 					packName: {
-						PackID: packID,
+						PackID:   packID,
+						PackName: packLabel,
 						Queries: map[string]config.Query{
 							queryName: {
 								Query: querySQL,
@@ -690,6 +700,13 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	}
 
 	if diff := cmp.Diff(packID, qi.PackID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(packLabel, qi.PackName); diff != "" {
+		t.Error(diff)
+	}
+	// query_name is taken from the pack's queries config map key.
+	if diff := cmp.Diff(queryName, qi.QueryName); diff != "" {
 		t.Error(diff)
 	}
 }
@@ -809,7 +826,9 @@ func TestSet_PackConflictingScheduleDefaultsRejected(t *testing.T) {
 	}
 }
 
-func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
+func TestSet_PackMixedNativeUnscheduledAccepted(t *testing.T) {
+	// Native interval mixed with unscheduled queries must not fail policy application;
+	// see https://github.com/elastic/beats/issues/51450
 	logger := logp.NewLogger("config_test")
 	cfgp := NewConfigPlugin(logger)
 	inputs := []config.InputConfig{
@@ -823,6 +842,37 @@ func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
 						Queries: map[string]config.Query{
 							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
 							"idle":   {Query: "select 2"},
+						},
+					},
+				},
+			},
+		},
+	}
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfgp.Count() != 2 {
+		t.Fatalf("expected 2 queries registered, got %d", cfgp.Count())
+	}
+}
+
+func TestSet_PackMixedRRuleScheduleModesRejected(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+	inputs := []config.InputConfig{
+		{
+			Name:       "osquery-manager-1",
+			Type:       "osquery",
+			Datastream: config.DatastreamConfig{Namespace: "default"},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					"mixed": {
+						Queries: map[string]config.Query{
+							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
+							"rrule": {Query: "select 2", RRuleSchedule: &config.RRuleScheduleConfig{
+								RRule:     "FREQ=DAILY",
+								StartDate: "2024-01-01T00:00:00Z",
+							}},
 						},
 					},
 				},

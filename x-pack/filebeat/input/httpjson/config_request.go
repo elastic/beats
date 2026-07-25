@@ -12,10 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 )
 
 type retryConfig struct {

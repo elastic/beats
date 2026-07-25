@@ -74,8 +74,8 @@ func TestFetchEventContents(t *testing.T) {
 	}
 }
 
-func getConfig(conn net.Conn) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(conn net.Conn) map[string]any {
+	return map[string]any{
 		"module":     "kvm",
 		"metricsets": []string{"dommemstat"},
 		"hosts":      []string{"test://" + conn.RemoteAddr().String() + ":123"},

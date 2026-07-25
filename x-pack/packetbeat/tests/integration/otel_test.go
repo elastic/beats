@@ -24,7 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
@@ -49,20 +48,26 @@ func skipIfNotRoot(t *testing.T) {
 	}
 }
 
-// startHTTPServer starts an HTTP server on the given port and registers
-// cleanup to stop it when the test ends.
-func startHTTPServer(t *testing.T, port uint16) *httptest.Server {
+// startHTTPServer starts an HTTP server bound to an ephemeral port on the
+// loopback interface and registers cleanup to stop it when the test ends.
+// Binding to an OS-assigned port avoids the time-of-check/time-of-use race of
+// pre-allocating a port.
+func startHTTPServer(t *testing.T) *httptest.Server {
 	t.Helper()
-	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port)) //nolint:noctx // fine for tests
-	require.NoError(t, err)
-	srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "packetbeat integration test")
 	}))
-	srv.Listener = listener
-	srv.Start()
 	t.Cleanup(srv.Close)
 	return srv
+}
+
+// serverPort returns the ephemeral TCP port the test HTTP server bound to.
+func serverPort(t *testing.T, srv *httptest.Server) int {
+	t.Helper()
+	addr, ok := srv.Listener.Addr().(*net.TCPAddr)
+	require.Truef(t, ok, "expected a TCP listener address, got %T", srv.Listener.Addr())
+	return addr.Port
 }
 
 // sendHTTPRequests sends numRequests GET requests to url, ignoring errors.
@@ -131,8 +136,6 @@ func TestPacketbeatOTelE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	index := "logs-integration-" + namespace
 
-	monitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
 	cfg := fmt.Sprintf(`receivers:
   packetbeatreceiver:
     packetbeat:
@@ -150,7 +153,7 @@ func TestPacketbeatOTelE2E(t *testing.T) {
     path.home: %s
     http.enabled: true
     http.host: localhost
-    http.port: %d
+    http.port: 0
     management.otel.enabled: true
 exporters:
   elasticsearch/log:
@@ -171,9 +174,9 @@ service:
         - packetbeatreceiver
       exporters:
         - elasticsearch/log
-`, tmpdir, monitoringPort, index)
+`, tmpdir, index)
 
-	oteltestcol.New(t, cfg)
+	collector := oteltestcol.New(t, cfg)
 
 	es := integration.GetESClient(t, "http")
 
@@ -188,15 +191,14 @@ service:
 		},
 		2*time.Minute, 1*time.Second, "expected packetbeat events in ES")
 
-	assertMonitoring(t, monitoringPort)
+	assertMonitoring(t, collector.MonitoringPort(t))
 }
 
 type receiverConfig struct {
-	PathHome       string
-	PcapFile       string
-	Protocol       string
-	Ports          []int
-	MonitoringPort uint16
+	PathHome string
+	PcapFile string
+	Protocol string
+	Ports    []int
 }
 
 // TestPacketbeatOTelMultipleReceiversE2E verifies that multiple packetbeat
@@ -210,21 +212,18 @@ func TestPacketbeatOTelMultipleReceiversE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	index := "logs-integration-" + namespace
 
-	ports := libbeattesting.MustAvailableTCP4Ports(t, 2)
 	receivers := []receiverConfig{
 		{
-			PathHome:       tmpdir + "/r0",
-			PcapFile:       "../../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
-			Protocol:       "http",
-			Ports:          []int{80},
-			MonitoringPort: ports[0],
+			PathHome: tmpdir + "/r0",
+			PcapFile: "../../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
+			Protocol: "http",
+			Ports:    []int{80},
 		},
 		{
-			PathHome:       tmpdir + "/r1",
-			PcapFile:       "../../../../packetbeat/tests/system/pcaps/dns_google_com.pcap",
-			Protocol:       "dns",
-			Ports:          []int{53},
-			MonitoringPort: ports[1],
+			PathHome: tmpdir + "/r1",
+			PcapFile: "../../../../packetbeat/tests/system/pcaps/dns_google_com.pcap",
+			Protocol: "dns",
+			Ports:    []int{53},
 		},
 	}
 
@@ -247,7 +246,7 @@ func TestPacketbeatOTelMultipleReceiversE2E(t *testing.T) {
     path.home: {{$r.PathHome}}
     http.enabled: true
     http.host: localhost
-    http.port: {{$r.MonitoringPort}}
+    http.port: 0
     management.otel.enabled: true
 {{end}}
 exporters:
@@ -276,7 +275,7 @@ service:
 		"Receivers": receivers,
 	})
 
-	oteltestcol.New(t, cfg)
+	collector := oteltestcol.New(t, cfg)
 
 	es := integration.GetESClient(t, "http")
 
@@ -293,8 +292,8 @@ service:
 		},
 		2*time.Minute, 1*time.Second, "expected events from %d receivers in ES", len(receivers))
 
-	for _, rec := range receivers {
-		assertMonitoring(t, int(rec.MonitoringPort))
+	for _, port := range collector.MonitoringPorts(t, len(receivers)) {
+		assertMonitoring(t, port)
 	}
 }
 
@@ -309,8 +308,6 @@ func TestPacketbeatOTelBeatE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	pbOtelIndex := "logs-integration-" + namespace
 	pbIndex := "logs-packetbeat-" + namespace
-
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
 
 	otelCfg := fmt.Sprintf(`receivers:
   packetbeatreceiver:
@@ -329,7 +326,7 @@ func TestPacketbeatOTelBeatE2E(t *testing.T) {
     path.home: %s
     http.enabled: true
     http.host: localhost
-    http.port: %d
+    http.port: 0
     management.otel.enabled: true
 exporters:
   elasticsearch/log:
@@ -350,9 +347,9 @@ service:
         - packetbeatreceiver
       exporters:
         - elasticsearch/log
-`, tmpdir, otelMonitoringPort, pbOtelIndex)
+`, tmpdir, pbOtelIndex)
 
-	oteltestcol.New(t, otelCfg)
+	collector := oteltestcol.New(t, otelCfg)
 
 	standaloneCfg := fmt.Sprintf(`
 packetbeat.interfaces.file: ../../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap
@@ -411,7 +408,7 @@ queue.mem.flush.timeout: 0s
 	assert.Equal(t, "packetbeat", otelDoc.Flatten()["agent.type"], "expected agent.type to be 'packetbeat' in otel doc")
 	assert.Equal(t, "packetbeat", pbDoc.Flatten()["agent.type"], "expected agent.type to be 'packetbeat' in standalone doc")
 
-	assertMonitoring(t, otelMonitoringPort)
+	assertMonitoring(t, collector.MonitoringPort(t))
 }
 
 // TestPacketbeatOTelLiveInterfaceE2E verifies that a packetbeat OTel receiver
@@ -425,11 +422,11 @@ func TestPacketbeatOTelLiveInterfaceE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	index := "logs-integration-" + namespace
 
-	ports := libbeattesting.MustAvailableTCP4Ports(t, 2)
-	monitoringPort := ports[0]
-	httpPort := ports[1]
-
-	srv := startHTTPServer(t, httpPort)
+	// The HTTP server binds an ephemeral port; packetbeat is configured to
+	// sniff that resolved port. http.port is 0 so the monitoring server also
+	// binds an ephemeral port, discovered from the collector logs below.
+	srv := startHTTPServer(t)
+	httpPort := serverPort(t, srv)
 
 	cfg := renderOtelConfig(t, `receivers:
   packetbeatreceiver:
@@ -447,7 +444,7 @@ func TestPacketbeatOTelLiveInterfaceE2E(t *testing.T) {
     path.home: {{.PathHome}}
     http.enabled: true
     http.host: localhost
-    http.port: {{.MonitoringPort}}
+    http.port: 0
 exporters:
   debug:
     use_internal_logger: false
@@ -474,17 +471,14 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, map[string]any{
-		"Device":         loopbackDevice(),
-		"HTTPPort":       httpPort,
-		"PathHome":       tmpdir,
-		"MonitoringPort": monitoringPort,
-		"Index":          index,
+		"Device":   loopbackDevice(),
+		"HTTPPort": httpPort,
+		"PathHome": tmpdir,
+		"Index":    index,
 	})
 
-	oteltestcol.New(t, cfg)
+	collector := oteltestcol.New(t, cfg)
 
 	// Generate HTTP traffic continuously: the packetbeat sniffer starts
 	// asynchronously, so a one-shot burst would race with capture startup.
@@ -503,7 +497,7 @@ service:
 		},
 		2*time.Minute, 1*time.Second, "expected packetbeat events in ES")
 
-	assertMonitoring(t, int(monitoringPort))
+	assertMonitoring(t, collector.MonitoringPort(t))
 }
 
 // TestPacketbeatOTelLiveInterfaceMultipleReceiversE2E verifies that multiple
@@ -518,22 +512,17 @@ func TestPacketbeatOTelLiveInterfaceMultipleReceiversE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	index := "logs-integration-" + namespace
 
-	// 4 ports: 2 monitoring + 2 HTTP servers
-	ports := libbeattesting.MustAvailableTCP4Ports(t, 4)
-
+	// Each HTTP server binds an ephemeral port; packetbeat sniffs the resolved
+	// ports. http.port is 0 so each monitoring server binds an ephemeral port
+	// too, discovered from the collector logs below.
 	type liveReceiverConfig struct {
-		PathHome       string
-		HTTPPort       uint16
-		MonitoringPort uint16
+		PathHome string
+		HTTPPort int
 	}
+	servers := []*httptest.Server{startHTTPServer(t), startHTTPServer(t)}
 	liveReceivers := []liveReceiverConfig{
-		{PathHome: tmpdir + "/r0", MonitoringPort: ports[0], HTTPPort: ports[2]},
-		{PathHome: tmpdir + "/r1", MonitoringPort: ports[1], HTTPPort: ports[3]},
-	}
-
-	servers := make([]*httptest.Server, len(liveReceivers))
-	for i, rec := range liveReceivers {
-		servers[i] = startHTTPServer(t, rec.HTTPPort)
+		{PathHome: tmpdir + "/r0", HTTPPort: serverPort(t, servers[0])},
+		{PathHome: tmpdir + "/r1", HTTPPort: serverPort(t, servers[1])},
 	}
 
 	cfg := renderOtelConfig(t, `receivers:
@@ -554,7 +543,7 @@ func TestPacketbeatOTelLiveInterfaceMultipleReceiversE2E(t *testing.T) {
     path.home: {{$r.PathHome}}
     http.enabled: true
     http.host: localhost
-    http.port: {{$r.MonitoringPort}}
+    http.port: 0
 {{end}}
 exporters:
   debug:
@@ -584,15 +573,13 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, map[string]any{
 		"Device":    loopbackDevice(),
 		"Index":     index,
 		"Receivers": liveReceivers,
 	})
 
-	oteltestcol.New(t, cfg)
+	collector := oteltestcol.New(t, cfg)
 
 	// Generate HTTP traffic continuously on each server: the packetbeat sniffer
 	// starts asynchronously, so a one-shot burst would race with capture startup.
@@ -615,7 +602,7 @@ service:
 		},
 		2*time.Minute, 1*time.Second, "expected events from %d receivers in ES", len(liveReceivers))
 
-	for _, rec := range liveReceivers {
-		assertMonitoring(t, int(rec.MonitoringPort))
+	for _, port := range collector.MonitoringPorts(t, len(liveReceivers)) {
+		assertMonitoring(t, port)
 	}
 }

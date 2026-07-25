@@ -291,14 +291,15 @@ func TestValidatePackQueriesAfterMerge(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("reject mixed native and unscheduled with no pack defaults", func(t *testing.T) {
+	t.Run("allow mixed native and unscheduled with no pack defaults", func(t *testing.T) {
+		// Accepted for backwards compatibility; see https://github.com/elastic/beats/issues/51450
 		err := ValidatePackQueriesAfterMerge(Pack{
 			Queries: map[string]Query{
 				"a": {Query: "select 1", NativeSchedule: NativeSchedule{Interval: 60}},
 				"b": {Query: "select 2"},
 			},
 		})
-		assert.ErrorIs(t, err, ErrPackMixedScheduleModes)
+		assert.NoError(t, err)
 	})
 
 	t.Run("reject mixed native and rrule with no pack defaults", func(t *testing.T) {
@@ -306,6 +307,16 @@ func TestValidatePackQueriesAfterMerge(t *testing.T) {
 			Queries: map[string]Query{
 				"a": {Query: "select 1", NativeSchedule: NativeSchedule{Interval: 60}},
 				"b": {Query: "select 2", RRuleSchedule: rrule},
+			},
+		})
+		assert.ErrorIs(t, err, ErrPackMixedScheduleModes)
+	})
+
+	t.Run("reject mixed rrule and unscheduled with no pack defaults", func(t *testing.T) {
+		err := ValidatePackQueriesAfterMerge(Pack{
+			Queries: map[string]Query{
+				"a": {Query: "select 1", RRuleSchedule: rrule},
+				"b": {Query: "select 2"},
 			},
 		})
 		assert.ErrorIs(t, err, ErrPackMixedScheduleModes)
@@ -342,5 +353,48 @@ func TestValidatePackQueriesAfterMerge(t *testing.T) {
 		}
 		err := ValidatePackQueriesAfterMerge(p)
 		assert.ErrorIs(t, err, ErrPackQueryViolatesPackScheduleDefault)
+	})
+}
+
+func TestUnscheduledQueryNamesInNativePack(t *testing.T) {
+	rrule := &RRuleScheduleConfig{RRule: "FREQ=DAILY", StartDate: "2024-01-01T00:00:00Z"}
+
+	t.Run("returns sorted unscheduled names when mixed with native", func(t *testing.T) {
+		names := UnscheduledQueryNamesInNativePack(Pack{
+			Queries: map[string]Query{
+				"native1": {Query: "select 1", NativeSchedule: NativeSchedule{Interval: 60}},
+				"zz":      {Query: "select 2"},
+				"aa":      {Query: "select 3"},
+			},
+		})
+		assert.Equal(t, []string{"aa", "zz"}, names)
+	})
+
+	t.Run("nil when all native", func(t *testing.T) {
+		names := UnscheduledQueryNamesInNativePack(Pack{
+			Queries: map[string]Query{
+				"a": {Query: "select 1", NativeSchedule: NativeSchedule{Interval: 60}},
+			},
+		})
+		assert.Nil(t, names)
+	})
+
+	t.Run("nil when all unscheduled", func(t *testing.T) {
+		names := UnscheduledQueryNamesInNativePack(Pack{
+			Queries: map[string]Query{
+				"a": {Query: "select 1"},
+				"b": {Query: "select 2"},
+			},
+		})
+		assert.Nil(t, names)
+	})
+
+	t.Run("nil for rrule pack", func(t *testing.T) {
+		names := UnscheduledQueryNamesInNativePack(Pack{
+			Queries: map[string]Query{
+				"a": {Query: "select 1", RRuleSchedule: rrule},
+			},
+		})
+		assert.Nil(t, names)
 	})
 }

@@ -184,16 +184,16 @@ func TestGoTest_Helper_AssertOutput(t *testing.T) {
 	})
 
 	t.Run("equals map", func(t *testing.T) {
-		want := map[string]interface{}{
+		want := map[string]any{
 			"a": 1,
 			"b": true,
 			"c": "test",
-			"e": map[string]interface{}{
+			"e": map[string]any{
 				"x": "y",
 			},
 		}
 
-		got := map[string]interface{}{
+		got := map[string]any{
 			"a": 42,
 			"b": false,
 			"c": "test",

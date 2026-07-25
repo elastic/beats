@@ -10,10 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 )
 
 var validateTests = []struct {

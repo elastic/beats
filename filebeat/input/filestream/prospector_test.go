@@ -703,8 +703,17 @@ func (t *testHarvesterGroup) Stop(s loginp.Source) {
 	t.events = append(t.events, harvesterStop(s.Name()))
 }
 
-func (t *testHarvesterGroup) Migrate(oldID string, next loginp.Source) {
-	t.events = append(t.events, harvesterMigrate(oldID+" -> "+next.Name()))
+func (t *testHarvesterGroup) Migrate(oldID string, next loginp.Source, updateStore func(string) error) error {
+	rk, ok := parseRegistryKey(oldID)
+	if !ok {
+		return fmt.Errorf("invalid old key: %s", oldID)
+	}
+	newID := rk.keyForIdentity(next.Name())
+	if err := updateStore(newID); err != nil {
+		return err
+	}
+	t.events = append(t.events, harvesterMigrate(oldID+" -> "+newID))
+	return nil
 }
 
 func (t *testHarvesterGroup) StopHarvesters() error {
@@ -790,6 +799,7 @@ type mockMetadataUpdater struct {
 	IterateOnPrefixCalled atomic.Int64
 	KeyExistsCalled       atomic.Int64
 	UpdateKeyCalled       int
+	UpdateKeyErr          error
 }
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
@@ -897,8 +907,11 @@ func (mu *mockMetadataUpdater) UpdateKey(oldKey, newKey string, meta any) error 
 	mu.mu.Lock()
 	defer mu.mu.Unlock()
 	mu.UpdateKeyCalled++
+	if mu.UpdateKeyErr != nil {
+		return mu.UpdateKeyErr
+	}
 	if _, ok := mu.table[oldKey]; !ok {
-		return fmt.Errorf("old key %s not found", oldKey)
+		return fmt.Errorf("old key %s: %w", oldKey, loginp.ErrKeyGone)
 	}
 	mu.table[newKey] = meta
 	delete(mu.table, oldKey)
@@ -1640,12 +1653,12 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		assert.Positive(t, store.IterateOnPrefixCalled.Load(), "slow path must scan the registry")
 		assert.Positive(t, store.UpdateKeyCalled, "slow path must migrate the matched entry")
 		assert.False(t, store.has(oldKey), "old key must be removed after migration")
-		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+src.Name()),
-			"migration must re-key the running harvester's registration")
 		// migrateGrowingFingerprint keeps the old key's plugin/input prefix and
 		// swaps in the new identity (src.Name()), which is the SHA-256-derived
 		// key, not the literal raw value used for event.SrcID.
 		newKey := "filestream::my-input::" + src.Name()
+		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+newKey),
+			"migration must re-key the running harvester's registration")
 		assert.NotEqual(t, oldKey, newKey)
 		assert.True(t, store.has(newKey), "migrated entry must exist under the new key")
 	})
@@ -1723,7 +1736,7 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		assert.Equal(t, rawEntry(newFingerprint, path), p.shortFingerprints.entries[newKey])
 
 		// The running harvester's registration is re-keyed along with the entry.
-		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+src.Name()),
+		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+newKey),
 			"migration must re-key the running harvester's registration")
 	})
 
@@ -1776,8 +1789,69 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		assert.Empty(t, p.shortFingerprints.entries, "short fingerprint set is empty after transition")
 
 		// The running harvester's registration is re-keyed along with the entry.
-		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+src.Name()),
+		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+newKey),
 			"migration must re-key the running harvester's registration")
+	})
+
+	// runGrowthEvent drives one below-threshold OpWrite growth event for the
+	// indexed oldKey against the given store.
+	runGrowthEvent := func(t *testing.T, store *mockMetadataUpdater) (p *fileProspector, hg *testHarvesterGroup, src loginp.Source, newKey string) {
+		t.Helper()
+		desc := loginp.FileDescriptor{
+			Fingerprint: loginp.FingerprintID{Raw: oldFingerprint + "ccdd"},
+		}
+		newKey = "filestream::" + inputID + "::fingerprint::" + desc.Fingerprint.Key()
+		p = &fileProspector{
+			logger:             log,
+			identifier:         identifier,
+			shortFingerprints:  newShortFingerprintSet(),
+			growingFingerprint: true,
+		}
+		p.shortFingerprints.AddRaw(oldKey, oldFingerprint, path)
+		event := loginp.FSEvent{
+			Op:         loginp.OpWrite,
+			OldPath:    path,
+			NewPath:    path,
+			SrcID:      newKey,
+			Descriptor: desc,
+		}
+		src = identifier.GetSource(event)
+		hg = newTestHarvesterGroup()
+		p.onFSEvent(log, input.Context{}, event, src, store, hg, time.Time{})
+		return p, hg, src, newKey
+	}
+
+	t.Run("failed migration: the event proceeds under the old identity", func(t *testing.T) {
+		// If the registry migration fails, the entry is still under the old
+		// key; starting a harvester under the new key would produce a second
+		// state and reader for the file. Data must keep flowing under the old
+		// identity until a later scan retries the migration.
+		store := newMockMetadataUpdater()
+		store.setRaw(oldKey, growingMeta(path, oldFingerprint))
+		store.UpdateKeyErr = fmt.Errorf("registry write failed")
+
+		p, hg, _, newKey := runGrowthEvent(t, store)
+
+		assert.True(t, store.has(oldKey), "old key must remain after a failed migration")
+		assert.False(t, store.has(newKey), "no state must be created under the new key")
+		assert.NotContains(t, hg.events, harvesterMigrate(oldKey+" -> "+newKey),
+			"no migration must be recorded")
+		assert.Contains(t, hg.events, harvesterStart("fingerprint::"+oldFingerprint),
+			"the harvester must be started under the old identity")
+		assert.Contains(t, p.shortFingerprints.entries, oldKey,
+			"the old entry must stay indexed so the next scan retries the migration")
+	})
+
+	t.Run("stale index entry: pruned and the file starts under its current identity", func(t *testing.T) {
+		// The index still knows oldKey but the registry entry is gone (e.g.
+		// removed by the cleaner): the stale entry must be dropped and the
+		// file ingested as new. The empty store makes UpdateKey fail with
+		// ErrKeyGone.
+		p, hg, src, _ := runGrowthEvent(t, newMockMetadataUpdater())
+
+		assert.NotContains(t, p.shortFingerprints.entries, oldKey, "the stale entry must be pruned")
+		assert.Contains(t, hg.events, harvesterStart(src.Name()),
+			"the file must be started under its current identity")
 	})
 }
 

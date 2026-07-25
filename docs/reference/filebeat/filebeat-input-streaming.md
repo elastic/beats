@@ -259,6 +259,20 @@ resource_origins:
 ```
 
 
+### `user_agent` [user-agent-streaming]
+```{applies_to}
+stack: ga 9.4+
+```
+
+An optional string that overrides the default `User-Agent` header sent on all outbound HTTP requests. This only applies when `stream_type` is `crowdstrike`. The header is set on discover, firehose, session refresh, and OAuth2 token requests.
+
+When not set, the Elastic Agent's built-in user agent string is used.
+
+```yaml
+user_agent: "Elastic-crowdstrike/4.0.0"
+```
+
+
 ### `program` [program-streaming]
 
 The CEL program that is executed on each message received. This field should ideally be present but if not the default program given below is used.

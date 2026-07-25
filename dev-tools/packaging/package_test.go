@@ -46,6 +46,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/testing/testutils"
 )
 
 const (
@@ -900,30 +901,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 	info, err := buildinfo.ReadFile(binaryPath)
 	require.NoError(t, err)
 
-	foundTags := false
-	foundFIPS := false
-	foundFIPSDefault := false
-	for _, setting := range info.Settings {
-		switch setting.Key {
-		case "-tags":
-			foundTags = true
-			require.Contains(t, setting.Value, "requirefips")
-			continue
-		case "GOFIPS140":
-			foundFIPS = true
-			require.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
-			continue
-		case "DefaultGODEBUG":
-			if strings.Contains(setting.Value, "fips140=on") {
-				foundFIPSDefault = true
-			}
-			continue
-		}
-	}
-
-	require.True(t, foundTags, "Did not find -tags within binary version information")
-	require.True(t, foundFIPS, "Did not find GOFIPS140 within binary version information")
-	require.True(t, foundFIPSDefault, "Did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
+	testutils.RequireFIPSBuildInfo(t, info.Settings)
 }
 
 // inspector is a file contents inspector. It vets the contents of the file

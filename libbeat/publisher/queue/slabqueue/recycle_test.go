@@ -55,7 +55,7 @@ func TestRecycleAvoidsAllocationOnRepeatedGetDone(t *testing.T) {
 	p := q.Producer(queue.ProducerConfig{ACK: func(int) {}})
 
 	const cycles = 100
-	for i := 0; i < cycles; i++ {
+	for i := range cycles {
 		_, ok := p.Publish(i)
 		require.True(t, ok)
 		b, err := q.Get(0)
@@ -122,7 +122,7 @@ func TestBatchRecycleResetsAckSlices(t *testing.T) {
 
 	// Run two full cycles so the second one definitely uses a recycled
 	// batch struct.
-	for cycle := 0; cycle < 2; cycle++ {
+	for cycle := range 2 {
 		p.Publish(cycle*10 + 1)
 		p.Publish(cycle*10 + 2)
 		b, err := q.Get(0)
@@ -167,7 +167,7 @@ func TestRecycleAfterRelease(t *testing.T) {
 	p := q.Producer(queue.ProducerConfig{ACK: func(int) {}})
 
 	const cycles = 100
-	for i := 0; i < cycles; i++ {
+	for i := range cycles {
 		_, ok := p.Publish(i)
 		require.True(t, ok)
 		b, err := q.Get(0)
@@ -257,14 +257,14 @@ func TestConcurrentRecycleNoCorruption(t *testing.T) {
 	defer pool.Shutdown()
 
 	var wg sync.WaitGroup
-	for i := 0; i < pipelines; i++ {
+	for i := range pipelines {
 		q := pool.Connect()
 		p := q.Producer(queue.ProducerConfig{ACK: func(int) {}})
 
 		wg.Add(2)
 		go func(p queue.Producer[int], base int) {
 			defer wg.Done()
-			for j := 0; j < eventsPerPipe; j++ {
+			for j := range eventsPerPipe {
 				if _, ok := p.Publish(base*1_000_000 + j); !ok {
 					return
 				}

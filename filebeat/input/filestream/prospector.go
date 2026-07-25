@@ -470,6 +470,10 @@ func (p *fileProspector) onFSEvent(
 			if found {
 				if err := p.migrateGrowingFingerprint(updater, group, oldKey, src, event); err != nil {
 					log.Errorf("failed to migrate growing fingerprint on rename: %v", err)
+					// Running onRename now would create state under the new key and block the
+					// migration retry forever; migrateGrowingFingerprint kept the index entry
+					// pointing at the renamed path so a later scan retries.
+					return
 				}
 			}
 		}
@@ -606,11 +610,9 @@ func (t *ignoreInactiveType) Unpack(v string) error {
 	return nil
 }
 
-// handleGrowingFingerprintLookup handles the lookup logic for growing-mode
-// fingerprint events. Two transitions are reconciled here: continued growth
-// below threshold (raw header extending) and the one-time threshold crossing
-// where the identity becomes a SHA-256 (the descriptor still carries the raw
-// header in Fingerprint.Raw to bridge the transition).
+// handleGrowingFingerprintLookup reconciles growing-mode fingerprint events: continued growth
+// below threshold and the one-time crossing where the identity becomes a SHA-256.
+// If a needed migration fails, the OLD source is returned so the file keeps its old identity.
 func (p *fileProspector) handleGrowingFingerprintLookup(
 	log *logp.Logger,
 	event loginp.FSEvent,
@@ -631,15 +633,29 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 		return src
 	}
 
-	// Found a prefix match - migrate to new key. The old harvester keeps
-	// running under the new key and the caller's group.Start(src) no-ops;
-	// see HarvesterGroup.Migrate.
+	// Found a prefix match. Migrate to new key.
 	if err := p.migrateGrowingFingerprint(updater, group, oldKey, src, event); err != nil {
 		log.Errorf("failed to migrate growing fingerprint: %v", err)
-		// Continue anyway - might create duplicate, but better than losing data
+		// Processing the event under the new identity would create a second state and reader.
+		// Stay on the old identity so data keeps flowing until a later scan retries the migration.
+		return sourceForKey(src, oldKey)
 	}
 
 	return src
+}
+
+// sourceForKey re-targets src at an existing registry key's identity, or returns src unchanged.
+func sourceForKey(src loginp.Source, key string) loginp.Source {
+	rk, ok := parseRegistryKey(key)
+	if !ok {
+		return src
+	}
+	fs, ok := src.(fileSource)
+	if !ok {
+		return src
+	}
+	fs.fileID = rk.identity()
+	return fs
 }
 
 // buildShortFingerprintSet scans the store once and populates shortFingerprints
@@ -735,9 +751,9 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 	return "", false
 }
 
-// migrateGrowingFingerprint migrates a registry entry from an old key to a new key when a file's
-// fingerprint has grown, and keeps the dependent state in sync: the short-fingerprint index and the
-// running harvester's bookkeeper registration.
+// migrateGrowingFingerprint migrates a registry entry from an old key to newSrc's identity when a
+// file's fingerprint has grown, keeping the short-fingerprint index in sync on both outcomes.
+// It returns nil when the old key is already gone; the file proceeds under its current identity.
 func (p *fileProspector) migrateGrowingFingerprint(
 	updater loginp.StateMetadataUpdater,
 	group loginp.HarvesterGroup,
@@ -757,23 +773,24 @@ func (p *fileProspector) migrateGrowingFingerprint(
 		FingerprintLen: event.Descriptor.Fingerprint.GrowingByteLen(),
 	}
 
-	// Keep the old key's plugin/input prefix and swap in the new identity.
-	// keyForIdentity is robust to input IDs that merely contain "fingerprint"
-	// as a substring (e.g. "my-fingerprint-input").
-	rk, ok := parseRegistryKey(oldKey)
-	if !ok {
-		return fmt.Errorf("invalid old key format: %s", oldKey)
-	}
-	newKey := rk.keyForIdentity(newSrc.Name())
-
-	err := updater.UpdateKey(oldKey, newKey, newMeta)
+	var newKey string
+	err := group.Migrate(oldKey, newSrc, func(newID string) error {
+		newKey = newID
+		return updater.UpdateKey(oldKey, newID, newMeta)
+	})
 	if err != nil {
-		return fmt.Errorf("failed to migrate growing fingerprint from %s to %s: %w", oldKey, newKey, err)
+		if errors.Is(err, loginp.ErrKeyGone) {
+			// The old key no longer exists: the matched index entry is stale. Drop it.
+			p.shortFingerprints.Remove(oldKey)
+			return nil
+		}
+		// Keep the entry indexed for a later retry, at the event's current path.
+		p.shortFingerprints.UpdateSource(oldKey, event.NewPath)
+		return fmt.Errorf("failed to migrate growing fingerprint from %s to %s: %w", oldKey, newSrc.Name(), err)
 	}
 
 	p.shortFingerprints.Remove(oldKey)
 	p.indexGrowingFingerprint(newKey, event.Descriptor, event.NewPath)
-	group.Migrate(oldKey, newSrc)
 
 	return nil
 }
