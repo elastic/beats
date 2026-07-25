@@ -761,7 +761,7 @@ func TestShutdownDrainTimeout(t *testing.T) {
 		},
 	}
 
-	factory := NewFactoryWithSettings(Settings{Home: tmpDir})
+	factory := NewFactory()
 	var settings receiver.Settings
 	settings.ID = component.NewIDWithName(factory.Type(), "r1")
 	settings.Logger = zap.NewNop()
