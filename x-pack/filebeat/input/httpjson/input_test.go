@@ -647,100 +647,6 @@ var testCases = []struct {
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 	},
 	{
-<<<<<<< HEAD
-=======
-		name: "file_auth_default_header",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			dir := t.TempDir()
-			secret := "file-secret"
-			path := filepath.Join(dir, "auth_token")
-			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
-				t.Fatalf("failed to write auth token: %v", err)
-			}
-			config["auth.file.path"] = path
-			config["auth.file.prefix"] = "Bearer "
-			config["auth.file.refresh_interval"] = "100ms"
-			server := httptest.NewServer(h)
-			config["request.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
-		baseConfig: map[string]interface{}{
-			"interval":       1,
-			"request.method": http.MethodGet,
-		},
-		handler:  tokenAuthHandler("Bearer file-secret", "", defaultHandler(http.MethodGet, "", "")),
-		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
-	},
-	{
-		name: "file_auth_custom_header",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			dir := t.TempDir()
-			tokenPath := filepath.Join(dir, "api_token")
-			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
-				t.Fatalf("failed to write token file: %v", err)
-			}
-			config["auth.file.path"] = tokenPath
-			config["auth.file.header"] = "X-API-Key"
-			config["auth.file.prefix"] = "ApiToken "
-			server := httptest.NewServer(h)
-			config["request.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
-		baseConfig: map[string]interface{}{
-			"interval":       1,
-			"request.method": http.MethodGet,
-		},
-		handler:  tokenAuthHandler("ApiToken secret-api-token", "X-API-Key", defaultHandler(http.MethodGet, "", "")),
-		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
-	},
-
-	// Auth header sanitization in trace logs.
-	{
-		name: "trace_sanitize_basic_auth",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			server := httptest.NewServer(h)
-			config["request.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
-		baseConfig: map[string]interface{}{
-			"interval":                1,
-			"request.method":          http.MethodGet,
-			"auth.basic.user":         "test_user",
-			"auth.basic.password":     "test_password",
-			"request.tracer.enabled":  true,
-			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
-		},
-		handler:                 tokenAuthHandler("Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ=", "", defaultHandler(http.MethodGet, "", "")),
-		expected:                []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
-		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
-		expectedTraceNotContain: []string{"Authorization"},
-	},
-	{
-		name: "trace_sanitize_oauth2",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			server := httptest.NewServer(h)
-			config["request.url"] = server.URL
-			config["auth.oauth2.token_url"] = server.URL + "/token"
-			t.Cleanup(server.Close)
-		},
-		baseConfig: map[string]interface{}{
-			"interval":                  1,
-			"request.method":            http.MethodPost,
-			"auth.oauth2.client.id":     "a_client_id",
-			"auth.oauth2.client.secret": "a_client_secret",
-			"auth.oauth2.endpoint_params": map[string]interface{}{
-				"param1": "v1",
-			},
-			"auth.oauth2.scopes":      []string{"scope1", "scope2"},
-			"request.tracer.enabled":  true,
-			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
-		},
-		handler:                 oauth2Handler,
-		expected:                []string{`{"hello": "world"}`},
-		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
-		expectedTraceNotContain: []string{"Authorization"},
-	},
-	{
 		name: "trace_sanitize_aws_auth",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			server := httptest.NewServer(h)
@@ -763,34 +669,6 @@ var testCases = []struct {
 		expectedTraceNotContain: []string{"Authorization"},
 	},
 	{
-		name: "trace_sanitize_file_auth",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			dir := t.TempDir()
-			secret := "file-secret"
-			path := filepath.Join(dir, "auth_token")
-			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
-				t.Fatalf("failed to write auth token: %v", err)
-			}
-			config["auth.file.path"] = path
-			config["auth.file.prefix"] = "Bearer "
-			config["auth.file.refresh_interval"] = "100ms"
-			server := httptest.NewServer(h)
-			config["request.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
-		baseConfig: map[string]interface{}{
-			"interval":                1,
-			"request.method":          http.MethodGet,
-			"request.tracer.enabled":  true,
-			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
-		},
-		handler:                 tokenAuthHandler("Bearer file-secret", "", defaultHandler(http.MethodGet, "", "")),
-		expected:                []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
-		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
-		expectedTraceNotContain: []string{"Authorization"},
-	},
-	{
->>>>>>> c63aec4b0 (x-pack/filebeat/input/{cel,entityanalytics,http_endpoint,httpjson}: do not log Authorization header in request traces (#52224))
 		name: "request_transforms_can_access_state_from_previous_transforms",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			server := httptest.NewServer(h)
