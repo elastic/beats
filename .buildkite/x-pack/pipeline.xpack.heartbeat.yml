@@ -106,9 +106,10 @@ steps:
           # atomic rename with ENOTDIR (the pre-installed entry is a symlink), so we
           # sidestep it entirely. Prepending the prefix bin makes both elastic-synthetics
           # and `npx @elastic/synthetics` resolve to this build.
-          export NPM_CONFIG_PREFIX="${HOME}/.npm-apijourney"
-          export PATH="${NPM_CONFIG_PREFIX}/bin:${PATH}"
-          mkdir -p "${NPM_CONFIG_PREFIX}"
+          # $$ escapes Buildkite's upload-time interpolation so these expand in the runtime shell.
+          export NPM_CONFIG_PREFIX="$${HOME}/.npm-apijourney"
+          export PATH="$${NPM_CONFIG_PREFIX}/bin:$${PATH}"
+          mkdir -p "$${NPM_CONFIG_PREFIX}"
           npm install -g 'github:elastic/synthetics#f2bf619857d44694267983deeb830da551ad3d9e'
           elastic-synthetics --version
           echo "~~~ Running tests"
