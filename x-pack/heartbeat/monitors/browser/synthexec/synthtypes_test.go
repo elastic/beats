@@ -41,8 +41,8 @@ func TestToMap(t *testing.T) {
 			mapstr.M{
 				"type":            JourneyStart,
 				"package_version": "1.2.3",
-				"root_fields": map[string]interface{}{
-					"synthetics": map[string]interface{}{
+				"root_fields": map[string]any{
+					"synthetics": map[string]any{
 						"nested": "v1",
 					},
 					"truly_at_root": "v2",
@@ -64,8 +64,8 @@ func TestToMap(t *testing.T) {
 			mapstr.M{
 				"type":            JourneyStart,
 				"package_version": "1.2.3",
-				"root_fields": map[string]interface{}{
-					"synthetics": map[string]interface{}{
+				"root_fields": map[string]any{
+					"synthetics": map[string]any{
 						"nested": "v1",
 					},
 					"truly_at_root": "v2",
@@ -91,8 +91,8 @@ func TestToMap(t *testing.T) {
 				"package_version": "1.2.3",
 				"journey":         mapstr.M{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
 				"step":            mapstr.M{"name": "MyStep", "status": "success", "index": 42, "duration": mapstr.M{"us": int64(1232131)}},
-				"root_fields": map[string]interface{}{
-					"synthetics": map[string]interface{}{
+				"root_fields": map[string]any{
+					"synthetics": map[string]any{
 						"nested": "v1",
 					},
 					"truly_at_root": "v2",

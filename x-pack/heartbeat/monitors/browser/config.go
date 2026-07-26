@@ -26,8 +26,8 @@ func DefaultConfig() *Config {
 }
 
 type Config struct {
-	Schedule  string                 `config:"schedule"`
-	Params    map[string]interface{} `config:"params"`
+	Schedule  string         `config:"schedule"`
+	Params    map[string]any `config:"params"`
 	RawConfig *config.C
 	Source    *source.Source `config:"source"`
 	// Type is the monitor type ("browser" or "api"); used to shape the CLI invocation.
@@ -37,10 +37,10 @@ type Config struct {
 	// Id is optional for lightweight checks but required for browsers
 	Id                string                        `config:"id"`
 	Sandbox           bool                          `config:"sandbox"`
-	Throttling        interface{}                   `config:"throttling"`
+	Throttling        any                           `config:"throttling"`
 	Screenshots       string                        `config:"screenshots"`
 	SyntheticsArgs    []string                      `config:"synthetics_args"`
-	PlaywrightOpts    map[string]interface{}        `config:"playwright_options"`
+	PlaywrightOpts    map[string]any                `config:"playwright_options"`
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
 	Timeout           time.Duration                 `config:"timeout"`
@@ -79,7 +79,7 @@ func HashConfig(cfg *config.C) (uint64, error) {
 		return 0, fmt.Errorf("nil config")
 	}
 
-	var config map[string]interface{}
+	var config map[string]any
 	if err := cfg.Unpack(&config); err != nil {
 		return 0, err
 	}

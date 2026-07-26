@@ -40,7 +40,7 @@ type DurationLoggable struct {
 	Mills int64 `json:"ms"`
 }
 
-type NetworkInfo map[string]interface{}
+type NetworkInfo map[string]any
 
 type MonitorRunInfo struct {
 	MonitorID   string      `json:"id"`

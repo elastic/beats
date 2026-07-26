@@ -267,7 +267,7 @@ func TestFilterDevFlags(t *testing.T) {
 	variadicGen := func(flag string, n int) []string {
 		params := []string{"dummy"}
 		params = append(params, flag)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			params = append(params, fmt.Sprintf("flag-%d", i))
 		}
 

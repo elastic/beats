@@ -194,8 +194,8 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	loc := getLocation(f.beatLocation, sf)
 	if loc != nil {
 		geoMap, _ := util.GeoConfigToMap(loc.Geo)
-		err = c.Merge(map[string]interface{}{
-			"run_from": map[string]interface{}{
+		err = c.Merge(map[string]any{
+			"run_from": map[string]any{
 				"id":  loc.ID,
 				"geo": geoMap,
 			},

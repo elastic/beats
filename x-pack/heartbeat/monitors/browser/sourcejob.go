@@ -71,7 +71,7 @@ func (sj *SourceJob) Workdir() string {
 	return sj.browserCfg.Source.Active().Workdir()
 }
 
-func (sj *SourceJob) Params() map[string]interface{} {
+func (sj *SourceJob) Params() map[string]any {
 	sj.mtx.Lock()
 	defer sj.mtx.Unlock()
 
@@ -179,7 +179,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 				}
 			case string:
 				extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", sj.browserCfg.Throttling))
-			case map[string]interface{}:
+			case map[string]any:
 				j, err := json.Marshal(t)
 				if err != nil {
 					//nolint:forbidigo // extraArgs has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
@@ -276,7 +276,7 @@ func filterDevFlags(args []string, filter map[string]int) []string {
 
 		if pCount, ok := filter[iter.Val()]; ok {
 		ParamsIter:
-			for i := 0; i < pCount; i++ {
+			for range pCount {
 				// Found filtered flag, check if it has associated params
 				if param, ok := iter.Peek(); ok && !strings.HasPrefix(param, "-") {
 					iter.Next()
