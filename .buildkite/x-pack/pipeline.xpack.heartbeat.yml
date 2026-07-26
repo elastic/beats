@@ -95,11 +95,16 @@ steps:
         key: "mandatory-linux-unit-test"
         command: |
           set -euo pipefail
+          # apiJourney() ships only in unreleased @elastic/synthetics; mage installSyntheticsAgent
+          # clones and builds the pinned capable commit (elastic/synthetics#997) so the same
+          # setup runs locally. Install into a private npm prefix and prepend its bin so the
+          # pinned build (not the CI image's asdf-shimmed agent) resolves at test time.
+          # Drop this and ELASTIC_SYNTHETICS_API_CAPABLE once apiJourney ships in a release.
+          # $$ escapes Buildkite's upload-time interpolation so these expand in the runtime shell.
+          export NPM_CONFIG_PREFIX="$${HOME}/.npm-apijourney"
+          export PATH="$${NPM_CONFIG_PREFIX}/bin:$${PATH}"
+          mkdir -p "$${NPM_CONFIG_PREFIX}"
           cd x-pack/heartbeat
-          # apiJourney() ships only in unreleased @elastic/synthetics; the mage goal
-          # installs the pinned capable commit (elastic/synthetics#997) so the same
-          # setup runs locally. Drop it and ELASTIC_SYNTHETICS_API_CAPABLE once
-          # apiJourney ships in a release.
           echo "~~~ Installing apiJourney-capable @elastic/synthetics (pinned commit)"
           mage installSyntheticsAgent
           echo "~~~ Running tests"

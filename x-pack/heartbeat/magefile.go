@@ -133,10 +133,11 @@ func InstallSyntheticsAgent() error {
 	}
 	defer os.RemoveAll(dir)
 
-	// Remove any pre-installed global agent so the local-path install below can't
-	// fail npm's atomic rename over an existing (sym)linked entry.
-	_ = exec.Command("npm", "rm", "-g", "@elastic/synthetics").Run()
-
+	// npm's git-dependency install of the pinned commit fails with ENOTDIR during
+	// its prepare step, so clone the pinned commit, build it, and install from the
+	// local path. Set NPM_CONFIG_PREFIX (typically to a private prefix whose bin is
+	// on PATH) before calling this goal so the install and the version check resolve
+	// to this build and bypass the CI image's asdf-shimmed @elastic/synthetics.
 	steps := []struct {
 		dir  string
 		name string
