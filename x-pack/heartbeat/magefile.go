@@ -10,6 +10,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -105,4 +107,56 @@ func Fields() error {
 // Config generates both the short/reference/docker configs.
 func Config() error {
 	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
+}
+
+// syntheticsPinnedCommit is the @elastic/synthetics commit that introduces the
+// apiJourney(...) DSL (elastic/synthetics#997). apiJourney is unreleased, so the
+// api monitor scenario tests need this specific build. Once it ships in a
+// release, drop InstallSyntheticsAgent and install @elastic/synthetics@<release>.
+const syntheticsPinnedCommit = "f2bf619857d44694267983deeb830da551ad3d9e"
+
+// InstallSyntheticsAgent installs the apiJourney-capable @elastic/synthetics
+// agent globally so the api monitor scenario tests (ELASTIC_SYNTHETICS_API_CAPABLE)
+// can run the same way in CI and locally. npm's git-dependency install of the
+// pinned commit fails with ENOTDIR during its prepare step, so we clone, build,
+// and install from the local path instead. Override the commit with the
+// SYNTHETICS_COMMIT env var.
+func InstallSyntheticsAgent() error {
+	commit := syntheticsPinnedCommit
+	if c := os.Getenv("SYNTHETICS_COMMIT"); c != "" {
+		commit = c
+	}
+
+	dir, err := os.MkdirTemp("", "synthetics-pinned-")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(dir)
+
+	// Remove any pre-installed global agent so the local-path install below can't
+	// fail npm's atomic rename over an existing (sym)linked entry.
+	_ = exec.Command("npm", "rm", "-g", "@elastic/synthetics").Run()
+
+	steps := []struct {
+		dir  string
+		name string
+		args []string
+	}{
+		{"", "git", []string{"clone", "--filter=blob:none", "https://github.com/elastic/synthetics.git", dir}},
+		{dir, "git", []string{"checkout", commit}},
+		{dir, "npm", []string{"install"}},
+		{dir, "npm", []string{"run", "build"}},
+		{dir, "npm", []string{"install", "-g", "."}},
+		{"", "elastic-synthetics", []string{"--version"}},
+	}
+	for _, s := range steps {
+		cmd := exec.Command(s.name, s.args...)
+		cmd.Dir = s.dir
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("installing synthetics agent (%s %s): %w", s.name, strings.Join(s.args, " "), err)
+		}
+	}
+	return nil
 }
