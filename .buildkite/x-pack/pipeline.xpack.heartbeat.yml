@@ -101,13 +101,14 @@ steps:
           # `@elastic/synthetics@<release>` and drop ELASTIC_SYNTHETICS_API_CAPABLE
           # once that release lands.
           echo "~~~ Installing apiJourney-capable @elastic/synthetics (pinned commit)"
-          # The base image ships a released @elastic/synthetics (no apiJourney). Installing
-          # the pinned git commit over it fails npm's atomic rename with ENOTDIR when the
-          # existing global entry is a symlink, so remove it first, then install the pinned
-          # commit (elastic/synthetics#997). Drop this and use @elastic/synthetics@<release>
-          # once apiJourney ships in a release.
-          npm rm -g @elastic/synthetics >/dev/null 2>&1 || true
-          rm -rf "$(npm root -g)/@elastic/synthetics"
+          # Install the pinned commit into a private, empty npm prefix instead of the
+          # base image's shared global. Installing over the existing global fails npm's
+          # atomic rename with ENOTDIR (the pre-installed entry is a symlink), so we
+          # sidestep it entirely. Prepending the prefix bin makes both elastic-synthetics
+          # and `npx @elastic/synthetics` resolve to this build.
+          export NPM_CONFIG_PREFIX="${HOME}/.npm-apijourney"
+          export PATH="${NPM_CONFIG_PREFIX}/bin:${PATH}"
+          mkdir -p "${NPM_CONFIG_PREFIX}"
           npm install -g 'github:elastic/synthetics#f2bf619857d44694267983deeb830da551ad3d9e'
           elastic-synthetics --version
           echo "~~~ Running tests"
