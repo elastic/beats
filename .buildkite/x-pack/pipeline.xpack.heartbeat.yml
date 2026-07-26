@@ -95,9 +95,15 @@ steps:
         key: "mandatory-linux-unit-test"
         command: |
           set -euo pipefail
-          echo "~~~ Installing @elastic/synthetics"
-          npm install -g @elastic/synthetics
+          # apiJourney() ships only in unreleased @elastic/synthetics, so we pin a
+          # capable commit (elastic/synthetics#997) and enable the api scenarios.
+          # Browser and api scenarios then both run against this agent. Switch to
+          # `@elastic/synthetics@<release>` and drop ELASTIC_SYNTHETICS_API_CAPABLE
+          # once that release lands.
+          echo "~~~ Installing apiJourney-capable @elastic/synthetics (pinned commit)"
+          npm install -g 'github:elastic/synthetics#f2bf619857d44694267983deeb830da551ad3d9e'
           echo "~~~ Running tests"
+          export ELASTIC_SYNTHETICS_API_CAPABLE=true
           cd x-pack/heartbeat
           mage build unitTest
         retry:
@@ -119,31 +125,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
-
-      # Real end-to-end run of the `api` monitor type against a live server.
-      # apiJourney() ships only in unreleased @elastic/synthetics, so we pin a
-      # capable commit here. Switch to `@elastic/synthetics@<release>` (and drop
-      # ELASTIC_SYNTHETICS_API_CAPABLE) once that release lands.
-      - label: ":ubuntu: x-pack/heartbeat: API Journey E2E"
-        key: "mandatory-linux-api-journey-e2e"
-        command: |
-          set -euo pipefail
-          echo "~~~ Installing apiJourney-capable @elastic/synthetics (pinned commit)"
-          npm install -g 'github:elastic/synthetics#f2bf619857d44694267983deeb830da551ad3d9e'
-          echo "~~~ Running API journey scenario"
-          export ELASTIC_SYNTHETICS_API_CAPABLE=true
-          cd x-pack/heartbeat
-          go test -tags synthetics -v -run TestAPISummaries ./scenarios/...
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        notify:
-          - github_commit_status:
-              context: "x-pack/heartbeat: API Journey E2E"
 
       - label: ":ubuntu: x-pack/heartbeat: Go Integration Tests"
         command: |
