@@ -28,7 +28,7 @@ func TestValidLocal(t *testing.T) {
 	timeout := 30
 	_, filename, _, _ := runtime.Caller(0)
 	path := path.Join(filepath.Dir(filename), "source/fixtures/todos")
-	testParams := map[string]interface{}{
+	testParams := map[string]any{
 		"key1": "value1",
 		"key2": "value2",
 	}
@@ -54,7 +54,7 @@ func TestValidLocal(t *testing.T) {
 func TestValidInline(t *testing.T) {
 	timeout := 30
 	script := "a script"
-	testParams := map[string]interface{}{
+	testParams := map[string]any{
 		"key1": "value1",
 		"key2": "value2",
 	}
@@ -117,9 +117,9 @@ func TestEmptySource(t *testing.T) {
 }
 
 func TestExtraArgs(t *testing.T) {
-	playWrightOpts := map[string]interface{}{
+	playWrightOpts := map[string]any{
 		"simpleOption": "simpleValue",
-		"extraHTTPHeaders": map[string]interface{}{
+		"extraHTTPHeaders": map[string]any{
 			"foo": "bar",
 		},
 	}
@@ -169,7 +169,7 @@ func TestExtraArgs(t *testing.T) {
 		},
 		{
 			"override throttling - JSON format",
-			&Config{Throttling: map[string]interface{}{
+			&Config{Throttling: map[string]any{
 				"download": 10,
 				"upload":   3,
 				"latency":  20,
@@ -410,7 +410,7 @@ func TestDisabledSourceDecoding(t *testing.T) {
 func TestUpdateParams(t *testing.T) {
 	timeout := 30
 	script := "a script"
-	testParams := map[string]interface{}{
+	testParams := map[string]any{
 		"key1": "value1",
 		"key2": "value2",
 	}

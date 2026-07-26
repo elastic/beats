@@ -93,7 +93,7 @@ func TestJourneyEnricher(t *testing.T) {
 			// version of the event
 			v = append(v, lookslike.MustCompile(se.ToMap()))
 		} else {
-			v = append(v, lookslike.MustCompile(map[string]interface{}{
+			v = append(v, lookslike.MustCompile(map[string]any{
 				"event.type":      "journey/end",
 				"synthetics.type": "journey/end",
 			}))
