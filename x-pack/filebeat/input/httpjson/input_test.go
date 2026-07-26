@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -31,14 +32,15 @@ import (
 )
 
 var testCases = []struct {
-	name           string
-	setupServer    func(testing.TB, http.HandlerFunc, map[string]interface{})
-	baseConfig     map[string]interface{}
-	handler        http.HandlerFunc
-	expected       []string
-	expectedFile   string
-	expectedNoFile string
-	wantErr        error
+	name                    string
+	setupServer             func(testing.TB, http.HandlerFunc, map[string]interface{})
+	baseConfig              map[string]interface{}
+	handler                 http.HandlerFunc
+	expected                []string
+	expectedFile            string
+	expectedNoFile          string
+	expectedTraceNotContain []string
+	wantErr                 error
 
 	skipReason string
 }{
@@ -643,6 +645,28 @@ var testCases = []struct {
 		},
 		handler:  awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "", "")),
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name: "trace_sanitize_aws_auth",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":                   1,
+			"request.method":             http.MethodGet,
+			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
+			"auth.aws.secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+			"auth.aws.default_region":    "us-east-1",
+			"auth.aws.service_name":      "guardduty",
+			"request.tracer.enabled":     true,
+			"request.tracer.filename":    "httpjson/logs/http-request-trace-*.ndjson",
+		},
+		handler:                 awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "", "")),
+		expected:                []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedTraceNotContain: []string{"Authorization"},
 	},
 	{
 		name: "request_transforms_can_access_state_from_previous_transforms",
@@ -1702,6 +1726,17 @@ func TestInput(t *testing.T) {
 				}
 				if len(paths) != 0 {
 					t.Errorf("unexpected files found: %v", paths)
+				}
+			}
+			if len(test.expectedTraceNotContain) > 0 && test.expectedFile != "" {
+				traceData, err := os.ReadFile(filepath.Join(tempDir, test.expectedFile))
+				if err != nil {
+					t.Fatalf("failed to read trace file for content check: %v", err)
+				}
+				for _, s := range test.expectedTraceNotContain {
+					if bytes.Contains(traceData, []byte(s)) {
+						t.Errorf("trace log must not contain %q", s)
+					}
 				}
 			}
 			assert.NoError(t, g.Wait())
