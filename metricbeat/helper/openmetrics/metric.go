@@ -481,10 +481,7 @@ type opLabelKeyPrefixRemover struct {
 func (o opLabelKeyPrefixRemover) Process(field string, value any, labels mapstr.M) (string, any, mapstr.M) {
 	renameKeys := []string{}
 	for k := range labels {
-		if len(k) < len(o.Prefix) {
-			continue
-		}
-		if k[:len(o.Prefix)] == o.Prefix {
+		if strings.HasPrefix(k, o.Prefix) {
 			renameKeys = append(renameKeys, k)
 		}
 	}
