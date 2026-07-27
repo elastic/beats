@@ -20,6 +20,7 @@ package publish
 import (
 	"errors"
 	"net"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -35,6 +36,7 @@ type TransactionPublisher struct {
 	pipeline  beat.Pipeline
 	canDrop   bool
 	processor transProcessor
+	wg        sync.WaitGroup
 }
 
 type transProcessor struct {
@@ -81,6 +83,7 @@ func NewTransactionPublisher(
 
 func (p *TransactionPublisher) Stop() {
 	close(p.done)
+	p.wg.Wait()
 }
 
 func (p *TransactionPublisher) CreateReporter(
@@ -124,6 +127,7 @@ func (p *TransactionPublisher) CreateReporter(
 	// start worker, so post-processing and processor-pipeline
 	// can work concurrently to sniffer acquiring new events
 	ch := make(chan beat.Event, 3)
+	p.wg.Add(1)
 	go p.worker(ch, client)
 	return func(event beat.Event) {
 		select {
@@ -135,6 +139,7 @@ func (p *TransactionPublisher) CreateReporter(
 }
 
 func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
+	defer p.wg.Done()
 	defer client.Close()
 	for {
 		select {

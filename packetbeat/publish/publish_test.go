@@ -20,21 +20,19 @@
 package publish
 
 import (
+	"context"
 	"net"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/packetbeat/pb"
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-libs/mapstr"
-)
-
-=======
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -84,7 +82,6 @@ func TestStopWaitsForWorkers(t *testing.T) {
 	assert.True(t, client.closed.Load(), "client.Close() should have been called before Stop() returned")
 }
 
->>>>>>> be145e43b ([beatreceiver] Remove global logger packetbeat 2/2 (#51682))
 func testEvent() beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),

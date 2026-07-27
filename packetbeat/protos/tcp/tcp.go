@@ -62,16 +62,7 @@ type TCP struct {
 }
 
 // Creates and returns a new Tcp.
-<<<<<<< HEAD
-func NewTCP(p protos.Protocols, id, device string, idx int, loggers ...*logp.Logger) (*TCP, error) {
-	isDebug = logp.IsDebug("tcp")
-	var logger *logp.Logger
-	if len(loggers) > 0 {
-		logger = loggers[0]
-	}
-=======
 func NewTCP(p protos.Protocols, id, device string, idx int, logger *logp.Logger) (*TCP, error) {
->>>>>>> be145e43b ([beatreceiver] Remove global logger packetbeat 2/2 (#51682))
 
 	portMap, err := buildPortsMap(p.GetAllTCP())
 	if err != nil {
@@ -82,11 +73,8 @@ func NewTCP(p protos.Protocols, id, device string, idx int, logger *logp.Logger)
 		protocols: p,
 		portMap:   portMap,
 		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap, logger),
-<<<<<<< HEAD
-=======
 		logger:    logger.Named("tcp"),
 		isDebug:   logger.IsDebug(),
->>>>>>> be145e43b ([beatreceiver] Remove global logger packetbeat 2/2 (#51682))
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -467,20 +455,10 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol, logger
 		processingTime: metrics.NewUniformSample(1024),
 	}
 
-<<<<<<< HEAD
-	if logger != nil {
-		_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
-			Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-		_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
-			Register("histogram", metrics.NewHistogram(out.processingTime))
-	}
-=======
-	//TODO: use local logger here
 	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
 	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
->>>>>>> be145e43b ([beatreceiver] Remove global logger packetbeat 2/2 (#51682))
 
 	out.device.Set(device)
 
