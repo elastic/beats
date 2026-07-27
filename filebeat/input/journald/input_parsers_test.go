@@ -175,3 +175,8 @@ func TestMultilineParserPreservesJournaldCheckpoint(t *testing.T) {
 	require.True(t, ok, "cursor update should be the last journal checkpoint")
 	require.Equal(t, wantCursor, cursorUpdate.Position)
 }
+
+func TestGetCursorUpdateEmptyPrivateSlice(t *testing.T) {
+	cursorUpdate := getCursorUpdate([]any{})
+	require.Nil(t, cursorUpdate, "empty aggregated Private values should not panic or produce a cursor update")
+}

@@ -283,6 +283,10 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 func getCursorUpdate(priv any) any {
 	switch v := priv.(type) {
 	case []any:
+		// This should never happen, but better safe than panic.
+		if len(v) == 0 {
+			return nil
+		}
 		return v[len(v)-1]
 	default:
 		return priv
