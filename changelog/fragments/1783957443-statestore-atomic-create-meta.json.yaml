@@ -1,7 +1,0 @@
-kind: bug-fix
-
-summary: Prevent statestore startup failure when meta.json is left empty after an unclean shutdown
-
-component: libbeat
-
-pr: https://github.com/elastic/beats/pull/51897

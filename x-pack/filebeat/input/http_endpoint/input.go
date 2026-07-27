@@ -239,8 +239,10 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 			if listenErr == nil {
 				metrics.bindAddr.Set(ln.Addr().String())
 				if e.tlsConfig != nil {
+					log.Infof("Started listening for HTTPS connection on: %s", ln.Addr().String())
 					listenErr = s.srv.ServeTLS(ln, "", "")
 				} else {
+					log.Infof("Started listening for HTTP connection on: %s", ln.Addr().String())
 					listenErr = s.srv.Serve(ln)
 				}
 			}

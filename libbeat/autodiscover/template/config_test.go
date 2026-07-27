@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -33,7 +33,7 @@ import (
 )
 
 func TestConfigsMapping(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck // legacy test logger setup
 
 	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct": "config",
@@ -331,8 +331,8 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 		panic(err)
 	}
 
-	writableKeystore.Store("PASSWORD", []byte(secret))
-	writableKeystore.Save()
+	writableKeystore.Store("PASSWORD", []byte(secret)) //nolint:errcheck // test helper
+	writableKeystore.Save()                            //nolint:errcheck // test helper
 	return keyStore
 }
 

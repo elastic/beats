@@ -78,7 +78,11 @@ func (ssp *BrowserStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
 
-func (ssp *BrowserStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} //noop
+// BeforeEachEvent sets monitor.check_group before the synthetics process is
+// spawned so the runner can propagate it as the APM trace id.
+func (ssp *BrowserStateStatusPlugin) BeforeEachEvent(event *beat.Event) {
+	ssp.cssp.setCheckGroup(event)
+}
 
 // LightweightStateStatusPlugin encapsulates the writing of the primary fields used by the summary,
 // those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
@@ -125,7 +129,11 @@ func (ssp *LightweightStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
 
-func (ssp *LightweightStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} // noop
+// BeforeEachEvent sets monitor.check_group before the job runs so synthetics
+// (api) monitors can propagate it as the APM trace id.
+func (ssp *LightweightStateStatusPlugin) BeforeEachEvent(event *beat.Event) {
+	ssp.cssp.setCheckGroup(event)
+}
 
 type commonSSP struct {
 	js           *jobsummary.JobSummary
@@ -150,8 +158,18 @@ func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFie
 	}
 }
 
-func (ssp *commonSSP) BeforeEach(event *beat.Event, err error) {
+// setCheckGroup writes the check group identifier for the current attempt to
+// the event. It is set both before the job runs (via BeforeEachEvent) and after
+// (via BeforeEach); the value is stable within an attempt so writing it twice is
+// harmless. Setting it early lets synthetics (browser/api) monitors propagate it
+// to the runner as the APM trace id, so a journey execution can be cross-linked
+// with the traced application's APM data.
+func (ssp *commonSSP) setCheckGroup(event *beat.Event) {
 	_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt))
+}
+
+func (ssp *commonSSP) BeforeEach(event *beat.Event, err error) {
+	ssp.setCheckGroup(event)
 }
 
 func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
