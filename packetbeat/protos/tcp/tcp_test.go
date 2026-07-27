@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -45,7 +46,7 @@ const (
 var httpProtocol, mysqlProtocol, redisProtocol protos.Protocol
 
 func init() {
-	new := func(_ bool, _ protos.Reporter, _ *procs.ProcessesWatcher, _ *conf.C) (protos.Plugin, error) {
+	new := func(_ bool, _ protos.Reporter, _ *procs.ProcessesWatcher, _ *conf.C, _ *logp.Logger) (protos.Plugin, error) {
 		return &TestProtocol{}, nil
 	}
 

@@ -35,9 +35,8 @@ import (
 )
 
 func BenchmarkIcmpProcessICMPv4(b *testing.B) {
-	logp.TestingSetup(logp.WithSelectors("icmp", "icmpdetailed"))
 
-	icmp, err := New(true, func(beat.Event) {}, &procs.ProcessesWatcher{}, conf.NewConfig())
+	icmp, err := New(true, func(beat.Event) {}, &procs.ProcessesWatcher{}, conf.NewConfig(), logp.NewNopLogger())
 	if err != nil {
 		b.Error("Failed to create ICMP processor")
 		return

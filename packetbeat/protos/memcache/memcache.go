@@ -48,6 +48,7 @@ type memcache struct {
 	tcpMemcache
 
 	handler memcacheHandler
+	logger  *logp.Logger
 }
 
 type memcacheHandler interface {
@@ -105,6 +106,7 @@ type transaction struct {
 
 	request  *message
 	response *message
+	logger   *logp.Logger
 }
 
 type memcacheString struct {
@@ -137,8 +139,10 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &memcache{}
+	p.logger = logger.Named("memcache")
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -154,7 +158,7 @@ func New(
 
 // Called to initialize the Plugin
 func (mc *memcache) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *memcacheConfig) error {
-	debug("init memcache plugin")
+	mc.logger.Debug("init memcache plugin")
 
 	mc.handler = mc
 	if err := mc.setFromConfig(config); err != nil {
@@ -184,10 +188,10 @@ func (mc *memcache) setFromConfig(config *memcacheConfig) error {
 	mc.udpConfig.transTimeout = config.UDPTransactionTimeout
 	mc.tcpConfig.tcpTransTimeout = config.TransactionTimeout
 
-	debug("transaction timeout: %v", config.TransactionTimeout)
-	debug("udp transaction timeout: %v", config.UDPTransactionTimeout)
-	debug("maxValues = %v", mc.config.maxValues)
-	debug("maxBytesPerValue = %v", mc.config.maxBytesPerValue)
+	mc.logger.Debugf("transaction timeout: %v", config.TransactionTimeout)
+	mc.logger.Debugf("udp transaction timeout: %v", config.UDPTransactionTimeout)
+	mc.logger.Debugf("maxValues = %v", mc.config.maxValues)
+	mc.logger.Debugf("maxBytesPerValue = %v", mc.config.maxBytesPerValue)
 
 	return nil
 }
@@ -210,7 +214,7 @@ func (mc *memcache) onTransaction(t *transaction) {
 		Fields: mapstr.M{},
 	}
 	t.Event(&event)
-	debug("publish event: %s", event)
+	mc.logger.Debugf("publish event: %+v", event)
 	mc.results(event)
 }
 
@@ -280,14 +284,14 @@ func tryMergeResponses(mc *memcache, prev, msg *message) (bool, error) {
 }
 
 func mergeValueMessages(mc *memcache, prev, msg *message) (bool, error) {
-	debug("try to merge value messages")
+	mc.logger.Debug("try to merge value messages")
 
 	valueMessages := prev.command.code == memcacheResValue &&
 		(msg.command.code == memcacheResValue ||
 			msg.command.code == memcacheResEnd)
 	if !valueMessages {
 		err := errExpectedValueForMerge
-		debug("%v", err)
+		mc.logger.Debugf("%v", err)
 		return false, nil
 	}
 
@@ -315,14 +319,14 @@ func mergeValueMessages(mc *memcache, prev, msg *message) (bool, error) {
 }
 
 func mergeStatsMessages(mc *memcache, prev, msg *message) (bool, error) {
-	debug("try to merge stats message: %v", msg.stats)
+	mc.logger.Debugf("try to merge stats message: %v", msg.stats)
 
 	statsMessages := prev.command.typ == memcacheStatsMsg &&
 		(msg.command.typ == memcacheStatsMsg ||
 			msg.command.code == memcacheResEnd)
 	if !statsMessages {
 		err := errExpectedStatsForMerge
-		debug("%v", err)
+		mc.logger.Debugf("%v", err)
 		return false, nil
 	}
 
@@ -346,7 +350,7 @@ func checkResponseComplete(msg *message) bool {
 	return !cont
 }
 
-func newTransaction(requ, resp *message) *transaction {
+func newTransaction(requ, resp *message, logger *logp.Logger) *transaction {
 	if requ == nil && resp == nil {
 		return nil
 	}
@@ -354,6 +358,7 @@ func newTransaction(requ, resp *message) *transaction {
 	t := &transaction{}
 	t.request = requ
 	t.response = resp
+	t.logger = logger
 	t.Status = computeTransactionStatus(requ, resp)
 
 	switch {
@@ -389,7 +394,7 @@ func (t *transaction) Init(msg *message) {
 }
 
 func (t *transaction) Event(event *beat.Event) error {
-	debug("count event notes: %v", len(t.Notes))
+	t.logger.Debugf("count event notes: %v", len(t.Notes))
 	if err := t.Transaction.Event(event); err != nil {
 		logp.Warn("error filling generic transaction fields: %v", err)
 		return err

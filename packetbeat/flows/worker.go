@@ -40,22 +40,24 @@ var (
 
 // worker is a generic asynchronous function processor.
 type worker struct {
-	wg   sync.WaitGroup
-	done chan struct{}
-	run  func(*worker)
+	wg     sync.WaitGroup
+	done   chan struct{}
+	run    func(*worker)
+	logger *logp.Logger
 }
 
 // newWorker returns a handle to a worker to run fn.
-func newWorker(fn func(w *worker)) *worker {
+func newWorker(fn func(w *worker), logger *logp.Logger) *worker {
 	return &worker{
-		done: make(chan struct{}),
-		run:  fn,
+		done:   make(chan struct{}),
+		run:    fn,
+		logger: logger,
 	}
 }
 
 // start starts execution of the worker function.
 func (w *worker) start() {
-	debugf("start flows worker")
+	w.logger.Debug("start flows worker")
 	w.wg.Add(1)
 	go func() {
 		defer w.finished()
@@ -68,16 +70,16 @@ func (w *worker) start() {
 // of the worker.
 func (w *worker) finished() {
 	w.wg.Done()
-	logp.Info("flows worker loop stopped")
+	w.logger.Info("flows worker loop stopped")
 }
 
 // stop terminates the function and waits until processing is complete.
 // stop may only be called once.
 func (w *worker) stop() {
-	debugf("stop flows worker")
+	w.logger.Debug("stop flows worker")
 	close(w.done)
 	w.wg.Wait()
-	debugf("stopped flows worker")
+	w.logger.Debug("stopped flows worker")
 }
 
 // sleep will sleep for the provided duration unless the worker has been
@@ -105,7 +107,7 @@ func (w *worker) tick(t *time.Ticker) bool {
 // periodically will execute fn each tick duration until the worker has been
 // stopped or fn returns a non-nil error.
 func (w *worker) periodically(tick time.Duration, fn func() error) {
-	defer debugf("stop periodic loop")
+	defer w.logger.Debug("stop periodic loop")
 
 	ticker := time.NewTicker(tick)
 	defer ticker.Stop()
@@ -127,7 +129,14 @@ func (w *worker) periodically(tick time.Duration, fn func() error) {
 // reporting will be done at flow lifetime end.
 // Flows are published via the pub Reporter after being enriched with process information
 // by watcher.
-func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration, enableDeltaFlowReports bool) (*worker, error) {
+func newFlowsWorker(
+	pub Reporter,
+	watcher *procs.ProcessesWatcher,
+	table *flowMetaTable,
+	counters *counterReg,
+	timeout, period time.Duration,
+	enableDeltaFlowReports bool,
+	logger *logp.Logger) (*worker, error) {
 	if timeout < time.Second {
 		return nil, ErrInvalidTimeout
 	}
@@ -156,7 +165,7 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 		}
 	}
 
-	debugf("new flows worker. timeout=%v, period=%v, tick=%v, ticksTO=%v, ticksP=%v",
+	logger.Debugf("new flows worker. timeout=%v, period=%v, tick=%v, ticksTO=%v, ticksP=%v",
 		timeout, period, tick, ticksTimeout, ticksPeriod)
 
 	defaultBatchSize := 1024
@@ -166,10 +175,11 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 		counters:                 counters,
 		timeout:                  timeout,
 		enableDeltaFlowReporting: enableDeltaFlowReports,
+		logger:                   logger,
 	}
 	processor.spool.init(pub, defaultBatchSize)
 
-	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10)
+	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10, logger)
 }
 
 // gcd returns the greatest common divisor of a and b.
@@ -183,7 +193,7 @@ func gcd(a, b time.Duration) time.Duration {
 // makeWorker returns a worker that runs processor.execute each tick. Each timeout'th tick,
 // the worker will check flow timeouts and each period'th tick, the worker will report flow
 // events to be published.
-func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64) (*worker, error) {
+func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64, logger *logp.Logger) (*worker, error) {
 	return newWorker(func(w *worker) {
 		defer processor.execute(w, false, true, true)
 
@@ -191,7 +201,7 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 			// Wait until the current time rounded up to nearest align seconds.
 			aligned := time.Unix(((time.Now().Unix()+(align-1))/align)*align, 0)
 			waitStart := time.Until(aligned)
-			debugf("worker wait start(%v): %v", aligned, waitStart)
+			logger.Debugf("worker wait start(%v): %v", aligned, waitStart)
 			if cont := w.sleep(waitStart); !cont {
 				return
 			}
@@ -200,11 +210,11 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 		nTimeout := timeout
 		nPeriod := period
 		reportPeriodically := period > 0
-		debugf("start flows worker loop")
+		logger.Debug("start flows worker loop")
 		w.periodically(tick, func() error {
 			nTimeout--
 			nPeriod--
-			debugf("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)
+			logger.Debugf("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)
 
 			handleTimeout := nTimeout == 0
 			if handleTimeout {
@@ -218,7 +228,7 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 			processor.execute(w, handleTimeout, handleReports, false)
 			return nil
 		})
-	}), nil
+	}, logger), nil
 }
 
 type flowsProcessor struct {
@@ -228,6 +238,7 @@ type flowsProcessor struct {
 	counters                 *counterReg
 	timeout                  time.Duration
 	enableDeltaFlowReporting bool
+	logger                   *logp.Logger
 }
 
 func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastReport bool) {
@@ -235,7 +246,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 		return
 	}
 
-	debugf("exec tick, timeout=%v, report=%v", checkTimeout, handleReports)
+	fw.logger.Debugf("exec tick, timeout=%v, report=%v", checkTimeout, handleReports)
 
 	// get counter names snapshot if reports must be generated
 	fw.counters.mutex.Lock()
@@ -257,13 +268,13 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 		for flow := table.flows.head; flow != nil; flow = next {
 			next = flow.next
 
-			debugf("handle flow: %v, %v", flow.id.flowIDMeta, flow.id.flowID)
+			fw.logger.Debugf("handle flow: %v, %v", flow.id.flowIDMeta, flow.id.flowID)
 
 			reportFlow := handleReports
 			isOver := lastReport
 			if checkTimeout {
 				if ts.Sub(flow.ts) > fw.timeout {
-					debugf("kill flow")
+					fw.logger.Debug("kill flow")
 
 					reportFlow = true
 					flow.kill() // mark flow as killed
@@ -273,7 +284,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 			}
 
 			if reportFlow {
-				debugf("report flow")
+				fw.logger.Debug("report flow")
 				fw.report(w, ts, flow, isOver, intNames, uintNames, floatNames)
 			}
 		}
@@ -285,7 +296,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string) {
 	event := createEvent(fw.watcher, ts, flow, isOver, intNames, uintNames, floatNames, fw.enableDeltaFlowReporting)
 
-	debugf("add event: %v", event)
+	fw.logger.Debugf("add event: %v", event)
 	fw.spool.publish(event)
 }
 
