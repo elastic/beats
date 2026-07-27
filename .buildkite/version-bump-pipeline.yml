@@ -29,7 +29,7 @@ steps:
     build:
       branch: "main"
       message: "Version bump beats to ${NEW_VERSION} (${WORKFLOW})"
-      meta_data:
+      env:
         REPOSITORY: "beats"
         RELEASE_TYPE: "${WORKFLOW}"
         CURRENT_RELEASE: "${NEW_VERSION}"
@@ -48,7 +48,7 @@ steps:
     build:
       branch: "main"
       message: "Version bump beats to ${NEW_VERSION} (patch)"
-      meta_data:
+      env:
         REPOSITORY: "beats"
         CURRENT_RELEASE: "${NEW_VERSION}"
         DRY_RUN: "false"
