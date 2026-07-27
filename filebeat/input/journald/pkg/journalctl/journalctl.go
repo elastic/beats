@@ -29,7 +29,6 @@ import (
 	"strings"
 	"sync"
 	"syscall"
-	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -52,12 +51,9 @@ type journalctl struct {
 	stopOnce sync.Once
 
 	// deadline bounds how long Next waits for the next entry before returning
-	// reader.ErrReadDeadline. Zero means no deadline. Set/read by the consuming
-	// goroutine only (via SetReadDeadline before Next), so it needs no locking.
-	deadline time.Time
-	// timer is reused across Next calls to avoid a per-call allocation when a
-	// deadline is set. Owned by the consuming goroutine.
-	timer *time.Timer
+	// reader.ErrReadDeadline. Set/read by the consuming goroutine only (via
+	// SetReadDeadline before Next), so it needs no locking.
+	reader.Deadline
 }
 
 // NewFactory returns a function that instantiates [journalctl].
@@ -214,16 +210,8 @@ func (j *journalctl) Kill() error {
 // exited unexpectedly, then `err` is non-nil, `finished` is false and an empty
 // byte array is returned.
 func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
-	if j.deadline.IsZero() {
-		select {
-		case <-cancel.Done():
-			return []byte{}, ErrCancelled
-		case d, open := <-j.dataChan:
-			return j.handleData(d, open)
-		}
-	}
-
-	// Fast path: an entry is already available, so no timer is needed.
+	// Fast path: an entry is already available (or the input is cancelled), so no
+	// timer is needed.
 	select {
 	case <-cancel.Done():
 		return []byte{}, ErrCancelled
@@ -232,30 +220,18 @@ func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
 	default:
 	}
 
-	// Slow path: arm the reused timer and wait.
-	if j.timer == nil {
-		j.timer = time.NewTimer(0)
-		j.timer.Stop()
-	}
-	j.timer.Reset(time.Until(j.deadline))
+	// Arm returns nil when no deadline is set, which never fires, so this select
+	// covers both the deadline and the plain blocking receive.
+	timeout := j.Arm()
+	defer j.Disarm()
 	select {
 	case <-cancel.Done():
 		return []byte{}, ErrCancelled
-	case <-j.timer.C:
+	case <-timeout:
 		return []byte{}, reader.ErrReadDeadline
 	case d, open := <-j.dataChan:
-		j.timer.Stop()
 		return j.handleData(d, open)
 	}
-}
-
-// SetReadDeadline bounds how long Next waits for the next entry before
-// returning reader.ErrReadDeadline. A zero time clears it. journalctl honors
-// deadlines (its read is a channel receive), so it returns true; this lets the
-// multiline timeout reader avoid a goroutine.
-func (j *journalctl) SetReadDeadline(t time.Time) bool {
-	j.deadline = t
-	return true
 }
 
 // handleData turns a dataChan receive into the Next return values. open is false

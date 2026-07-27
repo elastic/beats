@@ -124,9 +124,10 @@ type Reader struct {
 
 	backoff backoff.Backoff
 
-	// deadline is the current read deadline, applied to the underlying journalctl
-	// before each read so it survives journalctl restarts. Set via SetReadDeadline.
-	deadline time.Time
+	// deadline is the current read deadline. The Reader never blocks on it
+	// itself; it applies it to the underlying journalctl before each read so the
+	// deadline survives journalctl restarts.
+	deadline reader.Deadline
 }
 
 // maybeAddBootAll appends "--boot", "all" to args only when boot-all is
@@ -325,10 +326,10 @@ func (r *Reader) Close() error {
 	return nil
 }
 
-// SetReadDeadline bounds how long the next read waits for an entry.
+// SetReadDeadline bounds how long the next read waits for an entry (see
+// reader.DeadlineSetter). It is forwarded to journalctl, which honors it.
 func (r *Reader) SetReadDeadline(t time.Time) bool {
-	r.deadline = t
-	return true
+	return r.deadline.SetReadDeadline(t)
 }
 
 // next reads the next entry from journalctl. It handles any errors from
@@ -336,7 +337,7 @@ func (r *Reader) SetReadDeadline(t time.Time) bool {
 // returns a valid journald entry or ErrCancelled when the input is cancelled.
 func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	// Apply the current read deadline to the (possibly restarted) journalctl.
-	r.jctl.SetReadDeadline(r.deadline)
+	r.jctl.SetReadDeadline(r.deadline.ReadDeadline())
 
 	msg, err := r.jctl.Next(cancel)
 

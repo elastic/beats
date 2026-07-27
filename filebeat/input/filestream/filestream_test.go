@@ -580,7 +580,7 @@ func TestLogFileReadDeadline(t *testing.T) {
 	deadline := time.Now().Add(time.Hour)
 	require.True(t, reader.SetReadDeadline(enc, deadline),
 		"deadline must reach the log file through the encode reader")
-	require.Equal(t, deadline, lf.readDeadline)
+	require.Equal(t, deadline, lf.ReadDeadline())
 
 	// Drain the file content (a generous deadline keeps the data reads from
 	// timing out), then a short deadline at EOF must surface ErrReadDeadline.

@@ -70,15 +70,13 @@ type logFile struct {
 	backoff backoff.Backoff
 	tg      *unison.TaskGroup
 
-	// readDeadline bounds how long Read waits for new data at EOF before
-	// returning reader.ErrReadDeadline. Zero means no deadline. It is set and
-	// read only by the harvester goroutine (via SetReadDeadline before Read), so
-	// it needs no synchronization. backoffInit is the poll interval used while a
-	// deadline is active (the deadline window is short, so a fixed poll is fine).
-	// deadlineTimer is reused across polls to avoid a per-poll allocation.
-	readDeadline  time.Time
-	backoffInit   time.Duration
-	deadlineTimer *time.Timer
+	// deadline bounds how long Read waits for new data at EOF before returning
+	// reader.ErrReadDeadline. It is set and read only by the harvester goroutine
+	// (via SetReadDeadline before Read), so it needs no synchronization.
+	// backoffInit is the poll interval used while a deadline is active (the
+	// deadline window is short, so a fixed poll is fine).
+	reader.Deadline
+	backoffInit time.Duration
 
 	readUntilEOFOnce sync.Once
 }
@@ -190,51 +188,20 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	return 0, ErrClosed
 }
 
-// SetReadDeadline bounds how long Read waits for new data at EOF before
-// returning reader.ErrReadDeadline. A zero time clears the deadline. logFile
-// always honors the deadline, so it returns true. It is called by the harvester
-// goroutine before a read, so it needs no synchronization with Read.
-func (f *logFile) SetReadDeadline(t time.Time) bool {
-	f.readDeadline = t
-	return true
-}
-
 // waitForData backs off after EOF until more data may be available. It returns
 // false if a read deadline (set via SetReadDeadline) elapses first, telling Read
 // to return reader.ErrReadDeadline. Without a deadline it uses the normal
 // exponential backoff; with one it polls at a fixed short interval bounded by
-// the remaining time so the deadline is honored precisely.
+// the remaining time so the deadline is honored precisely. Cancellation is
+// handled by the Read loop condition, so it returns true in that case.
 func (f *logFile) waitForData() bool {
-	if f.readDeadline.IsZero() {
+	if f.ReadDeadline().IsZero() {
 		f.backoff.Wait(f.readerCtx)
 		return true
 	}
 
-	remaining := time.Until(f.readDeadline)
-	if remaining <= 0 {
-		return false
-	}
-
-	wait := f.backoffInit
-	atDeadline := false
-	if wait <= 0 || wait >= remaining {
-		wait, atDeadline = remaining, true
-	}
-
-	// Reuse the timer across polls to avoid a per-poll allocation.
-	if f.deadlineTimer == nil {
-		f.deadlineTimer = time.NewTimer(0)
-		f.deadlineTimer.Stop()
-	}
-	f.deadlineTimer.Reset(wait)
-	select {
-	case <-f.readerCtx.Done():
-		// Cancellation is handled by the Read loop condition.
-		f.deadlineTimer.Stop()
-		return true
-	case <-f.deadlineTimer.C:
-		return !atDeadline
-	}
+	_, ok := f.WaitBackoff(f.readerCtx.Done(), f.backoffInit)
+	return ok
 }
 
 func (f *logFile) startFileMonitoringIfNeeded() {

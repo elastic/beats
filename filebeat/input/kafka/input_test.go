@@ -67,16 +67,17 @@ func TestDeadlineReceiver(t *testing.T) {
 		require.Equal(t, []byte("x"), msg.Value)
 	})
 
-	t.Run("fast path returns a buffered message without arming the timer", func(t *testing.T) {
+	t.Run("fast path returns a buffered message without consulting the deadline", func(t *testing.T) {
 		ch := make(chan *sarama.ConsumerMessage, 1)
 		ch <- &sarama.ConsumerMessage{Value: []byte("y")}
 		var d deadlineReceiver
-		d.SetReadDeadline(time.Now().Add(time.Hour))
+		// An already elapsed deadline must not preempt a message that is ready:
+		// only the fast path can return it.
+		d.SetReadDeadline(time.Now().Add(-time.Hour))
 		msg, ok, timedOut := d.recv(ch)
 		require.True(t, ok)
 		require.False(t, timedOut)
 		require.Equal(t, []byte("y"), msg.Value)
-		require.Nil(t, d.timer, "fast path must not allocate a timer")
 	})
 
 	t.Run("times out on an empty channel", func(t *testing.T) {
@@ -85,20 +86,26 @@ func TestDeadlineReceiver(t *testing.T) {
 		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
 		_, _, timedOut := d.recv(ch)
 		require.True(t, timedOut)
+
+		// The timer is reused across calls (see reader.Deadline), so a second
+		// deadline must still fire rather than observe the first firing.
+		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		_, _, timedOut = d.recv(ch)
+		require.True(t, timedOut)
 	})
 
-	t.Run("reuses a single timer across slow-path calls", func(t *testing.T) {
+	t.Run("clearing the deadline restores a blocking receive", func(t *testing.T) {
 		ch := make(chan *sarama.ConsumerMessage)
 		var d deadlineReceiver
 		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
 		_, _, timedOut := d.recv(ch)
 		require.True(t, timedOut)
-		first := d.timer
-		require.NotNil(t, first)
 
-		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
-		_, _, timedOut = d.recv(ch)
-		require.True(t, timedOut)
-		require.Same(t, first, d.timer, "the timer must be reused, not reallocated")
+		d.SetReadDeadline(time.Time{})
+		go func() { ch <- &sarama.ConsumerMessage{Value: []byte("z")} }()
+		msg, ok, timedOut := d.recv(ch)
+		require.True(t, ok)
+		require.False(t, timedOut, "a cleared deadline must not time out")
+		require.Equal(t, []byte("z"), msg.Value)
 	})
 }

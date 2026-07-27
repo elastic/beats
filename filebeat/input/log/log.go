@@ -39,13 +39,10 @@ type Log struct {
 	backoff      time.Duration
 	done         chan struct{}
 
-	// readDeadline bounds how long Read waits for new data at EOF before
-	// returning reader.ErrReadDeadline. Zero means no deadline. It is set and read
-	// only by the harvester read goroutine (via SetReadDeadline before Read), so
-	// it needs no synchronization. deadlineTimer is reused across waits to avoid a
-	// per-wait allocation.
-	readDeadline  time.Time
-	deadlineTimer *time.Timer
+	// deadline bounds how long Read waits for new data at EOF before returning
+	// reader.ErrReadDeadline. It is set and read only by the harvester read
+	// goroutine (via SetReadDeadline before Read), so it needs no synchronization.
+	reader.Deadline
 }
 
 // NewLog creates a new log instance to read log sources
@@ -122,17 +119,6 @@ func (f *Log) Read(buf []byte) (int, error) {
 			return totalN, reader.ErrReadDeadline
 		}
 	}
-}
-
-// SetReadDeadline bounds how long Read waits for new data at EOF before
-// returning reader.ErrReadDeadline. A zero time clears the deadline. Log honors
-// it (its EOF wait is a cancellable sleep), so it returns true; this lets the
-// multiline timeout reader bound the wait synchronously without a goroutine. It
-// is called by the harvester read goroutine before a read, so it needs no
-// synchronization with Read.
-func (f *Log) SetReadDeadline(t time.Time) bool {
-	f.readDeadline = t
-	return true
 }
 
 // errorChecks determines the cause for EOF errors, and how the EOF event should be handled
@@ -221,7 +207,7 @@ func (f *Log) checkFileDisappearedErrors() error {
 // backoff; with one it polls bounded by the remaining time so the deadline is
 // honored. The block is a cancellable sleep, so no goroutine is needed to bound it.
 func (f *Log) wait() bool {
-	if f.readDeadline.IsZero() {
+	if f.ReadDeadline().IsZero() {
 		select {
 		case <-f.done:
 			return true
@@ -231,34 +217,11 @@ func (f *Log) wait() bool {
 		return true
 	}
 
-	remaining := time.Until(f.readDeadline)
-	if remaining <= 0 {
-		return false
+	completed, ok := f.WaitBackoff(f.done, f.backoff)
+	if completed {
+		f.incBackoff()
 	}
-	wait := f.backoff
-	atDeadline := false
-	if wait <= 0 || wait >= remaining {
-		wait, atDeadline = remaining, true
-	}
-
-	// Reuse the timer across waits to avoid a per-wait allocation. Go 1.23+ (see
-	// go.mod) makes Reset/Stop safe without draining the channel.
-	if f.deadlineTimer == nil {
-		f.deadlineTimer = time.NewTimer(0)
-		f.deadlineTimer.Stop()
-	}
-	f.deadlineTimer.Reset(wait)
-	select {
-	case <-f.done:
-		f.deadlineTimer.Stop()
-		return true
-	case <-f.deadlineTimer.C:
-		if atDeadline {
-			return false
-		}
-	}
-	f.incBackoff()
-	return true
+	return ok
 }
 
 // incBackoff increases the backoff up to MaxBackoff.
