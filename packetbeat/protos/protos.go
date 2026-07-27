@@ -133,16 +133,9 @@ func (s ProtocolsStruct) Init(test bool, pub reporterFactory, watch *procs.Proce
 	return s.InitFiltered(test, "", pub, watch, cfgs, list, logger)
 }
 
-<<<<<<< HEAD
-func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
-	if len(cfgs) != 0 && s.logger != nil {
-		// TODO: https://github.com/elastic/ingest-dev/issues/6000
-		s.logger.Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
-=======
 func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C, logger *logp.Logger) error {
 	if len(cfgs) != 0 {
 		logger.Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
->>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 	}
 
 	for proto := range protocolSyms {

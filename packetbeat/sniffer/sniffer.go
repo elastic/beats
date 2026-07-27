@@ -92,23 +92,11 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-<<<<<<< HEAD
 func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, logger *logp.Logger, closers ...func()) (*Sniffer, error) {
 	if logger == nil {
 		logger = logp.NewNopLogger()
 	}
 
-=======
-func New(
-	id string,
-	testMode bool,
-	_ string,
-	decoders map[string]Decoders,
-	interfaces []config.InterfaceConfig,
-	reporter status.StatusReporter,
-	logger *logp.Logger,
-	closers ...func()) (*Sniffer, error) {
->>>>>>> 5544f631c ([beatreceiver] Remove global loggers from packetbeat 1/2 (#51631))
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		closers:  closers,
