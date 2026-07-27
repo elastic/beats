@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -33,7 +35,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/stretchr/testify/require"
 )
 
 // TestInputParsers ensures journald input support parsers,
