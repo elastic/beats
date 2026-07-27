@@ -68,6 +68,16 @@ func TestMessageBufferAddLine(t *testing.T) {
 	}
 }
 
+func TestMessageBufferPrivate(t *testing.T) {
+	buf := newMessageBuffer(1024, 5, []byte("\n"), false)
+	buf.addLine(reader.Message{Content: []byte("line1"), Bytes: 5, Private: "cursor-1"})
+	buf.addLine(reader.Message{Content: []byte("line2"), Bytes: 5, Private: "cursor-2"})
+	buf.addLine(reader.Message{Content: []byte("line3"), Bytes: 5, Private: "cursor-3"})
+
+	msg := buf.finalize()
+	assert.Equal(t, []any{"cursor-1", "cursor-2", "cursor-3"}, msg.Private)
+}
+
 func TestFinalizeMessage(t *testing.T) {
 	testcases := map[string]struct {
 		maxBytes int
