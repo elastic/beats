@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: fix data races in the add_docker_metadata cache initialization
-component: all

@@ -10,13 +10,19 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"text/template"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	mqtttestutil "github.com/elastic/beats/v7/filebeat/input/mqtt/testutil"
@@ -821,4 +827,305 @@ receivers:
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+}
+
+func TestHTTPEndpointInputOTelE2E(t *testing.T) {
+	httpEndpointInputTestMsg := "http-endpoint-otel-e2e-test-event"
+
+	integration.EnsureESIsRunning(t)
+
+	otelHome := t.TempDir()
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNamespace
+
+	type options struct {
+		Index    string
+		ESURL    string
+		Username string
+		Password string
+		Host     string
+		Port     string
+		PathHome string
+	}
+
+	filebeatConfig := `filebeat.inputs:
+- type: http_endpoint
+  id: http-endpoint-input-e2e
+  listen_address: {{ .Host }}
+  listen_port: {{ .Port }}
+  url: /events
+  prefix: json
+` + filebeatOutputYAML
+
+	otelConfig := otelElasticsearchExporterYAML + `receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - type: http_endpoint
+                  id: http-endpoint-input-e2e
+                  listen_address: {{ .Host }}
+                  listen_port: {{ .Port }}
+                  url: /events
+                  prefix: json
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        path.home: {{ .PathHome }}
+        management.otel.enabled: true
+` + otelElasticsearchServiceYAML
+
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+		Host:     "127.0.0.1",
+		// Bind to an ephemeral port and read the OS-assigned port back from
+		// the logs
+		Port:     "0",
+		PathHome: otelHome,
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.Index = otelIndex
+	require.NoError(t, template.Must(template.New("config").Parse(otelConfig)).Execute(&configBuffer, optionsValue))
+
+	col := oteltestcol.New(t, configBuffer.String())
+	otelPort := col.SocketListeningPort(t)
+
+	configBuffer.Reset()
+
+	optionsValue.Index = fbIndex
+	require.NoError(t, template.Must(template.New("config").Parse(filebeatConfig)).Execute(&configBuffer, optionsValue))
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	filebeat.WaitLogsContainsAnyOrder(
+		[]string{"filebeat start running"},
+		20*time.Second,
+		"filebeat did not run",
+	)
+	fbPort := filebeat.SocketListeningPort(20 * time.Second)
+
+	payload := fmt.Sprintf(`{"message":%q}`, httpEndpointInputTestMsg)
+	postHTTPEndpointEvent(t, fmt.Sprintf("http://127.0.0.1:%d/events", otelPort), payload)
+	postHTTPEndpointEvent(t, fmt.Sprintf("http://127.0.0.1:%d/events", fbPort), payload)
+
+	es := integration.GetESClient(t, "http")
+	t.Cleanup(func() {
+		deleteDataStreamsFromES(t, es, []string{otelIndex, fbIndex})
+	})
+
+	rawQuery := map[string]any{
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
+					{
+						"match_phrase": map[string]any{
+							"input.type": "http_endpoint",
+						},
+					},
+					{
+						"match_phrase": map[string]any{
+							"json.message": httpEndpointInputTestMsg,
+						},
+					},
+				},
+			},
+		},
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
+		},
+	}
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
+
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+	}
+	oteltest.AssertMapsEqual(t, filebeatDocs.Hits.Hits[0].Source, otelDocs.Hits.Hits[0].Source, ignoredFields, "expected documents to be equal")
+}
+
+func TestNetflowInputOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	netflowSourceIP := "172.16.32.100"
+
+	otelHome := t.TempDir()
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNamespace
+
+	packet, err := os.ReadFile(filepath.Join("..", "..", "input", "netflow", "testdata", "dat", "netflow9_test_valid01.dat"))
+	require.NoError(t, err, "failed to read netflow test packet")
+
+	type options struct {
+		Index    string
+		ESURL    string
+		Username string
+		Password string
+		Host     string
+		PathHome string
+	}
+
+	filebeatConfig := `filebeat.inputs:
+- type: netflow
+  id: netflow-input-e2e
+  host: {{ .Host }}
+` + filebeatOutputYAML
+
+	otelConfig := otelElasticsearchExporterYAML + `receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - type: netflow
+                  id: netflow-input-e2e
+                  host: {{ .Host }}
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        path.home: {{ .PathHome }}
+        management.otel.enabled: true
+` + otelElasticsearchServiceYAML
+
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+		PathHome: otelHome,
+	}
+
+	ephemeralHost := hostAddress(0)
+
+	var configBuffer bytes.Buffer
+	optionsValue.Host = ephemeralHost
+	optionsValue.Index = otelIndex
+	require.NoError(t, template.Must(template.New("config").Parse(otelConfig)).Execute(&configBuffer, optionsValue))
+
+	col := oteltestcol.New(t, configBuffer.String())
+	otelAddress := hostAddress(col.SocketListeningPort(t))
+
+	configBuffer.Reset()
+
+	optionsValue.Host = ephemeralHost
+	optionsValue.Index = fbIndex
+	require.NoError(t, template.Must(template.New("config").Parse(filebeatConfig)).Execute(&configBuffer, optionsValue))
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	filebeat.WaitLogsContainsAnyOrder(
+		[]string{"filebeat start running"},
+		20*time.Second,
+		"filebeat did not run",
+	)
+	fbAddress := hostAddress(filebeat.SocketListeningPort(20 * time.Second))
+
+	go sendUDPPacket(t, otelAddress, packet)
+	go sendUDPPacket(t, fbAddress, packet)
+
+	es := integration.GetESClient(t, "http")
+	t.Cleanup(func() {
+		deleteDataStreamsFromES(t, es, []string{otelIndex, fbIndex})
+	})
+
+	rawQuery := map[string]any{
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
+					{
+						"match_phrase": map[string]any{
+							"input.type": "netflow",
+						},
+					},
+					{
+						"match_phrase": map[string]any{
+							"source.ip": netflowSourceIP,
+						},
+					},
+				},
+			},
+		},
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
+		},
+	}
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
+
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"event.created",
+		"netflow.exporter.address",
+		"observer.ip",
+	}
+	oteltest.AssertMapsEqual(t, filebeatDocs.Hits.Hits[0].Source, otelDocs.Hits.Hits[0].Source, ignoredFields, "expected documents to be equal")
+}
+
+func postHTTPEndpointEvent(t *testing.T, url, payload string) {
+	t.Helper()
+	require.EventuallyWithT(t, func(ct *assert.CollectT) {
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, url, strings.NewReader(payload))
+		if !assert.NoError(ct, err, "failed to create request") {
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := http.DefaultClient.Do(req)
+		if !assert.NoError(ct, err, "failed to POST to http_endpoint") {
+			return
+		}
+		defer resp.Body.Close()
+		_, _ = io.Copy(io.Discard, resp.Body)
+		assert.Equal(ct, http.StatusOK, resp.StatusCode, "unexpected http_endpoint status")
+	}, 20*time.Second, 100*time.Millisecond, "http_endpoint did not accept event at %s", url)
+}
+
+func sendUDPPacket(t *testing.T, address string, packet []byte) {
+	t.Helper()
+	require.EventuallyWithT(t, func(ct *assert.CollectT) {
+		conn, err := net.Dial("udp", address) //nolint:noctx // test helper
+		if !assert.NoError(ct, err, "failed to dial udp %s", address) {
+			return
+		}
+		defer conn.Close()
+		n, err := conn.Write(packet)
+		assert.NoError(ct, err, "failed to write udp packet to %s", address)
+		assert.Equal(ct, len(packet), n, "short udp write to %s", address)
+	}, 20*time.Second, 100*time.Millisecond, "udp endpoint %s was not ready", address)
 }

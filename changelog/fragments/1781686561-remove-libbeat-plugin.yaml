@@ -1,0 +1,22 @@
+kind: breaking-change
+
+summary: Remove the experimental `--plugin` flag for loading external Go plugins
+
+description: |
+  Removed the experimental `--plugin` flag, which loaded external Go plugins at
+  startup. The feature was opt-in, logged an "experimental" warning when used,
+  and was never promoted to a stable feature; no plugins were ever shipped.
+
+impact: |
+  The `--plugin` flag is no longer recognized. Anyone who used it to load their
+  own compiled Go plugins can no longer do so.
+
+action: |
+  Remove the `--plugin` flag from your startup command. The feature was
+  experimental and has no replacement.
+
+component: libbeat
+
+pr: https://github.com/elastic/beats/pull/45840
+
+issue: https://github.com/elastic/beats/issues/44903

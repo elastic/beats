@@ -63,7 +63,7 @@ changelog/fragments/
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ski-docs
-/libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/management @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
 /libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
 /libbeat/processors/cache/ @elastic/security-service-integrations
@@ -118,13 +118,13 @@ changelog/fragments/
 /metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
 /packetbeat/ @elastic/sec-linux-platform
+/pkg/autodiscover/ @elastic/elastic-agent-data-plane
 /script/ @elastic/elastic-agent-data-plane
 /testing/ @elastic/elastic-agent-data-plane
 /tools/ @elastic/elastic-agent-data-plane
 /winlogbeat/ @elastic/sec-windows-platform
 /x-pack/auditbeat/ @elastic/sec-linux-platform
 /x-pack/auditbeat/abreceiver/ @elastic/elastic-agent-data-plane
-/x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations

@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 )
 
@@ -39,6 +40,9 @@ type osquerydMetrics struct {
 	diskWriteBytes *monitoring.Uint   // disk.write_bytes_total - Cumulative bytes written to disk (counter)
 	uptime         *monitoring.Uint   // uptime.ms - Milliseconds the process has been running (gauge)
 	version        *monitoring.String // version - osqueryd version string
+
+	extensionsLoaded  *monitoring.Uint // extensions.loaded - Customer-managed extensions passing the pre-check and referenced in the autoload file (gauge)
+	extensionsSkipped *monitoring.Uint // extensions.skipped - Customer-managed extension entries or binaries skipped during resolution (gauge)
 
 	log *logp.Logger
 }
@@ -95,8 +99,31 @@ func newOsquerydMetrics(registry *monitoring.Registry, log *logp.Logger) *osquer
 		diskWriteBytes: monitoring.NewUint(osqdReg, "disk.write_bytes_total"),
 		uptime:         monitoring.NewUint(osqdReg, "uptime.ms"),
 		version:        monitoring.NewString(osqdReg, "version"),
-		log:            log,
+
+		extensionsLoaded:  monitoring.NewUint(osqdReg, "extensions.loaded"),
+		extensionsSkipped: monitoring.NewUint(osqdReg, "extensions.skipped"),
+
+		log: log,
 	}
+}
+
+// updateExtensionCounts publishes how many customer-managed extension binaries
+// passed the pre-check (and are referenced in the autoload file) and how many
+// entries or binaries were skipped, so broken extension deployments are visible
+// in fleet-wide monitoring without pulling per-agent diagnostics. An entry-level
+// resolution error (e.g. missing path) counts as one skip.
+func (m *osquerydMetrics) updateExtensionCounts(results []osqd.ExtensionResolveResult) {
+	var loaded, skipped uint64
+	for _, res := range results {
+		if res.Error != "" {
+			skipped++
+			continue
+		}
+		loaded += uint64(len(res.Loaded))
+		skipped += uint64(len(res.Skipped))
+	}
+	m.extensionsLoaded.Set(loaded)
+	m.extensionsSkipped.Set(skipped)
 }
 
 // update queries osqueryd process metrics and updates the monitoring registry

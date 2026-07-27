@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Add an input_type resource attribute to CEL input OTel metrics for consistent filtering across custom and HTTP client metrics.
-component: filebeat

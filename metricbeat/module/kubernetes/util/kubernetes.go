@@ -20,6 +20,7 @@ package util
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -34,8 +35,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	k8sresource "k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -572,7 +573,7 @@ func addEventHandlersToWatcher(
 	}
 
 	metaWatcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
+		AddFunc: func(obj any) {
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
 				containerMetricsUpdateFunc(res)
@@ -580,7 +581,7 @@ func addEventHandlersToWatcher(
 				nodeMetricsUpdateFunc(res)
 			}
 		},
-		UpdateFunc: func(obj interface{}) {
+		UpdateFunc: func(obj any) {
 			clearMetadataCacheFunc(obj)
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
@@ -589,7 +590,7 @@ func addEventHandlersToWatcher(
 				nodeMetricsUpdateFunc(res)
 			}
 		},
-		DeleteFunc: func(obj interface{}) {
+		DeleteFunc: func(obj any) {
 			clearMetadataCacheFunc(obj)
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
@@ -705,7 +706,8 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 	}
 
 	var metaGen metadata.MetaGen
-	if resourceName == PodResource {
+	switch resourceName {
+	case PodResource:
 		var nodeWatcher kubernetes.Watcher
 		if nodeMetaWatcher := resourceWatchers.metaWatchersMap[NodeResource]; nodeMetaWatcher != nil {
 			nodeWatcher = (*nodeMetaWatcher).watcher
@@ -727,7 +729,7 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		metaGen = metadata.GetPodMetaGen(commonConfig, mainWatcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
 			jobWatcher, addResourceMetadata)
 		return metaGen, nil
-	} else if resourceName == ServiceResource {
+	case ServiceResource:
 		namespaceMetaWatcher := resourceWatchers.metaWatchersMap[NamespaceResource]
 		if namespaceMetaWatcher == nil {
 			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
@@ -987,7 +989,7 @@ func NewContainerMetadataEnricher(
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-			id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
+			id := join(pod.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 			ids = append(ids, id)
 		}
 
@@ -1231,10 +1233,8 @@ func (e *enricher) getMetadata(event mapstr.M) mapstr.M {
 func (e *enricher) updateMetadataCacheFromWatcher(key string) {
 	storeKey := getWatcherStoreKeyFromMetadataKey(key)
 	if res, exists, _ := e.watcher.watcher.Store().GetByKey(storeKey); exists {
-		eventMetaMap := e.updateFunc(res.(kubernetes.Resource))
-		for k, v := range eventMetaMap {
-			e.metadataCache[k] = v
-		}
+		eventMetaMap := e.updateFunc(res.(kubernetes.Resource)) //nolint:errcheck // store object type is validated by watcher
+		maps.Copy(e.metadataCache, eventMetaMap)
 	}
 }
 
@@ -1324,7 +1324,7 @@ func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 // transformReplicaSetMetadata ensures that the PartialObjectMetadata resources we get from a metadata watcher
 // can be correctly interpreted by the update function returned by getEventMetadataFunc.
 // This really just involves adding missing type information.
-func transformReplicaSetMetadata(obj interface{}) (interface{}, error) {
+func transformReplicaSetMetadata(obj any) (any, error) {
 	old, ok := obj.(*metav1.PartialObjectMetadata)
 	if !ok {
 		return nil, fmt.Errorf("obj of type %T neither a ReplicaSet nor a PartialObjectMetadata", obj)

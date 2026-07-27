@@ -287,10 +287,16 @@ func (p PdataValuesMap) GetValue(key string) (any, error) {
 
 // GetAtPath retrieves the value at a dotted key path (e.g. "cloud.instance.id")
 // from m, traversing nested maps as needed.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.GetValue behaviour for keys stored flat), then falls back
+// to path navigation.
 func GetAtPath(key string, m pcommon.Map) (pcommon.Value, bool) {
-	before, after, ok0 := strings.Cut(key, ".")
-	if !ok0 {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
 		return m.Get(key)
+	}
+	if v, found := m.Get(key); found {
+		return v, true
 	}
 	parent, ok := m.Get(before)
 	if !ok || parent.Type() != pcommon.ValueTypeMap {
@@ -312,6 +318,48 @@ func PutAtPath(key string, val any, m pcommon.Map) error {
 		return PutAtPath(rest, val, existing.Map())
 	}
 	return PutAtPath(rest, val, m.PutEmptyMap(head))
+}
+
+// DeleteAtPath removes the value at a dotted key path (e.g. "cloud.instance.id")
+// from m, traversing nested maps as needed. Returns false if the path did not exist.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.Delete behaviour for keys stored flat), then falls back
+// to path navigation.
+func DeleteAtPath(key string, m pcommon.Map) bool {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
+		return m.Remove(key)
+	}
+	if m.Remove(key) {
+		return true
+	}
+	parent, ok := m.Get(before)
+	if !ok || parent.Type() != pcommon.ValueTypeMap {
+		return false
+	}
+	return DeleteAtPath(after, parent.Map())
+}
+
+// FlattenKeys returns all key paths in m as dotted strings (e.g. "cloud.instance.id"),
+// including intermediate map keys. This mirrors the behaviour of mapstr.M.FlattenKeys:
+// children are listed before their parent map key.
+func FlattenKeys(m pcommon.Map) []string {
+	out := make([]string, 0, m.Len())
+	flattenPdataKeys("", m, &out)
+	return out
+}
+
+func flattenPdataKeys(prefix string, m pcommon.Map, out *[]string) {
+	for k, v := range m.All() {
+		fullKey := k
+		if prefix != "" {
+			fullKey = prefix + "." + k
+		}
+		if v.Type() == pcommon.ValueTypeMap {
+			flattenPdataKeys(fullKey, v.Map(), out)
+		}
+		*out = append(*out, fullKey)
+	}
 }
 
 // FormatTimestamp renders t in the layout the elasticsearchexporter's
