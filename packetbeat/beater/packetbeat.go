@@ -97,10 +97,6 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		configurator = initialConfig().FromStatic
 	}
 
-<<<<<<< HEAD
-=======
-	logger := b.Info.Logger
-
 	timeout, err := config.GetShutDownTimeOut(rawConfig)
 	if err != nil {
 		return nil, err
@@ -108,7 +104,6 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	b.ShutdownTimeout = timeout
 
->>>>>>> 663f45459 ([beatreceiver][packetbeat] Delegate shutdown_timeout logic to libbeat (#52005))
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err

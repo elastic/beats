@@ -49,24 +49,13 @@ type noopReporter struct{}
 func (noopReporter) UpdateStatus(status.Status, string) {}
 
 type processor struct {
-<<<<<<< HEAD
-	wg              sync.WaitGroup
-	publisher       *publish.TransactionPublisher
-	flows           *flows.Flows
-	sniffer         *sniffer.Sniffer
-	shutdownTimeout time.Duration
-	err             chan error
-	status          status.StatusReporter
-=======
 	wg             sync.WaitGroup
 	publisher      *publish.TransactionPublisher
 	flows          *flows.Flows
 	sniffer        *sniffer.Sniffer
 	err            chan error
-	statusMu       sync.RWMutex
 	status         status.StatusReporter
 	publishTimeout time.Duration
->>>>>>> 663f45459 ([beatreceiver][packetbeat] Delegate shutdown_timeout logic to libbeat (#52005))
 }
 
 func newProcessor(publishTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error, status status.StatusReporter) *processor {
@@ -89,7 +78,7 @@ func (p *processor) Start() {
 		p.flows.Start()
 	}
 	p.wg.Add(1)
-	p.wg.Go(func() {
+	go func() {
 		defer p.wg.Done()
 
 		p.UpdateStatus(status.Running, "running packetbeat processor")
@@ -100,7 +89,7 @@ func (p *processor) Start() {
 			return
 		}
 		p.err <- nil
-	})
+	}()
 }
 
 func (p *processor) Stop() {
