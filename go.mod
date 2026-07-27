@@ -3,9 +3,15 @@ module github.com/elastic/beats/v7
 go 1.26.5
 
 require (
+<<<<<<< HEAD
 	cloud.google.com/go/bigquery v1.75.0
 	cloud.google.com/go/monitoring v1.24.3
 	cloud.google.com/go/pubsub v1.50.2
+=======
+	cloud.google.com/go/bigquery v1.79.0
+	cloud.google.com/go/monitoring v1.30.0
+	cloud.google.com/go/pubsub v1.51.0
+>>>>>>> c42e11637 (build(deps): bump the gcp-sdks group with 10 updates (#52271))
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
@@ -129,7 +135,7 @@ require (
 	golang.org/x/text v0.38.0
 	golang.org/x/time v0.15.0
 	golang.org/x/tools v0.45.0
-	google.golang.org/api v0.279.0
+	google.golang.org/api v0.287.1
 	google.golang.org/genproto v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/grpc v1.82.0
 	google.golang.org/protobuf v1.36.11
@@ -145,8 +151,13 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
+<<<<<<< HEAD
 	cloud.google.com/go/compute v1.57.0
 	cloud.google.com/go/redis v1.18.3
+=======
+	cloud.google.com/go/compute v1.65.0
+	cloud.google.com/go/redis v1.25.0
+>>>>>>> c42e11637 (build(deps): bump the gcp-sdks group with 10 updates (#52271))
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
@@ -188,7 +199,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/cel-go v0.28.0
-	github.com/googleapis/gax-go/v2 v2.22.0
+	github.com/googleapis/gax-go/v2 v2.23.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hashicorp/golang-lru/v2 v2.0.7
@@ -225,7 +236,7 @@ require (
 	go.opentelemetry.io/collector/receiver v1.62.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.44.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
+	google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -285,12 +296,18 @@ require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.1 // indirect
-	cloud.google.com/go/auth v0.20.0 // indirect
+	cloud.google.com/go/auth v0.22.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
+<<<<<<< HEAD
 	cloud.google.com/go/iam v1.6.0 // indirect
 	cloud.google.com/go/longrunning v0.9.0 // indirect
 	cloud.google.com/go/pubsub/v2 v2.5.1 // indirect
+=======
+	cloud.google.com/go/iam v1.12.0 // indirect
+	cloud.google.com/go/longrunning v1.2.0 // indirect
+	cloud.google.com/go/pubsub/v2 v2.6.1 // indirect
+>>>>>>> c42e11637 (build(deps): bump the gcp-sdks group with 10 updates (#52271))
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	filippo.io/edwards25519 v1.1.1 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
@@ -396,7 +413,7 @@ require (
 	github.com/google/licenseclassifier v0.0.0-20221004142553-c1ed8fcf4bab // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.15 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/hashicorp/cronexpr v1.1.3 // indirect
@@ -541,7 +558,7 @@ require (
 	golang.org/x/telemetry v0.0.0-20260508192327-42602be52be6 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260630182238-925bb5da69e7 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912 // indirect
@@ -556,7 +573,11 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	cloud.google.com/go/storage v1.61.3
+=======
+	cloud.google.com/go/storage v1.62.3
+>>>>>>> c42e11637 (build(deps): bump the gcp-sdks group with 10 updates (#52271))
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
