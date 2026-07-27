@@ -450,39 +450,44 @@ func TestUpdateParams(t *testing.T) {
 	require.NoError(t, e)
 }
 
-// extraArgs must elide browser-only CLI flags for `api` monitors while still
-// forwarding the flags that apply to both types.
+// extraArgs must elide browser-only CLI flags for `api` monitors (and its
+// Fleet-emitted alias `synthetics/api`) while still forwarding flags that
+// apply to both types.
 func TestExtraArgsForAPIMonitor(t *testing.T) {
-	cfg := conf.MustNewConfigFrom(mapstr.M{
-		"type":     "api",
-		"name":     "My API monitor",
-		"id":       "myApiId",
-		"schedule": "@every 1m",
-		"source": mapstr.M{
-			"inline": mapstr.M{
-				"script": "// api journey",
-			},
-		},
-		// Browser-only — should NOT make it into the CLI invocation.
-		"sandbox":     true,
-		"screenshots": "on",
-		"throttling":  false,
-		// Honored for both types.
-		"ignore_https_errors": true,
-		"playwright_options":  mapstr.M{"ignoreHTTPSErrors": true},
-	})
+	for _, monType := range []string{"api", "synthetics/api"} {
+		t.Run(monType, func(t *testing.T) {
+			cfg := conf.MustNewConfigFrom(mapstr.M{
+				"type":     monType,
+				"name":     "My API monitor",
+				"id":       "myApiId",
+				"schedule": "@every 1m",
+				"source": mapstr.M{
+					"inline": mapstr.M{
+						"script": "// api journey",
+					},
+				},
+				// Browser-only — should NOT make it into the CLI invocation.
+				"sandbox":     true,
+				"screenshots": "on",
+				"throttling":  false,
+				// Honored for both types.
+				"ignore_https_errors": true,
+				"playwright_options":  mapstr.M{"ignoreHTTPSErrors": true},
+			})
 
-	sj, err := NewSourceJob(cfg)
-	require.NoError(t, err)
-	args := sj.extraArgs(false)
+			sj, err := NewSourceJob(cfg)
+			require.NoError(t, err)
+			args := sj.extraArgs(false)
 
-	assert.NotContains(t, args, "--sandbox", "api journeys must not receive --sandbox")
-	assert.NotContains(t, args, "--screenshots", "api journeys must not receive --screenshots")
-	assert.NotContains(t, args, "--no-throttling", "api journeys must not receive --no-throttling")
-	assert.NotContains(t, args, "--throttling", "api journeys must not receive --throttling")
+			assert.NotContains(t, args, "--sandbox", "api journeys must not receive --sandbox")
+			assert.NotContains(t, args, "--screenshots", "api journeys must not receive --screenshots")
+			assert.NotContains(t, args, "--no-throttling", "api journeys must not receive --no-throttling")
+			assert.NotContains(t, args, "--throttling", "api journeys must not receive --throttling")
 
-	assert.Contains(t, args, "--ignore-https-errors", "api journeys must still honor --ignore-https-errors")
-	assert.Contains(t, args, "--playwright-options", "api journeys must still receive --playwright-options")
+			assert.Contains(t, args, "--ignore-https-errors", "api journeys must still honor --ignore-https-errors")
+			assert.Contains(t, args, "--playwright-options", "api journeys must still receive --playwright-options")
+		})
+	}
 }
 
 // Browser monitors must keep receiving all existing flags (regression guard).

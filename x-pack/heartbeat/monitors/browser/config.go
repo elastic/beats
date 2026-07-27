@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -46,10 +47,10 @@ type Config struct {
 	Timeout           time.Duration                 `config:"timeout"`
 }
 
-// IsAPI reports whether this is the `api` monitor type, which reuses the
-// browser pipeline but filters out browser-only CLI flags.
+// IsAPI reports whether this is the `api` monitor type (or its alias), which
+// reuses the browser pipeline but filters out browser-only CLI flags.
 func (c *Config) IsAPI() bool {
-	return c.Type == "api"
+	return stdfields.IsAPIType(c.Type)
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")

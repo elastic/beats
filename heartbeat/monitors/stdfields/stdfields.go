@@ -72,8 +72,19 @@ func (s StdMonitorFields) IsSyntheticsType() bool {
 // the browser and api packages).
 func IsSyntheticsType(monitorType string) bool {
 	switch monitorType {
-	case "browser", "synthetic", "synthetics/synthetic",
-		"api", "synthetics/api":
+	case "browser", "synthetic", "synthetics/synthetic":
+		return true
+	default:
+		return IsAPIType(monitorType)
+	}
+}
+
+// IsAPIType reports whether the monitor is the `api` synthetics type. It matches
+// the canonical name and every registered alias, since a monitor's configured
+// `type` may be any of them (see plugin.RegisterWithHashFunc in the api package).
+func IsAPIType(monitorType string) bool {
+	switch monitorType {
+	case "api", "synthetics/api":
 		return true
 	default:
 		return false
