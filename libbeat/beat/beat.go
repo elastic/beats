@@ -18,6 +18,8 @@
 package beat
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
@@ -87,6 +89,12 @@ type Beat struct {
 
 	API      *api.Server      // API server. This is nil unless the http endpoint is enabled.
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
+
+	// ShutdownTimeout, when set by a Creator, tells the framework how long the
+	// Beater may take to drain in-flight events during shutdown. On 8.19 this
+	// field is stored for beater use / forward compatibility; full libbeat
+	// watchdog drain support requires the #51136 backport.
+	ShutdownTimeout time.Duration
 }
 
 // GenerateUserAgent populates the UserAgent field on the beat.Info struct

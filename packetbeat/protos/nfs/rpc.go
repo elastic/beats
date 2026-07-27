@@ -74,6 +74,7 @@ func New(
 	results protos.Reporter,
 	_ *procs.ProcessesWatcher,
 	cfg *conf.C,
+	log *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &rpc{}
 	config := defaultConfig

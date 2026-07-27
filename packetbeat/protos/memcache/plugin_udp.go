@@ -216,7 +216,7 @@ func (mc *memcache) onUDPMessage(
 
 func (mc *memcache) onUDPTrans(udp *udpTransaction) error {
 	debug("received memcache(udp) transaction")
-	trans := newTransaction(udp.request, udp.response)
+	trans := newTransaction(udp.request, udp.response, mc.logger)
 	return mc.finishTransaction(trans)
 }
 
