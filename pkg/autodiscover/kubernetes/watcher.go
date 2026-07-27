@@ -19,6 +19,7 @@ package kubernetes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -47,6 +48,12 @@ const (
 var (
 	accessor = meta.NewAccessor()
 )
+
+// ErrWatcherStopped is returned by Start when the watcher has already been
+// stopped and cannot be restarted. The underlying Kubernetes SharedInformer is
+// one-shot: once its Run loop has exited, the informer, workqueue and context
+// are permanently unusable.
+var ErrWatcherStopped = errors.New("kubernetes watcher has been stopped and cannot be restarted")
 
 // Watcher watches Kubernetes resources events
 type Watcher interface {
@@ -282,6 +289,23 @@ func (w *watcher) CachedObject() runtime.Object {
 
 // Start watching pods
 func (w *watcher) Start() error {
+	// A stopped watcher must never be restarted. The Kubernetes SharedInformer
+	// is one-shot; once Run has exited it rejects a second invocation with
+	// "run more than once is not allowed" and returns immediately, yet
+	// WaitForCacheSync below would still succeed because HasSynced stays true
+	// from the first run. That turns an invalid restart into a silent no-op
+	// against a frozen store. Detect the terminal lifecycle state up front and
+	// fail loudly so callers construct a fresh watcher instead.
+	if w.informer.IsStopped() || w.queue.ShuttingDown() || w.ctx.Err() != nil {
+		return fmt.Errorf(
+			"%w (informer_stopped=%t, queue_shutting_down=%t, context_error=%v)",
+			ErrWatcherStopped,
+			w.informer.IsStopped(),
+			w.queue.ShuttingDown(),
+			w.ctx.Err(), //nolint:errorlint // Another error is wrapped
+		)
+	}
+
 	go w.informer.Run(w.ctx.Done())
 
 	if !cache.WaitForCacheSync(w.ctx.Done(), w.informer.HasSynced) {
