@@ -69,9 +69,6 @@ steps:
       - WORKFLOW: ${WORKFLOW}
     key: block-get-dra-artifacts
     blocked_state: running
-    depends_on:
-      - bump-version-minor-major
-      - bump-version-patch
 
   - label: "Fetch DRA Artifacts"
     key: fetch-dra-artifacts
