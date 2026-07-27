@@ -133,7 +133,7 @@ func (s *store) Has(key string) (bool, error) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	var v interface{}
+	var v any
 	err := s.get(key, v)
 	if err != nil {
 		if errors.Is(err, ErrKeyUnknown) {
@@ -144,7 +144,7 @@ func (s *store) Has(key string) (bool, error) {
 	return true, nil
 }
 
-func (s *store) Get(key string, to interface{}) error {
+func (s *store) Get(key string, to any) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}
@@ -154,7 +154,7 @@ func (s *store) Get(key string, to interface{}) error {
 	return s.get(key, to)
 }
 
-func (s *store) get(key string, to interface{}) error {
+func (s *store) get(key string, to any) error {
 	status, data, err := s.cli.Request("GET", fmt.Sprintf("/%s/%s/%s", s.index, docType, url.QueryEscape(key)), "", nil, nil)
 
 	if err != nil {
@@ -190,21 +190,21 @@ type doc struct {
 }
 
 type entry struct {
-	value interface{}
+	value any
 }
 
-func (e entry) Decode(to interface{}) error {
+func (e entry) Decode(to any) error {
 	return typeconv.Convert(to, e.value)
 }
 
-func renderRequest(val interface{}) doc {
+func renderRequest(val any) doc {
 	return doc{
 		Value:     val,
 		UpdatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
 	}
 }
 
-func (s *store) Set(key string, value interface{}) error {
+func (s *store) Set(key string, value any) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}

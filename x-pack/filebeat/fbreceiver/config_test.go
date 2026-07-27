@@ -17,17 +17,17 @@ func TestValidate(t *testing.T) {
 		errorString string
 	}{
 		"Empty config": {
-			c:           &Config{Beatconfig: map[string]interface{}{}},
+			c:           &Config{Beatconfig: map[string]any{}},
 			hasError:    true,
 			errorString: "Configuration is required",
 		},
 		"No filebeat section": {
-			c:           &Config{Beatconfig: map[string]interface{}{"other": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"other": map[string]any{}}},
 			hasError:    true,
 			errorString: "Configuration key 'filebeat' is required",
 		},
 		"Valid config": {
-			c:           &Config{Beatconfig: map[string]interface{}{"filebeat": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"filebeat": map[string]any{}}},
 			hasError:    false,
 			errorString: "",
 		},

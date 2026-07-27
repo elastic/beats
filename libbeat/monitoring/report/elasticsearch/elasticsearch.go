@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"maps"
 	"math/rand/v2"
 	"strconv"
 	"sync"
@@ -148,7 +149,7 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 	}
 
 	queueConfig := conf.Namespace{}
-	conf, err := conf.NewConfigFrom(map[string]interface{}{
+	conf, err := conf.NewConfigFrom(map[string]any{
 		"mem.events":           32,
 		"mem.flush.min_events": 1,
 	})
@@ -367,9 +368,7 @@ func getClusterUUID(mon beatmonitoring.Monitoring) string {
 func makeClientParams(config config) map[string]string {
 	params := map[string]string{}
 
-	for k, v := range config.Params {
-		params[k] = v
-	}
+	maps.Copy(params, config.Params)
 
 	return params
 }

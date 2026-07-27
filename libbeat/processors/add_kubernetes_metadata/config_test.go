@@ -27,23 +27,23 @@ import (
 
 func TestConfigValidate(t *testing.T) {
 	tests := []struct {
-		cfg   map[string]interface{}
+		cfg   map[string]any
 		error bool
 	}{
 		{
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"scope": "foo",
 			},
 			error: true,
 		},
 		{
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"scope": "cluster",
 			},
 			error: false,
 		},
 		{
-			cfg:   map[string]interface{}{},
+			cfg:   map[string]any{},
 			error: false,
 		},
 	}
@@ -64,24 +64,24 @@ func TestConfigValidate(t *testing.T) {
 func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 	tests := []struct {
 		matcherName   string
-		matcherConfig map[string]interface{}
+		matcherConfig map[string]any
 		error         bool
 	}{
 		{
 			matcherName:   "",
-			matcherConfig: map[string]interface{}{},
+			matcherConfig: map[string]any{},
 			error:         false,
 		},
 		{
 			matcherName: "logs_path",
-			matcherConfig: map[string]interface{}{
+			matcherConfig: map[string]any{
 				"resource_type": "pod",
 			},
 			error: true,
 		},
 		{
 			matcherName: "logs_path",
-			matcherConfig: map[string]interface{}{
+			matcherConfig: map[string]any{
 				"resource_type": "pod",
 				"invalid_field": "invalid_value",
 			},
@@ -89,7 +89,7 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 		},
 		{
 			matcherName: "logs_path",
-			matcherConfig: map[string]interface{}{
+			matcherConfig: map[string]any{
 				"resource_type": "pod",
 				"logs_path":     "/var/log/invalid/path/",
 			},
@@ -97,7 +97,7 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 		},
 		{
 			matcherName: "logs_path",
-			matcherConfig: map[string]interface{}{
+			matcherConfig: map[string]any{
 				"resource_type": "pod",
 				"logs_path":     "/var/log/pods/",
 			},
@@ -105,7 +105,7 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 		},
 		{
 			matcherName: "logs_path",
-			matcherConfig: map[string]interface{}{
+			matcherConfig: map[string]any{
 				"resource_type": "container",
 				"logs_path":     "/var/log/containers/",
 			},

@@ -23,10 +23,10 @@ import (
 )
 
 // Key type used in the cache.
-type Key interface{}
+type Key any
 
 // Value type held in the cache. Cannot be nil.
-type Value interface{}
+type Value any
 
 // RemovalListener is the callback function type that can be registered with
 // the cache to receive notification of the removal of expired elements.

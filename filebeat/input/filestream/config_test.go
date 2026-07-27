@@ -20,6 +20,7 @@ package filestream
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"strings"
 	"testing"
 	"time"
@@ -100,7 +101,7 @@ func TestConfigValidate(t *testing.T) {
 
 	t.Run("compression requires fingerprint file_identity", func(t *testing.T) {
 		makeFileIdentity := func(t *testing.T, name string) *conf.Namespace {
-			cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			cfg := conf.MustNewConfigFrom(map[string]any{
 				name: nil,
 			})
 			ns := &conf.Namespace{}
@@ -299,30 +300,30 @@ read_until_eof.enabled: false
 func TestNormalizeConfig(t *testing.T) {
 	tcs := []struct {
 		name        string
-		cfg         map[string]interface{}
+		cfg         map[string]any
 		wantEnabled bool
 	}{
 		{
 			name: "path identity disables prospector.scanner.fingerprint by default",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"path": nil},
+			cfg: map[string]any{
+				"file_identity": map[string]any{"path": nil},
 			},
 			wantEnabled: false,
 		},
 		{
 			name: "native identity disables scanner fingerprint by default",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"native": nil},
+			cfg: map[string]any{
+				"file_identity": map[string]any{"native": nil},
 			},
 			wantEnabled: false,
 		},
 		{
 			name: "explicit scanner fingerprint true is preserved",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"path": nil},
-				"prospector": map[string]interface{}{
-					"scanner": map[string]interface{}{
-						"fingerprint": map[string]interface{}{"enabled": true},
+			cfg: map[string]any{
+				"file_identity": map[string]any{"path": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": true},
 					},
 				},
 			},
@@ -330,11 +331,11 @@ func TestNormalizeConfig(t *testing.T) {
 		},
 		{
 			name: "explicit scanner fingerprint false is preserved",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"fingerprint": nil},
-				"prospector": map[string]interface{}{
-					"scanner": map[string]interface{}{
-						"fingerprint": map[string]interface{}{"enabled": false},
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": false},
 					},
 				},
 			},
@@ -342,23 +343,23 @@ func TestNormalizeConfig(t *testing.T) {
 		},
 		{
 			name: "fingerprint identity keeps default scanner fingerprint",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"fingerprint": nil},
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
 			},
 			wantEnabled: true,
 		},
 		{
 			name: "non-fingerprint inode_marker disables scanner fingerprint by default",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{
-					"inode_marker": map[string]interface{}{"path": "/logs/.filebeat-marker"},
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"inode_marker": map[string]any{"path": "/logs/.filebeat-marker"},
 				},
 			},
 			wantEnabled: false,
 		},
 		{
 			name:        "no file_identity keeps default scanner fingerprint",
-			cfg:         map[string]interface{}{},
+			cfg:         map[string]any{},
 			wantEnabled: true,
 		},
 	}
@@ -366,12 +367,10 @@ func TestNormalizeConfig(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
 			c := defaultConfig()
-			cfg := map[string]interface{}{
+			cfg := map[string]any{
 				"paths": []string{"/tmp/logs/*.log"},
 			}
-			for key, value := range tc.cfg {
-				cfg[key] = value
-			}
+			maps.Copy(cfg, tc.cfg)
 			raw := conf.MustNewConfigFrom(cfg)
 			require.NoError(t, raw.Unpack(&c))
 

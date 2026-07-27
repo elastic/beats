@@ -80,7 +80,8 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 			b.API, err = api.NewWithDefaultRoutes(
 				b.Info.Logger.Named("metrics.http"),
 				b.Config.HTTP,
-				b.Monitoring)
+				b.Monitoring,
+			)
 			if err != nil {
 				return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 			}
@@ -97,14 +98,22 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 	return BeatReceiver{
-		beat:   b,
-		beater: beater,
-		Logger: b.Info.Logger,
+		beat:    b,
+		beater:  beater,
+		Logger:  b.Info.Logger,
+		runDone: make(chan error, 1),
 	}, nil
 }
 
 // BeatReceiver.Start() starts the beat receiver.
-func (br *BeatReceiver) Start(host component.Host) error {
+func (br *BeatReceiver) Start(host component.Host) (retErr error) {
+	// If Start returns an error before the beater.Run goroutine is launched,
+	// signal runDone so that a concurrent Shutdown does not block forever on it.
+	defer func() {
+		if retErr != nil {
+			br.runDone <- retErr
+		}
+	}()
 	var groupReporter otelstatus.RunnerReporter
 	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
 		groupReporter = otelstatus.NewGroupStatusReporter(host)
@@ -125,7 +134,7 @@ func (br *BeatReceiver) Start(host component.Host) error {
 			// This is registered once per beat receiver.
 			diagExt.RegisterDiagnosticHook(br.beat.Info.ComponentID, "Metrics from the default monitoring namespace and expvar.",
 				"beat_metrics.json", "application/json", func() []byte {
-					m := monitoring.CollectStructSnapshot((br.beat.Monitoring.StatsRegistry()), monitoring.Full, true)
+					m := monitoring.CollectStructSnapshot(br.beat.Monitoring.StatsRegistry(), monitoring.Full, true)
 					data, err := json.MarshalIndent(m, "", "  ")
 					if err != nil {
 						return fmt.Appendf(nil, "Failed to collect beat metric snapshot for Agent diagnostics: %v", err)
@@ -157,7 +166,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	})
 
-	br.runDone = make(chan error, 1)
 	go func() {
 		err := br.beater.Run(&br.beat.Beat)
 		if err != nil {

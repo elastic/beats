@@ -76,7 +76,7 @@ func TestFromMapstrSliceDuration(t *testing.T) {
 
 func TestFromMapstrString(t *testing.T) {
 	tests := map[string]struct {
-		mapstr_val  interface{}
+		mapstr_val  any
 		pcommon_val string
 	}{
 		"forty two": {mapstr_val: "forty two", pcommon_val: "forty two"},
@@ -188,7 +188,7 @@ func TestConvertNonPrimitiveWholeFloat(t *testing.T) {
 
 func TestFromMapstrBool(t *testing.T) {
 	tests := map[string]struct {
-		mapstr_val  interface{}
+		mapstr_val  any
 		pcommon_val bool
 	}{
 		"true":  {mapstr_val: true, pcommon_val: true},
@@ -423,11 +423,11 @@ func TestToMapstr(t *testing.T) {
 		"int":    int64(42),
 		"float":  4.2,
 		"string": "forty two",
-		"slice": []interface{}{
+		"slice": []any{
 			int64(1),
 			int64(2),
 		},
-		"map": map[string]interface{}{
+		"map": map[string]any{
 			"int": int64(42),
 		},
 	}

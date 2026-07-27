@@ -67,7 +67,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	require.NoError(t, err)
 	pid := info.State.Pid
 
-	config, err := config.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]any{
 		"match_fields": []string{"cid"},
 	})
 	watcherConstructor := newWatcherWith(client)

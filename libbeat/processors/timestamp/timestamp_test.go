@@ -71,7 +71,7 @@ func TestParsePatterns(t *testing.T) {
 		p.Layouts = []string{"UNIX"}
 
 		epochSec := expected.Unix()
-		times := []interface{}{
+		times := []any{
 			epochSec,
 			float64(epochSec),
 			strconv.FormatInt(epochSec, 10),
@@ -95,7 +95,7 @@ func TestParsePatterns(t *testing.T) {
 		p.Layouts = []string{"UNIX_MS"}
 
 		epochMs := int64(expected.UnixNano()) / int64(time.Millisecond)
-		times := []interface{}{
+		times := []any{
 			epochMs,
 			float64(epochMs),
 			strconv.FormatInt(epochMs, 10),
@@ -275,7 +275,7 @@ func TestTimezone(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			config := conf.MustNewConfigFrom(map[string]interface{}{
+			config := conf.MustNewConfigFrom(map[string]any{
 				"field":    "ts",
 				"timezone": c.Timezone,
 				"layouts":  []string{time.ANSIC},

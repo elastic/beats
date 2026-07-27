@@ -213,7 +213,7 @@ logging.level: debug
 func TestFilestreamGZIPCompressionNotSetWithGZIPFile(t *testing.T) {
 	var plainContent []byte
 	for i := range 500 {
-		plainContent = append(plainContent, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+		plainContent = append(plainContent, fmt.Appendf(nil, "%d: a log line\n", i)...)
 	}
 	gzContent := gziptest.Compress(t, plainContent, gziptest.CorruptNone)
 
@@ -363,7 +363,7 @@ logging.level: debug
 func TestFilestreamGZIPCompressionGZIPWithPlainFile(t *testing.T) {
 	var content []byte
 	for i := range 100 {
-		content = append(content, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+		content = append(content, fmt.Appendf(nil, "%d: a log line\n", i)...)
 	}
 
 	filebeat := integration.NewBeat(
@@ -419,7 +419,7 @@ logging.level: debug
 func TestFilestreamGZIPEOF(t *testing.T) {
 	var content []byte
 	for i := range 100 {
-		content = append(content, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+		content = append(content, fmt.Appendf(nil, "%d: a log line\n", i)...)
 	}
 
 	filebeat := integration.NewBeat(

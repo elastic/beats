@@ -34,7 +34,7 @@ func TestMimeTypeFromTo(t *testing.T) {
 			"foo.bar.baz": "hello world!",
 		},
 	}
-	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]any{
 		"field":  "foo.bar.baz",
 		"target": "bar.baz.zoiks",
 	}), logptest.NewTestingLogger(t, ""))
@@ -56,7 +56,7 @@ func TestMimeTypeFromToMetadata(t *testing.T) {
 	expectedMeta := mapstr.M{
 		"field": "text/plain; charset=utf-8",
 	}
-	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]any{
 		"field":  "foo.bar.baz",
 		"target": "@metadata.field",
 	}), logptest.NewTestingLogger(t, ""))
@@ -74,7 +74,7 @@ func TestMimeTypeTestNoMatch(t *testing.T) {
 			"foo.bar.baz": string([]byte{0, 0}),
 		},
 	}
-	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]any{
 		"field":  "foo.bar.baz",
 		"target": "bar.baz.zoiks",
 	}), logptest.NewTestingLogger(t, ""))

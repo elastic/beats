@@ -56,7 +56,7 @@ type Provider struct {
 	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
 	templates     template.Mapper
-	stop          chan interface{}
+	stop          chan any
 	startListener bus.Listener
 	stopListener  bus.Listener
 	stoppers      map[string]*time.Timer
@@ -125,7 +125,7 @@ func AutodiscoverBuilder(
 		appenders:     appenders,
 		templates:     mapper,
 		watcher:       watcher,
-		stop:          make(chan interface{}),
+		stop:          make(chan any),
 		startListener: start,
 		stopListener:  stop,
 		stoppers:      make(map[string]*time.Timer),

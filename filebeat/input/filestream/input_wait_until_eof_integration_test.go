@@ -45,7 +45,7 @@ func TestWaitUntilEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	id := "TestWaitUntilEOF"
 	waitEOFTimeout := 30 * time.Second
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                     id,
 		"paths":                  []string{path},
 		"read_until_eof.timeout": waitEOFTimeout,
@@ -94,7 +94,7 @@ func TestWaitUntilEOF_reachesEOFWithCloseOnEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	id := "TestWaitUntilEOF_reachesEOFWithCloseOnEOF"
 	waitEOFTimeout := 30 * time.Second
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                     id,
 		"paths":                  []string{path},
 		"read_until_eof.timeout": waitEOFTimeout,
@@ -142,7 +142,7 @@ func TestWaitUntilEOF_gzipFile(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	id := "TestWaitUntilEOF_gzipFile"
 	waitEOFTimeout := 30 * time.Second
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                     id,
 		"paths":                  []string{path},
 		"compression":            "auto",
@@ -197,7 +197,7 @@ func TestWaitUntilEOF_fileDeletedDuringReadUntilEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	id := "TestWaitUntilEOF_fileDeletedDuringReadUntilEOF"
 	waitEOFTimeout := 30 * time.Second
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                            id,
 		"paths":                         []string{path},
 		"read_until_eof.enabled":        true,
@@ -266,7 +266,7 @@ func TestWaitUntilEOF_timeout(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	id := "TestWaitUntilEOF"
 	waitEOFTimeout := 1 * time.Second
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                     id,
 		"paths":                  []string{path},
 		"read_until_eof.timeout": waitEOFTimeout,
@@ -330,7 +330,7 @@ func TestWaitUntilEOF_disabled(t *testing.T) {
 
 	env := newInputTestingEnvironment(t)
 	id := "TestWaitUntilEOF_disabled"
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                     id,
 		"paths":                  []string{path},
 		"read_until_eof.enabled": false,

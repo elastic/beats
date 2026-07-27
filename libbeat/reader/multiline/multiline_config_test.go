@@ -28,29 +28,29 @@ import (
 
 func TestInvalidConfiguration(t *testing.T) {
 	testcases := map[string]struct {
-		config        map[string]interface{}
+		config        map[string]any
 		expectedError error
 	}{
 		"missing multiline pattern": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"match": "before",
 			},
 			expectedError: ErrMissingPattern,
 		},
 		"unknown multiline mode": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"type": "no_such_mode",
 			},
 			expectedError: fmt.Errorf("unknown multiline type: no_such_mode"),
 		},
 		"missing multiline count": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"type": "count",
 			},
 			expectedError: ErrMissingCount,
 		},
 		"missing multiline pattern when while_pattern type is selected": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"type": "while_pattern",
 			},
 			expectedError: ErrMissingPattern,
@@ -58,7 +58,6 @@ func TestInvalidConfiguration(t *testing.T) {
 	}
 
 	for name, test := range testcases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			var config Config
 			c := c.MustNewConfigFrom(test.config)
@@ -71,23 +70,23 @@ func TestInvalidConfiguration(t *testing.T) {
 
 func TestValidConfiguration(t *testing.T) {
 	testcases := map[string]struct {
-		config map[string]interface{}
+		config map[string]any
 	}{
 		"correct pattern based multiline": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"type":    "pattern",
 				"match":   "before",
 				"pattern": "^\n",
 			},
 		},
 		"correct while_pattern based multiline": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"type":    "while_pattern",
 				"pattern": "^\n",
 			},
 		},
 		"correct count based multiline": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"type":        "count",
 				"count_lines": 5,
 			},
@@ -95,7 +94,6 @@ func TestValidConfiguration(t *testing.T) {
 	}
 
 	for name, test := range testcases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			var config Config
 			c := c.MustNewConfigFrom(test.config)

@@ -115,10 +115,10 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor             interface{}
-	pendingCursorValue interface{}
-	pendingUpdate      interface{} // delta value of most recent pending updateOp
-	cursorMeta         interface{}
+	cursor             any
+	pendingCursorValue any
+	pendingUpdate      any // delta value of most recent pending updateOp
+	cursorMeta         any
 }
 
 type (
@@ -135,8 +135,8 @@ type (
 	state struct {
 		TTL     time.Duration
 		Updated time.Time
-		Cursor  interface{}
-		Meta    interface{}
+		Cursor  any
+		Meta    any
 	}
 
 	stateInternal struct {
@@ -188,12 +188,12 @@ func newSourceStore(
 	}
 }
 
-func (s *sourceStore) FindCursorMeta(src Source, v interface{}) error {
+func (s *sourceStore) FindCursorMeta(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.findCursorMeta(key, v)
 }
 
-func (s *sourceStore) UpdateMetadata(src Source, v interface{}) error {
+func (s *sourceStore) UpdateMetadata(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.updateMetadata(key, v)
 }
@@ -203,7 +203,7 @@ func (s *sourceStore) Remove(src Source) error {
 	return s.store.remove(key)
 }
 
-func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
+func (s *sourceStore) ResetCursor(src Source, cur any) error {
 	key := s.identifier.ID(src)
 	return s.store.resetCursor(key, cur)
 }
@@ -510,7 +510,7 @@ func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
 }
 
-func (s *store) findCursorMeta(key string, to interface{}) error {
+func (s *store) findCursorMeta(key string, to any) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -520,7 +520,7 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 }
 
 // updateMetadata updates the cursor metadata in the persistent store.
-func (s *store) updateMetadata(key string, meta interface{}) error {
+func (s *store) updateMetadata(key string, meta any) error {
 	resource := s.ephemeralStore.Find(key, true)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -552,7 +552,7 @@ func (s *store) writeState(r *resource) {
 
 // resetCursor sets the cursor to the value in cur in the persistent store and
 // drops all pending cursor operations.
-func (s *store) resetCursor(key string, cur interface{}) error {
+func (s *store) resetCursor(key string, cur any) error {
 	r := s.ephemeralStore.Find(key, false)
 	if r == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -697,14 +697,14 @@ func (r *resource) UpdatesReleaseN(n uint) {
 func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 
 // UnpackCursor deserializes the in memory state.
-func (r *resource) UnpackCursor(to interface{}) error {
+func (r *resource) UnpackCursor(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.activeCursor())
 }
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
-func (r *resource) UnpackCursorMeta(to interface{}) error {
+func (r *resource) UnpackCursorMeta(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.cursorMeta)
@@ -761,9 +761,9 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // Note: The stateMutex must be locked when calling pendingCursor.
 //
 //nolint:errcheck // not changing behaviour on this commit
-func (r *resource) pendingCursor() interface{} {
+func (r *resource) pendingCursor() any {
 	if r.pendingUpdate != nil {
-		var tmp interface{}
+		var tmp any
 		typeconv.Convert(&tmp, &r.cursor)
 		typeconv.Convert(&tmp, r.pendingUpdate)
 		r.pendingCursorValue = tmp
@@ -773,7 +773,7 @@ func (r *resource) pendingCursor() interface{} {
 }
 
 // activeCursor
-func (r *resource) activeCursor() interface{} {
+func (r *resource) activeCursor() any {
 	if r.activeCursorOperations != 0 {
 		return r.pendingCursor()
 	}

@@ -33,7 +33,7 @@ type Registry interface {
 // ValueDecoder is used to decode values into go structs or maps within a transaction.
 // A ValueDecoder is supposed to be invalidated by beats after the loop operations has returned.
 type ValueDecoder interface {
-	Decode(to interface{}) error
+	Decode(to any) error
 }
 
 // Store provides access to key value pairs.
@@ -51,13 +51,13 @@ type Store interface {
 	// Besides internal implementation specific errors an error is assumed
 	// to be returned if the key does not exist or the type of the value
 	// passed is incompatible to the actual value in the store (decoding error).
-	Get(key string, value interface{}) error
+	Get(key string, value any) error
 
 	// Set inserts or overwrites a key pair in the store.
 	// The `value` parameters can be assumed to be a struct or a map.  Besides
 	// internal implementation specific errors, an error should be returned if
 	// the value given can not be encoded.
-	Set(key string, value interface{}) error
+	Set(key string, value any) error
 
 	// Remove removes and entry from the store.
 	Remove(string) error

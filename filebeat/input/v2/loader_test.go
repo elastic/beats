@@ -138,27 +138,27 @@ func TestLoader_Configure(t *testing.T) {
 
 	cases := map[string]struct {
 		setup  loaderConfig
-		config map[string]interface{}
+		config map[string]any
 		check  inputCheck
 	}{
 		"success": {
 			setup:  defaultSetup,
-			config: map[string]interface{}{"type": "a"},
+			config: map[string]any{"type": "a"},
 			check:  okSetup,
 		},
 		"load default": {
 			setup:  defaultSetup.WithDefaultType("a"),
-			config: map[string]interface{}{},
+			config: map[string]any{},
 			check:  okSetup,
 		},
 		"type is missing": {
 			setup:  defaultSetup,
-			config: map[string]interface{}{},
+			config: map[string]any{},
 			check:  failSetup,
 		},
 		"unknown type": {
 			setup:  defaultSetup,
-			config: map[string]interface{}{"type": "unknown"},
+			config: map[string]any{"type": "unknown"},
 			check:  failSetup,
 		},
 		"input config fails": {
@@ -169,7 +169,7 @@ func TestLoader_Configure(t *testing.T) {
 					return nil, errors.New("oops")
 				}, logp.NewNopLogger()),
 			}),
-			config: map[string]interface{}{"type": "a"},
+			config: map[string]any{"type": "a"},
 			check:  failSetup,
 		},
 	}

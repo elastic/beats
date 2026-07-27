@@ -54,7 +54,6 @@ func TestConfigAcceptValidKerberos(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {

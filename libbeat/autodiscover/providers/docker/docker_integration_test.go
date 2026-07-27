@@ -88,7 +88,7 @@ func TestDockerStart(t *testing.T) {
 	checkEvent(t, listener, ID, false)
 }
 
-func getValue(e bus.Event, key string) interface{} {
+func getValue(e bus.Event, key string) any {
 	val, err := mapstr.M(e).GetValue(key)
 	if err != nil {
 		return nil

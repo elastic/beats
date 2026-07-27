@@ -33,7 +33,7 @@ var MandatoryExportedFields = []string{"type"}
 // NewPluginConfigFromList creates a PluginConfig from a list of raw processor config objects
 func NewPluginConfigFromList(raw []mapstr.M) (PluginConfig, error) {
 	processors := make([]*config.C, len(raw))
-	for i := 0; i < len(raw); i++ {
+	for i := range raw {
 		cfg, err := config.NewConfigFrom(raw[i])
 		if err != nil {
 			return nil, fmt.Errorf("error creating processor config: %w", err)

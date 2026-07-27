@@ -298,7 +298,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations, _ := indexers[0].Data.GetValue("kubernetes.annotations")
 	assert.Nil(t, rawAnnotations)
 
-	config, err := config.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]any{
 		"include_annotations": []string{"a"},
 		"include_labels":      []string{"foo"},
 	})
@@ -336,7 +336,7 @@ func TestFilteredGenMeta(t *testing.T) {
 func TestFilteredGenMetaExclusion(t *testing.T) {
 	var testConfig = config.NewConfig()
 
-	config, err := config.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]any{
 		"exclude_labels": []string{"x"},
 	})
 	assert.NoError(t, err)

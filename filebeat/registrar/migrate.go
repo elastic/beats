@@ -20,6 +20,7 @@ package registrar
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 
@@ -410,12 +411,8 @@ func mergeStates(st, other *file.State) {
 		meta = metaNew
 	} else {
 		meta = map[string]string{}
-		for k, v := range metaOld {
-			meta[k] = v
-		}
-		for k, v := range metaNew {
-			meta[k] = v
-		}
+		maps.Copy(meta, metaOld)
+		maps.Copy(meta, metaNew)
 	}
 
 	if len(meta) == 0 {

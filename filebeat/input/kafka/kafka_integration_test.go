@@ -306,7 +306,7 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		select {
 		case event := <-events:
 			text, err := event.Fields.GetValue("val")
@@ -524,7 +524,7 @@ func checkMatchingHeaders(
 		t.Fatal("event.Fields.kafka.headers isn't a []string")
 	}
 	assert.Len(t, headerArray, len(expected))
-	for i := 0; i < len(expected); i++ {
+	for i := range expected {
 		splitIndex := strings.Index(headerArray[i], ": ")
 		if splitIndex == -1 {
 			t.Errorf(

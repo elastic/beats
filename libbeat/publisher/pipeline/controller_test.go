@@ -83,8 +83,7 @@ func TestOutputReload(t *testing.T) {
 				defer pipeline.Close()
 
 				var wg sync.WaitGroup
-				wg.Add(1)
-				go func() {
+				wg.Go(func() {
 					// Our initial pipeline has no outputs set, so we need
 					// to create the client in a goroutine since any
 					// Connect calls will block until the pipeline has an
@@ -92,13 +91,12 @@ func TestOutputReload(t *testing.T) {
 					pipelineClient, err := pipeline.Connect()
 					require.NoError(t, err)
 					defer pipelineClient.Close()
-					for i := uint(0); i < numEventsToPublish; i++ {
+					for range numEventsToPublish {
 						pipelineClient.Publish(beat.Event{})
 					}
-					wg.Done()
-				}()
+				})
 
-				for i := uint(0); i < numOutputReloads; i++ {
+				for range numOutputReloads {
 					outputClient := ctor(countingPublishFn)
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
@@ -245,7 +243,7 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	const producerCount = 10
 	var remaining atomic.Int64
 	remaining.Store(producerCount)
-	for i := 0; i < producerCount; i++ {
+	for range producerCount {
 		go func() {
 			controller.queueProducer(queue.ProducerConfig{})
 			remaining.Add(-1)

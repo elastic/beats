@@ -32,12 +32,12 @@ type appenderPlugin struct {
 var pluginKey = "libbeat.autodiscover.appender"
 
 // Plugin accepts a AppenderBuilder to be registered as a plugin
-func Plugin(name string, appender autodiscover.AppenderBuilder) map[string][]interface{} {
+func Plugin(name string, appender autodiscover.AppenderBuilder) map[string][]any {
 	return p.MakePlugin(pluginKey, appenderPlugin{name, appender})
 }
 
 func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	p.MustRegisterLoader(pluginKey, func(ifc any) error {
 		app, ok := ifc.(appenderPlugin)
 		if !ok {
 			return errors.New("plugin does not match appender plugin type")

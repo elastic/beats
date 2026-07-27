@@ -193,16 +193,13 @@ func (l *runLoop[T]) getRequestShouldBlock(req *getRequest[T]) bool {
 // Respond to the given get request without blocking or waiting for more events
 func (l *runLoop[T]) handleGetReply(req *getRequest[T]) {
 	eventsAvailable := l.eventCount - l.consumedCount
-	batchSize := req.entryCount
-	if eventsAvailable < batchSize {
-		batchSize = eventsAvailable
-	}
+	batchSize := min(eventsAvailable, req.entryCount)
 
 	startIndex := l.bufPos + l.consumedCount
 	batch := newBatch(l.broker, startIndex, batchSize)
 
 	batchBytes := 0
-	for i := 0; i < batchSize; i++ {
+	for i := range batchSize {
 		batchBytes += batch.rawEntry(i).eventSize
 	}
 
@@ -215,7 +212,7 @@ func (l *runLoop[T]) handleGetReply(req *getRequest[T]) {
 
 func (l *runLoop[T]) handleDelete(count int) {
 	byteCount := 0
-	for i := 0; i < count; i++ {
+	for i := range count {
 		entry := l.broker.buf[(l.bufPos+i)%len(l.broker.buf)]
 		byteCount += entry.eventSize
 	}

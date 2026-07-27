@@ -1,0 +1,5 @@
+kind: security
+
+summary: Reject CPIO entries in macOS .pkg payloads whose paths escape the destination directory, preventing path traversal during extraction (CWE-22).
+
+component: osquerybeat
