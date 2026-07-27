@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -127,17 +128,15 @@ func InstallSyntheticsAgent() error {
 		commit = c
 	}
 
-	dir, err := os.MkdirTemp("", "synthetics-pinned-")
-	if err != nil {
+	// Clone into a stable, persistent path (do NOT delete it after installing):
+	// `npm install -g .` links the global agent back to this checkout's built dist,
+	// so removing it leaves the agent running unbuilt src/*.ts and inline api
+	// journeys fail with "Cannot use import statement outside a module".
+	dir := filepath.Join(os.TempDir(), "synthetics-pinned")
+	if err := os.RemoveAll(dir); err != nil {
 		return err
 	}
-	defer os.RemoveAll(dir)
 
-	// npm's git-dependency install of the pinned commit fails with ENOTDIR during
-	// its prepare step, so clone the pinned commit, build it, and install from the
-	// local path. Set NPM_CONFIG_PREFIX (typically to a private prefix whose bin is
-	// on PATH) before calling this goal so the install and the version check resolve
-	// to this build and bypass the CI image's asdf-shimmed @elastic/synthetics.
 	steps := []struct {
 		dir  string
 		name string
