@@ -131,7 +131,12 @@ func (b *messageBuffer) finalize() reader.Message {
 	}
 
 	if len(b.privates) > 0 {
-		b.message.Private = append([]any(nil), b.privates...)
+		// Preserve the message.Private if multiline contains a single source message
+		if b.processedLines == 1 {
+			b.message.Private = b.privates[0]
+		} else {
+			b.message.Private = append([]any(nil), b.privates...)
+		}
 	}
 
 	// Copy message from existing content
