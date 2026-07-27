@@ -217,7 +217,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 			continue
 		}
 
-		var h map[string]interface{}
+		var h map[string]any
 		err := moduleCfg.Unpack(&h)
 		if err != nil {
 			return fmt.Errorf("could not unpack config: %w", err)
@@ -266,12 +266,10 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		<-bt.done
 		modules.Stop()
-	}()
+	})
 
 	// Start the manager after all the reload hooks are configured,
 	// the Manager is stopped at the end of the execution.
@@ -289,23 +287,19 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}
 
 		go moduleReloader.Run(factory)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			<-bt.done
 			moduleReloader.Stop()
-		}()
+		})
 	}
 
 	// Autodiscover (metricbeat.autodiscover)
 	if bt.autodiscover != nil {
 		bt.autodiscover.Start()
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			<-bt.done
 			bt.autodiscover.Stop()
-		}()
+		})
 	}
 
 	wg.Wait()

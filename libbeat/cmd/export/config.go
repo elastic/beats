@@ -45,7 +45,7 @@ func exportConfig(settings instance.Settings) error {
 		fatalfInitCmd(err)
 	}
 
-	var config map[string]interface{}
+	var config map[string]any
 	err = b.RawConfig.Unpack(&config)
 	if err != nil {
 		fatalf("Error unpacking config: %+v.", err)

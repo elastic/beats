@@ -193,7 +193,7 @@ func configID(config *conf.C) (string, error) {
 		return tmp.ID, nil
 	}
 
-	var h map[string]interface{}
+	var h map[string]any
 	err := config.Unpack(&h)
 	if err != nil {
 		return "", fmt.Errorf("could not unpack config into %T: unpack failed: %w",

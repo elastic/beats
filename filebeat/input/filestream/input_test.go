@@ -213,7 +213,7 @@ func TestNewFile(t *testing.T) {
 	testCases := map[string]struct {
 		compression   string
 		filePath      string
-		expectedType  interface{}
+		expectedType  any
 		expectError   bool
 		errorContains string
 		setup         func(t *testing.T, filePath string) *os.File
@@ -414,7 +414,7 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	file, err := os.CreateTemp(dir, "*")
 	require.NoError(t, err)
 	filename := file.Name()
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		fmt.Fprintf(file, "rather mediocre log line message in %s - %d\n", filename, i)
 	}
 	err = file.Close()
@@ -562,8 +562,7 @@ func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
 // ErrFileTruncate / unknown errors behave the same regardless of
 // whether ctx is cancelled or read_until_eof is enabled.
 func TestFilestream_handleReadError_OtherErrors(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	logger := logptest.NewTestingLogger(t, "")
 	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 

@@ -128,11 +128,9 @@ func MakeReporter(beat beat.Info, cfg *conf.C, mon beatmonitoring.Monitoring) (r
 	r.registries["state"] = mon.StateRegistry()
 	r.registries["dataset"] = mon.InputsRegistry()
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		r.snapshotLoop()
-	}()
+	})
 	return r, nil
 }
 

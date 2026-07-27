@@ -35,7 +35,7 @@ func loadPlugins(path string) error {
 		return err
 	}
 
-	ptr, ok := sym.(*map[string][]interface{})
+	ptr, ok := sym.(*map[string][]any)
 	if !ok {
 		return errors.New("invalid bundle type")
 	}

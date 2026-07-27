@@ -119,15 +119,15 @@ func (f *copyFields) String() string {
 // cloneValue returns a shallow copy of a map. All other types are passed
 // through in the return. This should be used when making straight copies of
 // maps without doing any type conversions.
-func cloneValue(value interface{}) interface{} {
+func cloneValue(value any) any {
 	switch v := value.(type) {
 	case mapstr.M:
 		return v.Clone()
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(v).Clone()
-	case []interface{}:
+	case []any:
 		len := len(v)
-		newArr := make([]interface{}, len)
+		newArr := make([]any, len)
 		for idx, val := range v {
 			newArr[idx] = cloneValue(val)
 		}

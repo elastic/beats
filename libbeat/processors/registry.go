@@ -33,12 +33,12 @@ type processorPlugin struct {
 
 var pluginKey = "libbeat.processor"
 
-func Plugin(name string, c Constructor) map[string][]interface{} {
+func Plugin(name string, c Constructor) map[string][]any {
 	return p.MakePlugin(pluginKey, processorPlugin{name, c})
 }
 
 func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	p.MustRegisterLoader(pluginKey, func(ifc any) error {
 		p, ok := ifc.(processorPlugin)
 		if !ok {
 			return errors.New("plugin does not match processor plugin type")

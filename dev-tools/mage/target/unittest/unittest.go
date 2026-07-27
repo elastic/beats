@@ -33,16 +33,16 @@ func init() {
 }
 
 var (
-	goTestDeps, pythonTestDeps []interface{}
+	goTestDeps, pythonTestDeps []any
 )
 
 // RegisterGoTestDeps registers dependencies of the GoUnitTest target.
-func RegisterGoTestDeps(deps ...interface{}) {
+func RegisterGoTestDeps(deps ...any) {
 	goTestDeps = append(goTestDeps, deps...)
 }
 
 // RegisterPythonTestDeps registers dependencies of the PythonUnitTest target.
-func RegisterPythonTestDeps(deps ...interface{}) {
+func RegisterPythonTestDeps(deps ...any) {
 	pythonTestDeps = append(pythonTestDeps, deps...)
 }
 

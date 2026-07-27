@@ -110,13 +110,13 @@ func NewNodeEventer(
 }
 
 // OnAdd ensures processing of node objects that are newly created
-func (n *node) OnAdd(obj interface{}) {
+func (n *node) OnAdd(obj any) {
 	n.logger.Debugf("Watcher Node add: %+v", obj)
 	n.emit(obj.(*kubernetes.Node), "start") //nolint // existing check
 }
 
 // OnUpdate ensures processing of node objects that are updated
-func (n *node) OnUpdate(obj interface{}) {
+func (n *node) OnUpdate(obj any) {
 	node, ok := obj.(*kubernetes.Node)
 	if !ok {
 		n.logger.Errorf("Unexpected type expecting *kubernetes.Node: %+v", obj)
@@ -137,7 +137,7 @@ func (n *node) OnUpdate(obj interface{}) {
 }
 
 // OnDelete ensures processing of node objects that are deleted
-func (n *node) OnDelete(obj interface{}) {
+func (n *node) OnDelete(obj any) {
 	n.logger.Debugf("Watcher Node delete: %+v", obj)
 	time.AfterFunc(n.config.CleanupTimeout, func() {
 		node, ok := obj.(*kubernetes.Node)
@@ -233,7 +233,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	n.publish([]bus.Event{event})
 }
 
-func isUpdated(o, n interface{}) bool {
+func isUpdated(o, n any) bool {
 	old, _ := o.(*kubernetes.Node)
 	new, _ := n.(*kubernetes.Node)
 

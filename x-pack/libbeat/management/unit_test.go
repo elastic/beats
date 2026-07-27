@@ -191,7 +191,7 @@ func (u *mockClientUnit) Expected() client.Expected {
 	return u.expected
 }
 
-func (u *mockClientUnit) UpdateState(state client.UnitState, msg string, _ map[string]interface{}) error {
+func (u *mockClientUnit) UpdateState(state client.UnitState, msg string, _ map[string]any) error {
 	u.reportedState = state
 	u.reportedMsg = msg
 	return nil

@@ -58,8 +58,8 @@ func TestData(t *testing.T) {
 
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":       "system",
 		"metricsets":   []string{"core"},
 		"core.metrics": []string{"percentages", "ticks"},

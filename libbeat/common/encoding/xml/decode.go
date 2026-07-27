@@ -47,13 +47,13 @@ func (d *Decoder) PrependHyphenToAttr() { d.prependHyphenToAttr = true }
 func (d *Decoder) LowercaseKeys() { d.lowercaseKeys = true }
 
 // Decode reads XML from the input stream and return a map containing the data.
-func (d *Decoder) Decode() (map[string]interface{}, error) {
+func (d *Decoder) Decode() (map[string]any, error) {
 	_, m, err := d.decode(nil)
 	return m, err
 }
 
-func (d *Decoder) decode(attrs []xml.Attr) (string, map[string]interface{}, error) {
-	elements := map[string]interface{}{}
+func (d *Decoder) decode(attrs []xml.Attr) (string, map[string]any, error) {
+	elements := map[string]any{}
 	var cdata string
 
 	for {
@@ -73,7 +73,7 @@ func (d *Decoder) decode(attrs []xml.Attr) (string, map[string]interface{}, erro
 			}
 
 			// Combine sub-elements and cdata.
-			var add interface{} = subElements
+			var add any = subElements
 			if len(subElements) == 0 {
 				add = cdata
 			} else if len(cdata) > 0 {
@@ -87,10 +87,10 @@ func (d *Decoder) decode(attrs []xml.Attr) (string, map[string]interface{}, erro
 			switch v := value.(type) {
 			case nil:
 				elements[key] = add
-			case []interface{}:
+			case []any:
 				elements[key] = append(v, add)
 			default:
-				elements[key] = []interface{}{v, add}
+				elements[key] = []any{v, add}
 			}
 		case xml.CharData:
 			cdata = string(bytes.TrimSpace(elem.Copy()))
@@ -101,7 +101,7 @@ func (d *Decoder) decode(attrs []xml.Attr) (string, map[string]interface{}, erro
 	}
 }
 
-func (d *Decoder) addAttributes(attrs []xml.Attr, m map[string]interface{}) {
+func (d *Decoder) addAttributes(attrs []xml.Attr, m map[string]any) {
 	for _, attr := range attrs {
 		key := d.attrKey(attr.Name.Local)
 		m[key] = attr.Value

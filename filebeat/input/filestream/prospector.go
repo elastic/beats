@@ -175,7 +175,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
-	globalStore.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	globalStore.UpdateIdentifiers(func(v loginp.Value) (id string, val any) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -234,7 +234,7 @@ func (p *fileProspector) Init(
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 	} else {
 		p.logger.Debug("trying to migrate file identity to fingerprint")
-		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
+		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, any) {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
 			if err != nil {

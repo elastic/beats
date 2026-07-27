@@ -35,17 +35,17 @@ import (
 func TestConfigsMapping(t *testing.T) {
 	logp.TestingSetup()
 
-	config, _ := conf.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct": "config",
 	})
 
-	configPorts, _ := conf.NewConfigFrom(map[string]interface{}{
+	configPorts, _ := conf.NewConfigFrom(map[string]any{
 		"correct": "config",
 		"hosts":   [1]string{"1.2.3.4:8080"},
 	})
 
 	const envValue = "valuefromenv"
-	configFromEnv, _ := conf.NewConfigFrom(map[string]interface{}{
+	configFromEnv, _ := conf.NewConfigFrom(map[string]any{
 		"correct": envValue,
 	})
 
@@ -171,7 +171,7 @@ func TestConfigsMapping(t *testing.T) {
 func TestConfigsMappingKeystore(t *testing.T) {
 	secret := "mapping_secret"
 	//expected config
-	config, _ := conf.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct":  "config",
 		"password": secret,
 	})
@@ -227,7 +227,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 func TestConfigsMappingKeystoreProvider(t *testing.T) {
 	secret := "mapping_provider_secret"
 	//expected config
-	config, _ := conf.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct":  "config",
 		"password": secret,
 	})

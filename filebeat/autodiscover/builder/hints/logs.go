@@ -165,7 +165,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 		module := l.getModule(hints)
 		if module != "" {
-			moduleConf := map[string]interface{}{
+			moduleConf := map[string]any{
 				"module": module,
 			}
 
@@ -176,8 +176,8 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				case harvester.ContainerType:
 					_ = filesetConf.SetString("stream", -1, cfg.Stream)
 				case harvester.FilestreamType:
-					filestreamContainerParser := map[string]interface{}{
-						"container": map[string]interface{}{
+					filestreamContainerParser := map[string]any{
+						"container": map[string]any{
 							"stream": cfg.Stream,
 							"format": "auto",
 						},
@@ -307,7 +307,7 @@ func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
 	return output
 }
 
-func shouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+func shouldPut(event mapstr.M, field string, value any, logger *logp.Logger) {
 	_, err := event.Put(field, value)
 	if err != nil {
 		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)

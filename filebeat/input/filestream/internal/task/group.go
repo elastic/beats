@@ -39,7 +39,7 @@ type Group struct {
 }
 
 type Logger interface {
-	Errorf(format string, args ...interface{})
+	Errorf(format string, args ...any)
 }
 
 // NewGroup returns a new task group which will run tasks on a goroutine. See
@@ -96,9 +96,7 @@ func (g *Group) Go(fn func(context.Context) error) error {
 		return fmt.Errorf("task group is closed: %w", err)
 	}
 
-	g.wg.Add(1)
-	go func() {
-		defer g.wg.Done()
+	g.wg.Go(func() {
 
 		if g.sem != nil {
 			err := g.sem.Acquire(g.ctx, 1)
@@ -116,7 +114,7 @@ func (g *Group) Go(fn func(context.Context) error) error {
 		if err != nil {
 			g.logErr(err)
 		}
-	}()
+	})
 
 	return nil
 }

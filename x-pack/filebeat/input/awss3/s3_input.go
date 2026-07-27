@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -269,6 +270,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
 
 	isStateValid := in.filterProvider.getApplierFunc()
+	excludePrefix := in.config.backupPrefixToExclude()
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
@@ -306,6 +308,10 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		// Metrics
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
+			if excludePrefix != "" && strings.HasPrefix(*object.Key, excludePrefix) {
+				continue
+			}
+
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
 
 			if in.strategy.ShouldSkipObject(state, isStateValid) {

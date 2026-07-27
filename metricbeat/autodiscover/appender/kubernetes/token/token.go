@@ -93,7 +93,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 		if tok == "" {
 			return
 		}
-		for i := 0; i < len(cfgs); i++ {
+		for i := range cfgs {
 			// Unpack the config
 			cfg := cfgs[i]
 			c := mapstr.M{}

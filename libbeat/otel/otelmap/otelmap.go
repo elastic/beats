@@ -189,7 +189,7 @@ func isFloatWholeNumber(f float64) bool {
 // marshalUnmarshal converts an interface to a mapstr.M by marshalling to JSON
 // then unmarshalling the JSON object into a mapstr.M.
 // Copied from libbeat/common/event.go
-func marshalUnmarshal(in interface{}, out interface{}) error {
+func marshalUnmarshal(in any, out any) error {
 	// Decode and encode as JSON to normalize the types.
 	marshaled, err := json.Marshal(in)
 	if err != nil {

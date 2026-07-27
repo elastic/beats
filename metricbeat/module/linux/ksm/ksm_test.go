@@ -59,8 +59,8 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, testKSM, rawEvent)
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "linux",
 		"metricsets": []string{"ksm"},
 		"hostfs":     "./_meta/testdata",

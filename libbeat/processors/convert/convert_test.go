@@ -288,8 +288,8 @@ func TestConvertRun(t *testing.T) {
 
 type testCase struct {
 	Type dataType
-	In   interface{}
-	Out  interface{}
+	In   any
+	Out  any
 	Err  bool
 }
 

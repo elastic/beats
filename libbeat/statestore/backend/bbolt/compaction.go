@@ -124,9 +124,7 @@ func (s *store) compactTo(path string) error {
 // startRetentionLoop runs a background goroutine that periodically removes
 // expired entries. It stops when ctx is cancelled.
 func (s *store) startRetentionLoop(ctx context.Context) {
-	s.wg.Add(1)
-	go func() {
-		defer s.wg.Done()
+	s.wg.Go(func() {
 
 		ticker := time.NewTicker(s.config.Retention.Interval)
 		defer ticker.Stop()
@@ -142,7 +140,7 @@ func (s *store) startRetentionLoop(ctx context.Context) {
 				return
 			}
 		}
-	}()
+	})
 }
 
 // cleanupExpired removes entries from the store whose timestamp is older

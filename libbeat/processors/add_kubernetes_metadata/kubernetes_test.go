@@ -34,7 +34,7 @@ import (
 
 // Test Annotator is skipped if kubernetes metadata already exist
 func TestAnnotatorSkipped(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -124,25 +124,25 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 	emptyRegister := NewRegister()
 	registerWithDefaults := NewRegister()
 	registerWithDefaults.AddDefaultIndexerConfig("ip_port", *config.NewConfig())
-	registerWithDefaults.AddDefaultMatcherConfig("field_format", *config.MustNewConfigFrom(map[string]interface{}{
+	registerWithDefaults.AddDefaultMatcherConfig("field_format", *config.MustNewConfigFrom(map[string]any{
 		"format": "%{[destination.ip]}:%{[destination.port]}",
 	}))
 
-	configWithIndexersAndMatchers := config.MustNewConfigFrom(map[string]interface{}{
-		"indexers": []map[string]interface{}{
+	configWithIndexersAndMatchers := config.MustNewConfigFrom(map[string]any{
+		"indexers": []map[string]any{
 			{
-				"container": map[string]interface{}{},
+				"container": map[string]any{},
 			},
 		},
-		"matchers": []map[string]interface{}{
+		"matchers": []map[string]any{
 			{
-				"fields": map[string]interface{}{
+				"fields": map[string]any{
 					"lookup_fields": []string{"container.id"},
 				},
 			},
 		},
 	})
-	configOverrideDefaults := config.MustNewConfigFrom(map[string]interface{}{
+	configOverrideDefaults := config.MustNewConfigFrom(map[string]any{
 		"default_indexers.enabled": "false",
 		"default_matchers.enabled": "false",
 	})
@@ -172,14 +172,14 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 		},
 		"default indexers and matchers, don't use indexers": {
 			register: registerWithDefaults,
-			config: config.MustNewConfigFrom(map[string]interface{}{
+			config: config.MustNewConfigFrom(map[string]any{
 				"default_indexers.enabled": "false",
 			}),
 			expectedMatchers: []string{"field_format"},
 		},
 		"default indexers and matchers, don't use matchers": {
 			register: registerWithDefaults,
-			config: config.MustNewConfigFrom(map[string]interface{}{
+			config: config.MustNewConfigFrom(map[string]any{
 				"default_matchers.enabled": "false",
 			}),
 			expectedIndexers: []string{"ip_port"},
@@ -223,7 +223,7 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 func newAnnotatorForTest(t testing.TB, cacheKey string, meta mapstr.M) *kubernetesAnnotator {
 	t.Helper()
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"container.id"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -246,7 +246,7 @@ func setReady(k *kubernetesAnnotator, matchers *Matchers) {
 }
 
 func TestConfigWithKubeadmDoesNotMutateOriginalConfig(t *testing.T) {
-	original := config.MustNewConfigFrom(map[string]interface{}{
+	original := config.MustNewConfigFrom(map[string]any{
 		"enabled":     true,
 		"use_kubeadm": false,
 	})
@@ -401,7 +401,7 @@ func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
 	}
 
 	// Use pod.name as the lookup field since there's no container sub-map.
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"pod.name"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -483,7 +483,7 @@ func TestAnnotatorRunCacheNotMutated(t *testing.T) {
 	processor := newAnnotatorForTest(t, "cache001", originalMeta)
 
 	// Run three times.
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_, err := processor.Run(baseEvent("cache001"))
 		require.NoError(t, err)
 	}
@@ -547,7 +547,7 @@ func TestAnnotatorRunEventIndependence(t *testing.T) {
 }
 
 func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"container.id"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(b, ""))

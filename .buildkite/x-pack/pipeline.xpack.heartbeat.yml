@@ -236,6 +236,41 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2022 Unit Tests"
 
+  - group: "Extended Tests"
+    key: "x-pack-heartbeat-extended-linux-arm-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+
+    steps:
+      - label: ":ubuntu: x-pack/heartbeat: Ubuntu arm64 Unit Tests"
+        key: "extended-arm64-unit-test"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        command: |
+          set -euo pipefail
+          echo "~~~ Installing @elastic/synthetics"
+          npm install -g @elastic/synthetics
+          echo "~~~ Running tests"
+          cd x-pack/heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Ubuntu arm64 Unit Tests"
+
   - group: "Extended Windows Tests"
     key: "x-pack-heartbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/

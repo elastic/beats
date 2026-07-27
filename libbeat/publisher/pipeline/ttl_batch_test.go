@@ -83,7 +83,7 @@ func TestNestedBatchSplit(t *testing.T) {
 
 	require.Len(t, retryer.batches, 4, "two SplitRetry calls should generate four retrys")
 
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		assert.False(t, doneWasCalled, "Original callback shouldn't be invoked until all children are")
 		require.Len(t, retryer.batches[i].events, 1, "Retried batches should have one event each")
 
