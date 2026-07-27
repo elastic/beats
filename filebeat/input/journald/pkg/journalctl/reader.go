@@ -143,9 +143,7 @@ type Reader struct {
 }
 
 // SetStatusReporter sets the status reporter used to report the reader's
-// health. The reader reports Degraded when journalctl repeatedly exits
-// without delivering any data and Running when it recovers.
-// It must be called before the first call to Next.
+// health. It must be called before the first call to Next.
 func (r *Reader) SetStatusReporter(reporter status.StatusReporter) {
 	r.statusReporter = reporter
 }
