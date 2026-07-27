@@ -117,7 +117,9 @@ func (b *messageBuffer) addLine(m reader.Message) {
 	b.last = m.Content
 	b.message.Bytes += m.Bytes
 	b.message.AddFields(m.Fields)
-	b.privates = append(b.privates, m.Private)
+	if m.Private != nil {
+		b.privates = append(b.privates, m.Private)
+	}
 }
 
 // finalize writes the existing content into the returned message and resets all reader variables.

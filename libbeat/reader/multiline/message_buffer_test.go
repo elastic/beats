@@ -73,6 +73,13 @@ func TestMessageBufferPrivate(t *testing.T) {
 		messages []reader.Message
 		expected any
 	}{
+		"preserves nil private value when no source message sets it": {
+			messages: []reader.Message{
+				{Content: []byte("line1"), Bytes: 5},
+				{Content: []byte("line2"), Bytes: 5},
+			},
+			expected: nil,
+		},
 		"preserves private value for one source message": {
 			messages: []reader.Message{
 				{Content: []byte("line1"), Bytes: 5, Private: "cursor-1"},
