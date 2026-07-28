@@ -26,21 +26,11 @@
 
 **Beats**
 
-* Replace COPILOT_GITHUB_TOKEN secret with copilot-requests:write permission in agentic workflow files. [#51293](https://github.com/elastic/beats/pull/51293) 
 * Add slabqueue, a new in-memory publisher queue that shares a single event budget across multiple pipelines while keeping per-pipeline FIFOs isolated. Selectable via queue.slab (~2.5× throughput vs queue.mem in stress tests); used by default in Beat receivers to support multi-receiver intake queue sharing. [#51047](https://github.com/elastic/beats/pull/51047) 
 * Disable periodic metrics logging (`logging.metrics`) by default when a beat runs as an OTel Collector receiver. [#51711](https://github.com/elastic/beats/pull/51711) 
 
 **Filebeat**
 
-* Add entcollect adapter for entity analytics minimal state providers. [#49871](https://github.com/elastic/beats/pull/49871) 
-
-  Add adapter infrastructure to bridge the entcollect library into the
-  entity analytics input. This includes a kvstore transaction-to-store
-  adapter, a document-to-beat.Event publisher closure, a minimal state
-  provider registry, and a generic sync loop with timer, buffering, and
-  ACK-then-commit semantics.
-  
-* Add entcollect store adapter to the Elasticsearch storage OTel extension. [#49871](https://github.com/elastic/beats/pull/49871) 
 * Add otel_file_storage registry backend for standalone Filebeat. [#50130](https://github.com/elastic/beats/pull/50130) 
 
   Remove the experimental `bbolt` registry backend. Add `otel_file_storage` as a new
@@ -146,13 +136,6 @@ opt-out (`growing: false` restores the legacy fingerprint behaviour).
 
 * Add OpenTelemetry Collector receiver for Heartbeat. [#49862](https://github.com/elastic/beats/pull/49862) 
 
-**Libbeat**
-
-* Consolidate Identity Federation authentication into shared libbeat packages. [#50280](https://github.com/elastic/beats/pull/50280) 
-
-  Moves all Identity Federation (Cloud Connectors) credential logic out of x-pack/libbeat/common/aws and into three new shared packages under x-pack/libbeat/common/identityfederation/{aws,gcp,azure}. The aws package exposes AWSConfigRoleChaining, AssumeRoleStep, WebIdentityRoleStep, NewIRSAChain, NewOIDCChain, and FormatExternalID. The gcp package exposes NewTokenSource for AWS-mediated GCP Workload Identity Federation. The azure package exposes NewClientAssertionCredential and ReadJWT. The existing use_cloud_connectors flow in ConfigAWS is updated to delegate to these packages, removing the previously duplicated role-chaining implementation.
-  
-
 **Metricbeat**
 
 * Adds cpu number information to iis module and windows perfmon dataset. [#48637](https://github.com/elastic/beats/pull/48637) 
@@ -165,7 +148,6 @@ opt-out (`growing: false` restores the legacy fingerprint behaviour).
 * Add osquerybeatreceiver to run osquerybeat under the EDOT collector. [#49868](https://github.com/elastic/beats/pull/49868) 
 * Add elastic_ntfs_partitions and elastic_ntfs_volumes tables to the osquery extension. [#50140](https://github.com/elastic/beats/pull/50140) 
 * Add elastic_ntfs_file table to the osquery extension for MFT-based file metadata on Windows. [#50641](https://github.com/elastic/beats/pull/50641) 
-* Harden osquerybeat RRULE scheduler reload, RRULE osqueryd rendering, splay limits, and pack schedule metadata. [#48767](https://github.com/elastic/beats/pull/48767) 
 * Rename osquerybeat query profiling settings to `profiling` and enable profiling by default. [#51691](https://github.com/elastic/beats/pull/51691) 
 
 **Packetbeat**
