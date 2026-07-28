@@ -1000,16 +1000,11 @@ func (g *harvesterRunner) drainAndStop() error {
 			toDrain = append(toDrain, state)
 		}
 	}
-	// Only an actual in-flight drain is worth announcing: if every source already
-	// reached EOF and tore itself down, there is nothing to wait for.
-	hadSources := len(g.states) > 0
 	g.mu.Unlock()
 
-	if hadSources {
-		g.ctx.Logger.Infof(
-			"input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first",
-			g.readUntilEOF.Timeout)
-	}
+	g.ctx.Logger.Debugf(
+		"input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first",
+		g.readUntilEOF.Timeout)
 
 	g.signalWaker() // let the waker observe closed and exit
 	for _, state := range toDrain {
@@ -1032,14 +1027,12 @@ func (g *harvesterRunner) drainAndStop() error {
 	}
 	g.finishRemaining()
 
-	if hadSources {
-		if reachedEOF {
-			g.ctx.Logger.Info("read_until_eof enabled, EOF reached. closing input")
-		} else {
-			g.ctx.Logger.Infof(
-				"read_until_eof enabled, %s timeout reached. closing input",
-				g.readUntilEOF.Timeout)
-		}
+	if reachedEOF {
+		g.ctx.Logger.Debug("read_until_eof enabled, EOF reached. closing input")
+	} else {
+		g.ctx.Logger.Infof(
+			"read_until_eof enabled, %s timeout reached. closing input",
+			g.readUntilEOF.Timeout)
 	}
 	return nil
 }
