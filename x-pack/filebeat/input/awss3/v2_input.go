@@ -271,6 +271,7 @@ func (in *inputV2) runPolling(ctx context.Context, log *logp.Logger, st status.S
 		Status:          st,
 		BucketARN:       in.config.getBucketARN(),
 		ListPrefix:      in.config.BucketListPrefix,
+		ExcludePrefix:   in.config.backupPrefixToExclude(),
 		ListInterval:    in.config.BucketListInterval,
 		NumWorkers:      in.config.NumberOfWorkers,
 		Region:          awsCfg.Region,

@@ -362,13 +362,13 @@ func filterEndLogShowLogline(buf []byte) string {
 func filterLogCmdLine(buf []byte, cmd, cmdPrefix string) string {
 	scanner := bufio.NewScanner(bytes.NewBuffer(buf))
 	for scanner.Scan() {
-		text := scanner.Text()
-		parts := strings.Split(text, "\t")
-		if len(parts) != 4 {
+		// The message is the last field; the local logger prepends caller info.
+		parts := strings.Split(scanner.Text(), "\t")
+		if len(parts) < 4 {
 			continue
 		}
 
-		trimmed := strings.TrimPrefix(parts[3], cmdPrefix)
+		trimmed := strings.TrimPrefix(parts[len(parts)-1], cmdPrefix)
 		if strings.HasPrefix(trimmed, cmd) {
 			return trimmed
 		}
