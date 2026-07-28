@@ -13,7 +13,7 @@ import (
 )
 
 func TestHistogramAssemblyConfigDefaults(t *testing.T) {
-	cfg := config{UseTypes: true}
+	cfg := config{UseTypes: true, UseHistogramAssembler: true}
 	require.NoError(t, cfg.Validate())
 	assert.Equal(t, 5*time.Second, cfg.HistogramAssembly.QuietPeriod)
 	assert.Equal(t, 30*time.Second, cfg.HistogramAssembly.HardTimeout)
@@ -25,7 +25,8 @@ func TestHistogramAssemblyConfigDefaults(t *testing.T) {
 func TestHistogramAssemblyConfigValidation(t *testing.T) {
 	t.Run("quiet greater than hard", func(t *testing.T) {
 		cfg := config{
-			UseTypes: true,
+			UseTypes:              true,
+			UseHistogramAssembler: true,
 			HistogramAssembly: HistogramAssembly{
 				QuietPeriod:  31 * time.Second,
 				HardTimeout:  30 * time.Second,
@@ -39,7 +40,8 @@ func TestHistogramAssemblyConfigValidation(t *testing.T) {
 
 	t.Run("non-positive quiet", func(t *testing.T) {
 		cfg := config{
-			UseTypes: true,
+			UseTypes:              true,
+			UseHistogramAssembler: true,
 			HistogramAssembly: HistogramAssembly{
 				QuietPeriod:  -1 * time.Second,
 				HardTimeout:  30 * time.Second,
@@ -54,4 +56,21 @@ func TestHistogramAssemblyConfigValidation(t *testing.T) {
 func TestHistogramAssemblySkippedWhenUseTypesFalse(t *testing.T) {
 	cfg := config{UseTypes: false, HistogramAssembly: HistogramAssembly{QuietPeriod: -1}}
 	require.NoError(t, cfg.Validate(), "histogram assembly validation applies only when use_types is enabled")
+}
+
+func TestHistogramAssemblySkippedWhenAssemblerDisabled(t *testing.T) {
+	cfg := config{
+		UseTypes:              true,
+		UseHistogramAssembler: false,
+		HistogramAssembly:     HistogramAssembly{QuietPeriod: -1},
+	}
+	require.NoError(t, cfg.Validate(), "histogram assembly validation applies only when the assembler is enabled")
+}
+
+func TestHistogramAssemblerRequiresUseTypes(t *testing.T) {
+	cfg := config{UseHistogramAssembler: true}
+	err := cfg.Validate()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "use_histogram_assembler")
+	assert.Contains(t, err.Error(), "use_types")
 }

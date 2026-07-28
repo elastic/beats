@@ -14,6 +14,7 @@ import (
 type config struct {
 	MetricsCount           bool              `config:"metrics_count"`
 	UseTypes               bool              `config:"use_types"`
+	UseHistogramAssembler  bool              `config:"use_histogram_assembler"`
 	RateCounters           bool              `config:"rate_counters"`
 	TypesPatterns          TypesPatterns     `config:"types_patterns" yaml:"types_patterns,omitempty"`
 	HistogramAssembly      HistogramAssembly `config:"histogram_assembly"`
@@ -22,7 +23,7 @@ type config struct {
 	MaxDecodedBodyBytes    int64             `config:"max_decoded_body_bytes"`
 }
 
-// HistogramAssembly configures cross-request histogram bucket assembly when use_types is enabled.
+// HistogramAssembly configures cross-request histogram bucket assembly when use_histogram_assembler is enabled.
 type HistogramAssembly struct {
 	QuietPeriod          time.Duration `config:"quiet_period"`
 	HardTimeout          time.Duration `config:"hard_timeout"`
@@ -49,6 +50,9 @@ func (c *config) Validate() error {
 	if c.RateCounters && !c.UseTypes {
 		return errors.New("'rate_counters' can only be enabled when `use_types` is also enabled")
 	}
+	if c.UseHistogramAssembler && !c.UseTypes {
+		return errors.New("'use_histogram_assembler' can only be enabled when `use_types` is also enabled")
+	}
 	duration, err := time.ParseDuration(c.Period.String())
 	{
 		if err != nil {
@@ -58,7 +62,7 @@ func (c *config) Validate() error {
 			c.Period = time.Second * 60
 		}
 	}
-	if c.UseTypes {
+	if c.UseHistogramAssembler {
 		if err := c.HistogramAssembly.validateAndApplyDefaults(); err != nil {
 			return err
 		}

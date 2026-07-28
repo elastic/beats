@@ -46,7 +46,7 @@ func newFactoryBaseMetricSet(t *testing.T, overrides map[string]interface{}) mb.
 }
 
 func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *testing.T) {
-	base := newFactoryBaseMetricSet(t, nil)
+	base := newFactoryBaseMetricSet(t, map[string]interface{}{"use_histogram_assembler": true})
 	gen, err := remoteWriteEventsGeneratorFactory(base)
 	require.NoError(t, err, "factory must validate and apply histogram_assembly defaults after unpack")
 
@@ -67,8 +67,9 @@ func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *te
 
 func TestRemoteWriteEventsGeneratorFactoryRejectsInvalidHistogramAssembly(t *testing.T) {
 	mod := mbtest.NewTestModule(t, map[string]interface{}{
-		"use_types": true,
-		"period":    "60s",
+		"use_types":               true,
+		"use_histogram_assembler": true,
+		"period":                  "60s",
 		"histogram_assembly": map[string]interface{}{
 			"quiet_period": "31s",
 			"hard_timeout": "30s",
@@ -92,4 +93,27 @@ func TestRemoteWriteEventsGeneratorFactoryUseTypesFalseSkipsHistogramValidation(
 	require.False(t, ok, "use_types=false must not construct typed generator")
 	_, ok = gen.(*rw.RemoteWriteEventGenerator)
 	require.True(t, ok, "use_types=false must use OSS generator")
+}
+
+func TestRemoteWriteEventsGeneratorFactoryDefaultsToLegacyHistogramConversion(t *testing.T) {
+	base := newFactoryBaseMetricSet(t, nil)
+	gen, err := remoteWriteEventsGeneratorFactory(base)
+	require.NoError(t, err)
+
+	typed, ok := gen.(*remoteWriteTypedGenerator)
+	require.True(t, ok, "use_types=true must construct the typed generator")
+	assert.Nil(t, typed.assembler, "histogram assembler must be disabled by default")
+	assert.Zero(t, typed.NextFlushInterval(), "disabled assembler must not start the owner-loop flush ticker")
+
+	timestamp := model.TimeFromUnix(100)
+	events := typed.GenerateEvents(model.Samples{
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "0.25"}, 10, timestamp),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "0.50"}, 20, timestamp),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "+Inf"}, 30, timestamp),
+	})
+
+	require.Len(t, events, 1, "legacy conversion must emit a complete histogram in the request")
+	for _, event := range events {
+		assert.Contains(t, event.ModuleFields, "http_request_duration_seconds", "legacy conversion must emit the histogram immediately")
+	}
 }

@@ -242,3 +242,15 @@ func TestRemoteWriteFactoryUseTypesFalseDoesNotRegisterHistogramAssemblerMonitor
 		assert.NotContains(t, key, "histogram_assembler.", "use_types=false must not register histogram assembler metrics")
 	}
 }
+
+func TestRemoteWriteFactoryAssemblerDisabledDoesNotRegisterHistogramAssemblerMonitoring(t *testing.T) {
+	base := newFactoryBaseMetricSet(t, nil)
+	gen, err := remoteWriteEventsGeneratorFactory(base)
+	require.NoError(t, err)
+	require.IsType(t, &remoteWriteTypedGenerator{}, gen)
+
+	snap := monitoring.CollectFlatSnapshot(base.Metrics(), monitoring.Full, false)
+	for key := range snap.Ints {
+		assert.NotContains(t, key, "histogram_assembler.", "disabled assembler must not register histogram assembler metrics")
+	}
+}

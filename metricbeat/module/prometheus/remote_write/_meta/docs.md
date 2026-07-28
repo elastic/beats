@@ -103,7 +103,7 @@ metricbeat.modules:
 
 Note that by default prometheus pushes data with the interval of 60s (in remote write). In case that prometheus push rate is changed, the `period` parameter needs to be configured accordingly.
 
-When `use_types` is enabled, histogram buckets can arrive in separate remote write requests. Metricbeat buffers buckets that have the same metric name, labels (excluding `le`), and sample timestamp, and then publishes them as one Elasticsearch histogram. The `histogram_assembly` settings control this buffering:
+When both `use_types` and `use_histogram_assembler` are enabled, Metricbeat buffers histogram buckets that arrive in separate remote write requests. Buckets with the same metric name, labels (excluding `le`), and sample timestamp are published as one Elasticsearch histogram. `use_histogram_assembler` defaults to `false`; when disabled, Metricbeat converts histogram buckets independently within each remote write request. The `histogram_assembly` settings control cross-request buffering:
 
 ```yaml
 metricbeat.modules:
@@ -112,6 +112,7 @@ metricbeat.modules:
   host: "localhost"
   port: "9201"
   use_types: true
+  use_histogram_assembler: true
   histogram_assembly:
     quiet_period: 5s
     hard_timeout: 30s

@@ -14,54 +14,11 @@ data:
       # Reload module configs as they change:
       reload.enabled: false
 
-    metricbeat.autodiscover:
-      providers:
-        - type: kubernetes
-          scope: cluster
-          node: ${NODE_NAME}
-          unique: true
-          templates:
-            - config:
-                - module: kubernetes
-                  hosts: ["kube-state-metrics:8080"]
-                  period: 10s
-                  add_metadata: true
-                  # use_kubeadm: true
-                  metricsets:
-                    - state_node
-                    - state_deployment
-                    - state_daemonset
-                    - state_replicaset
-                    - state_pod
-                    - state_container
-                    - state_job
-                    - state_cronjob
-                    - state_resourcequota
-                    - state_statefulset
-                    - state_service
-                    - state_persistentvolume
-                    - state_persistentvolumeclaim
-                    - state_storageclass
-                    - state_namespace
-                - module: kubernetes
-                  metricsets:
-                    - apiserver
-                  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
-                  # use_kubeadm: true
-                  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-                  ssl.certificate_authorities:
-                    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-                  period: 30s
-                # Uncomment this to get k8s events:
-                - module: kubernetes
-                  metricsets:
-                   - event
-                  # use_kubeadm: true
-        # To enable hints based autodiscover uncomment this:
-        #- type: kubernetes
-        #  node: ${NODE_NAME}
-        #  hints.enabled: true
-
+    http.enabled: true
+    http.host: 0.0.0.0
+    http.port: 5066
+    http.pprof.enabled: true 
+    
     processors:
       - add_cloud_metadata:
 
@@ -70,6 +27,7 @@ data:
 
     output.elasticsearch:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      ssl.verification_mode: none
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
 ---
@@ -107,32 +65,20 @@ data:
       processors:
       - drop_event.when.regexp:
           system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)'
-  kubernetes.yml: |-
-    - module: kubernetes
-      metricsets:
-        - node
-        - system
-        - pod
-        - container
-        - volume
-      period: 10s
-      host: ${NODE_NAME}
-      # use_kubeadm: true
-      hosts: ["https://${NODE_NAME}:10250"]
-      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-      ssl.verification_mode: "none"
-      # If there is a CA bundle that contains the issuer of the certificate used in the Kubelet API,
-      # remove ssl.verification_mode entry and use the CA, for instance:
-      #ssl.certificate_authorities:
-        #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-    # Currently `proxy` metricset is not supported on Openshift, comment out section
-    - module: kubernetes
-      metricsets:
-        - proxy
-      period: 10s
-      # use_kubeadm: true
-      host: ${NODE_NAME}
-      hosts: ["localhost:10249"]
+
+  prometheus.yml: |-
+    - module: prometheus
+      metricsets: ["remote_write"]
+      host: "0.0.0.0"
+      port: "9201"
+      use_types: true
+      use_histogram_assembler: true
+      histogram_assembly:
+        quiet_period: 5s
+        hard_timeout: 30s
+        max_pending_histograms: 10000
+        max_pending_buckets: 100000
+        tombstone_ttl: 30s
 ---
 # Deploy a Metricbeat instance per node for node metrics retrieval
 apiVersion: apps/v1
@@ -150,6 +96,7 @@ spec:
     metadata:
       labels:
         k8s-app: metricbeat
+        app: elastic-agent
     spec:
       serviceAccountName: metricbeat
       terminationGracePeriodSeconds: 30
@@ -157,7 +104,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: metricbeat
-          image: docker.elastic.co/beats/metricbeat:8.16.0-SNAPSHOT
+          image: docker.elastic.co/beats/metricbeat:9.3.2
+          ports:
+            - name: remote-write
+              containerPort: 9201
+              protocol: TCP
           command: [ "sleep" ]
           args: [ "infinity" ]
           env:
@@ -183,10 +134,10 @@ spec:
             #privileged: true
           resources:
             limits:
-              memory: 200Mi
+              memory: 4Gi
             requests:
               cpu: 100m
-              memory: 100Mi
+              memory: 1Gi
           volumeMounts:
             - name: config
               mountPath: /etc/metricbeat.yml

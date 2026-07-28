@@ -28,6 +28,13 @@ const (
 	otherType     = "other_type"
 )
 
+type histogram struct {
+	timestamp  time.Time
+	buckets    []*p.Bucket
+	labels     mapstr.M
+	metricName string
+}
+
 func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, opts ...rw.RemoteWriteEventsGeneratorOption) (rw.RemoteWriteEventsGenerator, error) {
 	config, err := loadRemoteWriteModuleConfig(base.Module())
 	if err != nil {
@@ -41,19 +48,21 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, opts ...rw.RemoteW
 		counters := collector.NewCounterCache(config.Period * 5)
 
 		g := &remoteWriteTypedGenerator{
-			counterCache:    counters,
-			rateCounters:    config.RateCounters,
-			metricsCount:    config.MetricsCount,
-			logger:          base.Logger(),
-			assemblyConfig:  config.HistogramAssembly.assemblyConfig(),
-			now:             time.Now,
-			retainedFlushes: make(map[string]mb.Event),
-			histogramMon:    registerHistogramAssemblerMonitoring(base.Metrics()),
+			counterCache: counters,
+			rateCounters: config.RateCounters,
+			metricsCount: config.MetricsCount,
+			logger:       base.Logger(),
+			now:          time.Now,
 		}
 		if g.logger == nil {
 			g.logger = logp.NewNopLogger()
 		}
-		g.assembler = newHistogramAssembler(g.assemblyConfig, g.histogramMon)
+		if config.UseHistogramAssembler {
+			g.assemblyConfig = config.HistogramAssembly.assemblyConfig()
+			g.retainedFlushes = make(map[string]mb.Event)
+			g.histogramMon = registerHistogramAssemblerMonitoring(base.Metrics())
+			g.assembler = newHistogramAssembler(g.assemblyConfig, g.histogramMon)
+		}
 
 		var err error
 		g.counterPatterns, err = p.CompilePatternList(config.TypesPatterns.CounterPatterns)
@@ -132,6 +141,9 @@ func (g *remoteWriteTypedGenerator) Stop() {
 }
 
 func (g *remoteWriteTypedGenerator) NextFlushInterval() time.Duration {
+	if g.assembler == nil {
+		return 0
+	}
 	min := g.assemblyConfig.QuietPeriod
 	if g.assemblyConfig.HardTimeout < min {
 		min = g.assemblyConfig.HardTimeout
@@ -144,6 +156,9 @@ func (g *remoteWriteTypedGenerator) NextFlushInterval() time.Duration {
 }
 
 func (g *remoteWriteTypedGenerator) RetainUnpublishedFlushEvents(events map[string]mb.Event) {
+	if g.assembler == nil {
+		return
+	}
 	if len(events) == 0 {
 		g.retainedFlushes = make(map[string]mb.Event)
 		g.retainedCapacity = flushEventCapacity{}
@@ -175,6 +190,9 @@ func (g *remoteWriteTypedGenerator) RetainUnpublishedFlushEvents(events map[stri
 }
 
 func (g *remoteWriteTypedGenerator) CheckCapacity(metrics model.Samples) error {
+	if g.assembler == nil {
+		return nil
+	}
 	batch := g.classifyBucketSamples(metrics)
 	impact := g.assembler.capacityImpact(g.now(), batch)
 	if g.assembler.wouldExceedCapacity(impact, g.retainedCapacity) {
@@ -187,6 +205,9 @@ func (g *remoteWriteTypedGenerator) CheckCapacity(metrics model.Samples) error {
 }
 
 func (g *remoteWriteTypedGenerator) FlushExpired(now time.Time) map[string]mb.Event {
+	if g.assembler == nil {
+		return nil
+	}
 	events := g.assembler.flushExpired(now, g.counterCache, g.metricsCount)
 	for k, v := range g.retainedFlushes {
 		events[k] = v
@@ -211,8 +232,8 @@ func (g *remoteWriteTypedGenerator) FlushExpired(now time.Time) map[string]mb.Ev
 // logical scrape count across immediate and flush paths.
 func (g *remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	var data mapstr.M
+	histograms := map[string]histogram{}
 	eventList := map[string]mb.Event{}
-	now := g.now()
 
 	for _, metric := range metrics {
 		if metric == nil {
@@ -239,15 +260,28 @@ func (g *remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[st
 			if !ok {
 				continue
 			}
-			g.assembler.ingest(now, bucketSample{
-				bucketMetricName: name,
-				labels:           labelsClone,
-				timestamp:        ts,
-				buckets: []bucketUpdate{{
-					upperBound:      upperBound,
-					cumulativeCount: val,
-				}},
-			})
+			if g.assembler != nil {
+				g.assembler.ingest(g.now(), bucketSample{
+					bucketMetricName: name,
+					labels:           labelsClone,
+					timestamp:        ts,
+					buckets: []bucketUpdate{{
+						upperBound:      upperBound,
+						cumulativeCount: val,
+					}},
+				})
+			} else {
+				histKey := name + labelsClone.String()
+				hist := histograms[histKey]
+				hist.buckets = append(hist.buckets, &p.Bucket{
+					CumulativeCount: &val,
+					UpperBound:      &upperBound,
+				})
+				hist.timestamp = ts
+				hist.labels = labelsClone
+				hist.metricName = name
+				histograms[histKey] = hist
+			}
 			continue
 		}
 
@@ -280,6 +314,10 @@ func (g *remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[st
 		}
 
 		e.ModuleFields.Update(data)
+	}
+
+	if g.assembler == nil {
+		g.processPromHistograms(eventList, histograms)
 	}
 
 	if g.metricsCount {
@@ -355,6 +393,31 @@ func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels mapst
 	}
 
 	return d
+}
+
+// processPromHistograms converts request-scoped Prometheus histograms to Elasticsearch histograms.
+func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]mb.Event, histograms map[string]histogram) {
+	for _, histogram := range histograms {
+		labelsHash := histogram.labels.String() + histogram.timestamp.String()
+		if _, ok := eventList[labelsHash]; !ok {
+			eventList[labelsHash] = mb.Event{
+				ModuleFields: mapstr.M{},
+				Timestamp:    histogram.timestamp,
+			}
+			if len(histogram.labels) > 0 {
+				eventList[labelsHash].ModuleFields["labels"] = histogram.labels
+			}
+		}
+
+		e := eventList[labelsHash]
+		hist := p.Histogram{Bucket: histogram.buckets}
+		name := strings.TrimSuffix(histogram.metricName, "_bucket")
+		e.ModuleFields.Update(mapstr.M{
+			name: mapstr.M{
+				"histogram": collector.PromHistogramToES(g.counterCache, histogram.metricName, histogram.labels, &hist),
+			},
+		})
+	}
 }
 
 // findMetricType evaluates the type of the metric by check the metricname format in order to handle it properly

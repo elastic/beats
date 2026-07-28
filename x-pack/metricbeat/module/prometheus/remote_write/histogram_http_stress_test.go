@@ -48,10 +48,11 @@ func TestHTTPConcurrentRemoteWriteCapacityStress(t *testing.T) {
 	)
 
 	cfg := map[string]interface{}{
-		"module":     "prometheus",
-		"metricsets": []string{"remote_write"},
-		"use_types":  true,
-		"period":     "60s",
+		"module":                  "prometheus",
+		"metricsets":              []string{"remote_write"},
+		"use_types":               true,
+		"use_histogram_assembler": true,
+		"period":                  "60s",
 		"histogram_assembly": map[string]interface{}{
 			"quiet_period":           "500ms",
 			"hard_timeout":           "5s",
