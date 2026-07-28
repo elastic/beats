@@ -26,8 +26,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"go.uber.org/zap"
-
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -90,8 +88,7 @@ func (inp *filestream) OpenSession(
 		return nil, fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.WithLazy(
-		zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
+	log := ctx.Logger
 	st := initState(log, cursor, fs)
 
 	s := &harvestSession{
