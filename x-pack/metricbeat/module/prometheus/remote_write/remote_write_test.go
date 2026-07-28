@@ -1119,6 +1119,94 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	assert.EqualValues(t, e.ModuleFields, expected2)
 }
 
+// TestGenerateEventsHistogramPartialAcrossRequests documents that each GenerateEvents
+// call emits a histogram built only from buckets in that batch, even when labels and
+// timestamp match a prior call.
+func TestGenerateEventsHistogramPartialAcrossRequests(t *testing.T) {
+	counters := xcollector.NewCounterCache(1 * time.Second)
+	g := remoteWriteTypedGenerator{
+		counterCache: counters,
+		rateCounters: true,
+	}
+	g.counterCache.Start()
+
+	timestamp := model.Time(424242)
+	labels := mapstr.M{
+		"runtime": model.LabelValue("linux"),
+	}
+	eventKey := labels.String() + timestamp.Time().String()
+
+	firstBatch := model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime":  "linux",
+				"le":       "0.25",
+			},
+			Value:     model.SampleValue(10),
+			Timestamp: timestamp,
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime":  "linux",
+				"le":       "0.50",
+			},
+			Value:     model.SampleValue(20),
+			Timestamp: timestamp,
+		},
+	}
+
+	secondBatch := model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime":  "linux",
+				"le":       "+Inf",
+			},
+			Value:     model.SampleValue(30),
+			Timestamp: timestamp,
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_sum",
+				"runtime":  "linux",
+			},
+			Value:     model.SampleValue(45),
+			Timestamp: timestamp,
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_count",
+				"runtime":  "linux",
+			},
+			Value:     model.SampleValue(46),
+			Timestamp: timestamp,
+		},
+	}
+
+	firstEvents := g.GenerateEvents(firstBatch)
+	secondEvents := g.GenerateEvents(secondBatch)
+
+	assert.Len(t, firstEvents, 1, "first batch should produce one event for the histogram labels/timestamp")
+	assert.Len(t, secondEvents, 1, "second batch should produce one event for the same labels/timestamp")
+	assert.Contains(t, firstEvents, eventKey, "first batch event key must match labels and timestamp")
+	assert.Contains(t, secondEvents, eventKey, "second batch event key must match labels and timestamp")
+
+	firstHist := firstEvents[eventKey].ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
+	secondHist := secondEvents[eventKey].ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
+
+	fullExpected := mapstr.M{
+		"values": []float64{0.125, 0.375, 0.5},
+		"counts": []uint64{0, 0, 0},
+	}
+	assert.NotEqual(t, fullExpected, firstHist, "first batch alone must not emit a complete histogram")
+	assert.NotEqual(t, fullExpected, secondHist, "second batch alone must not emit a complete histogram")
+
+	assert.Equal(t, []float64{0.125, 0.375}, firstHist["values"], "first batch histogram is missing the +Inf bucket")
+	assert.Equal(t, []float64{0.0}, secondHist["values"], "second batch histogram only contains the +Inf bucket")
+}
+
 // TestGenerateEventsCounterWithDefinedPattern tests counter with defined pattern
 func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 
