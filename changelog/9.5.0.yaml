@@ -1,18 +1,5 @@
 version: 9.5.0
 entries:
-    - kind: enhancement
-      summary: Replace COPILOT_GITHUB_TOKEN secret with copilot-requests:write permission in agentic workflow files
-      description: ""
-      component: beats
-      pr:
-        - https://github.com/elastic/beats/pull/51293
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1750077000
-      file:
-        name: 1750077000-copilot-requests-write-permission.yaml
-        checksum: f4afef124f9385c8db7aed9b2ff627e79b541ec0
     - kind: feature
       summary: Adds cpu number information to iis module and windows perfmon dataset
       description: ""
@@ -130,50 +117,6 @@ entries:
       file:
         name: 1775092603-add-osquerybeat-otel-receiver.yaml
         checksum: 5475e6319f34cdba04ef9587d87814e483f9c94f
-    - kind: feature
-      summary: Add entcollect adapter for entity analytics minimal state providers.
-      description: |
-        Add adapter infrastructure to bridge the entcollect library into the
-        entity analytics input. This includes a kvstore transaction-to-store
-        adapter, a document-to-beat.Event publisher closure, a minimal state
-        provider registry, and a generic sync loop with timer, buffering, and
-        ACK-then-commit semantics.
-      component: filebeat
-      pr:
-        - https://github.com/elastic/beats/pull/49871
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1775095457
-      file:
-        name: 1775095457-entity-analytics-entcollect-adapter.yaml
-        checksum: 00bce16e3d05e15f774e62621ccb6a36e5492901
-    - kind: enhancement
-      summary: harden osquerybeat RRULE scheduler reload, RRULE osqueryd rendering, splay limits, and pack schedule metadata
-      description: ""
-      component: osquerybeat
-      pr:
-        - https://github.com/elastic/beats/pull/48767
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1775587200
-      file:
-        name: 1775587200-osquerybeat-schedule-config-hardening.yaml
-        checksum: d83cd0093b48394fcc3a64fade83617ed721be90
-    - kind: feature
-      summary: Add entcollect store adapter to the Elasticsearch storage OTel extension.
-      description: ""
-      component: filebeat
-      pr:
-        - https://github.com/elastic/beats/pull/49871
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1775685154
-      file:
-        name: 1775685154-add-entcollect-store-adapter.yaml
-        checksum: 899126f5cc1412f45bea564c8e7dd5204459644a
     - kind: bug-fix
       summary: Fix add_host_metadata host.geo map sharing across events causing data corruption.
       description: ""
@@ -287,20 +230,6 @@ entries:
       file:
         name: 1776420000-add-otel-file-storage-registry-backend.yaml
         checksum: 8e11dfd126bdf1f00419a595cfafb4139042d3a3
-    - kind: enhancement
-      summary: Consolidate Identity Federation authentication into shared libbeat packages
-      description: |
-        Moves all Identity Federation (Cloud Connectors) credential logic out of x-pack/libbeat/common/aws and into three new shared packages under x-pack/libbeat/common/identityfederation/{aws,gcp,azure}. The aws package exposes AWSConfigRoleChaining, AssumeRoleStep, WebIdentityRoleStep, NewIRSAChain, NewOIDCChain, and FormatExternalID. The gcp package exposes NewTokenSource for AWS-mediated GCP Workload Identity Federation. The azure package exposes NewClientAssertionCredential and ReadJWT. The existing use_cloud_connectors flow in ConfigAWS is updated to delegate to these packages, removing the previously duplicated role-chaining implementation.
-      component: libbeat
-      pr:
-        - https://github.com/elastic/beats/pull/50280
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1776901242
-      file:
-        name: 1776901242-identity-federation-shared-packages.yaml
-        checksum: 06c5091850a1a95eb9462baf08ab72027f11d139
     - kind: feature
       summary: Add Jamf provider support for entity analytics minimal-state mode.
       description: ""
@@ -919,15 +848,3 @@ entries:
       file:
         name: 1784565082-fix-nil-rundone-channel.yaml
         checksum: 0d61daeca4e2c358d252ce4666c7c6de1945fd5b
-    - kind: other
-      summary: Bump npm to 12.0.1 in the Heartbeat synthetics Docker image.
-      description: ""
-      component: heartbeat
-      pr: []
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1784642288
-      file:
-        name: 1784642288-bump-heartbeat-npm-12.0.1.yaml
-        checksum: 91b169245a4cbb9794a0bbb549da7fadc43053c3
