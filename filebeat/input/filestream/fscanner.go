@@ -751,7 +751,7 @@ func (s *fileScanner) matchedEarlier(a string, aIndex int, b string, bIndex int)
 	// sorts before '/' (e.g. Glob visits "d" before "d-x", yet "d-x/a" < "d/z").
 	as := strings.Split(a, string(filepath.Separator))
 	bs := strings.Split(b, string(filepath.Separator))
-	for i := 0; i < len(as) && i < len(bs); i++ {
+	for i := range min(len(as), len(bs)) {
 		if as[i] != bs[i] {
 			return as[i] < bs[i]
 		}

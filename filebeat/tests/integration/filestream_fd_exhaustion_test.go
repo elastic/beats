@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 
@@ -49,13 +50,15 @@ func TestFilestreamFDExhaustionNoReingest(t *testing.T) {
 	filebeatBinary, err := filepath.Abs("../../filebeat.test")
 	require.NoError(t, err, "resolving filebeat test binary path")
 
+	t.Setenv("TEST_FILEBEAT_BIN", filebeatBinary)
+	t.Setenv("TEST_FD_LIMIT", strconv.Itoa(fdLimit))
 	wrapper := filepath.Join(t.TempDir(), "filebeat-low-nofile")
-	wrapperScript := fmt.Sprintf(`#!/usr/bin/env bash
-set -euo pipefail
-ulimit -Sn %[1]d
-ulimit -Hn %[1]d
-exec %[2]q "$@"
-`, fdLimit, filebeatBinary)
+	const wrapperScript = `#!/bin/sh
+set -eu
+ulimit -Sn "$TEST_FD_LIMIT"
+ulimit -Hn "$TEST_FD_LIMIT"
+exec "$TEST_FILEBEAT_BIN" "$@"
+`
 	require.NoError(t, os.WriteFile(wrapper, []byte(wrapperScript), 0o750))
 
 	filebeat := integration.NewBeat(t, "filebeat", wrapper)
