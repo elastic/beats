@@ -66,13 +66,10 @@ func (e ignoredFileError) Unwrap() error {
 }
 
 // isObservationError reports whether err means the scanner could not observe a
-// path this scan, as opposed to the path being genuinely gone. It is true for
-// filesystem syscall failures such as EMFILE/ENFILE (file-descriptor
-// exhaustion), EACCES or EIO, and false for a missing file/dir or a path
-// component that is no longer a directory (real deletion signals), and for
-// logical rejections that carry no syscall error (e.g. "file is a directory",
-// "symlink and they're disabled") — those wrap a plain error, not an
-// *os.PathError.
+// path this scan (a filesystem syscall failure such as EMFILE/ENFILE, EACCES or
+// EIO), as opposed to the path being genuinely gone. It is false for a missing
+// file/dir (os.ErrNotExist/ENOTDIR) and for logical rejections that carry no
+// *os.PathError (e.g. "file is a directory", "symlinks disabled").
 func isObservationError(err error) bool {
 	if err == nil || errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
 		return false
@@ -135,17 +132,16 @@ type fileScanner struct {
 	// Only fileWatcher.watch advances it, so prospector enumeration can't wrongly suppress it.
 	completedFingerprints map[string]struct{}
 
-	// walkGroups and literals are derived from paths once (buildWalkGroups) and
-	// drive GetFiles: walkGroups are glob patterns grouped by the base directory
-	// to walk, literals are paths without any glob metacharacter.
+	// walkGroups are glob patterns grouped by the base directory to walk;
+	// literals are paths without any glob metacharacter. Set once by
+	// buildWalkGroups.
 	walkGroups map[string]*walkGroup
 	literals   []string
 
-	// pathIndex maps each pattern in paths to its position, and pathsCanOverlap
-	// records whether any two patterns can match the same file. Together they let
-	// GetFiles resolve a duplicate-identity collision from the scan-order index the
-	// walk already knows, instead of rescanning paths on every collision (see
-	// matchedEarlier). Both are set once by buildWalkGroups.
+	// pathIndex maps each pattern to its position in paths; pathsCanOverlap records
+	// whether any two patterns can match the same file. Together they let GetFiles
+	// resolve a duplicate-identity collision from the walk's scan-order index
+	// instead of rescanning paths (see matchedEarlier). Set once by buildWalkGroups.
 	pathIndex       map[string]int
 	pathsCanOverlap bool
 
@@ -231,7 +227,7 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 // matchedTarget is a file already accepted for a FileID during a scan: its path
 // and the scan-order index (position in s.paths) of the pattern that matched it.
 // The index lets matchedEarlier resolve a later collision on the same FileID
-// without rescanning s.paths, except when patterns can overlap.
+// without rescanning s.paths (except when patterns can overlap).
 type matchedTarget struct {
 	name  string
 	order int
@@ -290,10 +286,10 @@ type scanState struct {
 	// uniqueFiles holds filenames already processed, used to filter duplicate
 	// matches when multiple globs match the same file.
 	uniqueFiles map[string]struct{}
-	// unobservable collects path prefixes the scan could not read/stat/open due
-	// to a resource or permission error (e.g. file-descriptor exhaustion) rather
-	// than the path being gone. The watcher uses them to postpone delete detection
-	// so a transient failure does not wipe registry state and re-ingest files.
+	// unobservable collects path prefixes the scan could not read/stat/open due to
+	// a resource or permission error rather than the path being gone. The watcher
+	// uses them to postpone delete detection so a transient failure does not wipe
+	// registry state and re-ingest files.
 	unobservable map[string]struct{}
 
 	metrics loginp.FileScanMetrics
@@ -391,10 +387,9 @@ func (st *scanState) process(filename string, orderIndex int) {
 		st.metrics.FilesNoIngestTarget++
 
 		// The same file is reachable via more than one path. Keep the path
-		// the previous implementation would have kept, so the returned
-		// filename is stable across scans and releases; otherwise,
-		//  - the "path" file identity would change and the file could be re-ingested,
-		//  - the fingerprint file identity could choose another file to open.
+		// the previous implementation would have, so the returned filename is
+		// stable across scans; otherwise the "path" identity would change (file
+		// re-ingested) or the fingerprint identity could open another file.
 		if !s.matchedEarlier(filename, orderIndex, known.name, known.order) {
 			s.log.Warnf("%q points to an already known ingest target %q. Skipping", fd.Filename, known.name)
 			return
@@ -438,11 +433,10 @@ type walkGroup struct {
 }
 
 // buildWalkGroups partitions s.paths into literal paths and walk groups keyed by
-// their base directory. Patterns that share a base are walked together so the tree
-// is read only once. Invalid patterns detectable upfront are dropped and reported
-// once here; malformed patterns that escape this check (a bad token behind a
-// literal prefix never reaches the parser when matching "") are reported once per
-// scan by walk.
+// their base directory, so patterns sharing a base read the tree only once.
+// Patterns invalid upfront are dropped and reported here; ones that escape this
+// check (a bad token behind a literal prefix never reaches the parser when
+// matching "") are reported once per scan by walk.
 func (s *fileScanner) buildWalkGroups() {
 	groups := map[string]*walkGroup{}
 	var literals []string
@@ -473,10 +467,9 @@ func (s *fileScanner) buildWalkGroups() {
 	s.walkGroups = groups
 	s.literals = literals
 
-	// Index every pattern by its position in paths, and record whether any two
-	// patterns can match the same file. When none can, the pattern the walk
-	// matched a file against is that file's scan-order position, so a
-	// duplicate-identity collision resolves from stored indices (matchedEarlier)
+	// Index every pattern by its position, and record whether any two patterns can
+	// match the same file. When none can, the walk's matched pattern is the file's
+	// scan-order position, so matchedEarlier resolves collisions from these indices
 	// instead of rescanning paths.
 	s.pathIndex = make(map[string]int, len(s.paths))
 	for i, p := range s.paths {
@@ -493,8 +486,8 @@ func (s *fileScanner) buildWalkGroups() {
 type walkPattern struct {
 	pattern string
 	comps   []string
-	// orderIndex is the pattern's position in s.paths, carried through to
-	// process so a matched file's scan order is known without rescanning s.paths.
+	// orderIndex is the pattern's position in s.paths, carried through to process
+	// so a matched file's scan order is known without rescanning s.paths.
 	orderIndex int
 }
 
@@ -503,11 +496,9 @@ type walkPattern struct {
 // the next component of some pattern. Pattern depth bounds the recursion, which
 // preserves the RecursiveGlobDepth cap and makes symlink cycles safe.
 func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderIndex int), recordUnobservable func(prefix string)) {
-	// Flatten the group's patterns in ascending depth order rather than map order,
-	// so per-scan malformed-pattern logging and matchLeaf's first-match break are
-	// deterministic instead of dependent on Go's map iteration. orderIndex carries
-	// each pattern's position in s.paths through to process, so a matched file's
-	// scan order is known without rescanning s.paths.
+	// Flatten the group's patterns in ascending depth order, not map order, so
+	// malformed-pattern logging and matchLeaf's first-match break are deterministic
+	// rather than dependent on Go's map iteration.
 	patterns := make([]walkPattern, 0, len(g.byDepth))
 	for d := 0; d <= g.maxDepth; d++ {
 		for _, p := range g.byDepth[d] {
@@ -544,22 +535,15 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 		}
 
 		onReadError := func(err error) {
-			// Skip unreadable directories instead of aborting the whole scan, as
-			// filepath.Glob did. But if the reason is an observation failure
-			// (e.g. EMFILE) rather than the directory being gone, record the
-			// subtree as unobservable so the watcher postpones deleting the files
-			// under it — otherwise fd exhaustion would wipe their state and
-			// re-ingest them once fds free up.
 			if isObservationError(err) {
 				recordUnobservable(dir)
 			}
 			s.log.Debugf("cannot read directory %q: %s", dir, err)
 		}
 
-		// matchLeaf matches one entry name against the exact patterns. Every
-		// ancestor component was already matched on the way down, so only the last
-		// component is checked here, and the full path is built (once) only when a
-		// match is emitted.
+		// matchLeaf matches one entry name against the exact patterns. Ancestor
+		// components were already matched on the way down, so only the last is
+		// checked here, and the full path is built only on a match.
 		matchLeaf := func(name string) {
 			for _, p := range exact {
 				matched, matchErr := filepath.Match(p.comps[childDepth-1], name)
@@ -574,9 +558,8 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 		}
 
-		// With nothing deeper to descend into, entry types are irrelevant, so read
-		// only the names rather than os.ReadDir, which would allocate an
-		// os.DirEntry per entry.
+		// With nothing deeper to descend into, entry types are irrelevant: read
+		// only the names, avoiding os.ReadDir's per-entry os.DirEntry allocation.
 		if len(deeper) == 0 {
 			names, err := readDirNames(dir)
 			if err != nil {
@@ -621,17 +604,9 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 			full := filepath.Join(dir, e.Name())
 			if !isDir {
-				// Resolve the symlink to decide whether to descend. A broken
-				// symlink cannot be descended into; if it  matched a pattern it
-				// was already yielded above.
+				// Resolve the symlink to decide whether to descend.
 				info, statErr := os.Stat(full)
 				if statErr != nil {
-					// If we could not stat the target because of an observation
-					// error (EACCES/EIO on the symlink target) we don't know
-					// whether to descend; record the subtree so the watcher
-					// postpones deleting files under it, as with a read error. A
-					// broken symlink (ErrNotExist) is not observable-related and is
-					// skipped.
 					if isObservationError(statErr) {
 						recordUnobservable(full)
 					}
@@ -647,10 +622,9 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 	rec(g.root, 0, patterns)
 }
 
-// readDirNames returns the sorted entry names of dir. It reads names only and
-// so avoids the per-entry os.DirEntry allocation of os.ReadDir; the walker uses
-// it for leaf directories, where entry types are not needed. Names are sorted
-// to keep traversal order stable.
+// readDirNames returns the sorted entry names of dir, reading names only to avoid
+// os.ReadDir's per-entry os.DirEntry allocation. Used for leaf directories, where
+// entry types are not needed. Sorted to keep traversal order stable.
 func readDirNames(dir string) ([]string, error) {
 	f, err := os.Open(dir)
 	if err != nil {
@@ -706,38 +680,29 @@ func patternComponents(root, pattern string) []string {
 	return strings.Split(rel, string(filepath.Separator))
 }
 
-// scanOrderIndex returns the index of the first configured (** expanded) pattern
-// in s.paths that matches filename. This reproduces the order in which the
-// previous filepath.Glob implementation processed matches: it globbed s.paths in
-// order, and s.paths is ordered by configured path, then by ascending recursive
-// depth. Scanning the whole of s.paths (rather than a single group) keeps the
-// result correct even when configured paths overlap.
+// scanOrderIndex returns the index of the first pattern in s.paths that matches
+// filename, reproducing the order filepath.Glob processed matches in (s.paths is
+// ordered by configured path, then ascending recursive depth). Scanning all of
+// s.paths keeps it correct when configured paths overlap.
 func (s *fileScanner) scanOrderIndex(filename string) int {
 	for i, p := range s.paths {
 		if ok, _ := filepath.Match(p, filename); ok {
 			return i
 		}
 	}
-	// Sentinel: rank a non-matching path after every real match (valid indices
-	// are 0..len(s.paths)-1, so len(s.paths) sorts strictly last). Unreachable in
-	// practice — callers only pass paths the walker already matched against a
-	// pattern in s.paths.
-	return len(s.paths)
+
+	return len(s.paths) // unreachable, rank last
 }
 
-// matchedEarlier reports whether path a would have been processed before path b by
-// the previous implementation using filepath.Glob. The path matched by the earlier
-// pattern wins; ties are broken comparing path components, mirroring Glob's
-// per-directory sort. Used only to resolve the rare case where two paths resolve
-// to the same file, so the current implementation does not affect which paths
-// are kept, preserving the behavior.
+// matchedEarlier reports whether path a would have been processed before path b
+// by the previous filepath.Glob implementation. The earlier pattern wins; ties
+// break on path components, mirroring Glob's per-directory sort. Used only to keep
+// the same path when two resolve to the same file, preserving the old behavior.
 //
-// aIndex and bIndex are the scan-order indices the walk already computed for each
-// path (the position in s.paths of the pattern it matched). They are authoritative
-// only when patterns cannot overlap: then each file matches exactly one pattern,
-// so the walk's index is the file's scan order. When patterns can overlap a file
-// may match an earlier pattern than the one the walk used, so the indices are
-// recomputed with scanOrderIndex.
+// aIndex and bIndex are the walk's scan-order indices (each path's matched pattern
+// position in s.paths). They are authoritative only when patterns cannot overlap;
+// when they can, a file may match an earlier pattern than the walk used, so the
+// indices are recomputed with scanOrderIndex.
 func (s *fileScanner) matchedEarlier(a string, aIndex int, b string, bIndex int) bool {
 	if s.pathsCanOverlap {
 		aIndex, bIndex = s.scanOrderIndex(a), s.scanOrderIndex(b)
@@ -745,10 +710,10 @@ func (s *fileScanner) matchedEarlier(a string, aIndex int, b string, bIndex int)
 	if aIndex != bIndex {
 		return aIndex < bIndex
 	}
-	// filepath.Glob sorts names within each directory and concatenates, so its
-	// order is lexicographic on path components, not on full-path bytes: the two
-	// diverge when a sibling name is a byte-prefix of another and the next byte
-	// sorts before '/' (e.g. Glob visits "d" before "d-x", yet "d-x/a" < "d/z").
+	// filepath.Glob sorts names per directory, so its order is lexicographic on
+	// path components, not full-path bytes. The two diverge when a sibling name is
+	// a byte-prefix of another and the next byte sorts before '/' (e.g. Glob visits
+	// "d" before "d-x", yet "d-x/a" < "d/z").
 	as := strings.Split(a, string(filepath.Separator))
 	bs := strings.Split(b, string(filepath.Separator))
 	for i := range min(len(as), len(bs)) {
@@ -759,12 +724,11 @@ func (s *fileScanner) matchedEarlier(a string, aIndex int, b string, bIndex int)
 	return len(as) < len(bs)
 }
 
-// pathsCanOverlap reports whether any two of the given (** expanded) patterns can
-// match the same file. It is conservative: it only rules a pair out when an
-// aligned path component is a differing literal in both patterns (which soundly
-// proves no path matches both), so it never returns false when an overlap is
-// possible. When it returns false, the pattern the walk matched a file against is
-// that file's scan-order position and matchedEarlier can skip scanOrderIndex.
+// pathsCanOverlap reports whether any two patterns can match the same file. It is
+// conservative: it rules a pair out only when an aligned component is a differing
+// literal in both (soundly proving no path matches both), so it never returns
+// false when an overlap is possible. When false, matchedEarlier can trust the
+// walk's index and skip scanOrderIndex.
 func pathsCanOverlap(paths []string) bool {
 	sep := string(filepath.Separator)
 	comps := make([][]string, len(paths))
@@ -773,9 +737,9 @@ func pathsCanOverlap(paths []string) bool {
 	}
 	for i := range len(comps) {
 		for j := i + 1; j < len(comps); j++ {
-			// Different segment counts can never match the same path: a wildcard
-			// does not cross the separator and there is no "**" left after
-			// expansion, so filepath.Match requires equal segment counts.
+			// Different segment counts can never match the same path: wildcards
+			// don't cross the separator and "**" is already expanded, so
+			// filepath.Match requires equal segment counts.
 			if len(comps[i]) != len(comps[j]) {
 				continue
 			}

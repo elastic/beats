@@ -1552,15 +1552,11 @@ scanner:
 	assert.Equal(t, baseline.FilesEmpty, metrics.FilesEmpty.Get(), "files_empty")
 }
 
-// getFilesViaGlob is the verbatim pre-#48686 filepath.Glob based GetFiles. It
-// is the oracle the single-pass walker must match.
-//
-// It deliberately calls the same production getIngestTarget/toFileDescriptor
-// helpers the walker uses, so the parity comparison isolates exactly the changed
-// logic — path enumeration, matching and dedup — and not the per-file ingest-target
-// resolution the two share. A behavior change in those shared helpers moves both
-// sides together and would not be caught here; that is intended, they are covered
-// by their own tests (e.g. TestGetIngestTarget).
+// getFilesViaGlob is the verbatim pre-#48686 filepath.Glob GetFiles: the oracle
+// the single-pass walker must match. It calls the same production
+// getIngestTarget/toFileDescriptor helpers, so the parity comparison isolates the
+// changed logic (enumeration, matching, dedup) and not the shared ingest-target
+// resolution, which has its own tests (e.g. TestGetIngestTarget).
 func getFilesViaGlob(s *fileScanner) map[string]loginp.FileDescriptor {
 	fdByName := map[string]loginp.FileDescriptor{}
 	// used to determine if a symlink resolves in a already known target
@@ -1747,11 +1743,9 @@ func TestScannerWalkMatchesGlob(t *testing.T) {
 			},
 		},
 		{
-			// The same file is reachable at depth 3 (real path) and depth 2
-			// (through the symlink, in a lexically earlier sibling). Both the old
-			// glob and the new walker must keep the shallower path so the "path"
-			// file identity is stable. This case diverges under a naive
-			// depth-first "first wins" dedup.
+			// Same file reachable at depth 3 (real) and depth 2 (via a symlink in a
+			// lexically earlier sibling). Both must keep the shallower path so the
+			// "path" identity is stable; a naive "first wins" dedup diverges here.
 			name: "symlink alias keeps shallowest path",
 			setup: func(t *testing.T, dir string) ([]string, fileScannerConfig) {
 				mkfile(t, filepath.Join(dir, "areal/deep/x.json"))
@@ -1769,11 +1763,9 @@ func TestScannerWalkMatchesGlob(t *testing.T) {
 			},
 		},
 		{
-			// The same file is reachable through two configured globs with
-			// different bases: directly under "a" (depth 1) and through a symlink
-			// under "b" (depth 2). "b" is configured first, so its (deeper) path
-			// must win — matching main's config-path-order tie-break, not a
-			// shallowest-path heuristic.
+			// Same file reachable via two globs with different bases: under "a"
+			// (depth 1) and via a symlink under "b" (depth 2). "b" is configured
+			// first, so its deeper path must win — config-path order, not shallowest.
 			name: "config-path order wins across bases",
 			setup: func(t *testing.T, dir string) ([]string, fileScannerConfig) {
 				mkfile(t, filepath.Join(dir, "a", "x.log"))
@@ -1794,12 +1786,10 @@ func TestScannerWalkMatchesGlob(t *testing.T) {
 			},
 		},
 		{
-			// Two sibling dirs where one name is a byte-prefix of the other and
-			// the next byte sorts before '/' ('-' is 0x2d, '/' is 0x2f): full-path
-			// byte order puts d-x/a.log first, but filepath.Glob sorts per
-			// directory, so main kept d/z.log. The files share a fingerprint, so
-			// they collide on FileID and the tie-break (same pattern, equal scan
-			// order index) decides which path survives.
+			// Sibling dirs where one name is a byte-prefix of the other and the next
+			// byte sorts before '/' ('-' 0x2d < '/' 0x2f): full-path byte order puts
+			// d-x/a.log first, but filepath.Glob's per-directory sort kept d/z.log.
+			// The shared fingerprint collides on FileID, so the tie-break decides.
 			name: "same fingerprint tie-break keeps glob order",
 			setup: func(t *testing.T, dir string) ([]string, fileScannerConfig) {
 				content := []byte(strings.Repeat("same-", 20)) // identical fingerprints
@@ -1820,10 +1810,9 @@ func TestScannerWalkMatchesGlob(t *testing.T) {
 			},
 		},
 		{
-			// filepath.Glob returns any entry whose name matches, including a
-			// symlink resolving to a directory; with symlinks enabled and
-			// fingerprinting off main kept it in the result map. The walker must
-			// yield it too and leave type filtering to getIngestTarget.
+			// filepath.Glob returns any name that matches, including a symlink to a
+			// directory. The walker must yield it too and leave type filtering to
+			// getIngestTarget.
 			name: "symlink to directory at leaf",
 			setup: func(t *testing.T, dir string) ([]string, fileScannerConfig) {
 				mkfile(t, filepath.Join(dir, "f.log"))
@@ -1834,12 +1823,10 @@ func TestScannerWalkMatchesGlob(t *testing.T) {
 					fileScannerConfig{Symlinks: true, Fingerprint: noFingerprint}
 			},
 			extra: func(t *testing.T, dir string, files map[string]loginp.FileDescriptor) {
-				// The walker matching the filepath.Glob oracle is asserted above and
-				// holds on every OS. Whether the symlink-to-directory survives
-				// getIngestTarget is platform specific: it stats the resolved target
-				// and drops it when Size()==0, which a directory reports on Windows
-				// but not on Unix. So on Unix the symlink is kept like a file; on
-				// Windows it is filtered out like the plain directory it points to.
+				// Walker/oracle parity is asserted above on every OS. Whether the
+				// symlink-to-dir survives getIngestTarget is platform specific: it
+				// drops targets with Size()==0, which a directory reports on Windows
+				// but not Unix. So Unix keeps it like a file; Windows filters it out.
 				if runtime.GOOS != "windows" {
 					assert.Contains(t, files, filepath.Join(dir, "linkdir"),
 						"a symlink resolving to a directory is matched like a file by filepath.Glob")
@@ -1849,9 +1836,9 @@ func TestScannerWalkMatchesGlob(t *testing.T) {
 			},
 		},
 		{
-			// A literal component after the first wildcard: only the "app" child
-			// of each first-level dir can match, and the walker must not collect
-			// (nor descend into) sibling subtrees.
+			// Literal component after the first wildcard: only the "app" child of
+			// each first-level dir can match; sibling subtrees must not be collected
+			// nor descended into.
 			name: "literal component after wildcard",
 			setup: func(t *testing.T, dir string) ([]string, fileScannerConfig) {
 				mkfile(t, filepath.Join(dir, "x", "app", "f.log"))

@@ -271,12 +271,8 @@ func (w *fileWatcher) watch(
 		delete(w.prev, path)
 	}
 
-	// Remaining files in the prev map are missing from this scan — either
-	// deleted, renamed, or under a path this scan could not observe. The passes
-	// below run in a deliberate priority order, because a positive rename match
-	// (the file's content was seen at a new path this scan) is stronger evidence
-	// than "the old location was unobservable", which is in turn stronger than
-	// "the file is gone":
+	// Remaining files in the prev map are missing from this scan in a priority
+	// order:
 	//
 	//   1. Exact-FileID rename match — works for every identity including
 	//      static fingerprint. Catches a plain rename where the file's
@@ -381,14 +377,10 @@ func (w *fileWatcher) watch(
 		}
 	}
 
-	// Postpone deletes for entries still unmatched after both rename passes
-	// whose path is under a prefix this scan could not observe (e.g. a directory
-	// that hit EMFILE). We cannot tell whether these files are really gone;
-	// treating them as deleted would wipe their registry state and re-ingest from
-	// offset 0 once the resource frees up. Running this after the rename
-	// passes is what prevents double-ingestion of a file renamed out of a now
-	// unobservable directory: it was already emitted as a rename above, so only
-	// entries that matched no rename reach this point.
+	// Postpone deletes for unmatched entries under a prefix this scan could not
+	// observe (e.g. a directory that hit EMFILE). We cannot tell whether they are
+	// really gone; treating them as deleted would wipe registry state and
+	// re-ingest from offset 0 once the resource frees up.
 	postponed := 0
 	if len(unobservable) > 0 {
 		unobservableSet := make(map[string]struct{}, len(unobservable))
@@ -405,9 +397,8 @@ func (w *fileWatcher) watch(
 		}
 	}
 
-	// Unmatched-leftover deletes: prev files that weren't matched by either
-	// the exact-FileID or the prefix-match rename pass, and are not under an
-	// unobservable prefix, are genuinely gone.
+	// Unmatched-leftover deletes: prev files matched by neither rename pass and
+	// not under an unobservable prefix are genuinely gone.
 	for remainingPath, remainingDesc := range w.prev {
 		srcID := w.getFileIdentity(remainingDesc)
 		select {
@@ -422,8 +413,7 @@ func (w *fileWatcher) watch(
 		w.closedHarvestersMutex.Unlock()
 	}
 
-	// Unmatched-leftover creates: new files left over after both rename
-	// passes are genuinely new.
+	// Unmatched-leftover creates: new files left after both rename passes.
 	for path, fd := range newFilesByName {
 		srcID := w.getFileIdentity(*fd)
 
@@ -540,9 +530,8 @@ func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
 	return w.sourceIdentifier.ID(src)
 }
 
-// underAnyUnobservable reports whether path is equal to, or nested under, any of
-// the given unobservable path prefixes. The comparison is separator-aware so
-// "/a/b" is not considered a prefix of "/a/bc".
+// underAnyUnobservable reports whether path equals, or is nested under, any of
+// the prefixes. Separator-aware, so "/a/b" is not a prefix of "/a/bc".
 func underAnyUnobservable(path string, prefixes map[string]struct{}) bool {
 	if _, ok := prefixes[path]; ok {
 		return true

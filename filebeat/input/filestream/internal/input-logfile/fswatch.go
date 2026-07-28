@@ -253,19 +253,13 @@ type FileScanOptions struct {
 
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
-	// GetFiles returns the list of monitored files.
+	// GetFiles returns the list of monitored files, keyed by path.
 	//
-	// The keys of the map are the paths to the files and the values are the file
-	// descriptors that contain all necessary information about the file.
-	//
-	// The third return value is the list of "unobservable" path prefixes: paths
-	// (a directory covers its whole subtree, a file covers itself) the scan could
-	// not observe this pass because of a resource or permission error such as
-	// file-descriptor exhaustion — as opposed to a path being genuinely gone. It
-	// is nil on a healthy scan. Callers doing deletion detection must not treat a
-	// previously seen path under one of these prefixes as removed, otherwise a
-	// transient failure to read a directory would delete registry state and cause
-	// the files to be re-ingested once the resource frees up.
+	// The third return value is the list of "unobservable" path prefixes (a
+	// directory covers its subtree, a file covers itself) the scan could not
+	// observe because of a resource or permission error, as opposed to being gone.
+	// It is nil on a healthy scan. Deletion detection must not treat a previously
+	// seen path under one of these prefixes as removed.
 	GetFiles(FileScanOptions) (map[string]FileDescriptor, FileScanMetrics, []string)
 }
 

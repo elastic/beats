@@ -246,12 +246,6 @@ func BenchmarkGetFilesManyPatterns(b *testing.B) {
 // first wildcard (base/*/app/*.log) over a tree where most second-level subtrees
 // cannot match. filepath.Glob only opened the literal "app" child; the walker must
 // prune the non-matching siblings instead of reading them to the pattern depth.
-//
-// Like the other benchmarks, the file count scales with BENCH_TREE_FILES. The
-// breadth is fixed (topDirs hosts, each with one matching "app" dir and
-// siblingDirs prunable "other-*" dirs), and the files are spread evenly across
-// every leaf dir, so 1/(1+siblingDirs) of them match and the rest live in
-// subtrees the walker must prune.
 func BenchmarkGetFilesLiteralMidComponent(b *testing.B) {
 	base := filepath.Join(b.TempDir(), "logs")
 	const topDirs, siblingDirs = 20, 5
@@ -289,12 +283,11 @@ func BenchmarkGetFilesLiteralMidComponent(b *testing.B) {
 	}
 }
 
-// BenchmarkGetFilesMixed models a realistic broad configuration: several include
-// globs — two recursive ("**") plus one with a literal component after a wildcard
-// ("hosts/*/app/*.log") — combined with the ~33 exclude_files regexes. It exercises
-// the whole pipeline at once: multiple walk groups, component pruning of the
-// non-"app" subtrees, the "**" descent, exclusion actually dropping some matches,
-// and the per-candidate regex-list cost.
+// BenchmarkGetFilesMixed models a realistic broad configuration: two recursive
+// ("**") include globs plus one with a literal mid-component ("hosts/*/app/*.log"),
+// combined with the ~33 exclude_files regexes. Exercises the whole pipeline at
+// once: multiple walk groups, component pruning, "**" descent, exclusion dropping
+// matches, and the per-candidate regex-list cost.
 func BenchmarkGetFilesMixed(b *testing.B) {
 	root := b.TempDir()
 	total := benchTreeFileCount(b)
@@ -370,15 +363,10 @@ func BenchmarkGetFilesMixed(b *testing.B) {
 // benchmark: small so files stay tiny, large enough to hold a distinct header.
 const collisionFPLen = 64
 
-// buildCollisionTree creates n ".log" files in a single directory three levels
-// below root (so root/**/*.log resolves them via root/*/*/*.log and scanOrderIndex
-// has to skip the shallower expansions). round(n*ratePercent/100) of the files
-// share their fingerprint header with an earlier file, so they collapse to the
-// same FileID; the rest get distinct headers. Colliding files diverge after the
-// shared header, mirroring the growing-fingerprint case where files share a
-// header while small and split apart as they grow. Whether the shared FileID
-// comes from a completed SHA-256 (as here) or a growing raw prefix does not
-// change the collision hot path (matchedEarlier/scanOrderIndex) being measured.
+// buildCollisionTree creates n ".log" files three levels below root (so
+// root/**/*.log resolves them via root/*/*/*.log and scanOrderIndex must skip the
+// shallower expansions). n*ratePercent/100 of them share their fingerprint header
+// with an earlier file, colliding on FileID; the rest get distinct headers.
 func buildCollisionTree(tb testing.TB, root string, n, ratePercent int) {
 	tb.Helper()
 	dir := filepath.Join(root, "a", "b")
@@ -404,11 +392,10 @@ func buildCollisionTree(tb testing.TB, root string, n, ratePercent int) {
 }
 
 // BenchmarkGetFilesIdentityCollision measures GetFiles when many matched files
-// resolve to the same FileID — the case a reviewer flagged for the single-pass
-// scanner: every collision triggers matchedEarlier/scanOrderIndex, which the
-// previous filepath.Glob implementation handled in O(1). Uses a "**" pattern so
-// scanOrderIndex has more than one expansion to test. Counts and collision rates
-// are small on purpose (the concern is per-collision overhead, not tree size).
+// resolve to the same FileID: every collision triggers matchedEarlier/
+// scanOrderIndex, which filepath.Glob handled in O(1). Uses a "**" pattern so
+// scanOrderIndex has more than one expansion to test. Counts and rates are small
+// on purpose — the concern is per-collision overhead, not tree size.
 func BenchmarkGetFilesIdentityCollision(b *testing.B) {
 	for _, n := range []int{100, 500, 1000} {
 		for _, ratePercent := range []int{10, 25, 50} {

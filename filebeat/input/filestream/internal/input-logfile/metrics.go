@@ -90,10 +90,8 @@ type FileScanMetrics struct {
 	FilesNoIngestTarget int64
 	FilesIgnored        int64
 	FilesEmpty          int64
-	// ScanErrors is the number of paths the scan could not observe (e.g. a
-	// directory that could not be read or a file that could not be stat'd/opened
-	// because of file-descriptor exhaustion or permissions). It is not a count of
-	// missing files: a genuinely deleted file does not count.
+	// ScanErrors is the number of paths the scan could not read due to an error
+	// (file-descriptor exhaustion or permissions). Missing/deleted files do not count.
 	ScanErrors int64
 }
 
