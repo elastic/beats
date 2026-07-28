@@ -4,7 +4,7 @@ COLLECTOR_LOG ?= $(TEMP_DIR)/collector.log
 
 # This version is used to build the OpenTelemetry Collector distribution.
 # It should be updated when the OTel Collector version is updated in the beats-otel-collector module.
-OCB_VERSION ?= v0.156.0
+OCB_VERSION ?= v0.157.0
 
 include $(ES_BEATS)/dev-tools/make/mage.mk
 
