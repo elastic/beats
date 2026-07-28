@@ -18,10 +18,14 @@
 package remote_write
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
+	"sync/atomic"
+	"time"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
@@ -59,11 +63,15 @@ type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet, opts ...RemoteW
 type MetricSet struct {
 	mb.BaseMetricSet
 	server                 serverhelper.Server
-	events                 chan mb.Event
+	batches                chan batchSubmission
 	promEventsGen          RemoteWriteEventsGenerator
-	eventGenStarted        bool
 	maxCompressedBodyBytes int64
 	maxDecodedBodyBytes    int64
+
+	intakeMu         sync.RWMutex
+	intakeCtx        context.Context
+	intakeCancel     context.CancelFunc
+	handlersInFlight atomic.Int32
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus remote_write metricset using
@@ -89,9 +97,8 @@ func MetricSetBuilderWithConfig(genFactory RemoteWriteEventsGeneratorFactory, ba
 
 		m := &MetricSet{
 			BaseMetricSet:          base,
-			events:                 make(chan mb.Event),
+			batches:                make(chan batchSubmission),
 			promEventsGen:          promEventsGen,
-			eventGenStarted:        false,
 			maxCompressedBodyBytes: config.MaxCompressedBodyBytes,
 			maxDecodedBodyBytes:    config.MaxDecodedBodyBytes,
 		}
@@ -107,32 +114,99 @@ func MetricSetBuilderWithConfig(genFactory RemoteWriteEventsGeneratorFactory, ba
 }
 
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
-	// Start event watcher
-	_ = m.server.Start()
+	m.promEventsGen.Start()
+	defer m.promEventsGen.Stop()
 
+	registerRunReadySignal(m)
+	defer runReadySignals.Delete(m)
+
+	intakeCtx, intakeCancel := context.WithCancel(context.Background())
+	m.intakeMu.Lock()
+	m.intakeCtx = intakeCtx
+	m.intakeCancel = intakeCancel
+	m.intakeMu.Unlock()
+	signalRunReady(m)
+	defer intakeCancel()
+
+	if shouldStartHTTPServer(m) {
+		_ = m.server.Start()
+	}
+
+	go func() {
+		<-reporter.Done()
+		m.shutdownIntake()
+		if shouldStartHTTPServer(m) {
+			m.server.Stop()
+		}
+	}()
+
+	tickFactory := tickSourceFactoryFor(m)
+	var flushTicker tickSource
+	var flushCh <-chan time.Time
+	if flusher, ok := m.promEventsGen.(RemoteWriteFlushCapable); ok {
+		if interval := flusher.NextFlushInterval(); interval > 0 {
+			flushTicker = tickFactory(interval)
+			flushCh = flushTicker.C()
+		}
+	}
+	if flushTicker != nil {
+		defer flushTicker.Stop()
+	}
+
+	shuttingDown := false
 	for {
+		var tickCh <-chan time.Time
+		if flushCh != nil {
+			tickCh = flushCh
+		}
+
 		select {
 		case <-reporter.Done():
-			m.server.Stop()
-			return
-		case e := <-m.events:
-			reporter.Event(e)
+			if !shuttingDown {
+				shuttingDown = true
+				m.shutdownOwnerLoop(reporter)
+				return
+			}
+		case sub := <-m.batches:
+			m.processBatch(reporter, sub)
+		case now := <-tickCh:
+			if tickCh != nil {
+				m.processFlush(reporter, now)
+			}
 		}
 	}
 }
 
-// Close stops the metricset
+// Close is intentionally a no-op. Generator Start and Stop are wholly owned by Run;
+// Close without Run has nothing to stop, and stopping the generator from Close while Run
+// is active would race with the owner loop.
 func (m *MetricSet) Close() error {
-	if m.eventGenStarted {
-		m.promEventsGen.Stop()
-	}
 	return nil
 }
 
+func writeBatchOutcome(writer http.ResponseWriter, outcome batchOutcome) {
+	if outcome.statusCode == http.StatusAccepted {
+		writer.WriteHeader(outcome.statusCode)
+		return
+	}
+	if outcome.message != "" {
+		http.Error(writer, outcome.message, outcome.statusCode)
+		return
+	}
+	writer.WriteHeader(outcome.statusCode)
+}
+
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
-	if !m.eventGenStarted {
-		m.promEventsGen.Start()
-		m.eventGenStarted = true
+	m.handlersInFlight.Add(1)
+	defer m.handlersInFlight.Add(-1)
+
+	if intakeCtx := m.getIntakeCtx(); intakeCtx != nil {
+		select {
+		case <-intakeCtx.Done():
+			http.Error(writer, "remote write intake stopped", http.StatusServiceUnavailable)
+			return
+		default:
+		}
 	}
 
 	// Limit the size of the compressed request body to prevent resource exhaustion
@@ -179,16 +253,78 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	samples := protoToSamples(&protoReq)
-	events := m.promEventsGen.GenerateEvents(samples)
+	result := make(chan batchOutcome, 1)
+	sub := batchSubmission{
+		samples: samples,
+		ctx:     req.Context(),
+		result:  result,
+	}
 
-	for _, e := range events {
+	submitted := make(chan bool, 1)
+	go func() {
+		sent := false
 		select {
+		case m.batches <- sub:
+			sent = true
+		case <-m.intakeDone():
 		case <-req.Context().Done():
-			return
-		case m.events <- e:
+		}
+		submitted <- sent
+	}()
+
+	select {
+	case sent := <-submitted:
+		if !sent {
+			select {
+			case <-req.Context().Done():
+				return
+			default:
+				http.Error(writer, "remote write intake stopped", http.StatusServiceUnavailable)
+				return
+			}
+		}
+	case <-req.Context().Done():
+		return
+	case <-m.intakeDone():
+		http.Error(writer, "remote write intake stopped", http.StatusServiceUnavailable)
+		return
+	}
+
+	select {
+	case outcome := <-result:
+		writeBatchOutcome(writer, outcome)
+	case <-req.Context().Done():
+		return
+	case <-m.intakeDone():
+		select {
+		case outcome := <-result:
+			writeBatchOutcome(writer, outcome)
+		case <-req.Context().Done():
 		}
 	}
-	writer.WriteHeader(http.StatusAccepted)
+}
+
+func (m *MetricSet) shutdownIntake() {
+	m.intakeMu.Lock()
+	cancel := m.intakeCancel
+	m.intakeMu.Unlock()
+	if cancel != nil {
+		cancel()
+	}
+}
+
+func (m *MetricSet) getIntakeCtx() context.Context {
+	m.intakeMu.RLock()
+	defer m.intakeMu.RUnlock()
+	return m.intakeCtx
+}
+
+func (m *MetricSet) intakeDone() <-chan struct{} {
+	ctx := m.getIntakeCtx()
+	if ctx == nil {
+		return intakeNeverClosed
+	}
+	return ctx.Done()
 }
 
 func protoToSamples(req *prompb.WriteRequest) model.Samples {

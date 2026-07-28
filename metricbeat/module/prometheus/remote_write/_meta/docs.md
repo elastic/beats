@@ -103,6 +103,33 @@ metricbeat.modules:
 
 Note that by default prometheus pushes data with the interval of 60s (in remote write). In case that prometheus push rate is changed, the `period` parameter needs to be configured accordingly.
 
+When `use_types` is enabled, histogram buckets can arrive in separate remote write requests. Metricbeat buffers buckets that have the same metric name, labels (excluding `le`), and sample timestamp, and then publishes them as one Elasticsearch histogram. The `histogram_assembly` settings control this buffering:
+
+```yaml
+metricbeat.modules:
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+  use_types: true
+  histogram_assembly:
+    quiet_period: 5s
+    hard_timeout: 30s
+    max_pending_histograms: 10000
+    max_pending_buckets: 100000
+    tombstone_ttl: 30s
+```
+
+`quiet_period` (default: `5s`) is the time Metricbeat waits without receiving an update after the `+Inf` bucket arrives. When this period expires, Metricbeat publishes the assembled histogram.
+
+`hard_timeout` (default: `30s`) is the maximum time Metricbeat buffers a histogram after receiving its first bucket. When this timeout expires, Metricbeat publishes the available buckets as a partial histogram. This value must be greater than or equal to `quiet_period`.
+
+`max_pending_histograms` (default: `10000`) limits the number of histograms buffered in memory. `max_pending_buckets` (default: `100000`) limits the total number of distinct buffered buckets. If accepting a remote write request would exceed either limit, Metricbeat rejects the request with HTTP status `503 Service Unavailable`, allowing the sender to retry it.
+
+`tombstone_ttl` (default: `30s`) controls how long Metricbeat remembers a histogram after publishing it. Buckets received for that histogram during this period are considered late and are dropped, preventing duplicate histogram events.
+
+Only histogram bucket samples are buffered. Histogram `_sum` and `_count` samples, counters, and gauges are published immediately.
+
 When `use_types` and `rate_counters` are enabled, metrics are stored like this:
 
 ```json

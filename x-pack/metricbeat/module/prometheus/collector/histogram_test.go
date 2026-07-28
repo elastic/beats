@@ -8,6 +8,7 @@
 package collector
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -463,4 +464,135 @@ func TestPromHistogramToES(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPromHistogramToESBucketOrdering(t *testing.T) {
+	metricName := "http_request_duration_seconds_bucket"
+	labels := mapstr.M{"runtime": "linux"}
+
+	makeHistogram := func(buckets []*p.Bucket) p.Histogram {
+		return p.Histogram{
+			SampleCount: proto.Float64(30),
+			SampleSum:   proto.Float64(10),
+			Bucket:      buckets,
+		}
+	}
+
+	bucket025 := &p.Bucket{UpperBound: proto.Float64(0.25), CumulativeCount: proto.Float64(10)}
+	bucket050 := &p.Bucket{UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(20)}
+	bucketInf := &p.Bucket{UpperBound: proto.Float64(math.Inf(1)), CumulativeCount: proto.Float64(30)}
+	bucket050Low := &p.Bucket{UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(5)}
+
+	canonical := makeHistogram([]*p.Bucket{bucket025, bucket050, bucketInf})
+	expected := mapstr.M{
+		"values": []float64{0.125, 0.375, 0.5},
+		"counts": []uint64{0, 0, 0},
+	}
+
+	cases := map[string]p.Histogram{
+		"canonical order": canonical,
+		"shuffled buckets": makeHistogram([]*p.Bucket{
+			bucket050,
+			bucketInf,
+			bucket025,
+		}),
+		"+Inf first": makeHistogram([]*p.Bucket{
+			bucketInf,
+			bucket025,
+			bucket050,
+		}),
+		"duplicate bound keeps greatest cumulative": makeHistogram([]*p.Bucket{
+			bucket025,
+			bucket050Low,
+			bucket050,
+			bucketInf,
+		}),
+	}
+
+	for name, histogram := range cases {
+		t.Run(name, func(t *testing.T) {
+			cache := NewCounterCache(120 * time.Minute)
+			result := PromHistogramToES(cache, metricName, labels, &histogram)
+			assert.EqualValues(t, expected, result, "output must match canonical ordered input")
+		})
+	}
+}
+
+func TestPromHistogramToESDuplicateBoundRetainsGreatestCumulative(t *testing.T) {
+	metricName := "http_request_duration_seconds_bucket"
+	labels := mapstr.M{"runtime": "linux"}
+
+	cache := NewCounterCache(120 * time.Minute)
+	cache.Start()
+	t.Cleanup(cache.Stop)
+
+	firstScrape := p.Histogram{
+		Bucket: []*p.Bucket{
+			{UpperBound: proto.Float64(0.25), CumulativeCount: proto.Float64(10)},
+			{UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(20)},
+			{UpperBound: proto.Float64(math.Inf(1)), CumulativeCount: proto.Float64(30)},
+		},
+	}
+	firstResult := PromHistogramToES(cache, metricName, labels, &firstScrape)
+	assert.EqualValues(t, mapstr.M{
+		"values": []float64{0.125, 0.375, 0.5},
+		"counts": []uint64{0, 0, 0},
+	}, firstResult, "baseline first scrape must seed the counter cache")
+
+	// Duplicate le=0.50 entries appear after sorting; only the greatest cumulative (25) is valid.
+	secondScrape := p.Histogram{
+		Bucket: []*p.Bucket{
+			{UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(15)},
+			{UpperBound: proto.Float64(0.25), CumulativeCount: proto.Float64(12)},
+			{UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(25)},
+			{UpperBound: proto.Float64(math.Inf(1)), CumulativeCount: proto.Float64(35)},
+		},
+	}
+	secondResult := PromHistogramToES(cache, metricName, labels, &secondScrape)
+
+	// Keeping le=0.50 cumulative 15 would treat the bucket as reset (15 < cached 20) and zero out
+	// its rate, yielding counts [2, 0, 3] instead of the correct [2, 3, 0].
+	assert.EqualValues(t, mapstr.M{
+		"values": []float64{0.125, 0.375, 0.5},
+		"counts": []uint64{2, 3, 0},
+	}, secondResult, "duplicate-bound dedup must retain the greatest cumulative count on later scrapes")
+}
+
+func TestPromHistogramToESDoesNotMutateBuckets(t *testing.T) {
+	buckets := []*p.Bucket{
+		{UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(20)},
+		{UpperBound: proto.Float64(math.Inf(1)), CumulativeCount: proto.Float64(30)},
+		{UpperBound: proto.Float64(0.25), CumulativeCount: proto.Float64(10)},
+	}
+	before := make([]float64, len(buckets))
+	for i, b := range buckets {
+		before[i] = b.GetUpperBound()
+	}
+
+	histogram := p.Histogram{Bucket: buckets}
+	cache := NewCounterCache(120 * time.Minute)
+	_ = PromHistogramToES(cache, "metric_bucket", mapstr.M{}, &histogram)
+
+	for i, b := range buckets {
+		assert.Equal(t, before[i], b.GetUpperBound(), "caller bucket slice must not be reordered")
+	}
+	assert.Equal(t, 0.50, histogram.Bucket[0].GetUpperBound(), "original slice order must be preserved")
+}
+
+var normalizedBucketsSink []*p.Bucket
+
+func TestNormalizedHistogramBucketsReusesOrderedUniqueInput(t *testing.T) {
+	buckets := []*p.Bucket{
+		{UpperBound: proto.Float64(0.25), CumulativeCount: proto.Float64(10)},
+		{UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(20)},
+		{UpperBound: proto.Float64(math.Inf(1)), CumulativeCount: proto.Float64(30)},
+	}
+
+	normalized := normalizedHistogramBuckets(buckets)
+
+	assert.Len(t, normalized, len(buckets))
+	assert.True(t, &normalized[0] == &buckets[0], "ordered unique input should reuse its backing array")
+	assert.Zero(t, testing.AllocsPerRun(100, func() {
+		normalizedBucketsSink = normalizedHistogramBuckets(buckets)
+	}), "ordered unique input should not allocate")
 }

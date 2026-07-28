@@ -31,7 +31,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -306,9 +305,8 @@ func encodeWriteRequest(req *prompb.WriteRequest) ([]byte, error) {
 	return snappy.Encode(nil, data), nil
 }
 
-// newTestMetricSet creates a MetricSet for testing using the mbtest infrastructure
-// to ensure proper initialization (including logger)
-func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
+// newTestMetricSetBase creates a MetricSet without starting the owner loop.
+func newTestMetricSetBase(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
 	config := map[string]interface{}{
 		"module":     "prometheus",
 		"metricsets": []string{"remote_write"},
@@ -318,12 +316,18 @@ func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes 
 	m, ok := ms.(*MetricSet)
 	require.True(t, ok, "expected *MetricSet, got %T", ms)
 
-	// Override the size limits for testing
 	m.maxCompressedBodyBytes = maxCompressedBodyBytes
 	m.maxDecodedBodyBytes = maxDecodedBodyBytes
-	// Ensure events channel exists for the handler
-	m.events = make(chan mb.Event, 100)
+	setOwnerLoopTestSeams(m, ownerLoopSeams{skipHTTPServer: true})
+	t.Cleanup(func() { clearOwnerLoopTestSeams(m) })
+	return m
+}
 
+// newTestMetricSet creates a MetricSet for testing using the mbtest infrastructure
+// to ensure proper initialization (including logger)
+func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
+	m := newTestMetricSetBase(t, maxCompressedBodyBytes, maxDecodedBodyBytes)
+	startOwnerLoop(t, m, newTestPushReporter(nil))
 	return m
 }
 
