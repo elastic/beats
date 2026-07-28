@@ -43,34 +43,11 @@
   be enabled by setting features.aws_s3_v2.enabled: true in the beat
   configuration.
   
-* Add Filestream harvester metrics to monitoring logs. [#51077](https://github.com/elastic/beats/pull/51077) [#36653](https://github.com/elastic/beats/issues/36653)
-
-  The following Filestream metrics are added to the logs and the `/stats` HTTP endpoint:
-   - files_ingested_percent_100
-   - files_ingested_percent_95_99
-   - files_ingested_percent_lt_95
-  
-  These gauges are aggregated across all running Filestream inputs and
-  count active plain-file harvesters only.
-  
+* Add filestream harvester metrics to monitoring logs. [#51077](https://github.com/elastic/beats/pull/51077) [#36653](https://github.com/elastic/beats/issues/36653)
 * Add sign-in activity enrichment to the minimal-state EntraID entity analytics provider. [#51724](https://github.com/elastic/beats/pull/51724) 
 * Aggregate SQS mode health status to reduce false Degraded/Healthy transitions.  [#51692](https://github.com/elastic/beats/issues/51692)
-
-  Replace scattered per-event status reporting in the aws-s3 SQS input with a
-  centralized health aggregator. The input now stays Running while making forward
-  progress despite bounded retryable failures, reports Degraded only for sustained
-  conditions needing operator action (persistent receive failures, delete/finalize
-  errors, poison-pill messages), filters out context.Canceled from shutdown/reload,
-  and clears Degraded only when the specific causing condition resolves.
-  
-* Wire SQS health status aggregation into the v2 aws-s3 input path.  [#51692](https://github.com/elastic/beats/issues/51692)
-
-  Apply the sqsHealth aggregator (from the legacy SQS path) to the v2 SQS
-  input. The v2 path now has the same health reporting semantics: transient
-  failures stay Running, sustained failures degrade with condition-specific
-  messages, and context cancellation from shutdown is suppressed.
-  
-* Add configurable User-Agent header to the CrowdStrike streaming input.  
+* Wire SQS health status aggregation into the v2 `aws-s3` input path. [#51692](https://github.com/elastic/beats/issues/51692)
+* Add configurable User-Agent header to the CrowdStrike streaming input.
 * Reduce filestream scanner per-scan memory allocations for large idle file sets.  
 * Pass configured HTTP transport to Okta minimal-state provider for TLS support.  
 
@@ -80,17 +57,17 @@
 
 **Metricbeat**
 
-* Adds cpu number information to iis module and windows perfmon dataset. [#48637](https://github.com/elastic/beats/pull/48637) 
-* Collect init container metrics in kubernetes state_container metricset. [#50052](https://github.com/elastic/beats/pull/50052) [#49797](https://github.com/elastic/beats/issues/49797)
+* Add CPU number information to IIS module and Windows perfmon dataset. [#48637](https://github.com/elastic/beats/pull/48637) 
+* Collect init container metrics in Kubernetes `state_container` metricset. [#50052](https://github.com/elastic/beats/pull/50052) [#49797](https://github.com/elastic/beats/issues/49797)
 
 **Osquerybeat**
 
-* Add RRULE scheduling and scheduled responses for osquerybeat. [#48767](https://github.com/elastic/beats/pull/48767) 
-* Removes the dependency on fslib and implements the functionality using go-ntfs instead. [#49763](https://github.com/elastic/beats/pull/49763) 
-* Add osquerybeatreceiver to run osquerybeat under the EDOT collector. [#49868](https://github.com/elastic/beats/pull/49868) 
-* Add elastic_ntfs_partitions and elastic_ntfs_volumes tables to the osquery extension. [#50140](https://github.com/elastic/beats/pull/50140) 
-* Add elastic_ntfs_file table to the osquery extension for MFT-based file metadata on Windows. [#50641](https://github.com/elastic/beats/pull/50641) 
-* Rename osquerybeat query profiling settings to `profiling` and enable profiling by default. [#51691](https://github.com/elastic/beats/pull/51691) 
+* Add RRULE scheduling and scheduled responses for Osquerybeat. [#48767](https://github.com/elastic/beats/pull/48767) 
+* Remove the dependency on `fslib` and implements the functionality using `go-ntfs` instead. [#49763](https://github.com/elastic/beats/pull/49763) 
+* Add `osquerybeatreceiver` to run Osquerybeat in the EDOT Collector. [#49868](https://github.com/elastic/beats/pull/49868) 
+* Add `elastic_ntfs_partitions` and `elastic_ntfs_volumes` tables to the Osquery extension. [#50140](https://github.com/elastic/beats/pull/50140) 
+* Add `elastic_ntfs_file` table to the Osquery extension for MFT-based file metadata on Windows. [#50641](https://github.com/elastic/beats/pull/50641) 
+* Rename Osquerybeat query profiling settings to `profiling` and enable profiling by default. [#51691](https://github.com/elastic/beats/pull/51691) 
 
 **Packetbeat**
 
@@ -102,8 +79,8 @@
 
 **All**
 
-* Upgrade to go 1.26.5.  
-* This fixes a bug where worker/workers setting was not respected when loadbalance is set to false. [#51041](https://github.com/elastic/beats/pull/51041) 
+* Upgrade Go to v1.26.5.  
+* Fix an issue where the `worker`/`workers` setting was not respected when `loadbalance` is set to `false`. [#51041](https://github.com/elastic/beats/pull/51041) 
 * Honor the enabled flag when reloading inputs. [#51472](https://github.com/elastic/beats/pull/51472) 
 
 **Beats**
