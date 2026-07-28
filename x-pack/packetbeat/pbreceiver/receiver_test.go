@@ -28,9 +28,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/receiver"
 
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -50,12 +53,13 @@ func TestNewReceiver(t *testing.T) {
 		Beatconfig: map[string]any{
 			"packetbeat": map[string]any{
 				"interfaces": map[string]any{
-					"device": "lo0",
+					// Read from a pre-recorded pcap file; no libpcap / root required.
+					"file": "../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
 				},
 				"protocols": []map[string]any{
 					{
 						"type":  "http",
-						"ports": []int{80, 8080},
+						"ports": []int{80},
 					},
 				},
 			},
@@ -80,6 +84,7 @@ func TestNewReceiver(t *testing.T) {
 	observed, zapLogs := observer.New(zapcore.DebugLevel)
 	core := zapcore.NewTee(zapCore, observed)
 
+	sink := &consumertest.LogsSink{}
 	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 	receiverSettings := receiver.Settings{}
 	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
@@ -89,20 +94,23 @@ func TestNewReceiver(t *testing.T) {
 		zap.String("otelcol.signal", "logs"),
 	}))
 
-	rec, err := factory.CreateLogs(t.Context(), receiverSettings, &config, consumertest.NewNop())
+	rec, err := factory.CreateLogs(t.Context(), receiverSettings, &config, sink)
 	require.NoError(t, err)
 	require.NoError(t, rec.Start(t.Context(), componenttest.NewNopHost()))
 
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
-		// Verify the monitoring socket is available
+		// Verify the monitoring socket is available.
 		var lastError strings.Builder
 		assert.Conditionf(c, func() bool {
 			return getFromSocket(t, &lastError, monitorSocket, "stats")
 		}, "failed to connect to monitoring socket stats endpoint, last error was: %s", &lastError)
 
-		// Verify metrics logging started
-		metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-		assert.NotEmpty(c, metricsStarted.All(), "metrics logging not started")
+		// Verify the metric reporter initialized.
+		metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+		assert.NotEmpty(c, metricsSkipped.All(), "metric reporter did not initialize")
+
+		// Verify that packetbeat decoded and forwarded at least one event from the pcap.
+		assert.Positive(c, sink.LogRecordCount(), "expected at least one log record from pcap replay")
 	}, 2*time.Minute, 1*time.Second,
 		"timeout waiting for packetbeat receiver to start")
 
@@ -133,7 +141,13 @@ func TestMultipleReceivers(t *testing.T) {
 			"packetbeat": map[string]any{
 				"id": "receiver-1",
 				"interfaces": map[string]any{
-					"device": "lo0",
+					"file": "../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
+				},
+				"protocols": []map[string]any{
+					{
+						"type":  "http",
+						"ports": []int{80},
+					},
 				},
 			},
 			"logging": map[string]any{
@@ -142,9 +156,10 @@ func TestMultipleReceivers(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost1,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost1,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -153,7 +168,13 @@ func TestMultipleReceivers(t *testing.T) {
 			"packetbeat": map[string]any{
 				"id": "receiver-2",
 				"interfaces": map[string]any{
-					"device": "lo0",
+					"file": "../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
+				},
+				"protocols": []map[string]any{
+					{
+						"type":  "http",
+						"ports": []int{80},
+					},
 				},
 			},
 			"logging": map[string]any{
@@ -162,9 +183,10 @@ func TestMultipleReceivers(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost2,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost2,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -176,9 +198,11 @@ func TestMultipleReceivers(t *testing.T) {
 	observed, zapLogs := observer.New(zapcore.DebugLevel)
 	core := zapcore.NewTee(zapCore, observed)
 
+	sink1 := &consumertest.LogsSink{}
+	sink2 := &consumertest.LogsSink{}
 	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 
-	createReceiver := func(name string, cfg *Config) receiver.Logs {
+	createReceiver := func(name string, cfg *Config, sink consumer.Logs) receiver.Logs {
 		set := receiver.Settings{}
 		set.ID = component.NewIDWithName(factory.Type(), name)
 		set.Logger = zap.New(core.With([]zapcore.Field{
@@ -186,30 +210,30 @@ func TestMultipleReceivers(t *testing.T) {
 			zap.String("otelcol.component.kind", "receiver"),
 			zap.String("otelcol.signal", "logs"),
 		}))
-		r, err := factory.CreateLogs(t.Context(), set, cfg, consumertest.NewNop())
+		r, err := factory.CreateLogs(t.Context(), set, cfg, sink)
 		require.NoError(t, err)
 		return r
 	}
 
-	r1 := createReceiver("r1", &config1)
-	r2 := createReceiver("r2", &config2)
+	r1 := createReceiver("r1", &config1, sink1)
+	r2 := createReceiver("r2", &config2, sink2)
 
 	require.NoError(t, r1.Start(t.Context(), componenttest.NewNopHost()))
 	require.NoError(t, r2.Start(t.Context(), componenttest.NewNopHost()))
 
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
-		// Make sure that each receiver has a separate logger instance
+		// Make sure that each receiver has a separate logger instance.
 		r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r1"))
 		assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
 		r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r2"))
 		assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 
-		r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r1"))
-		assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrics logging every 30s")
-		r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r2"))
-		assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrics logging every 30s")
+		r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r1"))
+		assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single skipping metrics logging entry")
+		r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r2"))
+		assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single skipping metrics logging entry")
 
-		// Verify monitoring sockets
+		// Verify monitoring sockets.
 		var lastError strings.Builder
 		assert.Conditionf(c, func() bool {
 			for _, sock := range []string{monitorSocket1, monitorSocket2} {
@@ -219,6 +243,10 @@ func TestMultipleReceivers(t *testing.T) {
 			}
 			return true
 		}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+
+		// Verify that each receiver decoded and forwarded at least one event from the pcap.
+		assert.Positive(c, sink1.LogRecordCount(), "r1: expected at least one log record from pcap replay")
+		assert.Positive(c, sink2.LogRecordCount(), "r2: expected at least one log record from pcap replay")
 	}, 2*time.Minute, 1*time.Second,
 		"timeout waiting for packetbeat receivers to start")
 
@@ -298,7 +326,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"packetbeat": map[string]any{
 				"interfaces": map[string]any{
 					"device": "lo0",
@@ -331,6 +359,57 @@ func BenchmarkFactory(b *testing.B) {
 		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
+}
+
+func TestReceiverStatus(t *testing.T) {
+	inputID := "pb-status-test"
+
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		inputStatus := inputStatuses.PutEmptyMap(inputID)
+		inputStatus.PutStr("status", state)
+		inputStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"packetbeat": map[string]any{
+				"id": inputID,
+				"interfaces": map[string]any{
+					"file": "../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
+				},
+				"protocols": []map[string]any{
+					{
+						"type":  "http",
+						"ports": []int{80},
+					},
+				},
+			},
+			"logging": map[string]any{
+				"level":     "info",
+				"selectors": []string{"*"},
+			},
+			"path.home":               t.TempDir(),
+			"management.otel.enabled": true,
+		},
+	}
+
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T: t,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Beat:    "packetbeat",
+				Config:  &cfg,
+				Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+			},
+		},
+		Status: componentstatus.NewEvent(componentstatus.StatusOK,
+			componentstatus.WithAttributes(inputStatusAttributes(
+				componentstatus.StatusOK.String(), "running packetbeat processor"))),
+	})
 }
 
 func TestReceiverHook(t *testing.T) {

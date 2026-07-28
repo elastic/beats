@@ -30,7 +30,7 @@ type FieldsGeneratorTestCase struct {
 }
 
 type RemoveProcessorTestCase struct {
-	processor map[string]interface{}
+	processor map[string]any
 	fields    []string
 }
 
@@ -199,25 +199,25 @@ func TestFieldsGeneratorKnownLimitations(t *testing.T) {
 func TestRemoveProcessor(t *testing.T) {
 	tests := []RemoveProcessorTestCase{
 		{
-			processor: map[string]interface{}{
+			processor: map[string]any{
 				"field": []string{},
 			},
 			fields: []string{},
 		},
 		{
-			processor: map[string]interface{}{
-				"field": []interface{}{},
+			processor: map[string]any{
+				"field": []any{},
 			},
 			fields: []string{},
 		},
 		{
-			processor: map[string]interface{}{
+			processor: map[string]any{
 				"field": "prospector.type",
 			},
 			fields: []string{"prospector.type"},
 		},
 		{
-			processor: map[string]interface{}{
+			processor: map[string]any{
 				"field": []string{"prospector.type", "input.type"},
 			},
 			fields: []string{"prospector.type", "input.type"},

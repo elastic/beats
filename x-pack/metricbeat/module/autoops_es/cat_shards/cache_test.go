@@ -118,6 +118,7 @@ func getIndexMetadata() map[string]IndexMetadata {
 	return map[string]IndexMetadata{
 		"my-index": {
 			aliases:    []string{"alias1", "alias2"},
+			dataStream: "data-stream1",
 			attributes: []string{"attribute1"},
 			indexType:  "index",
 			hidden:     false,
@@ -161,6 +162,7 @@ func TestEnrichNodeIndexShardsWithoutCache(t *testing.T) {
 		require.Nil(t, nodeIndexShards.SearchLatencyInMillis)
 		// unknown index metadata
 		require.Nil(t, nodeIndexShards.Aliases)
+		require.Equal(t, "", nodeIndexShards.DataStream)
 		require.Nil(t, nodeIndexShards.Attributes)
 		require.Nil(t, nodeIndexShards.IndexType)
 		require.Nil(t, nodeIndexShards.IsHidden)
@@ -193,6 +195,7 @@ func TestEnrichNodeIndexShardsWithoutCachedValues(t *testing.T) {
 		require.Nil(t, nodeIndexShards.SearchLatencyInMillis)
 		// unknown index metadata
 		require.Nil(t, nodeIndexShards.Aliases)
+		require.Equal(t, "", nodeIndexShards.DataStream)
 		require.Nil(t, nodeIndexShards.Attributes)
 		require.Nil(t, nodeIndexShards.IndexType)
 		require.Nil(t, nodeIndexShards.IsHidden)
@@ -242,6 +245,7 @@ func TestEnrichNodeIndexShardsWithCachedValues(t *testing.T) {
 		metadata := indexMetadata[nodeIndexShards.Index]
 
 		require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+		require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 		require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 		require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 		require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -320,6 +324,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNoChange(t *testing.T) {
 		metadata := indexMetadata[nodeIndexShards.Index]
 
 		require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+		require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 		require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 		require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 		require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -387,6 +392,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithHoles(t *testing.T) {
 		metadata := indexMetadata[nodeIndexShards.Index]
 
 		require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+		require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 		require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 		require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 		require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -445,6 +451,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			metadata := indexMetadata[nodeIndexShards.Index]
 
 			require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+			require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 			require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 			require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 			require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -462,6 +469,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			require.Nil(t, nodeIndexShards.SearchLatencyInMillis)
 			// unknown index metadata
 			require.Nil(t, nodeIndexShards.Aliases)
+			require.Equal(t, "", nodeIndexShards.DataStream)
 			require.Nil(t, nodeIndexShards.Attributes)
 			require.Nil(t, nodeIndexShards.IndexType)
 			require.Nil(t, nodeIndexShards.IsHidden)
@@ -573,6 +581,7 @@ func TestConvertToNodeIndexShardsUncached(t *testing.T) {
 	require.Equal(t, YELLOW, *yellowNode2.IndexStatus)
 	require.Nil(t, yellowNode2.IndexType)
 	require.Nil(t, yellowNode2.Aliases)
+	require.Equal(t, "", yellowNode2.DataStream)
 	require.Nil(t, yellowNode2.Attributes)
 	require.Nil(t, yellowNode2.IsHidden)
 	require.Nil(t, yellowNode2.IsOpen)
@@ -631,6 +640,7 @@ func TestConvertToNodeIndexShardsUncached(t *testing.T) {
 	require.Equal(t, RED, *redIndex.IndexStatus)
 	require.Nil(t, redIndex.IndexType)
 	require.Nil(t, redIndex.Aliases)
+	require.Equal(t, "", redIndex.DataStream)
 	require.Nil(t, redIndex.Attributes)
 	require.Nil(t, redIndex.IsHidden)
 	require.Nil(t, redIndex.IsOpen)
@@ -705,6 +715,7 @@ func TestConvertToNodeIndexShardsWithCache(t *testing.T) {
 	require.Equal(t, GREEN, *myIndexNode1.IndexStatus)
 	require.Equal(t, "index", *myIndexNode1.IndexType)
 	require.ElementsMatch(t, []string{"alias1", "alias2"}, myIndexNode1.Aliases)
+	require.Equal(t, "data-stream1", myIndexNode1.DataStream)
 	require.ElementsMatch(t, []string{"attribute1"}, myIndexNode1.Attributes)
 	require.Equal(t, false, *myIndexNode1.IsHidden)
 	require.Equal(t, true, *myIndexNode1.IsOpen)
@@ -763,6 +774,7 @@ func TestConvertToNodeIndexShardsWithCache(t *testing.T) {
 	require.Equal(t, GREEN, *myIndexNode3.IndexStatus)
 	require.Equal(t, "index", *myIndexNode3.IndexType)
 	require.ElementsMatch(t, []string{"alias1", "alias2"}, myIndexNode3.Aliases)
+	require.Equal(t, "data-stream1", myIndexNode3.DataStream)
 	require.ElementsMatch(t, []string{"attribute1"}, myIndexNode3.Attributes)
 	require.Equal(t, false, *myIndexNode3.IsHidden)
 	require.Equal(t, true, *myIndexNode3.IsOpen)

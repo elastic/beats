@@ -31,17 +31,17 @@ func init() {
 }
 
 var (
-	goTestDeps, pythonTestDeps []interface{}
+	goTestDeps, pythonTestDeps []any
 	whitelistedEnvVars         []string
 )
 
 // RegisterGoTestDeps registers dependencies of the GoIntegTest target.
-func RegisterGoTestDeps(deps ...interface{}) {
+func RegisterGoTestDeps(deps ...any) {
 	goTestDeps = append(goTestDeps, deps...)
 }
 
 // RegisterPythonTestDeps registers dependencies of the PythonIntegTest target.
-func RegisterPythonTestDeps(deps ...interface{}) {
+func RegisterPythonTestDeps(deps ...any) {
 	pythonTestDeps = append(pythonTestDeps, deps...)
 }
 

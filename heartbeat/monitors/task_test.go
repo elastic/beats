@@ -21,6 +21,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike/validator"
 
@@ -98,7 +99,7 @@ func Test_runPublishJob(t *testing.T) {
 			pipel := &MockPipeline{}
 			client, err := pipel.Connect()
 			require.NoError(t, err)
-			queue := runPublishJob(tc.job, client)
+			queue := runPublishJob(tc.job, client, logptest.NewTestingLogger(t, ""))
 			for {
 				if len(queue) == 0 {
 					break

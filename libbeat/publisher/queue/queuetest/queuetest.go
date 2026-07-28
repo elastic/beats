@@ -31,7 +31,7 @@ import (
 // QueueFactory is used to create a per test queue instance.
 type QueueFactory func(t *testing.T) queue.Queue[publisher.Event]
 
-type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue[publisher.Event]) func()
+type workerFactory func(*sync.WaitGroup, any, *TestLogger, queue.Queue[publisher.Event]) func()
 
 type testCase struct {
 	name                 string
@@ -223,7 +223,7 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 func multiple(
 	fns ...workerFactory,
 ) workerFactory {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, queue queue.Queue[publisher.Event]) func() {
+	return func(wg *sync.WaitGroup, info any, log *TestLogger, queue queue.Queue[publisher.Event]) func() {
 		runners := make([]func(), len(fns))
 		for i, gen := range fns {
 			runners[i] = gen(wg, info, log, queue)
@@ -241,8 +241,8 @@ func makeProducer(
 	maxEvents int,
 	waitACK bool,
 	makeFields func(int) mapstr.M,
-) func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue[publisher.Event]) func() {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue[publisher.Event]) func() {
+) func(*sync.WaitGroup, any, *TestLogger, queue.Queue[publisher.Event]) func() {
+	return func(wg *sync.WaitGroup, info any, log *TestLogger, b queue.Queue[publisher.Event]) func() {
 		wg.Add(1)
 		return func() {
 			defer wg.Done()
@@ -263,7 +263,7 @@ func makeProducer(
 					total += N
 					log.Debugf("producer ACK: N=%v, total=%v/%v\n", N, total, maxEvents)
 
-					for i := 0; i < N; i++ {
+					for range N {
 						ackWG.Done()
 					}
 				}
@@ -272,10 +272,11 @@ func makeProducer(
 			producer := b.Producer(queue.ProducerConfig{
 				ACK: ackCB,
 			})
-			for i := 0; i < maxEvents; i++ {
+			for i := range maxEvents {
 				log.Debug("publish event", i)
 				producer.Publish(MakeEvent(makeFields(i)))
 			}
+			producer.Close()
 
 			ackWG.Wait()
 		}
@@ -287,7 +288,7 @@ func makeConsumer(maxEvents, batchSize int) workerFactory {
 }
 
 func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue[publisher.Event]) func() {
+	return func(wg *sync.WaitGroup, info any, log *TestLogger, b queue.Queue[publisher.Event]) func() {
 		wg.Add(1)
 		return func() {
 			defer wg.Done()
@@ -297,7 +298,7 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 			log.Debugf("consumer: wait for %v events\n", maxEvents)
 			events.Add(maxEvents)
 
-			for i := 0; i < numConsumers; i++ {
+			for range numConsumers {
 				b := b
 
 				go func() {

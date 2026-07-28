@@ -58,7 +58,7 @@ func GenerateDirModulesD() error {
 			return err
 		}
 
-		data, err := Expand(modulesDConfigTemplate, map[string]interface{}{
+		data, err := Expand(modulesDConfigTemplate, map[string]any{
 			"Module": moduleName,
 			"Config": string(config),
 		})

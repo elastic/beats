@@ -97,7 +97,7 @@ func TestMinimalInput_RunSync_FullCycle(t *testing.T) {
 	dbFile := filepath.Join(tmpDir, "test.db")
 
 	log := logptest.NewTestingLogger(t, "test")
-	store, err := kvstore.NewStore(log, dbFile, 0600)
+	store, err := kvstore.NewStore(log, dbFile, 0o600)
 	if err != nil {
 		t.Fatalf("NewStore: %v", err)
 	}
@@ -122,28 +122,21 @@ func TestMinimalInput_RunSync_FullCycle(t *testing.T) {
 		},
 	}
 
-	mi := &minimalStateInput{
-		provider:     prov,
-		providerName: "testprov",
-		logger:       log,
-		path:         paths.New(),
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	ackClient := &ackingClient{inner: client}
+	s := &bboltSyncer{store: store, bucketName: bucketName}
 
-	err = mi.runSync(
+	err = s.runSync(
 		v2.Context{
 			Logger:      log,
 			ID:          "test-input-1",
 			Cancelation: v2.GoContextFromCanceler(ctx),
 		},
-		store,
+		prov,
 		ackClient,
 		slogger,
-		bucketName,
 		true,
 	)
 	if err != nil {
@@ -179,7 +172,7 @@ func TestMinimalInput_RunSync_ErrorDiscardsBuffer(t *testing.T) {
 	dbFile := filepath.Join(tmpDir, "test-err.db")
 
 	log := logptest.NewTestingLogger(t, "test")
-	store, err := kvstore.NewStore(log, dbFile, 0600)
+	store, err := kvstore.NewStore(log, dbFile, 0o600)
 	if err != nil {
 		t.Fatalf("NewStore: %v", err)
 	}
@@ -206,24 +199,18 @@ func TestMinimalInput_RunSync_ErrorDiscardsBuffer(t *testing.T) {
 		},
 	}
 
-	mi := &minimalStateInput{
-		provider:     prov,
-		providerName: "testprov",
-		logger:       log,
-		path:         paths.New(),
-	}
-
 	ctx := context.Background()
-	err = mi.runSync(
+	s := &bboltSyncer{store: store, bucketName: bucketName}
+
+	err = s.runSync(
 		v2.Context{
 			Logger:      log,
 			ID:          "test-input-err",
 			Cancelation: v2.GoContextFromCanceler(ctx),
 		},
-		store,
+		prov,
 		ackClient,
 		slogger,
-		bucketName,
 		true,
 	)
 	if !errors.Is(err, syncErr) {

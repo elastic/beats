@@ -23,12 +23,15 @@ import (
 	"sync"
 	"time"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -51,6 +54,8 @@ func init() {
 
 	reg = monitoring.Default.GetOrCreateRegistry(logName, monitoring.DoNotReport)
 }
+
+var _ processors.PdataProcessor = (*addHostMetadata)(nil)
 
 type metrics struct {
 	FQDNLookupFailed *monitoring.Int
@@ -240,6 +245,40 @@ func (p *addHostMetadata) fetchData(useFQDN bool) (mapstr.M, error) {
 	return data, nil
 }
 
+// RunPdata enriches the given pcommon.Map directly with host metadata, avoiding
+// the round-trip conversion to/from mapstr.M used by the standard Run path.
+func (p *addHostMetadata) RunPdata(body pcommon.Map) (bool, error) {
+	if !p.config.ReplaceFields && skipAddingHostMetadataPdata(body) {
+		return false, nil
+	}
+
+	data, err := p.loadData(features.FQDN())
+	if err != nil {
+		return false, fmt.Errorf("error loading data during event update: %w", err)
+	}
+
+	if err := otelmap.MergeMapstrIntoPdata(data, body, true); err != nil {
+		return false, fmt.Errorf("error merging host metadata: %w", err)
+	}
+
+	if len(p.geoData) > 0 {
+		if err := otelmap.MergeMapstrIntoPdata(p.geoData, body, true); err != nil {
+			return false, fmt.Errorf("error merging geo data: %w", err)
+		}
+	}
+	return false, nil
+}
+
+func skipAddingHostMetadataPdata(body pcommon.Map) bool {
+	hostVal, ok := body.Get("host")
+	if !ok || hostVal.Type() != pcommon.ValueTypeMap {
+		return false
+	}
+	hostMap := hostVal.Map()
+	_, hasName := hostMap.Get("name")
+	return hostMap.Len() > 0 && (!hasName || hostMap.Len() != 1)
+}
+
 func (p *addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
 		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
@@ -262,7 +301,7 @@ func skipAddingHostMetadata(event *beat.Event) bool {
 			return false
 		}
 		return true
-	case map[string]interface{}:
+	case map[string]any:
 		hostMapStr := mapstr.M(m)
 		// if "name" is the only field, don't skip
 		hasName, _ := hostMapStr.HasKey("name")

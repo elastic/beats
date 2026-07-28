@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -41,11 +42,11 @@ func testTCPConfigCheck(t *testing.T, configMap mapstr.M) *beat.Event {
 	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
-	p, err := create("tcp", config)
+	p, err := create("tcp", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

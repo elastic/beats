@@ -27,11 +27,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-func getParser() *parser {
+func getParser(t *testing.T) *parser {
 	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
-	return &parser{}
+	return &parser{logger: logptest.NewTestingLogger(t, "")}
 }
 
 func mkBuf(t *testing.T, s string, length int) *bufferView {
@@ -41,7 +42,7 @@ func mkBuf(t *testing.T, s string, length int) *bufferView {
 }
 
 func TestParse(t *testing.T) {
-	parser := getParser()
+	parser := getParser(t)
 	err := parser.parseAlert(mkBuf(t, "0102", 2))
 	assert.NoError(t, err)
 	assert.Len(t, parser.alerts, 1)
@@ -50,7 +51,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestShortBuffer(t *testing.T) {
-	parser := getParser()
+	parser := getParser(t)
 	err := parser.parseAlert(mkBuf(t, "", 2))
 	assert.Error(t, err)
 	assert.Empty(t, parser.alerts)
@@ -61,7 +62,7 @@ func TestShortBuffer(t *testing.T) {
 }
 
 func TestEncrypted(t *testing.T) {
-	parser := getParser()
+	parser := getParser(t)
 	err := parser.parseAlert(mkBuf(t, "010200000000", 6))
 	assert.NoError(t, err)
 	assert.Empty(t, parser.alerts)

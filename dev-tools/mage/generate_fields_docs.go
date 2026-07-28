@@ -56,9 +56,9 @@ type fieldsYAMLField struct {
 	Type           string            `yaml:"type,omitempty"`
 	Description    string            `yaml:"description,omitempty"`
 	HasDescription bool              `yaml:"-"`
-	Example        interface{}       `yaml:"example,omitempty"`
+	Example        any               `yaml:"example,omitempty"`
 	Format         string            `yaml:"format,omitempty"`
-	Required       interface{}       `yaml:"required,omitempty"`
+	Required       any               `yaml:"required,omitempty"`
 	Path           string            `yaml:"path,omitempty"`
 	FieldPath      string            `yaml:"field_path,omitempty"`
 	Index          *bool             `yaml:"index,omitempty"`
@@ -115,7 +115,7 @@ func GenerateFieldsDocs(fieldsYMLPath, outputPath, beat string) error {
 // It also normalises null descriptions to "None" and converts non-standard
 // timestamps in Example values to match Python's datetime formatting.
 func markKeyPresence(data []byte, docs []fieldsYAMLSection) {
-	var rawSections []map[interface{}]interface{}
+	var rawSections []map[any]any
 	if err := yaml.Unmarshal(data, &rawSections); err != nil {
 		return
 	}
@@ -130,17 +130,17 @@ func markKeyPresence(data []byte, docs []fieldsYAMLSection) {
 		if _, has := rawSection["skipdocs"]; has {
 			docs[i].HasSkipDocs = true
 		}
-		rawFields, _ := rawSection["fields"].([]interface{})
+		rawFields, _ := rawSection["fields"].([]any)
 		markFieldsKeyPresence(rawFields, docs[i].Fields)
 	}
 }
 
-func markFieldsKeyPresence(rawFields []interface{}, fields []fieldsYAMLField) {
+func markFieldsKeyPresence(rawFields []any, fields []fieldsYAMLField) {
 	for i, raw := range rawFields {
 		if i >= len(fields) {
 			break
 		}
-		m, ok := raw.(map[interface{}]interface{})
+		m, ok := raw.(map[any]any)
 		if !ok {
 			continue
 		}
@@ -162,11 +162,11 @@ func markFieldsKeyPresence(rawFields []interface{}, fields []fieldsYAMLField) {
 				fields[i].Example = formatPythonDatetime(t)
 			}
 		}
-		subRaw, _ := m["fields"].([]interface{})
+		subRaw, _ := m["fields"].([]any)
 		if len(subRaw) > 0 && len(fields[i].Fields) > 0 {
 			markFieldsKeyPresence(subRaw, fields[i].Fields)
 		}
-		subRaw, _ = m["multi_fields"].([]interface{})
+		subRaw, _ = m["multi_fields"].([]any)
 		if len(subRaw) > 0 && len(fields[i].MultiFields) > 0 {
 			markFieldsKeyPresence(subRaw, fields[i].MultiFields)
 		}
@@ -533,7 +533,7 @@ func GetServerlessLifecycleFromString(appliesTo string) string {
 		return "ga"
 	}
 	var parts []string
-	for _, p := range strings.Split(appliesTo, ",") {
+	for p := range strings.SplitSeq(appliesTo, ",") {
 		p = strings.TrimSpace(p)
 		if p != "" {
 			parts = append(parts, p)
@@ -573,7 +573,7 @@ func LoadModuleMeta(fieldsYMLPath string) (title, appliesTo string, err error) {
 // str() representation: booleans are capitalized (True/False), floats
 // always have a decimal point, integers stay as-is, lists use Python
 // bracket notation, and timestamps use Python's datetime str() format.
-func formatYAMLValue(v interface{}) string {
+func formatYAMLValue(v any) string {
 	switch val := v.(type) {
 	case bool:
 		if val {
@@ -589,7 +589,7 @@ func formatYAMLValue(v interface{}) string {
 		return strconv.Itoa(val)
 	case time.Time:
 		return formatPythonDatetime(val)
-	case []interface{}:
+	case []any:
 		return formatPythonList(val)
 	default:
 		return fmt.Sprintf("%v", v)
@@ -614,7 +614,7 @@ func formatPythonDatetime(t time.Time) string {
 
 // formatPythonList formats a []interface{} to match Python's str(list) output,
 // e.g. ['foo', 'bar'] for strings, [1, 2] for numbers.
-func formatPythonList(items []interface{}) string {
+func formatPythonList(items []any) string {
 	parts := make([]string, len(items))
 	for i, item := range items {
 		switch v := item.(type) {

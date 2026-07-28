@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const cfgPositive = "positive"
@@ -73,7 +74,7 @@ var (
 	errBodyIllegalBody       = errors.New("unsupported content under check.body")
 )
 
-func makeValidateResponse(config *responseParameters) (multiValidator, error) {
+func makeValidateResponse(config *responseParameters, logger *logp.Logger) (multiValidator, error) {
 	var respValidators []respValidator
 	var bodyValidators []bodyValidator
 
@@ -98,7 +99,7 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	}
 
 	if len(config.RecvJSON) > 0 {
-		jsonChecks, err := checkJson(config.RecvJSON)
+		jsonChecks, err := checkJson(config.RecvJSON, logger)
 		if err != nil {
 			return multiValidator{}, fmt.Errorf("could not load JSON check: %w", err)
 		}

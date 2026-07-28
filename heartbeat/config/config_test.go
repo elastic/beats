@@ -23,6 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestDefaults(t *testing.T) {
@@ -82,6 +84,20 @@ func TestDefaults(t *testing.T) {
 			"icmp",
 			911,
 		},
+		{
+			"API default is 4 when nothing is overridden",
+			"FOO",
+			"bar",
+			"api",
+			4,
+		},
+		{
+			"API monitor override",
+			"SYNTHETICS_LIMIT_API",
+			"321",
+			"api",
+			321,
+		},
 	}
 
 	for _, c := range cases {
@@ -89,7 +105,7 @@ func TestDefaults(t *testing.T) {
 			os.Setenv(c.EnvKey, c.EnvVal)
 			defer os.Unsetenv(c.EnvKey)
 
-			dc := DefaultConfig()
+			dc := DefaultConfig(logptest.NewTestingLogger(t, ""))
 			require.NotNil(t, dc.Jobs[c.LimitType])
 			assert.Equal(t, dc.Jobs[c.LimitType].Limit, c.LimitVal)
 		})

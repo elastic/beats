@@ -19,9 +19,9 @@ package nfs
 
 import "github.com/elastic/elastic-agent-libs/logp"
 
-func dropMalformed(context string, err error) bool {
+func dropMalformed(context string, err error, logger *logp.Logger) bool {
 	if err != nil {
-		logp.Warn("nfs: dropping malformed %s: %v", context, err)
+		logger.Warnf("nfs: dropping malformed %s: %v", context, err)
 		return true
 	}
 	return false

@@ -7,6 +7,7 @@ package instance
 import (
 	"maps"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/filebeat/input/log"
+	libbeatinstance "github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -80,5 +82,87 @@ type: "log"`)
 type: "log"`)
 		require.NoError(t, err)
 		assert.False(t, log.AllowDeprecatedUse(cfg))
+	})
+}
+
+func TestNewBeatForReceiverDoesNotSetPacketbeatShutdownTimeout(t *testing.T) {
+	cfg := map[string]any{
+		"packetbeat": map[string]any{},
+		"path.home":  t.TempDir(),
+	}
+
+	_, err := NewBeatForReceiver(
+		libbeatinstance.Settings{Name: "packetbeat"},
+		cfg,
+		consumertest.NewNop(),
+		"testcomponent",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err)
+
+	assert.NotContains(t, cfg["packetbeat"], "shutdown_timeout",
+		"packetbeat must retain its own shutdown timeout semantics")
+}
+
+func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
+	tmpDir := t.TempDir()
+	baseCfg := map[string]any{
+		"filebeat": map[string]any{
+			"inputs": []map[string]any{
+				{
+					"type":    "benchmark",
+					"enabled": true,
+					"message": "test",
+					"count":   10,
+				},
+			},
+		},
+		"path.home": tmpDir,
+	}
+
+	t.Run("defaults to disabled metric logging when unset", func(t *testing.T) {
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), baseCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+		require.NotNil(t, beat.Config.MetricLogging)
+
+		var metricCfg struct {
+			Period time.Duration `config:"period"`
+		}
+		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
+		assert.Equal(t, time.Duration(0), metricCfg.Period)
+	})
+
+	t.Run("honors an explicitly configured period", func(t *testing.T) {
+		tmpCfg := map[string]any{}
+		maps.Copy(tmpCfg, baseCfg)
+		tmpCfg["logging.metrics.period"] = "15s"
+
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+		require.NotNil(t, beat.Config.MetricLogging)
+
+		var metricCfg struct {
+			Period time.Duration `config:"period"`
+		}
+		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
+		assert.Equal(t, 15*time.Second, metricCfg.Period)
+	})
+
+	t.Run("keeps the default period when an unrelated metric logging field is set", func(t *testing.T) {
+		tmpCfg := map[string]any{}
+		maps.Copy(tmpCfg, baseCfg)
+		tmpCfg["logging.metrics.enabled"] = true
+
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+		require.NotNil(t, beat.Config.MetricLogging)
+
+		var metricCfg struct {
+			Enabled bool          `config:"enabled"`
+			Period  time.Duration `config:"period"`
+		}
+		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
+		assert.True(t, metricCfg.Enabled)
+		assert.Equal(t, time.Duration(0), metricCfg.Period)
 	})
 }

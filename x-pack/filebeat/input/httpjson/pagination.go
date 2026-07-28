@@ -50,6 +50,15 @@ func newPagination(config config, client *httpClient, stat status.StatusReporter
 		return &mapstr.M{}
 	}()
 
+	var allowedOrigins []*url.URL
+	for _, s := range config.Response.PaginationAllowedHosts {
+		u, err := url.Parse(s)
+		if err != nil {
+			continue // already validated by responseConfig.Validate
+		}
+		allowedOrigins = append(allowedOrigins, u)
+	}
+
 	requestFactory := newPaginationRequestFactory(
 		config.Request.Method,
 		config.Request.EncodeAs,
@@ -57,6 +66,7 @@ func newPagination(config config, client *httpClient, stat status.StatusReporter
 		body,
 		append(rts, pts...),
 		config.Auth,
+		allowedOrigins,
 		stat,
 		log,
 	)
@@ -64,15 +74,17 @@ func newPagination(config config, client *httpClient, stat status.StatusReporter
 	return pagination
 }
 
-func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, stat status.StatusReporter, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method, encodeAs string, u url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, allowedOrigins []*url.URL, stat status.StatusReporter, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
-		url:        url,
-		method:     method,
-		body:       body,
-		transforms: ts,
-		log:        log,
-		encoder:    registeredEncoders[encodeAs],
+		url:            u,
+		method:         method,
+		body:           body,
+		transforms:     ts,
+		log:            log,
+		encoder:        registeredEncoders[encodeAs],
+		originURL:      &u,
+		allowedOrigins: allowedOrigins,
 	}
 	if authConfig != nil && authConfig.Basic.isEnabled() {
 		rf.user = authConfig.Basic.User

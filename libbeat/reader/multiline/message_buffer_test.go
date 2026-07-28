@@ -55,7 +55,6 @@ func TestMessageBufferAddLine(t *testing.T) {
 	}
 
 	for name, test := range testcases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			buf := getTestMessageBuffer(1024, test.skipNewline, nil)
@@ -118,7 +117,6 @@ func TestFinalizeMessage(t *testing.T) {
 	}
 
 	for name, test := range testcases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			var messages []reader.Message

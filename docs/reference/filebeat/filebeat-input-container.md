@@ -12,7 +12,7 @@ applies_to:
 ::::{warning}
 The container input is just a preset for the [`log`](/reference/filebeat/filebeat-input-log.md) input. The `log` input is deprecated in version 7.16 and disabled in version 9.0.
 
-Please use the the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input with its [`container`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-parsers-container) parser instead. Follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log`/`container` inputs to `filestream` inputs.
+Please use the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input with its [`container`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-parsers-container) parser instead. Follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log`/`container` inputs to `filestream` inputs.
 
 After deprecation it’s possible to use this input type (e.g. for migration to `filestream`) only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
 

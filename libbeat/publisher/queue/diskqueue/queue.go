@@ -291,5 +291,6 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer[publisher
 		config:  cfg,
 		encoder: newEventEncoder(SerializationCBOR),
 		done:    make(chan struct{}),
+		ackWait: make(chan struct{}),
 	}
 }

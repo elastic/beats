@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/esutil"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -119,7 +121,7 @@ func TestMakeESLoaderError(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			etc := newESTestContext(t)
 			etc.ec.HTTP = fakeHTTPClient{respStatus: test.statusCode}
-			loader := MakeESLoader(etc.ec, "fakeIndexPattern", etc.location)
+			loader := MakeESLoader(etc.ec, "fakeIndexPattern", etc.location, logptest.NewTestingLogger(t, ""))
 
 			_, err := loader(stdfields.StdMonitorFields{})
 
@@ -172,7 +174,7 @@ func newESTestContext(t *testing.T) *esTestContext {
 		location:  location,
 	}
 
-	etc.tracker = NewTracker(etc.loader, true)
+	etc.tracker = NewTracker(etc.loader, true, logptest.NewTestingLogger(t, ""))
 
 	return etc
 }

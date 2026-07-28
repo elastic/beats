@@ -344,7 +344,7 @@ func TestSourceFieldErrors(t *testing.T) {
 	testFields := mapstr.M{
 		"field1": "foo",
 		"field2": "bar",
-		"complex_field": map[string]interface{}{
+		"complex_field": map[string]any{
 			"child": "qux",
 		},
 		"unused_field": "baz",
@@ -508,7 +508,7 @@ func nRandomEvents(num int) []beat.Event {
 	b := make([]byte, 200)
 
 	events := make([]beat.Event, 0, num)
-	for i := 0; i < num; i++ {
+	for range num {
 		for j := range b {
 			b[j] = charset[prng.IntN(charsetLen)]
 		}

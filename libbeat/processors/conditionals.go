@@ -22,8 +22,11 @@ import (
 	"fmt"
 	"strings"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -39,7 +42,16 @@ func NewConditional(
 			return nil, err
 		}
 
-		return addCondition(cfg, rule, log)
+		cond, err := addCondition(cfg, rule, log)
+		if err != nil {
+			// The processor was already constructed and may hold resources
+			// (or a reference to a shared instance): release it.
+			if closeErr := Close(rule); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("failed to close processor after condition error: %w", closeErr))
+			}
+			return nil, err
+		}
+		return cond, nil
 	}
 }
 
@@ -63,11 +75,20 @@ func NewConditionRule(
 	if cond == nil {
 		return p, nil
 	}
-	if _, ok := p.(Closer); ok {
-		return &ClosingWhenProcessor{WhenProcessor{cond, p}}, nil
-	}
 
-	return &WhenProcessor{cond, p}, nil
+	_, isCloser := p.(Closer)
+	pdataInner, isPdata := p.(PdataProcessor)
+
+	switch {
+	case isCloser && isPdata:
+		return &ClosingWhenPdataProcessor{WhenPdataProcessor{WhenProcessor{cond, p}, pdataInner}}, nil
+	case isCloser:
+		return &ClosingWhenProcessor{WhenProcessor{cond, p}}, nil
+	case isPdata:
+		return &WhenPdataProcessor{WhenProcessor{cond, p}, pdataInner}, nil
+	default:
+		return &WhenProcessor{cond, p}, nil
+	}
 }
 
 // Run executes this WhenProcessor.
@@ -102,6 +123,37 @@ type ClosingWhenProcessor struct {
 }
 
 func (cwp *ClosingWhenProcessor) Close() error {
+	return Close(cwp.p)
+}
+
+var _ PdataProcessor = (*WhenPdataProcessor)(nil)
+var _ PdataProcessor = (*ClosingWhenPdataProcessor)(nil)
+
+// WhenPdataProcessor is like WhenProcessor but is only created when the inner
+// processor implements PdataProcessor. It delegates RunPdata directly to the
+// inner processor.
+type WhenPdataProcessor struct {
+	WhenProcessor
+	pdataInner PdataProcessor
+}
+
+// RunPdata evaluates the condition on the pdata body and, if it passes,
+// delegates directly to the inner processor's RunPdata. The inner is
+// guaranteed to implement PdataProcessor by construction.
+func (r *WhenPdataProcessor) RunPdata(body pcommon.Map) (bool, error) {
+	if !r.condition.Check(otelmap.PdataValuesMap{M: body}) {
+		return false, nil
+	}
+	return r.pdataInner.RunPdata(body)
+}
+
+// ClosingWhenPdataProcessor is like WhenPdataProcessor but adds Close for
+// inner processors that implement Closer.
+type ClosingWhenPdataProcessor struct {
+	WhenPdataProcessor
+}
+
+func (cwp *ClosingWhenPdataProcessor) Close() error {
 	return Close(cwp.p)
 }
 
@@ -172,6 +224,13 @@ func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (beat.Processor,
 		return nil, err
 	}
 	if elseProcessors, err = newProcessors(c.Else); err != nil {
+		// The 'then' processors were already constructed and may hold
+		// resources (or references to shared instances): release them.
+		if ifProcessors != nil {
+			if closeErr := ifProcessors.Close(); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("failed to close 'then' processors after 'else' error: %w", closeErr))
+			}
+		}
 		return nil, err
 	}
 

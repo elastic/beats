@@ -100,6 +100,21 @@ func TestDecodeError(t *testing.T) {
 			cloudID:  "dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDhhMDI4M2FmMDQxZjE5NWY3NzI5YmMwNGM2NmEwZg==",
 			errorMsg: "Expected at least 3 parts",
 		},
+		{
+			// esID contains '#'
+			cloudID:  "inject-es:#:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MSNhdHRhY2tlci5jb20kYzZjMmNhNmQwNDIyNDlhZjBjYzdkN2E5ZTk2MjU3NDM=",
+			errorMsg: "invalid character",
+		},
+		{
+			// kbID contains '#'
+			cloudID:  "inject-kb:#:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZCNhdHRhY2tlci5jb20=",
+			errorMsg: "invalid character",
+		},
+		{
+			// host contains '#'
+			cloudID:  "inject-host:#:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyNhdHRhY2tlci5jb20kY2VjNmYyNjFhNzRiZjI0Y2UzM2JiODgxMWI4NDI5NGYkYzZjMmNhNmQwNDIyNDlhZjBjYzdkN2E5ZTk2MjU3NDM=",
+			errorMsg: "invalid character",
+		},
 	}
 
 	for _, test := range tests {
@@ -112,27 +127,27 @@ func TestDecodeError(t *testing.T) {
 func TestOverwriteSettings(t *testing.T) {
 	tests := []struct {
 		name   string
-		inCfg  map[string]interface{}
-		outCfg map[string]interface{}
+		inCfg  map[string]any
+		outCfg map[string]any
 	}{
 		{
 			name: "No cloud-id specified, nothing should change",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"output.elasticsearch.hosts": "localhost:9200",
 			},
-			outCfg: map[string]interface{}{
+			outCfg: map[string]any{
 				"output.elasticsearch.hosts": "localhost:9200",
 			},
 		},
 		{
 			name: "cloudid realistic example",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"output.elasticsearch.hosts": "localhost:9200",
 				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 				"cloud.auth":                 "elastic:changeme",
 			},
-			outCfg: map[string]interface{}{
-				"output.elasticsearch.hosts":    []interface{}{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
+			outCfg: map[string]any{
+				"output.elasticsearch.hosts":    []any{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
 				"output.elasticsearch.username": "elastic",
 				"output.elasticsearch.password": "changeme",
 				"setup.kibana.host":             "https://d4ac7559d4674b7c91abe10856d84304.us-east-1.aws.found.io:443",
@@ -142,35 +157,35 @@ func TestOverwriteSettings(t *testing.T) {
 		},
 		{
 			name: "only cloudid specified",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"output.elasticsearch.hosts": "localhost:9200",
 				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
-			outCfg: map[string]interface{}{
-				"output.elasticsearch.hosts": []interface{}{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
+			outCfg: map[string]any{
+				"output.elasticsearch.hosts": []any{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
 				"setup.kibana.host":          "https://d4ac7559d4674b7c91abe10856d84304.us-east-1.aws.found.io:443",
 				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
 		},
 		{
 			name: "no output defined",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"cloud.id": "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
-			outCfg: map[string]interface{}{
-				"output.elasticsearch.hosts": []interface{}{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
+			outCfg: map[string]any{
+				"output.elasticsearch.hosts": []any{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
 				"setup.kibana.host":          "https://d4ac7559d4674b7c91abe10856d84304.us-east-1.aws.found.io:443",
 				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
 		},
 		{
 			name: "multiple hosts to overwrite",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"output.elasticsearch.hosts": []string{"localhost:9200", "test", "test1"},
 				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
-			outCfg: map[string]interface{}{
-				"output.elasticsearch.hosts": []interface{}{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
+			outCfg: map[string]any{
+				"output.elasticsearch.hosts": []any{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
 				"setup.kibana.host":          "https://d4ac7559d4674b7c91abe10856d84304.us-east-1.aws.found.io:443",
 				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
@@ -186,11 +201,11 @@ func TestOverwriteSettings(t *testing.T) {
 		err = OverwriteSettings(cfg)
 		assert.NoError(t, err)
 
-		var res map[string]interface{}
+		var res map[string]any
 		err = cfg.Unpack(&res)
 		assert.NoError(t, err)
 
-		var expected map[string]interface{}
+		var expected map[string]any
 		expectedCfg, err := config.NewConfigFrom(test.outCfg)
 		assert.NoError(t, err)
 		err = expectedCfg.Unpack(&expected)
@@ -203,26 +218,26 @@ func TestOverwriteSettings(t *testing.T) {
 func TestOverwriteErrors(t *testing.T) {
 	tests := []struct {
 		name   string
-		inCfg  map[string]interface{}
+		inCfg  map[string]any
 		errMsg string
 	}{
 		{
 			name: "cloud.auth specified but cloud.id not",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"cloud.auth": "elastic:changeme",
 			},
 			errMsg: "cloud.auth specified but cloud.id is empty",
 		},
 		{
 			name: "invalid cloud.id",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"cloud.id": "blah",
 			},
 			errMsg: "Error decoding cloud.id",
 		},
 		{
 			name: "invalid cloud.auth",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"cloud.id":   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 				"cloud.auth": "blah",
 			},
@@ -230,7 +245,7 @@ func TestOverwriteErrors(t *testing.T) {
 		},
 		{
 			name: "logstash output enabled",
-			inCfg: map[string]interface{}{
+			inCfg: map[string]any{
 				"cloud.id":              "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 				"output.logstash.hosts": "localhost:544",
 			},

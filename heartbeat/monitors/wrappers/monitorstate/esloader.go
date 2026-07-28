@@ -41,10 +41,15 @@ func (e LoaderError) Error() string {
 	return e.err.Error()
 }
 
-func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
+func MakeESLoader(
+	esc *eslegclient.Connection,
+	indexPattern string,
+	beatLocation *config.LocationWithID,
+	logger *logp.Logger,
+) StateLoader {
 	if indexPattern == "" {
 		// Should never happen, but if we ever make a coding error...
-		logp.L().Warn("ES state loader initialized with no index pattern, will not load states from ES")
+		logger.Warn("ES state loader initialized with no index pattern, will not load states from ES")
 		return NilStateLoader
 	}
 	return func(sf stdfields.StdMonitorFields) (*State, error) {
@@ -108,7 +113,7 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 		}
 
 		if len(sh.Hits.Hits) == 0 {
-			logp.L().Infof("no previous state found for monitor %s in Elasticsearch (loc=%s)", sf.ID, runFromID)
+			logger.Infof("no previous state found for monitor %s in Elasticsearch (loc=%s)", sf.ID, runFromID)
 			return nil, nil
 		}
 

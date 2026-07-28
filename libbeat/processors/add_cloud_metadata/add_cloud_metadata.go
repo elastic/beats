@@ -23,7 +23,10 @@ import (
 	"sync"
 	"time"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
@@ -43,6 +46,8 @@ func init() {
 	processors.RegisterPlugin("add_cloud_metadata", New)
 	jsprocessor.RegisterPlugin("AddCloudMetadata", New)
 }
+
+var _ processors.PdataProcessor = (*addCloudMetadata)(nil)
 
 type addCloudMetadata struct {
 	baseCtx       context.Context
@@ -148,6 +153,28 @@ func (p *addCloudMetadata) Close() error {
 	p.baseCtxCancel()
 	p.initOnce.Do(func() {})
 	return nil
+}
+
+// RunPdata enriches the given pcommon.Map directly with cloud metadata,
+// avoiding the round-trip conversion to/from mapstr.M used by the standard Run path.
+// It reads p.metadata without cloning: PutAtPath copies values into pdata so
+// there is no aliasing between the cached metadata and the log record.
+func (p *addCloudMetadata) RunPdata(body pcommon.Map) (bool, error) {
+	p.init()
+	if len(p.metadata) == 0 {
+		return false, nil
+	}
+	for key, metaVal := range p.metadata {
+		if !p.initData.overwrite {
+			if _, exists := otelmap.GetAtPath(key, body); exists {
+				continue
+			}
+		}
+		if err := otelmap.PutAtPath(key, metaVal, body); err != nil {
+			return false, err
+		}
+	}
+	return false, nil
 }
 
 func (p *addCloudMetadata) addMeta(event *beat.Event, meta mapstr.M) error {

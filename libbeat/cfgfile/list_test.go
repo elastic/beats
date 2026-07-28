@@ -144,6 +144,22 @@ func TestNewConfigs(t *testing.T) {
 	assert.Len(t, list.copyRunnerList(), 3)
 }
 
+func TestReloadSkipsDisabledConfigs(t *testing.T) {
+	factory := &runnerFactory{}
+	logger := logptest.NewTestingLogger(t, "")
+	list := NewRunnerList("", factory, nil, logger)
+
+	err := list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+		createDisabledConfig(2),
+		createConfig(3),
+	})
+
+	require.NoError(t, err, "reloading configs with one disabled config should succeed")
+	assert.Len(t, list.copyRunnerList(), 2, "disabled configs should not start runners")
+	assert.Len(t, factory.runners, 2, "disabled configs should not be passed to the runner factory")
+}
+
 func TestReloadSameConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	logger := logptest.NewTestingLogger(t, "")
@@ -217,6 +233,33 @@ func TestReloadStopConfigs(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Len(t, list.copyRunnerList(), 2)
+}
+
+func TestReloadStopsDisabledConfigs(t *testing.T) {
+	factory := &runnerFactory{}
+	logger := logptest.NewTestingLogger(t, "")
+	list := NewRunnerList("", factory, nil, logger)
+
+	err := list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+		createConfig(2),
+	})
+	require.NoError(t, err, "initial reload should start enabled configs")
+	assert.Len(t, list.copyRunnerList(), 2, "initial reload should start both enabled configs")
+
+	hash, err := HashConfig(createConfig(2).Config)
+	require.NoError(t, err, "hashing enabled config should succeed")
+	startedRunner := list.copyRunnerList()[hash]
+	require.NotNil(t, startedRunner, "expected runner for config before disabling it")
+
+	err = list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+		createDisabledConfig(2),
+	})
+
+	require.NoError(t, err, "reloading with disabled config should succeed")
+	assert.Len(t, list.copyRunnerList(), 1, "disabled configs should be removed from the running set")
+	assert.True(t, startedRunner.(*runner).stopped, "runner should stop when its config is disabled") //nolint:errcheck //false positive
 }
 
 func TestReloadStartStopConfigs(t *testing.T) {
@@ -342,4 +385,10 @@ func createConfig(id int64) *reload.ConfigWithMeta {
 	return &reload.ConfigWithMeta{
 		Config: c,
 	}
+}
+
+func createDisabledConfig(id int64) *reload.ConfigWithMeta {
+	cfg := createConfig(id)
+	_ = cfg.Config.SetBool("enabled", -1, false)
+	return cfg
 }

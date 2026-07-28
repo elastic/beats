@@ -8,7 +8,7 @@ applies_to:
 
 # Run Packetbeat on Docker [running-on-docker]
 
-Docker images for Packetbeat are available from the Elastic Docker registry. The base image is [Red Hat Universal Base Image 9 Minimal](https://hub.docker.com/r/redhat/ubi9-minimal).
+Docker images for Packetbeat are available from the Elastic Docker registry. The base image is [Red Hat Universal Base Image 10 Minimal](https://hub.docker.com/r/redhat/ubi10-minimal).
 
 A list of all published Docker images and tags is available at [www.docker.elastic.co](https://www.docker.elastic.co).
 

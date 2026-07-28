@@ -524,7 +524,7 @@ This feature is NOT supported on Windows. The default value is `false`.
 
 
 ::::{note}
-This feature requres the `execve` system call to be enabled. If you have a custom seccomp policy in place, make sure to allow for `execve`.
+This feature requires the `execve` system call to be enabled. If you have a custom seccomp policy in place, make sure to allow for `execve`.
 ::::
 
 

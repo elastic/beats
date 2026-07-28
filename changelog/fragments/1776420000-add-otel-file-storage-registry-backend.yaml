@@ -1,0 +1,10 @@
+kind: feature
+
+summary: Add otel_file_storage registry backend for standalone Filebeat
+
+description: |
+  Remove the experimental `bbolt` registry backend. Add `otel_file_storage` as a new
+  registry backend for standalone Filebeat, using the same on-disk layout as the
+  OpenTelemetry Collector file_storage extension.
+
+component: filebeat

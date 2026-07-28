@@ -9,6 +9,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -25,6 +26,7 @@ import (
 	"github.com/moby/moby/client"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
@@ -50,10 +52,10 @@ var (
 	dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
 
 	platformMap = map[string]map[string]interface{}{
-		"amd64": map[string]interface{}{
+		"amd64": {
 			"from": "alpine:3.10",
 		},
-		"arm64": map[string]interface{}{
+		"arm64": {
 			"from": "arm64v8/alpine:3.10",
 		},
 	}
@@ -106,7 +108,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 
 	buildContext, err := os.Open(tarPath)
 	if err != nil {
-		return fmt.Errorf("error opening temp dur: %w", err)
+		return fmt.Errorf("error opening temp dir: %w", err)
 	}
 	defer buildContext.Close()
 
@@ -422,6 +424,30 @@ func BuildAndInstall() {
 // Update is currently a dummy test for the `testsuite` target
 func Update() {
 	fmt.Println(">> update: There is no Update for The Elastic Log Plugin")
+}
+
+// Generate copies entry.proto from the moby/moby/v2 module cache, regenerates
+// logdriver/entry.pb.go via go generate, adds the Elastic license header, and
+// formats the file. Run this after bumping the moby dependency.
+// Requires protoc and protoc-gen-gogofaster: go install github.com/gogo/protobuf/protoc-gen-gogofaster@latest
+func Generate() error {
+	out, err := sh.Output("go", "list", "-m", "-json", "github.com/moby/moby/v2")
+	if err != nil {
+		return fmt.Errorf("finding moby module: %w", err)
+	}
+	var mod struct{ Dir string }
+	if err := json.Unmarshal([]byte(out), &mod); err != nil {
+		return fmt.Errorf("parsing module info: %w", err)
+	}
+	src := filepath.Join(mod.Dir, "daemon", "logger", "internal", "logdriver", "entry.proto")
+	if err := devtools.Copy(src, filepath.Join("logdriver", "entry.proto")); err != nil {
+		return fmt.Errorf("copying entry.proto: %w", err)
+	}
+	if err := sh.Run("go", "generate", "./logdriver/..."); err != nil {
+		return fmt.Errorf("running go generate: %w", err)
+	}
+	devtools.Format()
+	return nil
 }
 
 func newDockerClient(ctx context.Context) (*client.Client, error) {

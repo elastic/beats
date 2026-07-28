@@ -67,7 +67,7 @@ import (
 )
 
 // toBool converts value to bool. In case of error, returns false
-func toBool(key string, data map[string]interface{}) (interface{}, error) {
+func toBool(key string, data map[string]any) (any, error) {
 	str, err := getString(key, data)
 	if err != nil {
 		return false, err
@@ -88,7 +88,7 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 // toFloat converts value to float64. In case of error, returns 0.0
-func toFloat(key string, data map[string]interface{}) (interface{}, error) {
+func toFloat(key string, data map[string]any) (any, error) {
 	str, err := getString(key, data)
 	if err != nil {
 		return false, err
@@ -109,7 +109,7 @@ func Float(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 // toInt converts value to int. In case of error, returns 0
-func toInt(key string, data map[string]interface{}) (interface{}, error) {
+func toInt(key string, data map[string]any) (any, error) {
 	str, err := getString(key, data)
 	if err != nil {
 		return false, err
@@ -130,7 +130,7 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 // toStr converts value to str. In case of error, returns ""
-func toStr(key string, data map[string]interface{}) (interface{}, error) {
+func toStr(key string, data map[string]any) (any, error) {
 	return getString(key, data)
 }
 
@@ -140,7 +140,7 @@ func toStr(key string, data map[string]interface{}) (interface{}, error) {
 func Time(layout, key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{
 		Key: key,
-		Func: func(key string, data map[string]interface{}) (interface{}, error) {
+		Func: func(key string, data map[string]any) (any, error) {
 			str, err := getString(key, data)
 			if err != nil {
 				return false, err
@@ -163,7 +163,7 @@ func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 // checkExists checks if a key exists in the given data set
-func getString(key string, data map[string]interface{}) (string, error) {
+func getString(key string, data map[string]any) (string, error) {
 	val, exists := data[key]
 	if !exists {
 		return "", schema.NewKeyNotFoundError(key)

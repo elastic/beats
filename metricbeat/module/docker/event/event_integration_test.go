@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -41,7 +41,7 @@ func TestData(t *testing.T) {
 
 	ms := mbtest.NewPushMetricSetV2WithContext(t, getConfig())
 	var events []mb.Event
-	done := make(chan interface{})
+	done := make(chan any)
 	go func() {
 		events = mbtest.RunPushMetricSetV2WithContext(30*time.Second, 1, ms)
 		close(done)
@@ -112,8 +112,8 @@ func pullBusyboxImage(t *testing.T) {
 	reader.Close()
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "docker",
 		"metricsets": []string{"event"},
 		"hosts":      []string{"unix:///var/run/docker.sock"},

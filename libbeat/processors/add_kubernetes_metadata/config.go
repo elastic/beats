@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -79,8 +79,8 @@ func (k *kubeAnnotatorConfig) Validate() error {
 		return fmt.Errorf("wait_for_metadata_timeout must be zero or greater (zero means wait indefinitely)")
 	}
 
-	if k.WaitMetadataRetryPeriod < 0 {
-		return fmt.Errorf("wait_for_metadata_retry_period must be zero or greater")
+	if k.WaitMetadataRetryPeriod <= 0 {
+		return fmt.Errorf("wait_for_metadata_retry_period must be greater than zero")
 	}
 
 	if k.WaitMetadataTimeout != 0 && k.WaitMetadataRetryPeriod > k.WaitMetadataTimeout {
@@ -108,7 +108,7 @@ func (k *kubeAnnotatorConfig) Validate() error {
 				if logsPathMatcher.ResourceType != "pod" && logsPathMatcher.ResourceType != "container" {
 					return fmt.Errorf("invalid resource_type %s, valid values include `pod`, `container`", logsPathMatcher.ResourceType)
 				}
-				if logsPathMatcher.ResourceType == "pod" && !(logsPathMatcher.LogsPath == "/var/lib/kubelet/pods/" || logsPathMatcher.LogsPath == "/var/log/pods/") {
+				if logsPathMatcher.ResourceType == "pod" && (logsPathMatcher.LogsPath != "/var/lib/kubelet/pods/" && logsPathMatcher.LogsPath != "/var/log/pods/") {
 					return fmt.Errorf("invalid logs_path defined for resource_type: %s, valid values include `/var/lib/kubelet/pods/`, `/var/log/pods/`", logsPathMatcher.ResourceType)
 				}
 				if logsPathMatcher.ResourceType == "container" && logsPathMatcher.LogsPath != "/var/log/containers/" {

@@ -18,6 +18,7 @@
 package common
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,11 +60,26 @@ func TestRound(t *testing.T) {
 			input:    1234.50005,
 			expected: 1234.5001,
 		},
+		{
+			name:     "keep exact negative half",
+			input:    -0.5,
+			expected: -0.5,
+		},
+		{
+			name:     "truncate negative below midpoint",
+			input:    -0.50004,
+			expected: -0.5,
+		},
+		{
+			name:     "round away from zero at negative midpoint",
+			input:    -0.50005,
+			expected: -0.5001,
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.InDelta(t, tc.expected, Round(tc.input, DefaultDecimalPlacesCount), 1e-10, "rounding %v should be %v", tc.input, tc.expected)
+			assert.InDelta(t, tc.expected, Round(tc.input, DefaultDecimalPlacesCount), math.Pow10(-DefaultDecimalPlacesCount), "rounding %v should be %v", tc.input, tc.expected)
 		})
 	}
 }

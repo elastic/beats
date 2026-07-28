@@ -29,10 +29,13 @@ import (
 )
 
 type prvdr struct {
-	ctx            context.Context
-	logger         *logp.Logger
-	qq             *quark.Queue
-	qqMtx          *sync.Mutex
+	ctx    context.Context
+	logger *logp.Logger
+
+	qqMtx sync.Mutex
+	qq    *quark.Queue
+
+	backoffMtx     sync.Mutex
 	combinedWait   time.Duration
 	inBackoff      bool
 	backoffStart   time.Time
@@ -85,8 +88,8 @@ func readPIDNsInode() (uint64, error) {
 // NewProvider returns a new instance of kerneltracingprovider
 func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER | quark.QQ_NO_SNAPSHOT
-	qq, err := quark.OpenQueue(attr, 64)
+	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER
+	qq, err := quark.OpenQueue(attr)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %w", err)
 	}
@@ -94,15 +97,11 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 	procMetrics := NewStats(reg)
 
 	p := &prvdr{
-		ctx:            ctx,
-		logger:         logger,
-		qq:             qq,
-		qqMtx:          new(sync.Mutex),
-		combinedWait:   0 * time.Millisecond,
-		inBackoff:      false,
-		backoffStart:   time.Now(),
-		since:          time.Now(),
-		backoffSkipped: 0,
+		ctx:          ctx,
+		logger:       logger,
+		qq:           qq,
+		backoffStart: time.Now(),
+		since:        time.Now(),
 	}
 
 	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr, stats *Stats) {
@@ -112,12 +111,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 		defer qq.Close()
 		for ctx.Err() == nil {
 			p.qqMtx.Lock()
-			events, err := qq.GetEvents()
+			// We just drive quark to populate the cache, not interested in the events
+			_, ok := qq.GetEvent()
 			p.qqMtx.Unlock()
-			if err != nil {
-				logger.Errorw("get events from quark, no more process enrichment from this processor will be done", "error", err)
-				break
-			}
+			// Is it time to update stats?
 			if time.Since(lastUpdate) > time.Second*5 {
 				p.qqMtx.Lock()
 				metrics := qq.Stats()
@@ -131,7 +128,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				lastUpdate = time.Now()
 			}
 
-			if len(events) == 0 {
+			// Quark is idle, Block for a bit
+			if !ok {
 				err = qq.Block()
 				if err != nil {
 					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
@@ -176,8 +174,7 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 
 	start := time.Now()
 
-	p.handleBackoff(start)
-	if p.inBackoff {
+	if p.handleBackoff(start) {
 		return nil
 	}
 
@@ -187,11 +184,11 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 		waited := time.Since(start)
 		if _, found := p.lookupLocked(pid); found {
 			p.logger.Debugw("got process that was missing ", "waited", waited)
-			p.combinedWait = p.combinedWait + waited
+			p.addCombinedWait(waited)
 			return nil
 		}
 		if waited >= maxWaitLimit {
-			p.combinedWait = p.combinedWait + waited
+			p.addCombinedWait(waited)
 			return fmt.Errorf("process %v was not seen after %v", pid, waited)
 		}
 		time.Sleep(nextWait)
@@ -203,20 +200,25 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 	}
 }
 
-// handleBackoff handles backoff logic of `Sync`
+// handleBackoff handles backoff logic of `Sync` and reports whether the
+// provider is currently in backoff (in which case the caller must skip waiting
+// for the process to appear in the cache).
+//
 // If the combinedWait time exceeds the combinedWaitLimit duration, the provider will go into backoff state until the backoffDuration is exceeded.
 // If in a backoff period, it will track the number of skipped processes, and then log the number when exiting backoff.
 //
 // If there have been no backoffs within the resetDuration, the combinedWait duration is reset to zero, to keep a moving window in which delays are tracked.
-func (p *prvdr) handleBackoff(now time.Time) {
+func (p *prvdr) handleBackoff(now time.Time) bool {
+	p.backoffMtx.Lock()
+	defer p.backoffMtx.Unlock()
+
 	if p.inBackoff {
 		if now.Sub(p.backoffStart) > backoffDuration {
 			p.logger.Infow("ended backoff, skipped processes", "backoffSkipped", p.backoffSkipped)
 			p.inBackoff = false
-			p.combinedWait = 0 * time.Millisecond
+			p.combinedWait = 0
 		} else {
 			p.backoffSkipped += 1
-			return
 		}
 	} else {
 		if p.combinedWait > combinedWaitLimit {
@@ -224,13 +226,21 @@ func (p *prvdr) handleBackoff(now time.Time) {
 			p.inBackoff = true
 			p.backoffStart = now
 			p.backoffSkipped = 0
-			return
 		}
 		if now.Sub(p.since) > resetDuration {
 			p.since = now
-			p.combinedWait = 0 * time.Millisecond
+			p.combinedWait = 0
 		}
 	}
+	return p.inBackoff
+}
+
+// addCombinedWait adds waited to the shared wait budget under backoffMtx.
+func (p *prvdr) addCombinedWait(waited time.Duration) {
+	p.backoffMtx.Lock()
+	defer p.backoffMtx.Unlock()
+
+	p.combinedWait += waited
 }
 
 // GetProcess returns a reference to Process struct that contains all known information for the
@@ -246,13 +256,13 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Minor: proc.Proc.TtyMinor,
 	})
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	ret := types.Process{
 		PID:              proc.Pid,
 		Start:            &start,
-		Name:             basename(proc.Filename),
-		Executable:       proc.Filename,
+		Name:             basename(proc.Exe),
+		Executable:       proc.Exe,
 		Args:             proc.Cmdline,
 		WorkingDirectory: proc.Cwd,
 		Interactive:      &interactive,
@@ -270,10 +280,10 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	if ok {
 		ret.Group.Name = groupname
 	}
-	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor)
-	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor)
+	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor) //nolint:gosec // tty major/minor numbers fit in uint16
+	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor) //nolint:gosec // tty major/minor numbers fit in uint16
 	if proc.Exit.Valid {
-		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess))
+		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess)) //nolint:gosec // ExitTimeProcess is a nanosecond timestamp that fits in int64
 		ret.ExitCode = proc.Exit.ExitCode
 		ret.End = &end
 	}
@@ -288,7 +298,7 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	return &ret, nil
 }
 
-func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
+func (p *prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 	p.qqMtx.Lock()
 	defer p.qqMtx.Unlock()
 
@@ -296,13 +306,13 @@ func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 }
 
 // fillParent populates the parent process fields with the attributes of the process with PID `ppid`
-func (p prvdr) fillParent(process *types.Process, ppid uint32) {
+func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 	proc, found := p.lookupLocked(ppid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
@@ -311,8 +321,8 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	egid := proc.Proc.Egid
 	process.Parent.PID = proc.Pid
 	process.Parent.Start = &start
-	process.Parent.Name = basename(proc.Filename)
-	process.Parent.Executable = proc.Filename
+	process.Parent.Name = basename(proc.Exe)
+	process.Parent.Executable = proc.Exe
 	process.Parent.Args = proc.Cmdline
 	process.Parent.WorkingDirectory = proc.Cwd
 	process.Parent.Interactive = &interactive
@@ -330,13 +340,13 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 }
 
 // fillGroupLeader populates the process group leader fields with the attributes of the process with PID `pgid`
-func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
+func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	proc, found := p.lookupLocked(pgid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -346,8 +356,8 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	egid := proc.Proc.Egid
 	process.GroupLeader.PID = proc.Pid
 	process.GroupLeader.Start = &start
-	process.GroupLeader.Name = basename(proc.Filename)
-	process.GroupLeader.Executable = proc.Filename
+	process.GroupLeader.Name = basename(proc.Exe)
+	process.GroupLeader.Executable = proc.Exe
 	process.GroupLeader.Args = proc.Cmdline
 	process.GroupLeader.WorkingDirectory = proc.Cwd
 	process.GroupLeader.Interactive = &interactive
@@ -365,13 +375,13 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 }
 
 // fillSessionLeader populates the session leader fields with the attributes of the process with PID `sid`
-func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
+func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	proc, found := p.lookupLocked(sid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -381,8 +391,8 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	egid := proc.Proc.Egid
 	process.SessionLeader.PID = proc.Pid
 	process.SessionLeader.Start = &start
-	process.SessionLeader.Name = basename(proc.Filename)
-	process.SessionLeader.Executable = proc.Filename
+	process.SessionLeader.Name = basename(proc.Exe)
+	process.SessionLeader.Executable = proc.Exe
 	process.SessionLeader.Args = proc.Cmdline
 	process.SessionLeader.WorkingDirectory = proc.Cwd
 	process.SessionLeader.Interactive = &interactive
@@ -400,13 +410,13 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 }
 
 // fillEntryLeader populates the entry leader fields with the attributes of the process with PID `elid`
-func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
+func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 	proc, found := p.lookupLocked(elid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -484,7 +494,7 @@ func calculateEntityIDv1(pid uint32, startTime time.Time) string {
 				pidNsInode,
 				bootID,
 				uint64(pid),
-				uint64(startTime.Unix()),
+				uint64(startTime.Unix()), //nolint:gosec // process start times are always positive
 			),
 		),
 	)

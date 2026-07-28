@@ -1,0 +1,8 @@
+# REQUIRED
+kind: enhancement
+
+# REQUIRED
+summary: Rename osquerybeat query profiling settings to `profiling` and enable profiling by default
+
+# REQUIRED
+component: osquerybeat

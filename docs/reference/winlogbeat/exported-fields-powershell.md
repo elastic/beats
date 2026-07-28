@@ -178,6 +178,12 @@ Data related to the PowerShell engine.
 
 Data related to the executed script file.
 
+**`powershell.file.script_block_hash`**
+:   SHA-256 hash of the executed script block.
+
+    type: keyword
+
+
 **`powershell.file.script_block_id`**
 :   Id of the executed script block.
 

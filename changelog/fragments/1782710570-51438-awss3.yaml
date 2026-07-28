@@ -1,0 +1,8 @@
+kind: enhancement
+summary: Add v2 aws-s3 input with adaptive flow control.
+description: |
+  The aws-s3 input has been rewritten with a simpler architecture, adaptive
+  concurrency control, and unified state management. The new implementation can
+  be enabled by setting features.aws_s3_v2.enabled: true in the beat
+  configuration.
+component: filebeat

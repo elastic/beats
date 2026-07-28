@@ -221,7 +221,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.destinationMacAddress`**
-:   Six colon-seperated hexadecimal numbers.
+:   Six colon-separated hexadecimal numbers.
 
     type: keyword
 
@@ -689,7 +689,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.deviceZoneURI`**
-:   Thee URI for the Zone that the device asset has been assigned to in ArcSight.
+:   The URI for the Zone that the device asset has been assigned to in ArcSight.
 
     type: keyword
 

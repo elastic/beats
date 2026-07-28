@@ -30,7 +30,7 @@ import (
 
 func TestApplyPresetNoConflicts(t *testing.T) {
 	const testHost = "http://elastic-host:9200"
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"hosts": []string{testHost},
 
 		// Set some parameters that aren't affected by performance presets
@@ -83,7 +83,7 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 
 func TestApplyPresetWithConflicts(t *testing.T) {
 	const testHost = "http://elastic-host:9200"
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"hosts": []string{testHost},
 
 		// Set parameters contained in the performance presets, with
@@ -146,7 +146,7 @@ func TestApplyPresetWithConflicts(t *testing.T) {
 
 func TestApplyPresetCustom(t *testing.T) {
 	const testHost = "http://elastic-host:9200"
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"hosts": []string{testHost},
 
 		// Set parameters contained in the performance presets, with
@@ -204,7 +204,7 @@ func TestFlattenedKeysRemovesNamespace(t *testing.T) {
 	// A test exhibiting the namespace corner case that breaks the baseline
 	// behavior of FlattenedKeys, and ensuring that flattenedKeysForConfig
 	// fixes it.
-	rawCfg := config.MustNewConfigFrom(map[string]interface{}{
+	rawCfg := config.MustNewConfigFrom(map[string]any{
 		"namespace.testkey": "testvalue",
 	})
 	ns := config.Namespace{}

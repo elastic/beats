@@ -1,0 +1,11 @@
+kind: enhancement
+summary: |
+  Add Enhanced Fingerprint mode to the filestream input's `fingerprint` file identity.
+  When enabled (`file_identity.fingerprint.growing: true`, the default), files smaller
+  than `prospector.scanner.fingerprint.offset + prospector.scanner.fingerprint.length`
+  are tracked instead of being skipped as too small. No data duplication happens
+  on upgrade or when enabling the enhanced fingerprint. The new behaviour is
+  opt-out (`growing: false` restores the legacy fingerprint behaviour).
+component: filebeat
+pr: https://github.com/elastic/beats/pull/50566
+issue: https://github.com/elastic/beats/issues/50116

@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func GetTestTcpServer(host string, port int) (server.Server, error) {
-	addr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(host, strconv.Itoa(int(port))))
-
+func GetTestTcpServer(host string) (*TcpServer, error) {
+	// Listen on port 0 so the OS assigns a free ephemeral port.
+	addr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(host, "0"))
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,6 @@ func GetTestTcpServer(host string, port int) (server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	logger.Infof("Started listening for TCP on: %s:%d", host, port)
 	return &TcpServer{
 		tcpAddr:           addr,
 		receiveBufferSize: 1024,
@@ -54,8 +53,7 @@ func GetTestTcpServer(host string, port int) (server.Server, error) {
 
 func TestTcpServer(t *testing.T) {
 	host := "127.0.0.1"
-	port := 2003
-	svc, err := GetTestTcpServer(host, port)
+	svc, err := GetTestTcpServer(host)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -68,6 +66,9 @@ func TestTcpServer(t *testing.T) {
 	}
 
 	defer svc.Stop()
+
+	// Start() binds the listener, so the OS-assigned port is now known.
+	port := svc.listener.Addr().(*net.TCPAddr).Port
 	writeToServer(t, "test1\n", host, port)
 	msg := <-svc.GetEvents()
 
