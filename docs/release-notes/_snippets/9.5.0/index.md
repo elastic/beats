@@ -36,13 +36,7 @@
 * Reduce allocations in filestream by pooling the per-file LineReader scratch buffer. [#51197](https://github.com/elastic/beats/pull/51197) 
 * Add emit macro, stream producers, and lazy JSON decode to the CEL input. [#51279](https://github.com/elastic/beats/pull/51279)
 * Promote the `winlog` input to GA (generally available). [#51557](https://github.com/elastic/beats/pull/51557) 
-* Add v2 aws-s3 input with adaptive flow control. [#51598](https://github.com/elastic/beats/pull/51598) 
-
-  The aws-s3 input has been rewritten with a simpler architecture, adaptive
-  concurrency control, and unified state management. The new implementation can
-  be enabled by setting features.aws_s3_v2.enabled: true in the beat
-  configuration.
-  
+* Add v2 `aws-s3` input with adaptive flow control. [#51598](https://github.com/elastic/beats/pull/51598)
 * Add filestream harvester metrics to monitoring logs. [#51077](https://github.com/elastic/beats/pull/51077) [#36653](https://github.com/elastic/beats/issues/36653)
 * Add sign-in activity enrichment to the minimal-state EntraID entity analytics provider. [#51724](https://github.com/elastic/beats/pull/51724) 
 * Aggregate SQS mode health status to reduce false Degraded/Healthy transitions.  [#51692](https://github.com/elastic/beats/issues/51692)
@@ -89,66 +83,32 @@
 
 **Elastic agent**
 
-* Fix beat receiver Shutdown hanging when Start fails before the beater is launched. [#52106](https://github.com/elastic/beats/pull/52106) [#52009](https://github.com/elastic/beats/issues/52009)
+* Fix Beat receiver shutdown hanging when start fails before the beater is launched. [#52106](https://github.com/elastic/beats/pull/52106) [#52009](https://github.com/elastic/beats/issues/52009)
 
 **Filebeat**
 
-* Harden Salesforce input batching compatibility and auth-failure recovery. [#50149](https://github.com/elastic/beats/pull/50149) 
-
-  Preserve Salesforce object cursor continuity across bounded-batch upgrades
-  and toggles. Existing installs now seed batched windows from legacy
-  first_event_time / last_event_time state, and disabling batching resumes
-  unbatched queries from the latest safe watermark instead of replaying quiet
-  windows that batching already drained.
-  
-  Tighten batching safety by rejecting object configs that enable batching
-  without referencing both batch_start_time and batch_end_time, or that still
-  reference those placeholders after batching is disabled.
-  
-  Prevent same-timestamp resume gaps for SetupAuditTrail and EventLogFile
-  collection by persisting the last seen record Id as a tie-breaker. Existing
-  installs remain compatible: older cursor state keeps the legacy resume boundary
-  until the next successful run records the new field.
-  
-  Normalize Salesforce OAuth token_url handling for user-password and JWT flows.
-  The input now accepts either a Salesforce OAuth host or the canonical
-  /services/oauth2/token endpoint and avoids constructing doubled token URLs.
-  
-  Improve resilience by propagating input cancellation into Salesforce HTTP
-  requests, retrying the initial SOQL request once after Salesforce auth errors,
-  retrying EventLogFile downloads once after a 401, and surfacing consecutive
-  collection failures in Elastic Agent status.
-  
-* Fix Okta minimal-state provider to accept configs with both okta_token and oauth2. [#51078](https://github.com/elastic/beats/pull/51078) [#51005](https://github.com/elastic/beats/issues/51005)
-* Fix S3 polling input to exclude same-bucket backup objects from listing.  
-
-  When same-bucket backup is configured with the default empty
-  bucket_list_prefix, backup objects are listed alongside source objects
-  and reprocessed indefinitely. Exclude keys matching the backup prefix
-  from listing results when the backup destination is the same bucket.
-  
-* Honor path_style for non-AWS S3 buckets in the aws-s3 input. [#52003](https://github.com/elastic/beats/pull/52003) 
-
-  When using non_aws_bucket_name with a custom endpoint, the aws-s3 input always marked the endpoint hostname immutable, forcing path-style requests and ignoring path_style. This broke S3-compatible providers that require virtual-hosted addressing, which returned VirtualHostDomainRequired.  The hostname is now kept mutable for non-AWS buckets so path_style is honored.
-  
+* Harden Salesforce input batching compatibility and auth-failure recovery. [#50149](https://github.com/elastic/beats/pull/50149)
+* Fix Okta minimal-state provider to accept configs with both `okta_token` and `oauth2`. [#51078](https://github.com/elastic/beats/pull/51078) [#51005](https://github.com/elastic/beats/issues/51005)
+* Fix S3 polling input to exclude same-bucket backup objects from listing.
+* Honor `path_style` for non-AWS S3 buckets in the `aws-s3` input. [#52003](https://github.com/elastic/beats/pull/52003)
 * Use a stable status message for SQS receive errors to prevent update churn during sustained outages.  
-* Do not mark the CEL input&#39;s health as degraded when the maximum executions is exceeded.  
-* Honor the configured language when rendering Windows events.  [#7332](https://github.com/elastic/sdh-beats/issues/7332)
+* Do not mark the CEL input's health as degraded when the maximum number of executions is exceeded.  
+* Honor the configured language when rendering Windows events. [#7332](https://github.com/elastic/sdh-beats/issues/7332)
 
 **Heartbeat**
 
-* Fix panic with multiple heartbeat receivers.  
+* Fix panic with multiple Heartbeat receivers.  
 
 **Libbeat**
 
 * Add LDAP channel binding for Windows SSPI binds. [#49733](https://github.com/elastic/beats/pull/49733) 
-* Fix add_host_metadata host.geo map sharing across events causing data corruption. [#49722](https://github.com/elastic/beats/pull/49722) [#49721](https://github.com/elastic/beats/issues/49721)
+* Fix `add_host_metadata` `host.geo` map sharing across events causing data corruption. [#49722](https://github.com/elastic/beats/pull/49722) [#49721](https://github.com/elastic/beats/issues/49721)
 
 **Osquerybeat**
 
 * Reject CPIO entries in macOS .pkg payloads whose paths escape the destination directory, preventing path traversal during extraction (CWE-22). [#51446](https://github.com/elastic/beats/pull/51446) 
-* Propagate osquery live-query space IDs to action response events. [#50808](https://github.com/elastic/beats/pull/50808) 
-* Fixes serialization of ads and active columns in elastic_ntfs_file table to use boolean instead of integer. [#51629](https://github.com/elastic/beats/pull/51629) 
+* Propagate Osquery live-query space IDs to action response events. [#50808](https://github.com/elastic/beats/pull/50808) 
+* Fix the serialization of ads and active columns in `elastic_ntfs_file` table to use boolean instead of integer. [#51629](https://github.com/elastic/beats/pull/51629) 
 
 **Winlogbeat**
 
