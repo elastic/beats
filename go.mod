@@ -130,7 +130,7 @@ require (
 	golang.org/x/time v0.15.0
 	golang.org/x/tools v0.47.0
 	google.golang.org/api v0.287.1
-	google.golang.org/genproto v0.0.0-20260401024825-9d38bb4040a9 // indirect
+	google.golang.org/genproto v0.0.0-20260519071638-aa98bba5eb94 // indirect
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/inf.v0 v0.9.1
@@ -312,8 +312,8 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.6.0 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.32.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.55.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.55.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.57.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.57.0 // indirect
 	github.com/Velocidex/json v0.0.0-20220224052537-92f3c0326e5a // indirect
 	github.com/Velocidex/ordereddict v0.0.0-20230909174157-2aa49cc5d11d // indirect
 	github.com/Velocidex/yaml/v2 v2.2.8 // indirect
@@ -559,7 +559,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.62.3
+	cloud.google.com/go/storage v1.64.0
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
