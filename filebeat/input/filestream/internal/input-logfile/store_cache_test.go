@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"errors"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -27,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -168,6 +170,43 @@ func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 	// more than one close would indicate duplicate release/close handling.
 	acquired.Release()
 	require.Equal(t, int32(1), closes.Load())
+}
+
+func TestStoreCache_ConcurrentInitialization(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	states := newCountingStateStore()
+	const acquisitions = 10
+	type acquireResult struct {
+		store *store
+		err   error
+	}
+	results := make(chan acquireResult, acquisitions)
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+	for range acquisitions {
+		wg.Go(func() {
+			<-start
+			s, err := acquireStore(logp.NewNopLogger(), states, "filestream")
+			t.Cleanup(func() { releaseAcquiredStore(s) })
+			results <- acquireResult{store: s, err: err}
+		})
+	}
+	close(start)
+	wg.Wait()
+	close(results)
+
+	var first *store
+	for result := range results {
+		require.NoError(t, result.err)
+		if first == nil {
+			first = result.store
+		} else {
+			require.Same(t, first, result.store)
+		}
+	}
+	require.Equal(t, int32(1), states.storeForCalls.Load())
 }
 
 type countingStateStore struct {
