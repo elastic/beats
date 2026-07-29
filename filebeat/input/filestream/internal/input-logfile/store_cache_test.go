@@ -180,35 +180,55 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	states := newCountingStateStore("concurrent-initialization-backend")
+	core, logs := observer.New(zap.DebugLevel)
+	logger, err := logp.NewZapLogger(zap.New(core))
+	require.NoError(t, err)
+
+	states := newBlockingStateStore("concurrent-initialization-backend", nil)
 	const acquisitions = 10
+	const waiters = acquisitions - 1
 	type acquireResult struct {
 		store *store
 		err   error
 	}
 	results := make(chan acquireResult, acquisitions)
-	start := make(chan struct{})
-	var wg sync.WaitGroup
-	for range acquisitions {
-		wg.Go(func() {
-			<-start
-			s, err := acquireStore(logp.NewNopLogger(), states, "filestream")
-			t.Cleanup(func() { releaseAcquiredStore(s) })
+
+	// The first caller owns initialization and remains in StoreFor until the
+	// remaining callers have observed the initializing cache entry.
+	go func() {
+		s, err := acquireStore(logger, states, "filestream")
+		results <- acquireResult{store: s, err: err}
+	}()
+	<-states.firstStoreForStarted
+
+	for range waiters {
+		go func() {
+			s, err := acquireStore(logger, states, "filestream")
 			results <- acquireResult{store: s, err: err}
-		})
+		}()
 	}
-	close(start)
-	wg.Wait()
-	close(results)
+	// The event is logged immediately before each caller waits for the
+	// initializing entry. This proves the test is exercising that path.
+	require.Eventually(t, func() bool {
+		return logs.FilterMessage("waiting for filestream shared store initialization").Len() == waiters
+	}, time.Second, time.Millisecond)
+
+	close(states.releaseFirstStoreFor)
 
 	var first *store
-	for result := range results {
+	acquiredStores := make([]*store, 0, acquisitions)
+	for range acquisitions {
+		result := <-results
 		require.NoError(t, result.err)
 		if first == nil {
 			first = result.store
 		} else {
 			require.Same(t, first, result.store)
 		}
+		acquiredStores = append(acquiredStores, result.store)
+	}
+	for _, acquired := range acquiredStores {
+		releaseAcquiredStore(acquired)
 	}
 	require.Equal(t, int32(1), states.storeForCalls.Load())
 }
@@ -221,7 +241,7 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 	logger, err := logp.NewZapLogger(zap.New(core))
 	require.NoError(t, err)
 
-	states := newFailingOnceStateStore()
+	states := newBlockingStateStore("failing-once-backend", errTestStoreInitialization)
 	const waiters = 4
 	type acquireResult struct{ err error }
 	results := make(chan acquireResult, waiters+1)
@@ -250,7 +270,7 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 
 	// Failing the initializer wakes every current waiter with the same error;
 	// nobody receives a store from this failed cache entry.
-	close(states.failFirstStoreFor)
+	close(states.releaseFirstStoreFor)
 	for range waiters + 1 {
 		require.ErrorIs(t, (<-results).err, errTestStoreInitialization)
 	}
@@ -379,25 +399,29 @@ func (*countingStateStore) CleanupInterval() time.Duration { return time.Minute 
 
 var errTestStoreInitialization = errors.New("test store initialization failed")
 
-type failingOnceStateStore struct {
+type blockingStateStore struct {
 	*countingStateStore
 	firstStoreForStarted chan struct{}
-	failFirstStoreFor    chan struct{}
+	releaseFirstStoreFor chan struct{}
+	firstStoreForError   error
 }
 
-func newFailingOnceStateStore() *failingOnceStateStore {
-	return &failingOnceStateStore{
-		countingStateStore:   newCountingStateStore("failing-once-backend"),
+func newBlockingStateStore(key string, firstStoreForError error) *blockingStateStore {
+	return &blockingStateStore{
+		countingStateStore:   newCountingStateStore(key),
 		firstStoreForStarted: make(chan struct{}),
-		failFirstStoreFor:    make(chan struct{}),
+		releaseFirstStoreFor: make(chan struct{}),
+		firstStoreForError:   firstStoreForError,
 	}
 }
 
-func (s *failingOnceStateStore) StoreFor(name string) (*statestore.Store, error) {
+func (s *blockingStateStore) StoreFor(name string) (*statestore.Store, error) {
 	if s.storeForCalls.Add(1) == 1 {
 		close(s.firstStoreForStarted)
-		<-s.failFirstStoreFor
-		return nil, errTestStoreInitialization
+		<-s.releaseFirstStoreFor
+		if s.firstStoreForError != nil {
+			return nil, s.firstStoreForError
+		}
 	}
 	return s.registry.Get(name)
 }
