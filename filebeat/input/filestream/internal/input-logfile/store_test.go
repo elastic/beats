@@ -53,6 +53,21 @@ func TestResource_CopyInto(t *testing.T) {
 }
 
 func TestStore_OpenClose(t *testing.T) {
+	t.Run("acquiring and releasing store closes", func(t *testing.T) {
+		var closed bool
+		cleanup := closeStoreWith(func(s *store) {
+			closed = true
+			s.close()
+		})
+		defer cleanup()
+
+		store, err := acquireStore(logptest.NewTestingLogger(t, ""), createSampleStore(t, nil), "test")
+		require.NoError(t, err)
+		releaseAcquiredStore(store)
+
+		require.True(t, closed)
+	})
+
 	t.Run("releasing store closes", func(t *testing.T) {
 		var closed bool
 		cleanup := closeStoreWith(func(s *store) {

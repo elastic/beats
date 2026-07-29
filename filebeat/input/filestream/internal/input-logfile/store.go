@@ -153,7 +153,7 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*store, error) {
+func openStore(logger *logp.Logger, statestore statestore.States, prefix string) (*store, error) {
 	ok := false
 
 	persistentStore, err := statestore.StoreFor("")
@@ -162,17 +162,30 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*
 	}
 	defer cleanup.IfNot(&ok, func() { persistentStore.Close() })
 
-	states, err := readStates(log, persistentStore, prefix)
+	states, err := readStates(logger, persistentStore, prefix)
 	if err != nil {
 		return nil, err
 	}
 
 	ok = true
 	return &store{
-		log:             log,
+		log:             logger,
 		persistentStore: persistentStore,
 		ephemeralStore:  states,
 	}, nil
+}
+
+// acquireStore obtains a store for an input manager. The cache-backed
+// implementation will retain one manager reference for each successful call.
+// Until then, openStore's initial reference belongs to the caller.
+func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*store, error) {
+	logger = logger.Named("store-cache")
+	return openStore(logger, states, prefix)
+}
+
+// releaseAcquiredStore releases a store acquired by acquireStore.
+func releaseAcquiredStore(s *store) {
+	s.Release()
 }
 
 // newSourceStore store returns a souceStore that will operate on the provided
@@ -938,7 +951,7 @@ func (r *resource) stateSnapshot() state {
 	}
 }
 
-func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*states, error) {
+func readStates(logger *logp.Logger, store *statestore.Store, prefix string) (*states, error) {
 	keyPrefix := prefix + "::"
 	states := &states{
 		table: map[string]*resource{},
@@ -951,7 +964,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		var st state
 		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
+			logger.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
 				key, err)
 			return true, nil
 		}
