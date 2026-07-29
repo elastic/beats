@@ -1232,7 +1232,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		traceLogger := zap.New(core)
 
 		maxBodyLen := cfg.Resource.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, log)
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 		c.Transport = trace
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,

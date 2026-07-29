@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -99,10 +100,17 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
+	}
+
+	if config.Matches.legacyFormat {
+		includeMatchesWarnOnce.Do(func() {
+			logger.Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
+				"include_matches config to the new more expressive format."))
+		})
 	}
 
 	paths := config.Paths
@@ -145,7 +153,7 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		ID:                 config.ID,
 		Since:              config.Since,
 		Seek:               config.Seek,
-		Matches:            journalfield.IncludeMatches(config.Matches),
+		Matches:            config.Matches.IncludeMatches,
 		Units:              config.Units,
 		Transports:         config.Transports,
 		Identifiers:        config.Identifiers,
@@ -217,6 +225,10 @@ func (inp *journald) Run(
 		ctx.UpdateStatus(status.Failed, wrappedErr.Error())
 		return wrappedErr
 	}
+
+	// Let the reader report Degraded when journalctl gets stuck in a
+	// crash/restart loop and Running when it recovers.
+	reader.SetStatusReporter(ctx)
 
 	defer reader.Close()
 
