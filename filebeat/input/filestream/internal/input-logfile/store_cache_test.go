@@ -140,6 +140,36 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	releaseAcquiredStore(acquired.store)
 }
 
+func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	var closes atomic.Int32
+	cleanup := closeStoreWith(func(s *store) {
+		closes.Add(1)
+		s.close()
+	})
+	t.Cleanup(cleanup)
+
+	states := newCountingStateStore()
+	acquired, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	require.NoError(t, err)
+	// Model getRetainedStore ownership. A premature cache close while this
+	// reference exists would leave an active caller using a closed store.
+	acquired.Retain()
+
+	// This drops manager ownership and stops the cleaner, which drops cache
+	// ownership. Forgetting the latter leaks the implicit RefCount owner and
+	// prevents the store from ever closing.
+	releaseAcquiredStore(acquired)
+	require.Zero(t, closes.Load(), "the short-lived reference keeps the store open")
+
+	// The final short-lived reference must be sufficient to close the store;
+	// more than one close would indicate duplicate release/close handling.
+	acquired.Release()
+	require.Equal(t, int32(1), closes.Load())
+}
+
 type countingStateStore struct {
 	registry      *statestore.Registry
 	storeForCalls atomic.Int32
