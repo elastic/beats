@@ -49,6 +49,51 @@ func TestStoreCache_AcquireHit(t *testing.T) {
 	releaseAcquiredStore(second)
 }
 
+func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	closeStarted := make(chan struct{})
+	allowClose := make(chan struct{})
+	cleanup := closeStoreWith(func(s *store) {
+		close(closeStarted)
+		<-allowClose
+		s.close()
+	})
+	t.Cleanup(cleanup)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Hour)
+	first, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	require.NoError(t, err)
+	second, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	require.NoError(t, err)
+
+	releaseAcquiredStore(first)
+	globalStoreCache.mu.Lock()
+	entry := globalStoreCache.entries[states.StoreKey()]
+	require.NotNil(t, entry)
+	require.Equal(t, storeActive, entry.state)
+	require.Equal(t, 1, entry.users)
+	globalStoreCache.mu.Unlock()
+
+	released := make(chan struct{})
+	go func() {
+		releaseAcquiredStore(second)
+		close(released)
+	}()
+	<-closeStarted
+
+	globalStoreCache.mu.Lock()
+	entry = globalStoreCache.entries[states.StoreKey()]
+	require.NotNil(t, entry)
+	require.Equal(t, storeDraining, entry.state)
+	require.Zero(t, entry.users)
+	globalStoreCache.mu.Unlock()
+
+	close(allowClose)
+	<-released
+}
+
 func resetStoreCacheForTest() {
 	globalStoreCache.mu.Lock()
 	entries := globalStoreCache.entries
