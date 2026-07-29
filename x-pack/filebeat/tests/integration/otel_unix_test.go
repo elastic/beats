@@ -42,8 +42,14 @@ func TestUnixInputOTelE2E(t *testing.T) {
 	otelIndex := "logs-integration-" + namespace
 	fbIndex := "logs-filebeat-" + namespace
 
+	// We use os.TempDir() here instead of t.TempDir() because there is a hard limit on how long the socket name cane be
+	// t.TempDir() blows that up.
 	otelSocketPath := filepath.Join(os.TempDir(), "otel-unix-"+shortNamespace+".sock")
 	fbSocketPath := filepath.Join(os.TempDir(), "fb-unix-"+shortNamespace+".sock")
+	t.Cleanup(func() {
+		_ = os.Remove(otelSocketPath)
+		_ = os.Remove(fbSocketPath)
+	})
 
 	type options struct {
 		Index      string
@@ -70,6 +76,13 @@ path.home: {{ .PathHome }}
                   id: unix-input-e2e
                   path: {{ .SocketPath }}
         path.home: {{ .PathHome }}
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false		
 ` + otelElasticsearchServiceYAML
 
 	optionsValue := options{
@@ -111,7 +124,6 @@ path.home: {{ .PathHome }}
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
-		"log.source.address",
 	}
 
 	oteltest.AssertMapsEqual(

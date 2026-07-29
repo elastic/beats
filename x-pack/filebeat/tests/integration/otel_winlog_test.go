@@ -63,6 +63,13 @@ path.home: {{ .PathHome }}
                   id: winlog-input-e2e
                   enabled: true
                   name: {{ .EVTXPath }}
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
         path.home: {{ .PathHome }}
 ` + otelElasticsearchServiceYAML
 

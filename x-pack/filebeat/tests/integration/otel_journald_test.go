@@ -74,6 +74,13 @@ path.home: {{ .PathHome }}
                   enabled: true
                   syslog_identifiers:
                     - {{ .SyslogID }}
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
         path.home: {{ .PathHome }}
 ` + otelElasticsearchServiceYAML
 
