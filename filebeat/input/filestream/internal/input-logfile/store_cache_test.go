@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -209,6 +211,57 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 	require.Equal(t, int32(1), states.storeForCalls.Load())
 }
 
+func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	core, logs := observer.New(zap.DebugLevel)
+	logger, err := logp.NewZapLogger(zap.New(core))
+	require.NoError(t, err)
+
+	states := newFailingOnceStateStore()
+	const waiters = 4
+	type acquireResult struct{ err error }
+	results := make(chan acquireResult, waiters+1)
+	// This first acquisition owns initialization and blocks in StoreFor until
+	// the test chooses whether initialisation can continue and fails.
+	go func() {
+		_, err := acquireStore(logger, states, "filestream")
+		results <- acquireResult{err: err}
+	}()
+	<-states.firstStoreForStarted
+
+	// These acquisitions find the initializing cache entry. They must wait for
+	// the first attempt instead of opening competing stores of their own.
+	for range waiters {
+		go func() {
+			_, err := acquireStore(logger, states, "filestream")
+			results <- acquireResult{err: err}
+		}()
+	}
+	// acquireStore logs this immediately before blocking on entry.ready. Using
+	// that existing lifecycle event as the barrier proves these are current
+	// waiters without adding production-only synchronization state to the cache.
+	require.Eventually(t, func() bool {
+		return logs.FilterMessage("waiting for filestream shared store initialization").Len() == waiters
+	}, time.Second, time.Millisecond)
+
+	// Failing the initializer wakes every current waiter with the same error;
+	// nobody receives a store from this failed cache entry.
+	close(states.failFirstStoreFor)
+	for range waiters + 1 {
+		require.ErrorIs(t, (<-results).err, errTestStoreInitialization)
+	}
+	require.Equal(t, int32(1), states.storeForCalls.Load())
+
+	// The failed placeholder must be gone, so a later acquisition can create a
+	// new entry and successfully open a replacement store.
+	retried, err := acquireStore(logger, states, "filestream")
+	require.NoError(t, err)
+	require.Equal(t, int32(2), states.storeForCalls.Load())
+	releaseAcquiredStore(retried)
+}
+
 type countingStateStore struct {
 	registry      *statestore.Registry
 	storeForCalls atomic.Int32
@@ -226,6 +279,31 @@ func (s *countingStateStore) StoreFor(name string) (*statestore.Store, error) {
 }
 
 func (*countingStateStore) CleanupInterval() time.Duration { return time.Minute }
+
+var errTestStoreInitialization = errors.New("test store initialization failed")
+
+type failingOnceStateStore struct {
+	*countingStateStore
+	firstStoreForStarted chan struct{}
+	failFirstStoreFor    chan struct{}
+}
+
+func newFailingOnceStateStore() *failingOnceStateStore {
+	return &failingOnceStateStore{
+		countingStateStore:   newCountingStateStore(),
+		firstStoreForStarted: make(chan struct{}),
+		failFirstStoreFor:    make(chan struct{}),
+	}
+}
+
+func (s *failingOnceStateStore) StoreFor(name string) (*statestore.Store, error) {
+	if s.storeForCalls.Add(1) == 1 {
+		close(s.firstStoreForStarted)
+		<-s.failFirstStoreFor
+		return nil, errTestStoreInitialization
+	}
+	return s.registry.Get(name)
+}
 
 func resetStoreCacheForTest() {
 	globalStoreCache.mu.Lock()
