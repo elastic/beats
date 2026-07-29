@@ -70,6 +70,7 @@ type Metrics struct {
 	FilesNoIngestTarget *monitoring.Int // Number of matched non-empty files without an ingest target, too small, or other internal errors (gauge).
 	FilesIgnored        *monitoring.Int // Number of ingestible files ignored by filestream settings (gauge).
 	FilesEmpty          *monitoring.Int // Number of empty files found by the scanner (gauge).
+	ScanErrors          *monitoring.Int // Number of paths the last scan could not observe, e.g. under file-descriptor exhaustion (gauge).
 
 	FilesIngestedPercent100    *monitoring.Int // Number of active harvesters that have fully ingested their files (gauge).
 	FilesIngestedPercent95To99 *monitoring.Int // Number of active harvesters that have ingested 95-99% of their files (gauge).
@@ -89,6 +90,9 @@ type FileScanMetrics struct {
 	FilesNoIngestTarget int64
 	FilesIgnored        int64
 	FilesEmpty          int64
+	// ScanErrors is the number of paths the scan could not read due to an error
+	// (file-descriptor exhaustion or permissions). Missing/deleted files do not count.
+	ScanErrors int64
 }
 
 // HarvesterMetrics contains the harvester progress snapshot for an input.
@@ -168,6 +172,7 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 		FilesNoIngestTarget: monitoring.NewInt(filestreamMetrics, "files_no_ingest_target"),
 		FilesIgnored:        monitoring.NewInt(filestreamMetrics, "files_ignored"),
 		FilesEmpty:          monitoring.NewInt(filestreamMetrics, "files_empty"),
+		ScanErrors:          monitoring.NewInt(filestreamMetrics, "scan_errors"),
 
 		FilesIngestedPercent100:    monitoring.NewInt(filestreamMetrics, "files_ingested_percent_100"),
 		FilesIngestedPercent95To99: monitoring.NewInt(filestreamMetrics, "files_ingested_percent_95_99"),
@@ -195,6 +200,7 @@ func (m *Metrics) UpdateFileScanMetrics(current FileScanMetrics) {
 	m.FilesNoIngestTarget.Add(current.FilesNoIngestTarget - m.lastFileScanMetrics.FilesNoIngestTarget)
 	m.FilesIgnored.Add(current.FilesIgnored - m.lastFileScanMetrics.FilesIgnored)
 	m.FilesEmpty.Add(current.FilesEmpty - m.lastFileScanMetrics.FilesEmpty)
+	m.ScanErrors.Add(current.ScanErrors - m.lastFileScanMetrics.ScanErrors)
 
 	m.lastFileScanMetrics = current
 }
