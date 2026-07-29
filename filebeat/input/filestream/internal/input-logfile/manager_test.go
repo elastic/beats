@@ -508,6 +508,29 @@ func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
 	require.NoError(t, group.Stop())
 }
 
+func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	states := newCountingStateStore("create-before-init-backend")
+	manager := &InputManager{
+		Logger:     logp.NewNopLogger(),
+		StateStore: states,
+		Type:       "filestream",
+	}
+
+	_, err := manager.Create(config.MustNewConfigFrom(map[string]any{}))
+	require.EqualError(t, err, "input manager Init must be called before Create")
+	require.Zero(t, states.storeForCalls.Load())
+	require.Nil(t, manager.store)
+	require.Nil(t, manager.ackCH)
+	require.Nil(t, manager.ackUpdater)
+
+	globalStoreCache.mu.Lock()
+	require.NotContains(t, globalStoreCache.entries, states.StoreKey())
+	globalStoreCache.mu.Unlock()
+}
+
 func initInputManager(t *testing.T, cim *InputManager) {
 	t.Helper()
 	if store, ok := cim.StateStore.(testStateStore); ok && store.GCPeriod <= 0 {
