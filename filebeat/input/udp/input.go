@@ -89,8 +89,16 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
+<<<<<<< HEAD:filebeat/input/udp/input.go
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log := ctx.Logger.With("host", s.Host)
+=======
+func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
+	//nolint:gosec // read_buffer is a byte size, never negative
+	s.metrics = netmetrics.NewUDP(reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
+	return s.metrics
+}
+>>>>>>> 90369c9a2 (filebeat/input/net: prevent shutdown hangs with blocked outputs (#52292)):filebeat/input/net/udp/input.go
 
 	log.Info("starting udp socket input")
 	defer log.Info("udp input stopped")
@@ -123,7 +131,19 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 			}
 		}
 
+<<<<<<< HEAD:filebeat/input/udp/input.go
 		publisher.Publish(evt)
+=======
+		select {
+		case evtChan <- netinput.DataMetadata{
+			Data:      data,
+			Metadata:  metadata,
+			Timestamp: now,
+		}:
+		case <-ctx.Cancelation.Done():
+		}
+	}, logger)
+>>>>>>> 90369c9a2 (filebeat/input/net: prevent shutdown hangs with blocked outputs (#52292)):filebeat/input/net/udp/input.go
 
 		// This must be called after publisher.Publish to measure
 		// the processing time metric.

@@ -128,6 +128,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 				}
 			}
 
+<<<<<<< HEAD:filebeat/input/tcp/input.go
 			publisher.Publish(evt)
 
 			// This must be called after publisher.Publish to measure
@@ -136,6 +137,21 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		},
 		split,
 	), log)
+=======
+				select {
+				case evtChan <- netinput.DataMetadata{
+					Data:      data,
+					Metadata:  metadata,
+					Timestamp: now,
+				}:
+				case <-ctx.Cancelation.Done():
+				}
+			},
+			split,
+		),
+		ctx.Logger,
+	)
+>>>>>>> 90369c9a2 (filebeat/input/net: prevent shutdown hangs with blocked outputs (#52292)):filebeat/input/net/tcp/input.go
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
 		return err
