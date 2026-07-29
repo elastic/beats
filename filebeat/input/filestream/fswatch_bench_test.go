@@ -166,7 +166,7 @@ func BenchmarkGetFilesSelective(b *testing.B) {
 	}
 	s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(base, "**", "*.json")}, cfg, CompressionNone)
 	require.NoError(b, err)
-	got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+	got := s.GetFiles(loginp.FileScanOptions{}).Files
 	require.Len(b, got, matched)
 
 	b.ReportAllocs()
@@ -197,7 +197,7 @@ func BenchmarkGetFilesExcludeMost(b *testing.B) {
 	}
 	s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(base, "**", "*.json")}, cfg, CompressionNone)
 	require.NoError(b, err)
-	got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+	got := s.GetFiles(loginp.FileScanOptions{}).Files
 	require.Len(b, got, kept)
 
 	b.ReportAllocs()
@@ -232,7 +232,7 @@ func BenchmarkGetFilesManyPatterns(b *testing.B) {
 	}
 	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
 	require.NoError(b, err)
-	got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+	got := s.GetFiles(loginp.FileScanOptions{}).Files
 	require.Len(b, got, total)
 
 	b.ReportAllocs()
@@ -273,7 +273,7 @@ func BenchmarkGetFilesLiteralMidComponent(b *testing.B) {
 	s, err := newFileScanner(logp.NewNopLogger(),
 		[]string{filepath.Join(base, "*", "app", "*.log")}, cfg, CompressionNone)
 	require.NoError(b, err)
-	got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+	got := s.GetFiles(loginp.FileScanOptions{}).Files
 	require.Len(b, got, topDirs*perDir)
 
 	b.ReportAllocs()
@@ -349,7 +349,7 @@ func BenchmarkGetFilesMixed(b *testing.B) {
 	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
 	require.NoError(b, err)
 	matched := structuredFiles + hostCount*perDir // skip/ files excluded, sibling dirs pruned
-	got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+	got := s.GetFiles(loginp.FileScanOptions{}).Files
 	require.Len(b, got, matched)
 
 	b.ReportAllocs()
@@ -411,7 +411,7 @@ func BenchmarkGetFilesIdentityCollision(b *testing.B) {
 				require.NoError(b, err)
 
 				unique := n - n*ratePercent/100
-				got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+				got := s.GetFiles(loginp.FileScanOptions{}).Files
 				require.Len(b, got, unique, "colliding files must dedup to one per distinct FileID")
 
 				b.ReportAllocs()

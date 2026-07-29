@@ -233,11 +233,10 @@ type matchedTarget struct {
 	order int
 }
 
-// GetFiles returns a map of file descriptors by filenames that match the
-// configured paths.
-// It walks each pattern's base directory a single time and filters
-// inline, so files are excluded as they're discovered.
-func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics, []string) {
+// GetFiles walks each configured pattern's base directory a single time,
+// filtering inline so files are excluded as they are discovered, and returns
+// the matched descriptors, per-scan metrics, and unobservable prefixes.
+func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
 	if opts.CurrentTime.IsZero() {
 		opts.CurrentTime = time.Now()
 	}
@@ -268,7 +267,11 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 	}
 
 	s.lastCount = len(st.fdByName)
-	return st.fdByName, st.metrics, prefixes
+	return loginp.ScanResults{
+		Files:        st.fdByName,
+		Metrics:      st.metrics,
+		Unobservable: prefixes,
+	}
 }
 
 // scanState is the mutable state of a single GetFiles scan. process and

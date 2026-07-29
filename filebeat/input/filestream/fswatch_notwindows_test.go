@@ -56,11 +56,11 @@ func TestFileScannerReportsUnobservablePaths(t *testing.T) {
 		s, err := newFileScanner(logger, []string{filepath.Join(dir, "**", "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files, metrics, unobservable := s.GetFiles(loginp.FileScanOptions{})
-		assert.Contains(t, files, filepath.Join(dir, "ok", "a.log"), "readable sibling must still be scanned")
-		assert.NotContains(t, files, filepath.Join(blocked, "b.log"), "file under an unreadable dir cannot be observed")
-		assert.Contains(t, unobservable, blocked, "unreadable dir must be reported as an unobservable prefix")
-		assert.Positive(t, metrics.ScanErrors, "scan_errors must count the unobservable path")
+		res := s.GetFiles(loginp.FileScanOptions{})
+		assert.Contains(t, res.Files, filepath.Join(dir, "ok", "a.log"), "readable sibling must still be scanned")
+		assert.NotContains(t, res.Files, filepath.Join(blocked, "b.log"), "file under an unreadable dir cannot be observed")
+		assert.Contains(t, res.Unobservable, blocked, "unreadable dir must be reported as an unobservable prefix")
+		assert.Positive(t, res.Metrics.ScanErrors, "scan_errors must count the unobservable path")
 	})
 
 	t.Run("literal path under an unreadable directory is reported", func(t *testing.T) {
@@ -76,9 +76,9 @@ func TestFileScannerReportsUnobservablePaths(t *testing.T) {
 		s, err := newFileScanner(logger, []string{lit}, cfg, CompressionNone) // no glob meta: a literal
 		require.NoError(t, err)
 
-		files, metrics, unobservable := s.GetFiles(loginp.FileScanOptions{})
-		assert.Empty(t, files, "the literal cannot be observed")
-		assert.Contains(t, unobservable, lit, "literal we could not lstat must be reported")
-		assert.Positive(t, metrics.ScanErrors)
+		res := s.GetFiles(loginp.FileScanOptions{})
+		assert.Empty(t, res.Files, "the literal cannot be observed")
+		assert.Contains(t, res.Unobservable, lit, "literal we could not lstat must be reported")
+		assert.Positive(t, res.Metrics.ScanErrors)
 	})
 }

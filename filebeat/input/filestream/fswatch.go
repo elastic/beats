@@ -184,8 +184,8 @@ func (w *fileWatcher) watch(
 		IgnoreOlder:         ignoreOlder,
 		IgnoreInactiveSince: ignoreInactiveSince,
 	}
-	paths, scanMetrics, unobservable := w.scanner.GetFiles(scanOpts)
-	metrics.UpdateFileScanMetrics(scanMetrics)
+	scanResults := w.scanner.GetFiles(scanOpts)
+	metrics.UpdateFileScanMetrics(scanResults.Metrics)
 
 	// for debugging purposes
 	writtenCount := 0
@@ -196,9 +196,9 @@ func (w *fileWatcher) watch(
 
 	newFilesByName := make(map[string]*loginp.FileDescriptor)
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
-	harvesterFiles := make([]loginp.HarvesterFile, 0, len(paths))
+	harvesterFiles := make([]loginp.HarvesterFile, 0, len(scanResults.Files))
 
-	for path, fd := range paths {
+	for path, fd := range scanResults.Files {
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
@@ -382,16 +382,16 @@ func (w *fileWatcher) watch(
 	// really gone; treating them as deleted would wipe registry state and
 	// re-ingest from offset 0 once the resource frees up.
 	postponed := 0
-	if len(unobservable) > 0 {
-		unobservableSet := make(map[string]struct{}, len(unobservable))
-		for _, p := range unobservable {
+	if len(scanResults.Unobservable) > 0 {
+		unobservableSet := make(map[string]struct{}, len(scanResults.Unobservable))
+		for _, p := range scanResults.Unobservable {
 			unobservableSet[p] = struct{}{}
 		}
 		for remainingPath, remainingDesc := range w.prev {
 			if !underAnyUnobservable(remainingPath, unobservableSet) {
 				continue
 			}
-			paths[remainingPath] = remainingDesc
+			scanResults.Files[remainingPath] = remainingDesc
 			delete(w.prev, remainingPath)
 			postponed++
 		}
@@ -437,7 +437,7 @@ func (w *fileWatcher) watch(
 	}
 
 	w.log.Debugw("File scan complete",
-		"total", len(paths),
+		"total", len(scanResults.Files),
 		"written", writtenCount,
 		"truncated", truncatedCount,
 		"renamed", renamedCount,
@@ -457,13 +457,13 @@ func (w *fileWatcher) watch(
 	//     the only writer of that set — see the completedFingerprints field for
 	//     why the prospector's enumeration scans must not seed it.
 	if w.growingFingerprint {
-		completed := make(map[string]struct{}, len(paths))
-		for p, fd := range paths {
+		completed := make(map[string]struct{}, len(scanResults.Files))
+		for p, fd := range scanResults.Files {
 			if fd.Fingerprint.Complete() {
 				completed[p] = struct{}{}
 				if fd.Fingerprint.Raw != "" {
 					fd.Fingerprint.Raw = ""
-					paths[p] = fd
+					scanResults.Files[p] = fd
 				}
 			}
 		}
@@ -474,7 +474,7 @@ func (w *fileWatcher) watch(
 
 	metrics.UpdateHarvesterBuckets(harvesterFiles)
 
-	w.prev = paths
+	w.prev = scanResults.Files
 }
 
 // hasClosedHarvesters reports whether any harvester-close notification awaits reconciliation.
@@ -579,6 +579,6 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 // completedFingerprints set, so these pre-watch scans cannot suppress the
 // bridging raw header a still-growing entry needs to migrate its registry key
 // after a restart.
-func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics, []string) {
+func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
 	return w.scanner.GetFiles(opts)
 }

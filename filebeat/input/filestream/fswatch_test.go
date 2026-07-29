@@ -1310,7 +1310,7 @@ scanner:
 		t.Run(tc.name, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
 			s := createScannerWithConfig(t, logger, paths, tc.cfgStr, tc.compression)
-			files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+			files := s.GetFiles(loginp.FileScanOptions{}).Files
 			requireEqualFiles(t, tc.expDesc, files)
 		})
 	}
@@ -1328,11 +1328,11 @@ scanner:
 		// the glob for the very small files
 		paths := []string{filepath.Join(dir, undersizedGlob)}
 		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Empty(t, files)
-		files, _, _ = s.GetFiles(loginp.FileScanOptions{})
+		files = s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Empty(t, files)
-		files, _, _ = s.GetFiles(loginp.FileScanOptions{})
+		files = s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Empty(t, files)
 
 		logs := parseLogs(buffer.String())
@@ -1425,7 +1425,7 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		assert.Len(t, files, 1, "empty.log must be excluded")
 		assert.Contains(t, files, nonEmpty, "nonempty.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
@@ -1457,7 +1457,7 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		assert.Len(t, files, 1, "empty_link.log must be excluded")
 		assert.Contains(t, files, nonEmptyLink, "nonempty_link.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
@@ -1499,13 +1499,13 @@ scanner:
 `
 
 	scanner := createScannerWithConfig(t, logp.NewNopLogger(), paths, cfgStr, CompressionNone)
-	files, scanMetrics, _ := scanner.GetFiles(loginp.FileScanOptions{
+	res := scanner.GetFiles(loginp.FileScanOptions{
 		CurrentTime: now,
 		IgnoreOlder: time.Hour,
 	})
-	require.Contains(t, files, keepLog, "keep log must be ingestible")
-	require.Contains(t, files, oldLog, "old log must still be returned")
-	require.Len(t, files, 2, "keep and old logs should be ingestible scan targets")
+	require.Contains(t, res.Files, keepLog, "keep log must be ingestible")
+	require.Contains(t, res.Files, oldLog, "old log must still be returned")
+	require.Len(t, res.Files, 2, "keep and old logs should be ingestible scan targets")
 
 	assert.Equal(t, loginp.FileScanMetrics{
 		FilesIgnored:        2,
@@ -1514,7 +1514,7 @@ scanner:
 		FilesEmpty:          1,
 		FilesUnique:         2,
 		ScanErrors:          0,
-	}, scanMetrics, "unexpected scan metrics")
+	}, res.Metrics, "unexpected scan metrics")
 }
 
 func TestFileWatcherScanMetricsCountsIgnoredFiles(t *testing.T) {
@@ -1862,7 +1862,7 @@ func TestScannerWalkMatchesGlob(t *testing.T) {
 			s, err := newFileScanner(logptest.NewTestingLogger(t, ""), paths, cfg, CompressionNone)
 			require.NoError(t, err)
 
-			got, _, _ := s.GetFiles(loginp.FileScanOptions{})
+			got := s.GetFiles(loginp.FileScanOptions{}).Files
 			requireEqualFiles(t, getFilesViaGlob(s), got)
 
 			if tc.extra != nil {
@@ -1895,7 +1895,7 @@ func TestScannerStablePathWithDuplicateFingerprint(t *testing.T) {
 		[]string{filepath.Join(dir, "**", "*.json")}, cfg, CompressionNone)
 	require.NoError(t, err)
 
-	files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+	files := s.GetFiles(loginp.FileScanOptions{}).Files
 	require.Len(t, files, 1, "files with the same fingerprint must dedup to one")
 	assert.Contains(t, files, filepath.Join(dir, "a.json"), "must keep the shallowest path")
 }
@@ -2214,10 +2214,10 @@ func TestFileScannerDoesNotReportNotDirectoryAsUnobservable(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	files, metrics, unobservable := s.GetFiles(loginp.FileScanOptions{})
-	assert.Empty(t, files, "a file used as a glob directory cannot contain matches")
-	assert.Empty(t, unobservable, "ENOTDIR is a real disappearance signal, not a transient scan failure")
-	assert.Equal(t, int64(0), metrics.ScanErrors, "ENOTDIR must not increment scan_errors")
+	res := s.GetFiles(loginp.FileScanOptions{})
+	assert.Empty(t, res.Files, "a file used as a glob directory cannot contain matches")
+	assert.Empty(t, res.Unobservable, "ENOTDIR is a real disappearance signal, not a transient scan failure")
+	assert.Equal(t, int64(0), res.Metrics.ScanErrors, "ENOTDIR must not increment scan_errors")
 }
 
 func TestFileWatcherHarvesterMetrics(t *testing.T) {
@@ -2369,13 +2369,17 @@ type scanResult struct {
 	unobservable []string
 }
 
-func (q *queuedScanner) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics, []string) {
+func (q *queuedScanner) GetFiles(loginp.FileScanOptions) loginp.ScanResults {
 	if q.next >= len(q.scans) {
-		return map[string]loginp.FileDescriptor{}, loginp.FileScanMetrics{}, nil
+		return loginp.ScanResults{Files: map[string]loginp.FileDescriptor{}}
 	}
 	r := q.scans[q.next]
 	q.next++
-	return r.files, loginp.FileScanMetrics{ScanErrors: int64(len(r.unobservable))}, r.unobservable
+	return loginp.ScanResults{
+		Files:        r.files,
+		Metrics:      loginp.FileScanMetrics{ScanErrors: int64(len(r.unobservable))},
+		Unobservable: r.unobservable,
+	}
 }
 
 func newStubWatcher(scanner loginp.FSScanner) *fileWatcher {
@@ -2632,8 +2636,8 @@ type testFileScanner struct {
 }
 
 // GetFiles returns s.files and empty metrics.
-func (s *testFileScanner) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics, []string) {
-	return s.files, loginp.FileScanMetrics{}, nil
+func (s *testFileScanner) GetFiles(loginp.FileScanOptions) loginp.ScanResults {
+	return loginp.ScanResults{Files: s.files}
 }
 
 const benchmarkFileCount = 1000
@@ -2673,7 +2677,7 @@ func BenchmarkGetFiles(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Len(b, files, benchmarkFileCount)
 	}
 }
@@ -2692,7 +2696,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Len(b, files, benchmarkFileCount)
 	}
 }
@@ -2748,7 +2752,7 @@ func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
 
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+				files := s.GetFiles(loginp.FileScanOptions{}).Files
 				require.Len(b, files, wantLen)
 			}
 		})
@@ -3153,7 +3157,7 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 			filename, []byte(strings.Repeat("abcd", n/4+1)[:n]), 0o644))
 	}
 	scan := func() loginp.FingerprintID {
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Contains(t, files, filename, "file must be scanned")
 		fp := files[filename].Fingerprint
 		advanceCompletedFingerprints(s, files)
@@ -3225,7 +3229,7 @@ func TestGetFiles_DuplicateFingerprint(t *testing.T) {
 	expectedRawHex := hex.EncodeToString(content[:length])
 
 	scan := func() map[string]loginp.FileDescriptor {
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		advanceCompletedFingerprints(s, files)
 		return files
 	}
@@ -3273,12 +3277,12 @@ func TestGetFiles_DuplicateFingerprintAllocBudget(t *testing.T) {
 		s, err := newFileScanner(logp.NewNopLogger(), glob, cfg, CompressionNone)
 		require.NoError(t, err, "could not create file scanner")
 
-		files, _, _ := s.GetFiles(loginp.FileScanOptions{})
+		files := s.GetFiles(loginp.FileScanOptions{}).Files
 		require.Len(t, files, 1, "duplicates must dedup to a single winner")
 
 		// completedFingerprints is never advanced, so the winner re-encodes on every run.
 		return testing.AllocsPerRun(10, func() {
-			_, _, _ = s.GetFiles(loginp.FileScanOptions{})
+			s.GetFiles(loginp.FileScanOptions{})
 		})
 	}
 
