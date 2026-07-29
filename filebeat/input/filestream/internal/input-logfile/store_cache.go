@@ -20,6 +20,7 @@ package input_logfile
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -96,7 +97,13 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 			started := time.Now()
 			entry.logger.Debugw("waiting for draining filestream shared store", "key", key)
 			<-closed
-			entry.logger.Debugw("finished waiting for draining filestream shared store", "key", key, "wait", time.Since(started))
+			entry.logger.Debugw(
+				fmt.Sprintf(
+					"finished waiting for draining filestream shared store. Waited for %s",
+					time.Since(started),
+				),
+				"key", key,
+			)
 		}
 	}
 }

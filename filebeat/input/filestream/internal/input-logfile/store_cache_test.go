@@ -1,27 +1,32 @@
 // Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with this work for
-// additional information regarding copyright ownership. Elasticsearch B.V.
-// licenses this file to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance with the License.
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
 // under the License.
 
 package input_logfile
 
 import (
 	"errors"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -93,6 +98,65 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	close(allowClose)
 	<-released
 }
+
+func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	states := newCountingStateStore()
+	first, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	require.NoError(t, err)
+	first.Retain() // Hold a short-lived getRetainedStore-style reference.
+	releaseAcquiredStore(first)
+
+	globalStoreCache.mu.Lock()
+	entry := globalStoreCache.entries[states.StoreKey()]
+	require.NotNil(t, entry)
+	require.Equal(t, storeDraining, entry.state)
+	globalStoreCache.mu.Unlock()
+
+	type acquireResult struct {
+		store *store
+		err   error
+	}
+	result := make(chan acquireResult, 1)
+	go func() {
+		s, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+		result <- acquireResult{store: s, err: err}
+	}()
+
+	select {
+	case acquired := <-result:
+		t.Fatalf("acquire completed while the old store was still retained: %+v", acquired)
+	case <-time.After(100 * time.Millisecond):
+	}
+	require.Equal(t, int32(1), states.storeForCalls.Load())
+
+	first.Release()
+	acquired := <-result
+	require.NoError(t, acquired.err)
+	require.Equal(t, int32(2), states.storeForCalls.Load())
+	require.NotEqual(t, first, acquired.store, "new store must be different from the first one")
+	releaseAcquiredStore(acquired.store)
+}
+
+type countingStateStore struct {
+	registry      *statestore.Registry
+	storeForCalls atomic.Int32
+}
+
+func newCountingStateStore() *countingStateStore {
+	return &countingStateStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
+}
+
+func (s *countingStateStore) StoreKey() string { return "counting-state-store" }
+
+func (s *countingStateStore) StoreFor(name string) (*statestore.Store, error) {
+	s.storeForCalls.Add(1)
+	return s.registry.Get(name)
+}
+
+func (*countingStateStore) CleanupInterval() time.Duration { return time.Minute }
 
 func resetStoreCacheForTest() {
 	globalStoreCache.mu.Lock()
