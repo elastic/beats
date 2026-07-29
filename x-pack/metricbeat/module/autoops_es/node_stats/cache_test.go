@@ -300,6 +300,29 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 	}
 }
 
+func TestEnrichNodeStatsGaugeDecreaseWritesZeroIngestRate(t *testing.T) {
+	initCache(getNodeStats(), 10)
+
+	nodeStatsMap := getNodeStats()
+	for key, nodeStats := range nodeStatsMap {
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") - 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") - 20
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStatsMap[key] = nodeStats
+	}
+
+	for key, nodeStats := range nodeStatsMap {
+		enrichNodeStats(key, &nodeStats, 10_000)
+		// gauge-backed rates write 0 on decrease, not nil
+		require.EqualValues(t, 0, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 0, nodeStats["ingest_bytes_per_second"])
+		// counter-backed rates still report correctly
+		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
+		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
+	}
+}
+
 func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) {
 	// 10s ago cache
 	initCache(getNodeStats(), 10)
