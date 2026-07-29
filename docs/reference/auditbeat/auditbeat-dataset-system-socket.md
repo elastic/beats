@@ -24,8 +24,10 @@ This is the `socket` dataset of the system module. It allows to monitor network 
 * Works on stock kernels without the need of custom modules, external libraries or development headers.
 * Correlates IP addresses with DNS requests.
 
-This dataset does not analyze application-layer protocols nor provide any other advanced features present in Packetbeat: - Monitor network traffic whose destination is not a local process, as is the case with traffic forwarding. - Monitor layer 2 traffic, ICMP or raw sockets.
+This dataset does not analyze application-layer protocols nor provide any other advanced features present in Packetbeat:
 
+* Monitor network traffic whose destination is not a local process, as is the case with traffic forwarding. 
+* Monitor layer 2 traffic, ICMP or raw sockets.
 
 ## Implementation [_implementation_2]
 
