@@ -202,24 +202,3 @@ func (c *storeCache) storeClosed(key string, entry *storeCacheEntry) {
 
 func (e *storeCacheEntry) closeReady()  { e.readyOnce.Do(func() { close(e.ready) }) }
 func (e *storeCacheEntry) closeClosed() { e.closedOnce.Do(func() { close(e.closed) }) }
-
-// TODO: remove if not used, move to a test file when needed
-func resetStoreCacheForTest() {
-	globalStoreCache.mu.Lock()
-	entries := globalStoreCache.entries
-	globalStoreCache.entries = make(map[string]*storeCacheEntry)
-	globalStoreCache.mu.Unlock()
-	for _, entry := range entries {
-		if entry.state == storeInitializing {
-			entry.initErr = errors.New("store cache reset")
-			entry.closeReady()
-			entry.closeClosed()
-			continue
-		}
-		if entry.state == storeActive {
-			entry.cancel()
-			entry.cleanerWg.Wait()
-			entry.store.Release()
-		}
-	}
-}
