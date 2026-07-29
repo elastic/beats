@@ -121,6 +121,7 @@ path.home: {{ .PathHome }}
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
+		"event.created",
 	}
 
 	oteltest.AssertMapsEqual(
