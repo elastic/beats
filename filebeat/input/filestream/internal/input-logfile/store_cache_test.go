@@ -101,8 +101,12 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
+	core, logs := observer.New(zap.DebugLevel)
+	logger, err := logp.NewZapLogger(zap.New(core))
+	require.NoError(t, err)
+
 	states := newCountingStateStore("draining-backend")
-	first, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	first, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
 	first.Retain() // Hold a short-lived getRetainedStore-style reference.
 	releaseAcquiredStore(first)
@@ -117,22 +121,28 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	}
 	result := make(chan acquireResult, 1)
 	go func() {
-		s, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+		s, err := acquireStore(logger, states, "filestream")
 		result <- acquireResult{store: s, err: err}
 	}()
 
-	select {
-	case acquired := <-result:
-		t.Fatalf("acquire completed while the old store was still retained: %+v", acquired)
-	case <-time.After(100 * time.Millisecond):
-	}
+	// acquireStore logs this immediately before waiting for the draining store
+	// to close. The event is therefore a deterministic barrier that the second
+	// acquisition cannot complete until the retained reference is released.
+	require.Eventually(t, func() bool {
+		return logs.FilterMessage("waiting for draining filestream shared store").Len() == 1
+	}, time.Second, time.Millisecond)
 	require.Equal(t, int32(1), states.storeForCalls.Load())
 
 	first.Release()
-	acquired := <-result
+	var acquired acquireResult
+	select {
+	case acquired = <-result:
+	case <-time.After(100 * time.Millisecond):
+		t.Fatal("timed out waiting for acquisition after releasing the draining store")
+	}
 	require.NoError(t, acquired.err)
 	require.Equal(t, int32(2), states.storeForCalls.Load())
-	require.NotEqual(t, first, acquired.store, "new store must be different from the first one")
+	require.NotSame(t, first, acquired.store, "new store must be different from the first one")
 	releaseAcquiredStore(acquired.store)
 }
 
