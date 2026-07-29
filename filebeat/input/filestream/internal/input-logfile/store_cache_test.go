@@ -101,9 +101,7 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	core, logs := observer.New(zap.DebugLevel)
-	logger, err := logp.NewZapLogger(zap.New(core))
-	require.NoError(t, err)
+	logger, logs := newObserverLogger(t)
 
 	states := newCountingStateStore("draining-backend")
 	first, err := acquireStore(logger, states, "filestream")
@@ -180,9 +178,7 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	core, logs := observer.New(zap.DebugLevel)
-	logger, err := logp.NewZapLogger(zap.New(core))
-	require.NoError(t, err)
+	logger, logs := newObserverLogger(t)
 
 	states := newBlockingStateStore("concurrent-initialization-backend", nil)
 	const acquisitions = 10
@@ -237,9 +233,7 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	core, logs := observer.New(zap.DebugLevel)
-	logger, err := logp.NewZapLogger(zap.New(core))
-	require.NoError(t, err)
+	logger, logs := newObserverLogger(t)
 
 	states := newBlockingStateStore("failing-once-backend", errTestStoreInitialization)
 	const waiters = 4
@@ -288,9 +282,7 @@ func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	core, logs := observer.New(zap.DebugLevel)
-	logger, err := logp.NewZapLogger(zap.New(core))
-	require.NoError(t, err)
+	logger, logs := newObserverLogger(t)
 	firstStates := newCountingStateStore("first-backend")
 	secondStates := newCountingStateStore("second-backend")
 
@@ -379,6 +371,14 @@ func storeCacheEntryCount() int {
 	globalStoreCache.mu.Lock()
 	defer globalStoreCache.mu.Unlock()
 	return len(globalStoreCache.entries)
+}
+
+func newObserverLogger(t *testing.T) (*logp.Logger, *observer.ObservedLogs) {
+	t.Helper()
+	core, logs := observer.New(zap.DebugLevel)
+	logger, err := logp.NewZapLogger(zap.New(core))
+	require.NoError(t, err)
+	return logger, logs
 }
 
 func newCountingStateStore(key string) *countingStateStore {
