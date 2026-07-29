@@ -1,6 +1,6 @@
 - name: iostat
   type: group
-  release: beta
+  release: ga
   description: >
     iostat
   fields:

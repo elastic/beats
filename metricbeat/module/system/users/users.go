@@ -26,7 +26,6 @@ import (
 
 	"github.com/godbus/dbus/v5"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -52,8 +51,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	base.Logger().Warn(cfgwarn.Beta("The system users metricset is beta."))
-
 	conn, err := initDbusConnection()
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to dbus: %w", err)
