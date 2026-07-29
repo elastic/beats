@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -69,9 +70,9 @@ func TestFilestreamScannerMetrics(t *testing.T) {
 		expectScanErrors = 1
 	}
 
-	pathsYAML := ""
+	var pathsYAML strings.Builder
 	for _, p := range paths {
-		pathsYAML += "\n      - " + p
+		pathsYAML.WriteString("\n      - " + p)
 	}
 
 	cfg := fmt.Sprintf(`
@@ -99,7 +100,7 @@ logging:
   metrics:
     enabled: true
     period: 1s
-`, pathsYAML, tempDir)
+`, pathsYAML.String(), tempDir)
 
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()

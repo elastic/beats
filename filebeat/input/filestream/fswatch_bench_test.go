@@ -75,7 +75,7 @@ func buildBenchDirTree(tb testing.TB, root string, fanout, depth int) []string {
 		if d == 0 {
 			return
 		}
-		for i := 0; i < fanout; i++ {
+		for i := range fanout {
 			child := filepath.Join(base, fmt.Sprintf("d%d", i))
 			require.NoError(tb, os.MkdirAll(child, 0o770))
 			dirs = append(dirs, child)
@@ -92,7 +92,7 @@ func buildBenchDirTree(tb testing.TB, root string, fanout, depth int) []string {
 func buildBenchTree(tb testing.TB, root string, total int, name func(i int) string) {
 	tb.Helper()
 	dirs := buildBenchDirTree(tb, root, benchTreeFanout, benchTreeDepth)
-	for i := 0; i < total; i++ {
+	for i := range total {
 		p := filepath.Join(dirs[i%len(dirs)], name(i))
 		require.NoError(tb, os.WriteFile(p, []byte("x"), 0o660))
 	}
@@ -250,10 +250,7 @@ func BenchmarkGetFilesLiteralMidComponent(b *testing.B) {
 	base := filepath.Join(b.TempDir(), "logs")
 	const topDirs, siblingDirs = 20, 5
 
-	perDir := benchTreeFileCount(b) / (topDirs * (1 + siblingDirs))
-	if perDir < 1 {
-		perDir = 1
-	}
+	perDir := max(benchTreeFileCount(b)/(topDirs*(1+siblingDirs)), 1)
 	writeN := func(tb testing.TB, dir, prefix string) {
 		require.NoError(tb, os.MkdirAll(dir, 0o770))
 		for k := 0; k < perDir; k++ {
@@ -261,10 +258,10 @@ func BenchmarkGetFilesLiteralMidComponent(b *testing.B) {
 				filepath.Join(dir, fmt.Sprintf("%s-%d.log", prefix, k)), []byte("x"), 0o660))
 		}
 	}
-	for i := 0; i < topDirs; i++ {
+	for i := range topDirs {
 		host := filepath.Join(base, fmt.Sprintf("host-%d", i))
 		writeN(b, filepath.Join(host, "app"), "f")
-		for j := 0; j < siblingDirs; j++ {
+		for j := range siblingDirs {
 			writeN(b, filepath.Join(host, fmt.Sprintf("other-%d", j)), "g")
 		}
 	}
@@ -308,7 +305,7 @@ func BenchmarkGetFilesMixed(b *testing.B) {
 	const excluded = 100
 	skipDir := filepath.Join(structured, "skip")
 	require.NoError(b, os.MkdirAll(skipDir, 0o770))
-	for i := 0; i < excluded; i++ {
+	for i := range excluded {
 		require.NoError(b, os.WriteFile(
 			filepath.Join(skipDir, fmt.Sprintf("drop-%d.json", i)), []byte("x"), 0o660))
 	}
@@ -317,10 +314,7 @@ func BenchmarkGetFilesMixed(b *testing.B) {
 	// hosts/*/app/*.log, the sibling dirs must be pruned.
 	hosts := filepath.Join(root, "hosts")
 	const hostCount, siblingDirs = 20, 5
-	perDir := (total - structuredFiles) / (hostCount * (1 + siblingDirs))
-	if perDir < 1 {
-		perDir = 1
-	}
+	perDir := max((total-structuredFiles)/(hostCount*(1+siblingDirs)), 1)
 	writeN := func(dir, prefix string) {
 		require.NoError(b, os.MkdirAll(dir, 0o770))
 		for k := 0; k < perDir; k++ {
@@ -328,10 +322,10 @@ func BenchmarkGetFilesMixed(b *testing.B) {
 				filepath.Join(dir, fmt.Sprintf("%s-%d.log", prefix, k)), []byte("x"), 0o660))
 		}
 	}
-	for i := 0; i < hostCount; i++ {
+	for i := range hostCount {
 		host := filepath.Join(hosts, fmt.Sprintf("host-%d", i))
 		writeN(filepath.Join(host, "app"), "f")
-		for j := 0; j < siblingDirs; j++ {
+		for j := range siblingDirs {
 			writeN(filepath.Join(host, fmt.Sprintf("other-%d", j)), "g")
 		}
 	}
@@ -376,7 +370,7 @@ func buildCollisionTree(tb testing.TB, root string, n, ratePercent int) {
 	unique := n - collisions
 	require.Positive(tb, unique, "need at least one distinct header")
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		k := i
 		if i >= unique {
 			k = (i - unique) % unique // duplicate an earlier file's header
