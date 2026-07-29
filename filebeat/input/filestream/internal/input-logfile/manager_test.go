@@ -470,6 +470,44 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 	require.NoError(t, secondGroup.Stop())
 }
 
+func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	manager := &InputManager{
+		Logger:     logp.NewNopLogger(),
+		StateStore: states,
+		Type:       "filestream",
+	}
+	var group unison.TaskGroup
+	t.Cleanup(func() { _ = group.Stop() })
+
+	const initializers = 10
+	errs := make(chan error, initializers)
+	var wg sync.WaitGroup
+	for range initializers {
+		wg.Go(func() {
+			errs <- manager.Init(&group)
+		})
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		require.NoError(t, err)
+	}
+
+	globalStoreCache.mu.Lock()
+	entry := globalStoreCache.entries[states.StoreKey()]
+	require.NotNil(t, entry)
+	require.Equal(t, 1, entry.users)
+	require.Same(t, manager.store, entry.store)
+	globalStoreCache.mu.Unlock()
+
+	// A duplicate shutdown waiter would attempt a second release here, which causes a panic
+	require.NoError(t, group.Stop())
+}
+
 func initInputManager(t *testing.T, cim *InputManager) {
 	t.Helper()
 	if store, ok := cim.StateStore.(testStateStore); ok && store.GCPeriod <= 0 {
