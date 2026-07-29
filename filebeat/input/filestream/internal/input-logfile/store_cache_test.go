@@ -45,14 +45,12 @@ func TestStoreCache_AcquireHit(t *testing.T) {
 	require.NoError(t, err)
 	require.Same(t, first, second)
 
-	globalStoreCache.mu.Lock()
-	entry := globalStoreCache.entries[states.StoreKey()]
-	require.NotNil(t, entry)
+	entry := snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 2, entry.users)
 	require.Same(t, first, entry.store)
-	require.Len(t, globalStoreCache.entries, 1)
-	globalStoreCache.mu.Unlock()
+	require.Equal(t, 1, storeCacheEntryCount())
 
 	releaseAcquiredStore(first)
 	releaseAcquiredStore(second)
@@ -78,12 +76,10 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	require.NoError(t, err)
 
 	releaseAcquiredStore(first)
-	globalStoreCache.mu.Lock()
-	entry := globalStoreCache.entries[states.StoreKey()]
-	require.NotNil(t, entry)
+	entry := snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 1, entry.users)
-	globalStoreCache.mu.Unlock()
 
 	released := make(chan struct{})
 	go func() {
@@ -92,12 +88,10 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	}()
 	<-closeStarted
 
-	globalStoreCache.mu.Lock()
-	entry = globalStoreCache.entries[states.StoreKey()]
-	require.NotNil(t, entry)
+	entry = snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
 	require.Equal(t, storeDraining, entry.state)
 	require.Zero(t, entry.users)
-	globalStoreCache.mu.Unlock()
 
 	close(allowClose)
 	<-released
@@ -113,11 +107,9 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	first.Retain() // Hold a short-lived getRetainedStore-style reference.
 	releaseAcquiredStore(first)
 
-	globalStoreCache.mu.Lock()
-	entry := globalStoreCache.entries[states.StoreKey()]
-	require.NotNil(t, entry)
+	entry := snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
 	require.Equal(t, storeDraining, entry.state)
-	globalStoreCache.mu.Unlock()
 
 	type acquireResult struct {
 		store *store
@@ -278,11 +270,9 @@ func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
 	require.NoError(t, err)
 	require.NotSame(t, first, second)
 
-	globalStoreCache.mu.Lock()
-	require.Len(t, globalStoreCache.entries, 2)
-	require.NotNil(t, globalStoreCache.entries[firstStates.StoreKey()])
-	require.NotNil(t, globalStoreCache.entries[secondStates.StoreKey()])
-	globalStoreCache.mu.Unlock()
+	require.Equal(t, 2, storeCacheEntryCount())
+	require.True(t, snapshotStoreCacheEntry(firstStates.StoreKey()).found)
+	require.True(t, snapshotStoreCacheEntry(secondStates.StoreKey()).found)
 	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
 	require.Equal(t, int32(1), secondStates.storeForCalls.Load())
 	require.Eventually(t, func() bool {
@@ -323,15 +313,42 @@ func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	globalStoreCache.mu.Lock()
-	require.NotContains(t, globalStoreCache.entries, states.StoreKey())
-	globalStoreCache.mu.Unlock()
+	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
 }
 
 type countingStateStore struct {
 	registry      *statestore.Registry
 	storeForCalls atomic.Int32
 	key           string
+}
+
+type cacheEntrySnapshot struct {
+	found bool
+	state storeCacheState
+	users int
+	store *store
+}
+
+func snapshotStoreCacheEntry(key string) cacheEntrySnapshot {
+	globalStoreCache.mu.Lock()
+	defer globalStoreCache.mu.Unlock()
+
+	entry := globalStoreCache.entries[key]
+	if entry == nil {
+		return cacheEntrySnapshot{}
+	}
+	return cacheEntrySnapshot{
+		found: true,
+		state: entry.state,
+		users: entry.users,
+		store: entry.store,
+	}
+}
+
+func storeCacheEntryCount() int {
+	globalStoreCache.mu.Lock()
+	defer globalStoreCache.mu.Unlock()
+	return len(globalStoreCache.entries)
 }
 
 func newCountingStateStore(key string) *countingStateStore {

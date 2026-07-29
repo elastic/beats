@@ -459,13 +459,11 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 	require.Same(t, first.store, second.store)
 
 	require.NoError(t, firstGroup.Stop())
-	globalStoreCache.mu.Lock()
-	entry := globalStoreCache.entries[states.StoreKey()]
-	require.NotNil(t, entry)
+	entry := snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 1, entry.users)
 	require.Same(t, second.store, entry.store)
-	globalStoreCache.mu.Unlock()
 
 	require.NoError(t, secondGroup.Stop())
 }
@@ -497,12 +495,10 @@ func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	globalStoreCache.mu.Lock()
-	entry := globalStoreCache.entries[states.StoreKey()]
-	require.NotNil(t, entry)
+	entry := snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
 	require.Equal(t, 1, entry.users)
 	require.Same(t, manager.store, entry.store)
-	globalStoreCache.mu.Unlock()
 
 	// A duplicate shutdown waiter would attempt a second release here, which causes a panic
 	require.NoError(t, group.Stop())
@@ -526,9 +522,7 @@ func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
 	require.Nil(t, manager.ackCH)
 	require.Nil(t, manager.ackUpdater)
 
-	globalStoreCache.mu.Lock()
-	require.NotContains(t, globalStoreCache.entries, states.StoreKey())
-	globalStoreCache.mu.Unlock()
+	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
 }
 
 func initInputManager(t *testing.T, cim *InputManager) {
