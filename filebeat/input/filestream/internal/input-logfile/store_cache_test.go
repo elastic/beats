@@ -107,7 +107,7 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	states := newCountingStateStore()
+	states := newCountingStateStore("draining-backend")
 	first, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
 	require.NoError(t, err)
 	first.Retain() // Hold a short-lived getRetainedStore-style reference.
@@ -155,7 +155,7 @@ func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 	})
 	t.Cleanup(cleanup)
 
-	states := newCountingStateStore()
+	states := newCountingStateStore("last-reference-backend")
 	acquired, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
 	require.NoError(t, err)
 	// Model getRetainedStore ownership. A premature cache close while this
@@ -178,7 +178,7 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	states := newCountingStateStore()
+	states := newCountingStateStore("concurrent-initialization-backend")
 	const acquisitions = 10
 	type acquireResult struct {
 		store *store
@@ -262,16 +262,51 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 	releaseAcquiredStore(retried)
 }
 
+func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	core, logs := observer.New(zap.DebugLevel)
+	logger, err := logp.NewZapLogger(zap.New(core))
+	require.NoError(t, err)
+	firstStates := newCountingStateStore("first-backend")
+	secondStates := newCountingStateStore("second-backend")
+
+	first, err := acquireStore(logger, firstStates, "filestream")
+	require.NoError(t, err)
+	second, err := acquireStore(logger, secondStates, "filestream")
+	require.NoError(t, err)
+	require.NotSame(t, first, second)
+
+	globalStoreCache.mu.Lock()
+	require.Len(t, globalStoreCache.entries, 2)
+	require.NotNil(t, globalStoreCache.entries[firstStates.StoreKey()])
+	require.NotNil(t, globalStoreCache.entries[secondStates.StoreKey()])
+	globalStoreCache.mu.Unlock()
+	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
+	require.Equal(t, int32(1), secondStates.storeForCalls.Load())
+	require.Eventually(t, func() bool {
+		return logs.FilterMessage("filestream shared store cleaner started").Len() == 2
+	}, time.Second, time.Millisecond)
+
+	releaseAcquiredStore(first)
+	releaseAcquiredStore(second)
+}
+
 type countingStateStore struct {
 	registry      *statestore.Registry
 	storeForCalls atomic.Int32
+	key           string
 }
 
-func newCountingStateStore() *countingStateStore {
-	return &countingStateStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
+func newCountingStateStore(key string) *countingStateStore {
+	return &countingStateStore{
+		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+		key:      key,
+	}
 }
 
-func (s *countingStateStore) StoreKey() string { return "counting-state-store" }
+func (s *countingStateStore) StoreKey() string { return s.key }
 
 func (s *countingStateStore) StoreFor(name string) (*statestore.Store, error) {
 	s.storeForCalls.Add(1)
@@ -290,7 +325,7 @@ type failingOnceStateStore struct {
 
 func newFailingOnceStateStore() *failingOnceStateStore {
 	return &failingOnceStateStore{
-		countingStateStore:   newCountingStateStore(),
+		countingStateStore:   newCountingStateStore("failing-once-backend"),
 		firstStoreForStarted: make(chan struct{}),
 		failFirstStoreFor:    make(chan struct{}),
 	}
