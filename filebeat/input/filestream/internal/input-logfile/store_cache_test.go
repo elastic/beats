@@ -293,6 +293,41 @@ func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
 	releaseAcquiredStore(second)
 }
 
+func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	states := newCountingStateStore("concurrent-acquire-release-backend")
+	const workers = 10
+	const iterations = 20
+	errs := make(chan error, workers*iterations)
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+	for range workers {
+		wg.Go(func() {
+			<-start
+			for range iterations {
+				s, err := acquireStore(logp.NewNopLogger(), states, "filestream")
+				if err != nil {
+					errs <- err
+					continue
+				}
+				releaseAcquiredStore(s)
+			}
+		})
+	}
+	close(start)
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		require.NoError(t, err)
+	}
+
+	globalStoreCache.mu.Lock()
+	require.NotContains(t, globalStoreCache.entries, states.StoreKey())
+	globalStoreCache.mu.Unlock()
+}
+
 type countingStateStore struct {
 	registry      *statestore.Registry
 	storeForCalls atomic.Int32
