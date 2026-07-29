@@ -437,6 +437,39 @@ paths:
 	})
 }
 
+func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
+	resetStoreCacheForTest()
+	t.Cleanup(resetStoreCacheForTest)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	newManager := func() *InputManager {
+		return &InputManager{
+			Logger:     logp.NewNopLogger(),
+			StateStore: states,
+			Type:       "filestream",
+		}
+	}
+	first, second := newManager(), newManager()
+	var firstGroup, secondGroup unison.TaskGroup
+	t.Cleanup(func() { _ = firstGroup.Stop() })
+	t.Cleanup(func() { _ = secondGroup.Stop() })
+
+	require.NoError(t, first.Init(&firstGroup))
+	require.NoError(t, second.Init(&secondGroup))
+	require.Same(t, first.store, second.store)
+
+	require.NoError(t, firstGroup.Stop())
+	globalStoreCache.mu.Lock()
+	entry := globalStoreCache.entries[states.StoreKey()]
+	require.NotNil(t, entry)
+	require.Equal(t, storeActive, entry.state)
+	require.Equal(t, 1, entry.users)
+	require.Same(t, second.store, entry.store)
+	globalStoreCache.mu.Unlock()
+
+	require.NoError(t, secondGroup.Stop())
+}
+
 func initInputManager(t *testing.T, cim *InputManager) {
 	t.Helper()
 	if store, ok := cim.StateStore.(testStateStore); ok && store.GCPeriod <= 0 {
