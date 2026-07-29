@@ -288,7 +288,8 @@ func TestReaderReportsDegradedOnRestartLoop(t *testing.T) {
 				}
 				return jdEvent, nil
 			},
-			KillFunc: func() error { return nil },
+			KillFunc:            func() error { return nil },
+			SetReadDeadlineFunc: func(time.Time) bool { return true },
 		}, nil
 	}
 
