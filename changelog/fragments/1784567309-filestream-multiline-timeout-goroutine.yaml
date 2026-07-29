@@ -19,9 +19,12 @@ description: >
   The multiline TimeoutReader no longer spawns a background read-ahead goroutine
   to enforce multiline.timeout. It now bounds the wait synchronously via a new
   reader.DeadlineSetter capability that delegates down the reader/parser chain to
-  the source (the filestream reader, the log input, journald, and kafka), which
-  bounds its own blocking read and returns reader.ErrReadDeadline when the
-  deadline elapses. This removes a lock-step goroutine ping-pong that spent ~82%
+  the source (the log input, journald, and kafka), which bounds its own blocking
+  read and returns reader.ErrReadDeadline when the deadline elapses. Sources
+  whose reads never block indefinitely are read directly, as there is no
+  unbounded wait to bound: the filestream reader yields at end of data, and
+  awss3's object reads are finite.
+  This removes a lock-step goroutine ping-pong that spent ~82%
   of multiline CPU parking and waking threads, cutting multiline read-path CPU
   and latency with no change in behavior. Per-source deadline timers are reused
   to keep the read path allocation-free.
