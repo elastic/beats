@@ -695,11 +695,11 @@ Requirement: Set `backoff.max` to be greater than or equal to `backoff.init` and
 
 ### `harvester_limit` [filebeat-input-filestream-harvester-limit]
 
-The `harvester_limit` option limits the number of harvesters that are started in parallel for one input. This directly relates to the maximum number of file handlers that are opened. The default for `harvester_limit` is 0, which means there is no limit. This configuration is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
+The `harvester_limit` option limits the number of files that are harvested in parallel for one input. Because each harvested file keeps its file handler open, this directly limits the maximum number of file handlers the input keeps open at once. The default for `harvester_limit` is 0, which means there is no limit. This configuration is useful when the number of files to be harvested exceeds the open file handler limit of the operating system.
 
-Setting a limit on the number of harvesters means that potentially not all files are opened in parallel. Therefore we recommended that you use this option in combination with the `close.on_state_change.*` options to make sure harvesters are stopped more often so that new files can be picked up.
+A file counts against the limit for the whole time it is being harvested, including while it is idle and being tailed for new data. An actively tailed file keeps its file handler open and its slot occupied, even when it has momentarily caught up and is waiting for more data to be written. A slot is only released when the file is closed. For this reason, we recommend that you use this option in combination with the `close.on_state_change.*` and `close.reader.*` options, so that files are closed and their slots freed, allowing files that are still waiting to be picked up.
 
-Currently, if a new harvester can be started again, the harvester is picked randomly. This means it’s possible that the harvester for a file that was just closed and then updated again might be started instead of the harvester for a file that hasn’t been harvested for a longer period of time.
+When the limit is reached, newly discovered files are queued and started in the order they were discovered (first in, first out) as open files are closed and slots become available.
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
 
