@@ -38,19 +38,28 @@ func TestStoreCache_AcquireHit(t *testing.T) {
 	resetStoreCacheForTest()
 	t.Cleanup(resetStoreCacheForTest)
 
-	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
-	first, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	logger, logs := newObserverLogger(t)
+	registry := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+	firstStates := newCountingStateStoreWithRegistry("shared-backend", registry)
+	secondStates := newCountingStateStoreWithRegistry("shared-backend", registry)
+
+	first, err := acquireStore(logger, firstStates, "filestream")
 	require.NoError(t, err)
-	second, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	second, err := acquireStore(logger, secondStates, "filestream")
 	require.NoError(t, err)
 	require.Same(t, first, second)
+	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
+	require.Zero(t, secondStates.storeForCalls.Load())
 
-	entry := snapshotStoreCacheEntry(states.StoreKey())
+	entry := snapshotStoreCacheEntry(firstStates.StoreKey())
 	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 2, entry.users)
 	require.Same(t, first, entry.store)
 	require.Equal(t, 1, storeCacheEntryCount())
+	require.Eventually(t, func() bool {
+		return logs.FilterMessage("filestream shared store cleaner started").Len() == 1
+	}, time.Second, time.Millisecond)
 
 	releaseAcquiredStore(first)
 	releaseAcquiredStore(second)
@@ -382,10 +391,11 @@ func newObserverLogger(t *testing.T) (*logp.Logger, *observer.ObservedLogs) {
 }
 
 func newCountingStateStore(key string) *countingStateStore {
-	return &countingStateStore{
-		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
-		key:      key,
-	}
+	return newCountingStateStoreWithRegistry(key, statestore.NewRegistry(storetest.NewMemoryStoreBackend()))
+}
+
+func newCountingStateStoreWithRegistry(key string, registry *statestore.Registry) *countingStateStore {
+	return &countingStateStore{registry: registry, key: key}
 }
 
 func (s *countingStateStore) StoreKey() string { return s.key }
