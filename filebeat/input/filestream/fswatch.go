@@ -316,6 +316,16 @@ func (w *fileWatcher) watch(
 			continue
 		}
 
+		// When the file identity is fingerprint-based, a matching FileID
+		// alone is not sufficient to prove a rename — two distinct files
+		// can share a header prefix and thus the same fingerprint hash.
+		// Verify the OS state (inode/device) as a secondary discriminator
+		// when available on the platform.
+		// See https://github.com/elastic/beats/issues/51417
+		if prevOS, newOS := remainingDesc.Info.GetOSState(), newDesc.Info.GetOSState(); prevOS != (commonfile.StateOS{}) && newOS != (commonfile.StateOS{}) && !prevOS.IsSame(newOS) {
+			continue
+		}
+
 		srcID := w.getFileIdentity(remainingDesc)
 		select {
 		case <-ctx.Done():

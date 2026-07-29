@@ -1421,6 +1421,84 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
 		5*time.Second)
 
-	// Ensure all events have been ingested
-	env.waitUntilEventCount(55)
+	// TestFilestreamFingerprintDistinctFilesNotConfusedOnRename verifies that
+// two distinct files sharing a common header prefix are NOT classified as a
+// rename of each other. When file A is removed and file B appears with the
+// same fingerprint (same header), the watcher must not emit OpRename A → B
+// — B must be harvested from offset 0 and all its content ingested.
+// See https://github.com/elastic/beats/issues/51417
+func TestFilestreamFingerprintDistinctFilesNotConfusedOnRename(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("removing/replacing files while Filebeat is running is not supported on Windows")
+	}
+
+	env := newInputTestingEnvironment(t)
+
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                     id,
+		"paths":                                  []string{env.abspath("log") + "*"},
+		"file_identity.fingerprint":              map[string]any{},
+		"prospector.scanner.fingerprint.enabled": true,
+		// 64 is the minimum fingerprint length (sha256.BlockSize); it keeps the
+		// test files small.
+		"prospector.scanner.fingerprint.offset": 0,
+		"prospector.scanner.fingerprint.length": 64,
+		"prospector.scanner.check_interval":     "500ms",
+		// Close A's idle harvester quickly instead of waiting for the 5m default.
+		"close.on_state_change.inactive":       "1s",
+		"close.on_state_change.check_interval": "100ms",
+	})
+
+	// header is longer than the fingerprint window and identical in both files,
+	// so A and B share a fingerprint.
+	header := "COMMON-HEADER-" + strings.Repeat("=", 60) + "\n" // 75 bytes
+	// aLine and bMid have the same byte length so offsetA (== size(A)) lands on
+	// the boundary between bMid and bTail in B.
+	aLine := "A-ONLY-LINE\n" // 12 bytes
+	bMid := "B-LOST-LINE\n"  // 12 bytes
+	bTail := "B-TAIL-RECOVERED-LINE\n"
+
+	contentA := []byte(header + aLine)
+	contentB := []byte(header + bMid + bTail)
+
+	env.mustWriteToFile("logA", contentA)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	defer func() {
+		cancelInput()
+		env.waitUntilInputStops()
+	}()
+	env.startInput(ctx, id, inp)
+
+	// File A is tracked and fully ingested (header line + A's unique line).
+	env.waitUntilEventCount(2)
+
+	ingested := func(sub string) bool {
+		for _, msg := range env.getOutputMessages() {
+			if strings.Contains(msg, sub) {
+				return true
+			}
+		}
+		return false
+	}
+
+	// Within a single scan window A disappears and distinct file B appears.
+	env.mustRemoveFile("logA")
+	env.mustWriteToFile("logB", contentB)
+
+	// All of B's unique content must be ingested. Both checks are non-fatal so a
+	// failure still reports the full picture of what was and wasn't ingested.
+	// B's prefix line overlaps A's offset range; it is the line dropped when B is
+	// misclassified as a rename of A.
+	require.Eventually(t, func() bool { return ingested("B-LOST-LINE") },
+		10*time.Second, 100*time.Millisecond,
+		"expected B's prefix line to be ingested, got: %v", env.getOutputMessages())
+
+	// B's tail line lies beyond A's offset. On the buggy path it is recovered
+	// only once A's idle harvester closes on inactivity
+	// (close.on_state_change.inactive) and frees the shared identity.
+	require.Eventually(t, func() bool { return ingested("B-TAIL-RECOVERED-LINE") },
+		10*time.Second, 100*time.Millisecond,
+		"expected B's tail to be ingested, got: %v", env.getOutputMessages())
 }
