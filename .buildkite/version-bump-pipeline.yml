@@ -33,13 +33,8 @@ steps:
         REPOSITORY: "beats"
         RELEASE_TYPE: "${WORKFLOW}"
         CURRENT_RELEASE: "${NEW_VERSION}"
-        DRY_RUN: "false"
         DISABLE_DEV_ISSUE: "true"
-        DISABLE_NOTIFICATIONS: "false"
-        DISABLE_BRANCH_CREATION: "false"
-        DISABLE_PREPARE_NEXT: "false"
         REVIEWERS: "elastic/elastic-agent-release"
-        DEV_ISSUE_URL: "https://github.com/elastic/dev/issues/0"
 
   - trigger: ingest-dev-pipeline-release-patch
     key: bump-version-patch
@@ -51,13 +46,8 @@ steps:
       env:
         REPOSITORY: "beats"
         CURRENT_RELEASE: "${NEW_VERSION}"
-        DRY_RUN: "false"
         DISABLE_DEV_ISSUE: "true"
-        DISABLE_NOTIFICATIONS: "false"
-        DISABLE_RELEASE_PREPARE: "false"
-        DISABLE_PREPARE_NEXT: "false"
         REVIEWERS: "elastic/elastic-agent-release"
-        DEV_ISSUE_URL: "https://github.com/elastic/dev/issues/0"
 
   - block: "Ready to fetch for DRA artifacts?"
     prompt: |
