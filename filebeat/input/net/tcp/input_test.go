@@ -34,6 +34,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -118,7 +119,7 @@ func TestInputStopsWhenPipelineIsBlocked(t *testing.T) {
 	v2Ctx := v2.Context{
 		ID:              t.Name(),
 		Cancelation:     ctx,
-		Logger:          logptest.NewTestingLogger(t, ""),
+		Logger:          logp.NewNopLogger(),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
