@@ -62,6 +62,8 @@ type store struct {
 	refCount        concert.RefCount
 	persistentStore *statestore.Store
 	ephemeralStore  *states
+	onClose         func()
+	cacheEntry      *storeCacheEntry
 }
 
 // states stores resource states in memory. When a cursor for an input is updated,
@@ -173,19 +175,6 @@ func openStore(logger *logp.Logger, statestore statestore.States, prefix string)
 		persistentStore: persistentStore,
 		ephemeralStore:  states,
 	}, nil
-}
-
-// acquireStore obtains a store for an input manager. The cache-backed
-// implementation will retain one manager reference for each successful call.
-// Until then, openStore's initial reference belongs to the caller.
-func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*store, error) {
-	logger = logger.Named("store-cache")
-	return openStore(logger, states, prefix)
-}
-
-// releaseAcquiredStore releases a store acquired by acquireStore.
-func releaseAcquiredStore(s *store) {
-	s.Release()
 }
 
 // newSourceStore store returns a souceStore that will operate on the provided
@@ -654,6 +643,9 @@ func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
 		closeStore(s)
+		if s.onClose != nil {
+			s.onClose()
+		}
 	}
 }
 
