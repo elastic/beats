@@ -303,6 +303,114 @@ func TestHarvesterRunner_OpenSessionErrorTearsDown(t *testing.T) {
 	require.NoError(t, g.StopHarvesters())
 }
 
+// TestHarvesterRunner_OpenSessionErrorNotifiesObserver asserts that a source
+// whose OpenSession fails still notifies the observer. The file watcher relies on
+// that notification to learn how much of the file was ingested: without it the
+// watcher keeps the size it recorded when it discovered the file, an unchanged
+// file then produces no further event, and the source is never retried. That is
+// how a transient open failure (file-descriptor exhaustion) used to strand a file
+// forever.
+func TestHarvesterRunner_OpenSessionErrorNotifiesObserver(t *testing.T) {
+	h := &fakeHarvester{openErr: errHarvester}
+	g := testHarvesterRunner(t, h, 0)
+	notify := make(chan HarvesterStatus, 1)
+	g.SetObserver(notify)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	select {
+	case got := <-notify:
+		require.Equal(t, id, got.ID, "the notification must identify the source")
+		require.Zero(t, got.Size,
+			"a source that never opened has ingested nothing, so the watcher must see 0")
+	case <-time.After(eventuallyTimeout):
+		t.Fatal("the observer was not notified when OpenSession failed")
+	}
+
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_TeardownNotifiesObserverWithSessionOffset asserts the
+// normal teardown path reports the session's offset to the observer.
+func TestHarvesterRunner_TeardownNotifiesObserverWithSessionOffset(t *testing.T) {
+	h := &fakeHarvester{
+		// Two budget-limited reads (each advances the fake session's offset),
+		// then finish, so teardown reports a non-zero offset.
+		readFn: func(call int, _ v2.Context) (SliceVerdict, error) {
+			if call < 3 {
+				return SliceBudget, nil
+			}
+			return SliceDone, nil
+		},
+		// Resume the source the waker parked after each budget-limited read.
+		pollFn: func(_ int) PollResult { return PollResume },
+	}
+	g := testHarvesterRunner(t, h, 0)
+	notify := make(chan HarvesterStatus, 1)
+	g.SetObserver(notify)
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	select {
+	case got := <-notify:
+		require.Equal(t, id, got.ID, "the notification must identify the source")
+		require.Equal(t, int64(2), got.Size,
+			"the observer must see the offset the session reached")
+	case <-time.After(eventuallyTimeout):
+		t.Fatal("the observer was not notified on teardown")
+	}
+
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_ConnectErrorDoesNotNotifyObserver asserts a setup failure
+// before the cursor exists does not notify the observer. A pipeline connect
+// failure is permanent and degrades the input (see
+// TestHarvesterRunner_ConnectErrorDegradesStatus) instead of being retried each
+// scan, so there is no ingested offset to report.
+func TestHarvesterRunner_ConnectErrorDoesNotNotifyObserver(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+	g.pipeline = &MockPipeline{connectErr: errPipelineConnect}
+	notify := make(chan HarvesterStatus, 1)
+	g.SetObserver(notify)
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	requireEventually(t, func() bool { return !g.hasID(id) },
+		"source should be removed when the pipeline connect fails")
+
+	select {
+	case got := <-notify:
+		t.Fatalf("the observer must not be notified when the pipeline connect fails, got %+v", got)
+	default:
+	}
+
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestCursorOffset asserts the offset reported to the observer for a source with
+// no session comes from the registry cursor.
+func TestCursorOffset(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "")
+
+	offset, ok := cursorOffset(log, NewCursorForTest("test::key", 42, -1))
+	require.True(t, ok, "unpacking a well-formed cursor must succeed")
+	require.Equal(t, int64(42), offset, "the persisted offset must be reported")
+}
+
 // TestHarvesterRunner_ConnectErrorTearsDown asserts that when the pipeline fails
 // to connect during setup, the source is torn down and no session is opened.
 func TestHarvesterRunner_ConnectErrorTearsDown(t *testing.T) {

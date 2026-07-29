@@ -28,6 +28,7 @@ import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -428,6 +429,12 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 
 	session, err := g.harvester.OpenSession(state.ctx, state.src, id, state.cursor, g.metrics)
 	if err != nil {
+		// Unnotified, the watcher never emits another event for an unchanged
+		// file, so a transient open failure (fd exhaustion) strands it. Notify
+		// before releasing the resource, while the cursor is still readable.
+		if offset, ok := cursorOffset(state.ctx.Logger, state.cursor); ok {
+			g.notifyObserver(state, offset)
+		}
 		_ = client.Close()
 		releaseResource(resource)
 		state.resource = nil
@@ -805,7 +812,9 @@ func (g *harvesterRunner) finish(state *sourceState) {
 	wasSetUp := state.setUp
 	g.mu.Unlock()
 
-	g.notifyObserver(state)
+	if state.session != nil {
+		g.notifyObserver(state, state.session.Offset())
+	}
 
 	log := state.ctx.Logger
 	if state.session != nil {
@@ -864,15 +873,34 @@ func (g *harvesterRunner) finish(state *sourceState) {
 	}
 }
 
-func (g *harvesterRunner) notifyObserver(state *sourceState) {
-	if g.notifyChan == nil || state.session == nil {
+func (g *harvesterRunner) notifyObserver(state *sourceState, offset int64) {
+	if g.notifyChan == nil {
 		return
 	}
-	offset := state.session.Offset()
 	select {
 	case g.notifyChan <- HarvesterStatus{ID: state.srcID, Size: offset}:
 	case <-g.ctx.Cancelation.Done():
 	}
+}
+
+// cursorOffset returns the offset cursor holds in the registry, which is how much
+// of its source has been ingested. It is the offset to report to the observer
+// when a source has no session to ask (see notifyObserver).
+func cursorOffset(log *logp.Logger, cursor Cursor) (int64, bool) {
+	// The cursor struct used by Filestream, defined in
+	// filebeat/input/filestream/input.go.
+	st := struct {
+		Offset int64 `json:"offset" struct:"offset"`
+	}{}
+	if err := cursor.Unpack(&st); err != nil {
+		// Unpack should never fail: either the cursor structure had a breaking
+		// change or the registry is corrupted. Either way it is better not to
+		// notify the observer than to report a bogus offset.
+		log.Errorf("cannot unpack cursor of a harvester that failed to open: %s", err)
+		return 0, false
+	}
+
+	return st.Offset, true
 }
 
 // Continue starts a new harvester carrying over the state of a previous source.
