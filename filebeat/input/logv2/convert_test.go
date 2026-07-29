@@ -19,6 +19,7 @@ package logv2
 
 import (
 	_ "embed"
+	"fmt"
 	"testing"
 	"time"
 
@@ -571,6 +572,10 @@ func (s *testInputStore) Close() {
 
 func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testInputStore) CleanupInterval() time.Duration {

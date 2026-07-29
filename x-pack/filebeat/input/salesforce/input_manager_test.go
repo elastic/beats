@@ -40,6 +40,7 @@ type stateStore struct{}
 func (stateStore) StoreFor(string) (*statestore.Store, error) {
 	return makeTestStore(map[string]interface{}{"hello": "world"}), nil
 }
+func (stateStore) StoreKey() string               { return "salesforce-test-store" }
 func (stateStore) CleanupInterval() time.Duration { return time.Duration(0) }
 
 func TestInputManager(t *testing.T) {

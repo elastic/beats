@@ -52,6 +52,7 @@ func TestOpenStateStore_SamePathSharesRegistry(t *testing.T) {
 	s2 := testOpenStore(t, dir)
 
 	assert.Same(t, s1.shared, s2.shared, "stores with the same path should share the same sharedRegistries")
+	assert.Equal(t, s1.StoreKey(), s2.StoreKey(), "stores with the same backend should have the same key")
 
 	globalMu.Lock()
 	assert.Equal(t, 2, s1.shared.refCount)
@@ -69,6 +70,7 @@ func TestOpenStateStore_DifferentPathsGetDifferentRegistries(t *testing.T) {
 	s2 := testOpenStore(t, dir2)
 
 	assert.NotSame(t, s1.shared, s2.shared, "stores with different paths should not share registries")
+	assert.NotEqual(t, s1.StoreKey(), s2.StoreKey(), "stores with different backends should have different keys")
 
 	s1.Close()
 	s2.Close()
