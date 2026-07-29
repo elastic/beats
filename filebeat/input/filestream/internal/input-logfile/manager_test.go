@@ -438,8 +438,7 @@ paths:
 }
 
 func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
 	newManager := func() *InputManager {
@@ -469,8 +468,7 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 }
 
 func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
 	manager := &InputManager{
@@ -505,8 +503,7 @@ func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
 }
 
 func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	states := newCountingStateStore("create-before-init-backend")
 	manager := &InputManager{

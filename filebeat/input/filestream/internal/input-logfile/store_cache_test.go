@@ -35,8 +35,7 @@ import (
 )
 
 func TestStoreCache_AcquireHit(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	logger, logs := newObserverLogger(t)
 	registry := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
@@ -66,8 +65,7 @@ func TestStoreCache_AcquireHit(t *testing.T) {
 }
 
 func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	closeStarted := make(chan struct{})
 	allowClose := make(chan struct{})
@@ -107,8 +105,7 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 }
 
 func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	logger, logs := newObserverLogger(t)
 
@@ -154,8 +151,7 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 }
 
 func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	var closes atomic.Int32
 	cleanup := closeStoreWith(func(s *store) {
@@ -184,8 +180,7 @@ func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 }
 
 func TestStoreCache_ConcurrentInitialization(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	logger, logs := newObserverLogger(t)
 
@@ -239,8 +234,7 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 }
 
 func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	logger, logs := newObserverLogger(t)
 
@@ -288,8 +282,7 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 }
 
 func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	logger, logs := newObserverLogger(t)
 	firstStates := newCountingStateStore("first-backend")
@@ -315,8 +308,7 @@ func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
 }
 
 func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
-	resetStoreCacheForTest()
-	t.Cleanup(resetStoreCacheForTest)
+	setupStoreCacheTest(t)
 
 	states := newCountingStateStore("concurrent-acquire-release-backend")
 	const workers = 10
@@ -436,22 +428,20 @@ func (s *blockingStateStore) StoreFor(name string) (*statestore.Store, error) {
 	return s.registry.Get(name)
 }
 
+func setupStoreCacheTest(t *testing.T) {
+	t.Helper()
+	resetStoreCacheForTest()
+	t.Cleanup(func() {
+		require.Zero(t, storeCacheEntryCount(), "all acquired store references must be released")
+	})
+}
+
+// resetStoreCacheForTest provides isolation before a test starts. Tests must
+// release all references themselves.
+// This helper never releases a store reference or alters an entry lifecycle;
+// cleanup detects ownership leaks instead.
 func resetStoreCacheForTest() {
 	globalStoreCache.mu.Lock()
-	entries := globalStoreCache.entries
+	defer globalStoreCache.mu.Unlock()
 	globalStoreCache.entries = make(map[string]*storeCacheEntry)
-	globalStoreCache.mu.Unlock()
-	for _, entry := range entries {
-		if entry.state == storeInitializing {
-			entry.initErr = errors.New("store cache reset")
-			entry.closeReady()
-			entry.closeClosed()
-			continue
-		}
-		if entry.state == storeActive {
-			entry.cancel()
-			entry.cleanerWg.Wait()
-			entry.store.Release()
-		}
-	}
 }
