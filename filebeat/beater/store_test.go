@@ -62,6 +62,37 @@ func TestOpenStateStore_SamePathSharesRegistry(t *testing.T) {
 	s2.Close()
 }
 
+func TestFilebeatStore_StoreKeyMatchesBackendAndPath(t *testing.T) {
+	beatPaths := paths.New()
+	beatPaths.Data = t.TempDir()
+	cfg := config.Registry{
+		Path:        "registry",
+		Permissions: 0o600,
+		Backend:     "memlog",
+	}
+	expected := storeKey(beatPaths.Resolve(paths.Data, cfg.Path), cfg.Backend)
+
+	first, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "first", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer first.Close()
+	second, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "second", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer second.Close()
+
+	assert.Equal(t, expected, first.StoreKey())
+	assert.Equal(t, expected, second.StoreKey())
+}
+
 func TestOpenStateStore_DifferentPathsGetDifferentRegistries(t *testing.T) {
 	dir1 := t.TempDir()
 	dir2 := t.TempDir()
