@@ -78,16 +78,19 @@ func TestFollowStreamReturnsOnCancelWithStalledServer(t *testing.T) {
 	published := make(chan struct{})
 	var client publisher
 	client.done = func() {
-		select {
-		case published <- struct{}{}:
-		default:
-		}
+		published <- struct{}{}
 	}
 
 	done := make(chan error, 1)
+	startChan := make(chan struct{})
 	go func() {
+		// do not start the input until the startChan is received
+		<-startChan
 		done <- input{}.run(v2Ctx, &source{c}, nil, &client)
 	}()
+
+	// start the input now that the publisher is ready
+	close(startChan)
 
 	select {
 	case <-published:
