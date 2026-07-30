@@ -20,6 +20,7 @@ package dissect
 import (
 	"errors"
 	"fmt"
+	"maps"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -76,7 +77,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	var (
 		m   Map
 		mc  MapConverted
-		v   interface{}
+		v   any
 		err error
 	)
 
@@ -188,8 +189,6 @@ func (p *processor) String() string {
 
 func mapInterfaceToMapStr(m MapConverted) mapstr.M {
 	newMap := make(mapstr.M, len(m))
-	for k, v := range m {
-		newMap[k] = v
-	}
+	maps.Copy(newMap, m)
 	return newMap
 }

@@ -131,7 +131,7 @@ func TestOutputWatcher(t *testing.T) {
 				name: "test when expected value is slice type",
 				fieldsToMatch: mapstr.M{
 					"fields": mapstr.M{
-						"slice": []interface{}{"20", "30", "40"},
+						"slice": []any{"20", "30", "40"},
 					},
 				},
 				expectObserved: true,
@@ -155,7 +155,7 @@ func TestOutputWatcher(t *testing.T) {
 				fieldsToMatch: mapstr.M{
 					"fields": mapstr.M{
 						"number": float64(20),
-						"slice":  []interface{}{"20", "30", "40"},
+						"slice":  []any{"20", "30", "40"},
 					},
 				},
 				expectObserved: true,

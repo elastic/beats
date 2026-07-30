@@ -243,8 +243,8 @@ func TestCopyFieldsSingleFieldNoClone(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			c, err := conf.NewConfigFrom(map[string]interface{}{
-				"fields": []map[string]interface{}{
+			c, err := conf.NewConfigFrom(map[string]any{
+				"fields": []map[string]any{
 					{"from": tc.from, "to": tc.to},
 				},
 				"fail_on_error": true,

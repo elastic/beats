@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -139,9 +140,7 @@ func PythonTest(params PythonTestArgs) error {
 	if IsInIntegTestEnv() {
 		pytestEnv["INTEGRATION_TESTS"] = "1"
 	}
-	for k, v := range params.Env {
-		pytestEnv[k] = v
-	}
+	maps.Copy(pytestEnv, params.Env)
 
 	pytestOptions := []string{
 		"--timeout=90",

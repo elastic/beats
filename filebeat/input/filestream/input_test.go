@@ -230,7 +230,7 @@ func TestNewFile(t *testing.T) {
 	testCases := map[string]struct {
 		compression   string
 		filePath      string
-		expectedType  interface{}
+		expectedType  any
 		expectError   bool
 		errorContains string
 		setup         func(t *testing.T, filePath string) *os.File
@@ -365,6 +365,33 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 	}
 }
 
+func TestReadFromSourceUpdatesActiveOffset(t *testing.T) {
+	inp := filestream{}
+	metricsOffset := &atomic.Int64{}
+	metricsOffset.Store(5)
+
+	err := inp.readFromSource(
+		v2.Context{Cancelation: context.Background(), Logger: logp.NewNopLogger()},
+		logp.NewNopLogger(),
+		&mockReader{
+			resp: []readerResponse{
+				{msg: "abc"},
+				{msg: "de"},
+			},
+		},
+		"test.log",
+		state{Offset: 5},
+		noopPublisher{},
+		false,
+		metricsOffset,
+		loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()),
+		nil,
+	)
+
+	require.NoError(t, err, "readFromSource should finish without error")
+	assert.EqualValues(t, 10, metricsOffset.Load(), "active harvester offset")
+}
+
 // runFilestreamBenchmark runs the entire filestream input with the in-memory registry and the test pipeline.
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
@@ -431,7 +458,7 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	file, err := os.CreateTemp(dir, "*")
 	require.NoError(t, err)
 	filename := file.Name()
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		fmt.Fprintf(file, "rather mediocre log line message in %s - %d\n", filename, i)
 	}
 	err = file.Close()
@@ -489,6 +516,12 @@ func (p *testPipeline) Disconnect(ctx context.Context) error {
 
 type testClient struct {
 	testPipeline *testPipeline
+}
+
+type noopPublisher struct{}
+
+func (noopPublisher) Publish(beat.Event, any) error {
+	return nil
 }
 
 func (c *testClient) Publish(event beat.Event) {
@@ -583,8 +616,7 @@ func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
 // ErrFileTruncate / unknown errors behave the same regardless of
 // whether ctx is cancelled or read_until_eof is enabled.
 func TestFilestream_handleReadError_OtherErrors(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	logger := logptest.NewTestingLogger(t, "")
 	metrics := newTestMetrics()
 

@@ -32,7 +32,7 @@ const (
 
 // TestLogger is used to report fatal errors to the testing framework.
 type TestLogger interface {
-	Fatal(args ...interface{})
+	Fatal(args ...any)
 	Cleanup(f func())
 }
 

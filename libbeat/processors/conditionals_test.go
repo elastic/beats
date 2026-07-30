@@ -85,7 +85,6 @@ func TestWhenProcessor(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.title, func(t *testing.T) {
 			makeFilter := func() beat.Processor {
 				cfg, err := conf.NewConfigFrom(test.filter)
@@ -102,14 +101,14 @@ func TestWhenProcessor(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, out)
 
-			// RunPdata path. When no condition is configured, NewConditional
-			// returns the inner processor directly, which doesn't implement
-			// PdataProcessor, so fall back to Run for that case.
+			// RunPdata path. The inner processor (addFieldsInner) is legacy-only,
+			// so neither WhenProcessor nor the bare inner implements PdataProcessor.
+			// Fall back to Run in all cases.
 			body := pcommon.NewMap()
 			require.NoError(t, otelmap.FromMapstr(body, test.input))
 			filter := makeFilter()
-			if wp, ok := filter.(*WhenProcessor); ok {
-				drop, err := wp.RunPdata(body)
+			if pp, ok := filter.(PdataProcessor); ok {
+				drop, err := pp.RunPdata(body)
 				require.NoError(t, err)
 				assert.False(t, drop)
 			} else {

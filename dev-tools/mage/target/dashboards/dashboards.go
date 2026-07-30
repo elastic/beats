@@ -26,12 +26,12 @@ import (
 )
 
 var (
-	buildDep             interface{}
-	collectDashboardsDep interface{}
+	buildDep             any
+	collectDashboardsDep any
 )
 
 // RegisterImportDeps registers dependencies of the Import target.
-func RegisterImportDeps(build, collectDashboards interface{}) {
+func RegisterImportDeps(build, collectDashboards any) {
 	buildDep = build
 	collectDashboardsDep = collectDashboards
 }

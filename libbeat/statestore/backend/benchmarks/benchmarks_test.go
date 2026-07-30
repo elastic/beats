@@ -135,7 +135,7 @@ func BenchmarkCRUD(b *testing.B) {
 			})
 
 			b.Run("Each", func(b *testing.B) {
-				for i := 0; i < numKeys; i++ {
+				for i := range numKeys {
 					if err := store.Set(key(i), makeValue(i)); err != nil {
 						b.Fatal(err)
 					}
@@ -180,7 +180,7 @@ func BenchmarkFilestreamHotpath(b *testing.B) {
 
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
-				for i := 0; i < numFiles; i++ {
+				for i := range numFiles {
 					k := fmt.Sprintf("filestream::native_id-%d", i)
 					src := fmt.Sprintf("/var/log/service/app-%d.log", i)
 					for u := 0; u <= cursorUpdatesPerFile; u++ {

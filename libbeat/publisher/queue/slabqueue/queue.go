@@ -308,7 +308,7 @@ func (q *Queue[T]) buildBatchLocked(n int) *batch[T] {
 	b.queue = q
 	d := q.pool.dir.Load()
 	cur := q.head
-	for i := 0; i < n; i++ {
+	for range n {
 		b.indices = append(b.indices, cur)
 		cur = d.slot(cur).next
 	}

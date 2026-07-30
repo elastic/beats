@@ -47,6 +47,10 @@ func (s *testSource) Name() string {
 	return s.name
 }
 
+func (s *testSource) LogPath() string {
+	return s.name
+}
+
 type noopProspector struct{}
 
 func (m noopProspector) Init(_, _ StoreUpdater, _ func(Source) string) error {
@@ -82,7 +86,6 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)

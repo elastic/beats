@@ -32,12 +32,12 @@ type providerPlugin struct {
 var pluginKey = "libbeat.autodiscover.provider"
 
 // Plugin accepts a ProviderBuilder to be registered as a plugin
-func Plugin(name string, provider autodiscover.ProviderBuilder) map[string][]interface{} {
+func Plugin(name string, provider autodiscover.ProviderBuilder) map[string][]any {
 	return p.MakePlugin(pluginKey, providerPlugin{name, provider})
 }
 
 func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	p.MustRegisterLoader(pluginKey, func(ifc any) error {
 		prov, ok := ifc.(providerPlugin)
 		if !ok {
 			return errors.New("plugin does not match processor plugin type")

@@ -41,7 +41,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Processors {
+func GetProcessors(t testing.TB, yml []map[string]any) *processors.Processors {
 	list, err := MakeProcessors(t, yml)
 	if err != nil {
 		t.Fatal(err)
@@ -50,7 +50,7 @@ func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Proce
 	return list
 }
 
-func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.Processors, error) {
+func MakeProcessors(t testing.TB, yml []map[string]any) (*processors.Processors, error) {
 	t.Helper()
 
 	var config processors.PluginConfig
@@ -69,17 +69,17 @@ func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.Pro
 func TestBadConfig(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"include_fields": map[string]interface{}{
-				"when": map[string]interface{}{
+			"include_fields": map[string]any{
+				"when": map[string]any{
 					"contains": map[string]string{
 						"proc.name": "test",
 					},
 				},
 				"fields": []string{"proc.cpu.total_p", "proc.mem", "dd"},
 			},
-			"drop_fields": map[string]interface{}{
+			"drop_fields": map[string]any{
 				"fields": []string{"proc.cpu"},
 			},
 		},
@@ -92,10 +92,10 @@ func TestBadConfig(t *testing.T) {
 func TestIncludeFields(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"include_fields": map[string]interface{}{
-				"when": map[string]interface{}{
+			"include_fields": map[string]any{
+				"when": map[string]any{
 					"contains": map[string]string{
 						"proc.name": "test",
 					},
@@ -161,10 +161,10 @@ func TestIncludeFields(t *testing.T) {
 func TestIncludeFields1(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"include_fields": map[string]interface{}{
-				"when": map[string]interface{}{
+			"include_fields": map[string]any{
+				"when": map[string]any{
 					"regexp": map[string]string{
 						"proc.cmdline": "launchd",
 					},
@@ -214,10 +214,10 @@ func TestIncludeFields1(t *testing.T) {
 }
 
 func TestDropFields(t *testing.T) {
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"drop_fields": map[string]interface{}{
-				"when": map[string]interface{}{
+			"drop_fields": map[string]any{
+				"when": map[string]any{
 					"equals": map[string]string{
 						"beat.hostname": "mar",
 					},
@@ -277,10 +277,10 @@ func TestDropFields(t *testing.T) {
 func TestMultipleIncludeFields(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"include_fields": map[string]interface{}{
-				"when": map[string]interface{}{
+			"include_fields": map[string]any{
+				"when": map[string]any{
 					"contains": map[string]string{
 						"beat.name": "my-shipper",
 					},
@@ -289,7 +289,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 			},
 		},
 		{
-			"include_fields": map[string]interface{}{
+			"include_fields": map[string]any{
 				"fields": []string{"proc.cpu.start_time", "proc.cpu.total_p", "proc.mem.rss_p", "proc.cmdline"},
 			},
 		},
@@ -374,11 +374,11 @@ func TestMultipleIncludeFields(t *testing.T) {
 func TestDropEvent(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"drop_event": map[string]interface{}{
-				"when": map[string]interface{}{
-					"range": map[string]interface{}{
+			"drop_event": map[string]any{
+				"when": map[string]any{
+					"range": map[string]any{
 						"proc.cpu.total_p": map[string]float64{
 							"lt": 0.5,
 						},
@@ -426,9 +426,9 @@ func TestDropEvent(t *testing.T) {
 func TestEmptyCondition(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"drop_event": map[string]interface{}{},
+			"drop_event": map[string]any{},
 		},
 	}
 
@@ -470,10 +470,10 @@ func TestEmptyCondition(t *testing.T) {
 func TestBadCondition(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"drop_event": map[string]interface{}{
-				"when": map[string]interface{}{
+			"drop_event": map[string]any{
+				"when": map[string]any{
 					"equal": map[string]string{
 						"type": "process",
 					},
@@ -489,10 +489,10 @@ func TestBadCondition(t *testing.T) {
 func TestMissingFields(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"include_fields": map[string]interface{}{
-				"when": map[string]interface{}{
+			"include_fields": map[string]any{
+				"when": map[string]any{
 					"equals": map[string]string{
 						"type": "process",
 					},
@@ -508,10 +508,10 @@ func TestMissingFields(t *testing.T) {
 func TestBadConditionConfig(t *testing.T) {
 	logp.TestingSetup()
 
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"include_fields": map[string]interface{}{
-				"when": map[string]interface{}{
+			"include_fields": map[string]any{
+				"when": map[string]any{
 					"fake": map[string]string{
 						"type": "process",
 					},
@@ -526,9 +526,9 @@ func TestBadConditionConfig(t *testing.T) {
 }
 
 func TestDropMissingFields(t *testing.T) {
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"drop_fields": map[string]interface{}{
+			"drop_fields": map[string]any{
 				"fields": []string{"foo.bar", "proc.cpu", "proc.sss", "beat", "mem"},
 			},
 		},
@@ -583,17 +583,17 @@ const (
 
 func BenchmarkEventBackups(b *testing.B) {
 	// listing all the processors that revert changes in case of an error
-	yml := []map[string]interface{}{
+	yml := []map[string]any{
 		{
-			"append": map[string]interface{}{
+			"append": map[string]any{
 				"target_field":  "append_target",
-				"values":        []interface{}{"third", "fourth"},
+				"values":        []any{"third", "fourth"},
 				"fail_on_error": true,
 			},
 		},
 		{
-			"copy_fields": map[string]interface{}{
-				"fields": []map[string]interface{}{
+			"copy_fields": map[string]any{
+				"fields": []map[string]any{
 					{
 						"from": "copy_from",
 						"to":   "copy.to",
@@ -603,8 +603,8 @@ func BenchmarkEventBackups(b *testing.B) {
 			},
 		},
 		{
-			"decode_base64_field": map[string]interface{}{
-				"field": map[string]interface{}{
+			"decode_base64_field": map[string]any{
+				"field": map[string]any{
 					"from": "base64_from",
 					"to":   "base64_to",
 				},
@@ -612,8 +612,8 @@ func BenchmarkEventBackups(b *testing.B) {
 			},
 		},
 		{
-			"decompress_gzip_field": map[string]interface{}{
-				"field": map[string]interface{}{
+			"decompress_gzip_field": map[string]any{
+				"field": map[string]any{
 					"from": "gzip_from",
 					"to":   "gzip_to",
 				},
@@ -621,8 +621,8 @@ func BenchmarkEventBackups(b *testing.B) {
 			},
 		},
 		{
-			"rename": map[string]interface{}{
-				"fields": []map[string]interface{}{
+			"rename": map[string]any{
+				"fields": []map[string]any{
 					{
 						"from": "rename_from",
 						"to":   "rename.to",
@@ -632,8 +632,8 @@ func BenchmarkEventBackups(b *testing.B) {
 			},
 		},
 		{
-			"replace": map[string]interface{}{
-				"fields": []map[string]interface{}{
+			"replace": map[string]any{
+				"fields": []map[string]any{
 					{
 						"field":       "replace_test",
 						"pattern":     "to replace",
@@ -644,15 +644,15 @@ func BenchmarkEventBackups(b *testing.B) {
 			},
 		},
 		{
-			"truncate_fields": map[string]interface{}{
-				"fields":         []interface{}{"to_truncate"},
+			"truncate_fields": map[string]any{
+				"fields":         []any{"to_truncate"},
 				"max_characters": 4,
 				"fail_on_error":  true,
 			},
 		},
 		{
-			"convert": map[string]interface{}{
-				"fields": []map[string]interface{}{
+			"convert": map[string]any{
+				"fields": []map[string]any{
 					{
 						"from": "convert_from",
 						"to":   "convert.to",
@@ -663,8 +663,8 @@ func BenchmarkEventBackups(b *testing.B) {
 			},
 		},
 		{
-			"decode_csv_fields": map[string]interface{}{
-				"fields": map[string]interface{}{
+			"decode_csv_fields": map[string]any{
+				"fields": map[string]any{
 					"csv_from": "csv.to",
 				},
 				"fail_on_error": true,
@@ -672,15 +672,15 @@ func BenchmarkEventBackups(b *testing.B) {
 		},
 		// it creates a backup unless `ignore_failure` is true
 		{
-			"dissect": map[string]interface{}{
+			"dissect": map[string]any{
 				"tokenizer": "%{key1} %{key2}",
 				"field":     "to_dissect",
 			},
 		},
 		{
-			"extract_array": map[string]interface{}{
+			"extract_array": map[string]any{
 				"field": "array_test",
-				"mappings": map[string]interface{}{
+				"mappings": map[string]any{
 					"array_first":  0,
 					"array_second": 1,
 				},
@@ -688,8 +688,8 @@ func BenchmarkEventBackups(b *testing.B) {
 			},
 		},
 		{
-			"urldecode": map[string]interface{}{
-				"fields": []map[string]interface{}{
+			"urldecode": map[string]any{
+				"fields": []map[string]any{
 					{
 						"from": "url_from",
 						"to":   "url.to",
@@ -706,7 +706,7 @@ func BenchmarkEventBackups(b *testing.B) {
 		Timestamp: time.Now(),
 		Meta:      mapstr.M{},
 		Fields: mapstr.M{
-			"append_target": []interface{}{"first", "second"},
+			"append_target": []any{"first", "second"},
 			"copy_from":     "to_copy",
 			"base64_from":   "dmFsdWU=",
 			// "decompressed data"
@@ -723,7 +723,7 @@ func BenchmarkEventBackups(b *testing.B) {
 	}
 
 	expFields := mapstr.M{
-		"append_target": []interface{}{"first", "second", "third", "fourth"},
+		"append_target": []any{"first", "second", "third", "fourth"},
 		"copy_from":     "to_copy",
 		"copy": mapstr.M{
 			"to": "to_copy",
@@ -776,7 +776,7 @@ func BenchmarkEventBackups(b *testing.B) {
 }
 
 func generateFields(t require.TestingT, m mapstr.M, count, nesting int) {
-	for i := 0; i < count; i++ {
+	for i := range count {
 		var err error
 		if nesting == 0 {
 			_, err = m.Put(fmt.Sprintf("field-%d", i), fmt.Sprintf("value-%d", i))

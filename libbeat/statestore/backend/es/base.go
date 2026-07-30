@@ -56,7 +56,7 @@ func NewStore(ctx context.Context, log *logp.Logger, cli *eslegclient.Connection
 	}
 }
 
-func (b *baseStore) Get(key string, to interface{}) error {
+func (b *baseStore) Get(key string, to any) error {
 	if b == nil {
 		return nil
 	}
@@ -64,7 +64,7 @@ func (b *baseStore) Get(key string, to interface{}) error {
 	return b.get(key, to)
 }
 
-func (b *baseStore) get(key string, to interface{}) error {
+func (b *baseStore) get(key string, to any) error {
 	status, data, err := b.cli.Request("GET", fmt.Sprintf("/%s/%s/%s", b.index, docType, url.QueryEscape(key)), "", nil, nil)
 
 	if err != nil {
@@ -93,7 +93,7 @@ func (b *baseStore) Has(key string) (bool, error) {
 		return false, nil
 	}
 
-	var v interface{}
+	var v any
 	err := b.get(key, &v)
 	if err != nil {
 		if errors.Is(err, ErrKeyUnknown) {
@@ -152,7 +152,7 @@ func (b *baseStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) er
 	return nil
 }
 
-func (b *baseStore) Set(key string, value interface{}) error {
+func (b *baseStore) Set(key string, value any) error {
 	if b == nil {
 		return nil
 	}
@@ -205,14 +205,14 @@ type doc struct {
 }
 
 type entry struct {
-	value interface{}
+	value any
 }
 
-func (e entry) Decode(to interface{}) error {
+func (e entry) Decode(to any) error {
 	return typeconv.Convert(to, e.value)
 }
 
-func renderRequest(val interface{}) doc {
+func renderRequest(val any) doc {
 	return doc{
 		Value:     val,
 		UpdatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),

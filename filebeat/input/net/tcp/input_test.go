@@ -23,7 +23,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"net"
 	"runtime"
 	"sync"
@@ -33,9 +32,10 @@ import (
 	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/stretchr/testify/assert"
@@ -60,22 +60,20 @@ func TestInput(t *testing.T) {
 	v2Ctx := v2.Context{
 		ID:              t.Name(),
 		Cancelation:     ctx,
-		Logger:          logp.NewNopLogger(),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	metrics := inp.InitMetrics("tcp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
 	c := make(chan netinput.DataMetadata, 2)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		if err := inp.Run(v2Ctx, c, metrics); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}
 		}
-	}()
+	})
 
 	nettest.RequireNetMetricsCount(t, v2Ctx.MetricsRegistry, time.Second, 2, 0, 6)
 
@@ -104,12 +102,55 @@ func TestInput(t *testing.T) {
 	}
 }
 
-func BenchmarkInput(b *testing.B) {
-	port, err := libbeattesting.AvailableTCP4Port()
+func TestInputStopsWhenPipelineIsBlocked(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	serverAddr := ephemeralTCPAddr(t)
+	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+		"host": serverAddr,
+	}))
 	if err != nil {
-		b.Fatalf("cannot find available port: %s", err)
+		t.Fatalf("cannot create input: %s", err)
 	}
-	serverAddr := net.JoinHostPort("localhost", fmt.Sprintf("%d", port))
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	v2Ctx := v2.Context{
+		ID:              t.Name(),
+		Cancelation:     ctx,
+		Logger:          logp.NewNopLogger(),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+
+	metrics := inp.InitMetrics("tcp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
+	c := make(chan netinput.DataMetadata)
+
+	runReturned := make(chan struct{})
+	go func() {
+		defer close(runReturned)
+		if err := inp.Run(v2Ctx, c, metrics); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
+			}
+		}
+	}()
+
+	nettest.RunTCPClient(t, serverAddr, []string{"foo", "bar"})
+
+	nettest.RequireNetMetricsCount(t, v2Ctx.MetricsRegistry, 30*time.Second, 1, 0, 3)
+
+	cancel()
+
+	select {
+	case <-runReturned:
+	case <-t.Context().Done():
+		t.Fatal("input Run did not return before the test context was cancelled")
+	}
+}
+
+func BenchmarkInput(b *testing.B) {
+	serverAddr := ephemeralTCPAddr(b)
 
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
 		"host":              serverAddr,
@@ -119,13 +160,12 @@ func BenchmarkInput(b *testing.B) {
 		b.Fatalf("cannot create input: %s", err)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := b.Context()
 
 	v2Ctx := v2.Context{
 		ID:              b.Name(),
 		Cancelation:     ctx,
-		Logger:          logp.NewNopLogger(),
+		Logger:          logptest.NewTestingLogger(b, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
@@ -140,8 +180,9 @@ func BenchmarkInput(b *testing.B) {
 		}
 	}()
 
+	var dialer net.Dialer
 	require.EventuallyWithTf(b, func(ct *assert.CollectT) {
-		conn, err := net.Dial("tcp", serverAddr)
+		conn, err := dialer.DialContext(b.Context(), "tcp", serverAddr)
 		require.NoError(ct, err)
 		conn.Close()
 	}, 30*time.Second, 100*time.Millisecond, "waiting for TCP server to start")
@@ -151,7 +192,7 @@ func BenchmarkInput(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			conn, err := net.Dial("tcp", serverAddr)
+			conn, err := dialer.DialContext(b.Context(), "tcp", serverAddr)
 			if err != nil {
 				b.Errorf("cannot create connection: %s", err)
 				continue
@@ -176,4 +217,23 @@ func BenchmarkInput(b *testing.B) {
 			}
 		}
 	})
+}
+
+// ephemeralTCPAddr binds an ephemeral localhost port, immediately releases
+// it, and returns the resolved "host:port" so a caller can configure a
+// server to listen on it.
+//
+// WARNING: racy by design. The port can become unavailable.
+func ephemeralTCPAddr(tb testing.TB) string {
+	tb.Helper()
+	var lc net.ListenConfig
+	l, err := lc.Listen(tb.Context(), "tcp", "localhost:0")
+	if err != nil {
+		tb.Fatalf("cannot bind an ephemeral port: %s", err)
+	}
+	addr := l.Addr().String()
+	if err := l.Close(); err != nil {
+		tb.Fatalf("cannot release ephemeral port %s: %s", addr, err)
+	}
+	return addr
 }

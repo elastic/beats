@@ -45,7 +45,7 @@ type Action interface {
 	Name() string
 
 	// Execute performs the action.
-	Execute(context.Context, map[string]interface{}) (map[string]interface{}, error)
+	Execute(context.Context, map[string]any) (map[string]any, error)
 }
 
 // Copy of github.com/elastic/elastic-agent-client/v7/pkg/client.DiagnosticHook to avoid the ELv2 License.

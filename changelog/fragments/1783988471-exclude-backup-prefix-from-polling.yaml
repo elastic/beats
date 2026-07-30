@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Fix S3 polling input to exclude same-bucket backup objects from listing.
+description: |
+  When same-bucket backup is configured with the default empty
+  bucket_list_prefix, backup objects are listed alongside source objects
+  and reprocessed indefinitely. Exclude keys matching the backup prefix
+  from listing results when the backup destination is the same bucket.
+component: filebeat

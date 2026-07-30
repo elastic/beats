@@ -24,9 +24,9 @@ import (
 	"io"
 	"os"
 	"slices"
+	"sync/atomic"
 	"time"
 
-	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -235,6 +235,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 func (inp *filestream) Run(
 	ctx input.Context,
 	src loginp.Source,
+	sourceID string,
 	cursor loginp.Cursor,
 	publisher loginp.Publisher,
 	metrics *loginp.Metrics) error {
@@ -243,11 +244,10 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
-	state := initState(log, cursor, fs)
+	state := initState(ctx.Logger, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
-		log.Infof("GZIP file already read to EOF, not reading it again, file name '%s'",
+		ctx.Logger.Infof("GZIP file already read to EOF, not reading it again, file name '%s'",
 			fs.newPath)
 		return nil
 	}
@@ -256,14 +256,21 @@ func (inp *filestream) Run(
 	// (upstream behavior). When read_until_eof is enabled, it "resets" the
 	// reader via startReadUntilEOF by swapping in a fresh, read_until_eof-scoped
 	// context so the drain read can proceed past ctx.Cancelation.
-	r, startReadUntilEOF, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
+	r, startReadUntilEOF, truncated, err := inp.open(ctx.Logger, ctx.Cancelation, fs, state.Offset)
 	if err != nil {
-		log.Errorf("File could not be opened for reading: %v", err)
+		ctx.Logger.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
 
 	if truncated {
 		state.Offset = 0
+	}
+
+	var metricsOffset *atomic.Int64
+	if !fs.desc.GZIP {
+		var cleanupActiveOffset func()
+		metricsOffset, cleanupActiveOffset = metrics.RegisterHarvesterOffset(sourceID, state.Offset)
+		defer cleanupActiveOffset()
 	}
 
 	metrics.FilesActive.Inc()
@@ -278,16 +285,16 @@ func (inp *filestream) Run(
 	}
 
 	defer func() {
-		log.Debug("Closing reader of filestream")
+		ctx.Logger.Debug("Closing reader of filestream")
 		if err := r.Close(); err != nil {
-			log.Errorf("Error stopping filestream reader: %v", err)
+			ctx.Logger.Errorf("Error stopping filestream reader: %v", err)
 		}
 	}()
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
 	err = inp.readFromSource(
-		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics,
+		ctx, ctx.Logger, r, fs.newPath, state, publisher, fs.desc.GZIP, metricsOffset, metrics,
 		startReadUntilEOF)
 	if err != nil {
 		// First handle actual errors
@@ -296,7 +303,7 @@ func (inp *filestream) Run(
 		}
 
 		if inp.deleterConfig.Enabled {
-			if err := inp.deleteFile(ctx, log, cursor, fs.newPath); err != nil {
+			if err := inp.deleteFile(ctx, ctx.Logger, cursor, fs.newPath); err != nil {
 				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
 			}
 		}
@@ -549,12 +556,9 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// log.file.fingerprint is opt-in (include_file_fingerprint, default false).
-	// A growing file's raw fingerprint material is the RAW hex of the file
-	// header, not a SHA-256, so publishing it would expose file content. Only
-	// publish the SHA-256 once the fingerprint is complete; below the threshold
-	// we publish no fingerprint at all. A renamed file may still carry the old
-	// path until the next open — that pre-existing limitation is unchanged here.
+	// Only publish the completed SHA-256. A still-growing fingerprint's material
+	// is the raw hex of the file header, not a hash, so publishing it would
+	// expose file content.
 	var fingerprint string
 	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
 		fingerprint = fs.desc.Fingerprint.Sum
@@ -729,6 +733,7 @@ func (inp *filestream) readFromSource(
 	s state,
 	p loginp.Publisher,
 	isGZIP bool,
+	metricsOffset *atomic.Int64,
 	metrics *loginp.Metrics,
 	startReadUntilEOF func(ctxtool.CancelContext)) error {
 
@@ -750,7 +755,7 @@ func (inp *filestream) readFromSource(
 
 	var err error
 	for ctx.Cancelation.Err() == nil {
-		err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, p)
+		err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, metricsOffset, p)
 		err, shouldContinue := inp.handleReadError(ctx, err, log, path, metrics, isGZIP)
 		if !shouldContinue {
 			return err
@@ -770,7 +775,7 @@ func (inp *filestream) readFromSource(
 			inp.readUntilEOF.Timeout)
 	LOOP:
 		for eofCancelCtx.Err() == nil {
-			err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, p)
+			err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, metricsOffset, p)
 			err, shouldContinue := inp.handleReadError(ctx, err, log, path, metrics, isGZIP)
 			if errors.Is(err, io.EOF) {
 				log.Debug("read_until_eof enabled, EOF reached. closing input")
@@ -788,7 +793,7 @@ func (inp *filestream) readFromSource(
 	return nil
 }
 
-func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, metrics *loginp.Metrics, isGZIP bool, s *state, p loginp.Publisher) error {
+func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, metrics *loginp.Metrics, isGZIP bool, s *state, metricsOffset *atomic.Int64, p loginp.Publisher) error {
 	message, err := r.Next()
 	if err != nil {
 		return err
@@ -797,6 +802,9 @@ func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, met
 	// state offset increase. Mutated through *s so subsequent reads in
 	// readFromSource see the accumulated offset
 	s.Offset += int64(message.Bytes) + int64(message.Offset)
+	if metricsOffset != nil {
+		metricsOffset.Store(s.Offset)
+	}
 
 	flags, err := message.Fields.GetValue("log.flags")
 	if err == nil {

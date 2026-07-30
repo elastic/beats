@@ -32,15 +32,18 @@ import (
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/shared"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 )
 
 const (
@@ -78,6 +81,8 @@ func init() {
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
+
+var _ processors.PdataProcessor = (*kubernetesAnnotator)(nil)
 
 func isKubernetesAvailable(client k8sclient.Interface, logger *logp.Logger) (bool, error) {
 	server, err := client.Discovery().ServerVersion()
@@ -313,15 +318,15 @@ func (k *kubernetesAnnotator) init(ctx context.Context, config kubeAnnotatorConf
 		indexers := NewIndexers(config.Indexers, metaGen)
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
+			AddFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(indexers, pod)
 			},
-			UpdateFunc: func(obj interface{}) {
+			UpdateFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(indexers, pod)
 			},
-			DeleteFunc: func(obj interface{}) {
+			DeleteFunc: func(obj any) {
 				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(indexers, pod)
 			},
@@ -398,34 +403,69 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// One full clone for the kubernetes field; one cheap sub-map clone for the OCI
-	// container field. This replaces the original three full clones.
-	kubeMeta := metadata.Clone()
+	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
+	if ociContainer != nil {
+		event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+	}
+	event.Fields.DeepUpdate(kubeMeta)
 
-	// Build the OCI container field by cloning only the container sub-map —
-	// much cheaper than cloning the full metadata. Transform it in place:
-	// drop container.name and rewrite container.image -> container.image.name.
+	return event, nil
+}
+
+// RunPdata enriches the given pcommon.Map directly with Kubernetes metadata
+func (k *kubernetesAnnotator) RunPdata(body pcommon.Map) (bool, error) {
+	if _, ok := body.Get("kubernetes"); ok {
+		return false, nil
+	}
+
+	// A nil state means init has not published yet (still running or kubernetes unavailable); the
+	// load pairs with the Store in init for a race-free read.
+	state := k.state.Load()
+	if state == nil {
+		return false, nil
+	}
+
+	index := state.matchers.MetadataIndexPdata(body)
+	if index == "" {
+		k.log.Debug("No container match string, not adding kubernetes data")
+		return false, nil
+	}
+
+	metadata := k.cache.get(index)
+	if metadata == nil {
+		return false, nil
+	}
+
+	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
+	if ociContainer != nil {
+		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body, true); err != nil {
+			return false, err
+		}
+	}
+	return false, otelmap.MergeMapstrIntoPdata(kubeMeta, body, true)
+}
+
+// prepareKubeMetadata clones the cached metadata, builds the OCI container
+// sub-map from kubernetes.container (dropping name, rewriting image), and
+// strips the kubernetes-only container fields. container.name is kept in
+// kubeMeta to match original behaviour.
+// ociContainer is nil when the kubernetes.container sub-map is absent.
+func prepareKubeMetadata(metadata mapstr.M) (kubeMeta mapstr.M, ociContainer mapstr.M) {
+	kubeMeta = metadata.Clone()
 	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
 		if cm, ok := containerVal.(mapstr.M); ok {
-			ociContainer := cm.Clone()
+			ociContainer = cm.Clone()
 			_ = ociContainer.Delete("name")
 			if img, imgErr := ociContainer.GetValue("image"); imgErr == nil {
 				_ = ociContainer.Delete("image")
 				ociContainer["image"] = mapstr.M{"name": img}
 			}
-			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
 		}
 	}
-
-	// Remove container fields that belong only in the OCI section before writing
-	// kubernetes metadata to the event. container.name is intentionally kept here
-	// to match original behaviour.
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
-	event.Fields.DeepUpdate(kubeMeta)
-
-	return event, nil
+	return
 }
 
 func (k *kubernetesAnnotator) Close() error {

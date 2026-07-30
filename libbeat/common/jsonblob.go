@@ -26,7 +26,7 @@ import (
 // a json.RawMessage.
 type JSONBlob json.RawMessage
 
-func (b *JSONBlob) Unpack(v interface{}) error {
+func (b *JSONBlob) Unpack(v any) error {
 	switch t := v.(type) {
 	case string:
 		*b = []byte(t)

@@ -18,11 +18,11 @@ import (
 
 func newJob(jobID string) *Job {
 	return &Job{
-		ID:          StringToPtr(jobID),
-		Region:      StringToPtr(api.GlobalRegion),
-		Name:        StringToPtr("my-job"),
-		Type:        StringToPtr(JobTypeService),
-		Status:      StringToPtr(JobStatusRunning),
+		ID:          new(jobID),
+		Region:      new(api.GlobalRegion),
+		Name:        new("my-job"),
+		Type:        new(JobTypeService),
+		Status:      new(JobStatusRunning),
 		Datacenters: []string{"europe-west4"},
 		Meta: map[string]string{
 			"key1":    "job-value",
@@ -30,7 +30,7 @@ func newJob(jobID string) *Job {
 		},
 		TaskGroups: []*TaskGroup{
 			{
-				Name: StringToPtr("web"),
+				Name: new("web"),
 				Meta: map[string]string{
 					"key1":      "group-value",
 					"group-key": "group.value",
@@ -69,7 +69,7 @@ func TestAllocationMetadata(t *testing.T) {
 		Namespace: api.DefaultNamespace,
 	}
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"labels.dedot":        false,
 		"annotations.dedot":   false,
 		"include_annotations": []string{"b", "b.key"},
@@ -102,7 +102,7 @@ func TestExcludeMetadata(t *testing.T) {
 		Namespace: "default",
 	}
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"exclude_labels": []string{"key1", "canary_tags"},
 	})
 	require.NoError(t, err)
@@ -124,15 +124,15 @@ func TestCronJob(t *testing.T) {
 	jobID, allocID := newUUID(), newUUID()
 
 	cron := &api.Job{
-		ID:          StringToPtr(jobID),
-		Region:      StringToPtr("global"),
-		Name:        StringToPtr("my-job"),
-		Type:        StringToPtr(JobTypeBatch),
-		Status:      StringToPtr(JobStatusRunning),
+		ID:          new(jobID),
+		Region:      new("global"),
+		Name:        new("my-job"),
+		Type:        new(JobTypeBatch),
+		Status:      new(JobStatusRunning),
 		Datacenters: []string{"europe-west4"},
 		TaskGroups: []*TaskGroup{
 			{
-				Name: StringToPtr("group"),
+				Name: new("group"),
 				Tasks: []*api.Task{
 					{
 						Name:   "web",
@@ -146,8 +146,8 @@ func TestCronJob(t *testing.T) {
 			},
 		},
 		Periodic: &api.PeriodicConfig{
-			SpecType: StringToPtr(api.PeriodicSpecCron),
-			Enabled:  BoolToPtr(true),
+			SpecType: new(api.PeriodicSpecCron),
+			Enabled:  new(true),
 		},
 	}
 
@@ -158,7 +158,7 @@ func TestCronJob(t *testing.T) {
 		Namespace: api.DefaultNamespace,
 	}
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{})
+	config, err := conf.NewConfigFrom(map[string]any{})
 	require.NoError(t, err)
 
 	metaGen, err := NewMetaGenerator(config, nil)

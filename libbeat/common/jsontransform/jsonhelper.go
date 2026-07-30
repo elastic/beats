@@ -37,7 +37,7 @@ var (
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
-func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
+func WriteJSONKeys(event *beat.Event, keys map[string]any, expandKeys, overwriteKeys, addErrKey bool) {
 	if expandKeys {
 		if err := expandFields(keys); err != nil {
 			event.SetErrorWithOption(err.Error(), addErrKey, "", "")
@@ -81,7 +81,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 					event.Meta[meta] = value
 				}
 
-			case map[string]interface{}:
+			case map[string]any:
 				if event.Meta == nil {
 					event.Meta = mapstr.M{}
 				}
@@ -111,7 +111,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 	event.Fields.DeepUpdate(keys)
 }
 
-func removeKeys(keys map[string]interface{}, names ...string) {
+func removeKeys(keys map[string]any, names ...string) {
 	for _, name := range names {
 		delete(keys, name)
 	}

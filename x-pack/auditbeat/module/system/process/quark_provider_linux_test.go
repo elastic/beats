@@ -61,21 +61,12 @@ func TestQuarkMetricSetKprobe(t *testing.T) {
 	testQuarkMetricSet(t, Kprobe)
 }
 
-// testInitialSnapshot see if quark is generating snapshot events
+// testInitialSnapshot checks if the initial cache is built and retrieved via Snapshot
 func testInitialSnapshot(t *testing.T, be backend) {
 	qq := openQueue(t, be)
 	defer qq.Close()
 
-	// There should be events of kind quark.QUARK_EV_SNAPSHOT
-	qevs := drainFor(t, qq, 5*time.Millisecond)
-	var gotsnap bool
-	for _, qev := range qevs {
-		if qev.Events&quark.QUARK_EV_SNAPSHOT != 0 {
-			gotsnap = true
-		}
-	}
-
-	require.True(t, gotsnap)
+	require.NotEmpty(t, qq.Snapshot())
 }
 
 // testForkExecExit tests if a spawned process shows up in quark
@@ -83,14 +74,14 @@ func testForkExecExit(t *testing.T, be backend) {
 	qq := openQueue(t, be)
 	defer qq.Close()
 
-	// runNop will fork+exec+exit /bin/true
+	// runNop will fork+exec+exit /usr/bin/true
 	cmd := runNop(t)
 	qev := drainFirstOfPid(t, qq, cmd.Process.Pid)
 
 	// We should get at least FORK|EXEC|EXIT in the aggregation
 	require.Equal(t,
-		qev.Events&(quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT),
-		quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT)
+		quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT,
+		qev.Events&(quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT))
 
 	// This is virtually impossible to fail, but we're pedantic
 	require.True(t, qev.Process.Proc.Valid)
@@ -100,9 +91,9 @@ func testForkExecExit(t *testing.T, be backend) {
 	require.NotZero(t, qev.Process.Proc.TimeBoot)
 	require.NotZero(t, qev.Process.Proc.Ppid)
 
-	// Must be /bin/true
-	require.Equal(t, qev.Process.Filename, cmd.Path)
-	require.Equal(t, qev.Process.Filename, cmd.Args[0])
+	// Must be /usr/bin/true
+	require.Equal(t, qev.Process.Exe, cmd.Path)
+	require.Equal(t, qev.Process.Exe, cmd.Args[0])
 
 	// Kprobe cwd path depth is limited
 	if be != Kprobe {
@@ -180,20 +171,21 @@ func openQueue(t *testing.T, be backend) *quark.Queue {
 	attr := quark.DefaultQueueAttr()
 	attr.HoldTime = 25
 	attr.Flags &= ^quark.QQ_ALL_BACKENDS
-	if be == Ebpf {
+	switch be {
+	case Ebpf:
 		attr.Flags |= quark.QQ_EBPF
-	} else if be == Kprobe {
+	case Kprobe:
 		attr.Flags |= quark.QQ_KPROBE
 	}
-	qq, err := quark.OpenQueue(attr, 1)
+	qq, err := quark.OpenQueue(attr)
 	require.NoError(t, err)
 
 	return qq
 }
 
-// runNop does fork+exec+exit /bin/true
+// runNop does fork+exec+exit /usr/bin/true
 func runNop(t *testing.T) *exec.Cmd {
-	cmd := exec.Command("/bin/true")
+	cmd := exec.CommandContext(t.Context(), "/usr/bin/true")
 	require.NotNil(t, cmd)
 	err := cmd.Run()
 	require.NoError(t, err)
@@ -201,55 +193,21 @@ func runNop(t *testing.T) *exec.Cmd {
 	return cmd
 }
 
-// drainFor drains all events for `d`
-func drainFor(t *testing.T, qq *quark.Queue, d time.Duration) []quark.Event {
-	var allQevs []quark.Event
-
-	start := time.Now()
-
-	for {
-		qevs, err := qq.GetEvents()
-		require.NoError(t, err)
-		for _, qev := range qevs {
-			if !wantedEvent(qev) {
-				continue
-			}
-			allQevs = append(allQevs, qev)
-		}
-		if time.Since(start) > d {
-			break
-		}
-		// Intentionally placed at the end so that we always
-		// get one more try after the last block
-		if len(qevs) == 0 {
-			_ = qq.Block()
-		}
-	}
-
-	return allQevs
-}
-
 // drainFirstOfPid returns the first event
 func drainFirstOfPid(t *testing.T, qq *quark.Queue, pid int) quark.Event {
 	start := time.Now()
 
 	for {
-		qevs, err := qq.GetEvents()
-		require.NoError(t, err)
-		for _, qev := range qevs {
-			if !wantedEvent(qev) {
-				continue
-			}
-			if qev.Process.Pid == uint32(pid) {
-				return qev
-			}
+		qev, ok := qq.GetEvent()
+		if ok && wantedEvent(qev) && qev.Process.Pid == uint32(pid) { //nolint:gosec // PID values fit in uint32
+			return qev
 		}
 		if time.Since(start) > time.Second {
 			break
 		}
 		// Intentionally placed at the end so that we always
 		// get one more try after the last block
-		if len(qevs) == 0 {
+		if !ok {
 			_ = qq.Block()
 		}
 	}
@@ -264,7 +222,8 @@ func firstEventOfPid(t *testing.T, events []mb.Event, pid int) mb.Event {
 	for _, event := range events {
 		pid2, err := event.RootFields.GetValue("process.pid")
 		require.NoError(t, err)
-		if pid2.(uint32) == uint32(pid) {
+		pid2u32, ok := pid2.(uint32)
+		if ok && pid2u32 == uint32(pid) { //nolint:gosec // PID values fit in uint32
 			return event
 		}
 	}
@@ -299,9 +258,9 @@ func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 			"process.name":                          qp.Comm,
 			"process.args":                          qp.Cmdline,
 			"process.args_count":                    len(qp.Cmdline),
-			"process.pid":                           uint32(os.Getpid()),
+			"process.pid":                           uint32(os.Getpid()), //nolint:gosec // PID values fit in uint32
 			"process.executable":                    exe,
-			"process.parent.pid":                    uint32(os.Getppid()),
+			"process.parent.pid":                    uint32(os.Getppid()), //nolint:gosec // PID values fit in uint32
 			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
@@ -336,8 +295,8 @@ func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb.Event {
 	// We should get at least FORK|EXEC|EXIT in the aggregation
 	require.Equal(t,
-		qev.Events&(quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT),
-		quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT)
+		quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT,
+		qev.Events&(quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT))
 	// This is virtually impossible to fail, but we're pedantic
 	require.True(t, qev.Process.Proc.Valid)
 
@@ -360,12 +319,12 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb
 			"event.category":                        []string{"process"},
 			"event.kind":                            "event",
 			"process.name":                          "true",
-			"process.args":                          []string{"/bin/true"},
+			"process.args":                          []string{"/usr/bin/true"},
 			"process.args_count":                    1,
-			"process.pid":                           uint32(cmd.Process.Pid),
-			"process.executable":                    "/bin/true",
-			"process.parent.pid":                    uint32(os.Getpid()),
-			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
+			"process.pid":                           uint32(cmd.Process.Pid), //nolint:gosec // PID values fit in uint32
+			"process.executable":                    "/usr/bin/true",
+			"process.parent.pid":                    uint32(os.Getpid()),                   //nolint:gosec // PID values fit in uint32
+			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)), //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
 			"user.effective.id":                     uint32(0),
@@ -392,8 +351,8 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb
 
 // getConfigForQuark enables quark and allows hashing so we can test
 // the cached hasher.
-func getConfigForQuark(be backend) map[string]interface{} {
-	config := map[string]interface{}{
+func getConfigForQuark(be backend) map[string]any {
+	config := map[string]any{
 		"module":   system.ModuleName,
 		"datasets": []string{"process"},
 
