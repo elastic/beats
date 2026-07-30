@@ -42,7 +42,7 @@ func TestWatchTicks(t *testing.T) {
 	defer watcher.stop() // unnecessary, but good hygiene
 
 	// Run through 10 ticks
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		err := watcher.once()
 		require.NoError(t, err)
 	}

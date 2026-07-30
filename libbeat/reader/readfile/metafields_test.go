@@ -52,7 +52,7 @@ func TestMetaFields(t *testing.T) {
 	path := "test/path"
 	offset := int64(0)
 
-	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), false, false, "hash", offset}
+	in := &FileMetaReader{reader: msgReader(messages), path: path, fi: createTestFileInfo(), fingerprint: "hash", offset: offset}
 	for {
 		msg, err := in.Next()
 		if errors.Is(err, io.EOF) {
@@ -97,7 +97,7 @@ func TestMetaFieldsOwnerAndGroup(t *testing.T) {
 	path := "test/path"
 	offset := int64(0)
 
-	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), true, true, "hash", offset}
+	in := &FileMetaReader{reader: msgReader(messages), path: path, fi: createTestFileInfo(), includeOwner: true, includeGroup: true, fingerprint: "hash", offset: offset}
 	for {
 		msg, err := in.Next()
 		if errors.Is(err, io.EOF) {
@@ -149,7 +149,7 @@ type testFileInfo struct {
 	name string
 	size int64
 	time time.Time
-	sys  interface{}
+	sys  any
 }
 
 func (t testFileInfo) Name() string       { return t.name }
@@ -157,4 +157,56 @@ func (t testFileInfo) Size() int64        { return t.size }
 func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
-func (t testFileInfo) Sys() interface{}   { return t.sys }
+func (t testFileInfo) Sys() any           { return t.sys }
+
+// freshMsgReader returns the same message on every Next() call with a freshly
+// allocated Fields map, so benchmarks measure only FileMetaReader.Next() overhead.
+type freshMsgReader struct {
+	msg reader.Message
+}
+
+func (r *freshMsgReader) Next() (reader.Message, error) {
+	r.msg.Fields = make(mapstr.M, 1)
+	return r.msg, nil
+}
+
+func (r *freshMsgReader) Close() error { return nil }
+
+func BenchmarkFileMetaReaderNext(b *testing.B) {
+	fi := createTestFileInfo()
+	base := reader.Message{
+		Content: []byte("2024-01-01T00:00:00Z INFO example log line with some content"),
+		Bytes:   60,
+	}
+
+	b.Run("no-fingerprint", func(b *testing.B) {
+		r := &FileMetaReader{
+			reader: &freshMsgReader{msg: base},
+			path:   "/var/log/app/test.log",
+			fi:     fi,
+		}
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			if _, err := r.Next(); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+
+	b.Run("with-fingerprint", func(b *testing.B) {
+		r := &FileMetaReader{
+			reader:      &freshMsgReader{msg: base},
+			path:        "/var/log/app/test.log",
+			fi:          fi,
+			fingerprint: "abc123deadbeef0123456789abcdef01",
+		}
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			if _, err := r.Next(); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+}

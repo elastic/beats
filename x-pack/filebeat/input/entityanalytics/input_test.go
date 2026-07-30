@@ -97,7 +97,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.NewNopLogger(), path)
+		plugin := Plugin(logp.NewNopLogger(), nil, path)
 		inp, err := plugin.Manager.Create(c)
 		require.NoError(t, err)
 		require.Equal(t, testInputName, inp.Name())
@@ -112,7 +112,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.NewNopLogger(), path)
+		plugin := Plugin(logp.NewNopLogger(), nil, path)
 		_, err = plugin.Manager.Create(c)
 
 		require.ErrorContains(t, err, "string value is not set accessing 'provider'")
@@ -127,7 +127,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.NewNopLogger(), path)
+		plugin := Plugin(logp.NewNopLogger(), nil, path)
 		_, err = plugin.Manager.Create(c)
 
 		require.ErrorContains(t, err, ErrProviderUnknown.Error())
@@ -142,7 +142,7 @@ func TestInputManager_Create(t *testing.T) {
 		c, err := config.NewConfigFrom(&rawConf)
 		require.NoError(t, err)
 
-		plugin := Plugin(logp.NewNopLogger(), path)
+		plugin := Plugin(logp.NewNopLogger(), nil, path)
 		_, err = plugin.Manager.Create(c)
 
 		require.ErrorContains(t, err, "test error")

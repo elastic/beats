@@ -38,9 +38,13 @@ type BrowserStateStatusPlugin struct {
 	cssp *commonSSP
 }
 
-func NewBrowserStateStatusplugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *BrowserStateStatusPlugin {
+func NewBrowserStateStatusplugin(
+	stateTracker *monitorstate.Tracker,
+	sf stdfields.StdMonitorFields,
+	logger *logp.Logger,
+) *BrowserStateStatusPlugin {
 	return &BrowserStateStatusPlugin{
-		cssp: newCommonSSP(stateTracker, sf),
+		cssp: newCommonSSP(stateTracker, sf, logger),
 	}
 }
 
@@ -74,17 +78,27 @@ func (ssp *BrowserStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
 
-func (ssp *BrowserStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} //noop
+// BeforeEachEvent sets monitor.check_group before the synthetics process is
+// spawned so the runner can propagate it as the APM trace id.
+func (ssp *BrowserStateStatusPlugin) BeforeEachEvent(event *beat.Event) {
+	ssp.cssp.setCheckGroup(event)
+}
 
 // LightweightStateStatusPlugin encapsulates the writing of the primary fields used by the summary,
 // those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
 type LightweightStateStatusPlugin struct {
-	cssp *commonSSP
+	cssp   *commonSSP
+	logger *logp.Logger
 }
 
-func NewLightweightStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *LightweightStateStatusPlugin {
+func NewLightweightStateStatusPlugin(
+	stateTracker *monitorstate.Tracker,
+	sf stdfields.StdMonitorFields,
+	logger *logp.Logger,
+) *LightweightStateStatusPlugin {
 	return &LightweightStateStatusPlugin{
-		cssp: newCommonSSP(stateTracker, sf),
+		cssp:   newCommonSSP(stateTracker, sf, logger),
+		logger: logger,
 	}
 }
 
@@ -115,19 +129,24 @@ func (ssp *LightweightStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
 
-func (ssp *LightweightStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} // noop
+// BeforeEachEvent sets monitor.check_group before the job runs so synthetics
+// (api) monitors can propagate it as the APM trace id.
+func (ssp *LightweightStateStatusPlugin) BeforeEachEvent(event *beat.Event) {
+	ssp.cssp.setCheckGroup(event)
+}
 
 type commonSSP struct {
 	js           *jobsummary.JobSummary
 	stateTracker *monitorstate.Tracker
 	sf           stdfields.StdMonitorFields
 	checkGroup   string
+	logger       *logp.Logger
 }
 
-func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *commonSSP {
+func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields, logger *logp.Logger) *commonSSP {
 	uu, err := uuid.NewV1()
 	if err != nil {
-		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
+		logger.Errorf("could not create v1 UUID for retry group: %s", err)
 	}
 	js := jobsummary.NewJobSummary(1, sf.MaxAttempts, uu.String())
 	return &commonSSP{
@@ -135,11 +154,22 @@ func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFie
 		stateTracker: stateTracker,
 		sf:           sf,
 		checkGroup:   uu.String(),
+		logger:       logger,
 	}
 }
 
-func (ssp *commonSSP) BeforeEach(event *beat.Event, err error) {
+// setCheckGroup writes the check group identifier for the current attempt to
+// the event. It is set both before the job runs (via BeforeEachEvent) and after
+// (via BeforeEach); the value is stable within an attempt so writing it twice is
+// harmless. Setting it early lets synthetics (browser/api) monitors propagate it
+// to the runner as the APM trace id, so a journey execution can be cross-linked
+// with the traced application's APM data.
+func (ssp *commonSSP) setCheckGroup(event *beat.Event) {
 	_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt))
+}
+
+func (ssp *commonSSP) BeforeEach(event *beat.Event, err error) {
+	ssp.setCheckGroup(event)
 }
 
 func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
@@ -178,7 +208,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 
 	eventext.MergeEventFields(event, fields)
 
-	logp.L().Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
+	ssp.logger.Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
 		return RetryBeforeSummary

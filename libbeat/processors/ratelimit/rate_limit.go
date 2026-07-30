@@ -68,6 +68,8 @@ func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("could not set default configuration: %w", err)
 	}
 
+	sort.Strings(config.Fields)
+
 	algoConfig := algoConfig{
 		limit:  config.Limit,
 		config: *config.Algorithm.Config(),
@@ -115,6 +117,11 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	return nil, nil
 }
 
+// Unshareable opts rate_limit out of process-wide processor sharing: the
+// algorithm keeps a token bucket, so sharing one instance across owners would
+// enforce a single global limit instead of an independent per-owner limit.
+func (p *rateLimit) Unshareable() {}
+
 func (p *rateLimit) String() string {
 	return fmt.Sprintf(
 		"%v=[limit=[%v],fields=[%v],algorithm=[%v]]",
@@ -127,7 +134,6 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 		return 0, nil
 	}
 
-	sort.Strings(p.config.Fields)
 	values := make([]string, len(p.config.Fields))
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)

@@ -1,0 +1,16 @@
+kind: enhancement
+
+summary: Consolidate Identity Federation authentication into shared libbeat packages
+
+description: >
+  Moves all Identity Federation (Cloud Connectors) credential logic out of
+  x-pack/libbeat/common/aws and into three new shared packages under
+  x-pack/libbeat/common/identityfederation/{aws,gcp,azure}. The aws package
+  exposes AWSConfigRoleChaining, AssumeRoleStep, WebIdentityRoleStep,
+  NewIRSAChain, NewOIDCChain, and FormatExternalID. The gcp package exposes
+  NewTokenSource for AWS-mediated GCP Workload Identity Federation. The azure
+  package exposes NewClientAssertionCredential and ReadJWT. The existing
+  use_cloud_connectors flow in ConfigAWS is updated to delegate to these
+  packages, removing the previously duplicated role-chaining implementation.
+
+component: libbeat

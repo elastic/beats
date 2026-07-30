@@ -23,8 +23,8 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -32,6 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -55,7 +56,7 @@ func InitializeModule() {
 }
 
 // NewHeartbeatHints builds a heartbeat hints builder
-func NewHeartbeatHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
+func NewHeartbeatHints(cfg *conf.C, logger *logp.Logger, p *paths.Path) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(config)
 

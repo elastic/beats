@@ -1,4 +1,0 @@
-kind: bug
-summary: Filestream only reports degraded status for permanent harvester errors.
-component: filebeat
-issue: https://github.com/elastic/beats/issues/49451

@@ -22,12 +22,15 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"net"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // FlowID records flow details and statistics.
 type FlowID struct {
 	rawFlowID
-	flow Flow // remember associated flow for faster lookup
+	flow   Flow // remember associated flow for faster lookup
+	logger *logp.Logger
 }
 
 type rawFlowID struct {
@@ -136,8 +139,9 @@ const (
 	flowDirReversed
 )
 
-func newFlowID() *FlowID {
+func newFlowID(logger *logp.Logger) *FlowID {
 	f := &FlowID{}
+	f.logger = logger
 	f.init()
 	return f
 }
@@ -154,13 +158,13 @@ func (f *FlowID) Reset(buf []byte) {
 }
 
 func (f *FlowID) AddEth(src, dst net.HardwareAddr) {
-	debugf("flowid: add eth")
+	f.logger.Debugf("flowid: add eth")
 	f.addID(&f.offEth, EthFlow, src, dst, flowDirUnset)
 	f.cntEth++
 }
 
 func (f *FlowID) AddIPv4(src, dst net.IP) {
-	debugf("flowid: add ipv4")
+	f.logger.Debugf("flowid: add ipv4")
 	f.addMultLayerID(
 		&f.offIPv4, &f.offOutterIPv4,
 		IPv4Flow, OutterIPv4Flow,
@@ -169,7 +173,7 @@ func (f *FlowID) AddIPv4(src, dst net.IP) {
 }
 
 func (f *FlowID) AddIPv6(src, dst net.IP) {
-	debugf("flowid: add ipv6")
+	f.logger.Debugf("flowid: add ipv6")
 	f.addMultLayerID(
 		&f.offIPv6, &f.offOutterIPv6,
 		IPv6Flow, OutterIPv6Flow,
@@ -178,7 +182,7 @@ func (f *FlowID) AddIPv6(src, dst net.IP) {
 }
 
 func (f *FlowID) AddVLan(id uint16) {
-	debugf("flowid: add vlan")
+	f.logger.Debugf("flowid: add vlan")
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
 	f.addMultLayerID(
@@ -189,7 +193,7 @@ func (f *FlowID) AddVLan(id uint16) {
 }
 
 func (f *FlowID) AddICMPv4Request(id uint16) {
-	debugf("flowid: add icmp4 request")
+	f.logger.Debugf("flowid: add icmp4 request")
 
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
@@ -197,7 +201,7 @@ func (f *FlowID) AddICMPv4Request(id uint16) {
 }
 
 func (f *FlowID) AddICMPv4Response(id uint16) {
-	debugf("flowid: add icmp4 response")
+	f.logger.Debugf("flowid: add icmp4 response")
 
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
@@ -205,7 +209,7 @@ func (f *FlowID) AddICMPv4Response(id uint16) {
 }
 
 func (f *FlowID) AddICMPv6Request(id uint16) {
-	debugf("flowid: add icmp6 request")
+	f.logger.Debugf("flowid: add icmp6 request")
 
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
@@ -213,7 +217,7 @@ func (f *FlowID) AddICMPv6Request(id uint16) {
 }
 
 func (f *FlowID) AddICMPv6Response(id uint16) {
-	debugf("flowid: add icmp6 response")
+	f.logger.Debugf("flowid: add icmp6 response")
 
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
@@ -221,19 +225,19 @@ func (f *FlowID) AddICMPv6Response(id uint16) {
 }
 
 func (f *FlowID) AddUDP(src, dst uint16) {
-	debugf("flowid: add udp")
+	f.logger.Debugf("flowid: add udp")
 
 	f.addWithPorts(&f.offUDP, UDPFlow, src, dst)
 }
 
 func (f *FlowID) AddTCP(src, dst uint16) {
-	debugf("flowid: add tcp")
+	f.logger.Debugf("flowid: add tcp")
 
 	f.addWithPorts(&f.offTCP, TCPFlow, src, dst)
 }
 
 func (f *FlowID) AddConnectionID(id uint64) {
-	debugf("flowid: add tcp connection id")
+	f.logger.Debugf("flowid: add tcp connection id")
 
 	var tmp [8]byte
 	binary.LittleEndian.PutUint64(tmp[:], id)

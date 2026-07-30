@@ -366,7 +366,7 @@ var hash2PartitionTests = []struct {
 func TestHash2Partition(t *testing.T) {
 	for _, tt := range hash2PartitionTests {
 		t.Run(tt.testName, func(t *testing.T) {
-			var partition, _ = hash2Partition(tt.hash, tt.numPartitions)
+			var partition = Hash2Partition(tt.hash, tt.numPartitions)
 			assert.Equal(t, tt.expectedResult, partition)
 		})
 	}

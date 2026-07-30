@@ -8,6 +8,9 @@ services:
       elasticsearch_kerberos.elastic: { condition: service_healthy }
       kibana:        { condition: service_healthy }
       cometd: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      redis: { condition: service_healthy }      
+      mosquitto: { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -103,6 +106,21 @@ services:
     volumes:
       - logstash_testdata:/data
     restart: "no"
+  kafka:
+    build: ${ES_BEATS}/testing/environments/docker/kafka
+    ports:
+      - 9092:9092
+      - 9093:9093
+      - 9094:9094
+      - 2181:2181
+    environment:
+      - ADVERTISED_HOST=kafka
+
+  mosquitto:
+    build: ${ES_BEATS}/testing/environments/docker/mosquitto
+    ports:
+      - 1883:1883
+
   logstash:
     depends_on:
       - init-logstash
@@ -123,6 +141,11 @@ services:
       - logstash_testdata:/usr/share/nginx/html:ro
     ports:
       - 8082:80
+
+  redis:
+    build: ${ES_BEATS}/testing/environments/docker/redis
+    ports:
+      - 6379:6379
 
 volumes:
   logstash_testdata:

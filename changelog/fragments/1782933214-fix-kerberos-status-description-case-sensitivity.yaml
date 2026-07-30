@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix Kerberos ticket status code descriptions not being set in the Security event log ingest pipeline when `winlog.event_data.Status` arrives in lower case.
+component: winlogbeat

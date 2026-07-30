@@ -23,7 +23,7 @@ type clientUnit interface {
 	ID() string
 	Type() client.UnitType
 	Expected() client.Expected
-	UpdateState(state client.UnitState, message string, payload map[string]interface{}) error
+	UpdateState(state client.UnitState, message string, payload map[string]any) error
 	RegisterAction(action client.Action)
 	UnregisterAction(action client.Action)
 	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook)
@@ -248,7 +248,7 @@ func (u *agentUnit) Type() client.UnitType {
 }
 
 // UpdateState updates the state for the unit.
-func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[string]interface{}) error {
+func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[string]any) error {
 	u.mtx.Lock()
 	defer u.mtx.Unlock()
 
@@ -271,17 +271,17 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 		return u.clientUnit.UpdateState(getUnitState(state), msg, payload)
 	}
 
-	streamsPayload := make(map[string]interface{}, len(u.streamStates))
+	streamsPayload := make(map[string]any, len(u.streamStates))
 
 	for streamID, streamState := range u.streamStates {
-		streamsPayload[streamID] = map[string]interface{}{
+		streamsPayload[streamID] = map[string]any{
 			"status": getUnitState(streamState.state).String(),
 			"error":  streamState.msg,
 		}
 	}
 
 	if payload == nil {
-		payload = make(map[string]interface{})
+		payload = make(map[string]any)
 	}
 
 	payload["streams"] = streamsPayload
@@ -313,16 +313,16 @@ func (u *agentUnit) updateStateForStream(streamID string, state status.Status, m
 
 	state, msg = u.calcState()
 
-	streamsPayload := make(map[string]interface{}, len(u.streamStates))
+	streamsPayload := make(map[string]any, len(u.streamStates))
 
 	for id, streamState := range u.streamStates {
-		streamsPayload[id] = map[string]interface{}{
+		streamsPayload[id] = map[string]any{
 			"status": getUnitState(streamState.state).String(),
 			"error":  streamState.msg,
 		}
 	}
 
-	payload := map[string]interface{}{
+	payload := map[string]any{
 		"streams": streamsPayload,
 	}
 

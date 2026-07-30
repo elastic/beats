@@ -36,13 +36,13 @@ type appendProcessor struct {
 }
 
 type appendProcessorConfig struct {
-	Fields            []string      `config:"fields"`
-	TargetField       string        `config:"target_field"`
-	Values            []interface{} `config:"values"`
-	IgnoreMissing     bool          `config:"ignore_missing"`
-	IgnoreEmptyValues bool          `config:"ignore_empty_values"`
-	FailOnError       bool          `config:"fail_on_error"`
-	AllowDuplicate    bool          `config:"allow_duplicate"`
+	Fields            []string `config:"fields"`
+	TargetField       string   `config:"target_field"`
+	Values            []any    `config:"values"`
+	IgnoreMissing     bool     `config:"ignore_missing"`
+	IgnoreEmptyValues bool     `config:"ignore_empty_values"`
+	FailOnError       bool     `config:"fail_on_error"`
+	AllowDuplicate    bool     `config:"allow_duplicate"`
 }
 
 func init() {
@@ -75,18 +75,12 @@ func NewAppendProcessor(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
 	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to append fields in append processor: %w", err)
 		f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 		if f.config.FailOnError {
-			event = backup
 			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {
 				return nil, fmt.Errorf("failed to append fields in append processor: %w", err)
 			}
@@ -97,8 +91,8 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.Event) error {
-	var arr []interface{}
+func (f *appendProcessor) appendValues(target string, fields []string, values []any, event *beat.Event) error {
+	var arr []any
 
 	// get the existing value of target field
 	targetVal, err := event.GetValue(target)
@@ -134,7 +128,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 	}
 
 	// replace the existing target with new array
-	if err := event.Delete(target); err != nil && !(err.Error() == "key not found") {
+	if err := event.Delete(target); err != nil && err.Error() != "key not found" {
 		return fmt.Errorf("unable to delete the target field %s due to error: %w", target, err)
 	}
 	if _, err := event.PutValue(target, arr); err != nil {
@@ -149,7 +143,7 @@ func (f *appendProcessor) String() string {
 }
 
 // this function will remove all the empty strings and nil values from the array
-func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
+func cleanEmptyValues(dirtyArr []any) (cleanArr []any) {
 	for _, val := range dirtyArr {
 		if val == "" || val == nil {
 			continue
@@ -160,8 +154,8 @@ func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
 }
 
 // this function will remove all the duplicate values from the array
-func removeDuplicates(dirtyArr []interface{}) (cleanArr []interface{}) {
-	set := make(map[interface{}]bool, 0)
+func removeDuplicates(dirtyArr []any) (cleanArr []any) {
+	set := make(map[any]bool, 0)
 	for _, val := range dirtyArr {
 		valType := reflect.TypeOf(val)
 		if valType == nil || valType.Comparable() {

@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
@@ -130,7 +131,7 @@ func TestOTELCELMetrics(t *testing.T) {
 
 	// Check for presence of expected OTEL metrics
 	expectedMetricNames := []string{
-		"input.cel.periodic.run",
+		"input.cel.periodic.run.count",
 		"input.cel.periodic.program.run.started",
 		"input.cel.periodic.program.run.success",
 		"input.cel.periodic.batch.received",
@@ -218,6 +219,51 @@ func (e *inMemoryExporter) getMetrics() []metricdata.ResourceMetrics {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	return e.metrics
+}
+
+func TestCreateOTELMetricsSetsInputTypeResourceAttribute(t *testing.T) {
+	exporter := &inMemoryExporter{}
+	otel.GetGlobalMetricsExporterFactory().SetGlobalMetricsExporter(exporter)
+	defer otel.GetGlobalMetricsExporterFactory().SetGlobalMetricsExporter(nil)
+
+	cfg := defaultConfig()
+	cfg.DataStream = "foo.bar"
+	cfg.Package = map[string]string{
+		"name":    "foo",
+		"version": "1.2.3",
+	}
+	env := v2.Context{
+		IDWithoutName: "test_input",
+		Agent: beat.Info{
+			Version: "9.0.0",
+		},
+	}
+
+	ctx := context.Background()
+	otelMetrics, _, err := createOTELMetrics(ctx, cfg, logptest.NewTestingLogger(t, "cel_metrics_test"), env, http.DefaultTransport, nil)
+	if err != nil {
+		t.Fatalf("failed to create OTEL metrics collector: %v", err)
+	}
+	defer otelMetrics.Shutdown(ctx)
+
+	otelMetrics.StartPeriodic(ctx)
+	otelMetrics.AddProgramExecutionStarted(ctx, 1)
+	otelMetrics.EndPeriodic(ctx)
+
+	deadline := time.Now().Add(5 * time.Second)
+	for len(exporter.getMetrics()) == 0 && time.Now().Before(deadline) {
+		time.Sleep(10 * time.Millisecond)
+	}
+	if got := len(exporter.getMetrics()); got == 0 {
+		t.Fatalf("expected OTEL metrics to be exported, got %d", got)
+	}
+
+	for _, rm := range exporter.getMetrics() {
+		if rm.Resource != nil && strings.Contains(rm.Resource.String(), "input_type=cel") {
+			return
+		}
+	}
+	t.Error("expected exported OTEL metrics resource attributes to include input_type=cel")
 }
 
 // testPublisher is a publisher that signals when events are published.

@@ -1,0 +1,218 @@
+[
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "auid": "700",
+        "exe": "/usr/bin/sudo",
+        "op": "PAM:session_close",
+        "pid": "4121",
+        "record_type": "USER_END",
+        "result": "success",
+        "sequence": "19600327",
+        "ses": "11988",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "auid": "700",
+        "exe": "/usr/bin/sudo",
+        "op": "PAM:setcred",
+        "pid": "4121",
+        "record_type": "CRED_DISP",
+        "result": "success",
+        "sequence": "19600328",
+        "ses": "11988",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "700",
+        "cmd": "/usr/lib64/nagios/plugins/check_asterisk_sip_peers -p 202",
+        "cwd": "/",
+        "pid": "4151",
+        "record_type": "USER_CMD",
+        "result": "success",
+        "sequence": "19600329",
+        "ses": "11988",
+        "uid": "497"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "auid": "700",
+        "exe": "/usr/bin/sudo",
+        "op": "PAM:setcred",
+        "pid": "4151",
+        "record_type": "CRED_ACQ",
+        "result": "success",
+        "sequence": "19600330",
+        "ses": "11988",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "auid": "700",
+        "exe": "/usr/bin/sudo",
+        "op": "PAM:session_open",
+        "pid": "4151",
+        "record_type": "USER_START",
+        "result": "success",
+        "sequence": "19600331",
+        "ses": "11988",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "auid": "4294967295",
+        "dst": "10.100.4.0",
+        "dst_prefixlen": "22",
+        "op": "SPD-add",
+        "record_type": "MAC_IPSEC_EVENT",
+        "result": "success",
+        "sequence": "19600354",
+        "ses": "4294967295",
+        "src": "10.100.0.0",
+        "src_prefixlen": "16"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "9",
+        "a1": "7f564ee6d2a0",
+        "a2": "b8",
+        "a3": "0",
+        "arch": "x86_64",
+        "auid": "4294967295",
+        "comm": "charon",
+        "egid": "0",
+        "euid": "0",
+        "exe": "/usr/libexec/strongswan/charon (deleted)",
+        "exit": "184",
+        "fsgid": "0",
+        "fsuid": "0",
+        "gid": "0",
+        "items": "0",
+        "pid": "1275",
+        "ppid": "1240",
+        "record_type": "SYSCALL",
+        "result": "success",
+        "sequence": "19600354",
+        "ses": "4294967295",
+        "sgid": "0",
+        "suid": "0",
+        "syscall": "sendto",
+        "tty": "(none)",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "new_auid": "700",
+        "new_ses": "12286",
+        "old_auid": "700",
+        "old_ses": "6793",
+        "pid": "28281",
+        "record_type": "LOGIN",
+        "sequence": "19623791",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "addr": "216.160.83.61",
+        "auid": "700",
+        "direction": "both",
+        "exe": "/usr/sbin/sshd",
+        "kind": "session",
+        "laddr": "107.170.139.210",
+        "lport": "50022",
+        "op": "destroy",
+        "pid": "28281",
+        "record_type": "CRYPTO_KEY_USER",
+        "result": "success",
+        "rport": "58994",
+        "sequence": "19623788",
+        "ses": "6793",
+        "spid": "28282",
+        "suid": "74",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "admin",
+        "addr": "216.160.83.61",
+        "auid": "700",
+        "exe": "/usr/sbin/sshd",
+        "op": "success",
+        "pid": "28281",
+        "record_type": "USER_AUTH",
+        "result": "success",
+        "sequence": "19623789",
+        "ses": "6793",
+        "terminal": "ssh",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "auid": "700",
+        "exe": "/bin/su",
+        "op": "PAM:authentication",
+        "pid": "28395",
+        "record_type": "USER_AUTH",
+        "result": "success",
+        "sequence": "19623807",
+        "ses": "12286",
+        "terminal": "pts/0",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "auid": "700",
+        "exe": "/bin/su",
+        "op": "PAM:accounting",
+        "pid": "28395",
+        "record_type": "USER_ACCT",
+        "result": "success",
+        "sequence": "19623808",
+        "ses": "12286",
+        "terminal": "pts/0",
+        "uid": "0"
+      }
+    }
+  }
+]

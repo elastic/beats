@@ -40,7 +40,7 @@ import (
 func TestClientShutdownPanic(t *testing.T) {
 	logger, buff := logp.NewInMemoryLocal("", logp.ConsoleEncoderConfig())
 
-	cfg, err := config.NewConfigFrom(map[string]interface{}{
+	cfg, err := config.NewConfigFrom(map[string]any{
 		"hosts":   []string{"localhost:9094"},
 		"topic":   "testTopic",
 		"timeout": "1s",
@@ -52,8 +52,9 @@ func TestClientShutdownPanic(t *testing.T) {
 		beat.Info{
 			Beat:        "libbeat",
 			IndexPrefix: "testbeat",
-			Logger:      logger},
-		outputs.NewStats(monitoring.NewRegistry(), logger), cfg, paths.New())
+			Logger:      logger,
+			Paths:       paths.New()},
+		outputs.NewStats(monitoring.NewRegistry(), logger), cfg)
 	require.NoError(t, err, "could not create kafka output")
 
 	b := outest.NewBatch(
@@ -81,12 +82,10 @@ func TestClientShutdownPanic(t *testing.T) {
 	c.producer = producerMock{input: ch}
 
 	// 1st: Publish and block on channel send
-	wc.Add(1)
-	go func() {
-		defer wc.Done()
+	wc.Go(func() {
 		err := c.Publish(context.Background(), b)
 		require.NoError(t, err, "publish failed")
-	}()
+	})
 
 	// 2nd: Get 1st message to make sure the Publishing goroutine run and did
 	// all it needs before sending the messages to the channel

@@ -53,11 +53,11 @@ func TestLoadPipeline(t *testing.T) {
 
 	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
 
-	content := map[string]interface{}{
+	content := map[string]any{
 		"description": "describe pipeline",
-		"processors": []interface{}{
-			map[string]interface{}{
-				"set": map[string]interface{}{
+		"processors": []any{
+			map[string]any{
+				"set": map[string]any{
 					"field": "foo",
 					"value": "bar",
 				},
@@ -90,10 +90,10 @@ func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expecte
 	require.NoError(t, err)
 	assert.Equal(t, 200, status)
 
-	var res map[string]interface{}
+	var res map[string]any
 	err = json.Unmarshal(response, &res)
 	if assert.NoError(t, err) {
-		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response)) //nolint:errcheck // Safe to ignore
+		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]any)["description"], string(response)) //nolint:errcheck // Safe to ignore
 	}
 }
 
@@ -124,7 +124,9 @@ func TestSetupNginx(t *testing.T) {
 	if err := beatPaths.InitPaths(beatPaths); err != nil {
 		t.Fatal(err)
 	}
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"), FilesetOverrides{}, beatPaths)
+	info := makeTestInfo("5.2.0")
+	info.Paths = beatPaths
+	reg, err := newModuleRegistry(modulesPath, configs, nil, info, FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,7 +210,9 @@ func TestLoadMultiplePipelines(t *testing.T) {
 	if err := beatPaths.InitPaths(beatPaths); err != nil {
 		t.Fatal(err)
 	}
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{}, beatPaths)
+	info := makeTestInfo("6.6.0")
+	info.Paths = beatPaths
+	reg, err := newModuleRegistry(modulesPath, configs, nil, info, FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -258,8 +262,9 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	if err := beatPaths.InitPaths(beatPaths); err != nil {
 		t.Fatal(err)
 	}
-
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{}, beatPaths)
+	info := makeTestInfo("6.6.0")
+	info.Paths = beatPaths
+	reg, err := newModuleRegistry(modulesPath, configs, nil, info, FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}

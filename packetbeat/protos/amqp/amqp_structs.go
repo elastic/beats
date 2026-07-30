@@ -21,10 +21,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type amqpMethod func(*amqpMessage, []byte) (bool, bool)
+type amqpMethod func(*amqpMessage, []byte, *logp.Logger) (bool, bool)
 
 const (
 	transactionsHashSize = 1 << 16
@@ -218,6 +219,7 @@ type amqpStream struct {
 	data        []byte
 	parseOffset int
 	message     *amqpMessage
+	logger      *logp.Logger
 }
 
 // contains the result of parsing

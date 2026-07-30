@@ -45,7 +45,7 @@ func TestBadConfig(t *testing.T) {
 		},
 		{
 			name:        "no-regex",
-			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: ptr("new_message")}}},
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: new("new_message")}}},
 			shouldError: true,
 		},
 		{
@@ -56,7 +56,7 @@ func TestBadConfig(t *testing.T) {
 		{
 			name: "valid-then-invalid",
 			cfg: replaceStringConfig{Fields: []replaceConfig{
-				{Field: "message", Pattern: regexp.MustCompile(`message`), Replacement: ptr("new_message")},
+				{Field: "message", Pattern: regexp.MustCompile(`message`), Replacement: new("new_message")},
 				{Field: "message", Pattern: regexp.MustCompile(`message`)},
 			},
 			},
@@ -64,12 +64,12 @@ func TestBadConfig(t *testing.T) {
 		},
 		{
 			name:        "no-error",
-			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: ptr("new_message"), Pattern: regexp.MustCompile(`message`)}}},
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: new("new_message"), Pattern: regexp.MustCompile(`message`)}}},
 			shouldError: false,
 		},
 		{
 			name:        "no-error zero string",
-			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: ptr(""), Pattern: regexp.MustCompile(`message`)}}},
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: new(""), Pattern: regexp.MustCompile(`message`)}}},
 			shouldError: false,
 		},
 	}
@@ -107,7 +107,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`a`),
-					Replacement: ptr("b"),
+					Replacement: new("b"),
 				},
 			},
 			Input: mapstr.M{
@@ -126,7 +126,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`a`),
-					Replacement: ptr(""),
+					Replacement: new(""),
 				},
 			},
 			Input: mapstr.M{
@@ -145,7 +145,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f.b",
 					Pattern:     regexp.MustCompile(`a`),
-					Replacement: ptr("b"),
+					Replacement: new("b"),
 				},
 			},
 			Input: mapstr.M{
@@ -168,12 +168,12 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`a.*c`),
-					Replacement: ptr("cab"),
+					Replacement: new("cab"),
 				},
 				{
 					Field:       "g",
 					Pattern:     regexp.MustCompile(`ef`),
-					Replacement: ptr("oor"),
+					Replacement: new("oor"),
 				},
 			},
 			Input: mapstr.M{
@@ -194,7 +194,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`abc`),
-					Replacement: ptr("xyz"),
+					Replacement: new("xyz"),
 				},
 				{
 					Field:       "g",
@@ -223,7 +223,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`.*`),
-					Replacement: ptr("b"),
+					Replacement: new("b"),
 				},
 			},
 			Input: mapstr.M{
@@ -245,7 +245,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`.*`),
-					Replacement: ptr("b"),
+					Replacement: new("b"),
 				},
 			},
 			Input: mapstr.M{
@@ -267,7 +267,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`.*`),
-					Replacement: ptr("b"),
+					Replacement: new("b"),
 				},
 			},
 			Input: mapstr.M{
@@ -311,7 +311,91 @@ func TestReplaceRun(t *testing.T) {
 	}
 }
 
-func ptr[T any](v T) *T { return &v }
+// TestReplaceFailOnErrorSafety verifies that when FailOnError=true and the
+// field is missing, the event fields are unchanged.
+func TestReplaceFailOnErrorSafety(t *testing.T) {
+	tests := []struct {
+		name  string
+		input mapstr.M
+	}{
+		{
+			name:  "missing field",
+			input: mapstr.M{"other": "value"},
+		},
+		{
+			name:  "non-string field value",
+			input: mapstr.M{"f": 42},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &replaceString{
+				log: logptest.NewTestingLogger(t, "replace"),
+				config: replaceStringConfig{
+					Fields: []replaceConfig{
+						{
+							Field:       "f",
+							Pattern:     regexp.MustCompile(`abc`),
+							Replacement: new("xyz"),
+						},
+					},
+					FailOnError: true,
+				},
+			}
+
+			input := tc.input.Clone()
+			event := &beat.Event{Fields: input}
+			original := input.Clone()
+
+			result, err := f.Run(event)
+			require.Error(t, err)
+			assert.Same(t, event, result)
+
+			result.Fields.Delete("error")
+			assert.Equal(t, original, result.Fields,
+				"event fields must be unchanged after error (clone skip safety)")
+		})
+	}
+}
+
+// TestReplaceMultiFieldBackup verifies that when multiple fields are configured
+// and a later field fails, the changes from earlier fields are rolled back via backup.
+func TestReplaceMultiFieldBackup(t *testing.T) {
+	f := &replaceString{
+		log: logptest.NewTestingLogger(t, "replace"),
+		config: replaceStringConfig{
+			Fields: []replaceConfig{
+				{
+					Field:       "f1",
+					Pattern:     regexp.MustCompile(`a`),
+					Replacement: new("X"),
+				},
+				{
+					Field:       "f2",
+					Pattern:     regexp.MustCompile(`a`),
+					Replacement: new("X"),
+				},
+			},
+			FailOnError: true,
+		},
+	}
+
+	// f1 is a string (replaces "abc" → "Xbc" on first iteration),
+	// f2 is an int (will fail the string type check on second iteration).
+	input := mapstr.M{"f1": "abc", "f2": 42}
+	event := &beat.Event{Fields: input.Clone()}
+	original := input.Clone()
+
+	result, err := f.Run(event)
+	require.Error(t, err)
+
+	// Multi-field: backup was taken and restored; result is the backup pointer.
+	// f1 change must be undone.
+	result.Fields.Delete("error")
+	assert.Equal(t, original, result.Fields,
+		"first field's replacement must be rolled back when second field fails")
+}
 
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
@@ -414,7 +498,7 @@ func TestReplaceField(t *testing.T) {
 					{
 						Field:       "@metadata.f",
 						Pattern:     regexp.MustCompile(`a`),
-						Replacement: ptr("b"),
+						Replacement: new("b"),
 					},
 				},
 			},

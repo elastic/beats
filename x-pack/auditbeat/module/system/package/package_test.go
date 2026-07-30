@@ -20,17 +20,22 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
+// testPaths returns a *paths.Path whose Data directory is dataDir.
+func testPaths(dataDir string) *paths.Path {
+	p := paths.New()
+	p.Data = dataDir
+	return p
+}
 
+func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
@@ -48,9 +53,7 @@ func TestData(t *testing.T) {
 }
 
 func TestDpkg(t *testing.T) {
-	logp.TestingSetup()
-
-	defer abtest.SetupDataDir(t)()
+	logp.TestingSetup() //nolint:staticcheck // TODO: replace with logptest.NewTestingLogger once MetricSet accepts an injected logger
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
@@ -107,9 +110,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		"python2.7-minimal": 0,
 	}
 
-	logp.TestingSetup()
-
-	defer abtest.SetupDataDir(t)()
+	logp.TestingSetup() //nolint:staticcheck // TODO: replace with logptest.NewTestingLogger once MetricSet accepts an injected logger
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
@@ -154,7 +155,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		if !assert.IsType(t, uint64(0), size) {
 			t.Fatal("uint64 expected")
 		}
-		got[name.(string)] = size.(uint64)
+		got[name.(string)] = size.(uint64) //nolint:errcheck // types checked above
 	}
 	assert.Equal(t, expected, got)
 }
@@ -199,17 +200,12 @@ func TestPackageV1GobDecode(t *testing.T) {
 }
 
 func TestPackageDatabaseMigration(t *testing.T) {
-	dbPath := filepath.Join(t.TempDir(), "beat.db")
-	if err := copyFile("testdata/package.v1.db", dbPath); err != nil {
+	dataDir := t.TempDir()
+	if err := copyFile("testdata/package.v1.db", filepath.Join(dataDir, "beat.db")); err != nil {
 		t.Fatal(err)
 	}
 
-	ds := datastore.New(dbPath, 0o600)
-	if err := ds.Update(migrateDatastoreSchema); err != nil {
-		t.Fatal(err)
-	}
-
-	bucket, err := ds.OpenBucket(bucketNameV2)
+	bucket, err := datastore.OpenBucketWithMigration(bucketNameV2, testPaths(dataDir), migrateDatastoreSchema)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,11 +242,11 @@ func TestPackageDatabaseMigration(t *testing.T) {
 //
 // This is a reproduction of https://github.com/elastic/beats/issues/44294.
 func TestPackageDatabaseMigrationWithEmptyPackageV1Bucket(t *testing.T) {
-	// Create empty package.v1 bucket.
-	dbPath := filepath.Join(t.TempDir(), "beat.db")
-	ds := datastore.New(dbPath, 0o600)
+	p := testPaths(t.TempDir())
 
-	bucket, err := ds.OpenBucket("package.v1")
+	// Create empty package.v1 bucket and close it so the database is
+	// released before we reopen it via the migration path.
+	bucket, err := datastore.OpenBucket("package.v1", p)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -258,7 +254,11 @@ func TestPackageDatabaseMigrationWithEmptyPackageV1Bucket(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := ds.Update(migrateDatastoreSchema); err != nil {
+	bucket, err = datastore.OpenBucketWithMigration(bucketNameV2, p, migrateDatastoreSchema)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = bucket.Close(); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -284,7 +284,7 @@ func copyFile(old, new string) error {
 // prevents test side effects. The tests should be refactored to support
 // true isolation with different data stores in different temp dirs.
 func deleteBucket(t *testing.T, metricSet mb.ReportingMetricSetV2) {
-	if err := metricSet.(*MetricSet).bucket.DeleteBucket(); err != nil {
+	if err := metricSet.(*MetricSet).bucket.DeleteBucket(); err != nil { //nolint:errcheck // unchecked type assertion
 		t.Fatal(err)
 	}
 }

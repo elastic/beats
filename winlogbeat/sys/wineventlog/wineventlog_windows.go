@@ -469,7 +469,7 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	switch runtime.GOARCH {
 	default:
 		return 0, fmt.Errorf("unhandled architecture: %s", runtime.GOARCH)
-	case "amd64":
+	case "amd64", "arm64":
 		err = binary.Read(reader, binary.LittleEndian, &dataPtr)
 		if err != nil {
 			return 0, err

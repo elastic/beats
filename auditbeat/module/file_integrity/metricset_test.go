@@ -32,15 +32,19 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
+// testPaths returns a *paths.Path whose Data directory is dataDir.
+func testPaths(dataDir string) *paths.Path {
+	p := paths.New()
+	p.Data = dataDir
+	return p
+}
 
+func TestData(t *testing.T) {
 	dir := t.TempDir()
 
 	go func() {
@@ -68,8 +72,6 @@ func TestActions(t *testing.T) {
 	skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
-
-	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
@@ -145,7 +147,7 @@ func TestActions(t *testing.T) {
 			// depending on whether the scanner or the platform-dependent
 			// filesystem event listener reported it. The subset of actions we test
 			// for here should be consistent across all cases though.
-			switch path.(string) {
+			switch path.(string) { //nolint:errcheck // err already checked above
 			case newDir:
 				assert.Contains(t, actions, "initial_scan")
 			case dir:
@@ -171,8 +173,6 @@ func TestExcludedFiles(t *testing.T) {
 	skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
-
-	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
@@ -210,7 +210,7 @@ func TestExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err) {
-			_, ok := wanted[path.(string)]
+			_, ok := wanted[path.(string)] //nolint:errcheck // err already checked above
 			assert.True(t, ok)
 		}
 	}
@@ -223,8 +223,6 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
-
-	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
@@ -270,7 +268,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err, "Failed to read file.path field") {
-			got[path.(string)] = true
+			got[path.(string)] = true //nolint:errcheck // err already checked above
 		}
 	}
 	assert.Equal(t, wanted, got)
@@ -288,8 +286,6 @@ func TestErrorReporting(t *testing.T) {
 		// in UNIX/Linux OS.
 		t.Skip("This test can't be run as root")
 	}
-	defer abtest.SetupDataDir(t)()
-
 	dir := t.TempDir()
 
 	path := filepath.Join(dir, "unreadable.txt")
@@ -304,7 +300,6 @@ func TestErrorReporting(t *testing.T) {
 
 	config := getConfig(dir)
 	config["scan_at_start"] = false
-	config["backend"] = "fsnotify" // Explicitly use fsnotify to maintain test behavior
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 
 	done := make(chan struct{}, 1)
@@ -465,15 +460,7 @@ func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
 type expectedEvents []expectedEvent
 
 func (e expectedEvents) validate(t *testing.T) {
-	store, err := os.CreateTemp("", "bucket")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
-	defer os.Remove(store.Name())
-
-	ds := datastore.New(store.Name(), 0o644)
-	bucket, err := ds.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -484,7 +471,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 	for _, ev := range e {
 		ev.validate(t, ms)
 	}
@@ -738,15 +725,7 @@ func TestEventFailedHash(t *testing.T) {
 }
 
 func TestEventDelete(t *testing.T) {
-	store, err := os.CreateTemp("", "bucket")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
-	defer os.Remove(store.Name())
-
-	ds := datastore.New(store.Name(), 0o644)
-	bucket, err := ds.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -757,7 +736,7 @@ func TestEventDelete(t *testing.T) {
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 
 	baseTime := time.Now()
 	sha := Digest("22222222222222222222")

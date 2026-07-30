@@ -10,7 +10,6 @@ updates:
       - dependabot
     allow:
       # Team:Elastic-Agent-Data-Plane
-      - dependency-name: github.com/elastic/elastic-agent-autodiscover
       - dependency-name: github.com/elastic/elastic-agent-client/*
       - dependency-name: github.com/elastic/elastic-agent-libs
       - dependency-name: github.com/elastic/elastic-agent-shipper-client
@@ -147,3 +146,13 @@ updates:
         patterns:
           - "*"
     open-pull-requests-limit: 5
+
+  - package-ecosystem: pre-commit
+    directory: "/"
+    schedule:
+      interval: 'weekly'
+      day: 'sunday'
+      time: '22:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'changelog:dependencies'

@@ -95,11 +95,19 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter, closers ...func()) (*Sniffer, error) {
+func New(
+	id string,
+	testMode bool,
+	_ string,
+	decoders map[string]Decoders,
+	interfaces []config.InterfaceConfig,
+	reporter status.StatusReporter,
+	logger *logp.Logger,
+	closers ...func()) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		closers:  closers,
-		log:      logp.NewLogger("sniffer"),
+		log:      logger.Named("sniffer"),
 	}
 
 	for i, iface := range interfaces {
@@ -137,7 +145,7 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			iface.Device = ""
 		} else {
 			// try to resolve device name (ignore error if testMode is enabled)
-			if name, err := resolveDeviceName(iface.Device); err != nil {
+			if name, err := resolveDeviceName(iface.Device, s.log); err != nil {
 				if !testMode {
 					return nil, err
 				}
@@ -284,7 +292,7 @@ func (s *sniffer) pollDefaultRoute(ctx context.Context, device chan<- string, re
 // if it has a change from the old default route interface. If device resolution
 // fails, the default route interface is left unchanged.
 func (s *sniffer) poll(old string, device chan<- string) (current string) {
-	current, err := resolveDeviceName(s.config.Device)
+	current, err := resolveDeviceName(s.config.Device, s.log)
 	if err != nil {
 		s.log.Warnf("sniffer failed to poll default route device: %v", err)
 		return old
@@ -492,14 +500,14 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 func (s *sniffer) open(device string) (snifferHandle, error) {
 	if s.config.File != "" {
-		return newFileHandler(s.config.File, s.config.TopSpeed, s.config.Loop)
+		return newFileHandler(s.config.File, s.config.TopSpeed, s.config.Loop, s.log)
 	}
 
 	switch s.config.Type {
 	case "pcap":
 		return openPcap(device, s.filter, &s.config)
 	case "af_packet":
-		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config)
+		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config, s.log)
 	default:
 		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config.Type)
 	}
@@ -546,7 +554,7 @@ func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle
 	return h, nil
 }
 
-func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig, logger *logp.Logger) (snifferHandle, error) {
 	szFrame, szBlock, numBlocks, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	if err != nil {
 		return nil, err
@@ -563,7 +571,7 @@ func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (sniff
 		MetricsInterval: cfg.MetricsInterval,
 		FanoutGroupID:   cfg.FanoutGroup,
 		Promiscuous:     cfg.EnableAutoPromiscMode,
-	})
+	}, logger)
 	if err != nil {
 		return nil, err
 	}

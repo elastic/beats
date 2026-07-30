@@ -1,6 +1,6 @@
 Please post all questions and issues first on
 [https://discuss.elastic.co/c/beats](https://discuss.elastic.co/c/beats)
-before opening a Github Issue.
+before opening a GitHub issue.
 
 # Contributing to Beats
 

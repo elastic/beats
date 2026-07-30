@@ -7,6 +7,7 @@ package streaming
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -25,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -61,7 +62,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -125,7 +126,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -241,7 +242,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 					"cursor":["What's next?"],
 				})`,
@@ -261,7 +262,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -273,7 +274,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-	              bytes(state.response).decode_json().as(inner_body,{
+	              state.response.decode_json().as(inner_body,{
 					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ?  [inner_body] : [],
 	          })`,
 			"state": map[string]interface{}{
@@ -315,7 +316,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
@@ -348,7 +349,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
@@ -381,7 +382,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
@@ -417,7 +418,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"retry": map[string]interface{}{
@@ -452,7 +453,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"retry": map[string]interface{}{
@@ -469,7 +470,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"ssl": map[string]interface{}{
@@ -539,7 +540,7 @@ var inputTests = []struct {
 		handler:     defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -621,7 +622,7 @@ var inputTests = []struct {
 				},
 			},
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -704,7 +705,7 @@ var inputTests = []struct {
 				},
 			},
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -821,7 +822,6 @@ var urlEvalTests = []struct {
 }
 
 func TestURLEval(t *testing.T) {
-	logp.TestingSetup()
 	for _, test := range urlEvalTests {
 		t.Run(test.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -852,7 +852,7 @@ func TestURLEval(t *testing.T) {
 			if now == nil {
 				now = time.Now
 			}
-			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, logp.NewLogger("websocket_url_eval_test"), now)
+			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, "", logptest.NewTestingLogger(t, "websocket_url_eval_test"), now)
 			if err != nil && !errors.Is(err, context.Canceled) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, nil)
 			}
@@ -866,20 +866,21 @@ func TestInput(t *testing.T) {
 	testutils.SkipIfFIPSOnly(t, "websocket setup requires SHA-1.")
 	// tests will ignore context cancelled errors, since they are expected
 	ctxCancelledError := fmt.Errorf("context canceled")
-	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
+			testConfig := cloneConfig(t, test.config)
+
 			if test.oauth2Server != nil {
-				test.oauth2Server(t, test.oauth2Handler, test.config)
+				test.oauth2Server(t, test.oauth2Handler, testConfig)
 			}
 			if test.server != nil {
-				test.server(t, test.handler, test.config, test.response)
+				test.server(t, test.handler, testConfig, test.response)
 			}
 			if test.proxyServer != nil {
-				test.proxyServer(t, test.handler, test.config, test.response)
+				test.proxyServer(t, test.handler, testConfig, test.response)
 			}
 
-			cfg := conf.MustNewConfigFrom(test.config)
+			cfg := conf.MustNewConfigFrom(testConfig)
 
 			conf := config{}
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
@@ -906,7 +907,7 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			v2Ctx := v2.Context{
-				Logger:          logp.NewLogger("websocket_test"),
+				Logger:          logptest.NewTestingLogger(t, "websocket_test"),
 				ID:              "test_id:" + test.name,
 				Cancelation:     ctx,
 				MetricsRegistry: monitoring.NewRegistry(),
@@ -926,18 +927,247 @@ func TestInput(t *testing.T) {
 				return
 			}
 
-			if len(client.published) < len(test.want) {
-				t.Errorf("unexpected number of published events: got:%d want at least:%d", len(client.published), len(test.want))
-				test.want = test.want[:len(client.published)]
+			want := test.want
+			if len(client.published) < len(want) {
+				t.Errorf("unexpected number of published events: got:%d want at least:%d", len(client.published), len(want))
+				want = want[:len(client.published)]
 			}
-			client.published = client.published[:len(test.want)]
+			client.published = client.published[:len(want)]
 			for i, got := range client.published {
-				if !reflect.DeepEqual(got.Fields, mapstr.M(test.want[i])) {
-					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, mapstr.M(test.want[i])))
+				if !reflect.DeepEqual(got.Fields, mapstr.M(want[i])) {
+					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, mapstr.M(want[i])))
 				}
 			}
 		})
 	}
+}
+
+// cloneConfig returns a deep copy of m via a JSON round-trip. This prevents
+// server factories from mutating the package-level inputTests table, which
+// would otherwise cause stale URLs and state when tests are run with -count >1.
+func cloneConfig(t *testing.T, m map[string]interface{}) map[string]interface{} {
+	t.Helper()
+	b, err := json.Marshal(m)
+	if err != nil {
+		t.Fatalf("failed to marshal config for deep copy: %v", err)
+	}
+	var clone map[string]interface{}
+	if err := json.Unmarshal(b, &clone); err != nil {
+		t.Fatalf("failed to unmarshal config for deep copy: %v", err)
+	}
+	return clone
+}
+
+// TestURLProgramReconnect verifies that url_program is re-evaluated before
+// each reconnection using the evolved cursor state. The test server records
+// the request URL for each connection and closes the first connection after
+// sending one message to force the error-reconnect path. The CEL program
+// updates the cursor with a timestamp from the message, and url_program
+// appends sinceTime from the cursor when present. The test asserts that:
+//   - the first connection URL has no sinceTime (no cursor yet)
+//   - the second connection URL includes sinceTime from the first message's
+//     timestamp, proving that url_program was re-evaluated with the cursor
+//     that process() returned after handling the first message
+func TestURLProgramReconnect(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "websocket uses SHA-1.")
+
+	var (
+		mu        sync.Mutex
+		urls      []string
+		connCount int
+	)
+
+	// The server records the request URL for each connection. It sends one
+	// JSON message per connection and closes the first connection to force
+	// the client through the error-reconnect path in FollowStream.
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		urls = append(urls, r.URL.String())
+		connCount++
+		n := connCount
+		mu.Unlock()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+
+		msg := fmt.Sprintf(`{"ts":"2024-01-01T%02d:00:00Z","data":"msg-%d"}`, n, n)
+		if err := conn.WriteMessage(websocket.TextMessage, []byte(msg)); err != nil {
+			return
+		}
+
+		if n == 1 {
+			conn.Close()
+		}
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"url":         "ws" + server.URL[4:] + "/v1/stream",
+		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
+		"program": `
+			state.response.decode_json().as(body, {
+				"cursor": {"last_timestamp": body.ts},
+				"events": [body],
+			})`,
+		"retry": map[string]interface{}{
+			"blanket_retries": true,
+			"wait_min":        "10ms",
+			"wait_max":        "50ms",
+		},
+	}
+	cfg := conf.MustNewConfigFrom(config)
+
+	c := defaultConfig()
+	c.Redact = &redact{}
+	err := cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("unexpected error unpacking config: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	v2Ctx := v2.Context{
+		Logger:          logptest.NewTestingLogger(t, "websocket_test"),
+		ID:              "test_id:url_program_reconnect",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+	var client publisher
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel()
+		}
+	}
+
+	src := &source{c}
+	err = input{}.run(v2Ctx, src, nil, &client)
+	if err != nil && err != context.Canceled { //nolint:errorlint // ctx.Err() is never wrapped.
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(urls) < 2 {
+		t.Fatalf("expected at least 2 connections, got %d", len(urls))
+	}
+
+	assert.Equal(t, "/v1/stream", urls[0])
+	assert.Contains(t, urls[1], "sinceTime=2024-01-01T01:00:00Z")
+}
+
+// TestURLProgramReconnectZeroEvents verifies that a zero-events message does
+// not regress the cursor to the startup snapshot. The scenario:
+//
+//  1. Input starts with an initial persisted cursor (last_timestamp=00:00:00Z).
+//  2. First message advances the cursor to 01:00:00Z.
+//  3. Second message produces zero events (empty data field).
+//  4. Connection drops, triggering a reconnect.
+//  5. The reconnect URL must contain sinceTime=01:00:00Z (advanced), not
+//     sinceTime=00:00:00Z (initial).
+func TestURLProgramReconnectZeroEvents(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "websocket uses SHA-1.")
+
+	var (
+		mu        sync.Mutex
+		urls      []string
+		connCount int
+	)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		urls = append(urls, r.URL.String())
+		connCount++
+		n := connCount
+		mu.Unlock()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+
+		if n == 1 {
+			// First connection: send a message that advances the cursor,
+			// then one that produces zero events, then close.
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"2024-01-01T01:00:00Z","data":"msg-1"}`))
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"","data":""}`))
+			time.Sleep(50 * time.Millisecond)
+			conn.Close()
+			return
+		}
+		// Second connection: send a message so the test can complete.
+		conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"2024-01-01T02:00:00Z","data":"msg-2"}`))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"url":         "ws" + server.URL[4:] + "/v1/stream",
+		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
+		"program": `
+			state.response.decode_json().as(body,
+				body.data != "" ?
+					{"cursor": {"last_timestamp": body.ts}, "events": [body]}
+				:
+					{"events": []}
+			)`,
+		"retry": map[string]interface{}{
+			"blanket_retries": true,
+			"wait_min":        "10ms",
+			"wait_max":        "50ms",
+		},
+	}
+	cfg := conf.MustNewConfigFrom(config)
+
+	c := defaultConfig()
+	c.Redact = &redact{}
+	err := cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("unexpected error unpacking config: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	v2Ctx := v2.Context{
+		Logger:          logptest.NewTestingLogger(t, "websocket_test"),
+		ID:              "test_id:url_program_reconnect_zero_events",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+	var client publisher
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel()
+		}
+	}
+
+	initialCursor := map[string]any{"last_timestamp": "2024-01-01T00:00:00Z"}
+	src := &source{c}
+	err = input{}.run(v2Ctx, src, initialCursor, &client)
+	if err != nil && err != context.Canceled { //nolint:errorlint // ctx.Err() is never wrapped.
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(urls) < 2 {
+		t.Fatalf("expected at least 2 connections, got %d", len(urls))
+	}
+
+	assert.Contains(t, urls[0], "sinceTime=2024-01-01T00:00:00Z",
+		"first connection should use the initial persisted cursor")
+	assert.Contains(t, urls[1], "sinceTime=2024-01-01T01:00:00Z",
+		"second connection should use the advanced cursor, not the initial one")
 }
 
 var _ inputcursor.Publisher = (*publisher)(nil)
@@ -1059,8 +1289,8 @@ func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func
 
 // webSocketServerWithRetry returns a function that creates a WebSocket server that rejects the first two connection attempts and accepts the third.
 func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
-	var attempt int
 	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+		var attempt int
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			attempt++
 			if attempt <= 2 {
@@ -1205,9 +1435,12 @@ func webSocketProxyHandler(targetURL string) http.HandlerFunc {
 // newWebSocketProxyTestServer creates a proxy server forwarding WebSocket traffic.
 func newWebSocketProxyTestServer(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) *httptest.Server {
 	backendServer := webSocketTestServer(t, handler, response)
+	t.Cleanup(backendServer.Close)
 	config["url"] = "ws" + backendServer.URL[4:]
 	config["proxy_url"] = "ws" + backendServer.URL[4:]
-	return httptest.NewServer(webSocketProxyHandler(config["url"].(string)))
+	proxy := httptest.NewServer(webSocketProxyHandler(config["url"].(string)))
+	t.Cleanup(proxy.Close)
+	return proxy
 }
 
 //nolint:errcheck // no point checking errors in test server.

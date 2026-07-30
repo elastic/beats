@@ -78,23 +78,3 @@ func GetBeatIndexPrefix(ctx context.Context) string {
 	}
 	return ""
 }
-
-// GetBeatEventMeta gives beat.Event.Meta from the context metadata
-func GetBeatEventMeta(ctx context.Context) map[string]any {
-	ctxData := client.FromContext(ctx)
-	var beatName, beatVersion, beatIndexPrefix string
-	if v := ctxData.Metadata.Get(BeatNameCtxKey); len(v) > 0 {
-		beatName = v[0]
-	}
-	if v := ctxData.Metadata.Get(BeatVersionCtxKey); len(v) > 0 {
-		beatVersion = v[0]
-	}
-	if v := ctxData.Metadata.Get(BeatIndexPrefixCtxKey); len(v) > 0 {
-		beatIndexPrefix = v[0]
-	}
-	return map[string]any{
-		MetadataBeatKey:        beatName,
-		MetadataVersionKey:     beatVersion,
-		MetadataIndexPrefixKey: beatIndexPrefix,
-	}
-}

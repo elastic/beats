@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"context"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -47,6 +49,9 @@ func (p *nilPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}, nil
 }
 
+func (p *nilPipeline) Disconnect(_ context.Context) error {
+	return nil
+}
 func (c *nilClient) Publish(event beat.Event) {
 	c.PublishAll([]beat.Event{event})
 }

@@ -30,8 +30,14 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
+)
+
+var (
+	isRecoverable         = IsRecoverable
+	openRetryInitialDelay = 5 * time.Second
+	readRetryInitialDelay = 5 * time.Second
+	retryMaxDelay         = time.Minute
 )
 
 type Publisher interface {
@@ -52,16 +58,25 @@ func Run(
 	defer runtime.UnlockOSThread()
 
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
-	// setup closing the API if either the run function is signaled asynchronously
-	// to shut down or when returning after io.EOF
-	cancelCtx, cancelFn := ctxtool.WithFunc(
-		ctx,
-		func() {
-			if err := api.Close(); err != nil {
-				log.Errorw("error while closing Windows Event Log access", "error", err)
-			}
-		})
+
+	cancelCtx, cancelFn := context.WithCancel(ctx)
 	defer cancelFn()
+
+	// Close the event log on this same goroutine once the read loop has
+	// returned, rather than asynchronously from a context-cancellation
+	// callback. Closing frees native Windows Event Log handles (subscription,
+	// render contexts and publisher metadata). If that happens on another
+	// goroutine while a Read is rendering an event, the in-flight
+	// EvtRender/EvtFormatMessage calls operate on freed handles and the
+	// process crashes with an access violation (0xc0000005) during shutdown.
+	// Reads are non-blocking (EvtNext uses a zero timeout) and the loop below
+	// exits promptly when cancelCtx is cancelled, so closing here keeps
+	// shutdown responsive without racing an active render.
+	defer func() {
+		if err := api.Close(); err != nil {
+			log.Errorw("error while closing Windows Event Log access", "error", err)
+		}
+	}()
 
 	openChannelNotFoundErrDetected := false
 	logChannelNotFoundOpenRetry := func(err error) {
@@ -73,7 +88,7 @@ func Run(
 		openChannelNotFoundErrDetected = true
 	}
 
-	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+	openErrHandler := newExponentialLimitedBackoff(log, openRetryInitialDelay, retryMaxDelay, func(err error) bool {
 		if mustIgnoreError(err, api) {
 			if isChannelNotFound(err) {
 				logChannelNotFoundOpenRetry(err)
@@ -82,7 +97,7 @@ func Run(
 			}
 			return true
 		}
-		if !IsRecoverable(err, api.IsFile()) {
+		if !isRecoverable(err, api.IsFile()) {
 			return false
 		}
 		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
@@ -94,7 +109,7 @@ func Run(
 		return true
 	})
 
-	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+	readErrHandler := newExponentialLimitedBackoff(log, readRetryInitialDelay, retryMaxDelay, func(err error) bool {
 		if mustIgnoreError(err, api) {
 			log.Warnw("ignoring read error", "error", err, "channel", api.Channel())
 			if resetErr := api.Reset(); resetErr != nil {
@@ -102,7 +117,7 @@ func Run(
 			}
 			return true
 		}
-		if !IsRecoverable(err, api.IsFile()) {
+		if !isRecoverable(err, api.IsFile()) {
 			return false
 		}
 		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
@@ -113,9 +128,10 @@ func Run(
 		return true
 	})
 
+	currentCheckpoint := evtCheckpoint
 runLoop:
 	for cancelCtx.Err() == nil {
-		openErr := api.Open(evtCheckpoint, metricsRegistry)
+		openErr := api.Open(currentCheckpoint, metricsRegistry)
 		if openErr != nil {
 			if openErrHandler.backoff(cancelCtx, openErr) {
 				continue runLoop
@@ -141,6 +157,7 @@ runLoop:
 					return err
 				}
 			}
+			currentCheckpoint = api.Checkpoint()
 
 			if readErr != nil {
 				// io.EOF signals a clean end of stream (e.g. no_more_events: stop).

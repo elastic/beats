@@ -28,7 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -55,7 +55,7 @@ func TestDockerStart(t *testing.T) {
 	s := &template.MapperSettings{nil, nil}
 	config.Templates = *s
 	k, _ := keystore.NewFileKeystore("test")
-	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, conf.MustNewConfigFrom(config), k, log)
+	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, conf.MustNewConfigFrom(config), k, log, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +88,7 @@ func TestDockerStart(t *testing.T) {
 	checkEvent(t, listener, ID, false)
 }
 
-func getValue(e bus.Event, key string) interface{} {
+func getValue(e bus.Event, key string) any {
 	val, err := mapstr.M(e).GetValue(key)
 	if err != nil {
 		return nil

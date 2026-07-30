@@ -64,7 +64,7 @@ $$$dashboard-subcommand$$$**`dashboard`**
 
     To load the dashboard, copy the generated `dashboard.json` file into the `kibana/6/dashboard` directory of Filebeat, and run `filebeat setup --dashboards` to import the dashboard.
 
-    If {{kib}} is not running on `localhost:5061`, you must also adjust the Filebeat configuration under `setup.kibana`.
+    If {{kib}} is not running on `localhost:5601`, you must also adjust the Filebeat configuration under `setup.kibana`.
 
 
 $$$template-subcommand$$$**`template`**
@@ -264,7 +264,7 @@ filebeat [FLAGS]
 
 
 **`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
+:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is deprecated, and an alternate hostfs should be specified via the `hostfs` module config value.
 
 Also see [Global flags](#global-flags).
 

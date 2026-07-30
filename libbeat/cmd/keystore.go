@@ -168,7 +168,7 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 	value, _ := store.Retrieve(key)
 	if value != nil && !force {
 		if stdin {
-			return fmt.Errorf("the settings %s already exist in the keystore use `--force` to replace it", key)
+			return fmt.Errorf("the setting %s already exists in the keystore; use `--force` to replace it", key)
 		}
 		answer := terminal.PromptYesNo(fmt.Sprintf("Setting %s already exists, Overwrite?", key), false)
 		if !answer {
@@ -196,7 +196,7 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 		return fmt.Errorf("could not add the key in the keystore, error: %w", err)
 	}
 	if err = writableKeystore.Save(); err != nil {
-		return fmt.Errorf("fail to save the keystore: %w", err)
+		return fmt.Errorf("failed to save the keystore: %w", err)
 	} else {
 		fmt.Println("Successfully updated the keystore") //nolint:forbidigo //needs refactor
 	}

@@ -138,7 +138,7 @@ func TestEvent(t *testing.T) {
 		cases := []struct {
 			name   string
 			key    string
-			exp    interface{}
+			exp    any
 			expErr error
 		}{
 			{
@@ -212,7 +212,7 @@ func TestEvent(t *testing.T) {
 		cases := []struct {
 			name   string
 			key    string
-			exp    interface{}
+			exp    any
 			expErr error
 		}{
 			{
@@ -289,8 +289,8 @@ func TestEvent(t *testing.T) {
 		cases := []struct {
 			name    string
 			key     string
-			val     interface{}
-			expPrev interface{}
+			val     any
+			expPrev any
 			expErr  error
 		}{
 			{
@@ -448,22 +448,22 @@ func TestEvent(t *testing.T) {
 
 	t.Run("DeepUpdate", func(t *testing.T) {
 		newTs := time.Now().Add(time.Hour)
-		update := map[string]interface{}{
+		update := map[string]any{
 			TimestampFieldKey: newTs,
-			MetadataFieldKey: map[string]interface{}{
+			MetadataFieldKey: map[string]any{
 				"metaLevel0Map": mapstr.M{ // mix types on purpose, should support both
-					"metaLevel1Map": map[string]interface{}{
+					"metaLevel1Map": map[string]any{
 						"new1": "newmetavalue1",
 					},
 				},
 				"metaLevel0Value": "metareplaced1",
 				"new2":            "newmetavalue2",
 			},
-			"fieldsLevel0Map": map[string]interface{}{
+			"fieldsLevel0Map": map[string]any{
 				"fieldsLevel1Map": mapstr.M{
 					"new3": "newfieldsvalue1",
 				},
-				"newmap": map[string]interface{}{
+				"newmap": map[string]any{
 					"new4": "newfieldsvalue2",
 				},
 			},

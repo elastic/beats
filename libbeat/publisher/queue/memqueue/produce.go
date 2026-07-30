@@ -18,28 +18,54 @@
 package memqueue
 
 import (
+	"sync"
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type forgetfulProducer struct {
-	broker    *broker
-	openState openState
+type forgetfulProducer[T any] struct {
+	broker    *broker[T]
+	openState openState[T]
+
+	// A forgetful producer has no ACK callback, so ackWait is closed as soon as
+	// Close is called — there are no acknowledgments to wait for.
+	ackWait chan struct{}
+	ackOnce sync.Once
 }
 
-type ackProducer struct {
-	broker        *broker
-	producedCount uint64
-	state         produceState
-	openState     openState
+type ackProducer[T any] struct {
+	broker    *broker[T]
+	state     produceState
+	openState openState[T]
+
+	// producedCount / ackedCount track this producer's published vs
+	// acknowledged events for ackWait accounting. producedCount is written on
+	// the publishing goroutine, ackedCount on the broker's ackLoop goroutine,
+	// so both are atomic. closed is set by Close. ackWait is closed once the
+	// producer is closed and ackedCount has caught up with producedCount (in
+	// maybeCloseAckWait), or by the broker on shutdown (the ackLoop stops then,
+	// so no further acks would arrive) — see broker.closeProducerAckWaits.
+	producedCount atomic.Uint64
+	ackedCount    atomic.Uint64
+	closed        atomic.Bool
+	ackWait       chan struct{}
+	ackOnce       sync.Once
 }
 
-type openState struct {
+type openState[T any] struct {
 	log          *logp.Logger
 	done         chan struct{}
 	queueClosing <-chan struct{}
-	events       chan pushRequest
-	encoder      queue.Encoder
+	events       chan pushRequest[T]
+	encoder      queue.Encoder[T]
+
+	// resp is used to receive the assigned EntryID after the runLoop
+	// processes a push request. It is allocated once per producer and
+	// reused across publishes. Publish is synchronous, so only one
+	// request is outstanding at a time.
+	resp chan queue.EntryID
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -55,78 +81,138 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer {
-	openState := openState{
+func newProducer[T any](b *broker[T], cb ackHandler, encoder queue.Encoder[T]) queue.Producer[T] {
+	openState := openState[T]{
 		log:          b.logger,
 		done:         make(chan struct{}),
 		queueClosing: b.closingChan,
 		events:       b.pushChan,
 		encoder:      encoder,
+		resp:         make(chan queue.EntryID, 1),
 	}
 
 	if cb != nil {
-		p := &ackProducer{broker: b, openState: openState}
-		p.state.cb = cb
+		p := &ackProducer[T]{
+			broker:    b,
+			openState: openState,
+			ackWait:   make(chan struct{}),
+		}
+		// Wrap the user callback so the producer's ack accounting advances on
+		// the ackLoop goroutine alongside delivery, without changing the
+		// callback the caller sees.
+		p.state.cb = func(n int) {
+			p.ackedCount.Add(uint64(n)) //nolint:gosec // G115: n is an ack count, always a small positive value
+			cb(n)
+			p.maybeCloseAckWait()
+		}
+		// Register so the broker can close ackWait on shutdown if the producer
+		// is closed before its events are acked (the ackLoop stops on shutdown).
+		b.registerProducer(p)
 		return p
 	}
-	return &forgetfulProducer{broker: b, openState: openState}
+	return &forgetfulProducer[T]{
+		broker:    b,
+		openState: openState,
+		ackWait:   make(chan struct{}),
+	}
 }
 
-func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
-	return pushRequest{
+func (p *forgetfulProducer[T]) makePushRequest(event T) pushRequest[T] {
+	return pushRequest[T]{
 		event: event,
-		resp:  resp}
+		resp:  p.openState.resp}
 }
 
-func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+func (p *forgetfulProducer[T]) Publish(event T) (queue.EntryID, bool) {
 	return p.openState.publish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+func (p *forgetfulProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) Close() {
+func (p *forgetfulProducer[T]) Close() {
+	p.ackOnce.Do(func() { close(p.ackWait) })
 	p.openState.Close()
 }
 
-func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
-	return pushRequest{
-		event:    event,
-		producer: p,
-		// We add 1 to the id so the default lastACK of 0 is a
-		// valid initial state and 1 is the first real id.
-		producerID: producerID(p.producedCount + 1),
-		resp:       resp}
+func (p *forgetfulProducer[T]) ACKWaitChan() <-chan struct{} { return p.ackWait }
+
+func (p *ackProducer[T]) makePushRequest(event T, id producerID) pushRequest[T] {
+	return pushRequest[T]{
+		event:      event,
+		producer:   p,
+		producerID: id,
+		resp:       p.openState.resp}
 }
 
-func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
-	id, published := p.openState.publish(p.makePushRequest(event))
-	if published {
-		p.producedCount++
+// Publish adds an event to the queue, blocking until there is room. It returns
+// the assigned entry ID and whether the event was accepted (false if the queue
+// closed first).
+func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
+	// Count the event before enqueuing it, else a concurrent Close could see
+	// ackedCount >= producedCount and close ackWait while it's still pending. The
+	// count doubles as the 1-based producerID.
+	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	entryID, published := p.openState.publish(p.makePushRequest(event, id))
+	if !published {
+		// Never enqueued: undo the count and re-check so it can't strand ackWait.
+		p.producedCount.Add(^uint64(0)) // -1
+		p.maybeCloseAckWait()
 	}
-	return id, published
+	return entryID, published
 }
 
-func (p *ackProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
-	id, published := p.openState.tryPublish(p.makePushRequest(event))
-	if published {
-		p.producedCount++
+// TryPublish adds an event to the queue only if there is room right now, never
+// blocking. It returns the assigned entry ID and whether the event was accepted.
+func (p *ackProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
+	// Count the event before enqueuing it, else a concurrent Close could see
+	// ackedCount >= producedCount and close ackWait while it's still pending. The
+	// count doubles as the 1-based producerID.
+	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	entryID, published := p.openState.tryPublish(p.makePushRequest(event, id))
+	if !published {
+		p.producedCount.Add(^uint64(0)) // -1
+		p.maybeCloseAckWait()
 	}
-	return id, published
+	return entryID, published
 }
 
-func (p *ackProducer) Close() {
+func (p *ackProducer[T]) Close() {
+	p.closed.Store(true)
+	// Events published before Close may already be fully acked, in which case
+	// no further callback will fire to close ackWait — check now.
+	p.maybeCloseAckWait()
 	p.openState.Close()
 }
 
-func (st *openState) Close() {
+func (p *ackProducer[T]) ACKWaitChan() <-chan struct{} { return p.ackWait }
+
+// maybeCloseAckWait closes ackWait exactly once, when the producer has been
+// closed and every published event has been acknowledged, and unregisters the
+// producer from the broker (it no longer needs the shutdown fan-out).
+func (p *ackProducer[T]) maybeCloseAckWait() {
+	if p.closed.Load() && p.ackedCount.Load() >= p.producedCount.Load() {
+		p.ackOnce.Do(func() {
+			close(p.ackWait)
+			p.broker.unregisterProducer(p)
+		})
+	}
+}
+
+// forceCloseAckWait closes ackWait unconditionally. Used by the broker on
+// shutdown to unblock a waiter even though the producer's events were never
+// acknowledged (the ackLoop has stopped). Unregistration is handled by the
+// broker's snapshot, so this does not call unregisterProducer.
+func (p *ackProducer[T]) forceCloseAckWait() {
+	p.ackOnce.Do(func() { close(p.ackWait) })
+}
+
+func (st *openState[T]) Close() {
 	close(st.done)
 }
 
-func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
+func (st *openState[T]) publish(req pushRequest[T]) (queue.EntryID, bool) {
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -144,7 +230,7 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	}
 }
 
-func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
+func (st *openState[T]) tryPublish(req pushRequest[T]) (queue.EntryID, bool) {
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -162,7 +248,7 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	}
 }
 
-func (st *openState) handlePendingResponse(respChan chan queue.EntryID) (queue.EntryID, bool) {
+func (st *openState[T]) handlePendingResponse(respChan chan queue.EntryID) (queue.EntryID, bool) {
 	// The events channel is buffered, which means we may successfully
 	// write to it even if the queue is shutting down. To avoid blocking
 	// forever during shutdown, we also have to wait on the queue's

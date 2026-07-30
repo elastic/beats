@@ -5,7 +5,6 @@
 package internal
 
 import (
-	"context"
 	"errors"
 	"time"
 
@@ -17,16 +16,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 )
 
-func parseEvent(ctx context.Context, logRecord *plog.LogRecord) (beat.Event, error) {
-	metadata := getEventMeta(ctx)
-	if !isBeatsEvent(metadata) {
-		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event metadata"))
-	}
-
+func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
 	fields, ok := parseEventFields(logRecord)
 	if !ok {
 		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event body, expected a map, got: " + logRecord.Body().Type().String()))
 	}
+
+	removeRedundantMetadataFields(fields)
 
 	timestamp, ok := parseEventTimestamp(fields)
 	if !ok {
@@ -35,7 +31,6 @@ func parseEvent(ctx context.Context, logRecord *plog.LogRecord) (beat.Event, err
 
 	return beat.Event{
 		Timestamp: timestamp,
-		Meta:      metadata,
 		Fields:    fields,
 	}, nil
 }
@@ -62,18 +57,11 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-func isBeatsEvent(metadata map[string]any) bool {
-	v, ok := metadata["beat"]
-	return ok && v != nil && v != ""
-}
-
-// getEventMeta gives beat.Event.Meta from the context metadata
-// The value of `[@metadata][beat]` is taken from the `Index` option of logstash output.
-// In Elastic Agent, `Index` option is not available, hence, the value of `[@metadata][beat]` is derived from `IndexPrefix`
-func getEventMeta(ctx context.Context) map[string]any {
-	metadata := otelctx.GetBeatEventMeta(ctx)
-	return map[string]any{
-		otelctx.MetadataBeatKey:    metadata[otelctx.MetadataIndexPrefixKey],
-		otelctx.MetadataVersionKey: metadata[otelctx.MetadataVersionKey],
-	}
+// removeRedundantMetadataFields removes certain metadata fields that will be generated again when the event is serialized.
+// See https://github.com/elastic/beats/blob/v9.3.3/libbeat/outputs/codec/json/event.go#L43-L54
+// Not removing these fields would create duplicates and bloat the final event size
+func removeRedundantMetadataFields(fields map[string]any) {
+	delete(fields, otelctx.MetadataBeatKey)
+	delete(fields, otelctx.MetadataVersionKey)
+	delete(fields, "type")
 }

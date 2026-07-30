@@ -45,24 +45,6 @@ func (ctx *transformContext) cursorMap() mapstr.M {
 	return ctx.cursor.clone()
 }
 
-func (ctx *transformContext) lastEventClone() *mapstr.M {
-	clone := ctx.lastEvent.Clone()
-	return &clone
-}
-
-func (ctx *transformContext) firstEventClone() *mapstr.M {
-	clone := ctx.firstEvent.Clone()
-	return &clone
-}
-
-func (ctx *transformContext) firstResponseClone() *response {
-	return ctx.firstResponse.clone()
-}
-
-func (ctx *transformContext) lastResponseClone() *response {
-	return ctx.lastResponse.clone()
-}
-
 func (ctx *transformContext) updateCursor() {
 	// we do not want to pass the cursor data to itself
 	newCtx := emptyTransformContext()

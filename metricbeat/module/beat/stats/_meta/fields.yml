@@ -723,6 +723,10 @@
                   type: long
                   description: >
                     Number of events failed
+                - name: failure_store
+                  type: long
+                  description: >
+                    Number of events written to the failure store
                 - name: toomany
                   type: long
                   description: >

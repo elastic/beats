@@ -17,16 +17,16 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
-// LogAndSendErrorEventWithRandomTransactionId sends an error event with a random transaction id to the reporter with the provided details.
-func LogAndSendErrorEventWithRandomTransactionId(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string) {
-	LogAndSendErrorEvent(err, clusterInfo, r, metricSetName, path, utils.NewUUID())
+// LogAndSendErrorEventWithoutTransactionId sends an error event without a transaction id to the reporter with the provided details.
+func LogAndSendErrorEventWithoutTransactionId(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string) {
+	LogAndSendErrorEvent(err, clusterInfo, r, metricSetName, path, "")
 }
 
 // LogAndSendErrorEventWithoutClusterInfo sends an error event without cluster info to the reporter with the provided details.
 func LogAndSendErrorEventWithoutClusterInfo(err error, r mb.ReporterV2, metricSetName string) {
 	LogAndSendErrorEvent(err, &utils.ClusterInfo{
 		Version: utils.ClusterInfoVersion{Number: &version.V{}},
-	}, r, metricSetName, "/", utils.NewUUID())
+	}, r, metricSetName, "/", "")
 }
 
 // LogAndSendErrorEvent sends an error event to the reporter with the provided details.
@@ -74,14 +74,13 @@ func createError(info *utils.ClusterInfo, err error, path string, transactionID 
 	status, errorCode, body := getHTTPResponseBodyInfo(err)
 	path, query := extractPathAndQuery(path)
 
-	return mb.Event{
+	event := mb.Event{
 		ModuleFields: mapstr.M{
 			"cluster": mapstr.M{
 				"id":      info.ClusterID,
 				"name":    info.ClusterName,
 				"version": info.Version.Number.String(),
 			},
-			"transaction_id": transactionID,
 		},
 		RootFields: mapstr.M{
 			"error": mapstr.M{
@@ -111,4 +110,10 @@ func createError(info *utils.ClusterInfo, err error, path string, transactionID 
 			},
 		},
 	}
+
+	if transactionID != "" {
+		event.ModuleFields["transaction_id"] = transactionID
+	}
+
+	return event
 }

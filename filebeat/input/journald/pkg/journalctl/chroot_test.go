@@ -32,10 +32,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/mount"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -49,7 +48,7 @@ func TestNewFactoryChroot(t *testing.T) {
 	containerChroot := "/hostfs"
 
 	// Create Docker client
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cli, err := client.New(client.FromEnv)
 	require.NoError(t, err, "failed to create docker client")
 	defer cli.Close()
 
@@ -100,14 +99,17 @@ func TestNewFactoryChroot(t *testing.T) {
 
 	// Create the container
 	ctx := t.Context()
-	createResp, err := cli.ContainerCreate(ctx, containerConfig, hostConfig, nil, nil, "")
+	createResp, err := cli.ContainerCreate(ctx, client.ContainerCreateOptions{
+		Config:     containerConfig,
+		HostConfig: hostConfig,
+	})
 	require.NoError(t, err, "failed to create container")
 	containerID := createResp.ID
 
 	// Start the container
-	err = cli.ContainerStart(ctx, containerID, container.StartOptions{})
+	_, err = cli.ContainerStart(ctx, containerID, client.ContainerStartOptions{})
 	require.NoError(t, err, "failed to start container")
-	attachResp, err := cli.ContainerAttach(ctx, containerID, container.AttachOptions{
+	attachResp, err := cli.ContainerAttach(ctx, containerID, client.ContainerAttachOptions{
 		Stream: true,
 		Stdout: true,
 		Stderr: true,
@@ -122,9 +124,9 @@ func TestNewFactoryChroot(t *testing.T) {
 		}
 	}()
 
-	waitRespChan, waitErrChan := cli.ContainerWait(ctx, containerID, container.WaitConditionRemoved)
+	waitResult := cli.ContainerWait(ctx, containerID, client.ContainerWaitOptions{Condition: container.WaitConditionRemoved})
 	select {
-	case r := <-waitRespChan:
+	case r := <-waitResult.Result:
 		if r.StatusCode != 0 {
 			t.Errorf("Test in container failed, returned status: %d.", r.StatusCode)
 			if r.Error != nil {
@@ -134,9 +136,9 @@ func TestNewFactoryChroot(t *testing.T) {
 			logDockerCmd(t, imageName, containerConfig, hostConfig)()
 			t.Log("Check the docker container logs for more information")
 		}
-	case err := <-waitErrChan:
+	case err := <-waitResult.Error:
 		t.Fatalf("error waiting for container to finish: %s", err)
-	case <-time.After(30 * time.Second):
+	case <-time.After(time.Minute):
 		t.Fatal("Container is stuck, stopping the test. Look at the container logs for more information.")
 	}
 }
@@ -165,7 +167,7 @@ func TestInDockerNewFactory(t *testing.T) {
 	// without the need of any messages in the journal
 	jctl, err := factory(jctlCtx, logger.Logger, "--version")
 	require.NoError(t, err, "failed to create journalctl with chroot")
-	defer jctl.Kill() //nolint: deadcode,errcheck // It's a test, there is nothing to do
+	defer jctl.Kill() //nolint:errcheck // It's a test, there is nothing to do
 
 	data, err := jctl.Next(jctlCtx)
 	require.NoError(t, err, "failed to read from journalctl")
@@ -173,7 +175,7 @@ func TestInDockerNewFactory(t *testing.T) {
 }
 
 func pullImage(t *testing.T, cli *client.Client, imageName string) {
-	reader, err := cli.ImagePull(t.Context(), imageName, image.PullOptions{})
+	reader, err := cli.ImagePull(t.Context(), imageName, client.ImagePullOptions{})
 	require.NoErrorf(t, err, "failed to pull image: %q", imageName)
 	defer reader.Close()
 

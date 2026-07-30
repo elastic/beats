@@ -20,18 +20,67 @@
 package publish
 
 import (
+	"context"
 	"net"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+type mockClient struct {
+	closed atomic.Bool
+}
+
+func (c *mockClient) Publish(_ beat.Event)      {}
+func (c *mockClient) PublishAll(_ []beat.Event) {}
+func (c *mockClient) Close() error {
+	c.closed.Store(true)
+	return nil
+}
+
+type mockPipeline struct {
+	client *mockClient
+}
+
+func (p *mockPipeline) ConnectWith(_ beat.ClientConfig) (beat.Client, error) {
+	return p.client, nil
+}
+func (p *mockPipeline) Connect() (beat.Client, error) {
+	return p.client, nil
+}
+
+func (p *mockPipeline) Disconnect(ctx context.Context) error {
+	return p.client.Close()
+}
+
+func TestStopWaitsForWorkers(t *testing.T) {
+	client := &mockClient{}
+	pipeline := &mockPipeline{client: client}
+	pub, err := NewTransactionPublisher("test", pipeline, false, false, nil, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	cfg, err := conf.NewConfigFrom(mapstr.M{})
+	require.NoError(t, err)
+
+	_, err = pub.CreateReporter(cfg)
+	require.NoError(t, err)
+
+	pub.Stop()
+
+	// After Stop returns, the worker must have exited and closed the client.
+	assert.True(t, client.closed.Load(), "client.Close() should have been called before Stop() returned")
+}
 
 func testEvent() beat.Event {
 	return beat.Event{
@@ -93,6 +142,7 @@ func TestFilterEvent(t *testing.T) {
 }
 
 func TestPublish(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "").Named("publish")
 	srcIP, dstIP := "192.145.2.4", "192.145.2.5"
 
 	event := func() *beat.Event {
@@ -118,6 +168,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(dstIP)},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -133,6 +184,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(srcIP)},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -148,6 +200,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(srcIP), net.ParseIP(dstIP)},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -163,6 +216,7 @@ func TestPublish(t *testing.T) {
 		processor := transProcessor{
 			localIPs: []net.IP{net.ParseIP(dstIP + "1")},
 			name:     "test",
+			logger:   logger,
 		}
 
 		res, _ := processor.Run(event())
@@ -179,6 +233,7 @@ func TestPublish(t *testing.T) {
 			localIPs:       []net.IP{net.ParseIP(srcIP)},
 			ignoreOutgoing: true,
 			name:           "test",
+			logger:         logger,
 		}
 
 		res, err := processor.Run(event())

@@ -30,11 +30,11 @@ import (
 
 // getTable updates fields with the table data at the given offset.
 // fields must be non_nil on entry.
-func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
+func getTable(fields mapstr.M, data []byte, offset uint32, logger *logp.Logger) (next uint32, err bool, exists bool) {
 	offset64 := int64(offset)
 	dataLen64 := int64(len(data))
 	if offset64 > dataLen64 || 4 > dataLen64-offset64 {
-		logp.Debug("amqp", "Error while parsing a field table")
+		logger.Debug("Error while parsing a field table")
 		return 0, true, false
 	}
 	offsetInt := int(offset64)
@@ -53,9 +53,9 @@ func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 		table := mapstr.M{}
 		tableStartInt := int(tableStart64)
 		tableEndInt := tableStartInt + int(length)
-		err := fieldUnmarshal(table, data[tableStartInt:tableEndInt], 0, length, -1)
+		err := fieldUnmarshal(table, data[tableStartInt:tableEndInt], 0, length, -1, logger)
 		if err {
-			logp.Debug("amqp", "Error while parsing a field table")
+			logger.Debug("Error while parsing a field table")
 			return 0, true, false
 		}
 		fields.Update(table)
@@ -65,10 +65,10 @@ func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 
 // getTable updates fields with the array data at the given offset.
 // fields must be non_nil on entry.
-func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
+func getArray(fields mapstr.M, data []byte, offset uint32, logger *logp.Logger) (next uint32, err bool, exists bool) {
 	length, err := getIntegerAt[uint32](data, offset)
 	if err {
-		logp.Debug("amqp", "Error while parsing a field table")
+		logger.Debug("Error while parsing a field table")
 		return 0, true, false
 	}
 	offset64 := int64(offset)
@@ -90,9 +90,9 @@ func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 		array := mapstr.M{}
 		arrayStartInt := int(arrayStart64)
 		arrayEndInt := arrayStartInt + int(length)
-		err := fieldUnmarshal(array, data[arrayStartInt:arrayEndInt], 0, length, 0)
+		err := fieldUnmarshal(array, data[arrayStartInt:arrayEndInt], 0, length, 0, logger)
 		if err {
-			logp.Debug("amqp", "Error while parsing a field array")
+			logger.Debug("Error while parsing a field array")
 			return 0, true, false
 		}
 		fields.Update(array)
@@ -102,7 +102,7 @@ func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 
 // The index parameter, when set at -1, indicates that the entry is a field table.
 // If it's set at 0, it is an array.
-func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, index int) (err bool) {
+func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, index int, logger *logp.Logger) (err bool) {
 	var name string
 
 	// Why is this returning false if attempting to offset past the length of the data?
@@ -112,9 +112,9 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	// get name of the field. If it's an array, it will be the index parameter as a
 	// string. If it's a table, it will be the name of the field.
 	if index < 0 {
-		fieldName, consumed, err := getLVString[uint8](data, offset)
+		fieldName, consumed, err := getLVString[uint8](data, offset, logger)
 		if err {
-			logp.Debug("amqp", "Failed to get short string in table")
+			logger.Debug("Failed to get short string in table")
 			return true
 		}
 		name = fieldName
@@ -135,7 +135,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case shortShortInt:
 		v, err := getIntegerAt[int8](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get int8 in table")
+			logger.Debug("Failed to get int8 in table")
 			return true
 		}
 		table[name] = v
@@ -143,7 +143,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case shortShortUint:
 		v, err := getIntegerAt[uint8](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get uint8 in table")
+			logger.Debug("Failed to get uint8 in table")
 			return true
 		}
 		table[name] = v
@@ -151,7 +151,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case shortInt:
 		v, err := getIntegerAt[int16](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get int16 in table")
+			logger.Debug("Failed to get int16 in table")
 			return true
 		}
 		table[name] = v
@@ -159,7 +159,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case shortUint:
 		v, err := getIntegerAt[uint16](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get uint16 in table")
+			logger.Debug("Failed to get uint16 in table")
 			return true
 		}
 		table[name] = v
@@ -167,7 +167,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case longInt:
 		v, err := getIntegerAt[int32](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get int32 in table")
+			logger.Debug("Failed to get int32 in table")
 			return true
 		}
 		table[name] = v
@@ -175,7 +175,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case longUint:
 		v, err := getIntegerAt[uint32](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get uint32 in table")
+			logger.Debug("Failed to get uint32 in table")
 			return true
 		}
 		table[name] = v
@@ -183,7 +183,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case longLongInt:
 		v, err := getIntegerAt[int64](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get int64 in table")
+			logger.Debug("Failed to get int64 in table")
 			return true
 		}
 		table[name] = v
@@ -191,7 +191,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case longLongUint:
 		v, err := getIntegerAt[uint64](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get uint64 in table")
+			logger.Debug("Failed to get uint64 in table")
 			return true
 		}
 		table[name] = v
@@ -199,7 +199,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case float:
 		v, err := getIntegerAt[uint32](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get float32 in table")
+			logger.Debug("Failed to get float32 in table")
 			return true
 		}
 		table[name] = math.Float32frombits(v)
@@ -207,14 +207,14 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case double:
 		v, err := getIntegerAt[uint64](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get float64 in table")
+			logger.Debug("Failed to get float64 in table")
 			return true
 		}
 		table[name] = math.Float64frombits(v)
 		offset += 9
 	case decimal:
 		if len(data) < int(offset)+6 {
-			logp.Debug("amqp", "Failed to get decimal in table")
+			logger.Debug("Failed to get decimal in table")
 			return true
 		}
 		scale := data[offset+1]
@@ -231,24 +231,24 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 		table[name] = strings.Join(ret, "")
 		offset += 6
 	case shortString:
-		s, consumed, err := getLVString[uint8](data, offset+1)
+		s, consumed, err := getLVString[uint8](data, offset+1, logger)
 		if err {
-			logp.Debug("amqp", "Failed to get short string in table")
+			logger.Debug("Failed to get short string in table")
 			return true
 		}
 		table[name] = s
 		offset += consumed + 1
 	case longString:
-		s, consumed, err := getLVString[uint32](data, offset+1)
+		s, consumed, err := getLVString[uint32](data, offset+1, logger)
 		if err {
-			logp.Debug("amqp", "Failed to get long string in table")
+			logger.Debug("Failed to get long string in table")
 			return true
 		}
 		table[name] = s
 		offset += consumed + 1
 	case fieldArray:
 		newMap := mapstr.M{}
-		next, err, _ := getArray(newMap, data, offset+1)
+		next, err, _ := getArray(newMap, data, offset+1, logger)
 		if err {
 			return true
 		}
@@ -257,7 +257,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case timestamp:
 		ts, err := getIntegerAt[int64](data, offset+1)
 		if err {
-			logp.Debug("amqp", "Failed to get timestamp in table")
+			logger.Debug("Failed to get timestamp in table")
 			return true
 		}
 		t := time.Unix(ts, 0)
@@ -265,7 +265,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 		offset += 9
 	case fieldTable:
 		newMap := mapstr.M{}
-		next, err, _ := getTable(newMap, data, offset+1)
+		next, err, _ := getTable(newMap, data, offset+1, logger)
 		if err {
 			return true
 		}
@@ -277,7 +277,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 	case byteArray:
 		size, err := getIntegerAt[uint32](data, offset+1)
 		if err || len(data) < int(offset+5+size) {
-			logp.Debug("amqp", "Failed to get byte array in table")
+			logger.Debug("Failed to get byte array in table")
 			return true
 		}
 		table[name] = bodyToByteArray(data[offset+5 : offset+5+size])
@@ -287,7 +287,7 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 		return true
 	}
 	// advance to next field recursively
-	return fieldUnmarshal(table, data, offset, length, index)
+	return fieldUnmarshal(table, data, offset, length, index, logger)
 }
 
 // function to convert a body slice into a byte array

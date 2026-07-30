@@ -35,8 +35,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
 
-var debugf = logp.MakeDebug("rpc")
-
 const (
 	rpcLastFrag = 0x80000000
 	rpcSizeMask = 0x7fffffff
@@ -61,6 +59,7 @@ type rpc struct {
 	ports              []int
 	callsSeen          *common.Cache
 	transactionTimeout time.Duration
+	logger             *logp.Logger
 
 	results protos.Reporter // Channel where results are pushed.
 }
@@ -74,18 +73,20 @@ func New(
 	results protos.Reporter,
 	_ *procs.ProcessesWatcher,
 	cfg *conf.C,
+	log *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &rpc{}
+	p.logger = log.Named("rpc")
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
-			logp.Warn("failed to read config")
+			p.logger.Warnf("failed to read config")
 			return nil, err
 		}
 	}
 
 	if err := p.init(results, &config); err != nil {
-		logp.Warn("failed to init")
+		p.logger.Warnf("failed to init")
 		return nil, err
 	}
 	return p, nil
@@ -102,7 +103,7 @@ func (r *rpc) init(results protos.Reporter, config *rpcConfig) error {
 		func(k common.Key, v common.Value) {
 			nfs, ok := v.(*nfs)
 			if !ok {
-				logp.Err("Expired value is not a MapStr (%T).", v)
+				r.logger.Errorf("Expired value is not a MapStr (%T).", v)
 				return
 			}
 			r.handleExpiredPacket(nfs)
@@ -133,7 +134,7 @@ func (r *rpc) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	conn := ensureRPCConnection(private)
+	conn := ensureRPCConnection(private, r.logger)
 
 	conn = r.handleRPCFragment(conn, pkt, tcptuple, dir)
 	if conn == nil {
@@ -166,26 +167,26 @@ func (r *rpc) ConnectionTimeout() time.Duration {
 	return r.transactionTimeout
 }
 
-func ensureRPCConnection(private protos.ProtocolData) *rpcConnectionData {
-	conn := getRPCConnection(private)
+func ensureRPCConnection(private protos.ProtocolData, logger *logp.Logger) *rpcConnectionData {
+	conn := getRPCConnection(private, logger)
 	if conn == nil {
 		conn = &rpcConnectionData{}
 	}
 	return conn
 }
 
-func getRPCConnection(private protos.ProtocolData) *rpcConnectionData {
+func getRPCConnection(private protos.ProtocolData, logger *logp.Logger) *rpcConnectionData {
 	if private == nil {
 		return nil
 	}
 
 	priv, ok := private.(*rpcConnectionData)
 	if !ok {
-		logp.Warn("rpc connection data type error")
+		logger.Warn("rpc connection data type error")
 		return nil
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: rpc connection data not set")
+		logger.Warn("Unexpected: rpc connection data not set")
 		return nil
 	}
 
@@ -207,7 +208,7 @@ func (r *rpc) handleRPCFragment(
 		// concatenate bytes
 		st.rawData = append(st.rawData, pkt.Payload...)
 		if len(st.rawData) > tcp.TCPMaxDataInStream {
-			debugf("Stream data too large, dropping TCP stream")
+			r.logger.Debug("Stream data too large, dropping TCP stream")
 			conn.streams[dir] = nil
 			return conn
 		}
@@ -216,7 +217,9 @@ func (r *rpc) handleRPCFragment(
 	for len(st.rawData) > 0 {
 
 		if len(st.rawData) < 4 {
-			debugf("Waiting for more data")
+			if r.logger.IsDebug() {
+				r.logger.Debug("Waiting for more data")
+			}
 			break
 		}
 
@@ -225,12 +228,14 @@ func (r *rpc) handleRPCFragment(
 		islast := (marker & rpcLastFrag) != 0
 
 		if len(st.rawData)-4 < size {
-			debugf("Waiting for more data")
+			if r.logger.IsDebug() {
+				r.logger.Debug("Waiting for more data")
+			}
 			break
 		}
 
 		if !islast {
-			logp.Warn("multifragment rpc message")
+			r.logger.Warn("multifragment rpc message")
 			break
 		}
 
@@ -247,18 +252,18 @@ func (r *rpc) handleRPCFragment(
 func (r *rpc) handleRPCPacket(xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 	defer func() {
 		if rec := recover(); rec != nil {
-			logp.Warn("nfs: recovered from panic while parsing RPC/NFS: %v", rec)
+			r.logger.Warnf("nfs: recovered from panic while parsing RPC/NFS: %v", rec)
 		}
 	}()
 
 	xidVal, err := xdr.getUInt()
-	if dropMalformed("rpc packet xid", err) {
+	if dropMalformed("rpc packet xid", err, r.logger) {
 		return
 	}
 	xid := fmt.Sprintf("%.8x", xidVal)
 
 	msgType, err := xdr.getUInt()
-	if dropMalformed("rpc packet msgType", err) {
+	if dropMalformed("rpc packet msgType", err, r.logger) {
 		return
 	}
 
@@ -268,7 +273,7 @@ func (r *rpc) handleRPCPacket(xdr *xdr, ts time.Time, tcptuple *common.TCPTuple,
 	case rpcReply:
 		r.handleReply(xid, xdr, ts, tcptuple, dir)
 	default:
-		logp.Warn("Bad RPC message")
+		r.logger.Warn("Bad RPC message")
 	}
 }
 

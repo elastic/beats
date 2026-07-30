@@ -75,6 +75,16 @@ func TestUnmarshal(t *testing.T) {
 	})
 }
 
+func TestUnmarshalIncludeMetadata(t *testing.T) {
+	cfg := &Config{}
+	userConf := confmap.NewFromStringMap(map[string]any{
+		"include_metadata": true,
+		"filebeat":         map[string]any{"inputs": []any{}},
+	})
+	require.NoError(t, cfg.Unmarshal(userConf))
+	assert.Equal(t, true, cfg.Beatconfig["include_metadata"])
+}
+
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
 		c           *Config
@@ -82,17 +92,17 @@ func TestValidate(t *testing.T) {
 		errorString string
 	}{
 		"Empty config": {
-			c:           &Config{Beatconfig: map[string]interface{}{}},
+			c:           &Config{Beatconfig: map[string]any{}},
 			hasError:    true,
 			errorString: "configuration is required",
 		},
 		"No filebeat section": {
-			c:           &Config{Beatconfig: map[string]interface{}{"other": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"other": map[string]any{}}},
 			hasError:    true,
 			errorString: "configuration key 'filebeat' is required",
 		},
 		"Valid config": {
-			c:           &Config{Beatconfig: map[string]interface{}{"filebeat": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"filebeat": map[string]any{}}},
 			hasError:    false,
 			errorString: "",
 		},

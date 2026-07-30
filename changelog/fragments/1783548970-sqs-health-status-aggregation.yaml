@@ -1,0 +1,11 @@
+kind: enhancement
+summary: Aggregate SQS mode health status to reduce false Degraded/Healthy transitions.
+description: |
+  Replace scattered per-event status reporting in the aws-s3 SQS input with a
+  centralized health aggregator. The input now stays Running while making forward
+  progress despite bounded retryable failures, reports Degraded only for sustained
+  conditions needing operator action (persistent receive failures, delete/finalize
+  errors, poison-pill messages), filters out context.Canceled from shutdown/reload,
+  and clears Degraded only when the specific causing condition resolves.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/51692

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
+//go:build !requirefips
 
 package collstats
 
@@ -30,7 +30,6 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-
 	content, err := os.ReadFile("./_meta/test/input.json")
 	assert.NoError(t, err)
 
@@ -42,5 +41,139 @@ func TestEventMapping(t *testing.T) {
 
 	event, _ := eventMapping("unit.test", data)
 
-	assert.Equal(t, event["total"].(mapstr.M)["count"], float64(1))
+	assert.InDelta(t, float64(1), event["total"].(mapstr.M)["count"], 0) //nolint:errcheck // safe
+}
+
+func TestEventMappingOptionalFields(t *testing.T) {
+	// Build a data map emulating flattened aggregation output including optional fields
+	data := mapstr.M{
+		"total":     mapstr.M{"count": 5, "time": 123},
+		"readLock":  mapstr.M{"count": 2, "time": 10},
+		"writeLock": mapstr.M{"count": 3, "time": 20},
+		"queries":   mapstr.M{"count": 1, "time": 2},
+		"getmore":   mapstr.M{"count": 0, "time": 0},
+		"insert":    mapstr.M{"count": 0, "time": 0},
+		"update":    mapstr.M{"count": 0, "time": 0},
+		"remove":    mapstr.M{"count": 0, "time": 0},
+		"commands":  mapstr.M{"count": 0, "time": 0},
+		"stats": mapstr.M{
+			"size":            1000,
+			"count":           5,
+			"avgObjSize":      200,
+			"storageSize":     2048,
+			"totalIndexSize":  512,
+			"totalSize":       2560,
+			"max":             100000,
+			"nindexes":        2,
+			"numOrphanDocs":   1,
+			"shardCount":      2,
+			"freeStorageSize": 4096,
+			"capped":          false,
+			"scaleFactor":     1024,
+			// shards breakdown and indexSizes omitted
+		},
+	}
+
+	event, err := eventMapping("dbX.collY", data)
+	assert.NoError(t, err)
+
+	stats := event["stats"].(mapstr.M)                    //nolint:errcheck // safe
+	assert.Equal(t, int(1), stats["numOrphanDocs"].(int)) //nolint:errcheck // safe
+	assert.Equal(t, int(2), stats["shardCount"].(int))    //nolint:errcheck // safe
+	assert.Equal(t, 4096, stats["freeStorageSize"].(int)) //nolint:errcheck // safe
+	assert.False(t, stats["capped"].(bool))               //nolint:errcheck // safe
+	assert.Equal(t, 1024, stats["scaleFactor"].(int))     //nolint:errcheck // safe
+	_, hasIndexSizes := stats["indexSizes"]
+	assert.False(t, hasIndexSizes)
+}
+
+func TestEventMappingInvalidKey(t *testing.T) {
+	// A key without a "." cannot be split into db.collection and must error.
+	_, err := eventMapping("nodot", mapstr.M{})
+	assert.Error(t, err)
+}
+
+func TestEventMappingOmitsAbsentOptionalFields(t *testing.T) {
+	// When optional fields are absent from source data, they must not appear in stats.
+	data := mapstr.M{
+		"stats": mapstr.M{
+			"size":  1000,
+			"count": 5,
+		},
+	}
+
+	event, err := eventMapping("dbX.collY", data)
+	assert.NoError(t, err)
+
+	stats := event["stats"].(mapstr.M) //nolint:errcheck // safe
+	for _, k := range []string{"numOrphanDocs", "shardCount", "freeStorageSize", "capped", "scaleFactor"} {
+		_, exists := stats[k]
+		assert.Falsef(t, exists, "optional field %q must be absent when not in source", k)
+	}
+}
+
+func TestEventMappingPreservesCollectionWithDots(t *testing.T) {
+	// Collection names may contain dots; only the first dot splits db/collection.
+	data := mapstr.M{
+		"stats": mapstr.M{"count": 1},
+	}
+
+	event, err := eventMapping("mydb.my.dotted.collection", data)
+	assert.NoError(t, err)
+	assert.Equal(t, "mydb", event["db"])
+	assert.Equal(t, "my.dotted.collection", event["collection"])
+}
+
+func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
+	shard1 := map[string]interface{}{
+		"count":       int64(10),
+		"size":        float64(1000),
+		"storageSize": float64(2000),
+		"avgObjSize":  float64(100),
+		"shard":       "shard1",
+		"host":        "host1",
+	}
+	shard2 := map[string]interface{}{
+		"count":       int64(20),
+		"size":        float64(3000),
+		"storageSize": float64(4000),
+		"avgObjSize":  float64(150),
+		"shard":       "shard2",
+		"host":        "host2",
+	}
+	merged, err := mergeShardedCollStats([]map[string]interface{}{shard1, shard2})
+	assert.NoError(t, err)
+	// Summed fields
+	assert.Equal(t, int64(30), merged["count"].(int64))           //nolint:errcheck // safe
+	assert.InDelta(t, float64(4000), merged["size"].(float64), 0) //nolint:errcheck // safe
+	// Weighted avg: (100*10 + 150*20)/30 = (1000 + 3000)/30 = 133.333...
+	assert.InDelta(t, 133.33, merged["avgObjSize"].(float64), 0.01) //nolint:errcheck // safe
+	// No indexSizes collected
+	_, hasIdx := merged["indexSizes"]
+	assert.False(t, hasIdx)
+	// Shard metadata only: shardCount present, no shards breakdown
+	assert.Equal(t, 2, merged["shardCount"].(int)) //nolint:errcheck // safe
+	_, hasShards := merged["shards"]
+	assert.False(t, hasShards)
+}
+
+func TestFlattenAggregationResult(t *testing.T) {
+	input := map[string]interface{}{
+		"storageStats": map[string]interface{}{
+			"size":           1000,
+			"count":          5,
+			"avgObjSize":     200,
+			"storageSize":    2048,
+			"totalIndexSize": 512,
+			"totalSize":      2560,
+			"scaleFactor":    1024,
+		},
+	}
+	flat := flattenAggregationResult(input)
+	// All expected top-level lifts
+	expectedKeys := []string{"size", "count", "avgObjSize", "storageSize", "totalIndexSize", "totalSize", "scaleFactor"}
+	for _, k := range expectedKeys {
+		assert.Contains(t, flat, k)
+	}
+	assert.Equal(t, 1024, flat["scaleFactor"])
 }

@@ -11,13 +11,14 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // NewProviderFromCertificate returns a TokenProvider that uses certificate-based
 // authentication.
-func NewProviderFromCertificate(resource, applicationID, tenantID string, conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
-	cert, privKey, err := loadConfigCerts(conf)
+func NewProviderFromCertificate(resource, applicationID, tenantID string, conf tlscommon.CertificateConfig, logger *logp.Logger) (sptp TokenProvider, err error) {
+	cert, privKey, err := loadConfigCerts(conf, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed loading certificates: %w", err)
 	}
@@ -30,8 +31,8 @@ func NewProviderFromCertificate(resource, applicationID, tenantID string, conf t
 	return (*credentialTokenProvider)(cred), nil
 }
 
-func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key *rsa.PrivateKey, err error) {
-	tlsCert, err := tlscommon.LoadCertificate(&cfg)
+func loadConfigCerts(cfg tlscommon.CertificateConfig, logger *logp.Logger) (cert *x509.Certificate, key *rsa.PrivateKey, err error) {
+	tlsCert, err := tlscommon.LoadCertificate(&cfg, logger)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error loading X509 certificate from '%s': %w", cfg.Certificate, err)
 	}

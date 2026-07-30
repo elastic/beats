@@ -74,7 +74,7 @@ func TestProcessStatusReporter(t *testing.T) {
 					Version: "1.17.0",
 				},
 			},
-			Source: tests.RequireNewStruct(map[string]interface{}{
+			Source: tests.RequireNewStruct(map[string]any{
 				"type":            "file",
 				"enabled":         true,
 				"path":            outPath,
@@ -203,8 +203,8 @@ func getInputStream(id string, pid int, stateIdx int) proto.UnitExpected {
 					Dataset: "system.process",
 					Type:    "metrics",
 				},
-				Source: tests.RequireNewStruct(map[string]interface{}{
-					"metricsets":  []interface{}{"process"},
+				Source: tests.RequireNewStruct(map[string]any{
+					"metricsets":  []any{"process"},
 					"process.pid": pid,
 				}),
 			}},

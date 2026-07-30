@@ -54,14 +54,12 @@ func newSOCKS5Proxy(t *testing.T) (net.Listener, func()) {
 
 	// Listen and serve
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		err := server.Serve(l)
 		if err != nil {
 			t.Logf("Server error (%T): %+v", err, err)
 		}
-	}()
+	})
 
 	cleanup := func() {
 		defer wg.Wait()

@@ -173,7 +173,7 @@ func usageFlag() {
 	flag.PrintDefaults()
 }
 
-var Template = template.Must(template.New("normalizations").Funcs(map[string]interface{}{
+var Template = template.Must(template.New("normalizations").Funcs(map[string]any{
 	"trim": strings.TrimSpace,
 }).Parse(`
 {{ .License | trim }}
@@ -234,7 +234,7 @@ func findModuleAndDatasets() ([]string, error) {
 			filepath.Join(moduleDir, "*/*/_meta"),
 		)
 		if err != nil {
-			return nil, fmt.Errorf("failed finding modules and datasets: %w", err)
+			return nil, fmt.Errorf("failed to find modules and datasets: %w", err)
 		}
 
 		for _, metaDir := range metaDirs {

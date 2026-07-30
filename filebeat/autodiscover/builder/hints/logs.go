@@ -23,8 +23,8 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -59,17 +59,17 @@ type logHints struct {
 
 // InitializeModule initializes this module.
 func InitializeModule() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	_ = autodiscover.Registry.AddBuilder("hints", newLogHints)
 }
 
-// NewLogHints builds a log hints builder
-func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
+// newLogHints builds a log hints builder
+func newLogHints(cfg *conf.C, logger *logp.Logger, paths *paths.Path) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{}, paths.Paths)
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger, Paths: paths}, false, fileset.FilesetOverrides{})
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 		module := l.getModule(hints)
 		if module != "" {
-			moduleConf := map[string]interface{}{
+			moduleConf := map[string]any{
 				"module": module,
 			}
 
@@ -176,8 +176,8 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				case harvester.ContainerType:
 					_ = filesetConf.SetString("stream", -1, cfg.Stream)
 				case harvester.FilestreamType:
-					filestreamContainerParser := map[string]interface{}{
-						"container": map[string]interface{}{
+					filestreamContainerParser := map[string]any{
+						"container": map[string]any{
 							"stream": cfg.Stream,
 							"format": "auto",
 						},
@@ -307,7 +307,7 @@ func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
 	return output
 }
 
-func shouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+func shouldPut(event mapstr.M, field string, value any, logger *logp.Logger) {
 	_, err := event.Put(field, value)
 	if err != nil {
 		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)

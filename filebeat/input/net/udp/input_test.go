@@ -25,15 +25,18 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"go.uber.org/zap/zaptest/observer"
 
 	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -60,22 +63,20 @@ func TestInput(t *testing.T) {
 	v2Ctx := v2.Context{
 		ID:              t.Name(),
 		Cancelation:     ctx,
-		Logger:          logp.NewNopLogger(),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	metrics := inp.InitMetrics("tcp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
 	c := make(chan netinput.DataMetadata, 2)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		if err := inp.Run(v2Ctx, c, metrics); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}
 		}
-	}()
+	})
 
 	// Allow the UDP server to start
 	runtime.Gosched()
@@ -106,4 +107,128 @@ func TestInput(t *testing.T) {
 	default:
 		// No more events on the channel, test passed
 	}
+}
+
+func waitForUDPServerAddress(t *testing.T, observedLogs *observer.ObservedLogs) string {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+	defer cancel()
+
+	for {
+		const listenLogPrefix = "Started listening for UDP connection on: "
+		for _, entry := range observedLogs.FilterMessageSnippet(listenLogPrefix).All() {
+			if addr, ok := strings.CutPrefix(entry.Message, listenLogPrefix); ok {
+				return addr
+			}
+		}
+
+		err := ctx.Err()
+		if err != nil {
+			t.Fatalf("UDP server did not log its listening address: %s", ctx.Err())
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
+func TestInputStopsWhenPipelineIsBlocked(t *testing.T) {
+	serverAddr := "127.0.0.1:0"
+	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+		"host": serverAddr,
+	}))
+	if err != nil {
+		t.Fatalf("cannot create input: %s", err)
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	v2Ctx := v2.Context{
+		ID:              t.Name(),
+		Cancelation:     ctx,
+		Logger:          logger,
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+
+	metrics := inp.InitMetrics("udp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
+	c := make(chan netinput.DataMetadata)
+
+	runReturned := make(chan struct{})
+	go func() {
+		defer close(runReturned)
+		if err := inp.Run(v2Ctx, c, metrics); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
+			}
+		}
+	}()
+
+	serverAddr = waitForUDPServerAddress(t, observedLogs)
+
+	nettest.RunUDPClient(t, serverAddr, []string{"foo", "bar", "baz"})
+
+	// Wait until at least one datagram was received
+	nettest.RequireNetMetricsCount(t, v2Ctx.MetricsRegistry, 30*time.Second, 1, 0, 4)
+
+	cancel()
+
+	select {
+	case <-runReturned:
+	case <-t.Context().Done():
+		t.Fatal("input Run did not return before the test context was cancelled")
+	}
+}
+
+// TestInputOversizedDatagram sends a datagram larger than max_message_size and
+// checks the input keeps running. On Windows an oversized read returns a nil
+// RemoteAddr, which used to panic the input while formatting the debug log
+// (#50718). A panic here would crash the test binary, so simply reaching the
+// end of the test is the assertion.
+func TestInputOversizedDatagram(t *testing.T) {
+	serverAddr := "127.0.0.1:9043"
+	wg := sync.WaitGroup{}
+	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+		"host":             serverAddr,
+		"max_message_size": 64,
+	}))
+	if err != nil {
+		t.Fatalf("cannot create input: %s", err)
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	v2Ctx := v2.Context{
+		ID:              t.Name(),
+		Cancelation:     ctx,
+		Logger:          logptest.NewTestingLogger(t, ""),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+
+	metrics := inp.InitMetrics("udp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
+	c := make(chan netinput.DataMetadata, 10)
+
+	wg.Go(func() {
+		if err := inp.Run(v2Ctx, c, metrics); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
+			}
+		}
+	})
+
+	// Allow the UDP server to start
+	runtime.Gosched()
+
+	// A datagram several times larger than max_message_size. It is sent a few
+	// times so a dropped packet on a slow runner doesn't leave the truncation
+	// path unexercised.
+	oversized := strings.Repeat("x", 256)
+	nettest.RunUDPClient(t, serverAddr, []string{oversized, oversized, oversized})
+
+	select {
+	case <-c:
+		// The oversized datagram was processed without panicking.
+	case <-time.After(30 * time.Second):
+		t.Fatal("timed out waiting for the oversized datagram to be processed")
+	}
+
+	cancel()
+	wg.Wait()
 }

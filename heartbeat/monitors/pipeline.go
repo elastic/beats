@@ -51,9 +51,9 @@ type wrappedClient struct {
 }
 
 // returns a new pipeline with the provided SyncPipelineClientWrapper.
-func WithSyncPipelineWrapper(pipeline beat.Pipeline, pw *SyncPipelineWrapper) beat.Pipeline {
+func WithSyncPipelineWrapper(pipeline beat.Pipeline, pw *SyncPipelineWrapper, logger *logp.Logger) beat.Pipeline {
 	pipeline = pipetool.WithACKer(pipeline, acker.TrackingCounter(func(_, total int) {
-		logp.L().Debugf("ack callback receives with events count of %d", total)
+		logger.Debugf("ack callback receives with events count of %d", total)
 		pw.onACK(total)
 	}))
 

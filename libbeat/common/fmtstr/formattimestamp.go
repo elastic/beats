@@ -89,7 +89,7 @@ func (fs *TimestampFormatString) String() string {
 // (which must be a string). Unpack method satisfies go-ucfg.Unpacker interface
 // required by config.C, in order to use TimestampFormatString with
 // `common.(*Config).Unpack()`.
-func (fs *TimestampFormatString) Unpack(v interface{}) error {
+func (fs *TimestampFormatString) Unpack(v any) error {
 	fs.eventFormatString = &EventFormatString{}
 	return fs.eventFormatString.Unpack(v)
 }

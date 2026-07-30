@@ -107,7 +107,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			},
 		}
 		if !r.Event(event) {
-			return errors.New("metricset has closed")
+			return errors.New("metricset is closed")
 		}
 	}
 	return nil

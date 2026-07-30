@@ -1,0 +1,371 @@
+{
+  "source": {
+    "data_stream": {
+      "namespace": "default"
+    },
+    "id": "synthetics/browser-synthetics-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+    "meta": {
+      "package": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      }
+    },
+    "name": "https://www.google.com/-test",
+    "package_policy_id": "66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+    "policy": {
+      "revision": 2
+    },
+    "revision": 1,
+    "streams": [
+      {
+        "__ui": {
+          "is_tls_enabled": true,
+          "script_source": {
+            "file_name": "",
+            "is_generated_script": false
+          }
+        },
+        "data_stream": {
+          "dataset": "browser",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "enabled": true,
+        "id": "66561b72-0b63-4948-86b5-be46a2d0e3df",
+        "maintenance_windows": null,
+        "max_attempts": 2,
+        "name": "https://www.google.com/",
+        "origin": "ui",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "config_id": "66561b72-0b63-4948-86b5-be46a2d0e3df",
+                "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                "meta": {
+                  "space_id": "default"
+                },
+                "monitor": {
+                  "fleet_managed": true,
+                  "interval": 600,
+                  "project": {
+                    "id": "",
+                    "name": ""
+                  }
+                }
+              },
+              "target": ""
+            }
+          }
+        ],
+        "run_from": {
+          "geo": {
+            "name": "test"
+          },
+          "id": "9ba26c7d-917b-465f-8461-b577fdd37a9f"
+        },
+        "schedule": "@every 10m",
+        "screenshots": "on",
+        "source": {
+          "inline": {
+            "encoding": "base64",
+            "script": "c3RlcCgnR28gdG8gaHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8nLCBhc3luYyAoKSA9PiB7CgogICAgICAgICAgYXdhaXQgcGFnZS5nb3RvKCdodHRwczovL3d3dy5nb29nbGUuY29tLycpOwoKICAgICAgICB9KTs="
+          }
+        },
+        "throttling": {
+          "download": 5,
+          "latency": 20,
+          "upload": 3
+        },
+        "timeout": null,
+        "type": "browser"
+      },
+      {
+        "data_stream": {
+          "dataset": "browser.network",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "id": "synthetics/browser-browser.network-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "monitor": {
+                  "fleet_managed": true
+                }
+              },
+              "target": ""
+            }
+          }
+        ]
+      },
+      {
+        "data_stream": {
+          "dataset": "browser.screenshot",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "id": "synthetics/browser-browser.screenshot-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "monitor": {
+                  "fleet_managed": true
+                }
+              },
+              "target": ""
+            }
+          }
+        ]
+      }
+    ],
+    "type": "synthetics/browser"
+  },
+  "id": "synthetics/browser-synthetics-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+  "type": "synthetics/browser",
+  "name": "https://www.google.com/-test",
+  "revision": 1,
+  "meta": {
+    "source": {
+      "package": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      }
+    },
+    "package": {
+      "source": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      },
+      "name": "synthetics",
+      "version": "1.6.1"
+    }
+  },
+  "data_stream": {
+    "source": {
+      "namespace": "default"
+    },
+    "namespace": "default"
+  },
+  "streams": [
+    {
+      "source": {
+        "__ui": {
+          "is_tls_enabled": true,
+          "script_source": {
+            "file_name": "",
+            "is_generated_script": false
+          }
+        },
+        "data_stream": {
+          "dataset": "browser",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "enabled": true,
+        "id": "66561b72-0b63-4948-86b5-be46a2d0e3df",
+        "maintenance_windows": null,
+        "max_attempts": 2,
+        "name": "https://www.google.com/",
+        "origin": "ui",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "config_id": "66561b72-0b63-4948-86b5-be46a2d0e3df",
+                "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                "meta": {
+                  "space_id": "default"
+                },
+                "monitor": {
+                  "fleet_managed": true,
+                  "interval": 600,
+                  "project": {
+                    "id": "",
+                    "name": ""
+                  }
+                }
+              },
+              "target": ""
+            }
+          }
+        ],
+        "run_from": {
+          "geo": {
+            "name": "test"
+          },
+          "id": "9ba26c7d-917b-465f-8461-b577fdd37a9f"
+        },
+        "schedule": "@every 10m",
+        "screenshots": "on",
+        "source": {
+          "inline": {
+            "encoding": "base64",
+            "script": "c3RlcCgnR28gdG8gaHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8nLCBhc3luYyAoKSA9PiB7CgogICAgICAgICAgYXdhaXQgcGFnZS5nb3RvKCdodHRwczovL3d3dy5nb29nbGUuY29tLycpOwoKICAgICAgICB9KTs="
+          }
+        },
+        "throttling": {
+          "download": 5,
+          "latency": 20,
+          "upload": 3
+        },
+        "timeout": null,
+        "type": "browser"
+      },
+      "id": "66561b72-0b63-4948-86b5-be46a2d0e3df",
+      "data_stream": {
+        "source": {
+          "dataset": "browser",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "dataset": "browser",
+        "type": "synthetics"
+      }
+    },
+    {
+      "source": {
+        "data_stream": {
+          "dataset": "browser.network",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "id": "synthetics/browser-browser.network-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "monitor": {
+                  "fleet_managed": true
+                }
+              },
+              "target": ""
+            }
+          }
+        ]
+      },
+      "id": "synthetics/browser-browser.network-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+      "data_stream": {
+        "source": {
+          "dataset": "browser.network",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "dataset": "browser.network",
+        "type": "synthetics"
+      }
+    },
+    {
+      "source": {
+        "data_stream": {
+          "dataset": "browser.screenshot",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "id": "synthetics/browser-browser.screenshot-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "monitor": {
+                  "fleet_managed": true
+                }
+              },
+              "target": ""
+            }
+          }
+        ]
+      },
+      "id": "synthetics/browser-browser.screenshot-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+      "data_stream": {
+        "source": {
+          "dataset": "browser.screenshot",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "dataset": "browser.screenshot",
+        "type": "synthetics"
+      }
+    }
+  ]
+}

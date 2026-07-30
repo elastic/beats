@@ -1,6 +1,6 @@
 # Readme
 
-This folder container some dev tools that make it easier to develop and deploy filebeat and metricbeat running inside a Kubernetes cluster. This is especially useful when developing the metricbeat module `kubernetes` since it requires metricbeat to run inside a Kubernetes cluster in order to interact with kube-state-metrics and the Kubernetes APIs.
+This folder contains some dev tools that make it easier to develop and deploy filebeat and metricbeat running inside a Kubernetes cluster. This is especially useful when developing the metricbeat module `kubernetes` since it requires metricbeat to run inside a Kubernetes cluster in order to interact with kube-state-metrics and the Kubernetes APIs.
 
 In details, a combination of Dockerfiles, Kubernetes manifests and Tiltfile make it possible to have features like:
 - hot reloading of code running in Kubernetes, without re-applying the Kubernetes manifest

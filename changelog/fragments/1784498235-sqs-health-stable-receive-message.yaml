@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Use a stable status message for SQS receive errors to prevent update churn during sustained outages.
+component: filebeat

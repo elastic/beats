@@ -34,6 +34,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// DefaultStateCheckInterval is the default for close.on_state_change.check_interval,
+// matching defaultCloserConfig in the filestream package.
+const DefaultStateCheckInterval = 5 * time.Second
+
 // InputManager is used to create, manage, and coordinate stateful inputs and
 // their persistent state.
 // The InputManager ensures that only one input can be active for a unique source.
@@ -79,6 +83,8 @@ type InputManager struct {
 // the source in the persistent state store.
 type Source interface {
 	Name() string
+	// LogPath returns the path used in logs.
+	LogPath() string
 }
 
 var errNoInputRunner = errors.New("no input runner available")
@@ -159,15 +165,25 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                  string         `config:"id"`
-		CleanInactive       time.Duration  `config:"clean_inactive" validate:"min=-1"`
-		HarvesterLimit      uint64         `config:"harvester_limit"`
-		AllowIDDuplication  bool           `config:"allow_deprecated_id_duplication"`
-		TakeOver            TakeOverConfig `config:"take_over"`
-		LegacyCleanInactive bool           `config:"legacy_clean_inactive"`
+		ID                  string             `config:"id"`
+		CleanInactive       time.Duration      `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit      uint64             `config:"harvester_limit"`
+		AllowIDDuplication  bool               `config:"allow_deprecated_id_duplication"`
+		TakeOver            TakeOverConfig     `config:"take_over"`
+		LegacyCleanInactive bool               `config:"legacy_clean_inactive"`
+		ReadUntilEOF        ReadUntilEOFConfig `config:"read_until_eof"`
+		Backoff             BackoffConfig      `config:"backoff"`
+		Close               struct {
+			OnStateChange struct {
+				CheckInterval time.Duration `config:"check_interval" validate:"nonzero"`
+			} `config:"on_state_change"`
+		} `config:"close"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
+		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
+		Backoff:       DefaultBackoffConfig(),
 	}
+	settings.Close.OnStateChange.CheckInterval = DefaultStateCheckInterval
 
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
@@ -282,11 +298,21 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		id:                     settings.ID,
 		prospector:             prospector,
 		harvester:              harvester,
+		readUntilEOF:           settings.ReadUntilEOF,
+		backoff:                settings.Backoff,
+		stateCheckInterval:     settings.Close.OnStateChange.CheckInterval,
 		sourceIdentifier:       srcIdentifier,
 		previousSrcIdentifiers: previousSrcIdentifiers,
 		cleanTimeout:           settings.CleanInactive,
 		harvesterLimit:         settings.HarvesterLimit,
 	}, nil
+}
+
+func DefaultReadUntilEOFConfig() ReadUntilEOFConfig {
+	return ReadUntilEOFConfig{
+		Enabled: true,
+		Timeout: time.Minute,
+	}
 }
 
 func (cim *InputManager) Delete(cfg *conf.C) error {
@@ -407,4 +433,29 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 
 func (t *TakeOverConfig) FromFilestream() bool {
 	return len(t.FromIDs) != 0
+}
+
+// ReadUntilEOFConfig configures the behaviour to keep reading the current
+// file until EOF before the input shuts down. If Timeout elapses before EOF
+// is reached, the input shuts down anyway.
+type ReadUntilEOFConfig struct {
+	Enabled bool `config:"enabled"`
+	// Timeout is the maximum time to wait for EOF to be reached.
+	Timeout time.Duration `config:"timeout" validate:"min=1"`
+}
+
+// BackoffConfig configures how aggressively the waker polls a parked (idle,
+// caught up to EOF) source for new data: Init is the first wait, doubling on
+// every still-idle poll up to Max, and resetting to Init as soon as a read
+// makes progress. See harvesterRunner.growBackoff.
+type BackoffConfig struct {
+	Init time.Duration `config:"init" validate:"nonzero"`
+	Max  time.Duration `config:"max" validate:"nonzero"`
+}
+
+func DefaultBackoffConfig() BackoffConfig {
+	return BackoffConfig{
+		Init: 2 * time.Second,
+		Max:  10 * time.Second,
+	}
 }

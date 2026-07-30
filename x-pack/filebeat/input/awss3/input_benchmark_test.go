@@ -178,7 +178,11 @@ func (c *fakePipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error
 }
 
 func (c *fakePipeline) Connect() (beat.Client, error) {
-	panic("Connect() is not implemented.")
+	return c.ConnectWith(beat.ClientConfig{})
+}
+
+func (c *fakePipeline) Disconnect(ctx context.Context) error {
+	return nil
 }
 
 var _ beat.Client = (*ackClient)(nil)
@@ -225,7 +229,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{}, paths.New())
 		sqsReader.log = log.Named("sqs")
-		sqsReader.status = &statusReporterHelperMock{}
+		sqsReader.health = newSQSHealth(&statusReporterHelperMock{}, logp.NewNopLogger())
 		sqsReader.pipeline = newFakePipeline()
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
 		sqsReader.sqs, err = newConstantSQS()

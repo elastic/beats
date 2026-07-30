@@ -26,6 +26,7 @@ import (
 // BrowserURLPlugin handles the logic for writing the error.* fields
 type BrowserURLPlugin struct {
 	urlFields mapstr.M
+	logger    *logp.Logger
 }
 
 func (busp *BrowserURLPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
@@ -43,7 +44,7 @@ func (busp *BrowserURLPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActi
 	if busp.urlFields != nil {
 		_, err := event.PutValue("url", busp.urlFields)
 		if err != nil {
-			logp.L().Errorf("could not set URL value for browser job: %s", err)
+			busp.logger.Errorf("could not set URL value for browser job: %s", err)
 		}
 	}
 	return 0

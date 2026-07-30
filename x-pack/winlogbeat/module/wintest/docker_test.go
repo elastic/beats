@@ -64,10 +64,11 @@ func TestDocker(t *testing.T) {
 		t.Errorf("unexpected error copying buffer: %v", err)
 	}
 
-	got := buf.String()
-	want := "green"
-	if !strings.Contains(got, want) {
-		t.Fatalf("unexpected response from elasticsearch: got:%s want:%s", got, want)
+	got := strings.TrimSpace(buf.String())
+	// Single-node test clusters report yellow when indices have unassigned
+	// replica shards. Both green and yellow indicate a functional cluster.
+	if got != "green" && got != "yellow" {
+		t.Fatalf("unexpected cluster health status: got:%q want:green or yellow", got)
 	}
 
 	t.Run("UploadPipelines", func(t *testing.T) {
@@ -83,8 +84,7 @@ func TestDocker(t *testing.T) {
 		}
 		defer conn.Close()
 
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		err = conn.Connect(ctx)
 		if err != nil {
 			t.Fatalf("unexpected error making connection: %v", err)
@@ -103,6 +103,7 @@ func TestDocker(t *testing.T) {
 			"powershell_operational",
 			"routing",
 			"security",
+			"security_standard",
 			"sysmon",
 		}
 		if len(loaded) != len(wantPipelines) {

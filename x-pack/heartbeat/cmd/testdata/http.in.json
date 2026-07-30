@@ -1,0 +1,219 @@
+{
+  "source": {
+    "data_stream": {
+      "namespace": "default"
+    },
+    "id": "synthetics/http-synthetics-987e913f-952e-47fd-b658-68752b92360a-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+    "meta": {
+      "package": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      }
+    },
+    "name": "https://www.example.com/-test",
+    "package_policy_id": "987e913f-952e-47fd-b658-68752b92360a-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+    "policy": {
+      "revision": 6
+    },
+    "revision": 1,
+    "streams": [
+      {
+        "__ui": {
+          "is_tls_enabled": false
+        },
+        "check": {
+          "request": {
+            "method": "GET"
+          }
+        },
+        "data_stream": {
+          "dataset": "http",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "enabled": true,
+        "id": "987e913f-952e-47fd-b658-68752b92360a",
+        "ipv4": true,
+        "ipv6": true,
+        "maintenance_windows": null,
+        "max_attempts": 2,
+        "max_redirects": 2,
+        "mode": "all",
+        "name": "https://www.example.com/",
+        "origin": "ui",
+        "password": "test",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "config_id": "987e913f-952e-47fd-b658-68752b92360a",
+                "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                "meta": {
+                  "space_id": "default"
+                },
+                "monitor": {
+                  "fleet_managed": true,
+                  "interval": 180
+                }
+              },
+              "target": ""
+            }
+          }
+        ],
+        "response": {
+          "include_body": "on_error",
+          "include_body_max_bytes": 1024,
+          "include_headers": true
+        },
+        "run_from": {
+          "geo": {
+            "name": "test"
+          },
+          "id": "9ba26c7d-917b-465f-8461-b577fdd37a9f"
+        },
+        "schedule": "@every 3m",
+        "tags": [
+          "test"
+        ],
+        "timeout": "12s",
+        "type": "http",
+        "urls": "https://www.example.com/",
+        "username": "test"
+      }
+    ],
+    "type": "synthetics/http"
+  },
+  "id": "synthetics/http-synthetics-987e913f-952e-47fd-b658-68752b92360a-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+  "type": "synthetics/http",
+  "name": "https://www.example.com/-test",
+  "revision": 1,
+  "meta": {
+    "source": {
+      "package": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      }
+    },
+    "package": {
+      "source": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      },
+      "name": "synthetics",
+      "version": "1.6.1"
+    }
+  },
+  "data_stream": {
+    "source": {
+      "namespace": "default"
+    },
+    "namespace": "default"
+  },
+  "streams": [
+    {
+      "source": {
+        "__ui": {
+          "is_tls_enabled": false
+        },
+        "check": {
+          "request": {
+            "method": "GET"
+          }
+        },
+        "data_stream": {
+          "dataset": "http",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "enabled": true,
+        "id": "987e913f-952e-47fd-b658-68752b92360a",
+        "ipv4": true,
+        "ipv6": true,
+        "maintenance_windows": null,
+        "max_attempts": 2,
+        "max_redirects": 2,
+        "mode": "all",
+        "name": "https://www.example.com/",
+        "origin": "ui",
+        "password": "test",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "config_id": "987e913f-952e-47fd-b658-68752b92360a",
+                "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                "meta": {
+                  "space_id": "default"
+                },
+                "monitor": {
+                  "fleet_managed": true,
+                  "interval": 180
+                }
+              },
+              "target": ""
+            }
+          }
+        ],
+        "response": {
+          "include_body": "on_error",
+          "include_body_max_bytes": 1024,
+          "include_headers": true
+        },
+        "run_from": {
+          "geo": {
+            "name": "test"
+          },
+          "id": "9ba26c7d-917b-465f-8461-b577fdd37a9f"
+        },
+        "schedule": "@every 3m",
+        "tags": [
+          "test"
+        ],
+        "timeout": "12s",
+        "type": "http",
+        "urls": "https://www.example.com/",
+        "username": "test"
+      },
+      "id": "987e913f-952e-47fd-b658-68752b92360a",
+      "data_stream": {
+        "source": {
+          "dataset": "http",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "dataset": "http",
+        "type": "synthetics"
+      }
+    }
+  ]
+}

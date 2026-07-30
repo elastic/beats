@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -65,11 +64,14 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
 
-	// begin code similar to configure
-	if err = plugin.Initialize(); err != nil {
-		return nil, fmt.Errorf("error initializing plugins: %w", err)
+	if v, ok := receiverConfig["include_metadata"]; ok {
+		if include, ok := v.(bool); ok {
+			b.Info.IncludeMetadata = include
+		}
+		delete(receiverConfig, "include_metadata")
 	}
 
+	// begin code similar to configure
 	b.InputQueueSize = settings.InputQueueSize
 
 	cfOpts := []ucfg.Option{
@@ -86,14 +88,20 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	// extracting it here for ease of use
 	logger := b.Info.Logger
 
-	// if output is set and if output is not otelconsumer, inform users
-	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil { //nolint: errcheck // output will always be of map type
-		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
+	if receiverConfig["output"] != nil {
+		logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 	}
 
-	// all beatreceivers will use otelconsumer output by default
-	receiverConfig["output"] = map[string]any{
-		"otelconsumer": map[string]any{},
+	// Set the default shutdown timeout to 5s. The beat default is 1s, which can be too short for the otel pipeline.
+	switch beatSection := receiverConfig[b.Info.Beat].(type) {
+	case map[string]any:
+		if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
+			beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
+		}
+	case nil:
+		receiverConfig[b.Info.Beat] = map[string]any{
+			"shutdown_timeout": receiverPublisherCloseTimeout.String(),
+		}
 	}
 
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
@@ -102,29 +110,23 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	cfg := (*config.C)(tmp)
-	if settings.Name == "filebeat" {
-		partialConfig := struct {
-			Path paths.Path `config:"path"`
-		}{}
+	partialConfig := struct {
+		Path paths.Path `config:"path"`
+	}{}
 
-		if err := cfg.Unpack(&partialConfig); err != nil {
-			return nil, fmt.Errorf("error extracting default paths: %w", err)
-		}
-		p := paths.New()
-		if err := p.InitPaths(&partialConfig.Path); err != nil {
-			return nil, fmt.Errorf("error initializing default paths: %w", err)
-		}
-		b.Paths = p
-	} else {
-		if err := instance.InitPaths(cfg); err != nil {
-			return nil, fmt.Errorf("error initializing paths: %w", err)
-		}
-		b.Paths = paths.Paths
+	if err := cfg.Unpack(&partialConfig); err != nil {
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
+
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error initializing default paths: %w", err)
+	}
+	b.Info.Paths = p
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Paths)
+	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Info.Paths)
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -155,6 +157,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	b.RawConfig = cfg
+
+	// Periodic metrics snapshots are expensive to collect and mostly
+	// redundant under a receiver, where metrics are already exported
+	// through the otel telemetry provider. Default them off.
+	b.Config.MetricLogging = config.MustNewConfigFrom(map[string]any{"period": 0})
+
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
@@ -182,9 +190,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", b.Paths.String())
+	logger.Infof("%s", b.Info.Paths.String())
 
-	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Info.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading meta data: %w", err)
@@ -269,20 +277,16 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
-	outputFactory := b.MakeOutputFactory(b.Config.Output)
-
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
-		Paths:          b.Paths,
 	}
-	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
+	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
-	b.Registry.MustRegisterOutput(b.MakeOutputReloader(publisher.OutputReloader()))
 	b.Publisher = publisher
 
 	return b, nil

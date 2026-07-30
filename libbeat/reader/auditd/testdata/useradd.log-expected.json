@@ -1,0 +1,152 @@
+[
+  {
+    "auditd": {
+      "log": {
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/usr/sbin/groupadd",
+        "hostname": "ubuntu-bionic",
+        "id": "1004",
+        "op": "adding group to /etc/group",
+        "pid": "2940",
+        "record_type": "ADD_GROUP",
+        "result": "success",
+        "sequence": "584",
+        "ses": "14",
+        "terminal": "pts/2",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/usr/sbin/groupadd",
+        "hostname": "ubuntu-bionic",
+        "id": "1004",
+        "op": "adding group to /etc/gshadow",
+        "pid": "2940",
+        "record_type": "ADD_GROUP",
+        "result": "success",
+        "sequence": "586",
+        "ses": "14",
+        "terminal": "pts/2",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/usr/sbin/groupadd",
+        "hostname": "ubuntu-bionic",
+        "id": "1004",
+        "pid": "2940",
+        "record_type": "ADD_GROUP",
+        "result": "success",
+        "sequence": "587",
+        "ses": "14",
+        "terminal": "pts/2",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/usr/sbin/useradd",
+        "hostname": "ubuntu-bionic",
+        "id": "1004",
+        "op": "adding user",
+        "pid": "2945",
+        "record_type": "ADD_USER",
+        "result": "success",
+        "sequence": "591",
+        "ses": "14",
+        "terminal": "pts/2",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/sbin/pam_tally2",
+        "hostname": "localhost",
+        "pid": "2948",
+        "record_type": "USER_ACCT",
+        "reset": "0",
+        "result": "success",
+        "sequence": "593",
+        "ses": "14",
+        "terminal": "/dev/pts/2",
+        "uid": "1004"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "charlie",
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/usr/bin/passwd",
+        "hostname": "ubuntu-bionic",
+        "op": "PAM:chauthtok",
+        "pid": "2953",
+        "record_type": "USER_CHAUTHTOK",
+        "result": "success",
+        "sequence": "594",
+        "ses": "14",
+        "terminal": "pts/2",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/usr/bin/chfn",
+        "hostname": "ubuntu-bionic",
+        "op": "PAM:authentication",
+        "pid": "2954",
+        "record_type": "USER_AUTH",
+        "result": "success",
+        "sequence": "595",
+        "ses": "14",
+        "terminal": "pts/2",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "addr": "127.0.0.1",
+        "auid": "1000",
+        "exe": "/usr/bin/chfn",
+        "hostname": "ubuntu-bionic",
+        "op": "PAM:accounting",
+        "pid": "2954",
+        "record_type": "USER_ACCT",
+        "result": "success",
+        "sequence": "596",
+        "ses": "14",
+        "terminal": "pts/2",
+        "uid": "0"
+      }
+    }
+  }
+]

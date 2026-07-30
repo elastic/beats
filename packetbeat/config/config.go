@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,10 +43,31 @@ type Config struct {
 	IgnoreOutgoing     bool               `config:"ignore_outgoing"`
 	ShutdownTimeout    time.Duration      `config:"shutdown_timeout"`
 	OverwritePipelines bool               `config:"overwrite_pipelines"` // Only used by standalone Packetbeat.
+
+	// For internal use only
+	PublishTimeout time.Duration `config:"publish_timeout"`
+}
+
+func GetShutDownTimeOut(cfg *conf.C) (time.Duration, error) {
+	timeout := struct {
+		ShutdownTimeout time.Duration `config:"shutdown_timeout"`
+	}{
+		ShutdownTimeout: 0,
+	}
+
+	if err := cfg.Unpack(&timeout); err != nil {
+		return 0, fmt.Errorf("error reading shutdown_timeout: %w", err)
+	}
+
+	if timeout.ShutdownTimeout <= 0 {
+		timeout.ShutdownTimeout = 0
+	}
+	return timeout.ShutdownTimeout, nil
+
 }
 
 // FromStatic initializes a configuration given a config.C
-func (c Config) FromStatic(cfg *conf.C) (Config, error) {
+func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
 		return c, err

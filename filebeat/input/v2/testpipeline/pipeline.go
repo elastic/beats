@@ -18,6 +18,7 @@
 package testpipeline
 
 import (
+	"context"
 	"sync/atomic"
 	"time"
 
@@ -50,6 +51,18 @@ func NewPipelineConnectorWithError(err error) *PipelineConnector {
 // to create this connector, then a nil client and the error are returned
 func (p *PipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, error) {
 	return p.Connect()
+}
+
+// Disconnect disconnects all clients created by this PipelineConnector.
+func (p *PipelineConnector) Disconnect(ctx context.Context) error {
+	for _, client := range p.clients {
+		err := client.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Connect returns a client that publishes to this pipeline.

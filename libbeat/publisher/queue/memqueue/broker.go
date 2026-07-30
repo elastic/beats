@@ -39,7 +39,7 @@ const (
 // consists of two goroutines: runLoop, which handles all public API requests
 // and owns the buffer state, and ackLoop, which listens for acknowledgments of
 // consumed events and runs any appropriate completion handlers.
-type broker struct {
+type broker[T any] struct {
 	settings Settings
 	logger   *logp.Logger
 
@@ -48,22 +48,37 @@ type broker struct {
 
 	// The ring buffer backing the queue. All buffer positions should be taken
 	// modulo the size of this array.
-	buf []queueEntry
+	buf []queueEntry[T]
 
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
+	// ackWaitProducers tracks ack-tracking producers so their ACKWaitChan can
+	// be closed when the broker shuts down — after that the ackLoop delivers no
+	// further acks, so a producer closed with unacknowledged events would
+	// otherwise strand a waiter. Producers remove themselves once fully acked.
+	// Guarded by ackWaitMu.
+	//
+	// Note: this bookkeeping exists to satisfy the queue.Producer.ACKWaitChan
+	// contract for all queue implementations (issue #50103). The standalone
+	// (process) pipeline shutdown does not consume it — it waits on Queue.Done
+	// instead — so today it is exercised mainly by the shared-pool slabqueue
+	// path. It is kept here so the memory queue honors the same interface and
+	// is ready for callers that wait per-producer.
+	ackWaitMu        sync.Mutex
+	ackWaitProducers map[*ackProducer[T]]struct{}
+
 	// The factory used to create an event encoder when creating a producer
-	encoderFactory queue.EncoderFactory
+	encoderFactory queue.EncoderFactory[T]
 
 	///////////////////////////
 	// api channels
 
 	// Producers send requests to pushChan to add events to the queue.
-	pushChan chan pushRequest
+	pushChan chan pushRequest[T]
 
 	// Consumers send requests to getChan to read events from the queue.
-	getChan chan getRequest
+	getChan chan getRequest[T]
 
 	// Close triggers a queue close by sending to closeChan.
 	// The value sent over this channel indicates if this is a force close.
@@ -74,7 +89,7 @@ type broker struct {
 
 	// Batches sent to consumers are also collected and forwarded to ackLoop
 	// through this channel so ackLoop can monitor them for acknowledgments.
-	consumedChan chan batchList
+	consumedChan chan batchList[T]
 
 	// When batches are acknowledged, ackLoop saves any metadata needed
 	// for producer callbacks and such, then notifies runLoop that it's
@@ -90,10 +105,10 @@ type broker struct {
 	// internal goroutine state
 
 	// The goroutine that manages the queue's core run state
-	runLoop *runLoop
+	runLoop *runLoop[T]
 
 	// The goroutine that manages ack notifications and callbacks
-	ackLoop *ackLoop
+	ackLoop *ackLoop[T]
 }
 
 type Settings struct {
@@ -108,44 +123,53 @@ type Settings struct {
 	FlushTimeout time.Duration
 }
 
-type queueEntry struct {
-	event     queue.Entry
+type queueEntry[T any] struct {
+	event     T
 	eventSize int
 	id        queue.EntryID
 
-	producer   *ackProducer
+	producer   *ackProducer[T]
 	producerID producerID // The order of this entry within its producer
 }
 
-type batch struct {
-	queue *broker
+type batch[T any] struct {
+	queue *broker[T]
 
 	// Next batch in the containing batchList
-	next *batch
+	next *batch[T]
 
 	// Position and length of the events within the queue buffer
 	start, count int
 
 	// batch.Done() sends to doneChan, where ackLoop reads it and handles
-	// acknowledgment / cleanup.
+	// acknowledgment / cleanup. batch.Release() also sends to doneChan
+	// but with batchDoneMsg.cancelled=true; ackLoop captures that flag
+	// here so processACK can skip the producer ACK callback while still
+	// freeing the underlying buffer slots.
 	doneChan chan batchDoneMsg
+
+	// cancelled is set by ackLoop when this batch was Released (abandoned)
+	// rather than Done'd. Read by processACK to skip the producer ACK
+	// callback while still counting the events for deletion from the ring
+	// buffer.
+	cancelled bool
 }
 
-type batchList struct {
-	head *batch
-	tail *batch
+type batchList[T any] struct {
+	head *batch[T]
+	tail *batch[T]
 }
 
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
 // Settings object can be wrapped in a queue-agnostic interface for
 // later use by the pipeline.
-func FactoryForSettings(settings Settings) queue.QueueFactory {
+func FactoryForSettings[T any](settings Settings) queue.QueueFactory[T] {
 	return func(
 		logger *logp.Logger,
 		observer queue.Observer,
 		inputQueueSize int,
-		encoderFactory queue.EncoderFactory,
-	) (queue.Queue, error) {
+		encoderFactory queue.EncoderFactory[T],
+	) (queue.Queue[T], error) {
 		return NewQueue(logger, observer, settings, inputQueueSize, encoderFactory), nil
 	}
 }
@@ -153,13 +177,13 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
-func NewQueue(
+func NewQueue[T any](
 	logger *logp.Logger,
 	observer queue.Observer,
 	settings Settings,
 	inputQueueSize int,
-	encoderFactory queue.EncoderFactory,
-) *broker {
+	encoderFactory queue.EncoderFactory[T],
+) *broker[T] {
 	b := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 
 	// Start the queue workers
@@ -180,13 +204,13 @@ func NewQueue(
 // parameters, but doesn't start the runLoop or ackLoop workers. This
 // lets us perform more granular / deterministic tests by controlling
 // when the workers are active.
-func newQueue(
+func newQueue[T any](
 	logger *logp.Logger,
 	observer queue.Observer,
 	settings Settings,
 	inputQueueSize int,
-	encoderFactory queue.EncoderFactory,
-) *broker {
+	encoderFactory queue.EncoderFactory[T],
+) *broker[T] {
 	if observer == nil {
 		observer = queue.NewQueueObserver(nil)
 	}
@@ -207,30 +231,32 @@ func newQueue(
 	}
 
 	if logger == nil {
-		logger = logp.NewLogger("memqueue")
+		logger = logp.NewLogger("memqueue") //nolint:forbidigo // fallback logger when the caller does not provide one.
 	} else {
 		logger = logger.Named("memqueue")
 	}
 
-	b := &broker{
+	b := &broker[T]{
 		settings: settings,
 		logger:   logger,
 
-		buf: make([]queueEntry, settings.Events),
+		buf: make([]queueEntry[T], settings.Events),
 
 		encoderFactory: encoderFactory,
 
 		// broker API channels
-		pushChan:  make(chan pushRequest, chanSize),
-		getChan:   make(chan getRequest),
+		pushChan:  make(chan pushRequest[T], chanSize),
+		getChan:   make(chan getRequest[T]),
 		closeChan: make(chan bool),
 
 		// internal runLoop and ackLoop channels
-		consumedChan: make(chan batchList),
+		consumedChan: make(chan batchList[T]),
 		deleteChan:   make(chan int),
 		closingChan:  make(chan struct{}),
+
+		ackWaitProducers: make(map[*ackProducer[T]]struct{}),
 	}
-	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
+	b.ctx, b.ctxCancel = context.WithCancel(context.Background()) //nolint:gosec // G118 false positive: ctxCancel is stored on the broker and called during shutdown.
 
 	b.runLoop = newRunLoop(b, observer)
 	b.ackLoop = newACKLoop(b)
@@ -240,7 +266,7 @@ func newQueue(
 	return b
 }
 
-func (b *broker) Close(force bool) error {
+func (b *broker[T]) Close(force bool) error {
 	select {
 	case b.closeChan <- force:
 	case <-b.ctx.Done():
@@ -249,37 +275,67 @@ func (b *broker) Close(force bool) error {
 	return nil
 }
 
-func (b *broker) Done() <-chan struct{} {
+func (b *broker[T]) Done() <-chan struct{} {
 	return b.ctx.Done()
 }
 
-func (b *broker) QueueType() string {
+func (b *broker[T]) QueueType() string {
 	return QueueType
 }
 
-func (b *broker) BufferConfig() queue.BufferConfig {
+func (b *broker[T]) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
 		MaxEvents: len(b.buf),
 	}
 }
 
-func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
+func (b *broker[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
 	// If we were given an encoder factory to allow producers to encode
 	// events for output before they entered the queue, then create an
 	// encoder for the new producer.
-	var encoder queue.Encoder
+	var encoder queue.Encoder[T]
 	if b.encoderFactory != nil {
 		encoder = b.encoderFactory()
 	}
 	return newProducer(b, cfg.ACK, encoder)
 }
 
-func (b *broker) Get(count int) (queue.Batch, error) {
-	responseChan := make(chan *batch, 1)
+// registerProducer adds an ack-tracking producer to the shutdown fan-out set.
+func (b *broker[T]) registerProducer(p *ackProducer[T]) {
+	b.ackWaitMu.Lock()
+	b.ackWaitProducers[p] = struct{}{}
+	b.ackWaitMu.Unlock()
+}
+
+// unregisterProducer removes a producer from the shutdown fan-out set, called
+// once its ackWait has been closed by its own ack accounting.
+func (b *broker[T]) unregisterProducer(p *ackProducer[T]) {
+	b.ackWaitMu.Lock()
+	delete(b.ackWaitProducers, p)
+	b.ackWaitMu.Unlock()
+}
+
+// closeProducerAckWaits closes the ackWait channel of every still-registered
+// producer. Called when the queue is shutting down and the ackLoop will
+// deliver no further acks, so a producer closed with unacknowledged events
+// does not strand a waiter. Snapshots under the lock and closes outside it.
+func (b *broker[T]) closeProducerAckWaits() {
+	b.ackWaitMu.Lock()
+	producers := b.ackWaitProducers
+	b.ackWaitProducers = make(map[*ackProducer[T]]struct{})
+	b.ackWaitMu.Unlock()
+
+	for p := range producers {
+		p.forceCloseAckWait()
+	}
+}
+
+func (b *broker[T]) Get(count int) (queue.Batch[T], error) {
+	responseChan := make(chan *batch[T], 1)
 	select {
 	case <-b.ctx.Done():
 		return nil, io.EOF
-	case b.getChan <- getRequest{
+	case b.getChan <- getRequest[T]{
 		entryCount: count, responseChan: responseChan}:
 	}
 
@@ -288,29 +344,16 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	return resp, nil
 }
 
-var batchPool = sync.Pool{
-	New: func() interface{} {
-		return &batch{
-			doneChan: make(chan batchDoneMsg, 1),
-		}
-	},
+func newBatch[T any](queue *broker[T], start, count int) *batch[T] {
+	return &batch[T]{
+		queue:    queue,
+		start:    start,
+		count:    count,
+		doneChan: make(chan batchDoneMsg, 1),
+	}
 }
 
-func newBatch(queue *broker, start, count int) *batch {
-	batch := batchPool.Get().(*batch) //nolint:errcheck //safe to ignore type check
-	batch.next = nil
-	batch.queue = queue
-	batch.start = start
-	batch.count = count
-	return batch
-}
-
-func releaseBatch(b *batch) {
-	b.next = nil
-	batchPool.Put(b)
-}
-
-func (l *batchList) prepend(b *batch) {
+func (l *batchList[T]) prepend(b *batch[T]) {
 	b.next = l.head
 	l.head = b
 	if l.tail == nil {
@@ -318,7 +361,7 @@ func (l *batchList) prepend(b *batch) {
 	}
 }
 
-func (l *batchList) concat(other *batchList) {
+func (l *batchList[T]) concat(other *batchList[T]) {
 	if other.head == nil {
 		return
 	}
@@ -332,7 +375,7 @@ func (l *batchList) concat(other *batchList) {
 	l.tail = other.tail
 }
 
-func (l *batchList) append(b *batch) {
+func (l *batchList[T]) append(b *batch[T]) {
 	if l.head == nil {
 		l.head = b
 	} else {
@@ -341,22 +384,22 @@ func (l *batchList) append(b *batch) {
 	l.tail = b
 }
 
-func (l *batchList) empty() bool {
+func (l *batchList[T]) empty() bool {
 	return l.head == nil
 }
 
-func (l *batchList) front() *batch {
+func (l *batchList[T]) front() *batch[T] {
 	return l.head
 }
 
-func (l *batchList) nextBatchChannel() chan batchDoneMsg {
+func (l *batchList[T]) nextBatchChannel() chan batchDoneMsg {
 	if l.head == nil {
 		return nil
 	}
 	return l.head.doneChan
 }
 
-func (l *batchList) pop() *batch {
+func (l *batchList[T]) pop() *batch[T] {
 	ch := l.head
 	if ch != nil {
 		l.head = ch.next
@@ -369,9 +412,9 @@ func (l *batchList) pop() *batch {
 	return ch
 }
 
-func (l *batchList) reverse() {
+func (l *batchList[T]) reverse() {
 	tmp := *l
-	*l = batchList{}
+	*l = batchList[T]{}
 
 	for !tmp.empty() {
 		l.prepend(tmp.pop())
@@ -390,30 +433,53 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 	return actual
 }
 
-func (b *batch) Count() int {
+func (b *batch[T]) Count() int {
 	return b.count
 }
 
 // Return a pointer to the queueEntry for the i-th element of this batch
-func (b *batch) rawEntry(i int) *queueEntry {
+func (b *batch[T]) rawEntry(i int) *queueEntry[T] {
 	// Indexes wrap around the end of the queue buffer
 	return &b.queue.buf[(b.start+i)%len(b.queue.buf)]
 }
 
 // Return the event referenced by the i-th element of this batch
-func (b *batch) Entry(i int) queue.Entry {
+func (b *batch[T]) Entry(i int) T {
 	return b.rawEntry(i).event
 }
 
-func (b *batch) FreeEntries() {
+func (b *batch[T]) FreeEntries() {
 	// This signals that the event data has been copied out of the batch, and is
 	// safe to free from the queue buffer, so set all the event pointers to nil.
+	var empty T
 	for i := 0; i < b.count; i++ {
 		index := (b.start + i) % len(b.queue.buf)
-		b.queue.buf[index].event = nil
+		b.queue.buf[index].event = empty
 	}
 }
 
-func (b *batch) Done() {
+func (b *batch[T]) Done() {
 	b.doneChan <- batchDoneMsg{}
+}
+
+// Release signals that the consumer is abandoning this batch — used by the
+// pipeline on shutdown when a batch has been read from the queue but
+// cannot be delivered. It removes the batch from ackLoop's pending list
+// (so subsequent batches' ACKs are not stalled behind it) and frees the
+// in-buffer slots, but does NOT fire producer ACK callbacks. This matches
+// memqueue's existing behaviour for batches abandoned by the consumer
+// not calling Done at all — except by making it explicit we also unblock
+// the ackLoop, which otherwise would sit forever on this batch's
+// doneChan and stall every batch queued behind it.
+//
+// Caller contract — IMPORTANT: see queue.Batch.Release. Release must
+// only be invoked when no further batches from the same producer will
+// be Done()'d; in this repo that means it is only safe from a
+// pipeline-wide shutdown path. Calling Release mid-flight leaves a
+// hole in the producer's ACK accounting (lastACK is not advanced past
+// the abandoned producer IDs by design, so a subsequent Done from the
+// same producer would over-count and falsely advance the input
+// registry).
+func (b *batch[T]) Release() {
+	b.doneChan <- batchDoneMsg{cancelled: true}
 }

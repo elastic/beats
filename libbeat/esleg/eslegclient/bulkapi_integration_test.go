@@ -30,9 +30,9 @@ func TestBulk(t *testing.T) {
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	ops := []map[string]interface{}{
+	ops := []map[string]any{
 		{
-			"index": map[string]interface{}{
+			"index": map[string]any{
 				"_index": index,
 				"_id":    "1",
 			},
@@ -42,7 +42,7 @@ func TestBulk(t *testing.T) {
 		},
 	}
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 	for _, op := range ops {
 		body = append(body, op)
 	}
@@ -76,7 +76,7 @@ func TestEmptyBulk(t *testing.T) {
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -94,9 +94,9 @@ func TestBulkMoreOperations(t *testing.T) {
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	ops := []map[string]interface{}{
+	ops := []map[string]any{
 		{
-			"index": map[string]interface{}{
+			"index": map[string]any{
 				"_index": index,
 				"_id":    "1",
 			},
@@ -106,14 +106,14 @@ func TestBulkMoreOperations(t *testing.T) {
 		},
 
 		{
-			"delete": map[string]interface{}{
+			"delete": map[string]any{
 				"_index": index,
 				"_id":    "2",
 			},
 		},
 
 		{
-			"create": map[string]interface{}{
+			"create": map[string]any{
 				"_index": index,
 				"_id":    "3",
 			},
@@ -123,19 +123,19 @@ func TestBulkMoreOperations(t *testing.T) {
 		},
 
 		{
-			"update": map[string]interface{}{
+			"update": map[string]any{
 				"_id":    "1",
 				"_index": index,
 			},
 		},
 		{
-			"doc": map[string]interface{}{
+			"doc": map[string]any{
 				"field2": "value2",
 			},
 		},
 	}
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 	for _, op := range ops {
 		body = append(body, op)
 	}

@@ -136,6 +136,9 @@ func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
 	if !fi.ts.IsZero() {
 		return fi.ts
 	}
+	if len(fi.path) < len(s.format) {
+		return time.Time{}
+	}
 	fileTs := fi.path[len(fi.path)-len(s.format):]
 
 	ts, err := time.Parse(s.format, fileTs)
@@ -196,7 +199,12 @@ type copyTruncateFileProspector struct {
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
-func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *copyTruncateFileProspector) Run(
+	ctx input.Context,
+	s loginp.StateMetadataUpdater,
+	hg loginp.HarvesterGroup,
+	metrics *loginp.Metrics,
+) {
 	log := ctx.Logger.With("prospector", copyTruncateProspectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
@@ -205,14 +213,14 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 
 	var tg unison.MultiErrGroup
 
+	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+
 	tg.Go(func() error {
-		p.filewatcher.Run(ctx.Cancelation)
+		p.filewatcher.Run(ctx.Cancelation, metrics, p.ignoreOlder, ignoreInactiveSince)
 		return nil
 	})
 
 	tg.Go(func() error {
-		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 
@@ -221,8 +229,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
-
+			p.onFSEvent(loggerWithEvent(log, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
@@ -233,24 +240,17 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 	}
 }
 
-func (p *copyTruncateFileProspector) onFSEvent(
-	log *logp.Logger,
-	ctx input.Context,
-	event loginp.FSEvent,
-	src loginp.Source,
-	updater loginp.StateMetadataUpdater,
-	group loginp.HarvesterGroup,
-	ignoreSince time.Time,
-) {
+func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
-		if event.Op == loginp.OpCreate {
+		switch event.Op {
+		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
-		} else if event.Op == loginp.OpWrite {
+		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
 
-		if p.fileProspector.isFileIgnored(log, event, ignoreSince) {
+		if p.isFileIgnored(log, event, ignoreSince) {
 			return
 		}
 
@@ -266,7 +266,6 @@ func (p *copyTruncateFileProspector) onFSEvent(
 			log.Debugf("File %s is rotated", event.NewPath)
 
 			p.onRotatedFile(log, ctx, event, src, group)
-
 		} else {
 			log.Debugf("File %s is original", event.NewPath)
 			// if file is original, add it to the bookeeper
@@ -287,7 +286,7 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	case loginp.OpDelete:
 		log.Debugf("File %s has been removed", event.OldPath)
 
-		p.fileProspector.onRemove(log, event, src, updater, group)
+		p.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
@@ -299,10 +298,10 @@ func (p *copyTruncateFileProspector) onFSEvent(
 			p.onRotatedFile(log, ctx, event, src, group)
 		}
 
-		p.fileProspector.onRename(log, ctx, event, src, updater, group)
+		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unknown return value %v", event.Op)
+		log.Errorf("Unknown return value %v", event.Op)
 	}
 }
 
@@ -310,13 +309,7 @@ func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
 	return p.rotatedSuffix.MatchString(event.NewPath)
 }
 
-func (p *copyTruncateFileProspector) onRotatedFile(
-	log *logp.Logger,
-	ctx input.Context,
-	fe loginp.FSEvent,
-	src loginp.Source,
-	hg loginp.HarvesterGroup,
-) {
+func (p *copyTruncateFileProspector) onRotatedFile(log *logp.Logger, ctx input.Context, fe loginp.FSEvent, src loginp.Source, hg loginp.HarvesterGroup) {
 	// Continue reading the rotated file from where we have left off with the original.
 	// The original will be picked up again when updated and read from the beginning.
 	originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.NewPath, "")

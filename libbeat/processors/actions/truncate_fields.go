@@ -83,7 +83,7 @@ func NewTruncateFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 	var backup *beat.Event
-	if f.config.FailOnError {
+	if f.config.FailOnError && len(f.config.Fields) > 1 {
 		backup = event.Clone()
 	}
 
@@ -92,7 +92,9 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Failed to truncate fields: %s", err)
 			if f.config.FailOnError {
-				event = backup
+				if backup != nil {
+					event = backup
+				}
 				return event, err
 			}
 		}

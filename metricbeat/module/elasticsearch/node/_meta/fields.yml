@@ -4,10 +4,6 @@
     node
   release: ga
   fields:
-    - name: version
-      type: keyword
-      description: >
-        Node version.
     - name: jvm
       type: group
       description: >

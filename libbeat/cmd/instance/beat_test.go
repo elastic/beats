@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -514,10 +515,6 @@ func (m mockManager) Status() status.Status                         { return sta
 func (m mockManager) Stop()                                         {}
 func (m mockManager) UnregisterAction(action management.Action)     {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
-func (m mockManager) WaitForStop(_ time.Duration) bool {
-	m.Stop()
-	return true
-}
 
 func TestManager(t *testing.T) {
 	// set the mockManger factory.
@@ -586,4 +583,41 @@ func TestMultipleLoadMeta(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+
+// TestRunShutdownWatchdogPromptReturn verifies that when Run returns promptly
+// (runReturned is closed) the watchdog returns without disconnecting.
+func TestRunShutdownWatchdogPromptReturn(t *testing.T) {
+	runReturned := make(chan struct{})
+	close(runReturned)
+
+	var disconnected atomic.Bool
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		// A long grace: it must not be reached because runReturned is closed.
+		runShutdownWatchdog(runReturned, time.Hour, func() { disconnected.Store(true) })
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(10 * time.Second):
+		t.Fatal("watchdog did not return after Run returned")
+	}
+	assert.False(t, disconnected.Load(), "watchdog must not disconnect when Run returns promptly")
+}
+
+// TestRunShutdownWatchdogTimeoutDisconnects verifies that when Run does not
+// return within the grace period the watchdog disconnects the pipeline.
+func TestRunShutdownWatchdogTimeoutDisconnects(t *testing.T) {
+	runReturned := make(chan struct{}) // never closed: simulates a hung beater
+
+	disconnected := make(chan struct{})
+	go runShutdownWatchdog(runReturned, time.Millisecond, func() { close(disconnected) })
+
+	select {
+	case <-disconnected:
+	case <-time.After(10 * time.Second):
+		require.Fail(t, "watchdog must disconnect the pipeline when Run does not return within the grace period")
+	}
 }

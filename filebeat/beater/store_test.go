@@ -36,11 +36,11 @@ func testOpenStore(t *testing.T, dir string) *filebeatStore {
 	beatPaths := paths.New()
 	beatPaths.Data = dir
 
-	store, err := openStateStore(t.Context(), beat.Info{Beat: "test"}, logp.NewNopLogger(), config.Registry{
+	store, err := openStateStore(t.Context(), beat.Info{Beat: "test", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
 		Path:          "",
 		Permissions:   0600,
 		CleanInterval: 5 * time.Second,
-	}, beatPaths)
+	})
 	require.NoError(t, err)
 	return store
 }
@@ -121,7 +121,7 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 
 	// Open stores concurrently
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go func(i int) {
 			defer wg.Done()
 			stores[i] = testOpenStore(t, dir)
@@ -140,7 +140,7 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 
 	// Close all concurrently
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go func(i int) {
 			defer wg.Done()
 			stores[i].Close()

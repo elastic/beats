@@ -101,7 +101,7 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		}
 
 		switch vv := v.(type) {
-		case map[string]interface{}, []interface{}, mapstr.M:
+		case map[string]any, []any, mapstr.M:
 			return makeErrNonScalarField(k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.

@@ -239,12 +239,12 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[strin
 
 	if err != nil {
 		err = fmt.Errorf("failed applying cluster settings schema %w", err)
-		events.LogAndSendErrorEventWithRandomTransactionId(err, info, r, ClusterSettingsMetricSet, ClusterSettingsPath)
+		events.LogAndSendErrorEventWithoutTransactionId(err, info, r, ClusterSettingsMetricSet, ClusterSettingsPath)
 		return nil
 	}
 
 	// Flatten settings with precedence: transient > persistent > defaults
-	r.Event(events.CreateEventWithRandomTransactionId(info, flattenSettings(metricSetFields)))
+	r.Event(events.CreateEventWithoutTransactionId(info, flattenSettings(metricSetFields)))
 
 	return nil
 }

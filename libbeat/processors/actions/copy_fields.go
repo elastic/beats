@@ -70,18 +70,20 @@ func NewCopyFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
 	var backup *beat.Event
-	if f.config.FailOnError {
+	if f.config.FailOnError && len(f.config.Fields) > 1 {
 		backup = event.Clone()
 	}
 
 	for _, field := range f.config.Fields {
 		err := f.copyField(field.From, field.To, event)
 		if err != nil {
-			errMsg := fmt.Errorf("Failed to copy fields in copy_fields processor: %w", err)
+			errMsg := fmt.Errorf("failed to copy fields in copy_fields processor: %w", err)
 			f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 			if f.config.FailOnError {
-				event = backup
+				if backup != nil {
+					event = backup
+				}
 				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
@@ -119,15 +121,15 @@ func (f *copyFields) String() string {
 // cloneValue returns a shallow copy of a map. All other types are passed
 // through in the return. This should be used when making straight copies of
 // maps without doing any type conversions.
-func cloneValue(value interface{}) interface{} {
+func cloneValue(value any) any {
 	switch v := value.(type) {
 	case mapstr.M:
 		return v.Clone()
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(v).Clone()
-	case []interface{}:
+	case []any:
 		len := len(v)
-		newArr := make([]interface{}, len)
+		newArr := make([]any, len)
 		for idx, val := range v {
 			newArr[idx] = cloneValue(val)
 		}

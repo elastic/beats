@@ -16,7 +16,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -267,12 +266,10 @@ func CheckEventWithTransactionId(t *testing.T, event mb.Event, info utils.Cluste
 	require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transaction_id"))
 }
 
-func CheckEventWithRandomTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo) {
+func CheckEventWithoutTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo) {
 	CheckEvent(t, event, info)
 
-	// valid, random UUID
-	_, err := uuid.FromString(GetObjectValue(event.ModuleFields, "transaction_id").(string))
-	require.NoError(t, err)
+	require.Nil(t, GetObjectValue(event.ModuleFields, "transaction_id"))
 }
 
 func CheckAllEventsUseSameTransactionId(t *testing.T, events []mb.Event) {

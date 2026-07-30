@@ -74,19 +74,12 @@ func NewDecodeBase64Field(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	// Creates a copy of the event to revert in case of failure
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
 	err := f.decodeField(event)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %w", err)
 		f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 		if f.config.FailOnError {
-			event = backup
 			_, _ = event.PutValue("error.message", errMsg.Error())
 			return event, err
 		}

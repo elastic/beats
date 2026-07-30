@@ -33,13 +33,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/k8skeystore"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/k8skeystore"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -96,6 +97,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("kubernetes")
 
@@ -125,7 +127,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -373,7 +375,7 @@ func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Conte
 	}()
 }
 
-func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+func ShouldPut(event mapstr.M, field string, value any, logger *logp.Logger) {
 	_, err := event.Put(field, value)
 	if err != nil {
 		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)

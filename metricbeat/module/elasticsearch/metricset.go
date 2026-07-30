@@ -211,6 +211,36 @@ func (m *MetricSet) GetMasterNodeID() (string, error) {
 	return "", errors.New("could not determine master node ID")
 }
 
+// NodeEnrichment captures the per-node identifying details that other metricsets
+// attach to per-node events so consumers can slice by name, role, or version
+// without joining across data streams. Version is included so dashboards can
+// segment behavior across rolling upgrades.
+type NodeEnrichment struct {
+	Name    string   `json:"name"`
+	Roles   []string `json:"roles"`
+	Version string   `json:"version,omitempty"`
+}
+
+// GetNodesEnrichment returns a map keyed by node ID with name, roles, and
+// version for every node in the cluster. It uses a single filter-path-scoped
+// /_nodes call and is intended to be invoked once per Fetch, with the result
+// reused across all per-node events emitted in that scrape.
+func (m *MetricSet) GetNodesEnrichment() (map[string]NodeEnrichment, error) {
+	content, err := fetchPath(m.HTTP, m.GetServiceURI(), "_nodes/_all",
+		"filter_path=nodes.*.name,nodes.*.roles,nodes.*.version")
+	if err != nil {
+		return nil, err
+	}
+
+	var response struct {
+		Nodes map[string]NodeEnrichment `json:"nodes"`
+	}
+	if err := json.Unmarshal(content, &response); err != nil {
+		return nil, err
+	}
+	return response.Nodes, nil
+}
+
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func (m *MetricSet) IsMLockAllEnabled(nodeID string) (bool, error) {
 	resetURI := m.GetServiceURI()
