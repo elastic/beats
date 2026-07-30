@@ -7,16 +7,8 @@
 
 **All**
 
-* Introduce `wait_for_metadata` and `wait_for_metadata_timeout` and `wait_for_metadata_retry_period` settings to `add_kubernetes_metadata` processor to allow waiting for Kubernetes API availability before processing events. [#50509](https://github.com/elastic/beats/pull/50509) 
+* Introduce `wait_for_metadata`, `wait_for_metadata_timeout`, and `wait_for_metadata_retry_period` settings to `add_kubernetes_metadata` processor to allow waiting for Kubernetes API availability before processing events. [#50509](https://github.com/elastic/beats/pull/50509) 
 * Retry connecting to Docker in `add_docker_metadata` when the initial connection attempt fails. [#50595](https://github.com/elastic/beats/pull/50595) 
-
-  The `add_docker_metadata` processor now retries connecting to Docker at
-  startup until `wait_for_metadata_timeout` expires. The timeout defaults to
-  30s and includes the initial connection attempt. Set `wait_for_metadata` to
-  true to block startup until Docker metadata is available. Set
-  `wait_for_metadata_timeout` to 0 to retry indefinitely. Configure retry
-  cadence with `wait_for_metadata_retry_period`.
-  
 * Improve Beats shutdown to wait for in-flight events to be acknowledged before stopping. [#51136](https://github.com/elastic/beats/pull/51136) 
 
 **Auditbeat**
@@ -26,8 +18,8 @@
 
 **Beats**
 
-* Add slabqueue, a new in-memory publisher queue that shares a single event budget across multiple pipelines while keeping per-pipeline FIFOs isolated. Selectable via queue.slab (~2.5× throughput vs queue.mem in stress tests); used by default in Beat receivers to support multi-receiver intake queue sharing. [#51047](https://github.com/elastic/beats/pull/51047) 
-* Disable periodic metrics logging (`logging.metrics`) by default when a beat runs as an OTel Collector receiver. [#51711](https://github.com/elastic/beats/pull/51711) 
+* Add `slabqueue`, a new in-memory publisher queue that shares a single event budget across multiple pipelines while keeping per-pipeline FIFOs isolated. Selectable via queue.slab (~2.5× throughput versus `queue.mem` in stress tests). Used by default in Beat receivers to support multi-receiver intake queue sharing. [#51047](https://github.com/elastic/beats/pull/51047) 
+* Turn off periodic metrics logging (`logging.metrics`) by default when a beat runs as an OTel Collector receiver. [#51711](https://github.com/elastic/beats/pull/51711) 
 
 **Filebeat**
 
@@ -39,33 +31,11 @@
   
 * Add Jamf provider support for entity analytics minimal-state mode. [#50445](https://github.com/elastic/beats/pull/50445) 
 * Add auditd filestream parser that populates auditd.log.* fields using go-libaudit. [#50791](https://github.com/elastic/beats/pull/50791) 
-* Add entcollect adapter for entity analytics minimal state providers. [#49871](https://github.com/elastic/beats/pull/49871) 
-
-  Add adapter infrastructure to bridge the entcollect library into the
-  entity analytics input. This includes a kvstore transaction-to-store
-  adapter, a document-to-beat.Event publisher closure, a minimal state
-  provider registry, and a generic sync loop with timer, buffering, and
-  ACK-then-commit semantics.
-  
-* Add entcollect store adapter to the Elasticsearch storage OTel extension. [#49871](https://github.com/elastic/beats/pull/49871) 
+* Add `entcollect store adapter to the Elasticsearch storage OTel extension. [#49871](https://github.com/elastic/beats/pull/49871) 
 * Filestream: include_file_fingerprint controls log.file.fingerprint in events. [#50129](https://github.com/elastic/beats/pull/50129) [#50724](https://github.com/elastic/beats/issues/50724)
-
-  Add an `include_file_fingerprint` option (default: `true`) to the filestream
-  input. By default `log.file.fingerprint` is included in published events when
-  `file_identity.fingerprint` is configured, preserving the previous behaviour.
-  Set `include_file_fingerprint: false` to omit the field and reduce network,
-  indexing, and storage costs at scale. A still-growing fingerprint is never
-  added to events; only the completed SHA-256 is published.
-  
 * Add minimal-state Active Directory entity analytics provider. [#50601](https://github.com/elastic/beats/pull/50601) [#49162](https://github.com/elastic/beats/issues/49162)
 * Add minimal-state Okta entity analytics provider with bulk-fetch group enrichment. [#50685](https://github.com/elastic/beats/pull/50685) 
 * Add minimal-state mode for the EntraID entity analytics provider. [#50773](https://github.com/elastic/beats/pull/50773) 
-
-  The EntraID (Azure AD) entity analytics provider now supports
-  use_minimal_state: true, replacing persistent entity and group graph
-  storage with delta-query-based sync and in-memory transitive group
-  membership computation.
-  
 * Add Enhanced Fingerprint mode to the filestream input&#39;s `fingerprint` file identity.
 When enabled (`file_identity.fingerprint.growing: true`, the default), files smaller
 than `prospector.scanner.fingerprint.offset &#43; prospector.scanner.fingerprint.length`
