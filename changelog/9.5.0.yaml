@@ -681,7 +681,8 @@ entries:
         errors, poison-pill messages), filters out context.Canceled from shutdown/reload,
         and clears Degraded only when the specific causing condition resolves.
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/51819
       issue:
         - https://github.com/elastic/beats/issues/51692
       impact: ""
@@ -698,7 +699,8 @@ entries:
         failures stay Running, sustained failures degrade with condition-specific
         messages, and context cancellation from shutdown is suppressed.
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/52001
       issue:
         - https://github.com/elastic/beats/issues/51692
       impact: ""
@@ -711,7 +713,8 @@ entries:
       summary: Add configurable User-Agent header to the CrowdStrike streaming input.
       description: ""
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/51822
       issue: []
       impact: ""
       action: ""
@@ -723,7 +726,8 @@ entries:
       summary: Reduce filestream scanner per-scan memory allocations for large idle file sets
       description: ""
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/51863
       issue: []
       impact: ""
       action: ""
@@ -739,7 +743,8 @@ entries:
         and reprocessed indefinitely. Exclude keys matching the backup prefix
         from listing results when the backup destination is the same bucket.
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/51912
       issue: []
       impact: ""
       action: ""
@@ -751,7 +756,8 @@ entries:
       summary: Fix panic with multiple heartbeat receivers
       description: ""
       component: heartbeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/52010
       issue: []
       impact: ""
       action: ""
@@ -777,7 +783,8 @@ entries:
       summary: Upgrade to go 1.26.5
       description: ""
       component: all
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/51873
       issue: []
       impact: ""
       action: ""
@@ -789,7 +796,8 @@ entries:
       summary: Use a stable status message for SQS receive errors to prevent update churn during sustained outages.
       description: ""
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/52059
       issue: []
       impact: ""
       action: ""
@@ -801,7 +809,8 @@ entries:
       summary: Do not mark the CEL input's health as degraded when the maximum executions is exceeded.
       description: ""
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/52060
       issue: []
       impact: ""
       action: ""
@@ -813,7 +822,8 @@ entries:
       summary: Pass configured HTTP transport to Okta minimal-state provider for TLS support.
       description: ""
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/52062
       issue: []
       impact: ""
       action: ""
@@ -825,7 +835,8 @@ entries:
       summary: Honor the configured language when rendering Windows events
       description: ""
       component: filebeat
-      pr: []
+      pr:
+        - https://github.com/elastic/beats/pull/52094
       issue:
         - https://github.com/elastic/sdh-beats/issues/7332
       impact: ""
