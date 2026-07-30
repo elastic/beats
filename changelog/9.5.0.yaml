@@ -859,3 +859,123 @@ entries:
       file:
         name: 1784565082-fix-nil-rundone-channel.yaml
         checksum: 0d61daeca4e2c358d252ce4666c7c6de1945fd5b
+    - kind: feature
+      summary: Add entcollect adapter for entity analytics minimal state providers.
+      description: |
+        Add adapter infrastructure to bridge the entcollect library into the
+        entity analytics input. This includes a kvstore transaction-to-store
+        adapter, a document-to-beat.Event publisher closure, a minimal state
+        provider registry, and a generic sync loop with timer, buffering, and
+        ACK-then-commit semantics.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49871
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775095457
+      file:
+        name: 1775095457-entity-analytics-entcollect-adapter.yaml
+        checksum: 00bce16e3d05e15f774e62621ccb6a36e5492901
+    - kind: enhancement
+      summary: harden osquerybeat RRULE scheduler reload, RRULE osqueryd rendering, splay limits, and pack schedule metadata
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/48767
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775587200
+      file:
+        name: 1775587200-osquerybeat-schedule-config-hardening.yaml
+        checksum: d83cd0093b48394fcc3a64fade83617ed721be90
+    - kind: feature
+      summary: Add entcollect store adapter to the Elasticsearch storage OTel extension.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49871
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775685154
+      file:
+        name: 1775685154-add-entcollect-store-adapter.yaml
+        checksum: 899126f5cc1412f45bea564c8e7dd5204459644a
+    - kind: bug-fix
+      summary: Fix aws-s3 input silently dropping events when a parser clears the message content
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52077
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784536512
+      file:
+        name: 1784536512-fix-awss3-readfile-drops-parser-fields.yaml
+        checksum: 136fa49521cb2499adea260f75141e5926b1b790
+    - kind: enhancement
+      summary: Remove Authorization headers from CEL, Entity Analytics, HTTP Endpoint, and HTTP JSON input request trace logs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52224
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784758682
+      file:
+        name: 1784758682-no-auth-trace-logs.yaml
+        checksum: 7d928aec539472fc6ba31c95fa120cdda0b9cce7
+    - kind: bug-fix
+      summary: Fix journald input facility filters on journalctl older than 245
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52231
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784830745
+      file:
+        name: 1784830745-journald-facility-old-journalctl.yaml
+        checksum: f518a6080a2132a71374977ac09b36d60666d302
+    - kind: bug-fix
+      summary: The journald input now reports a Degraded status when journalctl repeatedly exits without delivering any data, instead of staying Healthy while collecting no events
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52232
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784830987
+      file:
+        name: 1784830987-journald-degraded-on-restart-loop.yaml
+        checksum: be7de189ea21eeed3e64a683bbe5f9ebe839326c
+    - kind: bug-fix
+      summary: Accept osquery packs mixing interval-scheduled and unscheduled queries again
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/52242
+      issue:
+        - https://github.com/elastic/beats/issues/51450
+      impact: ""
+      action: ""
+      timestamp: 1784900000
+      file:
+        name: 1784900000-osquerybeat-allow-native-unscheduled-pack-mix.yaml
+        checksum: fb93687c721de1a3dfd16d28bbfb9a08d606fa5c
+    - kind: bug-fix
+      summary: Fix TCP and UDP inputs hanging during shutdown
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52292
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1785228000
+      file:
+        name: 1785228000-fix-net-input-shutdown-hang.yaml
+        checksum: 67d3c5c14257923cf8d826b7392da777cddb76f6
