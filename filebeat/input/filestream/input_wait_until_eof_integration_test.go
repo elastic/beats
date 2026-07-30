@@ -173,13 +173,11 @@ func TestWaitUntilEOF_gzipFile(t *testing.T) {
 		waitEOFTimeout, 1*time.Second)
 }
 
-// TestWaitUntilEOF_fileDeletedDuringReadUntilEOF deletes the file after
-// readUntilEOF mode has started, and asserts the reader continues to drain
-// the fd to EOF — the Linux fd-still-readable semantic. It runs with
-// close.on_state_change.removed=true to also exercise 'periodicStateCheck'
-// must have been stopped by startReadUntilEOF before the deletion, otherwise it
-// would cancel the swapped-in readerCtx when it next ticked and the readUntilEOF
-// mode would be aborted before reading the remaining bytes.
+// TestWaitUntilEOF_fileDeletedDuringReadUntilEOF deletes the file after the
+// read_until_eof drain has started and asserts the reader continues to drain the
+// fd to EOF (the Linux fd-still-readable semantic). It runs with
+// close.on_state_change.removed=true to confirm that detecting the removal does
+// not abort the drain before the remaining bytes are read.
 //
 // Restricted to non-Windows because Windows file-deletion semantics
 // (sharing modes, delete-on-close) differ.
@@ -312,6 +310,61 @@ func TestWaitUntilEOF_timeout(t *testing.T) {
 
 	assert.Len(t, env.pipeline.GetAllEvents(), wantEvents,
 		"unexpected number of events published")
+}
+
+// TestWaitUntilEOF_sliceBudgetDrainsToEOF verifies that, with a slice time
+// budget active (here via harvester_limit), a read_until_eof drain slice that
+// yields on its budget with data still unread keeps reading to EOF instead of
+// tearing the source down mid-file, so every event is published.
+//
+// The reader is deterministically forced to yield on budget rather than at EOF:
+// it is blocked in Publish (SetAllowedEvents(1)) when the input is cancelled and
+// the drain begins, then held there past its 1ms budget deadline before being
+// unblocked, so the resumed slice reports SliceBudget with events still unread.
+func TestWaitUntilEOF_sliceBudgetDrainsToEOF(t *testing.T) {
+	prefix := strings.Repeat("a", 1024)
+	events := 10
+	logGen := testingintegration.NewJSONGenerator(prefix)
+	_, files := testingintegration.GenerateLogFiles(t, 1, events, logGen)
+	path := files[0]
+
+	env := newInputTestingEnvironment(t)
+	id := "TestWaitUntilEOF_sliceBudgetDrainsToEOF"
+	waitEOFTimeout := 30 * time.Second
+	inp := env.mustCreateInput(map[string]any{
+		"id":                     id,
+		"paths":                  []string{path},
+		"read_until_eof.timeout": waitEOFTimeout,
+		"close.reader.on_eof":    true,
+		// harvester_limit > 0 activates the slice time budget (sliceBudget =
+		// close.on_state_change.check_interval); 1ms makes it tiny so a slice held
+		// past its deadline yields on budget with data still unread.
+		"harvester_limit":                      1,
+		"close.on_state_change.check_interval": "1ms",
+	})
+
+	env.pipeline.SetAllowedEvents(1) // publish event 1, then block on event 2
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	// Event 1 is published; the reader is now blocked publishing event 2.
+	env.waitUntilEventCount(1)
+
+	cancelInput()
+
+	// Wait until the drain has begun (g.draining is set) so the still-blocked
+	// read, once unblocked, resumes past its 1ms budget deadline.
+	env.WaitLogsContains(fmt.Sprintf("input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first", waitEOFTimeout),
+		10*time.Second, "readUntilEOF drain did not start")
+	time.Sleep(50 * time.Millisecond) // let the 1ms slice budget lapse while the read is blocked
+
+	env.pipeline.UnblockClients()
+
+	// The drain must read past the budget yield to real EOF and publish everything.
+	env.waitUntilEventCount(events)
+	env.WaitLogsContains("read_until_eof enabled, EOF reached. closing input",
+		waitEOFTimeout, "drain did not reach EOF")
 }
 
 // TestWaitUntilEOF_disabled exercises the opt-out: with
