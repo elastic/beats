@@ -107,11 +107,7 @@ func TestInput(t *testing.T) {
 			checkMatchingHeaders(t, event, msg.headers)
 
 			// emulating the pipeline (kafkaInput.Run)
-			meta, ok := event.Private.(eventMeta)
-			if !ok {
-				t.Fatal("could not get eventMeta and ack the message")
-			}
-			meta.ackHandler()
+			ackEventPrivate(event.Private)
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
@@ -398,11 +394,7 @@ func TestSASLAuthentication(t *testing.T) {
 					checkMatchingHeaders(t, event, msg.headers)
 
 					// emulating the pipeline (kafkaInput.Run)
-					meta, ok := event.Private.(eventMeta)
-					if !ok {
-						t.Fatal("could not get eventMeta and ack the message")
-					}
-					meta.ackHandler()
+					ackEventPrivate(event.Private)
 				case <-timeout:
 					t.Fatal("timeout waiting for incoming events")
 				}
