@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Fix a leader election data race and wait for lease release on shutdown.
+
+component: libbeat

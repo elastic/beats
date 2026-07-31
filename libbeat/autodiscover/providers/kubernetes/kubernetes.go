@@ -22,6 +22,7 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -86,6 +87,7 @@ type eventerManager struct {
 type leaderElectionManager struct {
 	leaderElection       leaderelection.LeaderElectionConfig
 	cancelLeaderElection context.CancelFunc
+	electorWg            sync.WaitGroup
 	logger               *logp.Logger
 }
 
@@ -287,8 +289,13 @@ func NewLeaderElectionManager(
 		Namespace: ns,
 	}
 
-	var eventID string
-	leaseId := lease.Name + "-" + lease.Namespace
+	// The elector calls OnStartedLeading and OnStoppedLeading from different
+	// goroutines, so eventID needs a lock to pass the current term's ID between them.
+	var (
+		eventMu sync.Mutex
+		eventID string
+	)
+	leaseID := lease.Name + "-" + lease.Namespace
 	lem.leaderElection = leaderelection.LeaderElectionConfig{
 		Lock: &resourcelock.LeaseLock{
 			LeaseMeta: lease,
@@ -303,13 +310,19 @@ func NewLeaderElectionManager(
 		RetryPeriod:     cfg.RetryPeriod,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
-				eventID = fmt.Sprintf("%v-%v", leaseId, time.Now().UnixNano())
-				logger.Debugf("leader election lock GAINED, holder: %v, eventID: %v", id, eventID)
-				startLeading(uuid.String(), eventID)
+				startedID := fmt.Sprintf("%v-%v", leaseID, time.Now().UnixNano())
+				eventMu.Lock()
+				eventID = startedID
+				eventMu.Unlock()
+				logger.Debugf("leader election lock GAINED, holder: %v, eventID: %v", id, startedID)
+				startLeading(uuid.String(), startedID)
 			},
 			OnStoppedLeading: func() {
-				logger.Debugf("leader election lock LOST, holder: %v, eventID: %v", id, eventID)
-				stopLeading(uuid.String(), eventID)
+				eventMu.Lock()
+				stoppedID := eventID
+				eventMu.Unlock()
+				logger.Debugf("leader election lock LOST, holder: %v, eventID: %v", id, stoppedID)
+				stopLeading(uuid.String(), stoppedID)
 			},
 		},
 	}
@@ -344,6 +357,8 @@ func (p *leaderElectionManager) Start() {
 func (p *leaderElectionManager) Stop() {
 	if p.cancelLeaderElection != nil {
 		p.cancelLeaderElection()
+		// Wait so ReleaseOnCancel can release the lease before shutdown continues.
+		p.electorWg.Wait()
 	}
 }
 
@@ -358,10 +373,13 @@ func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Conte
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
 		p.logger.Errorf("error while creating Leader Elector: %v", err)
+		return
 	}
 	p.logger.Debugf("Starting Leader Elector")
 
+	p.electorWg.Add(1)
 	go func() {
+		defer p.electorWg.Done()
 		for {
 			le.Run(ctx)
 			select {
