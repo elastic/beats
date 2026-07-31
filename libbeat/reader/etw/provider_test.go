@@ -84,7 +84,7 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 		// Calculate size needed for the provider name string
 		nameSize := (len(utf16ProviderName) + 1) * 2 // +1 for null-terminator
 
-		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{}) + uintptr(nameSize))
+		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{}) + uintptr(nameSize)) //nolint:gosec // G115: test buffer size is a small fixed layout
 		if *pBufferSize < requiredSize {
 			*pBufferSize = requiredSize
 			return ERROR_INSUFFICIENT_BUFFER
@@ -137,7 +137,7 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 		// Calculate size needed for the provider name string
 		nameSize := (len(utf16ProviderName) + 1) * 2 // +1 for null-terminator
 
-		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{}) + uintptr(nameSize))
+		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{}) + uintptr(nameSize)) //nolint:gosec // G115: test buffer size is a small fixed layout
 		if *pBufferSize < requiredSize {
 			*pBufferSize = requiredSize
 			return ERROR_INSUFFICIENT_BUFFER

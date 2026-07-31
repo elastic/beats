@@ -116,12 +116,12 @@ func (q *Query) GetCounterPaths(counterPath string) ([]string, error) {
 		return paths, err
 	}
 	//check if Windows installed language is not ENG, the ExpandWildCardPath will return either one of the errors below.
-	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
+	if errors.Is(err, PDH_CSTATUS_NO_OBJECT) || errors.Is(err, PDH_CSTATUS_NO_COUNTER) {
 		handle, err := q.AddEnglishCounter(counterPath)
 		if err != nil {
 			return nil, err
 		}
-		defer PdhRemoveCounter(handle)
+		defer func() { _ = PdhRemoveCounter(handle) }()
 		info, err := PdhGetCounterInfo(handle)
 		if err != nil {
 			return nil, err
@@ -187,10 +187,10 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
 	counters, instances, err := PdhEnumObjectItems(objectName)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s: %w", objectName, err)
+		return nil, nil, fmt.Errorf("unable to retrieve counter and instance list for %s: %w", objectName, err)
 	}
 	if len(counters) == 0 && len(instances) == 0 {
-		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s", objectName)
+		return nil, nil, fmt.Errorf("unable to retrieve counter and instance list for %s", objectName)
 	}
 	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
 }
@@ -217,7 +217,7 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		return UTF16ToStringArray(expdPaths), nil
 	} else {
 		if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
-			if err == PDH_MORE_DATA {
+			if errors.Is(err, PDH_MORE_DATA) {
 				if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
 					return nil, err
 				}
@@ -234,7 +234,7 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 				return UTF16ToStringArray(expdPaths), nil
 			}
 		} else {
-			return paths, err
+			return paths, nil
 		}
 	}
 

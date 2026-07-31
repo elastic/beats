@@ -186,7 +186,7 @@ func renderStructArray(cache providerCache, eventInfo *cachedEventInfo, propInfo
 	}
 
 	result := make([]any, arraySize)
-	for j := 0; j < arraySize; j++ {
+	for j := range arraySize {
 		value, err := renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse struct member %d: %w", j, err)
@@ -219,7 +219,7 @@ func renderSimpleArray(cache providerCache, eventInfo *cachedEventInfo, propInfo
 	}
 
 	result := make([]any, count)
-	for i := uint32(0); i < count; i++ {
+	for i := range count {
 		// For each array element, process it as a single property
 		value, err := renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo, bufferPools)
 		if err != nil {
@@ -374,8 +374,8 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 	}
 
 	fileTime := windows.Filetime{
-		HighDateTime: uint32(fileTime64 >> 32),            //nolint:gosec // High part of the 64-bit FileTime
-		LowDateTime:  uint32(fileTime64 & math.MaxUint32), //nolint:gosec // Low part of the 64-bit FileTime
+		HighDateTime: uint32(fileTime64 >> 32),            // High part of the 64-bit FileTime
+		LowDateTime:  uint32(fileTime64 & math.MaxUint32), // Low part of the 64-bit FileTime
 	}
 
 	return time.Unix(0, fileTime.Nanoseconds()).UTC()
@@ -473,8 +473,8 @@ retryLoop:
 			ptrSize,
 			propInfo.InType,
 			propInfo.OutType,
-			uint16(propertyLength),
-			uint16(len(*buf)), //nolint:gosec // This is the length of the user data buffer
+			uint16(propertyLength), //nolint:gosec // G115: property length comes from ETW metadata and fits TdhFormatProperty's uint16 parameter
+			uint16(len(*buf)),      //nolint:gosec // This is the length of the user data buffer
 			dataPtr,
 			&formattedDataSize,
 			&formattedData[0],
