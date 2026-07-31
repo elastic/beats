@@ -231,7 +231,7 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		if len(paths) == 1 && strings.Contains(paths[0], "*") && paths[0] == wildCardPath {
 			expdPaths, err = PdhExpandWildCardPath(utfPath)
 			if err == nil {
-				return paths, err
+				return UTF16ToStringArray(expdPaths), nil
 			}
 		} else {
 			return paths, err
