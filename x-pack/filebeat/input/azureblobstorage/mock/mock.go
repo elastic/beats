@@ -98,6 +98,7 @@ func AzureStorageFileServer() http.Handler {
 					case "txn1.csv":
 						w.Header().Set(contentType, "text/csv")
 					}
+					//nolint:gosec // G705 false positive: test HTTP mock serving static fixture bytes
 					w.Write(data)
 					return
 				}
@@ -127,6 +128,7 @@ func AzureFileServerNoContentType() http.Handler {
 				if availableFileBlobs[path[0]][path[1]] {
 					absPath, _ := filepath.Abs("testdata/" + path[1])
 					data, _ := os.ReadFile(absPath)
+					//nolint:gosec // G705 false positive: test HTTP mock serving static fixture bytes
 					w.Write(data)
 					return
 				}
