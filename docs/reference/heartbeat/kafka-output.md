@@ -372,7 +372,9 @@ See [Internal queue](/reference/heartbeat/configuring-internal-queue.md) for mor
 
 Note:`queue` options can be set under `heartbeat.yml` or the `output` section but not both.
 
-### `idempotent` [_idempotent] {applies_to}`stack: ga 9.6.0`
+### `idempotent` [_idempotent] 
+
+{applies_to}`stack: ga 9.6.0`
 
 When Idempotent is enabled, the producer will ensure that exactly one copy of each message is written.
 This setting requires kafka version to be >=0.11.0.0, `max_retries` to be greater than `0` and `required_acks` to be equal to `-1`.
