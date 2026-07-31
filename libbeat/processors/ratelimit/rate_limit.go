@@ -117,6 +117,11 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	return nil, nil
 }
 
+// Unshareable opts rate_limit out of process-wide processor sharing: the
+// algorithm keeps a token bucket, so sharing one instance across owners would
+// enforce a single global limit instead of an independent per-owner limit.
+func (p *rateLimit) Unshareable() {}
+
 func (p *rateLimit) String() string {
 	return fmt.Sprintf(
 		"%v=[limit=[%v],fields=[%v],algorithm=[%v]]",
