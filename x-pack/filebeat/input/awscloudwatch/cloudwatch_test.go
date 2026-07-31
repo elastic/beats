@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type clock struct {
@@ -189,7 +189,7 @@ func TestReceive(t *testing.T) {
 		cfg.LogGroupName = "LogGroup"
 
 		handler, err := newStateHandler(nil, cfg, createTestInputStore())
-		assert.Nil(t, err)
+		assert.NoError(t, err, "newStateHandler should succeed")
 
 		p := &cloudwatchPoller{
 			workRequestChan: make(chan struct{}),
@@ -197,7 +197,7 @@ func TestReceive(t *testing.T) {
 			// so we can guarantee that clock updates happen when cwPoller has already
 			// decided on its output
 			workResponseChan: make(chan workResponse),
-			log:              logp.NewLogger("test"),
+			log:              logptest.NewTestingLogger(t, ""),
 			stateHandler:     handler,
 		}
 

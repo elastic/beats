@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -40,6 +39,7 @@ var (
 )
 
 func TestInputDone(t *testing.T) {
+	//nolint:gosec // test fixture credentials, not real secrets
 	config := mapstr.M{
 		"channel_name":              "channel_channel",
 		"auth.oauth2.client.id":     "DEMOCLIENTID",
@@ -201,7 +201,7 @@ func TestSingleInput(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -260,7 +260,7 @@ func TestInputStop_Wait(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -290,16 +290,14 @@ func TestInputStop_Wait(t *testing.T) {
 	var waitForEventCollection sync.WaitGroup
 	var waitForConnections sync.WaitGroup
 	waitForEventCollection.Add(1)
-	waitForConnections.Add(1)
-	go func() {
+	waitForConnections.Go(func() {
 		require.Equal(t, 1, bay.GetConnectedCount()) // current open channels count should be 1
 		event := <-eventsCh
 		assertEventMatches(t, expected, event) // wait for single event
 		waitForEventCollection.Done()
 		time.Sleep(100 * time.Millisecond)           // let input.Stop() be executed.
 		require.Equal(t, 0, bay.GetConnectedCount()) // current open channels count should be 0
-		waitForConnections.Done()
-	}()
+	})
 
 	waitForEventCollection.Wait()
 	input.Wait()
@@ -308,7 +306,7 @@ func TestInputStop_Wait(t *testing.T) {
 
 func TestStop(t *testing.T) {
 	conf := defaultConfig()
-	logger := logp.NewLogger("test")
+	logger := logptest.NewTestingLogger(t, "")
 	authParams := bay.AuthenticationParameters{}
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
@@ -333,7 +331,7 @@ func TestStop(t *testing.T) {
 
 func TestWait(t *testing.T) {
 	conf := defaultConfig()
-	logger := logp.NewLogger("test")
+	logger := logptest.NewTestingLogger(t, "")
 	authParams := bay.AuthenticationParameters{}
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
@@ -421,7 +419,7 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -493,7 +491,7 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 	close(eventsCh)
 
 	go func() {
-		for j := 0; j < expectedEventCount; j++ {
+		for range expectedEventCount {
 			event := <-eventsCh
 			assertEventMatches(t, expected, event)
 		}
@@ -506,7 +504,7 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 func newTestServer(URL string, handler http.Handler) (*httptest.Server, error) {
 	server := httptest.NewUnstartedServer(handler)
 	if URL != "" {
-		l, err := net.Listen("tcp", URL)
+		l, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", URL)
 		if err != nil {
 			return nil, err
 		}
@@ -539,7 +537,7 @@ func TestNegativeCases(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
