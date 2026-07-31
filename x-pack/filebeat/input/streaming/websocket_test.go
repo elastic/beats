@@ -70,27 +70,23 @@ func TestFollowStreamReturnsOnCancelWithStalledServer(t *testing.T) {
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
-	// Cancel after the first event is published. Publish sends on
-	// an unbuffered channel; by the time the test goroutine receives
+	// Cancel after the first event is published. By the time the test goroutine receives
 	// and calls cancel, the client has returned from processing and
 	// re-entered ReadMessage (a blocking syscall that yields the
 	// goroutine).
-	published := make(chan struct{})
+	published := make(chan struct{}, 1)
 	var client publisher
 	client.done = func() {
-		published <- struct{}{}
+		select {
+		case published <- struct{}{}:
+		default:
+		}
 	}
 
 	done := make(chan error, 1)
-	startChan := make(chan struct{})
 	go func() {
-		// do not start the input until the startChan is received
-		<-startChan
 		done <- input{}.run(v2Ctx, &source{c}, nil, &client)
 	}()
-
-	// start the input now that the publisher is ready
-	close(startChan)
 
 	select {
 	case <-published:
