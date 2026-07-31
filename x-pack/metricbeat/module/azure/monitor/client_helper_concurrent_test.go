@@ -93,12 +93,12 @@ func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 
 		assert.NoError(t, err)
-		assert.Equal(t, collectedMetrics[0].ResourceId, "123")
-		assert.Equal(t, collectedMetrics[0].Namespace, "namespace")
-		assert.Equal(t, collectedMetrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
-		assert.Equal(t, collectedMetrics[0].Aggregations, "Average")
-		assert.Equal(t, collectedMetrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
-		assert.Equal(t, collectedMetrics[0].TimeGrain, oneHrDuration)
+		assert.Equal(t, "123", collectedMetrics[0].ResourceId)
+		assert.Equal(t, "namespace", collectedMetrics[0].Namespace)
+		assert.Equal(t, []string{"TotalRequests", "Capacity", "BytesRead"}, collectedMetrics[0].Names)
+		assert.Equal(t, "Average", collectedMetrics[0].Aggregations)
+		assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetrics[0].Dimensions)
+		assert.Equal(t, oneHrDuration, collectedMetrics[0].TimeGrain)
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
@@ -116,13 +116,13 @@ func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 		assert.NoError(t, err)
 
-		assert.True(t, len(collectedMetrics) > 0)
-		assert.Equal(t, collectedMetrics[0].ResourceId, "123")
-		assert.Equal(t, collectedMetrics[0].Namespace, "namespace")
-		assert.Equal(t, collectedMetrics[0].Names, []string{"TotalRequests", "Capacity"})
-		assert.Equal(t, collectedMetrics[0].Aggregations, "Average")
-		assert.Equal(t, collectedMetrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
-		assert.Equal(t, collectedMetrics[0].TimeGrain, oneHrDuration)
+		assert.NotEmpty(t, collectedMetrics)
+		assert.Equal(t, "123", collectedMetrics[0].ResourceId)
+		assert.Equal(t, "namespace", collectedMetrics[0].Namespace)
+		assert.Equal(t, []string{"TotalRequests", "Capacity"}, collectedMetrics[0].Names)
+		assert.Equal(t, "Average", collectedMetrics[0].Aggregations)
+		assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetrics[0].Dimensions)
+		assert.Equal(t, oneHrDuration, collectedMetrics[0].TimeGrain)
 		m.AssertExpectations(t)
 	})
 }
@@ -172,17 +172,17 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		for _, collectedMetric := range collectedMetrics {
 			switch collectedMetric.TimeGrain {
 			case oneMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"Capacity"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"Capacity"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			case thirtyMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"TotalRequests", "BytesRead"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"TotalRequests", "BytesRead"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			}
 		}
 		m.AssertExpectations(t)
@@ -202,7 +202,7 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 		assert.NoError(t, err)
 
-		assert.True(t, len(collectedMetrics) > 0)
+		assert.NotEmpty(t, collectedMetrics)
 
 		// we should have two groups, one per first timegrain value
 		assert.Len(t, collectedMetrics, 2)
@@ -211,17 +211,17 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		for _, collectedMetric := range collectedMetrics {
 			switch collectedMetric.TimeGrain {
 			case oneMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"Capacity"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"Capacity"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			case thirtyMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"TotalRequests"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"TotalRequests"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			}
 		}
 

@@ -97,23 +97,23 @@ func TestConcurrentMapMetrics(t *testing.T) {
 		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 
 		assert.NoError(t, err)
-		assert.Equal(t, collectedMetrics[0].ResourceId, "123")
-		assert.Equal(t, collectedMetrics[0].Namespace, "Microsoft.Storage/storageAccounts")
-		assert.Equal(t, collectedMetrics[1].ResourceId, "123")
-		assert.Equal(t, collectedMetrics[1].Namespace, "Microsoft.Storage/storageAccounts")
-		assert.Equal(t, collectedMetrics[0].Dimensions, []azure.Dimension(nil))
-		assert.Equal(t, collectedMetrics[1].Dimensions, []azure.Dimension(nil))
+		assert.Equal(t, "123", collectedMetrics[0].ResourceId)
+		assert.Equal(t, "Microsoft.Storage/storageAccounts", collectedMetrics[0].Namespace)
+		assert.Equal(t, "123", collectedMetrics[1].ResourceId)
+		assert.Equal(t, "Microsoft.Storage/storageAccounts", collectedMetrics[1].Namespace)
+		assert.Equal(t, []azure.Dimension(nil), collectedMetrics[0].Dimensions)
+		assert.Equal(t, []azure.Dimension(nil), collectedMetrics[1].Dimensions)
 
 		//order of elements can be different when running the test
-		assert.Equal(t, len(collectedMetrics), 4)
+		assert.Len(t, collectedMetrics, 4)
 		for _, metricValue := range collectedMetrics {
-			assert.Equal(t, metricValue.Aggregations, "Average")
-			assert.Equal(t, len(metricValue.Names), 1)
+			assert.Equal(t, "Average", metricValue.Aggregations)
+			assert.Len(t, metricValue.Names, 1)
 			assert.Contains(t, []string{"TotalRequests", "Capacity"}, metricValue.Names[0])
 			if reflect.DeepEqual(metricValue.Names, []string{"Capacity"}) {
-				assert.Equal(t, metricValue.TimeGrain, "PT1H")
+				assert.Equal(t, "PT1H", metricValue.TimeGrain)
 			} else {
-				assert.Equal(t, metricValue.TimeGrain, "PT5M")
+				assert.Equal(t, "PT5M", metricValue.TimeGrain)
 			}
 		}
 		m.AssertExpectations(t)
