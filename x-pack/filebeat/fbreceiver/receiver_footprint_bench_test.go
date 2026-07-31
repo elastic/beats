@@ -226,7 +226,11 @@ func dumpIdleGoroutines(b *testing.B, nReceivers int) {
 		return
 	}
 
-	f, err := os.Create(filepath.Join(dir, fmt.Sprintf("goroutines-%d.txt", nReceivers)))
+	root, err := os.OpenRoot(dir)
+	require.NoError(b, err)
+	defer root.Close()
+
+	f, err := root.Create(fmt.Sprintf("goroutines-%d.txt", nReceivers))
 	require.NoError(b, err)
 	defer f.Close()
 
