@@ -30,6 +30,7 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -112,7 +113,7 @@ func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 		currentIndex: 0,
 	}
 
-	for i := 0; i < totalListingObjectsForInputS3; i++ {
+	for i := range totalListingObjectsForInputS3 {
 		ret.objects = append(ret.objects, s3Types.Object{
 			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
 			ETag:         aws.String(fmt.Sprintf("etag-%s-%d", listPrefix, i)),
@@ -313,7 +314,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
 		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers, logp.NewNopLogger())
@@ -336,7 +337,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 		errChan := make(chan error)
 		wg := new(sync.WaitGroup)
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			wg.Add(1)
 			go func(i int, wg *sync.WaitGroup) {
 				defer wg.Done()
@@ -402,6 +403,9 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
+	if raceBuildEnabled {
+		t.Skip("too slow under the race detector: the worker counts below scale to 1024 pollers per case, and instrumented throughput numbers are meaningless anyway")
+	}
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),
