@@ -105,7 +105,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the auditd config: %w", err)
 	}
 
-	log := logp.NewLogger(moduleName)
+	log := base.Logger()
 	_, _, kernel, _ := kernelVersion()
 	log.Infof("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 
@@ -396,7 +396,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 	}
 
 	// run the SetPID logic in a retry loop, since the startup process can be fragile.
-	for i := 0; i < retries; i++ {
+	for range retries {
 		// This call will block on send, which isn't great, but the reply can *also* time out
 		// or return something like ENOBUFS.
 		err = ms.client.SetPID(libaudit.WaitForReply)
@@ -411,7 +411,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 			// the netlink connection is losing data. Try to drain and send again.
 			// This is technically dropping data, but auditbeat is configured as best-effort anyway, and we'll drop events under high load anyway.
 			maxRecv := 10000
-			for i := 0; i < maxRecv; i++ {
+			for range maxRecv {
 				var retryOuter bool // hack because of how switch/break statements work
 				_, err = ms.client.Netlink.Receive(true, noParse)
 				switch {
@@ -968,7 +968,7 @@ func kernelVersion() (major, minor int, full string, err error) {
 			length = i
 			break
 		}
-		data[i] = byte(v)
+		data[i] = byte(v) //nolint:gosec // G115: kernel release uses ASCII bytes before the NUL terminator
 	}
 
 	release := string(data[:length])
