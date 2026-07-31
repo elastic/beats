@@ -96,7 +96,8 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		r.cachedMeta = m
 	}
 
-	// Copy cached fields into a fresh map for this event.
+	// cachedMeta contains only scalars, so a shallow copy gives each event its
+	// own map.
 	fileMap := make(mapstr.M, len(r.cachedMeta))
 	maps.Copy(fileMap, r.cachedMeta)
 	// Direct assignment replaces any existing "log" key rather than merging.
