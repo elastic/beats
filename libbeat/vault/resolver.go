@@ -31,6 +31,8 @@ package vault
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -53,25 +55,47 @@ const refPrefix = "vault/"
 
 const defaultKVMount = "secret"
 
-// Config is the top-level `vault:` block read once at Beat startup.
+// Config is the vault connection. It can be provided either as a structured
+// block (standalone heartbeat.yml) or, under Fleet, as a single base64-encoded
+// JSON string so the whole connection is one $co.elastic.secret{...} value
+// (see NewResolverOption). The json tags match the base64/JSON form Kibana
+// produces.
 type Config struct {
-	Enabled bool `config:"enabled"`
+	Enabled bool `config:"enabled" json:"enabled"`
 
-	Address   string `config:"address"`
-	Namespace string `config:"namespace"`
+	Address   string `config:"address" json:"address"`
+	Namespace string `config:"namespace" json:"namespace"`
 
 	// AuthMethod is "token" or "approle" (default "approle" when role_id is set,
 	// otherwise "token").
-	AuthMethod string `config:"auth_method"`
-	Token      string `config:"token"`
-	RoleID     string `config:"role_id"`
-	SecretID   string `config:"secret_id"`
+	AuthMethod string `config:"auth_method" json:"auth_method"`
+	Token      string `config:"token" json:"token"`
+	RoleID     string `config:"role_id" json:"role_id"`
+	SecretID   string `config:"secret_id" json:"secret_id"`
 
 	// KVMount is the KV v2 secrets-engine mount path (default "secret").
-	KVMount string `config:"kv_mount"`
+	KVMount string `config:"kv_mount" json:"kv_mount"`
 
 	// TLSSkipVerify disables TLS verification. Intended for local/dev only.
-	TLSSkipVerify bool `config:"tls_skip_verify"`
+	TLSSkipVerify bool `config:"tls_skip_verify" json:"tls_skip_verify"`
+}
+
+// decodeBase64Config decodes a base64-encoded JSON vault connection. This is
+// the form delivered by Fleet, where the whole connection is stored as a single
+// Fleet secret and injected as one opaque string — base64 avoids any YAML
+// formatting issues in the agent policy.
+func decodeBase64Config(s string) (Config, error) {
+	var c Config
+	decoded, err := base64.StdEncoding.DecodeString(strings.TrimSpace(s))
+	if err != nil {
+		return c, fmt.Errorf("vault: config is not valid base64: %w", err)
+	}
+	if err := json.Unmarshal(decoded, &c); err != nil {
+		return c, fmt.Errorf("vault: decoded config is not valid JSON: %w", err)
+	}
+	// Presence of a delivered connection implies it is enabled.
+	c.Enabled = true
+	return c, nil
 }
 
 // resolver reads secrets from Vault and memoizes them for the process lifetime.
@@ -93,14 +117,24 @@ func NewResolverOption(cfg *config.C, log *logp.Logger) (ucfg.Option, bool, erro
 		return nil, false, nil
 	}
 
-	sub, err := cfg.Child("vault", -1)
-	if err != nil {
-		return nil, false, fmt.Errorf("vault: reading config block: %w", err)
-	}
-
 	var c Config
-	if err := sub.Unpack(&c); err != nil {
-		return nil, false, fmt.Errorf("vault: invalid config: %w", err)
+	// Fleet delivers the whole connection as a single base64-encoded JSON string
+	// (a $co.elastic.secret{...} value). Standalone heartbeat.yml can instead use
+	// a structured block. Detect the string form first.
+	if s, serr := cfg.String("vault", -1); serr == nil && s != "" {
+		decoded, derr := decodeBase64Config(s)
+		if derr != nil {
+			return nil, false, derr
+		}
+		c = decoded
+	} else {
+		sub, cerr := cfg.Child("vault", -1)
+		if cerr != nil {
+			return nil, false, fmt.Errorf("vault: reading config block: %w", cerr)
+		}
+		if uerr := sub.Unpack(&c); uerr != nil {
+			return nil, false, fmt.Errorf("vault: invalid config: %w", uerr)
+		}
 	}
 	if !c.Enabled {
 		return nil, false, nil

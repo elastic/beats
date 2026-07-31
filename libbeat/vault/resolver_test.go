@@ -18,11 +18,38 @@
 package vault
 
 import (
+	"encoding/base64"
 	"errors"
 	"testing"
 
 	"github.com/elastic/go-ucfg"
 )
+
+// TestDecodeBase64Config verifies the Fleet delivery form: the whole connection
+// arrives as one base64-encoded JSON string (a single Fleet secret).
+func TestDecodeBase64Config(t *testing.T) {
+	jsonCfg := `{"address":"https://vault.internal:8200","auth_method":"approle","role_id":"r1","secret_id":"s1","kv_mount":"secret"}`
+	b64 := base64.StdEncoding.EncodeToString([]byte(jsonCfg))
+
+	c, err := decodeBase64Config(b64)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !c.Enabled {
+		t.Fatal("expected Enabled=true for a delivered connection")
+	}
+	if c.Address != "https://vault.internal:8200" || c.AuthMethod != "approle" ||
+		c.RoleID != "r1" || c.SecretID != "s1" || c.KVMount != "secret" {
+		t.Fatalf("decoded config mismatch: %+v", c)
+	}
+
+	if _, err := decodeBase64Config("not!base64!!"); err == nil {
+		t.Fatal("expected error for invalid base64")
+	}
+	if _, err := decodeBase64Config(base64.StdEncoding.EncodeToString([]byte("not json"))); err == nil {
+		t.Fatal("expected error for invalid JSON")
+	}
+}
 
 // TestResolveRouting verifies the parsing/routing done before any network call:
 // non-vault keys fall through with ErrMissing, and malformed references error
