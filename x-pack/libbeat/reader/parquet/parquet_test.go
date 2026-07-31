@@ -31,6 +31,9 @@ func TestParquetWithRandomData(t *testing.T) {
 	testCases := []struct {
 		columns int
 		rows    int
+		// skipUnderRace marks shapes whose record count makes the instrumented
+		// arrow readers exceed the package test timeout.
+		skipUnderRace bool
 	}{
 		{
 			columns: 10,
@@ -53,8 +56,9 @@ func TestParquetWithRandomData(t *testing.T) {
 			rows:    1000,
 		},
 		{
-			columns: 15,
-			rows:    10000,
+			columns:       15,
+			rows:          10000,
+			skipUnderRace: true,
 		},
 	}
 
@@ -62,6 +66,9 @@ func TestParquetWithRandomData(t *testing.T) {
 	for i, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with rows=%d, and columns=%d", tc.rows, tc.columns)
 		t.Run(name, func(t *testing.T) {
+			if tc.skipUnderRace && raceBuildEnabled {
+				t.Skip("too slow under the race detector: BatchSize 1 reads every row through the instrumented arrow readers")
+			}
 			tempDir := t.TempDir()
 			fName := fmt.Sprintf("%s/%s_%d.parquet", tempDir, "test", i)
 			data := createRandomParquet(t, fName, tc.columns, tc.rows)
