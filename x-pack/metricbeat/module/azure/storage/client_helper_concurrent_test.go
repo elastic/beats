@@ -20,6 +20,39 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
+func waitAndCollectConcurrentMapMetrics(client *azure.BatchClient, wg *sync.WaitGroup) ([]azure.Metric, error) {
+	metricsCh := client.ResourceConfigurations.MetricDefinitionsChan
+	errorCh := client.ResourceConfigurations.ErrorChan
+
+	go func() {
+		wg.Wait()
+		client.Log.Infof("All collections finished. Closing channels ")
+		close(metricsCh)
+		close(errorCh)
+	}()
+
+	var collectedMetrics []azure.Metric
+	var collectedErr error
+	metricsOpen := true
+	errorOpen := true
+	for metricsOpen || errorOpen {
+		select {
+		case resMetricDefinition, ok := <-metricsCh:
+			if !ok {
+				metricsOpen = false
+			} else {
+				collectedMetrics = append(collectedMetrics, resMetricDefinition...)
+			}
+		case err, ok := <-errorCh:
+			if ok && err != nil {
+				collectedErr = err
+			}
+			errorOpen = false
+		}
+	}
+	return collectedMetrics, collectedErr
+}
+
 func TestConcurrentMapMetrics(t *testing.T) {
 	resource := MockResource()
 	metricDefinitions := armmonitor.MetricDefinitionCollection{
@@ -45,44 +78,10 @@ func TestConcurrentMapMetrics(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			if client.ResourceConfigurations.ErrorChan != nil {
-				close(client.ResourceConfigurations.ErrorChan)
-			}
-		}()
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
-
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-
-		assert.Error(t, error)
-		assert.Equal(t, error.Error(), "no metric definitions were found for resource 123 and namespace Microsoft.Storage/storageAccounts")
-		assert.Equal(t, collectedMetrics, []azure.Metric(nil))
+		assert.EqualError(t, err, "no metric definitions were found for resource 123 and namespace Microsoft.Storage/storageAccounts", "unexpected error from concurrentMapMetrics")
+		assert.Empty(t, collectedMetrics, "no metrics should be collected when the definitions lookup fails")
 		m.AssertExpectations(t)
 	})
 	t.Run("return mapped metrics correctly", func(t *testing.T) {
@@ -95,40 +94,9 @@ func TestConcurrentMapMetrics(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			close(client.ResourceConfigurations.ErrorChan)
-		}()
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
-
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-
-		assert.NoError(t, error)
+		assert.NoError(t, err)
 		assert.Equal(t, collectedMetrics[0].ResourceId, "123")
 		assert.Equal(t, collectedMetrics[0].Namespace, "Microsoft.Storage/storageAccounts")
 		assert.Equal(t, collectedMetrics[1].ResourceId, "123")
