@@ -774,7 +774,7 @@ func Test_StorageClient(t *testing.T) {
 				case <-timeout.C:
 					t.Errorf("timed out waiting for %d events", len(tt.expected))
 					cancel()
-					return
+					break wait
 				case got := <-chanClient.Channel:
 					var val interface{}
 					var err error
@@ -788,6 +788,12 @@ func Test_StorageClient(t *testing.T) {
 						break wait
 					}
 				}
+			}
+
+			// Wait for scheduler and job goroutines to finish before the subtest
+			// returns; they log through inputCtx.Logger backed by this *testing.T.
+			if err := g.Wait(); err != nil {
+				assert.ErrorIs(t, err, context.Canceled, "input run should stop after cancel")
 			}
 		})
 	}
