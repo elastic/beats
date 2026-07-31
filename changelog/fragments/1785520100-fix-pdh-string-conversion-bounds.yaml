@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix truncated Windows performance counter lists when a counter path contains characters outside the basic multilingual plane
+component: metricbeat

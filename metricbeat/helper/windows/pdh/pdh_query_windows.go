@@ -27,7 +27,7 @@ import (
 	"slices"
 	"strings"
 	"syscall"
-	"unsafe"
+	"unicode/utf16"
 
 	"golang.org/x/sys/windows"
 )
@@ -346,23 +346,24 @@ func getPDHFormat(format string) PdhCounterFormat {
 }
 
 // UTF16ToStringArray converts list of Windows API NULL terminated strings  to Go string array.
+// The list ends at the first empty string, as in the Win32 MULTI_SZ convention.
 func UTF16ToStringArray(buf []uint16) []string {
 	var strings []string
-	nextLineStart := 0
-	stringLine := UTF16PtrToString(&buf[0])
-	for stringLine != "" {
-		strings = append(strings, stringLine)
-		nextLineStart += len([]rune(stringLine)) + 1
-		remainingBuf := buf[nextLineStart:]
-		stringLine = UTF16PtrToString(&remainingBuf[0])
+	for len(buf) > 0 && buf[0] != 0 {
+		end := 0
+		for end < len(buf) && buf[end] != 0 {
+			end++
+		}
+		strings = append(strings, string(utf16.Decode(buf[:end])))
+		if end == len(buf) {
+			break
+		}
+		buf = buf[end+1:]
 	}
 	return strings
 }
 
 // UTF16PtrToString converts Windows API LPTSTR (pointer to string) to Go string.
 func UTF16PtrToString(s *uint16) string {
-	if s == nil {
-		return ""
-	}
-	return syscall.UTF16ToString((*[1 << 29]uint16)(unsafe.Pointer(s))[0:])
+	return windows.UTF16PtrToString(s)
 }
