@@ -35,6 +35,7 @@ var (
 	_ mb.ReportingMetricSetV2Error = (*MetricSet)(nil)
 )
 
+// ntpQueryProvider implementations must be safe for concurrent use.
 type ntpQueryProvider interface {
 	query(host string, options ntp.QueryOptions) (*ntp.Response, error)
 	validate(*ntp.Response) error

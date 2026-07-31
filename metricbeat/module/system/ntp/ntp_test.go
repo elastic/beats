@@ -20,6 +20,7 @@ package ntp
 import (
 	"errors"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -94,7 +95,7 @@ func TestFetchOffset_Error(t *testing.T) {
 }
 
 type ntpValidationFailed struct {
-	Called int
+	called atomic.Int32
 }
 
 func (n *ntpValidationFailed) query(host string, opt ntp.QueryOptions) (*ntp.Response, error) {
@@ -102,7 +103,7 @@ func (n *ntpValidationFailed) query(host string, opt ntp.QueryOptions) (*ntp.Res
 }
 
 func (n *ntpValidationFailed) validate(_ *ntp.Response) error {
-	n.Called++
+	n.called.Add(1)
 	return errors.New("ntp validation error")
 }
 
@@ -117,7 +118,7 @@ func TestFetchOffset_ValidationError(t *testing.T) {
 		ntpMetricSet.queryProvider = queryProvider
 
 		events, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
-		assert.Equal(t, 2, queryProvider.Called, "expected validate to be called twice, called %d times", queryProvider.Called)
+		assert.Equal(t, int32(2), queryProvider.called.Load(), "expected validate to be called twice, called %d times", queryProvider.called.Load())
 		require.Empty(t, events, "expected no events, got %v", events)
 		require.Empty(t, errs, "expected no errors, got: %v", errs)
 	})
@@ -135,7 +136,7 @@ func TestFetchOffset_ValidationError(t *testing.T) {
 		ntpMetricSet.queryProvider = queryProvider
 
 		_, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
-		assert.Equal(t, 0, queryProvider.Called, "expected validate to be NOT called, called %d times", queryProvider.Called)
+		assert.Equal(t, int32(0), queryProvider.called.Load(), "expected validate to be NOT called, called %d times", queryProvider.called.Load())
 		require.Empty(t, errs, "expected no errors, got: %v", errs)
 	})
 
