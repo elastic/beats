@@ -22962,11 +22962,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.2/LICENS
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/go-licence-detector
-Version: v0.7.0
+Version: v0.10.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.7.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.10.0/LICENSE:
 
 
                                  Apache License
@@ -57386,11 +57386,11 @@ respective owners.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/licenseclassifier
-Version: v0.0.0-20221004142553-c1ed8fcf4bab
+Version: v0.0.0-20250213175939-b5d1a3369749
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20221004142553-c1ed8fcf4bab/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20250213175939-b5d1a3369749/LICENSE:
 
 
                                  Apache License
@@ -71481,11 +71481,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/sergi/go-diff
-Version: v1.3.1
+Version: v1.4.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/sergi/go-diff@v1.3.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/sergi/go-diff@v1.4.0/LICENSE:
 
 Copyright (c) 2012-2016 The go-diff Authors. All rights reserved.
 
