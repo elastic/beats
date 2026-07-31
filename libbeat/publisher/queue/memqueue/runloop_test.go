@@ -52,10 +52,18 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
+<<<<<<< HEAD
 	for i := range 100 {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go rl.runIteration()
+=======
+	iterLock := sync.Mutex{}
+	for i := range 100 {
+		// Pair each publish call with an iteration of the run loop so we
+		// get a response.
+		go runIterationLocked(rl, &iterLock)
+>>>>>>> eece1f708 (libbeat/memqueue: fix data race in TestFlushSettingsBlockPartialBatches (#52362))
 		_, ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish call must succeed")
 	}
@@ -69,7 +77,12 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 		// there's a logical error.
 		_, _ = broker.Get(100)
 	}()
+<<<<<<< HEAD
 	rl.runIteration()
+=======
+	// Lock: the last asynchronous iteration above may still be running.
+	runIterationLocked(rl, &iterLock)
+>>>>>>> eece1f708 (libbeat/memqueue: fix data race in TestFlushSettingsBlockPartialBatches (#52362))
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since the request should succeed immediately")
 	assert.Equal(t, 100, rl.consumedCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
 }
@@ -91,10 +104,11 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
+	iterLock := sync.Mutex{}
 	for range 100 {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
-		go rl.runIteration()
+		go runIterationLocked(rl, &iterLock)
 		_, ok := producer.Publish("some event")
 		require.True(t, ok, "Queue publish call must succeed")
 	}
@@ -106,7 +120,8 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 		// there's a logical error.
 		_, _ = broker.Get(101)
 	}()
-	rl.runIteration()
+	// Lock: the last asynchronous iteration above may still be running.
+	runIterationLocked(rl, &iterLock)
 	assert.NotNil(t, rl.pendingGetRequest, "Queue should have a pending get request since the queue doesn't have the requested event count")
 	assert.Equal(t, 0, rl.consumedCount, "Queue should have a consumedCount of 0 since the Get request couldn't be completely filled")
 
@@ -114,6 +129,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	go func() {
 		_, _ = producer.Publish("some event")
 	}()
+	// No lock needed: the asynchronous iterations above have all finished.
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since adding an event should unblock the previous one")
 	assert.Equal(t, 101, rl.consumedCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
@@ -218,6 +234,12 @@ func TestObserverRemoveEvents(t *testing.T) {
 	// It should have deleted 25 events, so we expect the size to be 25 * 123.
 	assertRegistryUint(t, reg, "queue.removed.events", deleteCount, "Deleting from the queue should report the removed events")
 	assertRegistryUint(t, reg, "queue.removed.bytes", deleteCount*123, "Deleting from the queue should report the removed bytes")
+}
+
+func runIterationLocked[T any](rl *runLoop[T], lock *sync.Mutex) {
+	lock.Lock()
+	defer lock.Unlock()
+	rl.runIteration()
 }
 
 func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expected uint64, message string) {
