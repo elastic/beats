@@ -64,6 +64,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v7/libbeat/vault"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
@@ -833,10 +834,27 @@ func (b *Beat) configure(settings Settings) error {
 
 	if settings.DisableConfigResolver {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
-	} else if store != nil {
+	} else {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		// note that if the store is nil it should be excluded as an option
-		config.OverwriteConfigOpts(configOptsWithKeystore(store))
+		var opts []ucfg.Option
+		if store != nil {
+			opts = configOptsWithKeystore(store)
+		} else {
+			opts = []ucfg.Option{ucfg.PathSep("."), ucfg.ResolveEnv, ucfg.VarExp}
+		}
+
+		// Wire a HashiCorp Vault resolver into the process-global config options
+		// when a `vault:` block is configured. This lets any ${vault/<path>#<field>}
+		// reference in any monitor/stream/top-level config value be resolved from
+		// Vault at config-unpack time, mirroring the keystore resolver pattern.
+		if vaultOpt, ok, verr := vault.NewResolverOption(cfg, b.Info.Logger); verr != nil {
+			return fmt.Errorf("could not initialize the vault config resolver: %w", verr)
+		} else if ok {
+			opts = append(opts, vaultOpt)
+		}
+
+		config.OverwriteConfigOpts(opts)
 	}
 
 	b.keystore = store
