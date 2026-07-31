@@ -51,6 +51,12 @@ type pathTestSuite struct {
 	suite.Suite
 }
 
+func (p *pathTestSuite) requireEmptyStatQueue(trav *pTraverser) {
+	trav.mtx.RLock()
+	defer trav.mtx.RUnlock()
+	p.Require().Empty(trav.statQueue, "statQueue should be empty after walk completes")
+}
+
 func Test_PathTraverser(t *testing.T) {
 	suite.Run(t, new(pathTestSuite))
 }
@@ -186,7 +192,7 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 	}
 
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestWalkAsyncTimeoutErr() {
@@ -307,7 +313,7 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 	}
 
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestAddTraverserContextCancel() {
@@ -339,7 +345,10 @@ func (p *pathTestSuite) TestAddTraverserContextCancel() {
 		if tries >= 4 {
 			p.Require().Fail("no path was added in 5 tries")
 		}
-		if len(pTrav.statQueue) == 0 {
+		pTrav.mtx.RLock()
+		statQueueEmpty := len(pTrav.statQueue) == 0
+		pTrav.mtx.RUnlock()
+		if statQueueEmpty {
 			tries++
 			time.Sleep(1 * time.Second)
 			continue
@@ -490,7 +499,7 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 
 	err = <-errChan
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestNonRecursiveAdd() {
@@ -597,7 +606,7 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 
 	err = <-errChan
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestStatErrAtRootAdd() {

@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Synchronize kprobes path traverser wait-for-ack signaling between walk and event consumer.
+
+component: auditbeat
