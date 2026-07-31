@@ -109,6 +109,7 @@ func TestDeadlineReceiver(t *testing.T) {
 		require.False(t, timedOut, "a cleared deadline must not time out")
 		require.Equal(t, []byte("z"), msg.Value)
 	})
+}
 
 func TestAckEventPrivate(t *testing.T) {
 	var acked int
