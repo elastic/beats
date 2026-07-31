@@ -345,6 +345,89 @@ paths:
 	}
 }
 
+// TestParsersNormalizedInPlace checks that parsers do not share maps between
+// events when the processing chain normalizes them in place.
+func TestParsersNormalizedInPlace(t *testing.T) {
+	testCases := []struct {
+		name    string
+		parsers string
+		content string
+		want    []mapstr.M
+	}{
+		{
+			name: "ndjson",
+			parsers: `
+parsers:
+  - ndjson:
+      target: ""`,
+			content: `{"msg":"one","nested":{"k":"v1"},"n":1}
+{"msg":"two","nested":{"k":"v2"},"n":2}
+`,
+			want: []mapstr.M{
+				{"msg": "one", "nested": mapstr.M{"k": "v1"}, "n": int64(1)},
+				{"msg": "two", "nested": mapstr.M{"k": "v2"}, "n": int64(2)},
+			},
+		},
+		{
+			name: "multiline",
+			parsers: `
+parsers:
+  - multiline:
+      type: pattern
+      pattern: '^[[:space:]]'
+      negate: false
+      match: after`,
+			content: "one\n  continued\ntwo\n  continued\n",
+			want: []mapstr.M{
+				{"message": "one\n  continued"},
+				{"message": "two\n  continued"},
+			},
+		},
+		{
+			name: "container",
+			parsers: `
+parsers:
+  - container:
+      stream: all
+      format: docker`,
+			content: `{"log":"one\n","stream":"stdout","time":"2026-01-01T00:00:00.000000000Z"}
+{"log":"two\n","stream":"stderr","time":"2026-01-01T00:00:01.000000000Z"}
+`,
+			want: []mapstr.M{
+				{"message": "one\n", "stream": "stdout"},
+				{"message": "two\n", "stream": "stderr"},
+			},
+		},
+	}
+
+	logger := logptest.NewTestingLogger(t, "")
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "log")
+			require.NoError(t, os.WriteFile(filename, []byte(testCase.content), 0o600))
+
+			cfg := fmt.Sprintf(`
+type: filestream
+id: %s
+prospector.scanner.check_interval: 1s
+file_identity.native: ~
+paths:
+    - %s%s`, testCase.name, filename, testCase.parsers)
+
+			runner := createFilestreamTestRunner(t, logger, testCase.name, cfg, int64(len(testCase.want)), true)
+			events := runner(t)
+
+			got := make([]mapstr.M, 0, len(events))
+			for _, event := range events {
+				// Offsets and paths differ per run.
+				delete(event.Fields, "log")
+				got = append(got, event.Fields)
+			}
+			assert.Equal(t, testCase.want, got)
+		})
+	}
+}
+
 // TestConfigure_SliceBudget asserts configure only bounds ReadSlice's duration
 // (filestream.sliceBudget, at close.on_state_change.check_interval) when
 // something depends on Poll running while a file stays continuously busy:
