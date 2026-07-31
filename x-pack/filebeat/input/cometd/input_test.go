@@ -12,6 +12,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -65,6 +67,116 @@ func TestMakeEventFailure(t *testing.T) {
 		Private: "DEMOBODYFAIL",
 	}
 	assert.NotEqual(t, event, makeEvent("DEMOCHANNEL", "DEMOID", "DEMOBODY"))
+}
+
+const payloadFormatEnvVar = "BEATS_COMETD_PAYLOAD_FORMAT"
+
+// connectResponses maps a Salesforce payload format to a /meta/connect response using it.
+var connectResponses = map[string]string{
+	"payload": `[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`,
+	"sobject": `[{"data": {"sobject": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`,
+}
+
+func TestInputPayloadFormats(t *testing.T) {
+	// github.com/elastic/bayeux keeps subscription state in unsynchronized package globals
+	// and its connect goroutine outlives Stop(), so two clients in one test binary race
+	// under -race no matter how the tests are ordered.
+	for format := range connectResponses {
+		t.Run(format, func(t *testing.T) {
+			//nolint:gosec // subprocess re-exec of this test binary with fixed args
+			cmd := exec.CommandContext(t.Context(), os.Args[0], "-test.run=^TestInputPayloadFormatsProcess$", "-test.count=1")
+			cmd.Env = append(os.Environ(), payloadFormatEnvVar+"="+format)
+			out, err := cmd.CombinedOutput()
+			require.NoError(t, err, "payload format %q subprocess failed:\n%s", format, out)
+		})
+	}
+}
+
+func TestInputPayloadFormatsProcess(t *testing.T) {
+	format := os.Getenv(payloadFormatEnvVar)
+	if format == "" {
+		t.Skip("subprocess helper for TestInputPayloadFormats")
+	}
+	connectResponse, ok := connectResponses[format]
+	require.True(t, ok, "unknown payload format %q", format)
+	runInputPayloadFormatCase(t, connectResponse)
+}
+
+func runInputPayloadFormatCase(t *testing.T, connectResponse string) {
+	t.Helper()
+
+	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
+
+	outlet := &mockedOutleter{
+		onEventHandler: func(event beat.Event) bool {
+			eventsCh <- event
+			return true
+		},
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+
+	var expected bay.MaybeMsg
+	expected.Msg.Data.Event.ReplayID = 1234
+	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	expected.Msg.Channel = "channel_name"
+
+	config := map[string]any{
+		"channel_name":              "channel_name",
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+
+	// The server serves each request on its own goroutine.
+	var connectEventSent atomic.Bool
+
+	r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		_ = r.ParseForm()
+		if getTokenHandler(w, r) {
+			return
+		}
+		body, _ := io.ReadAll(r.Body)
+		data := getBayData(body)
+
+		switch data.Channel {
+		case "/meta/handshake":
+			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
+			return
+		case "/meta/connect":
+			if connectEventSent.Swap(true) {
+				_, _ = w.Write([]byte(`{}`))
+				return
+			}
+			_, _ = w.Write([]byte(connectResponse))
+			return
+		case "/meta/subscribe":
+			_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
+			return
+		default:
+		}
+	})
+	server := httptest.NewServer(r)
+	defer server.Close()
+	serverURL = server.URL
+	config["auth.oauth2.token_url"] = serverURL + "/token"
+
+	cfg := conf.MustNewConfigFrom(config)
+
+	var inputContext finput.Context
+
+	logger := logptest.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
+	require.NoError(t, err, "NewInput for payload format case")
+	require.NotNil(t, input, "input for payload format case")
+
+	input.Run()
+	assertEventMatches(t, expected, <-eventsCh)
+	input.Stop()
 }
 
 func TestSingleInput(t *testing.T) {
@@ -245,122 +357,6 @@ func TestWait(t *testing.T) {
 	case <-workerCtx.Done():
 	case <-time.After(time.Second): // let input.Stop() be executed.
 		require.NoError(t, fmt.Errorf("input is not stopped."))
-	}
-}
-
-func TestMultiInput(t *testing.T) {
-	expectedHTTPEventCount = 2
-	defer atomic.StoreUint64(&called, 0)
-	eventsCh := make(chan beat.Event)
-	defer close(eventsCh)
-
-	outlet := &mockedOutleter{
-		onEventHandler: func(event beat.Event) bool {
-			eventsCh <- event
-			return true
-		},
-	}
-	connector := &mockedConnector{
-		outlet: outlet,
-	}
-
-	var expected1 bay.MaybeMsg
-	expected1.Msg.Data.Event.ReplayID = 1234
-	expected1.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	expected1.Msg.Channel = "channel_name"
-
-	config := map[string]interface{}{
-		"channel_name":              "channel_name",
-		"auth.oauth2.client.id":     "client.id",
-		"auth.oauth2.client.secret": "client.secret",
-		"auth.oauth2.user":          "user",
-		"auth.oauth2.password":      "password",
-	}
-
-	// create Server
-	r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
-		_ = r.ParseForm()
-		if getTokenHandler(w, r) {
-			return
-		}
-		body, _ := io.ReadAll(r.Body)
-		data := getBayData(body)
-
-		switch data.Channel {
-		case "/meta/handshake":
-			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
-			return
-		case "/meta/connect":
-			if called < uint64(expectedHTTPEventCount) { //nolint:gosec //Safe to ignore in tests
-				//nolint:staticcheck //Safe to ignore in tests
-				if called == 0 {
-					atomic.AddUint64(&called, 1)
-					_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
-					return
-				} else if called == 1 {
-					atomic.AddUint64(&called, 1)
-					_, _ = w.Write([]byte(`[{"data": {"sobject": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
-					return
-				}
-			}
-			_, _ = w.Write([]byte(`{}`))
-			return
-		case "/meta/subscribe":
-			//nolint:staticcheck //Safe to ignore in tests
-			if called == 0 {
-				_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
-			} else if called == 1 {
-				_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name1", "successful":true}]`))
-			}
-			return
-		default:
-		}
-	})
-	server := httptest.NewServer(r)
-	defer server.Close()
-	serverURL = server.URL
-	config["auth.oauth2.token_url"] = serverURL + "/token"
-
-	// get common config
-	cfg1 := conf.MustNewConfigFrom(config)
-	config["channel_name"] = "channel_name1"
-	cfg2 := conf.MustNewConfigFrom(config)
-
-	var inputContext finput.Context
-
-	logger := logptest.NewTestingLogger(t, "")
-	// initialize inputs
-	input1, err := NewInput(cfg1, connector, inputContext, logger)
-	require.NoError(t, err)
-	require.NotNil(t, input1)
-
-	input2, err := NewInput(cfg2, connector, inputContext, logger)
-	require.NoError(t, err)
-	require.NotNil(t, input2)
-
-	require.Equal(t, 0, bay.GetConnectedCount())
-
-	got := 0
-	go func() {
-		// run input
-		input1.Run()
-		defer input1.Stop()
-
-		// run input
-		input2.Run()
-		defer input2.Stop()
-
-		for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
-			message, err := event.GetValue("message")
-			require.NoError(t, err)
-			require.Equal(t, string(expected1.Msg.Data.Payload), message)
-			got++
-		}
-	}()
-	time.Sleep(time.Second)
-	if got < 2 {
-		require.NoError(t, fmt.Errorf("not able to get events."))
 	}
 }
 
