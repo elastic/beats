@@ -37,7 +37,11 @@ const installTimeout = 120 * time.Second
 
 // muInstall protects use of npcap.Installer. The only writes to npcap.Installer
 // are here and during init in x-pack/packetbeat/npcap/npcap_windows.go
-var muInstall sync.Mutex
+var (
+	muInstall       sync.Mutex
+	npcapInstalled  bool
+	npcapInstallErr error
+)
 
 func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	if !b.Info.ElasticLicensed {
@@ -56,6 +60,18 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 			log.Infof("npcap version: %s", npcapVersion)
 		}
 	}()
+
+	muInstall.Lock()
+	defer muInstall.Unlock()
+	if npcapInstalled {
+		return npcapInstallErr
+	}
+	npcapInstalled = true
+	npcapInstallErr = installNpcapLocked(b, cfg)
+	return npcapInstallErr
+}
+
+func installNpcapLocked(b *beat.Beat, cfg *conf.C) error {
 	if !npcap.Upgradeable() {
 		npcap.Installer = nil
 		return nil
@@ -82,8 +98,6 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()
 
-	muInstall.Lock()
-	defer muInstall.Unlock()
 	if npcap.Installer == nil {
 		return nil
 	}

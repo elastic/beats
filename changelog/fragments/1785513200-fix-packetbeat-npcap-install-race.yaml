@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Install Npcap at most once so concurrent packetbeat receivers do not race on it
+component: packetbeat
