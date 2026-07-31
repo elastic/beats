@@ -377,9 +377,7 @@ func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Conte
 	}
 	p.logger.Debugf("Starting Leader Elector")
 
-	p.electorWg.Add(1)
-	go func() {
-		defer p.electorWg.Done()
+	p.electorWg.Go(func() {
 		for {
 			le.Run(ctx)
 			select {
@@ -390,7 +388,7 @@ func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Conte
 				// is still a candidate to get the lease.
 			}
 		}
-	}()
+	})
 }
 
 func ShouldPut(event mapstr.M, field string, value any, logger *logp.Logger) {
