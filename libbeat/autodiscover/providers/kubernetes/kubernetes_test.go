@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/coordination/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -91,6 +92,58 @@ func TestLeaseConfigurableFields(t *testing.T) {
 	require.Equalf(t, cfg.LeaseDuration, leaseDuration, "lease duration should be the same as the one provided in the configuration.")
 	require.Equalf(t, cfg.RetryPeriod, retryPeriod, "retry period should be the same as the one provided in the configuration.")
 	require.Equalf(t, cfg.RenewDeadline, renewDeadline, "renew deadline should be the same as the one provided in the configuration.")
+}
+
+// TestLeaderElectionManagerStopWaitsForElector checks that Stop returns only after the
+// elector is done, so that the lease is released instead of being left behind to expire.
+func TestLeaderElectionManagerStopWaitsForElector(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	require.NoError(t, applyLease(client, createLease()), "the lease should be created")
+
+	id, err := uuid.NewV4()
+	require.NoError(t, err, "a uuid should be generated")
+
+	leading := make(chan struct{}, 1)
+	var stoppedLeading atomic.Bool
+
+	startLeadingFunc := func(uuid string, eventID string) {
+		select {
+		case leading <- struct{}{}:
+		default:
+		}
+	}
+	stopLeadingFunc := func(uuid string, eventID string) {
+		// A Stop that does not wait returns while this callback is still sleeping.
+		time.Sleep(100 * time.Millisecond)
+		stoppedLeading.Store(true)
+	}
+
+	cfg := Config{
+		Node:          "node-0",
+		LeaderLease:   leaseName,
+		LeaseDuration: 15 * time.Second,
+		RenewDeadline: 10 * time.Second,
+		RetryPeriod:   2 * time.Second,
+	}
+
+	le, err := NewLeaderElectionManager(id, &cfg, client, startLeadingFunc, stopLeadingFunc, logptest.NewTestingLogger(t, "kubernetes-test"))
+	require.NoError(t, err, "the leader election manager should be created")
+
+	le.Start()
+	select {
+	case <-leading:
+	case <-time.After(30 * time.Second):
+		t.Fatal("timed out waiting for the manager to become leader")
+	}
+
+	le.Stop()
+
+	assert.True(t, stoppedLeading.Load(), "Stop should wait for the stop leading callback to finish")
+
+	lease, err := client.CoordinationV1().Leases(namespace).Get(context.Background(), leaseName, metav1.GetOptions{})
+	require.NoError(t, err, "the lease should be readable")
+	require.NotNil(t, lease.Spec.HolderIdentity, "the lease should have a holder identity")
+	assert.Empty(t, *lease.Spec.HolderIdentity, "Stop should wait for the lease to be released")
 }
 
 // TestNewLeaderElectionManager will test the leader elector.
