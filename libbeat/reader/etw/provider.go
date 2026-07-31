@@ -120,9 +120,11 @@ func guidFromProviderName(providerName string) (windows.GUID, error) {
 		return windows.GUID{}, fmt.Errorf("no providers found")
 	}
 
-	it := uintptr(unsafe.Pointer(&pEnum.TraceProviderInfoArray[0]))
-	for i := uintptr(0); i < uintptr(pEnum.NumberOfProviders); i++ {
-		pInfo := (*TraceProviderInfo)(unsafe.Pointer(it + i*unsafe.Sizeof(pEnum.TraceProviderInfoArray[0])))
+	providers, err := flexArrayFromBuffer[TraceProviderInfo](buf, unsafe.Offsetof(ProviderEnumerationInfo{}.TraceProviderInfoArray), pEnum.NumberOfProviders)
+	if err != nil {
+		return windows.GUID{}, fmt.Errorf("failed to enumerate providers: %w", err)
+	}
+	for _, pInfo := range providers {
 		name := getStringFromBufferOffset(buf, pInfo.ProviderNameOffset)
 
 		// If a match is found, return the corresponding GUID.

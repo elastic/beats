@@ -94,11 +94,9 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 
 	// Parse ExtendedData if present
 	if p.r.ExtendedDataCount > 0 && p.r.ExtendedData != nil {
-		for i := 0; i < int(p.r.ExtendedDataCount); i++ {
-			item := (*EventHeaderExtendedDataItem)(unsafe.Pointer(
-				uintptr(unsafe.Pointer(p.r.ExtendedData)) + uintptr(i)*unsafe.Sizeof(*p.r.ExtendedData),
-			))
-			event.ExtendedData[i] = renderExtendedData(item)
+		items := unsafe.Slice(p.r.ExtendedData, int(p.r.ExtendedDataCount))
+		for i := range items {
+			event.ExtendedData[i] = renderExtendedData(&items[i])
 			event.extendedDataMap[event.ExtendedData[i].ExtType] = i // Map the extended data type to its index
 		}
 	}
@@ -253,7 +251,7 @@ func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo,
 		// Length is specified by another property - use the property index
 		var dataDescriptor PropertyDataDescriptor
 		lengthPropIndex := propInfo.getLengthPropertyIndex()
-		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(lengthPropIndex))
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(eventInfo.InfoBuf, uint32(lengthPropIndex))
 		if nameProp == nil {
 			return 0, fmt.Errorf("property length is defined by another property, but no property found at index %d", lengthPropIndex)
 		}
@@ -269,7 +267,7 @@ func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo,
 		// Count is specified by another property - use the property index
 		var dataDescriptor PropertyDataDescriptor
 		countPropIndex := propInfo.getCountPropertyIndex()
-		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(countPropIndex))
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(eventInfo.InfoBuf, uint32(countPropIndex))
 		if nameProp == nil {
 			return 0, fmt.Errorf("property count is defined by another property, but no property found at index %d", countPropIndex)
 		}
@@ -307,7 +305,7 @@ func getElementLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, 
 		// Length is specified by another property - use the property index
 		var dataDescriptor PropertyDataDescriptor
 		lengthPropIndex := propInfo.getLengthPropertyIndex()
-		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(lengthPropIndex))
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(eventInfo.InfoBuf, uint32(lengthPropIndex))
 		if nameProp == nil {
 			return 0, fmt.Errorf("property length is defined by another property, but no property found at index %d", lengthPropIndex)
 		}

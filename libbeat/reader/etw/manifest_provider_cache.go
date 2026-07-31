@@ -114,9 +114,11 @@ func (cache *manifestProviderCache) initKeywords() error {
 		return fmt.Errorf("no keywords found for provider %s", cache.guid)
 	}
 
-	it := uintptr(unsafe.Pointer(&pfInfoArr.FieldInfoArray[0]))
-	for i := uint32(0); i < pfInfoArr.NumberOfElements; i++ {
-		pfInfo := *(*ProviderFieldInfo)(unsafe.Pointer(it + uintptr(i)*unsafe.Sizeof(pfInfoArr.FieldInfoArray[0])))
+	fields, err := flexArrayFromBuffer[ProviderFieldInfo](buf, unsafe.Offsetof(ProviderFieldInfoArray{}.FieldInfoArray), pfInfoArr.NumberOfElements)
+	if err != nil {
+		return fmt.Errorf("TdhEnumerateProviderFieldInformation failed: %w", err)
+	}
+	for _, pfInfo := range fields {
 		cache.keywords[pfInfo.Value] = &cachedProviderKeyword{
 			Name:        getStringFromBufferOffset(buf, pfInfo.NameOffset),
 			Description: getStringFromBufferOffset(buf, pfInfo.DescriptionOffset),
@@ -157,7 +159,7 @@ func (cache *manifestProviderCache) initEvent(r *EventRecord) error {
 		OpcodeName:            getStringFromBufferOffset(buf, info.OpcodeNameOffset),
 		EventMessage:          getStringFromBufferOffset(buf, info.EventMessageOffset),
 		ProviderMessage:       getStringFromBufferOffset(buf, info.ProviderMessageOffset),
-		BinaryXML:             getEventInfoBinaryXML(info),
+		BinaryXML:             getEventInfoBinaryXML(buf, info),
 		ActivityIDName:        getStringFromBufferOffset(buf, info.ActivityIDNameOffset),
 		RelatedActivityIDName: getStringFromBufferOffset(buf, info.RelatedActivityIDNameOffset),
 	}
@@ -235,12 +237,11 @@ func getProviderEventDescriptors(guid *windows.GUID) ([]EventDescriptor, error) 
 		return nil, errors.New("no events found for provider")
 	}
 
-	descriptors := make([]EventDescriptor, prInfo.NumberOfEvents)
-	it := uintptr(unsafe.Pointer(&prInfo.EventDescriptorsArray[0]))
-	for i := uint32(0); i < prInfo.NumberOfEvents; i++ {
-		descriptors[i] = *(*EventDescriptor)(unsafe.Pointer(it + uintptr(i)*unsafe.Sizeof(prInfo.EventDescriptorsArray[0])))
+	descriptors, err := flexArrayFromBuffer[EventDescriptor](buf, unsafe.Offsetof(ProviderEventInfo{}.EventDescriptorsArray), prInfo.NumberOfEvents)
+	if err != nil {
+		return nil, fmt.Errorf("TdhEnumerateManifestProviderEvents failed: %w", err)
 	}
-	return descriptors, nil
+	return append([]EventDescriptor(nil), descriptors...), nil
 }
 
 var dataIdxRegexp = regexp.MustCompile(`%(\d+)`)
@@ -269,20 +270,23 @@ func compileEventMessageTemplate(eventMessage string) (*template.Template, error
 }
 
 func getStringFromBufferOffset(buf []byte, offset uint32) string {
-	if offset == 0 || len(buf) == 0 {
+	if offset == 0 || len(buf) == 0 || int(offset) >= len(buf) {
 		return ""
 	}
 	ptr := unsafe.Add(unsafe.Pointer(&buf[0]), offset)
 	return strings.TrimSpace(windows.UTF16PtrToString((*uint16)(ptr)))
 }
 
-func getEventInfoBinaryXML(info *TraceEventInfo) string {
+func getEventInfoBinaryXML(buf []byte, info *TraceEventInfo) string {
 	if info == nil || info.BinaryXMLOffset == 0 || info.BinaryXMLSize == 0 {
 		return ""
 	}
+	end := uintptr(info.BinaryXMLOffset) + uintptr(info.BinaryXMLSize)
+	if end > uintptr(len(buf)) {
+		return ""
+	}
 	var result string
-	ptr := unsafe.Add(unsafe.Pointer(info), info.BinaryXMLOffset)
-	data := unsafe.Slice((*byte)(ptr), info.BinaryXMLSize)
+	data := unsafe.Slice((*byte)(unsafe.Add(unsafe.Pointer(&buf[0]), info.BinaryXMLOffset)), int(info.BinaryXMLSize))
 	if isPrintable(data) {
 		result = string(data)
 	} else {
@@ -322,7 +326,7 @@ func getEventInfoProperties(buf []byte, info *TraceEventInfo) []*cachedPropertyI
 	}
 	infos := make([]*cachedPropertyInfo, info.TopLevelPropertyCount)
 	for i := uint32(0); i < info.TopLevelPropertyCount; i++ {
-		prInfo := info.getEventPropertyInfoAtIndex(i)
+		prInfo := info.getEventPropertyInfoAtIndex(buf, i)
 		infos[i] = parseEventPropertyInfo(buf, info, prInfo)
 	}
 	return infos
@@ -393,7 +397,7 @@ func parseEventPropertyInfo(buf []byte, info *TraceEventInfo, prInfo *EventPrope
 		}
 
 		for i := startIndex; i < lastIndex; i++ {
-			memberInfo := info.getEventPropertyInfoAtIndex(uint32(i))
+			memberInfo := info.getEventPropertyInfoAtIndex(buf, uint32(i))
 			if memberInfo == nil {
 				continue // Skip invalid property info
 			}
@@ -462,9 +466,11 @@ func parseEventMapBuffer(mapName string, buf []byte, mapInfo *EventMapInfo) *cac
 		return parsed
 	}
 
-	it := uintptr(unsafe.Pointer(&mapInfo.MapEntryArray[0]))
-	for i := uint32(0); i < mapInfo.EntryCount; i++ {
-		mapEntry := (*EventMapEntry)(unsafe.Pointer(it + uintptr(i)*unsafe.Sizeof(EventMapEntry{})))
+	entries, err := flexArrayFromBuffer[EventMapEntry](buf, unsafe.Offsetof(EventMapInfo{}.MapEntryArray), mapInfo.EntryCount)
+	if err != nil {
+		return parsed
+	}
+	for _, mapEntry := range entries {
 		var entryKey any
 		switch {
 		case parsed.IsPattern:

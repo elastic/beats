@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Bound ETW flexible array reads to the enumeration buffer instead of using unchecked pointer arithmetic
+component: libbeat

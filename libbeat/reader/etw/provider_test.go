@@ -94,8 +94,9 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 		// It's placed after ProviderEnumerationInfo and TraceProviderInfo
 		nameOffset := unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{})
 
-		// Convert pBuffer to a byte slice starting at the calculated offset for the name
-		byteBuffer := (*[1 << 30]byte)(unsafe.Pointer(pBuffer))[:]
+		// Keep the view inside the caller's buffer so the race detector's
+		// checkptr instrumentation can validate the writes below.
+		byteBuffer := unsafe.Slice((*byte)(unsafe.Pointer(pBuffer)), *pBufferSize)
 		// Copy the UTF-16 encoded name into the buffer
 		for i, char := range utf16ProviderName {
 			binary.LittleEndian.PutUint16(byteBuffer[nameOffset+(uintptr(i)*2):], char)
@@ -146,8 +147,9 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 		// It's placed after ProviderEnumerationInfo and TraceProviderInfo
 		nameOffset := unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{})
 
-		// Convert pBuffer to a byte slice starting at the calculated offset for the name
-		byteBuffer := (*[1 << 30]byte)(unsafe.Pointer(pBuffer))[:]
+		// Keep the view inside the caller's buffer so the race detector's
+		// checkptr instrumentation can validate the writes below.
+		byteBuffer := unsafe.Slice((*byte)(unsafe.Pointer(pBuffer)), *pBufferSize)
 		// Copy the UTF-16 encoded name into the buffer
 		for i, char := range utf16ProviderName {
 			binary.LittleEndian.PutUint16(byteBuffer[nameOffset+(uintptr(i)*2):], char)
