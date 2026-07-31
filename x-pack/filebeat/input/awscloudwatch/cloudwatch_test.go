@@ -6,6 +6,7 @@ package awscloudwatch
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 
@@ -15,11 +16,20 @@ import (
 )
 
 type clock struct {
+	mu   sync.Mutex
 	time time.Time
 }
 
 func (c *clock) now() time.Time {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	return c.time
+}
+
+func (c *clock) set(t time.Time) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.time = t
 }
 
 type receiveTestStep struct {
@@ -196,7 +206,7 @@ func TestReceive(t *testing.T) {
 		if test.configOverrides != nil {
 			test.configOverrides(&p.config)
 		}
-		clock.time = test.startTime
+		clock.set(test.startTime)
 		go p.receive(ctx, test.logGroupIDs, clock.now)
 		for _, step := range test.steps {
 			for i, expected := range step.expected {
@@ -204,7 +214,7 @@ func TestReceive(t *testing.T) {
 				if i+1 == len(step.expected) && !step.nextTime.Equal(time.Time{}) {
 					// On the last request of the step, we advance the clock if a
 					// time is set
-					clock.time = step.nextTime
+					clock.set(step.nextTime)
 				}
 				response := <-p.workResponseChan
 				assert.Equalf(t, expected, response, "%v: step %v response %v doesn't match", test.name, stepIndex, i)
