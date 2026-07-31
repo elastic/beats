@@ -260,7 +260,35 @@ func runCmd(
 		wg.Done()
 	}()
 
-	// Send the test results into the output
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err = cmd.Start()
+
+		cmdStarted <- err
+
+		err := cmd.Wait()
+		cmdDone <- err
+	}()
+
+	err = <-cmdStarted
+	if err != nil {
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Warn("Could not start command %s: %s", cmd, err)
+		_ = jsonWriter.Close()
+		_ = jsonReader.Close()
+		wg.Wait()
+		return nil, err
+	}
+
+	// Send the test results into the output. Start before this goroutine so
+	// jsonReader is not closed while cmd.Start reads its fd from ExtraFiles.
 	wg.Add(1)
 	go func() {
 		defer jsonReader.Close()
@@ -285,30 +313,6 @@ func runCmd(
 
 		wg.Done()
 	}()
-
-	// This use of channels for results is awkward, but required for the thread locking below
-	cmdStarted := make(chan error)
-	cmdDone := make(chan error)
-	go func() {
-		// We must idle this thread and ensure it is not killed while the external program is running
-		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
-		// could cause the subprocess to die prematurely
-		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
-		err = cmd.Start()
-
-		cmdStarted <- err
-
-		err := cmd.Wait()
-		cmdDone <- err
-	}()
-
-	err = <-cmdStarted
-	if err != nil {
-		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Warn("Could not start command %s: %s", cmd, err)
-		return nil, err
-	}
 
 	// Get timeout from parent ctx
 	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
