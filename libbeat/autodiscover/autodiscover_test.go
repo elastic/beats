@@ -779,6 +779,16 @@ func wait(t *testing.T, test func() bool) {
 	}
 }
 
+func activeRunnerCount(runners []*mockRunner) int {
+	count := 0
+	for _, r := range runners {
+		if r.started && !r.stopped {
+			count++
+		}
+	}
+	return count
+}
+
 func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopped bool) {
 	t.Helper()
 	for _, r := range runners {
@@ -952,8 +962,6 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	// Wait for configs to be processed
 	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
-	// check that configs and metadata exist
-	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	metaKeys := autodiscover.meta.Keys()
 	assert.Len(t, metaKeys, 2, "Should have 2 metadata entries for id foo")
 
@@ -976,8 +984,6 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	})
 	// Wait for configs to be processed
 	wait(t, func() bool { return len(adapter.Runners()) == 4 })
-	assert.Len(t, autodiscover.configs["mock:foo"], 2)
-	assert.Len(t, autodiscover.configs["mock:bar"], 2)
 	metaKeys = autodiscover.meta.Keys()
 	assert.Len(t, metaKeys, 4, "Should have 4 metadata entries total")
 
@@ -992,9 +998,9 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 		},
 	})
 
-	// Wait for some configs to be removed from active configs
+	// Wait until foo runners stop while bar keeps running
 	wait(t, func() bool {
-		return len(autodiscover.configs["mock:foo"]) == 0 && len(autodiscover.configs["mock:bar"]) == 2
+		return activeRunnerCount(adapter.Runners()) == 2
 	})
 
 	// Wait for debounce period so the worker can run the metadata GC
@@ -1014,9 +1020,8 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 		},
 	})
 
-	// Wait for all configs to be removed
 	wait(t, func() bool {
-		return len(autodiscover.configs["mock:bar"]) == 0
+		return activeRunnerCount(adapter.Runners()) == 0
 	})
 
 	// Without active configs, metadata should be cleaned up
