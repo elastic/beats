@@ -39,6 +39,7 @@ type EventConverter interface {
 type GenericEventConverter struct {
 	log      *logp.Logger
 	keepNull bool
+	inPlace  bool
 }
 
 // NewGenericEventConverter creates an EventConverter with the given configuration options
@@ -47,6 +48,15 @@ func NewGenericEventConverter(keepNull bool, logger *logp.Logger) *GenericEventC
 		log:      logger.Named("event"),
 		keepNull: keepNull,
 	}
+}
+
+// NewGenericEventConverterInPlace creates a converter that reuses input maps.
+// Callers must exclusively own every reachable map: producer state and other
+// events must not reference them. Slices are still rebuilt.
+func NewGenericEventConverterInPlace(keepNull bool, logger *logp.Logger) *GenericEventConverter {
+	e := NewGenericEventConverter(keepNull, logger)
+	e.inPlace = true
+	return e
 }
 
 // Convert normalizes the types contained in the given mapstr.M.
@@ -63,13 +73,20 @@ func (e *GenericEventConverter) Convert(m mapstr.M) mapstr.M {
 	return event
 }
 
-// normalizeMap normalizes each element contained in the given map. If an error
-// occurs during normalization, processing of m will continue, and all errors
-// are returned at the end.
+// normalizeMap normalizes each element contained in the given map. Unless the
+// converter normalizes in place, the result is a copy and m is left untouched.
+// If an error occurs during normalization, processing of m will continue, and
+// all errors are returned at the end.
 func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr.M, []error) {
 	var errs []error
 
-	out := make(mapstr.M, len(m))
+	// Preserve the copying mode's nil-to-empty normalization.
+	reuse := e.inPlace && m != nil
+	out := m
+	if !reuse {
+		out = make(mapstr.M, len(m))
+	}
+
 	for key, value := range m {
 		v, err := e.normalizeValue(value, append(keys, key)...)
 		if len(err) > 0 {
@@ -80,6 +97,9 @@ func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr
 		if !e.keepNull && v == nil {
 			if e.log.IsDebug() {
 				e.log.Debugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
+			}
+			if reuse {
+				delete(out, key)
 			}
 			continue
 		}
