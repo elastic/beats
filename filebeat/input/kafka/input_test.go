@@ -21,6 +21,7 @@ package kafka
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -29,6 +30,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestNewInputDone(t *testing.T) {
@@ -53,6 +55,60 @@ func AssertNotStartedInputCanBeDone(t *testing.T, configMap *conf.C) {
 
 	_, err = Plugin(logp.NewNopLogger()).Manager.Create(config)
 	require.NoError(t, err)
+}
+
+func TestDeadlineReceiver(t *testing.T) {
+	t.Run("no deadline blocks until a message arrives", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage, 1)
+		ch <- &sarama.ConsumerMessage{Value: []byte("x")}
+		var d deadlineReceiver
+		msg, ok, timedOut := d.recv(ch)
+		require.True(t, ok)
+		require.False(t, timedOut)
+		require.Equal(t, []byte("x"), msg.Value)
+	})
+
+	t.Run("fast path returns a buffered message without consulting the deadline", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage, 1)
+		ch <- &sarama.ConsumerMessage{Value: []byte("y")}
+		var d deadlineReceiver
+		// An already elapsed deadline must not preempt a message that is ready:
+		// only the fast path can return it.
+		d.SetReadDeadline(time.Now().Add(-time.Hour))
+		msg, ok, timedOut := d.recv(ch)
+		require.True(t, ok)
+		require.False(t, timedOut)
+		require.Equal(t, []byte("y"), msg.Value)
+	})
+
+	t.Run("times out on an empty channel", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage)
+		var d deadlineReceiver
+		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		_, _, timedOut := d.recv(ch)
+		require.True(t, timedOut)
+
+		// The timer is reused across calls (see reader.Deadline), so a second
+		// deadline must still fire rather than observe the first firing.
+		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		_, _, timedOut = d.recv(ch)
+		require.True(t, timedOut)
+	})
+
+	t.Run("clearing the deadline restores a blocking receive", func(t *testing.T) {
+		ch := make(chan *sarama.ConsumerMessage)
+		var d deadlineReceiver
+		d.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		_, _, timedOut := d.recv(ch)
+		require.True(t, timedOut)
+
+		d.SetReadDeadline(time.Time{})
+		go func() { ch <- &sarama.ConsumerMessage{Value: []byte("z")} }()
+		msg, ok, timedOut := d.recv(ch)
+		require.True(t, ok)
+		require.False(t, timedOut, "a cleared deadline must not time out")
+		require.Equal(t, []byte("z"), msg.Value)
+	})
 }
 
 func TestAckEventPrivate(t *testing.T) {

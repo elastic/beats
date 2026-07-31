@@ -35,6 +35,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -73,6 +74,9 @@ type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...str
 //
 //go:generate moq --fmt gofmt -out jctlmock_test.go . Jctl
 type Jctl interface {
+	// journalctl always honors read deadlines (its read is a channel receive)
+	reader.DeadlineSetter
+
 	// Next returns the next journal entry. If there is no entry available
 	// next will block until there is an entry or cancel is cancelled.
 	//
@@ -127,6 +131,11 @@ type Reader struct {
 	supportsBootAll bool
 
 	backoff backoff.Backoff
+
+	// deadline is the current read deadline. The Reader never blocks on it
+	// itself; it applies it to the underlying journalctl before each read so the
+	// deadline survives journalctl restarts.
+	deadline reader.Deadline
 
 	// statusReporter, when set, is used to report the reader's health:
 	// Degraded when journalctl keeps exiting without delivering any data,
@@ -357,10 +366,19 @@ func (r *Reader) Close() error {
 	return nil
 }
 
+// SetReadDeadline bounds how long the next read waits for an entry (see
+// reader.DeadlineSetter). It is forwarded to journalctl, which honors it.
+func (r *Reader) SetReadDeadline(t time.Time) bool {
+	return r.deadline.SetReadDeadline(t)
+}
+
 // next reads the next entry from journalctl. It handles any errors from
 // journalctl restarting it as necessary with a backoff strategy. It either
 // returns a valid journald entry or ErrCancelled when the input is cancelled.
 func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
+	// Apply the current read deadline to the (possibly restarted) journalctl.
+	r.jctl.SetReadDeadline(r.deadline.ReadDeadline())
+
 	msg, err := r.jctl.Next(cancel)
 
 	// Check if the input has been cancelled
@@ -383,6 +401,11 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 			r.updateStatus(status.Running, "journalctl recovered and is delivering data")
 		}
 		return msg, nil
+	}
+	if errors.Is(err, reader.ErrReadDeadline) {
+		// The read deadline elapsed (multiline timeout) — not a journalctl
+		// failure, so propagate it without restarting.
+		return nil, err
 	}
 	r.logger.Warnf("reader error: '%s', restarting...", err)
 
