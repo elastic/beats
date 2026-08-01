@@ -22,8 +22,84 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-ucfg"
 )
+
+// TestGetResolverCachesClient verifies the Vault client is built once per
+// connection and shared across monitors (never rebuilt per monitor run).
+func TestGetResolverCachesClient(t *testing.T) {
+	c := Config{Enabled: true, Address: "http://127.0.0.1:8200", AuthMethod: "token", Token: "t", KVMount: "secret"}
+
+	r1, err := GetResolver(c, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	r2, err := GetResolver(c, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if r1 != r2 {
+		t.Fatal("expected the same cached resolver for the same connection")
+	}
+
+	other := c
+	other.Address = "http://127.0.0.1:8201"
+	r3, err := GetResolver(other, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if r3 == r1 {
+		t.Fatal("expected a distinct resolver for a different connection")
+	}
+}
+
+// TestResolveConfigStripsVault verifies the per-monitor `vault` field is
+// consumed (removed) and non-vault fields are preserved. A config with no
+// ${vault/..} refs never triggers a Vault read.
+func TestResolveConfigStripsVault(t *testing.T) {
+	blob := base64.StdEncoding.EncodeToString(
+		[]byte(`{"address":"http://127.0.0.1:8200","auth_method":"token","token":"t","kv_mount":"secret"}`))
+	raw, err := config.NewConfigFrom(map[string]interface{}{
+		"type":  "http",
+		"name":  "m1",
+		"urls":  []string{"http://example.com"},
+		"vault": blob,
+	})
+	if err != nil {
+		t.Fatalf("build config: %v", err)
+	}
+
+	out, err := ResolveConfig(raw, nil)
+	if err != nil {
+		t.Fatalf("ResolveConfig: %v", err)
+	}
+	if out.HasField("vault") {
+		t.Fatal("expected the vault field to be stripped")
+	}
+	var got struct {
+		Name string   `config:"name"`
+		URLs []string `config:"urls"`
+	}
+	if err := out.Unpack(&got); err != nil {
+		t.Fatalf("unpack resolved: %v", err)
+	}
+	if got.Name != "m1" || len(got.URLs) != 1 || got.URLs[0] != "http://example.com" {
+		t.Fatalf("non-vault fields not preserved: %+v", got)
+	}
+}
+
+// TestResolveConfigNoVault returns configs without a vault field unchanged.
+func TestResolveConfigNoVault(t *testing.T) {
+	raw, _ := config.NewConfigFrom(map[string]interface{}{"type": "http", "name": "m2"})
+	out, err := ResolveConfig(raw, nil)
+	if err != nil {
+		t.Fatalf("ResolveConfig: %v", err)
+	}
+	if out != raw {
+		t.Fatal("expected the same config instance when no vault field is present")
+	}
+}
 
 // TestDecodeBase64Config verifies the Fleet delivery form: the whole connection
 // arrives as one base64-encoded JSON string (a single Fleet secret).

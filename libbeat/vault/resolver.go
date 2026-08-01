@@ -31,7 +31,9 @@ package vault
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -44,6 +46,43 @@ import (
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 )
+
+// registry caches one resolver (Vault client + secret cache) per unique
+// connection for the lifetime of the process. Many monitors share the same
+// Vault connection, so the client is built once and the resolved-secret cache
+// is shared across every monitor — a monitor run never re-fetches a secret that
+// another monitor already resolved.
+var (
+	registry   = map[string]*resolver{}
+	registryMu sync.Mutex
+)
+
+func connKey(c Config) string {
+	h := sha256.Sum256([]byte(strings.Join([]string{
+		c.Address, c.Namespace, c.AuthMethod, c.Token, c.RoleID, c.SecretID, c.KVMount,
+	}, "\x00")))
+	return hex.EncodeToString(h[:])
+}
+
+// GetResolver returns the shared resolver for a connection, building (and
+// caching) the Vault client on first use and reusing it for every subsequent
+// monitor that uses the same connection.
+func GetResolver(c Config, log *logp.Logger) (*resolver, error) {
+	key := connKey(c)
+
+	registryMu.Lock()
+	defer registryMu.Unlock()
+
+	if r, ok := registry[key]; ok {
+		return r, nil
+	}
+	r, err := newResolver(c, log)
+	if err != nil {
+		return nil, err
+	}
+	registry[key] = r
+	return r, nil
+}
 
 // refPrefix is the sentinel that routes a config reference to this resolver.
 // A reference looks like ${vault/<secret-path>#<field>}, e.g.
@@ -140,11 +179,71 @@ func NewResolverOption(cfg *config.C, log *logp.Logger) (ucfg.Option, bool, erro
 		return nil, false, nil
 	}
 
-	r, err := newResolver(c, log)
+	r, err := GetResolver(c, log)
 	if err != nil {
 		return nil, false, err
 	}
 	return ucfg.Resolve(r.resolve), true, nil
+}
+
+// ResolveConfig handles the per-monitor delivery form: under Fleet, each monitor
+// carries its own `vault` connection (as a base64 string). When present, the
+// shared resolver for that connection is looked up (built once, cached), the
+// monitor's ${vault/<path>#<field>} references are resolved in place, and the
+// `vault` field is stripped so the monitor plugin never sees it. Monitors
+// without a `vault` field are returned unchanged.
+func ResolveConfig(raw *config.C, log *logp.Logger) (*config.C, error) {
+	if raw == nil || !raw.HasField("vault") {
+		return raw, nil
+	}
+
+	var c Config
+	if s, err := raw.String("vault", -1); err == nil && s != "" {
+		decoded, derr := decodeBase64Config(s)
+		if derr != nil {
+			return nil, derr
+		}
+		c = decoded
+	} else {
+		sub, cerr := raw.Child("vault", -1)
+		if cerr != nil {
+			return nil, fmt.Errorf("vault: reading monitor connection: %w", cerr)
+		}
+		if uerr := sub.Unpack(&c); uerr != nil {
+			return nil, fmt.Errorf("vault: invalid monitor connection: %w", uerr)
+		}
+	}
+
+	// Resolve the monitor's ${vault/...} references using the shared (cached)
+	// resolver. config.C.Unpack always uses the process-global options, so drop
+	// to the underlying ucfg config to add the per-monitor vault resolver.
+	var m map[string]interface{}
+	if c.Enabled {
+		r, err := GetResolver(c, log)
+		if err != nil {
+			return nil, err
+		}
+		opts := []ucfg.Option{
+			ucfg.PathSep("."),
+			ucfg.Resolve(r.resolve),
+			ucfg.ResolveEnv,
+			ucfg.VarExp,
+		}
+		if err := (*ucfg.Config)(raw).Unpack(&m, opts...); err != nil {
+			return nil, fmt.Errorf("vault: resolving monitor references: %w", err)
+		}
+	} else if err := raw.Unpack(&m); err != nil {
+		return nil, err
+	}
+
+	// The connection is consumed here; the monitor plugin must not see it.
+	delete(m, "vault")
+
+	resolved, err := config.NewConfigFrom(m)
+	if err != nil {
+		return nil, fmt.Errorf("vault: rebuilding monitor config: %w", err)
+	}
+	return resolved, nil
 }
 
 func newResolver(c Config, log *logp.Logger) (*resolver, error) {
