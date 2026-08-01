@@ -61,7 +61,7 @@ var (
 
 func connKey(c Config) string {
 	h := sha256.Sum256([]byte(strings.Join([]string{
-		c.Address, c.Namespace, c.AuthMethod, c.Token, c.RoleID, c.SecretID, c.KVMount,
+		c.Name, c.Address, c.Namespace, c.AuthMethod, c.Token, c.RoleID, c.SecretID, c.KVMount,
 		c.SecretRefreshInterval, c.Version,
 	}, "\x00")))
 	return hex.EncodeToString(h[:])
@@ -97,13 +97,19 @@ const refPrefix = "vault/"
 
 const defaultKVMount = "secret"
 
-// Config is the vault connection. It can be provided either as a structured
-// block (standalone heartbeat.yml) or, under Fleet, as a single base64-encoded
-// JSON string so the whole connection is one $co.elastic.secret{...} value
-// (see NewResolverOption). The json tags match the base64/JSON form Kibana
-// produces.
+// Config is a single vault connection. Multiple connections may be configured
+// (as an array); each is addressed by Name in references of the form
+// ${vault/<name>@<path>#<field>}. A reference without "<name>@" uses the default
+// connection. Config may be provided as a structured block (standalone
+// heartbeat.yml) or, under Fleet, as a base64-encoded JSON value (a single
+// object or an array) so it can be one $co.elastic.secret{...} value. The json
+// tags match the base64/JSON form Kibana produces.
 type Config struct {
 	Enabled bool `config:"enabled" json:"enabled"`
+
+	// Name addresses this connection in references (${vault/<name>@...}). Empty
+	// means the default connection.
+	Name string `config:"name" json:"name"`
 
 	Address   string `config:"address" json:"address"`
 	Namespace string `config:"namespace" json:"namespace"`
@@ -147,22 +153,121 @@ func (c Config) refreshInterval() time.Duration {
 	return d
 }
 
-// decodeBase64Config decodes a base64-encoded JSON vault connection. This is
-// the form delivered by Fleet, where the whole connection is stored as a single
-// Fleet secret and injected as one opaque string — base64 avoids any YAML
-// formatting issues in the agent policy.
-func decodeBase64Config(s string) (Config, error) {
-	var c Config
+// decodeConfigs decodes a base64-encoded JSON vault connection. This is the form
+// delivered by Fleet, where the connection(s) are stored as a single Fleet
+// secret and injected as one opaque string — base64 avoids any YAML formatting
+// issues in the agent policy. The JSON may be a single object or an array of
+// connections.
+func decodeConfigs(s string) ([]Config, error) {
 	decoded, err := base64.StdEncoding.DecodeString(strings.TrimSpace(s))
 	if err != nil {
-		return c, fmt.Errorf("vault: config is not valid base64: %w", err)
+		return nil, fmt.Errorf("vault: config is not valid base64: %w", err)
 	}
-	if err := json.Unmarshal(decoded, &c); err != nil {
-		return c, fmt.Errorf("vault: decoded config is not valid JSON: %w", err)
+	// Array of connections first, then a single object.
+	var arr []Config
+	if err := json.Unmarshal(decoded, &arr); err == nil {
+		for i := range arr {
+			arr[i].Enabled = true // a delivered connection is enabled
+		}
+		return arr, nil
 	}
-	// Presence of a delivered connection implies it is enabled.
-	c.Enabled = true
-	return c, nil
+	var one Config
+	if err := json.Unmarshal(decoded, &one); err != nil {
+		return nil, fmt.Errorf("vault: decoded config is not valid JSON: %w", err)
+	}
+	one.Enabled = true
+	return []Config{one}, nil
+}
+
+// parseConfigs reads the `vault` field as one or more connections. It accepts a
+// base64 string (Fleet form), a single object, or an array of objects
+// (standalone heartbeat.yml).
+func parseConfigs(cfg *config.C) ([]Config, error) {
+	if s, err := cfg.String("vault", -1); err == nil && s != "" {
+		return decodeConfigs(s)
+	}
+	var arrWrap struct {
+		Vault []Config `config:"vault"`
+	}
+	if err := cfg.Unpack(&arrWrap); err == nil && len(arrWrap.Vault) > 0 {
+		return arrWrap.Vault, nil
+	}
+	sub, err := cfg.Child("vault", -1)
+	if err != nil {
+		return nil, fmt.Errorf("vault: reading config block: %w", err)
+	}
+	var one Config
+	if err := sub.Unpack(&one); err != nil {
+		return nil, fmt.Errorf("vault: invalid config: %w", err)
+	}
+	return []Config{one}, nil
+}
+
+// dispatcher routes ${vault/[<name>@]<path>#<field>} references to the resolver
+// of the named connection (empty name = default).
+type dispatcher struct {
+	byName map[string]*resolver
+}
+
+// buildDispatcher builds (or reuses cached) resolvers for the enabled
+// connections, indexed by name. Returns nil when nothing is enabled.
+func buildDispatcher(configs []Config, log *logp.Logger) (*dispatcher, error) {
+	d := &dispatcher{byName: map[string]*resolver{}}
+	var enabled []Config
+	for _, c := range configs {
+		if !c.Enabled {
+			continue
+		}
+		enabled = append(enabled, c)
+		r, err := GetResolver(c, log)
+		if err != nil {
+			return nil, err
+		}
+		d.byName[c.Name] = r
+	}
+	if len(enabled) == 0 {
+		return nil, nil
+	}
+	// A single connection is also the default, so unqualified references work.
+	if _, ok := d.byName[""]; !ok && len(enabled) == 1 {
+		d.byName[""] = d.byName[enabled[0].Name]
+	}
+	return d, nil
+}
+
+func (d *dispatcher) resolve(key string) (string, parse.Config, error) {
+	noop := parse.NoopConfig
+	if !strings.HasPrefix(key, refPrefix) {
+		return "", noop, ucfg.ErrMissing
+	}
+	spec := strings.TrimPrefix(key, refPrefix)
+
+	name := ""
+	if at := strings.Index(spec, "@"); at >= 0 {
+		name = spec[:at]
+		spec = spec[at+1:]
+	}
+
+	hash := strings.LastIndex(spec, "#")
+	if hash < 0 {
+		return "", noop, fmt.Errorf(
+			"vault: reference %q must be vault/[<connection>@]<path>#<field>", key)
+	}
+	path := strings.Trim(spec[:hash], "/")
+	field := spec[hash+1:]
+	if path == "" || field == "" {
+		return "", noop, fmt.Errorf("vault: reference %q has an empty path or field", key)
+	}
+
+	r, ok := d.byName[name]
+	if !ok {
+		return "", noop, fmt.Errorf("vault: no connection named %q for reference %q", name, key)
+	}
+	val, err := r.read(path, field)
+	if err != nil {
+		return "", noop, err
+	}
+	return val, noop, nil
 }
 
 type cacheEntry struct {
@@ -182,85 +287,57 @@ type resolver struct {
 	cache map[string]cacheEntry
 }
 
-// NewResolverOption reads the `vault:` block from the given config and, when it
-// is present and enabled, returns a go-ucfg resolver option plus ok=true. When
-// the block is absent or disabled it returns ok=false and the caller should
-// leave the config options unchanged.
+// NewResolverOption reads the `vault:` config (one or more connections) and,
+// when present and enabled, returns a go-ucfg resolver option plus ok=true. When
+// absent or nothing is enabled it returns ok=false and the caller should leave
+// the config options unchanged.
 func NewResolverOption(cfg *config.C, log *logp.Logger) (ucfg.Option, bool, error) {
 	if cfg == nil || !cfg.HasField("vault") {
 		return nil, false, nil
 	}
 
-	var c Config
-	// Fleet delivers the whole connection as a single base64-encoded JSON string
-	// (a $co.elastic.secret{...} value). Standalone heartbeat.yml can instead use
-	// a structured block. Detect the string form first.
-	if s, serr := cfg.String("vault", -1); serr == nil && s != "" {
-		decoded, derr := decodeBase64Config(s)
-		if derr != nil {
-			return nil, false, derr
-		}
-		c = decoded
-	} else {
-		sub, cerr := cfg.Child("vault", -1)
-		if cerr != nil {
-			return nil, false, fmt.Errorf("vault: reading config block: %w", cerr)
-		}
-		if uerr := sub.Unpack(&c); uerr != nil {
-			return nil, false, fmt.Errorf("vault: invalid config: %w", uerr)
-		}
-	}
-	if !c.Enabled {
-		return nil, false, nil
-	}
-
-	r, err := GetResolver(c, log)
+	configs, err := parseConfigs(cfg)
 	if err != nil {
 		return nil, false, err
 	}
-	return ucfg.Resolve(r.resolve), true, nil
+	d, err := buildDispatcher(configs, log)
+	if err != nil {
+		return nil, false, err
+	}
+	if d == nil {
+		return nil, false, nil
+	}
+	return ucfg.Resolve(d.resolve), true, nil
 }
 
 // ResolveConfig handles the per-monitor delivery form: under Fleet, each monitor
-// carries its own `vault` connection (as a base64 string). When present, the
-// shared resolver for that connection is looked up (built once, cached), the
-// monitor's ${vault/<path>#<field>} references are resolved in place, and the
-// `vault` field is stripped so the monitor plugin never sees it. Monitors
-// without a `vault` field are returned unchanged.
+// carries its own `vault` connection(s) (as a base64 string, single or array).
+// The shared resolver for each connection is looked up (built once, cached), the
+// monitor's ${vault/[<name>@]<path>#<field>} references are resolved in place,
+// and the `vault` field is stripped so the monitor plugin never sees it.
+// Monitors without a `vault` field are returned unchanged.
 func ResolveConfig(raw *config.C, log *logp.Logger) (*config.C, error) {
 	if raw == nil || !raw.HasField("vault") {
 		return raw, nil
 	}
 
-	var c Config
-	if s, err := raw.String("vault", -1); err == nil && s != "" {
-		decoded, derr := decodeBase64Config(s)
-		if derr != nil {
-			return nil, derr
-		}
-		c = decoded
-	} else {
-		sub, cerr := raw.Child("vault", -1)
-		if cerr != nil {
-			return nil, fmt.Errorf("vault: reading monitor connection: %w", cerr)
-		}
-		if uerr := sub.Unpack(&c); uerr != nil {
-			return nil, fmt.Errorf("vault: invalid monitor connection: %w", uerr)
-		}
+	configs, err := parseConfigs(raw)
+	if err != nil {
+		return nil, err
+	}
+	d, err := buildDispatcher(configs, log)
+	if err != nil {
+		return nil, err
 	}
 
 	// Resolve the monitor's ${vault/...} references using the shared (cached)
-	// resolver. config.C.Unpack always uses the process-global options, so drop
+	// resolvers. config.C.Unpack always uses the process-global options, so drop
 	// to the underlying ucfg config to add the per-monitor vault resolver.
 	var m map[string]interface{}
-	if c.Enabled {
-		r, err := GetResolver(c, log)
-		if err != nil {
-			return nil, err
-		}
+	if d != nil {
 		opts := []ucfg.Option{
 			ucfg.PathSep("."),
-			ucfg.Resolve(r.resolve),
+			ucfg.Resolve(d.resolve),
 			ucfg.ResolveEnv,
 			ucfg.VarExp,
 		}
@@ -370,36 +447,6 @@ func authenticate(client *vaultapi.Client, c Config) error {
 		return fmt.Errorf("vault: unknown auth_method %q", c.AuthMethod)
 	}
 	return nil
-}
-
-// resolve is the go-ucfg resolver callback. It only handles keys prefixed with
-// "vault/"; anything else returns ucfg.ErrMissing so the next resolver (keystore
-// / env) gets a chance.
-func (r *resolver) resolve(key string) (string, parse.Config, error) {
-	// parse.NoopConfig prevents the resolved secret from being re-interpreted by
-	// the ucfg parser (e.g. a value that happens to contain ${...} or commas).
-	noop := parse.NoopConfig
-
-	if !strings.HasPrefix(key, refPrefix) {
-		return "", noop, ucfg.ErrMissing
-	}
-
-	spec := strings.TrimPrefix(key, refPrefix)
-	hash := strings.LastIndex(spec, "#")
-	if hash < 0 {
-		return "", noop, fmt.Errorf("vault: reference %q must be of the form vault/<path>#<field>", key)
-	}
-	path := strings.Trim(spec[:hash], "/")
-	field := spec[hash+1:]
-	if path == "" || field == "" {
-		return "", noop, fmt.Errorf("vault: reference %q has an empty path or field", key)
-	}
-
-	val, err := r.read(path, field)
-	if err != nil {
-		return "", noop, err
-	}
-	return val, noop, nil
 }
 
 func (r *resolver) read(path, field string) (string, error) {

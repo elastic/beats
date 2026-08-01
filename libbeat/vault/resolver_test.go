@@ -105,16 +105,20 @@ func TestResolveConfigNoVault(t *testing.T) {
 	}
 }
 
-// TestDecodeBase64Config verifies the Fleet delivery form: the whole connection
-// arrives as one base64-encoded JSON string (a single Fleet secret).
-func TestDecodeBase64Config(t *testing.T) {
+// TestDecodeConfigs verifies the Fleet delivery form: the connection(s) arrive
+// as one base64-encoded JSON value — a single object or an array.
+func TestDecodeConfigs(t *testing.T) {
 	jsonCfg := `{"address":"https://vault.internal:8200","auth_method":"approle","role_id":"r1","secret_id":"s1","kv_mount":"secret"}`
 	b64 := base64.StdEncoding.EncodeToString([]byte(jsonCfg))
 
-	c, err := decodeBase64Config(b64)
+	cs, err := decodeConfigs(b64)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+	if len(cs) != 1 {
+		t.Fatalf("expected 1 connection, got %d", len(cs))
+	}
+	c := cs[0]
 	if !c.Enabled {
 		t.Fatal("expected Enabled=true for a delivered connection")
 	}
@@ -123,20 +127,30 @@ func TestDecodeBase64Config(t *testing.T) {
 		t.Fatalf("decoded config mismatch: %+v", c)
 	}
 
-	if _, err := decodeBase64Config("not!base64!!"); err == nil {
+	// Array form (multiple connections).
+	arrJSON := `[{"name":"prod","address":"https://p:8200","auth_method":"token","token":"t"},` +
+		`{"name":"staging","address":"https://s:8200","auth_method":"token","token":"t"}]`
+	arr, err := decodeConfigs(base64.StdEncoding.EncodeToString([]byte(arrJSON)))
+	if err != nil {
+		t.Fatalf("array decode: %v", err)
+	}
+	if len(arr) != 2 || arr[0].Name != "prod" || arr[1].Name != "staging" {
+		t.Fatalf("array decode mismatch: %+v", arr)
+	}
+
+	if _, err := decodeConfigs("not!base64!!"); err == nil {
 		t.Fatal("expected error for invalid base64")
 	}
-	if _, err := decodeBase64Config(base64.StdEncoding.EncodeToString([]byte("not json"))); err == nil {
+	if _, err := decodeConfigs(base64.StdEncoding.EncodeToString([]byte("not json"))); err == nil {
 		t.Fatal("expected error for invalid JSON")
 	}
 }
 
 // TestResolveRouting verifies the parsing/routing done before any network call:
 // non-vault keys fall through with ErrMissing, and malformed references error
-// out. These paths never touch the Vault client, so a zero-value resolver is
-// sufficient.
+// out. These paths never touch a Vault client.
 func TestResolveRouting(t *testing.T) {
-	r := &resolver{cache: map[string]cacheEntry{}}
+	d := &dispatcher{byName: map[string]*resolver{}}
 
 	tests := []struct {
 		name      string
@@ -149,11 +163,12 @@ func TestResolveRouting(t *testing.T) {
 		{name: "missing hash separator", key: "vault/myapp/creds", wantError: true},
 		{name: "empty path", key: "vault/#password", wantError: true},
 		{name: "empty field", key: "vault/myapp/creds#", wantError: true},
+		{name: "unknown connection name", key: "vault/nope@myapp/creds#password", wantError: true},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			_, _, err := r.resolve(tc.key)
+			_, _, err := d.resolve(tc.key)
 			switch {
 			case tc.wantMiss:
 				if !errors.Is(err, ucfg.ErrMissing) {
@@ -168,19 +183,47 @@ func TestResolveRouting(t *testing.T) {
 	}
 }
 
-// TestResolveUsesCache verifies a non-expired cached value is returned without a
-// client call.
+// TestResolveUsesCache verifies a non-expired cached value is returned via the
+// default connection without a client call.
 func TestResolveUsesCache(t *testing.T) {
 	r := &resolver{cache: map[string]cacheEntry{
 		"myapp/creds#password": {value: "cached-secret", expiresAt: time.Now().Add(time.Hour)},
 	}}
+	d := &dispatcher{byName: map[string]*resolver{"": r}}
 
-	v, _, err := r.resolve("vault/myapp/creds#password")
+	v, _, err := d.resolve("vault/myapp/creds#password")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if v != "cached-secret" {
 		t.Fatalf("expected cached-secret, got %q", v)
+	}
+}
+
+// TestDispatchByName verifies references route to the named connection, and the
+// default (no name@) routes to the default connection.
+func TestDispatchByName(t *testing.T) {
+	prod := &resolver{cache: map[string]cacheEntry{
+		"db#password": {value: "prod-pw", expiresAt: time.Now().Add(time.Hour)},
+	}}
+	staging := &resolver{cache: map[string]cacheEntry{
+		"db#password": {value: "staging-pw", expiresAt: time.Now().Add(time.Hour)},
+	}}
+	d := &dispatcher{byName: map[string]*resolver{"prod": prod, "staging": staging, "": prod}}
+
+	cases := map[string]string{
+		"vault/prod@db#password":    "prod-pw",
+		"vault/staging@db#password": "staging-pw",
+		"vault/db#password":         "prod-pw", // default
+	}
+	for key, want := range cases {
+		v, _, err := d.resolve(key)
+		if err != nil {
+			t.Fatalf("%q: unexpected error: %v", key, err)
+		}
+		if v != want {
+			t.Fatalf("%q: got %q, want %q", key, v, want)
+		}
 	}
 }
 
