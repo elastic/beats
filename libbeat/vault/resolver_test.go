@@ -21,8 +21,12 @@ import (
 	"encoding/base64"
 	"errors"
 	"testing"
+	"time"
+
+	vaultapi "github.com/hashicorp/vault/api"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -132,7 +136,7 @@ func TestDecodeBase64Config(t *testing.T) {
 // out. These paths never touch the Vault client, so a zero-value resolver is
 // sufficient.
 func TestResolveRouting(t *testing.T) {
-	r := &resolver{cache: map[string]string{}}
+	r := &resolver{cache: map[string]cacheEntry{}}
 
 	tests := []struct {
 		name      string
@@ -164,9 +168,12 @@ func TestResolveRouting(t *testing.T) {
 	}
 }
 
-// TestResolveUsesCache verifies a cached value is returned without a client call.
+// TestResolveUsesCache verifies a non-expired cached value is returned without a
+// client call.
 func TestResolveUsesCache(t *testing.T) {
-	r := &resolver{cache: map[string]string{"myapp/creds#password": "cached-secret"}}
+	r := &resolver{cache: map[string]cacheEntry{
+		"myapp/creds#password": {value: "cached-secret", expiresAt: time.Now().Add(time.Hour)},
+	}}
 
 	v, _, err := r.resolve("vault/myapp/creds#password")
 	if err != nil {
@@ -174,5 +181,50 @@ func TestResolveUsesCache(t *testing.T) {
 	}
 	if v != "cached-secret" {
 		t.Fatalf("expected cached-secret, got %q", v)
+	}
+}
+
+// TestRefreshInterval verifies parsing + defaulting of secret_refresh_interval.
+func TestRefreshInterval(t *testing.T) {
+	cases := map[string]time.Duration{
+		"":        defaultRefreshInterval,
+		"30s":     30 * time.Second,
+		"10m":     10 * time.Minute,
+		"garbage": defaultRefreshInterval,
+		"0s":      defaultRefreshInterval,
+		"-5m":     defaultRefreshInterval,
+	}
+	for in, want := range cases {
+		if got := (Config{SecretRefreshInterval: in}).refreshInterval(); got != want {
+			t.Fatalf("refreshInterval(%q) = %s, want %s", in, got, want)
+		}
+	}
+}
+
+// TestExpiredCacheIsRefetched verifies an expired cache entry is not served; the
+// read path re-fetches (and here fails, since no client is configured), proving
+// the TTL gate is applied rather than returning the stale value.
+func TestExpiredCacheIsRefetched(t *testing.T) {
+	apiCfg := vaultapi.DefaultConfig()
+	apiCfg.Address = "http://127.0.0.1:1" // unreachable -> fetch errors instead of returning stale
+	client, err := vaultapi.NewClient(apiCfg)
+	if err != nil {
+		t.Fatalf("client: %v", err)
+	}
+	client.SetToken("t")
+
+	r := &resolver{
+		client:          client,
+		cfg:             Config{Address: apiCfg.Address, AuthMethod: "token", Token: "t"},
+		mount:           "secret",
+		refreshInterval: time.Minute,
+		log:             logp.NewLogger("test"),
+		cache: map[string]cacheEntry{
+			"myapp/creds#password": {value: "stale", expiresAt: time.Now().Add(-time.Minute)},
+		},
+	}
+	// Expired entry -> read() must not return "stale"; it re-fetches and errors.
+	if v, err := r.read("myapp/creds", "password"); err == nil {
+		t.Fatalf("expected a re-fetch error for an expired entry, got value %q", v)
 	}
 }

@@ -35,9 +35,11 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	vaultapi "github.com/hashicorp/vault/api"
 
@@ -60,6 +62,7 @@ var (
 func connKey(c Config) string {
 	h := sha256.Sum256([]byte(strings.Join([]string{
 		c.Address, c.Namespace, c.AuthMethod, c.Token, c.RoleID, c.SecretID, c.KVMount,
+		c.SecretRefreshInterval, c.Version,
 	}, "\x00")))
 	return hex.EncodeToString(h[:])
 }
@@ -117,6 +120,31 @@ type Config struct {
 
 	// TLSSkipVerify disables TLS verification. Intended for local/dev only.
 	TLSSkipVerify bool `config:"tls_skip_verify" json:"tls_skip_verify"`
+
+	// SecretRefreshInterval is how long a resolved secret is cached before it is
+	// re-read from Vault — the cache-invalidation window that lets rotated
+	// secrets be picked up without restarting. A Go duration string, e.g. "5m".
+	// Defaults to defaultRefreshInterval.
+	SecretRefreshInterval string `config:"secret_refresh_interval" json:"secret_refresh_interval"`
+
+	// Version is an opaque value bumped by the control plane (e.g. when a user
+	// clicks "Refresh secrets"). It is part of the connection identity, so a new
+	// version yields a fresh resolver with an empty cache — the next read
+	// re-fetches from Vault. This is what makes a manual refresh force an update.
+	Version string `config:"version" json:"version"`
+}
+
+const defaultRefreshInterval = 5 * time.Minute
+
+func (c Config) refreshInterval() time.Duration {
+	if c.SecretRefreshInterval == "" {
+		return defaultRefreshInterval
+	}
+	d, err := time.ParseDuration(c.SecretRefreshInterval)
+	if err != nil || d <= 0 {
+		return defaultRefreshInterval
+	}
+	return d
 }
 
 // decodeBase64Config decodes a base64-encoded JSON vault connection. This is
@@ -137,14 +165,21 @@ func decodeBase64Config(s string) (Config, error) {
 	return c, nil
 }
 
-// resolver reads secrets from Vault and memoizes them for the process lifetime.
+type cacheEntry struct {
+	value     string
+	expiresAt time.Time
+}
+
+// resolver reads secrets from Vault and caches them for secret_refresh_interval.
 type resolver struct {
-	client *vaultapi.Client
-	mount  string
-	log    *logp.Logger
+	client          *vaultapi.Client
+	cfg             Config // retained so the token can be re-established on expiry
+	mount           string
+	refreshInterval time.Duration
+	log             *logp.Logger
 
 	mu    sync.Mutex
-	cache map[string]string
+	cache map[string]cacheEntry
 }
 
 // NewResolverOption reads the `vault:` block from the given config and, when it
@@ -273,38 +308,8 @@ func newResolver(c Config, log *logp.Logger) (*resolver, error) {
 		client.SetNamespace(c.Namespace)
 	}
 
-	authMethod := c.AuthMethod
-	if authMethod == "" {
-		if c.RoleID != "" {
-			authMethod = "approle"
-		} else {
-			authMethod = "token"
-		}
-	}
-
-	switch authMethod {
-	case "token":
-		if c.Token == "" {
-			return nil, fmt.Errorf("vault: token auth requires a token")
-		}
-		client.SetToken(c.Token)
-	case "approle":
-		if c.RoleID == "" || c.SecretID == "" {
-			return nil, fmt.Errorf("vault: approle auth requires role_id and secret_id")
-		}
-		secret, err := client.Logical().WriteWithContext(context.Background(), "auth/approle/login", map[string]interface{}{
-			"role_id":   c.RoleID,
-			"secret_id": c.SecretID,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("vault: approle login failed: %w", err)
-		}
-		if secret == nil || secret.Auth == nil || secret.Auth.ClientToken == "" {
-			return nil, fmt.Errorf("vault: approle login returned no client token")
-		}
-		client.SetToken(secret.Auth.ClientToken)
-	default:
-		return nil, fmt.Errorf("vault: unknown auth_method %q", authMethod)
+	if err := authenticate(client, c); err != nil {
+		return nil, err
 	}
 
 	mount := c.KVMount
@@ -312,14 +317,59 @@ func newResolver(c Config, log *logp.Logger) (*resolver, error) {
 		mount = defaultKVMount
 	}
 
-	log.Infof("initialized HashiCorp Vault resolver (address=%s, kv_mount=%s, auth=%s)", c.Address, mount, authMethod)
+	r := &resolver{
+		client:          client,
+		cfg:             c,
+		mount:           mount,
+		refreshInterval: c.refreshInterval(),
+		log:             log,
+		cache:           map[string]cacheEntry{},
+	}
+	log.Infof("initialized HashiCorp Vault resolver (address=%s, kv_mount=%s, auth=%s, refresh=%s)",
+		c.Address, mount, authMethodOf(c), r.refreshInterval)
+	return r, nil
+}
 
-	return &resolver{
-		client: client,
-		mount:  mount,
-		log:    log,
-		cache:  map[string]string{},
-	}, nil
+// authMethodOf returns the effective auth method (defaults to approle when a
+// role_id is present, otherwise token).
+func authMethodOf(c Config) string {
+	if c.AuthMethod != "" {
+		return c.AuthMethod
+	}
+	if c.RoleID != "" {
+		return "approle"
+	}
+	return "token"
+}
+
+// authenticate establishes the client token from the configured auth method. It
+// is used both on initial connect and to re-authenticate when the token expires.
+func authenticate(client *vaultapi.Client, c Config) error {
+	switch authMethodOf(c) {
+	case "token":
+		if c.Token == "" {
+			return fmt.Errorf("vault: token auth requires a token")
+		}
+		client.SetToken(c.Token)
+	case "approle":
+		if c.RoleID == "" || c.SecretID == "" {
+			return fmt.Errorf("vault: approle auth requires role_id and secret_id")
+		}
+		secret, err := client.Logical().WriteWithContext(context.Background(), "auth/approle/login", map[string]interface{}{
+			"role_id":   c.RoleID,
+			"secret_id": c.SecretID,
+		})
+		if err != nil {
+			return fmt.Errorf("vault: approle login failed: %w", err)
+		}
+		if secret == nil || secret.Auth == nil || secret.Auth.ClientToken == "" {
+			return fmt.Errorf("vault: approle login returned no client token")
+		}
+		client.SetToken(secret.Auth.ClientToken)
+	default:
+		return fmt.Errorf("vault: unknown auth_method %q", c.AuthMethod)
+	}
+	return nil
 }
 
 // resolve is the go-ucfg resolver callback. It only handles keys prefixed with
@@ -358,26 +408,52 @@ func (r *resolver) read(path, field string) (string, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if v, ok := r.cache[cacheKey]; ok {
-		return v, nil
+	// Serve from cache until secret_refresh_interval elapses; after that the
+	// secret is re-read so a rotated value is picked up without a restart.
+	if e, ok := r.cache[cacheKey]; ok && time.Now().Before(e.expiresAt) {
+		return e.value, nil
 	}
 
+	val, err := r.fetch(path, field)
+	if err != nil {
+		return "", err
+	}
+
+	r.cache[cacheKey] = cacheEntry{value: val, expiresAt: time.Now().Add(r.refreshInterval)}
+	// Never log the secret value itself.
+	r.log.Debugf("resolved vault reference %s/%s#%s (cached %s)", r.mount, path, field, r.refreshInterval)
+	return val, nil
+}
+
+// fetch reads a single field from Vault, re-authenticating once if the token has
+// expired (403), so a long-lived Heartbeat survives token/lease expiry.
+func (r *resolver) fetch(path, field string) (string, error) {
 	secret, err := r.client.KVv2(r.mount).Get(context.Background(), path)
+	if err != nil && isPermissionError(err) {
+		r.log.Debugf("vault token rejected, re-authenticating")
+		if aerr := authenticate(r.client, r.cfg); aerr != nil {
+			return "", fmt.Errorf("vault: re-authentication failed: %w", aerr)
+		}
+		secret, err = r.client.KVv2(r.mount).Get(context.Background(), path)
+	}
 	if err != nil {
 		return "", fmt.Errorf("vault: reading %s/%s: %w", r.mount, path, err)
 	}
 	if secret == nil || secret.Data == nil {
 		return "", fmt.Errorf("vault: no data at %s/%s", r.mount, path)
 	}
-
 	raw, ok := secret.Data[field]
 	if !ok {
 		return "", fmt.Errorf("vault: field %q not found at %s/%s", field, r.mount, path)
 	}
+	return fmt.Sprintf("%v", raw), nil
+}
 
-	val := fmt.Sprintf("%v", raw)
-	r.cache[cacheKey] = val
-	// Never log the secret value itself.
-	r.log.Debugf("resolved vault reference %s/%s#%s", r.mount, path, field)
-	return val, nil
+// isPermissionError reports whether err is a Vault 401/403 (expired/invalid token).
+func isPermissionError(err error) bool {
+	var respErr *vaultapi.ResponseError
+	if errors.As(err, &respErr) {
+		return respErr.StatusCode == 401 || respErr.StatusCode == 403
+	}
+	return false
 }
