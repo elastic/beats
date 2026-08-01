@@ -461,7 +461,11 @@ type opUnixTimestampValue struct {
 
 // Process converts a value in seconds into an unix time
 func (o opUnixTimestampValue) Process(field string, value any, labels mapstr.M) (string, any, mapstr.M) {
-	return field, common.Time(time.Unix(int64(value.(float64)), 0)), labels
+	v, ok := value.(float64)
+	if !ok {
+		return field, value, labels
+	}
+	return field, common.Time(time.Unix(int64(v), 0)), labels
 }
 
 // OpLabelKeyPrefixRemover removes prefix from label keys
