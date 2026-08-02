@@ -150,7 +150,7 @@ func TestDecodeConfigs(t *testing.T) {
 // non-vault keys fall through with ErrMissing, and malformed references error
 // out. These paths never touch a Vault client.
 func TestResolveRouting(t *testing.T) {
-	d := &dispatcher{byName: map[string]*resolver{}}
+	d := &dispatcher{byName: map[string]Resolver{}}
 
 	tests := []struct {
 		name      string
@@ -189,7 +189,7 @@ func TestResolveUsesCache(t *testing.T) {
 	r := &resolver{cache: map[string]cacheEntry{
 		"myapp/creds#password": {value: "cached-secret", expiresAt: time.Now().Add(time.Hour)},
 	}}
-	d := &dispatcher{byName: map[string]*resolver{"": r}}
+	d := &dispatcher{byName: map[string]Resolver{"": r}}
 
 	v, _, err := d.resolve("vault/myapp/creds#password")
 	if err != nil {
@@ -209,7 +209,7 @@ func TestDispatchByName(t *testing.T) {
 	staging := &resolver{cache: map[string]cacheEntry{
 		"db#password": {value: "staging-pw", expiresAt: time.Now().Add(time.Hour)},
 	}}
-	d := &dispatcher{byName: map[string]*resolver{"prod": prod, "staging": staging, "": prod}}
+	d := &dispatcher{byName: map[string]Resolver{"prod": prod, "staging": staging, "": prod}}
 
 	cases := map[string]string{
 		"vault/prod@db#password":    "prod-pw",
@@ -269,5 +269,29 @@ func TestExpiredCacheIsRefetched(t *testing.T) {
 	// Expired entry -> read() must not return "stale"; it re-fetches and errors.
 	if v, err := r.read("myapp/creds", "password"); err == nil {
 		t.Fatalf("expected a re-fetch error for an expired entry, got value %q", v)
+	}
+}
+
+// TestProviderTypeDispatch verifies newResolver routes by provider type: an empty
+// type defaults to HashiCorp Vault, and an unknown type is rejected. This is the
+// seam other secret-provider backends plug into.
+func TestProviderTypeDispatch(t *testing.T) {
+	if got := providerTypeOf(Config{}); got != ProviderHashiCorpVault {
+		t.Fatalf("empty type should default to %q, got %q", ProviderHashiCorpVault, got)
+	}
+	if got := providerTypeOf(Config{Type: "cyberark"}); got != "cyberark" {
+		t.Fatalf("explicit type should be returned, got %q", got)
+	}
+
+	// The default/known provider builds a resolver (token auth makes no network call).
+	if _, err := newResolver(
+		Config{Address: "http://127.0.0.1:8200", AuthMethod: "token", Token: "t"}, nil,
+	); err != nil {
+		t.Fatalf("default provider should build: %v", err)
+	}
+
+	// An unimplemented provider type is rejected rather than silently ignored.
+	if _, err := newResolver(Config{Type: "bogus", Address: "http://127.0.0.1:8200"}, nil); err == nil {
+		t.Fatal("expected an error for an unknown provider type")
 	}
 }

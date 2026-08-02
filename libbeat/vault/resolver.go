@@ -55,13 +55,13 @@ import (
 // is shared across every monitor — a monitor run never re-fetches a secret that
 // another monitor already resolved.
 var (
-	registry   = map[string]*resolver{}
+	registry   = map[string]Resolver{}
 	registryMu sync.Mutex
 )
 
 func connKey(c Config) string {
 	h := sha256.Sum256([]byte(strings.Join([]string{
-		c.Name, c.Address, c.Namespace, c.AuthMethod, c.Token, c.RoleID, c.SecretID, c.KVMount,
+		c.Type, c.Name, c.Address, c.Namespace, c.AuthMethod, c.Token, c.RoleID, c.SecretID, c.KVMount,
 		c.SecretRefreshInterval, c.Version,
 	}, "\x00")))
 	return hex.EncodeToString(h[:])
@@ -70,7 +70,7 @@ func connKey(c Config) string {
 // GetResolver returns the shared resolver for a connection, building (and
 // caching) the Vault client on first use and reusing it for every subsequent
 // monitor that uses the same connection.
-func GetResolver(c Config, log *logp.Logger) (*resolver, error) {
+func GetResolver(c Config, log *logp.Logger) (Resolver, error) {
 	key := connKey(c)
 
 	registryMu.Lock()
@@ -97,6 +97,10 @@ const refPrefix = "vault/"
 
 const defaultKVMount = "secret"
 
+// ProviderHashiCorpVault is the only implemented secret-provider backend. New
+// backends add their own constant and a case in newResolver.
+const ProviderHashiCorpVault = "hashicorp_vault"
+
 // Config is a single vault connection. Multiple connections may be configured
 // (as an array); each is addressed by Name in references of the form
 // ${vault/<name>@<path>#<field>}. A reference without "<name>@" uses the default
@@ -106,6 +110,12 @@ const defaultKVMount = "secret"
 // tags match the base64/JSON form Kibana produces.
 type Config struct {
 	Enabled bool `config:"enabled" json:"enabled"`
+
+	// Type selects the secret-provider backend. Only "hashicorp_vault" is
+	// implemented; empty defaults to it. Adding a provider (CyberArk, Azure Key
+	// Vault, AWS Secrets Manager) means a new Resolver impl plus a case in
+	// newResolver — references, caching and dispatch are provider-agnostic.
+	Type string `config:"type" json:"type"`
 
 	// Name addresses this connection in references (${vault/<name>@...}). Empty
 	// means the default connection.
@@ -206,13 +216,13 @@ func parseConfigs(cfg *config.C) ([]Config, error) {
 // dispatcher routes ${vault/[<name>@]<path>#<field>} references to the resolver
 // of the named connection (empty name = default).
 type dispatcher struct {
-	byName map[string]*resolver
+	byName map[string]Resolver
 }
 
 // buildDispatcher builds (or reuses cached) resolvers for the enabled
 // connections, indexed by name. Returns nil when nothing is enabled.
 func buildDispatcher(configs []Config, log *logp.Logger) (*dispatcher, error) {
-	d := &dispatcher{byName: map[string]*resolver{}}
+	d := &dispatcher{byName: map[string]Resolver{}}
 	var enabled []Config
 	for _, c := range configs {
 		if !c.Enabled {
@@ -358,7 +368,36 @@ func ResolveConfig(raw *config.C, log *logp.Logger) (*config.C, error) {
 	return resolved, nil
 }
 
-func newResolver(c Config, log *logp.Logger) (*resolver, error) {
+// Resolver reads a secret field for one connection. Each provider backend
+// implements it; the registry, dispatcher and cache treat every provider
+// uniformly, so only newResolver knows about concrete backends.
+type Resolver interface {
+	read(path, field string) (string, error)
+}
+
+// providerTypeOf returns the connection's backend, defaulting to HashiCorp Vault
+// when unset (older blobs, or a single-provider deployment).
+func providerTypeOf(c Config) string {
+	if c.Type == "" {
+		return ProviderHashiCorpVault
+	}
+	return c.Type
+}
+
+// newResolver builds the resolver for a connection's provider type. This switch is
+// the single extension point for new backends.
+func newResolver(c Config, log *logp.Logger) (Resolver, error) {
+	switch providerTypeOf(c) {
+	case ProviderHashiCorpVault:
+		return newVaultResolver(c, log)
+	default:
+		return nil, fmt.Errorf("vault: unknown provider type %q", c.Type)
+	}
+}
+
+// newVaultResolver builds a HashiCorp Vault resolver: a Vault API client
+// authenticated per the connection, with a TTL secret cache.
+func newVaultResolver(c Config, log *logp.Logger) (*resolver, error) {
 	if log == nil {
 		log = logp.NewLogger("vault")
 	} else {
