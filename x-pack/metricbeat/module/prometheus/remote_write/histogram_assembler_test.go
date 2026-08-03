@@ -104,7 +104,10 @@ func TestHistogramAssemblerSameRequestBuffering(t *testing.T) {
 	flushed := g.FlushExpired(g.now())
 	require.Len(t, flushed, 1, "quiet flush after +Inf should emit one histogram event")
 	for _, ev := range flushed {
-		hist := ev.ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
+		metric, ok := ev.ModuleFields["http_request_duration_seconds"].(mapstr.M)
+		require.True(t, ok, "flushed metric must use the typed metric layout")
+		hist, ok := metric["histogram"].(mapstr.M)
+		require.True(t, ok, "flushed metric must contain a histogram")
 		assert.Equal(t, []float64{0.125, 0.375, 0.5}, hist["values"], "same-request buckets must assemble all centroids")
 	}
 }
@@ -128,7 +131,10 @@ func TestHistogramAssemblerCrossCallMerge(t *testing.T) {
 	flushed := g.FlushExpired(ts.Time().Add(2*time.Second + cfg.QuietPeriod + time.Millisecond))
 	require.Len(t, flushed, 1)
 	labels := mapstr.M{"runtime": model.LabelValue("linux")}
-	hist := flushed[labels.String()+ts.Time().String()].ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
+	metric, ok := flushed[labels.String()+ts.Time().String()].ModuleFields["http_request_duration_seconds"].(mapstr.M)
+	require.True(t, ok, "flushed metric must use the typed metric layout")
+	hist, ok := metric["histogram"].(mapstr.M)
+	require.True(t, ok, "flushed metric must contain a histogram")
 	assert.Equal(t, []float64{0.125, 0.375, 0.5}, hist["values"])
 }
 
@@ -341,7 +347,9 @@ func TestGenerateEventsCounterUnaffectedByAssembly(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 	require.Len(t, events, 1)
-	assert.Equal(t, float64(42), events[labels.String()+ts.Time().String()].ModuleFields["net_conntrack_listener_conn_closed_total"].(mapstr.M)["counter"])
+	metric, ok := events[labels.String()+ts.Time().String()].ModuleFields["net_conntrack_listener_conn_closed_total"].(mapstr.M)
+	require.True(t, ok, "counter metric must use the typed metric layout")
+	assert.Equal(t, float64(42), metric["counter"])
 }
 
 func TestNextFlushIntervalDeterministic(t *testing.T) {

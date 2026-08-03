@@ -646,7 +646,7 @@ func TestOwnerLoopTimerFlushRetainsPartialOnMidFlushFailure(t *testing.T) {
 	}, time.Second, 5*time.Millisecond, "two events should remain unpublished after mid-flush rejection")
 
 	publishedKeys := make(map[string]struct{})
-	published.Range(func(k, _ interface{}) bool {
+	published.Range(func(k, _ any) bool {
 		key, ok := k.(string)
 		require.True(t, ok, "published event keys must be strings")
 		publishedKeys[key] = struct{}{}

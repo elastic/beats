@@ -337,7 +337,7 @@ func encodeWriteRequest(req *prompb.WriteRequest) ([]byte, error) {
 
 // newTestMetricSetBase creates a MetricSet without starting the owner loop.
 func newTestMetricSetBase(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"remote_write"},
 	}

@@ -6,6 +6,7 @@ package remote_write
 
 import (
 	"fmt"
+	"maps"
 	"math"
 	"regexp"
 	"strings"
@@ -215,9 +216,7 @@ func (g *remoteWriteTypedGenerator) FlushExpired(now time.Time) map[string]mb.Ev
 		return nil
 	}
 	events := g.assembler.flushExpired(now, g.counterCache, g.metricsCount)
-	for k, v := range g.retainedFlushes {
-		events[k] = v
-	}
+	maps.Copy(events, g.retainedFlushes)
 	// Retained capacity leaves accounting while the owner loop publishes synchronously;
 	// it is restored by RetainUnpublishedFlushEvents if publication fails.
 	g.retainedFlushes = make(map[string]mb.Event)
