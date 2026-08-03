@@ -182,7 +182,7 @@ func (g *remoteWriteTypedGenerator) RetainUnpublishedFlushEvents(events map[stri
 		if nextH > maxH || nextB > maxB {
 			if g.assembler != nil {
 				// G115: flush capacities start at zero and only increase by non-negative counts.
-				g.assembler.stats.RetentionDrops += uint64(evCap.histograms) //nolint:gosec
+				g.assembler.stats.RetentionDrops += uint64(evCap.histograms)    //nolint:gosec
 				g.assembler.stats.RetentionBucketDrops += uint64(evCap.buckets) //nolint:gosec
 			}
 			continue
@@ -261,8 +261,15 @@ func (g *remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[st
 		}
 
 		if promType == histogramType {
-			le, _ := labels.GetValue("le")
-			upperBound, ok := parseLEUpperBound(string(le.(model.LabelValue)))
+			le, err := labels.GetValue("le")
+			if err != nil {
+				continue
+			}
+			leValue, ok := le.(model.LabelValue)
+			if !ok {
+				continue
+			}
+			upperBound, ok := parseLEUpperBound(string(leValue))
 			if !ok {
 				continue
 			}
@@ -371,8 +378,15 @@ func (g *remoteWriteTypedGenerator) classifyBucketSamples(metrics model.Samples)
 		}
 		labelsClone := labels.Clone()
 		_ = labelsClone.Delete("le")
-		le, _ := labels.GetValue("le")
-		upperBound, ok := parseLEUpperBound(string(le.(model.LabelValue)))
+		le, err := labels.GetValue("le")
+		if err != nil {
+			continue
+		}
+		leValue, ok := le.(model.LabelValue)
+		if !ok {
+			continue
+		}
+		upperBound, ok := parseLEUpperBound(string(leValue))
 		if !ok {
 			continue
 		}

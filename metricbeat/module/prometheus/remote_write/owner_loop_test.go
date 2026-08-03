@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -570,9 +571,7 @@ func TestOwnerLoopTimerFlushRetainsOnReporterFailure(t *testing.T) {
 	gen := &fakeGenerator{
 		flushHook: func(time.Time) map[string]mb.Event {
 			out := make(map[string]mb.Event, len(flushEvents))
-			for k, v := range flushEvents {
-				out[k] = v
-			}
+			maps.Copy(out, flushEvents)
 			return out
 		},
 		flushInterval: time.Minute,
@@ -648,7 +647,9 @@ func TestOwnerLoopTimerFlushRetainsPartialOnMidFlushFailure(t *testing.T) {
 
 	publishedKeys := make(map[string]struct{})
 	published.Range(func(k, _ interface{}) bool {
-		publishedKeys[k.(string)] = struct{}{}
+		key, ok := k.(string)
+		require.True(t, ok, "published event keys must be strings")
+		publishedKeys[key] = struct{}{}
 		return true
 	})
 

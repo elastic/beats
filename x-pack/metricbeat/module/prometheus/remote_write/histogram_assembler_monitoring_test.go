@@ -35,18 +35,18 @@ func histogramAssemblerMonitoringPrefix() string {
 	return "histogram_assembler."
 }
 
-func histogramAssemblerMetricSnapshot(t *testing.T, msReg *monitoring.Registry) map[string]uint64 {
+func histogramAssemblerMetricSnapshot(t *testing.T, msReg *monitoring.Registry) map[string]int64 {
 	t.Helper()
 	require.NotNil(t, msReg, "metricset registry must be set for snapshot tests")
 
 	snap := monitoring.CollectFlatSnapshot(msReg, monitoring.Full, false)
-	out := make(map[string]uint64, len(histogramAssemblerMonitoringMetricNames))
+	out := make(map[string]int64, len(histogramAssemblerMonitoringMetricNames))
 	prefix := histogramAssemblerMonitoringPrefix()
 	for _, name := range histogramAssemblerMonitoringMetricNames {
 		key := prefix + name
 		val, ok := snap.Ints[key]
 		require.True(t, ok, "expected monitoring metric %q to be registered", key)
-		out[name] = uint64(val)
+		out[name] = val
 	}
 
 	for key := range snap.Ints {
@@ -113,8 +113,8 @@ func TestHistogramAssemblerMonitoringIngestUpdatesPendingGauges(t *testing.T) {
 	})
 
 	metrics := histogramAssemblerMetricSnapshot(t, msReg)
-	assert.Equal(t, uint64(1), metrics["pending_gauge"], "ingest must track one pending histogram")
-	assert.Equal(t, uint64(2), metrics["pending_buckets_gauge"], "ingest must track pending bucket count in assembler memory only")
+	assert.Equal(t, int64(1), metrics["pending_gauge"], "ingest must track one pending histogram")
+	assert.Equal(t, int64(2), metrics["pending_buckets_gauge"], "ingest must track pending bucket count in assembler memory only")
 }
 
 func TestHistogramAssemblerMonitoringQuietFlush(t *testing.T) {
@@ -132,11 +132,11 @@ func TestHistogramAssemblerMonitoringQuietFlush(t *testing.T) {
 	g.FlushExpired(g.now())
 
 	metrics := histogramAssemblerMetricSnapshot(t, msReg)
-	assert.Equal(t, uint64(0), metrics["pending_gauge"], "quiet flush clears pending histogram gauge")
-	assert.Equal(t, uint64(0), metrics["pending_buckets_gauge"], "quiet flush clears pending bucket gauge")
-	assert.Equal(t, uint64(1), metrics["quiet_flushes_total"], "quiet flush must increment quiet counter")
-	assert.Equal(t, uint64(0), metrics["hard_timeout_flushes_total"], "quiet flush must not increment hard timeout counter")
-	assert.Equal(t, uint64(0), metrics["partial_flushes_total"], "quiet flush must not increment partial counter")
+	assert.Equal(t, int64(0), metrics["pending_gauge"], "quiet flush clears pending histogram gauge")
+	assert.Equal(t, int64(0), metrics["pending_buckets_gauge"], "quiet flush clears pending bucket gauge")
+	assert.Equal(t, int64(1), metrics["quiet_flushes_total"], "quiet flush must increment quiet counter")
+	assert.Equal(t, int64(0), metrics["hard_timeout_flushes_total"], "quiet flush must not increment hard timeout counter")
+	assert.Equal(t, int64(0), metrics["partial_flushes_total"], "quiet flush must not increment partial counter")
 }
 
 func TestHistogramAssemblerMonitoringHardTimeoutPartialFlush(t *testing.T) {
@@ -153,9 +153,9 @@ func TestHistogramAssemblerMonitoringHardTimeoutPartialFlush(t *testing.T) {
 	g.FlushExpired(ts.Time().Add(cfg.HardTimeout))
 
 	metrics := histogramAssemblerMetricSnapshot(t, msReg)
-	assert.Equal(t, uint64(1), metrics["hard_timeout_flushes_total"], "hard timeout flush must increment hard timeout counter")
-	assert.Equal(t, uint64(1), metrics["partial_flushes_total"], "hard timeout flush must increment partial counter")
-	assert.Equal(t, uint64(0), metrics["quiet_flushes_total"], "partial hard flush must not increment quiet counter")
+	assert.Equal(t, int64(1), metrics["hard_timeout_flushes_total"], "hard timeout flush must increment hard timeout counter")
+	assert.Equal(t, int64(1), metrics["partial_flushes_total"], "hard timeout flush must increment partial counter")
+	assert.Equal(t, int64(0), metrics["quiet_flushes_total"], "partial hard flush must not increment quiet counter")
 }
 
 func TestHistogramAssemblerMonitoringCapacityRejection(t *testing.T) {
@@ -179,8 +179,8 @@ func TestHistogramAssemblerMonitoringCapacityRejection(t *testing.T) {
 	}), rw.ErrRemoteWriteCapacityExceeded, "second histogram must be rejected")
 
 	metrics := histogramAssemblerMetricSnapshot(t, msReg)
-	assert.Equal(t, uint64(1), metrics["capacity_rejections_total"], "capacity rejection must increment once per rejected request")
-	assert.Equal(t, uint64(1), metrics["pending_gauge"], "rejected batch must not mutate pending histogram gauge")
+	assert.Equal(t, int64(1), metrics["capacity_rejections_total"], "capacity rejection must increment once per rejected request")
+	assert.Equal(t, int64(1), metrics["pending_gauge"], "rejected batch must not mutate pending histogram gauge")
 }
 
 func TestHistogramAssemblerMonitoringLateBucketAfterFlush(t *testing.T) {
@@ -204,8 +204,8 @@ func TestHistogramAssemblerMonitoringLateBucketAfterFlush(t *testing.T) {
 	})
 
 	metrics := histogramAssemblerMetricSnapshot(t, msReg)
-	assert.Equal(t, uint64(1), metrics["late_buckets_total"], "post-close bucket observation must increment late_buckets_total")
-	assert.Equal(t, uint64(1), metrics["late_buckets_dropped_total"], "dropped late bucket must increment late_buckets_dropped_total")
+	assert.Equal(t, int64(1), metrics["late_buckets_total"], "post-close bucket observation must increment late_buckets_total")
+	assert.Equal(t, int64(1), metrics["late_buckets_dropped_total"], "dropped late bucket must increment late_buckets_dropped_total")
 }
 
 func TestHistogramAssemblerMonitoringShutdownDropped(t *testing.T) {
@@ -224,8 +224,8 @@ func TestHistogramAssemblerMonitoringShutdownDropped(t *testing.T) {
 	g.Stop()
 
 	metrics := histogramAssemblerMetricSnapshot(t, msReg)
-	assert.Equal(t, uint64(0), metrics["pending_gauge"], "shutdown clears pending gauge")
-	assert.Equal(t, uint64(3), metrics["shutdown_dropped_total"], "shutdown must count pending histograms plus retained flush entries")
+	assert.Equal(t, int64(0), metrics["pending_gauge"], "shutdown clears pending gauge")
+	assert.Equal(t, int64(3), metrics["shutdown_dropped_total"], "shutdown must count pending histograms plus retained flush entries")
 }
 
 func TestRemoteWriteFactoryUseTypesFalseDoesNotRegisterHistogramAssemblerMonitoring(t *testing.T) {
