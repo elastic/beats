@@ -20,6 +20,7 @@ package memqueue
 import (
 	"context"
 	"io"
+	"sync"
 	"testing"
 	"time"
 
@@ -52,18 +53,11 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
-<<<<<<< HEAD
-	for i := range 100 {
-		// Pair each publish call with an iteration of the run loop so we
-		// get a response.
-		go rl.runIteration()
-=======
 	iterLock := sync.Mutex{}
 	for i := range 100 {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go runIterationLocked(rl, &iterLock)
->>>>>>> eece1f708 (libbeat/memqueue: fix data race in TestFlushSettingsBlockPartialBatches (#52362))
 		_, ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish call must succeed")
 	}
@@ -77,12 +71,8 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 		// there's a logical error.
 		_, _ = broker.Get(100)
 	}()
-<<<<<<< HEAD
-	rl.runIteration()
-=======
 	// Lock: the last asynchronous iteration above may still be running.
 	runIterationLocked(rl, &iterLock)
->>>>>>> eece1f708 (libbeat/memqueue: fix data race in TestFlushSettingsBlockPartialBatches (#52362))
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since the request should succeed immediately")
 	assert.Equal(t, 100, rl.consumedCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
 }
