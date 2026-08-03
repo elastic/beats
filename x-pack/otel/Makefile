@@ -1,8 +1,7 @@
 ES_BEATS ?= ../..
+TEMP_DIR ?= $(or $(TMPDIR),$(TEMP),$(TMP),/tmp)
+COLLECTOR_LOG ?= $(TEMP_DIR)/collector.log
 
-<<<<<<< HEAD
-include $(ES_BEATS)/dev-tools/make/mage.mk
-=======
 # This version is used to build the OpenTelemetry Collector distribution.
 # It should be updated when the OTel Collector version is updated in the beats-otel-collector module.
 OCB_VERSION ?= v0.157.0
@@ -22,4 +21,3 @@ build-otel-distro-ci: install-builder
 	timeout 30s mage runOtelDistro 2>&1 | tee "$(COLLECTOR_LOG)" || true
 	echo "---"
 	grep -q "Starting beats-otel-collector" "$(COLLECTOR_LOG)"
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
