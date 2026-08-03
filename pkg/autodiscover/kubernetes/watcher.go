@@ -289,13 +289,8 @@ func (w *watcher) CachedObject() runtime.Object {
 
 // Start watching pods
 func (w *watcher) Start() error {
-	// A stopped watcher must never be restarted. The Kubernetes SharedInformer
-	// is one-shot; once Run has exited it rejects a second invocation with
-	// "run more than once is not allowed" and returns immediately, yet
-	// WaitForCacheSync below would still succeed because HasSynced stays true
-	// from the first run. That turns an invalid restart into a silent no-op
-	// against a frozen store. Detect the terminal lifecycle state up front and
-	// fail loudly so callers construct a fresh watcher instead.
+	// A stopped SharedInformer cannot be restarted, and its watch options cannot
+	// be changed. Reject it so callers construct a fresh watcher.
 	if w.informer.IsStopped() || w.queue.ShuttingDown() || w.ctx.Err() != nil {
 		return fmt.Errorf(
 			"%w (informer_stopped=%t, queue_shutting_down=%t, context_error=%v)",
