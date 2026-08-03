@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/sarama"
 )
 
@@ -412,9 +411,4 @@ func deleteKafkaInputTopic(t *testing.T, topic string) {
 	if err := admin.DeleteTopic(topic); err != nil {
 		t.Logf("failed to delete topic %q: %v", topic, err)
 	}
-}
-
-func deleteDataStreamsFromES(t *testing.T, es *elasticsearch.Client, dataStreams []string) {
-	_, err := es.Indices.DeleteDataStream(dataStreams)
-	require.NoError(t, err, "failed to delete data streams")
 }
