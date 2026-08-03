@@ -35,11 +35,6 @@ import (
 )
 
 var (
-	debugf     = logp.MakeDebug("sip")
-	detailedf  = logp.MakeDebug("sipdetailed")
-	isDebug    = false
-	isDetailed = false
-
 	_ protos.UDPPlugin                = &plugin{}
 	_ protos.ExpirationAwareTCPPlugin = &plugin{}
 )
@@ -54,9 +49,11 @@ type connectionData struct {
 
 // SIP application level protocol analyser UDP and TCP plugin.
 type plugin struct {
-	cfg     *config
-	results protos.Reporter
-	watcher *procs.ProcessesWatcher
+	cfg                                  *config
+	results                              protos.Reporter
+	watcher                              *procs.ProcessesWatcher
+	logger, sipLogger, sipDetailedLogger *logp.Logger
+	isDebug, isDetailed                  bool
 }
 
 func New(
@@ -67,9 +64,6 @@ func New(
 	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	logger.Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
-
-	isDebug = logger.Named("sip").IsDebug()
-	isDetailed = logger.Named("sipdetailed").IsDebug()
 
 	config := defaultConfig
 	if !testMode {
@@ -82,11 +76,29 @@ func New(
 	switch tp {
 	case "tcp", "udp":
 		p := &plugin{}
+		p.logger = logger
+		p.sipLogger = logger.Named("sip")
+		p.sipDetailedLogger = logger.Named("sipdetailed")
+		p.isDebug, p.isDetailed = p.sipLogger.IsDebug(), p.sipDetailedLogger.IsDebug()
 		p.init(results, watcher, &config)
 		return p, nil
 	}
 
 	return nil, fmt.Errorf("unsupported transport_protocol: %s", tp)
+}
+
+//go:inline
+func (p *plugin) debugf(format string, args ...interface{}) {
+	if p.isDebug {
+		p.sipLogger.Debugf(format, args...)
+	}
+}
+
+//go:inline
+func (p *plugin) detailedf(format string, args ...interface{}) {
+	if p.isDetailed {
+		p.sipDetailedLogger.Debugf(format, args...)
+	}
 }
 
 // Init initializes the HTTP protocol analyser.
@@ -101,9 +113,9 @@ func (p *plugin) GetPorts() []int {
 }
 
 func (p *plugin) ParseUDP(pkt *protos.Packet) {
-	pi := newParsingInfo(pkt, pkt.Tuple.BaseTuple)
+	pi := newParsingInfo(pkt, pkt.Tuple.BaseTuple, p.sipLogger, p.sipDetailedLogger)
 	if _, err := p.doParse(pi); err != nil {
-		logp.Error(err)
+		p.logger.Error(err)
 	}
 }
 
@@ -114,10 +126,10 @@ func (p *plugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	conn := ensureConnection(private)
+	conn := ensureConnection(private, p.logger)
 	st := conn.streams[dir]
 	if st == nil {
-		st = newParsingInfo(pkt, tcptuple.BaseTuple)
+		st = newParsingInfo(pkt, tcptuple.BaseTuple, p.sipLogger, p.sipDetailedLogger)
 		conn.streams[dir] = st
 	} else {
 		st.data = append(st.data, pkt.Payload...)
@@ -126,7 +138,7 @@ func (p *plugin) Parse(
 
 	ok, err := p.doParse(st)
 	if err != nil {
-		logp.Error(err)
+		p.logger.Error(err)
 	}
 
 	if !ok {
@@ -138,26 +150,26 @@ func (p *plugin) Parse(
 	return private
 }
 
-func ensureConnection(private protos.ProtocolData) *connectionData {
-	conn := getConnection(private)
+func ensureConnection(private protos.ProtocolData, logger *logp.Logger) *connectionData {
+	conn := getConnection(private, logger)
 	if conn == nil {
 		conn = &connectionData{}
 	}
 	return conn
 }
 
-func getConnection(private protos.ProtocolData) *connectionData {
+func getConnection(private protos.ProtocolData, logger *logp.Logger) *connectionData {
 	if private == nil {
 		return nil
 	}
 
 	priv, ok := private.(*connectionData)
 	if !ok {
-		logp.Warn("connection data type error")
+		logger.Warn("connection data type error")
 		return nil
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: connection data not set")
+		logger.Warn("Unexpected: connection data not set")
 		return nil
 	}
 
@@ -170,8 +182,8 @@ func (p *plugin) ReceivedFin(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	debugf("Received FIN")
-	conn := getConnection(private)
+	p.debugf("Received FIN")
+	conn := getConnection(private, p.logger)
 	if conn == nil {
 		return private
 	}
@@ -205,7 +217,7 @@ func (p *plugin) GapInStream(
 	private protos.ProtocolData,
 ) (priv protos.ProtocolData, drop bool,
 ) {
-	conn := getConnection(private)
+	conn := getConnection(private, p.logger)
 	if conn == nil {
 		return private, false
 	}
@@ -217,9 +229,7 @@ func (p *plugin) GapInStream(
 	}
 
 	ok, complete := p.messageGap(st, nbytes)
-	if isDetailed {
-		detailedf("messageGap returned ok=%v complete=%v", ok, complete)
-	}
+	p.detailedf("messageGap returned ok=%v complete=%v", ok, complete)
 	if !ok {
 		// on errors, drop stream
 		conn.streams[dir] = nil
@@ -250,9 +260,7 @@ func (p *plugin) messageGap(pi *parsingInfo, nbytes int) (ok bool, complete bool
 		// we know we cannot recover from these
 		return false, false
 	case stateBody:
-		if isDebug {
-			debugf("gap in body: %d", nbytes)
-		}
+		p.debugf("gap in body: %d", nbytes)
 		if len(pi.data)+nbytes >= m.contentLength-pi.bodyReceived {
 			// we're done, but the last portion of the data is gone
 			return true, true
@@ -271,20 +279,16 @@ func (p *plugin) ConnectionTimeout() time.Duration {
 }
 
 func (p *plugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
-	conn := getConnection(private)
+	conn := getConnection(private, p.logger)
 	if conn == nil {
 		return
 	}
-	if isDebug {
-		debugf("expired connection %s", tuple)
-	}
+	p.debugf("expired connection %s", tuple)
 	// terminate streams
 	for _, st := range conn.streams {
 		// Do not send incomplete or empty messages
 		if st != nil && st.message != nil && st.message.headerOffset > 0 {
-			if isDebug {
-				debugf("got message %+v", st.message)
-			}
+			p.debugf("got message %+v", st.message)
 			// Current message is complete, we need to publish from here
 			evt, err := p.buildEvent(p.cfg, st)
 			if err != nil {
@@ -300,9 +304,7 @@ func (p *plugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
 }
 
 func (p *plugin) doParse(pi *parsingInfo) (bool, error) {
-	if isDetailed {
-		detailedf("Payload received: [%s]", pi.pkt.Payload)
-	}
+	p.detailedf("Payload received: [%s]", pi.pkt.Payload)
 
 	for len(pi.data) > 0 {
 		if pi.message == nil {
@@ -357,10 +359,10 @@ func (p *plugin) buildEvent(cfg *config, pi *parsingInfo) (*beat.Event, error) {
 		populateResponseFields(m, &sipFields)
 	}
 
-	populateHeadersFields(cfg, m, evt, pbf, &sipFields)
+	populateHeadersFields(cfg, m, evt, pbf, &sipFields, p.sipLogger, p.sipDetailedLogger)
 
 	if cfg.ParseBody {
-		populateBodyFields(m, pbf, &sipFields)
+		populateBodyFields(m, pbf, &sipFields, p.sipLogger, p.sipDetailedLogger)
 	}
 
 	pbf.Network.IANANumber = "17"
@@ -413,7 +415,13 @@ func populateResponseFields(m *message, fields *ProtocolFields) {
 	fields.Version = m.version.String()
 }
 
-func populateHeadersFields(cfg *config, m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
+func populateHeadersFields(
+	cfg *config,
+	m *message,
+	evt beat.Event,
+	pbf *pb.Fields,
+	fields *ProtocolFields,
+	sipLogger, sipDetailedLogger *logp.Logger) {
 	fields.Allow = m.allow
 	fields.CallID = m.callID
 	fields.ContentLength = m.contentLength
@@ -454,7 +462,7 @@ func populateHeadersFields(cfg *config, m *message, evt beat.Event, pbf *pb.Fiel
 	populateContactFields(m, pbf, fields)
 
 	if cfg.ParseAuthorization {
-		populateAuthFields(m, evt, pbf, fields)
+		populateAuthFields(m, evt, pbf, fields, sipLogger, sipDetailedLogger)
 	}
 }
 
@@ -556,24 +564,24 @@ func populateEventFields(cfg *config, pi *parsingInfo, pbf *pb.Fields, fields Pr
 	pbf.Event.Reason = string(fields.Status)
 }
 
-func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
+func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields, sipLogger, sipDetailedLogger *logp.Logger) {
 	auths, found := m.headers["authorization"]
 	if !found || len(auths) == 0 {
-		if isDetailed {
-			detailedf("sip packet without authorization header")
+		if sipDetailedLogger.IsDebug() {
+			sipDetailedLogger.Debug("sip packet without authorization header")
 		}
 		return
 	}
 
-	if isDetailed {
-		detailedf("sip packet with authorization header")
+	if sipDetailedLogger.IsDebug() {
+		sipDetailedLogger.Debug("sip packet with authorization header")
 	}
 
 	auth := bytes.TrimSpace(auths[0])
 	pos := bytes.IndexByte(auth, ' ')
 	if pos == -1 {
-		if isDebug {
-			debugf("malformed authorization header: missing scheme")
+		if sipLogger.IsDebug() {
+			sipLogger.Debug("malformed authorization header: missing scheme")
 		}
 		return
 	}
@@ -608,21 +616,21 @@ func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *Prot
 
 var constSDPContentType = []byte("application/sdp")
 
-func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields) {
+func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields, sipLogger, sipDetailedLogger *logp.Logger) {
 	if !msg.hasContentLength {
 		return
 	}
 
 	if !bytes.Equal(msg.contentType, constSDPContentType) {
-		if isDebug {
-			debugf("body content-type: %s is not supported", msg.contentType)
+		if sipLogger.IsDebug() {
+			sipLogger.Debugf("body content-type: %s is not supported", msg.contentType)
 		}
 		return
 	}
 
 	if _, found := msg.headers["content-encoding"]; found {
-		if isDebug {
-			debugf("body decoding is not supported yet if content-encoding is present")
+		if sipDetailedLogger.IsDebug() {
+			sipDetailedLogger.Debug("body decoding is not supported yet if content-encoding is present")
 		}
 		return
 	}
@@ -666,8 +674,8 @@ func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields) {
 			}()
 			parts := bytes.SplitN(kv[1][pos:], []byte(" "), nParts)
 			if len(parts) != nParts {
-				if isDebug {
-					debugf("malformed owner SDP line")
+				if sipLogger.IsDebug() {
+					sipLogger.Debug("malformed owner SDP line")
 				}
 				continue
 			}

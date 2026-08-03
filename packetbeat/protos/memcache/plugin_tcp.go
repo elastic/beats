@@ -47,6 +47,7 @@ type tcpConnectionData struct {
 type stream struct {
 	applayer.Stream
 	parser parser
+	logger *logp.Logger
 }
 
 type connection struct {
@@ -60,18 +61,18 @@ type messageList struct {
 	tail *message
 }
 
-func ensureMemcacheConnection(private protos.ProtocolData) *tcpConnectionData {
+func ensureMemcacheConnection(private protos.ProtocolData, logger *logp.Logger) *tcpConnectionData {
 	if private == nil {
 		return &tcpConnectionData{}
 	}
 
 	priv, ok := private.(*tcpConnectionData)
 	if !ok {
-		logp.Warn("memcache connection data type error, create new one")
+		logger.Warn("memcache connection data type error, create new one")
 		return &tcpConnectionData{}
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: memcache TCP connection data not set, create new one")
+		logger.Warn("Unexpected: memcache TCP connection data not set, create new one")
 		return &tcpConnectionData{}
 	}
 	return priv
@@ -97,7 +98,7 @@ func (mc *memcache) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	tcpConn := ensureMemcacheConnection(private)
+	tcpConn := ensureMemcacheConnection(private, mc.logger)
 	mc.logger.Debugf("memcache connection %p", tcpConn)
 	tcpConn = mc.memcacheParseTCP(tcpConn, pkt, tcptuple, dir)
 	if tcpConn == nil {
@@ -108,8 +109,10 @@ func (mc *memcache) Parse(
 }
 
 func (mc *memcache) newStream() *stream {
-	s := &stream{}
-	s.parser.init(&mc.config)
+	s := &stream{
+		logger: mc.logger,
+		parser: *newParser(&mc.config, mc.logger),
+	}
 	s.Stream.Init(tcp.TCPMaxDataInStream)
 	return s
 }
@@ -166,7 +169,7 @@ func (mc *memcache) memcacheParseTCP(
 		tuple := tcptuple.IPPort()
 		err = mc.onTCPMessage(conn, tuple, dir, msg)
 		if err != nil {
-			logp.Warn("error processing memcache message: %s", err)
+			mc.logger.Warnf("error processing memcache message: %s", err)
 		}
 	}
 
@@ -267,7 +270,7 @@ func (mc *memcache) correlateTCP(conn *connection) error {
 			requ = conn.requests.pop()
 			if requ.isBinary != resp.isBinary {
 				err := errMixOfBinaryAndText
-				logp.Warn("%v", err)
+				mc.logger.Warnf("%v", err)
 				return err
 			}
 
@@ -286,7 +289,7 @@ func (mc *memcache) correlateTCP(conn *connection) error {
 			// received a response
 			if requ.isBinary && !requ.isQuiet {
 				note := noteNonQuietResponseOnly
-				logp.Warn("%s", note)
+				mc.logger.Warnf("%s", note)
 				requ.AddNotes(note)
 				unmatchedRequests.Add(1)
 			}
@@ -295,7 +298,7 @@ func (mc *memcache) correlateTCP(conn *connection) error {
 			mc.logger.Debugf("send single request=%p", requ)
 			err := mc.onTCPTrans(requ, nil)
 			if err != nil {
-				logp.Warn("error processing memcache transaction: %s", err)
+				mc.logger.Warnf("error processing memcache transaction: %s", err)
 			}
 			requ = nil
 		}
@@ -312,7 +315,7 @@ func (mc *memcache) correlateTCP(conn *connection) error {
 		mc.logger.Debugf("merge request=%p and response=%p", requ, resp)
 		err := mc.onTCPTrans(requ, resp)
 		if err != nil {
-			logp.Warn("error processing memcache transaction: %s", err)
+			mc.logger.Warnf("error processing memcache transaction: %s", err)
 		}
 		// continue processing more transactions (reporting error only)
 	}
@@ -366,7 +369,7 @@ func (mc *memcache) GapInStream(
 		parser.state == parseStateIncompleteData
 	if inData {
 		if msg == nil {
-			logp.NewLogger("memcache").DPanic("parser message is nil on data load")
+			mc.logger.DPanic("parser message is nil on data load")
 			return private, true
 		}
 
@@ -420,7 +423,7 @@ func (mc *memcache) pushAllTCPTrans(conn *connection) {
 		mc.logger.Debugf("push incomplete request=%p", msg)
 		err := mc.onTCPTrans(msg, nil)
 		if err != nil {
-			logp.Warn("failed to publish unfinished transaction with %v", err)
+			mc.logger.Warnf("failed to publish unfinished transaction with %v", err)
 		}
 		// continue processing more transactions (reporting error only)
 	}
@@ -433,7 +436,7 @@ func (private *tcpConnectionData) drop(dir uint8) {
 
 func (stream *stream) reset() {
 	parser := &stream.parser
-	debug("consumed %v bytes", stream.Buf.BufferConsumed())
+	stream.logger.Debugf("consumed %v bytes", stream.Buf.BufferConsumed())
 	stream.Stream.Reset()
 	parser.reset()
 }
@@ -466,7 +469,6 @@ func (ml *messageList) pop() *message {
 	if ml.head == nil {
 		ml.tail = nil
 	}
-	debug("new head=%p", ml.head)
 	return msg
 }
 

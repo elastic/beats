@@ -351,11 +351,13 @@ const (
 
 type protoVersion byte
 
-func (p protoVersion) IsRequest() bool {
+func (p protoVersion) IsRequest(logger *logp.Logger) bool {
 	v := p.version()
 
 	if v < protoVersion1 || v > protoVersion4 {
-		logp.Err("unsupported request version: %x", v)
+		if logger != nil {
+			logger.Errorf("unsupported request version: %x", v)
+		}
 	}
 
 	if v == protoVersion4 {
@@ -369,11 +371,13 @@ func (p protoVersion) IsRequest() bool {
 	return p == 0x00
 }
 
-func (p protoVersion) IsResponse() bool {
+func (p protoVersion) IsResponse(logger *logp.Logger) bool {
 	v := p.version()
 
 	if v < protoVersion1 || v > protoVersion4 {
-		logp.Err("unsupported response version: %x", v)
+		if logger != nil {
+			logger.Errorf("unsupported response version: %x", v)
+		}
 	}
 
 	if v == protoVersion4 {
@@ -393,7 +397,7 @@ func (p protoVersion) version() byte {
 
 func (p protoVersion) String() string {
 	dir := "REQ"
-	if p.IsResponse() {
+	if p.IsResponse(nil) {
 		dir = "RESP"
 	}
 

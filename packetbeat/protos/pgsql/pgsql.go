@@ -145,7 +145,13 @@ func New(
 	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
-	p.SetLogger(logp.NewNopLogger())
+	p.log = logger
+	p.debug = logger.Named("pgsql")
+	p.detail = logger.Named("pgsqldetailed")
+
+	p.isDebug = p.debug.IsDebug()
+	p.isDetail = p.detail.IsDebug()
+
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {

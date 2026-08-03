@@ -49,6 +49,7 @@ type memcache struct {
 
 	handler memcacheHandler
 	logger  *logp.Logger
+	isDebug bool
 }
 
 type memcacheHandler interface {
@@ -122,8 +123,6 @@ type memcacheStat struct {
 	Value memcacheString `json:"value"`
 }
 
-var debug = logp.MakeDebug("memcache")
-
 var (
 	unmatchedRequests      = monitoring.NewInt(nil, "memcache.unmatched_requests")
 	unmatchedResponses     = monitoring.NewInt(nil, "memcache.unmatched_responses")
@@ -143,6 +142,7 @@ func New(
 ) (protos.Plugin, error) {
 	p := &memcache{}
 	p.logger = logger.Named("memcache")
+	p.isDebug = p.logger.IsDebug()
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -154,6 +154,12 @@ func New(
 		return nil, err
 	}
 	return p, nil
+}
+
+func (mc *memcache) debugf(format string, args ...interface{}) {
+	if mc.isDebug {
+		mc.logger.Debugf(format, args...)
+	}
 }
 
 // Called to initialize the Plugin
@@ -396,7 +402,7 @@ func (t *transaction) Init(msg *message) {
 func (t *transaction) Event(event *beat.Event) error {
 	t.logger.Debugf("count event notes: %v", len(t.Notes))
 	if err := t.Transaction.Event(event); err != nil {
-		logp.Warn("error filling generic transaction fields: %v", err)
+		t.logger.Warnf("error filling generic transaction fields: %v", err)
 		return err
 	}
 
@@ -411,7 +417,7 @@ func (t *transaction) Event(event *beat.Event) error {
 	if t.request != nil {
 		_, err := t.request.SubEvent("request", mc)
 		if err != nil {
-			logp.Warn("error filling transaction request: %v", err)
+			t.logger.Warnf("error filling transaction request: %v", err)
 			return err
 		}
 		event.Fields["event.action"] = "memcache." + strings.ToLower(t.request.command.typ.String())
@@ -419,7 +425,7 @@ func (t *transaction) Event(event *beat.Event) error {
 	if t.response != nil {
 		_, err := t.response.SubEvent("response", mc)
 		if err != nil {
-			logp.Warn("error filling transaction response: %v", err)
+			t.logger.Warnf("error filling transaction response: %v", err)
 			return err
 		}
 		normalized := normalizeEventOutcome(memcacheStatusCode(t.response.status).String())
