@@ -204,7 +204,7 @@ func (g *remoteWriteTypedGenerator) CheckCapacity(metrics model.Samples) error {
 		return nil
 	}
 	prepared := g.prepareBatch(metrics)
-	return g.checkPreparedCapacity(prepared)
+	return g.checkPreparedCapacityAt(g.now(), prepared)
 }
 
 // ProcessOwnerLoopBatch classifies a request once, admits it against assembler
@@ -214,15 +214,18 @@ func (g *remoteWriteTypedGenerator) ProcessOwnerLoopBatch(metrics model.Samples)
 		return g.GenerateEvents(metrics), nil
 	}
 	prepared := g.prepareBatch(metrics)
-	if err := g.checkPreparedCapacity(prepared); err != nil {
+	// Use one timestamp for capacity + commit so tombstone expiry cannot be
+	// skipped in admission and then reopen pending state on ingest.
+	now := g.now()
+	if err := g.checkPreparedCapacityAt(now, prepared); err != nil {
 		return nil, err
 	}
-	g.commitPreparedHistograms(prepared)
+	g.commitPreparedHistogramsAt(now, prepared)
 	return g.applyPreparedImmediate(prepared), nil
 }
 
-func (g *remoteWriteTypedGenerator) checkPreparedCapacity(prepared preparedBatch) error {
-	impact := g.assembler.capacityImpactGrouped(g.now(), prepared.groups)
+func (g *remoteWriteTypedGenerator) checkPreparedCapacityAt(now time.Time, prepared preparedBatch) error {
+	impact := g.assembler.capacityImpactGrouped(now, prepared.groups)
 	if g.assembler.wouldExceedCapacity(impact, g.retainedCapacity) {
 		if g.histogramMon != nil {
 			g.histogramMon.observeCapacityRejection()
@@ -386,10 +389,13 @@ func mergeBucketUpdate(buckets []bucketUpdate, upd bucketUpdate) []bucketUpdate 
 }
 
 func (g *remoteWriteTypedGenerator) commitPreparedHistograms(prepared preparedBatch) {
+	g.commitPreparedHistogramsAt(g.now(), prepared)
+}
+
+func (g *remoteWriteTypedGenerator) commitPreparedHistogramsAt(now time.Time, prepared preparedBatch) {
 	if g.assembler == nil {
 		return
 	}
-	now := g.now()
 	for _, group := range prepared.groups {
 		g.assembler.ingestGrouped(now, group)
 	}

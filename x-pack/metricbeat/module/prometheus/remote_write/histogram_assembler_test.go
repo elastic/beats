@@ -5,6 +5,7 @@
 package remote_write
 
 import (
+	"errors"
 	"maps"
 	"math"
 	"strconv"
@@ -605,4 +606,106 @@ func TestProcessOwnerLoopBatchCapacityRejectionNoMutation(t *testing.T) {
 	metric := events[labels.String()+ts.Time().String()].ModuleFields["requests_total"].(mapstr.M)
 	assert.Equal(t, float64(150), metric["counter"])
 	assert.Equal(t, float64(0), metric["rate"], "rejected batch must not seed counter cache")
+}
+
+
+// TestProcessOwnerLoopBatchUsesSingleNowAcrossCapacityAndCommit locks the
+// capacity-check and commit path to a single now() snapshot. If those steps
+// each call now() independently, a tombstone can expire between them: admission
+// treats the identity as free (still tombstoned), then ingest reopens it and
+// pending can exceed max_pending_histograms. NeverExceedsMaxPending alone does
+// not cover this boundary.
+func TestProcessOwnerLoopBatchUsesSingleNowAcrossCapacityAndCommit(t *testing.T) {
+	cfg := histogramAssemblyConfig{
+		QuietPeriod:          time.Second,
+		HardTimeout:          2 * time.Second,
+		MaxPendingHistograms: 2,
+		MaxPendingBuckets:    100,
+	}
+	start := time.Unix(5000, 0)
+	g, setNow := newTestTypedGenerator(t, cfg, start)
+	ts := model.TimeFromUnix(5000)
+
+	setNow(start)
+	_, err := g.ProcessOwnerLoopBatch(model.Samples{
+		promBucketSample("m_bucket", map[string]string{"id": "a", "le": "+Inf"}, 1, ts),
+		promBucketSample("m_bucket", map[string]string{"id": "b", "le": "+Inf"}, 1, ts),
+	})
+	require.NoError(t, err)
+
+	flushAt := start.Add(cfg.QuietPeriod + time.Millisecond)
+	setNow(flushAt)
+	require.Len(t, g.FlushExpired(g.now()), 2)
+
+	ts2 := model.TimeFromUnix(5001)
+	_, err = g.ProcessOwnerLoopBatch(model.Samples{
+		promBucketSample("m_bucket", map[string]string{"id": "c", "le": "+Inf"}, 1, ts2),
+		promBucketSample("m_bucket", map[string]string{"id": "d", "le": "+Inf"}, 1, ts2),
+	})
+	require.NoError(t, err)
+	require.Equal(t, 2, g.assembler.statsSnapshot().PendingHistograms)
+
+	// If capacity and commit each called now() separately, the second call would
+	// land after tombstone expiry and reopen identities without admission cost.
+	beforeExpiry := flushAt.Add(cfg.HardTimeout - time.Millisecond)
+	afterExpiry := flushAt.Add(cfg.HardTimeout + time.Millisecond)
+	var nowCalls int
+	g.now = func() time.Time {
+		nowCalls++
+		if nowCalls == 1 {
+			return beforeExpiry
+		}
+		return afterExpiry
+	}
+
+	_, err = g.ProcessOwnerLoopBatch(model.Samples{
+		promBucketSample("m_bucket", map[string]string{"id": "a", "le": "+Inf"}, 1, ts),
+		promBucketSample("m_bucket", map[string]string{"id": "b", "le": "+Inf"}, 1, ts),
+	})
+	require.NoError(t, err)
+	assert.Equal(t, 1, nowCalls, "capacity and commit must share one now() snapshot")
+	assert.Equal(t, 2, g.assembler.statsSnapshot().PendingHistograms,
+		"active tombstones at the snapshot time must late-drop instead of exceeding max pending")
+	assert.Equal(t, uint64(2), g.assembler.stats.LateDrops)
+}
+
+func TestProcessOwnerLoopBatchNeverExceedsMaxPending(t *testing.T) {
+	cfg := histogramAssemblyConfig{
+		QuietPeriod:          time.Hour,
+		HardTimeout:          time.Hour,
+		MaxPendingHistograms: 50,
+		MaxPendingBuckets:    10_000,
+	}
+	g, setNow := newTestTypedGenerator(t, cfg, time.Unix(1000, 0))
+	ts := model.TimeFromUnix(1000)
+	setNow(ts.Time())
+
+	accepted := 0
+	rejected := 0
+	for i := 0; i < 200; i++ {
+		samples := model.Samples{
+			promBucketSample("http_request_duration_seconds_bucket", map[string]string{
+				"runtime": "linux",
+				"id":      strconv.Itoa(i),
+				"le":      "0.25",
+			}, 1, ts),
+			promBucketSample("http_request_duration_seconds_bucket", map[string]string{
+				"runtime": "linux",
+				"id":      strconv.Itoa(i),
+				"le":      "+Inf",
+			}, 2, ts),
+		}
+		_, err := g.ProcessOwnerLoopBatch(samples)
+		if errors.Is(err, rw.ErrRemoteWriteCapacityExceeded) {
+			rejected++
+			continue
+		}
+		require.NoError(t, err)
+		accepted++
+	}
+	snap := g.assembler.statsSnapshot()
+	assert.LessOrEqual(t, snap.PendingHistograms, cfg.MaxPendingHistograms,
+		"pending histograms must never exceed max (accepted=%d rejected=%d)", accepted, rejected)
+	assert.Equal(t, cfg.MaxPendingHistograms, snap.PendingHistograms, "should fill exactly to max")
+	assert.Greater(t, rejected, 0, "later batches must be capacity-rejected")
 }
