@@ -608,7 +608,6 @@ func TestProcessOwnerLoopBatchCapacityRejectionNoMutation(t *testing.T) {
 	assert.Equal(t, float64(0), metric["rate"], "rejected batch must not seed counter cache")
 }
 
-
 // TestProcessOwnerLoopBatchUsesSingleNowAcrossCapacityAndCommit locks the
 // capacity-check and commit path to a single now() snapshot. If those steps
 // each call now() independently, a tombstone can expire between them: admission
