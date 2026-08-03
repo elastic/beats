@@ -6,6 +6,7 @@ package remote_write
 
 import (
 	"fmt"
+	"maps"
 	"math"
 	"regexp"
 	"strings"
@@ -62,6 +63,13 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, opts ...rw.RemoteW
 			g.retainedFlushes = make(map[string]mb.Event)
 			g.histogramMon = registerHistogramAssemblerMonitoring(base.Metrics())
 			g.assembler = newHistogramAssembler(g.assemblyConfig, g.histogramMon)
+			g.logger.Named("prometheus.remote_write").Infof(
+				"histogram assembly enabled: quiet_period=%s hard_timeout=%s max_pending_histograms=%d max_pending_buckets=%d",
+				g.assemblyConfig.QuietPeriod,
+				g.assemblyConfig.HardTimeout,
+				g.assemblyConfig.MaxPendingHistograms,
+				g.assemblyConfig.MaxPendingBuckets,
+			)
 		}
 
 		var err error
@@ -229,9 +237,7 @@ func (g *remoteWriteTypedGenerator) FlushExpired(now time.Time) map[string]mb.Ev
 		return nil
 	}
 	events := g.assembler.flushExpired(now, g.counterCache, g.metricsCount)
-	for k, v := range g.retainedFlushes {
-		events[k] = v
-	}
+	maps.Copy(events, g.retainedFlushes)
 	// Retained capacity leaves accounting while the owner loop publishes synchronously;
 	// it is restored by RetainUnpublishedFlushEvents if publication fails.
 	g.retainedFlushes = make(map[string]mb.Event)

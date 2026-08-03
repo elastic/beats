@@ -5,6 +5,7 @@
 package remote_write
 
 import (
+	"maps"
 	"math"
 	"strconv"
 	"testing"
@@ -46,9 +47,7 @@ func newTestTypedGenerator(t *testing.T, cfg histogramAssemblyConfig, start time
 
 func mergeEvents(base, flush map[string]mb.Event) map[string]mb.Event {
 	out := make(map[string]mb.Event, len(base)+len(flush))
-	for k, v := range base {
-		out[k] = v
-	}
+	maps.Copy(out, base)
 	for k, v := range flush {
 		if existing, ok := out[k]; ok {
 			existing.ModuleFields.Update(v.ModuleFields)
