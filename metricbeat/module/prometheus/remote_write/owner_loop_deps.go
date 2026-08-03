@@ -44,7 +44,9 @@ func clearOwnerLoopTestSeams(m *MetricSet) {
 
 func seamsForMetricSet(m *MetricSet) ownerLoopSeams {
 	if v, ok := ownerLoopTestSeams.Load(m); ok {
-		return v.(ownerLoopSeams)
+		if seams, ok := v.(ownerLoopSeams); ok {
+			return seams
+		}
 	}
 	return ownerLoopSeams{}
 }
@@ -69,13 +71,17 @@ func registerRunReadySignal(m *MetricSet) chan struct{} {
 
 func signalRunReady(m *MetricSet) {
 	if v, ok := runReadySignals.Load(m); ok {
-		close(v.(chan struct{}))
+		if ch, ok := v.(chan struct{}); ok {
+			close(ch)
+		}
 	}
 }
 
 func waitRunReady(m *MetricSet) <-chan struct{} {
 	if v, ok := runReadySignals.Load(m); ok {
-		return v.(chan struct{})
+		if ch, ok := v.(chan struct{}); ok {
+			return ch
+		}
 	}
 	ch := make(chan struct{})
 	close(ch)

@@ -127,7 +127,8 @@ func (g *remoteWriteTypedGenerator) Stop() {
 	// so pending assembler state and unpublished flush retries are discarded here.
 	var shutdownDropped uint64
 	if g.assembler != nil {
-		shutdownDropped = uint64(len(g.assembler.pending) + len(g.retainedFlushes))
+		// G115: map lengths are non-negative and fit in uint64 on all supported platforms.
+		shutdownDropped = uint64(len(g.assembler.pending) + len(g.retainedFlushes)) //nolint:gosec
 		g.assembler.shutdown(g.now())
 	}
 	if g.assembler != nil && len(g.retainedFlushes) > 0 {
@@ -180,8 +181,9 @@ func (g *remoteWriteTypedGenerator) RetainUnpublishedFlushEvents(events map[stri
 		nextB := capSum.buckets + evCap.buckets
 		if nextH > maxH || nextB > maxB {
 			if g.assembler != nil {
-				g.assembler.stats.RetentionDrops += uint64(evCap.histograms)
-				g.assembler.stats.RetentionBucketDrops += uint64(evCap.buckets)
+				// G115: flush capacities start at zero and only increase by non-negative counts.
+				g.assembler.stats.RetentionDrops += uint64(evCap.histograms) //nolint:gosec
+				g.assembler.stats.RetentionBucketDrops += uint64(evCap.buckets) //nolint:gosec
 			}
 			continue
 		}

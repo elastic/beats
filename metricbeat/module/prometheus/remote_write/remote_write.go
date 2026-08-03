@@ -223,7 +223,6 @@ func (m *MetricSet) runOwnerLoop(reporter mb.PushReporterV2) {
 		defer flushTicker.Stop()
 	}
 
-	shuttingDown := false
 	for {
 		var tickCh <-chan time.Time
 		if flushCh != nil {
@@ -232,11 +231,8 @@ func (m *MetricSet) runOwnerLoop(reporter mb.PushReporterV2) {
 
 		select {
 		case <-reporter.Done():
-			if !shuttingDown {
-				shuttingDown = true
-				m.shutdownOwnerLoop(reporter)
-				return
-			}
+			m.shutdownOwnerLoop(reporter)
+			return
 		case sub := <-m.batches:
 			m.processBatch(reporter, sub)
 		case now := <-tickCh:

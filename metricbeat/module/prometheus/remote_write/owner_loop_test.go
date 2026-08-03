@@ -285,7 +285,7 @@ func TestOwnerLoopSerializesConcurrentGenerateEvents(t *testing.T) {
 	const workers = 8
 	var wg sync.WaitGroup
 	statuses := make([]int, workers)
-	for i := 0; i < workers; i++ {
+	for i := range workers {
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
