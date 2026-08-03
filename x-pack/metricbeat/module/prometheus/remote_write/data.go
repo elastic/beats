@@ -6,7 +6,6 @@ package remote_write
 
 import (
 	"fmt"
-	"maps"
 	"math"
 	"regexp"
 	"strings"
@@ -154,11 +153,7 @@ func (g *remoteWriteTypedGenerator) NextFlushInterval() time.Duration {
 	if g.assemblyConfig.HardTimeout < min {
 		min = g.assemblyConfig.HardTimeout
 	}
-	interval := min / 2
-	if interval < time.Second {
-		interval = time.Second
-	}
-	return interval
+	return max(min/2, time.Second)
 }
 
 func (g *remoteWriteTypedGenerator) RetainUnpublishedFlushEvents(events map[string]mb.Event) {
@@ -200,8 +195,26 @@ func (g *remoteWriteTypedGenerator) CheckCapacity(metrics model.Samples) error {
 	if g.assembler == nil {
 		return nil
 	}
-	batch := g.classifyBucketSamples(metrics)
-	impact := g.assembler.capacityImpact(g.now(), batch)
+	prepared := g.prepareBatch(metrics)
+	return g.checkPreparedCapacity(prepared)
+}
+
+// ProcessOwnerLoopBatch classifies a request once, admits it against assembler
+// capacity, then commits immediate metrics and grouped histogram ingestion.
+func (g *remoteWriteTypedGenerator) ProcessOwnerLoopBatch(metrics model.Samples) (map[string]mb.Event, error) {
+	if g.assembler == nil {
+		return g.GenerateEvents(metrics), nil
+	}
+	prepared := g.prepareBatch(metrics)
+	if err := g.checkPreparedCapacity(prepared); err != nil {
+		return nil, err
+	}
+	g.commitPreparedHistograms(prepared)
+	return g.applyPreparedImmediate(prepared), nil
+}
+
+func (g *remoteWriteTypedGenerator) checkPreparedCapacity(prepared preparedBatch) error {
+	impact := g.assembler.capacityImpactGrouped(g.now(), prepared.groups)
 	if g.assembler.wouldExceedCapacity(impact, g.retainedCapacity) {
 		if g.histogramMon != nil {
 			g.histogramMon.observeCapacityRejection()
@@ -216,12 +229,30 @@ func (g *remoteWriteTypedGenerator) FlushExpired(now time.Time) map[string]mb.Ev
 		return nil
 	}
 	events := g.assembler.flushExpired(now, g.counterCache, g.metricsCount)
-	maps.Copy(events, g.retainedFlushes)
+	for k, v := range g.retainedFlushes {
+		events[k] = v
+	}
 	// Retained capacity leaves accounting while the owner loop publishes synchronously;
 	// it is restored by RetainUnpublishedFlushEvents if publication fails.
 	g.retainedFlushes = make(map[string]mb.Event)
 	g.retainedCapacity = flushEventCapacity{}
 	return events
+}
+
+type preparedImmediate struct {
+	labelsHash string
+	labels     mapstr.M
+	timestamp  time.Time
+	name       string
+	promType   string
+	value      float64
+}
+
+type preparedBatch struct {
+	immediate []preparedImmediate
+	groups    []preparedHistogramGroup
+	// requestLocalHistograms is used only when the assembler is disabled.
+	requestLocalHistograms map[string]histogram
 }
 
 // GenerateEvents receives a list of Sample and:
@@ -235,29 +266,40 @@ func (g *remoteWriteTypedGenerator) FlushExpired(now time.Time) map[string]mb.Ev
 // metric-name set (and metrics_names_fingerprint) than the immediate _sum/_count event for the
 // same labels. metrics_count, when enabled, is computed per emitted mb.Event, not as a unified
 // logical scrape count across immediate and flush paths.
+//
+// GenerateEvents does not perform capacity admission. Owner-loop traffic must use
+// ProcessOwnerLoopBatch for atomic capacity rejection.
 func (g *remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
-	var data mapstr.M
-	histograms := map[string]histogram{}
-	eventList := map[string]mb.Event{}
+	prepared := g.prepareBatch(metrics)
+	if g.assembler != nil {
+		g.commitPreparedHistograms(prepared)
+	}
+	events := g.applyPreparedImmediate(prepared)
+	if g.assembler == nil {
+		g.processPromHistograms(events, prepared.requestLocalHistograms)
+		g.applyMetricsCount(events)
+	}
+	return events
+}
 
+// prepareBatch classifies samples once and groups histogram buckets by identity.
+// It must not mutate assembler state or the counter cache.
+func (g *remoteWriteTypedGenerator) prepareBatch(metrics model.Samples) preparedBatch {
+	prepared := preparedBatch{}
+	if g.assembler == nil {
+		prepared.requestLocalHistograms = map[string]histogram{}
+	}
+
+	groupIndex := map[string]int{}
 	for _, metric := range metrics {
 		if metric == nil {
 			continue
 		}
-
 		name, labels, val, ts, ok := g.readSample(metric)
 		if !ok {
 			continue
 		}
-
 		promType := g.findMetricType(name, labels)
-
-		labelsHash := labels.String() + ts.String()
-		labelsClone := labels.Clone()
-		_ = labelsClone.Delete("le")
-		if promType == histogramType {
-			labelsHash = labelsClone.String() + ts.String()
-		}
 
 		if promType == histogramType {
 			le, err := labels.GetValue("le")
@@ -272,77 +314,127 @@ func (g *remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[st
 			if !ok {
 				continue
 			}
-			if g.assembler != nil {
-				g.assembler.ingest(g.now(), bucketSample{
-					bucketMetricName: name,
-					labels:           labelsClone,
-					timestamp:        ts,
-					buckets: []bucketUpdate{{
-						upperBound:      upperBound,
-						cumulativeCount: val,
-					}},
-				})
-			} else {
+			labelsClone := labels.Clone()
+			_ = labelsClone.Delete("le")
+
+			if g.assembler == nil {
 				histKey := name + labelsClone.String()
-				hist := histograms[histKey]
+				hist := prepared.requestLocalHistograms[histKey]
+				count := val
+				bound := upperBound
 				hist.buckets = append(hist.buckets, &p.Bucket{
-					CumulativeCount: &val,
-					UpperBound:      &upperBound,
+					CumulativeCount: &count,
+					UpperBound:      &bound,
 				})
 				hist.timestamp = ts
 				hist.labels = labelsClone
 				hist.metricName = name
-				histograms[histKey] = hist
+				prepared.requestLocalHistograms[histKey] = hist
+				continue
 			}
+
+			id := histogramIdentity{
+				bucketMetricName: name,
+				labelsKey:        labelsClone.String(),
+				timestamp:        ts,
+			}
+			key := id.key()
+			upd := bucketUpdate{upperBound: upperBound, cumulativeCount: val}
+			if idx, ok := groupIndex[key]; ok {
+				prepared.groups[idx].buckets = mergeBucketUpdate(prepared.groups[idx].buckets, upd)
+				continue
+			}
+			groupIndex[key] = len(prepared.groups)
+			prepared.groups = append(prepared.groups, preparedHistogramGroup{
+				identity: id,
+				key:      key,
+				labels:   labelsClone,
+				buckets:  []bucketUpdate{upd},
+			})
 			continue
 		}
 
-		// join metrics with same labels in a single event
-		if _, ok := eventList[labelsHash]; !ok {
-			eventList[labelsHash] = mb.Event{
+		prepared.immediate = append(prepared.immediate, preparedImmediate{
+			labelsHash: labels.String() + ts.String(),
+			labels:     labels,
+			timestamp:  ts,
+			name:       name,
+			promType:   promType,
+			value:      val,
+		})
+	}
+	return prepared
+}
+
+func mergeBucketUpdate(buckets []bucketUpdate, upd bucketUpdate) []bucketUpdate {
+	bk := boundKey(upd.upperBound)
+	for i, existing := range buckets {
+		if boundKey(existing.upperBound) == bk {
+			if upd.cumulativeCount > existing.cumulativeCount {
+				buckets[i] = upd
+			}
+			return buckets
+		}
+	}
+	return append(buckets, upd)
+}
+
+func (g *remoteWriteTypedGenerator) commitPreparedHistograms(prepared preparedBatch) {
+	if g.assembler == nil {
+		return
+	}
+	now := g.now()
+	for _, group := range prepared.groups {
+		g.assembler.ingestGrouped(now, group)
+	}
+}
+
+func (g *remoteWriteTypedGenerator) applyPreparedImmediate(prepared preparedBatch) map[string]mb.Event {
+	eventList := map[string]mb.Event{}
+	for _, sample := range prepared.immediate {
+		if _, ok := eventList[sample.labelsHash]; !ok {
+			eventList[sample.labelsHash] = mb.Event{
 				RootFields:   mapstr.M{},
 				ModuleFields: mapstr.M{},
-				Timestamp:    ts,
+				Timestamp:    sample.timestamp,
 			}
-
-			if len(labels) > 0 {
-				eventList[labelsHash].ModuleFields["labels"] = labels
+			if len(sample.labels) > 0 {
+				eventList[sample.labelsHash].ModuleFields["labels"] = sample.labels
 			}
 		}
-
-		e := eventList[labelsHash]
-
-		switch promType {
+		e := eventList[sample.labelsHash]
+		var data mapstr.M
+		switch sample.promType {
 		case counterType:
 			data = mapstr.M{
-				name: g.rateCounterFloat64(name, labels, val),
+				sample.name: g.rateCounterFloat64(sample.name, sample.labels, sample.value),
 			}
 		case otherType:
 			data = mapstr.M{
-				name: mapstr.M{
-					"value": val,
+				sample.name: mapstr.M{
+					"value": sample.value,
 				},
 			}
 		}
-
 		e.ModuleFields.Update(data)
 	}
-
-	if g.assembler == nil {
-		g.processPromHistograms(eventList, histograms)
+	if g.assembler != nil {
+		g.applyMetricsCount(eventList)
 	}
+	return eventList
+}
 
-	if g.metricsCount {
-		for _, e := range eventList {
-			if _, hasLabels := e.ModuleFields["labels"]; hasLabels {
-				e.RootFields["metrics_count"] = len(e.ModuleFields) - 1
-			} else {
-				e.RootFields["metrics_count"] = len(e.ModuleFields)
-			}
+func (g *remoteWriteTypedGenerator) applyMetricsCount(eventList map[string]mb.Event) {
+	if !g.metricsCount {
+		return
+	}
+	for _, e := range eventList {
+		if _, hasLabels := e.ModuleFields["labels"]; hasLabels {
+			e.RootFields["metrics_count"] = len(e.ModuleFields) - 1
+		} else {
+			e.RootFields["metrics_count"] = len(e.ModuleFields)
 		}
 	}
-
-	return eventList
 }
 
 func (g *remoteWriteTypedGenerator) readSample(metric *model.Sample) (name string, labels mapstr.M, val float64, ts time.Time, ok bool) {
@@ -360,46 +452,6 @@ func (g *remoteWriteTypedGenerator) readSample(metric *model.Sample) (name strin
 		labels[string(k)] = v
 	}
 	return name, labels, val, ts, true
-}
-
-func (g *remoteWriteTypedGenerator) classifyBucketSamples(metrics model.Samples) []bucketSample {
-	var batch []bucketSample
-	for _, metric := range metrics {
-		if metric == nil {
-			continue
-		}
-		name, labels, val, ts, ok := g.readSample(metric)
-		if !ok {
-			continue
-		}
-		if g.findMetricType(name, labels) != histogramType {
-			continue
-		}
-		labelsClone := labels.Clone()
-		_ = labelsClone.Delete("le")
-		le, err := labels.GetValue("le")
-		if err != nil {
-			continue
-		}
-		leValue, ok := le.(model.LabelValue)
-		if !ok {
-			continue
-		}
-		upperBound, ok := parseLEUpperBound(string(leValue))
-		if !ok {
-			continue
-		}
-		batch = append(batch, bucketSample{
-			bucketMetricName: name,
-			labels:           labelsClone,
-			timestamp:        ts,
-			buckets: []bucketUpdate{{
-				upperBound:      upperBound,
-				cumulativeCount: val,
-			}},
-		})
-	}
-	return batch
 }
 
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled

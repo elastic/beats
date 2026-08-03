@@ -40,6 +40,13 @@ type RemoteWriteCapacityChecker interface {
 	CheckCapacity(samples model.Samples) error
 }
 
+// RemoteWriteOwnerLoopBatchProcessor optionally owns classify → capacity check → commit for
+// one owner-loop batch. Capacity rejection must return ErrRemoteWriteCapacityExceeded with no
+// generator mutations. Other errors are treated as internal failures.
+type RemoteWriteOwnerLoopBatchProcessor interface {
+	ProcessOwnerLoopBatch(samples model.Samples) (map[string]mb.Event, error)
+}
+
 // RemoteWriteFlushCapable optionally emits buffered events on a timer owned by MetricSet.Run.
 type RemoteWriteFlushCapable interface {
 	FlushExpired(now time.Time) map[string]mb.Event
@@ -109,15 +116,37 @@ func (m *MetricSet) preflightBatch(sub batchSubmission) (batchOutcome, bool) {
 }
 
 func (m *MetricSet) processBatch(reporter mb.PushReporterV2, sub batchSubmission) {
-	if outcome, ok := m.preflightBatch(sub); !ok {
-		m.completeBatch(sub, outcome)
-		return
+	var events map[string]mb.Event
+	if processor, ok := m.promEventsGen.(RemoteWriteOwnerLoopBatchProcessor); ok {
+		var err error
+		events, err = processor.ProcessOwnerLoopBatch(sub.samples)
+		if err != nil {
+			if errors.Is(err, ErrRemoteWriteCapacityExceeded) {
+				m.completeBatch(sub, batchOutcome{
+					statusCode: http.StatusServiceUnavailable,
+					message:    batchOutcomeMsgCapacityExceeded,
+				})
+				return
+			}
+			m.Logger().Errorf("remote write preflight failed: %v", err)
+			m.completeBatch(sub, batchOutcome{
+				statusCode: http.StatusInternalServerError,
+				message:    batchOutcomeMsgPreflightFailed,
+			})
+			return
+		}
+	} else {
+		if outcome, ok := m.preflightBatch(sub); !ok {
+			m.completeBatch(sub, outcome)
+			return
+		}
+
+		// Request cancellation after preflight admission cannot roll back generator state or
+		// events already delivered to the reporter; that matches at-least-once remote_write
+		// semantics. Capacity preflight is the only required atomic rejection from the client.
+		events = m.promEventsGen.GenerateEvents(sub.samples)
 	}
 
-	// Request cancellation after preflight admission cannot roll back generator state or
-	// events already delivered to the reporter; that matches at-least-once remote_write
-	// semantics. Capacity preflight is the only required atomic rejection from the client.
-	events := m.promEventsGen.GenerateEvents(sub.samples)
 	for _, e := range events {
 		select {
 		case <-sub.ctx.Done():

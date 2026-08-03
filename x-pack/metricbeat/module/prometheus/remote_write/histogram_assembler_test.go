@@ -104,10 +104,7 @@ func TestHistogramAssemblerSameRequestBuffering(t *testing.T) {
 	flushed := g.FlushExpired(g.now())
 	require.Len(t, flushed, 1, "quiet flush after +Inf should emit one histogram event")
 	for _, ev := range flushed {
-		metric, ok := ev.ModuleFields["http_request_duration_seconds"].(mapstr.M)
-		require.True(t, ok, "flushed metric must use the typed metric layout")
-		hist, ok := metric["histogram"].(mapstr.M)
-		require.True(t, ok, "flushed metric must contain a histogram")
+		hist := ev.ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
 		assert.Equal(t, []float64{0.125, 0.375, 0.5}, hist["values"], "same-request buckets must assemble all centroids")
 	}
 }
@@ -131,10 +128,7 @@ func TestHistogramAssemblerCrossCallMerge(t *testing.T) {
 	flushed := g.FlushExpired(ts.Time().Add(2*time.Second + cfg.QuietPeriod + time.Millisecond))
 	require.Len(t, flushed, 1)
 	labels := mapstr.M{"runtime": model.LabelValue("linux")}
-	metric, ok := flushed[labels.String()+ts.Time().String()].ModuleFields["http_request_duration_seconds"].(mapstr.M)
-	require.True(t, ok, "flushed metric must use the typed metric layout")
-	hist, ok := metric["histogram"].(mapstr.M)
-	require.True(t, ok, "flushed metric must contain a histogram")
+	hist := flushed[labels.String()+ts.Time().String()].ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
 	assert.Equal(t, []float64{0.125, 0.375, 0.5}, hist["values"])
 }
 
@@ -347,9 +341,7 @@ func TestGenerateEventsCounterUnaffectedByAssembly(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 	require.Len(t, events, 1)
-	metric, ok := events[labels.String()+ts.Time().String()].ModuleFields["net_conntrack_listener_conn_closed_total"].(mapstr.M)
-	require.True(t, ok, "counter metric must use the typed metric layout")
-	assert.Equal(t, float64(42), metric["counter"])
+	assert.Equal(t, float64(42), events[labels.String()+ts.Time().String()].ModuleFields["net_conntrack_listener_conn_closed_total"].(mapstr.M)["counter"])
 }
 
 func TestNextFlushIntervalDeterministic(t *testing.T) {
@@ -502,4 +494,116 @@ func TestGenerateEventsImmediateSumSeparateFromBufferedHistogram(t *testing.T) {
 		assert.Contains(t, ev.ModuleFields, "http_request_duration_seconds_sum")
 		assert.NotContains(t, ev.ModuleFields, "http_request_duration_seconds")
 	}
+}
+
+func TestProcessOwnerLoopBatchGroupsBucketsByIdentity(t *testing.T) {
+	cfg := defaultHistogramAssemblyConfig()
+	start := time.Unix(970, 0)
+	g, setNow := newTestTypedGenerator(t, cfg, start)
+	ts := model.TimeFromUnix(970)
+	setNow(ts.Time())
+
+	events, err := g.ProcessOwnerLoopBatch(model.Samples{
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "zone": "a", "le": "0.25"}, 10, ts),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "zone": "b", "le": "0.25"}, 11, ts),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "zone": "a", "le": "0.50"}, 20, ts),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "zone": "b", "le": "+Inf"}, 30, ts),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "zone": "a", "le": "+Inf"}, 30, ts),
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "cpu_usage",
+				"runtime":  "linux",
+			},
+			Value:     7,
+			Timestamp: ts,
+		},
+	})
+	require.NoError(t, err)
+	require.Len(t, events, 1, "only immediate non-histogram metrics must emit now")
+	assert.Equal(t, 2, g.assembler.statsSnapshot().PendingHistograms, "two identities must be buffered")
+
+	setNow(ts.Time().Add(cfg.QuietPeriod + time.Millisecond))
+	flushed := g.FlushExpired(g.now())
+	require.Len(t, flushed, 2, "quiet flush must emit one event per identity")
+}
+
+func TestProcessOwnerLoopBatchDuplicateBoundsKeepGreatest(t *testing.T) {
+	cfg := defaultHistogramAssemblyConfig()
+	start := time.Unix(971, 0)
+	g, setNow := newTestTypedGenerator(t, cfg, start)
+	ts := model.TimeFromUnix(971)
+	setNow(ts.Time())
+
+	_, err := g.ProcessOwnerLoopBatch(model.Samples{
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "0.5"}, 10, ts),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "0.5"}, 25, ts),
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "+Inf"}, 30, ts),
+	})
+	require.NoError(t, err)
+	snap := g.assembler.statsSnapshot()
+	assert.Equal(t, 1, snap.PendingHistograms)
+	assert.Equal(t, 2, snap.PendingBuckets, "duplicate le in one request must count once")
+
+	var entry *pendingHistogram
+	for _, p := range g.assembler.pending {
+		entry = p
+		break
+	}
+	require.NotNil(t, entry)
+	require.Contains(t, entry.buckets, 0.5)
+	assert.Equal(t, float64(25), entry.buckets[0.5].GetCumulativeCount())
+}
+
+func TestProcessOwnerLoopBatchCapacityRejectionNoMutation(t *testing.T) {
+	cfg := histogramAssemblyConfig{
+		QuietPeriod:          time.Second,
+		HardTimeout:          10 * time.Second,
+		MaxPendingHistograms: 1,
+		MaxPendingBuckets:    10,
+	}
+	start := time.Unix(972, 0)
+	g, setNow := newTestTypedGenerator(t, cfg, start)
+	ts := model.TimeFromUnix(972)
+	setNow(ts.Time())
+
+	_, err := g.ProcessOwnerLoopBatch(model.Samples{
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "0.25"}, 1, ts),
+	})
+	require.NoError(t, err)
+	before := g.assembler.statsSnapshot()
+
+	rejectedCounter := &model.Sample{
+		Metric: map[model.LabelName]model.LabelValue{
+			"__name__": "requests_total",
+			"runtime":  "linux",
+		},
+		Value:     100,
+		Timestamp: ts,
+	}
+	_, err = g.ProcessOwnerLoopBatch(model.Samples{
+		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "darwin", "le": "0.25"}, 1, ts),
+		rejectedCounter,
+	})
+	require.ErrorIs(t, err, rw.ErrRemoteWriteCapacityExceeded)
+	after := g.assembler.statsSnapshot()
+	assert.Equal(t, before.PendingHistograms, after.PendingHistograms)
+	assert.Equal(t, before.PendingBuckets, after.PendingBuckets)
+
+	// If the rejected batch had seeded the cache at 100, this observation would report rate 50.
+	// With deferred counter-cache updates, the first successful observation still has rate 0.
+	acceptedCounter := &model.Sample{
+		Metric: map[model.LabelName]model.LabelValue{
+			"__name__": "requests_total",
+			"runtime":  "linux",
+		},
+		Value:     150,
+		Timestamp: ts,
+	}
+	events, err := g.ProcessOwnerLoopBatch(model.Samples{acceptedCounter})
+	require.NoError(t, err)
+	require.Len(t, events, 1)
+	labels := mapstr.M{"runtime": model.LabelValue("linux")}
+	metric := events[labels.String()+ts.Time().String()].ModuleFields["requests_total"].(mapstr.M)
+	assert.Equal(t, float64(150), metric["counter"])
+	assert.Equal(t, float64(0), metric["rate"], "rejected batch must not seed counter cache")
 }

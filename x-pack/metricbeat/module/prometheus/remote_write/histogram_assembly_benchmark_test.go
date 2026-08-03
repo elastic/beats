@@ -18,8 +18,8 @@ import (
 
 var benchmarkEventCount int
 
-type benchmarkCapacityChecker interface {
-	CheckCapacity(model.Samples) error
+type benchmarkBatchProcessor interface {
+	ProcessOwnerLoopBatch(model.Samples) (map[string]mb.Event, error)
 }
 
 type benchmarkFlushCapable interface {
@@ -79,10 +79,17 @@ func BenchmarkHistogramAssemblyPipeline(b *testing.B) {
 
 						eventCount := 0
 						for _, batch := range batches {
-							if checker, ok := any(generator).(benchmarkCapacityChecker); ok {
-								if err := checker.CheckCapacity(batch); err != nil {
-									b.Fatalf("capacity check failed: %v", err)
+							if mode.assemblyEnabled {
+								processor, ok := any(generator).(benchmarkBatchProcessor)
+								if !ok {
+									b.Fatal("assembly_enabled generator must implement ProcessOwnerLoopBatch")
 								}
+								events, err := processor.ProcessOwnerLoopBatch(batch)
+								if err != nil {
+									b.Fatalf("ProcessOwnerLoopBatch failed: %v", err)
+								}
+								eventCount += len(events)
+								continue
 							}
 							eventCount += len(generator.GenerateEvents(batch))
 						}

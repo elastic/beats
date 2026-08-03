@@ -5,6 +5,7 @@
 package remote_write
 
 import (
+	"maps"
 	"testing"
 	"time"
 
@@ -21,17 +22,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func newFactoryBaseMetricSet(t *testing.T, overrides map[string]interface{}) mb.BaseMetricSet {
+func newFactoryBaseMetricSet(t *testing.T, overrides map[string]any) mb.BaseMetricSet {
 	t.Helper()
-	raw := map[string]interface{}{
+	raw := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"remote_write"},
 		"use_types":  true,
 		"period":     "60s",
 	}
-	for k, v := range overrides {
-		raw[k] = v
-	}
+	maps.Copy(raw, overrides)
 	c, err := conf.NewConfigFrom(raw)
 	require.NoError(t, err)
 	_, bases, err := mb.NewModule(c, mb.Registry, beat.Info{
@@ -46,8 +45,8 @@ func newFactoryBaseMetricSet(t *testing.T, overrides map[string]interface{}) mb.
 }
 
 func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *testing.T) {
-	base := newFactoryBaseMetricSet(t, map[string]interface{}{
-		"histogram_assembly": map[string]interface{}{
+	base := newFactoryBaseMetricSet(t, map[string]any{
+		"histogram_assembly": map[string]any{
 			"enabled": true,
 		},
 	})
@@ -70,10 +69,10 @@ func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *te
 }
 
 func TestRemoteWriteEventsGeneratorFactoryRejectsInvalidHistogramAssembly(t *testing.T) {
-	mod := mbtest.NewTestModule(t, map[string]interface{}{
+	mod := mbtest.NewTestModule(t, map[string]any{
 		"use_types": true,
 		"period":    "60s",
-		"histogram_assembly": map[string]interface{}{
+		"histogram_assembly": map[string]any{
 			"enabled":      true,
 			"quiet_period": "31s",
 			"hard_timeout": "30s",
@@ -85,9 +84,9 @@ func TestRemoteWriteEventsGeneratorFactoryRejectsInvalidHistogramAssembly(t *tes
 }
 
 func TestRemoteWriteEventsGeneratorFactoryDisabledHistogramAssemblyIgnoresInvalidTuning(t *testing.T) {
-	base := newFactoryBaseMetricSet(t, map[string]interface{}{
+	base := newFactoryBaseMetricSet(t, map[string]any{
 		"use_types": false,
-		"histogram_assembly": map[string]interface{}{
+		"histogram_assembly": map[string]any{
 			"quiet_period": "-1s",
 		},
 	})
@@ -145,12 +144,12 @@ func TestMetricSetFlowMatchesHistogramAssemblerConfiguration(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			config := map[string]interface{}{
+			config := map[string]any{
 				"module":     "prometheus",
 				"metricsets": []string{"remote_write"},
 				"use_types":  true,
 				"period":     "60s",
-				"histogram_assembly": map[string]interface{}{
+				"histogram_assembly": map[string]any{
 					"enabled": test.useAssembler,
 				},
 			}

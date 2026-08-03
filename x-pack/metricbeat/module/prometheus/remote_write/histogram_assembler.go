@@ -140,18 +140,32 @@ type capacityBatchImpact struct {
 }
 
 func (a *histogramAssembler) capacityImpact(now time.Time, batch []bucketSample) capacityBatchImpact {
+	groups := make([]preparedHistogramGroup, 0, len(batch))
+	for _, s := range batch {
+		id := histogramIdentityFromParts(s.bucketMetricName, s.labels, s.timestamp)
+		groups = append(groups, preparedHistogramGroup{
+			identity: id,
+			key:      id.key(),
+			labels:   s.labels,
+			buckets:  s.buckets,
+		})
+	}
+	return a.capacityImpactGrouped(now, groups)
+}
+
+// capacityImpactGrouped computes admission impact using precomputed identity keys.
+func (a *histogramAssembler) capacityImpactGrouped(now time.Time, groups []preparedHistogramGroup) capacityBatchImpact {
 	var impact capacityBatchImpact
 	newHistInBatch := make(map[string]struct{})
 	newBucketsInBatch := make(map[string]map[float64]struct{})
 
-	for _, s := range batch {
-		id := histogramIdentityFromParts(s.bucketMetricName, s.labels, s.timestamp)
-		key := id.key()
+	for _, group := range groups {
+		key := group.key
 		if a.isActiveTombstone(key, now) {
 			continue
 		}
 		if _, ok := a.pending[key]; ok {
-			for _, b := range s.buckets {
+			for _, b := range group.buckets {
 				bound := b.upperBound
 				if a.pending[key].hasBucket(bound) {
 					continue
@@ -168,7 +182,7 @@ func (a *histogramAssembler) capacityImpact(now time.Time, batch []bucketSample)
 			newHistInBatch[key] = struct{}{}
 			impact.newHistograms++
 		}
-		for _, b := range s.buckets {
+		for _, b := range group.buckets {
 			bound := b.upperBound
 			if batchHasBound(newBucketsInBatch, key, bound) {
 				continue
@@ -226,6 +240,15 @@ type bucketUpdate struct {
 	cumulativeCount float64
 }
 
+// preparedHistogramGroup is one histogram identity with precomputed key and
+// bucket updates for a single remote_write request.
+type preparedHistogramGroup struct {
+	identity histogramIdentity
+	key      string
+	labels   mapstr.M
+	buckets  []bucketUpdate
+}
+
 func (p *pendingHistogram) hasBucket(upperBound float64) bool {
 	_, ok := p.buckets[boundKey(upperBound)]
 	return ok
@@ -241,7 +264,17 @@ func (a *histogramAssembler) isActiveTombstone(key string, now time.Time) bool {
 
 func (a *histogramAssembler) ingest(now time.Time, sample bucketSample) bool {
 	id := histogramIdentityFromParts(sample.bucketMetricName, sample.labels, sample.timestamp)
-	key := id.key()
+	return a.ingestGrouped(now, preparedHistogramGroup{
+		identity: id,
+		key:      id.key(),
+		labels:   sample.labels,
+		buckets:  sample.buckets,
+	})
+}
+
+// ingestGrouped applies one prepared histogram identity using a precomputed key.
+func (a *histogramAssembler) ingestGrouped(now time.Time, group preparedHistogramGroup) bool {
+	key := group.key
 	if a.isActiveTombstone(key, now) {
 		a.stats.LateDrops++
 		if a.mon != nil {
@@ -254,8 +287,8 @@ func (a *histogramAssembler) ingest(now time.Time, sample bucketSample) bool {
 	entry := a.pending[key]
 	if entry == nil {
 		entry = &pendingHistogram{
-			identity:   id,
-			labels:     sample.labels.Clone(),
+			identity:   group.identity,
+			labels:     group.labels.Clone(),
 			buckets:    make(map[float64]*p.Bucket),
 			firstSeen:  now,
 			lastUpdate: now,
@@ -264,7 +297,7 @@ func (a *histogramAssembler) ingest(now time.Time, sample bucketSample) bool {
 	}
 
 	changed := false
-	for _, upd := range sample.buckets {
+	for _, upd := range group.buckets {
 		bk := boundKey(upd.upperBound)
 		val := upd.cumulativeCount
 		if existing, ok := entry.buckets[bk]; ok {

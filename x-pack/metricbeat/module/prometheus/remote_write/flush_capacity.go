@@ -57,7 +57,7 @@ func histogramBucketPoints(hist mapstr.M) int {
 	switch v := hist["values"].(type) {
 	case []float64:
 		return len(v)
-	case []interface{}:
+	case []any:
 		return len(v)
 	default:
 		return 0

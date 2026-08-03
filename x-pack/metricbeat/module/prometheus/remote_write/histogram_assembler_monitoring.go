@@ -40,10 +40,7 @@ func registerHistogramAssemblerMonitoring(msReg *monitoring.Registry) *histogram
 		return nil
 	}
 	slotVal, _ := histogramAssemblerMonitoringSlots.LoadOrStore(msReg, &histogramAssemblerMonitoringSlot{})
-	slot, ok := slotVal.(*histogramAssemblerMonitoringSlot)
-	if !ok {
-		return nil
-	}
+	slot := slotVal.(*histogramAssemblerMonitoringSlot)
 	slot.once.Do(func() {
 		reg := msReg.GetOrCreateRegistry("histogram_assembler")
 		slot.m = &histogramAssemblerMonitoring{

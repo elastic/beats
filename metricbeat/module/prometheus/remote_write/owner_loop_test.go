@@ -147,6 +147,7 @@ type fakeGenerator struct {
 	inGenerate          int
 	maxConcurrent       int
 	generateCalls       atomic.Int32
+	checkCapacityCalls  atomic.Int32
 	startCalled         bool
 	stopCalled          bool
 	startCalls          int
@@ -196,6 +197,7 @@ func (f *fakeGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Even
 }
 
 func (f *fakeGenerator) CheckCapacity(samples model.Samples) error {
+	f.checkCapacityCalls.Add(1)
 	if f.checkCapacityFn != nil {
 		return f.checkCapacityFn(samples)
 	}
@@ -226,7 +228,26 @@ func (f *fakeGenerator) RequiresOwnerLoop() bool {
 	return true
 }
 
+type fakeBatchProcessorGenerator struct {
+	*fakeGenerator
+	processCalls atomic.Int32
+	processFn    func(model.Samples) (map[string]mb.Event, error)
+}
+
+func (f *fakeBatchProcessorGenerator) ProcessOwnerLoopBatch(samples model.Samples) (map[string]mb.Event, error) {
+	f.processCalls.Add(1)
+	if f.processFn != nil {
+		return f.processFn(samples)
+	}
+	return nil, nil
+}
+
 func newMetricSetWithFakeGenerator(t *testing.T, gen *fakeGenerator) (*MetricSet, *fakeTicker, *testPushReporter) {
+	t.Helper()
+	return newMetricSetWithGenerator(t, gen)
+}
+
+func newMetricSetWithGenerator(t *testing.T, gen RemoteWriteEventsGenerator) (*MetricSet, *fakeTicker, *testPushReporter) {
 	t.Helper()
 	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
 	m.setPromEventsGenerator(gen)
@@ -329,6 +350,99 @@ func TestOwnerLoopAcceptedAfterReporterEvent(t *testing.T) {
 	}
 }
 
+func TestOwnerLoopPrefersBatchProcessor(t *testing.T) {
+	gen := &fakeBatchProcessorGenerator{
+		fakeGenerator: &fakeGenerator{},
+		processFn: func(samples model.Samples) (map[string]mb.Event, error) {
+			require.Len(t, samples, 2)
+			return map[string]mb.Event{
+				"processed": {RootFields: mapstr.M{"source": "processor"}},
+			}, nil
+		},
+	}
+	m, _, reporter := newMetricSetWithGenerator(t, gen)
+
+	rec := postWriteRequest(t, m, 2)
+
+	assert.Equal(t, http.StatusAccepted, rec.Code)
+	assert.Equal(t, int32(1), gen.processCalls.Load(), "batch processor must run exactly once")
+	assert.Zero(t, gen.checkCapacityCalls.Load(), "processor must bypass fallback preflight")
+	assert.Zero(t, gen.generateCalls.Load(), "processor must bypass fallback generation")
+	select {
+	case event := <-reporter.events:
+		assert.Equal(t, "processor", event.RootFields["source"])
+	default:
+		t.Fatal("processor events must be published")
+	}
+}
+
+func TestOwnerLoopFallbackChecksCapacityThenGeneratesEvents(t *testing.T) {
+	gen := &fakeGenerator{}
+	m, _, _ := newMetricSetWithFakeGenerator(t, gen)
+
+	rec := postWriteRequest(t, m, 1)
+
+	assert.Equal(t, http.StatusAccepted, rec.Code)
+	assert.Equal(t, int32(1), gen.checkCapacityCalls.Load(), "fallback must check capacity once")
+	assert.Equal(t, int32(1), gen.generateCalls.Load(), "fallback must generate events once")
+}
+
+func TestOwnerLoopBatchProcessorCapacityErrorReturns503(t *testing.T) {
+	gen := &fakeBatchProcessorGenerator{
+		fakeGenerator: &fakeGenerator{},
+		processFn: func(model.Samples) (map[string]mb.Event, error) {
+			return nil, ErrRemoteWriteCapacityExceeded
+		},
+	}
+	m, _, _ := newMetricSetWithGenerator(t, gen)
+
+	rec := postWriteRequest(t, m, 1)
+
+	assertHTTPErrorBody(t, rec, http.StatusServiceUnavailable, batchOutcomeMsgCapacityExceeded)
+	assert.Equal(t, int32(1), gen.processCalls.Load(), "batch processor must run exactly once")
+	assert.Zero(t, gen.generateCalls.Load(), "GenerateEvents must not run after processor capacity errors")
+}
+
+func TestOwnerLoopBatchProcessorUnexpectedErrorReturns500(t *testing.T) {
+	gen := &fakeBatchProcessorGenerator{
+		fakeGenerator: &fakeGenerator{},
+		processFn: func(model.Samples) (map[string]mb.Event, error) {
+			return nil, errors.New("processor internal failure")
+		},
+	}
+	m, _, _ := newMetricSetWithGenerator(t, gen)
+
+	rec := postWriteRequest(t, m, 1)
+
+	assertHTTPErrorBody(t, rec, http.StatusInternalServerError, batchOutcomeMsgPreflightFailed)
+	assert.Equal(t, int32(1), gen.processCalls.Load(), "batch processor must run exactly once")
+	assert.Zero(t, gen.generateCalls.Load(), "GenerateEvents must not run after processor errors")
+}
+
+func TestOwnerLoopBatchProcessorPipelineRejectionReturns503(t *testing.T) {
+	gen := &fakeBatchProcessorGenerator{
+		fakeGenerator: &fakeGenerator{},
+		processFn: func(model.Samples) (map[string]mb.Event, error) {
+			return map[string]mb.Event{
+				"processed": {RootFields: mapstr.M{"source": "processor"}},
+			}, nil
+		},
+	}
+	m, _, reporter := newMetricSetWithGenerator(t, gen)
+	var eventCount atomic.Int32
+	reporter.eventFn = func(mb.Event) bool {
+		eventCount.Add(1)
+		return false
+	}
+
+	rec := postWriteRequest(t, m, 1)
+
+	assertHTTPErrorBody(t, rec, http.StatusServiceUnavailable, batchOutcomeMsgPipelineRejected)
+	assert.Equal(t, int32(1), gen.processCalls.Load(), "batch processor must run exactly once")
+	assert.Equal(t, int32(1), eventCount.Load(), "processor event must use existing reporter path")
+	assert.Zero(t, gen.generateCalls.Load(), "GenerateEvents must not run for processor batches")
+}
+
 func TestOwnerLoopCapacityRejectionReturns503(t *testing.T) {
 	gen := &fakeGenerator{
 		checkCapacityFn: func(model.Samples) error {
@@ -391,9 +505,9 @@ func TestOwnerLoopTimerFlushUsesFakeTicker(t *testing.T) {
 		flushInterval: time.Minute,
 	}
 	_, ticker, reporter := newMetricSetWithFakeGenerator(t, gen)
-	var reported int32
+	var reported atomic.Int32
 	reporter.eventFn = func(event mb.Event) bool {
-		atomic.AddInt32(&reported, 1)
+		reported.Add(1)
 		select {
 		case reporter.events <- event:
 			return true
@@ -408,7 +522,7 @@ func TestOwnerLoopTimerFlushUsesFakeTicker(t *testing.T) {
 		return flushCount.Load() == 1
 	}, time.Second, 5*time.Millisecond, "flush tick should invoke FlushExpired")
 	require.Eventually(t, func() bool {
-		return atomic.LoadInt32(&reported) >= 1
+		return reported.Load() >= 1
 	}, time.Second, 5*time.Millisecond, "flush events should reach reporter")
 }
 
@@ -617,9 +731,7 @@ func TestOwnerLoopTimerFlushRetainsPartialOnMidFlushFailure(t *testing.T) {
 	gen := &fakeGenerator{
 		flushHook: func(time.Time) map[string]mb.Event {
 			out := make(map[string]mb.Event, len(flushEvents))
-			for k, v := range flushEvents {
-				out[k] = v
-			}
+			maps.Copy(out, flushEvents)
 			return out
 		},
 		flushInterval: time.Minute,
@@ -646,7 +758,7 @@ func TestOwnerLoopTimerFlushRetainsPartialOnMidFlushFailure(t *testing.T) {
 	}, time.Second, 5*time.Millisecond, "two events should remain unpublished after mid-flush rejection")
 
 	publishedKeys := make(map[string]struct{})
-	published.Range(func(k, _ any) bool {
+	published.Range(func(k, _ interface{}) bool {
 		key, ok := k.(string)
 		require.True(t, ok, "published event keys must be strings")
 		publishedKeys[key] = struct{}{}
