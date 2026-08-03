@@ -296,11 +296,11 @@ func TestNormalizeValue(t *testing.T) {
 		"uint64 masked":                     {uint64(1<<63 + 10), uint64(10)},
 		"string value":                      {"hello", "hello"},
 		"map to mapstr.M":                   {map[string]any{"foo": "bar"}, mapstr.M{"foo": "bar"}},
+		"map[string]string to mapstr.M":     {map[string]string{"foo": "bar"}, mapstr.M{"foo": "bar"}},
 
 		// Other map types are converted using marshalUnmarshal which will lose
 		// type information for arrays which become []interface{} and numbers
 		// which all become float64.
-		"map[string]string to mapstr.M":   {map[string]string{"foo": "bar"}, mapstr.M{"foo": "bar"}},
 		"map[string][]string to mapstr.M": {map[string][]string{"list": {"foo", "bar"}}, mapstr.M{"list": []any{"foo", "bar"}}},
 
 		"array of strings":         {[]string{"foo", "bar"}, []string{"foo", "bar"}},
@@ -421,15 +421,15 @@ func TestNormalizeTime(t *testing.T) {
 // Uses TextMarshaler interface.
 func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": NetString("hola")})
 	}
 }
 
-// Uses reflection.
+// Uses the map[string]string fast path.
 func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
 	}
 }
@@ -437,7 +437,7 @@ func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 // Uses recursion to step into the nested mapstr.M.
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": map[string]any{"greeting": "hola"}})
 	}
 }
@@ -445,7 +445,7 @@ func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 // No reflection required.
 func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
 	}
 }
@@ -454,7 +454,7 @@ func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
 func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	type myString string
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
 	}
 }
@@ -463,7 +463,7 @@ func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
 func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	val := "foo"
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": &val})
 	}
 }

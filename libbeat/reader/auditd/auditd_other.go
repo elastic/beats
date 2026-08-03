@@ -21,6 +21,7 @@ package auditd
 
 import (
 	"errors"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -38,3 +39,6 @@ func (p *Parser) Next() (reader.Message, error) {
 func NewParser(_ reader.Reader, _ Config, _ *logp.Logger) *Parser {
 	return &Parser{}
 }
+
+// SetReadDeadline is a no-op on platforms without auditd support.
+func (p *Parser) SetReadDeadline(time.Time) bool { return false }

@@ -76,3 +76,8 @@ func (r EncoderReader) Next() (reader.Message, error) {
 func (r EncoderReader) Close() error {
 	return r.reader.Close()
 }
+
+// SetReadDeadline delegates to the underlying line reader (see reader.DeadlineSetter).
+func (r EncoderReader) SetReadDeadline(t time.Time) bool {
+	return r.reader.SetReadDeadline(t)
+}

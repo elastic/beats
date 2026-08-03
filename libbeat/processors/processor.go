@@ -30,8 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-const logName = "processors"
-
 // Processors is
 type Processors struct {
 	List []beat.Processor
@@ -51,6 +49,13 @@ type Closer interface {
 // with beat-specific paths. This method must be called before the processor can be used.
 type PathSetter interface {
 	SetPaths(*paths.Path) error
+}
+
+// Unshareable opts a processor out of sharing with other owners using the same
+// configuration. Implement it when sharing would change per-owner semantics.
+// Its marker method is never called.
+type Unshareable interface {
+	Unshareable()
 }
 
 // PdataProcessor is an optional interface that beat processors can implement to
