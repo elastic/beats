@@ -19,6 +19,7 @@ package remote_write
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -423,6 +424,36 @@ func TestLegacyHandlerGeneratesAndForwardsWithoutOwnerLoop(t *testing.T) {
 	select {
 	case <-gen.stopped:
 		t.Fatal("legacy generator Stop must run exactly once")
+	default:
+	}
+}
+
+func TestLegacyHandlerRejectsRequestsAfterClose(t *testing.T) {
+	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
+	gen := newLegacyFlowGenerator()
+	m.setPromEventsGenerator(gen)
+
+	require.NoError(t, m.Close(), "legacy Close must succeed before the first request")
+	require.NoError(t, m.Close(), "legacy Close must be idempotent")
+
+	body, err := encodeWriteRequest(createTestWriteRequest(1))
+	require.NoError(t, err, "write request must encode")
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body)).WithContext(ctx)
+	rec := httptest.NewRecorder()
+	m.handleFunc(rec, req)
+
+	assert.Equal(t, http.StatusServiceUnavailable, rec.Code, "post-Close requests must be rejected")
+	assert.Equal(t, "remote write metricset closed\n", rec.Body.String(), "post-Close response must be stable")
+	select {
+	case <-gen.started:
+		t.Fatal("post-Close request must not restart the generator")
+	default:
+	}
+	select {
+	case <-gen.generate:
+		t.Fatal("post-Close request must not use the generator")
 	default:
 	}
 }

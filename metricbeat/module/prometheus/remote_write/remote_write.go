@@ -38,6 +38,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
+const legacyClosedMessage = "remote write metricset closed"
+
 func init() {
 	mb.Registry.MustAddMetricSet("prometheus", "remote_write",
 		MetricSetBuilder(DefaultRemoteWriteEventsGeneratorFactory),
@@ -80,6 +82,7 @@ type MetricSet struct {
 	useOwnerLoop           bool
 	eventGenMu             sync.Mutex
 	eventGenStarted        bool
+	eventGenClosed         bool
 	maxCompressedBodyBytes int64
 	maxDecodedBodyBytes    int64
 
@@ -127,15 +130,23 @@ func MetricSetBuilderWithConfig(genFactory RemoteWriteEventsGeneratorFactory, ba
 	}
 }
 
+// setPromEventsGenerator replaces the generator and recomputes its flow before Run starts.
 func (m *MetricSet) setPromEventsGenerator(generator RemoteWriteEventsGenerator) {
+	m.eventGenMu.Lock()
+	defer m.eventGenMu.Unlock()
+
 	m.promEventsGen = generator
 	m.useOwnerLoop = RequiresRemoteWriteOwnerLoop(generator)
 	m.eventGenStarted = false
+	m.eventGenClosed = false
+
+	// Allocate only the intake channel used by the selected flow.
 	if m.useOwnerLoop {
 		m.events = nil
 		m.batches = make(chan batchSubmission)
 		return
 	}
+
 	m.events = make(chan mb.Event)
 	m.batches = nil
 }
@@ -234,14 +245,15 @@ func (m *MetricSet) runOwnerLoop(reporter mb.PushReporterV2) {
 	}
 }
 
-// Close stops a legacy generator if an HTTP handler started it. Owner-loop generator
-// lifecycle is wholly owned by Run so Close cannot race with batch processing.
+// Close permanently closes legacy intake and stops its generator if an HTTP handler started it.
+// Owner-loop generator lifecycle is wholly owned by Run so Close cannot race with batch processing.
 func (m *MetricSet) Close() error {
+	m.eventGenMu.Lock()
+	defer m.eventGenMu.Unlock()
 	if m.useOwnerLoop {
 		return nil
 	}
-	m.eventGenMu.Lock()
-	defer m.eventGenMu.Unlock()
+	m.eventGenClosed = true
 	if m.eventGenStarted {
 		m.promEventsGen.Stop()
 		m.eventGenStarted = false
@@ -263,7 +275,10 @@ func writeBatchOutcome(writer http.ResponseWriter, outcome batchOutcome) {
 
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	if !m.useOwnerLoop {
-		m.startLegacyGenerator()
+		if !m.startLegacyGenerator() {
+			http.Error(writer, legacyClosedMessage, http.StatusServiceUnavailable)
+			return
+		}
 	}
 
 	samples, ok := m.decodeWriteRequest(writer, req)
@@ -278,13 +293,17 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	m.handleOwnerBatch(writer, req, samples)
 }
 
-func (m *MetricSet) startLegacyGenerator() {
+func (m *MetricSet) startLegacyGenerator() bool {
 	m.eventGenMu.Lock()
 	defer m.eventGenMu.Unlock()
+	if m.eventGenClosed {
+		return false
+	}
 	if !m.eventGenStarted {
 		m.promEventsGen.Start()
 		m.eventGenStarted = true
 	}
+	return true
 }
 
 func (m *MetricSet) decodeWriteRequest(writer http.ResponseWriter, req *http.Request) (model.Samples, bool) {

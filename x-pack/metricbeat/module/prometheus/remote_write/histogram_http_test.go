@@ -210,6 +210,10 @@ func newXPackRemoteWriteHTTPMetricSet(t *testing.T, quietPeriod time.Duration) *
 	nowFn, setNow := testClock(start)
 	typed.now = nowFn
 	m.SetPromEventsGeneratorForTest(gen)
+	useOwnerLoop, hasEvents, hasBatches := m.FlowModeForTest()
+	require.True(t, useOwnerLoop, "assembler HTTP tests must exercise owner-loop mode")
+	require.False(t, hasEvents, "owner-loop mode must not allocate the legacy events channel")
+	require.True(t, hasBatches, "assembler HTTP tests must submit through the batches channel")
 
 	ticker := newXpackFakeTicker()
 	rw.ConfigureOwnerLoopForTest(m, func(time.Duration) rw.OwnerLoopTickSource {

@@ -252,6 +252,14 @@ func TestSetPromEventsGeneratorForTestRecomputesModeAndChannels(t *testing.T) {
 	assert.False(t, m.useOwnerLoop, "legacy replacement must recompute legacy mode")
 	assert.NotNil(t, m.events, "legacy mode must allocate the events channel")
 	assert.Nil(t, m.batches, "legacy mode must clear the batches channel")
+
+	require.NoError(t, m.Close(), "legacy replacement must close")
+	assert.False(t, m.startLegacyGenerator(), "closed legacy mode must be terminal")
+
+	replacement := newLegacyFlowGenerator()
+	m.SetPromEventsGeneratorForTest(replacement)
+	assert.True(t, m.startLegacyGenerator(), "replacement before Run must reset closed state")
+	require.NoError(t, m.Close(), "replacement must remain closable")
 }
 
 func postWriteRequest(t *testing.T, m *MetricSet, numSamples int) *httptest.ResponseRecorder {

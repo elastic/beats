@@ -73,6 +73,10 @@ func TestHTTPConcurrentRemoteWriteCapacityStress(t *testing.T) {
 	nowFn, setNow := testClock(start)
 	typed.now = nowFn
 	m.SetPromEventsGeneratorForTest(gen)
+	useOwnerLoop, hasEvents, hasBatches := m.FlowModeForTest()
+	require.True(t, useOwnerLoop, "assembler stress test must exercise owner-loop mode")
+	require.False(t, hasEvents, "owner-loop mode must not allocate the legacy events channel")
+	require.True(t, hasBatches, "assembler stress test must submit through the batches channel")
 
 	ticker := newXpackFakeTicker()
 	rw.ConfigureOwnerLoopForTest(m, func(time.Duration) rw.OwnerLoopTickSource {
