@@ -41,7 +41,7 @@ func WrapCommon(js []jobs.Job,
 	stateLoader monitorstate.StateLoader, logger *logp.Logger) []jobs.Job {
 	mst := monitorstate.NewTracker(stateLoader, false, logger)
 	var wrapped []jobs.Job
-	if stdMonFields.Type != "browser" || stdMonFields.BadConfig {
+	if !stdMonFields.IsSyntheticsType() || stdMonFields.BadConfig {
 		wrapped = WrapLightweight(js, stdMonFields, mst, logger)
 	} else {
 		wrapped = WrapBrowser(js, stdMonFields, mst, logger)
@@ -49,7 +49,6 @@ func WrapCommon(js []jobs.Job,
 	// Wrap just the root jobs with the summarizer
 	// The summarizer itself wraps the continuations in a stateful way
 	for i, j := range wrapped {
-		j := j
 		wrapped[i] = func(event *beat.Event) ([]jobs.Job, error) {
 			s := summarizer.NewSummarizer(j, stdMonFields, mst, logger)
 			return s.Wrap(j)(event)
