@@ -128,11 +128,6 @@ github.com/AzureAD/microsoft-authentication-extensions-for-go/cache v0.1.1/go.mo
 github.com/AzureAD/microsoft-authentication-library-for-go v1.6.0 h1:XRzhVemXdgvJqCH0sFfrBUTnUJSBrBf7++ypk+twtRs=
 github.com/AzureAD/microsoft-authentication-library-for-go v1.6.0/go.mod h1:HKpQxkWaGLJ+D/5H8QRpyQXA1eKjxkFlOMwck5+33Jk=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-<<<<<<< HEAD
-=======
-github.com/BurntSushi/toml v1.6.0 h1:dRaEfpa2VI55EwlIW72hMRHdWouJeRF7TPYhI+AUQjk=
-github.com/BurntSushi/toml v1.6.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.32.0 h1:rIkQfkCOVKc1OiRCNcSDD8ml5RJlZbH/Xsq7lbpynwc=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.32.0/go.mod h1:RD2SsorTmYhF6HkTmDw7KmPYQk8OBYwTkuasChwv7R4=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.55.0 h1:UnDZ/zFfG1JhH/DqxIZYU/1CUAlTUScoXD/LcM2Ykk8=
@@ -188,24 +183,24 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPd
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkYZB8zMSxRWpUBQtwG5a7fFgvEO+odwuTv2gs=
 github.com/aws/aws-msk-iam-sasl-signer-go v1.0.4 h1:2jAwFwA0Xgcx94dUId+K24yFabsKYDtAhCgyMit6OqE=
 github.com/aws/aws-msk-iam-sasl-signer-go v1.0.4/go.mod h1:MVYeeOhILFFemC/XlYTClvBjYZrg/EPd3ts885KrNTI=
-github.com/aws/aws-sdk-go-v2 v1.41.10 h1:i/Ezw+xWTo/EtO/lEq6xBYu9RXpRb3QPN5UlTsJg8Ck=
-github.com/aws/aws-sdk-go-v2 v1.41.10/go.mod h1:+HsoOEX80qAVUitj1A2DhCNTjmb3edVyuDypb6LNEeo=
-github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.11 h1:h5+3VT69KUBK24grGuuA5saDJTj2IIjLb9au668Fo5I=
-github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.11/go.mod h1:dnakxebH6UwFvcvujL0LVggYQ8nEvBGjU4G/V79Nv94=
-github.com/aws/aws-sdk-go-v2/config v1.32.21 h1:1i1v5jWn6iNPl7zkH4VwIXQOb+OMqMRFNjdHQeZbFVo=
-github.com/aws/aws-sdk-go-v2/config v1.32.21/go.mod h1:7NXDJjk0e4QOMv3Y3ppwALx3ifdSQHzCACFtRX5J1hI=
-github.com/aws/aws-sdk-go-v2/credentials v1.19.20 h1:nIGz0+cQKwijxSsWNpggvPxjxFMtrAHNj16RYzGbu2Q=
-github.com/aws/aws-sdk-go-v2/credentials v1.19.20/go.mod h1:/UQHYia3DSeilGdchXJDEVzJws15XuZSdnTlwbTBg0Q=
-github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.26 h1:a1VPHz7eG7mVNHWHXUcCyC8rQDBEr4k+o4HJYbSoYZ0=
-github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.26/go.mod h1:9G8LPblMwaodeQdS+IfDBgPqABDctJLpyZ/M6jflE6s=
+github.com/aws/aws-sdk-go-v2 v1.42.1 h1:9eOTgu1z/dVtYpNZ3/8/XbbaX0x/BqE3HUzAzs6K0ek=
+github.com/aws/aws-sdk-go-v2 v1.42.1/go.mod h1:5pKeft2eJj+gElQ38Jqg4ibCqh+/AK33/0X3hip7IjM=
+github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.14 h1:3IZY0XAJquT3aHzbkHfPzy4ACPcEjVG0x87KOwtpqGY=
+github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.14/go.mod h1:zwM6veDkhGgQFqkBy+uT28AAYpLu+uFMlPl+rCg/73E=
+github.com/aws/aws-sdk-go-v2/config v1.32.27 h1:SJwJ9Q4kM7v5QVSYYyXj3znRr6lNyZEhSgAXmXXcVbI=
+github.com/aws/aws-sdk-go-v2/config v1.32.27/go.mod h1:uBfrzTRedDmB2u+b6+UlaKJy2O6VSH5un2jP24t/KvQ=
+github.com/aws/aws-sdk-go-v2/credentials v1.19.26 h1:Si8kk1kyJnuJWCEgiwpBtTdtgSdR7i611596NnC0YIQ=
+github.com/aws/aws-sdk-go-v2/credentials v1.19.26/go.mod h1:lBckz+W9SAdNtSDw3pYgQUJDJFcBBWry0GSzw+bK0TY=
+github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.30 h1:/hi1JADLEW9YYryEz1w4GQu0EtP23pP553Cf9KgsDV4=
+github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.30/go.mod h1:/3AOgy4K17Dm4ucMZVC/MJkzy5kmfKUcINRHZyo0koQ=
 github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.79 h1:mGo6WGWry+s5GEf2GLfw3zkHad109FQmtvBV3VYQ8mA=
 github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.79/go.mod h1:siwnpWxHYFSSge7Euw9lGMgQBgvRyym352mCuGNHsMQ=
-github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.26 h1:dx1qc6V0exl5SK5/kwSc2IdOKCxLHoNbl/zXuYRwopw=
-github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.26/go.mod h1:iDMGb+drKqPTqRjv1kWc5meMYzT6HsvPXxJV/Axq1t0=
-github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.26 h1:ZjsIjuahUd/OxnxgfeK6OZqrReRNru1BcPfFD95IoN0=
-github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.26/go.mod h1:57VbRA0K0Xxx5XUUTUrVxZ/gm4u8Bk3LBflfufwHtKQ=
-github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.27 h1:i49S7g2smFWmlconi97Nn8dxb7jSQ0TeOFD20NX3M+o=
-github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.27/go.mod h1:qiLes3uVQAK+cpb837HUEhypYKGBz2ZCDcDl5BYQtpM=
+github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.30 h1:xM/Is9cKMHa8Jj8zkvWhvrFkZsXJV9E+BB4g0HW0duQ=
+github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.30/go.mod h1:WueJeNDZvK1fMYEWJIkcivBfEzUkTpBhzlrUKKY8EuA=
+github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.30 h1:jn46zC9LdsVR/ZpMIJqMqb8hHv31BlLx3ulVqNspUOk=
+github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.30/go.mod h1:1hTMsAgbdS/AtUi4bw8+gUuh1pceo+eXRLfpSuSQj3M=
+github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.31 h1:3GUprIsfmGcC5SACIyB0e7E0BM1O1b3Erl5CePYIAeQ=
+github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.31/go.mod h1:7PuV1yl5e2xnUbm+RqvVg5i2iBM8EyijZNoI9wsOoOc=
 github.com/aws/aws-sdk-go-v2/service/apigateway v1.31.3 h1:k3hj3fFmb03BW7dh56fucmmxk44p64uJaz4mnR4TYfs=
 github.com/aws/aws-sdk-go-v2/service/apigateway v1.31.3/go.mod h1:feiyjU7qpOZ9BXA/BFxZ/hipgsnPtGyW/gxzr4l8WQM=
 github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.28.3 h1:8frWkH+rWP1joKQlWJerGCPrSvZkcvWSDbDv1smYvUE=
@@ -224,34 +219,34 @@ github.com/aws/aws-sdk-go-v2/service/health v1.30.3 h1:calnqWx6QS7sSy50SkYxnvw5I
 github.com/aws/aws-sdk-go-v2/service/health v1.30.3/go.mod h1:EdJbR2a/rKOvTtMwmGuO1uvqDAw2xttLLbbyO+uaIP4=
 github.com/aws/aws-sdk-go-v2/service/iam v1.42.1 h1:w41T3NvOJdpMeuAd3sXKGDj9hC3Gl2l/Ijl6WRAtkWg=
 github.com/aws/aws-sdk-go-v2/service/iam v1.42.1/go.mod h1:JNyIvyaNq8HVkFePaU5lki3CTDa5YeGMZm+yeQBynko=
-github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.10 h1:d5/908OJ4bXg8lyjeMPvXetEKqoDoLi5Owy1zNue3yg=
-github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.10/go.mod h1:a57l7Hwh+FWI+we50g5NPJHYUKeJKfXbc4w8SyXu8Ig=
-github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.19 h1:q/Kqqr7Jz4IKSHbFhsCwm5Q4WU7NUTY9tc4nHuBg7pg=
-github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.19/go.mod h1:kTMPExiQ8IW43fOffpm0npgLopHXzTxZ/1CnB2c8c0E=
-github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.26 h1:oIRaBVJ2CxT7T61l3JkBCW/rnyh2TFZIRL71MvJTKRI=
-github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.26/go.mod h1:1gCTZPMlqAUSFoFbkl35hKtTpE96WFl7ORvDXmSLpRc=
-github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.26 h1:eiwOPA7MW2LZzSfULHOFWdekrv59pEpDckN37IiK1EM=
-github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.26/go.mod h1:qM4B4ioTSHmkcKKhyoQMc3fcgl+d4mgqdJGzBJApYy0=
+github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.13 h1:mbRIur/BiHK6SKPjoBIXSE/hJ6g6JGRLuxQy1jGjlN4=
+github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.13/go.mod h1:ITg9em2KbJx1s0y4aqRX5OYWG6HBZ5TVR//OdpEZ2CQ=
+github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.23 h1:9Fjh6fi/U5JEStVZijmaMpUwE/gvBJj7x2B/PjbO9To=
+github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.23/go.mod h1:iMoT2f1tClxrWAAnKCXjZQ6LOmfLrMG14wmnWpM+F14=
+github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.30 h1:/Z5jmNrKsSD7EmDjzAPsm/3L9IuOkzaynklJZ1qX7S4=
+github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.30/go.mod h1:lEzEZnOosE7zi8Z6royW1cFJTD9fpab4Ul1SBrllewk=
+github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.31 h1:uao4A3QZ5UmB326V6KF+qRpv9Tjz7IlnlnTbbANntlU=
+github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.31/go.mod h1:I/1+z0VwL1GhQyLgkoHDlygpUZ+iTAwOQ/NsftiUL2I=
 github.com/aws/aws-sdk-go-v2/service/organizations v1.38.4 h1:c9K/EJ59uX93DPV1KAlNPDVBEi9HNEH8pnnauJrl1IA=
 github.com/aws/aws-sdk-go-v2/service/organizations v1.38.4/go.mod h1:Ldi1UjvCP73Z6b0fJDxkNj2W074iu0QTC+XYUnmLTGA=
 github.com/aws/aws-sdk-go-v2/service/rds v1.118.2 h1:pkEeQneYFpTAnGhyqSbyp/DlCPPJTGt0GkWahlLYzMA=
 github.com/aws/aws-sdk-go-v2/service/rds v1.118.2/go.mod h1:7gS+cGrKF0mH253QHFlStmx79ws+DlNk+04ZRfmw3U0=
 github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.26.5 h1:rdMiRQ4Ir9g9zUaH1uFWZ4tbJhPobcRZZOQOQ9hw+Go=
 github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.26.5/go.mod h1:UeZ53VlMQPMO/zGER+yyODug2Tl8v2nOrIX7J9fhyEw=
-github.com/aws/aws-sdk-go-v2/service/s3 v1.103.0 h1:BmOawMUDBUiFAMgk8zTp3w5iei2Vh5j4mwIHTXOuGTc=
-github.com/aws/aws-sdk-go-v2/service/s3 v1.103.0/go.mod h1:pivHPRqURZdlzSlGmULol6xBEoy7hHmWW/pIfAkc8Tw=
-github.com/aws/aws-sdk-go-v2/service/signin v1.1.2 h1:qwU4CNor4G2gRW3Na24FWOCZSEvr967IAV3D+MXxdE0=
-github.com/aws/aws-sdk-go-v2/service/signin v1.1.2/go.mod h1:vwIj2P3URYf7ZtOQkO2iVbAaR8qFhqMv05w3aPPA5XA=
+github.com/aws/aws-sdk-go-v2/service/s3 v1.104.2 h1:bAY6O/TDv1HQnvylh9E247IyIKsUWUt2G965S7qX110=
+github.com/aws/aws-sdk-go-v2/service/s3 v1.104.2/go.mod h1:zdmCoFO/dSI7GlrwsPqFJI+WlFnSU4Tc8TJnlXrM1Do=
+github.com/aws/aws-sdk-go-v2/service/signin v1.2.2 h1:69JEZSDTQ+UNbTWQJCZMmbpQb5sfc79KUt0O7Pyfjmo=
+github.com/aws/aws-sdk-go-v2/service/signin v1.2.2/go.mod h1:mxC0nT/C8wMMS97DemZPzvUZxvIt+2Iq+eS3JdFZGgg=
 github.com/aws/aws-sdk-go-v2/service/sqs v1.38.7 h1:hbOlzaZYwfKhLss4XhjtcEQkVCI6BnzzYF+Wrlhtv/w=
 github.com/aws/aws-sdk-go-v2/service/sqs v1.38.7/go.mod h1:cSnwA6RKvtcl0f7ORIrOdSVV6XQmdAHUDAxuQRGF/kw=
-github.com/aws/aws-sdk-go-v2/service/sso v1.31.0 h1:cMDUWhi7vlmGFj6rldHofjnAQhLLBWwRvNRbtEoyZo4=
-github.com/aws/aws-sdk-go-v2/service/sso v1.31.0/go.mod h1:VfGCm6HLUGwcouY6zjQJd81PoFsb8sfSmKd5QCg9XXc=
-github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.3 h1:/pKy3mNES+ppFHf3g/XmI95+f3vdeXnkWYObByoYGAg=
-github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.3/go.mod h1:0z2rhlVAjsYeBzV8fdT4jR23Nq+fYhoJNSJN+4SBlqM=
-github.com/aws/aws-sdk-go-v2/service/sts v1.43.0 h1:HN43uYvF8D2NtaPTeE4L3HMvXgd+RtqEqrea4uUztkM=
-github.com/aws/aws-sdk-go-v2/service/sts v1.43.0/go.mod h1:qzhDlfw1BRYyoNofevemNzrlRpUXa0BJamWx7klrR8w=
-github.com/aws/smithy-go v1.26.0 h1:9ouqbi+NyKP7fV3Te7UElCwdAb6Y8uk7LGwPE5tVe/s=
-github.com/aws/smithy-go v1.26.0/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
+github.com/aws/aws-sdk-go-v2/service/sso v1.31.5 h1:xlK3Tdc8FO7Tq1k0+hL+otF33glj+dE+qeM5iINiDvU=
+github.com/aws/aws-sdk-go-v2/service/sso v1.31.5/go.mod h1:u8af9Nqkmqnr96f7v9nHqzZT9XBwbXEkTiqT4ROuJSE=
+github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.8 h1:yX1IbiBfC7SdEgDwIGnRaZyPPDRbQPDOJxl8102PcGk=
+github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.8/go.mod h1:DMPWJBjYs6+3+f/qhBFEFPPlQ6NlhWjai3dJNvipJ84=
+github.com/aws/aws-sdk-go-v2/service/sts v1.43.5 h1:T3ANO8QWDbzQD8f4+UaX+fvJlyGnOFMKLbW+NGBHg04=
+github.com/aws/aws-sdk-go-v2/service/sts v1.43.5/go.mod h1:9gdl4RrflIdpDb2TlXshWgR1F9TeCkvqDx77Vpr4Z/Q=
+github.com/aws/smithy-go v1.27.3 h1:F3Zb497UhhskkfpJmfkXswyo+t0sh9OTBnIHjogWbVY=
+github.com/aws/smithy-go v1.27.3/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
 github.com/benbjohnson/clock v1.3.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
@@ -361,15 +356,10 @@ github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumpti
 github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic/go.mod h1:0vCBR1wgGwZeGmloJ+eCWIZF2S47grTXRzj2mftg2Nk=
 github.com/elastic/bayeux v1.0.5 h1:UceFq01ipmT3S8DzFK+uVAkbCdiPR0Bqei8qIGmUeY0=
 github.com/elastic/bayeux v1.0.5/go.mod h1:CSI4iP7qeo5MMlkznGvYKftp8M7qqP/3nzmVZoXHY68=
-<<<<<<< HEAD
-github.com/elastic/ebpfevents v0.9.0 h1:La6+7+hbnzlM6IOo9edRJfa4qQ6Uo4ALsKRhS2gwBKI=
-github.com/elastic/ebpfevents v0.9.0/go.mod h1:RDOopYpSomVu55gCO8CPqDMzcU1poDvBeQUEb7pkI2k=
-github.com/elastic/elastic-agent-autodiscover v0.10.3-0.20260423154939-e990715f9426 h1:zqt0GOf6/e287nhLlAODfW6Pncydjr4ArEpM589MIXI=
-github.com/elastic/elastic-agent-autodiscover v0.10.3-0.20260423154939-e990715f9426/go.mod h1:HyjdiEVP/A7iMN0jeac2EoUohpHKAZIFRDQsvPDg2Dw=
-=======
 github.com/elastic/ebpfevents v0.9.1-0.20260727124511-05b78de333fd h1:rdNoCVYva7VIImN/KMM0mXPjuHvylHfrgfawZzJcl4w=
 github.com/elastic/ebpfevents v0.9.1-0.20260727124511-05b78de333fd/go.mod h1:qR5AsvbH3Bnldc2EmBnsP5PxsuctUqSuEz6CXwvTMYU=
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
+github.com/elastic/elastic-agent-autodiscover v0.10.3-0.20260423154939-e990715f9426 h1:zqt0GOf6/e287nhLlAODfW6Pncydjr4ArEpM589MIXI=
+github.com/elastic/elastic-agent-autodiscover v0.10.3-0.20260423154939-e990715f9426/go.mod h1:HyjdiEVP/A7iMN0jeac2EoUohpHKAZIFRDQsvPDg2Dw=
 github.com/elastic/elastic-agent-client/v7 v7.18.1 h1:WnM53JjaukeysrAuiTyrhDPmFxJG07ZAByc2TrkcKcs=
 github.com/elastic/elastic-agent-client/v7 v7.18.1/go.mod h1:uDpSGZ+YCKgqgtkwCA0qjwX0gU/wmixDsVbPjY3GkPs=
 github.com/elastic/elastic-agent-libs v0.46.1 h1:1dVRKOaGWBxqDQPb/NCtoJHI8Nx3QbJOmr4v6y+UdKQ=
@@ -639,8 +629,8 @@ github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/googleapis/enterprise-certificate-proxy v0.3.15 h1:xolVQTEXusUcAA5UgtyRLjelpFFHWlPQ4XfWGc7MBas=
-github.com/googleapis/enterprise-certificate-proxy v0.3.15/go.mod h1:vqVt9yG9480NtzREnTlmGSBmFrA+bzb0yl0TxoBQXOg=
+github.com/googleapis/enterprise-certificate-proxy v0.3.17 h1:73NfMHdiqo9JFU9+7a5ExpVa10/R29pXfZIaW559nrg=
+github.com/googleapis/enterprise-certificate-proxy v0.3.17/go.mod h1:rSEsBUemEBZEexP2y6jPp16LUmUbjmSbcPMQizR0o4k=
 github.com/googleapis/gax-go/v2 v2.22.0 h1:PjIWBpgGIVKGoCXuiCoP64altEJCj3/Ei+kSU5vlZD4=
 github.com/googleapis/gax-go/v2 v2.22.0/go.mod h1:irWBbALSr0Sk3qlqb9SyJ1h68WjgeFuiOzI4Rqw5+aY=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 h1:EGx4pi6eqNxGaHF6qqu48+N2wcFQ5qg5FXgOdqsJ5d8=
@@ -876,19 +866,10 @@ github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearch
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.157.0/go.mod h1:IYZigztY1e75GBJ077HM68k+ctisFRdM5yItsd/t5GM=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.156.0 h1:Og/n4bCRF/D2p6ajzbjlRb/XpcarbKLcH1gQlkdLHFo=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.156.0/go.mod h1:skS3vqB22/ijvqUzYSkEcVZF0DvFVzPfkKKD2F4ACqE=
-<<<<<<< HEAD
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.156.0 h1:NbW0V2xBmQ7WWzlVsJw61/nLxQM5kSKhkwQClLPo3TA=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.156.0/go.mod h1:552gyph19MYV0RWg+j5zXTOVrXfmSJa3hinSvVJMj24=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.156.0 h1:wca5xIy5I/8CAylZYgOYzj5P5JAAicBA8uNtiRNh2Zo=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.156.0/go.mod h1:CaT/YS8vvoNgsLewbtwDpS0mAgsHXNXceSPzlP+TeJI=
-=======
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.156.0 h1:s5m+OpxE6x0FxKgOcGn84Wlyag9anOg3YoJWf5v0ep0=
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.156.0/go.mod h1:jWwQGQtbMiNxUlTtBEzIw/vZe87o4fK42i7xPyom/Vs=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.157.0 h1:aQVvm4iiT1DUx2CzeDLEWETDKgbBvWAPJgancj6SQXY=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.157.0/go.mod h1:O8CaK9NpZseY5l4LSxsOkH3QQVpIK+qwoAAXUPWrZdg=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.157.0 h1:VSSYnwXzCdpNOfWkBj0JWOy/iEj+BwS97MEgDquQP6k=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.157.0/go.mod h1:CJVh4lwbI8NZ7lrYvM5AUNSyMkeiM/iRJqOWzDGjd8s=
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.156.0 h1:TqEMZ2vo190lCArlN/MGNmngKHN5zKIfZ02QLIiSZ9k=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.156.0/go.mod h1:5Nu+pQGTUxiiBwQrtGYUuzEdze7W+XS8B+LxkJ4vQts=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.156.0 h1:AShwgKiEskb+R8fM9LprIbrAKTK5paOh05lOJI72YDo=
@@ -1340,15 +1321,10 @@ golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa/go.mod h1:IxCIyHEi3zRg3s0
 golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/crypto v0.6.0/go.mod h1:OFC/31mSvZgRz0V1QTNCzfAI1aIRzbiufJtkMIlEp58=
 golang.org/x/crypto v0.17.0/go.mod h1:gCAAfMLgwOJRpTjQ2zCCt2OcSfYMTeZVSRtQlPC7Nq4=
-<<<<<<< HEAD
 golang.org/x/crypto v0.19.0/go.mod h1:Iy9bg/ha4yyC70EfRS8jz+B6ybOBKMaSxLj6P6oBDfU=
 golang.org/x/crypto v0.21.0/go.mod h1:0BP7YvVV9gBbVKyeTG0Gyn+gZm94bibOW5BjDEYAOMs=
-golang.org/x/crypto v0.53.0 h1:QZ4Muo8THX6CizN2vPPd5fBGHyogrdK9fG4wLPFUsto=
-golang.org/x/crypto v0.53.0/go.mod h1:DNLU434OwVakk9PzuwV8w62mAJpRJL3vsgcfp4Qnsio=
-=======
 golang.org/x/crypto v0.54.0 h1:YLIA59K4fiNzHzjnZt2tUJQjQtUWfWbeHBqKtk3eScw=
 golang.org/x/crypto v0.54.0/go.mod h1:KWL8ny2AZdGR2cWmzeHrp2azQPGogOv+HeQaVEXC2dk=
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
 golang.org/x/exp v0.0.0-20190121172915-509febef88a4/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20260611194520-c48552f49976 h1:X8Hz2ImujgbmetVuW+w2YkyZChE3cBpZi2P158rTG9M=
 golang.org/x/exp v0.0.0-20260611194520-c48552f49976/go.mod h1:vnf4pv9iKZXY58sQE1L86zmNWJ4159e1RkcWiLCkeEY=
@@ -1393,15 +1369,10 @@ golang.org/x/net v0.0.0-20220812174116-3211cb980234/go.mod h1:YDH+HFinaLZZlnHAfS
 golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
 golang.org/x/net v0.7.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
 golang.org/x/net v0.10.0/go.mod h1:0qNGK6F8kojg2nk9dLZ2mShWaEBan6FAoqfSigmmuDg=
-<<<<<<< HEAD
 golang.org/x/net v0.21.0/go.mod h1:bIjVDfnllIU7BJ2DNgfnXvpSvtn8VRwhlsaeUTyUS44=
 golang.org/x/net v0.22.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=
-golang.org/x/net v0.56.0 h1:Rw8j/hFzGvJUZwNBXnAtf5sVDVt+65SK2C7IxCxZt5o=
-golang.org/x/net v0.56.0/go.mod h1:D3Ku6r+V6JROoZK144D2XfMHFcMq/0zSfLelVTCFKec=
-=======
 golang.org/x/net v0.57.0 h1:K5+3DljvIuDG9/Jv9rvyMywYNFCQ9RSUY6OOTTkT+tE=
 golang.org/x/net v0.57.0/go.mod h1:KpXc8iv+r3XplLAG/f7Jsf9RPszJzdR0f58q9vGOuEU=
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20190130055435-99b60b757ec1/go.mod h1:gOpvHmFTYa4IltrdGE7lF6nIHvwfUNPOp7c8zoXwtLw=
 golang.org/x/oauth2 v0.36.0 h1:peZ/1z27fi9hUOFCAZaHyrpWG5lwe0RJEEEeH0ThlIs=
@@ -1454,33 +1425,21 @@ golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.8.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.15.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
-<<<<<<< HEAD
 golang.org/x/sys v0.17.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
 golang.org/x/sys v0.18.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
-golang.org/x/sys v0.46.0 h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw=
-golang.org/x/sys v0.46.0/go.mod h1:4GL1E5IUh+htKOUEOaiffhrAeqysfVGipDYzABqnCmw=
-golang.org/x/telemetry v0.0.0-20260508192327-42602be52be6 h1:HjU6IWBiAgRIdAJ9/y1rwCn+UELEmwV+VsTLzj/W4sE=
-golang.org/x/telemetry v0.0.0-20260508192327-42602be52be6/go.mod h1:Eqhaxk/wZsWEH8CRxLwj6xzEJbz7k1EFGqx7nyCoabE=
-=======
 golang.org/x/sys v0.47.0 h1:o7XGOvZQCADBQQ4Y7VNq2dRWQR7JmOUW8Kxx4ZsNgWs=
 golang.org/x/sys v0.47.0/go.mod h1:4GL1E5IUh+htKOUEOaiffhrAeqysfVGipDYzABqnCmw=
 golang.org/x/telemetry v0.0.0-20260625142307-59b4966ccb57 h1:nwGZBCt+FnXUrGsj5vjzAsEmkcaFvd82BbOjECiFYZc=
 golang.org/x/telemetry v0.0.0-20260625142307-59b4966ccb57/go.mod h1:3AWMyWHS+caVoiEXpiq6+tzKA40J4vQT3MYr80ZtQpc=
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.5.0/go.mod h1:jMB1sMXY+tzblOD4FWmEbocvup2/aLOaQEp7JmGp78k=
 golang.org/x/term v0.8.0/go.mod h1:xPskH00ivmX89bAKVGSKKtLOWNx2+17Eiy94tnKShWo=
 golang.org/x/term v0.15.0/go.mod h1:BDl952bC7+uMoWR75FIrCDx79TPU9oHkTZ9yRbYOrX0=
-<<<<<<< HEAD
 golang.org/x/term v0.17.0/go.mod h1:lLRBjIVuehSbZlaOtGMbcMncT+aqLLLmKrsjNrUguwk=
 golang.org/x/term v0.18.0/go.mod h1:ILwASektA3OnRv7amZ1xhE/KTR+u50pbXfZ03+6Nx58=
-golang.org/x/term v0.44.0 h1:0rLvDRCtNj0gZkyIXhCyOb2OAzEhLVqc4B+hrsBhrmc=
-golang.org/x/term v0.44.0/go.mod h1:7ze4MdzUzLXpSAoFP1H0bOI9aXDqveSvatT5vKcFh2Y=
-=======
 golang.org/x/term v0.45.0 h1:NwWyBmoJCbfTHpxrWoZ9C6/VxOf7ic219I8xZZFdrf0=
 golang.org/x/term v0.45.0/go.mod h1:9aqxs0blBcrm/n0L9QW0aRVD+ktan8ssZromtqJC43w=
->>>>>>> b9becacaf (chore: update OTel Collector dependencies to v0.157.0/v1.63.0 (#52298))
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
 golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
@@ -1521,8 +1480,8 @@ golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da h1:noIWHXmPHxILtqtCOPIhS
 golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da/go.mod h1:NDW/Ps6MPRej6fsCIbMTohpP40sJ/P/vI1MoTEGwX90=
 gonum.org/v1/gonum v0.17.0 h1:VbpOemQlsSMrYmn7T2OUvQ4dqxQXU+ouZFQsZOx50z4=
 gonum.org/v1/gonum v0.17.0/go.mod h1:El3tOrEuMpv2UdMrbNlKEh9vd86bmQ6vqIcDwxEOc1E=
-google.golang.org/api v0.279.0 h1:hsx2M2OaRcaKtVYK6vXEUnQvdjnend7ZYES+lYaot74=
-google.golang.org/api v0.279.0/go.mod h1:B9TqLBwJqVjp1mtt7WeoQwWRwvu/400y5lETOql+giQ=
+google.golang.org/api v0.287.1 h1:LiyJx32VU3cwQfLchn/513qKhc25hq0pEANYJoWNnnI=
+google.golang.org/api v0.287.1/go.mod h1:lM2kYRzYUCBY91P9h6VF1PYmvhxii3O5hji37qRvIcY=
 google.golang.org/appengine v1.1.0/go.mod h1:EbEs0AVv82hx2wNQdGPgUI5lhzA/G0D9YwlJXL52JkM=
 google.golang.org/appengine v1.4.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7/EB5XEv4=
 google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8/go.mod h1:JiN7NxoALGmiZfu7CAH4rXhgtRTLTxftemlI0sWmxmc=
@@ -1530,10 +1489,10 @@ google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55/go.mod h1:DMBHOl98
 google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013/go.mod h1:NbSheEEYHJ7i3ixzK3sjbqSGDJWnxyFXZblF3eUsNvo=
 google.golang.org/genproto v0.0.0-20260401024825-9d38bb4040a9 h1:w8JYjr7zHemS95YA5FFwk+fUv5tdQU4I8twN9bFdxVU=
 google.golang.org/genproto v0.0.0-20260401024825-9d38bb4040a9/go.mod h1:YCEC8W7HTtK7iBv+pI7g7hGAi7qdGB6bQXw3BIYAusM=
-google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa h1:Kjn0N0tCrDgiAFW+lGO4JZ3ck44CehvJQMAwj9QF0G8=
-google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa/go.mod h1:q4lMZS6kskjT5HvCPrnnypcDPVJqT/f4nfxmkE7gryY=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa h1:mZHHdPZl0dbGHCflZgAq/Q468DWVFcU2whhB2KAo8fk=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa/go.mod h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=
+google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7 h1:jQ9p21COKWjP3VwuFrNRiiOTMh3mPpN45R7SLrH/HUU=
+google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7/go.mod h1:KqHwBx2upmfa1XSi1WuRvC+2VGCLtooKkfmyvRbUmqA=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20260630182238-925bb5da69e7 h1:eM/YSd5bBFagF51o1E745Ta7RwzpW0h+z+QDNZOgmQ8=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20260630182238-925bb5da69e7/go.mod h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.23.0/go.mod h1:Y5yQAOtifL1yxbo5wqy6BxZv8vAUGQwXBOALyacEbxg=
 google.golang.org/grpc v1.25.1/go.mod h1:c3i+UQWmh7LiEpx4sFZnkU36qjEYZ0imhYfXVyQciAY=
