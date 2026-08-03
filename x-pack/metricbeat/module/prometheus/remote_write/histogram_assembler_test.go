@@ -309,7 +309,7 @@ func TestHistogramAssemblerBoundedTombstones(t *testing.T) {
 	}
 	a := newHistogramAssembler(cfg, nil)
 	now := time.Unix(0, 0)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		labels := mapstr.M{"i": model.LabelValue(strconv.Itoa(i))}
 		ts := now.Add(time.Duration(i) * time.Second)
 		a.ingest(now, bucketSample{
@@ -682,7 +682,7 @@ func TestProcessOwnerLoopBatchNeverExceedsMaxPending(t *testing.T) {
 
 	accepted := 0
 	rejected := 0
-	for i := 0; i < 200; i++ {
+	for i := range 200 {
 		samples := model.Samples{
 			promBucketSample("http_request_duration_seconds_bucket", map[string]string{
 				"runtime": "linux",

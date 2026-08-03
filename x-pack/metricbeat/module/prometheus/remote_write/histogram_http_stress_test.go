@@ -111,7 +111,7 @@ func TestHTTPConcurrentRemoteWriteCapacityStress(t *testing.T) {
 	startBar.Add(1)
 	doneBar.Add(workers)
 
-	for i := 0; i < workers; i++ {
+	for i := range workers {
 		go func(idx int) {
 			defer doneBar.Done()
 			startBar.Wait()

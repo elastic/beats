@@ -306,7 +306,7 @@ func TestMetricsCount(t *testing.T) {
 // createTestWriteRequest creates a prompb.WriteRequest with the given number of samples
 func createTestWriteRequest(numSamples int) *prompb.WriteRequest {
 	samples := make([]prompb.Sample, numSamples)
-	for i := 0; i < numSamples; i++ {
+	for i := range numSamples {
 		samples[i] = prompb.Sample{
 			Value:     float64(i),
 			Timestamp: int64(i * 1000),

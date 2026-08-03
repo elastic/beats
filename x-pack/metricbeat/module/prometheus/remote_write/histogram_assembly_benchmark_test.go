@@ -110,7 +110,7 @@ func BenchmarkHistogramAssemblyPipeline(b *testing.B) {
 func benchmarkNonHistogramSamples(count int) model.Samples {
 	samples := make(model.Samples, 0, count)
 	timestamp := model.Time(1_000_000)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		samples = append(samples, &model.Sample{
 			Metric: model.Metric{
 				"__name__": "benchmark_gauge",
@@ -131,9 +131,9 @@ func benchmarkHistogramSamples(histograms, finiteBuckets int, split bool) []mode
 	batches := make([]model.Samples, batchCount)
 	timestamp := model.Time(1_000_000)
 
-	for histogram := 0; histogram < histograms; histogram++ {
+	for histogram := range histograms {
 		series := model.LabelValue(strconv.Itoa(histogram))
-		for bucket := 0; bucket < finiteBuckets; bucket++ {
+		for bucket := range finiteBuckets {
 			batch := 0
 			if split {
 				batch = bucket % batchCount
