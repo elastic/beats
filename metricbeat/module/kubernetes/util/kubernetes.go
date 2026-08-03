@@ -1115,6 +1115,8 @@ func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
 	if resourceMetaWatcher.restartWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
 		if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
 			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
+			resourceMetaWatcher.restartWatcher = nil
+			watcherToStop = resourceMetaWatcher.restartWatcher
 		} else {
 			if resourceMetaWatcher.started {
 				watcherToStop = resourceMetaWatcher.watcher
