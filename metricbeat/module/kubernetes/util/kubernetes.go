@@ -110,8 +110,9 @@ type metaWatcher struct {
 	enrichers   map[*enricher]struct{}            // enrichers that use this watcher as their primary source
 	metricsRepo *MetricsRepo                      // used to update container metrics derived from metadata, like resource limits
 
-	nodeScope      bool               // whether the active watcher watches resources in the current node or the whole cluster
-	restartWatcher kubernetes.Watcher // whether this watcher needs a restart. Only relevant in leader nodes due to metricsets with different nodescope(pod, state_pod)
+	nodeScope             bool                               // whether the active watcher watches resources in the current node or the whole cluster
+	restartWatcher        kubernetes.Watcher                 // whether this watcher needs a restart. Only relevant in leader nodes due to metricsets with different nodescope(pod, state_pod)
+	restartWatcherFactory func() (kubernetes.Watcher, error) // creates a fresh replacement after a failed one-shot watcher start
 }
 
 type Watchers struct {
@@ -436,12 +437,19 @@ func createWatcher(
 			if isNamespaced(resourceName) {
 				options.Namespace = namespace
 			}
-			restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
+			restartWatcherFactory := func() (kubernetes.Watcher, error) {
+				restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
+				if err != nil {
+					return nil, err
+				}
+				restartWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
+				return restartWatcher, nil
+			}
+			restartWatcher, err := restartWatcherFactory()
 			if err != nil {
 				return false, err
 			}
-			// update the handler of the restartWatcher to match the current watcher's handler.
-			restartWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
+			resourceMetaWatcher.restartWatcherFactory = restartWatcherFactory
 			resourceMetaWatcher.restartWatcher = restartWatcher
 		}
 		registerWatcherUser(resourceName, resourceMetaWatcher, e, !extraWatcher, nodeScope)
@@ -1112,17 +1120,27 @@ func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
 	// one cluster-scoped owner has completed construction. Start it before
 	// stopping the active watcher so a failed replacement does not interrupt
 	// metadata collection.
+	if resourceMetaWatcher.nodeScope && hasCommittedClusterScopedUser(resourceMetaWatcher) &&
+		resourceMetaWatcher.restartWatcher == nil && resourceMetaWatcher.restartWatcherFactory != nil {
+		restartWatcher, err := resourceMetaWatcher.restartWatcherFactory()
+		if err != nil {
+			e.log.Warnf("Error recreating %s watcher: %s", e.resourceName, err)
+		} else {
+			resourceMetaWatcher.restartWatcher = restartWatcher
+		}
+	}
 	if resourceMetaWatcher.restartWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
 		if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
 			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
-			resourceMetaWatcher.restartWatcher = nil
 			watcherToStop = resourceMetaWatcher.restartWatcher
+			resourceMetaWatcher.restartWatcher = nil
 		} else {
 			if resourceMetaWatcher.started {
 				watcherToStop = resourceMetaWatcher.watcher
 			}
 			resourceMetaWatcher.watcher = resourceMetaWatcher.restartWatcher
 			resourceMetaWatcher.restartWatcher = nil
+			resourceMetaWatcher.restartWatcherFactory = nil
 			resourceMetaWatcher.nodeScope = false
 			resourceMetaWatcher.started = true
 		}
@@ -1159,8 +1177,9 @@ func releaseWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 				metaWatcher.started = false
 				watchersToStop = append(watchersToStop, metaWatcher.watcher)
 			}
-		} else if metaWatcher.restartWatcher != nil && !hasClusterScopedUser(metaWatcher) {
+		} else if !hasClusterScopedUser(metaWatcher) {
 			metaWatcher.restartWatcher = nil
+			metaWatcher.restartWatcherFactory = nil
 		}
 	}
 	e.watchedResources = nil
