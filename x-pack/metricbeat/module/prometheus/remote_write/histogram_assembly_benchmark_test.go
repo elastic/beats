@@ -26,10 +26,16 @@ type benchmarkFlushCapable interface {
 	FlushExpired(time.Time) map[string]mb.Event
 }
 
-// BenchmarkHistogramAssemblyPipeline intentionally uses interfaces that the
-// pre-assembly generator does not implement. This lets the same benchmark run
-// against revisions before and after histogram assembly for a benchstat comparison.
+// BenchmarkHistogramAssemblyPipeline compares request-local histogram conversion
+// with cross-request histogram assembly on the same revision.
 func BenchmarkHistogramAssemblyPipeline(b *testing.B) {
+	modes := []struct {
+		name            string
+		assemblyEnabled bool
+	}{
+		{name: "assembly_disabled", assemblyEnabled: false},
+		{name: "assembly_enabled", assemblyEnabled: true},
+	}
 	workloads := []struct {
 		name  string
 		build func() []model.Samples
@@ -60,31 +66,35 @@ func BenchmarkHistogramAssemblyPipeline(b *testing.B) {
 		},
 	}
 
-	for _, workload := range workloads {
-		b.Run(workload.name, func(b *testing.B) {
-			b.ReportAllocs()
-			for i := 0; i < b.N; i++ {
-				b.StopTimer()
-				generator := benchmarkTypedGenerator(false)
-				batches := workload.build()
-				b.StartTimer()
+	for _, mode := range modes {
+		b.Run(mode.name, func(b *testing.B) {
+			for _, workload := range workloads {
+				b.Run(workload.name, func(b *testing.B) {
+					b.ReportAllocs()
+					for range b.N {
+						b.StopTimer()
+						generator := benchmarkTypedGeneratorWithAssembly(false, mode.assemblyEnabled)
+						batches := workload.build()
+						b.StartTimer()
 
-				eventCount := 0
-				for _, batch := range batches {
-					if checker, ok := any(generator).(benchmarkCapacityChecker); ok {
-						if err := checker.CheckCapacity(batch); err != nil {
-							b.Fatalf("capacity check failed: %v", err)
+						eventCount := 0
+						for _, batch := range batches {
+							if checker, ok := any(generator).(benchmarkCapacityChecker); ok {
+								if err := checker.CheckCapacity(batch); err != nil {
+									b.Fatalf("capacity check failed: %v", err)
+								}
+							}
+							eventCount += len(generator.GenerateEvents(batch))
 						}
-					}
-					eventCount += len(generator.GenerateEvents(batch))
-				}
-				if flusher, ok := any(generator).(benchmarkFlushCapable); ok {
-					eventCount += len(flusher.FlushExpired(time.Now().Add(time.Minute)))
-				}
+						if flusher, ok := any(generator).(benchmarkFlushCapable); ok {
+							eventCount += len(flusher.FlushExpired(time.Now().Add(time.Minute)))
+						}
 
-				b.StopTimer()
-				generator.counterCache.Stop()
-				benchmarkEventCount = eventCount
+						b.StopTimer()
+						generator.counterCache.Stop()
+						benchmarkEventCount = eventCount
+					}
+				})
 			}
 		})
 	}

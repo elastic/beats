@@ -40,6 +40,10 @@ func flushAllHistogramsHardTimeout(g *remoteWriteTypedGenerator) map[string]mb.E
 }
 
 func benchmarkTypedGenerator(metricsCount bool) *remoteWriteTypedGenerator {
+	return benchmarkTypedGeneratorWithAssembly(metricsCount, true)
+}
+
+func benchmarkTypedGeneratorWithAssembly(metricsCount, assemblyEnabled bool) *remoteWriteTypedGenerator {
 	counters := xcollector.NewCounterCache(time.Minute)
 	g := &remoteWriteTypedGenerator{
 		metricsCount:    metricsCount,
@@ -48,7 +52,9 @@ func benchmarkTypedGenerator(metricsCount bool) *remoteWriteTypedGenerator {
 		now:             time.Now,
 		retainedFlushes: make(map[string]mb.Event),
 	}
-	g.assembler = newHistogramAssembler(g.assemblyConfig, nil)
+	if assemblyEnabled {
+		g.assembler = newHistogramAssembler(g.assemblyConfig, nil)
+	}
 	g.counterCache.Start()
 	return g
 }
@@ -59,7 +65,7 @@ func BenchmarkGenerateEvents(b *testing.B) {
 	defer generator.counterCache.Stop()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		generator.GenerateEvents(metrics)
 	}
 }
