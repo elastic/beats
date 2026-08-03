@@ -49,10 +49,6 @@ var (
 	accessor = meta.NewAccessor()
 )
 
-// ErrWatcherStopped is returned by Start when the watcher has already been
-// stopped and cannot be restarted. The underlying Kubernetes SharedInformer is
-// one-shot: once its Run loop has exited, the informer, workqueue and context
-// are permanently unusable.
 var ErrWatcherStopped = errors.New("kubernetes watcher has been stopped and cannot be restarted")
 
 // Watcher watches Kubernetes resources events
@@ -293,11 +289,11 @@ func (w *watcher) Start() error {
 	// be changed. Reject it so callers construct a fresh watcher.
 	if w.informer.IsStopped() || w.queue.ShuttingDown() || w.ctx.Err() != nil {
 		return fmt.Errorf(
-			"%w (informer_stopped=%t, queue_shutting_down=%t, context_error=%v)",
+			"%w (informer_stopped=%t, queue_shutting_down=%t, context_error=%w)",
 			ErrWatcherStopped,
 			w.informer.IsStopped(),
 			w.queue.ShuttingDown(),
-			w.ctx.Err(), //nolint:errorlint // Another error is wrapped
+			w.ctx.Err(),
 		)
 	}
 
