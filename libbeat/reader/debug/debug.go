@@ -20,7 +20,9 @@ package debug
 import (
 	"bytes"
 	"io"
+	"time"
 
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -121,11 +123,10 @@ func (r *Reader) Close() error {
 
 func makeNullCheck(log *logp.Logger, minSize int) CheckFunc {
 	// create a slice with null bytes to match on the buffer.
-	pattern := make([]byte, minSize, minSize)
+	pattern := make([]byte, minSize)
 	return func(offset int64, buf []byte) bool {
 		idx := bytes.Index(buf, pattern)
 		if idx <= 0 {
-			offset += int64(len(buf))
 			return false
 		}
 		reportNull(log, offset+int64(idx), idx, buf)
@@ -176,4 +177,12 @@ func AppendReaders(reader io.ReadCloser, logger *logp.Logger) (io.ReadCloser, er
 		}
 	}
 	return reader, nil
+}
+
+// SetReadDeadline delegates to the wrapped reader if it honors deadlines.
+func (r *Reader) SetReadDeadline(t time.Time) bool {
+	if d, ok := r.reader.(reader.DeadlineSetter); ok {
+		return d.SetReadDeadline(t)
+	}
+	return false
 }

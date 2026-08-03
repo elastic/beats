@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -107,7 +107,7 @@ condition.equals:
 			assert.Len(t, cfgs, 1)
 
 			out := mapstr.M{}
-			cfgs[0].Unpack(&out)
+			cfgs[0].Unpack(&out) //nolint:errcheck // test assertion follows
 
 			assert.Equal(t, out, test.result)
 		})
