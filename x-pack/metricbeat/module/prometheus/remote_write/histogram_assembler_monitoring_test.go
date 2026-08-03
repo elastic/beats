@@ -165,7 +165,6 @@ func TestHistogramAssemblerMonitoringCapacityRejection(t *testing.T) {
 		HardTimeout:          time.Second,
 		MaxPendingHistograms: 1,
 		MaxPendingBuckets:    100,
-		TombstoneTTL:         time.Second,
 	}
 	start := time.Unix(400, 0)
 	g, setNow := newTestTypedGeneratorWithMonitoring(t, cfg, start, msReg)

@@ -184,17 +184,16 @@ func newXPackRemoteWriteHTTPMetricSet(t *testing.T, quietPeriod time.Duration) *
 	t.Helper()
 
 	cfg := map[string]interface{}{
-		"module":                  "prometheus",
-		"metricsets":              []string{"remote_write"},
-		"use_types":               true,
-		"use_histogram_assembler": true,
-		"period":                  "60s",
+		"module":     "prometheus",
+		"metricsets": []string{"remote_write"},
+		"use_types":  true,
+		"period":     "60s",
 		"histogram_assembly": map[string]interface{}{
+			"enabled":                true,
 			"quiet_period":           quietPeriod.String(),
 			"hard_timeout":           (10 * quietPeriod).String(),
 			"max_pending_histograms": 100,
 			"max_pending_buckets":    1000,
-			"tombstone_ttl":          (2 * quietPeriod).String(),
 		},
 	}
 	ms := mbtest.NewMetricSet(t, cfg)
@@ -212,7 +211,7 @@ func newXPackRemoteWriteHTTPMetricSet(t *testing.T, quietPeriod time.Duration) *
 	m.SetPromEventsGeneratorForTest(gen)
 	useOwnerLoop, hasEvents, hasBatches := m.FlowModeForTest()
 	require.True(t, useOwnerLoop, "assembler HTTP tests must exercise owner-loop mode")
-	require.False(t, hasEvents, "owner-loop mode must not allocate the legacy events channel")
+	require.False(t, hasEvents, "owner-loop mode must not allocate the events channel")
 	require.True(t, hasBatches, "assembler HTTP tests must submit through the batches channel")
 
 	ticker := newXpackFakeTicker()

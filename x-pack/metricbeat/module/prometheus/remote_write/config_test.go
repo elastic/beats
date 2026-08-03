@@ -13,24 +13,37 @@ import (
 )
 
 func TestHistogramAssemblyConfigDefaults(t *testing.T) {
-	cfg := config{UseTypes: true, UseHistogramAssembler: true}
+	cfg := config{
+		UseTypes: true,
+		HistogramAssembly: HistogramAssembly{
+			Enabled: true,
+		},
+	}
 	require.NoError(t, cfg.Validate())
 	assert.Equal(t, 5*time.Second, cfg.HistogramAssembly.QuietPeriod)
 	assert.Equal(t, 30*time.Second, cfg.HistogramAssembly.HardTimeout)
 	assert.Equal(t, 10_000, cfg.HistogramAssembly.MaxPendingHistograms)
 	assert.Equal(t, 100_000, cfg.HistogramAssembly.MaxPendingBuckets)
-	assert.Equal(t, 30*time.Second, cfg.HistogramAssembly.TombstoneTTL)
+}
+
+func TestHistogramAssemblyConfigDisabledByDefault(t *testing.T) {
+	cfg := config{UseTypes: true}
+	require.NoError(t, cfg.Validate())
+	assert.False(t, cfg.HistogramAssembly.Enabled)
+	assert.Zero(t, cfg.HistogramAssembly.QuietPeriod)
+	assert.Zero(t, cfg.HistogramAssembly.HardTimeout)
+	assert.Zero(t, cfg.HistogramAssembly.MaxPendingHistograms)
+	assert.Zero(t, cfg.HistogramAssembly.MaxPendingBuckets)
 }
 
 func TestHistogramAssemblyConfigValidation(t *testing.T) {
 	t.Run("quiet greater than hard", func(t *testing.T) {
 		cfg := config{
-			UseTypes:              true,
-			UseHistogramAssembler: true,
+			UseTypes: true,
 			HistogramAssembly: HistogramAssembly{
-				QuietPeriod:  31 * time.Second,
-				HardTimeout:  30 * time.Second,
-				TombstoneTTL: time.Second,
+				Enabled:     true,
+				QuietPeriod: 31 * time.Second,
+				HardTimeout: 30 * time.Second,
 			},
 		}
 		err := cfg.Validate()
@@ -40,12 +53,11 @@ func TestHistogramAssemblyConfigValidation(t *testing.T) {
 
 	t.Run("non-positive quiet", func(t *testing.T) {
 		cfg := config{
-			UseTypes:              true,
-			UseHistogramAssembler: true,
+			UseTypes: true,
 			HistogramAssembly: HistogramAssembly{
-				QuietPeriod:  -1 * time.Second,
-				HardTimeout:  30 * time.Second,
-				TombstoneTTL: time.Second,
+				Enabled:     true,
+				QuietPeriod: -1 * time.Second,
+				HardTimeout: 30 * time.Second,
 			},
 		}
 		err := cfg.Validate()
@@ -53,24 +65,25 @@ func TestHistogramAssemblyConfigValidation(t *testing.T) {
 	})
 }
 
-func TestHistogramAssemblySkippedWhenUseTypesFalse(t *testing.T) {
-	cfg := config{UseTypes: false, HistogramAssembly: HistogramAssembly{QuietPeriod: -1}}
-	require.NoError(t, cfg.Validate(), "histogram assembly validation applies only when use_types is enabled")
-}
-
-func TestHistogramAssemblySkippedWhenAssemblerDisabled(t *testing.T) {
+func TestHistogramAssemblyDisabledIgnoresInvalidTuning(t *testing.T) {
 	cfg := config{
-		UseTypes:              true,
-		UseHistogramAssembler: false,
-		HistogramAssembly:     HistogramAssembly{QuietPeriod: -1},
+		UseTypes: true,
+		HistogramAssembly: HistogramAssembly{
+			Enabled:     false,
+			QuietPeriod: -1,
+		},
 	}
-	require.NoError(t, cfg.Validate(), "histogram assembly validation applies only when the assembler is enabled")
+	require.NoError(t, cfg.Validate(), "histogram assembly tuning applies only when histogram_assembly.enabled is true")
 }
 
 func TestHistogramAssemblerRequiresUseTypes(t *testing.T) {
-	cfg := config{UseHistogramAssembler: true}
+	cfg := config{
+		HistogramAssembly: HistogramAssembly{
+			Enabled: true,
+		},
+	}
 	err := cfg.Validate()
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "use_histogram_assembler")
+	assert.Contains(t, err.Error(), "histogram_assembly.enabled")
 	assert.Contains(t, err.Error(), "use_types")
 }

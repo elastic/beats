@@ -57,7 +57,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, opts ...rw.RemoteW
 		if g.logger == nil {
 			g.logger = logp.NewNopLogger()
 		}
-		if config.UseHistogramAssembler {
+		if config.HistogramAssembly.Enabled {
 			g.assemblyConfig = config.HistogramAssembly.assemblyConfig()
 			g.retainedFlushes = make(map[string]mb.Event)
 			g.histogramMon = registerHistogramAssemblerMonitoring(base.Metrics())

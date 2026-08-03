@@ -934,7 +934,9 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
-	setNow(timestamp.Time().Add(g.assemblyConfig.HardTimeout + g.assemblyConfig.TombstoneTTL + time.Second))
+	// The first histogram flushed after QuietPeriod, and its tombstone remains
+	// active for HardTimeout from that flush.
+	setNow(timestamp.Time().Add(g.assemblyConfig.QuietPeriod + g.assemblyConfig.HardTimeout + time.Second))
 	metrics = model.Samples{
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -1320,7 +1322,9 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
-	setNow(timestamp.Time().Add(g.assemblyConfig.HardTimeout + g.assemblyConfig.TombstoneTTL + time.Second))
+	// The first histogram flushed at timestamp+HardTimeout, so its tombstone
+	// expires one more HardTimeout later.
+	setNow(timestamp.Time().Add(2*g.assemblyConfig.HardTimeout + time.Second))
 	metrics = model.Samples{
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{

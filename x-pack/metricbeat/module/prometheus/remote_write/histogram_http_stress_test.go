@@ -48,17 +48,16 @@ func TestHTTPConcurrentRemoteWriteCapacityStress(t *testing.T) {
 	)
 
 	cfg := map[string]interface{}{
-		"module":                  "prometheus",
-		"metricsets":              []string{"remote_write"},
-		"use_types":               true,
-		"use_histogram_assembler": true,
-		"period":                  "60s",
+		"module":     "prometheus",
+		"metricsets": []string{"remote_write"},
+		"use_types":  true,
+		"period":     "60s",
 		"histogram_assembly": map[string]interface{}{
+			"enabled":                true,
 			"quiet_period":           "500ms",
 			"hard_timeout":           "5s",
 			"max_pending_histograms": maxHistograms,
 			"max_pending_buckets":    maxBuckets,
-			"tombstone_ttl":          "2s",
 		},
 	}
 	ms := mbtest.NewMetricSet(t, cfg)
@@ -75,7 +74,7 @@ func TestHTTPConcurrentRemoteWriteCapacityStress(t *testing.T) {
 	m.SetPromEventsGeneratorForTest(gen)
 	useOwnerLoop, hasEvents, hasBatches := m.FlowModeForTest()
 	require.True(t, useOwnerLoop, "assembler stress test must exercise owner-loop mode")
-	require.False(t, hasEvents, "owner-loop mode must not allocate the legacy events channel")
+	require.False(t, hasEvents, "owner-loop mode must not allocate the events channel")
 	require.True(t, hasBatches, "assembler stress test must submit through the batches channel")
 
 	ticker := newXpackFakeTicker()

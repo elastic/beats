@@ -153,13 +153,14 @@ func (m *MetricSet) setPromEventsGenerator(generator RemoteWriteEventsGenerator)
 
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	if !m.useOwnerLoop {
-		m.runLegacy(reporter)
+		m.runEvents(reporter)
 		return
 	}
 	m.runOwnerLoop(reporter)
 }
 
-func (m *MetricSet) runLegacy(reporter mb.PushReporterV2) {
+// This is the events-channel path used when the histogram assembler is disabled.
+func (m *MetricSet) runEvents(reporter mb.PushReporterV2) {
 	registerRunReadySignal(m)
 	defer runReadySignals.Delete(m)
 
@@ -181,6 +182,7 @@ func (m *MetricSet) runLegacy(reporter mb.PushReporterV2) {
 	}
 }
 
+// This is the owner loop path used when the histogram assembler is enabled.
 func (m *MetricSet) runOwnerLoop(reporter mb.PushReporterV2) {
 	m.promEventsGen.Start()
 	defer m.promEventsGen.Stop()

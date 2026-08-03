@@ -21,7 +21,6 @@ type histogramAssemblyConfig struct {
 	HardTimeout          time.Duration
 	MaxPendingHistograms int
 	MaxPendingBuckets    int
-	TombstoneTTL         time.Duration
 }
 
 func defaultHistogramAssemblyConfig() histogramAssemblyConfig {
@@ -30,7 +29,6 @@ func defaultHistogramAssemblyConfig() histogramAssemblyConfig {
 		HardTimeout:          30 * time.Second,
 		MaxPendingHistograms: 10_000,
 		MaxPendingBuckets:    100_000,
-		TombstoneTTL:         30 * time.Second,
 	}
 }
 
@@ -302,8 +300,10 @@ func (a *histogramAssembler) expireTombstones(now time.Time) {
 
 func (a *histogramAssembler) addTombstone(key string, now time.Time) {
 	a.tombSeq++
+	// Keep the flushed identity closed for one hard timeout so late buckets
+	// cannot reopen it and produce a duplicate histogram event.
 	ts := tombstone{
-		expiresAt: now.Add(a.cfg.TombstoneTTL),
+		expiresAt: now.Add(a.cfg.HardTimeout),
 		seq:       a.tombSeq,
 	}
 	a.tombstones[key] = ts

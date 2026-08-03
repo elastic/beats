@@ -72,13 +72,12 @@ data:
       host: "0.0.0.0"
       port: "9201"
       use_types: true
-      use_histogram_assembler: true
       histogram_assembly:
+        enabled: true
         quiet_period: 5s
         hard_timeout: 30s
         max_pending_histograms: 10000
         max_pending_buckets: 100000
-        tombstone_ttl: 30s
 ---
 # Deploy a Metricbeat instance per node for node metrics retrieval
 apiVersion: apps/v1

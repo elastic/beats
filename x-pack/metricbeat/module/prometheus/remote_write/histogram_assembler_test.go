@@ -201,7 +201,6 @@ func TestCheckCapacityRejectsWithoutMutation(t *testing.T) {
 		HardTimeout:          10 * time.Second,
 		MaxPendingHistograms: 1,
 		MaxPendingBuckets:    10,
-		TombstoneTTL:         time.Second,
 	}
 	start := time.Unix(400, 0)
 	g, setNow := newTestTypedGenerator(t, cfg, start)
@@ -228,7 +227,6 @@ func TestCheckCapacityRejectsBucketOverflowWithoutMutation(t *testing.T) {
 		HardTimeout:          10 * time.Second,
 		MaxPendingHistograms: 10,
 		MaxPendingBuckets:    2,
-		TombstoneTTL:         time.Second,
 	}
 	start := time.Unix(401, 0)
 	g, setNow := newTestTypedGenerator(t, cfg, start)
@@ -308,7 +306,6 @@ func TestHistogramAssemblerBoundedTombstones(t *testing.T) {
 		HardTimeout:          time.Hour,
 		MaxPendingHistograms: 2,
 		MaxPendingBuckets:    100,
-		TombstoneTTL:         time.Hour,
 	}
 	a := newHistogramAssembler(cfg, nil)
 	now := time.Unix(0, 0)
@@ -358,7 +355,6 @@ func TestCheckCapacityIncludesRetainedFlushEvents(t *testing.T) {
 		HardTimeout:          10 * time.Second,
 		MaxPendingHistograms: 1,
 		MaxPendingBuckets:    10,
-		TombstoneTTL:         time.Second,
 	}
 	g, setNow := newTestTypedGenerator(t, cfg, time.Unix(800, 0))
 	ts := model.TimeFromUnix(800)
@@ -386,7 +382,6 @@ func TestCheckCapacityIncludesRetainedBucketCounts(t *testing.T) {
 		HardTimeout:          10 * time.Second,
 		MaxPendingHistograms: 10,
 		MaxPendingBuckets:    3,
-		TombstoneTTL:         time.Second,
 	}
 	g, setNow := newTestTypedGenerator(t, cfg, time.Unix(810, 0))
 	ts := model.TimeFromUnix(810)
@@ -412,7 +407,6 @@ func TestRetainUnpublishedFlushEventsDeterministicOverflow(t *testing.T) {
 		HardTimeout:          time.Second,
 		MaxPendingHistograms: 1,
 		MaxPendingBuckets:    100,
-		TombstoneTTL:         time.Second,
 	}
 	g, _ := newTestTypedGenerator(t, cfg, time.Unix(0, 0))
 
@@ -433,7 +427,12 @@ func TestRetainUnpublishedFlushEventsDeterministicOverflow(t *testing.T) {
 }
 
 func TestHistogramAssemblerTombstoneExpiresBeforeReaccept(t *testing.T) {
-	cfg := defaultHistogramAssemblyConfig()
+	cfg := histogramAssemblyConfig{
+		QuietPeriod:          time.Second,
+		HardTimeout:          10 * time.Second,
+		MaxPendingHistograms: 10,
+		MaxPendingBuckets:    100,
+	}
 	g, setNow := newTestTypedGenerator(t, cfg, time.Unix(900, 0))
 	ts := model.TimeFromUnix(900)
 	setNow(ts.Time())
@@ -446,17 +445,17 @@ func TestHistogramAssemblerTombstoneExpiresBeforeReaccept(t *testing.T) {
 	g.FlushExpired(flushAt)
 	require.Equal(t, 1, g.HistogramAssemblyStats().Tombstones, "flush must leave a tombstone for the identity")
 
-	setNow(flushAt.Add(cfg.TombstoneTTL - time.Millisecond))
+	setNow(flushAt.Add(cfg.HardTimeout - time.Millisecond))
 	g.GenerateEvents(model.Samples{
 		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "0.5"}, 2, ts),
 	})
-	assert.Equal(t, uint64(1), g.assembler.stats.LateDrops, "same identity during tombstone TTL must be dropped")
+	assert.Equal(t, uint64(1), g.assembler.stats.LateDrops, "same identity inside hard timeout after flush must be dropped")
 
-	setNow(flushAt.Add(cfg.TombstoneTTL + time.Millisecond))
+	setNow(flushAt.Add(cfg.HardTimeout + time.Millisecond))
 	g.GenerateEvents(model.Samples{
 		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "0.5"}, 2, ts),
 	})
-	assert.Equal(t, 1, g.assembler.statsSnapshot().PendingHistograms, "exact identity must be accepted after tombstone TTL")
+	assert.Equal(t, 1, g.assembler.statsSnapshot().PendingHistograms, "exact identity must be accepted strictly after hard timeout")
 }
 
 func TestStopDoesNotPublishBufferedHistograms(t *testing.T) {

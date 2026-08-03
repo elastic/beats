@@ -46,7 +46,11 @@ func newFactoryBaseMetricSet(t *testing.T, overrides map[string]interface{}) mb.
 }
 
 func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *testing.T) {
-	base := newFactoryBaseMetricSet(t, map[string]interface{}{"use_histogram_assembler": true})
+	base := newFactoryBaseMetricSet(t, map[string]interface{}{
+		"histogram_assembly": map[string]interface{}{
+			"enabled": true,
+		},
+	})
 	gen, err := remoteWriteEventsGeneratorFactory(base)
 	require.NoError(t, err, "factory must validate and apply histogram_assembly defaults after unpack")
 
@@ -57,7 +61,6 @@ func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *te
 	assert.Equal(t, 30*time.Second, typed.assemblyConfig.HardTimeout)
 	assert.Equal(t, 10_000, typed.assemblyConfig.MaxPendingHistograms)
 	assert.Equal(t, 100_000, typed.assemblyConfig.MaxPendingBuckets)
-	assert.Equal(t, 30*time.Second, typed.assemblyConfig.TombstoneTTL)
 
 	ts := model.TimeFromUnix(100)
 	err = typed.CheckCapacity(model.Samples{
@@ -68,10 +71,10 @@ func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *te
 
 func TestRemoteWriteEventsGeneratorFactoryRejectsInvalidHistogramAssembly(t *testing.T) {
 	mod := mbtest.NewTestModule(t, map[string]interface{}{
-		"use_types":               true,
-		"use_histogram_assembler": true,
-		"period":                  "60s",
+		"use_types": true,
+		"period":    "60s",
 		"histogram_assembly": map[string]interface{}{
+			"enabled":      true,
 			"quiet_period": "31s",
 			"hard_timeout": "30s",
 		},
@@ -96,7 +99,7 @@ func TestRemoteWriteEventsGeneratorFactoryUseTypesFalseSkipsHistogramValidation(
 	require.True(t, ok, "use_types=false must use OSS generator")
 }
 
-func TestRemoteWriteEventsGeneratorFactoryDefaultsToLegacyHistogramConversion(t *testing.T) {
+func TestRemoteWriteEventsGeneratorFactoryDefaultsToRequestLocalHistogramConversion(t *testing.T) {
 	base := newFactoryBaseMetricSet(t, nil)
 	gen, err := remoteWriteEventsGeneratorFactory(base)
 	require.NoError(t, err)
@@ -104,7 +107,7 @@ func TestRemoteWriteEventsGeneratorFactoryDefaultsToLegacyHistogramConversion(t 
 	typed, ok := gen.(*remoteWriteTypedGenerator)
 	require.True(t, ok, "use_types=true must construct the typed generator")
 	assert.Nil(t, typed.assembler, "histogram assembler must be disabled by default")
-	assert.False(t, rw.RequiresRemoteWriteOwnerLoop(typed), "assembler-disabled typed generator must preserve the legacy events flow")
+	assert.False(t, rw.RequiresRemoteWriteOwnerLoop(typed), "assembler-disabled typed generator must use the events-channel flow")
 	assert.Zero(t, typed.NextFlushInterval(), "disabled assembler must not start the owner-loop flush ticker")
 
 	timestamp := model.TimeFromUnix(100)
@@ -114,9 +117,9 @@ func TestRemoteWriteEventsGeneratorFactoryDefaultsToLegacyHistogramConversion(t 
 		promBucketSample("http_request_duration_seconds_bucket", map[string]string{"runtime": "linux", "le": "+Inf"}, 30, timestamp),
 	})
 
-	require.Len(t, events, 1, "legacy conversion must emit a complete histogram in the request")
+	require.Len(t, events, 1, "request-local histogram conversion must emit a complete histogram in the request")
 	for _, event := range events {
-		assert.Contains(t, event.ModuleFields, "http_request_duration_seconds", "legacy conversion must emit the histogram immediately")
+		assert.Contains(t, event.ModuleFields, "http_request_duration_seconds", "request-local histogram conversion must emit the histogram immediately")
 	}
 }
 
@@ -143,11 +146,13 @@ func TestMetricSetFlowMatchesHistogramAssemblerConfiguration(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config := map[string]interface{}{
-				"module":                  "prometheus",
-				"metricsets":              []string{"remote_write"},
-				"use_types":               true,
-				"use_histogram_assembler": test.useAssembler,
-				"period":                  "60s",
+				"module":     "prometheus",
+				"metricsets": []string{"remote_write"},
+				"use_types":  true,
+				"period":     "60s",
+				"histogram_assembly": map[string]interface{}{
+					"enabled": test.useAssembler,
+				},
 			}
 			ms := mbtest.NewMetricSet(t, config)
 			m, ok := ms.(*rw.MetricSet)
