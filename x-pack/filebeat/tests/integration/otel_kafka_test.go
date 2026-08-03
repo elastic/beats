@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/sarama"
 )
 
@@ -235,23 +234,7 @@ func TestKafkaInputOTelE2E(t *testing.T) {
     - {{ .Topic }}
   group_id: {{ .GroupID }}
   wait_close: 0
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
-    index: {{ .Index}}
-
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
+` + filebeatOutputYAML
 
 	kafkaOTelConfig := `exporters:
     elasticsearch:
@@ -428,9 +411,4 @@ func deleteKafkaInputTopic(t *testing.T, topic string) {
 	if err := admin.DeleteTopic(topic); err != nil {
 		t.Logf("failed to delete topic %q: %v", topic, err)
 	}
-}
-
-func deleteDataStreamsFromES(t *testing.T, es *elasticsearch.Client, dataStreams []string) {
-	_, err := es.Indices.DeleteDataStream(dataStreams)
-	require.NoError(t, err, "failed to delete data streams")
 }
