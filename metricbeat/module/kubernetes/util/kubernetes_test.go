@@ -1024,7 +1024,7 @@ func TestConcurrentInvalidationAndEnrichment(t *testing.T) {
 			}
 		},
 		func(resource kubernetes.Resource) []string {
-			deployment := resource.(*kubernetes.Deployment)
+			deployment := resource.(*kubernetes.Deployment) //nolint:errcheck // It's a test, let it panic
 			return []string{join(deployment.Namespace, deployment.Name)}
 		},
 		func(event mapstr.M) string {
@@ -1341,9 +1341,9 @@ func TestGetWatcherStoreKeyFromMetadataKey(t *testing.T) {
 
 func resourceMetadataConfig(t *testing.T, node, namespace, deployment, cronJob bool) *metadata.AddResourceMetadataConfig {
 	t.Helper()
-	nodeConfig, err := conf.NewConfigFrom(map[string]interface{}{"enabled": node})
+	nodeConfig, err := conf.NewConfigFrom(map[string]any{"enabled": node})
 	require.NoError(t, err, "node metadata config must be valid")
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{"enabled": namespace})
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{"enabled": namespace})
 	require.NoError(t, err, "namespace metadata config must be valid")
 	return &metadata.AddResourceMetadataConfig{
 		Node:       nodeConfig,
@@ -1372,7 +1372,7 @@ func configureRealInformerTestEnricher(e *enricher, container bool) {
 	defer e.Unlock()
 
 	e.updateFunc = func(resource kubernetes.Resource) map[string]mapstr.M {
-		pod := resource.(*kubernetes.Pod)
+		pod := resource.(*kubernetes.Pod) //nolint:errcheck // It's a test, let it panic
 		eventMetadata := func() mapstr.M {
 			return mapstr.M{
 				"kubernetes": mapstr.M{
@@ -1395,7 +1395,7 @@ func configureRealInformerTestEnricher(e *enricher, container bool) {
 		return map[string]mapstr.M{join(pod.Namespace, pod.Name): eventMetadata()}
 	}
 	e.deleteFunc = func(resource kubernetes.Resource) []string {
-		pod := resource.(*kubernetes.Pod)
+		pod := resource.(*kubernetes.Pod) //nolint:errcheck // It's a test, let it panic
 		if container {
 			ids := make([]string, 0, len(pod.Spec.Containers))
 			for _, podContainer := range pod.Spec.Containers {
