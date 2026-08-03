@@ -493,8 +493,7 @@ func trimBucketSuffix(metricName string) string {
 }
 
 func (a *histogramAssembler) shutdown(now time.Time) histogramAssemblerStats {
-	// G115: map lengths are non-negative and fit in uint64 on all supported platforms.
-	dropped := uint64(len(a.pending)) //nolint:gosec
+	dropped := uint64FromCount(len(a.pending))
 	a.stats.ShutdownDroppedHists += dropped
 	a.pending = make(map[string]*pendingHistogram)
 	a.tombstones = make(map[string]tombstone)
@@ -503,6 +502,5 @@ func (a *histogramAssembler) shutdown(now time.Time) histogramAssemblerStats {
 }
 
 func (a *histogramAssembler) dropRetainedEvents(count int) {
-	// G115: count comes from a map length and is therefore non-negative.
-	a.stats.ShutdownDroppedEvents += uint64(count) //nolint:gosec
+	a.stats.ShutdownDroppedEvents += uint64FromCount(count)
 }

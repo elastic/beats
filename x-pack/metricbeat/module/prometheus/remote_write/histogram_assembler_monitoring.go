@@ -65,9 +65,8 @@ func (m *histogramAssemblerMonitoring) setPending(histograms, buckets int) {
 	if m == nil {
 		return
 	}
-	// G115: pending counts come from map lengths and are therefore non-negative.
-	m.pending.Set(uint64(histograms))     //nolint:gosec
-	m.pendingBuckets.Set(uint64(buckets)) //nolint:gosec
+	m.pending.Set(uint64FromCount(histograms))
+	m.pendingBuckets.Set(uint64FromCount(buckets))
 }
 
 func (m *histogramAssemblerMonitoring) observeLateBucket(dropped bool) {

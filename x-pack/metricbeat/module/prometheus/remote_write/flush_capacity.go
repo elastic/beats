@@ -72,3 +72,12 @@ func sortedEventKeys(events map[string]mb.Event) []string {
 	sort.Strings(keys)
 	return keys
 }
+
+// uint64FromCount converts a non-negative count (map length, capacity) to uint64.
+// Negatives are clamped to zero; callers only pass lengths and capacity counters.
+func uint64FromCount(n int) uint64 {
+	if n <= 0 {
+		return 0
+	}
+	return uint64(n) //nolint:gosec // G115: n is non-negative after the guard above
+}
