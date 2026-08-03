@@ -148,6 +148,8 @@ type fakeGenerator struct {
 	generateCalls       atomic.Int32
 	startCalled         bool
 	stopCalled          bool
+	startCalls          int
+	stopCalls           int
 	generateHook        func(model.Samples) map[string]mb.Event
 	checkCapacityFn     func(model.Samples) error
 	flushHook           func(time.Time) map[string]mb.Event
@@ -159,12 +161,14 @@ func (f *fakeGenerator) Start() {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.startCalled = true
+	f.startCalls++
 }
 
 func (f *fakeGenerator) Stop() {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.stopCalled = true
+	f.stopCalls++
 }
 
 func (f *fakeGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
@@ -217,10 +221,14 @@ func (f *fakeGenerator) RetainUnpublishedFlushEvents(events map[string]mb.Event)
 	f.retainedFlushEvents = events
 }
 
+func (f *fakeGenerator) RequiresOwnerLoop() bool {
+	return true
+}
+
 func newMetricSetWithFakeGenerator(t *testing.T, gen *fakeGenerator) (*MetricSet, *fakeTicker, *testPushReporter) {
 	t.Helper()
 	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
-	m.promEventsGen = gen
+	m.setPromEventsGenerator(gen)
 	ticker := newFakeTicker()
 	setOwnerLoopTestSeams(m, ownerLoopSeams{
 		newTickSource:  func(time.Duration) tickSource { return ticker },
@@ -230,6 +238,20 @@ func newMetricSetWithFakeGenerator(t *testing.T, gen *fakeGenerator) (*MetricSet
 	reporter := newTestPushReporter(nil)
 	startOwnerLoop(t, m, reporter)
 	return m, ticker, reporter
+}
+
+func TestSetPromEventsGeneratorForTestRecomputesModeAndChannels(t *testing.T) {
+	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
+
+	m.SetPromEventsGeneratorForTest(&fakeGenerator{})
+	assert.True(t, m.useOwnerLoop, "owner-capable replacement must select owner mode")
+	assert.Nil(t, m.events, "owner mode must clear the events channel")
+	assert.NotNil(t, m.batches, "owner mode must allocate the batches channel")
+
+	m.SetPromEventsGeneratorForTest(newLegacyFlowGenerator())
+	assert.False(t, m.useOwnerLoop, "legacy replacement must recompute legacy mode")
+	assert.NotNil(t, m.events, "legacy mode must allocate the events channel")
+	assert.Nil(t, m.batches, "legacy mode must clear the batches channel")
 }
 
 func postWriteRequest(t *testing.T, m *MetricSet, numSamples int) *httptest.ResponseRecorder {
@@ -436,7 +458,7 @@ func assertHTTPErrorBody(t *testing.T, rec *httptest.ResponseRecorder, code int,
 func TestOwnerLoopGeneratorLifecycle(t *testing.T) {
 	gen := &fakeGenerator{}
 	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
-	m.promEventsGen = gen
+	m.setPromEventsGenerator(gen)
 	reporter := newTestPushReporter(nil)
 
 	runDone := make(chan struct{})
@@ -460,6 +482,11 @@ func TestOwnerLoopGeneratorLifecycle(t *testing.T) {
 		return gen.startCalled
 	}, time.Second, 5*time.Millisecond, "Run should start generator once")
 
+	require.NoError(t, m.Close(), "owner Close must be a no-op while Run owns lifecycle")
+	gen.mu.Lock()
+	assert.Zero(t, gen.stopCalls, "owner Close must not stop the active generator")
+	gen.mu.Unlock()
+
 	rec := postWriteRequest(t, m, 1)
 	assert.Equal(t, http.StatusAccepted, rec.Code)
 
@@ -474,17 +501,21 @@ func TestOwnerLoopGeneratorLifecycle(t *testing.T) {
 	defer gen.mu.Unlock()
 	assert.True(t, gen.startCalled, "generator Start must run exactly once per Run")
 	assert.True(t, gen.stopCalled, "Run should stop generator after intake stops")
+	assert.Equal(t, 1, gen.startCalls, "owner Run must start generator exactly once")
+	assert.Equal(t, 1, gen.stopCalls, "owner Run must stop generator exactly once")
 }
 
 func TestMetricSetCloseWithoutRunIsNoOp(t *testing.T) {
 	gen := &fakeGenerator{}
 	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
-	m.promEventsGen = gen
+	m.setPromEventsGenerator(gen)
 	require.NoError(t, m.Close())
 	gen.mu.Lock()
 	defer gen.mu.Unlock()
 	assert.False(t, gen.startCalled, "Close must not start generator")
 	assert.False(t, gen.stopCalled, "Close must not stop generator without Run")
+	assert.Zero(t, gen.startCalls, "Close must not call Start")
+	assert.Zero(t, gen.stopCalls, "Close must not call Stop for owner mode")
 }
 
 func TestOwnerLoopPreflightUnexpectedErrorReturns500(t *testing.T) {

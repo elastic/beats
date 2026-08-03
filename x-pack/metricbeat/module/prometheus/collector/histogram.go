@@ -7,7 +7,6 @@ package collector
 import (
 	"fmt"
 	"math"
-	"sort"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 
@@ -40,12 +39,10 @@ func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram 
 	var values []float64
 	var counts []uint64
 
-	buckets := normalizedHistogramBuckets(histogram.GetBucket())
-
 	// calculate centroids and rated counts
 	var lastUpper float64
 	var sumCount, prevCount uint64
-	for _, bucket := range buckets {
+	for _, bucket := range histogram.GetBucket() {
 		// Ignore non-numbers
 		if math.IsNaN(bucket.GetCumulativeCount()) || math.IsInf(bucket.GetCumulativeCount(), 0) {
 			continue
@@ -93,70 +90,4 @@ func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram 
 	}
 
 	return res
-}
-
-func normalizedHistogramBuckets(buckets []*p.Bucket) []*p.Bucket {
-	if len(buckets) == 0 {
-		return nil
-	}
-	if histogramBucketsAreOrderedAndUnique(buckets) {
-		return buckets
-	}
-
-	copied := make([]*p.Bucket, len(buckets))
-	copy(copied, buckets)
-
-	sort.Slice(copied, func(i, j int) bool {
-		bi := copied[i].GetUpperBound()
-		bj := copied[j].GetUpperBound()
-		iInf := math.IsInf(bi, 1)
-		jInf := math.IsInf(bj, 1)
-		switch {
-		case iInf && jInf:
-			return false
-		case iInf:
-			return false
-		case jInf:
-			return true
-		default:
-			return bi < bj
-		}
-	})
-
-	deduped := copied[:0]
-	for _, bucket := range copied {
-		if len(deduped) == 0 {
-			deduped = append(deduped, bucket)
-			continue
-		}
-
-		last := deduped[len(deduped)-1]
-		if bucketUpperBoundsEqual(last.GetUpperBound(), bucket.GetUpperBound()) {
-			if bucket.GetCumulativeCount() > last.GetCumulativeCount() {
-				deduped[len(deduped)-1] = bucket
-			}
-			continue
-		}
-		deduped = append(deduped, bucket)
-	}
-
-	return deduped
-}
-
-func histogramBucketsAreOrderedAndUnique(buckets []*p.Bucket) bool {
-	for i := 1; i < len(buckets); i++ {
-		previous := buckets[i-1].GetUpperBound()
-		current := buckets[i].GetUpperBound()
-		if math.IsNaN(previous) || math.IsNaN(current) || previous >= current {
-			return false
-		}
-	}
-	return true
-}
-
-func bucketUpperBoundsEqual(a, b float64) bool {
-	if math.IsInf(a, 1) && math.IsInf(b, 1) {
-		return true
-	}
-	return a == b
 }

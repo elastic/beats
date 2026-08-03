@@ -13,7 +13,9 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
@@ -172,6 +174,25 @@ func TestHistogramAssemblerDuplicateLeGreatestCumulative(t *testing.T) {
 	})
 	key := histogramIdentityFromParts("http_request_duration_seconds_bucket", labels, ts).key()
 	assert.Equal(t, 25.0, a.pending[key].buckets[0.5].GetCumulativeCount())
+}
+
+func TestHistogramAssemblerOrdersBucketsBeforeConversion(t *testing.T) {
+	buckets := map[float64]*p.Bucket{
+		math.Inf(1): {UpperBound: proto.Float64(math.Inf(1)), CumulativeCount: proto.Float64(30)},
+		0.50:        {UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(20)},
+		-1:          {UpperBound: proto.Float64(-1), CumulativeCount: proto.Float64(5)},
+		0.25:        {UpperBound: proto.Float64(0.25), CumulativeCount: proto.Float64(10)},
+	}
+
+	ordered := histogramBucketsInOrder(buckets)
+
+	require.Len(t, ordered, 4)
+	assert.Equal(t, []float64{-1, 0.25, 0.50, math.Inf(1)}, []float64{
+		ordered[0].GetUpperBound(),
+		ordered[1].GetUpperBound(),
+		ordered[2].GetUpperBound(),
+		ordered[3].GetUpperBound(),
+	})
 }
 
 func TestCheckCapacityRejectsWithoutMutation(t *testing.T) {

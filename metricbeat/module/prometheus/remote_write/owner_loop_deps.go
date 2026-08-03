@@ -120,7 +120,12 @@ func (m *MetricSet) HTTPHandler() http.HandlerFunc {
 
 // SetPromEventsGeneratorForTest replaces the events generator before Run for integration tests.
 func (m *MetricSet) SetPromEventsGeneratorForTest(gen RemoteWriteEventsGenerator) {
-	m.promEventsGen = gen
+	m.setPromEventsGenerator(gen)
+}
+
+// FlowModeForTest reports the selected mode and allocated intake channels.
+func (m *MetricSet) FlowModeForTest() (useOwnerLoop, hasEvents, hasBatches bool) {
+	return m.useOwnerLoop, m.events != nil, m.batches != nil
 }
 
 // HandlersInFlightForTest reports in-flight HTTP handlers (tests only).

@@ -52,6 +52,7 @@ func TestRemoteWriteEventsGeneratorFactoryAppliesHistogramAssemblyDefaults(t *te
 
 	typed, ok := gen.(*remoteWriteTypedGenerator)
 	require.True(t, ok)
+	assert.True(t, rw.RequiresRemoteWriteOwnerLoop(typed), "enabled histogram assembler must opt into owner-loop processing")
 	assert.Equal(t, 5*time.Second, typed.assemblyConfig.QuietPeriod)
 	assert.Equal(t, 30*time.Second, typed.assemblyConfig.HardTimeout)
 	assert.Equal(t, 10_000, typed.assemblyConfig.MaxPendingHistograms)
@@ -103,6 +104,7 @@ func TestRemoteWriteEventsGeneratorFactoryDefaultsToLegacyHistogramConversion(t 
 	typed, ok := gen.(*remoteWriteTypedGenerator)
 	require.True(t, ok, "use_types=true must construct the typed generator")
 	assert.Nil(t, typed.assembler, "histogram assembler must be disabled by default")
+	assert.False(t, rw.RequiresRemoteWriteOwnerLoop(typed), "assembler-disabled typed generator must preserve the legacy events flow")
 	assert.Zero(t, typed.NextFlushInterval(), "disabled assembler must not start the owner-loop flush ticker")
 
 	timestamp := model.TimeFromUnix(100)
@@ -115,5 +117,46 @@ func TestRemoteWriteEventsGeneratorFactoryDefaultsToLegacyHistogramConversion(t 
 	require.Len(t, events, 1, "legacy conversion must emit a complete histogram in the request")
 	for _, event := range events {
 		assert.Contains(t, event.ModuleFields, "http_request_duration_seconds", "legacy conversion must emit the histogram immediately")
+	}
+}
+
+func TestMetricSetFlowMatchesHistogramAssemblerConfiguration(t *testing.T) {
+	tests := []struct {
+		name               string
+		useAssembler       bool
+		wantOwnerLoop      bool
+		wantEventsChannel  bool
+		wantBatchesChannel bool
+	}{
+		{
+			name:              "assembler disabled",
+			wantEventsChannel: true,
+		},
+		{
+			name:               "assembler enabled",
+			useAssembler:       true,
+			wantOwnerLoop:      true,
+			wantBatchesChannel: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			config := map[string]interface{}{
+				"module":                  "prometheus",
+				"metricsets":              []string{"remote_write"},
+				"use_types":               true,
+				"use_histogram_assembler": test.useAssembler,
+				"period":                  "60s",
+			}
+			ms := mbtest.NewMetricSet(t, config)
+			m, ok := ms.(*rw.MetricSet)
+			require.True(t, ok, "expected OSS remote_write MetricSet, got %T", ms)
+
+			useOwnerLoop, hasEvents, hasBatches := m.FlowModeForTest()
+			assert.Equal(t, test.wantOwnerLoop, useOwnerLoop, "owner-loop mode must match assembler configuration")
+			assert.Equal(t, test.wantEventsChannel, hasEvents, "events channel allocation must match flow mode")
+			assert.Equal(t, test.wantBatchesChannel, hasBatches, "batches channel allocation must match flow mode")
+		})
 	}
 }

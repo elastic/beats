@@ -96,6 +96,10 @@ type remoteWriteTypedGenerator struct {
 	retainedCapacity flushEventCapacity
 }
 
+func (g *remoteWriteTypedGenerator) RequiresOwnerLoop() bool {
+	return g.assembler != nil
+}
+
 // HistogramAssemblyStats exposes assembler counters for tests and introspection.
 // Operational counters are published under histogram_assembler.* on the metricset monitoring registry.
 func (g *remoteWriteTypedGenerator) HistogramAssemblyStats() histogramAssemblerStats {

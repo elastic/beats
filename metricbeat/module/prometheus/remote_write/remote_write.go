@@ -57,14 +57,29 @@ type RemoteWriteEventsGenerator interface {
 	Stop()
 }
 
+// RemoteWriteOwnerLoopRequired marks generators that require serialized batch processing.
+type RemoteWriteOwnerLoopRequired interface {
+	RequiresOwnerLoop() bool
+}
+
+// RequiresRemoteWriteOwnerLoop reports whether generator explicitly requires owner-loop processing.
+func RequiresRemoteWriteOwnerLoop(generator RemoteWriteEventsGenerator) bool {
+	required, ok := generator.(RemoteWriteOwnerLoopRequired)
+	return ok && required.RequiresOwnerLoop()
+}
+
 // RemoteWriteEventsGeneratorFactory creates a RemoteWriteEventsGenerator when instanciating a metricset
 type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet, opts ...RemoteWriteEventsGeneratorOption) (RemoteWriteEventsGenerator, error)
 
 type MetricSet struct {
 	mb.BaseMetricSet
 	server                 serverhelper.Server
+	events                 chan mb.Event
 	batches                chan batchSubmission
 	promEventsGen          RemoteWriteEventsGenerator
+	useOwnerLoop           bool
+	eventGenMu             sync.Mutex
+	eventGenStarted        bool
 	maxCompressedBodyBytes int64
 	maxDecodedBodyBytes    int64
 
@@ -97,11 +112,10 @@ func MetricSetBuilderWithConfig(genFactory RemoteWriteEventsGeneratorFactory, ba
 
 		m := &MetricSet{
 			BaseMetricSet:          base,
-			batches:                make(chan batchSubmission),
-			promEventsGen:          promEventsGen,
 			maxCompressedBodyBytes: config.MaxCompressedBodyBytes,
 			maxDecodedBodyBytes:    config.MaxDecodedBodyBytes,
 		}
+		m.setPromEventsGenerator(promEventsGen)
 
 		svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
 		if err != nil {
@@ -113,7 +127,50 @@ func MetricSetBuilderWithConfig(genFactory RemoteWriteEventsGeneratorFactory, ba
 	}
 }
 
+func (m *MetricSet) setPromEventsGenerator(generator RemoteWriteEventsGenerator) {
+	m.promEventsGen = generator
+	m.useOwnerLoop = RequiresRemoteWriteOwnerLoop(generator)
+	m.eventGenStarted = false
+	if m.useOwnerLoop {
+		m.events = nil
+		m.batches = make(chan batchSubmission)
+		return
+	}
+	m.events = make(chan mb.Event)
+	m.batches = nil
+}
+
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
+	if !m.useOwnerLoop {
+		m.runLegacy(reporter)
+		return
+	}
+	m.runOwnerLoop(reporter)
+}
+
+func (m *MetricSet) runLegacy(reporter mb.PushReporterV2) {
+	registerRunReadySignal(m)
+	defer runReadySignals.Delete(m)
+
+	if shouldStartHTTPServer(m) {
+		_ = m.server.Start()
+	}
+	signalRunReady(m)
+
+	for {
+		select {
+		case <-reporter.Done():
+			if shouldStartHTTPServer(m) {
+				m.server.Stop()
+			}
+			return
+		case event := <-m.events:
+			reporter.Event(event)
+		}
+	}
+}
+
+func (m *MetricSet) runOwnerLoop(reporter mb.PushReporterV2) {
 	m.promEventsGen.Start()
 	defer m.promEventsGen.Stop()
 
@@ -177,10 +234,18 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 }
 
-// Close is intentionally a no-op. Generator Start and Stop are wholly owned by Run;
-// Close without Run has nothing to stop, and stopping the generator from Close while Run
-// is active would race with the owner loop.
+// Close stops a legacy generator if an HTTP handler started it. Owner-loop generator
+// lifecycle is wholly owned by Run so Close cannot race with batch processing.
 func (m *MetricSet) Close() error {
+	if m.useOwnerLoop {
+		return nil
+	}
+	m.eventGenMu.Lock()
+	defer m.eventGenMu.Unlock()
+	if m.eventGenStarted {
+		m.promEventsGen.Stop()
+		m.eventGenStarted = false
+	}
 	return nil
 }
 
@@ -197,6 +262,90 @@ func writeBatchOutcome(writer http.ResponseWriter, outcome batchOutcome) {
 }
 
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
+	if !m.useOwnerLoop {
+		m.startLegacyGenerator()
+	}
+
+	samples, ok := m.decodeWriteRequest(writer, req)
+	if !ok {
+		return
+	}
+
+	if !m.useOwnerLoop {
+		m.handleLegacyEvents(writer, req, samples)
+		return
+	}
+	m.handleOwnerBatch(writer, req, samples)
+}
+
+func (m *MetricSet) startLegacyGenerator() {
+	m.eventGenMu.Lock()
+	defer m.eventGenMu.Unlock()
+	if !m.eventGenStarted {
+		m.promEventsGen.Start()
+		m.eventGenStarted = true
+	}
+}
+
+func (m *MetricSet) decodeWriteRequest(writer http.ResponseWriter, req *http.Request) (model.Samples, bool) {
+	// Limit the size of the compressed request body to prevent resource exhaustion
+	req.Body = http.MaxBytesReader(writer, req.Body, m.maxCompressedBodyBytes)
+
+	compressed, err := io.ReadAll(req.Body)
+	if err != nil {
+		var maxBytesError *http.MaxBytesError
+		if errors.As(err, &maxBytesError) {
+			m.Logger().Warnf("Request body too large: exceeds %d bytes limit", m.maxCompressedBodyBytes)
+			http.Error(writer, fmt.Sprintf("request body too large: exceeds %d bytes limit", m.maxCompressedBodyBytes), http.StatusRequestEntityTooLarge)
+			return nil, false
+		}
+		m.Logger().Errorf("Read error %v", err)
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return nil, false
+	}
+
+	// Check decoded length before allocating memory to prevent
+	decodedLen, err := snappy.DecodedLen(compressed)
+	if err != nil {
+		m.Logger().Errorf("Decoded length error: %v", err)
+		http.Error(writer, "Decoded length error", http.StatusBadRequest)
+		return nil, false
+	}
+	if int64(decodedLen) > m.maxDecodedBodyBytes {
+		m.Logger().Warnf("Decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes)
+		http.Error(writer, fmt.Sprintf("decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes), http.StatusRequestEntityTooLarge)
+		return nil, false
+	}
+
+	reqBuf, err := snappy.Decode(nil, compressed)
+	if err != nil {
+		m.Logger().Errorf("Decode error %v", err)
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return nil, false
+	}
+
+	var protoReq prompb.WriteRequest
+	if err := proto.Unmarshal(reqBuf, &protoReq); err != nil {
+		m.Logger().Errorf("Unmarshal error %v", err)
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return nil, false
+	}
+	return protoToSamples(&protoReq), true
+}
+
+func (m *MetricSet) handleLegacyEvents(writer http.ResponseWriter, req *http.Request, samples model.Samples) {
+	events := m.promEventsGen.GenerateEvents(samples)
+	for _, event := range events {
+		select {
+		case <-req.Context().Done():
+			return
+		case m.events <- event:
+		}
+	}
+	writer.WriteHeader(http.StatusAccepted)
+}
+
+func (m *MetricSet) handleOwnerBatch(writer http.ResponseWriter, req *http.Request, samples model.Samples) {
 	m.handlersInFlight.Add(1)
 	defer m.handlersInFlight.Add(-1)
 
@@ -209,50 +358,6 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	// Limit the size of the compressed request body to prevent resource exhaustion
-	req.Body = http.MaxBytesReader(writer, req.Body, m.maxCompressedBodyBytes)
-
-	compressed, err := io.ReadAll(req.Body)
-	if err != nil {
-		var maxBytesError *http.MaxBytesError
-		if errors.As(err, &maxBytesError) {
-			m.Logger().Warnf("Request body too large: exceeds %d bytes limit", m.maxCompressedBodyBytes)
-			http.Error(writer, fmt.Sprintf("request body too large: exceeds %d bytes limit", m.maxCompressedBodyBytes), http.StatusRequestEntityTooLarge)
-			return
-		}
-		m.Logger().Errorf("Read error %v", err)
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Check decoded length before allocating memory to prevent
-	decodedLen, err := snappy.DecodedLen(compressed)
-	if err != nil {
-		m.Logger().Errorf("Decoded length error: %v", err)
-		http.Error(writer, "Decoded length error", http.StatusBadRequest)
-		return
-	}
-	if int64(decodedLen) > m.maxDecodedBodyBytes {
-		m.Logger().Warnf("Decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes)
-		http.Error(writer, fmt.Sprintf("decoded length too large: %d bytes exceeds %d max decoded bytes limit (maxDecodedBodyBytes)", decodedLen, m.maxDecodedBodyBytes), http.StatusRequestEntityTooLarge)
-		return
-	}
-
-	reqBuf, err := snappy.Decode(nil, compressed)
-	if err != nil {
-		m.Logger().Errorf("Decode error %v", err)
-		http.Error(writer, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	var protoReq prompb.WriteRequest
-	if err := proto.Unmarshal(reqBuf, &protoReq); err != nil {
-		m.Logger().Errorf("Unmarshal error %v", err)
-		http.Error(writer, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	samples := protoToSamples(&protoReq)
 	result := make(chan batchOutcome, 1)
 	sub := batchSubmission{
 		samples: samples,

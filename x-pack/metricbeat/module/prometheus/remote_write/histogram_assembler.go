@@ -409,10 +409,7 @@ func (a *histogramAssembler) flushExpired(now time.Time, counterCache collector.
 }
 
 func (a *histogramAssembler) entryToEvent(entry *pendingHistogram, counterCache collector.CounterCache, metricsCount bool) (string, mb.Event) {
-	bucketList := make([]*p.Bucket, 0, len(entry.buckets))
-	for _, b := range entry.buckets {
-		bucketList = append(bucketList, b)
-	}
+	bucketList := histogramBucketsInOrder(entry.buckets)
 	hist := p.Histogram{Bucket: bucketList}
 	name := entry.identity.bucketMetricName
 	baseName := trimBucketSuffix(name)
@@ -442,6 +439,17 @@ func (a *histogramAssembler) entryToEvent(entry *pendingHistogram, counterCache 
 		}
 	}
 	return labelsHash, event
+}
+
+func histogramBucketsInOrder(buckets map[float64]*p.Bucket) []*p.Bucket {
+	ordered := make([]*p.Bucket, 0, len(buckets))
+	for _, bucket := range buckets {
+		ordered = append(ordered, bucket)
+	}
+	sort.Slice(ordered, func(i, j int) bool {
+		return ordered[i].GetUpperBound() < ordered[j].GetUpperBound()
+	})
+	return ordered
 }
 
 func trimBucketSuffix(metricName string) string {

@@ -23,6 +23,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
@@ -31,9 +32,37 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+type legacyFlowGenerator struct {
+	started  chan struct{}
+	stopped  chan struct{}
+	generate chan model.Samples
+}
+
+func newLegacyFlowGenerator() *legacyFlowGenerator {
+	return &legacyFlowGenerator{
+		started:  make(chan struct{}, 1),
+		stopped:  make(chan struct{}, 1),
+		generate: make(chan model.Samples, 1),
+	}
+}
+
+func (g *legacyFlowGenerator) Start() {
+	g.started <- struct{}{}
+}
+
+func (g *legacyFlowGenerator) Stop() {
+	g.stopped <- struct{}{}
+}
+
+func (g *legacyFlowGenerator) GenerateEvents(samples model.Samples) map[string]mb.Event {
+	g.generate <- samples
+	return map[string]mb.Event{"legacy": {RootFields: mapstr.M{"flow": "legacy"}}}
+}
 
 // TestGenerateEventsCounter tests counter simple cases
 func TestGenerateEventsCounter(t *testing.T) {
@@ -329,6 +358,73 @@ func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes 
 	m := newTestMetricSetBase(t, maxCompressedBodyBytes, maxDecodedBodyBytes)
 	startOwnerLoop(t, m, newTestPushReporter(nil))
 	return m
+}
+
+func TestDefaultGeneratorUsesLegacyEventsFlow(t *testing.T) {
+	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
+
+	assert.False(t, m.useOwnerLoop, "default OSS generator must preserve the legacy events flow")
+	assert.NotNil(t, m.events, "legacy mode must allocate the events channel")
+	assert.Nil(t, m.batches, "legacy mode must not allocate the owner-loop batches channel")
+}
+
+func TestLegacyHandlerGeneratesAndForwardsWithoutOwnerLoop(t *testing.T) {
+	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
+	gen := newLegacyFlowGenerator()
+	m.setPromEventsGenerator(gen)
+
+	body, err := encodeWriteRequest(createTestWriteRequest(1))
+	require.NoError(t, err, "write request must encode")
+	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	rec := httptest.NewRecorder()
+	handlerDone := make(chan struct{})
+	go func() {
+		m.handleFunc(rec, req)
+		close(handlerDone)
+	}()
+
+	select {
+	case <-gen.started:
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must start the generator")
+	}
+	select {
+	case samples := <-gen.generate:
+		assert.Len(t, samples, 1, "legacy handler must generate the decoded request")
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must call GenerateEvents directly")
+	}
+	select {
+	case event := <-m.events:
+		assert.Equal(t, "legacy", event.RootFields["flow"], "legacy event must enter the events channel")
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must forward generated events")
+	}
+	select {
+	case <-handlerDone:
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must return after forwarding events")
+	}
+	assert.Equal(t, http.StatusAccepted, rec.Code, "legacy handler must return 202")
+	m.startLegacyGenerator()
+	select {
+	case <-gen.started:
+		t.Fatal("legacy generator Start must run exactly once")
+	default:
+	}
+
+	require.NoError(t, m.Close(), "legacy metricset must close")
+	select {
+	case <-gen.stopped:
+	case <-time.After(time.Second):
+		t.Fatal("Close must stop a generator started by the legacy handler")
+	}
+	require.NoError(t, m.Close(), "repeated legacy Close must succeed")
+	select {
+	case <-gen.stopped:
+		t.Fatal("legacy generator Stop must run exactly once")
+	default:
+	}
 }
 
 func TestHandleFuncDecodedSizeLimit(t *testing.T) {
