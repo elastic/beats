@@ -1061,24 +1061,28 @@ func join(fields ...string) string {
 
 // Start starts all the watchers associated with a given enricher's resource.
 func (e *enricher) Start(resourceWatchers *Watchers) {
+	watcherToStop := e.start(resourceWatchers)
+	if watcherToStop != nil {
+		watcherToStop.Stop()
+	}
+}
+
+func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
+	resourceWatchers.lock.Lock()
+	defer resourceWatchers.lock.Unlock()
 	var watcherToStop kubernetes.Watcher
 
-	resourceWatchers.lock.Lock()
-
 	if len(e.watchedResources) == 0 {
-		resourceWatchers.lock.Unlock()
-		return
+		return nil
 	}
 
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
 	if resourceMetaWatcher == nil {
-		resourceWatchers.lock.Unlock()
-		return
+		return nil
 	}
 	registration, owned := resourceMetaWatcher.users[e]
 	if !owned || !registration.committed {
-		resourceWatchers.lock.Unlock()
-		return
+		return nil
 	}
 
 	// Each resource may require multiple watchers. Firstly, we start the
@@ -1127,11 +1131,8 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 			resourceMetaWatcher.started = true
 		}
 	}
-	resourceWatchers.lock.Unlock()
 
-	if watcherToStop != nil {
-		watcherToStop.Stop()
-	}
+	return watcherToStop
 }
 
 // releaseWatcherOwnership releases all exact watcher dependencies registered by
