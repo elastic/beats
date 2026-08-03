@@ -117,6 +117,20 @@ func TestBuildCloudConfig(t *testing.T) {
 		assert.Equal(t, "https://management.adfs.azurestack.local/abc-123", rm.Audience)
 	})
 
+	t.Run("legacy German cloud remains supported as an explicit override", func(t *testing.T) {
+		config := Config{
+			ResourceManagerEndpoint: "https://management.microsoftazure.de/",
+			ResourceManagerAudience: "https://management.microsoftazure.de/",
+		}
+		require.NoError(t, config.Validate(), "legacy German cloud configuration must remain valid")
+
+		cfg := BuildCloudConfig(config)
+		resourceManager := cfg.Services[cloud.ResourceManager]
+		assert.Equal(t, "https://management.microsoftazure.de/", resourceManager.Endpoint, "legacy German resource manager endpoint must be preserved")
+		assert.Equal(t, "https://management.microsoftazure.de/", resourceManager.Audience, "legacy German resource manager audience must be preserved")
+		assert.Equal(t, "https://login.microsoftonline.de/", cfg.ActiveDirectoryAuthorityHost, "legacy German authority must continue to be derived")
+	})
+
 	t.Run("does not mutate the SDK global cloud configurations", func(t *testing.T) {
 		publicBefore := cloud.AzurePublic.Services[cloud.ResourceManager]
 		govBefore := cloud.AzureGovernment.Services[cloud.ResourceManager]
