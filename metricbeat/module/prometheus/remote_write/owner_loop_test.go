@@ -289,7 +289,7 @@ func postWriteRequest(t *testing.T, m *MetricSet, numSamples int) *httptest.Resp
 	writeReq := createTestWriteRequest(numSamples)
 	body, err := encodeWriteRequest(writeReq)
 	require.NoError(t, err)
-	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()
 	m.handleFunc(rec, req)
 	return rec
@@ -472,8 +472,7 @@ func TestOwnerLoopRequestCancellationUnblocks(t *testing.T) {
 	body, err := encodeWriteRequest(writeReq)
 	require.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
-	req = req.WithContext(ctx)
+	req := httptest.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()
 
 	done := make(chan struct{})

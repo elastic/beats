@@ -15,7 +15,6 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/proto"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -178,10 +177,10 @@ func TestHistogramAssemblerDuplicateLeGreatestCumulative(t *testing.T) {
 
 func TestHistogramAssemblerOrdersBucketsBeforeConversion(t *testing.T) {
 	buckets := map[float64]*p.Bucket{
-		math.Inf(1): {UpperBound: proto.Float64(math.Inf(1)), CumulativeCount: proto.Float64(30)},
-		0.50:        {UpperBound: proto.Float64(0.50), CumulativeCount: proto.Float64(20)},
-		-1:          {UpperBound: proto.Float64(-1), CumulativeCount: proto.Float64(5)},
-		0.25:        {UpperBound: proto.Float64(0.25), CumulativeCount: proto.Float64(10)},
+		math.Inf(1): {UpperBound: new(math.Inf(1)), CumulativeCount: new(30.0)},
+		0.50:        {UpperBound: new(0.50), CumulativeCount: new(20.0)},
+		-1:          {UpperBound: new(-1.0), CumulativeCount: new(5.0)},
+		0.25:        {UpperBound: new(0.25), CumulativeCount: new(10.0)},
 	}
 
 	ordered := histogramBucketsInOrder(buckets)

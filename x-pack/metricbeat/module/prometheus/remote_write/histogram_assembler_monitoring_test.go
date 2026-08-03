@@ -229,7 +229,7 @@ func TestHistogramAssemblerMonitoringShutdownDropped(t *testing.T) {
 }
 
 func TestRemoteWriteFactoryUseTypesFalseDoesNotRegisterHistogramAssemblerMonitoring(t *testing.T) {
-	base := newFactoryBaseMetricSet(t, map[string]interface{}{
+	base := newFactoryBaseMetricSet(t, map[string]any{
 		"use_types": false,
 	})
 	gen, err := remoteWriteEventsGeneratorFactory(base)

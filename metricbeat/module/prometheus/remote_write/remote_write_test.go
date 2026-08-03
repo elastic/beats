@@ -337,7 +337,7 @@ func encodeWriteRequest(req *prompb.WriteRequest) ([]byte, error) {
 
 // newTestMetricSetBase creates a MetricSet without starting the owner loop.
 func newTestMetricSetBase(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"remote_write"},
 	}
@@ -376,7 +376,7 @@ func TestLegacyHandlerGeneratesAndForwardsWithoutOwnerLoop(t *testing.T) {
 
 	body, err := encodeWriteRequest(createTestWriteRequest(1))
 	require.NoError(t, err, "write request must encode")
-	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()
 	handlerDone := make(chan struct{})
 	go func() {
@@ -440,7 +440,7 @@ func TestLegacyHandlerRejectsRequestsAfterClose(t *testing.T) {
 	require.NoError(t, err, "write request must encode")
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body)).WithContext(ctx)
+	req := httptest.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()
 	m.handleFunc(rec, req)
 
@@ -494,7 +494,7 @@ func TestHandleFuncDecodedSizeLimit(t *testing.T) {
 			require.NoError(t, err)
 
 			// Create HTTP request
-			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+			req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(body))
 			rec := httptest.NewRecorder()
 
 			// Call the handler
@@ -556,7 +556,7 @@ func TestHandleFuncCompressedSizeLimit(t *testing.T) {
 			}
 
 			// Create HTTP request
-			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+			req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(body))
 			rec := httptest.NewRecorder()
 
 			// Call the handler
@@ -578,7 +578,7 @@ func TestHandleFuncInvalidSnappyData(t *testing.T) {
 	// Send data with an invalid truncated varint header that will fail at snappy.DecodedLen. We simulate only one sample scenario.
 	// A byte with high bit set (0x80+) indicates continuation, but with no following byte it's invalid
 	invalidData := []byte{0x80, 0x80, 0x80, 0x80, 0x80, 0x80}
-	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(invalidData))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(invalidData))
 	rec := httptest.NewRecorder()
 
 	m.handleFunc(rec, req)
