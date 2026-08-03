@@ -9,7 +9,6 @@ package azure
 import (
 	"fmt"
 	"maps"
-	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 )
@@ -26,16 +25,12 @@ const (
 // batch API, ...) gets a consistent endpoint and token audience. The second
 // return value reports whether the endpoint matched a known cloud.
 func baseCloud(resourceManagerEndpoint string) (cloud.Configuration, bool) {
-	// A trailing slash does not change the resource manager endpoint, and both
-	// forms have historically been documented and accepted by the module.
-	resourceManagerEndpoint = strings.TrimSuffix(resourceManagerEndpoint, "/")
-
-	switch resourceManagerEndpoint {
-	case "", strings.TrimSuffix(DefaultBaseURI, "/"):
+	switch normalizeResourceManagerEndpoint(resourceManagerEndpoint) {
+	case "", DefaultBaseURI:
 		return cloud.AzurePublic, true
-	case strings.TrimSuffix(GovCloudBaseURI, "/"):
+	case GovCloudBaseURI:
 		return cloud.AzureGovernment, true
-	case strings.TrimSuffix(ChinaCloudBaseURI, "/"):
+	case ChinaCloudBaseURI:
 		return cloud.AzureChina, true
 	default:
 		return cloud.AzurePublic, false
@@ -47,7 +42,7 @@ func baseCloud(resourceManagerEndpoint string) (cloud.Configuration, bool) {
 // and resource_manager_endpoint/resource_manager_audience act as overrides on
 // top of it for non-standard environments (e.g. Azure Stack).
 func BuildCloudConfig(config Config) cloud.Configuration {
-	base, _ := baseCloud(config.ResourceManagerEndpoint)
+	base, known := baseCloud(config.ResourceManagerEndpoint)
 
 	// Deep-copy the services map: the SDK's predefined configurations are
 	// package-level globals shared by the whole process and must not be mutated.
@@ -55,7 +50,7 @@ func BuildCloudConfig(config Config) cloud.Configuration {
 	maps.Copy(services, base.Services)
 
 	resourceManager := services[cloud.ResourceManager]
-	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != DefaultBaseURI {
+	if config.ResourceManagerEndpoint != "" && normalizeResourceManagerEndpoint(config.ResourceManagerEndpoint) != DefaultBaseURI {
 		resourceManager.Endpoint = config.ResourceManagerEndpoint
 	}
 	if config.ResourceManagerAudience != "" {
@@ -63,8 +58,13 @@ func BuildCloudConfig(config Config) cloud.Configuration {
 	}
 	services[cloud.ResourceManager] = resourceManager
 
+	activeDirectoryAuthorityHost := config.ActiveDirectoryEndpoint
+	if activeDirectoryAuthorityHost == "" && known {
+		activeDirectoryAuthorityHost = base.ActiveDirectoryAuthorityHost
+	}
+
 	return cloud.Configuration{
-		ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+		ActiveDirectoryAuthorityHost: activeDirectoryAuthorityHost,
 		Services:                     services,
 	}
 }

@@ -69,6 +69,7 @@ func TestBuildCloudConfig(t *testing.T) {
 			wantResourceManagerURL   string
 			wantResourceManagerScope string
 			wantMetricsScope         string
+			wantADHost               string
 		}{
 			{
 				name:                     "public",
@@ -76,6 +77,7 @@ func TestBuildCloudConfig(t *testing.T) {
 				wantResourceManagerURL:   "https://management.azure.com",
 				wantResourceManagerScope: "https://management.core.windows.net/",
 				wantMetricsScope:         "https://metrics.monitor.azure.com",
+				wantADHost:               "https://login.microsoftonline.com/",
 			},
 			{
 				name:                     "government",
@@ -83,6 +85,7 @@ func TestBuildCloudConfig(t *testing.T) {
 				wantResourceManagerURL:   "https://management.usgovcloudapi.net",
 				wantResourceManagerScope: "https://management.core.usgovcloudapi.net/",
 				wantMetricsScope:         "https://metrics.monitor.azure.us",
+				wantADHost:               "https://login.microsoftonline.us/",
 			},
 			{
 				name:                     "china",
@@ -90,19 +93,35 @@ func TestBuildCloudConfig(t *testing.T) {
 				wantResourceManagerURL:   "https://management.chinacloudapi.cn",
 				wantResourceManagerScope: "https://management.core.chinacloudapi.cn/",
 				wantMetricsScope:         "https://metrics.monitor.azure.cn",
+				wantADHost:               "https://login.chinacloudapi.cn/",
 			},
 		}
 
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
-				cfg := BuildCloudConfig(Config{ResourceManagerEndpoint: test.resourceManagerEndpoint})
+				config := Config{ResourceManagerEndpoint: test.resourceManagerEndpoint}
+				require.NoError(t, config.Validate(), "known cloud endpoint must validate without a trailing slash")
+				cfg := BuildCloudConfig(config)
 
 				resourceManager := cfg.Services[cloud.ResourceManager]
 				assert.Equal(t, test.wantResourceManagerURL, resourceManager.Endpoint, "resource manager endpoint must match the selected cloud")
 				assert.Equal(t, test.wantResourceManagerScope, resourceManager.Audience, "resource manager audience must match the selected cloud")
 				assert.Equal(t, test.wantMetricsScope, cfg.Services[azmetrics.ServiceName].Audience, "metrics audience must match the selected cloud")
+				assert.Equal(t, test.wantADHost, cfg.ActiveDirectoryAuthorityHost, "AD authority must match the selected cloud")
 			})
 		}
+	})
+
+	t.Run("known cloud supplies AD authority without validation", func(t *testing.T) {
+		cfg := BuildCloudConfig(Config{ResourceManagerEndpoint: GovCloudBaseURI})
+
+		assert.Equal(t, "https://login.microsoftonline.us/", cfg.ActiveDirectoryAuthorityHost, "recognized cloud must supply its default AD authority")
+	})
+
+	t.Run("custom cloud does not inherit public AD authority", func(t *testing.T) {
+		cfg := BuildCloudConfig(Config{ResourceManagerEndpoint: "https://management.local.azurestack.external/"})
+
+		assert.Empty(t, cfg.ActiveDirectoryAuthorityHost, "custom cloud must require an explicit AD authority")
 	})
 
 	t.Run("explicit audience overrides the cloud default", func(t *testing.T) {
