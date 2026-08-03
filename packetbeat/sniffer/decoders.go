@@ -80,7 +80,7 @@ func DecodersFor(
 			return nil, nil, err
 		}
 
-		udp, err := udp.NewUDP(protocols, id, device, idx)
+		udp, err := udp.NewUDP(protocols, id, device, idx, logger)
 		if err != nil {
 			return nil, nil, err
 		}
