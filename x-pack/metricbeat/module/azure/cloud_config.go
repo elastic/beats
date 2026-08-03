@@ -9,6 +9,7 @@ package azure
 import (
 	"fmt"
 	"maps"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 )
@@ -25,12 +26,16 @@ const (
 // batch API, ...) gets a consistent endpoint and token audience. The second
 // return value reports whether the endpoint matched a known cloud.
 func baseCloud(resourceManagerEndpoint string) (cloud.Configuration, bool) {
+	// A trailing slash does not change the resource manager endpoint, and both
+	// forms have historically been documented and accepted by the module.
+	resourceManagerEndpoint = strings.TrimSuffix(resourceManagerEndpoint, "/")
+
 	switch resourceManagerEndpoint {
-	case "", DefaultBaseURI:
+	case "", strings.TrimSuffix(DefaultBaseURI, "/"):
 		return cloud.AzurePublic, true
-	case GovCloudBaseURI:
+	case strings.TrimSuffix(GovCloudBaseURI, "/"):
 		return cloud.AzureGovernment, true
-	case ChinaCloudBaseURI:
+	case strings.TrimSuffix(ChinaCloudBaseURI, "/"):
 		return cloud.AzureChina, true
 	default:
 		return cloud.AzurePublic, false

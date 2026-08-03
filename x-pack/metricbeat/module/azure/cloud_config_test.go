@@ -62,6 +62,49 @@ func TestBuildCloudConfig(t *testing.T) {
 		assert.Equal(t, "https://metrics.monitor.azure.cn", cfg.Services[azmetrics.ServiceName].Audience)
 	})
 
+	t.Run("known endpoints without trailing slash select their cloud", func(t *testing.T) {
+		tests := []struct {
+			name                     string
+			resourceManagerEndpoint  string
+			wantResourceManagerURL   string
+			wantResourceManagerScope string
+			wantMetricsScope         string
+		}{
+			{
+				name:                     "public",
+				resourceManagerEndpoint:  "https://management.azure.com",
+				wantResourceManagerURL:   "https://management.azure.com",
+				wantResourceManagerScope: "https://management.core.windows.net/",
+				wantMetricsScope:         "https://metrics.monitor.azure.com",
+			},
+			{
+				name:                     "government",
+				resourceManagerEndpoint:  "https://management.usgovcloudapi.net",
+				wantResourceManagerURL:   "https://management.usgovcloudapi.net",
+				wantResourceManagerScope: "https://management.core.usgovcloudapi.net/",
+				wantMetricsScope:         "https://metrics.monitor.azure.us",
+			},
+			{
+				name:                     "china",
+				resourceManagerEndpoint:  "https://management.chinacloudapi.cn",
+				wantResourceManagerURL:   "https://management.chinacloudapi.cn",
+				wantResourceManagerScope: "https://management.core.chinacloudapi.cn/",
+				wantMetricsScope:         "https://metrics.monitor.azure.cn",
+			},
+		}
+
+		for _, test := range tests {
+			t.Run(test.name, func(t *testing.T) {
+				cfg := BuildCloudConfig(Config{ResourceManagerEndpoint: test.resourceManagerEndpoint})
+
+				resourceManager := cfg.Services[cloud.ResourceManager]
+				assert.Equal(t, test.wantResourceManagerURL, resourceManager.Endpoint, "resource manager endpoint must match the selected cloud")
+				assert.Equal(t, test.wantResourceManagerScope, resourceManager.Audience, "resource manager audience must match the selected cloud")
+				assert.Equal(t, test.wantMetricsScope, cfg.Services[azmetrics.ServiceName].Audience, "metrics audience must match the selected cloud")
+			})
+		}
+	})
+
 	t.Run("explicit audience overrides the cloud default", func(t *testing.T) {
 		cfg := BuildCloudConfig(Config{
 			ResourceManagerEndpoint: "https://management.local.azurestack.external/",
@@ -111,6 +154,42 @@ func TestMetricsBatchEndpoint(t *testing.T) {
 		got, err := metricsBatchEndpoint("https://management.chinacloudapi.cn/", "chinaeast2")
 		require.NoError(t, err)
 		assert.Equal(t, "https://chinaeast2.metrics.monitor.azure.cn", got)
+	})
+
+	t.Run("known endpoints without trailing slash", func(t *testing.T) {
+		tests := []struct {
+			name                    string
+			resourceManagerEndpoint string
+			location                string
+			want                    string
+		}{
+			{
+				name:                    "public",
+				resourceManagerEndpoint: "https://management.azure.com",
+				location:                "westeurope",
+				want:                    "https://westeurope.metrics.monitor.azure.com",
+			},
+			{
+				name:                    "government",
+				resourceManagerEndpoint: "https://management.usgovcloudapi.net",
+				location:                "usgovvirginia",
+				want:                    "https://usgovvirginia.metrics.monitor.azure.us",
+			},
+			{
+				name:                    "china",
+				resourceManagerEndpoint: "https://management.chinacloudapi.cn",
+				location:                "chinaeast2",
+				want:                    "https://chinaeast2.metrics.monitor.azure.cn",
+			},
+		}
+
+		for _, test := range tests {
+			t.Run(test.name, func(t *testing.T) {
+				got, err := metricsBatchEndpoint(test.resourceManagerEndpoint, test.location)
+				require.NoError(t, err, "known cloud endpoint must be accepted without a trailing slash")
+				assert.Equal(t, test.want, got, "batch endpoint must match the selected cloud")
+			})
+		}
 	})
 
 	t.Run("unknown cloud fails loudly", func(t *testing.T) {
