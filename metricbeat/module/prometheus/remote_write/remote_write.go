@@ -159,7 +159,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	m.runOwnerLoop(reporter)
 }
 
-// This is the events-channel path used when the histogram assembler is disabled.
+// runEvents publishes events submitted through the events channel.
 func (m *MetricSet) runEvents(reporter mb.PushReporterV2) {
 	registerRunReadySignal(m)
 	defer runReadySignals.Delete(m)

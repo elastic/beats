@@ -84,7 +84,7 @@ func TestRemoteWriteEventsGeneratorFactoryRejectsInvalidHistogramAssembly(t *tes
 	assert.Contains(t, err.Error(), "quiet_period")
 }
 
-func TestRemoteWriteEventsGeneratorFactoryUseTypesFalseSkipsHistogramValidation(t *testing.T) {
+func TestRemoteWriteEventsGeneratorFactoryDisabledHistogramAssemblyIgnoresInvalidTuning(t *testing.T) {
 	base := newFactoryBaseMetricSet(t, map[string]interface{}{
 		"use_types": false,
 		"histogram_assembly": map[string]interface{}{
