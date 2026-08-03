@@ -29,7 +29,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.67.2
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.318.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.58.3
-	github.com/aws/aws-sdk-go-v2/service/iam v1.56.2
+	github.com/aws/aws-sdk-go-v2/service/iam v1.57.0
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.53.2
 	github.com/aws/aws-sdk-go-v2/service/rds v1.123.2
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.35.2
