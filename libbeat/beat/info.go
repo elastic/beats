@@ -37,7 +37,6 @@ import (
 // with multiple beat receivers, the last configured override wins and affects all
 // receivers' processors. This is a known limitation of using a process-wide global;
 // each beat still manages its own Info fields.
-// SetHostnameOverride("") does clear it, which only tests rely on.
 var hostnameOverride atomic.Pointer[string]
 
 // SetHostnameOverride sets the process-wide hostname override used by processors

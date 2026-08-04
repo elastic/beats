@@ -114,7 +114,7 @@ type Beat struct {
 	keystore   keystore.Keystore
 	processors processing.Supporter
 
-	hostnameOverride string // set by handleFlags and configure, from the --hostname flag or the hostname config field
+	hostnameOverride string
 
 	InputQueueSize int // Size of the producer queue used by most queues.
 
@@ -828,7 +828,7 @@ func (b *Beat) ApplyHostname(h, source string) {
 	b.Info.Name = h
 	b.Info.FQDN = h
 	b.hostnameOverride = h
-	// handleFlags runs before logging is configured, so the flag case is logged later by configure.
+	// Logger may not be set yet when called before configure initialises logging.
 	if b.Info.Logger != nil {
 		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
 	}
