@@ -6,7 +6,6 @@
 package testjamf
 
 import (
-	_ "embed"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	// For testdata/computers.json
+	_ "embed"
 	"github.com/gofrs/uuid/v5"
 )
 
