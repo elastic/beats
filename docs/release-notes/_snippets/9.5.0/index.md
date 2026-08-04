@@ -98,33 +98,30 @@
 * Harden Salesforce input batching compatibility and auth-failure recovery. [#50149](https://github.com/elastic/beats/pull/50149)
 * Fix Okta minimal-state provider to accept configs with both `okta_token` and `oauth2`. [#51078](https://github.com/elastic/beats/pull/51078) [#51005](https://github.com/elastic/beats/issues/51005)
 * Fix S3 polling input to exclude same-bucket backup objects from listing. [#51912](https://github.com/elastic/beats/pull/51912)
-* Honor path_style for non-AWS S3 buckets in the aws-s3 input. [#52003](https://github.com/elastic/beats/pull/52003) 
-
-  When using non_aws_bucket_name with a custom endpoint, the aws-s3 input always marked the endpoint hostname immutable, forcing path-style requests and ignoring path_style. This broke S3-compatible providers that require virtual-hosted addressing, which returned VirtualHostDomainRequired.  The hostname is now kept mutable for non-AWS buckets so path_style is honored.
-  
+* Honor `path_style` for non-AWS S3 buckets in the `aws-s3` input. [#52003](https://github.com/elastic/beats/pull/52003)
 * Use a stable status message for SQS receive errors to prevent update churn during sustained outages. [#52059](https://github.com/elastic/beats/pull/52059) 
-* Do not mark the CEL input&#39;s health as degraded when the maximum executions is exceeded. [#52060](https://github.com/elastic/beats/pull/52060) 
+* Do not mark the CEL input's health as degraded when the maximum number of executions is exceeded. [#52060](https://github.com/elastic/beats/pull/52060) 
 * Honor the configured language when rendering Windows events. [#52094](https://github.com/elastic/beats/pull/52094) [#7332](https://github.com/elastic/sdh-beats/issues/7332)
-* Fix aws-s3 input silently dropping events when a parser clears the message content. [#52077](https://github.com/elastic/beats/pull/52077) 
-* Fix journald input facility filters on journalctl older than 245. [#52231](https://github.com/elastic/beats/pull/52231) 
-* The journald input now reports a Degraded status when journalctl repeatedly exits without delivering any data, instead of staying Healthy while collecting no events. [#52232](https://github.com/elastic/beats/pull/52232) 
+* Fix the `aws-s3` input silently dropping events when a parser clears the message content. [#52077](https://github.com/elastic/beats/pull/52077) 
+* Fix `journald` input facility filters on `journalctl` older than 245. [#52231](https://github.com/elastic/beats/pull/52231) 
+* The `journald` input now reports a Degraded status when `journalctl` repeatedly exits without delivering any data, instead of staying Healthy while collecting no events. [#52232](https://github.com/elastic/beats/pull/52232) 
 * Fix TCP and UDP inputs hanging during shutdown. [#52292](https://github.com/elastic/beats/pull/52292) 
 
 **Heartbeat**
 
-* Fix panic with multiple heartbeat receivers. [#52010](https://github.com/elastic/beats/pull/52010) 
+* Fix panic with multiple Heartbeat receivers. [#52010](https://github.com/elastic/beats/pull/52010) 
 
 **Libbeat**
 
 * Add LDAP channel binding for Windows SSPI binds. [#49733](https://github.com/elastic/beats/pull/49733) 
-* Fix add_host_metadata host.geo map sharing across events causing data corruption. [#49722](https://github.com/elastic/beats/pull/49722) [#49721](https://github.com/elastic/beats/issues/49721)
+* Fix `add_host_metadata` `host.geo` map sharing across events causing data corruption. [#49722](https://github.com/elastic/beats/pull/49722) [#49721](https://github.com/elastic/beats/issues/49721)
 
 **Osquerybeat**
 
 * Reject CPIO entries in macOS .pkg payloads whose paths escape the destination directory, preventing path traversal during extraction (CWE-22). [#51446](https://github.com/elastic/beats/pull/51446) 
-* Propagate osquery live-query space IDs to action response events. [#50808](https://github.com/elastic/beats/pull/50808) 
-* Fixes serialization of ads and active columns in elastic_ntfs_file table to use boolean instead of integer. [#51629](https://github.com/elastic/beats/pull/51629) 
-* Accept osquery packs mixing interval-scheduled and unscheduled queries again. [#52242](https://github.com/elastic/beats/pull/52242) [#51450](https://github.com/elastic/beats/issues/51450)
+* Propagate Osquery live-query space IDs to action response events. [#50808](https://github.com/elastic/beats/pull/50808) 
+* Fix the serialization of ads and active columns in `elastic_ntfs_file` table to use boolean instead of integer. [#51629](https://github.com/elastic/beats/pull/51629) 
+* Accept Osquery packs mixing interval-scheduled and unscheduled queries again. [#52242](https://github.com/elastic/beats/pull/52242) [#51450](https://github.com/elastic/beats/issues/51450)
 
 **Winlogbeat**
 
