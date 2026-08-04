@@ -81,8 +81,8 @@
 
 **All**
 
-* Upgrade to go 1.26.5. [#51873](https://github.com/elastic/beats/pull/51873) 
-* This fixes a bug where worker/workers setting was not respected when loadbalance is set to false. [#51041](https://github.com/elastic/beats/pull/51041) 
+* Upgrade Go to v1.26.5. [#51873](https://github.com/elastic/beats/pull/51873) 
+* Fix an issue where the `worker`/`workers` setting was not respected when `loadbalance` is set to `false`. [#51041](https://github.com/elastic/beats/pull/51041) 
 * Honor the enabled flag when reloading inputs. [#51472](https://github.com/elastic/beats/pull/51472) 
 
 **Beats**
@@ -91,44 +91,13 @@
 
 **Elastic agent**
 
-* Fix beat receiver Shutdown hanging when Start fails before the beater is launched. [#52106](https://github.com/elastic/beats/pull/52106) [#52009](https://github.com/elastic/beats/issues/52009)
+* Fix Beat receiver shutdown hanging when start fails before the beater is launched. [#52106](https://github.com/elastic/beats/pull/52106) [#52009](https://github.com/elastic/beats/issues/52009)
 
 **Filebeat**
 
-* Harden Salesforce input batching compatibility and auth-failure recovery. [#50149](https://github.com/elastic/beats/pull/50149) 
-
-  Preserve Salesforce object cursor continuity across bounded-batch upgrades
-  and toggles. Existing installs now seed batched windows from legacy
-  first_event_time / last_event_time state, and disabling batching resumes
-  unbatched queries from the latest safe watermark instead of replaying quiet
-  windows that batching already drained.
-  
-  Tighten batching safety by rejecting object configs that enable batching
-  without referencing both batch_start_time and batch_end_time, or that still
-  reference those placeholders after batching is disabled.
-  
-  Prevent same-timestamp resume gaps for SetupAuditTrail and EventLogFile
-  collection by persisting the last seen record Id as a tie-breaker. Existing
-  installs remain compatible: older cursor state keeps the legacy resume boundary
-  until the next successful run records the new field.
-  
-  Normalize Salesforce OAuth token_url handling for user-password and JWT flows.
-  The input now accepts either a Salesforce OAuth host or the canonical
-  /services/oauth2/token endpoint and avoids constructing doubled token URLs.
-  
-  Improve resilience by propagating input cancellation into Salesforce HTTP
-  requests, retrying the initial SOQL request once after Salesforce auth errors,
-  retrying EventLogFile downloads once after a 401, and surfacing consecutive
-  collection failures in Elastic Agent status.
-  
-* Fix Okta minimal-state provider to accept configs with both okta_token and oauth2. [#51078](https://github.com/elastic/beats/pull/51078) [#51005](https://github.com/elastic/beats/issues/51005)
-* Fix S3 polling input to exclude same-bucket backup objects from listing. [#51912](https://github.com/elastic/beats/pull/51912) 
-
-  When same-bucket backup is configured with the default empty
-  bucket_list_prefix, backup objects are listed alongside source objects
-  and reprocessed indefinitely. Exclude keys matching the backup prefix
-  from listing results when the backup destination is the same bucket.
-  
+* Harden Salesforce input batching compatibility and auth-failure recovery. [#50149](https://github.com/elastic/beats/pull/50149)
+* Fix Okta minimal-state provider to accept configs with both `okta_token` and `oauth2`. [#51078](https://github.com/elastic/beats/pull/51078) [#51005](https://github.com/elastic/beats/issues/51005)
+* Fix S3 polling input to exclude same-bucket backup objects from listing. [#51912](https://github.com/elastic/beats/pull/51912)
 * Honor path_style for non-AWS S3 buckets in the aws-s3 input. [#52003](https://github.com/elastic/beats/pull/52003) 
 
   When using non_aws_bucket_name with a custom endpoint, the aws-s3 input always marked the endpoint hostname immutable, forcing path-style requests and ignoring path_style. This broke S3-compatible providers that require virtual-hosted addressing, which returned VirtualHostDomainRequired.  The hostname is now kept mutable for non-AWS buckets so path_style is honored.
