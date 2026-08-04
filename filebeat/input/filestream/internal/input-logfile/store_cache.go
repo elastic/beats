@@ -129,12 +129,8 @@ func initializeStoreCacheEntry(
 		return nil, err
 	}
 
+	// The config validation already ensures cleanup_interval >= 0
 	interval := states.CleanupInterval()
-	if interval <= 0 {
-		// Even a new store needs to be "released"
-		s.Release()
-		return nil, errors.New("clean up interval must be > 0")
-	}
 	ctx, cancel := context.WithCancel(context.Background())
 	entry.cleanerWg.Add(1)
 	s.onClose = func() { globalStoreCache.storeClosed(key, entry) }

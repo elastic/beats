@@ -117,7 +117,7 @@ func (cim *InputManager) init(group unison.Group) error {
 		// group.Go will never run, therefore this manager's store acquisition
 		// would never be released. Wait until the shutdown waiter is running.
 		// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
-		// for contex from the old implementation.
+		// for context from the old implementation.
 		waitRunning := make(chan struct{})
 		err := group.Go(func(canceler context.Context) error {
 			waitRunning <- struct{}{}

@@ -49,7 +49,7 @@ type Registry struct {
 	Path          string        `config:"path"`
 	Permissions   os.FileMode   `config:"file_permissions"`
 	FlushTimeout  time.Duration `config:"flush"`
-	CleanInterval time.Duration `config:"cleanup_interval"`
+	CleanInterval time.Duration `config:"cleanup_interval", validate:"positive`
 	MigrateFile   string        `config:"migrate_file"`
 	Backend       string        `config:"backend"`
 	// FileStorage holds the raw user configuration for the OpenTelemetry file_storage
