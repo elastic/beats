@@ -380,4 +380,4 @@ Note:`queue` options can be set under `auditbeat.yml` or the `output` section bu
 When Idempotent is enabled, the producer will ensure that exactly one copy of each message is written. 
 This setting requires kafka version to be >=0.11.0.0, `max_retries` to be greater than `0` and `required_acks` to be equal to `-1`.   
 
-The default value is false
+The default value is `false`.
