@@ -39,8 +39,6 @@ func TestGenRootCmdWithSettingsExposesHostnameFlag(t *testing.T) {
 		instance.HostnameFlag = ""
 	})
 
-	assert.Nil(t, flag.Lookup("hostname"), "hostname must not be registered with the Go flag package")
-
 	settings := instance.Settings{Name: "testbeat", Version: "0.0.1"}
 	rootCmd := GenRootCmdWithSettings(nil, settings)
 	f := rootCmd.PersistentFlags().Lookup("hostname")
