@@ -28,10 +28,29 @@ import (
 	mqtttestutil "github.com/elastic/beats/v7/filebeat/input/mqtt/testutil"
 	redistestutil "github.com/elastic/beats/v7/filebeat/input/redis/testutil"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	azureblobmock "github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
+	gcppubsubtestutil "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub/testutil"
 	gcsmock "github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/mock"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 )
+
+const (
+	azureBlobTestAccountName = "beatsblobnew"
+	azureBlobTestAccountKey  = "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q=="
+	azureBlobTestContainer   = "beatscontainer"
+	azureBlobTestBlob        = "ata.json"
+	azureBlobTestMessage     = "iPhone 9"
+)
+
+func startAzureBlobMockStorageServer(t *testing.T) string {
+	t.Helper()
+
+	srv := httptest.NewServer(azureblobmock.AzureStorageServer())
+	t.Cleanup(srv.Close)
+
+	return srv.URL + "/"
+}
 
 func TestCELInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
@@ -827,6 +846,233 @@ receivers:
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+}
+
+func TestAzureBlobStorageInputOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	storageURL := startAzureBlobMockStorageServer(t)
+	otelHome := t.TempDir()
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNamespace
+
+	type options struct {
+		Index       string
+		ESURL       string
+		Username    string
+		Password    string
+		StorageURL  string
+		PathHome    string
+		AccountName string
+		AccountKey  string
+	}
+
+	filebeatConfig := `filebeat.inputs:
+- type: azure-blob-storage
+  id: azure-blob-storage-input-e2e
+  account_name: {{ .AccountName }}
+  storage_url: {{ .StorageURL }}
+  auth:
+    shared_credentials:
+      account_key: {{ .AccountKey }}
+  poll: false
+  max_workers: 1
+  containers:
+    - name: ` + azureBlobTestContainer + `
+  file_selectors:
+    - regex: '^` + azureBlobTestBlob + `$'
+` + filebeatOutputYAML
+
+	otelConfig := otelElasticsearchExporterYAML + `receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - type: azure-blob-storage
+                  id: azure-blob-storage-input-e2e
+                  account_name: {{ .AccountName }}
+                  storage_url: {{ .StorageURL }}
+                  auth:
+                    shared_credentials:
+                      account_key: {{ .AccountKey }}
+                  poll: false
+                  max_workers: 1
+                  containers:
+                    - name: ` + azureBlobTestContainer + `
+                  file_selectors:
+                    - regex: '^` + azureBlobTestBlob + `$'
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        path.home: {{ .PathHome }}
+` + otelElasticsearchServiceYAML
+
+	optionsValue := options{
+		ESURL:       fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:    user,
+		Password:    password,
+		StorageURL:  storageURL,
+		PathHome:    otelHome,
+		AccountName: azureBlobTestAccountName,
+		AccountKey:  azureBlobTestAccountKey,
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.Index = otelIndex
+	require.NoError(t, template.Must(template.New("config").Parse(otelConfig)).Execute(&configBuffer, optionsValue))
+	oteltestcol.New(t, configBuffer.String())
+
+	configBuffer.Reset()
+	optionsValue.Index = fbIndex
+	require.NoError(t, template.Must(template.New("config").Parse(filebeatConfig)).Execute(&configBuffer, optionsValue))
+
+	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	filebeat.WaitLogsContains("filebeat start running", 20*time.Second, "filebeat did not run")
+
+	es := integration.GetESClient(t, "http")
+	t.Cleanup(func() {
+		deleteDataStreamsFromES(t, es, []string{otelIndex, fbIndex})
+	})
+
+	rawQuery := otelE2ERawQueryForInputTypeAndMessage("azure-blob-storage", azureBlobTestMessage)
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
+
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDocs.Hits.Hits[0].Source, otelDocs.Hits.Hits[0].Source, ignoredFields, "expected documents to be equal")
+}
+
+func TestGCPInputOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	client, clientCancel := gcppubsubtestutil.TestSetup(t)
+	defer func() {
+		clientCancel()
+		client.Close()
+	}()
+
+	gcppubsubtestutil.CreateTopic(t, client)
+	gcppubsubtestutil.CreateSubscription(t, "test-subscription-otel", client)
+	gcppubsubtestutil.CreateSubscription(t, "test-subscription-fb", client)
+	const numMsgs = 10
+	gcppubsubtestutil.PublishMessages(t, client, numMsgs)
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+	fbNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNamespace
+
+	type options struct {
+		Index           string
+		ESURL           string
+		Username        string
+		Password        string
+		Subscription    string
+		CredentialsFile string
+	}
+
+	gcpFilebeatConfig := `filebeat.inputs:
+- type: gcp-pubsub
+  project_id: test-project-id
+  topic: test-topic-foo
+  subscription.name:  {{ .Subscription }}
+  credentials_file: "{{ .CredentialsFile }}"
+` + filebeatOutputYAML
+
+	gcpOTelConfig := otelElasticsearchExporterYAML + `receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - credentials_file: "{{ .CredentialsFile }}"
+                  project_id: test-project-id
+                  subscription:
+                    name: {{ .Subscription }}
+                  topic: test-topic-foo
+                  type: gcp-pubsub
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        management.otel.enabled: true
+` + otelElasticsearchServiceYAML
+
+	//nolint:gosec // G101: CredentialsFile is a path to a test fixture, not a secret
+	optionsValue := options{
+		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:        user,
+		Password:        password,
+		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json",
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.Index = otelIndex
+	optionsValue.Subscription = "test-subscription-otel"
+	require.NoError(t, template.Must(template.New("config").Parse(gcpOTelConfig)).Execute(&configBuffer, optionsValue))
+	oteltestcol.New(t, configBuffer.String())
+
+	configBuffer.Reset()
+	optionsValue.Index = fbIndex
+	optionsValue.Subscription = "test-subscription-fb"
+	require.NoError(t, template.Must(template.New("config").Parse(gcpFilebeatConfig)).Execute(&configBuffer, optionsValue))
+
+	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	es := integration.GetESClient(t, "http")
+	t.Cleanup(func() {
+		deleteDataStreamsFromES(t, es, []string{otelIndex, fbIndex})
+	})
+
+	rawQuery := map[string]any{
+		"query": map[string]any{
+			"match_phrase": map[string]any{
+				"input.type": "gcp-pubsub",
+			},
+		},
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
+		},
+	}
+
+	filebeatDocs, otelDocs := getFilebeatOTelDocs(t, fbIndex, otelIndex, rawQuery)
+
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"event.created",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDocs.Hits.Hits[0].Source, otelDocs.Hits.Hits[0].Source, ignoredFields, "expected documents to be equal")
 }
 
 func TestHTTPEndpointInputOTelE2E(t *testing.T) {
