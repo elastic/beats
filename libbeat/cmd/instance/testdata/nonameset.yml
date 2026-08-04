@@ -1,0 +1,7 @@
+############################# Mockbeat ######################################
+mockbeat:
+
+# No "name:" on purpose, so the --hostname flag value is used as the beat name.
+
+output.elasticsearch:
+    hosts: ["localhost:9200"]

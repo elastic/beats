@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -115,6 +114,8 @@ type Beat struct {
 	keystore   keystore.Keystore
 	processors processing.Supporter
 
+	hostnameOverride string // set by handleFlags and configure, from the --hostname flag or the hostname config field
+
 	InputQueueSize int // Size of the producer queue used by most queues.
 
 	// shouldReexec is a flag to indicate the Beat should restart
@@ -128,6 +129,7 @@ type beatConfig struct {
 
 	// beat top-level settings
 	Name      string `config:"name"`
+	Hostname  string `config:"hostname"`
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
@@ -796,12 +798,45 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags converts -flag to --flags, parses the command line
-// flags, and it invokes the HandleFlags callback if implemented by
-// the Beat.
+// HostnameFlag is bound to the --hostname Cobra flag exposed in root.go.
+// It is intentionally not advertised: elastic-agent uses it to pass the correct
+// node hostname to managed beats in environments where os.Hostname() is unreliable
+// (e.g. Kubernetes pods without hostNetwork).
+var HostnameFlag string
+
+// handleFlags applies values already parsed by Cobra and invokes the
+// HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	flag.Parse()
+	b.ApplyHostname(HostnameFlag, "--hostname flag")
 	return cfgfile.HandleFlags()
+}
+
+// ApplyHostname sets Info.Hostname, Info.Name, and Info.FQDN to the trimmed form of h,
+// and updates the process-wide hostname override read by processors.
+// source identifies where h came from for logging. It is a no-op when h is empty or blank,
+// so a beat without an override never clears a value set by another component.
+// Must be called before RegisterHostname and before the name: config field is applied
+// (which overwrites Info.Name).
+func (b *Beat) ApplyHostname(h, source string) {
+	if strings.TrimSpace(h) == "" {
+		return
+	}
+	beat.SetHostnameOverride(h)
+	// SetHostnameOverride is the single normalization point (TrimSpace only); read it back.
+	h = beat.GetHostnameOverride()
+	b.Info.Hostname = h
+	b.Info.Name = h
+	b.Info.FQDN = h
+	b.hostnameOverride = h
+	// handleFlags runs before logging is configured, so the flag case is logged later by configure.
+	if b.Info.Logger != nil {
+		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
+	}
+}
+
+// HostnameOverride returns the hostname override of this beat, or "" when it has none.
+func (b *Beat) HostnameOverride() string {
+	return b.hostnameOverride
 }
 
 // config reads the configuration file from disk, parses the common options
@@ -867,10 +902,23 @@ func (b *Beat) configure(settings Settings) error {
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
+
+	// The --hostname flag wins over the config field, so only apply the config
+	// value when the flag left no override. Beats running as OTel receivers never
+	// see CLI flags, so the config field is the only way to reach them.
+	// This has to happen before RegisterHostname, so monitoring reports the same
+	// hostname as the events.
+	if b.hostnameOverride == "" {
+		b.ApplyHostname(b.Config.Hostname, "config hostname field")
+	}
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
 
+	// The configured name wins for Info.Name (agent.name), but hostnameOverride
+	// keeps the overridden hostname, so add_host_metadata and add_observer_metadata
+	// still use it for host.name and observer.hostname respectively.
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
 	}
@@ -896,23 +944,26 @@ func (b *Beat) configure(settings Settings) error {
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return fmt.Errorf("failed to get host information: %w", err)
-	}
+	// The hostname override applies to the FQDN too, so skip the lookup.
+	if b.hostnameOverride == "" {
+		// Try to get the host's FQDN and set it.
+		h, err := sysinfo.Host()
+		if err != nil {
+			return fmt.Errorf("failed to get host information: %w", err)
+		}
 
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
+		fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
 
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+		fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// initialize config manager

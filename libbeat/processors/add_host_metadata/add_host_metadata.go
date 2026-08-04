@@ -104,7 +104,9 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		},
 		hostInfoFactory: func() (hostInfo, error) { return sysinfo.Host() },
 	}
-	// Fetch and cache the initial host data.
+	// Fetch and cache the initial host data. Any hostname override
+	// (beat.SetHostnameOverride) must be applied before constructing this
+	// processor — the override is sampled here and cached until TTL expiry.
 	if _, err := p.loadData(features.FQDN()); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
 	}
@@ -196,7 +198,14 @@ func (p *addHostMetadata) fetchData(useFQDN bool) (mapstr.M, error) {
 
 	hInfo := h.Info()
 	hostname := hInfo.Hostname
-	if useFQDN {
+
+	// host.hostname is set by MapHostInfo from sysinfo and still reflects the OS
+	// hostname even when an override is active — this is intentional (ECS: "as
+	// reported by the OS"). Only host.name is redirected to the override value.
+	if override := beat.GetHostnameOverride(); override != "" {
+		p.logger.Debugf("using hostname override %q for host.name (host.hostname still reflects OS value)", override)
+		hostname = override
+	} else if useFQDN {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
 

@@ -18,6 +18,8 @@
 package beat
 
 import (
+	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,6 +28,38 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+// hostnameOverride is set when the --hostname flag or the hostname config field
+// is provided.
+// It is read by processors (add_host_metadata, add_observer_metadata) that
+// cannot receive per-beat state through their constructor interface.
+// In a single-beat process this is written before any processor runs. In a process
+// with multiple beat receivers, the last configured override wins and affects all
+// receivers' processors. This is a known limitation of using a process-wide global;
+// each beat still manages its own Info fields.
+// SetHostnameOverride("") does clear it, which only tests rely on.
+var hostnameOverride atomic.Pointer[string]
+
+// SetHostnameOverride sets the process-wide hostname override used by processors
+// that cannot receive per-beat state (add_host_metadata, add_observer_metadata).
+// The value is trimmed but its casing is kept: whoever passes the hostname decides it.
+// Pass "" to clear any previously set override.
+func SetHostnameOverride(h string) {
+	h = strings.TrimSpace(h)
+	if h == "" {
+		hostnameOverride.Store(nil)
+		return
+	}
+	hostnameOverride.Store(&h)
+}
+
+// GetHostnameOverride returns the active hostname override, or "" if none is set.
+func GetHostnameOverride() string {
+	if h := hostnameOverride.Load(); h != nil {
+		return *h
+	}
+	return ""
+}
 
 // Info stores a beats instance meta data.
 type Info struct {

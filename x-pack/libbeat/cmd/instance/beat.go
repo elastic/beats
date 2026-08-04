@@ -181,6 +181,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("could not parse features: %w", err)
 	}
+
+	// Receivers never see CLI flags, so the config field is the only way to override
+	// the hostname here. It has to happen before RegisterHostname, so monitoring
+	// reports the same hostname as the events.
+	b.ApplyHostname(b.Config.Hostname, "config hostname field")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -204,15 +210,18 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	fqdn, err := fqdnOnce()
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+	// The hostname override applies to the FQDN too, so skip the lookup.
+	if b.HostnameOverride() == "" {
+		// Try to get the host's FQDN and set it.
+		fqdn, err := fqdnOnce()
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// register NewOtelManager

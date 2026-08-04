@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/filebeat/input/log"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	libbeatinstance "github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
@@ -102,6 +103,40 @@ func TestNewBeatForReceiverDoesNotSetPacketbeatShutdownTimeout(t *testing.T) {
 
 	assert.NotContains(t, cfg["packetbeat"], "shutdown_timeout",
 		"packetbeat must retain its own shutdown timeout semantics")
+}
+
+func TestReceiverHostnameConfigField(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	cfg := map[string]any{
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
+	}
+
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+	require.NoError(t, err)
+
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "receiver-node", b.Info.Name)
+	assert.Equal(t, "receiver-node", b.Info.FQDN)
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
+}
+
+func TestReceiverNameWinsOverHostname(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	cfg := map[string]any{
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
+		"name":      "custom-name",
+	}
+
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+	require.NoError(t, err)
+
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "custom-name", b.Info.Name, "name: should win over hostname: for Info.Name")
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
 }
 
 func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {

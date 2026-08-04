@@ -1,0 +1,5 @@
+############################# Mockbeat ######################################
+mockbeat:
+
+hostname: config-hostname
+name: config-name
