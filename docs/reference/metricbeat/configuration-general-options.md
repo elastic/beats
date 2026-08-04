@@ -63,9 +63,7 @@ name: "my-shipper"
 
 ### `hostname` [_hostname]
 
-Overrides the hostname that the Beat reports in events, including `host.name` and `agent.name`. Also affects `observer.hostname` if the `add_observer_metadata` processor is configured. Use this when the Beat cannot determine its own hostname correctly, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node hostname.
-
-If the `name` setting is also set, `name` takes precedence for `agent.name`. The `--hostname` command-line flag overrides this setting.
+Sets the hostname the Beat reports in `host.name` and `observer.hostname` (when `add_observer_metadata` is configured). Use this when the Beat cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
 
 Example:
 

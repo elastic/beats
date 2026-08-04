@@ -117,12 +117,12 @@ func TestReceiverHostnameConfigField(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "receiver-node", b.Info.Hostname)
-	assert.Equal(t, "receiver-node", b.Info.Name)
 	assert.Equal(t, "receiver-node", b.Info.FQDN)
 	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
+	assert.NotEqual(t, "receiver-node", b.Info.Name, "hostname: must not affect agent.name")
 }
 
-func TestReceiverNameWinsOverHostname(t *testing.T) {
+func TestReceiverNameAndHostnameAreIndependent(t *testing.T) {
 	t.Cleanup(func() { beat.SetHostnameOverride("") })
 
 	cfg := map[string]any{
@@ -135,7 +135,7 @@ func TestReceiverNameWinsOverHostname(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "receiver-node", b.Info.Hostname)
-	assert.Equal(t, "custom-name", b.Info.Name, "name: should win over hostname: for Info.Name")
+	assert.Equal(t, "custom-name", b.Info.Name)
 	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
 }
 

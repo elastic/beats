@@ -811,24 +811,18 @@ func (b *Beat) handleFlags() error {
 	return cfgfile.HandleFlags()
 }
 
-// ApplyHostname sets Info.Hostname, Info.Name, and Info.FQDN to the trimmed form of h,
-// and updates the process-wide hostname override read by processors.
-// source identifies where h came from for logging. It is a no-op when h is empty or blank,
-// so a beat without an override never clears a value set by another component.
-// Must be called before RegisterHostname and before the name: config field is applied
-// (which overwrites Info.Name).
+// ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
+// hostname override used by processors (add_host_metadata, add_observer_metadata).
+// It is a no-op when h is empty or blank. Must be called before RegisterHostname.
 func (b *Beat) ApplyHostname(h, source string) {
 	if strings.TrimSpace(h) == "" {
 		return
 	}
 	beat.SetHostnameOverride(h)
-	// SetHostnameOverride is the single normalization point (TrimSpace only); read it back.
 	h = beat.GetHostnameOverride()
 	b.Info.Hostname = h
-	b.Info.Name = h
 	b.Info.FQDN = h
 	b.hostnameOverride = h
-	// Logger may not be set yet when called before configure initialises logging.
 	if b.Info.Logger != nil {
 		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
 	}
@@ -903,11 +897,6 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
 
-	// The --hostname flag wins over the config field, so only apply the config
-	// value when the flag left no override. Beats running as OTel receivers never
-	// see CLI flags, so the config field is the only way to reach them.
-	// This has to happen before RegisterHostname, so monitoring reports the same
-	// hostname as the events.
 	if b.hostnameOverride == "" {
 		b.ApplyHostname(b.Config.Hostname, "config hostname field")
 	}
@@ -916,9 +905,6 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Beat.Config = &b.Config.BeatConfig
 
-	// The configured name wins for Info.Name (agent.name), but hostnameOverride
-	// keeps the overridden hostname, so add_host_metadata and add_observer_metadata
-	// still use it for host.name and observer.hostname respectively.
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
 	}

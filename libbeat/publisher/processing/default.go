@@ -148,9 +148,13 @@ var WithECS = WithFields(mapstr.M{
 
 // WithHost modifier adds `host.name` builtin fields to a processing pipeline
 var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
+	name := info.Name
+	if override := beat.GetHostnameOverride(); override != "" {
+		name = override
+	}
 	return mapstr.M{
 		"host": mapstr.M{
-			"name": info.Name,
+			"name": name,
 		},
 	}
 })
