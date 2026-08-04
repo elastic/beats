@@ -1098,34 +1098,39 @@ func join(fields ...string) string {
 
 // Start starts all the watchers associated with a given enricher's resource.
 func (e *enricher) Start(resourceWatchers *Watchers) {
-	watcherToStop := e.start(resourceWatchers)
-	if watcherToStop != nil {
-		watcherToStop.Stop()
-	}
-}
-
-func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
+	// Each resource may require multiple watchers. Firstly, we start the
+	// extra watchers as they are a dependency for the main resource watcher.
+	// For example a pod watcher requires namespace and node watcher to be started
+	// first.
+	//
+	// watcher.Start() calls WaitForCacheSync, which blocks until the informer
+	// syncs. When RBAC denies the LIST the informer retries indefinitely, so
+	// watcher.Start() can block for a long time. The lock must not be held
+	// across that call: Stop() needs the same lock to call watcher.Stop(),
+	// which cancels the watcher context and unblocks WaitForCacheSync.
 	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-	var watcherToStop kubernetes.Watcher
-
 	if len(e.watchedResources) == 0 {
-		return nil
+		resourceWatchers.lock.Unlock()
+		return
 	}
 
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
 	if resourceMetaWatcher == nil {
-		return nil
+		resourceWatchers.lock.Unlock()
+		return
 	}
 	registration, owned := resourceMetaWatcher.users[e]
 	if !owned || !registration.committed {
-		return nil
+		resourceWatchers.lock.Unlock()
+		return
 	}
 
-	// Each resource may require multiple watchers. Firstly, we start the
-	// extra watchers as they are a dependency for the main resource watcher
-	// For example a pod watcher requires namespace and node watcher to be started
-	// first.
+	type extraToStart struct {
+		name    string
+		meta    *metaWatcher
+		watcher kubernetes.Watcher
+	}
+	var extrasToStart []extraToStart
 	for _, resourceName := range e.watchedResources {
 		if resourceName == e.resourceName {
 			continue
@@ -1136,19 +1141,33 @@ func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
 		}
 		extraRegistration, extraOwned := extraWatcherMeta.users[e]
 		if extraOwned && extraRegistration.committed && !extraWatcherMeta.started {
-			if err := extraWatcherMeta.watcher.Start(); err != nil {
-				e.log.Warnf("Error starting %s watcher: %s", resourceName, err)
-			} else {
-				extraWatcherMeta.started = true
-			}
+			extraWatcherMeta.started = true
+			extrasToStart = append(extrasToStart, extraToStart{resourceName, extraWatcherMeta, extraWatcherMeta.watcher})
+		}
+	}
+	resourceWatchers.lock.Unlock()
+
+	for _, extra := range extrasToStart {
+		if err := extra.watcher.Start(); err != nil {
+			e.log.Warnf("Error starting %s watcher: %s", extra.name, err)
+			resourceWatchers.lock.Lock()
+			extra.meta.started = false
+			resourceWatchers.lock.Unlock()
 		}
 	}
 
 	// Start the main watcher if not already started.
 	// A pending cluster-wide replacement can be activated only after at least
-	// one cluster-scoped owner has completed construction. Start it before
-	// stopping the active watcher so a failed replacement does not interrupt
-	// metadata collection.
+	// one cluster-scoped owner has completed construction. Swap the replacement
+	// in before releasing the lock so a concurrent Stop() can cancel its context
+	// if Start() blocks.
+	resourceWatchers.lock.Lock()
+	resourceMetaWatcher = resourceWatchers.metaWatchersMap[e.resourceName]
+	if resourceMetaWatcher == nil {
+		resourceWatchers.lock.Unlock()
+		return
+	}
+
 	if resourceMetaWatcher.nodeScope && hasCommittedClusterScopedUser(resourceMetaWatcher) &&
 		resourceMetaWatcher.restartWatcher == nil && resourceMetaWatcher.restartWatcherFactory != nil {
 		restartWatcher, err := resourceMetaWatcher.restartWatcherFactory()
@@ -1158,31 +1177,59 @@ func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
 			resourceMetaWatcher.restartWatcher = restartWatcher
 		}
 	}
+
 	if resourceMetaWatcher.restartWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
-		if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
-			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
-			watcherToStop = resourceMetaWatcher.restartWatcher
-			resourceMetaWatcher.restartWatcher = nil
+		restartWatcher := resourceMetaWatcher.restartWatcher
+		wasStarted := resourceMetaWatcher.started
+		wasNodeScope := resourceMetaWatcher.nodeScope
+		wasRestartWatcherFactory := resourceMetaWatcher.restartWatcherFactory
+		// Swap in the new watcher before releasing the lock so that a concurrent
+		// Stop() call cancels the new watcher's context, not the old one.
+		var oldWatcher kubernetes.Watcher
+		if wasStarted {
+			oldWatcher = resourceMetaWatcher.replaceActiveWatcher(restartWatcher)
 		} else {
-			if resourceMetaWatcher.started {
-				watcherToStop = resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
-			} else {
-				resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
+			resourceMetaWatcher.replaceActiveWatcher(restartWatcher)
+		}
+		resourceMetaWatcher.restartWatcher = nil
+		resourceMetaWatcher.restartWatcherFactory = nil
+		resourceMetaWatcher.nodeScope = false
+		resourceMetaWatcher.started = true
+		resourceWatchers.lock.Unlock()
+
+		if err := restartWatcher.Start(); err != nil {
+			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
+			resourceWatchers.lock.Lock()
+			if resourceMetaWatcher.watcher == restartWatcher {
+				// restartWatcher failed to start; restore the previous state so the
+				// next Start() attempt can try again.
+				resourceMetaWatcher.replaceActiveWatcher(oldWatcher)
+				resourceMetaWatcher.started = wasStarted
+				resourceMetaWatcher.nodeScope = wasNodeScope
+				resourceMetaWatcher.restartWatcherFactory = wasRestartWatcherFactory
 			}
-			resourceMetaWatcher.restartWatcher = nil
-			resourceMetaWatcher.restartWatcherFactory = nil
-			resourceMetaWatcher.nodeScope = false
-			resourceMetaWatcher.started = true
+			resourceWatchers.lock.Unlock()
+			restartWatcher.Stop()
+		} else if wasStarted && oldWatcher != nil {
+			// Only stop the old watcher after the new one is confirmed running.
+			oldWatcher.Stop()
 		}
 	} else if !resourceMetaWatcher.started {
-		if err := resourceMetaWatcher.watcher.Start(); err != nil {
-			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
-		} else {
-			resourceMetaWatcher.started = true
-		}
-	}
+		mainWatcher := resourceMetaWatcher.watcher
+		resourceMetaWatcher.started = true
+		resourceWatchers.lock.Unlock()
 
-	return watcherToStop
+		if err := mainWatcher.Start(); err != nil {
+			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
+			resourceWatchers.lock.Lock()
+			if resourceMetaWatcher.watcher == mainWatcher {
+				resourceMetaWatcher.started = false
+			}
+			resourceWatchers.lock.Unlock()
+		}
+	} else {
+		resourceWatchers.lock.Unlock()
+	}
 }
 
 // releaseWatcherOwnership releases all exact watcher dependencies registered by
