@@ -425,6 +425,9 @@ These global flags are available whenever you run Filebeat.
 **`--environment`**
 :   For logging purposes, specifies the environment that Filebeat is running in. This setting is used to select a default log output when no log output is configured. Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`. If `systemd` or `container` is specified, Filebeat will log to stdout and stderr by default.
 
+**`--hostname HOSTNAME`**
+:   Overrides the hostname that Filebeat reports in events, including `host.name` and `agent.name`. Also affects `observer.hostname` if the `add_observer_metadata` processor is configured. Use this when the host cannot determine its own hostname correctly, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node hostname. Takes precedence over the `hostname` configuration field.
+
 **`--path.config`**
 :   Sets the path for configuration files. See the [Directory layout](/reference/filebeat/directory-layout.md) section for details.
 
