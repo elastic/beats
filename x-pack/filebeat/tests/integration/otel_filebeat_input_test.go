@@ -29,7 +29,10 @@ import (
 	redistestutil "github.com/elastic/beats/v7/filebeat/input/redis/testutil"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	azureblobmock "github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
-	eatestutil "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/testutil"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/testactivedirectory"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/testazuread"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/testokta"
 	gcppubsubtestutil "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub/testutil"
 	gcsmock "github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/mock"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
@@ -1380,7 +1383,7 @@ func sendUDPPacket(t *testing.T, address string, packet []byte) {
 func TestEntityAnalyticsOktaInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
-	oktaSrv := eatestutil.StartOktaServer(t)
+	oktaSrv := testokta.StartServer(t)
 	oktaDomain := strings.TrimPrefix(oktaSrv.URL, "https://")
 
 	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
@@ -1440,7 +1443,7 @@ receivers:
 func TestEntityAnalyticsJamfInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
-	jamfTenant, username, password, _ := eatestutil.StartJamfServer(t)
+	jamfTenant, username, password, _ := testjamf.StartServer(t)
 
 	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
 		name: "jamf",
@@ -1489,7 +1492,7 @@ receivers:
 		queryMust: []map[string]any{
 			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
 			{"match_phrase": map[string]any{"event.action": "device-discovered"}},
-			{"match_phrase": map[string]any{"device.id": eatestutil.JamfDeviceUDID}},
+			{"match_phrase": map[string]any{"device.id": testjamf.DeviceUDID}},
 		},
 	})
 }
@@ -1497,7 +1500,7 @@ receivers:
 func TestEntityAnalyticsAzureADInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
-	azureSrv := eatestutil.StartAzureADGraphServer(t)
+	azureSrv := testazuread.StartGraphServer(t)
 
 	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
 		name: "azure-ad",
@@ -1555,7 +1558,7 @@ receivers:
 		queryMust: []map[string]any{
 			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
 			{"match_phrase": map[string]any{"event.action": "user-discovered"}},
-			{"match_phrase": map[string]any{"user.id": eatestutil.AzureADUserID}},
+			{"match_phrase": map[string]any{"user.id": testazuread.UserID}},
 		},
 	})
 }
@@ -1563,7 +1566,7 @@ receivers:
 func TestEntityAnalyticsActiveDirectoryInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
-	ldapURL := eatestutil.StartLDAPServer(t)
+	ldapURL := testactivedirectory.StartLDAPServer(t)
 
 	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
 		name: "activedirectory",
@@ -1614,7 +1617,7 @@ receivers:
 		queryMust: []map[string]any{
 			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
 			{"match_phrase": map[string]any{"event.action": "user-discovered"}},
-			{"match_phrase": map[string]any{"user.id": eatestutil.ADUserDN}},
+			{"match_phrase": map[string]any{"user.id": testactivedirectory.UserDN}},
 		},
 	})
 }

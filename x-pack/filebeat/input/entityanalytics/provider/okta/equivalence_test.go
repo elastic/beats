@@ -14,7 +14,7 @@ import (
 	"time"
 
 	legacyokta "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/testutil"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/testokta"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 	ecokta "github.com/elastic/entcollect/provider/okta"
@@ -34,7 +34,7 @@ import (
 //   - Supervises on incremental sync is computed from the current batch
 //     only (minimal-state), vs globally from all stored users (legacy).
 func TestEquivalence_UserTypes(t *testing.T) {
-	fixture := testutil.OktaUsersJSON()
+	fixture := testokta.UsersJSON()
 
 	// Parse through legacy types.
 	var legacyUsers []legacyokta.User
@@ -64,7 +64,7 @@ func TestEquivalence_UserTypes(t *testing.T) {
 
 // TestEquivalence_DeviceTypes verifies the same JSON round-trip for devices.
 func TestEquivalence_DeviceTypes(t *testing.T) {
-	fixture := testutil.OktaDevicesJSON()
+	fixture := testokta.DevicesJSON()
 
 	var legacyDevices []legacyokta.Device
 	if err := json.Unmarshal(fixture, &legacyDevices); err != nil {
@@ -94,7 +94,7 @@ func TestEquivalence_DeviceTypes(t *testing.T) {
 // an httptest mock and verifies it produces the expected user and device
 // documents with correct group enrichment.
 func TestEquivalence_FullSync(t *testing.T) {
-	srv := testutil.StartOktaServer(t)
+	srv := testokta.StartServer(t)
 
 	cfg := ecokta.DefaultConfig()
 	cfg.Domain = strings.TrimPrefix(srv.URL, "https://")

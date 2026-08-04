@@ -22,7 +22,7 @@ import (
 	mockauth "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/testutil"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/testazuread"
 )
 
 // TestEquivalence_FullSync runs both the legacy and minimal-state EntraID
@@ -62,7 +62,7 @@ import (
 func TestEquivalence_FullSync(t *testing.T) {
 	legacyUsers, legacyDevices, legacyUserGroups, legacyDeviceGroups, legacyMFAUserIDs, legacySignIn := runLegacyFetch(t)
 
-	srv := testutil.StartAzureADGraphServer(t)
+	srv := testazuread.StartGraphServer(t)
 	minimalDocs := runMinimalFullSync(t, srv)
 
 	minimalUsers := filterDocsByKind(minimalDocs, entcollect.KindUser)

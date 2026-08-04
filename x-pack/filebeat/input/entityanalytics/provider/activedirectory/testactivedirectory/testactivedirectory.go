@@ -2,7 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package testutil
+// Package testactivedirectory provides LDAP mocks for AD entity-analytics tests.
+package testactivedirectory
 
 import (
 	"net"
@@ -13,8 +14,8 @@ import (
 	"github.com/jimlambrt/gldap"
 )
 
-// ADUserDN is the distinguished name of the first user in StartLDAPServer.
-const ADUserDN = "cn=alice,dc=example,dc=com"
+// UserDN is the distinguished name of the first user in StartLDAPServer.
+const UserDN = "cn=alice,dc=example,dc=com"
 
 // StartLDAPServer starts a gldap mock with the same fixtures as the
 // activedirectory provider equivalence tests. Returns an ldap:// URL.

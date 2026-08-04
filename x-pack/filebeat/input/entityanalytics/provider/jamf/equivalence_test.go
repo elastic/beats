@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/testutil"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 	ecjamf "github.com/elastic/entcollect/provider/jamf"
@@ -37,7 +37,7 @@ import (
 //   - Minimal-state detects API absences as deletions via idset; legacy
 //     has no equivalent detection on incremental.
 func TestEquivalence_FullSync(t *testing.T) {
-	tenant, username, password, client := testutil.StartJamfServer(t)
+	tenant, username, password, client := testjamf.StartServer(t)
 
 	legacyPayloads := runLegacyFetch(t, tenant, username, password, client)
 	minimalDocs := runMinimalFullSync(t, tenant, username, password, client)
@@ -58,11 +58,11 @@ func TestEquivalence_FullSync(t *testing.T) {
 // tag drift between the two type definitions.
 func TestEquivalence_DeviceTypes(t *testing.T) {
 	var legacy jamf.Computers
-	if err := json.Unmarshal(testutil.ComputersJSON, &legacy); err != nil {
+	if err := json.Unmarshal(testjamf.ComputersJSON, &legacy); err != nil {
 		t.Fatalf("unmarshal legacy: %v", err)
 	}
 	var ec ecjamf.Computers
-	if err := json.Unmarshal(testutil.ComputersJSON, &ec); err != nil {
+	if err := json.Unmarshal(testjamf.ComputersJSON, &ec); err != nil {
 		t.Fatalf("unmarshal entcollect: %v", err)
 	}
 

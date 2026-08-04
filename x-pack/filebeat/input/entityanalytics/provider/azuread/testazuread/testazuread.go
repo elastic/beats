@@ -2,7 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package testutil
+// Package testazuread provides httptest mocks for Azure AD entity-analytics tests.
+package testazuread
 
 import (
 	"encoding/json"
@@ -16,13 +17,13 @@ import (
 	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
 )
 
-// AzureADUserID is the ID of the first user in mockfetcher.UserResponse.
-const AzureADUserID = "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"
+// UserID is the ID of the first user in mockfetcher.UserResponse.
+const UserID = "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"
 
-// StartAzureADGraphServer starts a plain HTTP mock of Entra ID token + Graph
+// StartGraphServer starts a plain HTTP mock of Entra ID token + Graph
 // endpoints backed by azuread/fetcher/mock data (same fixtures as the azure-ad
 // provider equivalence and e2e tests).
-func StartAzureADGraphServer(t *testing.T) *httptest.Server {
+func StartGraphServer(t *testing.T) *httptest.Server {
 	t.Helper()
 
 	var srvURL string

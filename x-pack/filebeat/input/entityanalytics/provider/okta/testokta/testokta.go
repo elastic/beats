@@ -2,9 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// Package testutil provides shared httptest/LDAP mocks and fixtures for
-// entity-analytics provider tests and OTel e2e tests.
-package testutil
+// Package testokta provides httptest mocks and fixtures for Okta entity-analytics tests.
+package testokta
 
 import (
 	"net/http"
@@ -15,21 +14,21 @@ import (
 	ecokta "github.com/elastic/entcollect/provider/okta"
 )
 
-// StartOktaServer starts a TLS httptest server that serves the Okta list-users,
+// StartServer starts a TLS httptest server that serves the Okta list-users,
 // groups, and devices fixtures used by provider equivalence and e2e tests.
-func StartOktaServer(t *testing.T) *httptest.Server {
+func StartServer(t *testing.T) *httptest.Server {
 	t.Helper()
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/v1/users", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write(OktaUsersJSON())
+		_, _ = w.Write(UsersJSON())
 	})
 
 	mux.HandleFunc("/api/v1/groups", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write(OktaGroupsJSON())
+		_, _ = w.Write(GroupsJSON())
 	})
 
 	mux.HandleFunc("/api/v1/groups/g1/users", func(w http.ResponseWriter, _ *http.Request) {
@@ -44,7 +43,7 @@ func StartOktaServer(t *testing.T) *httptest.Server {
 
 	mux.HandleFunc("/api/v1/devices", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write(OktaDevicesJSON())
+		_, _ = w.Write(DevicesJSON())
 	})
 
 	mux.HandleFunc("/api/v1/devices/d1/users", func(w http.ResponseWriter, _ *http.Request) {
@@ -57,8 +56,8 @@ func StartOktaServer(t *testing.T) *httptest.Server {
 	return srv
 }
 
-// OktaUsersJSON returns the deterministic users fixture (ids u1, u2, u3).
-func OktaUsersJSON() []byte {
+// UsersJSON returns the deterministic users fixture (ids u1, u2, u3).
+func UsersJSON() []byte {
 	now := time.Date(2026, 1, 2, 12, 0, 0, 0, time.UTC)
 	return []byte(`[
 		{
@@ -88,16 +87,16 @@ func OktaUsersJSON() []byte {
 	]`)
 }
 
-// OktaGroupsJSON returns the deterministic groups fixture (ids g1, g2).
-func OktaGroupsJSON() []byte {
+// GroupsJSON returns the deterministic groups fixture (ids g1, g2).
+func GroupsJSON() []byte {
 	return []byte(`[
 		{"id": "g1", "profile": {"name": "Staff", "description": "All staff"}},
 		{"id": "g2", "profile": {"name": "Engineering", "description": "Engineering team"}}
 	]`)
 }
 
-// OktaDevicesJSON returns the deterministic devices fixture (id d1).
-func OktaDevicesJSON() []byte {
+// DevicesJSON returns the deterministic devices fixture (id d1).
+func DevicesJSON() []byte {
 	return []byte(`[
 		{
 			"id": "d1",

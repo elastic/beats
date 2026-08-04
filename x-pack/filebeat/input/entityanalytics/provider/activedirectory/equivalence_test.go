@@ -14,7 +14,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/testutil"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/testactivedirectory"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 	ecad "github.com/elastic/entcollect/provider/ad"
@@ -33,7 +33,7 @@ import (
 //     minimal-state uses idset. First-sync output (no prior state) should
 //     match for discovered entities.
 func TestEquivalence_FullSync(t *testing.T) {
-	url := testutil.StartLDAPServer(t)
+	url := testactivedirectory.StartLDAPServer(t)
 
 	// Run the legacy provider's data extraction.
 	legacyUsers, legacyDevices := runLegacyFetch(t, url)
@@ -111,7 +111,7 @@ func runLegacyFetch(t *testing.T, url string) (users, devices []json.RawMessage)
 // attributes regardless of the request list, so this test exercises the
 // entcollect withMandatory logic rather than the LDAP server filtering.
 func TestMinimalFullSync_ConfiguredAttrs(t *testing.T) {
-	url := testutil.StartLDAPServer(t)
+	url := testactivedirectory.StartLDAPServer(t)
 
 	cfg := ecad.DefaultConfig()
 	cfg.URL = url

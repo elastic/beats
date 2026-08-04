@@ -2,7 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package testutil
+// Package testjamf provides httptest mocks and fixtures for Jamf entity-analytics tests.
+package testjamf
 
 import (
 	_ "embed"
@@ -21,22 +22,22 @@ import (
 var ComputersJSON []byte
 
 const (
-	// JamfUsername is the Basic-auth username accepted by StartJamfServer.
-	JamfUsername = "testuser"
-	// JamfPassword is the Basic-auth password accepted by StartJamfServer.
-	JamfPassword = "testpassword"
-	// JamfDeviceUDID is the UDID of the first computer in ComputersJSON.
-	JamfDeviceUDID = "5982CE36-4526-580B-B4B9-ECC6782535BC"
+	// Username is the Basic-auth username accepted by StartServer.
+	Username = "testuser"
+	// Password is the Basic-auth password accepted by StartServer.
+	Password = "testpassword"
+	// DeviceUDID is the UDID of the first computer in ComputersJSON.
+	DeviceUDID = "5982CE36-4526-580B-B4B9-ECC6782535BC"
 )
 
-// StartJamfServer starts a TLS httptest server that serves token + computers
+// StartServer starts a TLS httptest server that serves token + computers
 // endpoints using ComputersJSON. Returns the tenant host (no scheme),
 // credentials, and an HTTP client that trusts the test server certificate.
-func StartJamfServer(t *testing.T) (tenant, username, password string, client *http.Client) {
+func StartServer(t *testing.T) (tenant, username, password string, client *http.Client) {
 	t.Helper()
 
-	username = JamfUsername
-	password = JamfPassword
+	username = Username
+	password = Password
 
 	var tokenMu sync.Mutex
 	var currentToken string
