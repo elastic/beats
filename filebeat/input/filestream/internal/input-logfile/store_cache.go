@@ -57,8 +57,11 @@ type storeCache struct {
 
 var globalStoreCache = storeCache{entries: make(map[string]*storeCacheEntry)}
 
+// acquireStore returns the shared store for a backend. The first caller initializes it;
+// concurrent callers wait, and callers arriving during draining wait for its replacement.
 func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*store, error) {
 	key := states.StoreKey()
+	// Retry after a concurrent initialization or draining store has completed.
 	for {
 		globalStoreCache.mu.Lock()
 		entry := globalStoreCache.entries[key]
@@ -79,12 +82,12 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 			users := entry.users
 			entry.store.Retain()
 			globalStoreCache.mu.Unlock()
-			logger.Debugw("filestream shared store cache hit", "key", key, "users", users)
+			logger.Debugw("filestream shared store cache hit", "filestream_store_key", key, "store_users_count", users)
 			return entry.store, nil
 		case storeInitializing:
 			ready := entry.ready
 			globalStoreCache.mu.Unlock()
-			logger.Debugw("waiting for filestream shared store initialization", "key", key)
+			logger.Debugw("waiting for filestream shared store initialization", "filestream_store_key", key)
 			<-ready
 			if entry.initErr != nil {
 				return nil, entry.initErr
@@ -93,14 +96,14 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 			closed := entry.closed
 			globalStoreCache.mu.Unlock()
 			started := time.Now()
-			logger.Debugw("waiting for draining filestream shared store", "key", key)
+			logger.Debugw("waiting for draining filestream shared store", "filestream_store_key", key)
 			<-closed
 			logger.Debugw(
 				fmt.Sprintf(
 					"finished waiting for draining filestream shared store. Waited for %s",
 					time.Since(started),
 				),
-				"key", key,
+				"filestream_store_key", key,
 			)
 		}
 	}
@@ -114,7 +117,7 @@ func initializeStoreCacheEntry(
 	prefix string,
 ) (*store, error) {
 
-	logger.Debugw("initializing filestream shared store cache entry", "key", key)
+	logger.Debugw("initializing filestream shared store cache entry", "filestream_store_key", key)
 	s, err := openStore(logger, states, prefix)
 	if err != nil {
 		globalStoreCache.mu.Lock()
@@ -156,17 +159,17 @@ func initializeStoreCacheEntry(
 	globalStoreCache.mu.Unlock()
 	logger.Debugw(
 		"initialized filestream shared store cache entry",
-		"key", key,
+		"filestream_store_key", key,
 		"interval", interval,
-		"users", 1,
+		"store_users_count", 1,
 	)
 
 	go func() {
 		defer entry.cleanerWg.Done()
 		defer entry.store.Release()
-		logger.Debugw("filestream shared store cleaner started", "key", key)
+		logger.Debugw("filestream shared store cleaner started", "filestream_store_key", key)
 		(&cleaner{log: logger}).run(ctx, s, interval)
-		logger.Debugw("filestream shared store cleaner stopped", "key", key)
+		logger.Debugw("filestream shared store cleaner stopped", "filestream_store_key", key)
 	}()
 	return s, nil
 }
@@ -183,7 +186,7 @@ func releaseAcquiredStore(logger *logp.Logger, s *store) {
 	users := entry.users
 	if users > 0 {
 		globalStoreCache.mu.Unlock()
-		logger.Debugw("released filestream shared store", "users", users)
+		logger.Debugw("released filestream shared store", "store_users_count", users)
 		s.Release()
 		return
 	}
