@@ -182,9 +182,10 @@ func releaseAcquiredStore(logger *logp.Logger, s *store) {
 		return
 	}
 	entry.users--
+	users := entry.users
 	if entry.users > 0 {
 		globalStoreCache.mu.Unlock()
-		logger.Debugw("released filestream shared store", "store_users_count", entry.users)
+		logger.Debugw("released filestream shared store", "store_users_count", users)
 		s.Release()
 		return
 	}
