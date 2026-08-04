@@ -16,6 +16,7 @@ import (
 
 	// For testdata/computers.json
 	_ "embed"
+
 	"github.com/gofrs/uuid/v5"
 )
 
