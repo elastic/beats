@@ -798,10 +798,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// HostnameFlag is bound to the --hostname Cobra flag exposed in root.go.
-// It is intentionally not advertised: elastic-agent uses it to pass the correct
-// node hostname to managed beats in environments where os.Hostname() is unreliable
-// (e.g. Kubernetes pods without hostNetwork).
+// HostnameFlag holds the value of the --hostname flag.
 var HostnameFlag string
 
 // handleFlags invokes the HandleFlags callback if implemented by the Beat.
