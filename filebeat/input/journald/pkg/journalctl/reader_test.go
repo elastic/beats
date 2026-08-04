@@ -61,7 +61,8 @@ func TestEventWithNonStringData(t *testing.T) {
 				NextFunc: func(canceler input.Canceler) ([]byte, error) {
 					return rawEvent, nil
 				},
-				KillFunc: func() error { return nil },
+				KillFunc:            func() error { return nil },
+				SetReadDeadlineFunc: func(time.Time) bool { return true },
 			}
 			r := Reader{
 				logger: logptest.NewTestingLogger(t, ""),
@@ -87,7 +88,8 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		NextFunc: func(canceler input.Canceler) ([]byte, error) {
 			return jdEvent, errors.New("journalctl exited with code 42")
 		},
-		KillFunc: func() error { return nil },
+		KillFunc:            func() error { return nil },
+		SetReadDeadlineFunc: func(time.Time) bool { return true },
 	}
 
 	versionMock := JctlMock{
@@ -286,7 +288,8 @@ func TestReaderReportsDegradedOnRestartLoop(t *testing.T) {
 				}
 				return jdEvent, nil
 			},
-			KillFunc: func() error { return nil },
+			KillFunc:            func() error { return nil },
+			SetReadDeadlineFunc: func(time.Time) bool { return true },
 		}, nil
 	}
 

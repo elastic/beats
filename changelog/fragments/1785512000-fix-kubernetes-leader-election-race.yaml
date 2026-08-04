@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Prevent stale autodiscover resources after Kubernetes leadership changes.
+
+component: libbeat
