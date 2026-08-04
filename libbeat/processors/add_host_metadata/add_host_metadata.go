@@ -219,7 +219,6 @@ func (p *addHostMetadata) fetchData(useFQDN bool) (mapstr.M, error) {
 
 	data := host.MapHostInfo(hInfo, hostname)
 
-	// MapHostInfo lowercases host.name; apply the override after to preserve casing.
 	if override := beat.GetHostnameOverride(); override != "" {
 		if _, err := data.Put("host.name", override); err != nil {
 			return nil, fmt.Errorf("could not set host.name override: %w", err)

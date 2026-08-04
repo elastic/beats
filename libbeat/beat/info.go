@@ -29,20 +29,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-// hostnameOverride is set when the --hostname flag or the hostname config field
-// is provided.
-// It is read by processors (add_host_metadata, add_observer_metadata) that
-// cannot receive per-beat state through their constructor interface.
-// In a single-beat process this is written before any processor runs. In a process
-// with multiple beat receivers, the last configured override wins and affects all
-// receivers' processors. This is a known limitation of using a process-wide global;
-// each beat still manages its own Info fields.
 var hostnameOverride atomic.Pointer[string]
 
-// SetHostnameOverride sets the process-wide hostname override used by processors
-// that cannot receive per-beat state (add_host_metadata, add_observer_metadata).
-// The value is trimmed but its casing is kept: whoever passes the hostname decides it.
-// Pass "" to clear any previously set override.
+// SetHostnameOverride sets the process-wide hostname override.
+// The value is trimmed; casing is preserved. Pass "" to clear.
 func SetHostnameOverride(h string) {
 	h = strings.TrimSpace(h)
 	if h == "" {

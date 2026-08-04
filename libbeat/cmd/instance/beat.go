@@ -927,7 +927,6 @@ func (b *Beat) configure(settings Settings) error {
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// The hostname override applies to the FQDN too, so skip the lookup.
 	if b.hostnameOverride == "" {
 		// Try to get the host's FQDN and set it.
 		h, err := sysinfo.Host()

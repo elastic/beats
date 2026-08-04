@@ -182,9 +182,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("could not parse features: %w", err)
 	}
 
-	// Receivers never see CLI flags, so the config field is the only way to override
-	// the hostname here. It has to happen before RegisterHostname, so monitoring
-	// reports the same hostname as the events.
 	b.ApplyHostname(b.Config.Hostname, "config hostname field")
 
 	b.RegisterHostname(features.FQDN())
@@ -210,7 +207,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// The hostname override applies to the FQDN too, so skip the lookup.
 	if b.HostnameOverride() == "" {
 		// Try to get the host's FQDN and set it.
 		fqdn, err := fqdnOnce()
