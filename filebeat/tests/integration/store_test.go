@@ -66,6 +66,7 @@ logging:
   selectors:
     - input
     - input.filestream
+    - input.filestream.store_cache
 `
 
 func TestStore(t *testing.T) {
