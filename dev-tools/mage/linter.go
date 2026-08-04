@@ -25,22 +25,35 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
 const (
-	linterVersion    = "v2.11.4"
-	linterInstallURL = "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
+	defaultLinterVersion = "v2.12.2"
+	linterInstallURL     = "https://golangci-lint.run/install.sh"
 )
 
 var (
-	linterConfigFilename = filepath.Join(".", ".golangci.yml")
-	linterInstallDir     = filepath.Join(".", "build")
-	linterInstallFile    = filepath.Join(linterInstallDir, "install-golang-ci.sh")
-	linterBinaryFile     = filepath.Join(linterInstallDir, linterVersion, "golangci-lint")
+	linterConfigFilename  = filepath.Join(".", ".golangci.yml")
+	linterVersionFilename = filepath.Join(".", ".golangci-lint-version")
+	linterInstallDir      = filepath.Join(".", "build")
+	linterInstallFile     = filepath.Join(linterInstallDir, "install-golang-ci.sh")
+	linterBinaryFile      = filepath.Join(linterInstallDir, linterVersion(), "golangci-lint")
 )
+
+func linterVersion() string {
+	b, err := os.ReadFile(linterVersionFilename)
+	if err != nil {
+		return defaultLinterVersion
+	}
+	if v := strings.TrimSpace(string(b)); v != "" {
+		return v
+	}
+	return defaultLinterVersion
+}
 
 // Linter contains targets related to linting the Go code
 type Linter mg.Namespace
@@ -116,7 +129,7 @@ func install(force bool) error {
 	}
 
 	// there must be no space after `-b`, otherwise the script does not work correctly ¯\_(ツ)_/¯
-	return sh.Run(linterInstallFile, "-b"+binaryDir, linterVersion)
+	return sh.Run(linterInstallFile, "-b"+binaryDir, linterVersion())
 }
 
 // All runs the linter against the entire codebase
