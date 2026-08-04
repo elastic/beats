@@ -104,9 +104,7 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		},
 		hostInfoFactory: func() (hostInfo, error) { return sysinfo.Host() },
 	}
-	// Fetch and cache the initial host data. Any hostname override
-	// (beat.SetHostnameOverride) must be applied before constructing this
-	// processor — the override is sampled here and cached until TTL expiry.
+	// Fetch and cache the initial host data.
 	if _, err := p.loadData(features.FQDN()); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
 	}
