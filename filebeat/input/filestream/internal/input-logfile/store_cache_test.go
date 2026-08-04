@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestStoreCache_AcquireHit(t *testing.T) {
@@ -76,7 +75,7 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	})
 	t.Cleanup(cleanup)
 
-	logger := logptest.NewTestingLogger(t, "")
+	logger := logp.NewNopLogger()
 	states := createSampleStore(t, nil).WithGCPeriod(time.Hour)
 	first, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
@@ -162,7 +161,7 @@ func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 	t.Cleanup(cleanup)
 
 	states := newCountingStateStore("last-reference-backend")
-	logger := logptest.NewTestingLogger(t, "")
+	logger := logp.NewNopLogger()
 	acquired, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
 	// Model getRetainedStore ownership. A premature cache close while this
