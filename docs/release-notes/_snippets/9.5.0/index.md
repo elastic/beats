@@ -37,53 +37,13 @@
 * Add minimal-state Okta entity analytics provider with bulk-fetch group enrichment. [#50685](https://github.com/elastic/beats/pull/50685) 
 * Add minimal-state mode for the EntraID entity analytics provider. [#50773](https://github.com/elastic/beats/pull/50773) 
 * Add Enhanced Fingerprint mode to the filestream input's `fingerprint` file identity. [#50566](https://github.com/elastic/beats/pull/50566) [#50116](https://github.com/elastic/beats/issues/50116)
-* Add Filestream scanner metrics to monitoring logs. [#50963](https://github.com/elastic/beats/pull/50963) 
-
-  The following Filestream metrics are added to the logs and the `/stats` HTTP endpoint:
-   - files_empty
-   - files_ignored
-   - files_matched
-   - files_no_ingest_target
-   - files_unique
-  
-  The metrics are gauges aggregated from all running Filestream inputs
-  
-* Add Elasticsearch-backed state store support for entity-analytics agentless deployments. [#51210](https://github.com/elastic/beats/pull/51210) 
-
-  The entity-analytics minimal-state input can now use an Elasticsearch-backed
-  state store when running in agentless mode. State is persisted to an
-  Elasticsearch index (agentless-state-&lt;input-id&gt;) instead of local bbolt,
-  enabling stateless pod scheduling. The store backend is selected automatically
-  based on the AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES environment
-  variable set by the agentless controller.
-  
+* Add filestream scanner metrics to monitoring logs. [#50963](https://github.com/elastic/beats/pull/50963)
+* Add Elasticsearch-backed state store support for entity-analytics Elastic Managed integration deployments. [#51210](https://github.com/elastic/beats/pull/51210)
 * Reduce allocations in filestream by pooling the per-file LineReader scratch buffer. [#51197](https://github.com/elastic/beats/pull/51197) 
-* Add emit macro, stream producers, and lazy JSON decode to the CEL input. [#51279](https://github.com/elastic/beats/pull/51279) 
-
-  Add the emit macro for publishing events during CEL evaluation instead of
-  collecting them in the state.events array. Combined with stream_gzip,
-  stream_zip, and decode_json_stream_lazy, this enables streaming
-  decompression and decoding of large payloads without holding all records
-  in memory.
-  
+* Add emit macro, stream producers, and lazy JSON decode to the CEL input. [#51279](https://github.com/elastic/beats/pull/51279)
 * Promote the `winlog` input to GA (generally available). [#51557](https://github.com/elastic/beats/pull/51557) 
-* Add v2 aws-s3 input with adaptive flow control. [#51598](https://github.com/elastic/beats/pull/51598) 
-
-  The aws-s3 input has been rewritten with a simpler architecture, adaptive
-  concurrency control, and unified state management. The new implementation can
-  be enabled by setting features.aws_s3_v2.enabled: true in the beat
-  configuration.
-  
-* Add Filestream harvester metrics to monitoring logs. [#51077](https://github.com/elastic/beats/pull/51077) [#36653](https://github.com/elastic/beats/issues/36653)
-
-  The following Filestream metrics are added to the logs and the `/stats` HTTP endpoint:
-   - files_ingested_percent_100
-   - files_ingested_percent_95_99
-   - files_ingested_percent_lt_95
-  
-  These gauges are aggregated across all running Filestream inputs and
-  count active plain-file harvesters only.
-  
+* Add v2 `aws-s3` input with adaptive flow control. [#51598](https://github.com/elastic/beats/pull/51598)
+* Add filestream harvester metrics to monitoring logs. [#51077](https://github.com/elastic/beats/pull/51077) [#36653](https://github.com/elastic/beats/issues/36653)
 * Add sign-in activity enrichment to the minimal-state EntraID entity analytics provider. [#51724](https://github.com/elastic/beats/pull/51724) 
 * Aggregate SQS mode health status to reduce false Degraded/Healthy transitions. [#51819](https://github.com/elastic/beats/pull/51819) [#51692](https://github.com/elastic/beats/issues/51692)
 
