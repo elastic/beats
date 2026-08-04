@@ -142,7 +142,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 
 func (cim *InputManager) shutdown() {
 	cim.ackUpdater.Close()
-	releaseAcquiredStore(cim.store)
+	releaseAcquiredStore(cim.Logger, cim.store)
 }
 
 // Create builds a new v2.Input using the provided Configure function.

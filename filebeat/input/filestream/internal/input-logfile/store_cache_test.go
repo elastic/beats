@@ -60,8 +60,8 @@ func TestStoreCache_AcquireHit(t *testing.T) {
 		return logs.FilterMessage("filestream shared store cleaner started").Len() == 1
 	}, time.Second, time.Millisecond)
 
-	releaseAcquiredStore(first)
-	releaseAcquiredStore(second)
+	releaseAcquiredStore(logger, first)
+	releaseAcquiredStore(logger, second)
 }
 
 func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
@@ -76,13 +76,14 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	})
 	t.Cleanup(cleanup)
 
+	logger := logptest.NewTestingLogger(t, "")
 	states := createSampleStore(t, nil).WithGCPeriod(time.Hour)
-	first, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	first, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
-	second, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	second, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
 
-	releaseAcquiredStore(first)
+	releaseAcquiredStore(logger, first)
 	entry := snapshotStoreCacheEntry(states.StoreKey())
 	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
@@ -90,7 +91,7 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 
 	released := make(chan struct{})
 	go func() {
-		releaseAcquiredStore(second)
+		releaseAcquiredStore(logger, second)
 		close(released)
 	}()
 	<-closeStarted
@@ -113,7 +114,7 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	first, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
 	first.Retain() // Hold a short-lived getRetainedStore-style reference.
-	releaseAcquiredStore(first)
+	releaseAcquiredStore(logger, first)
 
 	entry := snapshotStoreCacheEntry(states.StoreKey())
 	require.True(t, entry.found)
@@ -147,7 +148,7 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	require.NoError(t, acquired.err)
 	require.Equal(t, int32(2), states.storeForCalls.Load())
 	require.NotSame(t, first, acquired.store, "new store must be different from the first one")
-	releaseAcquiredStore(acquired.store)
+	releaseAcquiredStore(logger, acquired.store)
 }
 
 func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
@@ -161,7 +162,8 @@ func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 	t.Cleanup(cleanup)
 
 	states := newCountingStateStore("last-reference-backend")
-	acquired, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "filestream")
+	logger := logptest.NewTestingLogger(t, "")
+	acquired, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
 	// Model getRetainedStore ownership. A premature cache close while this
 	// reference exists would leave an active caller using a closed store.
@@ -170,7 +172,7 @@ func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 	// This drops manager ownership and stops the cleaner, which drops cache
 	// ownership. Forgetting the latter leaks the implicit RefCount owner and
 	// prevents the store from ever closing.
-	releaseAcquiredStore(acquired)
+	releaseAcquiredStore(logger, acquired)
 	require.Zero(t, closes.Load(), "the short-lived reference keeps the store open")
 
 	// The final short-lived reference must be sufficient to close the store;
@@ -228,7 +230,7 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 		acquiredStores = append(acquiredStores, result.store)
 	}
 	for _, acquired := range acquiredStores {
-		releaseAcquiredStore(acquired)
+		releaseAcquiredStore(logger, acquired)
 	}
 	require.Equal(t, int32(1), states.storeForCalls.Load())
 }
@@ -278,7 +280,7 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 	retried, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
 	require.Equal(t, int32(2), states.storeForCalls.Load())
-	releaseAcquiredStore(retried)
+	releaseAcquiredStore(logger, retried)
 }
 
 func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
@@ -303,14 +305,15 @@ func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
 		return logs.FilterMessage("filestream shared store cleaner started").Len() == 2
 	}, time.Second, time.Millisecond)
 
-	releaseAcquiredStore(first)
-	releaseAcquiredStore(second)
+	releaseAcquiredStore(logger, first)
+	releaseAcquiredStore(logger, second)
 }
 
 func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
 	setupStoreCacheTest(t)
 
 	states := newCountingStateStore("concurrent-acquire-release-backend")
+	logger := logp.NewNopLogger()
 	const workers = 10
 	const iterations = 20
 	errs := make(chan error, workers*iterations)
@@ -320,12 +323,12 @@ func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
 		wg.Go(func() {
 			<-start
 			for range iterations {
-				s, err := acquireStore(logp.NewNopLogger(), states, "filestream")
+				s, err := acquireStore(logger, states, "filestream")
 				if err != nil {
 					errs <- err
 					continue
 				}
-				releaseAcquiredStore(s)
+				releaseAcquiredStore(logger, s)
 			}
 		})
 	}

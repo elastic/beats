@@ -48,7 +48,6 @@ type storeCacheEntry struct {
 	cancel     context.CancelFunc
 	cleanerWg  sync.WaitGroup
 	interval   time.Duration
-	logger     *logp.Logger
 }
 
 type storeCache struct {
@@ -68,7 +67,6 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 				state:  storeInitializing,
 				ready:  make(chan struct{}),
 				closed: make(chan struct{}),
-				logger: logger,
 			}
 			globalStoreCache.entries[key] = entry
 			globalStoreCache.mu.Unlock()
@@ -81,12 +79,12 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 			users := entry.users
 			entry.store.Retain()
 			globalStoreCache.mu.Unlock()
-			entry.logger.Debugw("filestream shared store cache hit", "key", key, "users", users)
+			logger.Debugw("filestream shared store cache hit", "key", key, "users", users)
 			return entry.store, nil
 		case storeInitializing:
 			ready := entry.ready
 			globalStoreCache.mu.Unlock()
-			entry.logger.Debugw("waiting for filestream shared store initialization", "key", key)
+			logger.Debugw("waiting for filestream shared store initialization", "key", key)
 			<-ready
 			if entry.initErr != nil {
 				return nil, entry.initErr
@@ -95,9 +93,9 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 			closed := entry.closed
 			globalStoreCache.mu.Unlock()
 			started := time.Now()
-			entry.logger.Debugw("waiting for draining filestream shared store", "key", key)
+			logger.Debugw("waiting for draining filestream shared store", "key", key)
 			<-closed
-			entry.logger.Debugw(
+			logger.Debugw(
 				fmt.Sprintf(
 					"finished waiting for draining filestream shared store. Waited for %s",
 					time.Since(started),
@@ -173,7 +171,7 @@ func initializeStoreCacheEntry(
 	return s, nil
 }
 
-func releaseAcquiredStore(s *store) {
+func releaseAcquiredStore(logger *logp.Logger, s *store) {
 	globalStoreCache.mu.Lock()
 	entry := s.cacheEntry
 	if entry == nil || entry.state != storeActive {
@@ -185,16 +183,16 @@ func releaseAcquiredStore(s *store) {
 	users := entry.users
 	if users > 0 {
 		globalStoreCache.mu.Unlock()
-		entry.logger.Debugw("released filestream shared store", "users", users)
+		logger.Debugw("released filestream shared store", "users", users)
 		s.Release()
 		return
 	}
 	entry.state = storeDraining
 	globalStoreCache.mu.Unlock()
-	entry.logger.Debug("draining filestream shared store")
+	logger.Debug("draining filestream shared store")
 	entry.cancel()
 	entry.cleanerWg.Wait()
-	entry.logger.Debug("releasing filestream shared store cache reference")
+	logger.Debug("releasing filestream shared store cache reference")
 	s.Release()
 }
 

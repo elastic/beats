@@ -75,10 +75,11 @@ func TestStore_OpenClose(t *testing.T) {
 		})
 		defer cleanup()
 
+		logger := logptest.NewTestingLogger(t, "")
 		states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
-		store, err := acquireStore(logptest.NewTestingLogger(t, ""), states, "test")
+		store, err := acquireStore(logger, states, "test")
 		require.NoError(t, err)
-		releaseAcquiredStore(store)
+		releaseAcquiredStore(logger, store)
 
 		require.True(t, closed)
 	})
