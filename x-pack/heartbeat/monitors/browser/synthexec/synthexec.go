@@ -281,7 +281,7 @@ func runCmd(
 		return nil, err
 	}
 
-	// Start the command before this reader because cmd.Start reads ExtraFiles.
+	// After cmd.Start: ExtraFiles must stay open until the child inherits them.
 	wg.Go(func() {
 		defer jsonReader.Close()
 
