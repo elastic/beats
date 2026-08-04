@@ -222,28 +222,57 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Watch input configuration updates
 	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
-	// Apply the OTel status factory wrapper and report Running for each
-	// configured input. This must happen before the osqueryd setup so that
-	// status events reach the host even in environments where osqueryd is
-	// unavailable. The pattern mirrors heartbeat, which wraps its monitor
-	// factory before loading monitors. osquerybeat drives the shim factory
-	// manually because it does not use cfgfile runner management.
+	// Set up OTel status shim runner tracking. reconcileOtelRunners starts a
+	// shim runner for each added input and stops runners for removed inputs so
+	// that per-input componentstatus events stay current for both static and
+	// dynamically delivered configs. This must happen before the osqueryd
+	// setup so that status events reach the host even in environments where
+	// osqueryd is unavailable.
+	var (
+		otelFactory cfgfile.RunnerFactory
+		otelRunners = make(map[string]cfgfile.Runner)
+	)
 	if bt.otelStatusFactoryWrapper != nil {
-		factory := bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
-		for i := range bt.config.Inputs {
-			rawCfg, cfgErr := conf.NewConfigFrom(&bt.config.Inputs[i])
-			if cfgErr != nil {
-				bt.log.Warnf("otel status: failed to build config for input %d: %v", i, cfgErr)
+		otelFactory = bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
+	}
+	inputKey := func(idx int, ic config.InputConfig) string {
+		if ic.ID != "" {
+			return ic.ID
+		}
+		return fmt.Sprintf("index:%d", idx)
+	}
+	reconcileOtelRunners := func(inputs []config.InputConfig) {
+		if otelFactory == nil {
+			return
+		}
+		newKeys := make(map[string]struct{}, len(inputs))
+		for i := range inputs {
+			key := inputKey(i, inputs[i])
+			newKeys[key] = struct{}{}
+			if _, exists := otelRunners[key]; exists {
 				continue
 			}
-			runner, cfgErr := factory.Create(b.Publisher, rawCfg)
+			rawCfg, cfgErr := conf.NewConfigFrom(&inputs[i])
 			if cfgErr != nil {
-				bt.log.Warnf("otel status: failed to create status runner for input %d: %v", i, cfgErr)
+				bt.log.Warnf("otel status: failed to build config for input %s: %v", key, cfgErr)
+				continue
+			}
+			runner, cfgErr := otelFactory.Create(b.Publisher, rawCfg)
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to create status runner for input %s: %v", key, cfgErr)
 				continue
 			}
 			runner.Start()
+			otelRunners[key] = runner
+		}
+		for key, runner := range otelRunners {
+			if _, ok := newKeys[key]; !ok {
+				runner.Stop()
+				delete(otelRunners, key)
+			}
 		}
 	}
+	reconcileOtelRunners(bt.config.Inputs)
 
 	// Create socket path
 	socketPath, cleanupFn, err := osqd.CreateSocketPath()
@@ -362,6 +391,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				if err != nil {
 					bt.log.Errorf("Failed to configure osquery runner, err: %v", err)
 				}
+				reconcileOtelRunners(inputConfigs)
 			}
 		}
 	})
