@@ -199,13 +199,7 @@ func (p *addHostMetadata) fetchData(useFQDN bool) (mapstr.M, error) {
 	hInfo := h.Info()
 	hostname := hInfo.Hostname
 
-	// host.hostname is set by MapHostInfo from sysinfo and still reflects the OS
-	// hostname even when an override is active — this is intentional (ECS: "as
-	// reported by the OS"). Only host.name is redirected to the override value.
-	if override := beat.GetHostnameOverride(); override != "" {
-		p.logger.Debugf("using hostname override %q for host.name (host.hostname still reflects OS value)", override)
-		hostname = override
-	} else if useFQDN {
+	if useFQDN {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
 
@@ -226,6 +220,14 @@ func (p *addHostMetadata) fetchData(useFQDN bool) (mapstr.M, error) {
 	}
 
 	data := host.MapHostInfo(hInfo, hostname)
+
+	// MapHostInfo lowercases host.name; apply the override after to preserve casing.
+	if override := beat.GetHostnameOverride(); override != "" {
+		if _, err := data.Put("host.name", override); err != nil {
+			return nil, fmt.Errorf("could not set host.name override: %w", err)
+		}
+	}
+
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()

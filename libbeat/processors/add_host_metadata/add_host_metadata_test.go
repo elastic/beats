@@ -214,7 +214,7 @@ func TestHostnameOverride(t *testing.T) {
 
 	v, err := newEvent.GetValue("host.name")
 	require.NoError(t, err)
-	assert.Equal(t, "override-host", v, "host.name keeps the processor's existing lowercase behavior")
+	assert.Equal(t, "Override-Host", v, "host.name preserves casing of the override")
 }
 
 func TestHostnameOverrideLosesToConfigName(t *testing.T) {

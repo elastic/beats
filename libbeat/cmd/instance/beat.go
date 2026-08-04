@@ -804,16 +804,14 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 // (e.g. Kubernetes pods without hostNetwork).
 var HostnameFlag string
 
-// handleFlags applies values already parsed by Cobra and invokes the
-// HandleFlags callback if implemented by the Beat.
+// handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	b.ApplyHostname(HostnameFlag, "--hostname flag")
 	return cfgfile.HandleFlags()
 }
 
 // ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
 // hostname override used by processors (add_host_metadata, add_observer_metadata).
-// It is a no-op when h is empty or blank. Must be called before RegisterHostname.
+// It is a no-op when h is empty or blank.
 func (b *Beat) ApplyHostname(h, source string) {
 	if strings.TrimSpace(h) == "" {
 		return
@@ -897,9 +895,11 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
 
-	if b.hostnameOverride == "" {
-		b.ApplyHostname(b.Config.Hostname, "config hostname field")
+	hostname := b.Config.Hostname
+	if HostnameFlag != "" {
+		hostname = HostnameFlag
 	}
+	b.ApplyHostname(hostname, "hostname config")
 
 	b.RegisterHostname(features.FQDN())
 

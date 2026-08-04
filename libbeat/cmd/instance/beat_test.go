@@ -88,7 +88,7 @@ func initBeatTestEnv(t *testing.T) {
 	t.Cleanup(func() { monitoring.GetNamespace("info").SetRegistry(nil) })
 }
 
-func TestHostnameFlagSetsBeatName(t *testing.T) {
+func TestHostnameFlagSetsHostname(t *testing.T) {
 	initBeatTestEnv(t)
 
 	HostnameFlag = "  Flag-Hostname  "
@@ -98,10 +98,10 @@ func TestHostnameFlagSetsBeatName(t *testing.T) {
 	b, err := NewInitializedBeat(Settings{})
 	require.NoError(t, err)
 
-	assert.Equal(t, "Flag-Hostname", b.Info.Hostname, "the flag value is trimmed and its casing is preserved")
-	assert.Equal(t, "Flag-Hostname", b.Info.Name)
+	assert.Equal(t, "Flag-Hostname", b.Info.Hostname, "flag value is trimmed and casing preserved")
 	assert.Equal(t, "Flag-Hostname", b.Info.FQDN)
 	assert.Equal(t, "Flag-Hostname", beat.GetHostnameOverride())
+	assert.NotEqual(t, "Flag-Hostname", b.Info.Name, "hostname flag must not affect agent.name")
 }
 
 func TestHostnameRegisteredInMonitoring(t *testing.T) {
@@ -144,7 +144,7 @@ func TestHostnameFlagEmptyKeepsProcessOverride(t *testing.T) {
 	assert.NotEmpty(t, b.Info.FQDN, "FQDN lookup must still run when this beat has no override")
 }
 
-func TestConfigNameWinsOverHostnameFlag(t *testing.T) {
+func TestNameAndHostnameFlagAreIndependent(t *testing.T) {
 	initBeatTestEnv(t)
 
 	HostnameFlag = "flag-hostname"
@@ -154,10 +154,10 @@ func TestConfigNameWinsOverHostnameFlag(t *testing.T) {
 	b, err := NewInitializedBeat(Settings{})
 	require.NoError(t, err)
 
-	assert.Equal(t, "TestMonitoringNameFromConfig", b.Info.Name, "name: from config should override --hostname flag")
-	assert.Equal(t, "flag-hostname", b.Info.Hostname, "Hostname should still be the flag value")
-	assert.Equal(t, "flag-hostname", b.Info.FQDN, "FQDN should still be the flag value")
-	assert.Equal(t, "flag-hostname", beat.GetHostnameOverride(), "override should survive config name taking precedence")
+	assert.Equal(t, "TestMonitoringNameFromConfig", b.Info.Name)
+	assert.Equal(t, "flag-hostname", b.Info.Hostname)
+	assert.Equal(t, "flag-hostname", b.Info.FQDN)
+	assert.Equal(t, "flag-hostname", beat.GetHostnameOverride())
 }
 
 func TestConfigHostnameField(t *testing.T) {
@@ -169,9 +169,9 @@ func TestConfigHostnameField(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "config-hostname", b.Info.Hostname)
-	assert.Equal(t, "config-hostname", b.Info.Name)
 	assert.Equal(t, "config-hostname", b.Info.FQDN)
 	assert.Equal(t, "config-hostname", beat.GetHostnameOverride())
+	assert.NotEqual(t, "config-hostname", b.Info.Name, "hostname: must not affect agent.name")
 }
 
 func TestConfigHostnameFieldIsTrimmed(t *testing.T) {
@@ -182,13 +182,13 @@ func TestConfigHostnameFieldIsTrimmed(t *testing.T) {
 	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
 	require.NoError(t, err)
 
-	assert.Equal(t, "Node-A", b.Info.Hostname, "config hostname should be trimmed and preserve its casing")
-	assert.Equal(t, "Node-A", b.Info.Name)
+	assert.Equal(t, "Node-A", b.Info.Hostname, "hostname is trimmed and casing is preserved")
 	assert.Equal(t, "Node-A", b.Info.FQDN)
 	assert.Equal(t, "Node-A", beat.GetHostnameOverride())
+	assert.NotEqual(t, "Node-A", b.Info.Name, "hostname: must not affect agent.name")
 }
 
-func TestConfigNameWinsOverConfigHostname(t *testing.T) {
+func TestNameAndConfigHostnameAreIndependent(t *testing.T) {
 	initBeatTestEnv(t)
 
 	require.NoError(t, flag.Set("c", "testdata/nameandhostnameset.yml"))
@@ -196,13 +196,13 @@ func TestConfigNameWinsOverConfigHostname(t *testing.T) {
 	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
 	require.NoError(t, err)
 
-	assert.Equal(t, "config-name", b.Info.Name, "name: from config should override the hostname field")
+	assert.Equal(t, "config-name", b.Info.Name)
 	assert.Equal(t, "config-hostname", b.Info.Hostname)
 	assert.Equal(t, "config-hostname", b.Info.FQDN)
 	assert.Equal(t, "config-hostname", beat.GetHostnameOverride())
 }
 
-func TestHostnameFlagWinsOverConfigHostname(t *testing.T) {
+func TestHostnameFlagOverridesConfigHostname(t *testing.T) {
 	initBeatTestEnv(t)
 
 	HostnameFlag = "flag-hostname"
@@ -212,10 +212,10 @@ func TestHostnameFlagWinsOverConfigHostname(t *testing.T) {
 	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
 	require.NoError(t, err)
 
-	assert.Equal(t, "flag-hostname", b.Info.Hostname, "flag should win over config hostname")
-	assert.Equal(t, "flag-hostname", b.Info.Name)
+	assert.Equal(t, "flag-hostname", b.Info.Hostname)
 	assert.Equal(t, "flag-hostname", b.Info.FQDN)
 	assert.Equal(t, "flag-hostname", beat.GetHostnameOverride())
+	assert.NotEqual(t, "flag-hostname", b.Info.Name, "hostname flag must not affect agent.name")
 }
 
 func TestNewInstanceUUID(t *testing.T) {

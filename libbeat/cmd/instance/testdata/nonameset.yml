@@ -1,7 +1,7 @@
 ############################# Mockbeat ######################################
 mockbeat:
 
-# No "name:" on purpose, so the --hostname flag value is used as the beat name.
+# No "name:" set — agent.name defaults to the OS hostname.
 
 output.elasticsearch:
     hosts: ["localhost:9200"]
