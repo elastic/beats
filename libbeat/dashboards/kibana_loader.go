@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -194,7 +195,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 	}
 
 	base := filepath.Dir(path)
-	var result string
+	var result strings.Builder
 	for _, ref := range d.References {
 		if ref.Type == "index-pattern" {
 			continue
@@ -213,7 +214,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 			return "", fmt.Errorf("failed to get references of %s: %w", referencePath, err)
 		}
 
-		result += refContentsWithReferences
+		result.WriteString(refContentsWithReferences)
 		loader.loadedAssets[referencePath] = true
 	}
 
@@ -222,9 +223,9 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 	if err != nil {
 		return "", fmt.Errorf("failed to convert asset: %w", err)
 	}
-	result += res.String() + "\n"
+	result.WriteString(res.String() + "\n")
 
-	return result, nil
+	return result.String(), nil
 }
 
 func (loader KibanaLoader) formatDashboardAssets(content []byte) []byte {
@@ -252,7 +253,7 @@ func (loader KibanaLoader) Close() error {
 	return loader.client.Close()
 }
 
-func (loader KibanaLoader) statusMsg(msg string, a ...interface{}) {
+func (loader KibanaLoader) statusMsg(msg string, a ...any) {
 	if loader.msgOutputter != nil {
 		loader.msgOutputter(msg, a...)
 	} else {

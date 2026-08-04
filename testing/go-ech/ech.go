@@ -22,7 +22,6 @@ package ech
 import (
 	"debug/buildinfo"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -32,6 +31,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/testing/testutils"
 )
 
 // VerifyEnvVars ensures that the env vars to connect to ES are set, and that the ES_HOST starts with https
@@ -53,33 +53,9 @@ func VerifyEnvVars(t *testing.T) {
 func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 	t.Helper()
 	info, err := buildinfo.ReadFile(binaryPath)
-	assert.NoError(t, err)
+	require.NoError(t, err, "unable to read build info from %s", binaryPath)
 
-	var foundTags, foundFIPS, foundFIPSDefault bool
-	for _, setting := range info.Settings {
-		switch setting.Key {
-		case "-tags":
-			foundTags = true
-			assert.Contains(t, setting.Value, "requirefips")
-			continue
-		case "GOFIPS140":
-			foundFIPS = true
-			assert.True(t, strings.HasPrefix(setting.Value, "v1.0.0"), "GOFIPS140 must reference the certified module version, got %q", setting.Value)
-			continue
-		case "DefaultGODEBUG":
-			if strings.Contains(setting.Value, "fips140=on") {
-				foundFIPSDefault = true
-			}
-			continue
-		}
-	}
-
-	assert.True(t, foundTags, "did not find build tags")
-	assert.True(t, foundFIPS, "did not find GOFIPS140 within binary version information")
-	assert.True(t, foundFIPSDefault, "did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime (check GOFIPS140 env at build time)")
-	if t.Failed() {
-		t.Fatal("Unable to verify FIPS binary.") // stop test if non-FIPS binary is used.
-	}
+	testutils.RequireFIPSBuildInfo(t, info.Settings)
 }
 
 // RunSmokeTest runs the beat on binaryPath with the passed config, and ensures that data ends up in Elasticsearch.

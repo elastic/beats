@@ -22,6 +22,8 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,9 +35,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/k8skeystore"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/k8skeystore"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -86,6 +88,7 @@ type eventerManager struct {
 type leaderElectionManager struct {
 	leaderElection       leaderelection.LeaderElectionConfig
 	cancelLeaderElection context.CancelFunc
+	electorWg            sync.WaitGroup
 	logger               *logp.Logger
 }
 
@@ -287,8 +290,9 @@ func NewLeaderElectionManager(
 		Namespace: ns,
 	}
 
-	var eventID string
-	leaseId := lease.Name + "-" + lease.Namespace
+	// The elector can call the start and stop callbacks concurrently.
+	var eventID atomic.Pointer[string]
+	leaseID := lease.Name + "-" + lease.Namespace
 	lem.leaderElection = leaderelection.LeaderElectionConfig{
 		Lock: &resourcelock.LeaseLock{
 			LeaseMeta: lease,
@@ -303,13 +307,18 @@ func NewLeaderElectionManager(
 		RetryPeriod:     cfg.RetryPeriod,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
-				eventID = fmt.Sprintf("%v-%v", leaseId, time.Now().UnixNano())
-				logger.Debugf("leader election lock GAINED, holder: %v, eventID: %v", id, eventID)
-				startLeading(uuid.String(), eventID)
+				startedID := fmt.Sprintf("%v-%v", leaseID, time.Now().UnixNano())
+				eventID.Store(&startedID)
+				logger.Debugf("leader election lock GAINED, holder: %v, eventID: %v", id, startedID)
+				startLeading(uuid.String(), startedID)
 			},
 			OnStoppedLeading: func() {
-				logger.Debugf("leader election lock LOST, holder: %v, eventID: %v", id, eventID)
-				stopLeading(uuid.String(), eventID)
+				var stoppedID string
+				if stored := eventID.Load(); stored != nil {
+					stoppedID = *stored
+				}
+				logger.Debugf("leader election lock LOST, holder: %v, eventID: %v", id, stoppedID)
+				stopLeading(uuid.String(), stoppedID)
 			},
 		},
 	}
@@ -344,6 +353,7 @@ func (p *leaderElectionManager) Start() {
 func (p *leaderElectionManager) Stop() {
 	if p.cancelLeaderElection != nil {
 		p.cancelLeaderElection()
+		p.electorWg.Wait()
 	}
 }
 
@@ -358,10 +368,11 @@ func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Conte
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
 		p.logger.Errorf("error while creating Leader Elector: %v", err)
+		return
 	}
 	p.logger.Debugf("Starting Leader Elector")
 
-	go func() {
+	p.electorWg.Go(func() {
 		for {
 			le.Run(ctx)
 			select {
@@ -372,10 +383,10 @@ func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Conte
 				// is still a candidate to get the lease.
 			}
 		}
-	}()
+	})
 }
 
-func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+func ShouldPut(event mapstr.M, field string, value any, logger *logp.Logger) {
 	_, err := event.Put(field, value)
 	if err != nil {
 		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)

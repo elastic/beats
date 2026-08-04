@@ -117,7 +117,7 @@ func SuccessNet(cfg config.Namespace,
 		groupNetClients := make([]NetworkClient, worker)
 		for i := 0; i < worker; i++ {
 			hostClients := make([]NetworkClient, numHosts)
-			for h := 0; h < numHosts; h++ {
+			for h := range numHosts {
 				hostClients[h] = netclients[h*worker+i]
 			}
 			groupNetClients[i] = NewFailoverClient(hostClients)

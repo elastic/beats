@@ -19,6 +19,7 @@ package kafka
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/elastic/sarama"
 )
@@ -110,10 +111,8 @@ func (v Version) Get() (sarama.KafkaVersion, bool) {
 	if err != nil {
 		return sarama.KafkaVersion{}, false
 	}
-	for _, supp := range sarama.SupportedVersions {
-		if version == supp {
-			return version, true
-		}
+	if slices.Contains(sarama.SupportedVersions, version) {
+		return version, true
 	}
 	return sarama.KafkaVersion{}, false
 }

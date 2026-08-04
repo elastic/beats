@@ -441,14 +441,14 @@ file_identity.fingerprint: ~
 
     `growing` {applies_to}`stack: ga 9.5.0+`
   :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
-      
+
       Set to `false` to restore the pre-9.5 behavior.
 
       ```yaml
       file_identity.fingerprint:
         growing: true
       ```
-    
+
 
 **`native`**
 :   Differentiates between files using their inodes and device IDs. This is the default file identity in Filebeat versions prior to 9.0.0.
@@ -695,11 +695,11 @@ Requirement: Set `backoff.max` to be greater than or equal to `backoff.init` and
 
 ### `harvester_limit` [filebeat-input-filestream-harvester-limit]
 
-The `harvester_limit` option limits the number of harvesters that are started in parallel for one input. This directly relates to the maximum number of file handlers that are opened. The default for `harvester_limit` is 0, which means there is no limit. This configuration is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
+The `harvester_limit` option limits the number of files that are harvested in parallel for one input. Because each harvested file keeps its file handler open, this directly limits the maximum number of file handlers the input keeps open at once. The default for `harvester_limit` is 0, which means there is no limit. This configuration is useful when the number of files to be harvested exceeds the open file handler limit of the operating system.
 
-Setting a limit on the number of harvesters means that potentially not all files are opened in parallel. Therefore we recommended that you use this option in combination with the `close.on_state_change.*` options to make sure harvesters are stopped more often so that new files can be picked up.
+A file counts against the limit for the whole time it is being harvested, including while it is idle and being tailed for new data. An actively tailed file keeps its file handler open and its slot occupied, even when it has momentarily caught up and is waiting for more data to be written. A slot is only released when the file is closed. For this reason, we recommend that you use this option in combination with the `close.on_state_change.*` and `close.reader.*` options, so that files are closed and their slots freed, allowing files that are still waiting to be picked up.
 
-Currently, if a new harvester can be started again, the harvester is picked randomly. This means it’s possible that the harvester for a file that was just closed and then updated again might be started instead of the harvester for a file that hasn’t been harvested for a longer period of time.
+When the limit is reached, newly discovered files are queued and started in the order they were discovered (first in, first out) as open files are closed and slots become available.
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
 
@@ -723,7 +723,7 @@ This option is not supported on Windows.
 ```yaml {applies_to}
 stack: ga 9.5.0
 ```
-Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `false`. The file path (`log.file.path`) is always present in events regardless of this setting.
+Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `true`. The file path (`log.file.path`) is always present in events regardless of this setting.
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
@@ -1371,22 +1371,29 @@ Note: Each metric listed has a corresponding gzip_* counterpart (e.g.,
 the same data but exclusively for GZIP compressed files. The original metrics
 provide the total count, including both plain and GZIP files.
 
-### Harvester metrics [_harvester_metrics]
+### Scanner and harvester metrics [_harvester_metrics]
 
 ```{applies_to}
 stack: ga 9.5+
 ```
 
-The `filestream` input also exposes scanner metrics under
+The `filestream` input also exposes scanner and harvester progress metrics under
 `.monitoring.metrics.filebeat.filestream` in monitoring logs and under
 `filebeat.filestream` in the `/stats` HTTP endpoint output. These metrics are
 aggregate gauges across all running `filestream` inputs. They are updated after
-each scanner pass and reset when inputs stop.
+each scanner pass and reset when inputs stop. Harvester progress metrics measure
+how much data active plain-file harvesters have read from their files. They do
+not measure output publishing or acknowledgment progress. GZIP files and files
+ignored by `filestream` settings or state are excluded.
 
 | Metric | Description |
 | --- | --- |
 | `files_empty` | Number of matched files that are empty. |
 | `files_ignored` | Number of matched files ignored by `filestream` settings or state, such as `prospector.scanner.exclude_files`, `ignore_older`, or `ignore_inactive`. |
+| `files_ingested_percent_100` | Number of active plain-file harvesters whose read offset is at or beyond the scanner-observed file size. |
+| `files_ingested_percent_95_99` | Number of active plain-file harvesters whose read offset is at least 95% and less than 100% of the scanner-observed file size. |
+| `files_ingested_percent_lt_95` | Number of active plain-file harvesters whose read offset is less than 95% of the scanner-observed file size. |
 | `files_matched` | Number of filesystem path matches returned by the configured `paths` globs before duplicate, ignore, and ingestibility filtering. |
 | `files_no_ingest_target` | Number of matched non-empty files that did not produce an ingest target, such as duplicate matches, files that are too small to fingerprint or symlinks to already known files. |
 | `files_unique` | Number of unique files that produced ingest targets after scanner filtering and de-duplication. |
+| `scan_errors` {applies_to}`stack: ga 9.6+` | Number of paths the last scan could not observe (for example a directory that could not be read, or a file that could not be stat'd or opened, because of file-descriptor exhaustion or permissions). A non-zero value means removal detection was postponed for the files under those paths to avoid re-ingestion; it does not count files that are genuinely gone. |

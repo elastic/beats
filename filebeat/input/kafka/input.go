@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -94,13 +95,13 @@ func (input *kafkaInput) Test(ctx input.TestContext) error {
 
 	var missingTopics []string
 	for _, neededTopic := range input.config.Topics {
-		if !contains(topics, neededTopic) {
+		if !slices.Contains(topics, neededTopic) {
 			missingTopics = append(missingTopics, neededTopic)
 		}
 	}
 
 	if len(missingTopics) > 0 {
-		return fmt.Errorf("Of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
+		return fmt.Errorf("of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
 	}
 
 	return nil
@@ -111,11 +112,9 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: acker.ConnectionOnly(
-			acker.EventPrivateReporter(func(_ int, events []interface{}) {
+			acker.EventPrivateReporter(func(_ int, events []any) {
 				for _, event := range events {
-					if meta, ok := event.(eventMeta); ok {
-						meta.ackHandler()
-					}
+					ackEventPrivate(event)
 				}
 			}),
 		),
@@ -136,7 +135,6 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	// If the consumer fails to connect, we use exponential backoff with
 	// jitter up to 8 * the initial backoff interval.
 	connectDelay := backoff.NewEqualJitterBackoff(
-		ctx.Cancelation.Done(),
 		input.config.ConnectBackoff,
 		8*input.config.ConnectBackoff,
 	)
@@ -150,7 +148,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		)
 		if err != nil {
 			log.Errorw("Error initializing kafka consumer group", "error", err)
-			connectDelay.Wait()
+			connectDelay.Wait(goContext)
 			continue
 		}
 		// We've successfully connected, reset the backoff timer.
@@ -223,6 +221,19 @@ type eventMeta struct {
 	ackHandler func()
 }
 
+func ackEventPrivate(priv any) {
+	switch v := priv.(type) {
+	case eventMeta:
+		v.ackHandler()
+	case []any:
+		for _, el := range v {
+			if meta, ok := el.(eventMeta); ok {
+				meta.ackHandler()
+			}
+		}
+	}
+}
+
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
 	array := []string{}
 	for _, header := range headers {
@@ -253,7 +264,6 @@ func doneChannelContext(ctx input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
-	//nolint:nakedret // omitting the return gives a build error
 	return
 }
 
@@ -264,7 +274,7 @@ func (c channelCtx) Done() <-chan struct{} {
 func (c channelCtx) Err() error {
 	return c.ctx.Cancelation.Err()
 }
-func (c channelCtx) Value(_ interface{}) interface{} { return nil }
+func (c channelCtx) Value(_ any) any { return nil }
 
 // The group handler for the sarama consumer group interface. In addition to
 // providing the basic consumption callbacks needed by sarama, groupHandler is
@@ -343,7 +353,40 @@ func (h *groupHandler) createReader(claim sarama.ConsumerGroupClaim) reader.Read
 	}
 }
 
+// deadlineReceiver receives from a Kafka message channel with an optional read
+// deadline. It is embedded by the message readers so the multiline timeout can
+// be enforced synchronously (no goroutine). The receive is a channel operation,
+// so deadlines are always honored.
+type deadlineReceiver struct {
+	reader.Deadline
+}
+
+// recv returns the next message from ch. With a deadline set it returns
+// timedOut=true if no message arrives in time, so callers can surface
+// reader.ErrReadDeadline instead of blocking.
+func (d *deadlineReceiver) recv(ch <-chan *sarama.ConsumerMessage) (msg *sarama.ConsumerMessage, ok bool, timedOut bool) {
+	// Fast path: a message is already buffered, so no timer is needed.
+	select {
+	case msg, ok = <-ch:
+		return msg, ok, false
+	default:
+	}
+
+	// Arm returns nil when no deadline is set, which never fires, so this select
+	// covers both the deadline and the plain blocking receive.
+	timeout := d.Arm()
+	defer d.Disarm()
+	select {
+	case msg, ok = <-ch:
+		return msg, ok, false
+	case <-timeout:
+		return nil, false, true
+	}
+}
+
 type recordReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	log          *logp.Logger
@@ -354,7 +397,10 @@ func (m *recordReader) Close() error {
 }
 
 func (m *recordReader) Next() (reader.Message, error) {
-	msg, ok := <-m.claim.Messages()
+	msg, ok, timedOut := m.recv(m.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}
@@ -367,6 +413,8 @@ func (m *recordReader) Next() (reader.Message, error) {
 }
 
 type listFromFieldReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	buffer       []reader.Message
@@ -383,7 +431,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 		return l.returnFromBuffer()
 	}
 
-	msg, ok := <-l.claim.Messages()
+	msg, ok, timedOut := l.recv(l.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}
@@ -415,7 +466,7 @@ func (l *listFromFieldReader) returnFromBuffer() (reader.Message, error) {
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (l *listFromFieldReader) parseMultipleMessages(bMessage []byte) []string {
-	var obj map[string][]interface{}
+	var obj map[string][]any
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
 		l.log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", l.field), "error", err)
@@ -467,13 +518,4 @@ func composeMessage(timestamp time.Time, content []byte, kafkaFields mapstr.M, a
 			ackHandler: ackHandler,
 		},
 	}
-}
-
-func contains(elements []string, element string) bool {
-	for _, e := range elements {
-		if e == element {
-			return true
-		}
-	}
-	return false
 }

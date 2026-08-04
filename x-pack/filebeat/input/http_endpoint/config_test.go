@@ -11,9 +11,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	confpkg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/lumberjack"
 )
 
 func Test_validateConfig(t *testing.T) {

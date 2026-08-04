@@ -49,7 +49,7 @@ func TestLogstashTCP(t *testing.T) {
 	timeout := 2 * time.Second
 	server := transptest.NewMockServerTCP(t, timeout, "", nil)
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"hosts":   []string{server.Addr()},
 		"index":   testLogstashIndex("logstash-conn-tcp"),
 		"timeout": "2s",
@@ -67,7 +67,7 @@ func TestLogstashTLS(t *testing.T) {
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	// create lumberjack output client
-	config := map[string]interface{}{
+	config := map[string]any{
 		"hosts":                       []string{server.Addr()},
 		"index":                       testLogstashIndex("logstash-conn-tls"),
 		"timeout":                     "2s",
@@ -85,7 +85,7 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	require.NoError(t, err)
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"hosts":                       []string{server.Addr()},
 		"index":                       testLogstashIndex("logstash-conn-tls-invalid"),
 		"timeout":                     2,
@@ -148,7 +148,7 @@ func testConnectionType(
 
 		events := batch.Events
 		assert.Len(t, events, 1)
-		msg, ok := events[0].(map[string]interface{})
+		msg, ok := events[0].(map[string]any)
 		assert.True(t, ok)
 		assert.Equal(t, 10.0, msg["extra"])
 		assert.Equal(t, "message", msg["message"])
@@ -167,7 +167,7 @@ func testEvent() beat.Event {
 func testOutputerFactory(
 	t *testing.T,
 	test string,
-	config map[string]interface{},
+	config map[string]any,
 ) func() outputs.NetworkClient {
 	return func() outputs.NetworkClient {
 		return newTestLumberjackOutput(t, test, config)
@@ -177,10 +177,10 @@ func testOutputerFactory(
 func newTestLumberjackOutput(
 	t *testing.T,
 	test string,
-	config map[string]interface{},
+	config map[string]any,
 ) outputs.NetworkClient {
 	if config == nil {
-		config = map[string]interface{}{
+		config = map[string]any{
 			"hosts": []string{getLogstashHost()},
 			"index": testLogstashIndex(test),
 		}

@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -34,6 +35,9 @@ import (
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
+
+// ErrKeyGone indicates the registry key does not exist (anymore)
+var ErrKeyGone = errors.New("registry key does not exist")
 
 // sourceStore is a store which can access resources using the Source
 // from an input.
@@ -116,10 +120,10 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor             interface{}
-	pendingCursorValue interface{}
-	pendingUpdate      interface{} // delta value of most recent pending updateOp
-	cursorMeta         interface{}
+	cursor             any
+	pendingCursorValue any
+	pendingUpdate      any // delta value of most recent pending updateOp
+	cursorMeta         any
 }
 
 type (
@@ -136,8 +140,8 @@ type (
 	state struct {
 		TTL     time.Duration
 		Updated time.Time
-		Cursor  interface{}
-		Meta    interface{}
+		Cursor  any
+		Meta    any
 	}
 
 	stateInternal struct {
@@ -189,12 +193,12 @@ func newSourceStore(
 	}
 }
 
-func (s *sourceStore) FindCursorMeta(src Source, v interface{}) error {
+func (s *sourceStore) FindCursorMeta(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.findCursorMeta(key, v)
 }
 
-func (s *sourceStore) UpdateMetadata(src Source, v interface{}) error {
+func (s *sourceStore) UpdateMetadata(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.updateMetadata(key, v)
 }
@@ -204,7 +208,7 @@ func (s *sourceStore) Remove(src Source) error {
 	return s.store.remove(key)
 }
 
-func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
+func (s *sourceStore) ResetCursor(src Source, cur any) error {
 	key := s.identifier.ID(src)
 	return s.store.resetCursor(key, cur)
 }
@@ -256,11 +260,11 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 
 	res := s.store.ephemeralStore.table[oldKey]
 	if res == nil {
-		return fmt.Errorf("old key %s not found", oldKey)
+		return fmt.Errorf("old key %s: %w", oldKey, ErrKeyGone)
 	}
 
 	if res.isDeleted() {
-		return fmt.Errorf("old key %s is deleted", oldKey)
+		return fmt.Errorf("old key %s is deleted: %w", oldKey, ErrKeyGone)
 	}
 
 	// Check if new key already exists
@@ -272,9 +276,14 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 	defer res.stateMutex.Unlock()
 
 	oldKeyValue := res.key
+	oldMeta := res.cursorMeta
+	oldStored := res.stored
 	res.key = newKey
 	res.cursorMeta = meta
 	res.stored = false
+	// The entry belongs to a live, just-scanned file; refresh Updated so the migrated entry is not
+	// immediately eligible for clean_inactive gc.
+	res.internalState.Updated = time.Now()
 
 	// Update the table: remove old entry, add new entry with same resource.
 	s.store.ephemeralStore.table[newKey] = res
@@ -286,10 +295,12 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta any) error {
 	// res.stored=true only on a successful write.
 	s.store.writeState(res)
 	if !res.stored {
-		// The write under newKey failed (already logged by writeState). Do NOT
-		// remove the old key: it is still the only durable record of this entry.
-		// The in-memory resource now lives under newKey and will be re-persisted
-		// on the next cursor checkpoint, so we do not lose state in memory either.
+		// The write under newKey failed. Roll back so memory and disk agree on oldKey again.
+		res.key = oldKeyValue
+		res.cursorMeta = oldMeta
+		res.stored = oldStored
+		s.store.ephemeralStore.table[oldKeyValue] = res
+		delete(s.store.ephemeralStore.table, newKey)
 		return fmt.Errorf(
 			"UpdateKey: failed to persist new key %q; keeping old key %q to avoid state loss",
 			newKey, oldKeyValue)
@@ -646,7 +657,7 @@ func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
 }
 
-func (s *store) findCursorMeta(key string, to interface{}) error {
+func (s *store) findCursorMeta(key string, to any) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -656,7 +667,7 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 }
 
 // updateMetadata updates the cursor metadata in the persistent store.
-func (s *store) updateMetadata(key string, meta interface{}) error {
+func (s *store) updateMetadata(key string, meta any) error {
 	resource := s.ephemeralStore.Find(key, true)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -688,7 +699,7 @@ func (s *store) writeState(r *resource) {
 
 // resetCursor sets the cursor to the value in cur in the persistent store and
 // drops all pending cursor operations.
-func (s *store) resetCursor(key string, cur interface{}) error {
+func (s *store) resetCursor(key string, cur any) error {
 	r := s.ephemeralStore.Find(key, false)
 	if r == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -833,14 +844,14 @@ func (r *resource) UpdatesReleaseN(n uint) {
 func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 
 // UnpackCursor deserializes the in memory state.
-func (r *resource) UnpackCursor(to interface{}) error {
+func (r *resource) UnpackCursor(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.activeCursor())
 }
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
-func (r *resource) UnpackCursorMeta(to interface{}) error {
+func (r *resource) UnpackCursorMeta(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.cursorMeta)
@@ -897,9 +908,9 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // Note: The stateMutex must be locked when calling pendingCursor.
 //
 //nolint:errcheck // not changing behaviour on this commit
-func (r *resource) pendingCursor() interface{} {
+func (r *resource) pendingCursor() any {
 	if r.pendingUpdate != nil {
-		var tmp interface{}
+		var tmp any
 		typeconv.Convert(&tmp, &r.cursor)
 		typeconv.Convert(&tmp, r.pendingUpdate)
 		r.pendingCursorValue = tmp
@@ -909,7 +920,7 @@ func (r *resource) pendingCursor() interface{} {
 }
 
 // activeCursor
-func (r *resource) activeCursor() interface{} {
+func (r *resource) activeCursor() any {
 	if r.activeCursorOperations != 0 {
 		return r.pendingCursor()
 	}

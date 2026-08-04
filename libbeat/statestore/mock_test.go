@@ -72,7 +72,7 @@ func (m *mockStore) Has(key string) (bool, error) {
 }
 
 func (m *mockStore) OnGet(key string) *mock.Call { return m.On("Get", key) }
-func (m *mockStore) Get(key string, into interface{}) error {
+func (m *mockStore) Get(key string, into any) error {
 	args := m.Called(key)
 	return args.Error(0)
 }
@@ -84,7 +84,7 @@ func (m *mockStore) Remove(key string) error {
 }
 
 func (m *mockStore) OnSet(key string) *mock.Call { return m.On("Set", key) }
-func (m *mockStore) Set(key string, from interface{}) error {
+func (m *mockStore) Set(key string, from any) error {
 	args := m.Called(key)
 	return args.Error(0)
 }

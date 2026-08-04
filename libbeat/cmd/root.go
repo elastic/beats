@@ -90,9 +90,6 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("strict.perms"))
-	if f := flag.CommandLine.Lookup("plugin"); f != nil {
-		rootCmd.PersistentFlags().AddGoFlag(f)
-	}
 
 	// Inherit root flags from run command
 	// TODO deprecate when root command no longer executes run (7.0)

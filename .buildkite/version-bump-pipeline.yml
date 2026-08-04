@@ -20,7 +20,35 @@ notify:
     if: build.state == "blocked"
 
 steps:
-  # TODO: replace this block step by real version bump logic
+  # Phase 3: trigger ingest-dev release automation for this repository only.
+  # Orchestrator env: NEW_VERSION, BRANCH, REPO, WORKFLOW (patch|minor|major).
+  - trigger: ingest-dev-pipeline-release-minor-major
+    key: bump-version-minor-major
+    label: ":rocket: Trigger ingest-dev minor/major release"
+    if: build.env("WORKFLOW") == "minor" || build.env("WORKFLOW") == "major"
+    build:
+      branch: "main"
+      message: "Version bump beats to ${NEW_VERSION} (${WORKFLOW})"
+      env:
+        REPOSITORY: "beats"
+        RELEASE_TYPE: "${WORKFLOW}"
+        CURRENT_RELEASE: "${NEW_VERSION}"
+        DISABLE_DEV_ISSUE: "true"
+        REVIEWERS: "elastic/elastic-agent-release"
+
+  - trigger: ingest-dev-pipeline-release-patch
+    key: bump-version-patch
+    label: ":rocket: Trigger ingest-dev patch release"
+    if: build.env("WORKFLOW") == "patch"
+    build:
+      branch: "main"
+      message: "Version bump beats to ${NEW_VERSION} (patch)"
+      env:
+        REPOSITORY: "beats"
+        CURRENT_RELEASE: "${NEW_VERSION}"
+        DISABLE_DEV_ISSUE: "true"
+        REVIEWERS: "elastic/elastic-agent-release"
+
   - block: "Ready to fetch for DRA artifacts?"
     prompt: |
       Unblock when your team is ready to proceed.

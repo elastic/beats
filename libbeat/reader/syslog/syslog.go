@@ -205,3 +205,8 @@ func NewParser(r reader.Reader, cfg *Config, logger *logp.Logger) *Parser {
 		logger: logger.Named("reader_syslog"),
 	}
 }
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *Parser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
+}

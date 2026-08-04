@@ -1,0 +1,13 @@
+kind: enhancement
+summary: Add Filestream harvester metrics to monitoring logs
+description: |
+  The following Filestream metrics are added to the logs and the `/stats` HTTP endpoint:
+   - files_ingested_percent_100
+   - files_ingested_percent_95_99
+   - files_ingested_percent_lt_95
+  
+  These gauges are aggregated across all running Filestream inputs and
+  count active plain-file harvesters only.
+
+component: filebeat
+issue: https://github.com/elastic/beats/issues/36653

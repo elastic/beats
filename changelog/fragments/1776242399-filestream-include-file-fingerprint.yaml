@@ -1,0 +1,12 @@
+kind: enhancement
+summary: "Filestream: include_file_fingerprint controls log.file.fingerprint in events."
+description: |
+  Add an `include_file_fingerprint` option (default: `true`) to the filestream
+  input. By default `log.file.fingerprint` is included in published events when
+  `file_identity.fingerprint` is configured, preserving the previous behaviour.
+  Set `include_file_fingerprint: false` to omit the field and reduce network,
+  indexing, and storage costs at scale. A still-growing fingerprint is never
+  added to events; only the completed SHA-256 is published.
+component: filebeat
+pr: https://github.com/elastic/beats/pull/50129
+issue: https://github.com/elastic/beats/issues/50724

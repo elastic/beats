@@ -24,7 +24,6 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sync/atomic"
@@ -69,11 +68,6 @@ func BenchmarkFilestream(b *testing.B) {
 		{"10000_files/fingerprint", 20, 10_000, true, false},
 		// Growing fingerprint: many small files that stay below the 1024-byte
 		// threshold, so each is tracked by a bounded growing-fingerprint key.
-		// This is the scenario the bounded-key optimization targets; the full
-		// pipeline here (incl. the registry/WAL writes the key participates in)
-		// is what scanner-only benchmarks miss. With -benchmem the B/op delta
-		// against an unbounded-key build reflects the smaller per-cursor-update
-		// WAL records.
 		{"1000_files/growing", 5, 1000, true, true},
 		{"10000_files/growing", 5, 10_000, true, true},
 	}
@@ -136,6 +130,87 @@ paths:
 			})
 		}
 	})
+
+	b.Run("multiline", func(b *testing.B) {
+		const eventCount = 2000
+		const linesPerEvent = 5 // 1 header + 4 continuation lines = 10k lines total
+		filename := generateMultilineFile(b, b.TempDir(), eventCount, linesPerEvent)
+		cfg := fmt.Sprintf(`
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true
+parsers:
+  - multiline:
+      type: pattern
+      pattern: '^[[:space:]]'
+      negate: false
+      match: after
+paths:
+    - %s
+`, filename)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			runFilestreamBenchmark(b, logger, fmt.Sprintf("multiline-%d", i), cfg, eventCount)
+		}
+	})
+
+	b.Run("container", func(b *testing.B) {
+		const lineCount = 10_000
+		filename := generateContainerFile(b, b.TempDir(), lineCount)
+		cfg := fmt.Sprintf(`
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true
+parsers:
+  - container:
+      stream: all
+      format: docker
+paths:
+    - %s
+`, filename)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			runFilestreamBenchmark(b, logger, fmt.Sprintf("container-%d", i), cfg, lineCount)
+		}
+	})
+}
+
+// generateContainerFile writes lineCount complete (non-partial) Docker-JSON log
+// lines, the common container-logging case.
+func generateContainerFile(t testing.TB, dir string, lineCount int) string {
+	t.Helper()
+	file, err := os.CreateTemp(dir, "*")
+	require.NoError(t, err)
+	filename := file.Name()
+	for i := range lineCount {
+		fmt.Fprintf(file,
+			`{"log":"rather mediocre container log line %d\n","stream":"stdout","time":"2024-01-01T00:00:00.000000000Z"}`+"\n",
+			i)
+	}
+	require.NoError(t, file.Close())
+	return filename
+}
+
+// generateMultilineFile writes eventCount stack-trace-like events, each a header
+// line followed by linesPerEvent-1 whitespace-indented continuation lines, so a
+// `^[[:space:]]` multiline pattern groups each event into one message.
+func generateMultilineFile(t testing.TB, dir string, eventCount, linesPerEvent int) string {
+	t.Helper()
+	file, err := os.CreateTemp(dir, "*")
+	require.NoError(t, err)
+	filename := file.Name()
+	for i := range eventCount {
+		fmt.Fprintf(file, "ERROR event %d failed in %s\n", i, filename)
+		for j := 1; j < linesPerEvent; j++ {
+			fmt.Fprintf(file, "\tat com.example.Service.call(Service.java:%d) line %d\n", j, i)
+		}
+	}
+	require.NoError(t, file.Close())
+	return filename
 }
 
 func filestreamBenchCfg(path string, fingerprint, growing bool) string {
@@ -161,6 +236,64 @@ close.reader.on_eof: true%s
 paths:
   - %s
 `, identity, path)
+}
+
+// BenchmarkFilestreamSliceBudget measures how the slice time budget affects
+// ingestion throughput (events/s) for a single busy file. The budget is active
+// only when one of harvester_limit / close.on_state_change.renamed /
+// close.reader.after_interval is set; here harvester_limit:1 activates it and
+// close.on_state_change.check_interval is the budget. Smaller budgets yield the
+// slice more often, so the reader parks/rebuilds its pipeline and re-seeks more
+// frequently — the "disabled" case (sliceBudget == 0, one uninterrupted read to
+// EOF) is the baseline to compare against.
+func BenchmarkFilestreamSliceBudget(b *testing.B) {
+	// Info level keeps per-line Debugf calls out of the hot path.
+	logger := logptest.NewTestingLogger(b, "", zap.IncreaseLevel(zap.InfoLevel))
+	const lineCount = 100_000
+
+	cases := []struct {
+		name          string
+		harvesterLim  int    // 0 => sliceBudget disabled
+		checkInterval string // slice budget when harvesterLim > 0
+	}{
+		{"disabled", 0, ""},
+		{"budget_1s", 1, "1s"},
+		{"budget_100ms", 1, "100ms"},
+		{"budget_10ms", 1, "10ms"},
+		{"budget_1ms", 1, "1ms"},
+	}
+
+	for _, tc := range cases {
+		b.Run(tc.name, func(b *testing.B) {
+			filename := generateFile(b, b.TempDir(), lineCount)
+			cfg := sliceBudgetBenchCfg(filename, tc.harvesterLim, tc.checkInterval)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				runFilestreamBenchmark(b, logger, fmt.Sprintf("slicebudget-%s-%d", tc.name, i), cfg, lineCount)
+			}
+			b.StopTimer()
+			b.ReportMetric(float64(lineCount)*float64(b.N)/b.Elapsed().Seconds(), "events/s")
+		})
+	}
+}
+
+func sliceBudgetBenchCfg(path string, harvesterLimit int, checkInterval string) string {
+	budget := ""
+	if harvesterLimit > 0 {
+		budget = fmt.Sprintf(`
+harvester_limit: %d
+close.on_state_change.check_interval: %s`, harvesterLimit, checkInterval)
+	}
+	return fmt.Sprintf(`
+id: benchmark-slicebudget
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true%s
+paths:
+  - %s
+`, budget, path)
 }
 
 func TestTakeOverTags(t *testing.T) {
@@ -208,6 +341,60 @@ paths:
 	}
 }
 
+// TestConfigure_SliceBudget asserts configure only bounds ReadSlice's duration
+// (filestream.sliceBudget, at close.on_state_change.check_interval) when
+// something depends on Poll running while a file stays continuously busy:
+// harvester_limit needs a close condition to free its slot, and
+// close.on_state_change.renamed only matters for a file still being written to
+// under its old name. Otherwise it's left unbounded to avoid the extra
+// pipeline-rebuild/stat overhead where nothing needs it.
+func TestConfigure_SliceBudget(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
+	require.NoError(t, err)
+
+	build := func(t *testing.T, extra string) *filestream {
+		t.Helper()
+		cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: test
+paths:
+  - /var/log/foo
+%s
+`, extra))
+		_, harvester, err := configure(cfg, logger, srcIdentifier)
+		require.NoError(t, err)
+		fs, ok := harvester.(*filestream)
+		require.True(t, ok)
+		return fs
+	}
+
+	t.Run("unset by default", func(t *testing.T) {
+		fs := build(t, "")
+		assert.Zero(t, fs.sliceBudget, "no setting needs a bounded slice")
+	})
+
+	t.Run("set when harvester_limit is enabled", func(t *testing.T) {
+		fs := build(t, "harvester_limit: 5")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("set when close.on_state_change.renamed is enabled", func(t *testing.T) {
+		fs := build(t, "close.on_state_change.renamed: true")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("set when close.reader.after_interval is enabled", func(t *testing.T) {
+		fs := build(t, "close.reader.after_interval: 30s")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("unaffected by settings that don't need it", func(t *testing.T) {
+		fs := build(t, "close.on_state_change.inactive: 1m\nclose.on_state_change.removed: true")
+		assert.Zero(t, fs.sliceBudget)
+	})
+}
+
 func TestNewFile(t *testing.T) {
 	tempDir := t.TempDir()
 
@@ -230,7 +417,7 @@ func TestNewFile(t *testing.T) {
 	testCases := map[string]struct {
 		compression   string
 		filePath      string
-		expectedType  interface{}
+		expectedType  any
 		expectError   bool
 		errorContains string
 		setup         func(t *testing.T, filePath string) *os.File
@@ -431,7 +618,7 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	file, err := os.CreateTemp(dir, "*")
 	require.NoError(t, err)
 	filename := file.Name()
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		fmt.Fprintf(file, "rather mediocre log line message in %s - %d\n", filename, i)
 	}
 	err = file.Close()
@@ -511,117 +698,4 @@ func (c *testClient) PublishAll(events []beat.Event) {
 }
 func (c *testClient) Close() error {
 	return nil
-}
-
-// TestFilestream_handleReadError_ErrClosed verifies the contract
-// handleReadError must uphold for ErrClosed: the readUntilEOF
-// drain must happen *only* when the input is being cancelled. A plain
-// ErrClosed from any other source (close.reader.after_interval,
-// close.on_state_change.removed, close.on_state_change.renamed, explicit
-// Close) must close the reader.
-func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
-	newCtx := func(t *testing.T, cancelled bool) v2.Context {
-		t.Helper()
-		ctx, cancel := context.WithCancel(context.Background())
-		t.Cleanup(cancel)
-		if cancelled {
-			cancel()
-		}
-		return v2.Context{
-			Cancelation: ctx,
-			Logger:      logptest.NewTestingLogger(t, ""),
-		}
-	}
-
-	metrics := newTestMetrics()
-
-	t.Run("read_until_eof=false: always close", func(t *testing.T) {
-		inp := &filestream{
-			readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: false},
-		}
-		for _, cancelled := range []bool{false, true} {
-			ctx := newCtx(t, cancelled)
-			gotErr, shouldContinue := inp.handleReadError(
-				ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
-			assert.NoError(t, gotErr,
-				"ErrClosed with read_until_eof=false must not propagate")
-			assert.False(t, shouldContinue,
-				"ErrClosed with read_until_eof=false must end the loop (cancelled=%v)",
-				cancelled)
-		}
-	})
-
-	t.Run("read_until_eof=true + input not cancelled: exit immediately", func(t *testing.T) {
-		inp := &filestream{
-			readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: true},
-		}
-		ctx := newCtx(t, false)
-		gotErr, shouldContinue := inp.handleReadError(
-			ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
-		assert.NoError(t, gotErr,
-			"ErrClosed must not propagate when input isn't closed")
-		assert.False(t, shouldContinue,
-			"ErrClosed with input not cancelled must close the reader")
-	})
-
-	t.Run("read_until_eof=true + input cancelled: triggers readUntilEOF", func(t *testing.T) {
-		inp := &filestream{
-			readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: true},
-		}
-		ctx := newCtx(t, true)
-		gotErr, shouldContinue := inp.handleReadError(
-			ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
-		assert.NoError(t, gotErr,
-			"handleReadError must return returning nil")
-		assert.True(t, shouldContinue,
-			"handleReadError must return true so readFromSource falls through to "+
-				"the readUntilEOF block")
-	})
-}
-
-// TestFilestream_handleReadError_OtherErrors ensures EOF / ErrInactive /
-// ErrFileTruncate / unknown errors behave the same regardless of
-// whether ctx is cancelled or read_until_eof is enabled.
-func TestFilestream_handleReadError_OtherErrors(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	logger := logptest.NewTestingLogger(t, "")
-	metrics := newTestMetrics()
-
-	for _, readUntilEOF := range []bool{false, true} {
-		name := fmt.Sprintf("read_until_eof=%v", readUntilEOF)
-		t.Run(name, func(t *testing.T) {
-			inp := &filestream{
-				readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: readUntilEOF},
-			}
-			inpCtx := v2.Context{Cancelation: ctx, Logger: logger}
-
-			t.Run("EOF", func(t *testing.T) {
-				gotErr, shouldContinue := inp.handleReadError(
-					inpCtx, io.EOF, logger, "/p", metrics, false)
-				if readUntilEOF {
-					assert.ErrorIs(t, gotErr, io.EOF,
-						"read_until_eof=true: EOF must propagate so readFromSource "+
-							"ends without entering readUntilEOF")
-				} else {
-					assert.NoError(t, gotErr)
-				}
-				assert.False(t, shouldContinue, "want shouldContinue == false")
-			})
-
-			t.Run("ErrInactive", func(t *testing.T) {
-				gotErr, shouldContinue := inp.handleReadError(
-					inpCtx, ErrInactive, logger, "/p", metrics, false)
-				assert.ErrorIs(t, gotErr, ErrInactive)
-				assert.False(t, shouldContinue, "want shouldContinue == false")
-			})
-
-			t.Run("ErrFileTruncate", func(t *testing.T) {
-				gotErr, shouldContinue := inp.handleReadError(
-					inpCtx, ErrFileTruncate, logger, "/p", metrics, false)
-				assert.NoError(t, gotErr, "ErrFileTruncate shouldn't propagate")
-				assert.False(t, shouldContinue, "want shouldContinue == false")
-			})
-		})
-	}
 }

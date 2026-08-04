@@ -458,8 +458,8 @@ func TestRenameField(t *testing.T) {
 // BenchmarkRenameSingleField benchmarks a single-field rename with different
 // top-level keys (e.g. message → event.original), the common agent pattern.
 func BenchmarkRenameSingleField(b *testing.B) {
-	c, err := conf.NewConfigFrom(map[string]interface{}{
-		"fields": []map[string]interface{}{
+	c, err := conf.NewConfigFrom(map[string]any{
+		"fields": []map[string]any{
 			{"from": "message", "to": "event.original"},
 		},
 		"fail_on_error": true,

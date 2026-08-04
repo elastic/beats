@@ -54,7 +54,7 @@ var Platforms = BuildPlatforms.Defaults()
 // values are ignored.
 func ParsePackageTypes(packageTypes string) []PackageType {
 	var parsed []PackageType
-	for _, packageType := range strings.Split(packageTypes, ",") {
+	for packageType := range strings.SplitSeq(packageTypes, ",") {
 		packageType = strings.TrimSpace(packageType)
 		if packageType == "" {
 			continue
@@ -208,7 +208,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 	mg.Deps(buildMage)
 
 	log.Println("crossBuild: Platform list =", params.Platforms)
-	var deps []interface{}
+	var deps []any
 	for _, buildPlatform := range params.Platforms {
 		if !buildPlatform.Flags.CanCrossBuild() {
 			return fmt.Errorf("unsupported cross build platform %v", buildPlatform.Name)
@@ -507,7 +507,7 @@ func gitAlternateObjectDirMounts(objectsDir, containerObjectsDir string, alterna
 	var mounts []dockerVolumeMount
 	seen := map[string]struct{}{}
 
-	for _, line := range strings.Split(string(alternates), "\n") {
+	for line := range strings.SplitSeq(string(alternates), "\n") {
 		alternate := strings.TrimSpace(line)
 		if alternate == "" || strings.HasPrefix(alternate, "#") {
 			continue
