@@ -48,6 +48,13 @@ func TestOutputReload(t *testing.T) {
 		"network_client": newMockNetworkClient,
 	}
 
+	// Each iteration publishes ~15k events across ~400 output reloads, which race
+	// instrumentation makes expensive enough to threaten the package test timeout.
+	maxCount := 25
+	if raceBuildEnabled {
+		maxCount = 5
+	}
+
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
 			testutil.SeedPRNG(t)
@@ -108,7 +115,7 @@ func TestOutputReload(t *testing.T) {
 				return waitUntilTrue(timeout, func() bool {
 					return uint64(numEventsToPublish) == publishedCount.Load()
 				})
-			}, &quick.Config{MaxCount: 25})
+			}, &quick.Config{MaxCount: maxCount})
 
 			if err != nil {
 				t.Error(err)

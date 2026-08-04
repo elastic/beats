@@ -30,8 +30,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -71,7 +73,7 @@ func createETLSessionConfig(sessionName string) Config {
 
 // ETWCallbackMeasurer counts ETW callback invocations safely
 type ETWCallbackMeasurer struct {
-	count int64
+	count atomic.Int64
 }
 
 // InjectableCallback returns a callback function that measures event processing performance
@@ -79,7 +81,7 @@ func (m *ETWCallbackMeasurer) InjectableCallback(session *Session) func(record *
 	return func(record *EventRecord) uintptr {
 		_, err := session.RenderEvent(record)
 		if err == nil || errors.Is(err, ErrUnprocessableEvent) {
-			atomic.AddInt64(&m.count, 1)
+			m.count.Add(1)
 		}
 		return 0
 	}
@@ -87,12 +89,12 @@ func (m *ETWCallbackMeasurer) InjectableCallback(session *Session) func(record *
 
 // Reset resets the counter for a new measurement
 func (m *ETWCallbackMeasurer) Reset() {
-	atomic.StoreInt64(&m.count, 0)
+	m.count.Store(0)
 }
 
 // GetCount returns the current count safely
 func (m *ETWCallbackMeasurer) GetCount() int64 {
-	return atomic.LoadInt64(&m.count)
+	return m.count.Load()
 }
 
 // Test Infrastructure
@@ -301,8 +303,15 @@ func TestETLGoldenFile(t *testing.T) {
 
 // collectEventsFromETL processes an ETL file and returns all rendered events
 func collectEventsFromETL(t *testing.T, session *Session) []RenderedEtwEvent {
+	// The consumer runs the callback on its own goroutine while this one polls
+	// for progress below.
+	var mu sync.Mutex
 	var events []RenderedEtwEvent
-	var eventCount int
+	snapshot := func() []RenderedEtwEvent {
+		mu.Lock()
+		defer mu.Unlock()
+		return slices.Clone(events)
+	}
 
 	session.Callback = func(record *EventRecord) uintptr {
 		event, err := session.RenderEvent(record)
@@ -313,8 +322,9 @@ func collectEventsFromETL(t *testing.T, session *Session) []RenderedEtwEvent {
 			t.Errorf("Failed to render event: %v", err)
 			return 1
 		}
+		mu.Lock()
 		events = append(events, event)
-		eventCount++
+		mu.Unlock()
 		return 0
 	}
 
@@ -343,17 +353,18 @@ func collectEventsFromETL(t *testing.T, session *Session) []RenderedEtwEvent {
 	})
 
 	// Wait for events to be processed
-	for eventCount == 0 {
+	for len(snapshot()) == 0 {
 		time.Sleep(100 * time.Millisecond)
 	}
 	time.Sleep(2 * time.Second)
 
-	if len(events) == 0 {
+	collected := snapshot()
+	if len(collected) == 0 {
 		t.Fatal("No events were processed from the ETL file")
 	}
 
-	t.Logf("Processed %d events from ETL file for golden file comparison", len(events))
-	return events
+	t.Logf("Processed %d events from ETL file for golden file comparison", len(collected))
+	return collected
 }
 
 // validateEventDataQuality checks for data quality issues in events
@@ -526,7 +537,7 @@ func compareRenderedEvents(actual, expected RenderedEtwEvent, eventIndex int) []
 }
 
 // comparePropertyValues compares two property values recursively
-func comparePropertyValues(actual, expected interface{}) bool {
+func comparePropertyValues(actual, expected any) bool {
 	actualJSON, err1 := json.Marshal(actual)
 	expectedJSON, err2 := json.Marshal(expected)
 	return err1 == nil && err2 == nil && string(actualJSON) == string(expectedJSON)

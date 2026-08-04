@@ -532,6 +532,9 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 		},
 	)
 	require.NoError(t, err)
+	// The pipeline's reaper logs through the test logger, so it has to be joined
+	// before the test ends.
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 	c, err := pipeline.ConnectWith(clientCfg)
 	require.NoError(t, err, "pipeline.ConnectWith failed")

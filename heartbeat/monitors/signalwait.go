@@ -18,13 +18,14 @@
 package monitors
 
 import (
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type signalWait struct {
-	count   int // number of potential 'alive' signals
+	count   atomic.Int32 // number of potential 'alive' signals
 	signals chan struct{}
 }
 
@@ -37,16 +38,16 @@ func NewSignalWait() *signalWait {
 }
 
 func (s *signalWait) Wait() {
-	if s.count == 0 {
+	if s.count.Load() == 0 {
 		return
 	}
 
 	<-s.signals
-	s.count--
+	s.count.Add(-1)
 }
 
 func (s *signalWait) Add(fn signaler) {
-	s.count++
+	s.count.Add(1)
 	go func() {
 		fn()
 		var v struct{}

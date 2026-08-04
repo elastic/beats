@@ -28,6 +28,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -359,6 +360,21 @@ func InstallGoTestTools() error {
 	)
 }
 
+// raceDetectorArgs returns the "go test" flags for a race-detector request.
+// DEV_OS/DEV_ARCH default to the host so CI, which sets only RACE_DETECTOR,
+// still runs -race; an unsupported platform errors instead of silently skipping.
+func raceDetectorArgs(race bool) ([]string, error) {
+	if !race {
+		return nil, nil
+	}
+	devOS := EnvOr("DEV_OS", runtime.GOOS)
+	devArch := EnvOr("DEV_ARCH", runtime.GOARCH)
+	if !testbin.RaceDetectorSupported(devOS, devArch) {
+		return nil, fmt.Errorf("race detector requested but not supported on %s/%s", devOS, devArch)
+	}
+	return []string{"-race"}, nil
+}
+
 // GoTest invokes "go test" and reports the results to stdout. It returns an
 // error if there was any failure executing the tests or if there were any
 // test failures.
@@ -394,19 +410,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		gotestsumArgs = append(gotestsumArgs, "--jsonfile", params.OutputFile+".json")
 	}
 
-	var testArgs []string
-
-	if params.Race {
-		// Only pass -race on platforms that support it; the predicate is shared
-		// with the test binary builder (testbin) to keep the two in sync.
-		devOS := os.Getenv("DEV_OS")
-		devArch := os.Getenv("DEV_ARCH")
-		if testbin.RaceDetectorSupported(devOS, devArch) {
-			testArgs = append(testArgs, "-race")
-		} else {
-			//nolint:gosec // G706: DEV_OS/DEV_ARCH are trusted build-time env vars, not untrusted input
-			log.Printf("Warning: skipping -race flag for unsupported platform %s/%s\n", devOS, devArch)
-		}
+	testArgs, err := raceDetectorArgs(params.Race)
+	if err != nil {
+		return err
 	}
 	if len(params.Tags) > 0 {
 		params := strings.Join(params.Tags, ",")
@@ -459,7 +465,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		goTest.Stderr = output
 	}
 
-	err := goTest.Run()
+	err = goTest.Run()
 
 	var goTestErr *exec.ExitError
 	if err != nil {

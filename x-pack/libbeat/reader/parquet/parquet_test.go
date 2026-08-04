@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"testing"
@@ -20,7 +20,6 @@ import (
 	"github.com/apache/arrow-go/v18/parquet/pqarrow"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -31,6 +30,9 @@ func TestParquetWithRandomData(t *testing.T) {
 	testCases := []struct {
 		columns int
 		rows    int
+		// skipUnderRace marks shapes whose record count makes the instrumented
+		// arrow readers exceed the package test timeout.
+		skipUnderRace bool
 	}{
 		{
 			columns: 10,
@@ -53,15 +55,18 @@ func TestParquetWithRandomData(t *testing.T) {
 			rows:    1000,
 		},
 		{
-			columns: 15,
-			rows:    10000,
+			columns:       15,
+			rows:          10000,
+			skipUnderRace: true,
 		},
 	}
 
-	logp.TestingSetup()
 	for i, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with rows=%d, and columns=%d", tc.rows, tc.columns)
 		t.Run(name, func(t *testing.T) {
+			if tc.skipUnderRace && raceBuildEnabled {
+				t.Skip("too slow under the race detector: BatchSize 1 reads every row through the instrumented arrow readers")
+			}
 			tempDir := t.TempDir()
 			fName := fmt.Sprintf("%s/%s_%d.parquet", tempDir, "test", i)
 			data := createRandomParquet(t, fName, tc.columns, tc.rows)
@@ -114,7 +119,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	data := make(map[string]bool)
 	// creates a new Arrow schema
 	fields := make([]arrow.Field, 0, numCols)
-	for i := 0; i < numCols; i++ {
+	for i := range numCols {
 		fieldType := arrow.PrimitiveTypes.Int32
 		field := arrow.Field{Name: fmt.Sprintf("col%d", i), Type: fieldType, Nullable: true}
 		fields = append(fields, field)
@@ -135,22 +140,21 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	memoryPool := memory.NewGoAllocator()
 
 	// uses a fixed seed value of 1 for generating random data
-	seed := int64(1)
-	r := rand.New(rand.NewSource(seed))
+	r := rand.New(rand.NewPCG(1, 0))
 
 	// generates random data for writing to the parquet file
 	for rowIdx := int64(0); rowIdx < int64(numRows); rowIdx++ {
 		// creates an Arrow record with random data
 		var recordColumns []arrow.Array
-		for colIdx := 0; colIdx < numCols; colIdx++ {
-			randData := []int32{r.Int31()}
+		for range numCols {
+			randData := []int32{r.Int32()}
 			builder := array.NewInt32Builder(memoryPool)
 			builder.AppendValues(randData, nil)
 			columnArray := array.NewInt32Data(builder.NewArray().Data())
 			builder.Release()
 			recordColumns = append(recordColumns, columnArray)
 		}
-		record := array.NewRecord(schema, recordColumns, 1)
+		record := array.NewRecordBatch(schema, recordColumns, 1)
 		val, err := record.MarshalJSON()
 		if err != nil {
 			t.Fatalf("Failed to marshal record to JSON: %v", err)
@@ -193,7 +197,6 @@ func TestParquetWithFiles(t *testing.T) {
 		},
 	}
 
-	logp.TestingSetup()
 	for _, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with source file=%s, and target comparison file=%s", tc.parquetFile, tc.jsonFile)
 		t.Run(name, func(t *testing.T) {
@@ -257,7 +260,7 @@ func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data ma
 		// asserts of number of rows read is the same as the number of rows from the input file
 		assert.Equal(t, rows, rowCount)
 	} else {
-		assert.EqualValues(t, rowCount, maxRowsToCompare)
+		assert.Equal(t, rowCount, maxRowsToCompare, "row count should match maxRowsToCompare limit")
 	}
 	// closes the stream reader and asserts that there are no errors
 	err = sReader.Close()

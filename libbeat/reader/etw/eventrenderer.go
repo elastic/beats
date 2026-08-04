@@ -94,11 +94,9 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 
 	// Parse ExtendedData if present
 	if p.r.ExtendedDataCount > 0 && p.r.ExtendedData != nil {
-		for i := 0; i < int(p.r.ExtendedDataCount); i++ {
-			item := (*EventHeaderExtendedDataItem)(unsafe.Pointer(
-				uintptr(unsafe.Pointer(p.r.ExtendedData)) + uintptr(i)*unsafe.Sizeof(*p.r.ExtendedData),
-			))
-			event.ExtendedData[i] = renderExtendedData(item)
+		items := unsafe.Slice(p.r.ExtendedData, int(p.r.ExtendedDataCount))
+		for i := range items {
+			event.ExtendedData[i] = renderExtendedData(&items[i])
 			event.extendedDataMap[event.ExtendedData[i].ExtType] = i // Map the extended data type to its index
 		}
 	}
@@ -188,7 +186,7 @@ func renderStructArray(cache providerCache, eventInfo *cachedEventInfo, propInfo
 	}
 
 	result := make([]any, arraySize)
-	for j := 0; j < arraySize; j++ {
+	for j := range arraySize {
 		value, err := renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse struct member %d: %w", j, err)
@@ -221,7 +219,7 @@ func renderSimpleArray(cache providerCache, eventInfo *cachedEventInfo, propInfo
 	}
 
 	result := make([]any, count)
-	for i := uint32(0); i < count; i++ {
+	for i := range count {
 		// For each array element, process it as a single property
 		value, err := renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo, bufferPools)
 		if err != nil {
@@ -253,7 +251,7 @@ func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo,
 		// Length is specified by another property - use the property index
 		var dataDescriptor PropertyDataDescriptor
 		lengthPropIndex := propInfo.getLengthPropertyIndex()
-		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(lengthPropIndex))
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(eventInfo.InfoBuf, uint32(lengthPropIndex))
 		if nameProp == nil {
 			return 0, fmt.Errorf("property length is defined by another property, but no property found at index %d", lengthPropIndex)
 		}
@@ -269,7 +267,7 @@ func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo,
 		// Count is specified by another property - use the property index
 		var dataDescriptor PropertyDataDescriptor
 		countPropIndex := propInfo.getCountPropertyIndex()
-		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(countPropIndex))
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(eventInfo.InfoBuf, uint32(countPropIndex))
 		if nameProp == nil {
 			return 0, fmt.Errorf("property count is defined by another property, but no property found at index %d", countPropIndex)
 		}
@@ -307,7 +305,7 @@ func getElementLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, 
 		// Length is specified by another property - use the property index
 		var dataDescriptor PropertyDataDescriptor
 		lengthPropIndex := propInfo.getLengthPropertyIndex()
-		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(lengthPropIndex))
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(eventInfo.InfoBuf, uint32(lengthPropIndex))
 		if nameProp == nil {
 			return 0, fmt.Errorf("property length is defined by another property, but no property found at index %d", lengthPropIndex)
 		}
@@ -376,8 +374,8 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 	}
 
 	fileTime := windows.Filetime{
-		HighDateTime: uint32(fileTime64 >> 32),            //nolint:gosec // High part of the 64-bit FileTime
-		LowDateTime:  uint32(fileTime64 & math.MaxUint32), //nolint:gosec // Low part of the 64-bit FileTime
+		HighDateTime: uint32(fileTime64 >> 32),            // High part of the 64-bit FileTime
+		LowDateTime:  uint32(fileTime64 & math.MaxUint32), // Low part of the 64-bit FileTime
 	}
 
 	return time.Unix(0, fileTime.Nanoseconds()).UTC()
@@ -475,8 +473,8 @@ retryLoop:
 			ptrSize,
 			propInfo.InType,
 			propInfo.OutType,
-			uint16(propertyLength),
-			uint16(len(*buf)), //nolint:gosec // This is the length of the user data buffer
+			uint16(propertyLength), //nolint:gosec // G115: property length comes from ETW metadata and fits TdhFormatProperty's uint16 parameter
+			uint16(len(*buf)),      //nolint:gosec // This is the length of the user data buffer
 			dataPtr,
 			&formattedDataSize,
 			&formattedData[0],

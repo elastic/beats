@@ -41,25 +41,26 @@ const (
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
 	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
 	beatsCSVContainer           = "beatscsvcontainer"
+	fakeAccountKey              = "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q=="
 )
 
 func Test_StorageClient(t *testing.T) {
 	tests := []struct {
 		name          string
-		baseConfig    map[string]interface{}
+		baseConfig    map[string]any
 		mockHandler   func() http.Handler
 		expected      map[string]bool
 		expectedError error
 	}{
 		{
 			name: "SingleContainerWithPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -74,13 +75,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleContainerWithoutPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                false,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -95,13 +96,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoContainersWithPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -121,13 +122,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoContainersWithoutPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                false,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -147,13 +148,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleContainerPoll_InvalidContainerErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": "azuretest",
 					},
@@ -165,13 +166,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleContainerWithoutPoll_InvalidBucketErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                false,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": "azuretest",
 					},
@@ -183,13 +184,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoContainersWithPoll_InvalidBucketErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": "azurenew",
 					},
@@ -204,13 +205,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidConfigValue",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         5100,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -222,13 +223,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoBucketWithPoll_InvalidConfigValue",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         5100,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -243,13 +244,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsJSONContainer,
 					},
@@ -264,13 +265,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadOctetStreamJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsMultilineJSONContainer,
 					},
@@ -284,13 +285,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadNdJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsNdJSONContainer,
 					},
@@ -304,13 +305,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadMultilineGzJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsGzJSONContainer,
 					},
@@ -324,13 +325,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadJSONWithRootAsArray",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         1,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsJSONWithArrayContainer,
 					},
@@ -346,14 +347,14 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByTimeStampEpoch",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"timestamp_epoch":                     1663157564,
 				"max_workers":                         2,
 				"poll":                                false,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -367,18 +368,18 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByFileSelectorRegexSingle",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                false,
 				"poll_interval":                       "10s",
-				"file_selectors": []map[string]interface{}{
+				"file_selectors": []map[string]any{
 					{
 						"regex": "docs/",
 					},
 				},
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -391,13 +392,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByFileSelectorRegexMulti",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                false,
 				"poll_interval":                       "10s",
-				"file_selectors": []map[string]interface{}{
+				"file_selectors": []map[string]any{
 					{
 						"regex": "docs/",
 					},
@@ -405,7 +406,7 @@ func Test_StorageClient(t *testing.T) {
 						"regex": "data",
 					},
 				},
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -419,19 +420,19 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ExpandEventListFromField",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
 				"expand_event_list_from_field":        "Events",
-				"file_selectors": []map[string]interface{}{
+				"file_selectors": []map[string]any{
 					{
 						"regex": "events-array",
 					},
 				},
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsJSONContainer,
 					},
@@ -445,16 +446,16 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "MultiContainerWithMultiFileSelectors",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
-						"file_selectors": []map[string]interface{}{
+						"file_selectors": []map[string]any{
 							{
 								"regex": "docs/",
 							},
@@ -462,7 +463,7 @@ func Test_StorageClient(t *testing.T) {
 					},
 					{
 						"name": beatsContainer2,
-						"file_selectors": []map[string]interface{}{
+						"file_selectors": []map[string]any{
 							{
 								"regex": "data_3",
 							},
@@ -478,13 +479,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "CustomContentTypeUnsupported",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name":                  beatsGzJSONContainer,
 						"content_type":          "application/xyz-plain",
@@ -499,13 +500,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "CustomContentTypeSupported",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name":         beatsGzJSONContainer,
 						"content_type": "application/x-gzip",
@@ -523,13 +524,13 @@ func Test_StorageClient(t *testing.T) {
 			// content-type already exists and we are not overriding it.
 			// So we expect a successful run.
 			name: "CustomContentTypeIgnored",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name":         beatsNdJSONContainer,
 						"content_type": "application/xyz-plain",
@@ -545,14 +546,14 @@ func Test_StorageClient(t *testing.T) {
 		{
 			// This checks if the root level content-type specifications are respected.
 			name: "CustomContentTypeAtRootLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
 				"content_type":                        "application/x-gzip",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsGzJSONContainer,
 					},
@@ -566,13 +567,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadCSVContainerLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         1,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name":                       beatsCSVContainer,
 						"decoding.codec.csv.enabled": true,
@@ -588,15 +589,15 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadCSVRootLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         1,
 				"poll":                                true,
 				"poll_interval":                       "10s",
 				"decoding.codec.csv.enabled":          true,
 				"decoding.codec.csv.comma":            " ",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsCSVContainer,
 					},
@@ -610,14 +611,14 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "BatchSizeGlobal",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"batch_size":                          3,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -632,13 +633,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "BatchContainberLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         2,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name":       beatsContainer,
 						"batch_size": 3,
@@ -654,14 +655,14 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByPathPrefix_NotFoundErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         1,
 				"poll":                                true,
 				"poll_interval":                       "10s",
 				"path_prefix":                         "docs/",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer2,
 					},
@@ -673,14 +674,14 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByPathPrefix_RootLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         1,
 				"poll":                                true,
 				"poll_interval":                       "10s",
 				"path_prefix":                         "docs/",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -693,13 +694,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByPathPrefix_ContainerLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         1,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name":        beatsContainer,
 						"path_prefix": "docs/",
@@ -774,13 +775,15 @@ func Test_StorageClient(t *testing.T) {
 				case <-timeout.C:
 					t.Errorf("timed out waiting for %d events", len(tt.expected))
 					cancel()
-					return
+					break wait
 				case got := <-chanClient.Channel:
-					var val interface{}
+					var val any
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
+					msg, ok := val.(string)
+					assert.True(t, ok, "message field should be a string")
+					assert.True(t, tt.expected[strings.ReplaceAll(msg, "\r\n", "\n")])
 					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
@@ -788,6 +791,12 @@ func Test_StorageClient(t *testing.T) {
 						break wait
 					}
 				}
+			}
+
+			// Wait for scheduler and job goroutines to finish before the subtest
+			// returns; they log through inputCtx.Logger backed by this *testing.T.
+			if err := g.Wait(); err != nil {
+				assert.ErrorIs(t, err, context.Canceled, "input run should stop after cancel")
 			}
 		})
 	}
@@ -800,13 +809,13 @@ func TestConcurrency(t *testing.T) {
 			serv := httptest.NewServer(mock.AzureConcurrencyServer())
 			t.Cleanup(serv.Close)
 
-			cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			cfg := conf.MustNewConfigFrom(map[string]any{
 				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"auth.shared_credentials.account_key": fakeAccountKey,
 				"max_workers":                         workers,
 				"poll":                                true,
 				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": mock.ConcurrencyContainer,
 					},
@@ -873,14 +882,14 @@ type publisher struct {
 	stop    func([]beat.Event)
 	events  []beat.Event
 	mu      sync.Mutex
-	cursors []map[string]interface{}
+	cursors []map[string]any
 }
 
-func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+func (p *publisher) Publish(e beat.Event, cursor any) error {
 	p.mu.Lock()
 	p.events = append(p.events, e)
 	if cursor != nil {
-		var c map[string]interface{}
+		var c map[string]any
 		chkpt, ok := cursor.(*Checkpoint)
 		if !ok {
 			return fmt.Errorf("invalid cursor type for testing: %T", cursor)

@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Return the retried counter path expansion instead of the unexpanded wildcard when the Windows PDH API needs a second call
+component: metricbeat

@@ -423,7 +423,9 @@ func testProcessS3ObjectError(t testing.TB, file, contentType string, numEvents 
 func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int, expectErr bool, selectors []fileSelectorConfig) []beat.Event {
 	t.Helper()
 
-	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+	// Decoding stops silently once this context expires, which shows up as a
+	// short event count rather than an error, so keep the budget generous.
+	ctx, cancel := context.WithTimeout(context.Background(), testTimeout*raceTimeoutScale)
 	defer cancel()
 
 	ctrl, ctx := gomock.WithContext(ctx, t)

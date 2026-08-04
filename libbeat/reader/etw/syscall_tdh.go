@@ -206,18 +206,29 @@ type TraceEventInfo struct {
 	EventPropertyInfoArray      [anysizeArray]EventPropertyInfo
 }
 
-func (info *TraceEventInfo) getEventPropertyInfoAtIndex(i uint32) *EventPropertyInfo {
+// flexArrayFromBuffer returns a slice view over count elements of T in buf at arrayOffset.
+func flexArrayFromBuffer[T any](buf []byte, arrayOffset uintptr, count uint32) ([]T, error) {
+	if count == 0 {
+		return nil, nil
+	}
+	elemSize := unsafe.Sizeof(*new(T))
+	end := arrayOffset + uintptr(count)*elemSize
+	if end > uintptr(len(buf)) || end < arrayOffset {
+		return nil, fmt.Errorf("buffer too small for %d elements", count)
+	}
+	return unsafe.Slice((*T)(unsafe.Add(unsafe.Pointer(&buf[0]), arrayOffset)), int(count)), nil
+}
+
+func (info *TraceEventInfo) getEventPropertyInfoAtIndex(buf []byte, i uint32) *EventPropertyInfo {
 	if i >= info.PropertyCount {
 		return nil
 	}
-
-	// Compute the pointer to the i-th EventPropertyInfo safely,
-	// simulating C-style flexible array access using offset arithmetic.
-	eventPropertyInfoPtr := uintptr(unsafe.Pointer(info)) +
-		unsafe.Offsetof(info.EventPropertyInfoArray) +
-		uintptr(i)*unsafe.Sizeof(EventPropertyInfo{})
-
-	return (*EventPropertyInfo)(unsafe.Pointer(eventPropertyInfoPtr))
+	offset := unsafe.Offsetof(TraceEventInfo{}.EventPropertyInfoArray) + uintptr(i)*unsafe.Sizeof(EventPropertyInfo{})
+	end := offset + unsafe.Sizeof(EventPropertyInfo{})
+	if end > uintptr(len(buf)) {
+		return nil
+	}
+	return (*EventPropertyInfo)(unsafe.Add(unsafe.Pointer(&buf[0]), offset))
 }
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-provider_event_info

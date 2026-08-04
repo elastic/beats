@@ -21,6 +21,7 @@ import (
 	"context"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -28,6 +29,8 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 )
 
 const envGoTestHelper = "GOTEST_WANT_HELPER"
@@ -142,6 +145,49 @@ func TestGoTest_CaptureOutput(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRaceDetectorArgs(t *testing.T) {
+	t.Run("race disabled adds no flag", func(t *testing.T) {
+		args, err := raceDetectorArgs(false)
+		require.NoError(t, err, "a disabled race detector must never error")
+		assert.Empty(t, args, "no -race flag expected when the race detector is disabled")
+	})
+
+	t.Run("unset DEV_OS/DEV_ARCH default to the host", func(t *testing.T) {
+		// Regression for CI: RACE_DETECTOR=true with DEV_OS/DEV_ARCH empty must
+		// resolve to the host, not the empty "/" that made RaceDetectorSupported
+		// report false and silently drop -race. The unsupported-host path is
+		// covered by the explicit linux/386 case below.
+		if !testbin.RaceDetectorSupported(runtime.GOOS, runtime.GOARCH) {
+			t.Skip("host platform does not support the race detector")
+		}
+		t.Setenv("DEV_OS", "")
+		t.Setenv("DEV_ARCH", "")
+
+		args, err := raceDetectorArgs(true)
+		require.NoError(t, err, "the host platform supports the race detector")
+		assert.Equal(t, []string{"-race"}, args,
+			"unset DEV_OS/DEV_ARCH must default to the host and apply -race")
+	})
+
+	t.Run("supported explicit platform gets -race", func(t *testing.T) {
+		t.Setenv("DEV_OS", "linux")
+		t.Setenv("DEV_ARCH", "amd64")
+
+		args, err := raceDetectorArgs(true)
+		require.NoError(t, err, "linux/amd64 supports the race detector")
+		assert.Equal(t, []string{"-race"}, args, "-race expected on a supported platform")
+	})
+
+	t.Run("unsupported explicit platform fails loudly", func(t *testing.T) {
+		t.Setenv("DEV_OS", "linux")
+		t.Setenv("DEV_ARCH", "386")
+
+		args, err := raceDetectorArgs(true)
+		require.Error(t, err, "requesting the race detector on an unsupported platform must return an error")
+		assert.Empty(t, args, "no -race flag should be returned on error")
+	})
 }
 
 func TestGoTest_Helper_OK(t *testing.T) {

@@ -19,12 +19,9 @@ const (
 
 //nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
 func AzureStorageServer() http.Handler {
-	var pathPrefix string
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
-		if r.URL.RawQuery != "" {
-			pathPrefix = r.URL.Query().Get("prefix")
-		}
+		pathPrefix := r.URL.Query().Get("prefix")
 
 		w.Header().Set(contentType, jsonType)
 		if r.Method == http.MethodGet {
@@ -48,16 +45,11 @@ func AzureStorageServer() http.Handler {
 				}
 
 				w.Header().Set(contentType, xmlType)
-				w.Write([]byte(fetchContainer[containerName]))
+				w.Write([]byte(filterListingByPrefix(fetchContainer[containerName], pathPrefix)))
 				return
 			case 2:
 				if Containers[path[0]] && availableBlobs[path[0]][path[1]] {
-					if pathPrefix != "" && !strings.HasPrefix(path[1], pathPrefix) {
-						w.WriteHeader(http.StatusNotFound)
-						w.Write([]byte("resource not found"))
-					} else {
-						w.Write([]byte(blobs[path[0]][path[1]]))
-					}
+					w.Write([]byte(blobs[path[0]][path[1]]))
 					return
 				}
 			case 3:
@@ -106,6 +98,7 @@ func AzureStorageFileServer() http.Handler {
 					case "txn1.csv":
 						w.Header().Set(contentType, "text/csv")
 					}
+					//nolint:gosec // G705 false positive: test HTTP mock serving static fixture bytes
 					w.Write(data)
 					return
 				}
@@ -135,6 +128,7 @@ func AzureFileServerNoContentType() http.Handler {
 				if availableFileBlobs[path[0]][path[1]] {
 					absPath, _ := filepath.Abs("testdata/" + path[1])
 					data, _ := os.ReadFile(absPath)
+					//nolint:gosec // G705 false positive: test HTTP mock serving static fixture bytes
 					w.Write(data)
 					return
 				}
@@ -183,4 +177,41 @@ func hasKeyWithPrefix(data map[string]bool, prefix string) bool {
 		}
 	}
 	return false
+}
+
+// filterListingByPrefix returns a container listing XML containing only blobs
+// whose names match prefix. An empty prefix returns the full listing.
+func filterListingByPrefix(listing, prefix string) string {
+	if prefix == "" {
+		return listing
+	}
+
+	var out strings.Builder
+	rest := listing
+	for {
+		start := strings.Index(rest, "<Blob>")
+		if start == -1 {
+			out.WriteString(rest)
+			break
+		}
+		out.WriteString(rest[:start])
+		rest = rest[start:]
+		end := strings.Index(rest, "</Blob>")
+		if end == -1 {
+			out.WriteString(rest)
+			break
+		}
+		blob := rest[:end+len("</Blob>")]
+		rest = rest[end+len("</Blob>"):]
+
+		nameStart := strings.Index(blob, "<Name>") + len("<Name>")
+		nameEnd := strings.Index(blob, "</Name>")
+		if nameStart < len("<Name>") || nameEnd == -1 {
+			continue
+		}
+		if strings.HasPrefix(blob[nameStart:nameEnd], prefix) {
+			out.WriteString(blob)
+		}
+	}
+	return out.String()
 }

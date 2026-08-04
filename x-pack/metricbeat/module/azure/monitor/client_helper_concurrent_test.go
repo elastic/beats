@@ -22,6 +22,39 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
+func waitAndCollectConcurrentMapMetrics(client *azure.BatchClient, wg *sync.WaitGroup) ([]azure.Metric, error) {
+	metricsCh := client.ResourceConfigurations.MetricDefinitionsChan
+	errorCh := client.ResourceConfigurations.ErrorChan
+
+	go func() {
+		wg.Wait()
+		client.Log.Infof("All collections finished. Closing channels ")
+		close(metricsCh)
+		close(errorCh)
+	}()
+
+	var collectedMetrics []azure.Metric
+	var collectedErr error
+	metricsOpen := true
+	errorOpen := true
+	for metricsOpen || errorOpen {
+		select {
+		case resMetricDefinition, ok := <-metricsCh:
+			if !ok {
+				metricsOpen = false
+			} else {
+				collectedMetrics = append(collectedMetrics, resMetricDefinition...)
+			}
+		case err, ok := <-errorCh:
+			if ok && err != nil {
+				collectedErr = err
+			}
+			errorOpen = false
+		}
+	}
+	return collectedMetrics, collectedErr
+}
+
 func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 	resource := MockResourceExpanded()
 	metricDefinitions := armmonitor.MetricDefinitionCollection{
@@ -41,40 +74,8 @@ func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			if client.ResourceConfigurations.ErrorChan != nil {
-				close(client.ResourceConfigurations.ErrorChan)
-			}
-		}()
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
-
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-		assert.Error(t, error)
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
+		assert.EqualError(t, err, "invalid resource ID", "unexpected error from concurrentMapMetrics")
 		assert.Equal(t, collectedMetrics, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
@@ -89,45 +90,15 @@ func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			close(client.ResourceConfigurations.ErrorChan)
-		}()
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-
-		assert.NoError(t, error)
-		assert.Equal(t, collectedMetrics[0].ResourceId, "123")
-		assert.Equal(t, collectedMetrics[0].Namespace, "namespace")
-		assert.Equal(t, collectedMetrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
-		assert.Equal(t, collectedMetrics[0].Aggregations, "Average")
-		assert.Equal(t, collectedMetrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
-		assert.Equal(t, collectedMetrics[0].TimeGrain, oneHrDuration)
+		assert.NoError(t, err)
+		assert.Equal(t, "123", collectedMetrics[0].ResourceId)
+		assert.Equal(t, "namespace", collectedMetrics[0].Namespace)
+		assert.Equal(t, []string{"TotalRequests", "Capacity", "BytesRead"}, collectedMetrics[0].Names)
+		assert.Equal(t, "Average", collectedMetrics[0].Aggregations)
+		assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetrics[0].Dimensions)
+		assert.Equal(t, oneHrDuration, collectedMetrics[0].TimeGrain)
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
@@ -142,46 +113,16 @@ func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			close(client.ResourceConfigurations.ErrorChan)
-		}()
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
+		assert.NoError(t, err)
 
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-		assert.NoError(t, error)
-
-		assert.True(t, len(collectedMetrics) > 0)
-		assert.Equal(t, collectedMetrics[0].ResourceId, "123")
-		assert.Equal(t, collectedMetrics[0].Namespace, "namespace")
-		assert.Equal(t, collectedMetrics[0].Names, []string{"TotalRequests", "Capacity"})
-		assert.Equal(t, collectedMetrics[0].Aggregations, "Average")
-		assert.Equal(t, collectedMetrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
-		assert.Equal(t, collectedMetrics[0].TimeGrain, oneHrDuration)
+		assert.NotEmpty(t, collectedMetrics)
+		assert.Equal(t, "123", collectedMetrics[0].ResourceId)
+		assert.Equal(t, "namespace", collectedMetrics[0].Namespace)
+		assert.Equal(t, []string{"TotalRequests", "Capacity"}, collectedMetrics[0].Names)
+		assert.Equal(t, "Average", collectedMetrics[0].Aggregations)
+		assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetrics[0].Dimensions)
+		assert.Equal(t, oneHrDuration, collectedMetrics[0].TimeGrain)
 		m.AssertExpectations(t)
 	})
 }
@@ -204,40 +145,8 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			if client.ResourceConfigurations.ErrorChan != nil {
-				close(client.ResourceConfigurations.ErrorChan)
-			}
-		}()
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
-
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-		assert.Error(t, error)
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
+		assert.EqualError(t, err, "invalid resource ID", "unexpected error from concurrentMapMetrics")
 		assert.Equal(t, collectedMetrics, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
@@ -252,39 +161,9 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			close(client.ResourceConfigurations.ErrorChan)
-		}()
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
 
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-
-		assert.NoError(t, error)
+		assert.NoError(t, err)
 
 		// we should have two groups, one per first timegrain value
 		assert.Len(t, collectedMetrics, 2)
@@ -293,17 +172,17 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		for _, collectedMetric := range collectedMetrics {
 			switch collectedMetric.TimeGrain {
 			case oneMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"Capacity"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"Capacity"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			case thirtyMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"TotalRequests", "BytesRead"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"TotalRequests", "BytesRead"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			}
 		}
 		m.AssertExpectations(t)
@@ -320,40 +199,10 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig, &wg)
-		go func() {
-			wg.Wait() // Wait for all the resource collection goroutines to finish
-			// Once all the goroutines are done, close the channels
-			client.Log.Infof("All collections finished. Closing channels ")
-			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			close(client.ResourceConfigurations.ErrorChan)
-		}()
-		var collectedMetrics []azure.Metric
-		var error error
-		for {
-			select {
-			case resMetricDefinition, ok := <-client.ResourceConfigurations.MetricDefinitionsChan:
-				if !ok {
-					client.ResourceConfigurations.MetricDefinitionsChan = nil
-				} else {
-					collectedMetrics = append(collectedMetrics, resMetricDefinition...)
-				}
-			case err, ok := <-client.ResourceConfigurations.ErrorChan:
-				if ok && err != nil {
-					// Handle error received from error channel
-					error = err
-				}
-				// Error channel is closed, stop error handling
-				client.ResourceConfigurations.ErrorChan = nil
-			}
+		collectedMetrics, err := waitAndCollectConcurrentMapMetrics(client, &wg)
+		assert.NoError(t, err)
 
-			// Break the loop when both Data and Error channels are closed
-			if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-				break
-			}
-		}
-		assert.NoError(t, error)
-
-		assert.True(t, len(collectedMetrics) > 0)
+		assert.NotEmpty(t, collectedMetrics)
 
 		// we should have two groups, one per first timegrain value
 		assert.Len(t, collectedMetrics, 2)
@@ -362,17 +211,17 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		for _, collectedMetric := range collectedMetrics {
 			switch collectedMetric.TimeGrain {
 			case oneMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"Capacity"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"Capacity"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			case thirtyMinuteDuration:
-				assert.Equal(t, collectedMetric.ResourceId, "123")
-				assert.Equal(t, collectedMetric.Namespace, "namespace")
-				assert.Equal(t, collectedMetric.Names, []string{"TotalRequests"})
-				assert.Equal(t, collectedMetric.Aggregations, "Average")
-				assert.Equal(t, collectedMetric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+				assert.Equal(t, "123", collectedMetric.ResourceId)
+				assert.Equal(t, "namespace", collectedMetric.Namespace)
+				assert.Equal(t, []string{"TotalRequests"}, collectedMetric.Names)
+				assert.Equal(t, "Average", collectedMetric.Aggregations)
+				assert.Equal(t, []azure.Dimension{{Name: "location", Value: "West Europe"}}, collectedMetric.Dimensions)
 			}
 		}
 

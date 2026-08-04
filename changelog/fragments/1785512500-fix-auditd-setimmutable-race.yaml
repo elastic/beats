@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Set audit immutable config before starting the event receive loop to avoid concurrent netlink reads.
+
+component: auditbeat

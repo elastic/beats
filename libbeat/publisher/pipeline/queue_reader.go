@@ -46,13 +46,15 @@ func makeQueueReader() queueReader {
 	return qr
 }
 
+// run dispatches queue reads until the request channel is closed. Nothing joins
+// this goroutine, so it must not log once shutdown has started: the logger can
+// outlive whoever owns it, which in tests means writing into a finished test.
 func (qr *queueReader) run(logger *logp.Logger) {
 	logger.Debug("pipeline event consumer queue reader: start")
 	for {
 		req, ok := <-qr.req
 		if !ok {
 			// The request channel is closed, we're shutting down
-			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}
 		queueBatch, _ := req.queue.Get(req.batchSize)
@@ -73,7 +75,6 @@ func (qr *queueReader) run(logger *logp.Logger) {
 			if batch != nil {
 				batch.Release()
 			}
-			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}
 	}
