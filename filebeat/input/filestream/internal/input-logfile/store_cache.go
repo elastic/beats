@@ -160,7 +160,6 @@ func initializeStoreCacheEntry(
 	logger.Debugw(
 		"initialized filestream shared store cache entry",
 		"filestream_store_key", key,
-		"interval", interval,
 		"store_users_count", 1,
 	)
 
@@ -183,10 +182,9 @@ func releaseAcquiredStore(logger *logp.Logger, s *store) {
 		return
 	}
 	entry.users--
-	users := entry.users
-	if users > 0 {
+	if entry.users > 0 {
 		globalStoreCache.mu.Unlock()
-		logger.Debugw("released filestream shared store", "store_users_count", users)
+		logger.Debugw("released filestream shared store", "store_users_count", entry.users)
 		s.Release()
 		return
 	}
