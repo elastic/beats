@@ -30,7 +30,6 @@ import (
 	"runtime"
 	"runtime/debug"
 	"strconv"
-	"flag"
 	"strings"
 	"sync"
 	"time"
@@ -801,10 +800,6 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 
 // HostnameFlag holds the value of the --hostname flag.
 var HostnameFlag string
-
-func init() {
-	flag.StringVar(&HostnameFlag, "hostname", "", "Override the detected hostname")
-}
 
 // handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
