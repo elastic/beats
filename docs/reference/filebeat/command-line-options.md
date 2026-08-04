@@ -263,9 +263,6 @@ filebeat [FLAGS]
     The `--once` option is not currently supported with the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input type.
 
 
-**`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is deprecated, and an alternate hostfs should be specified via the `hostfs` module config value.
-
 Also see [Global flags](#global-flags).
 
 **EXAMPLE**
