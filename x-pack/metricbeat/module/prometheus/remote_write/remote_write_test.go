@@ -7,7 +7,6 @@
 package remote_write
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -1207,7 +1206,6 @@ func TestGenerateEventsHistogramPartialAcrossRequests(t *testing.T) {
 	flushed := flushHistogramEventsQuiet(g)
 	require.Contains(t, flushed, eventKey)
 	hist := flushed[eventKey].ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
-	fmt.Printf("final histogram: %#v\n", hist)
 
 	assert.Equal(t, []float64{0.125, 0.375, 0.5}, hist["values"], "flush must merge buckets across requests")
 }
