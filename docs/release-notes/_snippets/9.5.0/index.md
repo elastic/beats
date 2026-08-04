@@ -64,12 +64,12 @@
 **Osquerybeat**
 
 * Add RRULE scheduling and scheduled responses for Osquerybeat. [#48767](https://github.com/elastic/beats/pull/48767)
-* Removes the dependency on fslib and implements the functionality using go-ntfs instead. [#49763](https://github.com/elastic/beats/pull/49763) 
-* Add osquerybeatreceiver to run osquerybeat under the EDOT collector. [#49868](https://github.com/elastic/beats/pull/49868) 
-* Add elastic_ntfs_partitions and elastic_ntfs_volumes tables to the osquery extension. [#50140](https://github.com/elastic/beats/pull/50140) 
-* Add elastic_ntfs_file table to the osquery extension for MFT-based file metadata on Windows. [#50641](https://github.com/elastic/beats/pull/50641) 
-* Rename osquerybeat query profiling settings to `profiling` and enable profiling by default. [#51691](https://github.com/elastic/beats/pull/51691) 
-* Harden osquerybeat RRULE scheduler reload, RRULE osqueryd rendering, splay limits, and pack schedule metadata. [#48767](https://github.com/elastic/beats/pull/48767) 
+* Remove the dependency on `fslib` and implements the functionality using `go-ntfs` instead. [#49763](https://github.com/elastic/beats/pull/49763)
+* Add `osquerybeatreceiver` to run Osquerybeat in the EDOT Collector. [#49868](https://github.com/elastic/beats/pull/49868) 
+* Add `elastic_ntfs_partitions` and `elastic_ntfs_volumes` tables to the Osquery extension. [#50140](https://github.com/elastic/beats/pull/50140)
+* Add `elastic_ntfs_file` table to the Osquery extension for MFT-based file metadata on Windows. [#50641](https://github.com/elastic/beats/pull/50641)
+* Rename Osquerybeat query profiling settings to `profiling` and enable profiling by default. [#51691](https://github.com/elastic/beats/pull/51691)
+* Harden Osquerybeat RRULE scheduler reload, RRULE osqueryd rendering, splay limits, and pack schedule metadata. [#48767](https://github.com/elastic/beats/pull/48767) 
 
 **Packetbeat**
 
