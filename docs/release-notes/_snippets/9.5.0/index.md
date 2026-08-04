@@ -30,19 +30,13 @@
   OpenTelemetry Collector file_storage extension.
   
 * Add Jamf provider support for entity analytics minimal-state mode. [#50445](https://github.com/elastic/beats/pull/50445) 
-* Add auditd filestream parser that populates auditd.log.* fields using go-libaudit. [#50791](https://github.com/elastic/beats/pull/50791) 
-* Add `entcollect store adapter to the Elasticsearch storage OTel extension. [#49871](https://github.com/elastic/beats/pull/49871) 
-* Filestream: include_file_fingerprint controls log.file.fingerprint in events. [#50129](https://github.com/elastic/beats/pull/50129) [#50724](https://github.com/elastic/beats/issues/50724)
+* Add `auditd` filestream parser that populates `auditd.log.*` fields using `go-libaudit`. [#50791](https://github.com/elastic/beats/pull/50791) 
+* Add `entcollect` store adapter to the Elasticsearch storage OTel extension. [#49871](https://github.com/elastic/beats/pull/49871) 
+* Add an `include_file_fingerprint` configuration option to the filestream input to control `log.file.fingerprint` in events. [#50129](https://github.com/elastic/beats/pull/50129) [#50724](https://github.com/elastic/beats/issues/50724)
 * Add minimal-state Active Directory entity analytics provider. [#50601](https://github.com/elastic/beats/pull/50601) [#49162](https://github.com/elastic/beats/issues/49162)
 * Add minimal-state Okta entity analytics provider with bulk-fetch group enrichment. [#50685](https://github.com/elastic/beats/pull/50685) 
 * Add minimal-state mode for the EntraID entity analytics provider. [#50773](https://github.com/elastic/beats/pull/50773) 
-* Add Enhanced Fingerprint mode to the filestream input&#39;s `fingerprint` file identity.
-When enabled (`file_identity.fingerprint.growing: true`, the default), files smaller
-than `prospector.scanner.fingerprint.offset &#43; prospector.scanner.fingerprint.length`
-are tracked instead of being skipped as too small. No data duplication happens
-on upgrade or when enabling the enhanced fingerprint. The new behaviour is
-opt-out (`growing: false` restores the legacy fingerprint behaviour).
-. [#50566](https://github.com/elastic/beats/pull/50566) [#50116](https://github.com/elastic/beats/issues/50116)
+* Add Enhanced Fingerprint mode to the filestream input's `fingerprint` file identity. [#50566](https://github.com/elastic/beats/pull/50566) [#50116](https://github.com/elastic/beats/issues/50116)
 * Add Filestream scanner metrics to monitoring logs. [#50963](https://github.com/elastic/beats/pull/50963) 
 
   The following Filestream metrics are added to the logs and the `/stats` HTTP endpoint:
