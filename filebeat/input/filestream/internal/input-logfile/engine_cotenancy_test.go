@@ -180,20 +180,21 @@ func TestSharedEngine_PollsDueSourcesConcurrently(t *testing.T) {
 	require.NoError(t, runnerB.StopHarvesters())
 }
 
-// TestSharedEngine_BoundsConcurrentPolls asserts the batch polling above is
-// bounded: however many sources come due at once, at most maxConcurrentPolls are
-// in flight, and the ones there was no budget for are re-parked, not dropped.
-// Nothing else bounds it — harvester_limit is per input and unbounded by default.
-func TestSharedEngine_BoundsConcurrentPolls(t *testing.T) {
+// TestSharedEngine_HarvesterLimitCapsConcurrentPolls asserts harvester_limit is
+// what bounds an input's poll fan-out: only a source holding an open slot can be
+// parked, and only a parked source is polled, so an input can never have more
+// than `limit` polls in flight — including when every one of them is wedged.
+// Unset (the case above) leaves it uncapped, as it does for open files.
+func TestSharedEngine_HarvesterLimitCapsConcurrentPolls(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	engine := newEngine(logger)
 	t.Cleanup(engine.stop)
 
-	// More sources than the budget, so some of the batch must wait for a later pass.
-	const total = maxConcurrentPolls + 16
+	const limit = 3
+	const total = 12
 
-	// Every Poll wedges until the test lets go, holding its slot: the
-	// unresponsive-mount case the budget exists for.
+	// Every Poll wedges until the test lets go, so a slot is never given back and
+	// the cap is the only thing holding the fan-out down.
 	release := make(chan struct{})
 	var inFlight, maxInFlight atomic.Int64
 	h := &fakeHarvester{
@@ -212,35 +213,19 @@ func TestSharedEngine_BoundsConcurrentPolls(t *testing.T) {
 		},
 	}
 
-	runner := newHarvesterRunnerOn(t, engine, func() {}, h, 0, ReadUntilEOFConfig{})
+	runner := newHarvesterRunnerOn(t, engine, func() {}, h, limit, ReadUntilEOFConfig{})
 	runner.backoff = fastBackoff
 	runner.start()
 	for i := range total {
 		runner.Start(startContext(t), &testSource{name: fmt.Sprintf("/f-%d", i)})
 	}
 
-	requireEventually(t, func() bool { return inFlight.Load() == maxConcurrentPolls },
-		"the scheduler must use its whole poll budget")
-	assert.Never(t, func() bool { return maxInFlight.Load() > maxConcurrentPolls },
-		500*time.Millisecond, eventuallyInterval,
-		"the scheduler must never exceed its poll budget, however many sources are due")
-
-	// Freeing the slots must let the sources that missed the batch through, which
-	// they only can if they were re-parked.
-	polled := func() int {
-		n := 0
-		for i := range h.opens() {
-			if h.session(i).pollCount() > 0 {
-				n++
-			}
-		}
-		return n
-	}
-	require.Less(t, polled(), total, "the batch must not have polled every source while the budget was full")
+	requireEventually(t, func() bool { return inFlight.Load() == limit },
+		"every open slot must end up in a wedged poll")
+	assert.Never(t, func() bool { return maxInFlight.Load() > limit }, 500*time.Millisecond, eventuallyInterval,
+		"an input must never have more polls in flight than harvester_limit, however many sources it has")
+	assert.Equal(t, limit, h.opens(), "queued sources must not be opened, so they are never polled")
 
 	close(release)
-	requireEventually(t, func() bool { return polled() == total },
-		"sources left unpolled by a full batch must be re-parked and polled on a later pass")
-
 	require.NoError(t, runner.StopHarvesters())
 }

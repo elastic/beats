@@ -653,7 +653,7 @@ func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	g.mu.Unlock()
 
 	start := time.Now()
-	done := g.startPoll(state, func() {})
+	done := g.startPoll(state)
 	require.NotNil(t, done, "an open runner must start the poll")
 	select {
 	case <-done:
@@ -681,7 +681,7 @@ func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing
 	g.closed = true // simulate StopHarvesters having already closed the runner
 	g.mu.Unlock()
 
-	assert.Nil(t, g.startPoll(state, func() {}),
+	assert.Nil(t, g.startPoll(state),
 		"a closed runner must report that no poll was started, so the scheduler does not wait for one")
 }
 
