@@ -156,6 +156,11 @@ RUN echo \
 
 USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
+# npm >= 12 blocks dependency install scripts by default, so playwright-chromium's
+# install hook no longer downloads browsers during `npm i`. Install them explicitly
+# with the bundled Playwright CLI (same revision synthetics expects).
+RUN HOME={{ $beatHome }} node "$(npm root -g)/@elastic/synthetics/node_modules/playwright-core/cli.js" install chromium && \
+    test -d {{ $beatHome }}/.cache/ms-playwright
 {{- end }}
 
 {{- if (and (eq .BeatName "heartbeat") (contains .from "ubi10-minimal")) }}
@@ -235,6 +240,11 @@ USER {{ .user }}
 # If this fails dump the NPM logs
 RUN npm i -g --loglevel verbose --production --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
 RUN chmod ug+rwX -R $NODE_PATH
+# npm >= 12 blocks dependency install scripts by default, so playwright-chromium's
+# install hook no longer downloads browsers during `npm i`. Install them explicitly
+# with the bundled Playwright CLI (same revision synthetics expects).
+RUN HOME={{ $beatHome }} node "$(npm root -g)/@elastic/synthetics/node_modules/playwright-core/cli.js" install chromium && \
+    test -d {{ $beatHome }}/.cache/ms-playwright
 
 USER root
 
