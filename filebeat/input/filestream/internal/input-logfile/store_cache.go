@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"go.uber.org/zap"
 )
 
 type storeCacheState uint8
@@ -64,7 +65,7 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 	key := states.StoreKey()
 	logger = logger.
 		Named("filestream.store_cache").
-		With("filestream_store_key", key)
+		WithLazy(zap.String("filestream_store_key", key))
 	// Retry after a concurrent initialization or draining store has completed.
 	for {
 		globalStoreCache.mu.Lock()
@@ -165,16 +166,17 @@ func initializeStoreCacheEntry(
 		defer entry.cleanerWg.Done()
 		defer entry.store.Release()
 		logger.Debugw("filestream shared store cleaner started")
-		(&cleaner{log: logger}).run(ctx, s, interval)
+		runCleaner(logger, ctx, s, interval)
 		logger.Debugw("filestream shared store cleaner stopped")
 	}()
+
 	return s, nil
 }
 
 func releaseAcquiredStore(logger *logp.Logger, s *store) {
 	logger = logger.
 		Named("filestream.store_cache").
-		With("filestream_store_key", s.cacheEntry.key)
+		WithLazy(zap.String("filestream_store_key", s.cacheEntry.key))
 
 	globalStoreCache.mu.Lock()
 	entry := s.cacheEntry

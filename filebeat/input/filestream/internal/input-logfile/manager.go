@@ -93,7 +93,7 @@ var errNoInputRunner = errors.New("no input runner available")
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
-func (cim *InputManager) init(group unison.Group) error {
+func (cim *InputManager) Init(group unison.Group) error {
 	cim.initOnce.Do(func() {
 		if group == nil {
 			cim.initErr = errors.New("input manager Init must be called before Create")
@@ -136,10 +136,6 @@ func (cim *InputManager) init(group unison.Group) error {
 	return cim.initErr
 }
 
-func (cim *InputManager) Init(group unison.Group) error {
-	return cim.init(group)
-}
-
 func (cim *InputManager) shutdown() {
 	cim.ackUpdater.Close()
 	releaseAcquiredStore(cim.Logger, cim.store)
@@ -148,7 +144,7 @@ func (cim *InputManager) shutdown() {
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
-	if err := cim.init(nil); err != nil {
+	if err := cim.Init(nil); err != nil {
 		return nil, err
 	}
 
