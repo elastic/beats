@@ -158,11 +158,11 @@ func (e *engine) stop() {
 	})
 }
 
-// waker evaluates parked sources from every registered input as they come due:
-// it resumes those with new data (by spawning a reader), re-parks those still
-// idle, and tears down those that hit a close condition. It pops only due
-// sources and sleeps until the next one is due, so an idle fleet of inputs costs
-// one sleeping goroutine.
+// waker hands parked sources from every registered input to their own input's
+// poll chain as they come due, which resumes those with new data (by spawning a
+// reader), re-parks those still idle, and tears down those that hit a close
+// condition. It pops only due sources and sleeps until the next one is due, so
+// an idle fleet of inputs costs one sleeping goroutine.
 func (e *engine) waker() {
 	for {
 		e.mu.Lock()
@@ -174,46 +174,14 @@ func (e *engine) waker() {
 		}
 		e.mu.Unlock()
 
-		// Poll the batch concurrently under one shared grace period. Polling in
-		// turn would cost K*pollGracePeriod for K stuck sources and put a healthy
-		// input's sources behind a sick one's, on a goroutine every input shares.
-		// Every actively read file passes through here at each slice boundary, so
-		// that is on the read path, not just the idle one.
-		//
-		// harvester_limit caps the fan-out per input: only a source holding an
-		// open slot can be parked, and only a parked source is polled. Unset (the
-		// default) is uncapped here, as it is for open files.
-		pending := make([]<-chan struct{}, 0, len(due))
+		// Hand each due source to its own input's poll chain and go back to
+		// sleep. Polls run in turn within an input and concurrently across
+		// inputs, so the fan-out is one chain per input with due work rather than
+		// a goroutine per due file, and a source stuck in Poll (a stat() on an
+		// unresponsive mount) delays only the input that owns it. A re-parked
+		// source signals the waker, so nothing is missed by not waiting here.
 		for _, state := range due {
-			if done := state.reg.startPoll(state); done != nil {
-				pending = append(pending, done)
-			}
-		}
-		if len(pending) > 0 {
-			grace := time.NewTimer(pollGracePeriod)
-		waitBatch:
-			for _, done := range pending {
-				select {
-				case <-done:
-				case <-grace.C:
-					// Polls still running are left to finish in the background,
-					// tracked by their own runner.
-					break waitBatch
-				}
-			}
-			grace.Stop()
-		}
-
-		// Loop immediately to pick up sources that became due during the polls,
-		// but check for stop first so a steady stream of due work cannot delay
-		// shutdown indefinitely.
-		if len(due) > 0 {
-			select {
-			case <-e.done:
-				return
-			default:
-			}
-			continue
+			state.reg.enqueuePoll(state)
 		}
 
 		wait := wakerIdleWait

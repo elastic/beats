@@ -641,8 +641,8 @@ func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T
 
 // TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait asserts a Poll that
 // returns quickly (the common case, e.g. a healthy local filesystem) is not
-// delayed by the grace period: the waker moves on as soon as it completes,
-// well under pollGracePeriod, rather than always waiting out the full window.
+// delayed by the grace period: the chain moves to the next source as soon as it
+// completes, rather than always waiting out the full window.
 func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
 	session := &fakeSession{pollFn: func(_ int) PollResult { return PollPark }}
@@ -653,22 +653,17 @@ func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	g.mu.Unlock()
 
 	start := time.Now()
-	done := g.startPoll(state)
-	require.NotNil(t, done, "an open runner must start the poll")
-	select {
-	case <-done:
-	case <-time.After(pollGracePeriod):
-	}
+	g.pollWithGracePeriod(state)
 	assert.Less(t, time.Since(start), pollGracePeriod,
 		"a fast Poll must not be held up until the grace period elapses")
 	assert.Equal(t, 1, session.pollCount())
 }
 
-// TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed asserts
-// startPoll reports that nothing was started when the runner is already closed:
-// spawn silently declines to run the closure, so without this the scheduler
-// would wait out the grace period for a poll that is never going to happen,
-// delaying shutdown past the stuck grace and skipping finishRemaining's cleanup.
+// TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed asserts a
+// closed runner runs no poll and does not wait: spawn silently declines to run
+// the closure, so without the check the chain would wait out the grace period
+// for a poll that is never going to happen, delaying shutdown past the stuck
+// grace and skipping finishRemaining's cleanup.
 func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing.T) {
 	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
 	state.session = &fakeSession{pollFn: func(_ int) PollResult {
@@ -681,8 +676,10 @@ func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing
 	g.closed = true // simulate StopHarvesters having already closed the runner
 	g.mu.Unlock()
 
-	assert.Nil(t, g.startPoll(state),
-		"a closed runner must report that no poll was started, so the scheduler does not wait for one")
+	start := time.Now()
+	g.pollWithGracePeriod(state)
+	assert.Less(t, time.Since(start), pollGracePeriod,
+		"a closed runner must not wait out the grace period for a poll it never started")
 }
 
 // TestHarvesterRunner_ParkCapsDueAtStateCheckInterval asserts park schedules the

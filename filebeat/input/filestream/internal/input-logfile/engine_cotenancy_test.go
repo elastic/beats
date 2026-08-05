@@ -110,36 +110,36 @@ func TestSharedEngine_StoppingOneInputLeavesTheOtherRunning(t *testing.T) {
 	require.NoError(t, runnerB.StopHarvesters())
 }
 
-// TestSharedEngine_PollsDueSourcesConcurrently asserts that sources coming due
-// together are polled together, across inputs, with the grace period on the
-// batch rather than on each source in turn.
+// TestSharedEngine_PollsSerialPerInputConcurrentAcrossInputs asserts the shape of
+// the scheduling: an input's due sources are polled one at a time, and different
+// inputs poll at the same time. So the scheduler's fan-out is one chain per input
+// with due work, not a goroutine per due file, and no input waits on another.
 //
-// Poll is typically a stat(), and on an unresponsive mount it hangs for the
-// whole grace period. Polled in turn, one such source would delay every other
-// input's sources on the goroutine they all share.
-func TestSharedEngine_PollsDueSourcesConcurrently(t *testing.T) {
+// This is what a per-input waker gave before the engine was shared; the engine
+// keeps it while costing one sleeping goroutine for the process instead of N.
+func TestSharedEngine_PollsSerialPerInputConcurrentAcrossInputs(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	engine := newEngine(logger)
 	t.Cleanup(engine.stop)
 
-	// Well under the grace period, so a concurrent batch finishes within it and
-	// the test never depends on the abandonment path.
+	// Well under the grace period, so no poll is ever abandoned and every overlap
+	// the test sees is real concurrency rather than a stuck poll left behind.
 	const holdFor = pollGracePeriod / 4
 	const sourcesPerInput = 4
 
-	// inFlightA/inFlightB count the polls each input has in progress; maxInFlight
-	// is the largest overlap seen across both, and crossInput records whether the
-	// two inputs were ever polled at the same instant.
-	var inFlightA, inFlightB, maxInFlight atomic.Int64
+	// inFlightA/inFlightB count the polls each input has in progress; maxPerInput
+	// is the largest either reached on its own, and crossInput records whether the
+	// two inputs were ever in Poll at the same instant.
+	var inFlightA, inFlightB, maxPerInput atomic.Int64
 	var crossInput atomic.Bool
 	hold := func(mine, theirs *atomic.Int64, polls *atomic.Int64) *fakeHarvester {
 		h := pollCountingHarvester(polls, 0)
 		inner := h.pollFn
 		h.pollFn = func(call int) PollResult {
-			n := mine.Add(1) + theirs.Load()
+			n := mine.Add(1)
 			for {
-				observed := maxInFlight.Load()
-				if n <= observed || maxInFlight.CompareAndSwap(observed, n) {
+				observed := maxPerInput.Load()
+				if n <= observed || maxPerInput.CompareAndSwap(observed, n) {
 					break
 				}
 			}
@@ -154,8 +154,8 @@ func TestSharedEngine_PollsDueSourcesConcurrently(t *testing.T) {
 	}
 
 	var pollsA, pollsB atomic.Int64
-	// Long enough that the sources of both inputs park before the first of them
-	// comes due, so they land in one due batch.
+	// Long enough that every source parks before the first comes due, so each
+	// input has a queue of sources to work through rather than one at a time.
 	batching := BackoffConfig{Init: 250 * time.Millisecond, Max: 250 * time.Millisecond}
 	runnerA := newHarvesterRunnerOn(t, engine, func() {}, hold(&inFlightA, &inFlightB, &pollsA), 0, ReadUntilEOFConfig{})
 	runnerB := newHarvesterRunnerOn(t, engine, func() {}, hold(&inFlightB, &inFlightA, &pollsB), 0, ReadUntilEOFConfig{})
@@ -168,64 +168,66 @@ func TestSharedEngine_PollsDueSourcesConcurrently(t *testing.T) {
 		runnerB.Start(startContext(t), &testSource{name: fmt.Sprintf("/b-%d", i)})
 	}
 
-	// Polled in turn, maxInFlight never leaves 1 and no two inputs are ever in
-	// Poll at once, so neither condition is a timing threshold to be tuned. A
-	// straggler that misses one batch only delays the observation to the next
-	// park cycle.
-	requireEventually(t,
-		func() bool { return crossInput.Load() && maxInFlight.Load() >= int64(sourcesPerInput) },
-		"sources that come due together must be polled together, across inputs, not one after another")
+	// Inputs overlapping each other is the property; a straggler that misses one
+	// batch only delays the observation to the next park cycle.
+	requireEventually(t, crossInput.Load,
+		"different inputs must poll at the same time, not one input's queue after another's")
+	// Serial within an input is an invariant, so it is checked for the whole run
+	// rather than at an instant: two of one input's sources in Poll at once means
+	// a second chain was started for it.
+	assert.Never(t, func() bool { return maxPerInput.Load() > 1 }, 500*time.Millisecond, eventuallyInterval,
+		"an input must poll its due sources in turn, never two at once")
 
 	require.NoError(t, runnerA.StopHarvesters())
 	require.NoError(t, runnerB.StopHarvesters())
 }
 
-// TestSharedEngine_HarvesterLimitCapsConcurrentPolls asserts harvester_limit is
-// what bounds an input's poll fan-out: only a source holding an open slot can be
-// parked, and only a parked source is polled, so an input can never have more
-// than `limit` polls in flight — including when every one of them is wedged.
-// Unset (the case above) leaves it uncapped, as it does for open files.
-func TestSharedEngine_HarvesterLimitCapsConcurrentPolls(t *testing.T) {
+// TestSharedEngine_StuckPollIsAbandonedAndOthersContinue asserts what happens
+// when a Poll does not come back — a stat() on an unresponsive mount. It is left
+// running on its own goroutine after the grace period, and neither the rest of
+// its own input's queue nor the other input on the same scheduler waits for it.
+func TestSharedEngine_StuckPollIsAbandonedAndOthersContinue(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	engine := newEngine(logger)
 	t.Cleanup(engine.stop)
 
-	const limit = 3
-	const total = 12
+	const sourcesPerInput = 3
 
-	// Every Poll wedges until the test lets go, so a slot is never given back and
-	// the cap is the only thing holding the fan-out down.
+	// The first poll of input A never returns; every later one is healthy, so any
+	// progress A makes proves the chain moved past the stuck source.
 	release := make(chan struct{})
-	var inFlight, maxInFlight atomic.Int64
-	h := &fakeHarvester{
-		readFn: func(int, v2.Context) (SliceVerdict, error) { return SliceYield, nil },
-		pollFn: func(int) PollResult {
-			n := inFlight.Add(1)
-			for {
-				observed := maxInFlight.Load()
-				if n <= observed || maxInFlight.CompareAndSwap(observed, n) {
-					break
-				}
-			}
+	var wedged, stuckLive atomic.Bool
+	var pollsA, pollsB atomic.Int64
+	hA := pollCountingHarvester(&pollsA, 0)
+	inner := hA.pollFn
+	hA.pollFn = func(call int) PollResult {
+		if wedged.CompareAndSwap(false, true) {
+			stuckLive.Store(true)
 			<-release
-			inFlight.Add(-1)
+			stuckLive.Store(false)
 			return PollPark
-		},
+		}
+		return inner(call)
 	}
 
-	runner := newHarvesterRunnerOn(t, engine, func() {}, h, limit, ReadUntilEOFConfig{})
-	runner.backoff = fastBackoff
-	runner.start()
-	for i := range total {
-		runner.Start(startContext(t), &testSource{name: fmt.Sprintf("/f-%d", i)})
+	runnerA := newHarvesterRunnerOn(t, engine, func() {}, hA, 0, ReadUntilEOFConfig{})
+	runnerB := newHarvesterRunnerOn(t, engine, func() {}, pollCountingHarvester(&pollsB, 0), 0, ReadUntilEOFConfig{})
+	runnerA.backoff, runnerB.backoff = fastBackoff, fastBackoff
+
+	runnerA.start()
+	runnerB.start()
+	for i := range sourcesPerInput {
+		runnerA.Start(startContext(t), &testSource{name: fmt.Sprintf("/a-%d", i)})
+		runnerB.Start(startContext(t), &testSource{name: fmt.Sprintf("/b-%d", i)})
 	}
 
-	requireEventually(t, func() bool { return inFlight.Load() == limit },
-		"every open slot must end up in a wedged poll")
-	assert.Never(t, func() bool { return maxInFlight.Load() > limit }, 500*time.Millisecond, eventuallyInterval,
-		"an input must never have more polls in flight than harvester_limit, however many sources it has")
-	assert.Equal(t, limit, h.opens(), "queued sources must not be opened, so they are never polled")
+	// Both inputs must keep being polled while the stuck poll is still sitting in
+	// its goroutine, so neither is waiting on it.
+	requireEventually(t, func() bool { return pollsA.Load() > 0 && pollsB.Load() > 5 },
+		"a stuck poll must not hold up its own input's other sources or another input")
+	assert.True(t, stuckLive.Load(), "the stuck poll must still be running, i.e. it was abandoned rather than waited out")
 
 	close(release)
-	require.NoError(t, runner.StopHarvesters())
+	require.NoError(t, runnerA.StopHarvesters())
+	require.NoError(t, runnerB.StopHarvesters())
 }

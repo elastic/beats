@@ -32,10 +32,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// pollGracePeriod bounds how long the scheduler waits for a batch of due
-// sources to finish polling (typically a stat() each) before moving on. It is
-// well above normal stat() latency even under load, so a healthy batch always
-// finishes within it; see startPoll and engine.waker.
+// pollGracePeriod bounds how long an input's poll chain waits for one due source
+// to finish polling (typically a stat()) before moving on to the next. It is well
+// above normal stat() latency even under load, so a healthy poll always finishes
+// within it; see pollWithGracePeriod.
 const pollGracePeriod = 100 * time.Millisecond
 
 // defaultStuckHarvesterGrace bounds how long StopHarvesters waits for cancelled
@@ -116,8 +116,7 @@ type sourceState struct {
 // A source that cannot get an open slot is queued and promoted (FIFO) when an
 // open file closes, so the fd count never exceeds the limit; 0 (the default) is
 // unbounded. The limit is per input: the engine shares scheduling, not the file
-// descriptor budget. It bounds the scheduler's poll fan-out for this input too,
-// since only an open source is ever parked and only a parked source is polled.
+// descriptor budget.
 type harvesterRunner struct {
 	engine        *engine
 	releaseEngine func()
@@ -182,6 +181,13 @@ type harvesterRunner struct {
 	nOpen    uint64
 	waiting  []*sourceState
 	nWaiting int
+
+	// pollQueue holds the due sources the scheduler has handed to this input, and
+	// polling reports whether a chain is draining them. At most one chain runs per
+	// input, so an input's polls happen in turn while inputs poll concurrently
+	// with one another. Guarded by mu. See enqueuePoll.
+	pollQueue []*sourceState
+	polling   bool
 
 	wg sync.WaitGroup
 }
@@ -598,19 +604,73 @@ func (g *harvesterRunner) park(state *sourceState, backoff time.Duration) {
 	heap.Push(&g.engine.parked, &parkedEntry{state: state, due: due})
 }
 
-// startPoll runs pollParked for state on its own goroutine and returns a channel
-// closed when that poll finishes, or nil if the runner is shutting down and no
-// poll was started. The caller decides how long to wait; an abandoned poll keeps
-// running in the background, tracked via g.spawn. See engine.waker.
-func (g *harvesterRunner) startPoll(state *sourceState) <-chan struct{} {
+// enqueuePoll hands a due source to this input's poll chain, starting the chain
+// if one is not already draining. It does not block: the scheduler hands every
+// due source to its own input and goes straight back to sleep, so no input waits
+// on another's polls.
+func (g *harvesterRunner) enqueuePoll(state *sourceState) {
+	g.mu.Lock()
+	if g.closed {
+		// The input began shutting down after the scheduler claimed this source;
+		// finishRemaining tears it down. Starting a poll now would race that.
+		g.mu.Unlock()
+		return
+	}
+	g.pollQueue = append(g.pollQueue, state)
+	if g.polling {
+		g.mu.Unlock()
+		return
+	}
+	g.polling = true
+	g.mu.Unlock()
+
+	if !g.spawn(g.drainPolls) {
+		g.mu.Lock()
+		g.polling = false
+		g.mu.Unlock()
+	}
+}
+
+// drainPolls polls this input's queued sources one at a time until the queue is
+// empty, then exits. Only one chain runs per input (see polling), so an input's
+// polls never overlap and a slow source delays only its own input's queue.
+// Sources left queued when the input closes stay claimed; finishRemaining tears
+// them down.
+func (g *harvesterRunner) drainPolls() {
+	for {
+		g.mu.Lock()
+		if g.closed || len(g.pollQueue) == 0 {
+			g.polling = false
+			g.pollQueue = nil
+			g.mu.Unlock()
+			return
+		}
+		state := g.pollQueue[0]
+		g.pollQueue[0] = nil
+		g.pollQueue = g.pollQueue[1:]
+		g.mu.Unlock()
+
+		g.pollWithGracePeriod(state)
+	}
+}
+
+// pollWithGracePeriod runs pollParked for state on its own goroutine, waiting up
+// to pollGracePeriod for it, so a stuck Poll (a stat() on an unresponsive mount)
+// cannot hold up the rest of this input's queue. The abandoned poll keeps running
+// in the background, tracked via g.spawn.
+func (g *harvesterRunner) pollWithGracePeriod(state *sourceState) {
 	done := make(chan struct{})
 	if !g.spawn(func() {
 		g.pollParked(state)
 		close(done)
 	}) {
-		return nil
+		return
 	}
-	return done
+
+	select {
+	case <-done:
+	case <-time.After(pollGracePeriod):
+	}
 }
 
 // pollParked polls one due source and acts on the result: resume (spawn a
