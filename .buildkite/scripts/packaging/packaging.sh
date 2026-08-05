@@ -20,7 +20,7 @@ BUILDKIT_PROGRESS=plain
 export BUILDKIT_PROGRESS
 
 cd $BEAT_DIR
-mage package
+mage -v package
 
 echo "Generated packages in ${BEAT_DIR}/build/distributions:"
 ls -lah "build/distributions"
