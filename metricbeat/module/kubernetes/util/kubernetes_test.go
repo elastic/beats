@@ -1054,6 +1054,116 @@ func TestConcurrentInvalidationAndEnrichment(t *testing.T) {
 	e.Stop(resourceWatchers)
 }
 
+func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	lookupStarted := make(chan struct{})
+	releaseLookup := make(chan struct{})
+	active := newCoordinatedWatcher(&blockingStore{
+		Store:         newMockWatcher().store,
+		lookupStarted: lookupStarted,
+		releaseLookup: releaseLookup,
+	})
+	replacement := newCoordinatedWatcher(newMockWatcher().store)
+	resource := &kubernetes.Pod{ObjectMeta: metav1.ObjectMeta{
+		Name:   "resource",
+		Labels: map[string]string{"source": "active"},
+	}}
+	replacementResource := resource.DeepCopy()
+	replacementResource.Labels = map[string]string{"source": "replacement"}
+	require.NoError(t, active.Store().Add(resource), "active watcher store must contain the resource")
+	require.NoError(t, replacement.Store().Add(replacementResource), "replacement watcher store must contain the resource")
+
+	metaWatcher := &metaWatcher{
+		watcher:        active,
+		started:        true,
+		users:          make(map[*enricher]watcherRegistration),
+		enrichers:      make(map[*enricher]struct{}),
+		nodeScope:      true,
+		restartWatcher: replacement,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+	e := newWatcherLookupTestEnricher(t, resourceWatchers, metaWatcher)
+
+	lookupDone := make(chan mapstr.M, 1)
+	go func() {
+		lookupDone <- e.getMetadata(mapstr.M{"name": resource.Name})
+	}()
+	<-lookupStarted
+
+	startDone := make(chan struct{})
+	go func() {
+		e.Start(resourceWatchers)
+		close(startDone)
+	}()
+	<-replacement.started
+	requireActiveWatcherWriterPending(t, metaWatcher, "scope replacement must wait for the in-progress lookup")
+	select {
+	case <-active.stopped:
+		t.Fatal("active watcher stopped while its store lookup was in progress")
+	default:
+	}
+
+	close(releaseLookup)
+	require.Equal(t, "active", (<-lookupDone)["source"], "in-progress lookup must finish against the active watcher")
+	<-startDone
+	<-active.stopped
+
+	e.Lock()
+	e.metadataCache = make(map[string]mapstr.M)
+	e.Unlock()
+	require.Equal(t, "replacement", e.getMetadata(mapstr.M{"name": resource.Name})["source"], "later lookup must use the replacement watcher")
+
+	e.Stop(resourceWatchers)
+}
+
+func TestActiveWatcherLookupCompletesBeforeFinalOwnerStop(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	lookupStarted := make(chan struct{})
+	releaseLookup := make(chan struct{})
+	active := newCoordinatedWatcher(&blockingStore{
+		Store:         newMockWatcher().store,
+		lookupStarted: lookupStarted,
+		releaseLookup: releaseLookup,
+	})
+	resource := &kubernetes.Pod{ObjectMeta: metav1.ObjectMeta{
+		Name:   "resource",
+		Labels: map[string]string{"source": "active"},
+	}}
+	require.NoError(t, active.Store().Add(resource), "active watcher store must contain the resource")
+
+	metaWatcher := &metaWatcher{
+		watcher:   active,
+		started:   true,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+	e := newWatcherLookupTestEnricher(t, resourceWatchers, metaWatcher)
+
+	lookupDone := make(chan mapstr.M, 1)
+	go func() {
+		lookupDone <- e.getMetadata(mapstr.M{"name": resource.Name})
+	}()
+	<-lookupStarted
+
+	stopDone := make(chan struct{})
+	go func() {
+		e.Stop(resourceWatchers)
+		close(stopDone)
+	}()
+
+	requireActiveWatcherWriterPending(t, metaWatcher, "final-owner stop must wait for the in-progress lookup")
+	close(releaseLookup)
+	require.Equal(t, "active", (<-lookupDone)["source"], "in-progress lookup must finish before final-owner stop")
+	<-stopDone
+	<-active.stopped
+
+	e.Lock()
+	e.metadataCache = make(map[string]mapstr.M)
+	e.Unlock()
+	require.Nil(t, e.getMetadata(mapstr.M{"name": resource.Name}), "lookup after withdrawal must not use the stopped watcher")
+}
+
 func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	metricsRepo := NewMetricsRepo()
@@ -1563,6 +1673,44 @@ func buildTestMetadataEnricherWithFuncsAndScope(
 	return e
 }
 
+func newWatcherLookupTestEnricher(t *testing.T, resourceWatchers *Watchers, metaWatcher *metaWatcher) *enricher {
+	t.Helper()
+
+	e := newMetadataEnricher(
+		"pod",
+		PodResource,
+		&kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()},
+		logptest.NewTestingLogger(t, selector),
+	)
+	e.index = func(event mapstr.M) string {
+		return event["name"].(string) //nolint:errcheck // test event always has a name
+	}
+	e.updateFunc = func(resource kubernetes.Resource) map[string]mapstr.M {
+		pod := resource.(*kubernetes.Pod) //nolint:errcheck // test watcher stores Pods
+		return map[string]mapstr.M{
+			pod.Name: {"source": pod.Labels["source"]},
+		}
+	}
+
+	resourceWatchers.lock.Lock()
+	registerWatcherUser(PodResource, metaWatcher, e, true, false)
+	resourceWatchers.lock.Unlock()
+	commitWatcherOwnership(e, resourceWatchers)
+	return e
+}
+
+func requireActiveWatcherWriterPending(t *testing.T, metaWatcher *metaWatcher, message string) {
+	t.Helper()
+
+	require.Eventually(t, func() bool {
+		if metaWatcher.activeWatcherLock.TryRLock() {
+			metaWatcher.activeWatcherLock.RUnlock()
+			return false
+		}
+		return true
+	}, time.Second, time.Millisecond, message)
+}
+
 type mockFuncs struct {
 	updated kubernetes.Resource
 	deleted kubernetes.Resource
@@ -1646,5 +1794,72 @@ func (m *mockWatcher) Client() k8s.Interface {
 }
 
 func (m *mockWatcher) CachedObject() runtime.Object {
+	return nil
+}
+
+type blockingStore struct {
+	cache.Store
+	lookupStarted chan<- struct{}
+	releaseLookup <-chan struct{}
+	lookupOnce    sync.Once
+}
+
+func (s *blockingStore) GetByKey(key string) (any, bool, error) {
+	s.lookupOnce.Do(func() {
+		close(s.lookupStarted)
+	})
+	<-s.releaseLookup
+	return s.Store.GetByKey(key)
+}
+
+type coordinatedWatcher struct {
+	store   cache.Store
+	handler kubernetes.ResourceEventHandler
+
+	started chan struct{}
+	stopped chan struct{}
+
+	startOnce sync.Once
+	stopOnce  sync.Once
+}
+
+func newCoordinatedWatcher(store cache.Store) *coordinatedWatcher {
+	return &coordinatedWatcher{
+		store:   store,
+		started: make(chan struct{}),
+		stopped: make(chan struct{}),
+	}
+}
+
+func (m *coordinatedWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return m.handler
+}
+
+func (m *coordinatedWatcher) Start() error {
+	m.startOnce.Do(func() {
+		close(m.started)
+	})
+	return nil
+}
+
+func (m *coordinatedWatcher) Stop() {
+	m.stopOnce.Do(func() {
+		close(m.stopped)
+	})
+}
+
+func (m *coordinatedWatcher) AddEventHandler(handler kubernetes.ResourceEventHandler) {
+	m.handler = handler
+}
+
+func (m *coordinatedWatcher) Store() cache.Store {
+	return m.store
+}
+
+func (*coordinatedWatcher) Client() k8s.Interface {
+	return nil
+}
+
+func (*coordinatedWatcher) CachedObject() runtime.Object {
 	return nil
 }

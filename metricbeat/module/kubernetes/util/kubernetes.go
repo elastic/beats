@@ -103,8 +103,9 @@ type watcherRegistration struct {
 }
 
 type metaWatcher struct {
-	watcher kubernetes.Watcher // watcher responsible for watching a specific resource
-	started bool               // true if watcher has started, false otherwise
+	activeWatcherLock sync.RWMutex       // protects watcher while it is used, replaced, or withdrawn
+	watcher           kubernetes.Watcher // watcher responsible for watching a specific resource
+	started           bool               // true if watcher has started, false otherwise
 
 	users       map[*enricher]watcherRegistration // enrichers that use this watcher/need it alive
 	enrichers   map[*enricher]struct{}            // enrichers that use this watcher as their primary source
@@ -113,6 +114,34 @@ type metaWatcher struct {
 	nodeScope             bool                               // whether the active watcher watches resources in the current node or the whole cluster
 	restartWatcher        kubernetes.Watcher                 // whether this watcher needs a restart. Only relevant in leader nodes due to metricsets with different nodescope(pod, state_pod)
 	restartWatcherFactory func() (kubernetes.Watcher, error) // creates a fresh replacement after a failed one-shot watcher start
+}
+
+// getActiveWatcherByKey keeps the active watcher alive while its store is read.
+func (m *metaWatcher) getActiveWatcherByKey(key string) (any, bool, error) {
+	m.activeWatcherLock.RLock()
+	defer m.activeWatcherLock.RUnlock()
+
+	if m.watcher == nil {
+		return nil, false, nil
+	}
+	return m.watcher.Store().GetByKey(key)
+}
+
+// replaceActiveWatcher replaces the active watcher and returns the old one.
+// The resource watcher registry must be locked by the caller.
+func (m *metaWatcher) replaceActiveWatcher(watcher kubernetes.Watcher) kubernetes.Watcher {
+	m.activeWatcherLock.Lock()
+	defer m.activeWatcherLock.Unlock()
+
+	oldWatcher := m.watcher
+	m.watcher = watcher
+	return oldWatcher
+}
+
+// withdrawActiveWatcher removes and returns the active watcher.
+// The resource watcher registry must be locked by the caller.
+func (m *metaWatcher) withdrawActiveWatcher() kubernetes.Watcher {
+	return m.replaceActiveWatcher(nil)
 }
 
 type Watchers struct {
@@ -1136,9 +1165,10 @@ func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
 			resourceMetaWatcher.restartWatcher = nil
 		} else {
 			if resourceMetaWatcher.started {
-				watcherToStop = resourceMetaWatcher.watcher
+				watcherToStop = resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
+			} else {
+				resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
 			}
-			resourceMetaWatcher.watcher = resourceMetaWatcher.restartWatcher
 			resourceMetaWatcher.restartWatcher = nil
 			resourceMetaWatcher.restartWatcherFactory = nil
 			resourceMetaWatcher.nodeScope = false
@@ -1173,9 +1203,10 @@ func releaseWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 		delete(metaWatcher.enrichers, e)
 		if removeWatcherUser(metaWatcher, e) {
 			delete(resourceWatchers.metaWatchersMap, resourceName)
+			activeWatcher := metaWatcher.withdrawActiveWatcher()
 			if metaWatcher.started {
 				metaWatcher.started = false
-				watchersToStop = append(watchersToStop, metaWatcher.watcher)
+				watchersToStop = append(watchersToStop, activeWatcher)
 			}
 		} else if !hasClusterScopedUser(metaWatcher) {
 			metaWatcher.restartWatcher = nil
@@ -1254,7 +1285,7 @@ func (e *enricher) getMetadata(event mapstr.M) mapstr.M {
 // updateMetadataCacheFromWatcher updates the metadata cache for the given key with data from the watcher.
 func (e *enricher) updateMetadataCacheFromWatcher(key string) {
 	storeKey := getWatcherStoreKeyFromMetadataKey(key)
-	if res, exists, _ := e.watcher.watcher.Store().GetByKey(storeKey); exists {
+	if res, exists, _ := e.watcher.getActiveWatcherByKey(storeKey); exists {
 		eventMetaMap := e.updateFunc(res.(kubernetes.Resource)) //nolint:errcheck // store object type is validated by watcher
 		maps.Copy(e.metadataCache, eventMetaMap)
 	}
