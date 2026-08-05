@@ -446,7 +446,7 @@ file_identity.fingerprint: ~
 
       ```yaml
       file_identity.fingerprint:
-        growing: true
+        growing: false
       ```
 
 
@@ -704,7 +704,7 @@ Currently, if a new harvester can be started again, the harvester is picked rand
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
 
 ### `include_file_owner_name` [filestream-input-include_file_owner_name]
-```yaml {applies_to}
+```{applies_to}
 stack: ga 9.3
 ```
 
@@ -712,7 +712,7 @@ Includes the log file owner to `log.file` metadata.
 This option is not supported on Windows.
 
 ### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
-```yaml {applies_to}
+```{applies_to}
 stack: ga 9.3
 ```
 
@@ -720,7 +720,7 @@ Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
 
 ### `include_file_fingerprint` [filestream-input-include_file_fingerprint]
-```yaml {applies_to}
+```{applies_to}
 stack: ga 9.5.0
 ```
 Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `true`. The file path (`log.file.path`) is always present in events regardless of this setting.
