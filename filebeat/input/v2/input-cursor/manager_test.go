@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -56,19 +57,53 @@ type stringSource string
 func TestManager_Init(t *testing.T) {
 	// Integration style tests for the InputManager and the state garbage collector
 
+	// Init is called for every registered input type, but most of them are never
+	// configured. Opening a registry store and starting a cleanup goroutine for
+	// each is a per-Beat cost paid for inputs that never run, and elastic-agent
+	// runs one Beat receiver per input stream.
+	t.Run("no store is opened and no goroutine started until an input is created", func(t *testing.T) {
+		goroutines := resources.NewGoroutinesChecker()
+
+		var grp unison.TaskGroup
+		//nolint:errcheck // We don't need the error from grp.Stop()
+		defer grp.Stop()
+		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+
+		require.Nil(t, manager.store, "Init must not open the registry store")
+		_, err := goroutines.WaitUntilOriginalCount()
+		require.NoError(t, err, "Init must not start the store cleanup goroutine")
+
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
+		require.NoError(t, err)
+		require.NotNil(t, manager.store, "Create must open the registry store")
+	})
+
+	// The store is opened with the input ID, which is only known once a config
+	// has been unpacked in Create.
+	t.Run("the store is opened with the created input's ID", func(t *testing.T) {
+		stateStore := createSampleStore(t, map[string]state{
+			"test::mykey": {Cursor: "value1"},
+		})
+
+		var grp unison.TaskGroup
+		//nolint:errcheck // We don't need the error from grp.Stop()
+		defer grp.Stop()
+		manager := cleanerManager(t, stateStore, &grp)
+
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
+		require.NoError(t, err)
+
+		snap := storeMemorySnapshot(manager.store)
+		assert.Contains(t, snap, "test::mykey")
+		assert.Equal(t, "value1", snap["test::mykey"].Cursor)
+	})
+
 	t.Run("stopping the taskgroup kills internal go-routines", func(t *testing.T) {
 		numRoutines := runtime.NumGoroutine()
 
 		var grp unison.TaskGroup
-		store := createSampleStore(t, nil)
-		manager := &InputManager{
-			Logger:              logptest.NewTestingLogger(t, "test"),
-			StateStore:          store,
-			Type:                "test",
-			DefaultCleanTimeout: 10 * time.Millisecond,
-		}
-
-		err := manager.Init(&grp)
+		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
 
 		time.Sleep(200 * time.Millisecond)
@@ -93,57 +128,83 @@ func TestManager_Init(t *testing.T) {
 		var grp unison.TaskGroup
 		//nolint:errcheck // We don't need the error from grp.Stop()
 		defer grp.Stop()
-		manager := &InputManager{
-			Logger:              logptest.NewTestingLogger(t, "test"),
-			StateStore:          store,
-			Type:                "test",
-			DefaultCleanTimeout: 10 * time.Millisecond,
-		}
+		manager := cleanerManager(t, store, &grp)
 
-		err := manager.Init(&grp)
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
 
 		for len(store.snapshot()) > 0 {
 			time.Sleep(1 * time.Millisecond)
 		}
 	})
+
+	// Two reload paths — static config, central management, autodiscovery — can
+	// create inputs of one type concurrently, and each of those is now what
+	// opens the store and starts the cleaner.
+	t.Run("concurrent Create opens one store and starts one cleaner", func(t *testing.T) {
+		var grp unison.TaskGroup
+		//nolint:errcheck // We don't need the error from grp.Stop()
+		defer grp.Stop()
+		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+
+		var wg sync.WaitGroup
+		for i := range 8 {
+			wg.Go(func() {
+				_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
+					"id": fmt.Sprintf("input-%d", i),
+				}))
+				assert.NoError(t, err)
+			})
+		}
+		wg.Wait()
+
+		require.NotNil(t, manager.store)
+		assert.Nil(t, manager.cleanerGroup, "the cleaner must have been started exactly once")
+	})
 }
 
-func TestManager_InitDefersStoreForES(t *testing.T) {
-	// Verify that ES-backed inputs defer store creation from Init() to Create().
-	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
-	features.ReinitForTest()
-	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
-
-	data := map[string]state{
-		"test::mykey": {Cursor: "value1"},
-	}
-	stateStore := createSampleStore(t, data)
-
-	var grp unison.TaskGroup
-	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+// cleanerManager builds an initialised InputManager whose Create succeeds, with
+// a clean timeout short enough for the garbage collector to act within a test.
+func cleanerManager(t *testing.T, store statestore.States, grp unison.Group) *InputManager {
+	t.Helper()
 
 	manager := &InputManager{
 		Logger:              logptest.NewTestingLogger(t, "test"),
-		StateStore:          stateStore,
+		StateStore:          store,
 		Type:                "test",
-		DefaultCleanTimeout: 30 * time.Minute,
+		DefaultCleanTimeout: 10 * time.Millisecond,
 		Configure: func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error) {
 			return sourceList("mykey"), &fakeTestInput{}, nil
 		},
 	}
+	require.NoError(t, manager.Init(grp))
+	return manager
+}
 
-	// Init() should not create a store for ES-backed inputs.
-	err := manager.Init(&grp)
-	require.NoError(t, err)
-	assert.Nil(t, manager.store, "store should be nil after Init() for ES-backed inputs")
+// TestManager_InitDefersStoreForES covers the Elasticsearch-backed store, which
+// has always been opened from Create because it needs the input ID. All input
+// types now take that path; this pins that the ES-specific store still reaches
+// it, since SetID is a no-op for the file-backed backends and only matters here.
+func TestManager_InitDefersStoreForES(t *testing.T) {
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
 
-	// Create() should create the store with the inputID.
-	_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{
+	stateStore := createSampleStore(t, map[string]state{
+		"test::mykey": {Cursor: "value1"},
+	})
+
+	var grp unison.TaskGroup
+	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+	manager := cleanerManager(t, stateStore, &grp)
+
+	require.Nil(t, manager.store, "store should be nil after Init()")
+
+	_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
 		"id": "my-input-id",
 	}))
 	require.NoError(t, err)
-	assert.NotNil(t, manager.store, "store should be created after Create()")
+	require.NotNil(t, manager.store, "store should be created after Create()")
 
 	snap := storeMemorySnapshot(manager.store)
 	assert.Contains(t, snap, "test::mykey")
