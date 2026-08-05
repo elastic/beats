@@ -182,11 +182,8 @@ func configure(
 
 // normalizeConfig reconciles filestream defaults with file_identity semantics.
 // Scanner fingerprinting is derived from the file identity: enabled for
-// fingerprint (the default), disabled otherwise. The deprecated
-// 'prospector.scanner.fingerprint.enabled' setting is ignored and a warning is
-// logged when it contradicts the derived value. The fingerprint identity needs
-// scanner fingerprints: without them every file gets the same empty fingerprint
-// ID and collapses into a single registry entry, silently losing data.
+// fingerprint, disabled otherwise. The deprecated
+// 'prospector.scanner.fingerprint.enabled' setting is ignored.
 func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
 	fingerprintIdentity := c.FileIdentity == nil || c.FileIdentity.Name() == fingerprintName
 
