@@ -145,6 +145,8 @@ func (g *remoteWriteTypedGenerator) Stop() {
 	}
 	if g.histogramMon != nil {
 		g.histogramMon.observeShutdownDropped(shutdownDropped)
+		g.histogramMon.unregister()
+		g.histogramMon = nil
 	}
 	if g.logger != nil {
 		g.logger.Debug("stopping counterCache")

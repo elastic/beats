@@ -17,6 +17,8 @@ import (
 // flush events retained for retry are not included; they are accounted on shutdown via
 // shutdown_dropped_total together with pending histograms.
 type histogramAssemblerMonitoring struct {
+	msReg *monitoring.Registry
+
 	pending            *monitoring.Uint
 	pendingBuckets     *monitoring.Uint
 	quietFlushes       *monitoring.Uint
@@ -33,6 +35,10 @@ type histogramAssemblerMonitoringSlot struct {
 	m    *histogramAssemblerMonitoring
 }
 
+// histogramAssemblerMonitoringSlots keeps one registration per metricset registry so
+// duplicate factory calls do not recreate metrics. Entries must be removed in
+// unregister() during generator Stop so start/stop cycles (e.g. beatreceiver) do
+// not retain registries forever.
 var histogramAssemblerMonitoringSlots sync.Map // *monitoring.Registry -> *histogramAssemblerMonitoringSlot
 
 func registerHistogramAssemblerMonitoring(msReg *monitoring.Registry) *histogramAssemblerMonitoring {
@@ -47,6 +53,7 @@ func registerHistogramAssemblerMonitoring(msReg *monitoring.Registry) *histogram
 	slot.once.Do(func() {
 		reg := msReg.GetOrCreateRegistry("histogram_assembler")
 		slot.m = &histogramAssemblerMonitoring{
+			msReg:              msReg,
 			pending:            monitoring.NewUint(reg, "pending_gauge"),
 			pendingBuckets:     monitoring.NewUint(reg, "pending_buckets_gauge"),
 			quietFlushes:       monitoring.NewUint(reg, "quiet_flushes_total"),
@@ -59,6 +66,16 @@ func registerHistogramAssemblerMonitoring(msReg *monitoring.Registry) *histogram
 		}
 	})
 	return slot.m
+}
+
+// unregister drops the process-wide slot for this metricset registry so the
+// registry can be garbage-collected after the metricset stops.
+func (m *histogramAssemblerMonitoring) unregister() {
+	if m == nil || m.msReg == nil {
+		return
+	}
+	histogramAssemblerMonitoringSlots.Delete(m.msReg)
+	m.msReg = nil
 }
 
 func (m *histogramAssemblerMonitoring) setPending(histograms, buckets int) {

@@ -76,6 +76,12 @@ func newTestTypedGeneratorWithMonitoring(t *testing.T, cfg histogramAssemblyConf
 	g.assembler = newHistogramAssembler(cfg, mon)
 	counters.Start()
 	t.Cleanup(counters.Stop)
+	t.Cleanup(func() {
+		if g.histogramMon != nil {
+			g.histogramMon.unregister()
+			g.histogramMon = nil
+		}
+	})
 	return g, setNow
 }
 
@@ -85,11 +91,13 @@ func TestRegisterHistogramAssemblerMonitoringIdempotent(t *testing.T) {
 	second := registerHistogramAssemblerMonitoring(msReg)
 	require.Same(t, first, second, "re-registering on the same metricset registry must not duplicate metrics")
 	histogramAssemblerMetricSnapshot(t, msReg)
+	t.Cleanup(first.unregister)
 }
 
 func TestHistogramAssemblerPendingMetricsAreReportedAsGauges(t *testing.T) {
 	msReg := monitoring.NewRegistry()
-	registerHistogramAssemblerMonitoring(msReg)
+	mon := registerHistogramAssemblerMonitoring(msReg)
+	t.Cleanup(mon.unregister)
 	snap := monitoring.CollectFlatSnapshot(msReg, monitoring.Full, false)
 	for _, name := range []string{"pending_gauge", "pending_buckets_gauge"} {
 		metricKey := "histogram_assembler." + name
@@ -226,6 +234,27 @@ func TestHistogramAssemblerMonitoringShutdownDropped(t *testing.T) {
 	metrics := histogramAssemblerMetricSnapshot(t, msReg)
 	assert.Equal(t, int64(0), metrics["pending_gauge"], "shutdown clears pending gauge")
 	assert.Equal(t, int64(3), metrics["shutdown_dropped_total"], "shutdown must count pending histograms plus retained flush entries")
+}
+
+func TestHistogramAssemblerMonitoringUnregisterOnStop(t *testing.T) {
+	msReg := monitoring.NewRegistry()
+	cfg := defaultHistogramAssemblyConfig()
+	start := time.Unix(700, 0)
+	g, _ := newTestTypedGeneratorWithMonitoring(t, cfg, start, msReg)
+
+	_, ok := histogramAssemblerMonitoringSlots.Load(msReg)
+	require.True(t, ok, "register must store a slot keyed by metricset registry")
+
+	g.Stop()
+
+	_, ok = histogramAssemblerMonitoringSlots.Load(msReg)
+	assert.False(t, ok, "Stop must free the process-wide monitoring slot for restart cycles")
+
+	// A subsequent register on the same registry (receiver restart) must succeed.
+	again := registerHistogramAssemblerMonitoring(msReg)
+	require.NotNil(t, again)
+	t.Cleanup(again.unregister)
+	histogramAssemblerMetricSnapshot(t, msReg)
 }
 
 func TestRemoteWriteFactoryUseTypesFalseDoesNotRegisterHistogramAssemblerMonitoring(t *testing.T) {
