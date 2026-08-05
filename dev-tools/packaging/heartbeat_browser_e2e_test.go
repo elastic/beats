@@ -23,9 +23,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -55,7 +57,7 @@ func checkHeartbeatBrowserE2E(t *testing.T, dockerArchives []string) {
 		archive, err := heartbeatBrowserE2EArchive(dockerArchives)
 		require.NoError(t, err, "selecting Heartbeat browser E2E archive should succeed")
 		if archive == "" {
-			t.Skip("standard Linux AMD64 Heartbeat Docker archive was not generated")
+			t.Skip("Heartbeat Docker archive was not generated")
 		}
 
 		ctx, cancel := dockerTestContext(t)
@@ -123,24 +125,33 @@ func checkHeartbeatBrowserE2E(t *testing.T, dockerArchives []string) {
 		require.NoError(t, logsErr, "reading Heartbeat browser E2E container logs should succeed")
 		require.NoError(t, inspectErr, "inspecting Heartbeat browser E2E container should succeed")
 
-		events := heartbeatBrowserE2EEvents(stdout)
+		events, eventsErr := heartbeatBrowserE2EEvents(stdout)
+		diagnostics += "\nevents:\n" + events.String()
+		require.NoError(t, eventsErr, "parsing Heartbeat browser E2E events should succeed\n%s", diagnostics)
 		assert.Equal(t, int64(0), exitCode, "Heartbeat browser E2E container should exit successfully\n%s", diagnostics)
-		assert.True(t, events.hasSuccessfulStep, "expected successful page loads step event\n%s", diagnostics)
-		assert.True(t, events.hasSuccessfulSummary, "expected successful monitor summary event\n%s", diagnostics)
+		assert.NotEmpty(t, events.successfulCheckGroups, "expected a successful page loads step event\n%s", diagnostics)
+		assert.True(t, events.hasSuccessfulSummary(), "expected a successful monitor summary event for the successful journey\n%s", diagnostics)
 	})
 }
 
 func heartbeatBrowserE2EArchive(archives []string) (string, error) {
-	var matches []string
+	var heartbeatArchives, matches []string
 	for _, archive := range archives {
-		if isHeartbeatBrowserE2EArchive(filepath.Base(archive)) {
+		name := filepath.Base(archive)
+		if strings.HasPrefix(name, "heartbeat-") {
+			heartbeatArchives = append(heartbeatArchives, archive)
+		}
+		if isHeartbeatBrowserE2EArchive(name) {
 			matches = append(matches, archive)
 		}
 	}
 
 	switch len(matches) {
 	case 0:
-		return "", nil
+		if len(heartbeatArchives) == 0 {
+			return "", nil
+		}
+		return "", fmt.Errorf("standard Linux AMD64 Heartbeat Docker archive was not generated; found: %s", strings.Join(heartbeatArchives, ", "))
 	case 1:
 		return matches[0], nil
 	default:
@@ -161,39 +172,75 @@ func copyHeartbeatBrowserE2EConfig(t *testing.T) string {
 	config, err := os.CreateTemp(t.TempDir(), "heartbeat.yml")
 	require.NoError(t, err, "creating Heartbeat browser E2E config should succeed")
 	require.NoError(t, config.Chmod(0o644), "making Heartbeat browser E2E config readable should succeed")
-	_, err = config.Write(contents)
+	n, err := config.Write(contents)
 	require.NoError(t, err, "writing Heartbeat browser E2E config should succeed")
+	require.Equal(t, len(contents), n, "Heartbeat browser E2E config should be written completely")
 	require.NoError(t, config.Close(), "closing Heartbeat browser E2E config should succeed")
 	return config.Name()
 }
 
+const heartbeatBrowserE2EMaxEventSize = 1 << 20
+
 type heartbeatBrowserE2EEventResult struct {
-	hasSuccessfulStep    bool
-	hasSuccessfulSummary bool
+	successfulCheckGroups map[string]struct{}
+	successfulSummaries   map[string]struct{}
+	malformedJSONEvents   int
 }
 
-func heartbeatBrowserE2EEvents(stdout string) heartbeatBrowserE2EEventResult {
-	var result heartbeatBrowserE2EEventResult
+func (result heartbeatBrowserE2EEventResult) hasSuccessfulSummary() bool {
+	for checkGroup := range result.successfulCheckGroups {
+		if _, ok := result.successfulSummaries[checkGroup]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+func (result heartbeatBrowserE2EEventResult) String() string {
+	return fmt.Sprintf("successful step check groups: %v\nsuccessful summary check groups: %v\nmalformed JSON events: %d", slices.Sorted(maps.Keys(result.successfulCheckGroups)), slices.Sorted(maps.Keys(result.successfulSummaries)), result.malformedJSONEvents)
+}
+
+func heartbeatBrowserE2EEvents(stdout string) (heartbeatBrowserE2EEventResult, error) {
+	result := heartbeatBrowserE2EEventResult{
+		successfulCheckGroups: make(map[string]struct{}),
+		successfulSummaries:   make(map[string]struct{}),
+	}
 	scanner := bufio.NewScanner(strings.NewReader(stdout))
+	scanner.Buffer(make([]byte, heartbeatBrowserE2EMaxEventSize), heartbeatBrowserE2EMaxEventSize)
 	for scanner.Scan() {
+		line := scanner.Bytes()
 		var event map[string]any
-		if json.Unmarshal(scanner.Bytes(), &event) != nil {
+		if json.Unmarshal(line, &event) != nil {
+			if bytes.HasPrefix(bytes.TrimSpace(line), []byte("{")) {
+				result.malformedJSONEvents++
+			}
 			continue
 		}
 
 		monitor, _ := event["monitor"].(map[string]any)
 		synthetics, _ := event["synthetics"].(map[string]any)
 		step, _ := synthetics["step"].(map[string]any)
-		if synthetics["type"] == "step/end" && step["name"] == "page loads" && step["status"] == "succeeded" {
-			result.hasSuccessfulStep = true
+		checkGroup, _ := monitor["check_group"].(string)
+		if synthetics["type"] == "step/end" && step["name"] == "page loads" && step["status"] == "succeeded" && checkGroup != "" {
+			result.successfulCheckGroups[checkGroup] = struct{}{}
 		}
-		if monitor["id"] == heartbeatBrowserE2EMonitorID && monitor["status"] == "up" {
-			if _, ok := event["summary"].(map[string]any); ok {
-				result.hasSuccessfulSummary = true
-			}
+		summary, _ := event["summary"].(map[string]any)
+		if monitor["id"] == heartbeatBrowserE2EMonitorID && monitor["status"] == "up" && synthetics["type"] == "heartbeat/summary" && summaryIsSuccessful(summary) && checkGroup != "" {
+			result.successfulSummaries[checkGroup] = struct{}{}
 		}
 	}
-	return result
+	if err := scanner.Err(); err != nil {
+		return result, fmt.Errorf("scanning console events: %w", err)
+	}
+	return result, nil
+}
+
+func summaryIsSuccessful(summary map[string]any) bool {
+	status, _ := summary["status"].(string)
+	up, upOK := summary["up"].(float64)
+	down, downOK := summary["down"].(float64)
+	finalAttempt, finalAttemptOK := summary["final_attempt"].(bool)
+	return status == "up" && upOK && up > 0 && downOK && down == 0 && finalAttemptOK && finalAttempt
 }
 
 func heartbeatBrowserE2ELogs(ctx context.Context, dockerClient *client.Client, containerID string) (string, string, error) {
@@ -219,9 +266,10 @@ func TestHeartbeatBrowserE2EArchive(t *testing.T) {
 		wantErr  bool
 	}{
 		{name: "standard archive", archives: []string{"heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"}, want: "heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"},
-		{name: "no matching archive", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}},
-		{name: "unexpected variant", archives: []string{"heartbeat-custom-9.5.0-linux-amd64.docker.tar.gz"}},
-		{name: "excluded variants", archives: []string{"heartbeat-oss-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-ubi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-fips-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-arm64.docker.tar.gz"}},
+		{name: "no Heartbeat archive", archives: []string{"filebeat-9.5.0-linux-amd64.docker.tar.gz"}},
+		{name: "only Wolfi archive", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
+		{name: "unexpected variant", archives: []string{"heartbeat-custom-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
+		{name: "excluded variants", archives: []string{"heartbeat-oss-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-ubi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-fips-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-arm64.docker.tar.gz"}, wantErr: true},
 		{name: "ambiguous archives", archives: []string{"heartbeat-9.4.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -241,17 +289,35 @@ func TestHeartbeatBrowserE2EEvents(t *testing.T) {
 		"unrelated startup log",
 		"{not-json}",
 		`{"synthetics":{"type":"step/end","step":{"name":"other step","status":"succeeded"}}}`,
-		`{"synthetics":{"type":"step/end","step":{"name":"page loads","status":"succeeded"}}}`,
-		`{"monitor":{"id":"generated-image-browser-e2e","status":"up"},"summary":{}}`,
+		`{"monitor":{"check_group":"journey-check-group"},"synthetics":{"type":"step/end","step":{"name":"page loads","status":"succeeded"}}}`,
+		`{"monitor":{"id":"generated-image-browser-e2e","status":"up","check_group":"journey-check-group"},"synthetics":{"type":"heartbeat/summary"},"summary":{"status":"up","up":1,"down":0,"final_attempt":true}}`,
 	}, "\n")
 
-	result := heartbeatBrowserE2EEvents(stdout)
-	assert.True(t, result.hasSuccessfulStep, "successful step should be found")
-	assert.True(t, result.hasSuccessfulSummary, "successful summary should be found")
+	result, err := heartbeatBrowserE2EEvents(stdout)
+	require.NoError(t, err, "parsing events should succeed")
+	assert.True(t, result.hasSuccessfulSummary(), "matching successful step and summary should be found")
+}
+
+func TestHeartbeatBrowserE2EEventsRequireMatchingCheckGroup(t *testing.T) {
+	stdout := strings.Join([]string{
+		`{"monitor":{"check_group":"step-check"},"synthetics":{"type":"step/end","step":{"name":"page loads","status":"succeeded"}}}`,
+		`{"monitor":{"id":"generated-image-browser-e2e","status":"up","check_group":"summary-check"},"synthetics":{"type":"heartbeat/summary"},"summary":{"status":"up","up":1,"down":0,"final_attempt":true}}`,
+	}, "\n")
+
+	result, err := heartbeatBrowserE2EEvents(stdout)
+	require.NoError(t, err, "parsing events should succeed")
+	assert.False(t, result.hasSuccessfulSummary(), "events from different journey executions must not satisfy the smoke test")
+}
+
+func TestHeartbeatBrowserE2EEventsReturnsScannerErrors(t *testing.T) {
+	oversizedEvent := "{" + strings.Repeat("a", heartbeatBrowserE2EMaxEventSize) + "}"
+	_, err := heartbeatBrowserE2EEvents(oversizedEvent)
+	assert.Error(t, err, "oversized console events must not be silently ignored")
 }
 
 func TestHeartbeatBrowserE2EEventsMissingRequiredEvents(t *testing.T) {
-	result := heartbeatBrowserE2EEvents(`{"synthetics":{"type":"step/end","step":{"name":"page loads","status":"failed"}}}`)
-	assert.False(t, result.hasSuccessfulStep, "failed step must not satisfy assertion")
-	assert.False(t, result.hasSuccessfulSummary, "missing summary must not satisfy assertion")
+	result, err := heartbeatBrowserE2EEvents(`{"synthetics":{"type":"step/end","step":{"name":"page loads","status":"failed"}}}`)
+	require.NoError(t, err, "parsing events should succeed")
+	assert.Empty(t, result.successfulCheckGroups, "failed step must not satisfy assertion")
+	assert.Empty(t, result.successfulSummaries, "missing summary must not satisfy assertion")
 }
