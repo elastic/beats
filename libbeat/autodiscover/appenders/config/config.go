@@ -24,14 +24,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
-	autodiscover.Registry.AddAppender("config", NewConfigAppender)
+	autodiscover.Registry.AddAppender("config", NewConfigAppender) //nolint:errcheck // provider registration
 }
 
 type config struct {
@@ -52,7 +52,7 @@ func NewConfigAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender,
 	config := config{}
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack config appender due to error: %+v", err)
+		return nil, fmt.Errorf("unable to unpack config appender due to error: %+w", err)
 	}
 
 	var cond conditions.Condition
@@ -88,7 +88,7 @@ func (c *configAppender) Append(event bus.Event) {
 	if !ok {
 		return
 	}
-	if c.condition == nil || c.condition.Check(mapstr.M(event)) == true {
+	if c.condition == nil || c.condition.Check(mapstr.M(event)) {
 		// Merge the template with all the configs
 		for _, cfg := range cfgs {
 			cf := mapstr.M{}

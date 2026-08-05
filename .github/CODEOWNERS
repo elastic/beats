@@ -116,6 +116,7 @@ changelog/fragments/
 /metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
 /packetbeat/ @elastic/sec-linux-platform
+/pkg/autodiscover/ @elastic/elastic-agent-data-plane
 /script/ @elastic/elastic-agent-data-plane
 /testing/ @elastic/elastic-agent-data-plane
 /tools/ @elastic/elastic-agent-data-plane

@@ -29,7 +29,7 @@ import (
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -222,7 +222,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 
 		wg.Go(func() {
 
-			conn, err := net.ListenPacket("udp4", net.JoinHostPort(ip.String(), "0"))
+			conn, err := net.ListenPacket("udp4", net.JoinHostPort(ip.String(), "0")) //nolint:noctx // legacy UDP discovery
 			if err != nil {
 				log.Error(err.Error())
 				return

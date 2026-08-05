@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -140,9 +140,9 @@ func TestGenerateHints(t *testing.T) {
 				"type":     "http",
 				"hosts":    []string{"1.2.3.4:9090"},
 				"schedule": "@every 5s",
-				"processors": []interface{}{
-					map[string]interface{}{
-						"add_locale": map[string]interface{}{
+				"processors": []any{
+					map[string]any{
+						"add_locale": map[string]any{
 							"abbrevation": "MST",
 						},
 					},
@@ -200,22 +200,22 @@ func TestGenerateHints(t *testing.T) {
 
 		m := heartbeatHints{
 			config: defaultConfig(),
-			logger: logp.L(),
+			logger: logp.L(), //nolint:forbidigo // test helper
 		}
 		cfgs := m.CreateConfig(test.event)
-		assert.Equal(t, test.len, len(cfgs), test.message)
+		assert.Len(t, cfgs, test.len, test.message)
 
 		if len(cfgs) != 0 {
 			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err, test.message)
+			assert.NoError(t, err, test.message)
 
 			// Autodiscover can return configs with different sort orders here, which is irrelevant
 			// To make tests pass consistently we sort the host list
 			hostStrs := []string{}
-			if hostsSlice, ok := config["hosts"].([]interface{}); ok && len(hostsSlice) > 0 {
+			if hostsSlice, ok := config["hosts"].([]any); ok && len(hostsSlice) > 0 {
 				for _, hi := range hostsSlice {
-					hostStrs = append(hostStrs, hi.(string))
+					hostStrs = append(hostStrs, hi.(string)) //nolint:errcheck // test fixture type
 				}
 				sort.Strings(hostStrs)
 				config["hosts"] = hostStrs

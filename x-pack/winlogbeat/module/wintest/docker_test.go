@@ -83,8 +83,7 @@ func TestDocker(t *testing.T) {
 		}
 		defer conn.Close()
 
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		err = conn.Connect(ctx)
 		if err != nil {
 			t.Fatalf("unexpected error making connection: %v", err)
