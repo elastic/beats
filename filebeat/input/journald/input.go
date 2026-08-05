@@ -260,7 +260,7 @@ func (inp *journald) Run(
 		}
 
 		event := entry.ToEvent()
-		if err := publisher.Publish(event, event.Private); err != nil {
+		if err := publisher.Publish(event, getCursorUpdate(event.Private)); err != nil {
 			msg := fmt.Sprintf("could not publish event: %s", err)
 			ctx.UpdateStatus(status.Failed, msg)
 			logger.Errorf("%s", msg)
@@ -287,6 +287,22 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 	}
 
 	return cp
+}
+
+// getCursorUpdate returns the journald checkpoint to persist for a
+// published event. Multiline parsers aggregate per-line checkpoints in Private
+// as []any; the last entry is the furthest read position in the journal.
+func getCursorUpdate(priv any) any {
+	switch v := priv.(type) {
+	case []any:
+		// This should never happen, but better safe than panic.
+		if len(v) == 0 {
+			return nil
+		}
+		return v[len(v)-1]
+	default:
+		return priv
+	}
 }
 
 // readerAdapter wraps journalread.Reader and adds two functionalities:
