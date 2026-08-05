@@ -1575,46 +1575,47 @@ func TestEntityAnalyticsActiveDirectoryInputOTelE2E(t *testing.T) {
 	ldapURL := testactivedirectory.StartLDAPServer(t)
 
 	fbConfig := `filebeat.inputs:
-	- type: entity-analytics
-	  id: entity-analytics-ad-e2e
-	  enabled: true
-	  use_minimal_state: true
-	  provider: activedirectory
-	  dataset: users
-	  sync_interval: 24h
-	  update_interval: 12h
-	  ad_url: {{ .ADURL }}
-	  ad_base_dn: DC=example,DC=com
-	  ad_user: cn=admin,dc=example,dc=com
-	  ad_password: pass
-	` + filebeatOutputYAML
+- type: entity-analytics
+  id: entity-analytics-ad-e2e
+  enabled: true
+  use_minimal_state: true
+  provider: activedirectory
+  dataset: users
+  sync_interval: 24h
+  update_interval: 12h
+  ad_url: {{ .ADURL }}
+  ad_base_dn: DC=example,DC=com
+  ad_user: cn=admin,dc=example,dc=com
+  ad_password: pass
+` + filebeatOutputYAML
 
 	otelConfig := otelElasticsearchExporterYAML + `
 receivers:
-		filebeatreceiver:
-			filebeat:
-				inputs:
-					- type: entity-analytics
-					  id: entity-analytics-ad-e2e
-					  enabled: true
-					  use_minimal_state: true
-					  provider: activedirectory
-					  dataset: users
-					  sync_interval: 24h
-					  update_interval: 12h
-					  ad_url: {{ .ADURL }}
-					  ad_base_dn: DC=example,DC=com
-					  ad_user: cn=admin,dc=example,dc=com
-					  ad_password: pass
-			path.home: {{ .PathHome }}
-			processors:
-				- add_host_metadata: ~
-				- add_cloud_metadata: ~
-				- add_docker_metadata: ~
-				- add_kubernetes_metadata: ~
-			queue.mem.flush.timeout: 0s
-			setup.template.enabled: false
-			management.otel.enabled: true` + otelElasticsearchServiceYAML
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - type: entity-analytics
+                  id: entity-analytics-ad-e2e
+                  enabled: true
+                  use_minimal_state: true
+                  provider: activedirectory
+                  dataset: users
+                  sync_interval: 24h
+                  update_interval: 12h
+                  ad_url: {{ .ADURL }}
+                  ad_base_dn: DC=example,DC=com
+                  ad_user: cn=admin,dc=example,dc=com
+                  ad_password: pass
+        path.home: {{ .PathHome }}
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        management.otel.enabled: true
+` + otelElasticsearchServiceYAML
 
 	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
 		name:       "activedirectory",
