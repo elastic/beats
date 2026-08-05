@@ -158,9 +158,13 @@ func copyHeartbeatBrowserE2EConfig(t *testing.T) string {
 	contents, err := os.ReadFile(heartbeatBrowserE2EConfig)
 	require.NoError(t, err, "reading Heartbeat browser E2E fixture should succeed")
 
-	path := filepath.Join(t.TempDir(), "heartbeat.yml")
-	require.NoError(t, os.WriteFile(path, contents, 0o644), "writing Heartbeat browser E2E config should succeed")
-	return path
+	config, err := os.CreateTemp(t.TempDir(), "heartbeat.yml")
+	require.NoError(t, err, "creating Heartbeat browser E2E config should succeed")
+	require.NoError(t, config.Chmod(0o644), "making Heartbeat browser E2E config readable should succeed")
+	_, err = config.Write(contents)
+	require.NoError(t, err, "writing Heartbeat browser E2E config should succeed")
+	require.NoError(t, config.Close(), "closing Heartbeat browser E2E config should succeed")
+	return config.Name()
 }
 
 type heartbeatBrowserE2EEventResult struct {
