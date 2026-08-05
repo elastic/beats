@@ -22,12 +22,13 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 
+	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
-// BenchmarkNReceiverFootprint measures the steady-state resource footprint of N
-// filebeatreceiver instances, each running one filestream input over its own
-// small log file, all sharing a single path.data. That is the layout
+// BenchmarkNReceiverIdleFootprint measures the steady-state resource footprint
+// of N filebeatreceiver instances, each running one filestream input over its
+// own small log file, all sharing a single path.data. That is the layout
 // elastic-agent produces: one receiver per input stream, every receiver of a
 // component pointed at the same BeatDataPath(comp.ID).
 //
@@ -40,7 +41,7 @@ import (
 //   - goroutines/receiver : resident goroutines per additional receiver
 //   - heap-B/receiver     : live heap bytes retained per receiver
 //   - goroutines          : absolute goroutine count of the idle fleet
-func BenchmarkNReceiverFootprint(b *testing.B) {
+func BenchmarkNReceiverIdleFootprint(b *testing.B) {
 	for _, n := range []int{1, 10, 50} {
 		b.Run(fmt.Sprintf("receivers=%d", n), func(b *testing.B) {
 			benchNReceiverFootprint(b, n, 1)
@@ -76,7 +77,7 @@ func benchNReceiverFootprint(b *testing.B, nReceivers, filesPerReceiver int) {
 
 	var goroutinesPer, heapPer, heapPerFile, goroutines float64
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		// A fresh data dir per iteration so every receiver re-reads its file
 		// from offset 0 instead of resuming a registry from the last iteration.
 		dataDir := b.TempDir()
@@ -183,19 +184,28 @@ func startFleet(
 							"id":      fmt.Sprintf("footprint-%d", r),
 							"enabled": true,
 							"paths":   []string{path},
+							// Everything else is left at its default, most
+							// importantly the fingerprint file identity: the
+							// footprint worth tracking is the one the default
+							// configuration produces. writeBenchLogFiles keeps
+							// every file above DefaultFingerprintSize so each
+							// one is actually harvested.
 							"prospector": map[string]any{
 								"scanner": map[string]any{
 									"check_interval": "100ms",
-									"fingerprint":    map[string]any{"enabled": false},
 								},
 							},
-							"file_identity": map[string]any{"native": nil},
 						},
 					},
 				},
 				"logging":   map[string]any{"level": "error"},
 				"path.home": homeDir,
 				"path.data": dataDir,
+				// Run under the OtelManager, as a receiver started by
+				// elastic-agent does. It marks the beat as under agent, which
+				// changes what the pipeline builds — the footprint is only
+				// meaningful if it is measured in that mode.
+				"management.otel.enabled": true,
 			},
 		}
 
@@ -207,7 +217,7 @@ func startFleet(
 
 	return func() {
 		for _, rcvr := range receivers {
-			shutdownCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			shutdownCtx, cancel := context.WithTimeout(b.Context(), 60*time.Second)
 			require.NoError(b, rcvr.Shutdown(shutdownCtx))
 			cancel()
 		}
@@ -241,6 +251,11 @@ func dumpIdleGoroutines(b *testing.B, nReceivers int) {
 
 // writeBenchLogFiles writes count log files for one receiver into their own
 // subdirectory and returns the glob matching them.
+//
+// The receiver and file numbers are part of every line so that no two files
+// share a fingerprint, and each file is required to be larger than
+// DefaultFingerprintSize — below that the default fingerprint identity cannot
+// take a file, and it would simply never be harvested.
 func writeBenchLogFiles(b *testing.B, dir string, receiver, count, lines int) string {
 	b.Helper()
 
@@ -252,13 +267,18 @@ func writeBenchLogFiles(b *testing.B, dir string, receiver, count, lines int) st
 		f, err := os.Create(path)
 		require.NoError(b, err)
 
+		written := 0
 		for l := range lines {
-			_, err := fmt.Fprintf(f, "receiver %d file %d line %d: a log line of a fairly typical length\n",
+			c, err := fmt.Fprintf(f, "receiver %d file %d line %d: a log line of a fairly typical length\n",
 				receiver, n, l)
 			require.NoError(b, err)
+			written += c
 		}
 		require.NoError(b, f.Sync())
 		require.NoError(b, f.Close())
+
+		require.Greaterf(b, int64(written), filestream.DefaultFingerprintSize,
+			"file %s is too small to be fingerprinted, increase linesPerFile", path)
 	}
 
 	return filepath.Join(rcvrDir, "*.log")
