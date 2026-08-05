@@ -48,6 +48,70 @@ const (
 
 var heartbeatBrowserE2EArchivePattern = regexp.MustCompile(`^heartbeat-\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)*-linux-amd64\.docker\.tar\.gz$`)
 
+func TestHeartbeatBrowserE2EArchive(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		archives []string
+		want     string
+		wantErr  bool
+	}{
+		{name: "standard archive", archives: []string{"heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"}, want: "heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"},
+		{name: "no Heartbeat archive", archives: []string{"filebeat-9.5.0-linux-amd64.docker.tar.gz"}},
+		{name: "only Wolfi archive", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
+		{name: "unexpected variant", archives: []string{"heartbeat-custom-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
+		{name: "excluded variants", archives: []string{"heartbeat-oss-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-ubi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-fips-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-arm64.docker.tar.gz"}, wantErr: true},
+		{name: "ambiguous archives", archives: []string{"heartbeat-9.4.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := heartbeatBrowserE2EArchive(test.archives)
+			if test.wantErr {
+				require.Error(t, err, "selecting an ambiguous archive should fail")
+				return
+			}
+			require.NoError(t, err, "selecting archive should not fail")
+			assert.Equal(t, test.want, got, "selected archive should match")
+		})
+	}
+}
+
+func TestHeartbeatBrowserE2EEvents(t *testing.T) {
+	stdout := strings.Join([]string{
+		"unrelated startup log",
+		"{not-json}",
+		`{"synthetics":{"type":"step/end","step":{"name":"other step","status":"succeeded"}}}`,
+		`{"monitor":{"check_group":"journey-check-group"},"synthetics":{"type":"step/end","step":{"name":"page loads","status":"succeeded"}}}`,
+		`{"monitor":{"id":"generated-image-browser-e2e","status":"up","check_group":"journey-check-group"},"synthetics":{"type":"heartbeat/summary"},"summary":{"status":"up","up":1,"down":0,"final_attempt":true}}`,
+	}, "\n")
+
+	result, err := heartbeatBrowserE2EEvents(stdout)
+	require.NoError(t, err, "parsing events should succeed")
+	assert.True(t, result.hasSuccessfulSummary(), "matching successful step and summary should be found")
+}
+
+func TestHeartbeatBrowserE2EEventsRequireMatchingCheckGroup(t *testing.T) {
+	stdout := strings.Join([]string{
+		`{"monitor":{"check_group":"step-check"},"synthetics":{"type":"step/end","step":{"name":"page loads","status":"succeeded"}}}`,
+		`{"monitor":{"id":"generated-image-browser-e2e","status":"up","check_group":"summary-check"},"synthetics":{"type":"heartbeat/summary"},"summary":{"status":"up","up":1,"down":0,"final_attempt":true}}`,
+	}, "\n")
+
+	result, err := heartbeatBrowserE2EEvents(stdout)
+	require.NoError(t, err, "parsing events should succeed")
+	assert.False(t, result.hasSuccessfulSummary(), "events from different journey executions must not satisfy the smoke test")
+}
+
+func TestHeartbeatBrowserE2EEventsReturnsScannerErrors(t *testing.T) {
+	oversizedEvent := "{" + strings.Repeat("a", heartbeatBrowserE2EMaxEventSize) + "}"
+	_, err := heartbeatBrowserE2EEvents(oversizedEvent)
+	assert.Error(t, err, "oversized console events must not be silently ignored")
+}
+
+func TestHeartbeatBrowserE2EEventsMissingRequiredEvents(t *testing.T) {
+	result, err := heartbeatBrowserE2EEvents(`{"synthetics":{"type":"step/end","step":{"name":"page loads","status":"failed"}}}`)
+	require.NoError(t, err, "parsing events should succeed")
+	assert.Empty(t, result.successfulCheckGroups, "failed step must not satisfy assertion")
+	assert.Empty(t, result.successfulSummaries, "missing summary must not satisfy assertion")
+}
+
 // checkHeartbeatBrowserE2E runs a browser journey from the standard Linux AMD64
 // Heartbeat image, if that image was generated as part of the package test.
 func checkHeartbeatBrowserE2E(t *testing.T, dockerArchives []string) {
@@ -256,68 +320,4 @@ func heartbeatBrowserE2ELogs(ctx context.Context, dockerClient *client.Client, c
 		return stdout.String(), stderr.String(), err
 	}
 	return stdout.String(), stderr.String(), nil
-}
-
-func TestHeartbeatBrowserE2EArchive(t *testing.T) {
-	for _, test := range []struct {
-		name     string
-		archives []string
-		want     string
-		wantErr  bool
-	}{
-		{name: "standard archive", archives: []string{"heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"}, want: "heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"},
-		{name: "no Heartbeat archive", archives: []string{"filebeat-9.5.0-linux-amd64.docker.tar.gz"}},
-		{name: "only Wolfi archive", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
-		{name: "unexpected variant", archives: []string{"heartbeat-custom-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
-		{name: "excluded variants", archives: []string{"heartbeat-oss-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-ubi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-fips-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-arm64.docker.tar.gz"}, wantErr: true},
-		{name: "ambiguous archives", archives: []string{"heartbeat-9.4.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
-	} {
-		t.Run(test.name, func(t *testing.T) {
-			got, err := heartbeatBrowserE2EArchive(test.archives)
-			if test.wantErr {
-				require.Error(t, err, "selecting an ambiguous archive should fail")
-				return
-			}
-			require.NoError(t, err, "selecting archive should not fail")
-			assert.Equal(t, test.want, got, "selected archive should match")
-		})
-	}
-}
-
-func TestHeartbeatBrowserE2EEvents(t *testing.T) {
-	stdout := strings.Join([]string{
-		"unrelated startup log",
-		"{not-json}",
-		`{"synthetics":{"type":"step/end","step":{"name":"other step","status":"succeeded"}}}`,
-		`{"monitor":{"check_group":"journey-check-group"},"synthetics":{"type":"step/end","step":{"name":"page loads","status":"succeeded"}}}`,
-		`{"monitor":{"id":"generated-image-browser-e2e","status":"up","check_group":"journey-check-group"},"synthetics":{"type":"heartbeat/summary"},"summary":{"status":"up","up":1,"down":0,"final_attempt":true}}`,
-	}, "\n")
-
-	result, err := heartbeatBrowserE2EEvents(stdout)
-	require.NoError(t, err, "parsing events should succeed")
-	assert.True(t, result.hasSuccessfulSummary(), "matching successful step and summary should be found")
-}
-
-func TestHeartbeatBrowserE2EEventsRequireMatchingCheckGroup(t *testing.T) {
-	stdout := strings.Join([]string{
-		`{"monitor":{"check_group":"step-check"},"synthetics":{"type":"step/end","step":{"name":"page loads","status":"succeeded"}}}`,
-		`{"monitor":{"id":"generated-image-browser-e2e","status":"up","check_group":"summary-check"},"synthetics":{"type":"heartbeat/summary"},"summary":{"status":"up","up":1,"down":0,"final_attempt":true}}`,
-	}, "\n")
-
-	result, err := heartbeatBrowserE2EEvents(stdout)
-	require.NoError(t, err, "parsing events should succeed")
-	assert.False(t, result.hasSuccessfulSummary(), "events from different journey executions must not satisfy the smoke test")
-}
-
-func TestHeartbeatBrowserE2EEventsReturnsScannerErrors(t *testing.T) {
-	oversizedEvent := "{" + strings.Repeat("a", heartbeatBrowserE2EMaxEventSize) + "}"
-	_, err := heartbeatBrowserE2EEvents(oversizedEvent)
-	assert.Error(t, err, "oversized console events must not be silently ignored")
-}
-
-func TestHeartbeatBrowserE2EEventsMissingRequiredEvents(t *testing.T) {
-	result, err := heartbeatBrowserE2EEvents(`{"synthetics":{"type":"step/end","step":{"name":"page loads","status":"failed"}}}`)
-	require.NoError(t, err, "parsing events should succeed")
-	assert.Empty(t, result.successfulCheckGroups, "failed step must not satisfy assertion")
-	assert.Empty(t, result.successfulSummaries, "missing summary must not satisfy assertion")
 }
