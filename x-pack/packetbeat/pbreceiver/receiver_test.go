@@ -409,6 +409,9 @@ func TestReceiverStatus(t *testing.T) {
 		Status: componentstatus.NewEvent(componentstatus.StatusOK,
 			componentstatus.WithAttributes(inputStatusAttributes(
 				componentstatus.StatusOK.String(), "running packetbeat processor"))),
+		// packetbeat replays a pcap and finishes quickly, transitioning through
+		// StatusOK before the first poll tick; historical matching is required.
+		StatusMatchHistorical: true,
 	})
 }
 
