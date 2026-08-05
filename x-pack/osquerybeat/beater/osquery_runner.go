@@ -55,7 +55,10 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		}
 	}
 
-	// Cleanup on exit
+	// Cleanup on exit: cancel child context first, then wait for the runfn
+	// goroutine to exit. The order matters — cancel must run before wg.Wait
+	// so the goroutine sees context cancellation and exits promptly.
+	defer wg.Wait()
 	defer cancel()
 
 	errCh := make(chan error, 1)
