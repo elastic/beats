@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -64,7 +64,7 @@ func (tea *testEventAccumulator) waitForNumEvents(t *testing.T, targetLen int, t
 }
 
 func Test_internalBuilder(t *testing.T) {
-	log := logp.NewLogger("elb")
+	log := logp.NewLogger("elb") //nolint:forbidigo // test setup
 	lbl := fakeLbl()
 	lbls := []*lbListener{lbl}
 	fetcher := newMockFetcher(lbls, nil)

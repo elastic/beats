@@ -5,7 +5,7 @@ about: "Report confirmed bugs. For unconfirmed bugs please visit https://discuss
 ---
 
 Please post all questions and issues on https://discuss.elastic.co/c/beats
-before opening a Github Issue. Your questions will reach a wider audience there,
+before opening a GitHub issue. Your questions will reach a wider audience there,
 and if we confirm that there is a bug, then you can open a new issue.
 
 For security vulnerabilities please only send reports to security@elastic.co.

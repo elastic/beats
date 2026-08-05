@@ -23,7 +23,7 @@ import (
 //     values; the returned sync intervals must match, confirming that at
 //     least the duration fields are wired through end-to-end.
 func TestMinimalConfigRoundTrip(t *testing.T) {
-	const wantFields = 11
+	const wantFields = 12
 	if got := reflect.TypeOf(ecokta.Config{}).NumField(); got != wantFields {
 		t.Fatalf("ecokta.Config has %d exported fields, want %d; "+
 			"update localConf inside minimalProvider and this test", got, wantFields)
@@ -32,6 +32,7 @@ func TestMinimalConfigRoundTrip(t *testing.T) {
 	wantSync := 48 * time.Hour
 	wantUpdate := 30 * time.Minute
 	limitFixed := 50
+	scratchDir := "/scratch"
 
 	cfg := config.MustNewConfigFrom(map[string]any{
 		"okta_domain":     "test.okta.com",
@@ -44,6 +45,7 @@ func TestMinimalConfigRoundTrip(t *testing.T) {
 		"idset_shards":    32,
 		"limit_window":    "2m",
 		"limit_fixed":     limitFixed,
+		"scratch_dir":     scratchDir,
 	})
 
 	_, gotSync, gotUpdate, err := minimalProvider(cfg, nil)

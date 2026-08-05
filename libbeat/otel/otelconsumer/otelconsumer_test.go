@@ -277,78 +277,26 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
 
-	t.Run("retries are delayed by exponential backoff", func(t *testing.T) {
-		const (
-			initBackoff = 50 * time.Millisecond
-			maxBackoff  = 500 * time.Millisecond
-		)
+	t.Run("retryable errors wait a per-attempt jittered backoff", func(t *testing.T) {
+		const initBackoff = 50 * time.Millisecond
 
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return errors.New("retryable error")
 		})
-		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
+		otelConsumer.retry = retryConfig{init: initBackoff, max: 500 * time.Millisecond}
 
-		// Measure the duration of each Publish call. Each call blocks during
-		// backoff Wait(), so elapsed time reflects the actual backoff delay.
-		var durations []time.Duration
-		for range 3 {
+		const margin = 25 * time.Millisecond
+		for range 4 {
 			batch := outest.NewBatch(event1)
 			start := time.Now()
 			err := otelConsumer.Publish(ctx, batch)
-			durations = append(durations, time.Since(start))
+			d := time.Since(start)
 			require.NoError(t, err, "Publish should not return an error")
+			require.Len(t, batch.Signals, 1, "expected exactly one signal from Publish")
 			assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag, "batch should be retried")
+			assert.GreaterOrEqual(t, d, initBackoff, "retry delay should be at least init")
+			assert.Less(t, d, 2*initBackoff+margin, "retry delay should not escalate past ~2*init (got %v)", d)
 		}
-
-		assert.GreaterOrEqual(t, durations[0], initBackoff, "first retry delay should be at least ~init")
-		assert.GreaterOrEqual(t, durations[1], 2*initBackoff, "second retry delay should be at least ~2*init (exponential growth)")
-		assert.GreaterOrEqual(t, durations[2], 4*initBackoff, "third retry delay should be at least ~4*init (exponential growth)")
-	})
-
-	t.Run("backoff resets on success", func(t *testing.T) {
-		const (
-			initBackoff = 50 * time.Millisecond
-			maxBackoff  = 500 * time.Millisecond
-		)
-
-		callCount := 0
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			callCount++
-			if callCount == 3 {
-				return nil
-			}
-			return errors.New("retryable error")
-		})
-		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
-
-		// Two failures grow the backoff past init level.
-		batch1 := outest.NewBatch(event1)
-		err := otelConsumer.Publish(ctx, batch1)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchRetry, batch1.Signals[0].Tag, "first batch should be retried")
-
-		batch2 := outest.NewBatch(event1)
-		err = otelConsumer.Publish(ctx, batch2)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchRetry, batch2.Signals[0].Tag, "second batch should be retried")
-
-		// Third call succeeds, triggering backoff Reset().
-		batch3 := outest.NewBatch(event1)
-		err = otelConsumer.Publish(ctx, batch3)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchACK, batch3.Signals[0].Tag, "third batch should be acked")
-
-		// Next failure should use init-level backoff ([init, 2*init) = [50ms, 100ms)),
-		// not the grown level which would be [4*init, 8*init) = [200ms, 400ms).
-		batch4 := outest.NewBatch(event1)
-		start := time.Now()
-		err = otelConsumer.Publish(ctx, batch4)
-		duration := time.Since(start)
-		require.NoError(t, err)
-		assert.Equal(t, outest.BatchRetry, batch4.Signals[0].Tag, "fourth batch should be retried")
-		// In equal jitter backoff strategy, initial backoff is between initBackoff and 2*initBackoff.
-		const margin = 10 * time.Millisecond
-		assert.Less(t, duration, 2*initBackoff+margin, "after success, backoff should reset to init level, not continue growing (got %v)", duration)
 	})
 
 	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {
@@ -741,6 +689,141 @@ func newMockES(t *testing.T, handler func(mockesapi.Action, []byte) int) *mockes
 		10,
 		handler,
 	)
+}
+
+func TestSanitizeDataStreamField(t *testing.T) {
+	cases := []struct {
+		name       string
+		input      string
+		disallowed string
+		want       string
+	}{
+		{
+			name:       "clean value unchanged",
+			input:      "http",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "http",
+		},
+		{
+			name:       "uppercase lowercased",
+			input:      "HTTP",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "http",
+		},
+		{
+			name:       "disallowed rune replaced with underscore",
+			input:      "my dataset",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "my_dataset",
+		},
+		{
+			name:       "multiple disallowed runes replaced",
+			input:      "a*b?c",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "a_b_c",
+		},
+		{
+			name:       "value truncated to maxDataStreamBytes",
+			input:      string(make([]byte, 110)),
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       string(make([]byte, 100)),
+		},
+		{
+			name:       "namespace allows hyphen, dataset does not",
+			input:      "my-namespace",
+			disallowed: `\/*?"<>| ,#:`,
+			want:       "my-namespace",
+		},
+		{
+			name:       "dataset treats hyphen as disallowed",
+			input:      "my-dataset",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "my_dataset",
+		},
+	}
+	const maxLength = 100
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := sanitizeDataStreamField(tc.input, tc.disallowed, maxLength)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestFillLogRecordSetsElasticsearchIndex(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+
+	cases := []struct {
+		name      string
+		dsType    string
+		dataset   string
+		namespace string
+		wantIndex string // empty means attribute should not be set
+	}{
+		{
+			name:      "synthetics type sets elasticsearch.index",
+			dsType:    "synthetics",
+			dataset:   "http",
+			namespace: "default",
+			wantIndex: "synthetics-http-default",
+		},
+		{
+			name:      "traces type sets elasticsearch.index",
+			dsType:    "traces",
+			dataset:   "apm.transaction",
+			namespace: "default",
+			wantIndex: "traces-apm.transaction-default",
+		},
+		{
+			name:      "logs type does not set elasticsearch.index",
+			dsType:    "logs",
+			dataset:   "system.syslog",
+			namespace: "default",
+			wantIndex: "",
+		},
+		{
+			name:      "metrics type does not set elasticsearch.index",
+			dsType:    "metrics",
+			dataset:   "system.cpu",
+			namespace: "default",
+			wantIndex: "",
+		},
+		{
+			name:      "synthetics dataset sanitized",
+			dsType:    "synthetics",
+			dataset:   "http monitor",
+			namespace: "my-namespace",
+			wantIndex: "synthetics-http_monitor-my-namespace",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			event := publisher.Event{
+				Content: beat.Event{
+					Fields: mapstr.M{
+						"data_stream": mapstr.M{
+							"type":      tc.dsType,
+							"dataset":   tc.dataset,
+							"namespace": tc.namespace,
+						},
+					},
+				},
+			}
+			logRecord := plog.NewLogRecord()
+			err := fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false)
+			require.NoError(t, err)
+
+			indexAttr, hasIndex := logRecord.Attributes().Get("elasticsearch.index")
+			if tc.wantIndex == "" {
+				assert.False(t, hasIndex, "elasticsearch.index should not be set for type %q", tc.dsType)
+			} else {
+				require.True(t, hasIndex, "elasticsearch.index should be set for type %q", tc.dsType)
+				assert.Equal(t, tc.wantIndex, indexAttr.Str())
+			}
+		})
+	}
 }
 
 // testIndexManager is a minimal outputs.IndexManager that always selects a fixed index name.

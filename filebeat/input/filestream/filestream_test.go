@@ -32,42 +32,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func TestLogFileTimedClosing(t *testing.T) {
+// TestLogFileCloseOnEOF covers the only close condition logFile still evaluates
+// itself: close.reader.on_eof (and GZIP, which always closes on EOF). The
+// on-state-change conditions (inactive/removed/renamed) and close-after-interval
+// are now evaluated by the harvester runner's waker and covered by integration tests.
+func TestLogFileCloseOnEOF(t *testing.T) {
 	testCases := []struct {
-		name           string
-		createFile     func(t *testing.T) *os.File
-		waitBeforeRead time.Duration
-		inactive       time.Duration
-		closeEOF       bool
-		afterInterval  time.Duration
-		expectedErr    error
+		name       string
+		createFile func(t *testing.T) *os.File
 	}{
-		{name: "plain: read from file and close inactive",
-			createFile:  createTestPlainLogFile,
-			inactive:    2 * time.Second,
-			expectedErr: ErrInactive,
-		},
-		{name: "plain: read from file and close after interval",
-			createFile:    createTestPlainLogFile,
-			afterInterval: 3 * time.Second,
-			expectedErr:   ErrClosed,
-		},
-		{name: "plain: read from file and close on EOF",
-			createFile:  createTestPlainLogFile,
-			closeEOF:    true,
-			expectedErr: io.EOF,
-		},
-		{name: "GZIP: read from file and close on EOF",
-			createFile:  createTestGzipLogFile,
-			closeEOF:    true,
-			expectedErr: io.EOF,
-		},
-		{name: "GZIP: read from file and close after interval",
-			createFile:     createTestPlainLogFile,
-			afterInterval:  3 * time.Second,
-			waitBeforeRead: 3 * time.Second,
-			expectedErr:    ErrClosed,
-		},
+		{name: "plain: read from file and close on EOF", createFile: createTestPlainLogFile},
+		{name: "GZIP: read from file and close on EOF", createFile: createTestGzipLogFile},
 	}
 
 	for _, tc := range testCases {
@@ -77,38 +52,26 @@ func TestLogFileTimedClosing(t *testing.T) {
 		f, err := fs.newFile(tc.createFile(t))
 		require.NoError(t, err,
 			"could not create file for reading")
-		defer f.Close()
-		defer os.Remove(f.Name())
+		t.Cleanup(func() {
+			_ = f.Close()
+			_ = os.Remove(f.Name())
+		})
 
 		t.Run(tc.name, func(t *testing.T) {
 			reader, err := newFileReader(
 				logp.NewNopLogger(),
 				context.TODO(),
 				f,
-				readerConfig{},
 				closerConfig{
-					OnStateChange: stateChangeCloserConfig{
-						CheckInterval: 1 * time.Second,
-						Inactive:      tc.inactive,
-					},
-					Reader: readerCloserConfig{
-						OnEOF:         tc.closeEOF,
-						AfterInterval: tc.afterInterval,
-					},
+					Reader: readerCloserConfig{OnEOF: true},
 				},
 			)
 			if err != nil {
 				t.Fatalf("error while creating logReader: %+v", err)
 			}
 
-			if tc.waitBeforeRead > 0 {
-				// GZIP files aren't kept open, thus we need to wait for
-				// 'AfterInterval' to elapse before reading.
-				time.Sleep(tc.waitBeforeRead)
-			}
-
 			err = readUntilError(reader)
-			assert.ErrorIs(t, err, tc.expectedErr)
+			assert.ErrorIs(t, err, io.EOF)
 		})
 	}
 }
@@ -161,7 +124,7 @@ func TestLogFileTruncated(t *testing.T) {
 			defer os.Remove(f.Name())
 
 			reader, err := newFileReader(
-				logp.NewNopLogger(), context.TODO(), f, fs.readerConfig, fs.closerConfig)
+				logp.NewNopLogger(), context.TODO(), f, fs.closerConfig)
 			require.NoError(t, err, "error while creating logReader")
 
 			buf := make([]byte, 32)
@@ -224,4 +187,95 @@ func readUntilError(reader *logFile) error {
 		_, err = reader.Read(buf)
 	}
 	return err
+}
+
+// TestLogFileNonBlocking tests logFile is non-blocking: it returns ErrWouldBlock
+// at EOF instead of waiting on the read backoff, and it resumes reading once new
+// data is appended.
+func TestLogFileNonBlocking(t *testing.T) {
+	osFile := createTestPlainLogFile(t)
+	fs := filestream{
+		readerConfig: readerConfig{BufferSize: 512},
+		compression:  CompressionAuto,
+	}
+	f, err := fs.newFile(osFile)
+	require.NoError(t, err, "could not create file for reading")
+	t.Cleanup(func() {
+		_ = f.Close()
+		_ = os.Remove(f.Name())
+	})
+
+	reader, err := newFileReader(
+		logp.NewNopLogger(), context.TODO(), f, closerConfig{})
+	require.NoError(t, err, "error while creating logReader")
+
+	// Drain the initial content written by createTestPlainLogFile.
+	content := readAllAvailable(t, reader)
+	require.NotEmpty(t, content, "expected to read the initial file content")
+
+	// At EOF a non-blocking reader must return ErrWouldBlock promptly instead
+	// of blocking on the read backoff.
+	n, err := readWithTimeout(t, reader, make([]byte, 1024), time.Second)
+	assert.Zero(t, n, "no bytes should be read at EOF")
+	assert.ErrorIs(t, err, ErrWouldBlock,
+		"non-blocking reader must return ErrWouldBlock at EOF")
+
+	// Once new data is appended the reader must pick it up rather than keep
+	// returning ErrWouldBlock.
+	appendToFile(t, f.Name(), "a new line\n")
+	more := readAllAvailable(t, reader)
+	assert.Equal(t, "a new line\n", string(more),
+		"non-blocking reader must read newly appended data")
+}
+
+// readWithTimeout runs reader.Read in a goroutine and fails the test if it does
+// not return within timeout, so a blocking Read fails clearly instead of hanging
+// the test.
+func readWithTimeout(t *testing.T, reader *logFile, buf []byte, timeout time.Duration) (int, error) {
+	t.Helper()
+	type result struct {
+		n   int
+		err error
+	}
+	ch := make(chan result, 1)
+	go func() {
+		n, err := reader.Read(buf)
+		ch <- result{n: n, err: err}
+	}()
+
+	select {
+	case r := <-ch:
+		return r.n, r.err
+	case <-time.After(timeout):
+		t.Fatalf("Read did not return within %s; the non-blocking reader appears to be blocking", timeout)
+		return 0, nil
+	}
+}
+
+// readAllAvailable reads from a non-blocking reader until ErrWouldBlock and
+// returns everything read.
+func readAllAvailable(t *testing.T, reader *logFile) []byte {
+	t.Helper()
+	var out []byte
+	for {
+		buf := make([]byte, 1024)
+		n, err := readWithTimeout(t, reader, buf, time.Second)
+		out = append(out, buf[:n]...)
+		if err != nil {
+			require.ErrorIs(t, err, ErrWouldBlock,
+				"unexpected error while draining non-blocking reader")
+			return out
+		}
+	}
+}
+
+func appendToFile(t *testing.T, path, data string) {
+	t.Helper()
+	wf, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0o600)
+	require.NoError(t, err, "could not open file for appending")
+	defer wf.Close()
+
+	_, err = wf.WriteString(data)
+	require.NoError(t, err, "could not append to file")
+	require.NoError(t, wf.Sync(), "could not sync appended data")
 }

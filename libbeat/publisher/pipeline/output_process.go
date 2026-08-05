@@ -32,6 +32,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+// closedChan is a pre-closed channel returned by producers that have no events
+// to wait for, so a caller selecting on ACKWaitChan never blocks.
+var closedChan = func() chan struct{} {
+	c := make(chan struct{})
+	close(c)
+	return c
+}()
+
 var _ outputController = (*processOutputController)(nil)
 
 // processOutputController implements outputController
@@ -52,6 +60,11 @@ type processOutputController struct {
 	queue           queue.Queue[publisher.Event]
 	queueLock       sync.Mutex
 	pendingRequests []producerRequest
+
+	// closing is set once closeQueue runs. After that queueProducer vends no
+	// more producers (it returns nil), so none is created on the closed queue.
+	// Guarded by queueLock.
+	closing bool
 
 	// This factory will be used to create the queue when needed, unless
 	// it is overridden by output configuration when outputController.Set
@@ -198,6 +211,7 @@ func (c *processOutputController) Reload(
 func (c *processOutputController) closeQueue(ctx context.Context, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
+	c.closing = true
 	if c.queue != nil {
 		c.logger.Infof("Output shutdown started. Waiting for enqueued events to be published.")
 		c.queue.Close(false)
@@ -219,6 +233,7 @@ func (c *processOutputController) closeQueue(ctx context.Context, force bool) {
 		// real error to the caller.
 		req.responseChan <- nil
 	}
+	c.pendingRequests = nil
 }
 
 // queueProducer creates a queue producer with the given config, blocking
@@ -233,6 +248,11 @@ func (c *processOutputController) queueProducer(config queue.ProducerConfig) que
 		return emptyProducer{}
 	}
 	c.queueLock.Lock()
+	if c.closing {
+		// The pipeline is shutting down.
+		c.queueLock.Unlock()
+		return nil
+	}
 	if c.queue != nil {
 		// We defer the unlock only after the nil check because if the
 		// queue doesn't exist we'll need to block until it does, and
@@ -316,4 +336,8 @@ func (emptyProducer) TryPublish(_ publisher.Event) (queue.EntryID, bool) {
 }
 
 func (emptyProducer) Close() {
+}
+
+func (emptyProducer) ACKWaitChan() <-chan struct{} {
+	return closedChan
 }

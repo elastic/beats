@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-08-18T13:45:57.4803543Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "changed-audit-config",

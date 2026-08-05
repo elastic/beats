@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Summarizer produces summary events (with summary.* and other asssociated fields).
@@ -33,13 +34,14 @@ import (
 // this summary.
 type Summarizer struct {
 	rootJob        jobs.Job
-	contsRemaining uint16
+	contsRemaining int
 	mtx            *sync.Mutex
 	sf             stdfields.StdMonitorFields
 	mst            *monitorstate.Tracker
 	retryDelay     time.Duration
 	plugins        []SummarizerPlugin
 	startedAt      time.Time
+	logger         *logp.Logger
 }
 
 func (s Summarizer) beforeEachEvent(event *beat.Event) {
@@ -76,7 +78,7 @@ type SummarizerPlugin interface {
 	BeforeRetry()
 }
 
-func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
+func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker, logger *logp.Logger) *Summarizer {
 	s := &Summarizer{
 		rootJob:        rootJob,
 		contsRemaining: 1,
@@ -85,6 +87,7 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 		sf:             sf,
 		retryDelay:     time.Second,
 		startedAt:      time.Now(),
+		logger:         logger,
 	}
 	s.setupPlugins()
 	return s
@@ -93,18 +96,18 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 func (s *Summarizer) setupPlugins() {
 	// ssp must appear before Err plugin since
 	// it intercepts errors
-	if s.sf.Type == "browser" {
+	if s.sf.IsSyntheticsType() {
 		s.plugins = []SummarizerPlugin{
 			DropBrowserExtraEvents{},
 			&BrowserDurationPlugin{},
-			&BrowserURLPlugin{},
-			NewBrowserStateStatusplugin(s.mst, s.sf),
+			&BrowserURLPlugin{logger: s.logger},
+			NewBrowserStateStatusplugin(s.mst, s.sf, s.logger),
 			NewBrowserErrPlugin(),
 		}
 	} else {
 		s.plugins = []SummarizerPlugin{
 			&LightweightDurationPlugin{},
-			NewLightweightStateStatusPlugin(s.mst, s.sf),
+			NewLightweightStateStatusPlugin(s.mst, s.sf, s.logger),
 			NewLightweightErrPlugin(),
 		}
 	}
@@ -126,7 +129,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 		s.contsRemaining-- // we just ran one cont, discount it
 		// these many still need to be processed
-		s.contsRemaining += uint16(len(conts))
+		s.contsRemaining += len(conts)
 
 		for _, plugin := range s.plugins {
 			actions := plugin.EachEvent(event, eventErr)

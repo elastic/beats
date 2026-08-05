@@ -35,6 +35,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -57,13 +58,18 @@ func BenchmarkFilestream(b *testing.B) {
 		lineCount   int
 		fileCount   int
 		fingerprint bool
+		growing     bool
 	}{
-		{"1_file/inode", 10_000, 1, false},
-		{"1_file/fingerprint", 10_000, 1, true},
-		{"100_files/inode", 1000, 100, false},
-		{"100_files/fingerprint", 1000, 100, true},
-		{"1000_files/fingerprint", 20, 1000, true},
-		{"10000_files/fingerprint", 20, 10_000, true},
+		{"1_file/inode", 10_000, 1, false, false},
+		{"1_file/fingerprint", 10_000, 1, true, false},
+		{"100_files/inode", 1000, 100, false, false},
+		{"100_files/fingerprint", 1000, 100, true, false},
+		{"1000_files/fingerprint", 20, 1000, true, false},
+		{"10000_files/fingerprint", 20, 10_000, true, false},
+		// Growing fingerprint: many small files that stay below the 1024-byte
+		// threshold, so each is tracked by a bounded growing-fingerprint key.
+		{"1000_files/growing", 5, 1000, true, true},
+		{"10000_files/growing", 5, 10_000, true, true},
 	}
 
 	for _, tc := range cases {
@@ -79,7 +85,7 @@ func BenchmarkFilestream(b *testing.B) {
 			}
 
 			expEvents := tc.lineCount * tc.fileCount
-			cfg := filestreamBenchCfg(ingestPath, tc.fingerprint)
+			cfg := filestreamBenchCfg(ingestPath, tc.fingerprint, tc.growing)
 			b.ResetTimer()
 
 			for i := 0; i < b.N; i++ {
@@ -124,9 +130,90 @@ paths:
 			})
 		}
 	})
+
+	b.Run("multiline", func(b *testing.B) {
+		const eventCount = 2000
+		const linesPerEvent = 5 // 1 header + 4 continuation lines = 10k lines total
+		filename := generateMultilineFile(b, b.TempDir(), eventCount, linesPerEvent)
+		cfg := fmt.Sprintf(`
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true
+parsers:
+  - multiline:
+      type: pattern
+      pattern: '^[[:space:]]'
+      negate: false
+      match: after
+paths:
+    - %s
+`, filename)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			runFilestreamBenchmark(b, logger, fmt.Sprintf("multiline-%d", i), cfg, eventCount)
+		}
+	})
+
+	b.Run("container", func(b *testing.B) {
+		const lineCount = 10_000
+		filename := generateContainerFile(b, b.TempDir(), lineCount)
+		cfg := fmt.Sprintf(`
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true
+parsers:
+  - container:
+      stream: all
+      format: docker
+paths:
+    - %s
+`, filename)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			runFilestreamBenchmark(b, logger, fmt.Sprintf("container-%d", i), cfg, lineCount)
+		}
+	})
 }
 
-func filestreamBenchCfg(path string, fingerprint bool) string {
+// generateContainerFile writes lineCount complete (non-partial) Docker-JSON log
+// lines, the common container-logging case.
+func generateContainerFile(t testing.TB, dir string, lineCount int) string {
+	t.Helper()
+	file, err := os.CreateTemp(dir, "*")
+	require.NoError(t, err)
+	filename := file.Name()
+	for i := range lineCount {
+		fmt.Fprintf(file,
+			`{"log":"rather mediocre container log line %d\n","stream":"stdout","time":"2024-01-01T00:00:00.000000000Z"}`+"\n",
+			i)
+	}
+	require.NoError(t, file.Close())
+	return filename
+}
+
+// generateMultilineFile writes eventCount stack-trace-like events, each a header
+// line followed by linesPerEvent-1 whitespace-indented continuation lines, so a
+// `^[[:space:]]` multiline pattern groups each event into one message.
+func generateMultilineFile(t testing.TB, dir string, eventCount, linesPerEvent int) string {
+	t.Helper()
+	file, err := os.CreateTemp(dir, "*")
+	require.NoError(t, err)
+	filename := file.Name()
+	for i := range eventCount {
+		fmt.Fprintf(file, "ERROR event %d failed in %s\n", i, filename)
+		for j := 1; j < linesPerEvent; j++ {
+			fmt.Fprintf(file, "\tat com.example.Service.call(Service.java:%d) line %d\n", j, i)
+		}
+	}
+	require.NoError(t, file.Close())
+	return filename
+}
+
+func filestreamBenchCfg(path string, fingerprint, growing bool) string {
 	identity := `
 prospector.scanner.fingerprint.enabled: false
 file_identity.native: ~`
@@ -135,13 +222,78 @@ file_identity.native: ~`
 prospector.scanner.fingerprint.enabled: true
 file_identity.fingerprint: ~`
 	}
+	if growing {
+		identity = `
+prospector.scanner.fingerprint.enabled: true
+file_identity.fingerprint:
+  growing: true`
+	}
 	return fmt.Sprintf(`
+id: benchmark
 type: filestream
 prospector.scanner.check_interval: 100ms
 close.reader.on_eof: true%s
 paths:
   - %s
 `, identity, path)
+}
+
+// BenchmarkFilestreamSliceBudget measures how the slice time budget affects
+// ingestion throughput (events/s) for a single busy file. The budget is active
+// only when one of harvester_limit / close.on_state_change.renamed /
+// close.reader.after_interval is set; here harvester_limit:1 activates it and
+// close.on_state_change.check_interval is the budget. Smaller budgets yield the
+// slice more often, so the reader parks/rebuilds its pipeline and re-seeks more
+// frequently — the "disabled" case (sliceBudget == 0, one uninterrupted read to
+// EOF) is the baseline to compare against.
+func BenchmarkFilestreamSliceBudget(b *testing.B) {
+	// Info level keeps per-line Debugf calls out of the hot path.
+	logger := logptest.NewTestingLogger(b, "", zap.IncreaseLevel(zap.InfoLevel))
+	const lineCount = 100_000
+
+	cases := []struct {
+		name          string
+		harvesterLim  int    // 0 => sliceBudget disabled
+		checkInterval string // slice budget when harvesterLim > 0
+	}{
+		{"disabled", 0, ""},
+		{"budget_1s", 1, "1s"},
+		{"budget_100ms", 1, "100ms"},
+		{"budget_10ms", 1, "10ms"},
+		{"budget_1ms", 1, "1ms"},
+	}
+
+	for _, tc := range cases {
+		b.Run(tc.name, func(b *testing.B) {
+			filename := generateFile(b, b.TempDir(), lineCount)
+			cfg := sliceBudgetBenchCfg(filename, tc.harvesterLim, tc.checkInterval)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				runFilestreamBenchmark(b, logger, fmt.Sprintf("slicebudget-%s-%d", tc.name, i), cfg, lineCount)
+			}
+			b.StopTimer()
+			b.ReportMetric(float64(lineCount)*float64(b.N)/b.Elapsed().Seconds(), "events/s")
+		})
+	}
+}
+
+func sliceBudgetBenchCfg(path string, harvesterLimit int, checkInterval string) string {
+	budget := ""
+	if harvesterLimit > 0 {
+		budget = fmt.Sprintf(`
+harvester_limit: %d
+close.on_state_change.check_interval: %s`, harvesterLimit, checkInterval)
+	}
+	return fmt.Sprintf(`
+id: benchmark-slicebudget
+type: filestream
+prospector.scanner.check_interval: 100ms
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
+close.reader.on_eof: true%s
+paths:
+  - %s
+`, budget, path)
 }
 
 func TestTakeOverTags(t *testing.T) {
@@ -189,6 +341,60 @@ paths:
 	}
 }
 
+// TestConfigure_SliceBudget asserts configure only bounds ReadSlice's duration
+// (filestream.sliceBudget, at close.on_state_change.check_interval) when
+// something depends on Poll running while a file stays continuously busy:
+// harvester_limit needs a close condition to free its slot, and
+// close.on_state_change.renamed only matters for a file still being written to
+// under its old name. Otherwise it's left unbounded to avoid the extra
+// pipeline-rebuild/stat overhead where nothing needs it.
+func TestConfigure_SliceBudget(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
+	require.NoError(t, err)
+
+	build := func(t *testing.T, extra string) *filestream {
+		t.Helper()
+		cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: test
+paths:
+  - /var/log/foo
+%s
+`, extra))
+		_, harvester, err := configure(cfg, logger, srcIdentifier)
+		require.NoError(t, err)
+		fs, ok := harvester.(*filestream)
+		require.True(t, ok)
+		return fs
+	}
+
+	t.Run("unset by default", func(t *testing.T) {
+		fs := build(t, "")
+		assert.Zero(t, fs.sliceBudget, "no setting needs a bounded slice")
+	})
+
+	t.Run("set when harvester_limit is enabled", func(t *testing.T) {
+		fs := build(t, "harvester_limit: 5")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("set when close.on_state_change.renamed is enabled", func(t *testing.T) {
+		fs := build(t, "close.on_state_change.renamed: true")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("set when close.reader.after_interval is enabled", func(t *testing.T) {
+		fs := build(t, "close.reader.after_interval: 30s")
+		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
+	})
+
+	t.Run("unaffected by settings that don't need it", func(t *testing.T) {
+		fs := build(t, "close.on_state_change.inactive: 1m\nclose.on_state_change.removed: true")
+		assert.Zero(t, fs.sliceBudget)
+	})
+}
+
 func TestNewFile(t *testing.T) {
 	tempDir := t.TempDir()
 
@@ -211,7 +417,7 @@ func TestNewFile(t *testing.T) {
 	testCases := map[string]struct {
 		compression   string
 		filePath      string
-		expectedType  interface{}
+		expectedType  any
 		expectError   bool
 		errorContains string
 		setup         func(t *testing.T, filePath string) *os.File
@@ -412,7 +618,7 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	file, err := os.CreateTemp(dir, "*")
 	require.NoError(t, err)
 	filename := file.Name()
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		fmt.Fprintf(file, "rather mediocre log line message in %s - %d\n", filename, i)
 	}
 	err = file.Close()

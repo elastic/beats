@@ -51,7 +51,7 @@ func TestDocumentedFieldCheck(t *testing.T) {
 	omitfields := []string{
 		"hello",
 	}
-	knownKeys := map[string]interface{}{
+	knownKeys := map[string]any{
 		"elasticsearch.stats": "key1",
 	}
 	err := documentedFieldCheck(foundKeys, knownKeys, omitfields)
@@ -63,7 +63,7 @@ func TestDocumentedFieldCheck(t *testing.T) {
 		"elasticsearch.metrics.requests.count": "requests2",
 	}
 
-	knownKeys = map[string]interface{}{
+	knownKeys = map[string]any{
 		"elasticsearch.stats.*":     "key1",
 		"elasticsearch.metrics.*.*": "hello1",
 	}
@@ -76,7 +76,7 @@ func TestDocumentedFieldCheck(t *testing.T) {
 		"elasticsearch.metrics.requests.count": "requests2",
 	}
 
-	knownKeys = map[string]interface{}{
+	knownKeys = map[string]any{
 		"elasticsearch.*":         "key1",
 		"elasticsearch.metrics.*": "hello1",
 	}

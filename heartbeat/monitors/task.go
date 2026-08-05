@@ -38,13 +38,15 @@ type configuredJob struct {
 	monitor   *Monitor
 	cancelFn  context.CancelFunc
 	pubClient beat.Client
+	logger    *logp.Logger
 }
 
-func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) *configuredJob {
+func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor, logger *logp.Logger) *configuredJob {
 	return &configuredJob{
 		job:     job,
 		config:  config,
 		monitor: monitor,
+		logger:  logger,
 	}
 }
 
@@ -65,7 +67,7 @@ func (e ProcessorsError) Error() string {
 
 func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
 	return func(_ context.Context) []scheduler.TaskFunc {
-		return runPublishJob(job, t.pubClient)
+		return runPublishJob(job, t.pubClient, t.logger)
 	}
 }
 
@@ -80,13 +82,13 @@ func (t *configuredJob) Start(pubClient beat.Client) {
 	t.pubClient = pubClient
 
 	if err != nil {
-		logp.L().Infof("could not start monitor: %v", err)
+		t.logger.Infof("could not start monitor: %v", err)
 		return
 	}
 
 	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ParsedMainteWin, t.monitor.stdFields.ID, t.makeSchedulerTaskFunc(), t.config.Type)
 	if err != nil {
-		logp.L().Infof("could not start monitor: %v", err)
+		t.logger.Infof("could not start monitor: %v", err)
 	}
 }
 
@@ -100,14 +102,14 @@ func (t *configuredJob) Stop() {
 	}
 }
 
-func runPublishJob(job jobs.Job, pubClient beat.Client) []scheduler.TaskFunc {
+func runPublishJob(job jobs.Job, pubClient beat.Client, logger *logp.Logger) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: mapstr.M{},
 	}
 
 	conts, err := job(event)
 	if err != nil {
-		logp.L().Infof("Job failed with: %s", err)
+		logger.Infof("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0
@@ -141,7 +143,7 @@ func runPublishJob(job jobs.Job, pubClient beat.Client) []scheduler.TaskFunc {
 		localCont := cont
 
 		contTasks[i] = func(_ context.Context) []scheduler.TaskFunc {
-			return runPublishJob(localCont, pubClient)
+			return runPublishJob(localCont, pubClient, logger)
 		}
 	}
 	return contTasks

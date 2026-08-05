@@ -109,6 +109,23 @@ func TestMetricProcessorProcess(t *testing.T) {
 	assert.Equal(t, event["stats"], float64(42))
 }
 
+func TestMetricProcessorProcessNTimestamp(t *testing.T) {
+	processor := GetMetricProcessor()
+
+	before := time.Now()
+	event, err := processor.Process("test.localhost.bash.stats 42 N")
+	after := time.Now()
+
+	assert.NoError(t, err)
+	assert.NotNil(t, event)
+	assert.Equal(t, event["stats"], float64(42))
+
+	ts, ok := event["@timestamp"].(common.Time)
+	require.True(t, ok, "expected @timestamp to be common.Time")
+	assert.False(t, time.Time(ts).Before(before), "timestamp should not be before the call")
+	assert.False(t, time.Time(ts).After(after), "timestamp should not be after the call")
+}
+
 func TestTemplateApply(t *testing.T) {
 	tests := []struct {
 		name          string

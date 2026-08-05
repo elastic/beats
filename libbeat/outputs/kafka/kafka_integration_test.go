@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"math/rand/v2"
 	"os"
 	"strconv"
@@ -73,7 +74,7 @@ func TestKafkaPublish(t *testing.T) {
 
 	tests := []struct {
 		title  string
-		config map[string]interface{}
+		config map[string]any
 		topic  string
 		events []eventInfo
 	}{
@@ -88,7 +89,7 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"publish single event with topic from type",
-			map[string]interface{}{
+			map[string]any{
 				"topic": "%{[type]}",
 			},
 			logType,
@@ -100,7 +101,7 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"publish single event with formating to test topic",
-			map[string]interface{}{
+			map[string]any{
 				"codec.format.string": "%{[message]}",
 			},
 			testTopic,
@@ -119,7 +120,7 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"batch publish to test topic from type",
-			map[string]interface{}{
+			map[string]any{
 				"topic": "%{[type]}",
 			},
 			logType,
@@ -130,8 +131,8 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"batch publish with random partitioner",
-			map[string]interface{}{
-				"partition.random": map[string]interface{}{
+			map[string]any{
+				"partition.random": map[string]any{
 					"group_events": 1,
 				},
 			},
@@ -143,8 +144,8 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"batch publish with round robin partitioner",
-			map[string]interface{}{
-				"partition.round_robin": map[string]interface{}{
+			map[string]any{
+				"partition.round_robin": map[string]any{
 					"group_events": 1,
 				},
 			},
@@ -156,8 +157,8 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"batch publish with hash partitioner without key (fallback to random)",
-			map[string]interface{}{
-				"partition.hash": map[string]interface{}{},
+			map[string]any{
+				"partition.hash": map[string]any{},
 			},
 			testTopic,
 			randMulti(1, 10, mapstr.M{
@@ -168,9 +169,9 @@ func TestKafkaPublish(t *testing.T) {
 		{
 			// warning: this test uses random keys. In case keys are reused, test might fail.
 			"batch publish with hash partitioner with key",
-			map[string]interface{}{
+			map[string]any{
 				"key":            "%{[message]}",
-				"partition.hash": map[string]interface{}{},
+				"partition.hash": map[string]any{},
 			},
 			testTopic,
 			randMulti(1, 10, mapstr.M{
@@ -181,7 +182,7 @@ func TestKafkaPublish(t *testing.T) {
 		{
 			// warning: this test uses random keys. In case keys are reused, test might fail.
 			"batch publish with fields hash partitioner",
-			map[string]interface{}{
+			map[string]any{
 				"partition.hash.hash": []string{
 					"@timestamp",
 					"type",
@@ -196,7 +197,7 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"publish single event to test topic with empty config",
-			map[string]interface{}{},
+			map[string]any{},
 			testTopic,
 			single(mapstr.M{
 				"host":    "test-host",
@@ -209,7 +210,7 @@ func TestKafkaPublish(t *testing.T) {
 			// in plaintext, and individual tests can switch to SCRAM
 			// by inserting the config in this example:
 			"SASL/SCRAM publish single event to test topic",
-			map[string]interface{}{
+			map[string]any{
 				"hosts":          []string{getTestSASLKafkaHost()},
 				"protocol":       "https",
 				"sasl.mechanism": "SCRAM-SHA-512",
@@ -229,7 +230,7 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"publish message with kafka headers to test topic",
-			map[string]interface{}{
+			map[string]any{
 				"headers": []map[string]string{
 					{
 						"key":   "app",
@@ -252,7 +253,7 @@ func TestKafkaPublish(t *testing.T) {
 		},
 		{
 			"publish message with zstd compression to test topic",
-			map[string]interface{}{
+			map[string]any{
 				"compression": "zstd",
 				"version":     "2.2",
 			},
@@ -264,14 +265,13 @@ func TestKafkaPublish(t *testing.T) {
 		},
 	}
 
-	defaultConfig := map[string]interface{}{
+	defaultConfig := map[string]any{
 		"hosts":   []string{getTestKafkaHost()},
 		"topic":   testTopic,
 		"timeout": "1s",
 	}
 
 	for i, test := range tests {
-		test := test
 		name := fmt.Sprintf("run test(%v): %v", i, test.title)
 
 		cfg := makeConfig(t, defaultConfig)
@@ -368,14 +368,14 @@ func TestKafkaErrors(t *testing.T) {
 
 	tests := []struct {
 		title        string
-		config       map[string]interface{}
+		config       map[string]any
 		topic        string
 		events       []eventInfo
 		errorMessage string
 	}{
 		{
 			"message of size large than `max_message_bytes` must be dropped",
-			map[string]interface{}{
+			map[string]any{
 				"max_message_bytes": "10",
 			},
 			testTopic,
@@ -387,7 +387,7 @@ func TestKafkaErrors(t *testing.T) {
 		},
 	}
 
-	defaultConfig := map[string]interface{}{
+	defaultConfig := map[string]any{
 		"hosts":   []string{getTestKafkaHost()},
 		"topic":   testTopic,
 		"timeout": "1s",
@@ -457,7 +457,7 @@ func TestKafkaErrors(t *testing.T) {
 }
 
 func validateJSON(t *testing.T, value []byte, events []beat.Event) string {
-	var decoded map[string]interface{}
+	var decoded map[string]any
 	err := json.Unmarshal(value, &decoded)
 	if err != nil {
 		t.Errorf("can not json decode event value: %v", value)
@@ -576,7 +576,7 @@ func ensureKafkaTopicReadyForWrites(t *testing.T, topic string) {
 	}, 30*time.Second, 200*time.Millisecond, "topic %s is not ready for writes", topic)
 }
 
-func makeConfig(t *testing.T, in map[string]interface{}) *config.C {
+func makeConfig(t *testing.T, in map[string]any) *config.C {
 	cfg, err := config.NewConfigFrom(in)
 	if err != nil {
 		t.Fatal(err)
@@ -728,13 +728,11 @@ func single(fields mapstr.M) []eventInfo {
 
 func randMulti(batches, n int, event mapstr.M) []eventInfo {
 	var out []eventInfo
-	for i := 0; i < batches; i++ {
+	for range batches {
 		var data []beat.Event
-		for j := 0; j < n; j++ {
+		for range n {
 			tmp := mapstr.M{}
-			for k, v := range event {
-				tmp[k] = v
-			}
+			maps.Copy(tmp, event)
 			tmp["message"] = randString(100)
 			data = append(data, beat.Event{Timestamp: time.Now(), Fields: tmp})
 		}

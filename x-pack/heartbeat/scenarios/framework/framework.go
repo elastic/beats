@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -103,10 +104,7 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 	t.Run(runS.Name, func(t *testing.T) {
 		t.Parallel()
 
-		numberRuns := runS.NumberOfRuns
-		if numberRuns < 1 {
-			numberRuns = 1 // default to one run
-		}
+		numberRuns := max(runS.NumberOfRuns, 1) // default to one run
 
 		loaderDB := newLoaderDB()
 
@@ -115,7 +113,7 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 		var err error
 		var sf stdfields.StdMonitorFields
 		var conf mapstr.M
-		for i := 0; i < numberRuns; i++ {
+		for range numberRuns {
 			var mtr *MonitorTestRun
 			mtr, err = runMonitorOnce(t, cfgMap, meta, runS.RunFrom, loaderDB.StateLoader())
 
@@ -163,8 +161,14 @@ func (sdb *ScenarioDB) Init() {
 	sdb.initOnce.Do(func() {
 		var prunedList []Scenario
 		icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
+		// apiJourney ships only in unreleased @elastic/synthetics, so api
+		// scenarios need an explicitly installed capable agent to run.
+		apiCapable := os.Getenv("ELASTIC_SYNTHETICS_API_CAPABLE") == "true"
 		for _, s := range sdb.All {
 			if s.Type == "icmp" && !icmpCapable {
+				continue
+			}
+			if s.Type == "api" && !apiCapable {
 				continue
 			}
 			prunedList = append(prunedList, s)
@@ -243,7 +247,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, 
 	// make a pipeline
 	pipe := &mockPipeline{}
 	// pass it to the factory
-	f, sched, closeFactory := setupFactoryAndSched(location, stateLoader)
+	f, sched, closeFactory := setupFactoryAndSched(t, location, stateLoader)
 	conf, err := config.NewConfigFrom(monitorConfig)
 	require.NoError(t, err)
 	err = conf.Unpack(&mtr.StdFields)
@@ -270,7 +274,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, 
 	return mtr, err
 }
 
-func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func setupFactoryAndSched(t *testing.T, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
@@ -284,6 +288,7 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
+		Logger:          logptest.NewTestingLogger(t, ""),
 	}
 
 	sched = scheduler.Create(
@@ -292,6 +297,7 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		time.Local,
 		nil,
 		true,
+		logptest.NewTestingLogger(t, ""),
 	)
 
 	return monitors.NewFactory(monitors.FactoryParams{

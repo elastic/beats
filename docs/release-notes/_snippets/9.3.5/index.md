@@ -42,6 +42,7 @@
 
 **Filebeat**
 
+* Filestream only reports degraded status for permanent harvester errors. [#49481](https://github.com/elastic/beats/pull/49481) [#49451](https://github.com/elastic/beats/issues/49451)
 * Fix internal processing time metric for `azureeventhub` input. [#40547](https://github.com/elastic/beats/pull/40547) 
 * Fix a race condition during multiline parser shutdown. [#49980](https://github.com/elastic/beats/pull/49980) 
 * Re-evaluate `url_program` on each websocket reconnect using evolved cursor state. [#50383](https://github.com/elastic/beats/pull/50383) 

@@ -31,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -46,7 +47,7 @@ func tarawaTime() *time.Location {
 }
 
 func TestNewWithLocation(t *testing.T) {
-	scheduler := Create(123, monitoring.NewRegistry(), tarawaTime(), nil, false)
+	scheduler := Create(123, monitoring.NewRegistry(), tarawaTime(), nil, false, logptest.NewTestingLogger(t, ""))
 	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, tarawaTime(), scheduler.location)
 }
@@ -81,7 +82,7 @@ func testTaskTimes(limit uint32, fn TaskFunc) TaskFunc {
 func TestSchedulerRun(t *testing.T) {
 	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
-	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false, logptest.NewTestingLogger(t, ""))
 	defer s.Stop()
 
 	mainWin := maintwin.ParsedMaintWin{}
@@ -159,7 +160,7 @@ func TestSchedulerRun(t *testing.T) {
 }
 
 func TestScheduler_WaitForRunOnce(t *testing.T) {
-	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, true)
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, true, logptest.NewTestingLogger(t, ""))
 
 	defer s.Stop()
 
@@ -184,7 +185,7 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 }
 
 func TestScheduler_Stop(t *testing.T) {
-	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false, logptest.NewTestingLogger(t, ""))
 
 	executed := make(chan struct{})
 	mainWin := maintwin.ParsedMaintWin{}
@@ -259,7 +260,7 @@ func TestSchedTaskLimits(t *testing.T) {
 					jobType: {Limit: tt.limit},
 				}
 			}
-			s := Create(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType, false)
+			s := Create(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType, false, logptest.NewTestingLogger(t, ""))
 			var taskArr []int
 			mtx := sync.Mutex{}
 			wg := sync.WaitGroup{}
@@ -273,7 +274,7 @@ func TestSchedTaskLimits(t *testing.T) {
 					taskArr = append(taskArr, num)
 				})
 				go func(tff TaskFunc) {
-					sj := newSchedJob(context.Background(), s, "myid", jobType, tff)
+					sj := newSchedJob(context.Background(), s, "myid", jobType, tff, logptest.NewTestingLogger(t, ""))
 					sj.run()
 					wg.Done()
 				}(tf)
@@ -285,7 +286,7 @@ func TestSchedTaskLimits(t *testing.T) {
 }
 
 func BenchmarkScheduler(b *testing.B) {
-	s := Create(0, monitoring.NewRegistry(), tarawaTime(), nil, false)
+	s := Create(0, monitoring.NewRegistry(), tarawaTime(), nil, false, logptest.NewTestingLogger(b, ""))
 
 	sched := testSchedule{0}
 	mainWin := maintwin.ParsedMaintWin{}

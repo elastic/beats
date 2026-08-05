@@ -29,9 +29,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors/shared"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -69,6 +67,46 @@ func containerEvent(containerID string) *beat.Event {
 	}
 }
 
+func TestAnnotatorRun_ConcurrentInitPublishAndRun(t *testing.T) {
+	const readers = 100
+	const containerID = "init-publish-cid"
+
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"lookup_fields": []string{"container.id"},
+	})
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	processor := &kubernetesAnnotator{
+		log:   logptest.NewTestingLogger(t, selector),
+		cache: newCache(10 * time.Second),
+	}
+	processor.cache.set(containerID, metaMap(containerID))
+
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+
+	// Publish the state exactly once, concurrently with the readers below.
+	wg.Go(func() {
+		<-start
+		setReady(processor, &Matchers{matchers: []Matcher{matcher}})
+	})
+
+	// Readers call the real Run while init is still publishing. Each must get either the
+	// un-enriched event (state not yet visible) or the fully enriched one.
+	for range readers {
+		wg.Go(func() {
+			<-start
+			out, runErr := processor.Run(containerEvent(containerID))
+			assert.NoError(t, runErr)
+			assert.NotNil(t, out)
+		})
+	}
+
+	close(start)
+	wg.Wait()
+}
+
 func TestAnnotatorRun_ConcurrentRace(t *testing.T) {
 	const goroutines = 100
 	const containerID = "race-cid"
@@ -77,7 +115,7 @@ func TestAnnotatorRun_ConcurrentRace(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			event := containerEvent(containerID)
@@ -105,7 +143,7 @@ func TestAnnotatorRun_ConcurrentRace_CacheWrite(t *testing.T) {
 	wg.Add(goroutines * 2)
 
 	// Half of the goroutines read via Run.
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			_, _ = processor.Run(containerEvent(containerID))
@@ -113,7 +151,7 @@ func TestAnnotatorRun_ConcurrentRace_CacheWrite(t *testing.T) {
 	}
 
 	// Half write via the cache directly (simulating the watcher callbacks).
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			processor.cache.set(containerID, meta)
@@ -128,20 +166,19 @@ func TestAnnotatorRun_ConcurrentRace_CacheWrite(t *testing.T) {
 func TestAnnotatorRun_EachEventAnnotatedIndependently(t *testing.T) {
 	const goroutines = 50
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"container.id"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	processor := &kubernetesAnnotator{
-		log:                 logptest.NewTestingLogger(t, selector),
-		cache:               newCache(10 * time.Second),
-		matchers:            &Matchers{matchers: []Matcher{matcher}},
-		kubernetesAvailable: true,
+		log:   logptest.NewTestingLogger(t, selector),
+		cache: newCache(10 * time.Second),
 	}
+	setReady(processor, &Matchers{matchers: []Matcher{matcher}})
 
-	for i := 0; i < goroutines; i++ {
+	for i := range goroutines {
 		cid := fmt.Sprintf("cid-%d", i)
 		processor.cache.set(cid, metaMap(cid))
 	}
@@ -191,8 +228,7 @@ func TestAnnotatorRun_MutatingOneResultDoesNotAffectOthers(t *testing.T) {
 	events := make([]*beat.Event, goroutines)
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
-		i := i
+	for i := range goroutines {
 		go func() {
 			defer wg.Done()
 			out, err := processor.Run(containerEvent(containerID))
@@ -237,8 +273,7 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(readers + writers)
 
-	for i := 0; i < readers; i++ {
-		i := i
+	for i := range readers {
 		go func() {
 			defer wg.Done()
 			out, err := processor.Run(containerEvent(containerID))
@@ -250,7 +285,7 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 		}()
 	}
 
-	for i := 0; i < writers; i++ {
+	for range writers {
 		go func() {
 			defer wg.Done()
 			// Write a completely different metadata map to the same key.
@@ -279,74 +314,5 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 		assert.True(t, ok, "event %d: pod.name must be a string", i)
 		assert.Contains(t, []string{"mypod", "replaced-pod"}, name,
 			"event %d: pod.name must be one of the two valid values", i)
-	}
-}
-
-func TestAnnotatorRun_SharedWrapper_EventIndependenceUnderConcurrency(t *testing.T) {
-	const goroutines = 60
-
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"lookup_fields": []string{"container.id"},
-	})
-	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
-	require.NoError(t, err)
-
-	cache := newCache(10 * time.Second)
-	annotator := &kubernetesAnnotator{
-		log:                 logptest.NewTestingLogger(t, selector),
-		cache:               cache,
-		matchers:            &Matchers{matchers: []Matcher{matcher}},
-		kubernetesAvailable: true,
-	}
-
-	// each goroutine has its own container ID in the cache.
-	for i := range goroutines {
-		cid := fmt.Sprintf("ev-%d", i)
-		cache.set(cid, metaMap(cid))
-	}
-
-	sharedConstructor := shared.New(func(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
-		return annotator, nil
-	})
-	proc, err := sharedConstructor(nil, nil)
-	require.NoError(t, err)
-
-	type result struct {
-		event *beat.Event
-		cid   string
-		err   error
-	}
-	results := make([]result, goroutines)
-	var wg sync.WaitGroup
-	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
-		i := i
-		cid := fmt.Sprintf("ev-%d", i)
-		go func() {
-			defer wg.Done()
-			out, runErr := proc.Run(containerEvent(cid))
-			results[i] = result{event: out, cid: cid, err: runErr}
-		}()
-	}
-	wg.Wait()
-
-	for i, r := range results {
-		require.NoError(t, r.err, "goroutine %d must not return an error", i)
-		require.NotNil(t, r.event, "goroutine %d must receive a non-nil event", i)
-
-		// container.id must match this goroutine's own cache key.
-		containerRaw, getErr := r.event.Fields.GetValue("container")
-		require.NoError(t, getErr, "goroutine %d: event must have container field", i)
-		container := containerRaw.(mapstr.M) //nolint:errcheck // it's a test
-		assert.Equal(t, r.cid, container["id"],
-			"goroutine %d: container.id must equal its own cache key, not another goroutine's", i)
-
-		// kubernetes.pod.uid must also be specific to this goroutine's entry.
-		k8sRaw, getErr := r.event.Fields.GetValue("kubernetes")
-		require.NoError(t, getErr, "goroutine %d: event must have kubernetes field", i)
-		k8s := k8sRaw.(mapstr.M)     //nolint:errcheck // it's a test
-		pod := k8s["pod"].(mapstr.M) //nolint:errcheck // it's a test
-		assert.Equal(t, "uid-"+r.cid, pod["uid"],
-			"goroutine %d: kubernetes.pod.uid must belong to its own cache entry", i)
 	}
 }

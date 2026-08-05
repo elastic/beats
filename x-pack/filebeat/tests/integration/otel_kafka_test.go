@@ -7,27 +7,30 @@
 package integration
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/input/kafka/testutil"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/sarama"
 )
 
-// kafkaBroker is the Kafka OUTSIDE listener, which advertises localhost:9094
-const kafkaBroker = "localhost:9094"
-
-func TestFilebeatOTelKafkaE2E(t *testing.T) {
+func TestFilebeatOTelKafkaOutputE2E(t *testing.T) {
 	numEvents := 1
 
 	tmpdir := t.TempDir()
@@ -36,6 +39,8 @@ func TestFilebeatOTelKafkaE2E(t *testing.T) {
 
 	logFilePath := filepath.Join(tmpdir, "kafka_e2e.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
+
+	kafkaBroker := testutil.GetTestKafkaHost()
 
 	otelCfg := fmt.Sprintf(`receivers:
   filebeatreceiver:
@@ -71,9 +76,6 @@ service:
         - filebeatreceiver
       exporters:
         - kafka
-  telemetry:
-    metrics:
-      level: none
 `, logFilePath, tmpdir, kafkaBroker, otelTopic)
 
 	oteltestcol.New(t, otelCfg)
@@ -137,21 +139,14 @@ func consumeKafkaTopic(t *testing.T, topic string) []byte {
 	t.Helper()
 
 	cfg := sarama.NewConfig()
+	cfg.Version = sarama.V1_0_0_0
 	cfg.Consumer.Return.Errors = true
 
 	t.Cleanup(func() {
-		admin, err := sarama.NewClusterAdmin([]string{kafkaBroker}, cfg)
-		if err != nil {
-			t.Logf("failed to create cluster admin for topic cleanup: %v", err)
-			return
-		}
-		defer admin.Close()
-		if err := admin.DeleteTopic(topic); err != nil {
-			t.Logf("failed to delete topic %q: %v", topic, err)
-		}
+		deleteKafkaInputTopic(t, topic)
 	})
 
-	consumer, err := sarama.NewConsumer([]string{kafkaBroker}, cfg)
+	consumer, err := sarama.NewConsumer([]string{testutil.GetTestKafkaHost()}, cfg)
 	require.NoError(t, err, "failed to create Kafka consumer")
 	t.Cleanup(func() { _ = consumer.Close() })
 
@@ -188,4 +183,166 @@ func consumeKafkaTopic(t *testing.T, topic string) []byte {
 	}, 30*time.Second, 500*time.Millisecond, "no message received from Kafka topic %q", topic)
 
 	return received
+}
+
+func TestKafkaInputOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+	kafkaInputTestMsg := "kafka-input-otel-e2e-test-event"
+
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-filebeat-" + fbNamespace
+
+	topic := fmt.Sprintf("test-kafka-input-%s", uuid.Must(uuid.NewV4()).String())
+	otelGroupID := fmt.Sprintf("otel-kafka-%s", uuid.Must(uuid.NewV4()).String())
+	fbGroupID := fmt.Sprintf("fb-kafka-%s", uuid.Must(uuid.NewV4()).String())
+
+	testutil.EnsureKafkaTopicReadyForWrites(t, topic)
+	testutil.WriteToKafkaTopic(t, topic, kafkaInputTestMsg, []sarama.RecordHeader{
+		testutil.RecordHeader("X-Test-Header", "test header value"),
+	})
+
+	tempDir := t.TempDir()
+
+	t.Cleanup(func() {
+		deleteKafkaInputTopic(t, topic)
+	})
+
+	type options struct {
+		ESURL    string
+		Username string
+		Password string
+		Broker   string
+		Topic    string
+		GroupID  string
+		PathHome string
+		Index    string
+	}
+
+	kafkaFilebeatConfig := `filebeat.inputs:
+- type: kafka
+  id: kafka-input-e2e
+  hosts:
+    - {{ .Broker }}
+  topics:
+    - {{ .Topic }}
+  group_id: {{ .GroupID }}
+  wait_close: 0
+` + filebeatOutputYAML
+
+	kafkaOTelConfig := otelElasticsearchExporterYAML + `receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - type: kafka
+                  id: kafka-input-e2e
+                  hosts:
+                    - {{ .Broker }}
+                  topics:
+                    - {{ .Topic }}
+                  group_id: {{ .GroupID }}
+                  wait_close: 0
+        processors:
+            - add_host_metadata: ~
+            - add_cloud_metadata: ~
+            - add_docker_metadata: ~
+            - add_kubernetes_metadata: ~
+        queue.mem.flush.timeout: 0s
+        setup.template.enabled: false
+        management.otel.enabled: true
+        path.home: {{ .PathHome }}
+` + otelElasticsearchServiceYAML
+
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+		Broker:   testutil.GetTestKafkaHost(),
+		Topic:    topic,
+		PathHome: tempDir,
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.GroupID = otelGroupID
+	optionsValue.Index = otelIndex
+	require.NoError(t, template.Must(template.New("config").Parse(kafkaOTelConfig)).Execute(&configBuffer, optionsValue))
+
+	oteltestcol.New(t, configBuffer.String())
+
+	configBuffer.Reset()
+
+	optionsValue.GroupID = fbGroupID
+	optionsValue.Index = fbIndex
+	require.NoError(t, template.Must(template.New("config").Parse(kafkaFilebeatConfig)).Execute(&configBuffer, optionsValue))
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	t.Cleanup(func() {
+		deleteDataStreamsFromES(t, es, []string{
+			otelIndex,
+			fbIndex,
+		})
+	})
+
+	rawQuery := otelE2ERawQueryForInputTypeAndMessage("kafka", kafkaInputTestMsg)
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
+			defer findCancel()
+
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
+
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
+		},
+		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+}
+
+func deleteKafkaInputTopic(t *testing.T, topic string) {
+	t.Helper()
+
+	cfg := sarama.NewConfig()
+	admin, err := sarama.NewClusterAdmin([]string{testutil.GetTestKafkaHost()}, cfg)
+	if err != nil {
+		t.Logf("failed to create cluster admin for topic cleanup: %v", err)
+		return
+	}
+	defer admin.Close()
+
+	if err := admin.DeleteTopic(topic); err != nil {
+		t.Logf("failed to delete topic %q: %v", topic, err)
+	}
 }

@@ -34,6 +34,8 @@ The `streaming` input websocket handler does not currently support XML messages.
 
 The Crowdstrike streaming input requires OAuth2.0 as described in the Crowdstrike documentation for the API. When using the Crowdstrike streaming type, the `crowdstrike_app_id` configuration field must be set. This field specifies the `appId` parameter sent to the Crowdstrike API. See the Crowdstrike documentation for details.
 
+The feed and refresh URLs returned by the Crowdstrike discover endpoint are validated against the configured URL's origin before any request is made. By default, both URLs must share the same registrable domain (e.g. `crowdstrike.com`) as the configured `url`. If the discover response returns URLs on a different domain, you can allowlist additional origins with the `resource_origins` option.
+
 The `stream_type` configuration field specifies which type of streaming input to use, "websocket" or "crowdstrike". If it is not set, the input defaults to websocket streaming  .
 
 ## Execution [_execution_3]
@@ -241,6 +243,34 @@ The `streaming` input supports the following configuration options plus the [Com
 ### `stream_type` [stream_type-streaming]
 
 The flavor of streaming to use. This may be either "websocket", "crowdstrike", or unset. If the field is unset, websocket streaming is used.
+
+
+### `resource_origins` [resource-origins-streaming]
+
+An optional list of additional origins (scheme and host) to accept for CrowdStrike resource URLs. This only applies when `stream_type` is `crowdstrike`.
+
+By default, the `dataFeedURL` and `refreshActiveSessionURL` returned by the discover endpoint must share the same registrable domain as the configured `url` (for example, both `api.crowdstrike.com` and `firehose.crowdstrike.com` share the registrable domain `crowdstrike.com`). HTTPS-to-HTTP scheme downgrades are always rejected.
+
+If CrowdStrike returns resource URLs on a different registrable domain, add them here to allow those origins without waiting for a code change. Each entry must include a scheme and host.
+
+```yaml
+resource_origins:
+  - "https://firehose.newdomain.com"
+```
+
+
+### `user_agent` [user-agent-streaming]
+```{applies_to}
+stack: ga 9.4+
+```
+
+An optional string that overrides the default `User-Agent` header sent on all outbound HTTP requests. This only applies when `stream_type` is `crowdstrike`. The header is set on discover, firehose, session refresh, and OAuth2 token requests.
+
+When not set, the Elastic Agent's built-in user agent string is used.
+
+```yaml
+user_agent: "Elastic-crowdstrike/4.0.0"
+```
 
 
 ### `program` [program-streaming]
@@ -541,5 +571,5 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
 
 ::::{note}
-The `streaming` input is currently tagged as experimental and might have bugs and other issues. Please report any issues on the [Github](https://github.com/elastic/beats) repository.
+The `streaming` input is currently tagged as experimental and might have bugs and other issues. Please report any issues on the [GitHub](https://github.com/elastic/beats) repository.
 ::::

@@ -81,7 +81,7 @@ func newFinishedLogger(wg *eventCounter) *finishedLogger {
 }
 
 func (l *finishedLogger) Published(n int) bool {
-	for i := 0; i < n; i++ {
+	for range n {
 		l.wg.Done()
 	}
 	return true

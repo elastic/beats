@@ -133,6 +133,7 @@ func newProspector(
 		takeOver:              config.TakeOver,
 		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Parsers.Suffix),
 		logIdentifiers:        logFileIdentifiers(logger),
+		growingFingerprint:    config.FileWatcher.Scanner.Fingerprint.Growing,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil
@@ -156,6 +157,14 @@ func newProspector(
 		strategy := cfg.Strategy.Name()
 		switch strategy {
 		case copytruncateStrategy:
+			// The fingerprint identity already handles copytruncate rotation.
+			// copyTruncateFileProspector does not support growing fingerprint, so use the regular
+			// prospector.
+			if config.FileWatcher.Scanner.Fingerprint.Growing {
+				logger.Warn("the fingerprint file identity handles 'copytruncate' rotation automatically; " +
+					"the experimental 'rotation.external.strategy.copytruncate' setting is unnecessary and is ignored for this input")
+				return &fileprospector, nil
+			}
 			experimentalWarning.Do(func() {
 				log.Warn(cfgwarn.Experimental("rotation.external.copytruncate is used."))
 			})

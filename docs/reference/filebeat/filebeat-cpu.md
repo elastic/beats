@@ -8,5 +8,5 @@ applies_to:
 
 # Filebeat is using too much CPU [filebeat-cpu]
 
-Filebeat might be configured to scan for files too frequently. Check the setting for `scan_frequency` in the `filebeat.yml` config file. Setting `scan_frequency` to less than 1s may cause Filebeat to scan the disk in a tight loop.
+Filebeat might be configured to scan for files too frequently. Check the setting for [`prospector.scanner.check_interval`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-scan-frequency)) in the `filebeat.yml` config file. Setting `prospector.scanner.check_interval` to less than 1s may cause Filebeat to scan the disk in a tight loop.
 

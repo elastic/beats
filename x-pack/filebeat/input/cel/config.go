@@ -13,12 +13,12 @@ import (
 	"regexp"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 	"github.com/elastic/mito/lib"
 )
 
@@ -165,7 +165,8 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
+	noEmit := lib.Emit(func() lib.Emitter { return nil })
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, "", patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false, noEmit)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -189,9 +190,10 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectForwardHeaders: false,
-			RedirectMaxRedirects:   10,
-			Transport:              transport,
+			RedirectForwardHeaders:   false,
+			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
+			RedirectMaxRedirects:     10,
+			Transport:                transport,
 		},
 	}
 }
@@ -283,15 +285,16 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 }
 
 type ResourceConfig struct {
-	URL                    *urlConfig       `config:"url" validate:"required"`
-	Headers                http.Header      `config:"headers"`
-	Retry                  retryConfig      `config:"retry"`
-	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
-	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
-	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
-	MaxBodySize            int64            `config:"max_body_size"`
-	RateLimit              *rateLimitConfig `config:"rate_limit"`
-	KeepAlive              keepAlive        `config:"keep_alive"`
+	URL                      *urlConfig       `config:"url" validate:"required"`
+	Headers                  http.Header      `config:"headers"`
+	Retry                    retryConfig      `config:"retry"`
+	RedirectForwardHeaders   bool             `config:"redirect.forward_headers"`
+	RedirectHeadersBanList   []string         `config:"redirect.headers_ban_list"`
+	RedirectSensitiveHeaders []string         `config:"redirect.sensitive_headers"`
+	RedirectMaxRedirects     int              `config:"redirect.max_redirects"`
+	MaxBodySize              int64            `config:"max_body_size"`
+	RateLimit                *rateLimitConfig `config:"rate_limit"`
+	KeepAlive                keepAlive        `config:"keep_alive"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 

@@ -70,7 +70,7 @@ func testInit() (*eventStore, *tlsPlugin) {
 	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 
 	results := &eventStore{}
-	tls, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil)
+	tls, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil, logp.NewNopLogger())
 	if err != nil {
 		return nil, nil
 	}

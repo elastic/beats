@@ -39,7 +39,7 @@ type publisher struct {
 	cursors []*time.Time
 }
 
-func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+func (p *publisher) Publish(e beat.Event, cursor any) error {
 	p.m.Lock()
 	defer p.m.Unlock()
 
@@ -76,10 +76,10 @@ func TestInput(t *testing.T) {
 			assertFunc: func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
 				require.NotEmpty(collect, events)
 				require.NotEmpty(collect, cursors)
-				assert.Equal(collect, len(events), len(cursors))
+				assert.Len(collect, events, len(cursors))
 				lastEvent := events[len(events)-1]
 				lastCursor := cursors[len(cursors)-1]
-				assert.EqualValues(collect, &lastEvent.Timestamp, lastCursor)
+				assert.Equal(collect, &lastEvent.Timestamp, lastCursor)
 			},
 		},
 		{
@@ -218,7 +218,6 @@ func TestInput(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.skip != nil && tc.skip(t) {
 				return
@@ -229,7 +228,7 @@ func TestInput(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 
 			pub := &publisher{}
-			log, buf := logp.NewInMemory("unifiedlogs_test", logp.JSONEncoderConfig())
+			log, buf := logp.NewInMemoryLocal("unifiedlogs_test", logp.JSONEncoderConfig())
 
 			var wg sync.WaitGroup
 			wg.Add(1)
@@ -294,7 +293,7 @@ func TestBackfillAndStream(t *testing.T) {
 	t.Cleanup(cancel)
 
 	pub := &publisher{}
-	log, buf := logp.NewInMemory("unifiedlogs_test", logp.JSONEncoderConfig())
+	log, buf := logp.NewInMemoryLocal("unifiedlogs_test", logp.JSONEncoderConfig())
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -316,7 +315,7 @@ func TestBackfillAndStream(t *testing.T) {
 			var endTime time.Time
 			regex := regexp.MustCompile(`--end\s+(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}[+-]\d{4})`)
 			matches := regex.FindStringSubmatch(showCmdLog)
-			require.Equal(collect, 2, len(matches))
+			require.Len(collect, matches, 2)
 			endTime, _ = time.Parse("2006-01-02 15:04:05-0700", matches[1])
 			endTime = endTime.Truncate(time.Second)
 
@@ -330,7 +329,7 @@ func TestBackfillAndStream(t *testing.T) {
 				}
 			}
 			require.NotNil(collect, firstStreamedEventTime)
-			assert.EqualValues(collect, endTime, *firstStreamedEventTime)
+			assert.Equal(collect, endTime, *firstStreamedEventTime)
 			assert.True(collect, strings.HasPrefix(showCmdLog, filterEndLogShowLogline(buf.Bytes())))
 		},
 		30*time.Second, time.Second,
@@ -363,13 +362,13 @@ func filterEndLogShowLogline(buf []byte) string {
 func filterLogCmdLine(buf []byte, cmd, cmdPrefix string) string {
 	scanner := bufio.NewScanner(bytes.NewBuffer(buf))
 	for scanner.Scan() {
-		text := scanner.Text()
-		parts := strings.Split(text, "\t")
-		if len(parts) != 4 {
+		// The message is the last field; the local logger prepends caller info.
+		parts := strings.Split(scanner.Text(), "\t")
+		if len(parts) < 4 {
 			continue
 		}
 
-		trimmed := strings.TrimPrefix(parts[3], cmdPrefix)
+		trimmed := strings.TrimPrefix(parts[len(parts)-1], cmdPrefix)
 		if strings.HasPrefix(trimmed, cmd) {
 			return trimmed
 		}
@@ -379,11 +378,11 @@ func filterLogCmdLine(buf []byte, cmd, cmdPrefix string) string {
 
 func eventsAndCursorAssertN(n int) func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
 	return func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
-		assert.Equal(collect, n, len(events))
-		assert.Equal(collect, n, len(cursors))
+		assert.Len(collect, events, n)
+		assert.Len(collect, cursors, n)
 		lastEvent := events[len(events)-1]
 		lastCursor := cursors[len(cursors)-1]
-		assert.EqualValues(collect, &lastEvent.Timestamp, lastCursor)
+		assert.Equal(collect, &lastEvent.Timestamp, lastCursor)
 	}
 }
 

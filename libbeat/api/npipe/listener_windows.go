@@ -49,9 +49,8 @@ func NewListener(name, sd string) (net.Listener, error) {
 // TransformString takes an input type name defined as a URI like
 // `npipe:///hello` and transforms it into // `\\.\pipe\hello`
 func TransformString(name string) string {
-	if strings.HasPrefix(name, "npipe:///") {
-		path := strings.TrimPrefix(name, "npipe:///")
-		return `\\.\pipe\` + path
+	if after, ok := strings.CutPrefix(name, "npipe:///"); ok {
+		return `\\.\pipe\` + after
 	}
 
 	return name

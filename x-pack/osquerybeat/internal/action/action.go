@@ -26,7 +26,9 @@ type Action struct {
 	// The optional action timeout
 	Timeout    time.Duration
 	ECSMapping ecs.Mapping
-	Profile    bool
+	// Profile is the optional per-action profiling override. When nil the global
+	// elastic_options.profiling.profiling_all default applies (see config.ResolveProfiling).
+	Profile *bool
 }
 
 func FromMap(m map[string]interface{}) (a Action, err error) {
@@ -47,7 +49,7 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 	var (
 		ecsm      ecs.Mapping
 		platforms []string
-		profile   bool
+		profile   *bool
 	)
 	if v, ok := m["data"]; ok {
 		var data map[string]interface{}
@@ -79,10 +81,11 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 			}
 		}
 		if profileRaw, ok := data["profile"]; ok {
-			profile, ok = profileRaw.(bool)
+			profileVal, ok := profileRaw.(bool)
 			if !ok {
 				return a, fmt.Errorf("invalid profile: %w", ErrActionRequest)
 			}
+			profile = &profileVal
 		}
 	}
 

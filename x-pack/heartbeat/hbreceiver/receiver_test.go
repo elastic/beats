@@ -99,8 +99,8 @@ func TestNewReceiver(t *testing.T) {
 			return getFromSocket(t, &lastError, monitorSocket, "stats")
 		}, "failed to connect to monitoring socket stats endpoint, last error was: %s", &lastError)
 
-		metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-		assert.NotEmpty(c, metricsStarted.All(), "metrics logging not started")
+		metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+		assert.NotEmpty(c, metricsSkipped.All(), "metric reporter did not initialize")
 	}, 2*time.Minute, 1*time.Second,
 		"timeout waiting for heartbeat receiver to start")
 
@@ -208,10 +208,10 @@ func TestMultipleReceivers(t *testing.T) {
 		r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "heartbeatreceiver/r2"))
 		assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 
-		r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "heartbeatreceiver/r1"))
-		assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrics logging every 30s")
-		r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "heartbeatreceiver/r2"))
-		assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrics logging every 30s")
+		r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "heartbeatreceiver/r1"))
+		assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single skipping metrics logging entry")
+		r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "heartbeatreceiver/r2"))
+		assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single skipping metrics logging entry")
 
 		var lastError strings.Builder
 		assert.Conditionf(c, func() bool {
@@ -300,7 +300,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"heartbeat": map[string]any{
 				"monitors": []map[string]any{
 					{

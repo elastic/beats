@@ -576,7 +576,7 @@ filebeat.inputs:
 
   # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
   #multiline.match: after
 
   # The maximum number of lines that are combined into one event.
@@ -684,7 +684,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -779,7 +779,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -970,7 +970,7 @@ filebeat.inputs:
 #- type: redis
   #enabled: false
 
-  # List of hosts to pool to retrieve the slow log information.
+  # List of hosts to poll to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
   # How often the input checks for redis slow log.
@@ -1083,6 +1083,19 @@ filebeat.inputs:
 
   # How long to wait before retrying a failed read.
   #consume_backoff: 2s
+
+  # Network timeout for the connection to the brokers (dial, read and write).
+  #timeout: 30s
+
+  # Keep-alive period for active network connections (0 disables it).
+  #keep_alive: 0s
+
+  # Consumer group session timeout. Increase for higher-latency consumers to
+  # avoid spurious rebalances.
+  #session_timeout: 10s
+
+  # How often the consumer sends heartbeats. Must be lower than session_timeout.
+  #heartbeat_interval: 3s
 
   # How long to wait for the minimum number of input bytes while reading.
   #max_wait_time: 250ms
@@ -2763,7 +2776,7 @@ logging.files:
 # sensitive information) together with other log messages, a different
 # log file, only for log entries containing raw events, is used. It will
 # use the same level, selectors and all other configurations from the
-# default logger, but it will have it's own file configuration.
+# default logger, but it will have its own file configuration.
 #
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.

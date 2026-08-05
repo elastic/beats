@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -56,19 +57,53 @@ type stringSource string
 func TestManager_Init(t *testing.T) {
 	// Integration style tests for the InputManager and the state garbage collector
 
+	// Init is called for every registered input type, but most of them are never
+	// configured. Opening a registry store and starting a cleanup goroutine for
+	// each is a per-Beat cost paid for inputs that never run, and elastic-agent
+	// runs one Beat receiver per input stream.
+	t.Run("no store is opened and no goroutine started until an input is created", func(t *testing.T) {
+		goroutines := resources.NewGoroutinesChecker()
+
+		var grp unison.TaskGroup
+		//nolint:errcheck // We don't need the error from grp.Stop()
+		defer grp.Stop()
+		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+
+		require.Nil(t, manager.store, "Init must not open the registry store")
+		_, err := goroutines.WaitUntilOriginalCount()
+		require.NoError(t, err, "Init must not start the store cleanup goroutine")
+
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
+		require.NoError(t, err)
+		require.NotNil(t, manager.store, "Create must open the registry store")
+	})
+
+	// The store is opened with the input ID, which is only known once a config
+	// has been unpacked in Create.
+	t.Run("the store is opened with the created input's ID", func(t *testing.T) {
+		stateStore := createSampleStore(t, map[string]state{
+			"test::mykey": {Cursor: "value1"},
+		})
+
+		var grp unison.TaskGroup
+		//nolint:errcheck // We don't need the error from grp.Stop()
+		defer grp.Stop()
+		manager := cleanerManager(t, stateStore, &grp)
+
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
+		require.NoError(t, err)
+
+		snap := storeMemorySnapshot(manager.store)
+		assert.Contains(t, snap, "test::mykey")
+		assert.Equal(t, "value1", snap["test::mykey"].Cursor)
+	})
+
 	t.Run("stopping the taskgroup kills internal go-routines", func(t *testing.T) {
 		numRoutines := runtime.NumGoroutine()
 
 		var grp unison.TaskGroup
-		store := createSampleStore(t, nil)
-		manager := &InputManager{
-			Logger:              logptest.NewTestingLogger(t, "test"),
-			StateStore:          store,
-			Type:                "test",
-			DefaultCleanTimeout: 10 * time.Millisecond,
-		}
-
-		err := manager.Init(&grp)
+		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
 
 		time.Sleep(200 * time.Millisecond)
@@ -93,57 +128,83 @@ func TestManager_Init(t *testing.T) {
 		var grp unison.TaskGroup
 		//nolint:errcheck // We don't need the error from grp.Stop()
 		defer grp.Stop()
-		manager := &InputManager{
-			Logger:              logptest.NewTestingLogger(t, "test"),
-			StateStore:          store,
-			Type:                "test",
-			DefaultCleanTimeout: 10 * time.Millisecond,
-		}
+		manager := cleanerManager(t, store, &grp)
 
-		err := manager.Init(&grp)
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
 
 		for len(store.snapshot()) > 0 {
 			time.Sleep(1 * time.Millisecond)
 		}
 	})
+
+	// Two reload paths — static config, central management, autodiscovery — can
+	// create inputs of one type concurrently, and each of those is now what
+	// opens the store and starts the cleaner.
+	t.Run("concurrent Create opens one store and starts one cleaner", func(t *testing.T) {
+		var grp unison.TaskGroup
+		//nolint:errcheck // We don't need the error from grp.Stop()
+		defer grp.Stop()
+		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+
+		var wg sync.WaitGroup
+		for i := range 8 {
+			wg.Go(func() {
+				_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
+					"id": fmt.Sprintf("input-%d", i),
+				}))
+				assert.NoError(t, err)
+			})
+		}
+		wg.Wait()
+
+		require.NotNil(t, manager.store)
+		assert.Nil(t, manager.cleanerGroup, "the cleaner must have been started exactly once")
+	})
 }
 
-func TestManager_InitDefersStoreForES(t *testing.T) {
-	// Verify that ES-backed inputs defer store creation from Init() to Create().
-	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
-	features.ReinitForTest()
-	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
-
-	data := map[string]state{
-		"test::mykey": {Cursor: "value1"},
-	}
-	stateStore := createSampleStore(t, data)
-
-	var grp unison.TaskGroup
-	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+// cleanerManager builds an initialised InputManager whose Create succeeds, with
+// a clean timeout short enough for the garbage collector to act within a test.
+func cleanerManager(t *testing.T, store statestore.States, grp unison.Group) *InputManager {
+	t.Helper()
 
 	manager := &InputManager{
 		Logger:              logptest.NewTestingLogger(t, "test"),
-		StateStore:          stateStore,
+		StateStore:          store,
 		Type:                "test",
-		DefaultCleanTimeout: 30 * time.Minute,
+		DefaultCleanTimeout: 10 * time.Millisecond,
 		Configure: func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error) {
 			return sourceList("mykey"), &fakeTestInput{}, nil
 		},
 	}
+	require.NoError(t, manager.Init(grp))
+	return manager
+}
 
-	// Init() should not create a store for ES-backed inputs.
-	err := manager.Init(&grp)
-	require.NoError(t, err)
-	assert.Nil(t, manager.store, "store should be nil after Init() for ES-backed inputs")
+// TestManager_InitDefersStoreForES covers the Elasticsearch-backed store, which
+// has always been opened from Create because it needs the input ID. All input
+// types now take that path; this pins that the ES-specific store still reaches
+// it, since SetID is a no-op for the file-backed backends and only matters here.
+func TestManager_InitDefersStoreForES(t *testing.T) {
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
 
-	// Create() should create the store with the inputID.
-	_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+	stateStore := createSampleStore(t, map[string]state{
+		"test::mykey": {Cursor: "value1"},
+	})
+
+	var grp unison.TaskGroup
+	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+	manager := cleanerManager(t, stateStore, &grp)
+
+	require.Nil(t, manager.store, "store should be nil after Init()")
+
+	_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
 		"id": "my-input-id",
 	}))
 	require.NoError(t, err)
-	assert.NotNil(t, manager.store, "store should be created after Create()")
+	require.NotNil(t, manager.store, "store should be created after Create()")
 
 	snap := storeMemorySnapshot(manager.store)
 	assert.Contains(t, snap, "test::mykey")
@@ -182,12 +243,12 @@ func TestManager_Create(t *testing.T) {
 			return sourceList(config.Sources...), &fakeTestInput{}, err
 		})
 
-		_, err := manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
 
-		_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
@@ -238,11 +299,9 @@ func TestManager_InputsTest(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.TODO())
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{Cancelation: ctx})
-		}()
+		})
 
 		cancel()
 		wg.Wait()
@@ -270,12 +329,10 @@ func TestManager_InputsTest(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{})
 			t.Logf("Test returned: %v", err)
-		}()
+		})
 
 		wg.Wait()
 		require.Error(t, err)
@@ -294,12 +351,10 @@ func TestManager_InputsTest(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{Logger: logptest.NewTestingLogger(t, "test")})
 			t.Logf("Test returned: %v", err)
-		}()
+		})
 
 		wg.Wait()
 		require.Error(t, err)
@@ -321,8 +376,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
@@ -351,8 +405,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
@@ -387,9 +440,7 @@ func TestManager_InputsRun(t *testing.T) {
 
 		var clientCounters pubtest.ClientCounter
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
 				ID:              id,
@@ -400,7 +451,7 @@ func TestManager_InputsRun(t *testing.T) {
 				Logger:          manager.Logger,
 			}
 			err = inp.Run(ctx, clientCounters.BuildConnector())
-		}()
+		})
 
 		cancel()
 		wg.Wait()
@@ -508,8 +559,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		// setup publishing pipeline and capture ACKer, so we can simulate progress in the Output
 		var acker beat.EventListener
@@ -529,9 +579,7 @@ func TestManager_InputsRun(t *testing.T) {
 
 		// start the input
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
 				ID:              id,
@@ -542,7 +590,7 @@ func TestManager_InputsRun(t *testing.T) {
 				Logger:          manager.Logger,
 			}
 			err = inp.Run(ctx, pipeline)
-		}()
+		})
 		// wait for test setup to shut down
 		defer wg.Wait()
 
@@ -615,15 +663,13 @@ func TestLockResource(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			resOther := store.Get("test::key")
 			err := lockResource(log, resOther, context.TODO())
 			if err == nil {
 				releaseResource(resOther)
 			}
-		}()
+		})
 
 		go func() {
 			time.Sleep(100 * time.Millisecond)

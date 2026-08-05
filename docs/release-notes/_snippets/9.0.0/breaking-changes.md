@@ -23,7 +23,7 @@ For more information, check [#41731]({{beats-pull}}41731).
 For more information, check [#41938]({{beats-issue}}41938) [#41954]({{beats-pull}}41954).
 ::::
 
-::::{dropdown} Filestream inputs can define "allow_deprecated_id_duplication: true" to run keep the previous behaviour of running inputs with duplicated IDs.
+::::{dropdown} Filestream inputs can define "allow_deprecated_id_duplication: true" to keep the previous behaviour of running inputs with duplicated IDs.
 For more information, check [#41938]({{beats-issue}}41938) [#41954]({{beats-pull}}41954).
 ::::
 
