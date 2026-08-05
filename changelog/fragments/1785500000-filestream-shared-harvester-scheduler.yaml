@@ -11,7 +11,7 @@
 kind: enhancement
 
 # Change summary; a 80ish characters long description of the change.
-summary: filestream inputs share one harvester scheduler per process
+summary: Reduce memory usage when multiple Filestream inputs run in the same process by sharing one harvester scheduler.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.

@@ -35,7 +35,7 @@ import (
 // pollGracePeriod bounds how long the scheduler waits for a batch of due
 // sources to finish polling (typically a stat() each) before moving on. It is
 // well above normal stat() latency even under load, so a healthy batch always
-// finishes within it; see startPoll and engine.waker.
+// finishes within it; see startPoll and engine.pollBatch.
 const pollGracePeriod = 100 * time.Millisecond
 
 // defaultStuckHarvesterGrace bounds how long StopHarvesters waits for cancelled
@@ -600,16 +600,37 @@ func (g *harvesterRunner) park(state *sourceState, backoff time.Duration) {
 // startPoll runs pollParked for state on its own goroutine and returns a channel
 // closed when that poll finishes, or nil if the runner is shutting down and no
 // poll was started. The caller decides how long to wait; an abandoned poll keeps
-// running in the background, tracked via g.spawn. See engine.waker.
-func (g *harvesterRunner) startPoll(state *sourceState) <-chan struct{} {
+// running in the background, tracked via g.spawn. See engine.pollBatch.
+//
+// release is called once the poll returns, whether or not the caller is still
+// waiting for it, so the scheduler's budget accounts for abandoned polls too.
+func (g *harvesterRunner) startPoll(state *sourceState, release func()) <-chan struct{} {
 	done := make(chan struct{})
 	if !g.spawn(func() {
+		defer release()
 		g.pollParked(state)
 		close(done)
 	}) {
 		return nil
 	}
 	return done
+}
+
+// repark puts a source the scheduler claimed but never polled (the batch ran out
+// of budget or grace period) back on the parked heap, due immediately. Its
+// backoff and state-check deadline don't move: nothing was learned about it. A
+// source claimed by another actor meanwhile is left to that actor.
+func (g *harvesterRunner) repark(state *sourceState) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	if state.finished || state.status != statusPolling {
+		return
+	}
+	due := time.Now()
+	state.nextCheck = due
+	g.setStatus(state, statusParked)
+	heap.Push(&g.engine.parked, &parkedEntry{state: state, due: due})
 }
 
 // pollParked polls one due source and acts on the result: resume (spawn a

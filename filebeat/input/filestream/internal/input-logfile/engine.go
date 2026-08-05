@@ -30,6 +30,16 @@ import (
 // matches DefaultBackoffConfig().Max, the longest a source is parked by default.
 const wakerIdleWait = 10 * time.Second
 
+// maxConcurrentPolls bounds the polls the scheduler has in flight process-wide,
+// so a large batch coming due cannot become a goroutine (and a stat()) per file.
+// harvester_limit does not cover this: it is per input and unbounded by default.
+//
+// A slot is held until the poll returns, even once the scheduler has stopped
+// waiting for it, so wedged polls count against the budget. Slots recycle in
+// microseconds on a healthy filesystem; when the budget does run out, the rest
+// of the batch is re-parked for a later pass.
+const maxConcurrentPolls = 128
+
 // engine is the scheduler shared by every running filestream input in the
 // process: one waker goroutine and one parked heap serve them all, rather than
 // one of each per input.
@@ -58,6 +68,10 @@ type engine struct {
 	// parked is a min-heap of parked sources across all registered runners, keyed
 	// by nextCheck, so the waker sees only the sources actually due.
 	parked sourceHeap
+
+	// pollSlots is the process-wide poll concurrency budget: a token is taken
+	// before a poll starts and handed back wherever it finishes.
+	pollSlots chan struct{}
 
 	wakerCh chan struct{}
 	done    chan struct{}
@@ -133,9 +147,10 @@ func releaseEngine() {
 // Tests use this to get an isolated scheduler.
 func newEngine(log *logp.Logger) *engine {
 	return &engine{
-		log:     log,
-		wakerCh: make(chan struct{}, 1),
-		done:    make(chan struct{}),
+		log:       log,
+		pollSlots: make(chan struct{}, maxConcurrentPolls),
+		wakerCh:   make(chan struct{}, 1),
+		done:      make(chan struct{}),
 	}
 }
 
@@ -174,31 +189,7 @@ func (e *engine) waker() {
 		}
 		e.mu.Unlock()
 
-		// Poll the batch concurrently under one shared grace period. Polling in
-		// turn would cost K*pollGracePeriod for K stuck sources and put a healthy
-		// input's sources behind a sick one's, on a goroutine every input shares.
-		// Every actively read file passes through here at each slice boundary, so
-		// that is on the read path, not just the idle one.
-		pending := make([]<-chan struct{}, 0, len(due))
-		for _, state := range due {
-			if done := state.reg.startPoll(state); done != nil {
-				pending = append(pending, done)
-			}
-		}
-		if len(pending) > 0 {
-			grace := time.NewTimer(pollGracePeriod)
-		waitBatch:
-			for _, done := range pending {
-				select {
-				case <-done:
-				case <-grace.C:
-					// Polls still running are left to finish in the background,
-					// tracked by their own runner.
-					break waitBatch
-				}
-			}
-			grace.Stop()
-		}
+		e.pollBatch(due)
 
 		// Loop immediately to pick up sources that became due during the polls,
 		// but check for stop first so a steady stream of due work cannot delay
@@ -223,6 +214,69 @@ func (e *engine) waker() {
 		case <-time.After(wait):
 		case <-e.wakerCh:
 		}
+	}
+}
+
+// pollBatch polls due sources concurrently, up to maxConcurrentPolls at a time,
+// returning once they have all answered or the shared grace period elapses. Polls
+// still running are left to finish in the background, tracked by their runner;
+// sources left unpolled are re-parked for a later pass.
+//
+// Polling in turn would cost K*pollGracePeriod for K stuck sources and put a
+// healthy input's sources behind a sick one's, on a goroutine every input shares.
+// Every actively read file passes through here at each slice boundary, so this is
+// on the read path, not just the idle one.
+func (e *engine) pollBatch(due []*sourceState) {
+	if len(due) == 0 {
+		return
+	}
+
+	// A channel closed by a timer, not the timer's own channel: both loops below
+	// read the deadline, and a timer channel only fires once.
+	expired := make(chan struct{})
+	grace := time.AfterFunc(pollGracePeriod, func() { close(expired) })
+	defer grace.Stop()
+
+	var unpolled []*sourceState
+	pending := make([]<-chan struct{}, 0, len(due))
+
+startBatch:
+	for i, state := range due {
+		select {
+		case e.pollSlots <- struct{}{}:
+		case <-expired:
+			unpolled = due[i:]
+			break startBatch
+		}
+
+		done := state.reg.startPoll(state, e.releasePollSlot)
+		if done == nil {
+			// No poll started (runner shutting down), so nothing hands the slot back.
+			e.releasePollSlot()
+			continue
+		}
+		pending = append(pending, done)
+	}
+
+waitBatch:
+	for _, done := range pending {
+		select {
+		case <-done:
+		case <-expired:
+			break waitBatch
+		}
+	}
+
+	for _, state := range unpolled {
+		state.reg.repark(state)
+	}
+}
+
+// releasePollSlot hands a poll's concurrency slot back to the budget.
+func (e *engine) releasePollSlot() {
+	select {
+	case <-e.pollSlots:
+	default:
 	}
 }
 

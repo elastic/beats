@@ -179,3 +179,68 @@ func TestSharedEngine_PollsDueSourcesConcurrently(t *testing.T) {
 	require.NoError(t, runnerA.StopHarvesters())
 	require.NoError(t, runnerB.StopHarvesters())
 }
+
+// TestSharedEngine_BoundsConcurrentPolls asserts the batch polling above is
+// bounded: however many sources come due at once, at most maxConcurrentPolls are
+// in flight, and the ones there was no budget for are re-parked, not dropped.
+// Nothing else bounds it — harvester_limit is per input and unbounded by default.
+func TestSharedEngine_BoundsConcurrentPolls(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	engine := newEngine(logger)
+	t.Cleanup(engine.stop)
+
+	// More sources than the budget, so some of the batch must wait for a later pass.
+	const total = maxConcurrentPolls + 16
+
+	// Every Poll wedges until the test lets go, holding its slot: the
+	// unresponsive-mount case the budget exists for.
+	release := make(chan struct{})
+	var inFlight, maxInFlight atomic.Int64
+	h := &fakeHarvester{
+		readFn: func(int, v2.Context) (SliceVerdict, error) { return SliceYield, nil },
+		pollFn: func(int) PollResult {
+			n := inFlight.Add(1)
+			for {
+				observed := maxInFlight.Load()
+				if n <= observed || maxInFlight.CompareAndSwap(observed, n) {
+					break
+				}
+			}
+			<-release
+			inFlight.Add(-1)
+			return PollPark
+		},
+	}
+
+	runner := newHarvesterRunnerOn(t, engine, func() {}, h, 0, ReadUntilEOFConfig{})
+	runner.backoff = fastBackoff
+	runner.start()
+	for i := range total {
+		runner.Start(startContext(t), &testSource{name: fmt.Sprintf("/f-%d", i)})
+	}
+
+	requireEventually(t, func() bool { return inFlight.Load() == maxConcurrentPolls },
+		"the scheduler must use its whole poll budget")
+	assert.Never(t, func() bool { return maxInFlight.Load() > maxConcurrentPolls },
+		500*time.Millisecond, eventuallyInterval,
+		"the scheduler must never exceed its poll budget, however many sources are due")
+
+	// Freeing the slots must let the sources that missed the batch through, which
+	// they only can if they were re-parked.
+	polled := func() int {
+		n := 0
+		for i := range h.opens() {
+			if h.session(i).pollCount() > 0 {
+				n++
+			}
+		}
+		return n
+	}
+	require.Less(t, polled(), total, "the batch must not have polled every source while the budget was full")
+
+	close(release)
+	requireEventually(t, func() bool { return polled() == total },
+		"sources left unpolled by a full batch must be re-parked and polled on a later pass")
+
+	require.NoError(t, runner.StopHarvesters())
+}
