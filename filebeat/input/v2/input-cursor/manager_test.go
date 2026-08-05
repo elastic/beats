@@ -70,9 +70,10 @@ func TestManager_Init(t *testing.T) {
 		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
 
 		require.Nil(t, manager.store, "Init must not open the registry store")
-		goroutines.WaitUntilOriginalCount()
+		_, err := goroutines.WaitUntilOriginalCount()
+		require.NoError(t, err, "Init must not start the store cleanup goroutine")
 
-		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
 		require.NoError(t, err)
 		require.NotNil(t, manager.store, "Create must open the registry store")
 	})
