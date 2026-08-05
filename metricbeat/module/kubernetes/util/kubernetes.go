@@ -1041,50 +1041,86 @@ func buildMetadataEnricher(
 
 // Start starts all the watchers associated with a given enricher's resource.
 func (e *enricher) Start(resourceWatchers *Watchers) {
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
 	// Each resource may require multiple watchers. Firstly, we start the
-	// extra watchers as they are a dependency for the main resource watcher
+	// extra watchers as they are a dependency for the main resource watcher.
 	// For example a pod watcher requires namespace and node watcher to be started
 	// first.
+	//
+	// watcher.Start() calls WaitForCacheSync, which blocks until the informer
+	// syncs. When RBAC denies the LIST the informer retries indefinitely, so
+	// watcher.Start() can block for a long time. The lock must not be held
+	// across that call: Stop() needs the same lock to call watcher.Stop(),
+	// which cancels the watcher context and unblocks WaitForCacheSync.
 	extras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
 	for _, extra := range extras {
+		resourceWatchers.lock.Lock()
 		extraWatcherMeta := resourceWatchers.metaWatchersMap[extra]
-		if extraWatcherMeta != nil && !extraWatcherMeta.started {
-			if err := extraWatcherMeta.watcher.Start(); err != nil {
-				e.log.Warnf("Error starting %s watcher: %s", extra, err)
-			} else {
-				extraWatcherMeta.started = true
-			}
+		if extraWatcherMeta == nil || extraWatcherMeta.started {
+			resourceWatchers.lock.Unlock()
+			continue
+		}
+		extraWatcher := extraWatcherMeta.watcher
+		extraWatcherMeta.started = true
+		resourceWatchers.lock.Unlock()
+
+		if err := extraWatcher.Start(); err != nil {
+			e.log.Warnf("Error starting %s watcher: %s", extra, err)
+			resourceWatchers.lock.Lock()
+			extraWatcherMeta.started = false
+			resourceWatchers.lock.Unlock()
 		}
 	}
 
 	// Start the main watcher if not already started.
 	// If there is a restartWatcher defined, stop the old watcher if started and start the restartWatcher.
 	// restartWatcher replaces the old watcher and resourceMetaWatcher.restartWatcher is set to nil.
+	resourceWatchers.lock.Lock()
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
-	if resourceMetaWatcher != nil {
-		if resourceMetaWatcher.restartWatcher != nil {
-			if resourceMetaWatcher.started {
-				resourceMetaWatcher.watcher.Stop()
+	if resourceMetaWatcher == nil {
+		resourceWatchers.lock.Unlock()
+		return
+	}
+
+	if resourceMetaWatcher.restartWatcher != nil {
+		oldWatcher := resourceMetaWatcher.watcher
+		wasStarted := resourceMetaWatcher.started
+		restartWatcher := resourceMetaWatcher.restartWatcher
+		// Swap in the new watcher before releasing the lock so that a concurrent
+		// Stop() call cancels the new watcher's context, not the old one.
+		resourceMetaWatcher.watcher = restartWatcher
+		resourceMetaWatcher.restartWatcher = nil
+		resourceMetaWatcher.started = true
+		resourceWatchers.lock.Unlock()
+
+		if err := restartWatcher.Start(); err != nil {
+			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
+			resourceWatchers.lock.Lock()
+			if resourceMetaWatcher.watcher == restartWatcher {
+				// restartWatcher failed to start; restore the old watcher so the
+				// next Start() attempt has something to restart from.
+				resourceMetaWatcher.watcher = oldWatcher
+				resourceMetaWatcher.started = false
 			}
-			if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
-				e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
-			} else {
-				resourceMetaWatcher.watcher = resourceMetaWatcher.restartWatcher
-				resourceMetaWatcher.restartWatcher = nil
-				resourceMetaWatcher.started = true
-			}
-		} else {
-			if !resourceMetaWatcher.started {
-				if err := resourceMetaWatcher.watcher.Start(); err != nil {
-					e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
-				} else {
-					resourceMetaWatcher.started = true
-				}
-			}
+			resourceWatchers.lock.Unlock()
+		} else if wasStarted {
+			// Only stop the old watcher after the new one is confirmed running.
+			oldWatcher.Stop()
 		}
+	} else if !resourceMetaWatcher.started {
+		mainWatcher := resourceMetaWatcher.watcher
+		resourceMetaWatcher.started = true
+		resourceWatchers.lock.Unlock()
+
+		if err := mainWatcher.Start(); err != nil {
+			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
+			resourceWatchers.lock.Lock()
+			if resourceMetaWatcher.watcher == mainWatcher {
+				resourceMetaWatcher.started = false
+			}
+			resourceWatchers.lock.Unlock()
+		}
+	} else {
+		resourceWatchers.lock.Unlock()
 	}
 }
 
