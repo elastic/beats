@@ -35,10 +35,6 @@ type histogramAssemblerMonitoringSlot struct {
 	m    *histogramAssemblerMonitoring
 }
 
-// histogramAssemblerMonitoringSlots keeps one registration per metricset registry so
-// duplicate factory calls do not recreate metrics. Entries must be removed in
-// unregister() during generator Stop so start/stop cycles (e.g. beatreceiver) do
-// not retain registries forever.
 var histogramAssemblerMonitoringSlots sync.Map // *monitoring.Registry -> *histogramAssemblerMonitoringSlot
 
 func registerHistogramAssemblerMonitoring(msReg *monitoring.Registry) *histogramAssemblerMonitoring {
@@ -68,8 +64,7 @@ func registerHistogramAssemblerMonitoring(msReg *monitoring.Registry) *histogram
 	return slot.m
 }
 
-// unregister drops the process-wide slot for this metricset registry so the
-// registry can be garbage-collected after the metricset stops.
+// unregister drops the process-wide slot for this metricset registry
 func (m *histogramAssemblerMonitoring) unregister() {
 	if m == nil || m.msReg == nil {
 		return
