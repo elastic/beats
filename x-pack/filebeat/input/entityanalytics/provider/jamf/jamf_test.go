@@ -20,7 +20,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/lumberjack"
 )
 
@@ -62,7 +62,7 @@ func TestJamfDoFetch(t *testing.T) {
 			JamfPassword: password,
 		},
 		client: client,
-		logger: logp.L(),
+		logger: logptest.NewTestingLogger(t, ""),
 	}
 	if *trace {
 		// Use legacy behaviour; nil enabled setting.

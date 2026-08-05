@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"maps"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -144,7 +145,6 @@ receivers:
 	)
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	es := integration.GetESClient(t, "http")
 
@@ -411,7 +411,6 @@ service:
 
 	// 2. Start filebeat standalone mode
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	es := integration.GetESClient(t, "http")
 
@@ -561,7 +560,6 @@ receivers:
 	)
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	es := integration.GetESClient(t, "http")
 
@@ -669,7 +667,6 @@ receivers:
 	)
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	es := integration.GetESClient(t, "http")
 
@@ -806,7 +803,6 @@ receivers:
 	)
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	es := integration.GetESClient(t, "http")
 
@@ -944,7 +940,6 @@ func TestAzureBlobStorageInputOTelE2E(t *testing.T) {
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	filebeat.WaitLogsContains("filebeat start running", 20*time.Second, "filebeat did not run")
 
@@ -1049,7 +1044,6 @@ func TestGCPInputOTelE2E(t *testing.T) {
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	es := integration.GetESClient(t, "http")
 	t.Cleanup(func() {
@@ -1166,7 +1160,6 @@ func TestHTTPEndpointInputOTelE2E(t *testing.T) {
 	)
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	filebeat.WaitLogsContainsAnyOrder(
 		[]string{"filebeat start running"},
@@ -1297,7 +1290,6 @@ func TestNetflowInputOTelE2E(t *testing.T) {
 	)
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	filebeat.WaitLogsContainsAnyOrder(
 		[]string{"filebeat start running"},
@@ -1451,9 +1443,7 @@ func TestEntityAnalyticsJamfInputOTelE2E(t *testing.T) {
 
 	jamfTenant, username, password, _ := testjamf.StartServer(t)
 
-	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
-		name: "jamf",
-		fbConfig: `filebeat.inputs:
+	fbConfig := `filebeat.inputs:
 - type: entity-analytics
   id: entity-analytics-jamf-e2e
   enabled: true
@@ -1464,8 +1454,9 @@ func TestEntityAnalyticsJamfInputOTelE2E(t *testing.T) {
   jamf_username: {{ .JamfUsername }}
   jamf_password: {{ .JamfPassword }}
   request.ssl.verification_mode: none
-` + filebeatOutputYAML,
-		otelConfig: otelElasticsearchExporterYAML + `
+` + filebeatOutputYAML
+
+	otelConfig := otelElasticsearchExporterYAML + `
 receivers:
     filebeatreceiver:
         filebeat:
@@ -1490,17 +1481,22 @@ receivers:
         setup.template.enabled: false
         management.otel.enabled: true
 ` + otelElasticsearchServiceYAML,
-		templateData: map[string]any{
-			"JamfTenant":   jamfTenant,
-			"JamfUsername": username,
-			"JamfPassword": password,
-		},
-		queryMust: []map[string]any{
-			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
-			{"match_phrase": map[string]any{"event.action": "device-discovered"}},
-			{"match_phrase": map[string]any{"device.id": testjamf.DeviceUDID}},
-		},
-	})
+
+		runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
+			name:       "jamf",
+			fbConfig:   fbConfig,
+			otelConfig: otelConfig,
+			templateData: map[string]any{
+				"JamfTenant":   jamfTenant,
+				"JamfUsername": username,
+				"JamfPassword": password,
+			},
+			queryMust: []map[string]any{
+				{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
+				{"match_phrase": map[string]any{"event.action": "device-discovered"}},
+				{"match_phrase": map[string]any{"device.id": testjamf.DeviceUDID}},
+			},
+		})
 }
 
 func TestEntityAnalyticsAzureADInputOTelE2E(t *testing.T) {
@@ -1508,11 +1504,7 @@ func TestEntityAnalyticsAzureADInputOTelE2E(t *testing.T) {
 
 	azureSrv := testazuread.StartGraphServer(t)
 
-	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
-		name: "azure-ad",
-		// use_minimal_state exposes login_endpoint/api_endpoint so Graph + token
-		// traffic can be pointed at httptest (plain HTTP).
-		fbConfig: `filebeat.inputs:
+	fbConfig := `filebeat.inputs:
 - type: entity-analytics
   id: entity-analytics-azure-ad-e2e
   enabled: true
@@ -1527,8 +1519,9 @@ func TestEntityAnalyticsAzureADInputOTelE2E(t *testing.T) {
   secret: test-secret
   login_endpoint: {{ .LoginEndpoint }}
   api_endpoint: {{ .APIEndpoint }}
-` + filebeatOutputYAML,
-		otelConfig: otelElasticsearchExporterYAML + `
+` + filebeatOutputYAML
+
+	otelConfig := otelElasticsearchExporterYAML + `
 receivers:
     filebeatreceiver:
         filebeat:
@@ -1557,16 +1550,23 @@ receivers:
         setup.template.enabled: false
         management.otel.enabled: true
 ` + otelElasticsearchServiceYAML,
-		templateData: map[string]any{
-			"LoginEndpoint": azureSrv.URL,
-			"APIEndpoint":   azureSrv.URL + "/v1.0",
-		},
-		queryMust: []map[string]any{
-			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
-			{"match_phrase": map[string]any{"event.action": "user-discovered"}},
-			{"match_phrase": map[string]any{"user.id": testazuread.UserID}},
-		},
-	})
+
+		runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
+			name: "azure-ad",
+			// use_minimal_state exposes login_endpoint/api_endpoint so Graph + token
+			// traffic can be pointed at httptest (plain HTTP).
+			fbConfig:   fbConfig,
+			otelConfig: otelConfig,
+			templateData: map[string]any{
+				"LoginEndpoint": azureSrv.URL,
+				"APIEndpoint":   azureSrv.URL + "/v1.0",
+			},
+			queryMust: []map[string]any{
+				{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
+				{"match_phrase": map[string]any{"event.action": "user-discovered"}},
+				{"match_phrase": map[string]any{"user.id": testazuread.UserID}},
+			},
+		})
 }
 
 func TestEntityAnalyticsActiveDirectoryInputOTelE2E(t *testing.T) {
@@ -1574,49 +1574,53 @@ func TestEntityAnalyticsActiveDirectoryInputOTelE2E(t *testing.T) {
 
 	ldapURL := testactivedirectory.StartLDAPServer(t)
 
+	fbConfig := `filebeat.inputs:
+	- type: entity-analytics
+	  id: entity-analytics-ad-e2e
+	  enabled: true
+	  use_minimal_state: true
+	  provider: activedirectory
+	  dataset: users
+	  sync_interval: 24h
+	  update_interval: 12h
+	  ad_url: {{ .ADURL }}
+	  ad_base_dn: DC=example,DC=com
+	  ad_user: cn=admin,dc=example,dc=com
+	  ad_password: pass
+	` + filebeatOutputYAML
+
+	otelConfig := otelElasticsearchExporterYAML + `
+	receivers:
+		filebeatreceiver:
+			filebeat:
+				inputs:
+					- type: entity-analytics
+					  id: entity-analytics-ad-e2e
+					  enabled: true
+					  use_minimal_state: true
+					  provider: activedirectory
+					  dataset: users
+					  sync_interval: 24h
+					  update_interval: 12h
+					  ad_url: {{ .ADURL }}
+					  ad_base_dn: DC=example,DC=com
+					  ad_user: cn=admin,dc=example,dc=com
+					  ad_password: pass
+			path.home: {{ .PathHome }}
+			processors:
+				- add_host_metadata: ~
+				- add_cloud_metadata: ~
+				- add_docker_metadata: ~
+				- add_kubernetes_metadata: ~
+			queue.mem.flush.timeout: 0s
+			setup.template.enabled: false
+			management.otel.enabled: true
+	` + otelElasticsearchServiceYAML
+
 	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
-		name: "activedirectory",
-		fbConfig: `filebeat.inputs:
-- type: entity-analytics
-  id: entity-analytics-ad-e2e
-  enabled: true
-  use_minimal_state: true
-  provider: activedirectory
-  dataset: users
-  sync_interval: 24h
-  update_interval: 12h
-  ad_url: {{ .ADURL }}
-  ad_base_dn: DC=example,DC=com
-  ad_user: cn=admin,dc=example,dc=com
-  ad_password: pass
-` + filebeatOutputYAML,
-		otelConfig: otelElasticsearchExporterYAML + `
-receivers:
-    filebeatreceiver:
-        filebeat:
-            inputs:
-                - type: entity-analytics
-                  id: entity-analytics-ad-e2e
-                  enabled: true
-                  use_minimal_state: true
-                  provider: activedirectory
-                  dataset: users
-                  sync_interval: 24h
-                  update_interval: 12h
-                  ad_url: {{ .ADURL }}
-                  ad_base_dn: DC=example,DC=com
-                  ad_user: cn=admin,dc=example,dc=com
-                  ad_password: pass
-        path.home: {{ .PathHome }}
-        processors:
-            - add_host_metadata: ~
-            - add_cloud_metadata: ~
-            - add_docker_metadata: ~
-            - add_kubernetes_metadata: ~
-        queue.mem.flush.timeout: 0s
-        setup.template.enabled: false
-        management.otel.enabled: true
-` + otelElasticsearchServiceYAML,
+		name:       "activedirectory",
+		fbConfig:   fbConfig,
+		otelConfig: otelConfig,
 		templateData: map[string]any{
 			"ADURL": ldapURL,
 		},
@@ -1657,9 +1661,8 @@ func runEntityAnalyticsOTelE2E(t *testing.T, tc entityAnalyticsE2ECase) {
 		"Password": password,
 		"PathHome": otelHome,
 	}
-	for k, v := range tc.templateData {
-		data[k] = v
-	}
+
+	maps.Copy(data, tc.templateData)
 
 	var configBuffer bytes.Buffer
 	require.NoError(t, template.Must(template.New("otel-"+tc.name).Parse(tc.otelConfig)).Execute(&configBuffer, data))
@@ -1672,7 +1675,6 @@ func runEntityAnalyticsOTelE2E(t *testing.T, tc entityAnalyticsE2ECase) {
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-	defer filebeat.Stop()
 
 	es := integration.GetESClient(t, "http")
 	t.Cleanup(func() {

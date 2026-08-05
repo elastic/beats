@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/jimlambrt/gldap"
+	"github.com/stretchr/testify/require"
 )
 
 // UserDN is the distinguished name of the first user in StartLDAPServer.
@@ -64,15 +65,10 @@ func StartLDAPServer(t *testing.T) string {
 	ln.Close()
 
 	go func() { _ = s.Run(addr) }()
-	for i := 0; i < 100; i++ {
-		if s.Ready() {
-			break
-		}
-		time.Sleep(20 * time.Millisecond)
-	}
-	if !s.Ready() {
-		t.Fatal("gldap server not ready")
-	}
+	require.Eventually(t, func() bool {
+		return s.Ready()
+	}, 10*time.Second, 20*time.Millisecond, "gldap server did not become ready")
+
 	return "ldap://" + addr
 }
 

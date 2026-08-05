@@ -267,7 +267,6 @@ func (m *equivMemStore) Delete(key string) error {
 
 func (m *equivMemStore) Each(fn func(string, func(any) error) (bool, error)) error {
 	for k, v := range m.data {
-		v := v
 		cont, err := fn(k, func(dst any) error { return json.Unmarshal(v, dst) })
 		if err != nil {
 			return err
