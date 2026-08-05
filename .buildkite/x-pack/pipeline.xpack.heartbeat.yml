@@ -380,7 +380,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
-          .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
+          VERBOSE=true .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
           automatic:
             - limit: 1
