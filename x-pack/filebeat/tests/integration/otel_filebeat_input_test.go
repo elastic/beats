@@ -1480,23 +1480,23 @@ receivers:
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
         management.otel.enabled: true
-` + otelElasticsearchServiceYAML,
+` + otelElasticsearchServiceYAML
 
-		runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
-			name:       "jamf",
-			fbConfig:   fbConfig,
-			otelConfig: otelConfig,
-			templateData: map[string]any{
-				"JamfTenant":   jamfTenant,
-				"JamfUsername": username,
-				"JamfPassword": password,
-			},
-			queryMust: []map[string]any{
-				{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
-				{"match_phrase": map[string]any{"event.action": "device-discovered"}},
-				{"match_phrase": map[string]any{"device.id": testjamf.DeviceUDID}},
-			},
-		})
+	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
+		name:       "jamf",
+		fbConfig:   fbConfig,
+		otelConfig: otelConfig,
+		templateData: map[string]any{
+			"JamfTenant":   jamfTenant,
+			"JamfUsername": username,
+			"JamfPassword": password,
+		},
+		queryMust: []map[string]any{
+			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
+			{"match_phrase": map[string]any{"event.action": "device-discovered"}},
+			{"match_phrase": map[string]any{"device.id": testjamf.DeviceUDID}},
+		},
+	})
 }
 
 func TestEntityAnalyticsAzureADInputOTelE2E(t *testing.T) {
@@ -1549,24 +1549,24 @@ receivers:
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
         management.otel.enabled: true
-` + otelElasticsearchServiceYAML,
+` + otelElasticsearchServiceYAML
 
-		runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
-			name: "azure-ad",
-			// use_minimal_state exposes login_endpoint/api_endpoint so Graph + token
-			// traffic can be pointed at httptest (plain HTTP).
-			fbConfig:   fbConfig,
-			otelConfig: otelConfig,
-			templateData: map[string]any{
-				"LoginEndpoint": azureSrv.URL,
-				"APIEndpoint":   azureSrv.URL + "/v1.0",
-			},
-			queryMust: []map[string]any{
-				{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
-				{"match_phrase": map[string]any{"event.action": "user-discovered"}},
-				{"match_phrase": map[string]any{"user.id": testazuread.UserID}},
-			},
-		})
+	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
+		name: "azure-ad",
+		// use_minimal_state exposes login_endpoint/api_endpoint so Graph + token
+		// traffic can be pointed at httptest (plain HTTP).
+		fbConfig:   fbConfig,
+		otelConfig: otelConfig,
+		templateData: map[string]any{
+			"LoginEndpoint": azureSrv.URL,
+			"APIEndpoint":   azureSrv.URL + "/v1.0",
+		},
+		queryMust: []map[string]any{
+			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
+			{"match_phrase": map[string]any{"event.action": "user-discovered"}},
+			{"match_phrase": map[string]any{"user.id": testazuread.UserID}},
+		},
+	})
 }
 
 func TestEntityAnalyticsActiveDirectoryInputOTelE2E(t *testing.T) {
@@ -1590,7 +1590,7 @@ func TestEntityAnalyticsActiveDirectoryInputOTelE2E(t *testing.T) {
 	` + filebeatOutputYAML
 
 	otelConfig := otelElasticsearchExporterYAML + `
-	receivers:
+receivers:
 		filebeatreceiver:
 			filebeat:
 				inputs:
@@ -1614,8 +1614,7 @@ func TestEntityAnalyticsActiveDirectoryInputOTelE2E(t *testing.T) {
 				- add_kubernetes_metadata: ~
 			queue.mem.flush.timeout: 0s
 			setup.template.enabled: false
-			management.otel.enabled: true
-	` + otelElasticsearchServiceYAML
+			management.otel.enabled: true` + otelElasticsearchServiceYAML
 
 	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
 		name:       "activedirectory",
