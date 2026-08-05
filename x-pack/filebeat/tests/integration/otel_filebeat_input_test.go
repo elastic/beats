@@ -1386,9 +1386,7 @@ func TestEntityAnalyticsOktaInputOTelE2E(t *testing.T) {
 	oktaSrv := testokta.StartServer(t)
 	oktaDomain := strings.TrimPrefix(oktaSrv.URL, "https://")
 
-	runEntityAnalyticsOTelE2E(t, entityAnalyticsE2ECase{
-		name: "okta",
-		fbConfig: `filebeat.inputs:
+	fbConfig := `filebeat.inputs:
 - type: entity-analytics
   id: entity-analytics-okta-e2e
   enabled: true
@@ -1401,8 +1399,9 @@ func TestEntityAnalyticsOktaInputOTelE2E(t *testing.T) {
   okta_token: test-token
   limit_fixed: 1000
   request.ssl.verification_mode: none
-` + filebeatOutputYAML,
-		otelConfig: otelElasticsearchExporterYAML + `
+` + filebeatOutputYAML
+
+	otelConfig := otelElasticsearchExporterYAML + `
 receivers:
     filebeatreceiver:
         filebeat:
@@ -1428,16 +1427,23 @@ receivers:
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
         management.otel.enabled: true
-` + otelElasticsearchServiceYAML,
-		templateData: map[string]any{
-			"OktaDomain": oktaDomain,
-		},
-		queryMust: []map[string]any{
-			{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
-			{"match_phrase": map[string]any{"event.action": "user-discovered"}},
-			{"match_phrase": map[string]any{"user.id": "u1"}},
-		},
-	})
+` + otelElasticsearchServiceYAML
+
+	runEntityAnalyticsOTelE2E(
+		t,
+		entityAnalyticsE2ECase{
+			name:       "okta",
+			fbConfig:   fbConfig,
+			otelConfig: otelConfig,
+			templateData: map[string]any{
+				"OktaDomain": oktaDomain,
+			},
+			queryMust: []map[string]any{
+				{"match_phrase": map[string]any{"input.type": "entity-analytics"}},
+				{"match_phrase": map[string]any{"event.action": "user-discovered"}},
+				{"match_phrase": map[string]any{"user.id": "u1"}},
+			},
+		})
 }
 
 func TestEntityAnalyticsJamfInputOTelE2E(t *testing.T) {
