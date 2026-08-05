@@ -96,8 +96,6 @@ func newProspector(
 
 	logger := log.Named("filestream").With("id", config.ID)
 
-	config.FileWatcher.Scanner.Fingerprint.Enabled = usesFingerprintIdentity(config.FileIdentity)
-
 	identifier, err := newFileIdentifier(
 		config.FileIdentity,
 		config.Reader.Parsers.Suffix,

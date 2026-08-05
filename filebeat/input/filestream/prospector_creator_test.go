@@ -115,46 +115,6 @@ prospector.scanner.fingerprint.enabled: false
 		}
 	})
 
-	t.Run("derives scanner fingerprinting from the identity when normalization is bypassed", func(t *testing.T) {
-		// The fingerprint identity without scanner fingerprints would
-		// silently collapse all files into one empty-fingerprint registry
-		// entry, so newProspector cannot trust the unpacked value.
-		cases := []struct {
-			cfgStr      string
-			wantEnabled bool
-		}{
-			{cfgStr: `
-paths: ['some']
-prospector.scanner.fingerprint.enabled: false
-`, wantEnabled: true},
-			{cfgStr: `
-paths: ['some']
-file_identity.fingerprint: ~
-prospector.scanner.fingerprint.enabled: false
-`, wantEnabled: true},
-			{cfgStr: `
-paths: ['some']
-file_identity.native: ~
-prospector.scanner.fingerprint.enabled: true
-`, wantEnabled: false},
-		}
-		for _, tc := range cases {
-			c, err := conf.NewConfigWithYAML([]byte(tc.cfgStr), tc.cfgStr)
-			require.NoError(t, err)
-
-			cfg := defaultConfig()
-			require.NoError(t, c.Unpack(&cfg))
-
-			p, err := newProspector(cfg, logptest.NewTestingLogger(t, ""), mustSourceIdentifier("foo-id"))
-			require.NoError(t, err)
-			fp, ok := p.(*fileProspector)
-			require.True(t, ok, "expected the standard file prospector, got %T", p)
-			watcher, ok := fp.filewatcher.(*fileWatcher)
-			require.True(t, ok, "expected the filestream file watcher, got %T", fp.filewatcher)
-			assert.Equal(t, tc.wantEnabled, watcher.cfg.Scanner.Fingerprint.Enabled, tc.cfgStr)
-		}
-	})
-
 	t.Run("copytruncate rotation and fingerprint file identity", func(t *testing.T) {
 		cases := []struct {
 			name             string

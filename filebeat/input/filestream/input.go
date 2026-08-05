@@ -188,7 +188,7 @@ func configure(
 // scanner fingerprints: without them every file gets the same empty fingerprint
 // ID and collapses into a single registry entry, silently losing data.
 func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
-	fingerprintIdentity := usesFingerprintIdentity(c.FileIdentity)
+	fingerprintIdentity := c.FileIdentity == nil || c.FileIdentity.Name() == fingerprintName
 
 	if fingerprintIdentity {
 		fingerprintCfg := defaultFingerprintIdentityConfig()

@@ -497,8 +497,7 @@ func TestNormalizeConfig(t *testing.T) {
 			if tc.wantWarn {
 				wantWarnings = 1
 			}
-			assert.Equal(t, wantWarnings,
-				obs.FilterMessageSnippet("'prospector.scanner.fingerprint.enabled' is deprecated").Len(),
+			assert.Len(t, obs.FilterMessageSnippet("'prospector.scanner.fingerprint.enabled' is deprecated").All(), wantWarnings,
 				"unexpected number of scanner fingerprint deprecation warnings")
 		})
 	}

@@ -206,7 +206,7 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 ::::
 
 
-`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile.
+`fingerprint` is the recommended file identity and the default in 9.0 and later. It does not rely on the file system or operating system. Instead, it generates a hash from part of the file (the first 1024 bytes by default) and uses that hash to identify the file. This works well with log rotation strategies that move or rename files and on Windows, where file identifiers might be more volatile.
 
 {applies_to}`stack: ga 9.5+` The [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay. In earlier versions, Filebeat waits until the file reaches 1024 bytes before ingesting it.
 
@@ -215,7 +215,7 @@ Once this file identity is enabled, changing the fingerprint configuration (offs
 ::::
 
 
-Please refer to the [fingerprint configuration for details](#filebeat-input-filestream-scan-fingerprint).
+Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
 
 Selecting `path` instructs Filebeat to identify files based on their paths. This is a quick way to avoid rereading files if inode and device ids might change. However, keep in mind if the files are rotated (renamed), they will be reread and resubmitted.
 
@@ -411,7 +411,20 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
-Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default when `file_identity` is omitted) and deactivates it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored. Filebeat logs a warning if its value contradicts the configured `file_identity`.
+::::{applies-switch}
+:::{applies-item} stack: ga 9.6+
+:sync: 9.6+
+Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default) and disables it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored.
+:::
+:::{applies-item} stack: ga 9.0-9.5
+:sync: 9.0-9.5
+Scanner fingerprinting is enabled by default. Set `prospector.scanner.fingerprint.enabled: false` when you configure any other file identity.
+:::
+:::{applies-item} stack: ga 8.10-8.19
+:sync: 8.10-8.19
+Scanner fingerprinting is disabled by default. Set `prospector.scanner.fingerprint.enabled: true` when you configure the `fingerprint` file identity.
+:::
+::::
 
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
@@ -426,10 +439,28 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 $$$filebeat-input-filestream-file-identity-fingerprint$$$
 
 **`fingerprint`**
-:   The default behavior of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
+:   Identifies files based on content by hashing a specific range (0 to 1024 bytes by default).
+
+This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint).
+
+::::{applies-switch}
+:group: fingerprint-scanner
+:::{applies-item} stack: ga 9.5+
+:sync: 9.5+
+Scanner fingerprinting is enabled automatically when using this identity.
+:::
+:::{applies-item} stack: ga 9.0-9.5
+:sync: 9.0-9.5
+Scanner fingerprinting is enabled by default. If you explicitly set `prospector.scanner.fingerprint.enabled: false`, this file identity will not work.
+:::
+:::{applies-item} stack: ga 8.10-8.19
+:sync: 8.10-8.19
+Scanner fingerprinting is disabled by default. Set `prospector.scanner.fingerprint.enabled: true` to use this file identity.
+:::
+::::
 
 ::::{warning}
-This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint), which is enabled automatically when this file identity is used. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 ::::
 
 
@@ -1210,23 +1241,36 @@ Following are some scenarios where this can happen:
 
     Depending on a mounting approach, the device ID (which is also used for comparing files) might change after a reboot.
 
-The scanner computes fingerprints when the [`fingerprint` file identity](#filebeat-input-filestream-file-identity-fingerprint) (the default) is used and skips them for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored.
-
-
 **Configuration**
 
 ::::{warning}
-Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size, so they can be fingerprinted. Until then these files are ignored.
+{applies_to}`stack: ga 8.10-9.4` Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size. Until then, these files are ignored.
+
+{applies_to}`stack: ga 9.5+` Enhanced fingerprint tracks smaller files by default. The ingestion delay applies only when `file_identity.fingerprint.growing` is set to `false`.
 ::::
 
+Normally, log lines contain timestamps and other unique fields that make the default fingerprint range suitable. Inspect your logs to determine appropriate `offset` and `length` values. The default `offset` is `0`, and the default `length` is `1024` bytes. `length` cannot be less than `64` bytes.
 
-Normally, log lines contain timestamps and other unique fields that should be able to use the fingerprint mode, but in every use-case users should inspect their logs to determine what are the appropriate values for the `offset` and `length` parameters. Default `offset` is `0` and default `length` is `1024` or 1 KB. `length` cannot be less than `64`.
-
+::::{applies-switch}
+:group: fingerprint-scanner
+:::{applies-item} stack: ga 9.0+
+:sync: 9.0+
 ```yaml
 fingerprint:
   offset: 0
   length: 1024
 ```
+:::
+:::{applies-item} stack: ga 8.10-8.19
+:sync: 8.10-8.19
+```yaml
+fingerprint:
+  enabled: true
+  offset: 0
+  length: 1024
+```
+:::
+::::
 
 
 ### `ignore_older` [filebeat-input-filestream-ignore-older]
