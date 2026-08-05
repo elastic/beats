@@ -24,9 +24,10 @@ import (
 	"sync"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"go.uber.org/zap"
 )
 
 type storeCacheState uint8
