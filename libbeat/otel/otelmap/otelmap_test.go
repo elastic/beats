@@ -415,9 +415,37 @@ func TestFromMapstrNamedPrimitivesInSlice(t *testing.T) {
 func TestUnknownType(t *testing.T) {
 	dst := pcommon.NewMap()
 	require.NoError(t, FromMapstr(dst, mapstr.M{
-		"unknown_map": map[string]int{"key": 42},
+		"unknown_map": map[int]string{1: "one"},
 	}))
-	assert.Equal(t, map[string]any{"unknown_map": "unknown type: map[string]int"}, dst.AsRaw())
+	assert.Equal(t, map[string]any{"unknown_map": "unknown type: map[int]string"}, dst.AsRaw())
+}
+
+// TestFromReflectiveMapStringKeyed pins the expected behavior for
+// reflect.Map values with string keys that are not mapstr.M or map[string]any
+// (e.g. map[string]string, map[string]int).
+func TestFromReflectiveMapStringKeyed(t *testing.T) {
+	type Severity string
+	input := mapstr.M{
+		"labels":        map[string]string{"env": "prod", "region": "us-east"},
+		"counters":      map[string]int{"a": 1, "b": 2},
+		"named_values":  map[string]Severity{"log": "warn", "alert": "error"},
+		"nested":        map[string]map[string]int{"inner": {"x": 1}},
+		"heterogeneous": map[string]any{"n": 42, "s": "hello", "b": true},
+	}
+	want := map[string]any{
+		"labels":   map[string]any{"env": "prod", "region": "us-east"},
+		"counters": map[string]any{"a": int64(1), "b": int64(2)},
+		"named_values": map[string]any{
+			"log":   "warn",
+			"alert": "error",
+		},
+		"nested":        map[string]any{"inner": map[string]any{"x": int64(1)}},
+		"heterogeneous": map[string]any{"n": int64(42), "s": "hello", "b": true},
+	}
+
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, input))
+	assert.Equal(t, want, dst.AsRaw())
 }
 
 func TestFromMapstrComplex(t *testing.T) {

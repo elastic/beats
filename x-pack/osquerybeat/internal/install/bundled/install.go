@@ -52,9 +52,13 @@ func BuildPlan(osarch distro.OSArch, format artifactformat.Format, installDir st
 			OSQueryTargetPath: distro.OsquerydPathForOS(osarch.OS, installDir),
 		}, nil
 	case artifactformat.Zip:
+		platform := "windows_arm64"
+		if osarch.Arch == "amd64" {
+			platform = "windows_x86_64"
+		}
 		return Plan{
-			OSQuerySourcePath: distro.OsquerydWindowsZipPath(),
-			CertsSourcePath:   distro.OsquerydCertsWindowsZipDistroPath(),
+			OSQuerySourcePath: distro.OsquerydWindowsZipPlatformPath(platform),
+			CertsSourcePath:   distro.OsquerydCertsWindowsZipPlatformDistroPath(platform),
 			OSQueryTargetPath: distro.OsquerydPathForOS(osarch.OS, installDir),
 		}, nil
 	default:
