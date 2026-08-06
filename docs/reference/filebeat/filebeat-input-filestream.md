@@ -428,24 +428,21 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 $$$filebeat-input-filestream-file-identity-fingerprint$$$
 
 **`fingerprint`**
-:   Identifies files based on content by hashing a specific range (0 to 1024 bytes by default).
+:   Identifies files based on content by hashing a specific range (0 to 1024 bytes by default). This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint).
 
-This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint).
+    {applies_to}`stack: ga 9.6+` Scanner fingerprinting is enabled automatically when using this identity.
 
-{applies_to}`stack: ga 9.6+` Scanner fingerprinting is enabled automatically when using this identity.
+    {applies_to}`stack: ga 9.0-9.5` If you explicitly set `prospector.scanner.fingerprint.enabled: false` (default `true`), this file identity will not work.
 
-{applies_to}`stack: ga 9.0-9.5` If you explicitly set `prospector.scanner.fingerprint.enabled: false` (default `true`), this file identity will not work.
+    ::::{warning}
+    Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+    ::::
 
-::::{warning}
-Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
-::::
+    Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
 
-
-Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
-
-```yaml
-file_identity.fingerprint: ~
-```
+    ```yaml
+    file_identity.fingerprint: ~
+    ```
 
     `growing` {applies_to}`stack: ga 9.5.0+`
   :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
