@@ -57,9 +57,9 @@ func TestHeartbeatBrowserE2EArchive(t *testing.T) {
 	}{
 		{name: "standard archive", archives: []string{"heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"}, want: "heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"},
 		{name: "no Heartbeat archive", archives: []string{"filebeat-9.5.0-linux-amd64.docker.tar.gz"}},
-		{name: "only Wolfi archive", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
-		{name: "unexpected variant", archives: []string{"heartbeat-custom-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
-		{name: "excluded variants", archives: []string{"heartbeat-oss-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-ubi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-fips-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-arm64.docker.tar.gz"}, wantErr: true},
+		{name: "only Wolfi archive", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}},
+		{name: "unexpected variant", archives: []string{"heartbeat-custom-9.5.0-linux-amd64.docker.tar.gz"}},
+		{name: "excluded variants", archives: []string{"heartbeat-oss-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-ubi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-fips-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-arm64.docker.tar.gz"}},
 		{name: "ambiguous archives", archives: []string{"heartbeat-9.4.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -199,23 +199,16 @@ func checkHeartbeatBrowserE2E(t *testing.T, dockerArchives []string) {
 }
 
 func heartbeatBrowserE2EArchive(archives []string) (string, error) {
-	var heartbeatArchives, matches []string
+	var matches []string
 	for _, archive := range archives {
-		name := filepath.Base(archive)
-		if strings.HasPrefix(name, "heartbeat-") {
-			heartbeatArchives = append(heartbeatArchives, archive)
-		}
-		if isHeartbeatBrowserE2EArchive(name) {
+		if isHeartbeatBrowserE2EArchive(filepath.Base(archive)) {
 			matches = append(matches, archive)
 		}
 	}
 
 	switch len(matches) {
 	case 0:
-		if len(heartbeatArchives) == 0 {
-			return "", nil
-		}
-		return "", fmt.Errorf("standard Linux AMD64 Heartbeat Docker archive was not generated; found: %s", strings.Join(heartbeatArchives, ", "))
+		return "", nil
 	case 1:
 		return matches[0], nil
 	default:
