@@ -411,20 +411,9 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
-::::{applies-switch}
-:::{applies-item} stack: ga 9.6+
-:sync: 9.6+
-Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default) and disables it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored.
-:::
-:::{applies-item} stack: ga 9.0-9.5
-:sync: 9.0-9.5
-Scanner fingerprinting is enabled by default. Set `prospector.scanner.fingerprint.enabled: false` when you configure any other file identity.
-:::
-:::{applies-item} stack: ga 8.10-8.19
-:sync: 8.10-8.19
-Scanner fingerprinting is disabled by default. Set `prospector.scanner.fingerprint.enabled: true` when you configure the `fingerprint` file identity.
-:::
-::::
+{applies_to}`stack: ga 9.6+` Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default) and disables it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored.
+
+{applies_to}`stack: ga 9.0-9.5` Scanner fingerprinting is enabled by default. Set `prospector.scanner.fingerprint.enabled: false` when you configure any other file identity.
 
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
@@ -443,21 +432,9 @@ $$$filebeat-input-filestream-file-identity-fingerprint$$$
 
 This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint).
 
-::::{applies-switch}
-:group: fingerprint-scanner
-:::{applies-item} stack: ga 9.5+
-:sync: 9.5+
-Scanner fingerprinting is enabled automatically when using this identity.
-:::
-:::{applies-item} stack: ga 9.0-9.5
-:sync: 9.0-9.5
-Scanner fingerprinting is enabled by default. If you explicitly set `prospector.scanner.fingerprint.enabled: false`, this file identity will not work.
-:::
-:::{applies-item} stack: ga 8.10-8.19
-:sync: 8.10-8.19
-Scanner fingerprinting is disabled by default. Set `prospector.scanner.fingerprint.enabled: true` to use this file identity.
-:::
-::::
+{applies_to}`stack: ga 9.6+` Scanner fingerprinting is enabled automatically when using this identity.
+
+{applies_to}`stack: ga 9.0-9.5` If you explicitly set `prospector.scanner.fingerprint.enabled: false` (default `true`), this file identity will not work.
 
 ::::{warning}
 Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
@@ -1244,33 +1221,18 @@ Following are some scenarios where this can happen:
 **Configuration**
 
 ::::{warning}
-{applies_to}`stack: ga 8.10-9.4` Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size. Until then, these files are ignored.
+{applies_to}`stack: ga 9.0-9.4` Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size. Until then, these files are ignored.
 
 {applies_to}`stack: ga 9.5+` Enhanced fingerprint tracks smaller files by default. The ingestion delay applies only when `file_identity.fingerprint.growing` is set to `false`.
 ::::
 
 Normally, log lines contain timestamps and other unique fields that make the default fingerprint range suitable. Inspect your logs to determine appropriate `offset` and `length` values. The default `offset` is `0`, and the default `length` is `1024` bytes. `length` cannot be less than `64` bytes.
 
-::::{applies-switch}
-:group: fingerprint-scanner
-:::{applies-item} stack: ga 9.0+
-:sync: 9.0+
 ```yaml
 fingerprint:
   offset: 0
   length: 1024
 ```
-:::
-:::{applies-item} stack: ga 8.10-8.19
-:sync: 8.10-8.19
-```yaml
-fingerprint:
-  enabled: true
-  offset: 0
-  length: 1024
-```
-:::
-::::
 
 
 ### `ignore_older` [filebeat-input-filestream-ignore-older]
