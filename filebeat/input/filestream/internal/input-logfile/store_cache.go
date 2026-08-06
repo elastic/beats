@@ -134,8 +134,11 @@ func initializeStoreCacheEntry(
 		return nil, err
 	}
 
-	// The config validation already ensures cleanup_interval >= 0
 	interval := states.CleanupInterval()
+	if interval <= 0 {
+		interval = 5 * time.Minute
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	entry.cleanerWg.Add(1)
 	s.onClose = func() { globalStoreCache.storeClosed(key, entry) }
