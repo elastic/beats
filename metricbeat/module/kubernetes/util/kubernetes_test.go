@@ -1064,13 +1064,13 @@ func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
 		releaseLookup: releaseLookup,
 	})
 	replacement := newCoordinatedWatcher(newMockWatcher().store)
-	resource := &kubernetes.Pod{ObjectMeta: metav1.ObjectMeta{
+	activeResource := &kubernetes.Pod{ObjectMeta: metav1.ObjectMeta{
 		Name:   "resource",
 		Labels: map[string]string{"source": "active"},
 	}}
-	replacementResource := resource.DeepCopy()
+	replacementResource := activeResource.DeepCopy()
 	replacementResource.Labels = map[string]string{"source": "replacement"}
-	require.NoError(t, active.Store().Add(resource), "active watcher store must contain the resource")
+	require.NoError(t, active.Store().Add(activeResource), "active watcher store must contain the resource")
 	require.NoError(t, replacement.Store().Add(replacementResource), "replacement watcher store must contain the resource")
 
 	metaWatcher := &metaWatcher{
@@ -1086,7 +1086,7 @@ func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
 
 	lookupDone := make(chan mapstr.M, 1)
 	go func() {
-		lookupDone <- e.getMetadata(mapstr.M{"name": resource.Name})
+		lookupDone <- e.getMetadata(mapstr.M{"name": activeResource.Name})
 	}()
 	<-lookupStarted
 
@@ -1111,7 +1111,7 @@ func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
 	e.Lock()
 	e.metadataCache = make(map[string]mapstr.M)
 	e.Unlock()
-	require.Equal(t, "replacement", e.getMetadata(mapstr.M{"name": resource.Name})["source"], "later lookup must use the replacement watcher")
+	require.Equal(t, "replacement", e.getMetadata(mapstr.M{"name": activeResource.Name})["source"], "later lookup must use the replacement watcher")
 
 	e.Stop(resourceWatchers)
 }
