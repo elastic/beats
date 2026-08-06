@@ -549,7 +549,7 @@ func (w *segmentWriter) UpdateCount(count uint32) error {
 	// Seek to count on disk
 	_, err = w.dst.Seek(4, io.SeekStart)
 	if err != nil {
-		return fmt.Errorf("cound not seek to count position: %w", err)
+		return fmt.Errorf("could not seek to count position: %w", err)
 	}
 	// Write the count
 	err = binary.Write(w.dst, binary.LittleEndian, count)
