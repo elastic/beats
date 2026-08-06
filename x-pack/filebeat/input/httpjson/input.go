@@ -234,7 +234,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 	}
-	pagination := newPagination(cfg, client, ctx, log)
+	pagination := newPagination(cfg, client, ctx, log, ctx.Agent.UserAgent)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, ctx, log)
 	requester := newRequester(client, requestFactory, responseProcessor, metrics, ctx, log)
 

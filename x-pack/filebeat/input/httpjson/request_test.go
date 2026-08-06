@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -66,7 +67,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "")
 	assert.NoError(t, err)
-	pagination := newPagination(config, client, noopReporter{}, log)
+	pagination := newPagination(config, client, noopReporter{}, log, "")
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
 
 	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
@@ -96,10 +97,11 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// ignore since has dynamic date and content length values
 	// and is not relevant
 	lastResp.header = nil
-	assert.EqualValues(t,
+	assert.EqualValues(
+		t,
 		&response{
 			page: 0,
-			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z"))),
+			url:  *newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z")),
 			body: mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		},
 		lastResp,
@@ -128,10 +130,11 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	lastResp = trCtx.lastResponse.clone()
 	lastResp.header = nil
-	assert.EqualValues(t,
+	assert.EqualValues(
+		t,
 		&response{
 			page: 0,
-			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z"))),
+			url:  *newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z")),
 			body: mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		},
 		lastResp,
@@ -193,7 +196,6 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			tt.args.cfg.Chain[0].Step = tt.args.step
 			tt.args.cfg.Chain[0].While = tt.args.while
 			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil, "")
@@ -203,7 +205,6 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 				assert.Equal(t, rf.user, user)
 				assert.Equal(t, rf.password, password)
 			}
-
 		})
 	}
 }
@@ -559,6 +560,16 @@ func TestChainStepOriginValidation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPaginationRequestFactorySetsUserAgent(t *testing.T) {
+	const wantUA = "Elastic-Filebeat/9.5.0 (linux; amd64)"
+	u, _ := url.Parse("https://api.example.com/v1/events")
+	rf := newPaginationRequestFactory("GET", "", *u, &mapstr.M{}, nil, nil, nil, noopReporter{}, logptest.NewTestingLogger(t, t.Name()), wantUA)
+
+	req, err := rf.newRequest(emptyTransformContext())
+	require.NoError(t, err)
+	assert.Equal(t, wantUA, req.header().Get("User-Agent"))
 }
 
 func defaultChainConfig() config {
