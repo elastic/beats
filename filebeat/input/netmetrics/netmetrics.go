@@ -26,6 +26,7 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -135,7 +136,10 @@ type netMetrics struct {
 	arrivalPeriod   metrics.Sample     // histogram of the elapsed time between packet arrivals
 	processingTime  metrics.Sample     // histogram of the elapsed time between packet receipt and publication
 	eventsPublished *monitoring.Uint   // number of events published
-	lastPacket      time.Time
+
+	// lastPacketMu guards lastPacket: EventReceived is called concurrently.
+	lastPacketMu sync.Mutex
+	lastPacket   time.Time
 }
 
 func newNetMetrics(reg *monitoring.Registry) netMetrics {
@@ -162,14 +166,15 @@ func (n *netMetrics) EventReceived(len int, timestamp time.Time) {
 		return
 	}
 
+	n.lastPacketMu.Lock()
 	if !n.lastPacket.IsZero() {
 		n.arrivalPeriod.Update(timestamp.Sub(n.lastPacket).Nanoseconds())
 	}
-
 	n.lastPacket = timestamp
+	n.lastPacketMu.Unlock()
 
 	n.packets.Add(1)
-	n.bytes.Add(uint64(len)) // nolint:gosec // length is never negative
+	n.bytes.Add(uint64(len)) //nolint:gosec // length is never negative
 }
 
 // EventPublished updates all metrics related to published events.
@@ -185,23 +190,23 @@ func (n *netMetrics) EventPublished(start time.Time) {
 }
 
 // Registry returns the monitoring registry of the metricset.
-func (m *netMetrics) Registry() *monitoring.Registry {
-	if m == nil {
+func (n *netMetrics) Registry() *monitoring.Registry {
+	if n == nil {
 		return nil
 	}
 
-	return m.monitorRegistry
+	return n.monitorRegistry
 }
 
 // Close closes the metricset and unregister the metrics.
-func (m *netMetrics) Close() {
-	if m == nil {
+func (n *netMetrics) Close() {
+	if n == nil {
 		return
 	}
-	if m.done != nil {
+	if n.done != nil {
 		// Shut down poller and wait until done before unregistering metrics.
-		m.done <- struct{}{}
+		n.done <- struct{}{}
 	}
 
-	m.monitorRegistry = nil
+	n.monitorRegistry = nil
 }
