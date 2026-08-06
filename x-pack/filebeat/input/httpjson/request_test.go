@@ -60,7 +60,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	config := defaultConfig()
 	assert.NoError(t, cfg.Unpack(&config))
 
-	log := logp.NewLogger("")
+	log := logptest.NewTestingLogger(t, "")
 	ctx := context.Background()
 	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	assert.NoError(t, err)
@@ -78,17 +78,17 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// first request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		mapstr.M{"timestamp": "2002-10-02T15:00:00Z"},
 		trCtx.cursorMap(),
 	)
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.firstEvent,
 	)
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.lastEvent,
@@ -143,7 +143,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 	ctx := context.Background()
-	log := logp.NewLogger("")
+	log := logptest.NewTestingLogger(t, "")
 	cfg := defaultChainConfig()
 
 	url, _ := url.Parse("https://example.com")
@@ -213,7 +213,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 	cfg := defaultChainConfig()
 	cfg.Request.URL = &urlConfig{URL: &url.URL{}}
 	ctx := context.Background()
-	log := logp.NewLogger("newChainClientTestLogger")
+	log := logptest.NewTestingLogger(t, "newChainClientTestLogger")
 
 	type args struct {
 		ctx        context.Context
