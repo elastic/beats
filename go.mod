@@ -207,7 +207,7 @@ require (
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/xdg-go/scram v1.2.0
 	github.com/zyedidia/generic v1.2.1
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.2
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.12
 	go.elastic.co/apm/module/apmhttp/v2 v2.7.12
 	go.elastic.co/apm/v2 v2.7.12
 	go.mongodb.org/mongo-driver v1.17.9
