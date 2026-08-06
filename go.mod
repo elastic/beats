@@ -96,15 +96,9 @@ require (
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
-<<<<<<< HEAD
 	github.com/lib/pq v1.10.3
-	github.com/magefile/mage v1.15.0
-	github.com/mattn/go-colorable v0.1.14
-=======
-	github.com/lib/pq v1.10.9
 	github.com/magefile/mage v1.17.2
-	github.com/mattn/go-colorable v0.1.14 // indirect
->>>>>>> 029b7b04f ([Chore] Single source of truth for the golangci-lint version (#52415))
+	github.com/mattn/go-colorable v0.1.14
 	github.com/miekg/dns v1.1.72
 	github.com/moby/moby/v2 v2.0.0-beta.14
 	github.com/osquery/osquery-go v0.0.0-20260226222546-0cc22f415e57
@@ -175,14 +169,9 @@ require (
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
-<<<<<<< HEAD
 	github.com/elastic/ebpfevents v0.9.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.3-0.20260423154939-e990715f9426
-	github.com/elastic/elastic-agent-libs v0.46.1
-=======
-	github.com/elastic/ebpfevents v0.9.1-0.20260727124511-05b78de333fd
 	github.com/elastic/elastic-agent-libs v0.46.3
->>>>>>> 029b7b04f ([Chore] Single source of truth for the golangci-lint version (#52415))
 	github.com/elastic/elastic-agent-system-metrics v0.14.4
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
