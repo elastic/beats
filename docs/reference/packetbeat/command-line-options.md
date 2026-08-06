@@ -368,6 +368,9 @@ These global flags are available whenever you run Packetbeat.
 :   For logging purposes, specifies the environment that Packetbeat is running in. This setting is used to select a default log output when no log output is configured. Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`. If `systemd` or `container` is specified, Packetbeat will log to stdout and stderr by default.
 
 **`--hostname HOSTNAME`**
+```{applies_to}
+stack: ga 9.6+
+```
 :   Sets the hostname reported in `host.name` and `observer.hostname` (when `add_observer_metadata` is configured). Use this when the host cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
 
 **`--path.config`**

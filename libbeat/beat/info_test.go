@@ -33,6 +33,7 @@ func TestSetHostnameOverride(t *testing.T) {
 	SetHostnameOverride("  ")
 	assert.Empty(t, GetHostnameOverride(), "whitespace-only should be treated as empty")
 
+	SetHostnameOverride("foo.bar")
 	SetHostnameOverride("")
 	assert.Empty(t, GetHostnameOverride(), "empty clears the override")
 }
