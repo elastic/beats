@@ -24,6 +24,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -332,6 +333,55 @@ func TestNormalizeValue(t *testing.T) {
 	})
 }
 
+func TestNormalizeInPlace(t *testing.T) {
+	ts := time.Date(2026, 4, 13, 9, 23, 18, 0, time.UTC)
+	input := func() mapstr.M {
+		return mapstr.M{
+			"str":     "value",
+			"dropped": nil,
+			"ts":      ts,
+			"nested":  mapstr.M{"n": 1, "dropped": nil},
+			"list":    []mapstr.M{{"l": "a", "dropped": nil}, nil},
+			"nilList": []mapstr.M(nil),
+			"nilMap":  mapstr.M(nil),
+		}
+	}
+	want := mapstr.M{
+		"str":     "value",
+		"ts":      Time(ts),
+		"nested":  mapstr.M{"n": 1},
+		"list":    []mapstr.M{{"l": "a"}, {}},
+		"nilList": []mapstr.M{},
+		"nilMap":  mapstr.M{},
+	}
+
+	t.Run("copying leaves the input untouched", func(t *testing.T) {
+		in := input()
+		g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
+
+		out := g.Convert(in)
+
+		assert.Equal(t, want, out)
+		assert.Equal(t, input(), in, "Convert must not modify the map it was given")
+
+		nested, ok := out["nested"].(mapstr.M)
+		require.True(t, ok, "nested map must stay a mapstr.M")
+		out["added"] = true
+		nested["added"] = true
+		assert.Equal(t, input(), in, "the converted event must not share maps with the input")
+	})
+
+	t.Run("in place normalizes the input itself", func(t *testing.T) {
+		in := input()
+		g := NewGenericEventConverterInPlace(false, logptest.NewTestingLogger(t, ""))
+
+		out := g.Convert(in)
+
+		assert.Equal(t, want, out)
+		assert.Equal(t, want, in, "NormalizeInPlace must normalize the map it was given")
+	})
+}
+
 func TestNormalizeMapError(t *testing.T) {
 	badInputs := []mapstr.M{
 		{"func": func() {}},
@@ -416,6 +466,52 @@ func TestNormalizeTime(t *testing.T) {
 
 	assert.Equal(t, time.UTC, time.Time(utcCommonTime).Location())
 	assert.True(t, now.Equal(time.Time(utcCommonTime)))
+}
+
+var benchmarkConvertEventResult mapstr.M
+
+// BenchmarkConvertEvent measures normalization of an already-built event.
+func BenchmarkConvertEvent(b *testing.B) {
+	event := mapstr.M{
+		"message": "2026-01-02T03:04:05.000Z INFO [publisher] pipeline/output.go:143 Connecting to backoff(elasticsearch(http://localhost:9200))",
+		"log": mapstr.M{
+			"level":  "info",
+			"logger": "publisher",
+			"offset": 12345,
+			"file":   mapstr.M{"path": "/var/log/filebeat/filebeat.log"},
+		},
+		"host": mapstr.M{
+			"name":         "host-01",
+			"architecture": "x86_64",
+			"ip":           []string{"10.0.0.4", "fe80::1"},
+			"os": mapstr.M{
+				"family": "debian", "kernel": "6.1.0", "name": "Ubuntu",
+				"platform": "ubuntu", "type": "linux", "version": "22.04.3 LTS",
+			},
+		},
+		"agent": mapstr.M{
+			"type": "filebeat", "version": "9.2.0", "name": "host-01",
+			"id": "8a4f500d-a42a-4f1d-b8c9-1a2b3c4d5e6f",
+		},
+		"ecs":    mapstr.M{"version": "8.11.0"},
+		"input":  mapstr.M{"type": "filestream"},
+		"event":  mapstr.M{"dataset": "filebeat.log", "module": "beat"},
+		"labels": mapstr.M{"env": "prod", "team": "platform"},
+	}
+	cases := map[string]func(bool, *logp.Logger) *GenericEventConverter{
+		"copy":     NewGenericEventConverter,
+		"in place": NewGenericEventConverterInPlace,
+	}
+
+	for name, newConverter := range cases {
+		b.Run(name, func(b *testing.B) {
+			g := newConverter(false, logptest.NewTestingLogger(b, ""))
+			b.ReportAllocs()
+			for b.Loop() {
+				benchmarkConvertEventResult = g.Convert(event)
+			}
+		})
+	}
 }
 
 // Uses TextMarshaler interface.
