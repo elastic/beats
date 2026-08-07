@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+
+export GO_VERSION=$(cat .go-version)
+
+# addtional preparation for macos step
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "elastic-agent-system-metrics" && "$BUILDKITE_STEP_KEY" == "macos-test" ]]; then
+    echo "--- prepare env"
+    source .buildkite/scripts/common.sh
+    with_go ${GO_VERSION} ${SETUP_GVM_VERSION}
+fi

@@ -1,0 +1,32 @@
+---
+name: Bump golang version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 20 * * 6'
+
+permissions:
+  pull-requests: write
+  contents: write
+
+env:
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Setup Git
+        uses: elastic/oblt-actions/git/setup@v1
+
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@22fc20fc94d2482874876b66b797e2a4a7178445
+
+      - name: Run Updatecli
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: updatecli apply --config ./.github/workflows/updatecli.d/bump-golang.yml

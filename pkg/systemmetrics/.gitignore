@@ -1,0 +1,54 @@
+# Directories
+/.vagrant
+/.idea
+/.vscode
+/build
+/*/*.template*.json
+**/html_docs
+*beat/fields.yml
+*beat/_meta/kibana.generated
+*beat/build
+*beat/logs
+*beat/data
+x-pack/functionbeat/pkg
+
+metric/system/cgroup/testdata/amzn2
+metric/system/cgroup/testdata/docker
+metric/system/cgroup/testdata/docker2
+metric/system/cgroup/testdata/ubuntu1804
+
+# Files
+.DS_Store
+/beats.iml
+*.dev.yml
+*.generated.yml
+coverage.out
+.python-version
+beat.db
+*.keystore
+go_env.properties
+mage_output_file.go
+x-pack/functionbeat/*/fields.yml
+x-pack/functionbeat/provider/*/functionbeat-*
+x-pack/dockerlogbeat/temproot.tar
+
+# Editor swap files
+*.swp
+*.swo
+*.swn
+
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+*.exe
+*.test
+*.prof
+*.pyc
+
+# Terraform
+*.terraform
+*.tfstate*
+
+# Files generated with the bump version automations
+*.bck
