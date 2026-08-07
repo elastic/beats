@@ -101,11 +101,6 @@ func TestParseInfo(t *testing.T) {
 	}
 }
 
-//go:fix inline
-func pointer[T any](d T) *T {
-	return new(d)
-}
-
 func TestParseClientPolicy(t *testing.T) {
 	sampleClusterName := "TestCluster"
 	sampleUser := "TestUser"

@@ -53,7 +53,7 @@ func TestLiveFilebeatSalesforceModuleSmoke(t *testing.T) {
 
 	apexProbeCfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 		EventLogFile: EventMonitoringConfig{
-			Enabled:  pointer(true),
+			Enabled:  new(true),
 			Interval: time.Hour,
 			Query: &QueryConfig{
 				Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY CreatedDate ASC NULLS FIRST LIMIT 1`),
@@ -74,13 +74,13 @@ func TestLiveFilebeatSalesforceModuleSmoke(t *testing.T) {
 	session := generateLoginActivity(t, creds)
 	waitCfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 		Object: EventMonitoringConfig{
-			Enabled:  pointer(true),
+			Enabled:  new(true),
 			Interval: 5 * time.Minute,
 			Batch: &batchConfig{
-				Enabled:          pointer(true),
+				Enabled:          new(true),
 				InitialInterval:  24 * time.Hour,
 				Window:           12 * time.Hour,
-				MaxWindowsPerRun: pointer(2),
+				MaxWindowsPerRun: new(2),
 			},
 			Query: &QueryConfig{
 				Default: getValueTpl("SELECT FIELDS(STANDARD) FROM LoginEvent ORDER BY EventDate DESC"),

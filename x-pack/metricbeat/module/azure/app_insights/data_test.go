@@ -18,12 +18,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// timePtr is a small helper to take the address of a time.Time literal in test
-// fixtures, mirroring the previous &date.Time{Time: ...} pattern.
-//
-//go:fix inline
-func timePtr(t time.Time) *time.Time { return new(t) }
-
 func newMetricsTest(ts ...*time.Time) []MetricValue {
 	type values struct {
 		SegmentName map[string]string
