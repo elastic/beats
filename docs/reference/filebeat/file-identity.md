@@ -55,10 +55,10 @@ Here is the brief high-level comparison of all currently available options:
 
 | Name | Use case | Pros | Cons |
 |------|----------|------|------|
-| path | Files are never moved or renamed, file names are never re-used. | Simple and fast. | The most unstable option, requires maintaining immutable file paths. |
+| fingerprint (default in Filebeat >= 9.0) | Log files with unique content.<br><br>{applies_to}`stack: ga 9.5+` Log files of any size ([growing fingerprint](#file-identity-fingerprint-growing)).<br><br>{applies_to}`stack: ga 9.0-9.4` Log files larger than the fingerprint size (1 KB by default). | The most stable. Support for any OS, any file system, network shares, containers and VMs.<br><br>{applies_to}`stack: ga 9.5+` Ingests files smaller than the fingerprint size without delay. | Slightly higher CPU / memory usage.<br><br>{applies_to}`stack: ga 9.0-9.4` Doesn't ingest files until they reach the fingerprint size (1 KB by default). |
 | native (default in Filebeat < 9.0) | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device ID` values. No support for network shares, containers or VMs. |
 | inode_marker | Same as `native`, but for environments where the `device ID` changes. | Same as `native` + no dependency on `device ID`. | Can still cause data duplication or data loss due to unstable `inode` values provided by the file system. Also, no support for network shares, containers or VMs. |
-| fingerprint (default in Filebeat >= 9.0) | Log files with unique content.<br><br>{applies_to}`stack: ga 9.5+` Log files of any size ([growing fingerprint](#file-identity-fingerprint-growing)).<br><br>{applies_to}`stack: ga 9.0-9.4` Log files larger than the fingerprint size (1 KB by default). | The most stable. Support for any OS, any file system, network shares, containers and VMs.<br><br>{applies_to}`stack: ga 9.5+` Ingests files smaller than the fingerprint size without delay. | Slightly higher CPU / memory usage.<br><br>{applies_to}`stack: ga 9.0-9.4` Doesn't ingest files until they reach the fingerprint size (1 KB by default). |
+| path | Files are never moved or renamed, file names are never re-used. | Simple and fast. | The most unstable option, requires maintaining immutable file paths. |
 
 ### `path`
 
