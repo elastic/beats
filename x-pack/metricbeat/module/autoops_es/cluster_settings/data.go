@@ -234,7 +234,7 @@ func flattenSettings(metricSetFields mapstr.M) mapstr.M {
 	return result
 }
 
-func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[string]interface{}) error {
+func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[string]any) error {
 	metricSetFields, err := schema.Apply(*settings)
 
 	if err != nil {

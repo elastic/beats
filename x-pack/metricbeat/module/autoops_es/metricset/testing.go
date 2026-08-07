@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package metricset
 
@@ -30,7 +29,7 @@ type FetcherData[T any] struct {
 	MetricSet mb.ReportingMetricSetV2Error
 	Reporter  *mbtest.CapturingReporterV2
 	Server    *httptest.Server
-	Config    map[string]interface{}
+	Config    map[string]any
 
 	// Data read from files
 	ClusterInfo utils.ClusterInfo
@@ -45,8 +44,8 @@ type FetcherCallback[T any] func(t *testing.T, data FetcherData[T])
 
 // Helper function to automatically use the server's URL and just the name as the metricset.
 func UseNamedMetricSet(name string) auto_ops_testing.SetupConfigCallback {
-	return func(server *httptest.Server) map[string]interface{} {
-		return map[string]interface{}{"module": "autoops_es",
+	return func(server *httptest.Server) map[string]any {
+		return map[string]any{"module": "autoops_es",
 			"metricsets": []string{name},
 			"hosts":      []string{server.URL},
 		}
@@ -165,7 +164,7 @@ func CreateClusterInfo(clusterVersion string) utils.ClusterInfo {
 }
 
 // Unravel `mapstr.M.GetValue` without an error response to make it easier to assert
-func GetObjectValue(obj mapstr.M, key string) interface{} {
+func GetObjectValue(obj mapstr.M, key string) any {
 	exists, err := obj.HasKey(key)
 
 	if err != nil {

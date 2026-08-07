@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package component_template
 
@@ -35,7 +34,8 @@ func getMappingObject(t *testing.T, templateName string) string {
 }
 
 func getTemplateResponse(t *testing.T, templateNames []string, ignoredNames []string) []byte {
-	mappings := `{"component_templates":[`
+	var mappings strings.Builder
+	mappings.WriteString(`{"component_templates":[`)
 	added := 0
 
 	for _, name := range templateNames {
@@ -44,13 +44,13 @@ func getTemplateResponse(t *testing.T, templateNames []string, ignoredNames []st
 		}
 
 		if added != 0 {
-			mappings += ","
+			mappings.WriteString(",")
 		}
 
-		mappings += getMappingObject(t, name)
+		mappings.WriteString(getMappingObject(t, name))
 
 		added++
 	}
 
-	return []byte(mappings + "]}")
+	return []byte(mappings.String() + "]}")
 }
