@@ -62,8 +62,11 @@ name: "my-shipper"
 
 
 ### `hostname` [_hostname]
+```{applies_to}
+stack: ga 9.6
+```
 
-{applies_to}`stack: ga 9.6` Sets the hostname the Beat reports in `host.name` and `observer.hostname` (when `add_observer_metadata` is configured). Use this when the Beat cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
+Sets the hostname the Beat reports in `host.name` and `observer.hostname` (when `add_observer_metadata` is configured). Use this when the Beat cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
 
 Example:
 
