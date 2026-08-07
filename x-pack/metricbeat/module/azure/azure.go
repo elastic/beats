@@ -324,12 +324,7 @@ func hasConfigOptions(config []string) bool {
 	if config == nil {
 		return false
 	}
-	for _, group := range config {
-		if group == "" {
-			return false
-		}
-	}
-	return true
+	return !slices.Contains(config, "")
 }
 
 // calculateTimespan returns the start and end times for the metric values given

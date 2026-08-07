@@ -41,7 +41,7 @@ func CancelEvent(event *beat.Event) {
 	}
 }
 
-func SetMeta(event *beat.Event, k string, v interface{}) {
+func SetMeta(event *beat.Event, k string, v any) {
 	if event.Meta == nil {
 		event.Meta = mapstr.M{}
 	}

@@ -102,7 +102,7 @@ func TestDecoding(t *testing.T) {
 					Codec: &decoder.CodecConfig{
 						CSV: &decoder.CSVCodecConfig{
 							Enabled: true,
-							Comma:   ptr[decoder.Rune](' '),
+							Comma:   new((decoder.Rune)(' ')),
 						},
 					},
 				},
@@ -118,7 +118,7 @@ func TestDecoding(t *testing.T) {
 					Codec: &decoder.CodecConfig{
 						CSV: &decoder.CSVCodecConfig{
 							Enabled: true,
-							Comma:   ptr[decoder.Rune](' '),
+							Comma:   new((decoder.Rune)(' ')),
 						},
 					},
 				},
@@ -184,7 +184,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune](' '),
+					Comma:   new((decoder.Rune)(' ')),
 					Comment: '#',
 				},
 			}},
@@ -215,7 +215,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune]('\x00'),
+					Comma:   new((decoder.Rune)('\x00')),
 				},
 			}},
 	},
@@ -273,5 +273,3 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
-
-func ptr[T any](v T) *T { return &v }
