@@ -408,8 +408,13 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 		return err
 	}
 
+	// The reader chain gives each message an unshared field tree. Any reader
+	// that attaches cached maps must clone them before enabling this.
 	client, err := g.pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: newInputACKHandler(g.ackCH),
+		Processing: beat.ProcessingConfig{
+			NormalizeInPlace: true,
+		},
 	})
 	if err != nil {
 		releaseResource(resource)

@@ -56,7 +56,7 @@ func (m *Message) IsEmpty() bool {
 	return false
 }
 
-// AddFields adds fields to the message.
+// AddFields copies top-level entries without cloning nested values.
 func (m *Message) AddFields(fields mapstr.M) {
 	if fields == nil {
 		return
