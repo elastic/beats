@@ -269,6 +269,3 @@ func (n *netflowInput) stop() {
 
 	n.started = false
 }
-
-//go:fix inline
-func boolPtr(b bool) *bool { return new(b) }
