@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build salesforce_live
-// +build salesforce_live
 
 // End-to-end Filebeat module smoke for Salesforce (requires a built x-pack filebeat binary).
 //
@@ -119,7 +118,7 @@ func TestLiveFilebeatSalesforceModuleSmoke(t *testing.T) {
 		}{out, err}
 	}()
 
-	var rows []map[string]interface{}
+	var rows []map[string]any
 	var nLogin, nApex int
 	loginObserved := false
 	lastProgressLog := time.Now()

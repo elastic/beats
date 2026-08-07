@@ -67,7 +67,7 @@ func TestEventMapping(t *testing.T) {
 	// this unusual format.
 	actualUsageDate := float64(20200807)
 	forecastUsageDate := float64(20200808)
-	rows := [][]interface{}{
+	rows := [][]any{
 		{actualCost, actualUsageDate, "Actual", "USD"},
 		{forecastCost, forecastUsageDate, "Forecast", "USD"},
 	}
@@ -207,7 +207,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	})
 
 	t.Run("wrong number of elements in a row", func(t *testing.T) {
-		rows := [][]interface{}{
+		rows := [][]any{
 			{float64(1), float64(2), "Actual", "USD", "UnexpectedValue"},
 		}
 		queryResult := armcostmanagement.QueryResult{
@@ -223,7 +223,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	})
 
 	t.Run("drop rows with a wrong type", func(t *testing.T) {
-		rows := [][]interface{}{
+		rows := [][]any{
 			{float64(1), float64(20220818), "Actual", "USD"}, // good row, this will be mapped as event
 			{42, float64(20220818), "Actual", "USD"},         // wrong cost type
 			{float64(1), 20220818, "Actual", "USD"},          // wrong usage date type
