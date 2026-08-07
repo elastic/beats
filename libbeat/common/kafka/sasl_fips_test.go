@@ -33,4 +33,7 @@ func TestValidate(t *testing.T) {
 
 	cfg.SaslMechanism = saslTypeSCRAMSHA256
 	require.Error(t, cfg.Validate())
+
+	cfg.SaslMechanism = saslTypeOAuthBearer
+	require.NoError(t, cfg.Validate())
 }

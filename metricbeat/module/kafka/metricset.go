@@ -67,9 +67,14 @@ func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, 
 		Sasl:        config.Sasl,
 	}
 
+	broker, err := NewBroker(base.Host(), base.Logger(), cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		broker:        NewBroker(base.Host(), base.Logger(), cfg),
+		broker:        broker,
 	}, nil
 
 }

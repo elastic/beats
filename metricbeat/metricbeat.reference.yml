@@ -479,9 +479,17 @@ metricbeat.modules:
   #username: ""
   #password: ""
 
-  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256, SCRAM-SHA-512, or OAUTHBEARER.
   # Defaults to PLAIN when `username` and `password` are configured.
   #sasl.mechanism: ''
+
+  # Path to a file containing a bearer token (JWT). Required when sasl.mechanism is OAUTHBEARER.
+  #sasl.credentials_path: ''
+
+  # Optional key/value pairs sent in the OAUTHBEARER `ext` field (for example, Confluent Cloud logicalCluster and identityPoolId).
+  #sasl.extensions:
+  #  logicalCluster: ''
+  #  identityPoolId: ''
 
 # Metrics collected from a Kafka broker using Jolokia
 #- module: kafka

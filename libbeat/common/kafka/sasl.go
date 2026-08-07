@@ -25,20 +25,23 @@ import (
 )
 
 type SaslConfig struct {
-	SaslMechanism string `config:"mechanism"`
+	SaslMechanism   string            `config:"mechanism"`
+	CredentialsPath string            `config:"credentials_path"`
+	Extensions      map[string]string `config:"extensions"`
 }
 
 const (
 	saslTypePlaintext   = sarama.SASLTypePlaintext
 	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
 	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
+	saslTypeOAuthBearer = sarama.SASLTypeOAuth
 )
 
-func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
+func (c *SaslConfig) ConfigureSarama(config *sarama.Config) error {
 	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
 	case "":
 		// SASL is not enabled
-		return
+		return nil
 	case saslTypePlaintext:
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
 	case saslTypeSCRAMSHA256:
@@ -49,8 +52,16 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 		config.Net.SASL.Handshake = true
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
 		config.Net.SASL.SCRAMClientGeneratorFunc = scramClient(saslTypeSCRAMSHA512)
+	case saslTypeOAuthBearer:
+		provider, err := newFileTokenProvider(c.CredentialsPath, c.Extensions)
+		if err != nil {
+			return err
+		}
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeOAuth)
+		config.Net.SASL.TokenProvider = provider
 	default:
 		// This should never happen because `SaslMechanism` is checked on `Validate()`, keeping a panic to detect it earlier if it happens.
-		panic(fmt.Sprintf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism))
+		panic(fmt.Sprintf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256|OAUTHBEARER", c.SaslMechanism))
 	}
+	return nil
 }

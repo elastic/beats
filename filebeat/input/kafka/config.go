@@ -20,6 +20,7 @@ package kafka
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -226,7 +227,14 @@ func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Conf
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
-		config.Sasl.ConfigureSarama(k)
+		if err := config.Sasl.ConfigureSarama(k); err != nil {
+			return nil, err
+		}
+	} else if strings.ToUpper(config.Sasl.SaslMechanism) == sarama.SASLTypeOAuth {
+		k.Net.SASL.Enable = true
+		if err := config.Sasl.ConfigureSarama(k); err != nil {
+			return nil, err
+		}
 	}
 
 	// configure client ID
