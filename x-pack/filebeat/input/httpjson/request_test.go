@@ -37,21 +37,21 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	testServer := httptest.NewServer(dateCursorHandler())
 	t.Cleanup(testServer.Close)
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"interval":       1,
 		"request.method": "GET",
 		"request.url":    testServer.URL,
-		"request.transforms": []interface{}{
-			map[string]interface{}{
-				"set": map[string]interface{}{
+		"request.transforms": []any{
+			map[string]any{
+				"set": map[string]any{
 					"target":  "url.params.$filter",
 					"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 					"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 				},
 			},
 		},
-		"cursor": map[string]interface{}{
-			"timestamp": map[string]interface{}{
+		"cursor": map[string]any{
+			"timestamp": map[string]any{
 				"value": `[[index .last_response.body "@timestamp"]]`,
 			},
 		},
@@ -97,7 +97,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// ignore since has dynamic date and content length values
 	// and is not relevant
 	lastResp.header = nil
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&response{
 			page: 0,
@@ -110,19 +110,19 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// second request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		mapstr.M{"timestamp": "2002-10-02T15:00:01Z"},
 		trCtx.cursorMap(),
 	)
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.firstEvent,
 	)
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.lastEvent,
@@ -130,7 +130,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	lastResp = trCtx.lastResponse.clone()
 	lastResp.header = nil
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&response{
 			page: 0,
@@ -247,7 +247,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 }
 
 func Test_evaluateResponse(t *testing.T) {
-	log := logp.NewLogger("newEvaluateResponseTestLogger")
+	log := logptest.NewTestingLogger(t, "newEvaluateResponseTestLogger")
 	responseTrue := bytes.NewBufferString(`{"status": "completed"}`).Bytes()
 	responseFalse := bytes.NewBufferString(`{"status": "initiated"}`).Bytes()
 
@@ -461,7 +461,7 @@ func TestPaginationRejectsCrossOriginURL(t *testing.T) {
 		url:        *base,
 		method:     "GET",
 		originURL:  base,
-		log:        logp.NewLogger("test"),
+		log:        logptest.NewTestingLogger(t, "test"),
 		encoder:    registeredEncoders[""],
 		transforms: []basicTransform{},
 	}

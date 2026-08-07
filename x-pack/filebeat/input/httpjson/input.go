@@ -77,7 +77,7 @@ func (log *retryLogger) Debug(msg string, keysAndValues ...any) {
 	log.log.Debugw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Warn(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Warn(msg string, keysAndValues ...any) {
 	log.log.Warnw(msg, keysAndValues...)
 }
 
@@ -133,11 +133,11 @@ func (m mapstrM) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	return nil
 }
 
-func tryToMapStr(v interface{}) (mapstrM, bool) {
+func tryToMapStr(v any) (mapstrM, bool) {
 	switch m := v.(type) {
 	case mapstrM:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstrM(m), true
 	default:
 		return nil, false
