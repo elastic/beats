@@ -43,14 +43,24 @@ type RegistryEntry struct {
 	Removed  bool
 }
 
-// ReadRegistry reads and returns all entries from the filestream registry log in homeDir.
-// It skips removed entries so only active state is returned.
+// ReadRegistry reads and returns the active entries from the filestream registry
+// log in homeDir. The log is append-only, so this function deduplicates by
+// keeping only the last entry per key. Entries that are explicitly removed
+// (Removed=true) or that carry TTL=0 (marked for pending removal by
+// clean_removed before the cleanup cycle has run) are excluded.
 func ReadRegistry(t *testing.T, homeDir string) []RegistryEntry {
 	t.Helper()
 	entries, _ := readFilestreamRegistryLog(t, RegistryLogPath(homeDir))
-	var out []RegistryEntry
+
+	// Keep only the last entry per key; later writes supersede earlier ones.
+	latest := make(map[string]registryEntry, len(entries))
 	for _, e := range entries {
-		if e.Removed {
+		latest[e.Key] = e
+	}
+
+	var out []RegistryEntry
+	for _, e := range latest {
+		if e.Removed || e.TTL == 0 {
 			continue
 		}
 		out = append(out, RegistryEntry{
@@ -62,6 +72,18 @@ func ReadRegistry(t *testing.T, homeDir string) []RegistryEntry {
 		})
 	}
 	return out
+}
+
+// FindRegistryEntryByFilename returns the first active registry entry whose
+// Filename field matches the given path, and true. Returns a zero value and
+// false if no matching entry is found.
+func FindRegistryEntryByFilename(entries []RegistryEntry, filename string) (RegistryEntry, bool) {
+	for _, e := range entries {
+		if e.Filename == filename {
+			return e, true
+		}
+	}
+	return RegistryEntry{}, false
 }
 
 // AssertLastOffset takes path of the registry file and the expected offset

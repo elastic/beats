@@ -23,7 +23,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -47,10 +46,9 @@ func TestInput(t *testing.T) {
 		}
 	}
 
-	serverAddr := "127.0.0.1:9042"
 	wg := sync.WaitGroup{}
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
-		"host":              serverAddr,
+		"host":              "127.0.0.1:0",
 		"number_of_workers": 2,
 	}))
 	if err != nil {
@@ -60,10 +58,11 @@ func TestInput(t *testing.T) {
 	data := []string{"foo", "bar"}
 
 	ctx, cancel := context.WithCancel(t.Context())
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	v2Ctx := v2.Context{
 		ID:              t.Name(),
 		Cancelation:     ctx,
-		Logger:          logptest.NewTestingLogger(t, ""),
+		Logger:          logger,
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
@@ -78,8 +77,7 @@ func TestInput(t *testing.T) {
 		}
 	})
 
-	// Allow the UDP server to start
-	runtime.Gosched()
+	serverAddr := waitForUDPServerAddress(t, observedLogs)
 	nettest.RunUDPClient(t, serverAddr, data)
 
 	nettest.RequireNetMetricsCount(t, v2Ctx.MetricsRegistry, time.Second, 2, 0, 8)
@@ -184,10 +182,9 @@ func TestInputStopsWhenPipelineIsBlocked(t *testing.T) {
 // (#50718). A panic here would crash the test binary, so simply reaching the
 // end of the test is the assertion.
 func TestInputOversizedDatagram(t *testing.T) {
-	serverAddr := "127.0.0.1:9043"
 	wg := sync.WaitGroup{}
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
-		"host":             serverAddr,
+		"host":             "127.0.0.1:0",
 		"max_message_size": 64,
 	}))
 	if err != nil {
@@ -195,10 +192,11 @@ func TestInputOversizedDatagram(t *testing.T) {
 	}
 
 	ctx, cancel := context.WithCancel(t.Context())
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	v2Ctx := v2.Context{
 		ID:              t.Name(),
 		Cancelation:     ctx,
-		Logger:          logptest.NewTestingLogger(t, ""),
+		Logger:          logger,
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
@@ -213,8 +211,7 @@ func TestInputOversizedDatagram(t *testing.T) {
 		}
 	})
 
-	// Allow the UDP server to start
-	runtime.Gosched()
+	serverAddr := waitForUDPServerAddress(t, observedLogs)
 
 	// A datagram several times larger than max_message_size. It is sent a few
 	// times so a dropped packet on a slow runner doesn't leave the truncation

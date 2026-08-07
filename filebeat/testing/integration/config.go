@@ -51,6 +51,18 @@ type FilestreamOptions struct {
 	NDJSON *NDJSONOptions
 	// Multiline enables multiline log reassembly.
 	Multiline *MultilineOptions
+	// CleanInactive removes registry entries after the file has been inactive for this long.
+	CleanInactive string
+	// CleanRemoved removes registry entries when the file is deleted.
+	CleanRemoved bool
+	// RegistryPath sets the global filebeat.registry.path.
+	// The registry will be written to RegistryPath/filebeat/log.json.
+	RegistryPath string
+	// RegistryCleanupInterval sets filebeat.registry.cleanup_interval, which
+	// controls how often the GC scans for expired clean_inactive entries.
+	// Defaults to 5 minutes when empty; use a short value (e.g. "1s") in tests
+	// that assert on clean_inactive behaviour.
+	RegistryCleanupInterval string
 	// GlobalProcessors is raw YAML inserted as the top-level processors block.
 	// Each entry must be a properly indented YAML list item, e.g.:
 	//   "  - drop_fields:\n      fields: [agent]"
@@ -125,6 +137,12 @@ func FilestreamInputConfig(id, path string, opts FilestreamOptions) string {
 	if opts.MaxBytes > 0 {
 		fmt.Fprintf(&sb, "    max_bytes: %d\n", opts.MaxBytes)
 	}
+	if opts.CleanInactive != "" {
+		fmt.Fprintf(&sb, "    clean_inactive: %s\n", opts.CleanInactive)
+	}
+	if opts.CleanRemoved {
+		fmt.Fprintf(&sb, "    clean_removed: true\n")
+	}
 	if opts.NDJSON != nil {
 		sb.WriteString("    parsers:\n      - ndjson:\n")
 		if opts.NDJSON.MessageKey != "" {
@@ -154,6 +172,13 @@ func FilestreamInputConfig(id, path string, opts FilestreamOptions) string {
 	}
 
 	sb.WriteString("\noutput.console:\n  enabled: true\n")
+
+	if opts.RegistryPath != "" {
+		fmt.Fprintf(&sb, "\nfilebeat.registry.path: %s\n", opts.RegistryPath)
+	}
+	if opts.RegistryCleanupInterval != "" {
+		fmt.Fprintf(&sb, "\nfilebeat.registry.cleanup_interval: %s\n", opts.RegistryCleanupInterval)
+	}
 
 	if opts.GlobalProcessors != "" {
 		fmt.Fprintf(&sb, "\nprocessors:\n%s\n", opts.GlobalProcessors)

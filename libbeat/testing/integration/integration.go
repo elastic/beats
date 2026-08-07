@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os/exec"
 	"regexp"
 	"sync"
@@ -151,6 +152,11 @@ type BeatTest interface {
 
 	// T returns the current testing context.
 	T() *testing.T
+
+	// Stdin returns the write end of the beat's stdin pipe.
+	// Must be called after Start. Returns nil unless StdinEnabled was set in
+	// the options passed to NewBeatTest.
+	Stdin() io.WriteCloser
 }
 
 // ReportOptions describes all reporting options
@@ -466,6 +472,16 @@ func (b *beatTest) PrintExpectations() {
 
 func (b *beatTest) T() *testing.T {
 	return b.t
+}
+
+// Stdin implements the BeatTest interface.
+func (b *beatTest) Stdin() io.WriteCloser {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+	if b.beat == nil {
+		return nil
+	}
+	return b.beat.Stdin()
 }
 
 // lock-free, so it can be used inside a lock

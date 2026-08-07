@@ -46,6 +46,7 @@ var (
 // RunningBeat describes the running Beat binary.
 type RunningBeat struct {
 	c           *exec.Cmd
+	stdin       io.WriteCloser
 	outputRW    sync.RWMutex
 	output      []string
 	outputDone  chan struct{}
@@ -53,6 +54,12 @@ type RunningBeat struct {
 	inspector   OutputInspector
 	keepRunning bool
 	t           *testing.T
+}
+
+// Stdin returns the write end of the beat's standard input pipe.
+// It is nil unless RunBeatOptions.StdinEnabled was set to true.
+func (b *RunningBeat) Stdin() io.WriteCloser {
+	return b.stdin
 }
 
 // CollectOutput returns the last `limit` lines of the currently
@@ -150,6 +157,9 @@ type RunBeatOptions struct {
 	// In this case user controls the runtime through the context
 	// passed in `RunBeat`.
 	KeepRunning bool
+	// StdinEnabled, when true, connects a writable pipe to the beat's stdin.
+	// Retrieve the pipe via RunningBeat.Stdin() after calling RunBeat.
+	StdinEnabled bool
 }
 
 // RunBeat runs a Beat binary with the given config and args.
@@ -201,8 +211,18 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 		return nil
 	}
 
+	var stdin io.WriteCloser
+	if opts.StdinEnabled {
+		stdin, err = c.StdinPipe()
+		if err != nil {
+			t.Fatalf("failed to create the stdin pipe: %s", err)
+			return nil
+		}
+	}
+
 	b := &RunningBeat{
 		c:           c,
+		stdin:       stdin,
 		watcher:     watcher,
 		inspector:   inspector,
 		keepRunning: opts.KeepRunning,

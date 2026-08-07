@@ -59,15 +59,19 @@ type TestOptions struct {
 	Config string
 	// Args sets additional arguments to pass when running the binary.
 	Args []string
+	// StdinEnabled, when true, connects a writable pipe to filebeat's stdin.
+	// Retrieve it via Test.Stdin() after Start is called.
+	StdinEnabled bool
 }
 
 // NewTest creates a new integration test for Filebeat.
 func NewTest(t *testing.T, opts TestOptions) Test {
 	return &test{
 		BeatTest: integration.NewBeatTest(t, integration.BeatTestOptions{
-			Beatname: "filebeat",
-			Config:   opts.Config,
-			Args:     opts.Args,
+			Beatname:     "filebeat",
+			Config:       opts.Config,
+			Args:         opts.Args,
+			StdinEnabled: opts.StdinEnabled,
 		}),
 	}
 }
