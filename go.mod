@@ -33,7 +33,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.53.3
 	github.com/aws/aws-sdk-go-v2/service/rds v1.124.0
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.35.3
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.106.3
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.106.4
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.46.3
 	github.com/aws/aws-sdk-go-v2/service/sts v1.45.3
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
@@ -160,7 +160,7 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.34
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.38
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.39
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.42.3
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.37.3
 	github.com/aws/aws-sdk-go-v2/service/health v1.40.3
