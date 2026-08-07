@@ -35,7 +35,7 @@ var (
 
 // eventMapping maps a subscription to a Metricbeat event using subscriptionsSchema
 // to parse through each subscription under a presumed channel
-func eventMapping(content map[string]interface{}) (mb.Event, error) {
+func eventMapping(content map[string]any) (mb.Event, error) {
 	fields, err := subscriptionsSchema.Apply(content)
 	if err != nil {
 		return mb.Event{}, fmt.Errorf("error applying subscription schema: %w", err)
@@ -70,7 +70,7 @@ type Channel struct {
 	Bytes   int64  `json:"bytes"`
 	LastSeq int64  `json:"last_seq"`
 	// Subscriptions []Subscription `json:"subscriptions,omitempty"`
-	Subscriptions []map[string]interface{} `json:"subscriptions,omitempty"`
+	Subscriptions []map[string]any `json:"subscriptions,omitempty"`
 }
 
 // Channels stores channels related information

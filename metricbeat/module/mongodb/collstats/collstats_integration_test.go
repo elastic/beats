@@ -73,15 +73,15 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "mongodb",
 		"metricsets": []string{"collstats"},
 		"hosts":      []string{host},
 	}
 }
 
-func getConfigWithScale(host string, scale int) map[string]interface{} {
+func getConfigWithScale(host string, scale int) map[string]any {
 	cfg := getConfig(host)
 	cfg["scale"] = scale
 	return cfg
@@ -121,7 +121,6 @@ func TestFetchStandaloneVersions(t *testing.T) {
 	require.NoError(t, err, "resolve working directory")
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run("mongo_"+strings.ReplaceAll(tc.version, ".", "_"), func(t *testing.T) {
 			logIfVerbose(t, "Starting test for MongoDB %s on port %s", tc.version, tc.port)
 
@@ -166,7 +165,7 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			// Wait for container to be healthy
 			logIfVerbose(t, "Waiting for MongoDB to be healthy...")
 			var containerReady bool
-			for i := 0; i < 30; i++ {
+			for range 30 {
 				healthCtx, healthCancel := context.WithTimeout(context.Background(), 10*time.Second)
 				healthCmd := exec.CommandContext(healthCtx, "docker", "ps", "--filter", fmt.Sprintf("name=%s", projectName), "--filter", "health=healthy", "--format", "{{.Names}}") //nolint:gosec // safe integration test
 				output, _ := healthCmd.CombinedOutput()
@@ -313,7 +312,6 @@ func TestFetchShardedMongos(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run("mongo_"+strings.ReplaceAll(tc.version, ".", "_"), func(t *testing.T) {
 			projectName := fmt.Sprintf("mbcollstatssharded%s", strings.ReplaceAll(tc.version, ".", ""))
 			cleanupEnv := buildComposeEnv(projectName, tc.version, "")
@@ -432,21 +430,21 @@ func verifyStandaloneEvents(t *testing.T, events []mb.Event, expectExtendedStats
 	}
 }
 
-func assertPositiveNumber(t *testing.T, value interface{}, msg string) {
+func assertPositiveNumber(t *testing.T, value any, msg string) {
 	t.Helper()
 	number, ok := normalizeNumeric(value)
 	require.Truef(t, ok, "%s must be numeric (got %T)", msg, value)
 	require.Greaterf(t, number, float64(0), "%s must be > 0 (got %v)", msg, value)
 }
 
-func assertNonNegativeNumber(t *testing.T, value interface{}, msg string) {
+func assertNonNegativeNumber(t *testing.T, value any, msg string) {
 	t.Helper()
 	number, ok := normalizeNumeric(value)
 	require.Truef(t, ok, "%s must be numeric (got %T)", msg, value)
 	require.GreaterOrEqualf(t, number, float64(0), "%s must be >= 0 (got %v)", msg, value)
 }
 
-func assertExactNumber(t *testing.T, value interface{}, expected float64, msg string) {
+func assertExactNumber(t *testing.T, value any, expected float64, msg string) {
 	t.Helper()
 	number, ok := normalizeNumeric(value)
 	require.Truef(t, ok, "%s must be numeric (got %T)", msg, value)
@@ -475,7 +473,7 @@ func assertExtendedStatsFields(t *testing.T, stats mapstr.M) {
 	}
 }
 
-func normalizeNumeric(value interface{}) (float64, bool) {
+func normalizeNumeric(value any) (float64, bool) {
 	switch v := value.(type) {
 	case int:
 		return float64(v), true
@@ -719,7 +717,7 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 	return nil
 }
 
-func logIfVerbose(t *testing.T, format string, args ...interface{}) {
+func logIfVerbose(t *testing.T, format string, args ...any) {
 	if !shouldLogVerbose() {
 		return
 	}
