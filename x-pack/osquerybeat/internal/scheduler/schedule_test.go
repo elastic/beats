@@ -335,9 +335,6 @@ func TestRecurrenceSchedule_ExecutionIndex_Weekly(t *testing.T) {
 	assert.Equal(t, 4, n)
 }
 
-//go:fix inline
-func ptr(t time.Time) *time.Time { return new(t) }
-
 func TestRecurrenceSchedule_WeeklyPattern(t *testing.T) {
 	// Every Monday and Wednesday
 	s := &RecurrenceSchedule{RRule: "FREQ=WEEKLY;BYDAY=MO,WE"}

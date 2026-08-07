@@ -11,9 +11,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-//go:fix inline
-func boolPtr(v bool) *bool { return new(v) }
-
 func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 	tests := []struct {
 		name    string
