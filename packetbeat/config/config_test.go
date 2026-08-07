@@ -542,10 +542,3 @@ func configC(a, b *config.C) bool {
 	}
 	return cmp.Equal(ma, mb)
 }
-
-// pointer returns a pointer to val.
-//
-//go:fix inline
-func pointer[T any](val T) *T {
-	return new(val)
-}
