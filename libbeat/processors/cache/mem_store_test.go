@@ -480,4 +480,5 @@ func (s *memStoreSet) has(id string) bool {
 	return ok
 }
 
-func ptrTo[T any](v T) *T { return &v }
+//go:fix inline
+func ptrTo[T any](v T) *T { return new(v) }

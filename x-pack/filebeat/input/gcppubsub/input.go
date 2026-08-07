@@ -66,7 +66,7 @@ func configID(config *conf.C) (string, error) {
 		return tmp.ID, nil
 	}
 
-	var h map[string]interface{}
+	var h map[string]any
 	_ = config.Unpack(&h)
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
@@ -153,7 +153,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 	// Build outlet for events.
 	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
 		EventListener: acker.ConnectionOnly(
-			acker.EventPrivateReporter(func(_ int, privates []interface{}) {
+			acker.EventPrivateReporter(func(_ int, privates []any) {
 				for _, priv := range privates {
 					if msg, ok := priv.(*pubsub.Message); ok {
 						msg.Ack()
@@ -171,7 +171,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.
-			EventNormalization: boolPtr(false),
+			EventNormalization: new(false),
 		},
 	})
 	if err != nil {
@@ -397,4 +397,6 @@ func (t userAgentDecorator) RoundTrip(r *http.Request) (*http.Response, error) {
 }
 
 // boolPtr returns a pointer to b.
-func boolPtr(b bool) *bool { return &b }
+//
+//go:fix inline
+func boolPtr(b bool) *bool { return new(b) }

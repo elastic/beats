@@ -361,7 +361,8 @@ func TestErrIsItemFound(t *testing.T) {
 	}
 }
 
-func ptr[T any](v T) *T { return &v }
+//go:fix inline
+func ptr[T any](v T) *T { return new(v) }
 
 func testSetupStore(t *testing.T, path string) *kvstore.Store {
 	t.Helper()
