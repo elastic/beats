@@ -64,6 +64,45 @@ func TestInitResourcesForBatch(t *testing.T) {
 	})
 }
 
+func TestGroupAndStoreMetrics(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	t.Run("metrics with different dimension values are placed in separate groups", func(t *testing.T) {
+		client := NewMockBatchClient(logger)
+		referenceTime := time.Now().UTC()
+
+		metrics := []Metric{
+			{
+				ResourceId:     "resourceId1",
+				ResourceSubId:  "resourceId1",
+				Namespace:      "Microsoft.Storage/storageAccounts/blobServices",
+				Names:          []string{"Transactions"},
+				Aggregations:   "Total",
+				TimeGrain:      "PT1M",
+				Location:       "West Europe",
+				SubscriptionId: "subscription",
+				Dimensions:     []Dimension{{Name: "ResponseType", Value: "Success"}},
+			},
+			{
+				ResourceId:     "resourceId1",
+				ResourceSubId:  "resourceId1",
+				Namespace:      "Microsoft.Storage/storageAccounts/blobServices",
+				Names:          []string{"Transactions"},
+				Aggregations:   "Total",
+				TimeGrain:      "PT1M",
+				Location:       "West Europe",
+				SubscriptionId: "subscription",
+				Dimensions:     []Dimension{{Name: "ResponseType", Value: "ServerError"}},
+			},
+		}
+
+		store := make(map[ResDefGroupingCriteria]*MetricStore)
+		client.GroupAndStoreMetrics(metrics, referenceTime, store)
+
+		require.Len(t, store, 2, "metrics with different dimension values must be in separate groups")
+	})
+}
+
 func TestGetMetricsInBatch(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	client := NewMockBatchClient(logger)
