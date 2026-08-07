@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/beats/v7/libbeat/vault"
 )
 
 // HBRunnerFactory is used for validating generated configurations and creating
@@ -142,6 +143,15 @@ func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
 	// Only for backwards-compatible monitors.d loading
 	c, err := stdfields.UnnestStream(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// Resolve any per-monitor HashiCorp Vault connection: expands
+	// ${vault/<path>#<field>} references using a process-wide, cached Vault
+	// client (built once and shared across all monitors) and strips the `vault`
+	// field so the monitor plugin never sees it.
+	c, err = vault.ResolveConfig(c, f.logger)
 	if err != nil {
 		return nil, err
 	}
