@@ -19,6 +19,7 @@ package consumergroup
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
@@ -90,6 +91,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		"address": broker.AdvertisedAddr(),
 	}
 
+	var eventCount int
 	emitEvent := func(event mapstr.M) {
 		// Helpful IDs to avoid scripts on queries
 		partitionTopicID := fmt.Sprintf("%d-%s", event["partition"], event["topic"])
@@ -111,10 +113,20 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			ModuleFields:    moduleFields,
 			MetricSetFields: event,
 		})
+		eventCount++
 	}
+
+	fetchStart := time.Now()
 	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred(), m.Logger())
+	fetchElapsed := time.Since(fetchStart)
 	if err != nil {
-		return fmt.Errorf("error in fetch: %w", err)
+		return fmt.Errorf("error in fetch (took %v): %w", fetchElapsed, err)
+	}
+
+	if eventCount == 0 {
+		m.Logger().Warnf("consumergroup fetch completed in %v but emitted 0 events", fetchElapsed)
+	} else {
+		m.Logger().Debugf("consumergroup fetch completed in %v, emitted %d events", fetchElapsed, eventCount)
 	}
 
 	return nil
