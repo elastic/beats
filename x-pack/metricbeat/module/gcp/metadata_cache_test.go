@@ -221,10 +221,3 @@ func TestCacheRegistry_TypedCaches(t *testing.T) {
 	assert.True(t, found)
 	assert.Equal(t, dataprocCluster, retrievedCluster)
 }
-
-// Helper function for string pointers
-//
-//go:fix inline
-func stringPtr(s string) *string {
-	return new(s)
-}

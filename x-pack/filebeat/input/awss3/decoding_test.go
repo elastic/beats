@@ -273,6 +273,3 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
-
-//go:fix inline
-func ptr[T any](v T) *T { return new(v) }
