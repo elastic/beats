@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package license
 
@@ -23,7 +22,7 @@ var (
 )
 
 func TestSuccessfulFetch(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/license.valid*.json", setupSuccessfulServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[map[string]interface{}]) {
+	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/license.valid*.json", setupSuccessfulServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[map[string]any]) {
 		require.NoError(t, data.Error)
 
 		require.Equal(t, 1, len(data.Reporter.GetEvents()))
