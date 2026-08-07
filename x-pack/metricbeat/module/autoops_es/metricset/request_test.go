@@ -12,13 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Helper function to get a pointer to a string.
-//
-//go:fix inline
-func stringPtr(s string) *string {
-	return new(s)
-}
-
 func TestGetCloudConnectedModeAPIURL(t *testing.T) {
 	testCases := []struct {
 		name        string
