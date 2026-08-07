@@ -1,0 +1,7 @@
+kind: enhancement
+
+summary: Add sticky partition rebalance strategy to Kafka input.
+
+component: filebeat
+
+pr: https://github.com/elastic/beats/pull/50900
