@@ -20,7 +20,7 @@
 package state
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -42,7 +42,7 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
+		input, err := os.ReadFile(f)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
@@ -62,7 +62,7 @@ func TestUuidFromEsOutput(t *testing.T) {
 		Beat: "testbeat",
 	}
 
-	input, err := ioutil.ReadFile("./_meta/test/uuid_es_output.json")
+	input, err := os.ReadFile("./_meta/test/uuid_es_output.json")
 	require.NoError(t, err)
 
 	err = eventMapping(reporter, info, input, true)
@@ -86,7 +86,7 @@ func TestNoEventIfEsOutputButNoUuidYet(t *testing.T) {
 		Beat: "testbeat",
 	}
 
-	input, err := ioutil.ReadFile("./_meta/test/uuid_es_output_pre_connect.json")
+	input, err := os.ReadFile("./_meta/test/uuid_es_output_pre_connect.json")
 	require.NoError(t, err)
 
 	err = eventMapping(reporter, info, input, true)
@@ -103,7 +103,7 @@ func TestUuidFromMonitoringConfig(t *testing.T) {
 		Beat: "testbeat",
 	}
 
-	input, err := ioutil.ReadFile("./_meta/test/uuid_monitoring_config.json")
+	input, err := os.ReadFile("./_meta/test/uuid_monitoring_config.json")
 	require.NoError(t, err)
 
 	err = eventMapping(reporter, info, input, true)
@@ -127,7 +127,7 @@ func TestNoUuidInMonitoringConfig(t *testing.T) {
 		Beat: "testbeat",
 	}
 
-	input, err := ioutil.ReadFile("./_meta/test/uuid_no_monitoring_config.json")
+	input, err := os.ReadFile("./_meta/test/uuid_no_monitoring_config.json")
 	require.NoError(t, err)
 
 	err = eventMapping(reporter, info, input, true)

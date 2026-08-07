@@ -81,7 +81,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 }
 
 func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.PipelineState, overrideClusterUUID string, isXpack bool) error {
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Logstash Node API response: %w", err)

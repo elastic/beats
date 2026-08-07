@@ -155,8 +155,8 @@ func TestGetAllIndices(t *testing.T) {
 }
 
 // GetConfig returns config for elasticsearch module
-func getConfigForMetricset(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfigForMetricset(metricset string, host string) map[string]any {
+	return map[string]any{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{metricset},
 		"hosts":                      []string{host},
@@ -164,8 +164,8 @@ func getConfigForMetricset(metricset string, host string) map[string]interface{}
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": metricSets,
 		"hosts":      []string{host},
@@ -386,7 +386,7 @@ func checkCCRStatsExists(host string) (bool, error) {
 
 	var data struct {
 		FollowStats struct {
-			Indices []map[string]interface{} `json:"indices"`
+			Indices []map[string]any `json:"indices"`
 		} `json:"follow_stats"`
 	}
 	err = json.Unmarshal(body, &data)
