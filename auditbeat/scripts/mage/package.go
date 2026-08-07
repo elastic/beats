@@ -71,7 +71,7 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 			}
 
 			// Origin rule file.
-			params := map[string]interface{}{"ArchBits": archBits}
+			params := map[string]any{"ArchBits": archBits}
 			origin := devtools.OSSBeatDir(
 				"module/auditd/_meta/audit.rules.d",
 				spec.MustExpand("sample-rules-linux-{{call .ArchBits .GOARCH}}bit.conf", params),

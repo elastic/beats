@@ -20,6 +20,7 @@
 package decoder
 
 import (
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -258,8 +259,8 @@ func TestFragment(t *testing.T) {
 		d, tcp, udp := newTestDecoder(t)
 
 		// Reverse the order of the packets.
-		for i := len(packets) - 1; i >= 0; i-- {
-			p := packets[i]
+		for _, v := range slices.Backward(packets) {
+			p := v
 			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 		}
 

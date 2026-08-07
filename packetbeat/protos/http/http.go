@@ -22,8 +22,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"maps"
 	"net"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -132,14 +134,14 @@ func New(
 }
 
 //go:inline
-func (p *httpPlugin) debugf(format string, args ...interface{}) {
+func (p *httpPlugin) debugf(format string, args ...any) {
 	if p.isDebug {
 		p.httpLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
-func (p *httpPlugin) detailedf(format string, args ...interface{}) {
+func (p *httpPlugin) detailedf(format string, args ...any) {
 	if p.isDetail {
 		p.httpDetailedLogger.Debugf(format, args...)
 	}
@@ -647,7 +649,7 @@ func (http *httpPlugin) publishTransaction(event beat.Event) {
 }
 
 func (http *httpPlugin) collectHeaders(m *message) mapstr.M {
-	hdrs := map[string]interface{}{}
+	hdrs := map[string]any{}
 
 	hdrs["content-length"] = m.contentLength
 	if len(m.contentType) > 0 {
@@ -694,8 +696,8 @@ func decodeBody(body []byte, encodings []string, maxSize int, logger *logp.Logge
 	if logger.IsDebug() {
 		logger.Debugf("decoding body with encodings=%v", encodings)
 	}
-	for idx := len(encodings) - 1; idx >= 0; idx-- {
-		format := encodings[idx]
+	for idx, v := range slices.Backward(encodings) {
+		format := v
 		body, err = decodeHTTPBody(body, format, maxSize)
 		if err != nil {
 			// Do not output a partial body unless failure occurs on the
@@ -712,8 +714,8 @@ func decodeBody(body []byte, encodings []string, maxSize int, logger *logp.Logge
 func splitCookiesHeader(headerVal string) map[string]string {
 	cookies := map[string]string{}
 
-	cstring := strings.Split(headerVal, ";")
-	for _, cval := range cstring {
+	cstring := strings.SplitSeq(headerVal, ";")
+	for cval := range cstring {
 		cookie := strings.SplitN(cval, "=", 2)
 		if len(cookie) == 2 {
 			cookies[strings.ToLower(strings.TrimSpace(cookie[0]))] = parseCookieValue(strings.TrimSpace(cookie[1]))
@@ -789,11 +791,7 @@ func (http *httpPlugin) hideHeaders(m *message) {
 
 			endOfHeader := bytes.Index(msg[authHeaderStartX:], constCRLF)
 			if endOfHeader >= 0 {
-				authHeaderEndX = authHeaderStartX + endOfHeader
-
-				if authHeaderEndX > limit {
-					authHeaderEndX = limit
-				}
+				authHeaderEndX = min(authHeaderStartX+endOfHeader, limit)
 
 				http.debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
 
@@ -849,9 +847,7 @@ func (http *httpPlugin) extractParameters(m *message) (path string, params strin
 			return
 		}
 
-		for key, value := range http.hideSecrets(values) {
-			paramsMap[key] = value
-		}
+		maps.Copy(paramsMap, http.hideSecrets(values))
 	}
 
 	params = paramsMap.Encode()
@@ -860,12 +856,7 @@ func (http *httpPlugin) extractParameters(m *message) (path string, params strin
 }
 
 func (http *httpPlugin) isSecretParameter(key string) bool {
-	for _, keyword := range http.hideKeywords {
-		if strings.ToLower(key) == keyword {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(http.hideKeywords, strings.ToLower(key))
 }
 
 func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
@@ -935,10 +926,10 @@ func extractBasicAuthUser(headers map[string]common.NetString) string {
 	}
 
 	cs := string(c)
-	s := strings.IndexByte(cs, ':')
-	if s < 0 {
+	before, _, ok := strings.Cut(cs, ":")
+	if !ok {
 		return ""
 	}
 
-	return cs[:s]
+	return before
 }
