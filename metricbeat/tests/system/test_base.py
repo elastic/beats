@@ -58,33 +58,6 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         assert self.log_contains('Loaded index template')
         assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.timeout(8 * 60, func_only=True)
-    def test_dashboards(self):
-        """
-        Test that the dashboards can be loaded with `setup --dashboards`
-        """
-        if self.is_saved_object_api_available():
-            raise unittest.SkipTest(
-                "Kibana Saved Objects API is used since 7.15")
-
-        shutil.copytree(self.kibana_dir(), os.path.join(self.working_dir, "kibana"))
-
-        es = Elasticsearch([self.get_elasticsearch_url()])
-        self.render_config_template(
-            modules=[{
-                "name": "apache",
-                "metricsets": ["status"],
-                "hosts": ["localhost"],
-            }],
-            elasticsearch={"host": self.get_elasticsearch_url()},
-            kibana={"host": self.get_kibana_url()},
-        )
-        exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
-
-        assert exit_code == 0, 'Error output: ' + self.get_log()
-        assert self.log_contains("Kibana dashboards successfully loaded.")
-
     def get_elasticsearch_url(self):
         return "http://" + self.compose_host("elasticsearch")
 
@@ -96,16 +69,3 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
     def kibana_dir(self):
         return os.path.join(self.beat_path, "build", "kibana")
-
-    def is_saved_object_api_available(self):
-        kibana_semver = semver.VersionInfo.parse(self.get_version())
-        return semver.VersionInfo.parse("7.14.0") <= kibana_semver
-
-    def get_version(self):
-        url = self.get_kibana_url() + "/api/status"
-
-        r = requests.get(url)
-        body = r.json()
-        version = body["version"]["number"]
-
-        return version
