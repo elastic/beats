@@ -1,0 +1,25 @@
+kind: bug-fix
+
+# Change summary; a 80ish characters long description of the change.
+summary: Bake Synthetics browser binaries into the heartbeat Docker image
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: |
+  npm 12 no longer runs a dependency's `install` lifecycle script during `npm i` by
+  default, so the transitive playwright-chromium `install` hook that used to download
+  the Playwright browsers into the heartbeat image during build stopped running. As a
+  result the image shipped with no browsers and all Synthetics browser monitors failed
+  with "browserType.launch: Executable doesn't exist at
+  .../chromium_headless_shell-<rev>/...". The image build now installs the browsers
+  explicitly with the bundled Playwright CLI after `npm i`, independent of npm's
+  install-script policy.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: heartbeat
+
+# PR URL; optional; the PR number that added the changeset.
+# pr: https://github.com/owner/repo/1234
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+issue: https://github.com/elastic/beats/issues/52439

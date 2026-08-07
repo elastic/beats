@@ -67,6 +67,53 @@ func TestMessageBufferAddLine(t *testing.T) {
 	}
 }
 
+func TestMessageBufferPrivate(t *testing.T) {
+	testcases := map[string]struct {
+		messages []reader.Message
+		expected any
+	}{
+		"preserves nil private value when no source message sets it": {
+			messages: []reader.Message{
+				{Content: []byte("line1"), Bytes: 5},
+				{Content: []byte("line2"), Bytes: 5},
+			},
+			expected: nil,
+		},
+		"preserves private value for one source message": {
+			messages: []reader.Message{
+				{Content: []byte("line1"), Bytes: 5, Private: "cursor-1"},
+			},
+			expected: "cursor-1",
+		},
+		"aggregates private values for multiple source messages": {
+			messages: []reader.Message{
+				{Content: []byte("line1"), Bytes: 5, Private: "cursor-1"},
+				{Content: []byte("line2"), Bytes: 5, Private: "cursor-2"},
+				{Content: []byte("line3"), Bytes: 5, Private: "cursor-3"},
+			},
+			expected: []any{"cursor-1", "cursor-2", "cursor-3"},
+		},
+	}
+
+	for name, test := range testcases {
+		t.Run(name, func(t *testing.T) {
+			buf := newMessageBuffer(1024, 5, []byte("\n"), false)
+			for _, message := range test.messages {
+				buf.addLine(message)
+			}
+
+			msg := buf.finalize()
+			assert.Equal(
+				t,
+				test.expected,
+				msg.Private,
+				"Private should preserve scalar values for one source "+
+					"message and aggregate multiple source messages",
+			)
+		})
+	}
+}
+
 func TestFinalizeMessage(t *testing.T) {
 	testcases := map[string]struct {
 		maxBytes int
