@@ -5,14 +5,7 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/51969
       issue: []
       impact: ""
       action: ""
@@ -25,14 +18,7 @@ entries:
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52130
       issue: []
       impact: ""
       action: ""
@@ -45,14 +31,7 @@ entries:
       description: ""
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52063
       issue: []
       impact: ""
       action: ""
@@ -84,14 +63,7 @@ entries:
         and clears Degraded only when the specific causing condition resolves.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/51997
       issue:
         - https://github.com/elastic/beats/issues/51692
       impact: ""
@@ -105,14 +77,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52025
       issue: []
       impact: ""
       action: ""
@@ -125,14 +90,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52345
       issue:
         - https://github.com/elastic/beats/issues/51981
       impact: ""
@@ -163,14 +121,7 @@ entries:
         from listing results when the backup destination is the same bucket.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52169
       issue: []
       impact: ""
       action: ""
@@ -196,14 +147,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52046
       issue: []
       impact: ""
       action: ""
@@ -230,14 +174,7 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52093
       issue: []
       impact: ""
       action: ""
@@ -250,14 +187,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52172
       issue: []
       impact: ""
       action: ""
@@ -270,14 +200,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52166
       issue: []
       impact: ""
       action: ""
@@ -304,14 +227,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52113
       issue:
         - https://github.com/elastic/sdh-beats/issues/7332
       impact: ""
@@ -339,14 +255,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52204
       issue: []
       impact: ""
       action: ""
@@ -359,14 +268,7 @@ entries:
       description: The Azure module now derives the full cloud configuration (ARM token audience, metrics batch API endpoint and audience) from resource_manager_endpoint. Previously the monitor metricset silently ignored resource_manager_audience, always requesting public-cloud tokens, the billing metricset mutated the SDK's global cloud configuration, and the metrics batch API endpoint was hardcoded to the public cloud.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52434
       issue: []
       impact: ""
       action: ""
@@ -379,14 +281,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52239
       issue: []
       impact: ""
       action: ""
@@ -399,14 +294,7 @@ entries:
       description: The journald input passed `--facility` to journalctl unconditionally, but the flag only exists on journalctl >= 245, so on older systems (e.g. RHEL 8) configurations with `facilities` set collected no events. Facilities are now passed as SYSLOG_FACILITY matches, which are supported on every version and are what `--facility` translates to internally.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52250
       issue: []
       impact: ""
       action: ""
@@ -419,14 +307,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52287
       issue: []
       impact: ""
       action: ""
@@ -439,14 +320,7 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52427
       issue: []
       impact: ""
       action: ""
@@ -467,14 +341,7 @@ entries:
         install-script policy.
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/52456
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52505
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52511
-        - https://github.com/elastic/beats/pull/52512
-        - https://github.com/elastic/beats/pull/52513
-        - https://github.com/elastic/beats/pull/52520
+        - https://github.com/elastic/beats/pull/52445
       issue:
         - https://github.com/elastic/beats/issues/52439
       impact: ""
