@@ -360,9 +360,9 @@ func TestWIITokenSourcePicksUpRotatedCert(t *testing.T) {
 	rotated := newWIITestPKI(t)
 	// The rotated client cert is signed by a different CA the server does not trust,
 	// so the next fetch must fail — proving the cert is re-read from disk per fetch.
-	certPEM, err := os.ReadFile(rotated.certPath)
+	certPEM, err := os.ReadFile(rotated.certPath) //nolint:gosec // G703: test-owned temp file
 	require.NoError(t, err)
-	keyPEM, err := os.ReadFile(rotated.keyPath)
+	keyPEM, err := os.ReadFile(rotated.keyPath) //nolint:gosec // G703: test-owned temp file
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(pki.certPath, certPEM, 0o600))
 	require.NoError(t, os.WriteFile(pki.keyPath, keyPEM, 0o600))
