@@ -257,10 +257,7 @@ func handshakePayload(secLayer byte, maxSize uint32, authzid []byte) []byte {
 	var truncatedSize uint32
 	if selectedSecurity != 0 {
 		// Only 3 bytes available for max size, set to 0x00FFFFFF per RFC 4752.
-		truncatedSize = 0b00000000_11111111_11111111_11111111
-		if truncatedSize > maxSize {
-			truncatedSize = maxSize
-		}
+		truncatedSize = min(0b00000000_11111111_11111111_11111111, maxSize)
 	}
 	payload := make([]byte, 4, 4+len(authzid))
 	binary.BigEndian.PutUint32(payload, truncatedSize)
