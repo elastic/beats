@@ -227,8 +227,3 @@ func TestRRuleScheduleConfig_ParseDates(t *testing.T) {
 		assert.Nil(t, parsed)
 	})
 }
-
-//go:fix inline
-func intPtr(i int) *int {
-	return new(i)
-}

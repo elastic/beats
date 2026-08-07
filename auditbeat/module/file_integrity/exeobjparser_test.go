@@ -180,15 +180,6 @@ func approxSections(tol float64) func(a, b any) bool {
 	}
 }
 
-//go:fix inline
-func strPtr(s string) *string { return new(s) }
-
-//go:fix inline
-func float64Ptr(f float64) *float64 { return new(f) }
-
-//go:fix inline
-func uint64Ptr(u uint64) *uint64 { return new(u) }
-
 func (o objSection) String() string {
 	name := "<nil>"
 	if o.Name != nil {

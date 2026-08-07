@@ -357,11 +357,6 @@ func TestGetAuthToken(t *testing.T) {
 	}
 }
 
-//go:fix inline
-func boolPtr(b bool) *bool {
-	return new(b)
-}
-
 // testOktaJWKJSON is a JWK JSON obtained from the Okta integration.
 const testOktaJWKJSON = `{ "d": "Cmhokw2MnZfX6da36nnsnQ7IPX9vE6se8_D1NgyL9j9rarYpexhlp45hswcAIFNgWA03NV848Gc0e84AW6wMbyD2E8LPI0Bd8lhdmzRE6L4or2Rxqqjk2Pr2aqGnqs4A0uTijAA7MfPF1zFFdR3EOVx499fEeTiMcLjO83IJCoNiOySDoQgt3KofX5bCbaDy2eiB83rzf0fEcWrWfTY65_Hc2c5lek-1uuF7NpELVzX80p5H-b9MOfLn0BdOGe-mJ2j5bXi-UCQ45Wxj2jdkoA_Qwb4MEtXZjp5LjcM75SrlGfVd99acML2wGZgYLGweJ0sAPDlKzGvj4ve-JT8nNw", "p": "8-UBb4psN0wRPktkh3S48L3ng4T5zR08t7nwXDYNajROrS2j7oq60dtlGY4IwgwcC0c9GDQP7NiN2IpU2uahYkGQ7lDyM_h7UfQWL5fMrsYiKgn2pUgSy5TTT8smkSLbJAD35nAH6PknsQ2PuvOlb4laiC0MXw1Rw4vT9HAEB9M", "q": "0DJkPEN0bECG_6lorlNJgIfoNahVevGKK-Yti1YZ5K-nQCuffPCwPG0oZZo_55y5LODe9W7psxnAt7wxkpAY4lK2hpHTWJSkPjqXWFYIP8trn4RZDShnJXli0i1XqPOqkiVzBZGx5nLtj2bUtmXfIU7-kneHGvLQ5EXcyQW1ISM", "dp": "Ye1PWEPSE5ndSo_m-2RoZXE6pdocmrjkijiEQ-IIHN6HwI0Ux1C4lk5rF4mqBo_qKrUd2Lv-sPB6c7mHPKVhoxwEX0vtE-TvTwacadufeYVgblS1zcNUmJ1XAzDkeV3vc1NYNhRBeM-hmjuBvGTbxh72VLsRvpCQhd186yaW17U", "dq": "jvSK7vZCUrJb_-CLCGgX6DFpuK5FQ43mmg4K58nPLb-Oz_kkId4CpPsu6dToXFi4raAad9wYi-n68i4-u6xF6eFxgyVOQVyPCkug7_7i2ysKUxXFL8u2R3z55edMca4eSQt91y0bQmlXxUeOd0-rzms3UcrQ8igYVyXBXCaXIJE", "qi": "iIY1Y4bzMYIFG7XH7gNP7C-mWi6QH4l9aGRTzPB_gPaFThvc0XKW0S0l82bfp_PPPWg4D4QpDCp7rZ6KhEA8BlNi86Vt3V6F3Hz5XiDa4ikgQNsAXiXLqf83R-y1-cwHjW70PP3U89hmalCRRFfVXcLHV77AVHqbrp9rAIo-X-I", "kty": "RSA", "e": "AQAB", "kid": "koeFQjkyiav_3Qwr3aRinCqCD2LaEHOjFnje7XlkbdI", "n": "xloTY8bAuI5AEo8JursCd7w0LmELCae7JOFaVo9njGrG8tRNqgIdjPyoGY_ABwKkmjcCMLGMA29llFDbry8rB4LTWai-h_jX4_uUUnl52mLX-lO6merL5HEPZF438Ql9Hrxs5yGzT8n865-E_3uwYSBrhTjvlZJeXYUeVHfKo8pJSSsw3RZEjBW4Tt0eFmCZnFErtTyk3oUPaYVP-8YLLAenhUDV4Lm1dC4dxqUj0Oh6XrWgIb-eYHGolMY9g9xbgyd4ir39RodA_1DOjzHWpNfCM-J5ZOtfpuKCAe5__u7L8FT0m56XOxcDoVVsz1J1VNrACWAGbhDWNjyHfL5E2Q" }`
 
