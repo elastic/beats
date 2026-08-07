@@ -1,0 +1,485 @@
+version: 8.19.20
+entries:
+    - kind: enhancement
+      summary: Use native Go for Linux FIPS builds
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781782084
+      file:
+        name: 1781782084-use-native-go-for-linux-fips-builds.yaml
+        checksum: a0d19fe8ee561496dba68dd092d48ed3a7e7060a
+    - kind: security
+      summary: Reject CPIO entries in macOS .pkg payloads whose paths escape the destination directory, preventing path traversal during extraction (CWE-22).
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782484560
+      file:
+        name: 1782484560-osquerybeat-pkg-path-traversal.yaml
+        checksum: 22e68720d3ef38d147eae8f26a9e7e3e31cd2357
+    - kind: enhancement
+      summary: update quark to 0.6.0
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783413804
+      file:
+        name: 1783413804-auditbeat-quark-0.6.yaml
+        checksum: 44809fab6ae36a2c7b4a20ea77ee190b6fe9939e
+    - kind: bug-fix
+      summary: Synchronize Filebeat Run and Shutdown functions.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51800
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783461968
+      file:
+        name: 1783461968-filebeat-sync-run-and-shutdown-functions.yaml
+        checksum: ec0b857df9dfb4307ee8a939bfc35b03785729ae
+    - kind: enhancement
+      summary: Aggregate SQS mode health status to reduce false Degraded/Healthy transitions.
+      description: |
+        Replace scattered per-event status reporting in the aws-s3 SQS input with a
+        centralized health aggregator. The input now stays Running while making forward
+        progress despite bounded retryable failures, reports Degraded only for sustained
+        conditions needing operator action (persistent receive failures, delete/finalize
+        errors, poison-pill messages), filters out context.Canceled from shutdown/reload,
+        and clears Degraded only when the specific causing condition resolves.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue:
+        - https://github.com/elastic/beats/issues/51692
+      impact: ""
+      action: ""
+      timestamp: 1783548970
+      file:
+        name: 1783548970-sqs-health-status-aggregation.yaml
+        checksum: 2c5deb9dc74399feb8c817036332196c94a92b97
+    - kind: enhancement
+      summary: Add configurable User-Agent header to the CrowdStrike streaming input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783565292
+      file:
+        name: 1783565292-streaming-user-agent.yaml
+        checksum: fa50776d27e9f9a77f906df3730a534a576a2569
+    - kind: bug-fix
+      summary: Fix offset commits when using multiline in Journald and Kafka inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue:
+        - https://github.com/elastic/beats/issues/51981
+      impact: ""
+      action: ""
+      timestamp: 1783624000
+      file:
+        name: 1783624000-fix-multiline-registry-update.yaml
+        checksum: d98b28ea6dffb7335b4fb70aee7c15ce781ad32e
+    - kind: bug-fix
+      summary: Prevent statestore startup failure when meta.json is left empty after an unclean shutdown
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51897
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783957443
+      file:
+        name: 1783957443-statestore-atomic-create-meta.json.yaml
+        checksum: 1e507904f5ef0c6aa605cf1458abe4ae3bb1c3d7
+    - kind: bug-fix
+      summary: Fix S3 polling input to exclude same-bucket backup objects from listing.
+      description: |
+        When same-bucket backup is configured with the default empty
+        bucket_list_prefix, backup objects are listed alongside source objects
+        and reprocessed indefinitely. Exclude keys matching the backup prefix
+        from listing results when the backup destination is the same bucket.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783988471
+      file:
+        name: 1783988471-exclude-backup-prefix-from-polling.yaml
+        checksum: 45cfd02c5ad599e0e059fca02ffea159d7233b03
+    - kind: bug-fix
+      summary: update elastic-agent-libs to v0.46.1
+      description: Fixed an issue where malformed TLS keys could be printed in the error logs during loading failures.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51921
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784030419
+      file:
+        name: 1784030419-update-elastic-agent-libs-to-v0.46.1.yaml
+        checksum: 322dd3d0f59846ea4895cd68e0a630e75f5ebbf6
+    - kind: bug-fix
+      summary: Fix panic with multiple heartbeat receivers
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784110000
+      file:
+        name: 1784110000-hbreceiver-arm64-seccomp-reregistration.yaml
+        checksum: bf9435850d2acb3e31568ed917ca4617f2092491
+    - kind: bug-fix
+      summary: Honor path_style for non-AWS S3 buckets in the aws-s3 input
+      description: |
+        When using non_aws_bucket_name with a custom endpoint, the aws-s3 input always marked the endpoint hostname immutable, forcing path-style requests and ignoring path_style. This broke S3-compatible providers that require virtual-hosted addressing, which returned VirtualHostDomainRequired.  The hostname is now kept mutable for non-AWS buckets so path_style is honored.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52003
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784190638
+      file:
+        name: 1784190638-fix-awss3-non-aws-path-style.yaml
+        checksum: a2ec804ddf7e4e7d8702e731ac0604e7aa45ce83
+    - kind: security
+      summary: Upgrade to go 1.26.5
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784322828
+      file:
+        name: 1784322828-upgrade-to-go-1.26.5.yaml
+        checksum: f3b3233f83d732f0b3d7c509db008a992bd411b4
+    - kind: bug-fix
+      summary: Use a stable status message for SQS receive errors to prevent update churn during sustained outages.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784498235
+      file:
+        name: 1784498235-sqs-health-stable-receive-message.yaml
+        checksum: 633e220d49789b077bc8f6cfb8c5167308797787
+    - kind: bug-fix
+      summary: Do not mark the CEL input's health as degraded when the maximum executions is exceeded.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784500632
+      file:
+        name: 1784500632-exceeding_budget_is_not_degradation.yaml
+        checksum: 20d545091406c077e7b7ff69eb31e0f70fbb74dd
+    - kind: bug-fix
+      summary: Fix aws-s3 input silently dropping events when a parser clears the message content
+      description: |
+        A parser can move the decoded data into the event fields and clear the content, for example an ndjson parser configured without a message_key. When such an object was read through the readFile path (any content-type other than application/json or application/x-ndjson), the input dropped every event with no error logged, because it only published when the message content was non-empty. Events are now published when either the content or the fields are populated.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52077
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784536512
+      file:
+        name: 1784536512-fix-awss3-readfile-drops-parser-fields.yaml
+        checksum: 136fa49521cb2499adea260f75141e5926b1b790
+    - kind: bug-fix
+      summary: Honor the configured language when rendering Windows events
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue:
+        - https://github.com/elastic/sdh-beats/issues/7332
+      impact: ""
+      action: ""
+      timestamp: 1784556644
+      file:
+        name: 1784556644-fix-winlogbeat-publisher-locale.yaml
+        checksum: 7bdf32f18cef00ffda528f9e640a844cf616ea8b
+    - kind: bug-fix
+      summary: Fix beat receiver Shutdown hanging when Start fails before the beater is launched
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/52106
+      issue:
+        - https://github.com/elastic/beats/issues/52009
+      impact: ""
+      action: ""
+      timestamp: 1784565082
+      file:
+        name: 1784565082-fix-nil-rundone-channel.yaml
+        checksum: 0d61daeca4e2c358d252ce4666c7c6de1945fd5b
+    - kind: other
+      summary: Bump npm to 12.0.1 in the Heartbeat synthetics Docker image.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784642288
+      file:
+        name: 1784642288-bump-heartbeat-npm-12.0.1.yaml
+        checksum: 91b169245a4cbb9794a0bbb549da7fadc43053c3
+    - kind: bug-fix
+      summary: Fix Azure module authentication on sovereign clouds (Government, China)
+      description: The Azure module now derives the full cloud configuration (ARM token audience, metrics batch API endpoint and audience) from resource_manager_endpoint. Previously the monitor metricset silently ignored resource_manager_audience, always requesting public-cloud tokens, the billing metricset mutated the SDK's global cloud configuration, and the metrics batch API endpoint was hardcoded to the public cloud.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784669312
+      file:
+        name: 1784669312-azure-sovereign-cloud-audience.yaml
+        checksum: d37b8af714b314633faa496f9a9e0ba1651498b4
+    - kind: enhancement
+      summary: Remove Authorization headers from CEL, Entity Analytics, HTTP Endpoint, and HTTP JSON input request trace logs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784758682
+      file:
+        name: 1784758682-no-auth-trace-logs.yaml
+        checksum: 7d928aec539472fc6ba31c95fa120cdda0b9cce7
+    - kind: bug-fix
+      summary: Fix journald input facility filters on journalctl older than 245
+      description: The journald input passed `--facility` to journalctl unconditionally, but the flag only exists on journalctl >= 245, so on older systems (e.g. RHEL 8) configurations with `facilities` set collected no events. Facilities are now passed as SYSLOG_FACILITY matches, which are supported on every version and are what `--facility` translates to internally.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784830745
+      file:
+        name: 1784830745-journald-facility-old-journalctl.yaml
+        checksum: f518a6080a2132a71374977ac09b36d60666d302
+    - kind: bug-fix
+      summary: The journald input now reports a Degraded status when journalctl repeatedly exits without delivering any data, instead of staying Healthy while collecting no events
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784830987
+      file:
+        name: 1784830987-journald-degraded-on-restart-loop.yaml
+        checksum: be7de189ea21eeed3e64a683bbe5f9ebe839326c
+    - kind: bug-fix
+      summary: Prevent stale autodiscover resources after Kubernetes leadership changes.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1785512000
+      file:
+        name: 1785512000-fix-kubernetes-leader-election-race.yaml
+        checksum: 1654038c5205cfc9b856c2540e399134a75ad6b2
+    - kind: bug-fix
+      summary: Bake Synthetics browser binaries into the heartbeat Docker image
+      description: |
+        npm 12 no longer runs a dependency's `install` lifecycle script during `npm i` by
+        default, so the transitive playwright-chromium `install` hook that used to download
+        the Playwright browsers into the heartbeat image during build stopped running. As a
+        result the image shipped with no browsers and all Synthetics browser monitors failed
+        with "browserType.launch: Executable doesn't exist at
+        .../chromium_headless_shell-<rev>/...". The image build now installs the browsers
+        explicitly with the bundled Playwright CLI after `npm i`, independent of npm's
+        install-script policy.
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52456
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52505
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52511
+        - https://github.com/elastic/beats/pull/52512
+        - https://github.com/elastic/beats/pull/52513
+        - https://github.com/elastic/beats/pull/52520
+      issue:
+        - https://github.com/elastic/beats/issues/52439
+      impact: ""
+      action: ""
+      timestamp: 1785872781
+      file:
+        name: 1785872781-fix-heartbeat-image-synthetics-browser-install.yaml
+        checksum: e6b0f2e404641c1e6093e5ee104c67166a3a9f0b
