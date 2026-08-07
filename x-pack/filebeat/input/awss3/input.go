@@ -71,8 +71,3 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	return nil, fmt.Errorf("configuration has no SQS queue URL and no S3 bucket ARN")
 }
-
-// boolPtr returns a pointer to b.
-//
-//go:fix inline
-func boolPtr(b bool) *bool { return new(b) }
