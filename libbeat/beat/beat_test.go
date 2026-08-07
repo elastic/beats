@@ -150,14 +150,14 @@ func TestSetupPipelinesEnabled(t *testing.T) {
 		},
 		{
 			name: "explicitly enabled",
-			cfg: mustNewConfigFrom(t, map[string]interface{}{
+			cfg: mustNewConfigFrom(t, map[string]any{
 				"setup.pipelines.enabled": true,
 			}),
 			want: true,
 		},
 		{
 			name: "explicitly disabled",
-			cfg: mustNewConfigFrom(t, map[string]interface{}{
+			cfg: mustNewConfigFrom(t, map[string]any{
 				"setup.pipelines.enabled": false,
 			}),
 			want: false,
@@ -171,7 +171,7 @@ func TestSetupPipelinesEnabled(t *testing.T) {
 	}
 }
 
-func mustNewConfigFrom(t *testing.T, from map[string]interface{}) *config.C {
+func mustNewConfigFrom(t *testing.T, from map[string]any) *config.C {
 	t.Helper()
 	cfg, err := config.NewConfigFrom(from)
 	require.NoError(t, err, "failed to create test config")
