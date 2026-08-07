@@ -182,8 +182,8 @@ func TestCheckUp(t *testing.T) {
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryStateChecks(1, 0),
 			hbtest.ResolveChecks(ip),
-			lookslike.MustCompile(map[string]interface{}{
-				"tcp": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
+				"tcp": map[string]any{
 					"rtt.validate.us": hbtestllext.IsInt64,
 				},
 			}),
@@ -214,11 +214,11 @@ func TestCheckDown(t *testing.T) {
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryStateChecks(0, 1),
 			hbtest.ResolveChecks(ip),
-			lookslike.MustCompile(map[string]interface{}{
-				"tcp": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
+				"tcp": map[string]any{
 					"rtt.validate.us": hbtestllext.IsInt64,
 				},
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"type":    "validate",
 					"message": "received string mismatch",
 				},

@@ -88,7 +88,6 @@ func TestNormalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			store := openTestStatestore()
 			registry, err := newStateRegistry(nil, store, "", false, 0)

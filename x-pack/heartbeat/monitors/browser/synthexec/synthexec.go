@@ -47,7 +47,7 @@ type SynthexecTimeout string
 var SynthexecTimeoutKey = SynthexecTimeout("synthexec_timeout")
 
 // ProjectJob will run a single journey by name from the given project.
-func ProjectJob(ctx context.Context, projectPath string, params func() map[string]interface{}, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
+func ProjectJob(ctx context.Context, projectPath string, params func() map[string]any, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given projectPath, use '.' as the first arg since the command runs
 	// in the correct dir
 	cmdFactory, err := projectCommandFactory(projectPath, extraArgs...)
@@ -79,7 +79,7 @@ func projectCommandFactory(projectPath string, args ...string) (func() *SynthCmd
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params func() map[string]interface{}, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params func() map[string]any, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *SynthCmd {
 		return &SynthCmd{exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)} //nolint:gosec,noctx // we are safely building a command here, users can add args at their own risk
 	}
@@ -90,7 +90,7 @@ func InlineJourneyJob(ctx context.Context, script string, params func() map[stri
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params func() map[string]interface{}, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params func() map[string]any, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
 		// Prefer the published monitor.check_group (set by the summarizer's
@@ -174,7 +174,7 @@ func runCmd(
 	ctx context.Context,
 	cmd *SynthCmd,
 	stdinStr *string,
-	params func() map[string]interface{},
+	params func() map[string]any,
 	filterJourneys FilterJourneyConfig,
 	sFields stdfields.StdMonitorFields,
 	traceID string,
@@ -235,34 +235,29 @@ func runCmd(
 	if err != nil {
 		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
 	}
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 			logp.L().Warn("could not scan stdout events from synthetics: %s", err)
 		}
 
-		wg.Done()
-	}()
+	})
 
 	stderrPipe, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
 	}
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 			logp.L().Warn("could not scan stderr events from synthetics: %s", err)
 		}
-		wg.Done()
-	}()
+	})
 
 	// Send the test results into the output
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		defer jsonReader.Close()
 
 		// We don't use scanToSynthEvents here because all lines here will be JSON
@@ -283,8 +278,7 @@ func runCmd(
 			mpx.writeSynthEvent(&se)
 		}
 
-		wg.Done()
-	}()
+	})
 
 	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
