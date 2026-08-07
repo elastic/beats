@@ -17,21 +17,21 @@ import (
 
 var configTests = []struct {
 	name    string
-	config  map[string]interface{}
+	config  map[string]any
 	wantErr error
 }{
 	{
 		name: "invalid_oauth2_config",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"account_name": "beatsblobnew",
-			"auth.oauth2": map[string]interface{}{
+			"auth.oauth2": map[string]any{
 				"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
 				"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
 			},
 			"max_workers":   2,
 			"poll":          true,
 			"poll_interval": "10s",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{
 					"name": beatsContainer,
 				},
@@ -41,9 +41,9 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_oauth2_config",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"account_name": "beatsblobnew",
-			"auth.oauth2": map[string]interface{}{
+			"auth.oauth2": map[string]any{
 				"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
 				"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
 				"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
@@ -51,7 +51,7 @@ var configTests = []struct {
 			"max_workers":   2,
 			"poll":          true,
 			"poll_interval": "10s",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{
 					"name": beatsContainer,
 				},
@@ -60,15 +60,15 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_retry_config",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"account_name":                        "beatsblobnew",
 			"auth.shared_credentials.account_key": "someKey",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{
 					"name": beatsContainer,
 				},
 			},
-			"retry": map[string]interface{}{
+			"retry": map[string]any{
 				"max_retries":         20,
 				"initial_retry_delay": "1s",
 				"max_retry_delay":     "30s",
@@ -77,15 +77,15 @@ var configTests = []struct {
 	},
 	{
 		name: "negative_initial_retry_delay",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"account_name":                        "beatsblobnew",
 			"auth.shared_credentials.account_key": "someKey",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{
 					"name": beatsContainer,
 				},
 			},
-			"retry": map[string]interface{}{
+			"retry": map[string]any{
 				"initial_retry_delay": "-1s",
 			},
 		},
@@ -93,15 +93,15 @@ var configTests = []struct {
 	},
 	{
 		name: "max_retry_delay_below_initial",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"account_name":                        "beatsblobnew",
 			"auth.shared_credentials.account_key": "someKey",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{
 					"name": beatsContainer,
 				},
 			},
-			"retry": map[string]interface{}{
+			"retry": map[string]any{
 				"initial_retry_delay": "30s",
 				"max_retry_delay":     "5s",
 			},
@@ -134,13 +134,13 @@ func TestConfig(t *testing.T) {
 // SDK-matching default seeded by defaultConfig (including for a partial block).
 func TestRetryConfig(t *testing.T) {
 	t.Run("explicit", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"account_name":                        "beatsblobnew",
 			"auth.shared_credentials.account_key": "someKey",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{"name": beatsContainer},
 			},
-			"retry": map[string]interface{}{
+			"retry": map[string]any{
 				"max_retries":         20,
 				"initial_retry_delay": "1s",
 				"max_retry_delay":     "30s",
@@ -160,10 +160,10 @@ func TestRetryConfig(t *testing.T) {
 	})
 
 	t.Run("defaults", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"account_name":                        "beatsblobnew",
 			"auth.shared_credentials.account_key": "someKey",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{"name": beatsContainer},
 			},
 		})
@@ -180,13 +180,13 @@ func TestRetryConfig(t *testing.T) {
 	t.Run("partial", func(t *testing.T) {
 		// A partial retry block overrides only the provided field and keeps the
 		// seeded defaults for the rest.
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"account_name":                        "beatsblobnew",
 			"auth.shared_credentials.account_key": "someKey",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{"name": beatsContainer},
 			},
-			"retry": map[string]interface{}{
+			"retry": map[string]any{
 				"max_retries": 7,
 			},
 		})

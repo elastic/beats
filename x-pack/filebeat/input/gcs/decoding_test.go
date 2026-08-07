@@ -53,7 +53,7 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[decoder.Rune](' '),
+						Comma:   new((decoder.Rune)(' ')),
 					},
 				},
 			},
@@ -67,7 +67,7 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[decoder.Rune](' '),
+						Comma:   new((decoder.Rune)(' ')),
 					},
 				},
 			},
@@ -113,7 +113,7 @@ type pub struct {
 	events []beat.Event
 }
 
-func (p *pub) Publish(e beat.Event, _cursor interface{}) error {
+func (p *pub) Publish(e beat.Event, _cursor any) error {
 	p.t.Logf("%v\n", e.Fields)
 	p.events = append(p.events, e)
 	return nil
@@ -153,7 +153,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune](' '),
+					Comma:   new((decoder.Rune)(' ')),
 					Comment: '#',
 				},
 			}},
@@ -184,7 +184,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune]('\x00'),
+					Comma:   new((decoder.Rune)('\x00')),
 				},
 			}},
 	},
@@ -231,5 +231,3 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
-
-func ptr[T any](v T) *T { return &v }

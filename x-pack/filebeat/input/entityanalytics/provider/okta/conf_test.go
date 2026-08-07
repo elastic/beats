@@ -67,7 +67,7 @@ var validateTests = []struct {
 			cfg.OktaDomain = "test.okta.com"
 			cfg.OktaToken = "test-token"
 			cfg.Tracer = &tracerConfig{
-				Enabled: ptrTo(false),
+				Enabled: new(false),
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			}
 			return cfg
@@ -81,7 +81,7 @@ var validateTests = []struct {
 			cfg.OktaDomain = "test.okta.com"
 			cfg.OktaToken = "test-token"
 			cfg.Tracer = &tracerConfig{
-				Enabled: ptrTo(true),
+				Enabled: new(true),
 				Logger:  lumberjack.Logger{Filename: "okta/logs/path.log"},
 			}
 			return cfg
@@ -94,15 +94,13 @@ var validateTests = []struct {
 			cfg.OktaDomain = "test.okta.com"
 			cfg.OktaToken = "test-token"
 			cfg.Tracer = &tracerConfig{
-				Enabled: ptrTo(true),
+				Enabled: new(true),
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			}
 			return cfg
 		}(),
 	},
 }
-
-func ptrTo[T any](v T) *T { return &v }
 
 func TestConfValidate(t *testing.T) {
 	for _, test := range validateTests {
@@ -128,32 +126,32 @@ func sameError(a, b error) bool {
 
 var keepAliveTests = []struct {
 	name    string
-	input   map[string]interface{}
+	input   map[string]any
 	want    httpcommon.WithKeepaliveSettings
 	wantErr error
 }{
 	{
 		name:  "keep_alive_none", // Default to the old behaviour of true.
-		input: map[string]interface{}{},
+		input: map[string]any{},
 		want:  httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_true",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": true,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_false",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": false,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: false},
 	},
 	{
 		name: "keep_alive_invalid_max",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable":              false,
 			"request.keep_alive.max_idle_connections": -1,
 		},
