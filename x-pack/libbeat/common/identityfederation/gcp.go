@@ -25,6 +25,83 @@ const (
 	defaultAWSRegion      = "us-east-1"
 )
 
+// GCPWIIParams configures the direct OIDC Workload Identity Federation flow using WII.
+//
+// Authentication chain:
+//  1. POST WII /token via mTLS → short-lived JWT (audience = GCP WIF provider URL)
+//  2. GCP STS SubjectTokenType=jwt token exchange → short-lived GCP access token
+//  3. (optional) Impersonate ServiceAccountEmail
+type GCPWIIParams struct {
+	// Audience is the GCP WIF provider URL:
+	// "//iam.googleapis.com/projects/<proj>/locations/global/workloadIdentityPools/<pool>/providers/<prov>"
+	Audience string
+	// WIIIssuerURL is the WII ECP proxy URL (WORKLOAD_IDENTITY_ISSUER_URL env var).
+	WIIIssuerURL string
+	// WIICertFile is the path to the WII client certificate (WORKLOAD_IDENTITY_SSL_CERT_FILE env var).
+	WIICertFile string
+	// WIIKeyFile is the path to the WII client private key (WORKLOAD_IDENTITY_SSL_KEY_FILE env var).
+	WIIKeyFile string
+	// ServiceAccountEmail is the GCP service account to impersonate.
+	// If empty, service account impersonation is skipped.
+	ServiceAccountEmail string
+	// HTTPClient is an optional HTTP client for the GCP STS token exchange.
+	HTTPClient *http.Client
+}
+
+// wiiOIDCSubjectTokenSupplier implements externalaccount.SubjectTokenSupplier by
+// fetching a JWT from the WII /token endpoint via mTLS.
+type wiiOIDCSubjectTokenSupplier struct {
+	source *WIITokenSource
+}
+
+func (s *wiiOIDCSubjectTokenSupplier) SubjectToken(_ context.Context, _ externalaccount.SupplierOptions) (string, error) {
+	token, err := s.source.GetIdentityToken()
+	if err != nil {
+		return "", fmt.Errorf("fetching WII OIDC subject token for GCP: %w", err)
+	}
+	return string(token), nil
+}
+
+// GCPNewWIITokenSource creates an OAuth2 token source for GCP using direct OIDC
+// Workload Identity Federation via the WII /token endpoint (mTLS). The JWT is
+// submitted directly to GCP STS — no intermediate AWS role is assumed.
+//
+// The Audience field must be the GCP WIF provider URL that the customer's identity
+// pool expects (used both as the WII token request audience and the GCP STS audience).
+func GCPNewWIITokenSource(ctx context.Context, params GCPWIIParams) (oauth2.TokenSource, error) {
+	if params.Audience == "" {
+		return nil, fmt.Errorf("GCPWIIParams.Audience is required")
+	}
+	if params.WIIIssuerURL == "" {
+		return nil, fmt.Errorf("GCPWIIParams.WIIIssuerURL is required")
+	}
+	if params.WIICertFile == "" || params.WIIKeyFile == "" {
+		return nil, fmt.Errorf("GCPWIIParams.WIICertFile and WIIKeyFile are required")
+	}
+
+	tokenSource, err := NewWIITokenSource(params.WIIIssuerURL, params.WIICertFile, params.WIIKeyFile, params.Audience)
+	if err != nil {
+		return nil, fmt.Errorf("configuring WII token source: %w", err)
+	}
+
+	extCfg := externalaccount.Config{
+		Audience:             params.Audience,
+		SubjectTokenType:     "urn:ietf:params:oauth:token-type:jwt",
+		TokenURL:             gcpSTSTokenURL,
+		Scopes:               []string{gcpCloudPlatformScope},
+		SubjectTokenSupplier: &wiiOIDCSubjectTokenSupplier{source: tokenSource},
+	}
+	if params.ServiceAccountEmail != "" {
+		extCfg.ServiceAccountImpersonationURL = gcpIAMCredentialsURL + params.ServiceAccountEmail + ":generateAccessToken"
+	}
+
+	if params.HTTPClient != nil {
+		ctx = context.WithValue(ctx, oauth2.HTTPClient, params.HTTPClient)
+	}
+
+	return externalaccount.NewTokenSource(ctx, extCfg)
+}
+
 // GCPParams configures the AWS-mediated GCP Workload Identity Federation flow.
 //
 // Authentication chain:

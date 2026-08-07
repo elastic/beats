@@ -21,6 +21,68 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
+// AzureWIIParams configures the Azure Workload Identity Federation flow using WII.
+//
+// Authentication chain:
+//  1. POST WII /token via mTLS → short-lived JWT (audience = Azure AD audience)
+//  2. ClientAssertionCredential(TenantID, ClientID, JWT) → Azure access token
+type AzureWIIParams struct {
+	// TenantID is the Azure Active Directory tenant ID.
+	TenantID string
+	// ClientID is the Azure application (client) ID registered for WIF.
+	ClientID string
+	// WIIIssuerURL is the WII ECP proxy URL (WORKLOAD_IDENTITY_ISSUER_URL env var).
+	WIIIssuerURL string
+	// WIICertFile is the path to the WII client certificate (WORKLOAD_IDENTITY_SSL_CERT_FILE env var).
+	WIICertFile string
+	// WIIKeyFile is the path to the WII client private key (WORKLOAD_IDENTITY_SSL_KEY_FILE env var).
+	WIIKeyFile string
+	// Audience is the Azure AD audience for the WII token request.
+	// Typically "api://AzureADTokenExchange".
+	Audience string
+	// Options are passed to azidentity.NewClientAssertionCredential.
+	Options *azidentity.ClientAssertionCredentialOptions
+}
+
+// AzureNewWIIClientAssertionCredential creates an Azure credential that uses a JWT
+// from the WII /token endpoint (mTLS) as the client assertion. The token is
+// fetched on each credential refresh — no intermediate role is assumed.
+func AzureNewWIIClientAssertionCredential(params AzureWIIParams) (*azidentity.ClientAssertionCredential, error) {
+	var errs []error
+	if params.TenantID == "" {
+		errs = append(errs, errors.New("TenantID is required"))
+	}
+	if params.ClientID == "" {
+		errs = append(errs, errors.New("ClientID is required"))
+	}
+	if params.WIIIssuerURL == "" {
+		errs = append(errs, errors.New("WIIIssuerURL is required"))
+	}
+	if params.WIICertFile == "" || params.WIIKeyFile == "" {
+		errs = append(errs, errors.New("WIICertFile and WIIKeyFile are required"))
+	}
+	if params.Audience == "" {
+		errs = append(errs, errors.New("Audience is required"))
+	}
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("invalid AzureWIIParams: %w", errors.Join(errs...))
+	}
+
+	tokenSource, err := NewWIITokenSource(params.WIIIssuerURL, params.WIICertFile, params.WIIKeyFile, params.Audience)
+	if err != nil {
+		return nil, fmt.Errorf("configuring WII token source: %w", err)
+	}
+	getAssertion := func(_ context.Context) (string, error) {
+		token, err := tokenSource.GetIdentityToken()
+		if err != nil {
+			return "", fmt.Errorf("fetching WII JWT for Azure assertion: %w", err)
+		}
+		return string(token), nil
+	}
+
+	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
+}
+
 // AzureParams configures the Azure client assertion credential flow.
 //
 // Authentication chain:
