@@ -102,9 +102,6 @@ var validateTests = []struct {
 	},
 }
 
-//go:fix inline
-func ptrTo[T any](v T) *T { return new(v) }
-
 func TestConfValidate(t *testing.T) {
 	for _, test := range validateTests {
 		t.Run(test.name, func(t *testing.T) {

@@ -93,9 +93,6 @@ func sameError(a, b error) bool {
 	}
 }
 
-//go:fix inline
-func ptrTo[T any](v T) *T { return new(v) }
-
 func TestApplyInFlightDefaults(t *testing.T) {
 	tests := []struct {
 		name              string

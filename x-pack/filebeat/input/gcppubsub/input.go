@@ -395,8 +395,3 @@ func (t userAgentDecorator) RoundTrip(r *http.Request) (*http.Response, error) {
 	}
 	return t.Transport.RoundTrip(r)
 }
-
-// boolPtr returns a pointer to b.
-//
-//go:fix inline
-func boolPtr(b bool) *bool { return new(b) }
