@@ -49,8 +49,8 @@ var logstashName2Decoder = map[string]fields.Decoder{
 
 // LoadFieldDefinitions takes a parsed YAML tree from a Logstash
 // Netflow or IPFIX custom fields format and converts it to a FieldDict.
-func LoadFieldDefinitions(yaml interface{}) (defs fields.FieldDict, err error) {
-	tree, ok := yaml.(map[interface{}]interface{})
+func LoadFieldDefinitions(yaml any) (defs fields.FieldDict, err error) {
+	tree, ok := yaml.(map[any]any)
 	if !ok {
 		return nil, fmt.Errorf("invalid custom fields definition format: expected a mapping of integer keys. Got %T", yaml)
 	}
@@ -76,7 +76,7 @@ func LoadFieldDefinitions(yaml interface{}) (defs fields.FieldDict, err error) {
 		if !fits(pem, 0, math.MaxUint32) {
 			return nil, fmt.Errorf("PEM %d out of uint32 range", pem)
 		}
-		tree, ok := fields.(map[interface{}]interface{})
+		tree, ok := fields.(map[any]any)
 		if !ok {
 			return nil, fmt.Errorf("IPFIX fields for pem=%d malformed", pem)
 		}
@@ -99,7 +99,7 @@ func LoadFieldDefinitionsFromFile(path string) (defs fields.FieldDict, err error
 	if err != nil {
 		return nil, err
 	}
-	var tree interface{}
+	var tree any
 	if err := yaml.Unmarshal(contents, &tree); err != nil {
 		return nil, fmt.Errorf("unable to parse YAML: %w", err)
 	}
@@ -117,7 +117,7 @@ func trimColon(s string) string {
 	return s
 }
 
-func toInt(value interface{}) (int64, error) {
+func toInt(value any) (int64, error) {
 	switch v := value.(type) {
 	case int64:
 		return v, nil
@@ -129,7 +129,7 @@ func toInt(value interface{}) (int64, error) {
 	return 0, fmt.Errorf("value %v cannot be converted to int", value)
 }
 
-func loadFields(def map[interface{}]interface{}, pem uint32, dest fields.FieldDict) error {
+func loadFields(def map[any]any, pem uint32, dest fields.FieldDict) error {
 	for keyI, iface := range def {
 		fieldID, err := toInt(keyI)
 		if err != nil {
@@ -138,7 +138,7 @@ func loadFields(def map[interface{}]interface{}, pem uint32, dest fields.FieldDi
 		if !fits(fieldID, 0, math.MaxUint16) {
 			return fmt.Errorf("field ID %d out of range uint16", fieldID)
 		}
-		list, ok := iface.([]interface{})
+		list, ok := iface.([]any)
 		if !ok {
 			return fmt.Errorf("field ID %d is not a list", fieldID)
 		}
@@ -187,7 +187,7 @@ func loadFields(def map[interface{}]interface{}, pem uint32, dest fields.FieldDi
 	return nil
 }
 
-func fieldsAreIPFIX(tree map[interface{}]interface{}) (bool, error) {
+func fieldsAreIPFIX(tree map[any]any) (bool, error) {
 	if len(tree) == 0 {
 		return false, errors.New("custom fields definition is empty")
 	}
@@ -195,12 +195,12 @@ func fieldsAreIPFIX(tree map[interface{}]interface{}) (bool, error) {
 	for key, value := range tree {
 		var msg string
 		switch v := value.(type) {
-		case map[interface{}]interface{}:
+		case map[any]any:
 			seenMap = true
 			if seenList {
 				msg = "expected IPFIX map of fields"
 			}
-		case []interface{}:
+		case []any:
 			seenList = true
 			if seenMap {
 				msg = "expected NetFlow single field definition"
