@@ -159,7 +159,10 @@ func TestNewSessionProperties(t *testing.T) {
 			assert.Equal(t, windows.GUID{}, props.Wnode.Guid, "GUID should be empty")
 			assert.Equal(t, uint32(1), props.Wnode.ClientContext, "ClientContext should be 1")
 			assert.Equal(t, uint32(WNODE_FLAG_TRACED_GUID), props.Wnode.Flags, "Flags should match WNODE_FLAG_TRACED_GUID")
-			assert.Equal(t, uint32(EVENT_TRACE_REAL_TIME_MODE), props.LogFileMode, "LogFileMode should be set to real-time")
+			assert.Equal(t,
+				uint32(EVENT_TRACE_REAL_TIME_MODE|EVENT_TRACE_PERSIST_ON_HYBRID_SHUTDOWN|EVENT_TRACE_INDEPENDENT_SESSION_MODE),
+				props.LogFileMode,
+				"LogFileMode should be REAL_TIME | PERSIST_ON_HYBRID_SHUTDOWN | INDEPENDENT_SESSION_MODE")
 			assert.Equal(t, uint32(0), props.LogFileNameOffset, "LogFileNameOffset should be 0")
 			assert.Equal(t, uint32(64), props.BufferSize, "BufferSize should be 64")
 			assert.Equal(t, uint32(unsafe.Sizeof(EventTraceProperties{})), props.LoggerNameOffset, "LoggerNameOffset should be the size of EventTraceProperties")
