@@ -38,7 +38,7 @@
 **Filebeat**
 
 * Fix offset commits when using multiline in Journald and Kafka inputs. [#52286](https://github.com/elastic/beats/pull/52286) [#51981](https://github.com/elastic/beats/issues/51981)
-* Fix S3 polling input to exclude same-bucket backup objects from listing. [#51940](https://github.com/elastic/beats/pull/51940) [#51912](https://github.com/elastic/beats/pull/51912) [#51804](https://github.com/elastic/beats/pull/51804) [#52271](https://github.com/elastic/beats/pull/52271) [#52417](https://github.com/elastic/beats/pull/52417) [#52420](https://github.com/elastic/beats/pull/52420) [#52488](https://github.com/elastic/beats/pull/52488) [#52516](https://github.com/elastic/beats/pull/52516) [#52517](https://github.com/elastic/beats/pull/52517) [#52518](https://github.com/elastic/beats/pull/52518) 
+* Fix S3 polling input to exclude same-bucket backup objects from listing. [#52170](https://github.com/elastic/beats/pull/52170) 
 
   When same-bucket backup is configured with the default empty
   bucket_list_prefix, backup objects are listed alongside source objects

@@ -82,16 +82,7 @@ entries:
         from listing results when the backup destination is the same bucket.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/51940
-        - https://github.com/elastic/beats/pull/51912
-        - https://github.com/elastic/beats/pull/51804
-        - https://github.com/elastic/beats/pull/52271
-        - https://github.com/elastic/beats/pull/52417
-        - https://github.com/elastic/beats/pull/52420
-        - https://github.com/elastic/beats/pull/52488
-        - https://github.com/elastic/beats/pull/52516
-        - https://github.com/elastic/beats/pull/52517
-        - https://github.com/elastic/beats/pull/52518
+        - https://github.com/elastic/beats/pull/52170
       issue: []
       impact: ""
       action: ""
