@@ -1,0 +1,105 @@
+version: 9.5.1
+entries:
+    - kind: bug-fix
+      summary: Fix offset commits when using multiline in Journald and Kafka inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52271
+        - https://github.com/elastic/beats/pull/52410
+        - https://github.com/elastic/beats/pull/52459
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52515
+      issue:
+        - https://github.com/elastic/beats/issues/51981
+      impact: ""
+      action: ""
+      timestamp: 1783624000
+      file:
+        name: 1783624000-fix-multiline-registry-update.yaml
+        checksum: d98b28ea6dffb7335b4fb70aee7c15ce781ad32e
+    - kind: bug-fix
+      summary: Fix Azure module authentication on sovereign clouds (Government, China)
+      description: The Azure module now derives the full cloud configuration (ARM token audience, metrics batch API endpoint and audience) from resource_manager_endpoint. Previously the monitor metricset silently ignored resource_manager_audience, always requesting public-cloud tokens, the billing metricset mutated the SDK's global cloud configuration, and the metrics batch API endpoint was hardcoded to the public cloud.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52271
+        - https://github.com/elastic/beats/pull/52410
+        - https://github.com/elastic/beats/pull/52459
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52515
+      issue:
+        - https://github.com/elastic/beats/issues/52460
+      impact: ""
+      action: ""
+      timestamp: 1784669312
+      file:
+        name: 1784669312-azure-sovereign-cloud-audience.yaml
+        checksum: d37b8af714b314633faa496f9a9e0ba1651498b4
+    - kind: bug-fix
+      summary: Prevent stale autodiscover resources after Kubernetes leadership changes.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52271
+        - https://github.com/elastic/beats/pull/52410
+        - https://github.com/elastic/beats/pull/52459
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52515
+      issue:
+        - https://github.com/elastic/beats/issues/52460
+      impact: ""
+      action: ""
+      timestamp: 1785512000
+      file:
+        name: 1785512000-fix-kubernetes-leader-election-race.yaml
+        checksum: 1654038c5205cfc9b856c2540e399134a75ad6b2
+    - kind: bug-fix
+      summary: Bake Synthetics browser binaries into the heartbeat Docker image
+      description: |
+        npm 12 no longer runs a dependency's `install` lifecycle script during `npm i` by
+        default, so the transitive playwright-chromium `install` hook that used to download
+        the Playwright browsers into the heartbeat image during build stopped running. As a
+        result the image shipped with no browsers and all Synthetics browser monitors failed
+        with "browserType.launch: Executable doesn't exist at
+        .../chromium_headless_shell-<rev>/...". The image build now installs the browsers
+        explicitly with the bundled Playwright CLI after `npm i`, independent of npm's
+        install-script policy.
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52271
+        - https://github.com/elastic/beats/pull/52410
+        - https://github.com/elastic/beats/pull/52459
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52515
+      issue:
+        - https://github.com/elastic/beats/issues/52439
+      impact: ""
+      action: ""
+      timestamp: 1785872781
+      file:
+        name: 1785872781-fix-heartbeat-image-synthetics-browser-install.yaml
+        checksum: e6b0f2e404641c1e6093e5ee104c67166a3a9f0b
+    - kind: bug-fix
+      summary: fix unknown type for map[string]string in otelmap
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/52271
+        - https://github.com/elastic/beats/pull/52410
+        - https://github.com/elastic/beats/pull/52459
+        - https://github.com/elastic/beats/pull/52420
+        - https://github.com/elastic/beats/pull/52488
+        - https://github.com/elastic/beats/pull/52515
+      issue:
+        - https://github.com/elastic/beats/issues/52460
+      impact: ""
+      action: ""
+      timestamp: 1785946345
+      file:
+        name: 1785946345-fix-unknown-type-for-map[string]string-in-otelmap.yaml
+        checksum: 16754bbc3f219bcfc8c9b553d3d2f03e8e033997
