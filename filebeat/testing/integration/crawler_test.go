@@ -71,9 +71,9 @@ func TestCrawlerMultipleAppends(t *testing.T) {
 
 	// Append three rounds of lines and wait for each round to be ingested.
 	totalExpected := int64(1) // the initial "hello world" line
-	for n := 0; n < 3; n++ {
+	for n := range 3 {
 		linesInRound := 20 + n
-		for i := 0; i < linesInRound; i++ {
+		for i := range linesInRound {
 			AppendToFile(t, logFile, fmt.Sprintf("hello world %d %d\n", i, n))
 			totalExpected++
 		}
