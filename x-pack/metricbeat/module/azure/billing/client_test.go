@@ -26,8 +26,8 @@ var (
 )
 
 func TestClient(t *testing.T) {
-	usageStart, usageEnd := usageIntervalFrom(time.Now())
-	forecastStart, forecastEnd := forecastIntervalFrom(time.Now())
+	usageStart, usageEnd := usageIntervalFrom(time.Now(), defaultUsageLookback)
+	forecastStart, forecastEnd := forecastIntervalFrom(time.Now(), defaultForecastWindow)
 	opts := TimeIntervalOptions{
 		usageStart:    usageStart,
 		usageEnd:      usageEnd,
@@ -64,4 +64,34 @@ func TestClient(t *testing.T) {
 		// assert.Equal(t, len(results.ForecastCosts), 2)
 		m.AssertExpectations(t)
 	})
+}
+
+func TestClientUsesRangeFilterForUsageDetails(t *testing.T) {
+	opts := TimeIntervalOptions{
+		usageStart:    time.Date(2026, 7, 19, 0, 0, 0, 0, time.UTC),
+		usageEnd:      time.Date(2026, 7, 21, 23, 59, 59, 0, time.UTC),
+		forecastStart: time.Date(2026, 7, 19, 0, 0, 0, 0, time.UTC),
+		forecastEnd:   time.Date(2026, 8, 17, 23, 59, 59, 0, time.UTC),
+	}
+
+	client := NewMockClient(logptest.NewTestingLogger(t, ""))
+	client.Config = azure.Config{SubscriptionId: "sub"}
+	m := &MockService{}
+
+	expectedFilter := "properties/usageStart ge '2026-07-19T00:00:00Z' and properties/usageEnd le '2026-07-21T23:59:59Z'"
+	m.On(
+		"GetUsageDetails",
+		"subscriptions/sub",
+		"properties/meterDetails",
+		expectedFilter,
+		armconsumption.MetrictypeActualCostMetricType,
+		"2026-07-19",
+		"2026-07-21",
+	).Return(armconsumption.UsageDetailsListResult{}, nil)
+	m.On("GetForecast", "subscriptions/sub", opts.forecastStart, opts.forecastEnd).Return(armcostmanagement.QueryResult{}, nil)
+	client.BillingService = m
+
+	_, err := client.GetMetrics(opts)
+	assert.NoError(t, err)
+	m.AssertExpectations(t)
 }

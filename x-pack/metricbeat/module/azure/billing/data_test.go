@@ -67,7 +67,7 @@ func TestEventMapping(t *testing.T) {
 	// this unusual format.
 	actualUsageDate := float64(20200807)
 	forecastUsageDate := float64(20200808)
-	rows := [][]interface{}{
+	rows := [][]any{
 		{actualCost, actualUsageDate, "Actual", "USD"},
 		{forecastCost, forecastUsageDate, "Forecast", "USD"},
 	}
@@ -92,8 +92,8 @@ func TestEventMapping(t *testing.T) {
 	//
 	// Run the tests
 	//
-	usageStart, usageEnd := usageIntervalFrom(time.Now())
-	forecastStart, forecastEnd := forecastIntervalFrom(time.Now())
+	usageStart, usageEnd := usageIntervalFrom(time.Now(), defaultUsageLookback)
+	forecastStart, forecastEnd := forecastIntervalFrom(time.Now(), defaultForecastWindow)
 	opts := TimeIntervalOptions{
 		usageStart:    usageStart,
 		usageEnd:      usageEnd,
@@ -103,7 +103,7 @@ func TestEventMapping(t *testing.T) {
 
 	events, err := EventsMapping("sub", usage, opts, logger)
 	assert.NoError(t, err)
-	assert.Equal(t, 3, len(events))
+	assert.Len(t, events, 3)
 
 	//
 	// Check the results
@@ -120,7 +120,7 @@ func TestEventMapping(t *testing.T) {
 			val3, _ := event.MetricSetFields.GetValue("department_name")
 			assert.Equal(t, val3, &name)
 			tags, _ := event.ModuleFields.GetValue("resource.tags")
-			assert.Equal(t, tags, map[string]*string{tagName: &tagValue})
+			assert.Equal(t, map[string]*string{tagName: &tagValue}, tags)
 
 		} else {
 			//
@@ -131,7 +131,7 @@ func TestEventMapping(t *testing.T) {
 			isActual, _ := event.MetricSetFields.HasKey("actual_cost")
 			if isActual {
 				cost, _ := event.MetricSetFields.GetValue("actual_cost")
-				assert.Equal(t, actualCost, cost)
+				assert.InDelta(t, actualCost, cost, 0.0001)
 				dt, _ := time.Parse("2006-01-02", "2020-08-07")
 				usageDate, _ := event.MetricSetFields.GetValue("usage_date")
 				assert.Equal(t, usageDate, dt)
@@ -141,7 +141,7 @@ func TestEventMapping(t *testing.T) {
 			isForecast, _ := event.MetricSetFields.HasKey("forecast_cost")
 			if isForecast {
 				cost, _ := event.MetricSetFields.GetValue("forecast_cost")
-				assert.Equal(t, forecastCost, cost)
+				assert.InDelta(t, forecastCost, cost, 0.0001)
 				dt, _ := time.Parse("2006-01-02", "2020-08-08")
 				usageDate, _ := event.MetricSetFields.GetValue("usage_date")
 				assert.Equal(t, usageDate, dt)
@@ -207,7 +207,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	})
 
 	t.Run("wrong number of elements in a row", func(t *testing.T) {
-		rows := [][]interface{}{
+		rows := [][]any{
 			{float64(1), float64(2), "Actual", "USD", "UnexpectedValue"},
 		}
 		queryResult := armcostmanagement.QueryResult{
@@ -223,7 +223,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	})
 
 	t.Run("drop rows with a wrong type", func(t *testing.T) {
-		rows := [][]interface{}{
+		rows := [][]any{
 			{float64(1), float64(20220818), "Actual", "USD"}, // good row, this will be mapped as event
 			{42, float64(20220818), "Actual", "USD"},         // wrong cost type
 			{float64(1), 20220818, "Actual", "USD"},          // wrong usage date type
@@ -238,7 +238,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 		}
 
 		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
-		assert.Equal(t, 1, len(events))
+		assert.Len(t, events, 1)
 		assert.NoError(t, err)
 	})
 }
