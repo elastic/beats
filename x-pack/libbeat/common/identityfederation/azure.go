@@ -62,7 +62,7 @@ func AzureNewWIIClientAssertionCredential(params AzureWIIParams) (*azidentity.Cl
 		errs = append(errs, errors.New("WIICertFile and WIIKeyFile are required"))
 	}
 	if params.Audience == "" {
-		errs = append(errs, errors.New("Audience is required"))
+		errs = append(errs, errors.New("audience is required"))
 	}
 	if len(errs) > 0 {
 		return nil, fmt.Errorf("invalid AzureWIIParams: %w", errors.Join(errs...))

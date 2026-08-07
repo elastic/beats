@@ -5,6 +5,8 @@
 package identityfederation
 
 import (
+	"bytes"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -215,7 +217,7 @@ func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
 	// WORKLOAD_IDENTITY_SSL_CA_FILE overrides the server CA trust — only used when the
 	// issuer endpoint presents a cert from a private CA (dev/test setups).
 	if caFile := os.Getenv(WIISSLCAFileEnvVar); caFile != "" {
-		caBytes, caErr := os.ReadFile(caFile)
+		caBytes, caErr := os.ReadFile(caFile) //nolint:gosec // G703: the path is operator-provided configuration, not untrusted input
 		if caErr != nil {
 			return nil, time.Time{}, fmt.Errorf("reading WII CA file %s: %w", caFile, caErr)
 		}
@@ -240,7 +242,7 @@ func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
 	if err != nil {
 		return nil, time.Time{}, fmt.Errorf("encoding WII token request: %w", err)
 	}
-	req, err := http.NewRequest(http.MethodPost, w.tokenEndpoint, strings.NewReader(string(body)))
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, w.tokenEndpoint, bytes.NewReader(body))
 	if err != nil {
 		return nil, time.Time{}, fmt.Errorf("creating WII token request: %w", err)
 	}

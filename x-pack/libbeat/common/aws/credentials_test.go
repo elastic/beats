@@ -380,7 +380,7 @@ func TestDefaultRegion(t *testing.T) {
 // role via a single AssumeRoleWithWebIdentity call — no intermediate Elastic global
 // role, no ExternalID.
 func TestApplyIdentityFederationChainWII(t *testing.T) {
-	const wiiToken = "eyJhbGciOiJSUzI1NiJ9.wii-test.sig"
+	const wiiToken = "eyJhbGciOiJSUzI1NiJ9.wii-test.sig" //nolint:gosec // G101: not a credential, an inert JWT-shaped test fixture
 
 	// A self-signed client keypair: the WII test server does not verify it, but the
 	// token source requires the files to exist (mTLS presentation is covered by the

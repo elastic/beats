@@ -21,6 +21,7 @@ const (
 	gcpSTSTokenURL        = "https://sts.googleapis.com/v1/token"                                  //nolint:gosec // not a credential, it's a public API endpoint
 	gcpIAMCredentialsURL  = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/" //nolint:gosec // not a credential, it's a public API endpoint
 	awsTokenType          = "urn:ietf:params:aws:token-type:aws4_request"                          //nolint:gosec // not a credential, it's an IETF token type identifier
+	jwtTokenType          = "urn:ietf:params:oauth:token-type:jwt"                                 //nolint:gosec // not a credential, it's an IETF token type identifier
 	gcpCloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 	defaultAWSRegion      = "us-east-1"
 )
@@ -86,7 +87,7 @@ func GCPNewWIITokenSource(ctx context.Context, params GCPWIIParams) (oauth2.Toke
 
 	extCfg := externalaccount.Config{
 		Audience:             params.Audience,
-		SubjectTokenType:     "urn:ietf:params:oauth:token-type:jwt",
+		SubjectTokenType:     jwtTokenType,
 		TokenURL:             gcpSTSTokenURL,
 		Scopes:               []string{gcpCloudPlatformScope},
 		SubjectTokenSupplier: &wiiOIDCSubjectTokenSupplier{source: tokenSource},
