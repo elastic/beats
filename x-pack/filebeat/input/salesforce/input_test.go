@@ -2716,8 +2716,8 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 	defaultResource := resourceConfig{
 		Retry: retryConfig{
 			MaxAttempts: new(5),
-			WaitMin:     pointer(time.Minute),
-			WaitMax:     pointer(time.Minute),
+			WaitMin:     new(time.Minute),
+			WaitMax:     new(time.Minute),
 		},
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	}
@@ -3039,7 +3039,7 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 				Cursor:   &cursorConfig{Field: "Id"},
 			}},
 			Resource: &resourceConfig{
-				Retry:     retryConfig{MaxAttempts: new(1), WaitMin: pointer(time.Second), WaitMax: pointer(time.Second)},
+				Retry:     retryConfig{MaxAttempts: new(1), WaitMin: new(time.Second), WaitMax: new(time.Second)},
 				Transport: httpcommon.DefaultHTTPTransportSettings(),
 			},
 		}
