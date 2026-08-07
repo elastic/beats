@@ -318,6 +318,9 @@ These global flags are available whenever you run Heartbeat.
 **`--environment`**
 :   For logging purposes, specifies the environment that Heartbeat is running in. This setting is used to select a default log output when no log output is configured. Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`. If `systemd` or `container` is specified, Heartbeat will log to stdout and stderr by default.
 
+{applies_to}`stack: ga 9.6` **`--hostname HOSTNAME`**
+:   Sets the hostname reported in `host.name` and `observer.hostname`. Use this when the host cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
+
 **`--path.config`**
 :   Sets the path for configuration files. See the [Directory layout](/reference/heartbeat/directory-layout.md) section for details.
 
