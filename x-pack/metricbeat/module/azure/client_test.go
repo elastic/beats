@@ -93,7 +93,7 @@ func TestGetMetricValues(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		metrics := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
+		metrics := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr, nil)
 		assert.Empty(t, metrics)
 		assert.Empty(t, client.ResourceConfigurations.Metrics[0].Values)
 		m.AssertExpectations(t)
@@ -116,7 +116,7 @@ func TestGetMetricValues(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
+		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr, nil)
 		assert.Empty(t, metricValues)
 		assert.Empty(t, client.ResourceConfigurations.Metrics[0].Values)
 		m.AssertExpectations(t)
@@ -173,7 +173,7 @@ func TestGetMetricValues(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 
-		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
+		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr, nil)
 
 		require.Len(t, metricValues, 1)
 		require.Len(t, metricValues[0].Values, 1)
@@ -256,7 +256,7 @@ func TestGetMetricValues(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 
-		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
+		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr, nil)
 
 		require.Len(t, metricValues, 3)
 
