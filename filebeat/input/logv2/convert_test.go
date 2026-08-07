@@ -84,9 +84,6 @@ paths:
   ],
   "prospector": {
     "scanner": {
-      "fingerprint": {
-        "enabled": false
-      },
       "symlinks": true
     }
   },
@@ -124,9 +121,6 @@ paths:
   ],
   "prospector": {
     "scanner": {
-      "fingerprint": {
-        "enabled": false
-      },
       "symlinks": true
     }
   },
@@ -170,9 +164,6 @@ multiline.type: count
   ],
   "prospector": {
     "scanner": {
-      "fingerprint": {
-        "enabled": false
-      },
       "symlinks": true
     }
   },
@@ -200,13 +191,6 @@ paths:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -232,13 +216,6 @@ file_identity.path: ~
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -295,13 +272,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -340,13 +310,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -384,13 +347,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -435,13 +391,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -471,13 +420,6 @@ multiline:
   "file_identity": {
     "native": null
   },
-  "prospector": {
-    "scanner": {
-      "fingerprint": {
-        "enabled": false
-      }
-    }
-  },
   "take_over": {
     "enabled": true
   },
@@ -506,13 +448,6 @@ multiline: true
 {
   "file_identity": {
     "native": null
-  },
-  "prospector": {
-    "scanner": {
-      "fingerprint": {
-        "enabled": false
-      }
-    }
   },
   "take_over": {
     "enabled": true
