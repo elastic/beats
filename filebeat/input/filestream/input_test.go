@@ -47,6 +47,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-concert/unison"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -580,6 +581,9 @@ func createFilestreamTestRunner(b testing.TB, logger *logp.Logger, testID string
 	require.NoError(b, err)
 
 	p := Plugin(logger, createTestStore(b))
+	var group unison.TaskGroup
+	require.NoError(b, p.Manager.Init(&group))
+	b.Cleanup(func() { require.NoError(b, group.Stop()) })
 	input, err := p.Manager.Create(c)
 	require.NoError(b, err)
 
@@ -642,6 +646,10 @@ func (s *testStore) Close() {
 
 func (s *testStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
+}
+
+func (s *testStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testStore) CleanupInterval() time.Duration {

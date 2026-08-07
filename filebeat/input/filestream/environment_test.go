@@ -569,6 +569,10 @@ func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
+}
+
 func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
 }
