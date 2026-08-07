@@ -35,10 +35,10 @@ type datastream struct {
 }
 
 type agentInput struct {
-	Type       string                   `config:"type"`
-	Datastream datastream               `config:"data_stream"`
-	Processors []mapstr.M               `config:"processors"`
-	Streams    []map[string]interface{} `config:"streams"`
+	Type       string           `config:"type"`
+	Datastream datastream       `config:"data_stream"`
+	Processors []mapstr.M       `config:"processors"`
+	Streams    []map[string]any `config:"streams"`
 }
 
 func defaultDevice() string {
@@ -92,15 +92,9 @@ func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 }
 
 func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
-	maxProcReadFreq := one.MaxProcReadFreq
-	if two.MaxProcReadFreq > maxProcReadFreq {
-		maxProcReadFreq = two.MaxProcReadFreq
-	}
+	maxProcReadFreq := max(two.MaxProcReadFreq, one.MaxProcReadFreq)
 
-	refreshPidsFreq := one.RefreshPidsFreq
-	if two.RefreshPidsFreq < refreshPidsFreq {
-		refreshPidsFreq = two.RefreshPidsFreq
-	}
+	refreshPidsFreq := min(two.RefreshPidsFreq, one.RefreshPidsFreq)
 
 	return procs.ProcsConfig{
 		Enabled:         true,
