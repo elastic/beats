@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Reduce filestream scanner per-scan memory allocations for large idle file sets
-component: filebeat

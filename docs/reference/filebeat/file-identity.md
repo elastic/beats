@@ -58,7 +58,7 @@ Here is the brief high-level comparison of all currently available options:
 | path | Files are never moved or renamed, file names are never re-used. | Simple and fast. | The most unstable option, requires to maintain immutable file paths. |
 | native (default in Filebeat < 9.0) | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device ID` values. No support for network shares, containers or VMs.
 | inode_marker | Same as `native` but `device ID` is changing. | Same as `native` + no dependency on `device ID`. | Can still cause data duplication or data loss due to unstable `inode` values provided by the file system. Also, no support for network shares, containers or VMs. |
-| fingerprint (default in Filebeat >= 9.0) | Log files with unique content.<br><br>{applies_to}`stack: ga 9.5+` Logs files of any size (enhanced fingerprint).<br><br> {applies_to}`stack: ga 9.0-9.4` Logs files larger than the fingerprint size (1 KB by default). | The most stable. Support for any OS, any file system, network shares, containers and VMs.<br><br>{applies_to}`stack: ga 9.5+` Ingests files smaller than the fingerprint size without delay. | Slightly higher CPU / memory usage.<br><br>{applies_to}`stack: ga 9.0-9.4` Only ingests files until they reach the fingerprint size (1 KB by default). |
+| fingerprint (default in Filebeat >= 9.0) | Log files with unique content.<br><br>{applies_to}`stack: ga 9.5+` Log files of any size (enhanced fingerprint).<br><br>{applies_to}`stack: ga 9.0-9.4` Log files larger than the fingerprint size (1 KB by default). | The most stable. Support for any OS, any file system, network shares, containers and VMs.<br><br>{applies_to}`stack: ga 9.5+` Ingests files smaller than the fingerprint size without delay. | Slightly higher CPU / memory usage.<br><br>{applies_to}`stack: ga 9.0-9.4` Doesn't ingest files until they reach the fingerprint size (1 KB by default). |
 
 ### `path`
 
@@ -159,7 +159,9 @@ Users specify a path by setting `file_identity.inode_marker.path`. This path lea
 
 The most stable file identity implementation at the moment. This file identity is default since Filebeat version 9.0.
 
-This file identity uses file fingerprints produced by the scanner component of the filestream input. Scanner fingerprinting is enabled by default in 9.x. If you explicitly disable it with `prospector.scanner.fingerprint.enabled: false`, this file identity cannot be used.
+This file identity uses file fingerprints produced by the scanner component of the filestream input.
+
+Scanner fingerprinting is enabled by default, so this file identity needs no extra configuration.
 
 In the context of the filestream input, fingerprint is a hash string computed from a part of the file content.
 
@@ -177,17 +179,14 @@ For example, Filebeat is running a filestream input with this configuration:
 
 ```yaml
 prospector.scanner.fingerprint:
-  enabled: true
   offset: 32   # e.g. the first 32 bytes are always identical in every file, we skip them
   length: 1024 # strong guarantee of uniqueness
 file_identity.fingerprint: ~
 ```
 
-If a new log file appears, the filestream input doesn’t register it until it grows to 1056 bytes (`offset`+`length`). Files that don't grow to that size are not ingested.
+{applies_to}`stack: ga 9.0-9.4` If a new log file appears, the filestream input doesn’t register it until it grows to 1056 bytes (`offset`+`length`). Files that don't grow to that size are not ingested.
 
 {applies_to}`stack: ga 9.5+` This limitation is removed by default. Refer to [Enhanced fingerprint](#file-identity-fingerprint-growing) for details.
-
-The stability of this file identity makes it a recommended and default option.
 
 #### Enhanced fingerprint [file-identity-fingerprint-growing]
 
@@ -208,7 +207,7 @@ The practical effects are:
 ::::{warning}
 Rolling back from Filebeat 9.5 or later to an earlier version can duplicate events for small files.
 
-The risk is limited to files that the newer Filebeat version had started reading, but that had not yet reached the fingerprint size (`offset` + `length`) before the rollback. 
+The risk is limited to files that the newer Filebeat version had started reading, but that had not yet reached the fingerprint size (`offset` + `length`) before the rollback.
 
 Earlier Filebeat versions do not understand the tracking information used for those files. After rollback, if one of those files later reaches the fingerprint size, Filebeat treats it as a new file and reads it from the beginning. Any unused registry entries remain until `clean_inactive` removes them.
 
