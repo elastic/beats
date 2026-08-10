@@ -503,13 +503,6 @@ func TestEnricherStopUsesPointerOwnershipAndEvictsFinalWatcher(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
-<<<<<<< HEAD
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
-		"enabled": true,
-	})
-	require.NoError(t, err)
-=======
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 	config := &kubernetesConfig{
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
