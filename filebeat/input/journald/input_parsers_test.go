@@ -21,9 +21,19 @@ package journald
 
 import (
 	"context"
+	"io"
 	"path/filepath"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -100,4 +110,73 @@ func TestPartialMessageTag(t *testing.T) {
 	if tagsStrSlice[0] != "partial_message" {
 		t.Fatalf("expecting the tag 'partial_message', got %v instead", tagsStrSlice)
 	}
+}
+
+func TestMultilineParserPreservesJournaldCheckpoint(t *testing.T) {
+	const wantCursor = "cursor-from-last-line"
+	cursors := []string{"cursor-1", "cursor-2", wantCursor}
+	lines := []string{"line1", "line2", "line3"}
+	call := 0
+
+	mock := &journalReaderMock{
+		CloseFunc: func() error { return nil },
+		NextFunc: func(cancel v2.Canceler) (journalctl.JournalEntry, error) {
+			if call >= len(lines) {
+				return journalctl.JournalEntry{}, io.EOF
+			}
+			i := call
+			call++
+			now := time.Now()
+			return journalctl.JournalEntry{
+				Cursor:             cursors[i],
+				RealtimeTimestamp:  uint64(now.UnixMicro()),
+				MonotonicTimestamp: 42,
+				Fields:             map[string]any{"MESSAGE": lines[i]},
+			}, nil
+		},
+	}
+
+	ra := &readerAdapter{
+		r:         mock,
+		converter: journalfield.NewConverter(logp.NewNopLogger(), nil),
+		canceler:  t.Context(),
+	}
+
+	var parserCfg parser.Config
+	require.NoError(t, conf.MustNewConfigFrom(mapstr.M{
+		"parsers": []mapstr.M{
+			{
+				"multiline": mapstr.M{
+					"type":        "count",
+					"count_lines": 3,
+				},
+			},
+		},
+	}).Unpack(&parserCfg))
+
+	p := parserCfg.Create(ra, logp.NewNopLogger())
+	t.Cleanup(func() { require.NoError(t, p.Close()) })
+
+	msg, err := p.Next()
+	require.NoError(t, err)
+	require.Equal(t, "line1\nline2\nline3", string(msg.Content))
+
+	privates, ok := msg.Private.([]any)
+	require.True(t, ok, "multiline output should aggregate Private values from each source line")
+	require.Len(t, privates, 3)
+
+	for i, want := range cursors {
+		cp, ok := privates[i].(checkpoint)
+		require.True(t, ok, "expected checkpoint at index %d", i)
+		require.Equal(t, want, cp.Position)
+	}
+
+	cursorUpdate, ok := getCursorUpdate(msg.Private).(checkpoint)
+	require.True(t, ok, "cursor update should be the last journal checkpoint")
+	require.Equal(t, wantCursor, cursorUpdate.Position)
+}
+
+func TestGetCursorUpdateEmptyPrivateSlice(t *testing.T) {
+	cursorUpdate := getCursorUpdate([]any{})
+	require.Nil(t, cursorUpdate, "empty aggregated Private values should not panic or produce a cursor update")
 }

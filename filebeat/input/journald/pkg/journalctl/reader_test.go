@@ -28,6 +28,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -61,7 +62,7 @@ func TestEventWithNonStringData(t *testing.T) {
 				KillFunc: func() error { return nil },
 			}
 			r := Reader{
-				logger: logp.L(),
+				logger: logptest.NewTestingLogger(t, ""),
 				jctl:   &mock,
 			}
 
@@ -276,6 +277,53 @@ func TestJournalctlSupportsBootAll(t *testing.T) {
 			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
 			if got != tc.wantBootAll {
 				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
+			}
+		})
+	}
+}
+
+func TestFacilityArgs(t *testing.T) {
+	// Facilities are always passed as SYSLOG_FACILITY matches regardless of
+	// the journalctl version: `--facility` only exists on journalctl >= 245
+	// and is implemented as exactly these matches.
+	for _, version := range []int{239, 250} {
+		t.Run(fmt.Sprintf("version %d", version), func(t *testing.T) {
+			f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
+				return &JctlMock{
+					NextFunc: func(canceler input.Canceler) ([]byte, error) {
+						ret := fmt.Sprintf("systemd %d (%d-test)\n+PAM +AUDIT", version, version)
+						return []byte(ret), nil
+					},
+					KillFunc: func() error { return nil },
+				}, nil
+			}
+
+			r, err := New(
+				logptest.NewTestingLogger(t, ""),
+				t.Context(),
+				nil,
+				nil,
+				nil,
+				journalfield.IncludeMatches{},
+				[]int{4, 10},
+				SeekHead,
+				"",
+				0,
+				"",
+				false,
+				f)
+			if err != nil {
+				t.Fatalf("did not expect an error when calling New: %s", err)
+			}
+
+			argsStr := strings.Join(r.args, " ")
+			for _, want := range []string{"SYSLOG_FACILITY=4", "SYSLOG_FACILITY=10"} {
+				if !strings.Contains(argsStr, want) {
+					t.Errorf("expected %q in args %q", want, argsStr)
+				}
+			}
+			if strings.Contains(argsStr, "--facility") {
+				t.Errorf("did not expect \"--facility\" in args %q", argsStr)
 			}
 		})
 	}
