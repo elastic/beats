@@ -302,6 +302,27 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 			require.NotContains(t, err.Error(), "id token")
 		}
 	})
+
+	t.Run("wii: cert and key files are required and there is no silent legacy fallback", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "https://wii.example.com")
+		// Legacy env vars are fully configured: the WII path must still be selected
+		// (and fail on the missing cert), never silently fall back to the legacy chain.
+		t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+		t.Setenv(identityfederation.AWSIDTokenFileEnvVar, "/path/token")
+		t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
+
+		err := applyIdentityFederationChain(ConfigAWS{RoleArn: validRoleARN}, &aws.Config{}, logger)
+		require.ErrorContains(t, err, "WORKLOAD_IDENTITY_SSL_CERT_FILE")
+	})
+
+	t.Run("wii: role_arn is required", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "https://wii.example.com")
+		t.Setenv(identityfederation.WIISSLCertFileEnvVar, "/path/wii-client.crt")
+		t.Setenv(identityfederation.WIISSLKeyFileEnvVar, "/path/wii-client.key")
+
+		err := applyIdentityFederationChain(ConfigAWS{}, &aws.Config{}, logger)
+		require.ErrorContains(t, err, "role_arn is required for WII identity federation")
+	})
 }
 
 func TestInitializeAWSConfig(t *testing.T) {
