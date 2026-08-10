@@ -208,7 +208,7 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 
 `fingerprint` is the recommended file identity and the default in 9.0 and later. It does not rely on the file system or operating system. Instead, it generates a hash from part of the file (the first 1024 bytes by default) and uses that hash to identify the file. This works well with log rotation strategies that move or rename files and on Windows, where file identifiers might be more volatile.
 
-{applies_to}`stack: ga 9.5+` The [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay. In earlier versions, Filebeat waits until the file reaches 1024 bytes before ingesting it.
+{applies_to}`stack: ga 9.5+` The [growing fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay. In earlier versions, Filebeat waits until the file reaches 1024 bytes before ingesting it.
 
 ::::{warning}
 Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
@@ -445,7 +445,7 @@ $$$filebeat-input-filestream-file-identity-fingerprint$$$
     ```
 
     `growing` {applies_to}`stack: ga 9.5.0+`
-  :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
+  :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [growing fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
 
       Set to `false` to restore the pre-9.5 behavior.
 
@@ -1220,7 +1220,7 @@ Following are some scenarios where this can happen:
 ::::{warning}
 {applies_to}`stack: ga 9.0-9.4` Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size. Until then, these files are ignored.
 
-{applies_to}`stack: ga 9.5+` Enhanced fingerprint tracks smaller files by default. The ingestion delay applies only when `file_identity.fingerprint.growing` is set to `false`.
+{applies_to}`stack: ga 9.5+` Growing fingerprint tracks smaller files by default. The ingestion delay applies only when `file_identity.fingerprint.growing` is set to `false`.
 ::::
 
 Normally, log lines contain timestamps and other unique fields that make the default fingerprint range suitable. Inspect your logs to determine appropriate `offset` and `length` values. The default `offset` is `0`, and the default `length` is `1024` bytes. `length` cannot be less than `64` bytes.
