@@ -27,7 +27,7 @@ CHANGELOG*
 /.github/workflows/golangci-lint.yml @elastic/elastic-agent-data-plane
 /.github/workflows/release-notes.yml @elastic/ingest-docs @elastic/elastic-agent-data-plane
 /.github/CODEOWNERS @elastic/beats-tech-leads
-/auditbeat/ @elastic/sec-linux-platform
+/auditbeat/ @elastic/security-service-integrations
 /deploy/ @elastic/elastic-agent-data-plane
 /deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /dev-tools/ @elastic/elastic-agent-data-plane
@@ -36,9 +36,9 @@ CHANGELOG*
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /filebeat/input/syslog/ @elastic/integration-experience
-/filebeat/input/winlog/ @elastic/sec-windows-platform
+/filebeat/input/winlog/ @elastic/security-service-integrations
 /filebeat/module/apache @elastic/obs-infraobs-integrations
-/filebeat/module/auditd @elastic/sec-linux-platform
+/filebeat/module/auditd @elastic/security-service-integrations
 /filebeat/module/elasticsearch/ @elastic/stack-monitoring
 /filebeat/module/haproxy @elastic/obs-infraobs-integrations
 /filebeat/module/icinga # TODO: find right team
@@ -50,7 +50,11 @@ CHANGELOG*
 /filebeat/module/mysql @elastic/obs-infraobs-integrations
 /filebeat/module/nats @elastic/obs-infraobs-integrations
 /filebeat/module/nginx @elastic/obs-infraobs-integrations
+<<<<<<< HEAD
 /filebeat/module/osquery @elastic/integration-experience
+=======
+/filebeat/module/osquery @elastic/security-service-integrations
+>>>>>>> dd1a35c64 (Transfer Linux and Windows team ownership to security-service-integrations (#52532))
 /filebeat/module/pensando @elastic/integration-experience
 /filebeat/module/postgresql @elastic/obs-infraobs-integrations
 /filebeat/module/redis @elastic/obs-infraobs-integrations
@@ -68,12 +72,19 @@ CHANGELOG*
 /libbeat/processors/cache/ @elastic/security-service-integrations
 /libbeat/processors/community_id/ @elastic/integration-experience
 /libbeat/processors/decode_xml/ @elastic/security-service-integrations
-/libbeat/processors/decode_xml_wineventlog/ @elastic/sec-windows-platform
+/libbeat/processors/decode_xml_wineventlog/ @elastic/security-service-integrations
 /libbeat/processors/dns/ @elastic/integration-experience
 /libbeat/processors/registered_domain/ @elastic/integration-experience
 /libbeat/processors/syslog/ @elastic/integration-experience
+<<<<<<< HEAD
 /libbeat/processors/translate_ldap_attribute/ @elastic/sec-windows-platform
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
+=======
+/libbeat/processors/translate_ldap_attribute/ @elastic/security-service-integrations
+/libbeat/processors/translate_sid/ @elastic/security-service-integrations
+/libbeat/reader/auditd/ @elastic/security-service-integrations
+/libbeat/reader/etw/ @elastic/security-service-integrations
+>>>>>>> dd1a35c64 (Transfer Linux and Windows team ownership to security-service-integrations (#52532))
 /libbeat/reader/syslog/ @elastic/integration-experience
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
@@ -109,12 +120,23 @@ CHANGELOG*
 /metricbeat/module/vsphere @elastic/obs-infraobs-integrations
 /metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
+<<<<<<< HEAD
 /packetbeat/ @elastic/sec-linux-platform
 /script/ @elastic/elastic-agent-data-plane
 /testing/ @elastic/elastic-agent-data-plane
 /tools/ @elastic/elastic-agent-data-plane
 /winlogbeat/ @elastic/sec-windows-platform
 /x-pack/auditbeat/ @elastic/sec-linux-platform
+=======
+/packetbeat/ @elastic/security-service-integrations
+/pkg/autodiscover/ @elastic/elastic-agent-data-plane
+/script/ @elastic/elastic-agent-data-plane
+/testing/ @elastic/elastic-agent-data-plane
+/tools/ @elastic/elastic-agent-data-plane
+/winlogbeat/ @elastic/security-service-integrations
+/x-pack/auditbeat/ @elastic/security-service-integrations
+/x-pack/auditbeat/abreceiver/ @elastic/elastic-agent-data-plane
+>>>>>>> dd1a35c64 (Transfer Linux and Windows team ownership to security-service-integrations (#52532))
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations
@@ -125,7 +147,7 @@ CHANGELOG*
 /x-pack/filebeat/input/cel/ @elastic/security-service-integrations
 /x-pack/filebeat/input/cometd/ @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-service-integrations
-/x-pack/filebeat/input/etw/ @elastic/sec-windows-platform
+/x-pack/filebeat/input/etw/ @elastic/security-service-integrations
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-service-integrations
 /x-pack/filebeat/input/gcs/ @elastic/security-service-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-service-integrations
@@ -162,10 +184,10 @@ CHANGELOG*
 /x-pack/filebeat/module/infoblox @elastic/security-service-integrations
 /x-pack/filebeat/module/iptables @elastic/integration-experience
 /x-pack/filebeat/module/juniper @elastic/integration-experience
-/x-pack/filebeat/module/microsoft @elastic/sec-windows-platform
+/x-pack/filebeat/module/microsoft @elastic/security-service-integrations
 /x-pack/filebeat/module/misp @elastic/security-service-integrations
 /x-pack/filebeat/module/mssql @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/mysqlenterprise @elastic/sec-windows-platform
+/x-pack/filebeat/module/mysqlenterprise @elastic/security-service-integrations
 /x-pack/filebeat/module/netflow @elastic/integration-experience
 /x-pack/filebeat/module/netscout @elastic/integration-experience
 /x-pack/filebeat/module/o365 @elastic/security-service-integrations
@@ -235,6 +257,15 @@ CHANGELOG*
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/stan/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
+<<<<<<< HEAD
 /x-pack/osquerybeat/ @elastic/integration-experience
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
+=======
+/x-pack/osquerybeat/ @elastic/security-service-integrations
+/x-pack/osquerybeat/osqreceiver/ @elastic/elastic-agent-data-plane
+/x-pack/osquerybeat/beater/receiver.go @elastic/elastic-agent-data-plane
+/x-pack/packetbeat/ @elastic/security-service-integrations
+/x-pack/packetbeat/pbreceiver/ @elastic/elastic-agent-data-plane
+/x-pack/winlogbeat/ @elastic/security-service-integrations
+>>>>>>> dd1a35c64 (Transfer Linux and Windows team ownership to security-service-integrations (#52532))
