@@ -9,7 +9,7 @@
 
 **All**
 
-* Fix unknown type for map[string]string in otelmap. [#52464](https://github.com/elastic/beats/pull/52464) 
+* Fix unknown type for `map[string]string` in `otelmap`. [#52464](https://github.com/elastic/beats/pull/52464) 
 
 **Filebeat**
 
@@ -17,7 +17,7 @@
 
 **Heartbeat**
 
-* Bake Synthetics browser binaries into the heartbeat Docker image. [#52443](https://github.com/elastic/beats/pull/52443) [#52439](https://github.com/elastic/beats/issues/52439)
+* Bake Synthetics browser binaries into the Heartbeat Docker image. [#52443](https://github.com/elastic/beats/pull/52443) [#52439](https://github.com/elastic/beats/issues/52439)
 
 **Libbeat**
 
