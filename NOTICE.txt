@@ -22268,11 +22268,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/vmware/govmomi
-Version: v0.52.0
+Version: v0.55.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.52.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.55.1/LICENSE.txt:
 
 
                                  Apache License
@@ -23360,11 +23360,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/v2@v2.7.12/LICEN
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/ecszap
-Version: v1.0.2
+Version: v1.0.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.3/LICENSE:
 
 
                                  Apache License
