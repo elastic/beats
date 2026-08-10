@@ -112,12 +112,12 @@ func NewNodeEventer(
 // OnAdd ensures processing of node objects that are newly created
 func (n *node) OnAdd(obj any) {
 	n.logger.Debugf("Watcher Node add: %+v", obj)
-	n.emit(obj.(*kubernetes.Node), "start")
+	n.emit(obj.(*kubernetes.Node), "start") //nolint:errcheck // informer object type is validated
 }
 
 // OnUpdate ensures processing of node objects that are updated
 func (n *node) OnUpdate(obj any) {
-	node := obj.(*kubernetes.Node)
+	node := obj.(*kubernetes.Node) //nolint:errcheck // informer object type is validated
 	if node.GetObjectMeta().GetDeletionTimestamp() != nil {
 		n.logger.Debugf("Watcher Node update (terminating): %+v", obj)
 		// Node is terminating, don't reload its configuration and ignore the event as long as node is Ready.
@@ -135,7 +135,7 @@ func (n *node) OnUpdate(obj any) {
 // OnDelete ensures processing of node objects that are deleted
 func (n *node) OnDelete(obj any) {
 	n.logger.Debugf("Watcher Node delete: %+v", obj)
-	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(obj.(*kubernetes.Node), "stop") })
+	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(obj.(*kubernetes.Node), "stop") }) //nolint:errcheck // informer object type is validated
 }
 
 // GenerateHints creates hints needed for hints builder
