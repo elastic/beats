@@ -27,10 +27,10 @@ import (
 // fingerprint file identity. The fields are propagated to the scanner's
 // fingerprint config via normalizeConfig before the prospector is created.
 type fingerprintIdentityConfig struct {
-	// Growing opts into the Enhanced Fingerprint behavior: files smaller
-	// than the configured fingerprint size (prospector.scanner.fingerprint.
-	// offset + prospector.scanner.fingerprint.length) are tracked using the
-	// raw bytes available so far, instead of being skipped as too small.
+	// Growing tracks files smaller than the configured fingerprint size
+	// (prospector.scanner.fingerprint.offset +
+	// prospector.scanner.fingerprint.length) using the raw bytes available
+	// so far, instead of skipping them as too small.
 	// Once such a file grows past the threshold it is automatically rekeyed
 	// to the same SHA-256 hex the static fingerprint produces, so existing
 	// static-fingerprint state is reused with no data duplication.
