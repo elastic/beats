@@ -122,12 +122,12 @@ prospector.scanner.fingerprint.enabled: false
 			wantCopyTruncate bool
 		}{
 			{
-				name:             "Enhanced Fingerprint ignores copytruncate and uses the standard prospector",
+				name:             "growing fingerprint ignores copytruncate and uses the standard prospector",
 				fileIdentity:     "file_identity.fingerprint: ~",
 				wantCopyTruncate: false,
 			},
 			{
-				name:             "opting out of Enhanced Fingerprint keeps the copytruncate prospector",
+				name:             "opting out of growing fingerprint keeps the copytruncate prospector",
 				fileIdentity:     "file_identity.fingerprint.growing: false",
 				wantCopyTruncate: true,
 			},
@@ -161,7 +161,7 @@ rotation.external.strategy.copytruncate:
 				fp, ok := p.(*fileProspector)
 				require.True(t, ok, "expected the standard file prospector, got %T", p)
 				assert.True(t, fp.growingFingerprint,
-					"Enhanced Fingerprint must stay enabled when copytruncate is ignored")
+					"growing fingerprint must stay enabled when copytruncate is ignored")
 			})
 		}
 	})

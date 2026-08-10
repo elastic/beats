@@ -46,7 +46,7 @@ func TestFetchEventContents(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "traefik",
 		"metricsets": []string{"health"},
 		"hosts":      []string{server.URL},

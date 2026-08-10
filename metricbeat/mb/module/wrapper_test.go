@@ -97,7 +97,7 @@ func newTestRegistry(t testing.TB) *mb.Register {
 	return r
 }
 
-func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
+func newConfig(t testing.TB, moduleConfig any) *conf.C {
 	config, err := conf.NewConfigFrom(moduleConfig)
 	require.NoError(t, err)
 	return config
@@ -107,7 +107,7 @@ func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
 
 func TestWrapperOfReportingFetcher(t *testing.T) {
 	hosts := []string{"alpha", "beta"}
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 		"hosts":      hosts,
@@ -138,7 +138,7 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 
 func TestWrapperOfPushMetricSet(t *testing.T) {
 	hosts := []string{"alpha"}
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{pushMetricSetName},
 		"hosts":      hosts,
@@ -185,7 +185,7 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
 			hosts := []string{"alpha"}
-			config := newConfig(t, map[string]interface{}{
+			config := newConfig(t, map[string]any{
 				"module":     moduleName,
 				"metricsets": []string{c.metricset},
 				"hosts":      hosts,
@@ -215,7 +215,7 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 
 func TestDurationIsAddedToEvent(t *testing.T) {
 	hosts := []string{"alpha"}
-	config := newConfig(t, map[string]interface{}{
+	config := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 		"hosts":      hosts,
@@ -244,7 +244,7 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 
 func TestNewWrapperForMetricSet(t *testing.T) {
 	hosts := []string{"alpha"}
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 		"hosts":      hosts,
