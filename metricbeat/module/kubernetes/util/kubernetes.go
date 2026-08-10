@@ -384,7 +384,9 @@ func hasCommittedClusterScopedUser(metaWatcher *metaWatcher) bool {
 	return false
 }
 
-// registerWatcherUser records ownership of one exact watched resource.
+// registerWatcherUser reserves one exact watched resource while the enricher is
+// initialized. This keeps a concurrently stopping owner from removing the
+// watcher while metadata generators are being created.
 // The resource watcher registry must be locked by the caller.
 func registerWatcherUser(resourceName string, metaWatcher *metaWatcher, e *enricher, primary, nodeScope bool) {
 	if addWatcherUser(metaWatcher, e, nodeScope) {
@@ -395,8 +397,10 @@ func registerWatcherUser(resourceName string, metaWatcher *metaWatcher, e *enric
 	}
 }
 
-// commitWatcherOwnership publishes a fully initialized enricher to Start and
-// watcher event handlers.
+// commitWatcherOwnership makes an enricher visible to Start and watcher event
+// handlers after its callbacks and indexes have been initialized. Registrations
+// are made earlier to reserve the shared watchers and rolled back if setup
+// fails.
 func commitWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
