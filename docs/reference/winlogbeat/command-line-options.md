@@ -204,9 +204,6 @@ winlogbeat [FLAGS]
 **`--memprofile FILE`**
 :   Writes memory profile data to the specified output file. This option is useful for troubleshooting Winlogbeat.
 
-**`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
-
 Also see [Global flags](#global-flags).
 
 **EXAMPLE**
