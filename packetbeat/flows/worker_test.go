@@ -28,7 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 )
@@ -37,7 +37,6 @@ import (
 var dataFlag = flag.Bool("data", false, "Write updated data.json files")
 
 func TestCreateEvent(t *testing.T) {
-	logp.TestingSetup()
 
 	// Build biflow event.
 	start := time.Unix(1542292881, 0)
@@ -50,7 +49,7 @@ func TestCreateEvent(t *testing.T) {
 	port1 := uint16(38901)
 	port2 := uint16(80)
 
-	id := newFlowID()
+	id := newFlowID(logptest.NewTestingLogger(t, ""))
 	id.AddEth(mac1, mac2)
 	id.AddVLan(vlan)
 	id.AddIPv4(ip1, ip2)

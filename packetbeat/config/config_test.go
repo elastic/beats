@@ -26,6 +26,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var fromStaticTests = []struct {
@@ -484,7 +485,7 @@ func TestFromStatic(t *testing.T) {
 				t.Fatalf("failed to construct config.C: %v", err)
 			}
 			got := test.cli
-			got, err = got.FromStatic(cfg)
+			got, err = got.FromStatic(cfg, logptest.NewTestingLogger(t, ""))
 			if !sameErr(err, test.wantErr) {
 				if err != nil {
 					t.Fatalf("failed to construct config.C: %v", err)

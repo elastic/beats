@@ -62,11 +62,11 @@ type tlsPlugin struct {
 	transactionTimeout     time.Duration
 	results                protos.Reporter
 	watcher                *procs.ProcessesWatcher
+	logger, tlsLogger      *logp.Logger
+	isDebug                bool
 }
 
 var (
-	debugf  = logp.MakeDebug("tls")
-	isDebug = false
 
 	// ensure that tlsPlugin fulfills the TCPPlugin interface
 	_ protos.TCPPlugin = &tlsPlugin{}
@@ -82,8 +82,12 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &tlsPlugin{}
+	p.logger = logger
+	p.tlsLogger = logger.Named("tls")
+	p.isDebug = p.tlsLogger.IsDebug()
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -97,6 +101,13 @@ func New(
 	return p, nil
 }
 
+//go:inline
+func (plugin *tlsPlugin) debugf(format string, args ...interface{}) {
+	if plugin.isDebug {
+		plugin.tlsLogger.Debugf(format, args...)
+	}
+}
+
 func (plugin *tlsPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *tlsConfig) error {
 	if err := plugin.setFromConfig(config); err != nil {
 		return err
@@ -104,7 +115,6 @@ func (plugin *tlsPlugin) init(results protos.Reporter, watcher *procs.ProcessesW
 
 	plugin.results = results
 	plugin.watcher = watcher
-	isDebug = logp.IsDebug("tls")
 
 	return nil
 }
@@ -139,7 +149,7 @@ func (plugin *tlsPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	conn := ensureTLSConnection(private)
+	conn := ensureTLSConnection(private, plugin.logger)
 	if private == nil {
 		conn.startTime = pkt.Ts
 	}
@@ -150,14 +160,14 @@ func (plugin *tlsPlugin) Parse(
 	return conn
 }
 
-func ensureTLSConnection(private protos.ProtocolData) *tlsConnectionData {
+func ensureTLSConnection(private protos.ProtocolData, logger *logp.Logger) *tlsConnectionData {
 	if private == nil {
 		return &tlsConnectionData{}
 	}
 
 	priv, ok := private.(*tlsConnectionData)
 	if !ok {
-		logp.Warn("tls connection data type error, creating a new one")
+		logger.Warn("tls connection data type error, creating a new one")
 		return &tlsConnectionData{}
 	}
 
@@ -180,13 +190,12 @@ func (plugin *tlsPlugin) doParse(
 	if st == nil {
 		st = newStream(tcptuple)
 		st.cmdlineTuple = plugin.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
+		st.parser.logger = plugin.tlsLogger
 		conn.streams[dir] = st
 	}
 
 	if err := st.Append(pkt.Payload); err != nil {
-		if isDebug {
-			debugf("%v, dropping TCP stream", err)
-		}
+		plugin.debugf("%v, dropping TCP stream", err)
 		return nil
 	}
 
@@ -203,9 +212,7 @@ func (plugin *tlsPlugin) doParse(
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			conn.streams[dir] = nil
-			if isDebug {
-				debugf("non-TLS message: TCP stream dropped. Try parsing with the next segment")
-			}
+			plugin.debugf("non-TLS message: TCP stream dropped. Try parsing with the next segment")
 
 		case resultEncrypted:
 			conn.handshakeCompleted |= 1 << dir
@@ -230,7 +237,7 @@ func newStream(tcptuple *common.TCPTuple) *stream {
 func (plugin *tlsPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	if conn := ensureTLSConnection(private); conn != nil {
+	if conn := ensureTLSConnection(private, plugin.logger); conn != nil {
 		plugin.sendEvent(conn)
 	}
 	return private
@@ -238,7 +245,7 @@ func (plugin *tlsPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 
 func (plugin *tlsPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-	if conn := ensureTLSConnection(private); conn != nil {
+	if conn := ensureTLSConnection(private, plugin.logger); conn != nil {
 		plugin.sendEvent(conn)
 	}
 	return private, true
@@ -277,7 +284,7 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 	detailed := mapstr.M{}
 
-	emptyHello := &helloMessage{}
+	emptyHello := &helloMessage{logger: plugin.tlsLogger}
 	var clientHello, serverHello *helloMessage
 	if client.parser.hello != nil {
 		clientHello = client.parser.hello

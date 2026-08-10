@@ -797,3 +797,99 @@ func TestS3ConfigModifierHostnameImmutable(t *testing.T) {
 		})
 	}
 }
+
+func TestBackupPrefixToExclude(t *testing.T) {
+	tests := []struct {
+		name string
+		cfg  config
+		want string
+	}{
+		{
+			name: "no backup configured",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "",
+			},
+			want: "",
+		},
+		{
+			name: "different bucket",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::other-bucket",
+					BackupToBucketPrefix: "processed/",
+				},
+			},
+			want: "",
+		},
+		{
+			name: "same bucket, empty list prefix",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::my-bucket",
+					BackupToBucketPrefix: "processed/",
+				},
+			},
+			want: "processed/",
+		},
+		{
+			name: "same bucket, backup prefix within list prefix scope",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "logs/",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::my-bucket",
+					BackupToBucketPrefix: "logs/processed/",
+				},
+			},
+			want: "logs/processed/logs/",
+		},
+		{
+			name: "same bucket, backup prefix outside list prefix scope",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "logs/",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::my-bucket",
+					BackupToBucketPrefix: "archived/",
+				},
+			},
+			want: "",
+		},
+		{
+			name: "same bucket via access point ARN",
+			cfg: config{
+				AccessPointARN:   "arn:aws:s3:us-east-1:123456789:accesspoint/ap",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:us-east-1:123456789:accesspoint/ap",
+					BackupToBucketPrefix: "done/",
+				},
+			},
+			want: "done/",
+		},
+		{
+			name: "same non-AWS bucket",
+			cfg: config{
+				NonAWSBucketName: "minio-bucket",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					NonAWSBackupToBucketName: "minio-bucket",
+					BackupToBucketPrefix:     "backup/",
+				},
+			},
+			want: "backup/",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.cfg.backupPrefixToExclude()
+			assert.Equal(t, tt.want, got, "backupPrefixToExclude() mismatch")
+		})
+	}
+}

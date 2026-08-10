@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: The journald input now reports a Degraded status when journalctl repeatedly exits without delivering any data, instead of staying Healthy while collecting no events
+component: filebeat

@@ -25,6 +25,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFindSocketsOfPid(t *testing.T) {
@@ -55,7 +57,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 		return
 	}
 
-	inodes, err := findSocketsOfPid(pathPrefix, 766)
+	inodes, err := findSocketsOfPid(pathPrefix, 766, logptest.NewTestingLogger(t, "procs"))
 	if err != nil {
 		t.Fatalf("FindSocketsOfPid: %s", err)
 	}
@@ -69,7 +71,7 @@ func TestParseInvalidIp6Addr(t *testing.T) {
 }
 
 func TestParse_Proc_Net_Tcp(t *testing.T) {
-	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp.txt", false)
+	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp.txt", false, logptest.NewTestingLogger(t, "procs"))
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}
@@ -85,7 +87,7 @@ func TestParse_Proc_Net_Tcp(t *testing.T) {
 }
 
 func TestParse_Proc_Net_Tcp6(t *testing.T) {
-	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp6.txt", true)
+	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp6.txt", true, logptest.NewTestingLogger(t, "procs"))
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}

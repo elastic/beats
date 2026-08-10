@@ -34,6 +34,8 @@ type parser struct {
 	framer    *gocql.Framer
 	message   *message
 	onMessage func(m *message) error
+	logger    *logp.Logger
+	isDebug   bool
 }
 
 type parserConfig struct {
@@ -68,20 +70,27 @@ type message struct {
 // Error code if stream exceeds max allowed size on append.
 var (
 	errStreamTooLarge = errors.New("Stream data too large")
-	isDebug           = false
 )
 
 func (p *parser) init(
 	cfg *parserConfig,
 	onMessage func(*message) error,
+	logger *logp.Logger,
 ) {
 	*p = parser{
 		buf:       streambuf.Buffer{},
 		config:    cfg,
 		onMessage: onMessage,
+		logger:    logger, // the incoming logger is the cassandra logger
+		isDebug:   logger.IsDebug(),
 	}
 
-	isDebug = logp.IsDebug("cassandra")
+}
+
+func (p *parser) debugf(format string, args ...interface{}) {
+	if p.isDebug {
+		p.logger.Debugf(format, args...)
+	}
 }
 
 func (p *parser) append(data []byte) error {
@@ -144,19 +153,15 @@ func (p *parser) parserBody() (bool, error) {
 	}
 
 	// let's wait for enough buf
-	debugf("bodyLength: %d", bdyLen)
+	p.debugf("bodyLength: %d", bdyLen)
 	if !p.buf.Avail(bdyLen) {
-		if isDebug {
-			debugf("buf not enough for body, waiting for more, return")
-		}
+		p.debugf("buf not enough for body, waiting for more, return")
 		return false, nil
 	}
 
 	// check if the ops already ignored
 	if p.message.ignored {
-		if isDebug {
-			debugf("message marked to be ignored, let's do this")
-		}
+		p.debugf("message marked to be ignored, let's do this")
 		p.buf.Collect(bdyLen)
 	} else {
 		// start to parse body
@@ -175,7 +180,7 @@ func (p *parser) parserBody() (bool, error) {
 		if unParsedSize > 0 {
 			if !p.buf.Avail(unParsedSize) {
 				err := errors.New("should be enough bytes for cleanup,but not enough")
-				logp.Err("Finishing frame failed with: %v", err)
+				p.logger.Errorf("Finishing frame failed with: %v", err)
 				return false, err
 			}
 
@@ -187,7 +192,7 @@ func (p *parser) parserBody() (bool, error) {
 
 	finalCollectedFrameLength := p.buf.BufferConsumed()
 	if finalCollectedFrameLength-headLen != bdyLen {
-		logp.Err("body_length:%d, head_length:%d, all_consumed:%d",
+		p.logger.Errorf("body_length:%d, head_length:%d, all_consumed:%d",
 			bdyLen, headLen, finalCollectedFrameLength)
 		return false, errors.New("data messed while parse frame body")
 	}
@@ -198,25 +203,24 @@ func (p *parser) parserBody() (bool, error) {
 func (p *parser) parse() (*message, error) {
 	// if p.frame is nil then create a new framer, or continue to process the last message
 	if p.framer == nil {
-		if isDebug {
-			debugf("start new framer")
+		if p.isDebug {
+			p.debugf("start new framer")
 		}
-		p.framer = gocql.NewFramer(&p.buf, p.config.compressor)
+		p.framer = gocql.NewFramer(&p.buf, p.config.compressor, p.logger)
 	}
 
 	// check if the frame header were parsed or not
 	if p.framer.Header == nil {
-		if isDebug {
-			debugf("start to parse header")
-		}
+		p.debugf("start to parse header")
+
 		if !p.buf.Avail(9) {
-			debugf("not enough head bytes, ignore")
+			p.debugf("not enough head bytes, ignore")
 			return nil, nil
 		}
 
 		_, err := p.framer.ReadHeader()
 		if err != nil {
-			logp.Err("%v", err)
+			p.logger.Errorf("%v", err)
 			p.framer = nil
 			return nil, err
 		}
@@ -226,9 +230,7 @@ func (p *parser) parse() (*message, error) {
 	if p.CheckFrameOpsIgnored() {
 		// as we already ignore the content, we now mark the result is ignored
 		p.message.ignored = true
-		if isDebug {
-			debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest())
-		}
+		p.debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest(p.logger))
 	}
 
 	msg := p.message
@@ -246,7 +248,7 @@ func (p *parser) parse() (*message, error) {
 	dir := applayer.NetOriginalDirection
 
 	isRequest := true
-	if p.framer.Header.Version.IsResponse() {
+	if p.framer.Header.Version.IsResponse(p.logger) {
 		dir = applayer.NetReverseDirection
 		isRequest = false
 	}

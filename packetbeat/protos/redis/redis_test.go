@@ -24,10 +24,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func newTestStream(content []byte) *stream {
-	st := newStream(time.Now(), nil)
+	st := newStream(time.Now(), nil, logp.NewNopLogger())
 	st.Append(content)
 	return st
 }

@@ -30,6 +30,8 @@ type parser struct {
 	parseOffset int
 	// bytesReceived int
 	message *redisMessage
+
+	logger *logp.Logger
 }
 
 type redisMessage struct {
@@ -301,9 +303,7 @@ func (p *parser) dispatch(depth int, buf *streambuf.Buffer) (common.NetString, b
 		iserror = true
 		value, ok, complete = p.parseSimpleString(buf)
 	default:
-		if isDebug {
-			debugf("Unexpected message starting with %s", buf.Bytes()[0])
-		}
+		p.logger.Debugf("Unexpected message starting with %d", buf.Bytes()[0])
 		return empty, false, false, false
 	}
 
@@ -317,7 +317,7 @@ func (p *parser) parseInt(buf *streambuf.Buffer) (common.NetString, bool, bool) 
 	value, ok, complete := p.parseSimpleString(buf)
 	if ok && complete {
 		if _, err := parseInt(value); err != nil {
-			logp.Err("Failed to read integer reply: %s", err)
+			p.logger.Errorf("Failed to read integer reply: %s", err)
 		}
 	}
 	return value, ok, complete
@@ -344,7 +344,7 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 
 	length, err := parseInt(line[1:])
 	if err != nil {
-		logp.Err("Failed to read bulk message: %s", err)
+		p.logger.Errorf("Failed to read bulk message: %s", err)
 		return empty, false, false
 	}
 
@@ -362,14 +362,10 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString, bool, bool, bool) {
 	line, err := buf.UntilCRLF()
 	if err != nil {
-		if isDebug {
-			debugf("End of line not found, waiting for more data")
-		}
+		p.logger.Debugf("End of line not found, waiting for more data")
 		return empty, false, false, false
 	}
-	if isDebug {
-		debugf("line %s: %d", line, buf.BufferConsumed())
-	}
+	p.logger.Debugf("line %s: %d", line, buf.BufferConsumed())
 
 	if len(line) == 3 && line[1] == '-' && line[2] == '1' {
 		return nilStr, false, true, true
@@ -381,7 +377,7 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 
 	count, err := parseInt(line[1:])
 	if err != nil {
-		logp.Err("Failed to read number of bulk messages: %s", err)
+		p.logger.Errorf("Failed to read number of bulk messages: %s", err)
 		return empty, false, false, false
 	}
 	if count < 0 {
@@ -413,9 +409,7 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 
 		value, iserror, ok, complete := p.dispatch(depth+1, buf)
 		if !ok || !complete {
-			if isDebug {
-				debugf("Array incomplete")
-			}
+			p.logger.Debug("Array incomplete")
 			return empty, iserror, ok, complete
 		}
 
