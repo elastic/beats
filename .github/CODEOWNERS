@@ -270,15 +270,6 @@ changelog/fragments/
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/stan/ @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
-<<<<<<< HEAD
-/x-pack/osquerybeat/ @elastic/sec-windows-platform
-/x-pack/packetbeat/ @elastic/sec-linux-platform
-/x-pack/winlogbeat/ @elastic/sec-windows-platform
-=======
 /x-pack/osquerybeat/ @elastic/security-service-integrations
-/x-pack/osquerybeat/osqreceiver/ @elastic/elastic-agent-data-plane
-/x-pack/osquerybeat/beater/receiver.go @elastic/elastic-agent-data-plane
 /x-pack/packetbeat/ @elastic/security-service-integrations
-/x-pack/packetbeat/pbreceiver/ @elastic/elastic-agent-data-plane
 /x-pack/winlogbeat/ @elastic/security-service-integrations
->>>>>>> dd1a35c64 (Transfer Linux and Windows team ownership to security-service-integrations (#52532))
