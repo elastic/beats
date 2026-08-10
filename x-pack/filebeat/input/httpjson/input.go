@@ -393,7 +393,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		traceLogger := zap.New(core)
 
 		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, log)
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 	} else if cfg.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.

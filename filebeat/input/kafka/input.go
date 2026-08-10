@@ -114,9 +114,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		EventListener: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, events []any) {
 				for _, event := range events {
-					if meta, ok := event.(eventMeta); ok {
-						meta.ackHandler()
-					}
+					ackEventPrivate(event)
 				}
 			}),
 		),
@@ -222,6 +220,19 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 // been successfully sent.
 type eventMeta struct {
 	ackHandler func()
+}
+
+func ackEventPrivate(priv any) {
+	switch v := priv.(type) {
+	case eventMeta:
+		v.ackHandler()
+	case []any:
+		for _, el := range v {
+			if meta, ok := el.(eventMeta); ok {
+				meta.ackHandler()
+			}
+		}
+	}
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {

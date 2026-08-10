@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Remove Authorization headers from CEL, Entity Analytics, HTTP Endpoint, and HTTP JSON input request trace logs.
+component: filebeat

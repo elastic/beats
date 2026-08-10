@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix TCP and UDP inputs hanging during shutdown
+component: filebeat
