@@ -1214,13 +1214,7 @@ Following are some scenarios where this can happen:
 **Configuration**
 
 ::::{warning}
-<<<<<<< HEAD
 Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size, so they can be fingerprinted. Until then these files are ignored.
-=======
-{applies_to}`stack: ga 9.0-9.4` Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size. Until then, these files are ignored.
-
-{applies_to}`stack: ga 9.5+` Growing fingerprint tracks smaller files by default. The ingestion delay applies only when `file_identity.fingerprint.growing` is set to `false`.
->>>>>>> 075a102c3 (filestream: rename "Enhanced Fingerprint" to "growing fingerprint" (#52491))
 ::::
 
 

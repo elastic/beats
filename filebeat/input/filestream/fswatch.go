@@ -304,19 +304,9 @@ func (w *fileWatcher) watch(
 	//   1. Exact-FileID rename match — works for every identity including
 	//      static fingerprint. Catches a plain rename where the file's
 	//      content (and so its fingerprint) is unchanged.
-<<<<<<< HEAD
-	//   2. Prefix-match rename detection (Enhanced Fingerprint / growing
-	//      mode only) — catches rename + content growth in the same scan.
-	//   3. Unmatched-leftover emission — anything still in w.prev becomes
-=======
 	//   2. Prefix-match rename detection (growing fingerprint only) —
 	//      catches rename + content growth in the same scan.
-	//   3. Postpone deletes for entries under an unobservable prefix. Runs
-	//      AFTER both rename passes so a file renamed out of a directory that
-	//      became unobservable this scan is still detected as a rename, instead
-	//      of being carried forward here AND re-created from offset 0.
-	//   4. Unmatched-leftover emission — anything still in w.prev becomes
->>>>>>> 075a102c3 (filestream: rename "Enhanced Fingerprint" to "growing fingerprint" (#52491))
+	//   3. Unmatched-leftover emission — anything still in w.prev becomes
 	//      OpDelete, anything still in newFilesByName becomes OpCreate.
 
 	// Exact-FileID rename match.
@@ -575,11 +565,10 @@ type fingerprintConfig struct {
 	Enabled bool  `config:"enabled"`
 	Offset  int64 `config:"offset"`
 	Length  int64 `config:"length"`
-	// Growing enables Enhanced Fingerprint behaviour: files smaller than
-	// Offset+Length are tracked using the raw bytes from Offset to the file's
-	// end (hex-encoded). When a file reaches the threshold, its registry key
-	// migrates to the same SHA-256 hex the static fingerprint produces, so
-	// existing static-fingerprint state is preserved.
+	// Growing tracks files smaller than Offset+Length using the raw bytes
+	// from Offset to the file's end (hex-encoded). When a file reaches the
+	// threshold, its registry key migrates to the same SHA-256 hex the static
+	// fingerprint produces, so existing static-fingerprint state is preserved.
 	//
 	// Not user-configurable here: the YAML key under prospector.scanner.fingerprint
 	// is silently ignored. The user-facing knob is file_identity.fingerprint.growing;
