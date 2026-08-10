@@ -190,12 +190,6 @@ heartbeat [FLAGS]
 **`--memprofile FILE`**
 :   Writes memory profile data to the specified output file. This option is useful for troubleshooting Heartbeat.
 
-<<<<<<< HEAD
-**`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
-
-=======
->>>>>>> 6c8a4cf9c (Remove incorrect --system.hostfs flag docs from non-Metricbeat beats (#52417))
 Also see [Global flags](#global-flags).
 
 **EXAMPLE**
