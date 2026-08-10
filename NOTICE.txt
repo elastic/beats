@@ -11183,11 +11183,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-concert@v0.3
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-elasticsearch/v8
-Version: v8.19.0
+Version: v8.19.7
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-elasticsearch/v8@v8.19.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-elasticsearch/v8@v8.19.7/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -14861,16 +14861,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/go-ldap/ldap/v3
-Version: v3.4.6
+Version: v3.4.14
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/go-ldap/ldap/v3@v3.4.6/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/go-ldap/ldap/v3@v3.4.14/LICENSE:
 
 The MIT License (MIT)
 
 Copyright (c) 2011-2015 Michael Mitton (mmitton@gmail.com)
-Portions copyright (c) 2015-2016 go-ldap Authors
+Portions copyright (c) 2015-2024 go-ldap Authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42682,11 +42682,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/alexbrainman/sspi
-Version: v0.0.0-20210105120005-909beea2cc74
+Version: v0.0.0-20250919150558-7d374ff0d59e
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/alexbrainman/sspi@v0.0.0-20210105120005-909beea2cc74/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/alexbrainman/sspi@v0.0.0-20250919150558-7d374ff0d59e/LICENSE:
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
@@ -50584,11 +50584,11 @@ Contents of probable licence file $GOMODCACHE/github.com/ebitengine/purego@v0.10
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-transport-go/v8
-Version: v8.8.0
+Version: v8.9.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-transport-go/v8@v8.8.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-transport-go/v8@v8.9.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -52602,11 +52602,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/go-asn1-ber/asn1-ber
-Version: v1.5.5
+Version: v1.5.8
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/go-asn1-ber/asn1-ber@v1.5.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/go-asn1-ber/asn1-ber@v1.5.8/LICENSE:
 
 The MIT License (MIT)
 
