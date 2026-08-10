@@ -184,6 +184,19 @@ func TestExtraArgs(t *testing.T) {
 			false,
 		},
 		{
+			"certificate_error_spki_allowlist",
+			&Config{CertificateErrorSpkiAllowlist: []string{
+				"-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----",
+				"/path/to/server.crt",
+			}},
+			[]string{
+				"--certificate-error-spki-allowlist",
+				"-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----",
+				"/path/to/server.crt",
+			},
+			false,
+		},
+		{
 			"screenshots",
 			&Config{Screenshots: "off"},
 			[]string{"--screenshots", "off"},
