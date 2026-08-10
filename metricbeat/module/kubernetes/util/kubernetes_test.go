@@ -116,14 +116,10 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-<<<<<<< HEAD
-		false, logptest.NewTestingLogger(t, ""))
-=======
 		false,
 		namespaceEnricher,
 		logptest.NewTestingLogger(t, ""),
 	)
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -141,14 +137,10 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-<<<<<<< HEAD
-		true, logptest.NewTestingLogger(t, ""))
-=======
 		true,
 		newMetadataEnricher("state_deployment", DeploymentResource, config, log),
 		logptest.NewTestingLogger(t, ""),
 	)
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -191,94 +183,8 @@ func TestWatcherUserPointerIdentity(t *testing.T) {
 	require.True(t, metaWatcher.users[first].nodeScope, "first pointer's scope must be preserved")
 	require.False(t, metaWatcher.users[second].nodeScope, "second pointer's scope must be preserved")
 
-<<<<<<< HEAD
-	options, err := getWatchOptions(config, false, client, log)
-	require.NoError(t, err)
-
-	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(
-		DeploymentResource,
-		&kubernetes.Deployment{},
-		*options, client,
-		metadataClient,
-		resourceWatchers,
-		metricsRepo,
-		config.Namespace,
-		false, logptest.NewTestingLogger(t, ""))
-	require.True(t, created)
-	require.NoError(t, err)
-
-	resourceWatchers.lock.Lock()
-	require.NotNil(t, resourceWatchers.metaWatchersMap[DeploymentResource].watcher)
-	require.Equal(t, []string{}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-
-	metricsetDeployment := "state_deployment"
-	addToMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	resourceWatchers.lock.Lock()
-	require.Equal(t, []string{metricsetDeployment}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-
-	metricsetContainer := "container"
-	addToMetricsetsUsing(DeploymentResource, metricsetContainer, resourceWatchers)
-	resourceWatchers.lock.Lock()
-	require.Equal(t, []string{metricsetDeployment, metricsetContainer}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
-	resourceWatchers.lock.Unlock()
-}
-
-func TestRemoveFromMetricsetsUsing(t *testing.T) {
-	resourceWatchers := NewWatchers()
-	metricsRepo := NewMetricsRepo()
-
-	client := k8sfake.NewSimpleClientset()
-	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
-	config := &kubernetesConfig{
-		Namespace:  "test-ns",
-		SyncPeriod: time.Minute,
-		Node:       "test-node",
-	}
-	log := logptest.NewTestingLogger(t, "test")
-
-	options, err := getWatchOptions(config, false, client, log)
-	require.NoError(t, err)
-
-	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(
-		DeploymentResource,
-		&kubernetes.Deployment{},
-		*options,
-		client,
-		metadataClient,
-		resourceWatchers,
-		metricsRepo,
-		config.Namespace,
-		false, logptest.NewTestingLogger(t, ""))
-	require.True(t, created)
-	require.NoError(t, err)
-
-	metricsetDeployment := "state_deployment"
-	metricsetPod := "state_pod"
-	addToMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	addToMetricsetsUsing(DeploymentResource, metricsetPod, resourceWatchers)
-
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
-	removed, size := removeFromMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	require.True(t, removed)
-	require.Equal(t, 1, size)
-
-	removed, size = removeFromMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
-	require.False(t, removed)
-	require.Equal(t, 1, size)
-
-	removed, size = removeFromMetricsetsUsing(DeploymentResource, metricsetPod, resourceWatchers)
-	require.True(t, removed)
-	require.Equal(t, 0, size)
-=======
 	require.False(t, removeWatcherUser(metaWatcher, first), "one pointer remains")
 	require.True(t, removeWatcherUser(metaWatcher, second), "the final pointer was removed")
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 }
 
 func TestWatcherContainerMetrics(t *testing.T) {
@@ -597,13 +503,6 @@ func TestEnricherStopUsesPointerOwnershipAndEvictsFinalWatcher(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
-<<<<<<< HEAD
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
-		"enabled": true,
-	})
-	require.NoError(t, err)
-=======
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 	config := &kubernetesConfig{
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}

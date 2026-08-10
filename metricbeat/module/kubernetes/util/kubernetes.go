@@ -587,17 +587,6 @@ func addEventHandlersToWatcher(
 		nodeStore.SetNodeMetrics(metrics)
 	}
 
-<<<<<<< HEAD
-	clearMetadataCacheFunc := func(obj interface{}) {
-		enrichers := make(map[string]*enricher, len(metaWatcher.enrichers))
-
-		resourceWatchers.lock.Lock()
-		maps.Copy(enrichers, metaWatcher.enrichers)
-		resourceWatchers.lock.Unlock()
-
-		for _, enricher := range enrichers {
-			enricher.Lock()
-=======
 	clearMetadataCacheFunc := func(obj any) {
 		resourceWatchers.lock.RLock()
 		enrichers := make([]*enricher, 0, len(metaWatcher.enrichers))
@@ -613,7 +602,6 @@ func addEventHandlersToWatcher(
 				continue
 			}
 			//nolint:errcheck // we know the underlying type implements this interface
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 			ids := enricher.deleteFunc(obj.(kubernetes.Resource))
 			// update this watcher events by removing all the metadata[id]
 			for _, id := range ids {
@@ -654,53 +642,6 @@ func addEventHandlersToWatcher(
 	})
 }
 
-<<<<<<< HEAD
-// addToMetricsetsUsing adds metricset identified by metricsetUsing to the list of resources using the shared watcher
-// identified by resourceName. The caller of this function should not be holding the lock.
-func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWatchers *Watchers) {
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
-	data, ok := resourceWatchers.metaWatchersMap[resourceName]
-	if ok {
-		contains := false
-		for _, which := range data.metricsetsUsing {
-			if which == metricsetUsing {
-				contains = true
-				break
-			}
-		}
-		// add this resource to the list of resources using it
-		if !contains {
-			data.metricsetsUsing = append(data.metricsetsUsing, metricsetUsing)
-		}
-	}
-}
-
-// removeFromMetricsetsUsing removes the metricset from the list of resources using the shared watcher.
-// It returns true if element was removed and new size of array.
-// The cache should be locked when called.
-func removeFromMetricsetsUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
-	data, ok := resourceWatchers.metaWatchersMap[resourceName]
-	removed := false
-	if ok {
-		newIndex := 0
-		for i, which := range data.metricsetsUsing {
-			if which == notUsingName {
-				removed = true
-			} else {
-				data.metricsetsUsing[newIndex] = data.metricsetsUsing[i]
-				newIndex++
-			}
-		}
-		data.metricsetsUsing = data.metricsetsUsing[:newIndex]
-		return removed, len(data.metricsetsUsing)
-	}
-	return removed, 0
-}
-
-=======
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 // createAllWatchers creates all the watchers required by a metricset
 func createAllWatchers(
 	client k8sclient.Interface,
@@ -1327,17 +1268,9 @@ func (e *enricher) getMetadata(event mapstr.M) mapstr.M {
 // updateMetadataCacheFromWatcher updates the metadata cache for the given key with data from the watcher.
 func (e *enricher) updateMetadataCacheFromWatcher(key string) {
 	storeKey := getWatcherStoreKeyFromMetadataKey(key)
-<<<<<<< HEAD
-	if res, exists, _ := e.watcher.watcher.Store().GetByKey(storeKey); exists {
-		eventMetaMap := e.updateFunc(res.(kubernetes.Resource))
-		for k, v := range eventMetaMap {
-			e.metadataCache[k] = v
-		}
-=======
 	if res, exists, _ := e.watcher.getActiveWatcherByKey(storeKey); exists {
 		eventMetaMap := e.updateFunc(res.(kubernetes.Resource)) //nolint:errcheck // store object type is validated by watcher
 		maps.Copy(e.metadataCache, eventMetaMap)
->>>>>>> b77622419 (Fix Kubernetes watcher ownership across reloads (#52028))
 	}
 }
 
