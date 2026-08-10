@@ -129,7 +129,7 @@ data:
               matchers:
                 - logs_path:
                     logs_path: "/var/log/containers/"
-
+          
           ## To enable collection of rotated logs, replace the above `filebeat.inputs` configuration with this.
           ## WARNING:
           ##    - enabling rotated pod logs ingestion might cause data re-ingestion, refer to the docs for details: https://www.elastic.co/docs/reference/beats/filebeat/running-on-kubernetes#_kubernetes_deploy_manifests
@@ -182,7 +182,7 @@ data:
     #           fingerprint.enabled: true
     #           symlinks: true # it can be removed if collecting logs from /var/log/pods/
     #        file_identity.fingerprint: ~
-
+    
     processors:
       - add_cloud_metadata:
       - add_host_metadata:
