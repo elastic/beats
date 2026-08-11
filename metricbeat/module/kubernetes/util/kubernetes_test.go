@@ -1169,6 +1169,43 @@ func TestActiveWatcherWithdrawalDoesNotBlockOnLookup(t *testing.T) {
 	require.Nil(t, e.getMetadata(mapstr.M{"name": resource.Name}), "lookup after withdrawal must not use the stopped watcher")
 }
 
+// TestRestartWatcherOldWatcherStoppedAfterConcurrentStop covers the race where
+// (a) Start() swaps in restartWatcher R and releases the lock, then
+// (b) a concurrent Stop() withdraws R and stops it (unblocking R.Start()), and
+// (c) R.Start() returns an error.
+// The old watcher W that was active before the swap was never captured by Stop()
+// and must be stopped by Start()'s else-branch to avoid a goroutine leak.
+func TestRestartWatcherOldWatcherStoppedAfterConcurrentStop(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	oldWatcher := newCoordinatedWatcher(newMockWatcher().store)
+	restartWatcher := newCancelErrorWatcher()
+
+	mw := &metaWatcher{
+		watcher:        oldWatcher,
+		started:        true,
+		users:          make(map[*enricher]watcherRegistration),
+		enrichers:      make(map[*enricher]struct{}),
+		nodeScope:      true,
+		restartWatcher: restartWatcher,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+	e := newWatcherLookupTestEnricher(t, resourceWatchers, mw)
+
+	startDone := make(chan struct{})
+	go func() {
+		e.Start(resourceWatchers)
+		close(startDone)
+	}()
+	<-restartWatcher.startCalled // Start() swapped in restartWatcher and released the lock.
+
+	// Stop() withdraws restartWatcher and calls Stop() on it, which unblocks
+	// restartWatcher.Start() so that it returns an error.
+	e.Stop(resourceWatchers)
+
+	<-startDone
+	<-oldWatcher.stopped // Start()'s else-branch must stop the old watcher.
+}
+
 func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	metricsRepo := NewMetricsRepo()
@@ -1888,7 +1925,6 @@ func newWatcherLookupTestEnricher(t *testing.T, resourceWatchers *Watchers, meta
 	return e
 }
 
-
 type mockFuncs struct {
 	updated kubernetes.Resource
 	deleted kubernetes.Resource
@@ -2041,3 +2077,37 @@ func (*coordinatedWatcher) Client() k8s.Interface {
 func (*coordinatedWatcher) CachedObject() runtime.Object {
 	return nil
 }
+
+// cancelErrorWatcher blocks in Start() until Stop() is called, then returns an
+// error. Used to simulate a watcher whose Start() is cancelled mid-flight.
+type cancelErrorWatcher struct {
+	store       cache.Store
+	startCalled chan struct{}
+	cancel      chan struct{}
+	startOnce   sync.Once
+	stopOnce    sync.Once
+}
+
+func newCancelErrorWatcher() *cancelErrorWatcher {
+	return &cancelErrorWatcher{
+		store:       newMockWatcher().store,
+		startCalled: make(chan struct{}),
+		cancel:      make(chan struct{}),
+	}
+}
+
+func (w *cancelErrorWatcher) Start() error {
+	w.startOnce.Do(func() { close(w.startCalled) })
+	<-w.cancel
+	return fmt.Errorf("start cancelled")
+}
+
+func (w *cancelErrorWatcher) Stop() {
+	w.stopOnce.Do(func() { close(w.cancel) })
+}
+
+func (w *cancelErrorWatcher) Store() cache.Store                              { return w.store }
+func (w *cancelErrorWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {}
+func (*cancelErrorWatcher) GetEventHandler() kubernetes.ResourceEventHandler  { return nil }
+func (*cancelErrorWatcher) Client() k8s.Interface                             { return nil }
+func (*cancelErrorWatcher) CachedObject() runtime.Object                      { return nil }

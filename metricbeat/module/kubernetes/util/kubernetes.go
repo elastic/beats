@@ -1159,7 +1159,9 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		if err := extra.watcher.Start(); err != nil {
 			e.log.Warnf("Error starting %s watcher: %s", extra.name, err)
 			resourceWatchers.lock.Lock()
-			extra.meta.started = false
+			if extra.meta.watcher == extra.watcher {
+				extra.meta.started = false
+			}
 			resourceWatchers.lock.Unlock()
 		}
 	}
@@ -1193,12 +1195,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		wasRestartWatcherFactory := resourceMetaWatcher.restartWatcherFactory
 		// Swap in the new watcher before releasing the lock so that a concurrent
 		// Stop() call cancels the new watcher's context, not the old one.
-		var oldWatcher kubernetes.Watcher
-		if wasStarted {
-			oldWatcher = resourceMetaWatcher.replaceActiveWatcher(restartWatcher)
-		} else {
-			resourceMetaWatcher.replaceActiveWatcher(restartWatcher)
-		}
+		oldWatcher := resourceMetaWatcher.replaceActiveWatcher(restartWatcher)
 		resourceMetaWatcher.restartWatcher = nil
 		resourceMetaWatcher.restartWatcherFactory = nil
 		resourceMetaWatcher.nodeScope = false
@@ -1215,9 +1212,17 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 				resourceMetaWatcher.started = wasStarted
 				resourceMetaWatcher.nodeScope = wasNodeScope
 				resourceMetaWatcher.restartWatcherFactory = wasRestartWatcherFactory
+				resourceWatchers.lock.Unlock()
+				restartWatcher.Stop()
+			} else {
+				// A concurrent Stop() already withdrew and stopped restartWatcher R.
+				// oldWatcher W was not captured by Stop() (it was superseded before
+				// Stop() ran), so we must stop it here.
+				resourceWatchers.lock.Unlock()
+				if wasStarted && oldWatcher != nil {
+					oldWatcher.Stop()
+				}
 			}
-			resourceWatchers.lock.Unlock()
-			restartWatcher.Stop()
 		} else if wasStarted && oldWatcher != nil {
 			// Only stop the old watcher after the new one is confirmed running.
 			oldWatcher.Stop()
