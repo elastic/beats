@@ -197,6 +197,15 @@ func TestExtraArgs(t *testing.T) {
 			false,
 		},
 		{
+			"certificate_error_spki_allowlist is omitted for API journeys",
+			&Config{
+				Type:                          "api",
+				CertificateErrorSpkiAllowlist: []string{"/path/to/server.crt"},
+			},
+			[]string{},
+			false,
+		},
+		{
 			"screenshots",
 			&Config{Screenshots: "off"},
 			[]string{"--screenshots", "off"},
