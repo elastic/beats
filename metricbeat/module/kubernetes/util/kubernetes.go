@@ -640,50 +640,6 @@ func addEventHandlersToWatcher(
 	})
 }
 
-// addToMetricsetsUsing adds metricset identified by metricsetUsing to the list of resources using the shared watcher
-// identified by resourceName. The caller of this function should not be holding the lock.
-func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWatchers *Watchers) {
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-
-	data, ok := resourceWatchers.metaWatchersMap[resourceName]
-	if ok {
-		contains := false
-		for _, which := range data.metricsetsUsing {
-			if which == metricsetUsing {
-				contains = true
-				break
-			}
-		}
-		// add this resource to the list of resources using it
-		if !contains {
-			data.metricsetsUsing = append(data.metricsetsUsing, metricsetUsing)
-		}
-	}
-}
-
-// removeFromMetricsetsUsing removes the metricset from the list of resources using the shared watcher.
-// It returns true if element was removed and new size of array.
-// The cache should be locked when called.
-func removeFromMetricsetsUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
-	data, ok := resourceWatchers.metaWatchersMap[resourceName]
-	removed := false
-	if ok {
-		newIndex := 0
-		for i, which := range data.metricsetsUsing {
-			if which == notUsingName {
-				removed = true
-			} else {
-				data.metricsetsUsing[newIndex] = data.metricsetsUsing[i]
-				newIndex++
-			}
-		}
-		data.metricsetsUsing = data.metricsetsUsing[:newIndex]
-		return removed, len(data.metricsetsUsing)
-	}
-	return removed, 0
-}
-
 // createAllWatchers creates all the watchers required by a metricset
 func createAllWatchers(
 	client k8sclient.Interface,
