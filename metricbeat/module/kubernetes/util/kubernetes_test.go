@@ -1054,7 +1054,11 @@ func TestConcurrentInvalidationAndEnrichment(t *testing.T) {
 	e.Stop(resourceWatchers)
 }
 
-func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
+// TestActiveWatcherScopeReplacementDoesNotBlockOnLookup verifies that an
+// in-progress metadata lookup does not prevent a concurrent scope replacement
+// from completing. Lookups capture the watcher pointer before the swap and
+// therefore still complete against the original watcher's store.
+func TestActiveWatcherScopeReplacementDoesNotBlockOnLookup(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	lookupStarted := make(chan struct{})
 	releaseLookup := make(chan struct{})
@@ -1095,13 +1099,9 @@ func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
 		e.Start(resourceWatchers)
 		close(startDone)
 	}()
+	// Scope replacement completes without waiting for the in-progress lookup.
+	// The replacement watcher is started and signalled before releaseLookup.
 	<-replacement.started
-	requireActiveWatcherWriterPending(t, metaWatcher, "scope replacement must wait for the in-progress lookup")
-	select {
-	case <-active.stopped:
-		t.Fatal("active watcher stopped while its store lookup was in progress")
-	default:
-	}
 
 	close(releaseLookup)
 	require.Equal(t, "active", (<-lookupDone)["source"], "in-progress lookup must finish against the active watcher")
@@ -1116,7 +1116,11 @@ func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
 	e.Stop(resourceWatchers)
 }
 
-func TestActiveWatcherLookupCompletesBeforeFinalOwnerStop(t *testing.T) {
+// TestActiveWatcherWithdrawalDoesNotBlockOnLookup verifies that a final-owner
+// Stop() does not wait for an in-progress metadata lookup to complete.
+// The lookup captures the watcher pointer before the withdrawal and finishes
+// against the stopped watcher's (still-readable) in-memory store.
+func TestActiveWatcherWithdrawalDoesNotBlockOnLookup(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	lookupStarted := make(chan struct{})
 	releaseLookup := make(chan struct{})
@@ -1152,11 +1156,12 @@ func TestActiveWatcherLookupCompletesBeforeFinalOwnerStop(t *testing.T) {
 		close(stopDone)
 	}()
 
-	requireActiveWatcherWriterPending(t, metaWatcher, "final-owner stop must wait for the in-progress lookup")
-	close(releaseLookup)
-	require.Equal(t, "active", (<-lookupDone)["source"], "in-progress lookup must finish before final-owner stop")
+	// Withdrawal completes without waiting for the in-progress lookup.
 	<-stopDone
 	<-active.stopped
+
+	close(releaseLookup)
+	require.Equal(t, "active", (<-lookupDone)["source"], "in-progress lookup must finish using the watcher captured before withdrawal")
 
 	e.Lock()
 	e.metadataCache = make(map[string]mapstr.M)
@@ -1437,6 +1442,190 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 }
 
+// TestBuildMetadataEnricher_StartStopDeadlock ensures that Stop() can unblock
+// a Start() that is blocked inside watcher.Start() (e.g. WaitForCacheSync
+// waiting for an informer that never syncs due to missing RBAC).
+func TestBuildMetadataEnricher_StartStopDeadlock(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: false,
+		},
+	}
+	log := logptest.NewTestingLogger(t, selector)
+
+	blocking := newBlockingMockWatcher()
+	mw := &metaWatcher{
+		watcher:   blocking,
+		started:   false,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	enricherDeployment := newMetadataEnricher("state_deployment", DeploymentResource, config, log)
+	enricherDeployment.watchedResources = []string{DeploymentResource}
+	mw.users[enricherDeployment] = watcherRegistration{committed: true, nodeScope: true}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[DeploymentResource] = mw
+	resourceWatchers.lock.Unlock()
+
+	startDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Start(resourceWatchers)
+		close(startDone)
+	}()
+
+	// Wait until Start() is blocked inside watcher.Start().
+	<-blocking.startCalled
+
+	stopDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Stop(resourceWatchers)
+		close(stopDone)
+	}()
+
+	select {
+	case <-stopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Stop() did not return within 5 seconds")
+	}
+	select {
+	case <-startDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Start() did not unblock after Stop() was called")
+	}
+
+	resourceWatchers.lock.Lock()
+	assert.False(t, mw.started)
+	resourceWatchers.lock.Unlock()
+}
+
+// TestBuildMetadataEnricher_StartStopDeadlock_ExtraWatcher verifies that
+// Stop() can unblock a Start() that is blocked inside an extra watcher's
+// Start() (same deadlock as the main watcher path).
+func TestBuildMetadataEnricher_StartStopDeadlock_ExtraWatcher(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	blockingNamespace := newBlockingMockWatcher()
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{"enabled": true})
+	require.NoError(t, err)
+
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: false,
+			Namespace:  namespaceConfig,
+		},
+	}
+	log := logptest.NewTestingLogger(t, selector)
+
+	deployMW := &metaWatcher{
+		watcher:   newMockWatcher(),
+		started:   false,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	nsMW := &metaWatcher{
+		watcher:   blockingNamespace,
+		started:   false,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	enricherDeployment := newMetadataEnricher("state_deployment", DeploymentResource, config, log)
+	// The enricher owns both the main watcher and the namespace extra watcher.
+	enricherDeployment.watchedResources = []string{NamespaceResource, DeploymentResource}
+	deployMW.users[enricherDeployment] = watcherRegistration{committed: true, nodeScope: true}
+	nsMW.users[enricherDeployment] = watcherRegistration{committed: true, nodeScope: true}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[DeploymentResource] = deployMW
+	resourceWatchers.metaWatchersMap[NamespaceResource] = nsMW
+	resourceWatchers.lock.Unlock()
+
+	startDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Start(resourceWatchers)
+		close(startDone)
+	}()
+
+	<-blockingNamespace.startCalled
+
+	stopDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Stop(resourceWatchers)
+		close(stopDone)
+	}()
+
+	select {
+	case <-stopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Stop() did not return within 5 seconds")
+	}
+	select {
+	case <-startDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Start() did not unblock after Stop() was called")
+	}
+
+	resourceWatchers.lock.Lock()
+	assert.False(t, nsMW.started)
+	resourceWatchers.lock.Unlock()
+}
+
+// blockingMockWatcher blocks in Start() until Stop() is called.
+type blockingMockWatcher struct {
+	startCalled chan struct{}
+	stopCalled  chan struct{}
+	store       cache.Store
+}
+
+func newBlockingMockWatcher() *blockingMockWatcher {
+	return &blockingMockWatcher{
+		startCalled: make(chan struct{}),
+		stopCalled:  make(chan struct{}),
+		store: cache.NewStore(func(obj any) (string, error) {
+			objName, err := cache.ObjectToName(obj)
+			if err != nil {
+				return "", err
+			}
+			return objName.Name, nil
+		}),
+	}
+}
+
+func (m *blockingMockWatcher) Start() error {
+	select {
+	case <-m.startCalled:
+	default:
+		close(m.startCalled)
+	}
+	<-m.stopCalled
+	return fmt.Errorf("watcher stopped before cache sync")
+}
+
+func (m *blockingMockWatcher) Stop() {
+	// Close only once; a second Stop() call is a no-op.
+	select {
+	case <-m.stopCalled:
+	default:
+		close(m.stopCalled)
+	}
+}
+
+func (m *blockingMockWatcher) GetEventHandler() kubernetes.ResourceEventHandler  { return nil }
+func (m *blockingMockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {}
+func (m *blockingMockWatcher) Store() cache.Store                                { return m.store }
+func (m *blockingMockWatcher) Client() k8s.Interface                             { return nil }
+func (m *blockingMockWatcher) CachedObject() runtime.Object                      { return nil }
+
 func TestGetWatcherStoreKeyFromMetadataKey(t *testing.T) {
 	t.Run("global resource", func(t *testing.T) {
 		assert.Equal(t, "name", getWatcherStoreKeyFromMetadataKey("name"))
@@ -1699,17 +1888,6 @@ func newWatcherLookupTestEnricher(t *testing.T, resourceWatchers *Watchers, meta
 	return e
 }
 
-func requireActiveWatcherWriterPending(t *testing.T, metaWatcher *metaWatcher, message string) {
-	t.Helper()
-
-	require.Eventually(t, func() bool {
-		if metaWatcher.activeWatcherLock.TryRLock() {
-			metaWatcher.activeWatcherLock.RUnlock()
-			return false
-		}
-		return true
-	}, time.Second, time.Millisecond, message)
-}
 
 type mockFuncs struct {
 	updated kubernetes.Resource

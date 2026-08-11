@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Fix deadlock in kubernetes metricbeat enricher when RBAC denies informer LIST requests.
+
+component: metricbeat
+
+issue: https://github.com/elastic/elastic-agent/issues/15666
