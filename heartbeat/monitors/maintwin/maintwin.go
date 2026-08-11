@@ -19,6 +19,7 @@ package maintwin
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -27,6 +28,26 @@ import (
 
 var weekdayLookup = map[string]rrule.Weekday{
 	"MO": rrule.MO, "TU": rrule.TU, "WE": rrule.WE, "TH": rrule.TH, "FR": rrule.FR, "SA": rrule.SA, "SU": rrule.SU,
+}
+
+// parseByweekday parses RRule BYDAY tokens such as "MO", "+2TU", or "-1FR".
+func parseByweekday(wd string) (rrule.Weekday, error) {
+	wd = strings.ToUpper(strings.TrimSpace(wd))
+	if len(wd) < 2 {
+		return rrule.Weekday{}, fmt.Errorf("invalid byweekday: %q", wd)
+	}
+	day, ok := weekdayLookup[wd[len(wd)-2:]]
+	if !ok {
+		return rrule.Weekday{}, fmt.Errorf("invalid byweekday: %q", wd)
+	}
+	if len(wd) == 2 {
+		return day, nil
+	}
+	n, err := strconv.Atoi(wd[:len(wd)-2])
+	if err != nil {
+		return rrule.Weekday{}, fmt.Errorf("invalid byweekday: %q", wd)
+	}
+	return day.Nth(n), nil
 }
 
 type MaintWin struct {
@@ -53,7 +74,7 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 	// validate the frequency, we don't support less than daily
 	freq, err := rrule.StrToFreq(strings.ToUpper(mw.Freq))
 	if err != nil || freq > rrule.DAILY {
-		return nil, fmt.Errorf("Invalid frequency %s: only yearly, monthly, weekly, and daily are supported", mw.Freq)
+		return nil, fmt.Errorf("invalid frequency %s: only yearly, monthly, weekly, and daily are supported", mw.Freq)
 	}
 
 	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
@@ -64,18 +85,19 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 	// validate DTSTART and make sure it's not older than 2 years
 	if dtstart.Before(time.Now().AddDate(-2, 0, 0)) && validateDtStart {
 		return nil, fmt.Errorf(
-			"invalid dtstart: %s is more than 2 years in the past. "+
-				"To prevent excessive iterations, please use a more recent date.",
+			"invalid dtstart: %s is more than 2 years in the past; "+
+				"to prevent excessive iterations, please use a more recent date",
 			dtstart.Format(time.RFC3339),
 		)
 	}
 
-	// Convert the string weekdays to rrule.Weekday
-	weekdays := []rrule.Weekday{}
+	weekdays := make([]rrule.Weekday, 0, len(mw.Byweekday))
 	for _, wd := range mw.Byweekday {
-		if weekday, exists := weekdayLookup[wd]; exists {
-			weekdays = append(weekdays, weekday)
+		weekday, err := parseByweekday(wd)
+		if err != nil {
+			return nil, err
 		}
+		weekdays = append(weekdays, weekday)
 	}
 
 	dtstart = dtstart.UTC()
