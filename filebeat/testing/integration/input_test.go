@@ -43,7 +43,7 @@ var inputReportOptions = libbeatintegration.ReportOptions{
 }
 
 // TestInputIgnoreOlderFiles verifies that files not modified within ignore_older
-// are skipped.  Corresponds to test_input.py::test_ignore_older_files.
+// are skipped.
 func TestInputIgnoreOlderFiles(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 	defer cancel()
