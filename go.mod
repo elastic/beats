@@ -27,7 +27,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.66.3
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.82.0
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.67.4
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.320.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.321.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.58.5
 	github.com/aws/aws-sdk-go-v2/service/iam v1.58.1
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.53.5
