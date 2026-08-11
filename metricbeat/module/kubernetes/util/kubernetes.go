@@ -116,6 +116,7 @@ type metaWatcher struct {
 	restartWatcherFactory func() (kubernetes.Watcher, error) // creates a fresh replacement after a failed one-shot watcher start
 }
 
+// getActiveWatcherByKey keeps the active watcher alive while its store is read.
 func (m *metaWatcher) getActiveWatcherByKey(key string) (any, bool, error) {
 	// Release the lock before calling GetByKey: the store lookup can block (e.g.
 	// waiting for a cache sync), and replaceActiveWatcher / withdrawActiveWatcher
@@ -1178,7 +1179,9 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		return
 	}
 
-	if resourceMetaWatcher.nodeScope && hasCommittedClusterScopedUser(resourceMetaWatcher) &&
+	hasClusterUser := hasCommittedClusterScopedUser(resourceMetaWatcher)
+
+	if resourceMetaWatcher.nodeScope && hasClusterUser &&
 		resourceMetaWatcher.restartWatcher == nil && resourceMetaWatcher.restartWatcherFactory != nil {
 		restartWatcher, err := resourceMetaWatcher.restartWatcherFactory()
 		if err != nil {
@@ -1188,7 +1191,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		}
 	}
 
-	if resourceMetaWatcher.restartWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
+	if resourceMetaWatcher.restartWatcher != nil && hasClusterUser {
 		restartWatcher := resourceMetaWatcher.restartWatcher
 		wasStarted := resourceMetaWatcher.started
 		wasNodeScope := resourceMetaWatcher.nodeScope
@@ -1207,7 +1210,10 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 			resourceWatchers.lock.Lock()
 			if resourceMetaWatcher.watcher == restartWatcher {
 				// restartWatcher failed to start; restore the previous state so the
-				// next Start() attempt can try again.
+				// next Start() attempt can try again. restartWatcher itself is left
+				// nil: the factory will produce a fresh instance next time.
+				// Stop() is safe even if Start() performed partial cleanup on error;
+				// kubernetes watcher Stop() calls context.CancelFunc, which is idempotent.
 				resourceMetaWatcher.replaceActiveWatcher(oldWatcher)
 				resourceMetaWatcher.started = wasStarted
 				resourceMetaWatcher.nodeScope = wasNodeScope
@@ -1268,7 +1274,11 @@ func releaseWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 				metaWatcher.started = false
 				watchersToStop = append(watchersToStop, activeWatcher)
 			}
+			// restartWatcher is always unstarted here (Start() sets it to nil
+			// before calling watcher.Start()), so no Stop() is needed.
 		} else if !hasClusterScopedUser(metaWatcher) {
+			// Discard the pending cluster-wide replacement; it is unstarted so
+			// no Stop() is needed.
 			metaWatcher.restartWatcher = nil
 			metaWatcher.restartWatcherFactory = nil
 		}
