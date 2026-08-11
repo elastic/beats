@@ -75,7 +75,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 
 	attr := quark.DefaultQueueAttr()
 	if quarkForceKprobe {
-		attr.Flags &= ^quark.QQ_ALL_BACKENDS
+		attr.Flags &= ^quark.QQ_EBPF
 		attr.Flags |= quark.QQ_KPROBE
 	}
 	qm.queue, err = quark.OpenQueue(attr)
