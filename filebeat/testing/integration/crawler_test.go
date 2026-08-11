@@ -138,7 +138,6 @@ func TestCrawlerNewLineOnOpenFile(t *testing.T) {
 }
 
 // TestCrawlerUTF8 verifies that UTF-8 characters are read correctly.
-// Corresponds to test_crawler.py::test_utf8.
 func TestCrawlerUTF8(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 	defer cancel()
