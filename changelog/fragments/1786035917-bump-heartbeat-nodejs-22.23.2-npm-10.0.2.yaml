@@ -9,21 +9,16 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: other
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Honor path_style for non-AWS S3 buckets in the aws-s3 input
+summary: Bump Node.js to 22.23.2 and npm to 12.0.2 in the Heartbeat Docker image.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: >
-  When using non_aws_bucket_name with a custom endpoint, the aws-s3 input
-  always marked the endpoint hostname immutable, forcing path-style requests
-  and ignoring path_style. This broke S3-compatible providers that require
-  virtual-hosted addressing, which returned VirtualHostDomainRequired. 
-  The hostname is now kept mutable for non-AWS buckets so path_style is honored.
+# description:
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -33,7 +28,7 @@ description: >
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: filebeat
+component: heartbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -41,7 +36,7 @@ component: filebeat
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/52003
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
