@@ -1711,11 +1711,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azcore
-Version: v1.21.1
+Version: v1.22.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.21.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.22.0/LICENSE.txt:
 
 MIT License
 
@@ -1984,11 +1984,19 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/storage/azblob
+<<<<<<< HEAD
 Version: v1.6.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/storage/azblob@v1.6.3/LICENSE.txt:
+=======
+Version: v1.8.0
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/storage/azblob@v1.8.0/LICENSE.txt:
+>>>>>>> ffbb488af (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/storage/azblob from 1.7.0 to 1.8.0 (#52595))
 
     MIT License
 
