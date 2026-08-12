@@ -360,7 +360,7 @@ Docker healthcheck metrics.
 Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
 
 **`docker.healthcheck.failingstreak`**
-:   concurent failed check
+:   concurrent failed check
 
     type: integer
 

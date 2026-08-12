@@ -32,7 +32,7 @@ output.elasticsearch.kerberos.config_path: "/etc/krb5.conf"
 output.elasticsearch.kerberos.realm: "ELASTIC.CO"
 ```
 
-The service principal name for the Elasticsearch instance is contructed from these options. Based on this configuration it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
+The service principal name for the Elasticsearch instance is constructed from these options. Based on this configuration it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
 
 
 ## Configuration options [_configuration_options_23]
