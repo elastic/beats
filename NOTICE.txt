@@ -40671,11 +40671,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/apache/thrift
-Version: v0.23.1-0.20260429145742-d2acd3c49e58
+Version: v0.24.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apache/thrift@v0.23.1-0.20260429145742-d2acd3c49e58/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/apache/thrift@v0.24.0/LICENSE:
 
 
                                  Apache License

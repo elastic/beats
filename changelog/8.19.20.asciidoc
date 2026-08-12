@@ -1,0 +1,106 @@
+// begin 8.19.20 relnotes
+
+[[release-notes-8.19.20]]
+==  8.19.20
+
+Review important information about the  8.19.20 release.
+
+[discrete]
+[[security-updates-8.19.20]]
+=== Security updates
+
+
+
+
+**All**
+
+* Upgrade Go to 1.26.5. https://github.com/elastic/beats/pull/52093[#52093] 
+
+
+**Osquerybeat**
+
+* Reject CPIO entries in macOS .pkg payloads whose paths escape the destination directory, preventing path traversal during extraction (CWE-22). https://github.com/elastic/beats/pull/52130[#52130] 
+
+
+
+
+
+
+
+
+
+
+[discrete]
+[[enhancements-8.19.20]]
+=== Enhancements
+
+
+
+
+**All**
+
+* Use native Go for Linux FIPS builds. https://github.com/elastic/beats/pull/51969[#51969] 
+
+
+**Auditbeat**
+
+* Update quark to 0.6.0. https://github.com/elastic/beats/pull/52063[#52063] 
+
+
+**Filebeat**
+
+* Aggregate SQS mode health status to reduce false Degraded/Healthy transitions. https://github.com/elastic/beats/pull/51997[#51997] https://github.com/elastic/beats/issues/51692[#51692]
+* Add configurable User-Agent header to the CrowdStrike streaming input. https://github.com/elastic/beats/pull/52025[#52025] 
+* Remove Authorization headers from CEL, Entity Analytics, HTTP Endpoint, and HTTP JSON input request trace logs. https://github.com/elastic/beats/pull/52239[#52239] 
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.20]]
+=== Bug fixes
+
+
+
+
+**All**
+
+* Update `elastic-agent-libs` to v0.46.1. https://github.com/elastic/beats/pull/51921[#51921] 
+
+
+**Elastic Agent**
+
+* Fix Beat receiver Shutdown hanging when Start fails before the beater is launched. https://github.com/elastic/beats/pull/52106[#52106] https://github.com/elastic/beats/issues/52009[#52009]
+
+
+**Filebeat**
+
+* Synchronize Filebeat Run and Shutdown functions. https://github.com/elastic/beats/pull/51800[#51800] 
+* Fix offset commits when using multiline in Journald and Kafka inputs. https://github.com/elastic/beats/pull/52345[#52345] https://github.com/elastic/beats/issues/51981[#51981]
+* Fix S3 polling input to exclude same-bucket backup objects from listing. https://github.com/elastic/beats/pull/52169[#52169] 
+* Honor `path_style` for non-AWS S3 buckets in the `aws-s3` input. https://github.com/elastic/beats/pull/52003[#52003] 
+* Use a stable status message for SQS receive errors to prevent update churn during sustained outages. https://github.com/elastic/beats/pull/52172[#52172] 
+* Do not mark the CEL input's health as degraded when the maximum number of executions is exceeded. https://github.com/elastic/beats/pull/52166[#52166] 
+* Fix the `aws-s3` input silently dropping events when a parser clears the message content. https://github.com/elastic/beats/pull/52077[#52077] 
+* Honor the configured language when rendering Windows events. https://github.com/elastic/beats/pull/52113[#52113] https://github.com/elastic/sdh-beats/issues/7332[#7332]
+* Fix `journald` input facility filters on `journalctl` older than 245. https://github.com/elastic/beats/pull/52250[#52250] 
+* The `journald` input now reports a Degraded status when `journalctl` repeatedly exits without delivering any data, instead of staying Healthy while collecting no events. https://github.com/elastic/beats/pull/52287[#52287] 
+
+
+**Heartbeat**
+
+* Fix panic with multiple Heartbeat receivers. https://github.com/elastic/beats/pull/52046[#52046] 
+* Bake Synthetics browser binaries into the Heartbeat Docker image. https://github.com/elastic/beats/pull/52445[#52445] https://github.com/elastic/beats/issues/52439[#52439]
+
+
+**Libbeat**
+
+* Prevent statestore startup failure when `meta.json` is left empty after an unclean shutdown. https://github.com/elastic/beats/pull/51897[#51897] 
+* Prevent stale autodiscover resources after Kubernetes leadership changes. https://github.com/elastic/beats/pull/52427[#52427] 
+
+
+**Metricbeat**
+
+* Fix Azure module authentication on sovereign clouds (Government, China). https://github.com/elastic/beats/pull/52434[#52434] 
+
+// end 8.19.20 relnotes
