@@ -826,7 +826,9 @@ func TestSet_PackConflictingScheduleDefaultsRejected(t *testing.T) {
 	}
 }
 
-func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
+func TestSet_PackMixedNativeUnscheduledAccepted(t *testing.T) {
+	// Native interval mixed with unscheduled queries must not fail policy application;
+	// see https://github.com/elastic/beats/issues/51450
 	logger := logp.NewLogger("config_test")
 	cfgp := NewConfigPlugin(logger)
 	inputs := []config.InputConfig{
@@ -840,6 +842,37 @@ func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
 						Queries: map[string]config.Query{
 							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
 							"idle":   {Query: "select 2"},
+						},
+					},
+				},
+			},
+		},
+	}
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfgp.Count() != 2 {
+		t.Fatalf("expected 2 queries registered, got %d", cfgp.Count())
+	}
+}
+
+func TestSet_PackMixedRRuleScheduleModesRejected(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+	inputs := []config.InputConfig{
+		{
+			Name:       "osquery-manager-1",
+			Type:       "osquery",
+			Datastream: config.DatastreamConfig{Namespace: "default"},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					"mixed": {
+						Queries: map[string]config.Query{
+							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
+							"rrule": {Query: "select 2", RRuleSchedule: &config.RRuleScheduleConfig{
+								RRule:     "FREQ=DAILY",
+								StartDate: "2024-01-01T00:00:00Z",
+							}},
 						},
 					},
 				},

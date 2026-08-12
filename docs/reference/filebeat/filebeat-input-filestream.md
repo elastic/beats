@@ -206,16 +206,16 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 ::::
 
 
-`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile.
+`fingerprint` is the recommended file identity and the default in 9.0 and later. It does not rely on the file system or operating system. Instead, it generates a hash from part of the file (the first 1024 bytes by default) and uses that hash to identify the file. This works well with log rotation strategies that move or rename files and on Windows, where file identifiers might be more volatile.
 
-{applies_to}`stack: ga 9.5+` The [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay. In earlier versions, Filebeat waits until the file reaches 1024 bytes before ingesting it.
+{applies_to}`stack: ga 9.5+` The [growing fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay. In earlier versions, Filebeat waited until the file reached the fingerprint size before ingesting it.
 
 ::::{warning}
 Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 ::::
 
 
-Please refer to the [fingerprint configuration for details](#filebeat-input-filestream-scan-fingerprint).
+Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
 
 Selecting `path` instructs Filebeat to identify files based on their paths. This is a quick way to avoid rereading files if inode and device ids might change. However, keep in mind if the files are rotated (renamed), they will be reread and resubmitted.
 
@@ -411,7 +411,9 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
-In 9.x, scanner fingerprinting is enabled by default. When you explicitly configure a non-fingerprint `file_identity` (for example `native`, `path`, or `inode_marker`) and do not explicitly set `prospector.scanner.fingerprint.enabled`, Filebeat automatically disables scanner fingerprinting for that input.
+{applies_to}`stack: ga 9.6+` Scanner fingerprinting follows the configured `file_identity`: Filebeat enables it for the `fingerprint` file identity (the default) and disables it for any other file identity. The `prospector.scanner.fingerprint.enabled` setting is deprecated and ignored.
+
+{applies_to}`stack: ga 9.0-9.5` Scanner fingerprinting is enabled by default. Set `prospector.scanner.fingerprint.enabled: false` when you configure any other file identity.
 
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
@@ -426,28 +428,32 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 $$$filebeat-input-filestream-file-identity-fingerprint$$$
 
 **`fingerprint`**
-:   The default behavior of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
+:   Identifies files based on content by hashing a specific range (0 to 1024 bytes by default). This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint).
 
-::::{warning}
-This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint), which are enabled by default in 9.x. If you explicitly disable scanner fingerprinting, this file identity will not work. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
-::::
+    {applies_to}`stack: ga 9.6+` Scanner fingerprinting is enabled automatically when using this identity.
 
+    {applies_to}`stack: ga 9.0-9.5` If you explicitly set `prospector.scanner.fingerprint.enabled: false` (default `true`), this file identity will not work.
 
-Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
+    ::::{warning}
+    Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+    ::::
 
-```yaml
-file_identity.fingerprint: ~
-```
+    Refer to the [fingerprint configuration](#filebeat-input-filestream-scan-fingerprint) for details.
 
-    `growing` {applies_to}`stack: ga 9.5.0+`
-  :   When `true` (default), files smaller than the fingerprint size (`offset` + `length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [Enhanced fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
+    ```yaml
+    file_identity.fingerprint: ~
+    ```
 
-      Set to `false` to restore the pre-9.5 behavior.
+    **`growing`** {applies_to}`stack: ga 9.5+`
 
-      ```yaml
-      file_identity.fingerprint:
-        growing: true
-      ```
+    When `true` (default), files smaller than the fingerprint size (`offset`+`length`) are tracked using the bytes available so far, instead of being skipped until they grow large enough. Once a file reaches the fingerprint size, it's automatically migrated to the regular SHA-256 fingerprint, with no data duplication. Refer to [growing fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
+
+    Set to `false` to restore the pre-9.5 behavior.
+
+    ```yaml
+    file_identity.fingerprint:
+      growing: false
+    ```
 
 
 **`native`**
@@ -695,16 +701,16 @@ Requirement: Set `backoff.max` to be greater than or equal to `backoff.init` and
 
 ### `harvester_limit` [filebeat-input-filestream-harvester-limit]
 
-The `harvester_limit` option limits the number of harvesters that are started in parallel for one input. This directly relates to the maximum number of file handlers that are opened. The default for `harvester_limit` is 0, which means there is no limit. This configuration is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
+The `harvester_limit` option limits the number of files that are harvested in parallel for one input. Because each harvested file keeps its file handler open, this directly limits the maximum number of file handlers the input keeps open at once. The default for `harvester_limit` is 0, which means there is no limit. This configuration is useful when the number of files to be harvested exceeds the open file handler limit of the operating system.
 
-Setting a limit on the number of harvesters means that potentially not all files are opened in parallel. Therefore we recommended that you use this option in combination with the `close.on_state_change.*` options to make sure harvesters are stopped more often so that new files can be picked up.
+A file counts against the limit for the whole time it is being harvested, including while it is idle and being tailed for new data. An actively tailed file keeps its file handler open and its slot occupied, even when it has momentarily caught up and is waiting for more data to be written. A slot is only released when the file is closed. For this reason, we recommend that you use this option in combination with the `close.on_state_change.*` and `close.reader.*` options, so that files are closed and their slots freed, allowing files that are still waiting to be picked up.
 
-Currently, if a new harvester can be started again, the harvester is picked randomly. This means it’s possible that the harvester for a file that was just closed and then updated again might be started instead of the harvester for a file that hasn’t been harvested for a longer period of time.
+When the limit is reached, newly discovered files are queued and started in the order they were discovered (first in, first out) as open files are closed and slots become available.
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
 
 ### `include_file_owner_name` [filestream-input-include_file_owner_name]
-```yaml {applies_to}
+```{applies_to}
 stack: ga 9.3
 ```
 
@@ -712,7 +718,7 @@ Includes the log file owner to `log.file` metadata.
 This option is not supported on Windows.
 
 ### `include_file_owner_group_name` [filestream-input-include_file_owner_group_name]
-```yaml {applies_to}
+```{applies_to}
 stack: ga 9.3
 ```
 
@@ -720,7 +726,7 @@ Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
 
 ### `include_file_fingerprint` [filestream-input-include_file_fingerprint]
-```yaml {applies_to}
+```{applies_to}
 stack: ga 9.5.0
 ```
 Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `true`. The file path (`log.file.path`) is always present in events regardless of this setting.
@@ -1210,19 +1216,18 @@ Following are some scenarios where this can happen:
 
     Depending on a mounting approach, the device ID (which is also used for comparing files) might change after a reboot.
 
-
 **Configuration**
 
 ::::{warning}
-Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size, so they can be fingerprinted. Until then these files are ignored.
+{applies_to}`stack: ga 9.0-9.4` Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size. Until then, these files are ignored.
+
+{applies_to}`stack: ga 9.5+` The [growing fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior tracks smaller files by default. The ingestion delay applies only when `file_identity.fingerprint.growing` is set to `false`.
 ::::
 
-
-Normally, log lines contain timestamps and other unique fields that should be able to use the fingerprint mode, but in every use-case users should inspect their logs to determine what are the appropriate values for the `offset` and `length` parameters. Default `offset` is `0` and default `length` is `1024` or 1 KB. `length` cannot be less than `64`.
+Normally, log lines contain timestamps and other unique fields that make the default fingerprint range suitable. Inspect your logs to determine appropriate `offset` and `length` values. The default `offset` is `0`, and the default `length` is `1024` bytes. `length` cannot be less than `64` bytes.
 
 ```yaml
 fingerprint:
-  enabled: false
   offset: 0
   length: 1024
 ```
@@ -1396,3 +1401,4 @@ ignored by `filestream` settings or state are excluded.
 | `files_matched` | Number of filesystem path matches returned by the configured `paths` globs before duplicate, ignore, and ingestibility filtering. |
 | `files_no_ingest_target` | Number of matched non-empty files that did not produce an ingest target, such as duplicate matches, files that are too small to fingerprint or symlinks to already known files. |
 | `files_unique` | Number of unique files that produced ingest targets after scanner filtering and de-duplication. |
+| `scan_errors` {applies_to}`stack: ga 9.6+` | Number of paths the last scan could not observe (for example a directory that could not be read, or a file that could not be stat'd or opened, because of file-descriptor exhaustion or permissions). A non-zero value means removal detection was postponed for the files under those paths to avoid re-ingestion; it does not count files that are genuinely gone. |

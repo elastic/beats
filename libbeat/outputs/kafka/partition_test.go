@@ -40,8 +40,8 @@ import (
 type partTestScenario func(*testing.T, bool, sarama.Partitioner) error
 
 func TestPartitioners(t *testing.T) {
-	type obj map[string]interface{}
-	type arr []interface{}
+	type obj map[string]any
+	type arr []any
 
 	nonHashScenarios := []partTestScenario{
 		partTestSimple(100, false),

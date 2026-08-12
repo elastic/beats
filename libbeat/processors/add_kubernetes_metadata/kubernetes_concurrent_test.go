@@ -29,9 +29,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors/shared"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -316,72 +314,5 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 		assert.True(t, ok, "event %d: pod.name must be a string", i)
 		assert.Contains(t, []string{"mypod", "replaced-pod"}, name,
 			"event %d: pod.name must be one of the two valid values", i)
-	}
-}
-
-func TestAnnotatorRun_SharedWrapper_EventIndependenceUnderConcurrency(t *testing.T) {
-	const goroutines = 60
-
-	cfg := config.MustNewConfigFrom(map[string]any{
-		"lookup_fields": []string{"container.id"},
-	})
-	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
-	require.NoError(t, err)
-
-	cache := newCache(10 * time.Second)
-	annotator := &kubernetesAnnotator{
-		log:   logptest.NewTestingLogger(t, selector),
-		cache: cache,
-	}
-	setReady(annotator, &Matchers{matchers: []Matcher{matcher}})
-
-	// each goroutine has its own container ID in the cache.
-	for i := range goroutines {
-		cid := fmt.Sprintf("ev-%d", i)
-		cache.set(cid, metaMap(cid))
-	}
-
-	sharedConstructor := shared.New(func(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
-		return annotator, nil
-	})
-	proc, err := sharedConstructor(nil, nil)
-	require.NoError(t, err)
-
-	type result struct {
-		event *beat.Event
-		cid   string
-		err   error
-	}
-	results := make([]result, goroutines)
-	var wg sync.WaitGroup
-	wg.Add(goroutines)
-	for i := range goroutines {
-		cid := fmt.Sprintf("ev-%d", i)
-		go func() {
-			defer wg.Done()
-			out, runErr := proc.Run(containerEvent(cid))
-			results[i] = result{event: out, cid: cid, err: runErr}
-		}()
-	}
-	wg.Wait()
-
-	for i, r := range results {
-		require.NoError(t, r.err, "goroutine %d must not return an error", i)
-		require.NotNil(t, r.event, "goroutine %d must receive a non-nil event", i)
-
-		// container.id must match this goroutine's own cache key.
-		containerRaw, getErr := r.event.Fields.GetValue("container")
-		require.NoError(t, getErr, "goroutine %d: event must have container field", i)
-		container := containerRaw.(mapstr.M) //nolint:errcheck // it's a test
-		assert.Equal(t, r.cid, container["id"],
-			"goroutine %d: container.id must equal its own cache key, not another goroutine's", i)
-
-		// kubernetes.pod.uid must also be specific to this goroutine's entry.
-		k8sRaw, getErr := r.event.Fields.GetValue("kubernetes")
-		require.NoError(t, getErr, "goroutine %d: event must have kubernetes field", i)
-		k8s := k8sRaw.(mapstr.M)     //nolint:errcheck // it's a test
-		pod := k8s["pod"].(mapstr.M) //nolint:errcheck // it's a test
-		assert.Equal(t, "uid-"+r.cid, pod["uid"],
-			"goroutine %d: kubernetes.pod.uid must belong to its own cache entry", i)
 	}
 }

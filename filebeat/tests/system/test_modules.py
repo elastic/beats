@@ -296,6 +296,11 @@ class Test(BaseTest):
         self.wait_until(lambda: self.es.indices.exists(index=self.index_name),
                         name="indices present for {}".format(test_file))
 
+        # The index existing does not mean every event is searchable yet, so
+        # wait for the expected documents before querying. Otherwise the
+        # comparison below races ingestion and sees a partial result.
+        self._wait_for_indexed_events(test_file)
+
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
         res = self.es.search(index=self.index_name, query={"match_all": {}},
@@ -340,6 +345,29 @@ class Test(BaseTest):
             if proc.poll() is None:
                 proc.kill()
             proc.wait()
+
+    def _wait_for_indexed_events(self, test_file):
+        """Wait for the expected number of events to become searchable.
+
+        Filebeat having exited (--once) or having been stopped only guarantees
+        that every event was published and acknowledged, not that Elasticsearch
+        has finished making all of them searchable.
+        """
+        expected = self._expected_event_count(test_file)
+        if expected is None:
+            # No golden file to count, or running with GENERATE: nothing to
+            # wait for, keep the previous behaviour.
+            return
+
+        deadline = time.monotonic() + MODULE_INGEST_TIMEOUT
+        count = self._indexed_event_count()
+        while count < expected and time.monotonic() < deadline:
+            time.sleep(0.5)
+            count = self._indexed_event_count()
+
+        assert count >= expected, \
+            "expected {} events indexed for {} but only {} were indexed after {}s".format(
+                expected, test_file, count, MODULE_INGEST_TIMEOUT)
 
     def _expected_event_count(self, test_file):
         if os.getenv("GENERATE"):

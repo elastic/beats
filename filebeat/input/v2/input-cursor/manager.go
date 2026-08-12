@@ -21,12 +21,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -63,10 +63,16 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-	initedFull   bool
-	initErr      error
-	store        *store
-	cleanerGroup unison.Group // saved from Init() for deferred cleaner start
+	// mu guards the deferred setup below. Inputs are created from several
+	// reload paths — static config, central management, autodiscovery — which
+	// can run concurrently for one input type.
+	mu         sync.Mutex
+	initedFull bool
+	initErr    error
+	store      *store
+	// cleanerGroup is the task group Init was given, held until an input is
+	// created and cleared once the cleaner is running.
+	cleanerGroup unison.Group
 }
 
 // Source describe a source the input can collect data from.
@@ -82,7 +88,7 @@ var (
 )
 
 // init initializes the state store with a full init (reading all states).
-// For ES-backed inputs, this is deferred until Create() where the inputID is known.
+// Caller holds cim.mu.
 func (cim *InputManager) init(inputID string) error {
 	if cim.initedFull {
 		return nil
@@ -102,24 +108,43 @@ func (cim *InputManager) init(inputID string) error {
 	return nil
 }
 
-// Init starts background processes for deleting old entries from the
-// persistent store if mode is ModeRun.
-// For ES-backed inputs, store creation is deferred to Create() where the
-// inputID is known, so Init() only saves the group for later use.
+// Init records the task group the registry cleanup process will run in. Opening
+// the store and starting that process are deferred to Create.
+//
+// v2.Loader.Init calls Init on every registered plugin, but a Beat instantiates
+// inputs for only a few of them: eager setup here cost one open registry store
+// and one idle cleanup goroutine per input type the Beat never runs. That is
+// paid per Beat, and elastic-agent runs one Beat receiver per input stream.
+//
+// Deferring also means a registry that cannot be opened now fails the inputs
+// that need it rather than the whole Beat. Elasticsearch-backed inputs already
+// worked this way, since they cannot open the store until Create gives them the
+// input ID.
 func (cim *InputManager) Init(group unison.Group) error {
-	if features.IsElasticsearchStateStoreEnabledForInput(cim.Type) {
-		cim.cleanerGroup = group
-		return nil
-	}
+	cim.mu.Lock()
+	defer cim.mu.Unlock()
 
-	if err := cim.init(""); err != nil {
+	cim.cleanerGroup = group
+	return nil
+}
+
+// setup opens the store and starts the registry cleanup process, once per
+// manager. Caller holds cim.mu.
+func (cim *InputManager) setup(inputID string) error {
+	if err := cim.init(inputID); err != nil {
 		return err
 	}
+
+	if cim.cleanerGroup == nil {
+		return nil
+	}
+	group := cim.cleanerGroup
+	cim.cleanerGroup = nil
 	return cim.startCleaner(group)
 }
 
 // startCleaner launches the background cleaner goroutine that removes stale
-// entries from the persistent store.
+// entries from the persistent store. Caller holds cim.mu.
 func (cim *InputManager) startCleaner(group unison.Group) error {
 	log := cim.Logger.With("input_type", cim.Type)
 
@@ -169,17 +194,11 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	if err := cim.init(settings.ID); err != nil {
+	cim.mu.Lock()
+	err := cim.setup(settings.ID)
+	cim.mu.Unlock()
+	if err != nil {
 		return nil, err
-	}
-
-	// For ES-backed inputs, the cleaner is deferred from Init() to here
-	// because the store isn't created until init() is called with the inputID.
-	if cim.cleanerGroup != nil {
-		if err := cim.startCleaner(cim.cleanerGroup); err != nil {
-			return nil, err
-		}
-		cim.cleanerGroup = nil
 	}
 
 	sources, inp, err := cim.Configure(config, cim.Logger)

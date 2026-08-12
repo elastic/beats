@@ -34,6 +34,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// DefaultStateCheckInterval is the default for close.on_state_change.check_interval,
+// matching defaultCloserConfig in the filestream package.
+const DefaultStateCheckInterval = 5 * time.Second
+
 // InputManager is used to create, manage, and coordinate stateful inputs and
 // their persistent state.
 // The InputManager ensures that only one input can be active for a unique source.
@@ -168,10 +172,18 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		TakeOver            TakeOverConfig     `config:"take_over"`
 		LegacyCleanInactive bool               `config:"legacy_clean_inactive"`
 		ReadUntilEOF        ReadUntilEOFConfig `config:"read_until_eof"`
+		Backoff             BackoffConfig      `config:"backoff"`
+		Close               struct {
+			OnStateChange struct {
+				CheckInterval time.Duration `config:"check_interval" validate:"nonzero"`
+			} `config:"on_state_change"`
+		} `config:"close"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
+		Backoff:       DefaultBackoffConfig(),
 	}
+	settings.Close.OnStateChange.CheckInterval = DefaultStateCheckInterval
 
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
@@ -287,6 +299,8 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		prospector:             prospector,
 		harvester:              harvester,
 		readUntilEOF:           settings.ReadUntilEOF,
+		backoff:                settings.Backoff,
+		stateCheckInterval:     settings.Close.OnStateChange.CheckInterval,
 		sourceIdentifier:       srcIdentifier,
 		previousSrcIdentifiers: previousSrcIdentifiers,
 		cleanTimeout:           settings.CleanInactive,
@@ -428,4 +442,20 @@ type ReadUntilEOFConfig struct {
 	Enabled bool `config:"enabled"`
 	// Timeout is the maximum time to wait for EOF to be reached.
 	Timeout time.Duration `config:"timeout" validate:"min=1"`
+}
+
+// BackoffConfig configures how aggressively the waker polls a parked (idle,
+// caught up to EOF) source for new data: Init is the first wait, doubling on
+// every still-idle poll up to Max, and resetting to Init as soon as a read
+// makes progress. See harvesterRunner.growBackoff.
+type BackoffConfig struct {
+	Init time.Duration `config:"init" validate:"nonzero"`
+	Max  time.Duration `config:"max" validate:"nonzero"`
+}
+
+func DefaultBackoffConfig() BackoffConfig {
+	return BackoffConfig{
+		Init: 2 * time.Second,
+		Max:  10 * time.Second,
+	}
 }

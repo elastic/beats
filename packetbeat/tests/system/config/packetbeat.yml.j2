@@ -197,7 +197,7 @@ tags: [
   {%- endif -%}
 ]
 
-packetbeat.shutdown_timeout: {{ shutdown_timeout|default('400ms') }}
+packetbeat.publish_timeout: {{ publish_timeout|default('400ms') }}
 
 {%- if include_mime %}
 processors:

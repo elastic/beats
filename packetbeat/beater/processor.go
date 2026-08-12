@@ -49,24 +49,24 @@ type noopReporter struct{}
 func (noopReporter) UpdateStatus(status.Status, string) {}
 
 type processor struct {
-	wg              sync.WaitGroup
-	publisher       *publish.TransactionPublisher
-	flows           *flows.Flows
-	sniffer         *sniffer.Sniffer
-	shutdownTimeout time.Duration
-	err             chan error
-	statusMu        sync.RWMutex
-	status          status.StatusReporter
+	wg             sync.WaitGroup
+	publisher      *publish.TransactionPublisher
+	flows          *flows.Flows
+	sniffer        *sniffer.Sniffer
+	err            chan error
+	statusMu       sync.RWMutex
+	status         status.StatusReporter
+	publishTimeout time.Duration
 }
 
-func newProcessor(shutdownTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error, status status.StatusReporter) *processor {
+func newProcessor(publishTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error, status status.StatusReporter) *processor {
 	return &processor{
-		publisher:       publisher,
-		flows:           flows,
-		sniffer:         sniffer,
-		err:             err,
-		shutdownTimeout: shutdownTimeout,
-		status:          status,
+		publisher:      publisher,
+		flows:          flows,
+		sniffer:        sniffer,
+		err:            err,
+		status:         status,
+		publishTimeout: publishTimeout,
 	}
 }
 
@@ -79,7 +79,7 @@ func (p *processor) Start() {
 		p.flows.Start()
 	}
 	p.wg.Add(1)
-	go func() {
+	p.wg.Go(func() {
 		defer p.wg.Done()
 
 		p.UpdateStatus(status.Running, "running packetbeat processor")
@@ -90,7 +90,7 @@ func (p *processor) Start() {
 			return
 		}
 		p.err <- nil
-	}()
+	})
 }
 
 func (p *processor) Stop() {
@@ -100,11 +100,13 @@ func (p *processor) Stop() {
 		p.flows.Stop()
 	}
 	p.wg.Wait()
-	// wait for shutdownTimeout to let the publisher flush
+
+	// wait for publish timeout to let the publisher flush
 	// whatever pending events
-	if p.shutdownTimeout > 0 {
-		time.Sleep(p.shutdownTimeout)
+	if p.publishTimeout > 0 {
+		time.Sleep(p.publishTimeout)
 	}
+
 	p.publisher.Stop()
 	p.UpdateStatus(status.Stopped, "stopped packetbeat processor")
 }
@@ -152,11 +154,11 @@ func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, c
 		statusReporter = noopReporter{}
 	}
 	statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
-	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, statusReporter)
+	publishTimeout, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, statusReporter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
 	}
-	return newProcessor(duration, publisher, flows, sniffer, errChan, statusReporter), nil
+	return newProcessor(publishTimeout, publisher, flows, sniffer, errChan, statusReporter), nil
 }
 
 // Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
@@ -233,7 +235,7 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		return 0, nil, nil, nil, nil, err
 	}
 
-	return config.ShutdownTimeout, publisher, flows, sniffer, p.err, nil
+	return config.PublishTimeout, publisher, flows, sniffer, p.err, nil
 }
 
 // setupFlows returns a *flows.Flows that will publish to the provided pipeline,
@@ -341,7 +343,7 @@ func configID(config *conf.C) (string, error) {
 		return tmp.ID, nil
 	}
 
-	var h map[string]interface{}
+	var h map[string]any
 	_ = config.Unpack(&h)
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {

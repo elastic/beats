@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -36,21 +37,21 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	testServer := httptest.NewServer(dateCursorHandler())
 	t.Cleanup(testServer.Close)
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"interval":       1,
 		"request.method": "GET",
 		"request.url":    testServer.URL,
-		"request.transforms": []interface{}{
-			map[string]interface{}{
-				"set": map[string]interface{}{
+		"request.transforms": []any{
+			map[string]any{
+				"set": map[string]any{
 					"target":  "url.params.$filter",
 					"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 					"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 				},
 			},
 		},
-		"cursor": map[string]interface{}{
-			"timestamp": map[string]interface{}{
+		"cursor": map[string]any{
+			"timestamp": map[string]any{
 				"value": `[[index .last_response.body "@timestamp"]]`,
 			},
 		},
@@ -59,14 +60,14 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	config := defaultConfig()
 	assert.NoError(t, cfg.Unpack(&config))
 
-	log := logp.NewLogger("")
+	log := logptest.NewTestingLogger(t, "")
 	ctx := context.Background()
 	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	assert.NoError(t, err)
 
 	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "")
 	assert.NoError(t, err)
-	pagination := newPagination(config, client, noopReporter{}, log)
+	pagination := newPagination(config, client, noopReporter{}, log, "")
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
 
 	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
@@ -77,17 +78,17 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// first request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		mapstr.M{"timestamp": "2002-10-02T15:00:00Z"},
 		trCtx.cursorMap(),
 	)
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.firstEvent,
 	)
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.lastEvent,
@@ -96,10 +97,11 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// ignore since has dynamic date and content length values
 	// and is not relevant
 	lastResp.header = nil
-	assert.EqualValues(t,
+	assert.Equal(
+		t,
 		&response{
 			page: 0,
-			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z"))),
+			url:  *newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z")),
 			body: mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		},
 		lastResp,
@@ -108,19 +110,19 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// second request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		mapstr.M{"timestamp": "2002-10-02T15:00:01Z"},
 		trCtx.cursorMap(),
 	)
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.firstEvent,
 	)
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.lastEvent,
@@ -128,10 +130,11 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	lastResp = trCtx.lastResponse.clone()
 	lastResp.header = nil
-	assert.EqualValues(t,
+	assert.Equal(
+		t,
 		&response{
 			page: 0,
-			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z"))),
+			url:  *newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z")),
 			body: mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		},
 		lastResp,
@@ -140,7 +143,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 	ctx := context.Background()
-	log := logp.NewLogger("")
+	log := logptest.NewTestingLogger(t, "")
 	cfg := defaultChainConfig()
 
 	url, _ := url.Parse("https://example.com")
@@ -193,7 +196,6 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			tt.args.cfg.Chain[0].Step = tt.args.step
 			tt.args.cfg.Chain[0].While = tt.args.while
 			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil, "")
@@ -203,7 +205,6 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 				assert.Equal(t, rf.user, user)
 				assert.Equal(t, rf.password, password)
 			}
-
 		})
 	}
 }
@@ -212,7 +213,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 	cfg := defaultChainConfig()
 	cfg.Request.URL = &urlConfig{URL: &url.URL{}}
 	ctx := context.Background()
-	log := logp.NewLogger("newChainClientTestLogger")
+	log := logptest.NewTestingLogger(t, "newChainClientTestLogger")
 
 	type args struct {
 		ctx        context.Context
@@ -246,7 +247,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 }
 
 func Test_evaluateResponse(t *testing.T) {
-	log := logp.NewLogger("newEvaluateResponseTestLogger")
+	log := logptest.NewTestingLogger(t, "newEvaluateResponseTestLogger")
 	responseTrue := bytes.NewBufferString(`{"status": "completed"}`).Bytes()
 	responseFalse := bytes.NewBufferString(`{"status": "initiated"}`).Bytes()
 
@@ -460,7 +461,7 @@ func TestPaginationRejectsCrossOriginURL(t *testing.T) {
 		url:        *base,
 		method:     "GET",
 		originURL:  base,
-		log:        logp.NewLogger("test"),
+		log:        logptest.NewTestingLogger(t, "test"),
 		encoder:    registeredEncoders[""],
 		transforms: []basicTransform{},
 	}
@@ -559,6 +560,16 @@ func TestChainStepOriginValidation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPaginationRequestFactorySetsUserAgent(t *testing.T) {
+	const wantUA = "Elastic-Filebeat/9.5.0 (linux; amd64)"
+	u, _ := url.Parse("https://api.example.com/v1/events")
+	rf := newPaginationRequestFactory("GET", "", *u, &mapstr.M{}, nil, nil, nil, noopReporter{}, logptest.NewTestingLogger(t, t.Name()), wantUA)
+
+	req, err := rf.newRequest(emptyTransformContext())
+	require.NoError(t, err)
+	assert.Equal(t, wantUA, req.header().Get("User-Agent"))
 }
 
 func defaultChainConfig() config {

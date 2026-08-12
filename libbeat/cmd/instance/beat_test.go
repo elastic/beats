@@ -571,16 +571,14 @@ func TestMultipleLoadMeta(t *testing.T) {
 	metaFile := filepath.Join(t.TempDir(), "meta.json")
 	var wg sync.WaitGroup
 	for range 64 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			testBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 			require.NoError(t, err)
 			logger := logptest.NewTestingLogger(t, "")
 			testBeat.Info.Logger = logger
 			err = testBeat.LoadMeta(metaFile)
 			require.NoError(t, err)
-		}()
+		})
 	}
 	wg.Wait()
 }

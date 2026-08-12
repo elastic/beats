@@ -1,0 +1,981 @@
+version: 9.5.0
+entries:
+    - kind: feature
+      summary: Adds cpu number information to iis module and windows perfmon dataset
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48637
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769821387
+      file:
+        name: 1769821387-iis-add-cpu-number-information.yaml
+        checksum: 4a0503e589397046fdbe91d4d7caabe17527c157
+    - kind: feature
+      summary: add RRULE scheduling and scheduled responses for osquerybeat
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/48767
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770723983
+      file:
+        name: 1770723983-osquerybeat-rrule-scheduling.yaml
+        checksum: 5937804766caf06dcff9c15355495acef88cc21d
+    - kind: bug-fix
+      summary: Fix an issue that could cause some beats to delay longer than needed on shutdown.
+      description: ""
+      component: beats
+      pr:
+        - https://github.com/elastic/beats/pull/49482
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773436535
+      file:
+        name: 1773436535-libbeat-manager-shutdown-wait.yaml
+        checksum: 45c64ce58b41095db48e9df52b3963e5086215a9
+    - kind: bug-fix
+      summary: add LDAP channel binding for Windows SSPI binds
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49733
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774610344
+      file:
+        name: 1774610344-1774610344-ldap-sspi-cbt.yaml
+        checksum: eb202b080c193523c90e3761ee5e902873b8494b
+    - kind: feature
+      summary: Removes the dependency on fslib and implements the functionality using go-ntfs instead
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49763
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774802490
+      file:
+        name: 1774802490-remove_fslib_dep.yaml
+        checksum: c9b7aaa4c7ecae72581c44074187bb3262398cc9
+    - kind: feature
+      summary: Add OpenTelemetry Collector receiver for Packetbeat
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49859
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775058467
+      file:
+        name: 1775058467-add-packetbeat-otel-receiver.yaml
+        checksum: 41f7c100f9c3acb75c35b2e5c7098eb40f060d66
+    - kind: feature
+      summary: Add OpenTelemetry Collector receiver for Auditbeat
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49860
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775058468
+      file:
+        name: 1775058468-add-auditbeat-otel-receiver.yaml
+        checksum: b2bb2802d674d084b01cc6f00362d01b9fe77569
+    - kind: feature
+      summary: Add OpenTelemetry Collector receiver for Heartbeat
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49862
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775058469
+      file:
+        name: 1775058469-add-heartbeat-otel-receiver.yaml
+        checksum: 48e784a127fa1fb4e74a17691fdb97f0f668ab40
+    - kind: feature
+      summary: Add osquerybeatreceiver to run osquerybeat under the EDOT collector
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49868
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775092603
+      file:
+        name: 1775092603-add-osquerybeat-otel-receiver.yaml
+        checksum: 5475e6319f34cdba04ef9587d87814e483f9c94f
+    - kind: bug-fix
+      summary: Fix add_host_metadata host.geo map sharing across events causing data corruption.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49722
+      issue:
+        - https://github.com/elastic/beats/issues/49721
+      impact: ""
+      action: ""
+      timestamp: 1775746229
+      file:
+        name: 1775746229-fix-add-host-metadata-geo-map-sharing.yaml
+        checksum: 671f21cf5866759deacbdbd3f439c46a4e02058c
+    - kind: enhancement
+      summary: Collect init container metrics in kubernetes state_container metricset
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50052
+      issue:
+        - https://github.com/elastic/beats/issues/49797
+      impact: ""
+      action: ""
+      timestamp: 1775801591
+      file:
+        name: 1775801591-add-init-container-metrics-state-container.yaml
+        checksum: 7d493c750672860daf8e0e8a3b94a7cede31e165
+    - kind: feature
+      summary: Add elastic_ntfs_partitions and elastic_ntfs_volumes tables to the osquery extension
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/50140
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776188687
+      file:
+        name: 1776188687-osquerybeat_extension_partitions_table.yaml
+        checksum: 67e09e2e5c4c79c96fe34134789771b991bd8c18
+    - kind: enhancement
+      summary: 'Filestream: include_file_fingerprint controls log.file.fingerprint in events.'
+      description: |
+        Add an `include_file_fingerprint` option (default: `true`) to the filestream
+        input. By default `log.file.fingerprint` is included in published events when
+        `file_identity.fingerprint` is configured, preserving the previous behaviour.
+        Set `include_file_fingerprint: false` to omit the field and reduce network,
+        indexing, and storage costs at scale. A still-growing fingerprint is never
+        added to events; only the completed SHA-256 is published.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50129
+      issue:
+        - https://github.com/elastic/beats/issues/50724
+      impact: ""
+      action: ""
+      timestamp: 1776242399
+      file:
+        name: 1776242399-filestream-include-file-fingerprint.yaml
+        checksum: 2320dd1e9245b7ed5e824f6c373d51058ab480a3
+    - kind: bug-fix
+      summary: Harden Salesforce input batching compatibility and auth-failure recovery.
+      description: |
+        Preserve Salesforce object cursor continuity across bounded-batch upgrades
+        and toggles. Existing installs now seed batched windows from legacy
+        first_event_time / last_event_time state, and disabling batching resumes
+        unbatched queries from the latest safe watermark instead of replaying quiet
+        windows that batching already drained.
+
+        Tighten batching safety by rejecting object configs that enable batching
+        without referencing both batch_start_time and batch_end_time, or that still
+        reference those placeholders after batching is disabled.
+
+        Prevent same-timestamp resume gaps for SetupAuditTrail and EventLogFile
+        collection by persisting the last seen record Id as a tie-breaker. Existing
+        installs remain compatible: older cursor state keeps the legacy resume boundary
+        until the next successful run records the new field.
+
+        Normalize Salesforce OAuth token_url handling for user-password and JWT flows.
+        The input now accepts either a Salesforce OAuth host or the canonical
+        /services/oauth2/token endpoint and avoids constructing doubled token URLs.
+
+        Improve resilience by propagating input cancellation into Salesforce HTTP
+        requests, retrying the initial SOQL request once after Salesforce auth errors,
+        retrying EventLogFile downloads once after a 401, and surfacing consecutive
+        collection failures in Elastic Agent status.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50149
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776270719
+      file:
+        name: 1776270719-salesforce-batching-hardening.yaml
+        checksum: 5f38d86cbb6ea4435cc3cf700e109eb2dd3914d4
+    - kind: feature
+      summary: Add otel_file_storage registry backend for standalone Filebeat
+      description: |
+        Remove the experimental `bbolt` registry backend. Add `otel_file_storage` as a new
+        registry backend for standalone Filebeat, using the same on-disk layout as the
+        OpenTelemetry Collector file_storage extension.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50130
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776420000
+      file:
+        name: 1776420000-add-otel-file-storage-registry-backend.yaml
+        checksum: 8e11dfd126bdf1f00419a595cfafb4139042d3a3
+    - kind: feature
+      summary: Add Jamf provider support for entity analytics minimal-state mode.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50445
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777610237
+      file:
+        name: 1777610237-jamf-minimal-state-provider.yaml
+        checksum: 999ff678a2bb2aeadea44f3b7bbc30658fd321fe
+    - kind: enhancement
+      summary: Introduce `wait_for_metadata` and `wait_for_metadata_timeout` and `wait_for_metadata_retry_period` settings to `add_kubernetes_metadata` processor to allow waiting for Kubernetes API availability before processing events.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50509
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778052475
+      file:
+        name: 1778052475-fix-k8s-processor.yaml
+        checksum: 33fbcfaebace3cce932b1a045e3a9c01dbe22f3b
+    - kind: enhancement
+      summary: Add minimal-state Active Directory entity analytics provider.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50601
+      issue:
+        - https://github.com/elastic/beats/issues/49162
+      impact: ""
+      action: ""
+      timestamp: 1778532587
+      file:
+        name: 1778532587-ad-minimal-state-provider.yaml
+        checksum: 9f41994a835595a6247953887ec3e6f273a45fc1
+    - kind: enhancement
+      summary: Retry connecting to Docker in `add_docker_metadata` when the initial connection attempt fails.
+      description: |
+        The `add_docker_metadata` processor now retries connecting to Docker at
+        startup until `wait_for_metadata_timeout` expires. The timeout defaults to
+        30s and includes the initial connection attempt. Set `wait_for_metadata` to
+        true to block startup until Docker metadata is available. Set
+        `wait_for_metadata_timeout` to 0 to retry indefinitely. Configure retry
+        cadence with `wait_for_metadata_retry_period`.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50595
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778617667
+      file:
+        name: 1778617667-retry-add_docker_metadata.yaml
+        checksum: 7b35873da81b27c51273168cbf81f937f69ebeae
+    - kind: enhancement
+      summary: Add minimal-state Okta entity analytics provider with bulk-fetch group enrichment.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50685
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778707911
+      file:
+        name: 1778707911-entityanalytics-okta-minimal-state.yaml
+        checksum: 74dedbfcc78916dff0a7c878c3d816cf96d7d389
+    - kind: enhancement
+      summary: Add minimal-state mode for the EntraID entity analytics provider.
+      description: |
+        The EntraID (Azure AD) entity analytics provider now supports
+        use_minimal_state: true, replacing persistent entity and group graph
+        storage with delta-query-based sync and in-memory transitive group
+        membership computation.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50773
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779159472
+      file:
+        name: 1779159472-entityanalytics-entraid-minimal-state.yaml
+        checksum: 740f6c82f7ad39efde2a1c9fe418778a0933a215
+    - kind: bug-fix
+      summary: Propagate osquery live-query space IDs to action response events.
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/50808
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779275680
+      file:
+        name: 1779275680-propagate-osquery-live-query-space-ids.yaml
+        checksum: b4565e844d29e49df7ed8d28b128e26c15e63d8c
+    - kind: feature
+      summary: Add auditd filestream parser that populates auditd.log.* fields using go-libaudit.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50791
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779435486
+      file:
+        name: 1779435486-mborden-filebeat-auditd-parser.yaml
+        checksum: 9a18cc0a3dab582ba7d88e864777ada4670839a5
+    - kind: enhancement
+      summary: |
+        Add Enhanced Fingerprint mode to the filestream input's `fingerprint` file identity.
+        When enabled (`file_identity.fingerprint.growing: true`, the default), files smaller
+        than `prospector.scanner.fingerprint.offset + prospector.scanner.fingerprint.length`
+        are tracked instead of being skipped as too small. No data duplication happens
+        on upgrade or when enabling the enhanced fingerprint. The new behaviour is
+        opt-out (`growing: false` restores the legacy fingerprint behaviour).
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50566
+      issue:
+        - https://github.com/elastic/beats/issues/50116
+      impact: ""
+      action: ""
+      timestamp: 1779460752
+      file:
+        name: 1779460752-filestream-enhanced-fingerprint.yaml
+        checksum: b16f1f32dcd2287152ecb5667bd0737b7b43dc7c
+    - kind: enhancement
+      summary: Add Filestream scanner metrics to monitoring logs
+      description: |
+        The following Filestream metrics are added to the logs and the `/stats` HTTP endpoint:
+         - files_empty
+         - files_ignored
+         - files_matched
+         - files_no_ingest_target
+         - files_unique
+
+        The metrics are gauges aggregated from all running Filestream inputs
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50963
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779898173
+      file:
+        name: 1779898173-add-filestream-scanner-metrics-to-monitoring-logs.yaml
+        checksum: 086aab74e3a2f05b58baa7046ce1057206cbfab4
+    - kind: feature
+      summary: Add elastic_ntfs_file table to the osquery extension for MFT-based file metadata on Windows
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/50641
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779917047
+      file:
+        name: 1779917047-add-mft-file-table-to-osquerybeat.yaml
+        checksum: 72aa3bd9423d26e08488bbe138e3d282af7454ef
+    - kind: bug-fix
+      summary: This fixes a bug where worker/workers setting was not respected when loadbalance is set to false.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51041
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1780315938
+      file:
+        name: 1780315938-fix-loadbalance-bug.yaml
+        checksum: 274aa67c9985c376b2b46b3cf5cc711f7edd9471
+    - kind: enhancement
+      summary: Add slabqueue, a new in-memory publisher queue that shares a single event budget across multiple pipelines while keeping per-pipeline FIFOs isolated. Selectable via queue.slab (~2.5× throughput vs queue.mem in stress tests); used by default in Beat receivers to support multi-receiver intake queue sharing.
+      description: ""
+      component: beats
+      pr:
+        - https://github.com/elastic/beats/pull/51047
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1780408365
+      file:
+        name: 1780408365-slabqueue-multi-pipeline.yaml
+        checksum: 68c75838d692ad740c61710abdc15a2cd1d291a1
+    - kind: bug-fix
+      summary: Fix Okta minimal-state provider to accept configs with both okta_token and oauth2.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51078
+      issue:
+        - https://github.com/elastic/beats/issues/51005
+      impact: ""
+      action: ""
+      timestamp: 1780464295
+      file:
+        name: 1780464295-okta-minimal-dual-auth.yaml
+        checksum: bde331bef00c484b3bdc51d02ded062a2b37fc35
+    - kind: unknown
+      summary: Add agent processors to heartbeat config transform running on managed mode
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51100
+      issue:
+        - https://github.com/elastic/beats/issues/33914
+      impact: ""
+      action: ""
+      timestamp: 1780569515
+      file:
+        name: 1780569515-hb-normalize-input-processors.yaml
+        checksum: fe3cc98efa1a9d817e00794b8939effb95fac14b
+    - kind: enhancement
+      summary: Improve Beats shutdown to wait for in-flight events to be acknowledged before stopping.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51136
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1780706698
+      file:
+        name: 1780706698-beats-shutdown-wait-for-acks.yaml
+        checksum: c9640c852224dc06045de940dbdcf487c3c98fb1
+    - kind: enhancement
+      summary: Add Elasticsearch-backed state store support for entity-analytics agentless deployments.
+      description: |
+        The entity-analytics minimal-state input can now use an Elasticsearch-backed
+        state store when running in agentless mode. State is persisted to an
+        Elasticsearch index (agentless-state-<input-id>) instead of local bbolt,
+        enabling stateless pod scheduling. The store backend is selected automatically
+        based on the AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES environment
+        variable set by the agentless controller.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51210
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781211047
+      file:
+        name: 1781211047-entity-analytics-es-state-store.yaml
+        checksum: b2f29cceb1c360a9dd1d0522f0b5b6cdd8915da7
+    - kind: enhancement
+      summary: Reduce allocations in filestream by pooling the per-file LineReader scratch buffer.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51197
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781553432
+      file:
+        name: 1781553432-filestream-linereader-buffer-pool.yaml
+        checksum: f6627a6bba098cf551a9cee82c16107a7a544301
+    - kind: enhancement
+      summary: Add emit macro, stream producers, and lazy JSON decode to the CEL input.
+      description: |
+        Add the emit macro for publishing events during CEL evaluation instead of
+        collecting them in the state.events array. Combined with stream_gzip,
+        stream_zip, and decode_json_stream_lazy, this enables streaming
+        decompression and decoding of large payloads without holding all records
+        in memory.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51279
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781587054
+      file:
+        name: 1781587054-cel-emit-stream.yaml
+        checksum: ac746571fd007e0a2a9c4858d9ae24f7d3228374
+    - kind: bug-fix
+      summary: Honor the enabled flag when reloading inputs.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51472
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781712219
+      file:
+        name: 1781712219-honor-enabled-flag-in-filebeat.config.inputs.yaml
+        checksum: 601a8d0ab6757c565fc3a2b9fd1003fa26658f6d
+    - kind: enhancement
+      summary: Promote the `winlog` input to GA (generally available).
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51557
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782385200
+      file:
+        name: 1782385200-winlog-input-ga.yaml
+        checksum: a06c12f29dcf05bf2e55b620784f82f6caa3cfff
+    - kind: security
+      summary: Reject CPIO entries in macOS .pkg payloads whose paths escape the destination directory, preventing path traversal during extraction (CWE-22).
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/51446
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782484560
+      file:
+        name: 1782484560-osquerybeat-pkg-path-traversal.yaml
+        checksum: 22e68720d3ef38d147eae8f26a9e7e3e31cd2357
+    - kind: enhancement
+      summary: Add v2 aws-s3 input with adaptive flow control.
+      description: |
+        The aws-s3 input has been rewritten with a simpler architecture, adaptive
+        concurrency control, and unified state management. The new implementation can
+        be enabled by setting features.aws_s3_v2.enabled: true in the beat
+        configuration.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51598
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782710570
+      file:
+        name: 1782710570-51438-awss3.yaml
+        checksum: b5792e741f965532bb1bd1bde3242bbf1cbaa2cf
+    - kind: bug-fix
+      summary: fixes serialization of ads and active columns in elastic_ntfs_file table to use boolean instead of integer
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/51629
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782770011
+      file:
+        name: 1782770011-fix-ads-column.yaml
+        checksum: cd79ff82cb829bee708f91a040a497717f3dd068
+    - kind: bug-fix
+      summary: Fix Kerberos ticket status code descriptions not being set in the Security event log ingest pipeline when `winlog.event_data.Status` arrives in lower case.
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51681
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782933214
+      file:
+        name: 1782933214-fix-kerberos-status-description-case-sensitivity.yaml
+        checksum: 71026604d8a1dee40dd6c627d5a0f6cb1669e20d
+    - kind: enhancement
+      summary: Rename osquerybeat query profiling settings to `profiling` and enable profiling by default
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/51691
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783001090
+      file:
+        name: 1783001090-osquerybeat-profiling-config.yaml
+        checksum: c22f4674e20cdbffa4afecd4c1758e955f45d116
+    - kind: enhancement
+      summary: Add Filestream harvester metrics to monitoring logs
+      description: |
+        The following Filestream metrics are added to the logs and the `/stats` HTTP endpoint:
+         - files_ingested_percent_100
+         - files_ingested_percent_95_99
+         - files_ingested_percent_lt_95
+
+        These gauges are aggregated across all running Filestream inputs and
+        count active plain-file harvesters only.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51077
+      issue:
+        - https://github.com/elastic/beats/issues/36653
+      impact: ""
+      action: ""
+      timestamp: 1783018351
+      file:
+        name: 1783018351-add-filestream-harvester-metrics.yaml
+        checksum: 63475da58ed3425311b2f97679a4d6d01bfec5b9
+    - kind: enhancement
+      summary: Disable periodic metrics logging (`logging.metrics`) by default when a beat runs as an OTel Collector receiver.
+      description: ""
+      component: beats
+      pr:
+        - https://github.com/elastic/beats/pull/51711
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783077556
+      file:
+        name: 1783077556-disable-metric-log-snapshots-by-default-in-receivers.yaml
+        checksum: b130ca95ff69236b788233322c2bcc038f02ea06
+    - kind: enhancement
+      summary: Add sign-in activity enrichment to the minimal-state EntraID entity analytics provider.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51724
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783306449
+      file:
+        name: 1783306449-entcollect-signin-activity.yaml
+        checksum: 102a7516dd3627317973646576b2dc2f253f6918
+    - kind: enhancement
+      summary: update quark to 0.6.0
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51767
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783413804
+      file:
+        name: 1783413804-auditbeat-quark-0.6.yaml
+        checksum: 44809fab6ae36a2c7b4a20ea77ee190b6fe9939e
+    - kind: enhancement
+      summary: Aggregate SQS mode health status to reduce false Degraded/Healthy transitions.
+      description: |
+        Replace scattered per-event status reporting in the aws-s3 SQS input with a
+        centralized health aggregator. The input now stays Running while making forward
+        progress despite bounded retryable failures, reports Degraded only for sustained
+        conditions needing operator action (persistent receive failures, delete/finalize
+        errors, poison-pill messages), filters out context.Canceled from shutdown/reload,
+        and clears Degraded only when the specific causing condition resolves.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51819
+      issue:
+        - https://github.com/elastic/beats/issues/51692
+      impact: ""
+      action: ""
+      timestamp: 1783548970
+      file:
+        name: 1783548970-sqs-health-status-aggregation.yaml
+        checksum: 2c5deb9dc74399feb8c817036332196c94a92b97
+    - kind: enhancement
+      summary: Wire SQS health status aggregation into the v2 aws-s3 input path.
+      description: |
+        Apply the sqsHealth aggregator (from the legacy SQS path) to the v2 SQS
+        input. The v2 path now has the same health reporting semantics: transient
+        failures stay Running, sustained failures degrade with condition-specific
+        messages, and context cancellation from shutdown is suppressed.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52001
+      issue:
+        - https://github.com/elastic/beats/issues/51692
+      impact: ""
+      action: ""
+      timestamp: 1783550459
+      file:
+        name: 1783550459-sqs-health-v2-wire.yaml
+        checksum: 0a220a55fb864387ec13a7370dd8e87317988ddd
+    - kind: enhancement
+      summary: Add configurable User-Agent header to the CrowdStrike streaming input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51822
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783565292
+      file:
+        name: 1783565292-streaming-user-agent.yaml
+        checksum: fa50776d27e9f9a77f906df3730a534a576a2569
+    - kind: enhancement
+      summary: Reduce filestream scanner per-scan memory allocations for large idle file sets
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51863
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783612408
+      file:
+        name: 1783612408-filestream-scanner-reduce-scan-allocations.yaml
+        checksum: 169f43e29cc2320e060c776e9aef18423be0c722
+    - kind: bug-fix
+      summary: Fix S3 polling input to exclude same-bucket backup objects from listing.
+      description: |
+        When same-bucket backup is configured with the default empty
+        bucket_list_prefix, backup objects are listed alongside source objects
+        and reprocessed indefinitely. Exclude keys matching the backup prefix
+        from listing results when the backup destination is the same bucket.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51912
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783988471
+      file:
+        name: 1783988471-exclude-backup-prefix-from-polling.yaml
+        checksum: 45cfd02c5ad599e0e059fca02ffea159d7233b03
+    - kind: bug-fix
+      summary: Fix panic with multiple heartbeat receivers
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52010
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784110000
+      file:
+        name: 1784110000-hbreceiver-arm64-seccomp-reregistration.yaml
+        checksum: bf9435850d2acb3e31568ed917ca4617f2092491
+    - kind: bug-fix
+      summary: Honor path_style for non-AWS S3 buckets in the aws-s3 input
+      description: |
+        When using non_aws_bucket_name with a custom endpoint, the aws-s3 input always marked the endpoint hostname immutable, forcing path-style requests and ignoring path_style. This broke S3-compatible providers that require virtual-hosted addressing, which returned VirtualHostDomainRequired.  The hostname is now kept mutable for non-AWS buckets so path_style is honored.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52003
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784190638
+      file:
+        name: 1784190638-fix-awss3-non-aws-path-style.yaml
+        checksum: a2ec804ddf7e4e7d8702e731ac0604e7aa45ce83
+    - kind: security
+      summary: Upgrade to go 1.26.5
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51873
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784322828
+      file:
+        name: 1784322828-upgrade-to-go-1.26.5.yaml
+        checksum: f3b3233f83d732f0b3d7c509db008a992bd411b4
+    - kind: bug-fix
+      summary: Use a stable status message for SQS receive errors to prevent update churn during sustained outages.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52059
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784498235
+      file:
+        name: 1784498235-sqs-health-stable-receive-message.yaml
+        checksum: 633e220d49789b077bc8f6cfb8c5167308797787
+    - kind: bug-fix
+      summary: Do not mark the CEL input's health as degraded when the maximum executions is exceeded.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52060
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784500632
+      file:
+        name: 1784500632-exceeding_budget_is_not_degradation.yaml
+        checksum: 20d545091406c077e7b7ff69eb31e0f70fbb74dd
+    - kind: enhancement
+      summary: Pass configured HTTP transport to Okta minimal-state provider for TLS support.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52062
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784521036
+      file:
+        name: 1784521036-okta-minimal-tls.yaml
+        checksum: d8dfbad85e422f9e326987bdb614ede550c86214
+    - kind: bug-fix
+      summary: Honor the configured language when rendering Windows events
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52094
+      issue:
+        - https://github.com/elastic/sdh-beats/issues/7332
+      impact: ""
+      action: ""
+      timestamp: 1784556644
+      file:
+        name: 1784556644-fix-winlogbeat-publisher-locale.yaml
+        checksum: 7bdf32f18cef00ffda528f9e640a844cf616ea8b
+    - kind: bug-fix
+      summary: Fix beat receiver Shutdown hanging when Start fails before the beater is launched
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/52106
+      issue:
+        - https://github.com/elastic/beats/issues/52009
+      impact: ""
+      action: ""
+      timestamp: 1784565082
+      file:
+        name: 1784565082-fix-nil-rundone-channel.yaml
+        checksum: 0d61daeca4e2c358d252ce4666c7c6de1945fd5b
+    - kind: feature
+      summary: Add entcollect adapter for entity analytics minimal state providers.
+      description: |
+        Add adapter infrastructure to bridge the entcollect library into the
+        entity analytics input. This includes a kvstore transaction-to-store
+        adapter, a document-to-beat.Event publisher closure, a minimal state
+        provider registry, and a generic sync loop with timer, buffering, and
+        ACK-then-commit semantics.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49871
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775095457
+      file:
+        name: 1775095457-entity-analytics-entcollect-adapter.yaml
+        checksum: 00bce16e3d05e15f774e62621ccb6a36e5492901
+    - kind: enhancement
+      summary: harden osquerybeat RRULE scheduler reload, RRULE osqueryd rendering, splay limits, and pack schedule metadata
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/48767
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775587200
+      file:
+        name: 1775587200-osquerybeat-schedule-config-hardening.yaml
+        checksum: d83cd0093b48394fcc3a64fade83617ed721be90
+    - kind: feature
+      summary: Add entcollect store adapter to the Elasticsearch storage OTel extension.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49871
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775685154
+      file:
+        name: 1775685154-add-entcollect-store-adapter.yaml
+        checksum: 899126f5cc1412f45bea564c8e7dd5204459644a
+    - kind: bug-fix
+      summary: Fix aws-s3 input silently dropping events when a parser clears the message content
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52077
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784536512
+      file:
+        name: 1784536512-fix-awss3-readfile-drops-parser-fields.yaml
+        checksum: 136fa49521cb2499adea260f75141e5926b1b790
+    - kind: enhancement
+      summary: Remove Authorization headers from CEL, Entity Analytics, HTTP Endpoint, and HTTP JSON input request trace logs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52224
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784758682
+      file:
+        name: 1784758682-no-auth-trace-logs.yaml
+        checksum: 7d928aec539472fc6ba31c95fa120cdda0b9cce7
+    - kind: bug-fix
+      summary: Fix journald input facility filters on journalctl older than 245
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52231
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784830745
+      file:
+        name: 1784830745-journald-facility-old-journalctl.yaml
+        checksum: f518a6080a2132a71374977ac09b36d60666d302
+    - kind: bug-fix
+      summary: The journald input now reports a Degraded status when journalctl repeatedly exits without delivering any data, instead of staying Healthy while collecting no events
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52232
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784830987
+      file:
+        name: 1784830987-journald-degraded-on-restart-loop.yaml
+        checksum: be7de189ea21eeed3e64a683bbe5f9ebe839326c
+    - kind: bug-fix
+      summary: Accept osquery packs mixing interval-scheduled and unscheduled queries again
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/52242
+      issue:
+        - https://github.com/elastic/beats/issues/51450
+      impact: ""
+      action: ""
+      timestamp: 1784900000
+      file:
+        name: 1784900000-osquerybeat-allow-native-unscheduled-pack-mix.yaml
+        checksum: fb93687c721de1a3dfd16d28bbfb9a08d606fa5c
+    - kind: bug-fix
+      summary: Fix TCP and UDP inputs hanging during shutdown
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52292
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1785228000
+      file:
+        name: 1785228000-fix-net-input-shutdown-hang.yaml
+        checksum: 67d3c5c14257923cf8d826b7392da777cddb76f6
