@@ -8,8 +8,8 @@
 The `add_locale` processor enriches each event with the machine's time zone
 offset from UTC or with the name of the time zone. It supports one configuration
 option named `format` that controls whether an offset or time zone abbreviation
-is added to the event. The default format is `offset`. The processor adds the
-a `event.timezone` value to each event.
+is added to the event. The default format is `offset`. The processor adds an
+`event.timezone` value to each event.
 
 The configuration below enables the processor with the default settings.
 
@@ -30,5 +30,5 @@ processors:
 -------------------------------------------------------------------------------
 
 NOTE: Please note that `add_locale` differentiates between daylight savings
-time (DST) and regular time. For example `CEST` indicates DST and and `CET` is
+time (DST) and regular time. For example `CEST` indicates DST and `CET` is
 regular time.
