@@ -95,7 +95,7 @@ func (c *config) Validate() error {
 
 	if c.BasicAuth {
 		if c.Username == "" || c.Password == "" {
-			return errors.New("username and password required when basicauth is enabled")
+			return errors.New("username and password are required when basicauth is enabled")
 		}
 	}
 
