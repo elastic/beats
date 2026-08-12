@@ -34,14 +34,14 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	assertDefaults := func(t *testing.T, c config) {
 		t.Helper()
 		require.Equal(t, 16*time.Second, c.Timeout, "timeout")
-		require.Equal(t, true, c.Mode.IPv4, "ipv4")
-		require.Equal(t, true, c.Mode.IPv6, "ipv6")
+		require.True(t, c.Mode.IPv4, "ipv4")
+		require.True(t, c.Mode.IPv6, "ipv6")
 		require.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
-		require.Equal(t, false, c.Socks5.LocalResolve, "proxy_use_local_resolver")
+		require.False(t, c.Socks5.LocalResolve, "proxy_use_local_resolver")
 	}
 
 	t.Run("all default fields absent", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{"hosts": "localhost:8080"})
+		cfg, err := conf.NewConfigFrom(map[string]any{"hosts": "localhost:8080"})
 		require.NoError(t, err)
 
 		c := defaultConfig()
@@ -50,7 +50,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	})
 
 	t.Run("all default fields explicitly null", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		cfg, err := conf.NewConfigFrom(map[string]any{
 			"hosts":                    "localhost:8080",
 			"timeout":                  nil,
 			"mode":                     nil,
@@ -66,7 +66,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	})
 
 	t.Run("explicit non-default values override", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		cfg, err := conf.NewConfigFrom(map[string]any{
 			"hosts":                    "localhost:8080",
 			"timeout":                  "30s",
 			"ipv4":                     false,
@@ -77,7 +77,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 		c := defaultConfig()
 		require.NoError(t, cfg.Unpack(&c))
 		require.Equal(t, 30*time.Second, c.Timeout)
-		require.Equal(t, false, c.Mode.IPv4)
-		require.Equal(t, true, c.Socks5.LocalResolve)
+		require.False(t, c.Mode.IPv4)
+		require.True(t, c.Socks5.LocalResolve)
 	})
 }

@@ -41,15 +41,15 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 		require.Equal(t, "GET", c.Check.Request.Method, "check.request.method")
 		require.Equal(t, 0, c.MaxRedirects, "max_redirects")
 		require.Equal(t, "on_error", c.Response.IncludeBody, "response.include_body")
-		require.Equal(t, true, c.Response.IncludeHeaders, "response.include_headers")
-		require.Equal(t, true, c.Mode.IPv4, "ipv4")
-		require.Equal(t, true, c.Mode.IPv6, "ipv6")
+		require.True(t, c.Response.IncludeHeaders, "response.include_headers")
+		require.True(t, c.Mode.IPv4, "ipv4")
+		require.True(t, c.Mode.IPv6, "ipv6")
 		require.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
 		require.Equal(t, 16*time.Second, c.Transport.Timeout, "timeout")
 	}
 
 	t.Run("all default fields absent", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		cfg, err := conf.NewConfigFrom(map[string]any{
 			"urls": "http://localhost:8080",
 		})
 		require.NoError(t, err)
@@ -60,7 +60,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	})
 
 	t.Run("all default fields explicitly null", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		cfg, err := conf.NewConfigFrom(map[string]any{
 			"urls":                     "http://localhost:8080",
 			"timeout":                  nil,
 			"max_redirects":            nil,
@@ -81,7 +81,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	// Control: confirms the dotted keys actually bind (path separator works),
 	// so the assertions above are meaningful and not passing by accident.
 	t.Run("explicit non-default values override", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		cfg, err := conf.NewConfigFrom(map[string]any{
 			"urls":                     "http://localhost:8080",
 			"max_redirects":            5,
 			"response.include_headers": false,
@@ -96,7 +96,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 		require.Equal(t, "POST", c.Check.Request.Method)
 		require.Equal(t, 5, c.MaxRedirects)
 		require.Equal(t, "always", c.Response.IncludeBody)
-		require.Equal(t, false, c.Response.IncludeHeaders)
-		require.Equal(t, false, c.Mode.IPv4)
+		require.False(t, c.Response.IncludeHeaders)
+		require.False(t, c.Mode.IPv4)
 	})
 }

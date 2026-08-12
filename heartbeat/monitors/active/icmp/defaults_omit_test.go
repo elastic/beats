@@ -35,13 +35,13 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 		t.Helper()
 		require.Equal(t, 16*time.Second, c.Timeout, "timeout")
 		require.Equal(t, 1*time.Second, c.Wait, "wait")
-		require.Equal(t, true, c.Mode.IPv4, "ipv4")
-		require.Equal(t, true, c.Mode.IPv6, "ipv6")
+		require.True(t, c.Mode.IPv4, "ipv4")
+		require.True(t, c.Mode.IPv6, "ipv6")
 		require.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
 	}
 
 	t.Run("all default fields absent", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{"hosts": "localhost"})
+		cfg, err := conf.NewConfigFrom(map[string]any{"hosts": "localhost"})
 		require.NoError(t, err)
 
 		c := DefaultConfig
@@ -50,7 +50,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	})
 
 	t.Run("all default fields explicitly null", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		cfg, err := conf.NewConfigFrom(map[string]any{
 			"hosts":   "localhost",
 			"timeout": nil,
 			"wait":    nil,
@@ -66,7 +66,7 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	})
 
 	t.Run("explicit non-default values override", func(t *testing.T) {
-		cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		cfg, err := conf.NewConfigFrom(map[string]any{
 			"hosts":   "localhost",
 			"timeout": "30s",
 			"wait":    "5s",
@@ -78,6 +78,6 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 		require.NoError(t, cfg.Unpack(&c))
 		require.Equal(t, 30*time.Second, c.Timeout)
 		require.Equal(t, 5*time.Second, c.Wait)
-		require.Equal(t, false, c.Mode.IPv6)
+		require.False(t, c.Mode.IPv6)
 	})
 }
