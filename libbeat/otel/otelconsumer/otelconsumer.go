@@ -224,6 +224,12 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 			observedTimestamp = pcommon.NewTimestampFromTime(created)
 		case common.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+		case string:
+			t, err := time.Parse(time.RFC3339, created)
+			if err != nil {
+				t = time.Now()
+			}
+			observedTimestamp = pcommon.NewTimestampFromTime(t)
 		case nil:
 			// not set
 		default:
