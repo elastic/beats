@@ -43,12 +43,7 @@ type Config struct {
 	SyntheticsArgs    []string                      `config:"synthetics_args"`
 	PlaywrightOpts    map[string]any                `config:"playwright_options"`
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
-	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
-	// CertificateErrorSpkiAllowlist is a list of PEM certificates (inline or
-	// file paths). Heartbeat forwards them to synthetics as
-	// --certificate-error-spki-allowlist so Chromium can bypass certificate
-	// errors for matching presented SPKIs. This does not install a CA into
-	// Chromium's NSS trust store.
+	IgnoreHTTPSErrors             bool          `config:"ignore_https_errors"`
 	CertificateErrorSpkiAllowlist []string      `config:"certificate_error_spki_allowlist"`
 	Timeout                       time.Duration `config:"timeout"`
 }
