@@ -65,7 +65,7 @@ All fields specific to the Windows Event Tracing are defined here.
 
 
 **`winlog.keywords`**
-:   The keywords defined in the event. Keywords are used to indicate an event's membership in a set of event categories. This keywords are a list of keywords, each keyword is a string that represents a specific keyword.
+:   The keywords defined in the event. Keywords are used to indicate an event's membership in a set of event categories. These keywords are a list of keywords, each keyword is a string that represents a specific keyword.
 
     type: keyword
 
