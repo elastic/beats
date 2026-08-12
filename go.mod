@@ -145,9 +145,15 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
+<<<<<<< HEAD
 	cloud.google.com/go/compute v1.64.0
 	cloud.google.com/go/redis v1.23.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.1
+=======
+	cloud.google.com/go/compute v1.66.0
+	cloud.google.com/go/redis v1.25.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.22.0
+>>>>>>> ffbb488af (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/storage/azblob from 1.7.0 to 1.8.0 (#52595))
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
@@ -156,7 +162,11 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.11.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
+<<<<<<< HEAD
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.6.3
+=======
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.8.0
+>>>>>>> ffbb488af (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/storage/azblob from 1.7.0 to 1.8.0 (#52595))
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.35
