@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -38,24 +38,24 @@ import (
 func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	assertDefaults := func(t *testing.T, c Config) {
 		t.Helper()
-		require.Equal(t, "GET", c.Check.Request.Method, "check.request.method")
-		require.Equal(t, 0, c.MaxRedirects, "max_redirects")
-		require.Equal(t, "on_error", c.Response.IncludeBody, "response.include_body")
-		require.True(t, c.Response.IncludeHeaders, "response.include_headers")
-		require.True(t, c.Mode.IPv4, "ipv4")
-		require.True(t, c.Mode.IPv6, "ipv6")
-		require.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
-		require.Equal(t, 16*time.Second, c.Transport.Timeout, "timeout")
+		assert.Equal(t, "GET", c.Check.Request.Method, "check.request.method")
+		assert.Equal(t, 0, c.MaxRedirects, "max_redirects")
+		assert.Equal(t, "on_error", c.Response.IncludeBody, "response.include_body")
+		assert.True(t, c.Response.IncludeHeaders, "response.include_headers")
+		assert.True(t, c.Mode.IPv4, "ipv4")
+		assert.True(t, c.Mode.IPv6, "ipv6")
+		assert.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
+		assert.Equal(t, 16*time.Second, c.Transport.Timeout, "timeout")
 	}
 
 	t.Run("all default fields absent", func(t *testing.T) {
 		cfg, err := conf.NewConfigFrom(map[string]any{
 			"urls": "http://localhost:8080",
 		})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := defaultConfig()
-		require.NoError(t, cfg.Unpack(&c))
+		assert.NoError(t, cfg.Unpack(&c))
 		assertDefaults(t, c)
 	})
 
@@ -71,10 +71,10 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 			"ipv4":                     nil,
 			"ipv6":                     nil,
 		})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := defaultConfig()
-		require.NoError(t, cfg.Unpack(&c))
+		assert.NoError(t, cfg.Unpack(&c))
 		assertDefaults(t, c)
 	})
 
@@ -89,14 +89,14 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 			"check.request.method":     "POST",
 			"ipv4":                     false,
 		})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := defaultConfig()
-		require.NoError(t, cfg.Unpack(&c))
-		require.Equal(t, "POST", c.Check.Request.Method)
-		require.Equal(t, 5, c.MaxRedirects)
-		require.Equal(t, "always", c.Response.IncludeBody)
-		require.False(t, c.Response.IncludeHeaders)
-		require.False(t, c.Mode.IPv4)
+		assert.NoError(t, cfg.Unpack(&c))
+		assert.Equal(t, "POST", c.Check.Request.Method)
+		assert.Equal(t, 5, c.MaxRedirects)
+		assert.Equal(t, "always", c.Response.IncludeBody)
+		assert.False(t, c.Response.IncludeHeaders)
+		assert.False(t, c.Mode.IPv4)
 	})
 }

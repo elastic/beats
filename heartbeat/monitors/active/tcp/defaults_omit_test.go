@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -33,19 +33,19 @@ import (
 func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	assertDefaults := func(t *testing.T, c config) {
 		t.Helper()
-		require.Equal(t, 16*time.Second, c.Timeout, "timeout")
-		require.True(t, c.Mode.IPv4, "ipv4")
-		require.True(t, c.Mode.IPv6, "ipv6")
-		require.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
-		require.False(t, c.Socks5.LocalResolve, "proxy_use_local_resolver")
+		assert.Equal(t, 16*time.Second, c.Timeout, "timeout")
+		assert.True(t, c.Mode.IPv4, "ipv4")
+		assert.True(t, c.Mode.IPv6, "ipv6")
+		assert.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
+		assert.False(t, c.Socks5.LocalResolve, "proxy_use_local_resolver")
 	}
 
 	t.Run("all default fields absent", func(t *testing.T) {
 		cfg, err := conf.NewConfigFrom(map[string]any{"hosts": "localhost:8080"})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := defaultConfig()
-		require.NoError(t, cfg.Unpack(&c))
+		assert.NoError(t, cfg.Unpack(&c))
 		assertDefaults(t, c)
 	})
 
@@ -58,10 +58,10 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 			"ipv6":                     nil,
 			"proxy_use_local_resolver": nil,
 		})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := defaultConfig()
-		require.NoError(t, cfg.Unpack(&c))
+		assert.NoError(t, cfg.Unpack(&c))
 		assertDefaults(t, c)
 	})
 
@@ -72,12 +72,12 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 			"ipv4":                     false,
 			"proxy_use_local_resolver": true,
 		})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := defaultConfig()
-		require.NoError(t, cfg.Unpack(&c))
-		require.Equal(t, 30*time.Second, c.Timeout)
-		require.False(t, c.Mode.IPv4)
-		require.True(t, c.Socks5.LocalResolve)
+		assert.NoError(t, cfg.Unpack(&c))
+		assert.Equal(t, 30*time.Second, c.Timeout)
+		assert.False(t, c.Mode.IPv4)
+		assert.True(t, c.Socks5.LocalResolve)
 	})
 }

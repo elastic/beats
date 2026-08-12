@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -33,19 +33,19 @@ import (
 func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 	assertDefaults := func(t *testing.T, c Config) {
 		t.Helper()
-		require.Equal(t, 16*time.Second, c.Timeout, "timeout")
-		require.Equal(t, 1*time.Second, c.Wait, "wait")
-		require.True(t, c.Mode.IPv4, "ipv4")
-		require.True(t, c.Mode.IPv6, "ipv6")
-		require.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
+		assert.Equal(t, 16*time.Second, c.Timeout, "timeout")
+		assert.Equal(t, 1*time.Second, c.Wait, "wait")
+		assert.True(t, c.Mode.IPv4, "ipv4")
+		assert.True(t, c.Mode.IPv6, "ipv6")
+		assert.Equal(t, monitors.PingAny, c.Mode.Mode, "mode")
 	}
 
 	t.Run("all default fields absent", func(t *testing.T) {
 		cfg, err := conf.NewConfigFrom(map[string]any{"hosts": "localhost"})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := DefaultConfig
-		require.NoError(t, cfg.Unpack(&c))
+		assert.NoError(t, cfg.Unpack(&c))
 		assertDefaults(t, c)
 	})
 
@@ -58,10 +58,10 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 			"ipv4":    nil,
 			"ipv6":    nil,
 		})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := DefaultConfig
-		require.NoError(t, cfg.Unpack(&c))
+		assert.NoError(t, cfg.Unpack(&c))
 		assertDefaults(t, c)
 	})
 
@@ -72,12 +72,12 @@ func TestOmittedDefaultsFallBackToHeartbeatDefaults(t *testing.T) {
 			"wait":    "5s",
 			"ipv6":    false,
 		})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 
 		c := DefaultConfig
-		require.NoError(t, cfg.Unpack(&c))
-		require.Equal(t, 30*time.Second, c.Timeout)
-		require.Equal(t, 5*time.Second, c.Wait)
-		require.False(t, c.Mode.IPv6)
+		assert.NoError(t, cfg.Unpack(&c))
+		assert.Equal(t, 30*time.Second, c.Timeout)
+		assert.Equal(t, 5*time.Second, c.Wait)
+		assert.False(t, c.Mode.IPv6)
 	})
 }
