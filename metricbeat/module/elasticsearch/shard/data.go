@@ -52,7 +52,7 @@ type stateStruct struct {
 	} `json:"nodes"`
 	RoutingTable struct {
 		Indices map[string]struct {
-			Shards map[string][]map[string]interface{} `json:"shards"`
+			Shards map[string][]map[string]any `json:"shards"`
 		} `json:"indices"`
 	} `json:"routing_table"`
 }

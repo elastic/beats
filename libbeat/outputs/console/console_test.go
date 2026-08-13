@@ -115,7 +115,6 @@ func TestConsoleOutput(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.title, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
 			batch := outest.NewBatch(test.events...)

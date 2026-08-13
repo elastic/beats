@@ -75,7 +75,6 @@ type KafkaConfig struct {
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
 	Sasl               kafka.SaslConfig          `config:"sasl"`
-	EnableFAST         bool                      `config:"enable_krb5_fast"`
 	Queue              config.Namespace          `config:"queue"`
 	Idempotent         bool                      `config:"idempotent"`
 
@@ -254,12 +253,7 @@ func newSaramaConfig(log *logp.Logger, config *KafkaConfig) (*sarama.Config, err
 	case config.Kerberos.IsEnabled():
 		log.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
 
-		// Due to a regrettable past decision, the flag controlling Kerberos
-		// FAST authentication was initially added to the output configuration
-		// rather than the shared Kerberos configuration. To avoid a breaking
-		// change, we still check for the old flag, but it is deprecated and
-		// should be removed in a future version.
-		enableFAST := config.Kerberos.EnableFAST || config.EnableFAST
+		enableFAST := config.Kerberos.EnableFAST
 
 		k.Net.SASL.Enable = true
 		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI

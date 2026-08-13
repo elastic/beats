@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
-type osComponents interface{}
+type osComponents any
 
 func osInputs(_ beat.Info, _ osComponents) []v2.Plugin {
 	return []v2.Plugin{}
