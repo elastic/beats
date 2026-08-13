@@ -170,7 +170,7 @@ func checkEvent(t *testing.T, target mb.Event, actual mb.Event) {
 func openQueue(t *testing.T, be backend) *quark.Queue {
 	attr := quark.DefaultQueueAttr()
 	attr.HoldTime = 25
-	attr.Flags &= ^quark.QQ_ALL_BACKENDS
+	attr.Flags &= ^(quark.QQ_EBPF | quark.QQ_KPROBE)
 	switch be {
 	case Ebpf:
 		attr.Flags |= quark.QQ_EBPF
