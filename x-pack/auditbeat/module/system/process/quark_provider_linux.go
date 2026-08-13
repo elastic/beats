@@ -79,6 +79,12 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 		attr.Flags |= quark.QQ_KPROBE
 	}
 	qm.queue, err = quark.OpenQueue(attr)
+	if err != nil && !quarkForceKprobe {
+		qm.log.Infof("quark ebpf backend failed (%v), trying kprobes", err)
+		attr.Flags &= ^quark.QQ_EBPF
+		attr.Flags |= quark.QQ_KPROBE
+		qm.queue, err = quark.OpenQueue(attr)
+	}
 	if err != nil {
 		qm.cachedHasher.Close()
 		return nil, fmt.Errorf("can't open quark queue: %w", err)
