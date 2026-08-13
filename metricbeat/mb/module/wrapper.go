@@ -185,7 +185,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			go func() {
 				select {
 				case <-done:
-					msw.close() //nolint:errcheck // second call from defer is a no-op
+					msw.close()
 				case <-stopCompanion:
 				}
 			}()
