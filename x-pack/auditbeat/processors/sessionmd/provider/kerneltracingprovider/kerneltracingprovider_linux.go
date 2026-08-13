@@ -130,6 +130,17 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				stats.Lost.Set(metrics.Lost)
 				stats.NonAggregations.Set(metrics.NonAggregations)
 				stats.Removals.Set(metrics.Removals)
+				// Quark hands out timestamps in nanoseconds since
+				// boot, converted at the last moment with
+				// quark.TimeToWallclock(). Refresh the boottime
+				// epoch so a system clock step (say NTP correcting
+				// a clock that was wrong at boot) doesn't leave
+				// every converted timestamp skewed by the step
+				// size. Quark only stores the epoch if btime
+				// actually changed, which happens only on a step.
+				if err := quark.UpdateBoottime(); err != nil {
+					logger.Warnf("can't update quark boottime: %v", err)
+				}
 				lastUpdate = time.Now()
 			}
 
@@ -261,7 +272,7 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Minor: proc.Proc.TtyMinor,
 	})
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	ret := types.Process{
 		PID:              proc.Pid,
@@ -288,7 +299,7 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor) //nolint:gosec // tty major/minor numbers fit in uint16
 	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor) //nolint:gosec // tty major/minor numbers fit in uint16
 	if proc.Exit.Valid {
-		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess)) //nolint:gosec // ExitTimeProcess is a nanosecond timestamp that fits in int64
+		end := time.Unix(0, int64(quark.TimeToWallclock(proc.Exit.ExitTimeProcess))) //nolint:gosec // ExitTimeProcess is a nanosecond timestamp that fits in int64
 		ret.ExitCode = proc.Exit.ExitCode
 		ret.End = &end
 	}
@@ -317,7 +328,7 @@ func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
@@ -351,7 +362,7 @@ func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -386,7 +397,7 @@ func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -421,7 +432,7 @@ func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
