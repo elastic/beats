@@ -264,7 +264,7 @@ class Test(BaseTest):
         self.get_config(options)
         filebeat = self.start_beat()
         self.wait_until(lambda: self.log_contains(
-            "username and password are required when basicauth is enabled"))
+            "username and password required when basicauth is enabled"))
         filebeat.kill_and_wait()
 
     def test_http_endpoint_wrong_auth_value(self):
