@@ -45,7 +45,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -55,7 +55,7 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	k8smetafake "k8s.io/client-go/metadata/fake"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 )
 
 const (
@@ -124,7 +124,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, 1)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
@@ -145,7 +145,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, 1)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
@@ -165,7 +165,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 2, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, 2)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[DeploymentResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	resourceWatchers.lock.Unlock()
@@ -239,15 +239,15 @@ func TestWatcherContainerMetrics(t *testing.T) {
 	containerStore := metricsRepo.GetNodeStore(pod.Spec.NodeName).GetPodStore(podId).GetContainerStore(containerName)
 	metrics := containerStore.GetContainerMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.1, metrics.CoresLimit.Value)
-	assert.Equal(t, 100*1024*1024.0, metrics.MemoryLimit.Value)
+	assert.Equal(t, 0.1, metrics.CoresLimit.Value)              //nolint:testifylint // exact float comparison
+	assert.Equal(t, 100*1024*1024.0, metrics.MemoryLimit.Value) //nolint:testifylint // exact float comparison
 
 	// modify the limit and verify the new value is present
 	pod.Spec.Containers[0].Resources.Limits[v1.ResourceCPU] = resource.MustParse("200m")
 	watcher.handler.OnUpdate(pod)
 	metrics = containerStore.GetContainerMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.2, metrics.CoresLimit.Value)
+	assert.Equal(t, 0.2, metrics.CoresLimit.Value) //nolint:testifylint // exact float comparison
 
 	// delete the pod and verify no metrics are present
 	watcher.handler.OnDelete(pod)
@@ -300,15 +300,15 @@ func TestWatcherNodeMetrics(t *testing.T) {
 	nodeStore := metricsRepo.GetNodeStore(node.Name)
 	metrics := nodeStore.GetNodeMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.1, metrics.CoresAllocatable.Value)
-	assert.Equal(t, 100*1024*1024.0, metrics.MemoryAllocatable.Value)
+	assert.Equal(t, 0.1, metrics.CoresAllocatable.Value)              //nolint:testifylint // exact float comparison
+	assert.Equal(t, 100*1024*1024.0, metrics.MemoryAllocatable.Value) //nolint:testifylint // exact float comparison
 
 	// modify the limit and verify the new value is present
 	node.Status.Allocatable[v1.ResourceCPU] = resource.MustParse("200m")
 	watcher.handler.OnUpdate(node)
 	metrics = nodeStore.GetNodeMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.2, metrics.CoresAllocatable.Value)
+	assert.Equal(t, 0.2, metrics.CoresAllocatable.Value) //nolint:testifylint // exact float comparison
 
 	// delete the node and verify no metrics are present
 	watcher.handler.OnDelete(node)
@@ -348,7 +348,7 @@ func TestCreateAllWatchers(t *testing.T) {
 		metricsRepo)
 	require.Error(t, err)
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 0, len(resourceWatchers.metaWatchersMap))
+	require.Empty(t, resourceWatchers.metaWatchersMap)
 	resourceWatchers.lock.Unlock()
 
 	// Start watcher for a resource that requires other resources, should start all the watchers
@@ -368,7 +368,7 @@ func TestCreateAllWatchers(t *testing.T) {
 	// Check that all the required watchers are in the map
 	resourceWatchers.lock.Lock()
 	// we add 1 to the expected result to represent the resource itself
-	require.Equal(t, len(extras)+1, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, len(extras)+1)
 	for _, extra := range extras {
 		require.NotNil(t, resourceWatchers.metaWatchersMap[extra])
 	}
@@ -429,7 +429,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 
 	log := logptest.NewTestingLogger(t, "test")
 
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{
 		"enabled": true,
 	})
 	require.NoError(t, err)
@@ -1728,7 +1728,7 @@ func (f *mockFuncs) update(obj kubernetes.Resource) map[string]mapstr.M {
 			},
 		},
 	}
-	logger := logp.NewLogger("kubernetes")
+	logger := logp.NewLogger("kubernetes") //nolint:forbidigo // test helper
 	for k, v := range accessor.GetLabels() {
 		kubernetes2.ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, logger)
 	}
@@ -1745,7 +1745,7 @@ func (f *mockFuncs) delete(obj kubernetes.Resource) []string {
 
 func (f *mockFuncs) index(m mapstr.M) string {
 	f.indexed = m
-	return m["name"].(string)
+	return m["name"].(string) //nolint:errcheck // test mock
 }
 
 type mockWatcher struct {
@@ -1758,7 +1758,7 @@ type mockWatcher struct {
 
 func newMockWatcher() *mockWatcher {
 	return &mockWatcher{
-		store: cache.NewStore(func(obj interface{}) (string, error) {
+		store: cache.NewStore(func(obj any) (string, error) {
 			objName, err := cache.ObjectToName(obj)
 			if err != nil {
 				return "", err

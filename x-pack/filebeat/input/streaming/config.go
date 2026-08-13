@@ -39,7 +39,7 @@ type config struct {
 	// program. If it has a cursor field, that field will
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
-	State map[string]interface{} `config:"state"`
+	State map[string]any `config:"state"`
 	// Auth is the authentication config for connection.
 	Auth authConfig `config:"auth"`
 	// URL is the websocket url to connect to.
