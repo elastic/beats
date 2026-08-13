@@ -262,7 +262,7 @@ type traceTestPublisher struct {
 	done func(n int)
 }
 
-func (p *traceTestPublisher) Publish(_ beat.Event, _ any) error {
+func (p *traceTestPublisher) Publish(beat.Event, any) error {
 	p.mu.Lock()
 	p.n++
 	n := p.n

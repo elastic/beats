@@ -56,7 +56,7 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   new((decoder.Rune)(' ')),
+						Comma:   new(decoder.Rune(' ')),
 					},
 				},
 			},
@@ -71,7 +71,7 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   new((decoder.Rune)(' ')),
+						Comma:   new(decoder.Rune(' ')),
 					},
 				},
 			},
@@ -178,7 +178,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   new((decoder.Rune)(' ')),
+					Comma:   new(decoder.Rune(' ')),
 					Comment: '#',
 				},
 			}},
@@ -209,7 +209,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   new((decoder.Rune)('\x00')),
+					Comma:   new(decoder.Rune('\x00')),
 				},
 			}},
 	},
