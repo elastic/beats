@@ -55,7 +55,7 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
+				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
 			},
 		},
 		{
@@ -64,7 +64,7 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
+				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
 			},
 		},
 	}
@@ -93,7 +93,8 @@ func sameError(a, b error) bool {
 	}
 }
 
-func ptrTo[T any](v T) *T { return &v }
+//go:fix inline
+func ptrTo[T any](v T) *T { return new(v) }
 
 func TestApplyInFlightDefaults(t *testing.T) {
 	tests := []struct {

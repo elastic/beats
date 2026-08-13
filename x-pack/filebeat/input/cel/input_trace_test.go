@@ -35,7 +35,7 @@ func TestTraceSpans_SingleExecution(t *testing.T) {
 	tp := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sr))
 	defer tp.Shutdown(context.Background())
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"interval":     "1m",
 		"resource.url": server.URL,
 		"program": `
@@ -122,7 +122,7 @@ func TestTraceSpans_WantMore(t *testing.T) {
 	tp := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sr))
 	defer tp.Shutdown(context.Background())
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"interval":     "1m",
 		"resource.url": server.URL,
 		"program": `
@@ -198,7 +198,7 @@ func TestTraceSpans_EvalError(t *testing.T) {
 	tp := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sr))
 	defer tp.Shutdown(context.Background())
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"interval":     1,
 		"resource.url": server.URL,
 		"program": `
@@ -262,7 +262,7 @@ type traceTestPublisher struct {
 	done func(n int)
 }
 
-func (p *traceTestPublisher) Publish(_ beat.Event, _ interface{}) error {
+func (p *traceTestPublisher) Publish(_ beat.Event, _ any) error {
 	p.mu.Lock()
 	p.n++
 	n := p.n

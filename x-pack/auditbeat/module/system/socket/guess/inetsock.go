@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -140,7 +139,7 @@ func (g *guessInetSockIPv4) Trigger() error {
 // Extract receives the dump of a struct inet_sock* and scans it for the
 // random local and remote IPs and ports. Will return lists of all the
 // offsets were each value was found.
-func (g *guessInetSockIPv4) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessInetSockIPv4) Extract(ev any) (mapstr.M, bool) {
 	data := ev.([]byte)
 
 	laddr := g.local.Addr[:]

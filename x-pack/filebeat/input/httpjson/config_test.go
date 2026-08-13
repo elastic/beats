@@ -149,7 +149,7 @@ func TestGetEndpointParamsWithAzure(t *testing.T) {
 }
 
 func TestConfigFailsWithInvalidMethod(t *testing.T) {
-	m := map[string]interface{}{
+	m := map[string]any{
 		"request.method": "DELETE",
 	}
 	cfg := conf.MustNewConfigFrom(m)
@@ -160,7 +160,7 @@ func TestConfigFailsWithInvalidMethod(t *testing.T) {
 }
 
 func TestConfigMustFailWithInvalidURL(t *testing.T) {
-	m := map[string]interface{}{
+	m := map[string]any{
 		"request.url": "::invalid::",
 	}
 	cfg := conf.MustNewConfigFrom(m)
@@ -170,7 +170,7 @@ func TestConfigMustFailWithInvalidURL(t *testing.T) {
 }
 
 func TestConfigMustFailWithSchemelessURL(t *testing.T) {
-	m := map[string]interface{}{
+	m := map[string]any{
 		"request.url": "host.name/path/to/endpoint",
 	}
 	cfg := conf.MustNewConfigFrom(m)
@@ -183,19 +183,19 @@ func TestConfigOauth2Validation(t *testing.T) {
 	cases := []struct {
 		name        string
 		expectedErr string
-		input       map[string]interface{}
+		input       map[string]any
 		setup       func()
 		teardown    func()
 	}{
 		{
 			name:        "can't set oauth2 and basic auth together",
 			expectedErr: "only one kind of auth can be enabled accessing 'auth'",
-			input: map[string]interface{}{
+			input: map[string]any{
 				"auth.basic.user":     "user",
 				"auth.basic.password": "pass",
-				"auth.oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]any{
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
@@ -205,7 +205,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "can't set file and basic auth together",
 			expectedErr: "only one kind of auth can be enabled accessing 'auth'",
-			input: map[string]interface{}{
+			input: map[string]any{
 				"auth.basic.user":     "user",
 				"auth.basic.password": "pass",
 				"auth.file.path":      "./token",
@@ -213,7 +213,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "can set file and basic auth together if file auth disabled",
-			input: map[string]interface{}{
+			input: map[string]any{
 				"auth.basic.user":     "user",
 				"auth.basic.password": "pass",
 				"auth.file.enabled":   false,
@@ -223,11 +223,11 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "can't set file and oauth2 auth together",
 			expectedErr: "only one kind of auth can be enabled accessing 'auth'",
-			input: map[string]interface{}{
+			input: map[string]any{
 				"auth.file.path": "./token",
-				"auth.oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]any{
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
@@ -236,12 +236,12 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "can set file and oauth2 auth together if file auth disabled",
-			input: map[string]interface{}{
+			input: map[string]any{
 				"auth.file.enabled": false,
 				"auth.file.path":    "./token",
-				"auth.oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]any{
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
@@ -250,13 +250,13 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "can set oauth2 and basic auth together if oauth2 is disabled",
-			input: map[string]interface{}{
+			input: map[string]any{
 				"auth.basic.user":     "user",
 				"auth.basic.password": "pass",
-				"auth.oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]any{
 					"enabled":   false,
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
@@ -266,17 +266,17 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "token_url and client credentials must be set",
 			expectedErr: "both token_url and client credentials must be provided accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{},
+			input: map[string]any{
+				"auth.oauth2": map[string]any{},
 			},
 		},
 		{
 			name: "client credential secret may be empty",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"enabled":   true,
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "",
 					},
@@ -286,11 +286,11 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "client credential secret may not be missing",
 			expectedErr: "both token_url and client credentials must be provided accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"enabled":   true,
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id": "a_client_id",
 					},
 				},
@@ -298,12 +298,12 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "if user and password is set oauth2 must use user-password authentication",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"user":      "a_client_user",
 					"password":  "a_client_password",
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
@@ -313,11 +313,11 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "if user is set password credentials must be set for user-password authentication",
 			expectedErr: "both user and password credentials must be provided accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"user":      "a_client_user",
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
@@ -327,11 +327,11 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "if password is set user credentials must be set for user-password authentication",
 			expectedErr: "both user and password credentials must be provided accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"password":  "a_client_password",
 					"token_url": "localhost",
-					"client": map[string]interface{}{
+					"client": map[string]any{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
@@ -340,8 +340,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "if password is set credentials may be missing for user-password authentication",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"user":      "a_client_user",
 					"password":  "a_client_password",
 					"token_url": "localhost",
@@ -351,8 +351,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "must fail with an unknown provider",
 			expectedErr: "unknown provider \"unknown\" accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "unknown",
 				},
 			},
@@ -360,8 +360,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "azure must have either tenant_id or token_url",
 			expectedErr: "at least one of token_url or tenant_id must be provided accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "azure",
 				},
 			},
@@ -369,8 +369,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "azure must have only one of token_url and tenant_id",
 			expectedErr: "only one of token_url and tenant_id can be used accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":        "azure",
 					"azure.tenant_id": "a_tenant_id",
 					"token_url":       "localhost",
@@ -380,8 +380,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "azure must have client credentials set",
 			expectedErr: "client credentials must be provided accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":        "azure",
 					"azure.tenant_id": "a_tenant_id",
 				},
@@ -389,10 +389,10 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "azure config is valid",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "azure",
-					"azure": map[string]interface{}{
+					"azure": map[string]any{
 						"tenant_id": "a_tenant_id",
 					},
 					"client.id":     "a_client_id",
@@ -403,10 +403,10 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google can't have token_url or client credentials set",
 			expectedErr: "none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "google",
-					"azure": map[string]interface{}{
+					"azure": map[string]any{
 						"tenant_id": "a_tenant_id",
 					},
 					"client.id":     "a_client_id",
@@ -418,8 +418,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google must fail if no ADC available",
 			expectedErr: "no authentication credentials were configured or detected (ADC) accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "google",
 				},
 			},
@@ -433,8 +433,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must send scopes and delegated_account if ADC available",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                 "google",
 					"google.delegated_account": "delegated@account.com",
 					"scopes":                   []string{"foo"},
@@ -453,8 +453,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google must fail if credentials file not found",
 			expectedErr: "the file \"./wrong\" cannot be found accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                "google",
 					"google.credentials_file": "./wrong",
 				},
@@ -463,8 +463,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google must fail if ADC is wrongly set",
 			expectedErr: "no authentication credentials were configured or detected (ADC) accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "google",
 				},
 			},
@@ -472,8 +472,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must work if ADC is set up",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "google",
 				},
 			},
@@ -481,8 +481,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must work if credentials_file is correct",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                "google",
 					"google.credentials_file": "./testdata/credentials.json",
 				},
@@ -490,8 +490,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must work if jwt_file is correct",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":        "google",
 					"google.jwt_file": "./testdata/credentials.json",
 				},
@@ -499,8 +499,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must work if jwt_json is correct",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "google",
 					"google.jwt_json": `{
 						"type":           "service_account",
@@ -514,8 +514,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must work if credentials_json is correct",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider": "google",
 					"google.credentials_json": `{
 						"type":           "service_account",
@@ -530,8 +530,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google must fail if credentials_json is not a valid JSON",
 			expectedErr: "the field can't be converted to valid JSON accessing 'auth.oauth2.google.credentials_json'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                "google",
 					"google.credentials_json": `invalid`,
 				},
@@ -540,8 +540,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google must fail if jwt_json is not a valid JSON",
 			expectedErr: "the field can't be converted to valid JSON accessing 'auth.oauth2.google.jwt_json'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":        "google",
 					"google.jwt_json": `invalid`,
 				},
@@ -550,8 +550,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google must fail if the provided credentials file is not a valid JSON",
 			expectedErr: "the file \"./testdata/invalid_credentials.json\" does not contain valid JSON accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                "google",
 					"google.credentials_file": "./testdata/invalid_credentials.json",
 				},
@@ -560,8 +560,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "google must fail if the delegated_account is set without jwt_file",
 			expectedErr: "google.delegated_account can only be provided with a jwt_file accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                 "google",
 					"google.credentials_file":  "./testdata/credentials.json",
 					"google.delegated_account": "delegated@account.com",
@@ -570,8 +570,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must work with delegated_account and a valid jwt_file",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                 "google",
 					"google.jwt_file":          "./testdata/credentials.json",
 					"google.delegated_account": "delegated@account.com",
@@ -580,8 +580,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "google must work with delegated_account and ADC set up",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":                 "google",
 					"google.delegated_account": "delegated@account.com",
 				},
@@ -591,8 +591,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
 			expectedErr: "okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided accessing 'auth.oauth2'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":  "okta",
 					"client.id": "a_client_id",
 					"token_url": "localhost",
@@ -603,8 +603,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		{
 			name:        "okta oauth2 validation fails if jwk_json is not a valid JSON",
 			expectedErr: "the field can't be converted to valid JSON accessing 'auth.oauth2.okta.jwk_json'",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":      "okta",
 					"client.id":     "a_client_id",
 					"token_url":     "localhost",
@@ -615,8 +615,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "okta successful oauth2 validation",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":      "okta",
 					"client.id":     "a_client_id",
 					"token_url":     "localhost",
@@ -627,8 +627,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name: "okta successful pem oauth2 validation",
-			input: map[string]interface{}{
-				"auth.oauth2": map[string]interface{}{
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
 					"provider":  "okta",
 					"client.id": "a_client_id",
 					"token_url": "localhost",
@@ -669,7 +669,6 @@ LNV/bIgMHOMoxiGrwyjAhg==
 	}
 
 	for _, c := range cases {
-		c := c
 		t.Run(c.name, func(t *testing.T) {
 			if c.setup != nil {
 				c.setup()
@@ -702,27 +701,27 @@ LNV/bIgMHOMoxiGrwyjAhg==
 func TestPaginationAllowedHostsValidation(t *testing.T) {
 	tests := []struct {
 		name    string
-		hosts   []interface{}
+		hosts   []any
 		wantErr string
 	}{
 		{
 			name:  "valid_entries",
-			hosts: []interface{}{"https://cdn.example.com", "https://api.other.com:8443"},
+			hosts: []any{"https://cdn.example.com", "https://api.other.com:8443"},
 		},
 		{
 			name:    "missing_scheme",
-			hosts:   []interface{}{"cdn.example.com"},
+			hosts:   []any{"cdn.example.com"},
 			wantErr: `pagination_allowed_hosts entry "cdn.example.com" must have both a scheme and a host`,
 		},
 		{
 			name:    "missing_host",
-			hosts:   []interface{}{"https://"},
+			hosts:   []any{"https://"},
 			wantErr: `pagination_allowed_hosts entry "https://" must have both a scheme and a host`,
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			m := map[string]interface{}{
+			m := map[string]any{
 				"request.url":                       "https://localhost",
 				"response.pagination_allowed_hosts": test.hosts,
 			}
@@ -746,17 +745,17 @@ func TestPaginationAllowedHostsValidation(t *testing.T) {
 }
 
 func TestCursorEntryConfig(t *testing.T) {
-	in := map[string]interface{}{
-		"entry1": map[string]interface{}{
+	in := map[string]any{
+		"entry1": map[string]any{
 			"ignore_empty_value": true,
 		},
-		"entry2": map[string]interface{}{
+		"entry2": map[string]any{
 			"ignore_empty_value": false,
 		},
-		"entry3": map[string]interface{}{
+		"entry3": map[string]any{
 			"ignore_empty_value": nil,
 		},
-		"entry4": map[string]interface{}{},
+		"entry4": map[string]any{},
 	}
 	cfg := conf.MustNewConfigFrom(in)
 	conf := cursorConfig{}
@@ -769,32 +768,32 @@ func TestCursorEntryConfig(t *testing.T) {
 
 var keepAliveTests = []struct {
 	name    string
-	input   map[string]interface{}
+	input   map[string]any
 	want    httpcommon.WithKeepaliveSettings
 	wantErr error
 }{
 	{
 		name:  "keep_alive_none", // Default to the old behaviour of true.
-		input: map[string]interface{}{},
+		input: map[string]any{},
 		want:  httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_true",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": true,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_false",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": false,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: false},
 	},
 	{
 		name: "keep_alive_invalid_max",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable":              false,
 			"request.keep_alive.max_idle_connections": -1,
 		},

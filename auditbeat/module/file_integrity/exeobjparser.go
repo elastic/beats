@@ -133,7 +133,6 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 			// section attributes are added from another parser.
 			stats := make([]objSection, len(sections))
 			for i, s := range sections {
-				s := s
 				if all {
 					name = &s.Name
 					size = &s.Size

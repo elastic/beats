@@ -64,11 +64,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -107,11 +107,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -140,11 +140,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -179,11 +179,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -221,11 +221,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -270,11 +270,11 @@ protocols:
 			},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -324,11 +324,11 @@ protocols:
 			},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -368,11 +368,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -411,11 +411,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -455,7 +455,7 @@ protocols:
 				{
 					Device:      "any",
 					Type:        "af_packet",
-					FanoutGroup: pointer(uint16(1)),
+					FanoutGroup: new(uint16(1)),
 				},
 			},
 		},
@@ -531,7 +531,7 @@ func cliOptions(file string, loop int, topSpeed, step bool, dump string) Config 
 }
 
 func configC(a, b *config.C) bool {
-	var ma, mb map[string]interface{}
+	var ma, mb map[string]any
 	err := a.Unpack(&ma)
 	if err != nil {
 		panic(err)
@@ -544,6 +544,8 @@ func configC(a, b *config.C) bool {
 }
 
 // pointer returns a pointer to val.
+//
+//go:fix inline
 func pointer[T any](val T) *T {
-	return &val
+	return new(val)
 }

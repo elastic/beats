@@ -28,7 +28,7 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 		{
 			name: "valid oauth2 config with jwk_json",
 			config: &oAuth2Config{
-				Enabled:  boolPtr(true),
+				Enabled:  new(true),
 				ClientID: "test-client",
 				Scopes:   []string{"okta.users.read"},
 				TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -49,7 +49,7 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 		{
 			name: "valid oauth2 config with jwk_pem",
 			config: &oAuth2Config{
-				Enabled:  boolPtr(true),
+				Enabled:  new(true),
 				ClientID: "test-client",
 				Scopes:   []string{"okta.users.read"},
 				TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -89,7 +89,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - bad jwk_pem data",
 			config: &oAuth2Config{
-				Enabled:    boolPtr(true),
+				Enabled:    new(true),
 				ClientID:   "test-client",
 				Scopes:     []string{"okta.users.read"},
 				TokenURL:   "https://test.okta.com/oauth2/v1/token",
@@ -100,7 +100,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "valid oauth2 config with client secret",
 			config: &oAuth2Config{
-				Enabled:      boolPtr(true),
+				Enabled:      new(true),
 				ClientID:     "test-client",
 				ClientSecret: "test-secret",
 				Scopes:       []string{"okta.users.read"},
@@ -111,7 +111,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - missing client.id",
 			config: &oAuth2Config{
-				Enabled:     boolPtr(true),
+				Enabled:     new(true),
 				Scopes:      []string{"okta.users.read"},
 				TokenURL:    "https://test.okta.com/oauth2/v1/token",
 				OktaJWKJSON: common.JSONBlob(`{"kty": "RSA"}`),
@@ -121,7 +121,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - missing scopes",
 			config: &oAuth2Config{
-				Enabled:     boolPtr(true),
+				Enabled:     new(true),
 				ClientID:    "test-client",
 				TokenURL:    "https://test.okta.com/oauth2/v1/token",
 				OktaJWKJSON: common.JSONBlob(`{"kty": "RSA"}`),
@@ -131,7 +131,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - missing token_url",
 			config: &oAuth2Config{
-				Enabled:     boolPtr(true),
+				Enabled:     new(true),
 				ClientID:    "test-client",
 				Scopes:      []string{"okta.users.read"},
 				OktaJWKJSON: common.JSONBlob(`{"kty": "RSA"}`),
@@ -141,7 +141,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - mixing client secret and JWT keys",
 			config: &oAuth2Config{
-				Enabled:      boolPtr(true),
+				Enabled:      new(true),
 				ClientID:     "test-client",
 				ClientSecret: "test-secret",
 				Scopes:       []string{"okta.users.read"},
@@ -153,7 +153,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - no authentication method provided",
 			config: &oAuth2Config{
-				Enabled:  boolPtr(true),
+				Enabled:  new(true),
 				ClientID: "test-client",
 				Scopes:   []string{"okta.users.read"},
 				TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -188,14 +188,14 @@ func TestOAuth2ConfigIsEnabled(t *testing.T) {
 		{
 			name: "enabled explicitly",
 			config: &oAuth2Config{
-				Enabled: boolPtr(true),
+				Enabled: new(true),
 			},
 			want: true,
 		},
 		{
 			name: "disabled explicitly",
 			config: &oAuth2Config{
-				Enabled: boolPtr(false),
+				Enabled: new(false),
 			},
 			want: false,
 		},
@@ -227,7 +227,7 @@ func TestConfValidationWithOAuth2(t *testing.T) {
 			config: conf{
 				OktaDomain: "test.okta.com",
 				OAuth2: &oAuth2Config{
-					Enabled:  boolPtr(true),
+					Enabled:  new(true),
 					ClientID: "test-client",
 					Scopes:   []string{"okta.users.read"},
 					TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -276,7 +276,7 @@ func TestConfValidationWithOAuth2(t *testing.T) {
 				OktaDomain: "test.okta.com",
 				OktaToken:  "test-token",
 				OAuth2: &oAuth2Config{
-					Enabled:  boolPtr(true),
+					Enabled:  new(true),
 					ClientID: "test-client",
 					Scopes:   []string{"okta.users.read"},
 					TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -324,7 +324,7 @@ func TestGetAuthToken(t *testing.T) {
 			name: "oauth2 enabled",
 			config: conf{
 				OAuth2: &oAuth2Config{
-					Enabled: boolPtr(true),
+					Enabled: new(true),
 				},
 			},
 			expected: "",
@@ -334,7 +334,7 @@ func TestGetAuthToken(t *testing.T) {
 			config: conf{
 				OktaToken: "test-token",
 				OAuth2: &oAuth2Config{
-					Enabled: boolPtr(false),
+					Enabled: new(false),
 				},
 			},
 			expected: "test-token",
@@ -357,8 +357,9 @@ func TestGetAuthToken(t *testing.T) {
 	}
 }
 
+//go:fix inline
 func boolPtr(b bool) *bool {
-	return &b
+	return new(b)
 }
 
 // testOktaJWKJSON is a JWK JSON obtained from the Okta integration.
@@ -399,7 +400,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 func TestOktaTokenSource_Token(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"access_token": "mock",
 			"token_type":   "Bearer",
 			"expires_in":   3600,
