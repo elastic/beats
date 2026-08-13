@@ -91,8 +91,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 	attr.Flags = quark.QQ_EBPF | quark.QQ_ENTRY_LEADER
 	qq, err := quark.OpenQueue(attr)
 	if err != nil {
-		attr.Flags = quark.QQ_KPROBE | quark.QQ_ENTRY_LEADER
 		logger.Warnw("failed to use ebpf, attempting to use kprobe", "error", err)
+		attr.Flags = quark.QQ_KPROBE | quark.QQ_ENTRY_LEADER
 		qq, err = quark.OpenQueue(attr)
 		if err != nil {
 			return nil, fmt.Errorf("open queue: %w", err)
