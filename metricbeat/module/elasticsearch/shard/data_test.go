@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/require"
 
@@ -36,15 +37,69 @@ func TestStats(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, f := range files {
-		input, err := os.ReadFile(f)
-		require.NoError(t, err)
+		t.Run(filepath.Base(f), func(t *testing.T) {
+			input, err := os.ReadFile(f)
+			require.NoError(t, err)
 
-		reporter := &mbtest.CapturingReporterV2{}
-		eventsMapping(reporter, input, true)
+			reporter := &mbtest.CapturingReporterV2{}
+			_ = eventsMapping(reporter, input, true, &lastClusterState{}, logp.NewLogger("test"))
 
-		require.True(t, len(reporter.GetEvents()) >= 1)
-		require.Equal(t, 0, len(reporter.GetErrors()))
+			require.True(t, len(reporter.GetEvents()) >= 1)
+			require.Equal(t, 0, len(reporter.GetErrors()))
+		})
 	}
+}
+
+func TestEventsMappingSkipsUnchangedClusterState(t *testing.T) {
+	input, err := os.ReadFile("./_meta/test/routing_table.710.json")
+	require.NoError(t, err)
+
+	prev := &lastClusterState{}
+	log := logp.NewLogger("test")
+
+	first := &mbtest.CapturingReporterV2{}
+	require.NoError(t, eventsMapping(first, input, true, prev, log))
+	require.NotEmpty(t, first.GetEvents())
+	require.True(t, prev.ok)
+	require.Equal(t, "n-UoXaqYRoOe9qAC76IG6A", prev.id)
+
+	second := &mbtest.CapturingReporterV2{}
+	require.NoError(t, eventsMapping(second, input, true, prev, log))
+	require.Empty(t, second.GetEvents())
+	require.Equal(t, "n-UoXaqYRoOe9qAC76IG6A", prev.id)
+}
+
+func TestEventsMappingEmitsWhenClusterStateChanges(t *testing.T) {
+	input, err := os.ReadFile("./_meta/test/routing_table.710.json")
+	require.NoError(t, err)
+
+	prev := &lastClusterState{}
+	log := logp.NewLogger("test")
+
+	first := &mbtest.CapturingReporterV2{}
+	require.NoError(t, eventsMapping(first, input, true, prev, log))
+	require.NotEmpty(t, first.GetEvents())
+	require.Equal(t, "n-UoXaqYRoOe9qAC76IG6A", prev.id)
+
+	changed := []byte(`{"cluster_name":"docker-cluster","cluster_uuid":"tMjf3CQ_TyCXNfcoR9eTWw","state_uuid":"changed-state-uuid","master_node":"hx-oJ1-aT_-5pRG22JMI1Q","nodes":{"hx-oJ1-aT_-5pRG22JMI1Q":{"name":"1fb2aa83efac"}},"routing_table":{"indices":{"test":{"shards":{"0":[{"state":"STARTED","primary":true,"node":"hx-oJ1-aT_-5pRG22JMI1Q","relocating_node":null,"shard":0,"index":"test"}]}}}}}`)
+	second := &mbtest.CapturingReporterV2{}
+	require.NoError(t, eventsMapping(second, changed, true, prev, log))
+	require.NotEmpty(t, second.GetEvents())
+	require.Equal(t, "changed-state-uuid", prev.id)
+}
+
+func TestEventsMappingEmitsFirstFetchWithEmptyStateUUID(t *testing.T) {
+	// Fixtures without state_uuid must still emit on the first fetch; an empty
+	// initial tracker must not be treated as "unchanged".
+	input, err := os.ReadFile("./_meta/test/routing_table.623.json")
+	require.NoError(t, err)
+
+	prev := &lastClusterState{}
+	reporter := &mbtest.CapturingReporterV2{}
+	_ = eventsMapping(reporter, input, true, prev, logp.NewLogger("test"))
+	require.NotEmpty(t, reporter.GetEvents())
+	require.True(t, prev.ok)
+	require.Equal(t, "", prev.id)
 }
 
 func TestData(t *testing.T) {
