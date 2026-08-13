@@ -20,6 +20,7 @@ package elastic
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -145,7 +146,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 	metricsets := xpackEnabledMetricsets
 	if err == nil && cfgdMetricsets != nil {
 		// Type cast the metricsets to a slice of strings
-		cfgdMetricsetsSlice, ok := cfgdMetricsets.([]interface{})
+		cfgdMetricsetsSlice, ok := cfgdMetricsets.([]any)
 		if !ok {
 			return nil, fmt.Errorf("configured metricsets are not a slice for module %s: %v", moduleName, cfgdMetricsets)
 		}
@@ -160,13 +161,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 
 		// Add any optional metricsets which are not already configured
 		for _, cfgdMs := range cfgdMetricsetsStrings {
-			found := false
-			for _, ms := range optionalXpackMetricsets {
-				if ms == cfgdMs {
-					found = true
-					break
-				}
-			}
+			found := slices.Contains(optionalXpackMetricsets, cfgdMs)
 
 			if found {
 				metricsets = append(metricsets, cfgdMs)

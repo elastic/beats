@@ -108,11 +108,9 @@ func (l *Listener) Start() error {
 		return err
 	}
 
-	l.wg.Add(1)
-	go func() {
-		defer l.wg.Done()
+	l.wg.Go(func() {
 		l.run()
-	}()
+	})
 	return nil
 }
 
@@ -168,11 +166,9 @@ func (l *Listener) run() {
 			continue
 		}
 
-		l.wg.Add(1)
-		go func() {
-			defer l.wg.Done()
+		l.wg.Go(func() {
 			l.handleConnection(conn)
-		}()
+		})
 	}
 }
 

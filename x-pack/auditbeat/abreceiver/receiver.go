@@ -21,14 +21,12 @@ type auditbeatReceiver struct {
 }
 
 func (ab *auditbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	ab.wg.Add(1)
-	go func() {
-		defer ab.wg.Done()
+	ab.wg.Go(func() {
 		ab.Logger.Info("starting auditbeat receiver")
 		if err := ab.BeatReceiver.Start(host); err != nil {
 			ab.Logger.Error("error starting auditbeat receiver", zap.Error(err))
 		}
-	}()
+	})
 	return nil
 }
 

@@ -55,7 +55,7 @@ func TestConfigDefault(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := conf.NewConfigFrom(map[string]any{})
 	assert.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
@@ -112,7 +112,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := conf.NewConfigFrom(map[string]interface{}{
+	testConfig, err := conf.NewConfigFrom(map[string]any{
 		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
@@ -172,7 +172,7 @@ func TestConfigName(t *testing.T) {
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"name": "my-host",
 	}
 
@@ -200,7 +200,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"geo.name":             "yerevan-am",
 		"geo.location":         "40.177200, 44.503490",
 		"geo.continent_name":   "Asia",
@@ -227,7 +227,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 }
 
 func TestGeoFieldsAreNotMutatedAcrossEvents(t *testing.T) {
-	testConfig, err := conf.NewConfigFrom(map[string]interface{}{
+	testConfig, err := conf.NewConfigFrom(map[string]any{
 		"geo.name": "yerevan-am",
 	})
 	require.NoError(t, err)
@@ -274,7 +274,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{}
+	config := map[string]any{}
 
 	testConfig, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
@@ -292,7 +292,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 }
 
 func TestEventWithReplaceFieldsFalse(t *testing.T) {
-	cfg := map[string]interface{}{}
+	cfg := map[string]any{}
 	cfg["replace_fields"] = false
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
@@ -372,7 +372,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 }
 
 func TestEventWithReplaceFieldsTrue(t *testing.T) {
-	cfg := map[string]interface{}{}
+	cfg := map[string]any{}
 	cfg["replace_fields"] = true
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
@@ -551,12 +551,12 @@ func TestFQDNEventSync(t *testing.T) {
 	hostname := "hostname"
 	fqdn := "fqdn"
 
-	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]any{
 		"cache.ttl": "5m",
 	})
 
 	// Start with FQDN off
-	err := features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+	err := features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]any{
 		"features.fqdn.enabled": false,
 	}))
 	require.NoError(t, err)
@@ -574,7 +574,7 @@ func TestFQDNEventSync(t *testing.T) {
 	require.NoError(t, err)
 
 	// update
-	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]any{
 		"features.fqdn.enabled": true,
 	}))
 	require.NoError(t, err)
@@ -595,12 +595,12 @@ func TestFQDNEventSync(t *testing.T) {
 
 func TestDataReload(t *testing.T) {
 	var processingGoroutineCount int32 = 10
-	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]any{
 		"cache.ttl": "5m",
 	})
 
 	// Start with FQDN off
-	err := features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+	err := features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]any{
 		"features.fqdn.enabled": false,
 	}))
 	require.NoError(t, err)
@@ -652,7 +652,7 @@ func TestDataReload(t *testing.T) {
 	assert.Equal(t, int64(0), info.FQDNRequestCount.Load())
 
 	// update
-	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]any{
 		"features.fqdn.enabled": true,
 	}))
 	require.NoError(t, err)
@@ -677,7 +677,7 @@ func TestDataReload(t *testing.T) {
 	assert.Equal(t, int64(1), info.FQDNRequestCount.Load())
 
 	// update back to the original value
-	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]any{
 		"features.fqdn.enabled": false,
 	}))
 	require.NoError(t, err)
@@ -724,7 +724,7 @@ func TestFQDNLookup(t *testing.T) {
 			}()
 
 			// Create processor and check that FQDN lookup failed
-			testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
+			testConfig, err := conf.NewConfigFrom(map[string]any{})
 			require.NoError(t, err)
 
 			factory := func() (hostInfo, error) {
@@ -764,7 +764,7 @@ func TestFQDNLookup(t *testing.T) {
 }
 
 func fqdnFeatureFlagConfig(fqdnEnabled bool) *conf.C {
-	return conf.MustNewConfigFrom(map[string]interface{}{
+	return conf.MustNewConfigFrom(map[string]any{
 		"features.fqdn.enabled": fqdnEnabled,
 	})
 }

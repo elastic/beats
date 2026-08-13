@@ -20,6 +20,7 @@ package readfile
 import (
 	"fmt"
 	"maps"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -114,4 +115,10 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 
 func (r *FileMetaReader) Close() error {
 	return r.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped reader so a synchronous timeout can
+// bound the underlying blocking read (see reader.DeadlineSetter).
+func (r *FileMetaReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(r.reader, t)
 }

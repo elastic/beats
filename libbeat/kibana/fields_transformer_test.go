@@ -191,7 +191,7 @@ func TestInvalidVersion(t *testing.T) {
 func TestTransformTypes(t *testing.T) {
 	tests := []struct {
 		commonField mapping.Field
-		expected    interface{}
+		expected    any
 	}{
 		{commonField: mapping.Field{}, expected: "string"},
 		{commonField: mapping.Field{Type: "half_float"}, expected: "number"},
@@ -270,7 +270,7 @@ func TestTransformGroup(t *testing.T) {
 func TestTransformMisc(t *testing.T) {
 	tests := []struct {
 		commonField mapping.Field
-		expected    interface{}
+		expected    any
 		attr        string
 	}{
 		{commonField: mapping.Field{}, expected: 0, attr: "count"},

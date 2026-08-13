@@ -82,17 +82,17 @@ func TestValidate(t *testing.T) {
 		errorString string
 	}{
 		"Empty config": {
-			c:           &Config{Beatconfig: map[string]interface{}{}},
+			c:           &Config{Beatconfig: map[string]any{}},
 			hasError:    true,
 			errorString: "configuration is required",
 		},
 		"No auditbeat section": {
-			c:           &Config{Beatconfig: map[string]interface{}{"other": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"other": map[string]any{}}},
 			hasError:    true,
 			errorString: "configuration key 'auditbeat' is required",
 		},
 		"Valid config": {
-			c:           &Config{Beatconfig: map[string]interface{}{"auditbeat": map[string]interface{}{}}},
+			c:           &Config{Beatconfig: map[string]any{"auditbeat": map[string]any{}}},
 			hasError:    false,
 			errorString: "",
 		},

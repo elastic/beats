@@ -85,7 +85,7 @@ func TestNestedBatchSplit(t *testing.T) {
 
 	require.Len(t, retryer.batches, 4, "two SplitRetry calls should generate four retrys")
 
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		assert.False(t, doneWasCalled, "Original callback shouldn't be invoked until all children are")
 		require.Len(t, retryer.batches[i].events, 1, "Retried batches should have one event each")
 
@@ -250,7 +250,7 @@ func TestTTLBatchRetryDoesNotReleaseSlots(t *testing.T) {
 	defer q.Close(true)
 
 	p := q.Producer(queue.ProducerConfig{})
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: i}})
 		require.True(t, ok)
 	}
@@ -265,7 +265,7 @@ func TestTTLBatchRetryDoesNotReleaseSlots(t *testing.T) {
 
 	// Retry several times — TTL decreases via reduceTTL but slots remain
 	// reserved because the queue.Batch's Done has not been invoked.
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		batch.Retry()
 		require.Equal(t, 0, pool.Available(), "slots must stay reserved during retry %d", i+1)
 	}

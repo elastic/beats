@@ -27,6 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.uber.org/goleak"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8sclient "k8s.io/client-go/kubernetes"
@@ -34,14 +35,36 @@ import (
 	k8stesting "k8s.io/client-go/testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// assertRunPdataEquivalent verifies that RunPdata, given the same input fields
+// used to produce result via Run, enriches a pcommon.Map with identical output.
+func assertRunPdataEquivalent(t *testing.T, p beat.Processor, input, result mapstr.M) {
+	t.Helper()
+
+	pp, ok := p.(processors.PdataProcessor)
+	require.True(t, ok, "processor must implement PdataProcessor")
+
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, input))
+	drop, err := pp.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
+
+	legacyNorm := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(legacyNorm, result))
+	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+		"Run and RunPdata must produce identical output")
+}
+
 // Test Annotator is skipped if kubernetes metadata already exist
 func TestAnnotatorSkipped(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -67,23 +90,7 @@ func TestAnnotatorSkipped(t *testing.T) {
 			},
 		})
 
-	event, err := processor.Run(&beat.Event{
-		Fields: mapstr.M{
-			"kubernetes": mapstr.M{
-				"pod": mapstr.M{
-					"name": "foo",
-					"id":   "pod_id",
-					"metrics": mapstr.M{
-						"a": 1,
-						"b": 2,
-					},
-				},
-			},
-		},
-	})
-	assert.NoError(t, err)
-
-	assert.Equal(t, mapstr.M{
+	input := mapstr.M{
 		"kubernetes": mapstr.M{
 			"pod": mapstr.M{
 				"name": "foo",
@@ -94,7 +101,14 @@ func TestAnnotatorSkipped(t *testing.T) {
 				},
 			},
 		},
-	}, event.Fields)
+	}
+	event, err := processor.Run(&beat.Event{Fields: input.Clone()})
+	assert.NoError(t, err)
+
+	assert.Equal(t, input, event.Fields)
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, &processor, input, event.Fields)
 }
 
 // Test metadata are not included in the event
@@ -123,6 +137,9 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, intialEventMap, event.Fields)
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, &processor, intialEventMap, event.Fields)
 }
 
 // TestNewProcessorConfigDefaultIndexers validates the behaviour of default indexers and
@@ -131,25 +148,25 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 	emptyRegister := NewRegister()
 	registerWithDefaults := NewRegister()
 	registerWithDefaults.AddDefaultIndexerConfig("ip_port", *config.NewConfig())
-	registerWithDefaults.AddDefaultMatcherConfig("field_format", *config.MustNewConfigFrom(map[string]interface{}{
+	registerWithDefaults.AddDefaultMatcherConfig("field_format", *config.MustNewConfigFrom(map[string]any{
 		"format": "%{[destination.ip]}:%{[destination.port]}",
 	}))
 
-	configWithIndexersAndMatchers := config.MustNewConfigFrom(map[string]interface{}{
-		"indexers": []map[string]interface{}{
+	configWithIndexersAndMatchers := config.MustNewConfigFrom(map[string]any{
+		"indexers": []map[string]any{
 			{
-				"container": map[string]interface{}{},
+				"container": map[string]any{},
 			},
 		},
-		"matchers": []map[string]interface{}{
+		"matchers": []map[string]any{
 			{
-				"fields": map[string]interface{}{
+				"fields": map[string]any{
 					"lookup_fields": []string{"container.id"},
 				},
 			},
 		},
 	})
-	configOverrideDefaults := config.MustNewConfigFrom(map[string]interface{}{
+	configOverrideDefaults := config.MustNewConfigFrom(map[string]any{
 		"default_indexers.enabled": "false",
 		"default_matchers.enabled": "false",
 	})
@@ -179,14 +196,14 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 		},
 		"default indexers and matchers, don't use indexers": {
 			register: registerWithDefaults,
-			config: config.MustNewConfigFrom(map[string]interface{}{
+			config: config.MustNewConfigFrom(map[string]any{
 				"default_indexers.enabled": "false",
 			}),
 			expectedMatchers: []string{"field_format"},
 		},
 		"default indexers and matchers, don't use matchers": {
 			register: registerWithDefaults,
-			config: config.MustNewConfigFrom(map[string]interface{}{
+			config: config.MustNewConfigFrom(map[string]any{
 				"default_matchers.enabled": "false",
 			}),
 			expectedIndexers: []string{"ip_port"},
@@ -230,7 +247,7 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 func newAnnotatorForTest(t testing.TB, cacheKey string, meta mapstr.M) *kubernetesAnnotator {
 	t.Helper()
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"container.id"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -317,6 +334,9 @@ func TestAnnotatorRunFullContainerMetadata(t *testing.T) {
 	assert.NotContains(t, k8sContainer, "id", "kubernetes.container must NOT have id")
 	assert.NotContains(t, k8sContainer, "runtime", "kubernetes.container must NOT have runtime")
 	assert.NotContains(t, k8sContainer, "image", "kubernetes.container must NOT have image")
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, processor, mapstr.M{"container": mapstr.M{"id": "abc123"}}, event.Fields)
 }
 
 // TestAnnotatorRunContainerWithoutImage verifies that when there is no image in
@@ -345,6 +365,9 @@ func TestAnnotatorRunContainerWithoutImage(t *testing.T) {
 	assert.Equal(t, "abc456", container["id"])
 	assert.Equal(t, "docker", container["runtime"])
 	assert.NotContains(t, container, "image", "container must NOT have image key when no image in metadata")
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, processor, baseEvent("abc456").Fields, event.Fields)
 }
 
 // TestAnnotatorRunContainerWithoutName verifies that missing container.name
@@ -375,6 +398,9 @@ func TestAnnotatorRunContainerWithoutName(t *testing.T) {
 	require.IsType(t, mapstr.M{}, imageRaw)
 	imageMap, _ := imageRaw.(mapstr.M)
 	assert.Equal(t, "busybox:latest", imageMap["name"])
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, processor, baseEvent("abc789").Fields, event.Fields)
 }
 
 // TestAnnotatorRunNoContainerSubMap verifies that when the metadata has no
@@ -391,7 +417,7 @@ func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
 	}
 
 	// Use pod.name as the lookup field since there's no container sub-map.
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"pod.name"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
@@ -426,6 +452,9 @@ func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
 	require.IsType(t, mapstr.M{}, podRaw)
 	pod, _ := podRaw.(mapstr.M)
 	assert.Equal(t, "mypod", pod["name"])
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, processor, mapstr.M{"pod": mapstr.M{"name": "mypod"}}, event.Fields)
 }
 
 // TestAnnotatorRunExtraContainerFieldsPreserved verifies that unknown extra
@@ -454,6 +483,9 @@ func TestAnnotatorRunExtraContainerFieldsPreserved(t *testing.T) {
 	container, _ := containerRaw.(mapstr.M)
 
 	assert.Equal(t, "extra", container["custom_field"], "extra container fields must be preserved in OCI container")
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, processor, baseEvent("xtra001").Fields, event.Fields)
 }
 
 // TestAnnotatorRunCacheNotMutated verifies that running the processor multiple
@@ -473,7 +505,7 @@ func TestAnnotatorRunCacheNotMutated(t *testing.T) {
 	processor := newAnnotatorForTest(t, "cache001", originalMeta)
 
 	// Run three times.
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_, err := processor.Run(baseEvent("cache001"))
 		require.NoError(t, err)
 	}
@@ -536,8 +568,26 @@ func TestAnnotatorRunEventIndependence(t *testing.T) {
 	assert.NotContains(t, container2, "injected", "mutating first result must not affect second result")
 }
 
+// TestAnnotatorRunCacheMiss verifies that when the matcher returns an index key
+// but the cache has no entry for it, both Run and RunPdata leave the event
+// unchanged and return no error.
+func TestAnnotatorRunCacheMiss(t *testing.T) {
+	// Seed the cache with a different key so the matcher can fire but miss.
+	processor := newAnnotatorForTest(t, "known-key", mapstr.M{
+		"kubernetes": mapstr.M{"pod": mapstr.M{"name": "mypod"}},
+	})
+
+	input := mapstr.M{"container": mapstr.M{"id": "unknown-key"}}
+	event, err := processor.Run(&beat.Event{Fields: input.Clone()})
+	require.NoError(t, err)
+	assert.Equal(t, input, event.Fields, "Run must leave the event unchanged on a cache miss")
+
+	// RunPdata path: assert Run == RunPdata.
+	assertRunPdataEquivalent(t, processor, input, event.Fields)
+}
+
 func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"lookup_fields": []string{"container.id"},
 	})
 	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(b, ""))

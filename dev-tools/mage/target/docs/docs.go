@@ -24,11 +24,11 @@ import (
 )
 
 var (
-	docsDeps []interface{}
+	docsDeps []any
 )
 
 // RegisterDeps registers dependencies of the Docs target.
-func RegisterDeps(deps ...interface{}) {
+func RegisterDeps(deps ...any) {
 	docsDeps = append(docsDeps, deps...)
 }
 

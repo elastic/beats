@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -61,7 +60,7 @@ func Export(client *kibana.Client, id string) ([]byte, error) {
 
 // ExportAllFromYml exports all dashboards found in the YML file
 func ExportAllFromYml(client *kibana.Client, ymlPath string) ([][]byte, ListYML, error) {
-	b, err := ioutil.ReadFile(ymlPath)
+	b, err := os.ReadFile(ymlPath)
 	if err != nil {
 		return nil, ListYML{}, fmt.Errorf("error opening the list of dashboards: %w", err)
 	}
@@ -102,7 +101,7 @@ func SaveToFile(dashboard []byte, filename, root string, version version.V) erro
 
 	out := filepath.Join(root, dashboardsPath, filename)
 
-	return ioutil.WriteFile(out, dashboard, OutputPermission)
+	return os.WriteFile(out, dashboard, OutputPermission)
 }
 
 // SaveToFile creates the required directories if needed and saves dashboard.
@@ -163,6 +162,6 @@ func saveAsset(line []byte, assetRoot string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get indented bytes: %+v", err)
 	}
-	return ioutil.WriteFile(out, assetIndented, OutputPermission)
+	return os.WriteFile(out, assetIndented, OutputPermission)
 
 }

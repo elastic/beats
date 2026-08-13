@@ -20,7 +20,7 @@ package fields
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -59,9 +59,9 @@ var types = map[string]string{
 }
 
 type pipeline struct {
-	Description string                   `json:"description"`
-	Processors  []map[string]interface{} `json:"processors"`
-	OnFailure   interface{}              `json:"on_failure"`
+	Description string           `json:"description"`
+	Processors  []map[string]any `json:"processors"`
+	OnFailure   any              `json:"on_failure"`
 }
 
 type field struct {
@@ -100,7 +100,7 @@ func Generate(beatsPath, module, fileset string, noDoc bool) error {
 
 func readPipeline(filesetPath string) (*pipeline, error) {
 	pipelinePath := filepath.Join(filesetPath, "ingest/pipeline.json")
-	r, err := ioutil.ReadFile(pipelinePath)
+	r, err := os.ReadFile(pipelinePath)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func readPipeline(filesetPath string) (*pipeline, error) {
 
 func writeFieldsYml(filesetPath string, fieldsBytes []byte) error {
 	output := filepath.Join(filesetPath, "_meta/fields.yml")
-	return ioutil.WriteFile(output, fieldsBytes, 0o644)
+	return os.WriteFile(output, fieldsBytes, 0o644)
 }
 
 func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
@@ -197,10 +197,10 @@ func getSemanticElementsFromPatterns(patterns []string) ([]field, error) {
 	return fs, nil
 }
 
-func accumulatePatterns(grok interface{}) ([]string, error) {
-	for k, v := range grok.(map[string]interface{}) {
+func accumulatePatterns(grok any) ([]string, error) {
+	for k, v := range grok.(map[string]any) {
 		if k == "patterns" {
-			vs := v.([]interface{})
+			vs := v.([]any)
 			var p []string
 			for _, s := range vs {
 				p = append(p, s.(string))
@@ -211,15 +211,15 @@ func accumulatePatterns(grok interface{}) ([]string, error) {
 	return nil, fmt.Errorf("No patterns in pipeline")
 }
 
-func accumulateRemoveFields(remove interface{}, out []string) []string {
-	for k, v := range remove.(map[string]interface{}) {
+func accumulateRemoveFields(remove any, out []string) []string {
+	for k, v := range remove.(map[string]any) {
 		if k == "field" {
 			switch vs := v.(type) {
 			case string:
 				return append(out, vs)
 			case []string:
 				out = append(out, vs...)
-			case []interface{}:
+			case []any:
 				for _, vv := range vs {
 					vvs := vv.(string)
 					out = append(out, vvs)
@@ -233,9 +233,9 @@ func accumulateRemoveFields(remove interface{}, out []string) []string {
 	return out
 }
 
-func accumulateRenameFields(rename interface{}, out map[string]string) map[string]string {
+func accumulateRenameFields(rename any, out map[string]string) map[string]string {
 	var from, to string
-	for k, v := range rename.(map[string]interface{}) {
+	for k, v := range rename.(map[string]any) {
 		if k == "field" {
 			from = v.(string)
 		}
@@ -275,7 +275,7 @@ func (p *processors) processFields() ([]field, error) {
 	return f, nil
 }
 
-func getProcessors(p []map[string]interface{}) (*processors, error) {
+func getProcessors(p []map[string]any) (*processors, error) {
 	var patterns, rmFields []string
 	mvFields := make(map[string]string)
 

@@ -241,7 +241,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	traceLogger := zap.New(core)
 
 	maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
+	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 	return cli
 }
 

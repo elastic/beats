@@ -18,6 +18,7 @@
 package backoff
 
 import (
+	"context"
 	"math/rand/v2"
 	"time"
 )
@@ -27,7 +28,6 @@ import (
 // necessary to distribute the wait on remote endpoint.
 type EqualJitterBackoff struct {
 	duration time.Duration
-	done     <-chan struct{}
 
 	init time.Duration
 	max  time.Duration
@@ -36,10 +36,9 @@ type EqualJitterBackoff struct {
 }
 
 // NewEqualJitterBackoff returns a new EqualJitter object.
-func NewEqualJitterBackoff(done <-chan struct{}, init, max time.Duration) Backoff {
+func NewEqualJitterBackoff(init, max time.Duration) Backoff {
 	return &EqualJitterBackoff{
 		duration: init * 2, // Allow to sleep at least the init period on the first wait.
-		done:     done,
 		init:     init,
 		max:      max,
 	}
@@ -51,8 +50,8 @@ func (b *EqualJitterBackoff) Reset() {
 	b.duration = b.init * 2
 }
 
-// Wait blocks until either the timer is completed or channel is done.
-func (b *EqualJitterBackoff) Wait() bool {
+// Wait blocks until either the timer is completed or the context is cancelled.
+func (b *EqualJitterBackoff) Wait(ctx context.Context) bool {
 	// Make sure we have always some minimal back off and jitter.
 	temp := int64(b.duration / 2)
 	backoff := time.Duration(temp + rand.Int64N(temp))
@@ -64,7 +63,7 @@ func (b *EqualJitterBackoff) Wait() bool {
 	}
 
 	select {
-	case <-b.done:
+	case <-ctx.Done():
 		return false
 	case <-time.After(backoff):
 		b.last = time.Now()

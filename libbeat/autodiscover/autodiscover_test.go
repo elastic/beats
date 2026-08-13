@@ -35,7 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -441,7 +441,7 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	eventBus := <-busChan
 
 	// Publish a couple of events.
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		eventBus.Publish(bus.Event{
 			"id":       "foo",
 			"provider": "mock",
@@ -578,10 +578,10 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 			"foo": "bar",
 		},
 		"config": []*conf.C{
-			conf.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]any{
 				"a": "b",
 			}),
-			conf.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]any{
 				"x": "y",
 			}),
 		},
@@ -591,8 +591,8 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	runners := adapter.Runners()
 	assert.Len(t, runners, 2)
 	assert.Len(t, autodiscover.configs["mock:foo"], 2)
-	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
-	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]any{"x": "y"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]any{"a": "b"}), true, false)
 	// Test start event with changed configurations
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
@@ -602,10 +602,10 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 			"foo": "bar",
 		},
 		"config": []*conf.C{
-			conf.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]any{
 				"a": "b",
 			}),
-			conf.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]any{
 				"x": "c",
 			}),
 		},
@@ -616,16 +616,16 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	t.Log(runners)
 	assert.Len(t, runners, 3)
 	assert.Len(t, autodiscover.configs["mock:foo"], 2)
-	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]any{"a": "b"}), true, false)
 
 	// Ensure that the runner for the stale config is stopped
 	wait(t, func() bool {
-		check(t, adapter.Runners(), conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
+		check(t, adapter.Runners(), conf.MustNewConfigFrom(map[string]any{"x": "c"}), true, false)
 		return true
 	})
 
 	// Ensure that the new runner is started
-	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]any{"x": "c"}), true, false)
 
 	// Stop all the configs
 	eventBus.Publish(bus.Event{
@@ -636,10 +636,10 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 			"foo": "bar",
 		},
 		"config": []*conf.C{
-			conf.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]any{
 				"a": "b",
 			}),
-			conf.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]any{
 				"x": "c",
 			}),
 		},
@@ -647,7 +647,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 
 	wait(t, func() bool { return adapter.Runners()[2].stopped == true })
 	runners = adapter.Runners()
-	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), false, true)
+	check(t, runners, conf.MustNewConfigFrom(map[string]any{"x": "c"}), false, true)
 }
 
 func TestAutodiscoverDebounce(t *testing.T) {

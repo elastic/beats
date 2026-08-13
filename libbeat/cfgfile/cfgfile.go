@@ -48,8 +48,8 @@ func Initialize() {
 		// be called prior to flags.Parse().
 		configfiles = config.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
 		overwrites = config.SettingFlag(nil, "E", "Configuration overwrite")
-		defaults = config.MustNewConfigFrom(map[string]interface{}{
-			"path": map[string]interface{}{
+		defaults = config.MustNewConfigFrom(map[string]any{
+			"path": map[string]any{
 				"home":   ".", // to be initialized by beat
 				"config": "${path.home}",
 				"data":   filepath.Join("${path.home}", "data"),

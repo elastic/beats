@@ -25,8 +25,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -111,7 +111,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, test.lineTerminator, unlimited, test.collectOnEOF}, logptest.NewTestingLogger(t, ""))
+		reader, err := NewLineReader(io.NopCloser(buffer), Config{codec, 1024, test.lineTerminator, unlimited, test.collectOnEOF}, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal("failed to initialize reader:", err)
 		}
@@ -190,11 +190,8 @@ func TestReaderEncodings(t *testing.T) {
 				for lineTerminatorName, lineTerminator := range lineTerminators {
 					lineTerminatorIsInvalid := false
 					if invalidLineTerminatorForEncoding, ok := invalidLineTerminatorForEncoding[test.encoding]; ok {
-						for _, invalidLineTerminator := range invalidLineTerminatorForEncoding {
-							if invalidLineTerminator == lineTerminator {
-								lineTerminatorIsInvalid = true
-								break
-							}
+						if slices.Contains(invalidLineTerminatorForEncoding, lineTerminator) {
+							lineTerminatorIsInvalid = true
 						}
 					}
 					if lineTerminatorIsInvalid {
@@ -230,7 +227,7 @@ func TestLineTerminators(t *testing.T) {
 		buffer.Write([]byte("this is my second line"))
 		buffer.Write(nl)
 
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, terminator, unlimited, false}, logptest.NewTestingLogger(t, ""))
+		reader, err := NewLineReader(io.NopCloser(buffer), Config{codec, 1024, terminator, unlimited, false}, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -270,7 +267,7 @@ func TestReadRandomLineLengths(t *testing.T) {
 	numLines := 100
 
 	lineLengths := make([]int, numLines)
-	for i := 0; i < numLines; i++ {
+	for i := range numLines {
 		lineLengths[i] = rand.Intn(maxLength-minLength) + minLength
 	}
 
@@ -282,7 +279,7 @@ func testReadLineLengths(t *testing.T, lineLengths []int) {
 	var lines [][]byte
 	for _, lineLength := range lineLengths {
 		inputLine := make([]byte, lineLength+1)
-		for i := 0; i < lineLength; i++ {
+		for i := range lineLength {
 			char := rand.Intn('z'-'A') + 'A'
 			inputLine[i] = byte(char)
 		}
@@ -308,7 +305,7 @@ func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	}
 
 	codec, _ := encoding.Plain(r)
-	reader, err := NewLineReader(ioutil.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited, false}, logptest.NewTestingLogger(t, ""))
+	reader, err := NewLineReader(io.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
@@ -370,7 +367,7 @@ func setupTestMaxBytesLimit(lineMaxLimit, lineLen int, nl []byte) (lines []strin
 
 	var b strings.Builder
 
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		var sz int
 		// Non-empty line
 		if randomBool(rnd) {
@@ -424,7 +421,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	}
 
 	// Create line reader
-	reader, err := NewLineReader(ioutil.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit, false}, logptest.NewTestingLogger(t, ""))
+	reader, err := NewLineReader(io.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
@@ -483,13 +480,13 @@ func TestBufferSize(t *testing.T) {
 	codec, _ := codecFactory(bytes.NewBuffer(nil))
 	bufferSize := 10
 
-	in := ioutil.NopCloser(strings.NewReader(strings.Join(lines, "")))
+	in := io.NopCloser(strings.NewReader(strings.Join(lines, "")))
 	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
 
-	for i := 0; i < len(lines); i++ {
+	for i := range lines {
 		b, n, err := reader.Next()
 		if err != nil {
 			if errors.Is(err, io.EOF) {

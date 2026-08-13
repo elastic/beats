@@ -149,7 +149,7 @@ func TestEventConsumerCloseReleasesHeldBatches(t *testing.T) {
 	defer q.Close(true)
 
 	p := q.Producer(queue.ProducerConfig{})
-	for i := 0; i < capacity; i++ {
+	for i := range capacity {
 		_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: i}})
 		require.True(t, ok)
 	}

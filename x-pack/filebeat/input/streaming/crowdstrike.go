@@ -197,6 +197,11 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		s.allowedOrigins = append(s.allowedOrigins, o)
 	}
 
+	ua := cfg.UserAgent
+	if ua == "" {
+		ua = env.Agent.UserAgent
+	}
+
 	// Build the auth transport before zeroing timeouts for the streaming
 	// client. The oauth2 token endpoint needs normal request timeouts;
 	// moving this after the timeout zeroing will cause auth requests to
@@ -210,7 +215,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		now = time.Now
 	}
 	s.authTransport = &rateLimitTransport{
-		base:     authClient.Transport,
+		base:     userAgentTransport{ua: ua, base: authClient.Transport},
 		timeout:  authClient.Timeout,
 		maxRetry: 3,
 		wait:     60 * time.Second,
@@ -225,8 +230,25 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		stat.UpdateStatus(status.Failed, "failed to configure client: "+err.Error())
 		return nil, err
 	}
+	s.plainClient.Transport = userAgentTransport{ua: ua, base: s.plainClient.Transport}
 
 	return &s, nil
+}
+
+var _ http.RoundTripper = userAgentTransport{}
+
+// userAgentTransport wraps an http.RoundTripper and unconditionally
+// sets the User-Agent header on every outgoing request. It overwrites
+// Go's default "Go-http-client/1.1" which http.Client.Do sets before
+// calling RoundTrip.
+type userAgentTransport struct {
+	ua   string
+	base http.RoundTripper
+}
+
+func (t userAgentTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	r.Header.Set("User-Agent", t.ua)
+	return t.base.RoundTrip(r)
 }
 
 // FollowStream receives, processes and publishes events from the subscribed

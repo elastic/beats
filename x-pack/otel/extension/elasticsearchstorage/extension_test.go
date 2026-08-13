@@ -79,7 +79,7 @@ func TestStore_SetGet(t *testing.T) {
 func TestStore_Get_UnknownKey(t *testing.T) {
 	s := newTestStore(t, uniqueIndex(t))
 
-	var v interface{}
+	var v any
 	err := s.Get("nonexistent", &v)
 	assert.ErrorIs(t, err, es.ErrKeyUnknown)
 }
@@ -151,7 +151,7 @@ func TestStore_Each_Empty(t *testing.T) {
 func TestStore_Each_EarlyStop(t *testing.T) {
 	s := newTestStore(t, uniqueIndex(t))
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		require.NoError(t, s.Set(fmt.Sprintf("k%d", i), i))
 	}
 
@@ -181,7 +181,7 @@ func TestElasticStorage_Lifecycle(t *testing.T) {
 	pass, _ := esURL.User.Password()
 
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
 			"username": user,
 			"password": pass,
@@ -212,7 +212,7 @@ func TestElasticStorage_Start_BadCredentials(t *testing.T) {
 	esURL := integration.GetESURL(t, "http")
 
 	cfg := &Config{
-		ElasticsearchConfig: map[string]interface{}{
+		ElasticsearchConfig: map[string]any{
 			"hosts":    []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
 			"username": "invaliduser",
 			"password": "wrongpassword",

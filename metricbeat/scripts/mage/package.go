@@ -186,7 +186,7 @@ func GenerateDirModulesD() error {
 		}
 		path := filepath.Join("modules.d", configName+suffix)
 
-		headerArgs := map[string]interface{}{
+		headerArgs := map[string]any{
 			"Module":        moduleName,
 			"BeatName":      devtools.BeatName,
 			"BeatDocBranch": docBranch,

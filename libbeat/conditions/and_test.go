@@ -27,12 +27,12 @@ func TestANDCondition(t *testing.T) {
 	config := Config{
 		AND: []Config{
 			{
-				Equals: &Fields{fields: map[string]interface{}{
+				Equals: &Fields{fields: map[string]any{
 					"client_server": "mar.local",
 				}},
 			},
 			{
-				Range: &Fields{fields: map[string]interface{}{
+				Range: &Fields{fields: map[string]any{
 					"http.code.gte": 200,
 					"http.code.lt":  300,
 				}},

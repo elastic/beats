@@ -64,7 +64,7 @@ type Event struct {
 	// it should store the encoded form in EncodedEvent and clear Content
 	// to free the unencoded data. The updated event will be provided to
 	// output workers when calling Publish.
-	EncodedEvent interface{}
+	EncodedEvent any
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.
@@ -77,7 +77,7 @@ type EventCache struct {
 }
 
 // Put lets outputs put key-value pairs into the event cache
-func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
+func (ec *EventCache) Put(key string, value any) (any, error) {
 	if ec.m == nil {
 		// uninitialized map
 		ec.m = mapstr.M{}
@@ -87,7 +87,7 @@ func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 }
 
 // GetValue lets outputs retrieve values from the event cache by key
-func (ec *EventCache) GetValue(key string) (interface{}, error) {
+func (ec *EventCache) GetValue(key string) (any, error) {
 	if ec.m == nil {
 		// uninitialized map
 		return nil, mapstr.ErrKeyNotFound

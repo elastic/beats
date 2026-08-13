@@ -84,6 +84,20 @@ func TestDefaults(t *testing.T) {
 			"icmp",
 			911,
 		},
+		{
+			"API default is 4 when nothing is overridden",
+			"FOO",
+			"bar",
+			"api",
+			4,
+		},
+		{
+			"API monitor override",
+			"SYNTHETICS_LIMIT_API",
+			"321",
+			"api",
+			321,
+		},
 	}
 
 	for _, c := range cases {

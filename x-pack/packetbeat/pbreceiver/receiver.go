@@ -21,14 +21,12 @@ type packetbeatReceiver struct {
 }
 
 func (pb *packetbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	pb.wg.Add(1)
-	go func() {
-		defer pb.wg.Done()
+	pb.wg.Go(func() {
 		pb.Logger.Info("starting packetbeat receiver")
 		if err := pb.BeatReceiver.Start(host); err != nil {
 			pb.Logger.Error("error starting packetbeat receiver", zap.Error(err))
 		}
-	}()
+	})
 	return nil
 }
 

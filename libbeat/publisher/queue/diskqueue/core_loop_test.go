@@ -70,14 +70,14 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			segments:        diskQueueSegments{nextID: 5},
 			frameSize:       1000,
 			shouldBlock:     false,
-			expectedResult:  boolRef(true),
+			expectedResult:  new(true),
 			expectedSegment: 5,
 		},
 		"reject immediately when frame is larger than segment limit": {
 			// max segment buffer size for the test wrapper is 1000.
 			frameSize:      1001,
 			shouldBlock:    true,
-			expectedResult: boolRef(false),
+			expectedResult: new(false),
 		},
 		"accept with frame in new segment if current segment is full": {
 			segments: diskQueueSegments{
@@ -87,7 +87,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			},
 			frameSize:       500,
 			shouldBlock:     false,
-			expectedResult:  boolRef(true),
+			expectedResult:  new(true),
 			expectedSegment: 1,
 		},
 		"reject when full and shouldBlock=false": {
@@ -98,7 +98,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			},
 			frameSize:      500,
 			shouldBlock:    false,
-			expectedResult: boolRef(false),
+			expectedResult: new(false),
 		},
 		"block when full and shouldBlock=true": {
 			segments: diskQueueSegments{
@@ -114,7 +114,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			blockedProducers: true,
 			frameSize:        500,
 			shouldBlock:      false,
-			expectedResult:   boolRef(false),
+			expectedResult:   new(false),
 		},
 		"block when blockedProducers is nonempty and shouldBlock=true": {
 			blockedProducers: true,
@@ -582,7 +582,7 @@ func TestMaybeReadPending(t *testing.T) {
 				startPosition: segmentHeaderSize,
 				endPosition:   500,
 			},
-			expectedACKingSegment: segmentIDRef(1),
+			expectedACKingSegment: new(segmentID(1)),
 		},
 		"move empty reading segment to the acking list if it's the only one": {
 			segments: diskQueueSegments{
@@ -592,7 +592,7 @@ func TestMaybeReadPending(t *testing.T) {
 				nextReadPosition: 1000,
 			},
 			expectedRequest:       nil,
-			expectedACKingSegment: segmentIDRef(1),
+			expectedACKingSegment: new(segmentID(1)),
 		},
 		"reading the beginning of an old segment file uses the right header size": {
 			segments: diskQueueSegments{
@@ -600,7 +600,7 @@ func TestMaybeReadPending(t *testing.T) {
 					{
 						id:            1,
 						byteCount:     1000,
-						schemaVersion: makeUint32Ptr(0)},
+						schemaVersion: new(uint32(0))},
 				},
 				// The next read request should start with frame 5
 				nextReadFrameID: 5,
@@ -783,7 +783,7 @@ func TestMaybeUnblockProducers(t *testing.T) {
 		t.Fatalf("Expected 2 pending frames and 1 blocked producer, got %v and %v",
 			len(dq.pendingFrames), len(dq.blockedProducers))
 	}
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		select {
 		case response := <-responseChans[i]:
 			if i < 2 && !response {
@@ -806,7 +806,7 @@ func TestMaybeUnblockProducers(t *testing.T) {
 		t.Fatalf("Expected 3 pending frames and 0 blocked producers, got %v and %v",
 			len(dq.pendingFrames), len(dq.blockedProducers))
 	}
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		// This time the first two response channels should get nothing and the
 		// third should get success.
 		select {
@@ -1017,14 +1017,6 @@ func TestObserverDeleteSegment(t *testing.T) {
 	assertRegistryUint(t, reg, "queue.removed.bytes", 1234+567, "Deleted bytes should be reported")
 }
 
-func boolRef(b bool) *bool {
-	return &b
-}
-
-func segmentIDRef(id segmentID) *segmentID {
-	return &id
-}
-
 // Convenience helper that creates a frame that will have the given size on
 // disk after accounting for header / footer size.
 func makeWriteFrameWithSize(size int) *writeFrame {
@@ -1033,10 +1025,6 @@ func makeWriteFrameWithSize(size int) *writeFrame {
 		return nil
 	}
 	return &writeFrame{serialized: make([]byte, size-frameMetadataSize)}
-}
-
-func makeUint32Ptr(value uint32) *uint32 {
-	return &value
 }
 
 func segmentWithSize(size int) *queueSegment {

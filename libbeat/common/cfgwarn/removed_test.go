@@ -36,7 +36,7 @@ func TestRemovedSetting(t *testing.T) {
 		{
 			name:   "no obsolete setting",
 			lookup: "notfound",
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"hello.world": "ok",
 			}),
 			expected: nil,
@@ -44,7 +44,7 @@ func TestRemovedSetting(t *testing.T) {
 		{
 			name:   "obsolete setting found",
 			lookup: "hello",
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"hello.world": "ok",
 			}),
 			expected: errors.New("setting 'hello' has been removed"),
@@ -81,7 +81,7 @@ func TestRemovedSettings(t *testing.T) {
 		{
 			name:   "no obsolete setting",
 			lookup: []string{"notfound"},
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"hello.world": "ok",
 			}),
 			expected: nil,
@@ -89,7 +89,7 @@ func TestRemovedSettings(t *testing.T) {
 		{
 			name:   "obsolete setting found",
 			lookup: []string{"hello"},
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"hello.world": "ok",
 			}),
 			expected: errors.Join(errors.New("setting 'hello' has been removed")),
@@ -97,7 +97,7 @@ func TestRemovedSettings(t *testing.T) {
 		{
 			name:   "multiple obsolete settings",
 			lookup: []string{"hello", "bad"},
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"hello.world": "ok",
 				"bad":         "true",
 			}),
@@ -109,9 +109,9 @@ func TestRemovedSettings(t *testing.T) {
 		{
 			name:   "multiple obsolete settings not on first level",
 			lookup: []string{"filebeat.config.prospectors", "filebeat.prospectors"},
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"filebeat.prospectors":        "ok",
-				"filebeat.config.prospectors": map[string]interface{}{"ok": "ok1"},
+				"filebeat.config.prospectors": map[string]any{"ok": "ok1"},
 			}),
 			expected: errors.Join(
 				errors.New("setting 'filebeat.config.prospectors' has been removed"),

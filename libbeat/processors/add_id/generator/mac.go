@@ -47,7 +47,7 @@ func getSecureMungedMACAddress() ([]byte, error) {
 		return nil, err
 	}
 
-	for i := 0; i < addrLen; i++ {
+	for i := range addrLen {
 		munged[i] ^= addr[i]
 	}
 

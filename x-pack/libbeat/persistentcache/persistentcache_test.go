@@ -165,7 +165,7 @@ var benchmarkCacheSizes = []int{10, 100, 1000, 10000, 100000}
 
 func BenchmarkPut(b *testing.B) {
 	type cache interface {
-		Put(key string, value interface{}) error
+		Put(key string, value any) error
 		Close() error
 	}
 
@@ -263,7 +263,7 @@ func BenchmarkPut(b *testing.B) {
 				Data [128]byte
 			}
 			objects := make([]entry, size)
-			for i := 0; i < size; i++ {
+			for i := range size {
 				objects[i] = entry{
 					ID: uuid.Must(uuid.NewV4()).String(),
 				}
@@ -289,7 +289,7 @@ func BenchmarkPut(b *testing.B) {
 
 func BenchmarkOpen(b *testing.B) {
 	type cache interface {
-		Put(key string, value interface{}) error
+		Put(key string, value any) error
 		Close() error
 	}
 
@@ -317,7 +317,7 @@ func BenchmarkOpen(b *testing.B) {
 			for _, c := range caches {
 				cacheName := b.Name()
 				cache := c.factory(b, cacheName)
-				for i := 0; i < size; i++ {
+				for range size {
 					e := entry{
 						ID: uuid.Must(uuid.NewV4()).String(),
 					}
@@ -341,8 +341,8 @@ func BenchmarkOpen(b *testing.B) {
 
 func BenchmarkGet(b *testing.B) {
 	type cache interface {
-		Put(key string, value interface{}) error
-		Get(key string, value interface{}) error
+		Put(key string, value any) error
+		Get(key string, value any) error
 		Close() error
 	}
 
@@ -372,7 +372,7 @@ func BenchmarkGet(b *testing.B) {
 
 				objects := make([]entry, size)
 				cache := c.factory(b, cacheName)
-				for i := 0; i < size; i++ {
+				for i := range size {
 					e := entry{
 						ID: uuid.Must(uuid.NewV4()).String(),
 					}

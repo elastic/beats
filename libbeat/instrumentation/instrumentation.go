@@ -73,11 +73,11 @@ type Config struct {
 
 type urls []*url.URL
 
-func (u *urls) Unpack(c interface{}) error {
+func (u *urls) Unpack(c any) error {
 	if c == nil {
 		return nil
 	}
-	hosts, ok := c.([]interface{})
+	hosts, ok := c.([]any)
 	if !ok {
 		return fmt.Errorf("hosts must be a list, got: %#v", c)
 	}
@@ -242,6 +242,6 @@ type warningLogger struct {
 }
 
 // Warningf logs a message at warning level.
-func (l warningLogger) Warningf(format string, args ...interface{}) {
+func (l warningLogger) Warningf(format string, args ...any) {
 	l.Warnf(format, args...)
 }

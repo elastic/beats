@@ -15,15 +15,15 @@ import (
 )
 
 type vpcFlowField struct {
-	Name        string                                           // Name of the VPC flow field that is added to our events.
-	Type        dataType                                         // Data type to convert the string into.
-	Enrich      func(originalFields mapstr.M, value interface{}) // Optional enrichment function to add new derived fields into the 'target_field' namespace.
-	ECSMappings []ecsFieldMapping                                // List of ECS fields to create or derive from this field.
+	Name        string                                   // Name of the VPC flow field that is added to our events.
+	Type        dataType                                 // Data type to convert the string into.
+	Enrich      func(originalFields mapstr.M, value any) // Optional enrichment function to add new derived fields into the 'target_field' namespace.
+	ECSMappings []ecsFieldMapping                        // List of ECS fields to create or derive from this field.
 }
 
 type ecsFieldMapping struct {
-	Target    string                                                         // ECS field target.
-	Transform func(targetField string, value interface{}, event *beat.Event) // Optional transform to modify the value. If omitted the value is copied.
+	Target    string                                                 // ECS field target.
+	Transform func(targetField string, value any, event *beat.Event) // Optional transform to modify the value. If omitted the value is copied.
 }
 
 var nameToFieldMap map[string]vpcFlowField
@@ -59,7 +59,7 @@ var vpcFlowFields = [...]vpcFlowField{
 			{Target: "source.ip"},
 			{
 				Target: "network.type",
-				Transform: func(targetField string, value interface{}, event *beat.Event) {
+				Transform: func(targetField string, value any, event *beat.Event) {
 					if ip := value.(string); strings.Contains(ip, ".") {
 						event.PutValue(targetField, "ipv4") //nolint:errcheck // This can only fail if 'network' is not an object.
 					} else {
@@ -97,14 +97,14 @@ var vpcFlowFields = [...]vpcFlowField{
 		ECSMappings: []ecsFieldMapping{
 			{
 				Target: "network.iana_number",
-				Transform: func(targetField string, value interface{}, event *beat.Event) {
+				Transform: func(targetField string, value any, event *beat.Event) {
 					protocol := value.(int32)
 					event.PutValue(targetField, strconv.Itoa(int(protocol))) //nolint:errcheck // This can only fail if 'network' is not an object.
 				},
 			},
 			{
 				Target: "network.transport",
-				Transform: func(targetField string, value interface{}, event *beat.Event) {
+				Transform: func(targetField string, value any, event *beat.Event) {
 					var name string
 					switch protocol := value.(int32); protocol {
 					case 0:
@@ -175,7 +175,7 @@ var vpcFlowFields = [...]vpcFlowField{
 		ECSMappings: []ecsFieldMapping{
 			{
 				Target: "event.outcome",
-				Transform: func(targetField string, value interface{}, event *beat.Event) {
+				Transform: func(targetField string, value any, event *beat.Event) {
 					var outcome string
 
 					switch s := value.(string); s {
@@ -192,13 +192,13 @@ var vpcFlowFields = [...]vpcFlowField{
 			},
 			{
 				Target: "event.action",
-				Transform: func(targetField string, value interface{}, event *beat.Event) {
+				Transform: func(targetField string, value any, event *beat.Event) {
 					event.PutValue(targetField, strings.ToLower(value.(string))) //nolint:errcheck // This can only fail if 'event' is not an object.
 				},
 			},
 			{
 				Target: "event.type",
-				Transform: func(targetField string, value interface{}, event *beat.Event) {
+				Transform: func(targetField string, value any, event *beat.Event) {
 					var eventType string
 
 					switch s := value.(string); s {
@@ -235,7 +235,7 @@ var vpcFlowFields = [...]vpcFlowField{
 	{
 		Name: "tcp_flags",
 		Type: integerType,
-		Enrich: func(originalFields mapstr.M, value interface{}) {
+		Enrich: func(originalFields mapstr.M, value any) {
 			flag := value.(int32)
 			flags := make([]string, 0, bits.OnesCount8(uint8(flag)))
 			if flag&0x01 != 0 {
@@ -328,7 +328,7 @@ var vpcFlowFields = [...]vpcFlowField{
 			{Target: "orchestrator.cluster.name"},
 			{
 				Target: "orchestrator.type",
-				Transform: func(targetField string, _ interface{}, event *beat.Event) {
+				Transform: func(targetField string, _ any, event *beat.Event) {
 					event.PutValue(targetField, "ecs") //nolint:errcheck // This can only fail if 'orchestrator' is not an object.
 				},
 			},
@@ -341,7 +341,7 @@ var vpcFlowFields = [...]vpcFlowField{
 			{Target: "orchestrator.resource.name"},
 			{
 				Target: "orchestrator.resource.type",
-				Transform: func(targetField string, _ interface{}, event *beat.Event) {
+				Transform: func(targetField string, _ any, event *beat.Event) {
 					event.PutValue(targetField, "container") //nolint:errcheck // This can only fail if 'orchestrator.resource' is not an object.
 				},
 			},

@@ -46,7 +46,7 @@ const (
 func TestDefaultSupport_Enabled(t *testing.T) {
 	cases := map[string]struct {
 		ilmCalls []onCall
-		cfg      map[string]interface{}
+		cfg      map[string]any
 		enabled  bool
 	}{
 		"templates and ilm disabled": {
@@ -54,7 +54,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			ilmCalls: []onCall{
 				onEnabled().Return(false),
 			},
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"setup.template.enabled": false,
 			},
 		},
@@ -63,7 +63,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			ilmCalls: []onCall{
 				onEnabled().Return(false),
 			},
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"setup.template.enabled": true,
 			},
 		},
@@ -72,7 +72,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			ilmCalls: []onCall{
 				onEnabled().Return(true),
 			},
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"setup.template.enabled": false,
 			},
 		},
@@ -107,24 +107,24 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 
 	cases := map[string]struct {
 		ilmCalls []onCall
-		imCfg    map[string]interface{}
-		cfg      map[string]interface{}
+		imCfg    map[string]any
+		cfg      map[string]any
 		want     nameFunc
 		meta     mapstr.M
 	}{
 		"without ilm": {
 			ilmCalls: noILM,
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			cfg:      map[string]any{"index": "test-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
 		"without ilm must be lowercase": {
 			ilmCalls: noILM,
-			cfg:      map[string]interface{}{"index": "TeSt-%{[agent.version]}"},
+			cfg:      map[string]any{"index": "TeSt-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
 		"event index without ilm": {
 			ilmCalls: noILM,
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			cfg:      map[string]any{"index": "test-%{[agent.version]}"},
 			want:     stable("test"),
 			meta: mapstr.M{
 				"index": "test",
@@ -132,7 +132,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		},
 		"event index without ilm must be lowercase": {
 			ilmCalls: noILM,
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			cfg:      map[string]any{"index": "test-%{[agent.version]}"},
 			want:     stable("test"),
 			meta: mapstr.M{
 				"index": "Test",
@@ -140,17 +140,17 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		},
 		"with ilm": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			cfg:      map[string]any{"index": "test-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
 		"with ilm must be lowercase": {
 			ilmCalls: ilmTemplateSettings("Test-9.9.9"),
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			cfg:      map[string]any{"index": "test-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
 		"event index with ilm": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			cfg:      map[string]any{"index": "test-%{[agent.version]}"},
 			want:     stable("event-index"),
 			meta: mapstr.M{
 				"index": "event-index",
@@ -158,9 +158,9 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		},
 		"use indices": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"index": "test-%{[agent.version]}",
-				"indices": []map[string]interface{}{
+				"indices": []map[string]any{
 					{"index": "myindex"},
 				},
 			},
@@ -168,9 +168,9 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		},
 		"use indices settings must be lowercase": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"index": "test-%{[agent.version]}",
-				"indices": []map[string]interface{}{
+				"indices": []map[string]any{
 					{"index": "MyIndex"},
 				},
 			},
@@ -290,15 +290,15 @@ func TestIndexManager_Setup(t *testing.T) {
 		}
 
 		if c.Settings.Index != nil {
-			c.Settings.Index = (map[string]interface{})(mapstr.M(c.Settings.Index).Clone())
+			c.Settings.Index = (map[string]any)(mapstr.M(c.Settings.Index).Clone())
 		}
 		if c.Settings.Source != nil {
-			c.Settings.Source = (map[string]interface{})(mapstr.M(c.Settings.Source).Clone())
+			c.Settings.Source = (map[string]any)(mapstr.M(c.Settings.Source).Clone())
 		}
 		return c
 	}
 
-	cfgWith := func(s template.TemplateConfig, mods ...map[string]interface{}) *template.TemplateConfig {
+	cfgWith := func(s template.TemplateConfig, mods ...map[string]any) *template.TemplateConfig {
 		for _, mod := range mods {
 			cfg := config.MustNewConfigFrom(mod)
 			s = cloneCfg(s)
@@ -328,7 +328,7 @@ func TestIndexManager_Setup(t *testing.T) {
 		policy                string
 	}{
 		"template default ilm default": {
-			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]any{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9",
@@ -338,7 +338,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			ilmCfg: defaultLifecycleConfig,
 		},
 		"template-default-dsl-config": {
-			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]any{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9",
@@ -352,7 +352,7 @@ func TestIndexManager_Setup(t *testing.T) {
 				"setup.ilm.policy_name": "policy-keep",
 			},
 			ilmCfg: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, CheckExists: true, PolicyName: *fmtstr.MustCompileEvent("policy-keep")}},
-			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]any{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9",
@@ -374,7 +374,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			},
 			loadTemplate: LoadModeOverwrite,
 			ilmCfg:       lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: false}},
-			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]any{
 				"overwrite": "true",
 				"name":      "test-9.9.9",
 				"pattern":   "test-9.9.9",
@@ -388,7 +388,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			},
 			loadTemplate: LoadModeForce,
 			ilmCfg:       lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: false}},
-			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]any{
 				"overwrite": "true",
 			}),
 		},
@@ -432,7 +432,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			loadILM: LoadModeDisabled,
 			ilmCfg:  defaultLifecycleConfig,
 			policy:  "test",
-			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]any{
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9",
 				"settings.index.lifecycle.name": "test",

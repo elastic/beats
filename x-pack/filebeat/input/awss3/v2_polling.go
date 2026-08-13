@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -34,6 +35,7 @@ type pollingDiscoveryV2 struct {
 	bucketARN      string
 	bucketName     string
 	listPrefix     string
+	excludePrefix  string
 	listInterval   time.Duration
 	numWorkers     int
 	region         string
@@ -52,6 +54,7 @@ type pollingDiscoveryV2Config struct {
 	Status          status.StatusReporter
 	BucketARN       string
 	ListPrefix      string
+	ExcludePrefix   string
 	ListInterval    time.Duration
 	NumWorkers      int
 	Region          string
@@ -71,6 +74,7 @@ func newPollingDiscoveryV2(cfg pollingDiscoveryV2Config) *pollingDiscoveryV2 {
 		bucketARN:      cfg.BucketARN,
 		bucketName:     getBucketNameFromARN(cfg.BucketARN),
 		listPrefix:     cfg.ListPrefix,
+		excludePrefix:  cfg.ExcludePrefix,
 		listInterval:   cfg.ListInterval,
 		numWorkers:     cfg.NumWorkers,
 		region:         cfg.Region,
@@ -101,11 +105,9 @@ func (p *pollingDiscoveryV2) poll(ctx context.Context, pipeline beat.Pipeline) {
 	workChan := make(chan state)
 
 	for range p.numWorkers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			p.worker(pollCtx, pipeline, workChan, pollCancel)
-		}()
+		})
 	}
 
 	ids, _, ok := p.listObjects(pollCtx, workChan)
@@ -135,7 +137,7 @@ func (p *pollingDiscoveryV2) worker(ctx context.Context, pipeline beat.Pipeline,
 		client.Close()
 	}()
 
-	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
+	rateLimitWaiter := backoff.NewEqualJitterBackoff(1, 120)
 	for st := range work {
 		if err := p.registry.MarkObjectInFlight(st.Key); err != nil {
 			p.log.Errorf("failed to mark object in-flight: %v", err)
@@ -156,7 +158,7 @@ func (p *pollingDiscoveryV2) worker(ctx context.Context, pipeline beat.Pipeline,
 			if err := p.registry.UnmarkObjectInFlight(st.Key); err != nil {
 				p.log.Errorf("failed to unmark object in-flight: %v", err)
 			}
-			rateLimitWaiter.Wait()
+			rateLimitWaiter.Wait(ctx)
 			continue
 		}
 		rateLimitWaiter.Reset()
@@ -194,7 +196,7 @@ func (p *pollingDiscoveryV2) listObjects(ctx context.Context, workChan chan<- st
 	defer close(workChan)
 
 	isStateValid := p.filterProvider.getApplierFunc()
-	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
+	errorBackoff := backoff.NewEqualJitterBackoff(1, 120)
 	circuitBreaker := 0
 
 	startAfterKey := p.registry.GetStartAfterKey()
@@ -212,7 +214,7 @@ func (p *pollingDiscoveryV2) listObjects(ctx context.Context, workChan chan<- st
 					return nil, numListed, false
 				}
 			}
-			errorBackoff.Wait()
+			errorBackoff.Wait(ctx)
 			continue
 		}
 		circuitBreaker = 0
@@ -222,6 +224,10 @@ func (p *pollingDiscoveryV2) listObjects(ctx context.Context, workChan chan<- st
 		p.metrics.s3ObjectsListedTotal.Add(uint64(len(page.Contents)))
 
 		for _, obj := range page.Contents {
+			if p.excludePrefix != "" && strings.HasPrefix(*obj.Key, p.excludePrefix) {
+				continue
+			}
+
 			st := newState(p.bucketName, *obj.Key, *obj.ETag, *obj.LastModified)
 
 			if p.strategy.ShouldSkipObject(st, isStateValid) {

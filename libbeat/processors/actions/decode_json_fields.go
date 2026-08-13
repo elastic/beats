@@ -117,7 +117,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			continue
 		}
 
-		var output interface{}
+		var output any
 		err = unmarshal(f.maxDepth, text, &output, f.processArray)
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
@@ -133,7 +133,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 
 		var id string
 		if key := f.documentID; key != "" {
-			if dict, ok := output.(map[string]interface{}); ok {
+			if dict, ok := output.(map[string]any); ok {
 				if tmp, err := mapstr.M(dict).GetValue(key); err == nil {
 					if v, ok := tmp.(string); ok {
 						id = v
@@ -146,7 +146,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		if target != "" {
 			if f.expandKeys {
 				switch t := output.(type) {
-				case map[string]interface{}:
+				case map[string]any:
 					jsontransform.ExpandFields(f.logger, event, t, f.addErrorKey)
 				default:
 					errs = append(errs, "failed to expand keys")
@@ -155,7 +155,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			_, err = event.PutValue(target, output)
 		} else {
 			switch t := output.(type) {
-			case map[string]interface{}:
+			case map[string]any:
 				jsontransform.WriteJSONKeys(event, t, f.expandKeys, f.overwriteKeys, f.addErrorKey)
 			default:
 				errs = append(errs, "failed to add target to root")
@@ -182,7 +182,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
+func unmarshal(maxDepth int, text string, fields *any, processArray bool) error {
 	if err := decodeJSON(text, fields); err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		return nil
 	}
 
-	tryUnmarshal := func(v interface{}) (interface{}, bool) {
+	tryUnmarshal := func(v any) (any, bool) {
 		str, isString := v.(string)
 		if !isString {
 			return v, false
@@ -200,7 +200,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 			return str, false
 		}
 
-		var tmp interface{}
+		var tmp any
 		err := unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
 			return v, errors.Is(err, errProcessingSkipped)
@@ -211,14 +211,14 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 
 	// try to deep unmarshal fields
 	switch O := (*fields).(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		for k, v := range O {
 			if decoded, ok := tryUnmarshal(v); ok {
 				O[k] = decoded
 			}
 		}
 	// We want to process arrays here
-	case []interface{}:
+	case []any:
 		if !processArray {
 			return errProcessingSkipped
 		}
@@ -232,7 +232,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	return nil
 }
 
-func decodeJSON(text string, to *interface{}) error {
+func decodeJSON(text string, to *any) error {
 	dec := json.NewDecoder(strings.NewReader(text))
 	dec.UseNumber()
 	err := dec.Decode(to)
@@ -250,7 +250,7 @@ func decodeJSON(text string, to *interface{}) error {
 	}
 
 	switch O := (*to).(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		jsontransform.TransformNumbers(O)
 	}
 	return nil

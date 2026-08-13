@@ -107,11 +107,7 @@ func TestInput(t *testing.T) {
 			checkMatchingHeaders(t, event, msg.headers)
 
 			// emulating the pipeline (kafkaInput.Run)
-			meta, ok := event.Private.(eventMeta)
-			if !ok {
-				t.Fatal("could not get eventMeta and ack the message")
-			}
-			meta.ackHandler()
+			ackEventPrivate(event.Private)
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
@@ -291,7 +287,7 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		select {
 		case event := <-events:
 			text, err := event.Fields.GetValue("val")
@@ -398,11 +394,7 @@ func TestSASLAuthentication(t *testing.T) {
 					checkMatchingHeaders(t, event, msg.headers)
 
 					// emulating the pipeline (kafkaInput.Run)
-					meta, ok := event.Private.(eventMeta)
-					if !ok {
-						t.Fatal("could not get eventMeta and ack the message")
-					}
-					meta.ackHandler()
+					ackEventPrivate(event.Private)
 				case <-timeout:
 					t.Fatal("timeout waiting for incoming events")
 				}
@@ -509,7 +501,7 @@ func checkMatchingHeaders(
 		t.Fatal("event.Fields.kafka.headers isn't a []string")
 	}
 	assert.Len(t, headerArray, len(expected))
-	for i := 0; i < len(expected); i++ {
+	for i := range expected {
 		splitIndex := strings.Index(headerArray[i], ": ")
 		if splitIndex == -1 {
 			t.Errorf(

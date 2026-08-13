@@ -47,7 +47,7 @@ func StatusReporterFactory(reporter RunnerReporter) cfgfile.FactoryWrapper {
 }
 
 func getInputId(config *config.C) (string, error) {
-	var h map[string]interface{}
+	var h map[string]any
 	err := config.Unpack(&h)
 	if err != nil {
 		return "", fmt.Errorf("could not unpack config: %w", err)

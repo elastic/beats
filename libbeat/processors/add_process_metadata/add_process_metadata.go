@@ -228,7 +228,7 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, ErrNoMatch
 }
 
-func pidToInt(value interface{}) (pid int, err error) {
+func pidToInt(value any) (pid int, err error) {
 	switch v := value.(type) {
 	case string:
 		pid, err = strconv.Atoi(v)

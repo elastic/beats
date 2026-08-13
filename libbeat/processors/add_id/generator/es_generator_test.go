@@ -48,7 +48,7 @@ func TestIDConsecutiveOrdering(t *testing.T) {
 	g := ESTimeBasedUUIDGenerator()
 
 	prevID := g.NextID()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		decodedPrevID, err := base64.RawURLEncoding.DecodeString(prevID)
 		assert.NoError(t, err)
 

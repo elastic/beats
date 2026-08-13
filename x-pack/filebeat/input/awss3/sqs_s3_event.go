@@ -19,7 +19,6 @@ import (
 	"github.com/aws/smithy-go"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -128,7 +127,7 @@ type sqsS3EventProcessor struct {
 	warnOnce             sync.Once
 	metrics              *inputMetrics
 	script               *script
-	status               status.StatusReporter
+	health               *sqsHealth
 }
 
 func newSQSS3EventProcessor(
@@ -139,7 +138,7 @@ func newSQSS3EventProcessor(
 	sqsVisibilityTimeout time.Duration,
 	maxReceiveCount int,
 	s3 s3ObjectHandlerFactory,
-	status status.StatusReporter,
+	health *sqsHealth,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
@@ -153,7 +152,7 @@ func newSQSS3EventProcessor(
 		log:                  log,
 		metrics:              metrics,
 		script:               script,
-		status:               status,
+		health:               health,
 	}
 }
 
@@ -231,7 +230,7 @@ func (r sqsProcessingResult) Done() {
 	if processingErr == nil {
 		if msgDelErr := p.sqs.DeleteMessage(context.Background(), r.msg); msgDelErr != nil {
 			p.log.Errorf("failed deleting message from SQS queue (it may be reprocessed): %v", msgDelErr.Error())
-			r.processor.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failed an attempt to delete an SQS message. Error: %s", msgDelErr.Error()))
+			p.health.SetDeleteFailed(msgDelErr)
 			return
 		}
 		if p.metrics != nil {
@@ -242,7 +241,9 @@ func (r sqsProcessingResult) Done() {
 		// SQS message finished and deleted, finalize s3 objects
 		if finalizeErr := r.finalizeS3Objects(); finalizeErr != nil {
 			p.log.Errorf("failed finalizing message from SQS queue (manual cleanup is required): %v", finalizeErr.Error())
-			r.processor.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failed finalizing message from SQS queue. Manual cleanup is required. Error: %s", finalizeErr.Error()))
+			p.health.SetFinalizeFailed(finalizeErr)
+		} else {
+			p.health.ClearDisposition()
 		}
 		return
 	}
@@ -260,12 +261,12 @@ func (r sqsProcessingResult) Done() {
 		if msgDelErr := p.sqs.DeleteMessage(context.Background(), r.msg); msgDelErr != nil {
 			p.log.Errorf("failed processing SQS message (attempted to delete message): %v", processingErr.Error())
 			p.log.Errorf("failed deleting message from SQS queue (it may be reprocessed): %v", msgDelErr.Error())
-			r.processor.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failed an attempt to delete an unprocessable SQS message. Error: %s", msgDelErr.Error()))
+			p.health.SetDeleteFailed(msgDelErr)
 			return
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
 		p.log.Errorf("failed processing SQS message (message was deleted): %v", processingErr)
-		r.processor.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failed processing SQS message. Message was deleted. Processing error: %s", processingErr.Error()))
+		p.health.RecordPoisonPill(processingErr)
 		return
 	}
 
@@ -275,7 +276,6 @@ func (r sqsProcessingResult) Done() {
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
 	p.log.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %v", processingErr)
-	r.processor.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failed processing SQS message. Processing will be reattempted: %s", processingErr.Error()))
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, msg *types.Message) {
@@ -301,7 +301,6 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, m
 						log.Warnw("Failed to extend message visibility timeout "+
 							"because SQS receipt handle is no longer valid. "+
 							"Stopping SQS message keepalive routine.", "error", err)
-						p.status.UpdateStatus(status.Degraded, fmt.Sprintf("An attempt to reset the SQS visibility timeout failed, %s", err.Error()))
 						return
 					}
 				}
@@ -453,9 +452,7 @@ func (p *sqsS3EventProcessor) processS3Events(
 			err = fmt.Errorf(
 				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification): %w",
 				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events), err)
-			// This single error is intentional as to not overwhelm the reader of the status reporting
-			// with a long message. More detailed information can be found in logs.
-			p.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 event processing failure: %s", err.Error()))
+			p.health.SetProcessingError(err)
 			errs = append(errs, err)
 		} else {
 			finalizers = append(finalizers, s3Processor.FinalizeS3Object)

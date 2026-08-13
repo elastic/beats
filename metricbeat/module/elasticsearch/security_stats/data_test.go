@@ -130,17 +130,17 @@ func TestMetricSetFieldsJSONShape(t *testing.T) {
 	raw, err := json.Marshal(events[0].MetricSetFields)
 	require.NoError(t, err)
 
-	var doc map[string]interface{}
+	var doc map[string]any
 	require.NoError(t, json.Unmarshal(raw, &doc))
 
-	want := map[string]interface{}{
-		"dls": map[string]interface{}{
-			"cache": map[string]interface{}{
-				"entries":   map[string]interface{}{"count": float64(1)},
-				"memory":    map[string]interface{}{"bytes": float64(2)},
-				"hits":      map[string]interface{}{"count": float64(3), "time": map[string]interface{}{"ms": float64(6)}},
-				"misses":    map[string]interface{}{"count": float64(4), "time": map[string]interface{}{"ms": float64(7)}},
-				"evictions": map[string]interface{}{"count": float64(5)},
+	want := map[string]any{
+		"dls": map[string]any{
+			"cache": map[string]any{
+				"entries":   map[string]any{"count": float64(1)},
+				"memory":    map[string]any{"bytes": float64(2)},
+				"hits":      map[string]any{"count": float64(3), "time": map[string]any{"ms": float64(6)}},
+				"misses":    map[string]any{"count": float64(4), "time": map[string]any{"ms": float64(7)}},
+				"evictions": map[string]any{"count": float64(5)},
 			},
 		},
 	}
@@ -161,7 +161,7 @@ func TestEventShapeWithEnrichment(t *testing.T) {
 	require.Equal(t, 1, len(events))
 	event := events[0]
 
-	for path, want := range map[string]interface{}{
+	for path, want := range map[string]any{
 		"cluster.id":   info.ClusterID,
 		"cluster.name": info.ClusterName,
 		"node.id":      nodeID,

@@ -69,7 +69,7 @@ func detectEncodedText(data []byte) string {
 	if json.Valid(data) {
 		return "application/json"
 	}
-	if xml.Unmarshal(data, new(interface{})) == nil {
+	if xml.Unmarshal(data, new(any)) == nil {
 		return "text/xml"
 	}
 	return ""

@@ -92,7 +92,7 @@ func parseSockstat(path string) (SockStat, error) {
 		"RAW: inuse %d",
 		"FRAG: inuse %d memory %d",
 	}
-	scanfOut := [][]interface{}{
+	scanfOut := [][]any{
 		{&ss.SocketsUsed},
 		{&ss.TCPInUse, &ss.TCPOrphan, &ss.TCPTW, &ss.TCPAlloc, &ss.TCPMem},
 		{&ss.UDPInUse, &ss.UDPMem},

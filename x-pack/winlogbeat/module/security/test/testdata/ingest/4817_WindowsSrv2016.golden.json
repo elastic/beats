@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-08-17T12:49:09.4942066Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "object-audit-changed",

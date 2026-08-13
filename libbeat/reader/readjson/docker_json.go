@@ -153,8 +153,8 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	partial := false
 	if p.criflags {
 		// currently only P(artial) or F(ull) are available
-		tags := bytes.Split(log[i], []byte{':'})
-		for _, tag := range tags {
+		tags := bytes.SplitSeq(log[i], []byte{':'})
+		for tag := range tags {
 			if len(tag) == 1 && tag[0] == 'P' {
 				partial = true
 			}
@@ -308,4 +308,9 @@ func stripNewLineWin(msg *reader.Message) {
 
 func (p *DockerJSONReader) Close() error {
 	return p.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *DockerJSONReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
 }

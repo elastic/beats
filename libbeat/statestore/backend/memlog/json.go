@@ -48,6 +48,6 @@ func (e *jsonEncoder) reset() {
 	}
 }
 
-func (e *jsonEncoder) Encode(v interface{}) error {
+func (e *jsonEncoder) Encode(v any) error {
 	return e.folder.Fold(v)
 }

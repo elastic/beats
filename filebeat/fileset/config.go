@@ -37,9 +37,9 @@ type ModuleConfig struct {
 
 // FilesetConfig contains the configuration file options for a fileset
 type FilesetConfig struct {
-	Enabled *bool                  `config:"enabled"`
-	Var     map[string]interface{} `config:"var"`
-	Input   map[string]interface{} `config:"input"`
+	Enabled *bool          `config:"enabled"`
+	Var     map[string]any `config:"var"`
+	Input   map[string]any `config:"input"`
 }
 
 // NewFilesetConfig creates a new FilesetConfig from a conf.C.
@@ -61,8 +61,8 @@ func NewFilesetConfig(cfg *conf.C) (*FilesetConfig, error) {
 // be available for variable expansion in module configuration (e.g. it enables
 // the use of ${path.config} in module config).
 func mergePathDefaults(c *conf.C, beatPaths *paths.Path) (*conf.C, error) {
-	defaults := conf.MustNewConfigFrom(map[string]interface{}{
-		"path": map[string]interface{}{
+	defaults := conf.MustNewConfigFrom(map[string]any{
+		"path": map[string]any{
 			"home":   beatPaths.Home,
 			"config": "${path.home}",
 			"data":   filepath.Join("${path.home}", "data"),

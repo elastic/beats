@@ -213,22 +213,22 @@ func TestURLHostParserBuilder(t *testing.T) {
 	const rawURL = "http://example.com"
 
 	var cases = []struct {
-		config  map[string]interface{}
+		config  map[string]any
 		builder URLHostParserBuilder
 		url     string
 	}{
-		{map[string]interface{}{"path": "/path"}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/path"},
-		{map[string]interface{}{}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/default"},
-		{map[string]interface{}{}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/default"},
-		{map[string]interface{}{"username": "guest"}, URLHostParserBuilder{}, "http://guest@example.com"},
-		{map[string]interface{}{"username": "guest", "password": "secret"}, URLHostParserBuilder{}, "http://guest:secret@example.com"},
-		{map[string]interface{}{"password": "secret"}, URLHostParserBuilder{}, "http://:secret@example.com"},
-		{map[string]interface{}{"basepath": "/foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
-		{map[string]interface{}{"basepath": "foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
-		{map[string]interface{}{"basepath": "/foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
-		{map[string]interface{}{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
-		{map[string]interface{}{}, URLHostParserBuilder{DefaultPort: "9090"}, "http://example.com:9090"},
-		{map[string]interface{}{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/queryParams", QueryParams: mb.QueryParams{"key": "value"}.String()}, "http://example.com/foo/queryParams?key=value"},
+		{map[string]any{"path": "/path"}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/path"},
+		{map[string]any{}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/default"},
+		{map[string]any{}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/default"},
+		{map[string]any{"username": "guest"}, URLHostParserBuilder{}, "http://guest@example.com"},
+		{map[string]any{"username": "guest", "password": "secret"}, URLHostParserBuilder{}, "http://guest:secret@example.com"},
+		{map[string]any{"password": "secret"}, URLHostParserBuilder{}, "http://:secret@example.com"},
+		{map[string]any{"basepath": "/foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]any{"basepath": "foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]any{"basepath": "/foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]any{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]any{}, URLHostParserBuilder{DefaultPort: "9090"}, "http://example.com:9090"},
+		{map[string]any{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/queryParams", QueryParams: mb.QueryParams{"key": "value"}.String()}, "http://example.com/foo/queryParams?key=value"},
 	}
 
 	for _, test := range cases {

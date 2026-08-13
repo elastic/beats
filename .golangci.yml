@@ -20,6 +20,7 @@ linters:
     - importas
     - ineffassign
     - misspell
+    - modernize
     - nakedret
     - nilerr
     - noctx
@@ -119,6 +120,12 @@ linters:
         - G401
         - G501
         - G505
+    modernize:
+      # omitzero rewrites `,omitempty` struct tags to `,omitzero`, which changes
+      # JSON marshaling semantics for struct/array fields. It is not a mechanical,
+      # behavior-preserving fix, so keep it disabled.
+      disable:
+        - omitzero
     nolintlint:
       require-explanation: true
       require-specific: false

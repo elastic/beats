@@ -66,9 +66,7 @@ func (c *RlpListener) Start(ctx context.Context) {
 	}
 	es := rlpClient.Stream(ctx, l)
 
-	c.wg.Add(1)
-	go func() {
-		defer c.wg.Done()
+	c.wg.Go(func() {
 		for {
 			select {
 			case <-ctx.Done():
@@ -97,7 +95,7 @@ func (c *RlpListener) Start(ctx context.Context) {
 				}
 			}
 		}
-	}()
+	})
 }
 
 // Stop receiving events

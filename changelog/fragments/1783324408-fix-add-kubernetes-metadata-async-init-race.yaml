@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix a startup data race in the add_kubernetes_metadata processor
-component: libbeat

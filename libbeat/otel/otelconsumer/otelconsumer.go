@@ -132,8 +132,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
-			bo := backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
-			if !bo.Wait() {
+			bo := backoff.NewEqualJitterBackoff(out.retry.init, out.retry.max)
+			if !bo.Wait(ctx) {
 				batch.Cancelled()
 				return nil
 			}
@@ -314,11 +314,11 @@ func sanitizeDataStreamField(field, disallowed string, maxLength int) string {
 	return field
 }
 
-func tryToMapStr(v interface{}) (mapstr.M, bool) {
+func tryToMapStr(v any) (mapstr.M, bool) {
 	switch m := v.(type) {
 	case mapstr.M:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(m), true
 	default:
 		return nil, false

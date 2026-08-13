@@ -20,8 +20,73 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestCheckGroupFromEvent(t *testing.T) {
+	t.Run("reads monitor.check_group", func(t *testing.T) {
+		event := &beat.Event{Fields: mapstr.M{}}
+		_, err := event.PutValue("monitor.check_group", "abc-1")
+		require.NoError(t, err)
+		require.Equal(t, "abc-1", checkGroupFromEvent(event))
+	})
+
+	t.Run("empty when absent", func(t *testing.T) {
+		require.Empty(t, checkGroupFromEvent(&beat.Event{Fields: mapstr.M{}}))
+	})
+
+	t.Run("empty for nil event", func(t *testing.T) {
+		require.Empty(t, checkGroupFromEvent(nil))
+	})
+}
+
+func TestSyntheticsCrosslinkEnv(t *testing.T) {
+	tests := []struct {
+		name    string
+		traceID string
+		sFields stdfields.StdMonitorFields
+		want    []string
+	}{
+		{
+			name:    "all fields",
+			traceID: "trace-1",
+			sFields: stdfields.StdMonitorFields{
+				ID:      "monitor-1",
+				Type:    "browser",
+				RunFrom: &hbconfig.LocationWithID{ID: "us-east"},
+			},
+			want: []string{
+				"ELASTIC_SYNTHETICS_TRACE_ID=trace-1",
+				"ELASTIC_SYNTHETICS_MONITOR_ID=monitor-1",
+				"ELASTIC_SYNTHETICS_MONITOR_TYPE=browser",
+				"ELASTIC_SYNTHETICS_MONITOR_LOCATION=us-east",
+			},
+		},
+		{
+			name:    "omits empty values and nil location",
+			traceID: "",
+			sFields: stdfields.StdMonitorFields{Type: "browser"},
+			want:    []string{"ELASTIC_SYNTHETICS_MONITOR_TYPE=browser"},
+		},
+		{
+			name:    "nil when nothing is set",
+			traceID: "",
+			sFields: stdfields.StdMonitorFields{},
+			want:    nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, syntheticsCrosslinkEnv(tt.traceID, tt.sFields))
+		})
+	}
+}
 
 func TestLineToSynthEventFactory(t *testing.T) {
 	testType := "mytype"
@@ -132,6 +197,7 @@ func goCmd(args ...string) *exec.Cmd {
 	if goRoot != "" {
 		goBinary = filepath.Join(goRoot, "bin", "go")
 	}
+	//nolint:gosec,noctx // test helper invoking the go toolchain with controlled args
 	return exec.Command(goBinary, args...)
 }
 
@@ -199,7 +265,7 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 	t.Run("has a cmd status event", func(t *testing.T) {
 		stdoutEvents := eventsWithType(CmdStatus, synthEvents)
 		require.Len(t, stdoutEvents, 1)
-		require.Equal(t, synthEvents[0].Error.Code, "CMD_TIMEOUT")
+		require.Equal(t, "CMD_TIMEOUT", synthEvents[0].Error.Code)
 	})
 }
 
@@ -209,7 +275,7 @@ func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time
 	cmd.Dir = filepath.Join(cwd, "testcmd")
 	ctx := context.WithValue(context.TODO(), SynthexecTimeoutKey, cmdTimeout)
 
-	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{})
+	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent

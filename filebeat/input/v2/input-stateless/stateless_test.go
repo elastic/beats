@@ -50,8 +50,8 @@ func TestStateless_Run(t *testing.T) {
 		input := createConfiguredInput(t, constInputManager(&fakeStatelessInput{
 			OnRun: func(ctx v2.Context, publisher stateless.Publisher) error {
 				defer close(ch)
-				for i := 0; i < numEvents; i++ {
-					publisher.Publish(beat.Event{Fields: map[string]interface{}{"id": i}})
+				for i := range numEvents {
+					publisher.Publish(beat.Event{Fields: map[string]any{"id": i}})
 				}
 				return nil
 			},
@@ -59,11 +59,9 @@ func TestStateless_Run(t *testing.T) {
 
 		var err error
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = input.Run(v2.Context{}, connector)
-		}()
+		})
 
 		var receivedEvents int
 		for range ch {
@@ -126,11 +124,9 @@ func TestStateless_Run(t *testing.T) {
 
 		var wg sync.WaitGroup
 		var err error
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = input.Run(v2.Context{Cancelation: ctx}, connector)
-		}()
+		})
 
 		// signal and wait for shutdown
 		for !started.Load() {
@@ -178,7 +174,7 @@ func (f *fakeStatelessInput) Run(ctx v2.Context, publish stateless.Publisher) er
 	return errors.New("oops, run not implemented")
 }
 
-func createConfiguredInput(t *testing.T, manager stateless.InputManager, config map[string]interface{}) v2.Input {
+func createConfiguredInput(t *testing.T, manager stateless.InputManager, config map[string]any) v2.Input {
 	input, err := manager.Create(conf.MustNewConfigFrom(config))
 	require.NoError(t, err)
 	return input

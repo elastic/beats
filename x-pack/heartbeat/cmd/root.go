@@ -15,7 +15,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	ucfg "github.com/elastic/go-ucfg"
 
 	_ "github.com/elastic/beats/v7/heartbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
@@ -28,9 +30,23 @@ var RootCmd *cmd.BeatsRootCmd
 // heartbeatCfg is a callback registered via SetTransform that returns a Elastic Agent client.Unit
 // configuration generated from a raw Elastic Agent config
 func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	configList, err := management.CreateReloadConfigFromInputs(TransformRawIn(rawIn))
+	rawInputs := TransformRawIn(rawIn)
+
+	// Browser "params" keys may contain literal dots (e.g. "subdomain.example.com"),
+	// so extract them before the dot-expanding parse and restore them after.
+	// See https://github.com/elastic/beats/issues/51685
+	browserParams, err := extractBrowserParams(rawInputs)
+	if err != nil {
+		return nil, err
+	}
+
+	configList, err := management.CreateReloadConfigFromInputs(rawInputs)
 	if err != nil {
 		return nil, fmt.Errorf("error creating reloader config: %w", err)
+	}
+
+	if err := restoreBrowserParams(configList, browserParams); err != nil {
+		return nil, err
 	}
 
 	processors := agentInfoRule(agentInfo)
@@ -46,6 +62,49 @@ func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 	}
 
 	return unnestedList, nil
+}
+
+// streamRef locates a stream within the raw input list.
+type streamRef struct{ input, stream int }
+
+// extractBrowserParams removes "params" from every browser stream in rawInputs
+// and pre-parses them with PathSep("") so dotted keys are kept literal.
+// Note: it mutates rawInputs.
+func extractBrowserParams(rawInputs []map[string]interface{}) (map[streamRef]*conf.C, error) {
+	extracted := map[streamRef]*conf.C{}
+	for i, input := range rawInputs {
+		streams, _ := input["streams"].([]interface{})
+		for j, s := range streams {
+			stream, ok := s.(map[string]interface{})
+			if kind, _ := stream["type"].(string); !ok || kind != "browser" {
+				continue
+			}
+			if params, ok := stream["params"].(map[string]interface{}); ok {
+				parsed, err := ucfg.NewFrom(params, ucfg.PathSep(""))
+				if err != nil {
+					return nil, fmt.Errorf("error parsing browser params for stream %d: %w", j, err)
+				}
+				extracted[streamRef{i, j}] = (*conf.C)(parsed)
+				delete(stream, "params")
+			}
+		}
+	}
+	return extracted, nil
+}
+
+// restoreBrowserParams puts the extracted browser params back into the parsed
+// configs, preserving their literal dotted keys.
+func restoreBrowserParams(configList []*reload.ConfigWithMeta, params map[streamRef]*conf.C) error {
+	for ref, p := range params {
+		streamCfg, err := configList[ref.input].Config.Child("streams", ref.stream)
+		if err != nil {
+			return fmt.Errorf("error restoring browser params for stream %d: %w", ref.stream, err)
+		}
+		if err := streamCfg.SetChild("params", -1, p); err != nil {
+			return fmt.Errorf("error restoring browser params for stream %d: %w", ref.stream, err)
+		}
+	}
+	return nil
 }
 
 // TransformRawIn removes unwanted fields to keep consistent hashing on reload()

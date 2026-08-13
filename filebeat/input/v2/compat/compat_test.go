@@ -145,7 +145,7 @@ type: test
 			loader.Loader)
 
 		// run
-		err := factory.CheckConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		err := factory.CheckConfig(conf.MustNewConfigFrom(map[string]any{
 			"type": "unknown",
 		}))
 		assert.Error(t, err)
@@ -181,7 +181,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 			monitoring.NewRegistry(),
 			loader.Loader)
 
-		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
+		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]any{
 			"type": "test",
 		}))
 		require.NoError(t, err)
@@ -207,7 +207,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 			monitoring.NewRegistry(),
 			loader.Loader)
 
-		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
+		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]any{
 			"type": "test",
 		}))
 		require.NoError(t, err)
@@ -229,7 +229,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		factory := RunnerFactory(beat.Info{Logger: log}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
-		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
+		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]any{
 			"type": "unknown",
 		}))
 		assert.Nil(t, runner)

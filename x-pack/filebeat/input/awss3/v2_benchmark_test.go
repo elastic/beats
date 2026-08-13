@@ -95,7 +95,7 @@ func benchmarkInputSQSV2(t *testing.T, log *logp.Logger, workerCount int) testin
 			Processor:         processor,
 			Metrics:           metrics,
 			Log:               log.Named("sqs"),
-			Status:            &statusReporterHelperMock{},
+			Health:            newSQSHealth(&statusReporterHelperMock{}, logp.NewNopLogger()),
 		})
 
 		co := newConcurrencyObserver(concurrencyObserverConfig{

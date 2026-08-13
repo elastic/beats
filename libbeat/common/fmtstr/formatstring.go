@@ -28,7 +28,7 @@ import (
 type FormatEvaler interface {
 	// Eval will execute the format and writes the results into
 	// the provided output buffer. Returns error on failure.
-	Eval(ctx interface{}, out *bytes.Buffer) error
+	Eval(ctx any, out *bytes.Buffer) error
 }
 
 // StringFormatter interface extends FormatEvaler adding support for querying
@@ -37,7 +37,7 @@ type StringFormatter interface {
 	FormatEvaler
 
 	// Run execute the formatter returning the generated string.
-	Run(ctx interface{}) (string, error)
+	Run(ctx any) (string, error)
 
 	// IsConst returns true, if execution of formatter will always return the
 	// same constant string.
@@ -199,12 +199,12 @@ func optimize(in []FormatEvaler) []FormatEvaler {
 	return out
 }
 
-func (f constStringFormatter) Eval(_ interface{}, out *bytes.Buffer) error {
+func (f constStringFormatter) Eval(_ any, out *bytes.Buffer) error {
 	_, err := out.WriteString(f.s)
 	return err
 }
 
-func (f constStringFormatter) Run(_ interface{}) (string, error) {
+func (f constStringFormatter) Run(_ any) (string, error) {
 	return f.s, nil
 }
 
@@ -212,7 +212,7 @@ func (f constStringFormatter) IsConst() bool {
 	return true
 }
 
-func (f execStringFormatter) Eval(ctx interface{}, out *bytes.Buffer) error {
+func (f execStringFormatter) Eval(ctx any, out *bytes.Buffer) error {
 	for _, evaler := range f.evalers {
 		if err := evaler.Eval(ctx, out); err != nil {
 			return err
@@ -221,7 +221,7 @@ func (f execStringFormatter) Eval(ctx interface{}, out *bytes.Buffer) error {
 	return nil
 }
 
-func (f execStringFormatter) Run(ctx interface{}) (string, error) {
+func (f execStringFormatter) Run(ctx any) (string, error) {
 	buf := bytes.NewBuffer(nil)
 	if err := f.Eval(ctx, buf); err != nil {
 		return "", err
@@ -239,7 +239,7 @@ func (e StringElement) compile(ctx *compileCtx) (FormatEvaler, error) {
 
 // Eval write the string elements constant string value into
 // output buffer.
-func (e StringElement) Eval(_ interface{}, out *bytes.Buffer) error {
+func (e StringElement) Eval(_ any, out *bytes.Buffer) error {
 	_, err := out.WriteString(e.s)
 	return err
 }

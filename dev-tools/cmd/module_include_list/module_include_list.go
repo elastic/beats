@@ -173,7 +173,7 @@ func usageFlag() {
 	flag.PrintDefaults()
 }
 
-var Template = template.Must(template.New("normalizations").Funcs(map[string]interface{}{
+var Template = template.Must(template.New("normalizations").Funcs(map[string]any{
 	"trim": strings.TrimSpace,
 }).Parse(`
 {{ .License | trim }}

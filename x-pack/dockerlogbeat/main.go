@@ -51,7 +51,7 @@ func setDestroyLogsOnStop() (bool, error) {
 	return strconv.ParseBool(setting)
 }
 
-func fatal(format string, vs ...interface{}) {
+func fatal(format string, vs ...any) {
 	fmt.Fprintf(os.Stderr, format, vs...)
 	os.Exit(1)
 }

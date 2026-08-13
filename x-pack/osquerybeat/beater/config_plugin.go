@@ -365,6 +365,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err := config.ValidatePackQueriesAfterMerge(pack); err != nil {
 			return fmt.Errorf("osquery.packs[%q]: %w", packName, err)
 		}
+		if names := config.UnscheduledQueryNamesInNativePack(pack); len(names) > 0 {
+			p.log.Warnf("osquery.packs[%q]: queries %v have no interval or rrule_schedule; "+
+				"if a query name contains dots it is split by config parsing and the query will not run, rename it without dots", packName, names)
+		}
 	}
 
 	// Iterate inputs for Osquery configuration for backwards compatibility

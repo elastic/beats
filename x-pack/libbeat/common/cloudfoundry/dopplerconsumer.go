@@ -61,19 +61,15 @@ func (c *DopplerConsumer) Run() {
 	c.stop = make(chan struct{})
 
 	if c.callbacks.Log != nil {
-		c.wg.Add(1)
-		go func() {
-			defer c.wg.Done()
+		c.wg.Go(func() {
 			c.logsFirehose()
-		}()
+		})
 	}
 
 	if c.callbacks.Metric != nil {
-		c.wg.Add(1)
-		go func() {
-			defer c.wg.Done()
+		c.wg.Go(func() {
 			c.metricsFirehose()
-		}()
+		})
 	}
 
 	c.started = true

@@ -326,7 +326,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"packetbeat": map[string]any{
 				"interfaces": map[string]any{
 					"device": "lo0",
@@ -409,6 +409,9 @@ func TestReceiverStatus(t *testing.T) {
 		Status: componentstatus.NewEvent(componentstatus.StatusOK,
 			componentstatus.WithAttributes(inputStatusAttributes(
 				componentstatus.StatusOK.String(), "running packetbeat processor"))),
+		// packetbeat replays a pcap and finishes quickly, transitioning through
+		// StatusOK before the first poll tick; historical matching is required.
+		StatusMatchHistorical: true,
 	})
 }
 

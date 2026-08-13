@@ -300,7 +300,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"heartbeat": map[string]any{
 				"monitors": []map[string]any{
 					{

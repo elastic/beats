@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
 
@@ -666,7 +667,7 @@ func TestConfig(t *testing.T) {
 			if tc.expectedCfg == nil {
 				t.Fatal("missing expected config in test case")
 			}
-			assert.EqualValues(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.s3AccessPoint, tc.nonAWSS3Bucket), c)
+			assert.Equal(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.s3AccessPoint, tc.nonAWSS3Bucket), c)
 		})
 	}
 }
@@ -727,6 +728,169 @@ func TestIsValidAccessPointARN(t *testing.T) {
 			if result != tc.expected {
 				t.Errorf("expected %v, got %v for ARN: %s", tc.expected, result, tc.arn)
 			}
+		})
+	}
+}
+
+func TestS3ConfigModifierHostnameImmutable(t *testing.T) {
+	const endpoint = "https://obs.example.com"
+
+	testCases := []struct {
+		name             string
+		config           config
+		pathStyle        bool
+		wantImmutable    bool
+		wantUsePathStyle bool
+	}{
+		{
+			// Non-AWS S3-compatible storage with the default path_style: false
+			// must keep the hostname mutable so the SDK can use virtual-hosted
+			// addressing.
+			name:             "non-AWS bucket keeps hostname mutable",
+			config:           config{NonAWSBucketName: "my-non-aws-bucket", RegionName: "us-east-1"},
+			pathStyle:        false,
+			wantImmutable:    false,
+			wantUsePathStyle: false,
+		},
+		{
+			// Non-AWS bucket with path_style: true still ends up path-style,
+			// but the decision is delegated to UsePathStyle rather than forced
+			// via HostnameImmutable.
+			name:             "non-AWS bucket with path_style true",
+			config:           config{NonAWSBucketName: "my-non-aws-bucket", RegionName: "us-east-1"},
+			pathStyle:        true,
+			wantImmutable:    false,
+			wantUsePathStyle: true,
+		},
+		{
+			name:             "AWS bucket ARN keeps hostname immutable",
+			config:           config{BucketARN: "arn:aws:s3:::my-bucket"},
+			pathStyle:        false,
+			wantImmutable:    true,
+			wantUsePathStyle: false,
+		},
+		{
+			name:             "access point ARN keeps hostname immutable",
+			config:           config{AccessPointARN: "arn:aws:s3:us-east-1:123456789012:accesspoint/my-ap"},
+			pathStyle:        false,
+			wantImmutable:    true,
+			wantUsePathStyle: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			c := tc.config
+			c.AWSConfig.Endpoint = endpoint
+			c.PathStyle = tc.pathStyle
+
+			var o s3.Options
+			c.s3ConfigModifier(&o)
+
+			//nolint:staticcheck // s3ConfigModifier uses the deprecated EndpointResolver; test it as configured
+			require.NotNil(t, o.EndpointResolver, "endpoint resolver should be set when endpoint is configured")
+			//nolint:staticcheck // s3ConfigModifier uses the deprecated EndpointResolver; test it as configured
+			ep, err := o.EndpointResolver.ResolveEndpoint("us-east-1", s3.EndpointResolverOptions{})
+			require.NoError(t, err)
+
+			assert.Equal(t, tc.wantImmutable, ep.HostnameImmutable, "HostnameImmutable")
+			assert.Equal(t, tc.wantUsePathStyle, o.UsePathStyle, "UsePathStyle")
+		})
+	}
+}
+
+func TestBackupPrefixToExclude(t *testing.T) {
+	tests := []struct {
+		name string
+		cfg  config
+		want string
+	}{
+		{
+			name: "no backup configured",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "",
+			},
+			want: "",
+		},
+		{
+			name: "different bucket",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::other-bucket",
+					BackupToBucketPrefix: "processed/",
+				},
+			},
+			want: "",
+		},
+		{
+			name: "same bucket, empty list prefix",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::my-bucket",
+					BackupToBucketPrefix: "processed/",
+				},
+			},
+			want: "processed/",
+		},
+		{
+			name: "same bucket, backup prefix within list prefix scope",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "logs/",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::my-bucket",
+					BackupToBucketPrefix: "logs/processed/",
+				},
+			},
+			want: "logs/processed/logs/",
+		},
+		{
+			name: "same bucket, backup prefix outside list prefix scope",
+			cfg: config{
+				BucketARN:        "arn:aws:s3:::my-bucket",
+				BucketListPrefix: "logs/",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:::my-bucket",
+					BackupToBucketPrefix: "archived/",
+				},
+			},
+			want: "",
+		},
+		{
+			name: "same bucket via access point ARN",
+			cfg: config{
+				AccessPointARN:   "arn:aws:s3:us-east-1:123456789:accesspoint/ap",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					BackupToBucketArn:    "arn:aws:s3:us-east-1:123456789:accesspoint/ap",
+					BackupToBucketPrefix: "done/",
+				},
+			},
+			want: "done/",
+		},
+		{
+			name: "same non-AWS bucket",
+			cfg: config{
+				NonAWSBucketName: "minio-bucket",
+				BucketListPrefix: "",
+				BackupConfig: backupConfig{
+					NonAWSBackupToBucketName: "minio-bucket",
+					BackupToBucketPrefix:     "backup/",
+				},
+			},
+			want: "backup/",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.cfg.backupPrefixToExclude()
+			assert.Equal(t, tt.want, got, "backupPrefixToExclude() mismatch")
 		})
 	}
 }

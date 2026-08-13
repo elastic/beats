@@ -117,13 +117,13 @@ var processorCompatibilityChecks = []processorCompatibility{
 // Processor represents and Ingest Node processor definition.
 type Processor struct {
 	name   string
-	config map[string]interface{}
+	config map[string]any
 }
 
 // NewProcessor returns the representation of an Ingest Node processor
 // for the given configuration.
-func NewProcessor(raw interface{}) (p Processor, err error) {
-	rawAsMap, ok := raw.(map[string]interface{})
+func NewProcessor(raw any) (p Processor, err error) {
+	rawAsMap, ok := raw.(map[string]any)
 	if !ok {
 		return p, fmt.Errorf("processor is not an object, got %T", raw)
 	}
@@ -136,7 +136,7 @@ func NewProcessor(raw interface{}) (p Processor, err error) {
 		return p, fmt.Errorf("processor doesn't have exactly 1 key, got %d: %v", len(keys), keys)
 	}
 	p.name = keys[0]
-	if p.config, ok = rawAsMap[p.name].(map[string]interface{}); !ok {
+	if p.config, ok = rawAsMap[p.name].(map[string]any); !ok {
 		return p, fmt.Errorf("processor config is not an object, got %T", rawAsMap[p.name])
 	}
 	return p, nil
@@ -153,7 +153,7 @@ func (p *Processor) IsNil() bool {
 }
 
 // Config returns the processor configuration as a map.
-func (p *Processor) Config() map[string]interface{} {
+func (p *Processor) Config() map[string]any {
 	return p.config
 }
 
@@ -170,18 +170,18 @@ func (p *Processor) GetString(key string) (value string, ok bool) {
 }
 
 // GetList returns an array from the processor's configuration.
-func (p *Processor) GetList(key string) (value []interface{}, ok bool) {
-	value, ok = p.config[key].([]interface{})
+func (p *Processor) GetList(key string) (value []any, ok bool) {
+	value, ok = p.config[key].([]any)
 	return
 }
 
 // Set a flag in the processor's configuration.
-func (p *Processor) Set(key string, value interface{}) {
+func (p *Processor) Set(key string, value any) {
 	p.config[key] = value
 }
 
 // Get a flag from the processor's configuration.
-func (p *Processor) Get(key string) (value interface{}, ok bool) {
+func (p *Processor) Get(key string) (value any, ok bool) {
 	value, ok = p.config[key]
 	return
 }
@@ -192,8 +192,8 @@ func (p *Processor) Delete(key string) {
 }
 
 // ToMap returns the representation for the processor as a map.
-func (p *Processor) ToMap() map[string]interface{} {
-	return map[string]interface{}{
+func (p *Processor) ToMap() map[string]any {
+	return map[string]any{
 		p.name: p.config,
 	}
 }
@@ -210,7 +210,7 @@ func (p *Processor) String() string {
 // adaptPipelineForCompatibility iterates over all processors in the pipeline
 // and adapts them for version of Elasticsearch used. Adapt can mean modifying
 // processor options or removing the processor.
-func AdaptPipelineForCompatibility(esVersion version.V, pipelineID string, content map[string]interface{}, log *logp.Logger) (err error) {
+func AdaptPipelineForCompatibility(esVersion version.V, pipelineID string, content map[string]any, log *logp.Logger) (err error) {
 	log = log.With("pipeline_id", pipelineID)
 	// Adapt the main processors in the pipeline.
 	if err = adaptProcessorsForCompatibility(esVersion, content, "processors", false, log); err != nil {
@@ -220,7 +220,7 @@ func AdaptPipelineForCompatibility(esVersion version.V, pipelineID string, conte
 	return adaptProcessorsForCompatibility(esVersion, content, "on_failure", true, log)
 }
 
-func adaptProcessorsForCompatibility(esVersion version.V, content map[string]interface{}, section string, ignoreMissingsection bool, log *logp.Logger) (err error) {
+func adaptProcessorsForCompatibility(esVersion version.V, content map[string]any, section string, ignoreMissingsection bool, log *logp.Logger) (err error) {
 	p, ok := content[section]
 	if !ok {
 		if ignoreMissingsection {
@@ -229,12 +229,12 @@ func adaptProcessorsForCompatibility(esVersion version.V, content map[string]int
 		return fmt.Errorf("'%s' is missing from the pipeline definition", section)
 	}
 
-	processors, ok := p.([]interface{})
+	processors, ok := p.([]any)
 	if !ok {
 		return fmt.Errorf("'%s' expected to be a list, found %T", section, p)
 	}
 
-	var filteredProcs []interface{}
+	var filteredProcs []any
 	log = log.With("processors_section", section)
 
 nextProcessor:
@@ -256,7 +256,7 @@ nextProcessor:
 
 		// Adapt inner processor in case of foreach.
 		if inner, found := processor.Get("processor"); found && processor.Name() == "foreach" {
-			processor.Set("processor", []interface{}{inner})
+			processor.Set("processor", []any{inner})
 			if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "processor", false,
 				log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
 				return fmt.Errorf("cannot parse inner processor for foreach in section '%s' index %d: %w", section, i, err)
@@ -397,7 +397,7 @@ func replaceConvertIP(processor Processor, log *logp.Logger) (Processor, error) 
 	}
 	log.Debug("processor input=", processor.String())
 	processor.Delete("type")
-	var srcIf, dstIf interface{}
+	var srcIf, dstIf any
 	var found bool
 	if srcIf, found = processor.Get("field"); !found {
 		return Processor{}, errors.New("field option is required for convert processor")

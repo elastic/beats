@@ -101,7 +101,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	}
 
 	err = nil
-	for retries := 0; retries < 3; retries++ {
+	for range 3 {
 		err := start()
 		if err == nil {
 			break

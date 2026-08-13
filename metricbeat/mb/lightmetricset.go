@@ -30,9 +30,9 @@ type LightMetricSet struct {
 	Module  string
 	Default bool `config:"default"`
 	Input   struct {
-		Module    string      `config:"module" validate:"required"`
-		MetricSet string      `config:"metricset" validate:"required"`
-		Defaults  interface{} `config:"defaults"`
+		Module    string `config:"module" validate:"required"`
+		MetricSet string `config:"metricset" validate:"required"`
+		Defaults  any    `config:"defaults"`
 	} `config:"input" validate:"required"`
 	Processors processors.PluginConfig `config:"processors"`
 }

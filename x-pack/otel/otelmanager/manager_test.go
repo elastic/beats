@@ -19,12 +19,12 @@ import (
 // forwarding of RegisterAction/UnregisterAction.
 type fakeActionExtension struct {
 	registeredName   string
-	handler          func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)
+	handler          func(ctx context.Context, params map[string]any) (map[string]any, error)
 	unregisteredName string
 	registerErr      error
 }
 
-func (f *fakeActionExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]interface{}) (map[string]interface{}, error)) error {
+func (f *fakeActionExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]any) (map[string]any, error)) error {
 	f.registeredName = name
 	f.handler = handler
 	return f.registerErr
@@ -43,7 +43,7 @@ type fakeAction struct {
 
 func (a *fakeAction) Name() string { return a.name }
 
-func (a *fakeAction) Execute(_ context.Context, params map[string]interface{}) (map[string]interface{}, error) {
+func (a *fakeAction) Execute(_ context.Context, params map[string]any) (map[string]any, error) {
 	a.executed = true
 	return params, nil
 }
@@ -64,9 +64,9 @@ func TestOtelManager_RegisterAction(t *testing.T) {
 	assert.Equal(t, "osquerybeatreceiver/_agent-component/osquery-default/stream", ext.registeredName)
 	require.NotNil(t, ext.handler)
 
-	res, err := ext.handler(t.Context(), map[string]interface{}{"id": "abc"})
+	res, err := ext.handler(t.Context(), map[string]any{"id": "abc"})
 	require.NoError(t, err)
-	assert.Equal(t, map[string]interface{}{"id": "abc"}, res)
+	assert.Equal(t, map[string]any{"id": "abc"}, res)
 	assert.True(t, action.executed, "invoking the registered handler should execute the underlying action")
 
 	m.UnregisterAction(action)

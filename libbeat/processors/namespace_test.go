@@ -50,7 +50,7 @@ func TestNamespace(t *testing.T) {
 		err := ns.Register(test.name, newTestFilterRule)
 		fatalError(t, err)
 
-		cfg, _ := config.NewConfigFrom(map[string]interface{}{
+		cfg, _ := config.NewConfigFrom(map[string]any{
 			test.name: nil,
 		})
 
@@ -74,24 +74,24 @@ func TestNamespaceError(t *testing.T) {
 	tests := []struct {
 		title   string
 		factory Constructor
-		config  interface{}
+		config  any
 	}{
 		{
 			"no module configured",
 			newTestFilterRule,
-			map[string]interface{}{},
+			map[string]any{},
 		},
 		{
 			"unknown module configured",
 			newTestFilterRule,
-			map[string]interface{}{
+			map[string]any{
 				"notTest": nil,
 			},
 		},
 		{
 			"too many modules",
 			newTestFilterRule,
-			map[string]interface{}{
+			map[string]any{
 				"a":    nil,
 				"b":    nil,
 				"test": nil,
@@ -102,7 +102,7 @@ func TestNamespaceError(t *testing.T) {
 			func(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
 				return nil, errors.New("test")
 			},
-			map[string]interface{}{
+			map[string]any{
 				"test": nil,
 			},
 		},

@@ -96,7 +96,7 @@ func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Produc
 }
 
 func publishEvents(r *rand.Rand, p queue.Producer[publisher.Event], num int) {
-	for i := 0; i < num; i++ {
+	for range num {
 		e := makePublisherEvent(r)
 		_, ok := p.Publish(e)
 		if !ok {

@@ -61,7 +61,6 @@ func TestNewInputMonitor(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		testName := fmt.Sprintf("with_id=%v/with_input=%v/custom_parent=%v/public_metrics=%v",
 			tc.ID != "", tc.Input != "", tc.OptionalParent != nil, tc.PublicMetrics)
 

@@ -58,7 +58,7 @@ func (m mockModule) Config() mb.ModuleConfig {
 	}
 }
 
-func (m mockModule) UnpackConfig(to interface{}) error {
+func (m mockModule) UnpackConfig(to any) error {
 	return nil
 }
 

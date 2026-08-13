@@ -109,7 +109,6 @@ func TestAddFields(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			ps := make([]*processors.Processors, len(tc.cfg))
 			for i := range tc.cfg {

@@ -45,14 +45,14 @@ type Prospector interface {
 // StateMetadataUpdater updates and removes the state information for a given Source.
 type StateMetadataUpdater interface {
 	// FindCursorMeta retrieves and unpacks the cursor metadata of an entry of the given Source.
-	FindCursorMeta(s Source, v interface{}) error
+	FindCursorMeta(s Source, v any) error
 	// UpdateMetadata updates the source metadata of a registry entry of a given Source.
-	UpdateMetadata(s Source, v interface{}) error
+	UpdateMetadata(s Source, v any) error
 	// Remove marks a state for deletion of a given Source.
 	Remove(s Source) error
 	// ResetCursor resets the cursor in the registry and drops previous state
 	// updates that are not yet ACKed.
-	ResetCursor(s Source, cur interface{}) error
+	ResetCursor(s Source, cur any) error
 
 	// IterateOnPrefix iterates over all entries that match this input's prefix.
 	// The callback receives the key and cursor metadata for each entry.
@@ -85,7 +85,7 @@ type StoreUpdater interface {
 // Value contains the cursor metadata.
 type Value interface {
 	// UnpackCursorMeta returns the cursor metadata required by the prospector.
-	UnpackCursorMeta(to interface{}) error
+	UnpackCursorMeta(to any) error
 
 	// Key return the registry's key for this resource
 	Key() string

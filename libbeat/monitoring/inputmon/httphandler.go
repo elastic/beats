@@ -20,6 +20,7 @@ package inputmon
 import (
 	"encoding/json"
 	"errors"
+	"maps"
 	"net/http"
 	"strings"
 
@@ -86,9 +87,7 @@ func filteredSnapshot(
 	// 1st collect all input metrics.
 	inputs := inputMetricsFromRegistry(global)
 	// If there is an id collision, metrics in the local registry take precedence
-	for id, value := range inputMetricsFromRegistry(local) {
-		inputs[id] = value
-	}
+	maps.Copy(inputs, inputMetricsFromRegistry(local))
 
 	// Now collect all that match the requested type
 	selected := make([]map[string]any, 0)

@@ -35,7 +35,7 @@ func (m *mode) Unpack(s string) error {
 	return fmt.Errorf("invalid mode type %q for "+procName, s)
 }
 
-func (m *mode) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (m *mode) UnmarshalYAML(unmarshal func(any) error) error {
 	var str string
 	if err := unmarshal(&str); err != nil {
 		return err
@@ -117,13 +117,13 @@ func parseFormat(format string) ([]vpcFlowField, error) {
 
 type formats []string
 
-func (f *formats) Unpack(value interface{}) error {
+func (f *formats) Unpack(value any) error {
 	switch v := value.(type) {
 	case string:
 		*f = []string{v}
 	case []string:
 		*f = v
-	case []interface{}:
+	case []any:
 		list := make([]string, 0, len(v))
 		for _, ifc := range v {
 			s, ok := ifc.(string)

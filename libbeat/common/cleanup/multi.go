@@ -17,6 +17,8 @@
 
 package cleanup
 
+import "slices"
+
 // FailClean keeps track of functions to be executed of FailClean did
 // not receive a success signal.
 type FailClean struct {
@@ -40,7 +42,7 @@ func (f *FailClean) Cleanup() {
 		return
 	}
 
-	for i := len(f.fns) - 1; i >= 0; i-- {
-		f.fns[i]()
+	for _, v := range slices.Backward(f.fns) {
+		v()
 	}
 }

@@ -142,7 +142,7 @@ func readCountResult(obj []byte) (*CountResults, error) {
 func (conn *Connection) Index(
 	index, docType, id string,
 	params map[string]string,
-	body interface{},
+	body any,
 ) (int, *QueryResult, error) {
 	method := "PUT"
 	if id == "" {
@@ -155,7 +155,7 @@ func (conn *Connection) Index(
 func (conn *Connection) Ingest(
 	index, docType, pipeline, id string,
 	params map[string]string,
-	body interface{},
+	body any,
 ) (int, *QueryResult, error) {
 	method := "PUT"
 	if id == "" {
@@ -173,7 +173,7 @@ func (conn *Connection) Refresh(index string) (int, *QueryResult, error) {
 // CreateIndex creates a new index, optionally with settings and mappings passed in
 // the body.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
-func (conn *Connection) CreateIndex(index string, body interface{}) (int, *QueryResult, error) {
+func (conn *Connection) CreateIndex(index string, body any) (int, *QueryResult, error) {
 	return withQueryResult(conn.apiCall("PUT", index, "", "", "", nil, body))
 }
 
@@ -205,7 +205,7 @@ func (conn *Connection) PipelineExists(id string) (bool, error) {
 func (conn *Connection) CreatePipeline(
 	id string,
 	params map[string]string,
-	body interface{},
+	body any,
 ) (int, *QueryResult, error) {
 	return withQueryResult(conn.apiCall("PUT", "_ingest", "pipeline", id, "", params, body))
 }
@@ -231,7 +231,7 @@ func (conn *Connection) SearchURIWithBody(
 	index string,
 	docType string,
 	params map[string]string,
-	body interface{},
+	body any,
 ) (int, *SearchResults, error) {
 	if !conn.version.LessThan(&version.V{Major: 8}) {
 		docType = ""
@@ -260,7 +260,7 @@ func (conn *Connection) CountSearchURI(
 func (conn *Connection) apiCall(
 	method, index, docType, id, pipeline string,
 	params map[string]string,
-	body interface{},
+	body any,
 ) (int, []byte, error) {
 	path, err := makePath(index, docType, id)
 	if err != nil {

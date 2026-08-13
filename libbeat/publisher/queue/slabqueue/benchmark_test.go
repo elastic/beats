@@ -125,7 +125,7 @@ func BenchmarkSlabQueuePool(b *testing.B) {
 
 			queues := make([]queue.Queue[benchEvent], m)
 			producers := make([]queue.Producer[benchEvent], m)
-			for i := 0; i < m; i++ {
+			for i := range m {
 				queues[i] = pool.Connect()
 				producers[i] = queues[i].Producer(queue.ProducerConfig{})
 			}
@@ -158,7 +158,6 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 	var consumerWG sync.WaitGroup
 	consumerWG.Add(len(consumerQueues))
 	for _, q := range consumerQueues {
-		q := q
 		go func() {
 			defer consumerWG.Done()
 			for {
@@ -182,11 +181,11 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 
 	var producerWG sync.WaitGroup
 	producerWG.Add(m)
-	for i := 0; i < m; i++ {
+	for i := range m {
 		prod := producers[i]
 		go func() {
 			defer producerWG.Done()
-			for j := 0; j < perProducer; j++ {
+			for j := range perProducer {
 				prod.Publish(benchEvent{id: j})
 			}
 		}()

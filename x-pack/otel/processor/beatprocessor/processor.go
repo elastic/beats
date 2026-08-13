@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"go.opentelemetry.io/collector/component"
 
@@ -23,9 +24,25 @@ import (
 	"go.uber.org/zap"
 )
 
+// allowedProcessors is the list of Beat processor names that may be configured
+// in the OTel Beat processor.
+var allowedProcessors = []string{
+	"add_cloud_metadata",
+	"add_docker_metadata",
+	"add_fields",
+	"add_host_metadata",
+	"add_kubernetes_metadata",
+	"detect_mime_type",
+	"drop_fields",
+}
+
 type beatProcessor struct {
 	logger     *zap.Logger
 	processors []beat.Processor
+	// pdataProcs is non-nil only when every processor in the chain implements
+	// processors.PdataProcessor. When set, ConsumeLogs takes the zero-copy
+	// pdata fast path; otherwise it falls back to a single legacy round-trip.
+	pdataProcs []processors.PdataProcessor
 }
 
 func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, error) {
@@ -50,7 +67,33 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 		}
 	}
 
+	bp.pdataProcs = buildPdataProcs(bp.processors)
+	if bp.pdataProcs == nil && len(bp.processors) > 0 {
+		var legacy []string
+		for _, p := range bp.processors {
+			if _, ok := p.(processors.PdataProcessor); !ok {
+				legacy = append(legacy, p.String())
+			}
+		}
+		bp.logger.Warn("pdata fast path disabled: processor(s) lack RunPdata, falling back to legacy round-trip per event",
+			zap.Strings("legacy_processors", legacy))
+	}
+
 	return bp, nil
+}
+
+// buildPdataProcs returns a typed slice of PdataProcessor when every proc in
+// the list implements the interface, or nil if any one does not.
+func buildPdataProcs(procs []beat.Processor) []processors.PdataProcessor {
+	pdataProcs := make([]processors.PdataProcessor, 0, len(procs))
+	for _, p := range procs {
+		pp, ok := p.(processors.PdataProcessor)
+		if !ok {
+			return nil
+		}
+		pdataProcs = append(pdataProcs, pp)
+	}
+	return pdataProcs
 }
 
 // createProcessor creates a Beat processor using the provided configuration.
@@ -78,9 +121,7 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
 		}
 
-		switch processorName {
-		case "add_host_metadata", "add_cloud_metadata", "add_docker_metadata", "add_kubernetes_metadata", "add_fields":
-		default:
+		if !slices.Contains(allowedProcessors, processorName) {
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
 
@@ -125,31 +166,65 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 
 	for _, resourceLogs := range logs.ResourceLogs().All() {
 		for _, scopeLogs := range resourceLogs.ScopeLogs().All() {
-			for _, logRecord := range scopeLogs.LogRecords().All() {
-				beatEvent, err := unpackBeatEventFromOTelLogRecord(logRecord)
+			scopeLogs.LogRecords().RemoveIf(func(logRecord plog.LogRecord) bool {
+				var (
+					drop bool
+					err  error
+				)
+				if p.pdataProcs != nil {
+					drop, err = p.consumeLogRecordPdata(logRecord)
+				} else {
+					drop, err = p.consumeLogRecordLegacy(logRecord)
+				}
 				if err != nil {
-					p.logger.Error("error converting OTel log to Beat event", zap.Error(err))
-					continue
+					p.logger.Error("error processing Beat event", zap.Error(err))
+					return false
 				}
-
-				for _, processor := range p.processors {
-					processedEvent, err := processor.Run(beatEvent)
-					if err != nil {
-						p.logger.Error("error processing Beat event", zap.Error(err))
-						continue
-					}
-					beatEvent = processedEvent
-				}
-
-				packingError := packBeatEventIntoOTelLogRecord(beatEvent, logRecord)
-				if packingError != nil {
-					p.logger.Error("error converting processed Beat event to OTel log record", zap.Error(packingError))
-				}
-			}
+				return drop
+			})
 		}
 	}
 
 	return logs, nil
+}
+
+// consumeLogRecordPdata runs all processors directly on the log record's
+// pcommon.Map body, with no round-trip to mapstr. It is only called when
+// every processor in the chain implements processors.PdataProcessor.
+func (p *beatProcessor) consumeLogRecordPdata(logRecord plog.LogRecord) (bool, error) {
+	body := logRecord.Body().Map()
+	for _, proc := range p.pdataProcs {
+		drop, err := proc.RunPdata(body)
+		if err != nil {
+			return false, err
+		}
+		if drop {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// consumeLogRecordLegacy unpacks the log record into a beat.Event, runs every
+// processor via Run, then packs the result back. It is used when at least one
+// processor in the chain does not implement processors.PdataProcessor, so the
+// entire chain pays a single round-trip rather than a per-processor one.
+func (p *beatProcessor) consumeLogRecordLegacy(logRecord plog.LogRecord) (bool, error) {
+	event, err := unpackBeatEventFromOTelLogRecord(logRecord)
+	if err != nil {
+		return false, err
+	}
+	for _, proc := range p.processors {
+		out, err := proc.Run(event)
+		if err != nil {
+			return false, err
+		}
+		if out == nil {
+			return true, nil
+		}
+		event = out
+	}
+	return false, packBeatEventIntoOTelLogRecord(event, logRecord)
 }
 
 func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, error) {
@@ -157,12 +232,34 @@ func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, er
 	beatEvent.Timestamp = logRecord.Timestamp().AsTime()
 
 	beatEvent.Meta = mapstr.M{}
-
 	beatEvent.Fields = otelmap.ToMapstr(logRecord.Body().Map())
+
+	// otelconsumer serializes beat.Event.Meta into the pdata body under the
+	// "@metadata" key. Extract it into event.Meta so that processors using
+	// the @metadata target (e.g. add_fields with target:"@metadata") see and
+	// can modify the correct field.
+	if raw, err := beatEvent.Fields.GetValue("@metadata"); err == nil {
+		switch m := raw.(type) {
+		case mapstr.M:
+			beatEvent.Meta = m
+		case map[string]any:
+			beatEvent.Meta = mapstr.M(m)
+		}
+		_ = beatEvent.Fields.Delete("@metadata")
+	}
 
 	return beatEvent, nil
 }
 
 func packBeatEventIntoOTelLogRecord(beatEvent *beat.Event, logRecord plog.LogRecord) error {
+	// Write Meta back under "@metadata" so it survives the round-trip.
+	if len(beatEvent.Meta) > 0 {
+		if beatEvent.Fields == nil {
+			beatEvent.Fields = mapstr.M{}
+		}
+		beatEvent.Fields["@metadata"] = beatEvent.Meta
+	}
+
+	logRecord.Body().Map().Clear()
 	return otelmap.FromMapstr(logRecord.Body().Map(), beatEvent.Fields)
 }
