@@ -54,6 +54,8 @@ func TestStoreCache_AcquireHit(t *testing.T) {
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 2, entry.users)
 	require.Same(t, first, entry.store)
+	require.NotNil(t, entry.ackCH)
+	require.NotNil(t, entry.ackUpdater)
 	require.Equal(t, 1, storeCacheEntryCount())
 	require.Eventually(t, func() bool {
 		return logs.FilterMessage("filestream shared store cleaner started").Len() == 1
@@ -348,10 +350,12 @@ type countingStateStore struct {
 }
 
 type cacheEntrySnapshot struct {
-	found bool
-	state storeCacheState
-	users int
-	store *store
+	found      bool
+	state      storeCacheState
+	users      int
+	store      *store
+	ackCH      *updateChan
+	ackUpdater *updateWriter
 }
 
 func snapshotStoreCacheEntry(key string) cacheEntrySnapshot {
@@ -363,10 +367,12 @@ func snapshotStoreCacheEntry(key string) cacheEntrySnapshot {
 		return cacheEntrySnapshot{}
 	}
 	return cacheEntrySnapshot{
-		found: true,
-		state: entry.state,
-		users: entry.users,
-		store: entry.store,
+		found:      true,
+		state:      entry.state,
+		users:      entry.users,
+		store:      entry.store,
+		ackCH:      entry.ackCH,
+		ackUpdater: entry.ackUpdater,
 	}
 }
 

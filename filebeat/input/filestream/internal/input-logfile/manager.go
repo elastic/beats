@@ -18,7 +18,6 @@
 package input_logfile
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -69,13 +68,13 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
-	initOnce   sync.Once
-	initErr    error
-	store      *store
-	ackUpdater *updateWriter
-	ackCH      *updateChan
-	idsMux     sync.Mutex
-	ids        map[string]struct{}
+	initOnce  sync.Once
+	closeOnce sync.Once
+	initErr   error
+	store     *store
+	ackCH     *updateChan
+	idsMux    sync.Mutex
+	ids       map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -109,36 +108,21 @@ func (cim *InputManager) Init(group unison.Group) error {
 		}
 
 		cim.store = store
-		cim.ackCH = newUpdateChan()
-		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
+		cim.ackCH = store.cacheEntry.ackCH
 		cim.ids = map[string]struct{}{}
-
-		// TL;DR: If Filebeat shuts down too quickly, the function passed to
-		// group.Go will never run, therefore this manager's store acquisition
-		// would never be released. Wait until the shutdown waiter is running.
-		// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
-		// for context from the old implementation.
-		waitRunning := make(chan struct{})
-		err := group.Go(func(canceler context.Context) error {
-			waitRunning <- struct{}{}
-			<-canceler.Done()
-			cim.shutdown()
-			return nil
-		})
-		if err != nil {
-			cim.shutdown()
-			cim.initErr = fmt.Errorf("can not start input manager shutdown waiter: %w", err)
-			return
-		}
-		<-waitRunning
 	})
 
 	return cim.initErr
 }
 
-func (cim *InputManager) shutdown() {
-	cim.ackUpdater.Close()
-	releaseAcquiredStore(cim.Logger, cim.store)
+// Close releases the store acquired by Init. It must be called after all inputs
+// managed by cim have stopped.
+func (cim *InputManager) Close() {
+	cim.closeOnce.Do(func() {
+		if cim.store != nil {
+			releaseAcquiredStore(cim.Logger, cim.store)
+		}
+	})
 }
 
 // Create builds a new v2.Input using the provided Configure function.

@@ -583,7 +583,10 @@ func createFilestreamTestRunner(b testing.TB, logger *logp.Logger, testID string
 	p := Plugin(logger, createTestStore(b))
 	var group unison.TaskGroup
 	require.NoError(b, p.Manager.Init(&group))
-	b.Cleanup(func() { require.NoError(b, group.Stop()) })
+	b.Cleanup(func() {
+		require.NoError(b, group.Stop())
+		p.Manager.(*loginp.InputManager).Close()
+	})
 	input, err := p.Manager.Create(c)
 	require.NoError(b, err)
 

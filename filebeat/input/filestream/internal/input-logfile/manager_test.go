@@ -450,14 +450,22 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 	}
 	first, second := newManager(), newManager()
 	var firstGroup, secondGroup unison.TaskGroup
-	t.Cleanup(func() { _ = firstGroup.Stop() })
-	t.Cleanup(func() { _ = secondGroup.Stop() })
+	t.Cleanup(func() {
+		_ = firstGroup.Stop()
+		first.Close()
+	})
+	t.Cleanup(func() {
+		_ = secondGroup.Stop()
+		second.Close()
+	})
 
 	require.NoError(t, first.Init(&firstGroup))
 	require.NoError(t, second.Init(&secondGroup))
 	require.Same(t, first.store, second.store)
+	require.Same(t, first.ackCH, second.ackCH)
 
 	require.NoError(t, firstGroup.Stop())
+	first.Close()
 	entry := snapshotStoreCacheEntry(states.StoreKey())
 	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
@@ -465,6 +473,7 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 	require.Same(t, second.store, entry.store)
 
 	require.NoError(t, secondGroup.Stop())
+	second.Close()
 }
 
 func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
@@ -477,7 +486,10 @@ func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
 		Type:       "filestream",
 	}
 	var group unison.TaskGroup
-	t.Cleanup(func() { _ = group.Stop() })
+	t.Cleanup(func() {
+		_ = group.Stop()
+		manager.Close()
+	})
 
 	const initializers = 10
 	errs := make(chan error, initializers)
@@ -498,8 +510,8 @@ func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
 	require.Equal(t, 1, entry.users)
 	require.Same(t, manager.store, entry.store)
 
-	// A duplicate shutdown waiter would attempt a second release here, which causes a panic
 	require.NoError(t, group.Stop())
+	manager.Close()
 }
 
 func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
@@ -517,7 +529,6 @@ func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
 	require.Zero(t, states.storeForCalls.Load())
 	require.Nil(t, manager.store)
 	require.Nil(t, manager.ackCH)
-	require.Nil(t, manager.ackUpdater)
 
 	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
 }
@@ -530,7 +541,10 @@ func initInputManager(t *testing.T, cim *InputManager) {
 	}
 	var group unison.TaskGroup
 	require.NoError(t, cim.Init(&group))
-	t.Cleanup(func() { require.NoError(t, group.Stop()) })
+	t.Cleanup(func() {
+		require.NoError(t, group.Stop())
+		cim.Close()
+	})
 }
 
 // TestInputManager_Create_BackoffConfig asserts InputManager.Create wires the

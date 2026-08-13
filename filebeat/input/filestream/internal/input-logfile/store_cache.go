@@ -46,6 +46,8 @@ type storeCacheEntry struct {
 	closedOnce sync.Once
 	initErr    error
 	store      *store
+	ackCH      *updateChan
+	ackUpdater *updateWriter
 	users      int
 	cancel     context.CancelFunc
 	cleanerWg  sync.WaitGroup
@@ -142,6 +144,7 @@ func initializeStoreCacheEntry(
 	ctx, cancel := context.WithCancel(context.Background())
 	entry.cleanerWg.Add(1)
 	s.onClose = func() { globalStoreCache.storeClosed(key, entry) }
+	entry.ackCH = newUpdateChan()
 
 	globalStoreCache.mu.Lock()
 	if globalStoreCache.entries[key] != entry || entry.initErr != nil {
@@ -166,6 +169,7 @@ func initializeStoreCacheEntry(
 		"store_users_count", 1,
 	)
 
+	entry.ackUpdater = newUpdateWriter(s, entry.ackCH)
 	go func() {
 		defer entry.cleanerWg.Done()
 		defer entry.store.Release()
@@ -202,6 +206,7 @@ func releaseAcquiredStore(logger *logp.Logger, s *store) {
 	logger.Debug("draining filestream shared store")
 	entry.cancel()
 	entry.cleanerWg.Wait()
+	entry.ackUpdater.Close()
 	s.Release()
 	logger.Debugw("released filestream shared store", "store_users_count", users)
 }

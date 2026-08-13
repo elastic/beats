@@ -125,7 +125,10 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
-		defer func() { _ = grp.Stop() }()
+		defer func() {
+			_ = grp.Stop()
+			e.getManager().(*loginp.InputManager).Close()
+		}()
 
 		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
