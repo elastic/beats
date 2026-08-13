@@ -81,7 +81,7 @@ func TestFilebeatTakeOverAfterRestart(t *testing.T) {
 	)
 	tempDir := filebeat.TempDir()
 	logFile := filepath.Join(tempDir, "log.log")
-	integration.WriteLogFile(t, logFile, batchSize, false)
+	integration.WriteLogFile(t, logFile, batchSize, false, "Log input event")
 
 	tmpl := template.Must(template.New("log-Cfg").Parse(takeOverBaseCfg))
 	cfg := strings.Builder{}
@@ -115,7 +115,7 @@ func TestFilebeatTakeOverAfterRestart(t *testing.T) {
 	require.NoError(t, err, "failed to locate registry backups")
 	require.NotEmpty(t, registryBackup, "takeover did not create a registry backup")
 
-	integration.WriteLogFile(t, logFile, batchSize, false, "second run")
+	integration.WriteLogFile(t, logFile, batchSize, true, "Filestream event")
 
 	totalEvents := batchSize * 2
 	filebeat.WaitPublishedEvents(30*time.Second, totalEvents)
@@ -126,13 +126,13 @@ func TestFilebeatTakeOverAfterRestart(t *testing.T) {
 
 	// First events are from the Log input
 	for i := range batchSize {
-		if events[i].Input.Type != "log" {
+		if events[i].Input.Type != "log" && events[i].Message == "Log input event" {
 			t.Errorf("Event %02d is not from the Log input", i)
 		}
 	}
 
 	for i := batchSize; i < totalEvents; i++ {
-		if events[i].Input.Type != "filestream" {
+		if events[i].Input.Type != "filestream" && events[i].Message == "Filestream input event" {
 			t.Errorf("Event %02d is not from the Filestream input", i)
 		}
 	}
