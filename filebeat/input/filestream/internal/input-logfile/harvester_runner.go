@@ -32,10 +32,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// pollGracePeriod bounds how long the waker waits inline for a single Poll
-// (typically a stat()) before moving on to the next due source. It is well
-// above normal stat() latency even under load, so a healthy poll always
-// finishes within it; see pollWithGracePeriod.
+// pollGracePeriod bounds how long an input's poll chain waits for one due source
+// to finish polling (typically a stat()) before moving on to the next. It is well
+// above normal stat() latency even under load, so a healthy poll always finishes
+// within it; see pollWithGracePeriod.
 const pollGracePeriod = 100 * time.Millisecond
 
 // defaultStuckHarvesterGrace bounds how long StopHarvesters waits for cancelled
@@ -78,6 +78,8 @@ const (
 // handle (in the session) stays open while it is being harvested, but it only
 // has a goroutine while it is actively reading.
 type sourceState struct {
+	runner *harvesterRunner
+
 	srcID   string
 	src     Source
 	session HarvesterSession
@@ -113,8 +115,12 @@ type sourceState struct {
 // files: sources holding a file descriptor, whether actively reading or parked.
 // A source that cannot get an open slot is queued and promoted (FIFO) when an
 // open file closes, so the fd count never exceeds the limit; 0 (the default) is
-// unbounded.
+// unbounded. The limit is per input: the engine shares scheduling, not the file
+// descriptor budget.
 type harvesterRunner struct {
+	engine        *engine
+	releaseEngine func()
+
 	pipeline     beat.PipelineConnector
 	harvester    Harvester
 	cleanTimeout time.Duration
@@ -156,17 +162,16 @@ type harvesterRunner struct {
 	mParked  *monitoring.Uint // sources parked, watched by the waker
 	mWaiting *monitoring.Uint // sources queued, waiting for an open slot
 
-	mu     sync.Mutex
+	// mu points at the engine's mutex, which guards this runner's scheduling
+	// state as well as the engine's parked heap; see engine.mu.
+	mu     *sync.Mutex
 	states map[string]*sourceState
 	closed bool
 	// draining is set during a read_until_eof shutdown: while it is true a reader
 	// that catches up to EOF tears its source down instead of parking it.
 	draining bool
-	// parked is a min-heap of parked sources keyed by nextCheck, so the waker
-	// processes only the sources that are actually due instead of scanning every
-	// source each tick. nActive/nParked track the gauge counts incrementally to
-	// avoid recounting under the lock. All guarded by mu.
-	parked  sourceHeap
+	// nActive/nParked track the gauge counts incrementally to avoid recounting
+	// under the lock. Guarded by mu.
 	nActive int
 	nParked int
 	// nOpen counts sources holding an open slot (an open fd, reading or parked).
@@ -177,38 +182,19 @@ type harvesterRunner struct {
 	waiting  []*sourceState
 	nWaiting int
 
-	wakerCh chan struct{}
-	wg      sync.WaitGroup
-}
+	// pollQueue holds the due sources the scheduler has handed to this input, and
+	// polling reports whether a chain is draining them. At most one chain runs per
+	// input, so an input's polls happen in turn while inputs poll concurrently
+	// with one another. Guarded by mu. See enqueuePoll.
+	pollQueue []*sourceState
+	polling   bool
 
-// parkedEntry is one scheduled poll of a source. Entries are immutable: when a
-// source is re-parked it gets a fresh entry, and an entry whose due time no
-// longer matches the source's nextCheck (re-parked or torn down) is stale and
-// skipped when popped.
-type parkedEntry struct {
-	state *sourceState
-	due   time.Time
-}
-
-type sourceHeap []*parkedEntry
-
-func (h sourceHeap) Len() int           { return len(h) }
-func (h sourceHeap) Less(i, j int) bool { return h[i].due.Before(h[j].due) }
-func (h sourceHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h *sourceHeap) Push(x any) {
-	e, _ := x.(*parkedEntry)
-	*h = append(*h, e)
-}
-func (h *sourceHeap) Pop() any {
-	old := *h
-	n := len(old)
-	e := old[n-1]
-	old[n-1] = nil
-	*h = old[:n-1]
-	return e
+	wg sync.WaitGroup
 }
 
 func newHarvesterRunner(
+	engine *engine,
+	releaseEngine func(),
 	ctx inputv2.Context,
 	harvesterLimit uint64,
 	pipeline beat.PipelineConnector,
@@ -224,6 +210,9 @@ func newHarvesterRunner(
 	stateCheckInterval time.Duration,
 ) *harvesterRunner {
 	g := &harvesterRunner{
+		engine:             engine,
+		releaseEngine:      releaseEngine,
+		mu:                 &engine.mu,
 		pipeline:           pipeline,
 		harvester:          harvester,
 		cleanTimeout:       cleanTimeout,
@@ -239,7 +228,6 @@ func newHarvesterRunner(
 		harvesterLimit:     harvesterLimit,
 		ctx:                ctx,
 		states:             map[string]*sourceState{},
-		wakerCh:            make(chan struct{}, 1),
 	}
 
 	if reg := ctx.MetricsRegistry; reg != nil {
@@ -251,15 +239,15 @@ func newHarvesterRunner(
 	return g
 }
 
-// start launches the waker goroutine. Reader goroutines are created on demand as
-// sources become ready.
+// start makes this runner ready to be scheduled.
 func (g *harvesterRunner) start() {
+	g.engine.start()
+
 	if g.harvesterLimit > 0 {
 		g.ctx.Logger.Infof("starting filestream harvester (max %d open files)", g.harvesterLimit)
 	} else {
 		g.ctx.Logger.Info("starting filestream harvester (unlimited open files)")
 	}
-	g.wg.Go(g.waker)
 }
 
 func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c }
@@ -410,6 +398,9 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 
 	client, err := g.pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: newInputACKHandler(g.ackCH),
+		Processing: beat.ProcessingConfig{
+			NormalizeInPlace: true,
+		},
 	})
 	if err != nil {
 		releaseResource(resource)
@@ -509,6 +500,7 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", src.LogPath())
 
 	state := &sourceState{
+		runner: g,
 		srcID:  srcID,
 		src:    src,
 		ctx:    ctx,
@@ -559,52 +551,6 @@ func (g *harvesterRunner) promoteLocked() *sourceState {
 	return nil
 }
 
-// waker evaluates parked sources as they come due: it resumes those with new
-// data (by spawning a reader), re-parks those still idle, and tears down those
-// that hit a close condition. It pops only due sources from the parked min-heap
-// (rather than scanning every source) and sleeps until the next one is due. It is
-// the single goroutine that applies the read backoff and the close-condition
-// checks for every parked source.
-func (g *harvesterRunner) waker() {
-	for {
-		g.mu.Lock()
-		if g.closed {
-			g.mu.Unlock()
-			return
-		}
-		due := g.popDue(time.Now())
-		g.publishGauges()
-		var next time.Time
-		hasNext := g.parked.Len() > 0
-		if hasNext {
-			next = g.parked[0].due
-		}
-		g.mu.Unlock()
-
-		for _, state := range due {
-			g.pollWithGracePeriod(state)
-		}
-
-		// If we processed any, loop immediately to pick up sources that became
-		// due during the polls before sleeping.
-		if len(due) > 0 {
-			continue
-		}
-
-		wait := g.backoff.Max
-		if hasNext {
-			wait = min(wait, time.Until(next))
-		}
-		wait = max(0, wait)
-		select {
-		case <-g.ctx.Cancelation.Done():
-			return
-		case <-time.After(wait):
-		case <-g.wakerCh:
-		}
-	}
-}
-
 func (s sourceStatus) isActive() bool {
 	return s == statusNew || s == statusRunning || s == statusPolling
 }
@@ -641,6 +587,7 @@ func (g *harvesterRunner) setStatus(state *sourceState, ns sourceStatus) {
 		g.nActive++
 	}
 	state.status = ns
+	g.publishGauges()
 }
 
 // park schedules state to be polled by the waker after backoff, recording it on the
@@ -657,32 +604,59 @@ func (g *harvesterRunner) park(state *sourceState, backoff time.Duration) {
 	}
 	state.nextCheck = due
 	g.setStatus(state, statusParked)
-	heap.Push(&g.parked, &parkedEntry{state: state, due: due})
+	heap.Push(&g.engine.parked, &parkedEntry{state: state, due: due})
 }
 
-// popDue removes and returns the parked sources whose nextCheck is due, claiming
-// each (statusPolling) so nothing else touches it. Stale heap entries — a source
-// re-parked or torn down since it was pushed — are skipped. Caller holds g.mu.
-func (g *harvesterRunner) popDue(now time.Time) []*sourceState {
-	var due []*sourceState
-	for g.parked.Len() > 0 {
-		if g.parked[0].due.After(now) {
-			break
-		}
-		e, _ := heap.Pop(&g.parked).(*parkedEntry)
-		state := e.state
-		if state.status == statusParked && state.nextCheck.Equal(e.due) {
-			g.setStatus(state, statusPolling)
-			due = append(due, state)
-		}
+// enqueuePoll hands a due source to this input's poll chain, starting the chain
+// if one is not already draining. It does not block: the scheduler hands every
+// due source to its own input and goes straight back to sleep, so no input waits
+// on another's polls.
+func (g *harvesterRunner) enqueuePoll(state *sourceState) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	if g.closed {
+		// The input began shutting down after the scheduler claimed this source;
+		// finishRemaining tears it down. Starting a poll now would race that.
+		return
 	}
-	return due
+	g.pollQueue = append(g.pollQueue, state)
+	if g.polling {
+		return
+	}
+	g.polling = true
+	if !g.spawnUnlocked(g.drainPolls) {
+		g.polling = false
+	}
 }
 
-// pollWithGracePeriod runs pollParked for state, waiting up to pollGracePeriod
-// before giving up so a stuck Poll (e.g. a stat() on an unresponsive network
-// filesystem) can't delay the rest of due. The abandoned poll keeps running in
-// the background, tracked via g.spawn.
+// drainPolls polls this input's queued sources one at a time until the queue is
+// empty, then exits. Only one chain runs per input (see polling), so an input's
+// polls never overlap and a slow source delays only its own input's queue.
+// Sources left queued when the input closes stay claimed; finishRemaining tears
+// them down.
+func (g *harvesterRunner) drainPolls() {
+	for {
+		g.mu.Lock()
+		if g.closed || len(g.pollQueue) == 0 {
+			g.polling = false
+			g.pollQueue = nil
+			g.mu.Unlock()
+			return
+		}
+		state := g.pollQueue[0]
+		g.pollQueue[0] = nil
+		g.pollQueue = g.pollQueue[1:]
+		g.mu.Unlock()
+
+		g.pollWithGracePeriod(state)
+	}
+}
+
+// pollWithGracePeriod runs pollParked for state on its own goroutine, waiting up
+// to pollGracePeriod for it, so a stuck Poll (a stat() on an unresponsive mount)
+// cannot hold up the rest of this input's queue. The abandoned poll keeps running
+// in the background, tracked via g.spawn.
 func (g *harvesterRunner) pollWithGracePeriod(state *sourceState) {
 	done := make(chan struct{})
 	if !g.spawn(func() {
@@ -971,7 +945,9 @@ func (g *harvesterRunner) Migrate(oldID string, next Source, updateStore func(ne
 	return nil
 }
 
-// StopHarvesters stops all harvesters and the waker goroutine. With
+// StopHarvesters tears down this input's harvesters and drops its reference to
+// the shared engine, whose waker stops once the last input has left. Inputs
+// registered with the same engine are untouched and keep running. With
 // read_until_eof enabled it first drains every source to EOF (bounded by the
 // configured Timeout) so data is not left unread on shutdown.
 func (g *harvesterRunner) StopHarvesters() error {
@@ -980,13 +956,15 @@ func (g *harvesterRunner) StopHarvesters() error {
 		g.mu.Unlock()
 		return nil
 	}
+	defer g.releaseEngine()
+
 	if g.readUntilEOF.Enabled {
 		return g.drainAndStop() // holds and releases g.mu
 	}
 	return g.stopNow() // holds and releases g.mu
 }
 
-// stopNow cancels every source and the waker and tears the sources down without
+// stopNow cancels every source of this input and tears them down without
 // draining. The caller holds g.mu; stopNow releases it.
 func (g *harvesterRunner) stopNow() error {
 	g.closed = true
@@ -1034,7 +1012,9 @@ func (g *harvesterRunner) drainAndStop() error {
 		"input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first",
 		g.readUntilEOF.Timeout)
 
-	g.signalWaker() // let the waker observe closed and exit
+	// Drop this runner's parked sources from the shared heap now rather than at
+	// the scheduler's next deadline.
+	g.signalWaker()
 	for _, state := range toDrain {
 		g.run(state) // draining: read to EOF, then finish (not park)
 	}
@@ -1077,8 +1057,10 @@ func (g *harvesterRunner) cancelAll() {
 	}
 }
 
-// waitBounded waits for every runner goroutine (readers and the waker) to
-// finish, giving up after timeout instead of blocking forever.
+// waitBounded waits for every goroutine this runner spawned (its readers and
+// polls) to finish, giving up after timeout instead of blocking forever. The
+// waker is not among them: it belongs to the shared engine and outlives this
+// input.
 func (g *harvesterRunner) waitBounded(timeout time.Duration) error {
 	done := make(chan struct{})
 	go func() {
@@ -1094,8 +1076,9 @@ func (g *harvesterRunner) waitBounded(timeout time.Duration) error {
 	}
 }
 
-// finishRemaining tears down any sources still registered after the readers and
-// waker have stopped (e.g. parked sources nothing drained).
+// finishRemaining tears down any sources still registered once this runner's
+// readers and polls have stopped: parked sources nothing drained, and sources
+// the waker dropped because the runner is closed.
 func (g *harvesterRunner) finishRemaining() {
 	g.mu.Lock()
 	remaining := make([]*sourceState, 0, len(g.states))
@@ -1110,16 +1093,13 @@ func (g *harvesterRunner) finishRemaining() {
 	}
 }
 
-// spawn runs fn on a new goroutine tracked on g.wg, unless the runner is
-// already closed, in which case it does nothing and returns false.
-func (g *harvesterRunner) spawn(fn func()) bool {
-	g.mu.Lock()
+// spawnUnlocked adds fn to g.wg and launches it on a new goroutine; returns
+// false if the runner is closed. Caller holds g.mu.
+func (g *harvesterRunner) spawnUnlocked(fn func()) bool {
 	if g.closed {
-		g.mu.Unlock()
 		return false
 	}
 	g.wg.Add(1)
-	g.mu.Unlock()
 	go func() {
 		defer g.wg.Done()
 		fn()
@@ -1127,12 +1107,15 @@ func (g *harvesterRunner) spawn(fn func()) bool {
 	return true
 }
 
-func (g *harvesterRunner) signalWaker() {
-	select {
-	case g.wakerCh <- struct{}{}:
-	default:
-	}
+// spawn runs fn on a new goroutine tracked on g.wg, unless the runner is
+// already closed, in which case it does nothing and returns false.
+func (g *harvesterRunner) spawn(fn func()) bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.spawnUnlocked(fn)
 }
+
+func (g *harvesterRunner) signalWaker() { g.engine.signalWaker() }
 
 // growBackoff returns the next backoff for a still-idle parked source: init on
 // the first (or a reset) call, doubling on every subsequent call up to max.
