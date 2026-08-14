@@ -72,8 +72,12 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 		if err != nil {
 			return nil, nil, err
 		}
+		allowMismatchedEth := false
+		if cfg.Flows != nil {
+			allowMismatchedEth = cfg.Flows.AllowMismatchedEth
+		}
 
-		worker, err := decoder.New(flows, dl, icmp4, icmp6, tcp, udp)
+		worker, err := decoder.New(flows, dl, icmp4, icmp6, tcp, udp, allowMismatchedEth)
 		if err != nil {
 			return nil, nil, err
 		}
