@@ -150,7 +150,7 @@ func TestInputFilesAddedLate(t *testing.T) {
 	test.Start(ctx)
 
 	// Wait for at least one scan to complete, then create the file.
-	WaitUntil(t, func() bool { return scanCount.Load() >= 1 }, 10*time.Second, 50*time.Millisecond)
+	require.Eventually(t,func() bool { return scanCount.Load() >= 1 }, 10*time.Second, 50*time.Millisecond)
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Hello World Late"))
 
 	test.Wait()
@@ -188,10 +188,10 @@ func TestInputCloseInactive(t *testing.T) {
 
 	// Write the first line and wait until the beat ingests it.
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Line 1"))
-	WaitUntil(t, func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
+	require.Eventually(t,func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 
 	// Wait for close_inactive to close the file.
-	WaitUntil(t, func() bool { return inactiveCount.Load() >= 1 }, 10*time.Second, 100*time.Millisecond)
+	require.Eventually(t,func() bool { return inactiveCount.Load() >= 1 }, 10*time.Second, 100*time.Millisecond)
 
 	// Write the second line; filestream should reopen the file.
 	AppendLogFile(t, logFile, 1, NewPlainTextGenerator("Line 2"))
@@ -261,11 +261,11 @@ func TestInputRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Line 1"))
 
 	// Wait for Line 1 to be ingested, then rotate.
-	WaitUntil(t, func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
+	require.Eventually(t,func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 	RotateFile(t, logFile, rotatedFile)
 
 	// Wait for close_inactive to close the rotated file.
-	WaitUntil(t, func() bool { return inactiveCount.Load() >= 1 }, 10*time.Second, 100*time.Millisecond)
+	require.Eventually(t,func() bool { return inactiveCount.Load() >= 1 }, 10*time.Second, 100*time.Millisecond)
 
 	// Write the second line into the new file at the original path.
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Line 2"))

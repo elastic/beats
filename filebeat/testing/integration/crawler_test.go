@@ -65,7 +65,7 @@ func TestCrawlerMultipleAppends(t *testing.T) {
 	test.Start(ctx)
 
 	// Wait for the initial line to be ingested.
-	WaitUntil(t, func() bool { return count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
+	require.Eventually(t,func() bool { return count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 
 	// Append three rounds of lines and wait for each round to be ingested.
 	totalExpected := int64(1) // the initial "hello world" line
@@ -73,7 +73,7 @@ func TestCrawlerMultipleAppends(t *testing.T) {
 		linesInRound := 20 + n
 		AppendLogFile(t, logFile, linesInRound, NewPlainTextGenerator("hello world"))
 		totalExpected += int64(linesInRound)
-		WaitUntil(t, func() bool { return count.Load() >= totalExpected },
+		require.Eventually(t,func() bool { return count.Load() >= totalExpected },
 			60*time.Second, 200*time.Millisecond)
 		t.Logf("round %d complete, events so far: %d", n, count.Load())
 	}
@@ -119,7 +119,7 @@ func TestCrawlerNewLineOnOpenFile(t *testing.T) {
 	test.Start(ctx)
 
 	// Wait for the initial line to be ingested before writing more.
-	WaitUntil(t, func() bool { return count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
+	require.Eventually(t,func() bool { return count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 
 	// Append two more lines while the file handle is still open.
 	_, err = f.WriteString("hello world 1\n")
@@ -189,13 +189,13 @@ func TestCrawlerFileDisappearAppear(t *testing.T) {
 	test.Start(ctx)
 
 	// Wait for the original file to be fully ingested.
-	WaitUntil(t, func() bool { return firstCount.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
+	require.Eventually(t,func() bool { return firstCount.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 
 	// Delete the original file; Filebeat should notice the removal and close it.
 	require.NoError(t, os.Remove(logFile))
 
 	// Wait for Filebeat to log that it closed the removed file.
-	WaitUntil(t, func() bool { return closeRemovedCount.Load() >= 1 }, 10*time.Second, 50*time.Millisecond)
+	require.Eventually(t,func() bool { return closeRemovedCount.Load() >= 1 }, 10*time.Second, 50*time.Millisecond)
 
 	// Create a new file at the same path with different content.
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("new file content"))
