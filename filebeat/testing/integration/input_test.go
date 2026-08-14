@@ -139,14 +139,18 @@ func TestInputFilesAddedLate(t *testing.T) {
 	})
 	test := NewTest(t, TestOptions{Config: config})
 
+	// Count scanner ticks to detect when at least one scan has run.
+	var scanCount atomic.Int64
+	test.CountOutput(&scanCount, "Start next scan")
+
 	// Register expectations before starting.
 	test.ExpectOutput("Hello World Late")
 	test.WithReportOptions(inputReportOptions)
 	test.ExpectStart()
 	test.Start(ctx)
 
-	// Let the beat run at least one scan with no files, then create the file.
-	time.Sleep(300 * time.Millisecond)
+	// Wait for at least one scan to complete, then create the file.
+	WaitUntil(t, func() bool { return scanCount.Load() >= 1 }, 10*time.Second, 50*time.Millisecond)
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Hello World Late"))
 
 	test.Wait()
@@ -173,6 +177,9 @@ func TestInputCloseInactive(t *testing.T) {
 	// Count Line 1 appearances so we can wait until it is ingested.
 	var line1Count atomic.Int64
 	test.CountOutput(&line1Count, "Line 1")
+	// Count close_inactive log lines so we know when the file has been closed.
+	var inactiveCount atomic.Int64
+	test.CountOutput(&inactiveCount, "File is inactive")
 	// Final expectation: Line 2 must also appear.
 	test.ExpectOutput("Line 2")
 	test.WithReportOptions(inputReportOptions)
@@ -184,7 +191,7 @@ func TestInputCloseInactive(t *testing.T) {
 	WaitUntil(t, func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 
 	// Wait for close_inactive to close the file.
-	time.Sleep(2 * time.Second)
+	WaitUntil(t, func() bool { return inactiveCount.Load() >= 1 }, 10*time.Second, 100*time.Millisecond)
 
 	// Write the second line; filestream should reopen the file.
 	AppendLogFile(t, logFile, 1, NewPlainTextGenerator("Line 2"))
@@ -243,6 +250,9 @@ func TestInputRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	var line1Count atomic.Int64
 	test.CountOutput(&line1Count, "Line 1")
+	// Count close_inactive log lines so we know when the rotated file has been closed.
+	var inactiveCount atomic.Int64
+	test.CountOutput(&inactiveCount, "File is inactive")
 	test.ExpectOutput("Line 2")
 	test.WithReportOptions(inputReportOptions)
 	test.ExpectStart()
@@ -254,8 +264,8 @@ func TestInputRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	WaitUntil(t, func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 	RotateFile(t, logFile, rotatedFile)
 
-	// Let close_inactive close the rotated file.
-	time.Sleep(2 * time.Second)
+	// Wait for close_inactive to close the rotated file.
+	WaitUntil(t, func() bool { return inactiveCount.Load() >= 1 }, 10*time.Second, 100*time.Millisecond)
 
 	// Write the second line into the new file at the original path.
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Line 2"))

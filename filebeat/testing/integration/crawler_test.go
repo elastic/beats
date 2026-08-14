@@ -178,6 +178,10 @@ func TestCrawlerFileDisappearAppear(t *testing.T) {
 	var firstCount atomic.Int64
 	test.CountOutput(&firstCount, "disappearing file")
 
+	// Count close_removed log lines so we know when Filebeat has closed the removed file.
+	var closeRemovedCount atomic.Int64
+	test.CountOutput(&closeRemovedCount, "close.on_state_change.removed")
+
 	// The test terminates when the new file's content is seen.
 	test.ExpectOutput("new file content")
 	test.WithReportOptions(crawlerReportOptions)
@@ -190,11 +194,8 @@ func TestCrawlerFileDisappearAppear(t *testing.T) {
 	// Delete the original file; Filebeat should notice the removal and close it.
 	require.NoError(t, os.Remove(logFile))
 
-	// Wait for filebeat to log that it closed the removed file before creating a new one
-	// at the same path.  A 500ms wait is a pragmatic minimum; on slow CI hosts
-	// this may occasionally be too short, but close_removed fires on the next
-	// scan tick (100ms), so 500ms provides 5 scan opportunities.
-	time.Sleep(500 * time.Millisecond)
+	// Wait for Filebeat to log that it closed the removed file.
+	WaitUntil(t, func() bool { return closeRemovedCount.Load() >= 1 }, 10*time.Second, 50*time.Millisecond)
 
 	// Create a new file at the same path with different content.
 	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("new file content"))
