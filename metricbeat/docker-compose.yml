@@ -17,7 +17,8 @@ services:
   elasticsearch:
     image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-9.5.1}-1
     build:
-      context: ./module/elasticsearch/_meta
+      context: ..
+      dockerfile: metricbeat/module/elasticsearch/_meta/Dockerfile
       args:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-9.5.1}
     environment:
@@ -26,10 +27,6 @@ services:
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=true"
       - "xpack.security.authc.realms.file.file1.order=0"
-    volumes:
-      - ../testing/environments/docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml:ro
-      - ../testing/environments/docker/elasticsearch/users:/usr/share/elasticsearch/config/users:ro
-      - ../testing/environments/docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles:ro
     healthcheck:
       test: ["CMD-SHELL", "curl -u admin:testing -f http://localhost:9200/_license"]
       retries: 300
