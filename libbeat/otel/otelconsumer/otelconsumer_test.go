@@ -558,6 +558,18 @@ func TestFillLogRecordFromEventCreated(t *testing.T) {
 		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
 	})
 
+	t.Run("valid RFC3339Nano string parses correctly", func(t *testing.T) {
+		want, err := time.Parse(time.RFC3339Nano, "2022-11-22T19:16:32.440123456Z")
+		require.NoError(t, err)
+
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": "2022-11-22T19:16:32.440123456Z"}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
 	t.Run("invalid string falls back to current time", func(t *testing.T) {
 		before := time.Now()
 		event := publisher.Event{Content: beat.Event{

@@ -225,7 +225,7 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		case common.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
 		case string:
-			t, err := time.Parse(time.RFC3339, created)
+			t, err := time.Parse(time.RFC3339Nano, created)
 			if err != nil {
 				t = time.Now()
 			}
