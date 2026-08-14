@@ -88,10 +88,15 @@ func readPIDNsInode() (uint64, error) {
 // NewProvider returns a new instance of kerneltracingprovider
 func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER
+	attr.Flags = quark.QQ_EBPF | quark.QQ_ENTRY_LEADER
 	qq, err := quark.OpenQueue(attr)
 	if err != nil {
-		return nil, fmt.Errorf("open queue: %w", err)
+		logger.Warnw("failed to use ebpf, attempting to use kprobe", "error", err)
+		attr.Flags = quark.QQ_KPROBE | quark.QQ_ENTRY_LEADER
+		qq, err = quark.OpenQueue(attr)
+		if err != nil {
+			return nil, fmt.Errorf("open queue: %w", err)
+		}
 	}
 
 	procMetrics := NewStats(reg)

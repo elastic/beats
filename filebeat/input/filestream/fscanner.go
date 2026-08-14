@@ -79,14 +79,15 @@ func isObservationError(err error) bool {
 }
 
 type fingerprintConfig struct {
+	// Enabled is deprecated and ignored; normalizeConfig in input.go derives it
+	// from the file identity.
 	Enabled bool  `config:"enabled"`
 	Offset  int64 `config:"offset"`
 	Length  int64 `config:"length"`
-	// Growing enables Enhanced Fingerprint behaviour: files smaller than
-	// Offset+Length are tracked using the raw bytes from Offset to the file's
-	// end (hex-encoded). When a file reaches the threshold, its registry key
-	// migrates to the same SHA-256 hex the static fingerprint produces, so
-	// existing static-fingerprint state is preserved.
+	// Growing tracks files smaller than Offset+Length using the raw bytes
+	// from Offset to the file's end (hex-encoded). When a file reaches the
+	// threshold, its registry key migrates to the same SHA-256 hex the static
+	// fingerprint produces, so existing static-fingerprint state is preserved.
 	//
 	// Not user-configurable here: the YAML key under prospector.scanner.fingerprint
 	// is silently ignored. The user-facing knob is file_identity.fingerprint.growing;
@@ -110,8 +111,6 @@ func defaultFileScannerConfig() fileScannerConfig {
 			Enabled: true,
 			Offset:  0,
 			Length:  DefaultFingerprintSize,
-			// false by default: the file identity config will set it to true if
-			// fingerprint is used
 			Growing: false,
 		},
 	}

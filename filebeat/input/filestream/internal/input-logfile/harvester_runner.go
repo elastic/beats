@@ -398,6 +398,9 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 
 	client, err := g.pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: newInputACKHandler(g.ackCH),
+		Processing: beat.ProcessingConfig{
+			NormalizeInPlace: true,
+		},
 	})
 	if err != nil {
 		releaseResource(resource)

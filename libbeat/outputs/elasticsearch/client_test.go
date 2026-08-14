@@ -403,7 +403,7 @@ func TestCollectPublishFailsNone(t *testing.T) {
 
 	event := mapstr.M{"field": 1}
 	events := make([]publisher.Event, N)
-	for i := 0; i < N; i++ {
+	for i := range N {
 		events[i] = publisher.Event{Content: beat.Event{Fields: event}}
 	}
 
@@ -1058,7 +1058,6 @@ func TestBulkEncodeEvents(t *testing.T) {
 	}
 
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
 			cfg := c.MustNewConfigFrom(test.config)
@@ -1179,7 +1178,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	require.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
 	require.Equal(t, 9, len(bulkItems), "incomplete bulk")
 
-	for i := 0; i < len(cases); i++ {
+	for i := range cases {
 		bulkEventIndex, _ := cases[i]["bulkIndex"].(int)
 		if bulkEventIndex == -1 {
 			continue
@@ -1188,7 +1187,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		caseMessage := cases[i]["message"].(string)
 		switch bulkItems[bulkEventIndex].(type) {
 		case eslegclient.BulkCreateAction:
-			validOpTypes := []interface{}{e.OpTypeCreate, nil}
+			validOpTypes := []any{e.OpTypeCreate, nil}
 			require.Contains(t, validOpTypes, caseOpType, caseMessage)
 		case eslegclient.BulkIndexAction:
 			require.Equal(t, e.OpTypeIndex, caseOpType, caseMessage)
@@ -1251,8 +1250,7 @@ func TestBulkRequestHasFilterPath(t *testing.T) {
 		return client
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	event1 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 

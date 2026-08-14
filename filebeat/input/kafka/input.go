@@ -353,7 +353,40 @@ func (h *groupHandler) createReader(claim sarama.ConsumerGroupClaim) reader.Read
 	}
 }
 
+// deadlineReceiver receives from a Kafka message channel with an optional read
+// deadline. It is embedded by the message readers so the multiline timeout can
+// be enforced synchronously (no goroutine). The receive is a channel operation,
+// so deadlines are always honored.
+type deadlineReceiver struct {
+	reader.Deadline
+}
+
+// recv returns the next message from ch. With a deadline set it returns
+// timedOut=true if no message arrives in time, so callers can surface
+// reader.ErrReadDeadline instead of blocking.
+func (d *deadlineReceiver) recv(ch <-chan *sarama.ConsumerMessage) (msg *sarama.ConsumerMessage, ok bool, timedOut bool) {
+	// Fast path: a message is already buffered, so no timer is needed.
+	select {
+	case msg, ok = <-ch:
+		return msg, ok, false
+	default:
+	}
+
+	// Arm returns nil when no deadline is set, which never fires, so this select
+	// covers both the deadline and the plain blocking receive.
+	timeout := d.Arm()
+	defer d.Disarm()
+	select {
+	case msg, ok = <-ch:
+		return msg, ok, false
+	case <-timeout:
+		return nil, false, true
+	}
+}
+
 type recordReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	log          *logp.Logger
@@ -364,7 +397,10 @@ func (m *recordReader) Close() error {
 }
 
 func (m *recordReader) Next() (reader.Message, error) {
-	msg, ok := <-m.claim.Messages()
+	msg, ok, timedOut := m.recv(m.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}
@@ -377,6 +413,8 @@ func (m *recordReader) Next() (reader.Message, error) {
 }
 
 type listFromFieldReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	buffer       []reader.Message
@@ -393,7 +431,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 		return l.returnFromBuffer()
 	}
 
-	msg, ok := <-l.claim.Messages()
+	msg, ok, timedOut := l.recv(l.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}
