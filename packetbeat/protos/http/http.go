@@ -696,8 +696,7 @@ func decodeBody(body []byte, encodings []string, maxSize int, logger *logp.Logge
 	if logger.IsDebug() {
 		logger.Debugf("decoding body with encodings=%v", encodings)
 	}
-	for idx, v := range slices.Backward(encodings) {
-		format := v
+	for idx, format := range slices.Backward(encodings) {
 		body, err = decodeHTTPBody(body, format, maxSize)
 		if err != nil {
 			// Do not output a partial body unless failure occurs on the

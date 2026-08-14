@@ -258,9 +258,7 @@ func TestFragment(t *testing.T) {
 	t.Run("out_of_order", func(t *testing.T) {
 		d, tcp, udp := newTestDecoder(t)
 
-		// Reverse the order of the packets.
-		for _, v := range slices.Backward(packets) {
-			p := v
+		for _, p := range slices.Backward(packets) {
 			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 		}
 

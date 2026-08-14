@@ -22,7 +22,6 @@ package checkpoint
 
 import (
 	"fmt"
-
 	"maps"
 	"os"
 	"path/filepath"
