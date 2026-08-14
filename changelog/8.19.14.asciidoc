@@ -75,4 +75,11 @@ of values intended to be secret.
 
 * Fix unnecessary Windows filesystem metricset errors from non-existent volumes. https://github.com/elastic/beats/pull/49553[#49553]
 
+[discrete]
+=== Known issues
+
+**Filebeat**
+
+* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+
 // end 8.19.14 relnotes

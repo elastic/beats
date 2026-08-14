@@ -41,4 +41,11 @@ Review important information about the  8.19.8 release.
 * Fix possible data corruption in tcp, syslog and unix inputs. https://github.com/elastic/beats/pull/47618[#47618] 
 * Skip s3 test events in filebeat s3 input. https://github.com/elastic/beats/pull/47635[#47635]
 
+[discrete]
+=== Known issues
+
+**Filebeat**
+
+* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+
 // end 8.19.8 relnotes

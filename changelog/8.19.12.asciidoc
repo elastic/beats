@@ -69,4 +69,11 @@ The 8.19.12 release adds the following new and notable features.
 * Clean up `int` overflows and array access issues in MySQL parsers. https://github.com/elastic/beats/pull/48543[#48543]
 * Add `int` overflow checks to the `http` parser. https://github.com/elastic/beats/pull/48563[#48563]
 
+[discrete]
+=== Known issues
+
+**Filebeat**
+
+* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+
 // end 8.19.12 relnotes

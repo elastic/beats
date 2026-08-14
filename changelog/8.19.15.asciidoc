@@ -84,4 +84,11 @@ The 8.19.15 release adds the following new and notable features.
 
 * Fix otelconsumer logging hundreds of errors per second when queue is full.  https://github.com/elastic/beats/pull/48807[#48807] https://github.com/elastic/beats/issues/48803[#48803] 
 
+[discrete]
+=== Known issues
+
+**Filebeat**
+
+* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+
 // end 8.19.15 relnotes

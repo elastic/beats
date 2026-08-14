@@ -864,6 +864,12 @@ https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
 === Beats version 8.19.5
 https://github.com/elastic/beats/compare/v8.19.4\...v8.19.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
 ==== Breaking changes
 
 *Filebeat*
@@ -896,6 +902,12 @@ https://github.com/elastic/beats/compare/v8.19.4\...v8.19.5[View commits]
 [[release-notes-8.19.4]]
 === Beats version 8.19.4
 https://github.com/elastic/beats/compare/v8.19.3\...v8.19.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 ==== Bugfixes
 
@@ -942,6 +954,9 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 
 *Filebeat*
 
+// tag::known-issue-8.19-filestream-take-over[]
+- Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+// end::known-issue-8.19-filestream-take-over[]
 // tag::known-issue-8.19-filestream-clean-inactive-1[]
 - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
 - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
@@ -1165,6 +1180,7 @@ https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
 
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
@@ -1178,6 +1194,7 @@ https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
@@ -1210,6 +1227,7 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]

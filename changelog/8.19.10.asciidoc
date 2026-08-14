@@ -57,4 +57,11 @@ The 8.19.10 release adds the following new and notable features.
 
 * Fix bounds checking in MongoDB protocol parser to prevent panics. https://github.com/elastic/beats/pull/47925[#47925]
 
+[discrete]
+=== Known issues
+
+**Filebeat**
+
+* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+
 // end 8.19.10 relnotes

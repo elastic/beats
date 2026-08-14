@@ -85,4 +85,11 @@ Review important information about the  8.19.19 release.
 
 * Fix a rare crash when Osquery restarts after a configuration change. https://github.com/elastic/beats/pull/51564[#51564] 
 
+[discrete]
+=== Known issues
+
+**Filebeat**
+
+* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+
 // end 8.19.19 relnotes
