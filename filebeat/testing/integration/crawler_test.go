@@ -42,7 +42,6 @@ var crawlerReportOptions = libbeatintegration.ReportOptions{
 
 // TestCrawlerMultipleAppends verifies that Filebeat keeps picking up new lines
 // as they are appended to a file in several rounds.
-// Corresponds to test_crawler.py::test_multiple_appends.
 func TestCrawlerMultipleAppends(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 3*time.Minute)
 	defer cancel()
