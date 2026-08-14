@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// TestBase covers the fundamental tests from test_base.py.
 func TestBase(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Minute)
 	defer cancel()
