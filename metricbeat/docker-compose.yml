@@ -24,7 +24,12 @@ services:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
-      - "xpack.security.enabled=false"
+      - "xpack.security.enabled=true"
+      - "xpack.security.authc.realms.file.file1.order=0"
+    volumes:
+      - ../testing/environments/docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml:ro
+      - ../testing/environments/docker/elasticsearch/users:/usr/share/elasticsearch/config/users:ro
+      - ../testing/environments/docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles:ro
     ports:
       - 9200:9200
 
@@ -41,6 +46,9 @@ services:
       context: ./module/kibana/_meta
       args:
         KIBANA_VERSION: ${KIBANA_VERSION:-9.5.1}
+    environment:
+      ELASTICSEARCH_USERNAME: kibana_system_user
+      ELASTICSEARCH_PASSWORD: testing
     healthcheck:
       test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600

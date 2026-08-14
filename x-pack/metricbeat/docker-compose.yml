@@ -35,6 +35,9 @@ services:
       context: ../../metricbeat/module/kibana/_meta
       args:
         KIBANA_VERSION: ${KIBANA_VERSION:-9.5.1}
+    environment:
+      ELASTICSEARCH_USERNAME: kibana_system_user
+      ELASTICSEARCH_PASSWORD: testing
     depends_on:
       - elasticsearch
     ports:
