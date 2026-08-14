@@ -17,7 +17,7 @@
 
 //go:build integration
 
-// Tests for file-discovery and crawling behaviour, ported from test_crawler.py.
+// Tests for file-discovery and crawling behaviour
 
 package integration
 
