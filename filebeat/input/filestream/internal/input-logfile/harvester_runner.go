@@ -78,7 +78,7 @@ const (
 // handle (in the session) stays open while it is being harvested, but it only
 // has a goroutine while it is actively reading.
 type sourceState struct {
-	reg *harvesterRunner
+	runner *harvesterRunner
 
 	srcID   string
 	src     Source
@@ -497,7 +497,7 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", src.LogPath())
 
 	state := &sourceState{
-		reg:    g,
+		runner: g,
 		srcID:  srcID,
 		src:    src,
 		ctx:    ctx,
@@ -610,24 +610,20 @@ func (g *harvesterRunner) park(state *sourceState, backoff time.Duration) {
 // on another's polls.
 func (g *harvesterRunner) enqueuePoll(state *sourceState) {
 	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	if g.closed {
 		// The input began shutting down after the scheduler claimed this source;
 		// finishRemaining tears it down. Starting a poll now would race that.
-		g.mu.Unlock()
 		return
 	}
 	g.pollQueue = append(g.pollQueue, state)
 	if g.polling {
-		g.mu.Unlock()
 		return
 	}
 	g.polling = true
-	g.mu.Unlock()
-
-	if !g.spawn(g.drainPolls) {
-		g.mu.Lock()
+	if !g.spawnUnlocked(g.drainPolls) {
 		g.polling = false
-		g.mu.Unlock()
 	}
 }
 
@@ -1094,21 +1090,26 @@ func (g *harvesterRunner) finishRemaining() {
 	}
 }
 
-// spawn runs fn on a new goroutine tracked on g.wg, unless the runner is
-// already closed, in which case it does nothing and returns false.
-func (g *harvesterRunner) spawn(fn func()) bool {
-	g.mu.Lock()
+// spawnUnlocked adds fn to g.wg and launches it on a new goroutine; returns
+// false if the runner is closed. Caller holds g.mu.
+func (g *harvesterRunner) spawnUnlocked(fn func()) bool {
 	if g.closed {
-		g.mu.Unlock()
 		return false
 	}
 	g.wg.Add(1)
-	g.mu.Unlock()
 	go func() {
 		defer g.wg.Done()
 		fn()
 	}()
 	return true
+}
+
+// spawn runs fn on a new goroutine tracked on g.wg, unless the runner is
+// already closed, in which case it does nothing and returns false.
+func (g *harvesterRunner) spawn(fn func()) bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.spawnUnlocked(fn)
 }
 
 func (g *harvesterRunner) signalWaker() { g.engine.signalWaker() }

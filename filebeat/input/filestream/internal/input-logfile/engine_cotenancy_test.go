@@ -132,7 +132,7 @@ func TestSharedEngine_PollsSerialPerInputConcurrentAcrossInputs(t *testing.T) {
 	// two inputs were ever in Poll at the same instant.
 	var inFlightA, inFlightB, maxPerInput atomic.Int64
 	var crossInput atomic.Bool
-	hold := func(mine, theirs *atomic.Int64, polls *atomic.Int64) *fakeHarvester {
+	hold := func(mine, theirs, polls *atomic.Int64) *fakeHarvester {
 		h := pollCountingHarvester(polls, 0)
 		inner := h.pollFn
 		h.pollFn = func(call int) PollResult {

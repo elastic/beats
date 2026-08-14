@@ -108,25 +108,32 @@ func acquireEngine(log *logp.Logger) (*engine, func()) {
 // Stopping outside the lock keeps a starting input from waiting on the departing
 // engine's waker, which can take a poll's grace period to wind down.
 func releaseEngine() {
+	// Synchronous, so a stopped input leaves no waker running behind it.
+	if stopping := releaseEngineRef(); stopping != nil {
+		stopping.stop()
+	}
+}
+
+// releaseEngineRef drops one engine reference. If this was the last reference,
+// it detaches the engine from the shared slot and returns it to the caller to
+// stop; otherwise returns nil.
+func releaseEngineRef() *engine {
 	sharedEngine.Lock()
+	defer sharedEngine.Unlock()
 
 	if sharedEngine.engine == nil {
-		sharedEngine.Unlock()
-		return
+		return nil
 	}
 	sharedEngine.refs--
 	if sharedEngine.refs > 0 {
-		sharedEngine.Unlock()
-		return
+		return nil
 	}
 
 	stopping := sharedEngine.engine
 	sharedEngine.engine = nil
 	sharedEngine.refs = 0
-	sharedEngine.Unlock()
 
-	// Synchronous, so a stopped input leaves no waker running behind it.
-	stopping.stop()
+	return stopping
 }
 
 // newEngine builds an engine without registering it as the process-global one.
@@ -181,7 +188,7 @@ func (e *engine) waker() {
 		// unresponsive mount) delays only the input that owns it. A re-parked
 		// source signals the waker, so nothing is missed by not waiting here.
 		for _, state := range due {
-			state.reg.enqueuePoll(state)
+			state.runner.enqueuePoll(state)
 		}
 
 		wait := wakerIdleWait
@@ -212,11 +219,14 @@ func (e *engine) popDue(now time.Time) []*sourceState {
 		// A source whose input is shutting down is dropped rather than claimed;
 		// finishRemaining tears it down. Claiming it would flip it to
 		// statusPolling, counting a reader that will never exist.
-		if state.reg.closed {
+		if state.runner.closed {
 			continue
 		}
+		// Skip stale heap entries: a source re-parked or torn down since it was
+		// pushed gets a fresh entry with a new due time, leaving the old entry's
+		// due no longer matching state.nextCheck.
 		if state.status == statusParked && state.nextCheck.Equal(entry.due) {
-			state.reg.setStatus(state, statusPolling)
+			state.runner.setStatus(state, statusPolling)
 			due = append(due, state)
 		}
 	}
