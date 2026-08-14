@@ -160,10 +160,10 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.35
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.79
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.31.3
-	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.28.3
-	github.com/aws/aws-sdk-go-v2/service/health v1.30.3
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.41
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.42.4
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.37.4
+	github.com/aws/aws-sdk-go-v2/service/health v1.40.4
 	github.com/aws/smithy-go v1.27.6
 	github.com/beevik/ntp v1.4.3
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
