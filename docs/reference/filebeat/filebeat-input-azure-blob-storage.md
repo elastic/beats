@@ -21,7 +21,7 @@ Use the `azure blob storage input` to read content from files stored in containe
 ::::{note}
 :name: supported-types
 
-`JSON`, `NDJSON` and `CSV` are supported blob/file formats. Blobs/files may be also be gzip compressed. `shared access keys`, `connection strings` and `Microsoft Entra ID RBAC` authentication types are supported.
+`JSON`, `NDJSON` and `CSV` are supported blob/file formats. Blobs/files may be also be gzip compressed. `shared access keys`, `connection strings`, `Microsoft Entra ID RBAC` and {applies_to}`stack: ga 9.4.6+` `managed identity` authentication types are supported.
 ::::
 
 
@@ -125,19 +125,20 @@ $$$supported-attributes$$$
 2. [auth.oauth2](#attrib-auth-oauth2)
 3. [auth.shared_credentials.account_key](#attrib-auth-shared-account-key)
 4. [auth.connection_string.uri](#attrib-auth-connection-string)
-5. [storage_url](#attrib-storage-url)
-6. [containers](#attrib-containers)
-7. [name](#attrib-container-name)
-8. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0+`
-9. [max_workers](#attrib-max_workers)
-10. [poll](#attrib-poll)
-11. [poll_interval](#attrib-poll_interval)
-12. [file_selectors](#attrib-file_selectors)
-13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
-14. [timestamp_epoch](#attrib-timestamp_epoch)
-15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4+`
-16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0+`
-17. [retry](#attrib-retry) {applies_to}`stack: ga 9.3+`
+5. [auth.managed_identity](#attrib-auth-managed-identity) {applies_to}`stack: ga 9.4.6+` (9.4.6+, 9.5.2+, 9.6.0+)
+6. [storage_url](#attrib-storage-url)
+7. [containers](#attrib-containers)
+8. [name](#attrib-container-name)
+9. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0+`
+10. [max_workers](#attrib-max_workers)
+11. [poll](#attrib-poll)
+12. [poll_interval](#attrib-poll_interval)
+13. [file_selectors](#attrib-file_selectors)
+14. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
+15. [timestamp_epoch](#attrib-timestamp_epoch)
+16. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4+`
+17. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0+`
+18. [retry](#attrib-retry) {applies_to}`stack: ga 9.3+`
 
 ## `account_name` [attrib-account-name]
 
@@ -187,8 +188,61 @@ This attribute contains the **access key**, found under the `Access keys` sectio
 This attribute contains the **connection string**, found under the `Access keys` section on Azure Clound, under the respective storage account. A single storage account can contain multiple containers, and they will all use this common connection string.
 
 ::::{note}
-We require only either of `auth.shared_credentials.account_key` or `auth.connection_string.uri` to be specified for authentication purposes. If both attributes are specified, then the one that occurs first in the configuration will be used.
+Configure exactly one authentication method. If more than one is present, the input uses the first of `auth.shared_credentials`, `auth.connection_string` and `auth.oauth2` that is configured, whatever order they appear in the configuration file. `auth.managed_identity` cannot be combined with another method, and the input rejects such a configuration at startup.
 ::::
+
+
+## `auth.managed_identity` [attrib-auth-managed-identity]
+
+```{applies_to}
+stack: ga 9.4.6+
+```
+
+:::{important}
+Available in {{filebeat}} 9.4.6 and later 9.4.x releases, in 9.5.2 and later 9.5.x releases, and in 9.6.0 and later. It is not available in 9.5.0 or 9.5.1.
+:::
+
+Use the managed identity of the Azure host that runs {{filebeat}}. Azure gives the token to the host, so the configuration holds no key and no secret.
+
+This works on hosts that Azure provides an identity for, such as Azure Virtual Machines, Virtual Machine Scale Sets, Azure Kubernetes Service, Container Apps, App Service, Azure Functions and Azure Arc enabled servers. It does not work on a host outside Azure. For an agent that runs outside Azure, use [auth.oauth2](#attrib-auth-oauth2) instead.
+
+This attribute has the following sub-attributes:
+
+1. `enabled`: Set it to `true` to use managed identity authentication.
+2. `client_id`: The client ID of a user-assigned managed identity. Leave it empty to use the system-assigned identity of the host.
+
+A sample configuration that uses the system-assigned identity of the host:
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  account_name: some_account
+  auth.managed_identity.enabled: true
+  containers:
+  - name: container_1
+    max_workers: 3
+    poll: true
+    poll_interval: 10s
+```
+
+Set `client_id` when the host has more than one user-assigned identity, or when you want a user-assigned identity rather than the system-assigned one:
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  account_name: some_account
+  auth.managed_identity:
+    enabled: true
+    client_id: "some_user_assigned_client_id"
+  containers:
+  - name: container_1
+```
+
+::::{note}
+Assign the `Storage Blob Data Reader` role to the identity, on the storage account or on the container. The input lists blobs and reads blobs, so it needs no write permission.
+::::
+
+To learn how to give an Azure resource a managed identity, refer to the Azure documentation on [managed identities for Azure resources](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview).
 
 
 
