@@ -611,7 +611,7 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 // for filestream inputs configured with take_over: true.
 func processLogInputTakeOver(logger *logp.Logger, stateStore statestore.States, config *cfg.Config, beatPaths *paths.Path) error {
 	logger = logger.Named("filestream-takeover")
-	inputs, err := fetchInputConfiguration(config, logger)
+	inputs, err := fetchInputConfiguration(config, logger, beatPaths)
 	if err != nil {
 		return fmt.Errorf("failed to fetch input configuration when attempting take over: %w", err)
 	}
@@ -633,16 +633,20 @@ func processLogInputTakeOver(logger *logp.Logger, stateStore statestore.States, 
 }
 
 // fetches all the defined input configuration available at Filebeat startup including external files.
-func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []*conf.C, err error) {
-	if len(config.Inputs) == 0 {
-		inputs = []*conf.C{}
-	} else {
-		inputs = config.Inputs
+func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger, beatPaths *paths.Path) (inputs []*conf.C, err error) {
+	inputs = make([]*conf.C, 0, len(config.Inputs))
+	for _, input := range config.Inputs {
+		if input.Enabled() {
+			inputs = append(inputs, input)
+		}
 	}
 
 	// reading external input configuration if defined
 	var dynamicInputCfg cfgfile.DynamicConfig
 	if config.ConfigInput != nil {
+		if !config.ConfigInput.Enabled() {
+			return inputs, nil
+		}
 		err = config.ConfigInput.Unpack(&dynamicInputCfg)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unpack the dynamic input configuration: %w", err)
@@ -652,7 +656,12 @@ func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []
 		return inputs, nil
 	}
 
-	cfgPaths, err := filepath.Glob(dynamicInputCfg.Path)
+	path := dynamicInputCfg.Path
+	if !filepath.IsAbs(path) {
+		path = beatPaths.Resolve(paths.Config, path)
+	}
+
+	cfgPaths, err := filepath.Glob(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve external input configuration paths: %w", err)
 	}
@@ -661,16 +670,16 @@ func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []
 		return inputs, nil
 	}
 
-	// making a copy so we can safely extend the slice
-	inputs = make([]*conf.C, len(config.Inputs))
-	copy(inputs, config.Inputs)
-
 	for _, p := range cfgPaths {
 		externalInputs, err := cfgfile.LoadList(p, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load external input configuration: %w", err)
 		}
-		inputs = append(inputs, externalInputs...)
+		for _, input := range externalInputs {
+			if input.Enabled() {
+				inputs = append(inputs, input)
+			}
+		}
 	}
 
 	return inputs, nil
