@@ -613,7 +613,7 @@ func processLogInputTakeOver(logger *logp.Logger, stateStore statestore.States, 
 	logger = logger.Named("filestream-takeover")
 	inputs, err := fetchInputConfiguration(config, logger)
 	if err != nil {
-		return fmt.Errorf("Failed to fetch input configuration when attempting take over: %w", err)
+		return fmt.Errorf("failed to fetch input configuration when attempting take over: %w", err)
 	}
 	if len(inputs) == 0 {
 		return nil
@@ -621,7 +621,7 @@ func processLogInputTakeOver(logger *logp.Logger, stateStore statestore.States, 
 
 	store, err := stateStore.StoreFor("")
 	if err != nil {
-		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
+		return fmt.Errorf("failed to access state when attempting take over: %w", err)
 	}
 	defer store.Close()
 
