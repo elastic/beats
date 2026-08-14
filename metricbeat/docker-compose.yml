@@ -30,6 +30,9 @@ services:
       - ../testing/environments/docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml:ro
       - ../testing/environments/docker/elasticsearch/users:/usr/share/elasticsearch/config/users:ro
       - ../testing/environments/docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -f http://localhost:9200/_license"]
+      retries: 300
     ports:
       - 9200:9200
 

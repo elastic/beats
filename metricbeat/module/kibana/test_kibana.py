@@ -74,7 +74,10 @@ class Test(metricbeat.BaseTest):
 
     def get_version(self):
         host = self.get_hosts()[0]
-        res = urllib.request.urlopen("http://" + host + "/api/status").read()
+        req = urllib.request.Request("http://" + host + "/api/status")
+        # auth: beats:testing
+        req.add_header("Authorization", "Basic YmVhdHM6dGVzdGluZw==")
+        res = urllib.request.urlopen(req).read()
 
         body = json.loads(res)
         version = body["version"]["number"]
