@@ -27,7 +27,6 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -53,7 +52,7 @@ func TestInputIgnoreOlderFiles(t *testing.T) {
 	logFile := filepath.Join(dir, "test.log")
 
 	// Write content, then back-date the file so it exceeds ignore_older.
-	WriteFile(t, logFile, strings.Repeat("hello world\n", 5))
+	GenerateLogFile(t, logFile, 5, NewPlainTextGenerator("hello world"))
 	pastTime := time.Now().Add(-5 * time.Second)
 	require.NoError(t, os.Chtimes(logFile, pastTime, pastTime))
 
@@ -78,7 +77,7 @@ func TestInputNotIgnoreOldFiles(t *testing.T) {
 
 	dir := t.TempDir()
 	logFile := filepath.Join(dir, "test.log")
-	WriteFile(t, logFile, strings.Repeat("hello world\n", 5))
+	GenerateLogFile(t, logFile, 5, NewPlainTextGenerator("hello world"))
 
 	config := FilestreamInputConfig("not-ignore-test", logFile, FilestreamOptions{
 		IgnoreOlder: "15s",
@@ -109,8 +108,8 @@ func TestInputExcludeFiles(t *testing.T) {
 	gzFile := filepath.Join(dir, "test.gz")
 	logFile := filepath.Join(dir, "test.log")
 
-	WriteFile(t, gzFile, "line in gz file\n")
-	WriteFile(t, logFile, "line in log file\n")
+	GenerateLogFile(t, gzFile, 1, NewPlainTextGenerator("line in gz file"))
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("line in log file"))
 
 	config := FilestreamInputConfig("exclude-files-test", filepath.Join(dir, "*"), FilestreamOptions{
 		ExcludeFiles: []string{`\.gz$`},
@@ -148,7 +147,7 @@ func TestInputFilesAddedLate(t *testing.T) {
 
 	// Let the beat run at least one scan with no files, then create the file.
 	time.Sleep(300 * time.Millisecond)
-	WriteFile(t, logFile, "Hello World Late\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Hello World Late"))
 
 	test.Wait()
 }
@@ -181,14 +180,14 @@ func TestInputCloseInactive(t *testing.T) {
 	test.Start(ctx)
 
 	// Write the first line and wait until the beat ingests it.
-	WriteFile(t, logFile, "Line 1\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Line 1"))
 	WaitUntil(t, func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
 
 	// Wait for close_inactive to close the file.
 	time.Sleep(2 * time.Second)
 
 	// Write the second line; filestream should reopen the file.
-	AppendToFile(t, logFile, "Line 2\n")
+	AppendLogFile(t, logFile, 1, NewPlainTextGenerator("Line 2"))
 
 	test.Wait()
 }
@@ -204,7 +203,7 @@ func TestInputSkipSymlinks(t *testing.T) {
 	realFile := filepath.Join(dir, "real-2016.log")
 	symlinkFile := filepath.Join(dir, "symlink.log")
 
-	WriteFile(t, realFile, "Hello world\n")
+	GenerateLogFile(t, realFile, 1, NewPlainTextGenerator("Hello world"))
 	CreateSymlink(t, realFile, symlinkFile)
 
 	// Without symlinks enabled, only the real file should be read.
@@ -249,7 +248,7 @@ func TestInputRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	test.ExpectStart()
 	test.Start(ctx)
 
-	WriteFile(t, logFile, "Line 1\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Line 1"))
 
 	// Wait for Line 1 to be ingested, then rotate.
 	WaitUntil(t, func() bool { return line1Count.Load() >= 1 }, 15*time.Second, 100*time.Millisecond)
@@ -259,7 +258,7 @@ func TestInputRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Write the second line into the new file at the original path.
-	WriteFile(t, logFile, "Line 2\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("Line 2"))
 
 	test.Wait()
 }

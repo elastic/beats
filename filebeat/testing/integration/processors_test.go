@@ -51,7 +51,7 @@ func TestProcessorsDropFields(t *testing.T) {
 
 	dir := t.TempDir()
 	logFile := filepath.Join(dir, "test.log")
-	WriteFile(t, logFile, "test message\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("test message"))
 
 	// Add a custom field then immediately drop it; the unique value should
 	// not appear in any JSON event output.
@@ -110,7 +110,7 @@ func TestProcessorsIncludeFields(t *testing.T) {
 
 	dir := t.TempDir()
 	logFile := filepath.Join(dir, "test.log")
-	WriteFile(t, logFile, "test message\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("test message"))
 
 	config := FilestreamInputConfig("include-fields-test", logFile, FilestreamOptions{
 		GlobalProcessors: "  - include_fields:\n      fields: [\"@timestamp\", message, log, input]\n",
@@ -124,7 +124,7 @@ func TestProcessorsIncludeFields(t *testing.T) {
 
 	// message and input.type must survive the include_fields filter.
 	test.ExpectJSONFields(mapstr.M{
-		"message":    "test message",
+		"message":    "test message test.log:1",
 		"input.type": "filestream",
 	})
 
@@ -148,8 +148,8 @@ func TestProcessorsDropEvent(t *testing.T) {
 	logFile1 := filepath.Join(dir, "test1.log")
 	logFile2 := filepath.Join(dir, "test2.log")
 
-	WriteFile(t, logFile1, "test1 message\n")
-	WriteFile(t, logFile2, "test2 message\n")
+	GenerateLogFile(t, logFile1, 1, NewPlainTextGenerator("test1 message"))
+	GenerateLogFile(t, logFile2, 1, NewPlainTextGenerator("test2 message"))
 
 	// Drop events from test1.log; only test2 events should appear in output.
 	config := FilestreamInputConfig("drop-event-test", filepath.Join(dir, "test*.log"), FilestreamOptions{

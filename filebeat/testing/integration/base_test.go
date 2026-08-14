@@ -46,12 +46,12 @@ func TestBase(t *testing.T) {
 
 		logDir := t.TempDir()
 		logFile := filepath.Join(logDir, "test.log")
-		WriteFile(t, logFile, "test message\n")
+		GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("test message"))
 
 		config := FilestreamInputConfig("base-test", logFile, FilestreamOptions{})
 		test := NewTest(t, TestOptions{Config: config})
 
-		test.ExpectJSONFields(mapstr.M{"message": "test message"})
+		test.ExpectJSONFields(mapstr.M{"message": "test message test.log:1"})
 		test.ExpectJSONFields(mapstr.M{"input.type": "filestream"})
 		test.WithReportOptions(reportOptions)
 		test.

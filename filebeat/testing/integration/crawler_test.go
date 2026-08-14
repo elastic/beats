@@ -23,7 +23,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"sync/atomic"
@@ -49,7 +48,7 @@ func TestCrawlerMultipleAppends(t *testing.T) {
 
 	dir := t.TempDir()
 	logFile := filepath.Join(dir, "test.log")
-	WriteFile(t, logFile, "hello world\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("hello world"))
 
 	const finalMarker = "crawl-multi-append-done"
 	config := FilestreamInputConfig("multi-append-test", filepath.Join(dir, "*.log"), FilestreamOptions{})
@@ -72,10 +71,8 @@ func TestCrawlerMultipleAppends(t *testing.T) {
 	totalExpected := int64(1) // the initial "hello world" line
 	for n := range 3 {
 		linesInRound := 20 + n
-		for i := range linesInRound {
-			AppendToFile(t, logFile, fmt.Sprintf("hello world %d %d\n", i, n))
-			totalExpected++
-		}
+		AppendLogFile(t, logFile, linesInRound, NewPlainTextGenerator("hello world"))
+		totalExpected += int64(linesInRound)
 		WaitUntil(t, func() bool { return count.Load() >= totalExpected },
 			60*time.Second, 200*time.Millisecond)
 		t.Logf("round %d complete, events so far: %d", n, count.Load())
@@ -86,7 +83,7 @@ func TestCrawlerMultipleAppends(t *testing.T) {
 		"expected 1 initial + 20 + 21 + 22 = 64 events")
 
 	// Write the final marker to let the beat terminate cleanly.
-	AppendToFile(t, logFile, finalMarker+"\n")
+	AppendLogFile(t, logFile, 1, NewPlainTextGenerator(finalMarker))
 	test.Wait()
 }
 
@@ -144,7 +141,7 @@ func TestCrawlerUTF8(t *testing.T) {
 
 	dir := t.TempDir()
 	logFile := filepath.Join(dir, "test.log")
-	WriteFile(t, logFile, "ニコラスRuflin\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("ニコラスRuflin"))
 
 	config := FilestreamInputConfig("utf8-test", filepath.Join(dir, "*.log"), FilestreamOptions{})
 	test := NewTest(t, TestOptions{Config: config})
@@ -169,7 +166,7 @@ func TestCrawlerFileDisappearAppear(t *testing.T) {
 	logFile := filepath.Join(dir, "test.log")
 
 	// Write first file's content.
-	WriteFile(t, logFile, "disappearing file\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("disappearing file"))
 
 	config := FilestreamInputConfig("disappear-appear-test", filepath.Join(dir, "*.log"), FilestreamOptions{
 		ScanInterval: "100ms",
@@ -200,7 +197,7 @@ func TestCrawlerFileDisappearAppear(t *testing.T) {
 	time.Sleep(500 * time.Millisecond)
 
 	// Create a new file at the same path with different content.
-	WriteFile(t, logFile, "new file content\n")
+	GenerateLogFile(t, logFile, 1, NewPlainTextGenerator("new file content"))
 
 	test.Wait()
 }

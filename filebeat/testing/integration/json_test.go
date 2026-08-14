@@ -25,9 +25,12 @@ package integration
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	libbeatintegration "github.com/elastic/beats/v7/libbeat/testing/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -50,12 +53,11 @@ func TestJSONDockerLogs(t *testing.T) {
 	logFile := filepath.Join(dir, "docker.log")
 
 	// Docker log format: each line is a JSON object with "log", "stream", "time".
-	WriteFile(
-		t, logFile,
+	require.NoError(t, os.WriteFile(logFile, []byte(
 		`{"log":"fetching dependencies\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}`+"\n"+
 			`{"log":"execute build script\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}`+"\n"+
 			`{"log":"build complete\n","stream":"stderr","time":"2016-03-02T22:59:05.617434682Z"}`+"\n",
-	)
+	), 0644))
 
 	config := FilestreamInputConfig("json-docker-test", logFile, FilestreamOptions{
 		NDJSON: &NDJSONOptions{
@@ -88,12 +90,11 @@ func TestJSONDockerLogsFiltering(t *testing.T) {
 	dir := t.TempDir()
 	logFile := filepath.Join(dir, "docker.log")
 
-	WriteFile(
-		t, logFile,
+	require.NoError(t, os.WriteFile(logFile, []byte(
 		`{"log":"linux line\n","stream":"stdout","time":"2016-01-01T00:00:00Z"}`+"\n"+
 			`{"log":"windows line\n","stream":"stdout","time":"2016-01-01T00:00:01Z"}`+"\n"+
 			`{"log":"another linux\n","stream":"stdout","time":"2016-01-01T00:00:02Z"}`+"\n",
-	)
+	), 0644))
 
 	config := FilestreamInputConfig("json-filter-test", logFile, FilestreamOptions{
 		NDJSON:       &NDJSONOptions{MessageKey: "log", KeysUnderRoot: true},
@@ -122,10 +123,9 @@ func TestJSONKeysUnderRoot(t *testing.T) {
 	logFile := filepath.Join(dir, "json.log")
 
 	// Use field names that are not reserved by ECS to avoid shadowing.
-	WriteFile(
-		t, logFile,
+	require.NoError(t, os.WriteFile(logFile, []byte(
 		`{"app_name":"myapp","app_env":"staging","message":"hello json world"}`+"\n",
-	)
+	), 0644))
 
 	config := FilestreamInputConfig("json-under-root-test", logFile, FilestreamOptions{
 		NDJSON: &NDJSONOptions{
@@ -159,10 +159,9 @@ func TestJSONOverwriteKeys(t *testing.T) {
 	dir := t.TempDir()
 	logFile := filepath.Join(dir, "override.log")
 
-	WriteFile(
-		t, logFile,
+	require.NoError(t, os.WriteFile(logFile, []byte(
 		`{"source":"hello","message":"test source"}`+"\n",
-	)
+	), 0644))
 
 	config := FilestreamInputConfig("json-overwrite-test", logFile, FilestreamOptions{
 		NDJSON: &NDJSONOptions{
@@ -198,11 +197,10 @@ func TestJSONAddErrorKey(t *testing.T) {
 	logFile := filepath.Join(dir, "invalid.log")
 
 	// Mix of valid and invalid JSON lines.
-	WriteFile(
-		t, logFile,
+	require.NoError(t, os.WriteFile(logFile, []byte(
 		"this is not json\n"+
 			`{"json_field":"valid_json_value"}`+"\n",
-	)
+	), 0644))
 
 	config := FilestreamInputConfig("json-error-key-test", logFile, FilestreamOptions{
 		NDJSON: &NDJSONOptions{
