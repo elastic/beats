@@ -127,6 +127,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() {
 			_ = grp.Stop()
+			//nolint:errcheck // It's a test, let it panic if the casting fails
 			e.getManager().(*loginp.InputManager).Close()
 		}()
 
@@ -399,7 +400,7 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
 	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		events := e.pipeline.GetAllEvents()
-		require.Equal(t, count, len(events), "unexpected number of events")
+		require.Len(t, events, count, "unexpected number of events")
 	}, 2*time.Minute, 10*time.Millisecond)
 }
 

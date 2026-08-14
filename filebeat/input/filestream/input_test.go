@@ -672,6 +672,7 @@ func createFilestreamTestRunner(tb testing.TB, logger *logp.Logger, testID strin
 	require.NoError(tb, p.Manager.Init(&group))
 	tb.Cleanup(func() {
 		require.NoError(tb, group.Stop())
+		//nolint:errcheck // It's a test, let it panic if the casting fails
 		p.Manager.(*loginp.InputManager).Close()
 	})
 	input, err := p.Manager.Create(c)

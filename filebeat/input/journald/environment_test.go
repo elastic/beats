@@ -325,6 +325,7 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
+	//nolint:gosec // cancel is passed to the mockClient
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &mockClient{
 		canceler:   cancel,
