@@ -500,9 +500,94 @@ func checkEventsActive(reg *monitoring.Registry) int64 {
 	return outputSnapshot.Ints["events.active"]
 }
 
+<<<<<<< HEAD
 // TestElasticsearchOutputVsExporterSerialization verifies that Beat events are serialized
 // identically whether they flow through the Beats Elasticsearch output or
 // through the OTel path (otelconsumer + ES exporter using bodymap mode).
+=======
+func TestFillLogRecordFromEventDoesNotError(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+
+	for _, tc := range benchmarkEventCases() {
+		t.Run(tc.name, func(t *testing.T) {
+			pubEvent := publisher.Event{Content: tc.event}
+			logRecord := plog.NewLogRecord()
+			if err := fillLogRecordFromEvent(logRecord, pubEvent, beatInfo, logger, false); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+func TestFillLogRecordFromEventCreated(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+	want := time.Date(2022, 11, 22, 19, 16, 32, 0, time.UTC)
+
+	t.Run("time.Time sets observed timestamp", func(t *testing.T) {
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": want}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("common.Time sets observed timestamp", func(t *testing.T) {
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": common.Time(want)}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("valid RFC3339 string parses correctly", func(t *testing.T) {
+		want, err := time.Parse(time.RFC3339, "2022-11-22T19:16:32.440Z")
+		require.NoError(t, err)
+
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": "2022-11-22T19:16:32.440Z"}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("valid RFC3339Nano string parses correctly", func(t *testing.T) {
+		want, err := time.Parse(time.RFC3339Nano, "2022-11-22T19:16:32.440123456Z")
+		require.NoError(t, err)
+
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": "2022-11-22T19:16:32.440123456Z"}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("invalid string falls back to current time", func(t *testing.T) {
+		before := time.Now()
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": "not-a-timestamp"}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		after := time.Now()
+
+		observed := logRecord.ObservedTimestamp().AsTime()
+		assert.False(t, observed.Before(before), "observed timestamp should not be before test start")
+		assert.False(t, observed.After(after), "observed timestamp should not be after test end")
+	})
+}
+
+// TestElasticsearchOutputVsExporterSerialization verifies that Beat events are
+// serialized identically across three paths for every fixture in
+// otelmap.BenchmarkCases:
+//   - Beats Elasticsearch output (go-structform encoder)
+//   - OTel path: otelmap.FromMapstr (direct) -> ES exporter (bodymap)
+>>>>>>> 7409abf51 (add string type to event.created conversion (#52604))
 func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	fixedTime := time.Date(2024, 6, 15, 10, 30, 0, 0, time.UTC)
