@@ -2386,7 +2386,7 @@ service:
 
 			docs, err := estools.GetAllLogsForIndexWithContext(findCtx, es, targetIndex)
 			assert.NoError(ct, err)
-			assert.Equal(ct, docs.Hits.Total.Value, numEvents*2,
+			assert.Equal(ct, numEvents*2, docs.Hits.Total.Value,
 				"expected %d events in %s index, got %d", numEvents*2, targetIndex, docs.Hits.Total.Value)
 		},
 		2*time.Minute, 1*time.Second,
