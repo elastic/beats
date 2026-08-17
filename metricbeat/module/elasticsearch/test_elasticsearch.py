@@ -86,7 +86,7 @@ class Test(metricbeat.BaseTest):
                                  "index_recovery.active_only": "false",
                                  "username": self.username,
                                  "password": self.password,
-                             })
+        })
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_xpack(self):
