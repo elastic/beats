@@ -24,6 +24,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
@@ -32,8 +35,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/testing/fs"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestHandleProducerWriteRequest(t *testing.T) {
