@@ -197,6 +197,12 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 				observedTimestamp = pcommon.NewTimestampFromTime(created)
 			case common.Time:
 				observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+			case string:
+				t, err := time.Parse(time.RFC3339Nano, created)
+				if err != nil {
+					t = time.Now()
+				}
+				observedTimestamp = pcommon.NewTimestampFromTime(t)
 			default:
 				out.log.Warnf("Invalid 'event.created' type (%T); using log timestamp as observed timestamp.", created)
 			}
