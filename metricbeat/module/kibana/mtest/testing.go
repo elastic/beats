@@ -23,6 +23,8 @@ func GetConfig(metricset string, host string) map[string]interface{} {
 		"module":     "kibana",
 		"metricsets": []string{metricset},
 		"hosts":      []string{host},
+		"username":   "admin",
+		"password":   "testing",
 	}
 
 	return config
