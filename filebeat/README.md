@@ -1,19 +1,20 @@
 # Filebeat
 
-Filebeat is an open source file harvester, mostly used to fetch log files and feed them into Logstash.
-Together with the libbeat lumberjack output is a replacement for [logstash-forwarder](https://github.com/elastic/logstash-forwarder).
+Filebeat is an open source shipper for logs and other event data.
+It reads from files, journals, network protocols, message queues, and cloud service APIs.
+It then sends the events to Elasticsearch, Logstash, Kafka, Redis, or a file.
 
 To learn more about Filebeat, check out https://www.elastic.co/beats/filebeat.
 
 
 ## Quick start
 
-Please follow the [quick start](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-installation-configuration.html)
+Please follow the [quick start](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-installation-configuration)
 guide from the docs.
 
 ## Documentation
 
-Please visit [elastic.co](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
+Please visit [elastic.co](https://www.elastic.co/docs/reference/beats/filebeat)
  for the documentation.
 
 
