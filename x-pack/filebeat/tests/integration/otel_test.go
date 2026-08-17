@@ -2315,7 +2315,7 @@ filebeat.inputs:
     file_identity.native: ~
     index: %s
     fields:
-      runtime: process
+      data_stream: process
 output:
   elasticsearch:
     hosts:
@@ -2351,7 +2351,7 @@ receivers:
           file_identity.native: ~
           index: %s
           fields:
-            runtime: otel
+            data_stream: otel
     logging:
       level: info
     queue.mem.flush.timeout: 0s

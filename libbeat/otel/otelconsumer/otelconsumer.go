@@ -213,11 +213,6 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
 	}
 
-	// if raw_index field is set on event metadata, propagate it as the elasticsearch index
-	if s, ok := event.Content.Meta["raw_index"].(string); ok {
-		logRecord.Attributes().PutStr(esIndexAttribute, s)
-	}
-
 	beatEvent := event.Content.Fields
 	if beatEvent == nil {
 		beatEvent = mapstr.M{}
@@ -255,6 +250,14 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		}
 		// temporary workaround for https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/49337
 		applyNonStandardDataStreamIndex(logRecord, ds)
+	}
+
+	// If raw_index is set on event metadata, propagate it as the
+	// Elasticsearch index, potentially overwriting the non-standard
+	// data stream index. This matches the behavior of the Beats
+	// index selector.
+	if s, ok := event.Content.Meta["raw_index"].(string); ok {
+		logRecord.Attributes().PutStr(esIndexAttribute, s)
 	}
 
 	bodyMap := logRecord.Body().SetEmptyMap()
