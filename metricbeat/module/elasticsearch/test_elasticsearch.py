@@ -16,8 +16,8 @@ class Test(metricbeat.BaseTest):
 
     def setUp(self):
         super(Test, self).setUp()
-        self.username = os.getenv("ES_USER", "")
-        self.password = os.getenv("ES_PASS", "")
+        self.username = os.getenv("ES_SUPERUSER_USER", "")
+        self.password = os.getenv("ES_SUPERUSER_PASS", "")
         self.es = Elasticsearch([self.get_elasticsearch_url()], basic_auth=(self.username, self.password))
         self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
         self.getHeaders = {"Authorization": f"Basic {self.auth_value}"}
@@ -82,7 +82,11 @@ class Test(metricbeat.BaseTest):
             self.create_enrich_stats()
 
         self.check_metricset("elasticsearch", metricset, [self.get_elasticsearch_url()], self.FIELDS +
-                             ["service"], extras={"index_recovery.active_only": "false"})
+                             ["service"], extras={
+                                 "index_recovery.active_only": "false",
+                                 "username": self.username,
+                                 "password": self.password,
+                             })
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_xpack(self):
@@ -109,6 +113,8 @@ class Test(metricbeat.BaseTest):
                 "shard"
             ],
             "hosts": [self.get_elasticsearch_url()],
+            "username": self.username,
+            "password": self.password,
             "period": "1s",
             "extras": {
                 "xpack.enabled": "true"
@@ -142,6 +148,8 @@ class Test(metricbeat.BaseTest):
                 "shard"
             ],
             "hosts": [self.get_elasticsearch_url()],
+            "username": self.username,
+            "password": self.password,
             "period": "1s",
             "extras": {
                 "xpack.enabled": "true"

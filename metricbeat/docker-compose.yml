@@ -4,6 +4,10 @@ services:
     environment:
       - ES_USER=metricbeat_user
       - ES_PASS=testing
+      - ES_SUPERUSER_USER=admin
+      - ES_SUPERUSER_PASS=testing
+      - KIBANA_USER=beats
+      - KIBANA_PASS=testing
       - BEAT_STRICT_PERMS=false
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
@@ -48,9 +52,9 @@ services:
         KIBANA_VERSION: ${KIBANA_VERSION:-9.5.1}
     environment:
       ELASTICSEARCH_USERNAME: kibana_system_user
-      ELASTICSEARCH_PASSWORD: testing
+      ELASTICSEARCH_PASSWORD: ${ES_PASS:-testing}
     healthcheck:
-      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      test: ["CMD-SHELL", "curl -u ${KIBANA_USER:-beats}:${KIBANA_PASS:-testing} -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
     depends_on:
       - elasticsearch
@@ -64,6 +68,9 @@ services:
       context: ./module/beat/_meta
       args:
         BEAT_VERSION: ${BEAT_VERSION:-9.5.1}
+    environment:
+      - ELASTICSEARCH_USERNAME=${ES_USER:-metricbeat_user}
+      - ELASTICSEARCH_PASSWORD=${ES_PASS:-testing}
     command: '-e'
     ports:
       - 5066:5066
