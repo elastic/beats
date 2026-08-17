@@ -1027,13 +1027,20 @@ This parser is only supported on Linux. On other platforms, configuring it retur
 
 The supported configuration options are:
 
+**`mode`**
+:   {applies_to}`stack: ga 9.5.3+` (Optional) Controls the parser behaviour. Valid values:
+
+    - `parse` (default): Each audit log line is parsed individually. Fields are added under `auditd.log.*`. This preserves one output event per input line.
+    - `coalesce`: Related audit records sharing the same sequence number are grouped into a single compound event using the same logic as `auditd_manager`. Fields are added under `auditd.data.*`, `auditd.summary.*`, and ECS root fields (`process.*`, `user.*`, `file.*`, etc.). Incomplete groups are flushed after a 2-second timeout.
+    - `none`: Disables parsing entirely. Lines pass through unchanged.
+
 **`log_errors`**
 :   (Optional) If `true`, parse errors are logged via the Filebeat logger. Defaults to `false`.
 
 **`add_error_key`**
 :   (Optional) If `true`, a parse error is added to the event under `error.message`. Defaults to `true`.
 
-Example configuration:
+Example configuration (per-line parsing, the default):
 
 ```yaml
 filebeat.inputs:
@@ -1045,6 +1052,20 @@ filebeat.inputs:
       - auditd:
           log_errors: true
           add_error_key: true
+```
+
+Example configuration (coalescing mode):
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: auditd-logs
+    paths:
+      - /var/log/audit/audit.log
+    parsers:
+      - auditd:
+          mode: coalesce
+          log_errors: true
 ```
 
 ### `encoding` [_encoding_2]

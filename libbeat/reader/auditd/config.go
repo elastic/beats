@@ -17,17 +17,49 @@
 
 package auditd
 
-// Config stores the configuration for the auditd Parser.
+import "fmt"
+
+// Mode controls what the auditd parser does with each log line.
+type Mode string
+
+const (
+	// ModeNone disables auditd parsing entirely (pass-through).
+	ModeNone Mode = "none"
+	// ModeParse parses each line independently, populating auditd.log.* fields.
+	ModeParse Mode = "parse"
+	// ModeCoalesce groups related records by sequence number and produces
+	// compound events in the auditd.data.* namespace using aucoalesce.
+	ModeCoalesce Mode = "coalesce"
+)
+
+// Unpack implements the config.Unpacker interface for Mode.
+func (m *Mode) Unpack(s string) error {
+	switch Mode(s) {
+	case ModeNone, ModeParse, ModeCoalesce:
+		*m = Mode(s)
+		return nil
+	default:
+		return fmt.Errorf("invalid auditd parser mode %q (valid: none, parse, coalesce)", s)
+	}
+}
+
+// Config stores the configuration for the auditd parser.
 type Config struct {
+	// Mode controls the parser behaviour. Default is "parse" (per-line parsing).
+	Mode Mode `config:"mode"`
 	// LogErrors, if true, logs parse errors via the parser's logger.
 	LogErrors bool `config:"log_errors"`
 	// AddErrorKey, if true, adds a parse error to the event under error.message.
 	AddErrorKey bool `config:"add_error_key"`
 }
 
-// DefaultConfig returns a Config populated with default values.
+// DefaultConfig returns a Config populated with default values. The default
+// mode is "parse" for backward compatibility: the auditd parser section is only
+// present when the integration has opted in via the use_auditd_parser toggle,
+// so its mere presence implies that parsing is desired.
 func DefaultConfig() Config {
 	return Config{
+		Mode:        ModeParse,
 		LogErrors:   false,
 		AddErrorKey: true,
 	}
