@@ -1027,11 +1027,11 @@ This parser is only supported on Linux. On other platforms, configuring it retur
 
 The supported configuration options are:
 
-**`mode`**
-:   {applies_to}`stack: ga 9.5.3+` (Optional) Controls the parser behaviour. Valid values:
+**`mode`** {applies_to}`stack: ga 9.5.3+`
+:   (Optional) Controls the parser behavior. Valid values:
 
     - `parse` (default): Each audit log line is parsed individually. Fields are added under `auditd.log.*`. This preserves one output event per input line.
-    - `coalesce`: Related audit records sharing the same sequence number are grouped into a single compound event using the same logic as `auditd_manager`. Fields are added under `auditd.data.*`, `auditd.summary.*`, and ECS root fields (`process.*`, `user.*`, `file.*`, etc.). Incomplete groups are flushed after a 2-second timeout.
+    - `coalesce`: Related audit records sharing the same sequence number are grouped into a single compound event using the same logic as `auditd_manager`. Fields are added under `auditd.data.*`, `auditd.summary.*`, and ECS root fields (`process.*`, `user.*`, `file.*`, and so on). Incomplete groups are flushed after a 2-second timeout.
     - `none`: Disables parsing entirely. Lines pass through unchanged.
 
 **`log_errors`**
