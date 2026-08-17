@@ -256,7 +256,7 @@ func handshakePayload(secLayer byte, maxSize uint32, authzid []byte) []byte {
 	selectedSecurity := secLayer
 	var truncatedSize uint32
 	if selectedSecurity != 0 {
-		// Only 3 bytes available for max size, set to 0x00FFFFFF per RFC 4752.
+		// Only 3 bytes available for max size, set to 0x00FFFFFF per RFC 4752, sections 3.1 and 3.2.
 		truncatedSize = min(0x00_FF_FF_FF, maxSize)
 	}
 	payload := make([]byte, 4, 4+len(authzid))
