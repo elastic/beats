@@ -36,13 +36,6 @@ services:
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
-<<<<<<< HEAD
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-9.2.2}-1
-    build:
-      context: ../../metricbeat/module/kibana/_meta
-      args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-9.2.2}
-=======
     image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-9.5.1}-1
     build:
       context: ../../metricbeat/module/kibana/_meta
@@ -54,7 +47,6 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -u ${KIBANA_USER:-beats}:${KIBANA_PASS:-testing} -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
->>>>>>> 1988845e4 ([Release] Update test environments for 9.5.2 (#52424))
     depends_on:
       - elasticsearch
     ports:
