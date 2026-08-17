@@ -20,6 +20,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -335,6 +336,70 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
+	t.Run("sets observed timestamp from event.created as common.Time", func(t *testing.T) {
+		eventTime := time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
+		eventCreatedTime := eventTime.Add(-time.Minute)
+
+		eventWithCommonTime := beat.Event{Fields: mapstr.M{"event": mapstr.M{"created": common.Time(eventCreatedTime)}}}
+		batch := outest.NewBatch(eventWithCommonTime)
+		batch.Events()[0].Content.Timestamp = eventTime
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			observedTimestamp := record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			expected := eventCreatedTime.UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.Equal(t, expected, observedTimestamp, "observed timestamp should match event.created common.Time value")
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
+	t.Run("sets observed timestamp from event.created as valid RFC3339Nano string", func(t *testing.T) {
+		eventTime := time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
+		eventCreatedTime := eventTime.Add(-time.Minute)
+
+		eventWithStringTime := beat.Event{Fields: mapstr.M{"event": mapstr.M{"created": eventCreatedTime.UTC().Format(time.RFC3339Nano)}}}
+		batch := outest.NewBatch(eventWithStringTime)
+		batch.Events()[0].Content.Timestamp = eventTime
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			observedTimestamp := record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			expected := eventCreatedTime.UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.Equal(t, expected, observedTimestamp, "observed timestamp should match event.created string value")
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
+	t.Run("falls back to time.Now for event.created as invalid string", func(t *testing.T) {
+		eventTime := time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
+
+		eventWithBadString := beat.Event{Fields: mapstr.M{"event": mapstr.M{"created": "not-a-timestamp"}}}
+		batch := outest.NewBatch(eventWithBadString)
+		batch.Events()[0].Content.Timestamp = eventTime
+
+		before := time.Now()
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			after := time.Now()
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			observedTime := record.ObservedTimestamp().AsTime()
+			assert.True(t, !observedTime.Before(before) && !observedTime.After(after),
+				"observed timestamp should be approximately time.Now() when event.created string is unparseable")
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
 	t.Run("sets the client context metadata with the beat info", func(t *testing.T) {
 		batch := outest.NewBatch(event1)
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
