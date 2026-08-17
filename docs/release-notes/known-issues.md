@@ -21,6 +21,20 @@ Known issues are significant defects or limitations that may impact your impleme
 
 % :::
 
+:::{dropdown} Disk queue filled metrics can overflow after blocked publishes
+**Applies to**: Beats with the disk queue enabled before this fix is released.
+
+**Details**
+When a disk queue reaches its configured capacity, a producer can block until
+the consumer frees space. The queue then accepts the blocked event without
+updating its metrics. When the event is later removed, the `queue.filled.events`
+and `queue.filled.bytes` metrics can underflow and report incorrect values;
+`queue.filled.pct` is also incorrect. Event delivery is unaffected.
+
+**Resolved**
+To apply the fix, upgrade to version 8.19.21, 9.5.3, 9.4.6, or any later release.
+:::
+
 :::{dropdown} OTel runtime silently converts `map[string]string` values to `"unknown type: map[string]string"`
 **Applies to**: Beats 9.5.0+ (OTel runtime)
 
