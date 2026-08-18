@@ -277,6 +277,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+<<<<<<< HEAD:metricbeat/docs/modules/system.asciidoc
 * <<metricbeat-metricset-system-core,core>>
 
 * <<metricbeat-metricset-system-cpu,cpu>>
@@ -350,3 +351,24 @@ include::system/uptime.asciidoc[]
 include::system/users.asciidoc[]
 
 :edit_url!:
+=======
+* [core](/reference/metricbeat/metricbeat-metricset-system-core.md)
+* [cpu](/reference/metricbeat/metricbeat-metricset-system-cpu.md)
+* [diskio](/reference/metricbeat/metricbeat-metricset-system-diskio.md)
+* [entropy](/reference/metricbeat/metricbeat-metricset-system-entropy.md)
+* [filesystem](/reference/metricbeat/metricbeat-metricset-system-filesystem.md)
+* [fsstat](/reference/metricbeat/metricbeat-metricset-system-fsstat.md)
+* [load](/reference/metricbeat/metricbeat-metricset-system-load.md)
+* [memory](/reference/metricbeat/metricbeat-metricset-system-memory.md)
+* [network](/reference/metricbeat/metricbeat-metricset-system-network.md)
+* [network_summary](/reference/metricbeat/metricbeat-metricset-system-network_summary.md)
+* [ntp](/reference/metricbeat/metricbeat-metricset-system-ntp.md)  {applies_to}`stack: beta 9.2.0`
+* [process](/reference/metricbeat/metricbeat-metricset-system-process.md)
+* [process_summary](/reference/metricbeat/metricbeat-metricset-system-process_summary.md)
+* [raid](/reference/metricbeat/metricbeat-metricset-system-raid.md)
+* [service](/reference/metricbeat/metricbeat-metricset-system-service.md)
+* [socket](/reference/metricbeat/metricbeat-metricset-system-socket.md)
+* [socket_summary](/reference/metricbeat/metricbeat-metricset-system-socket_summary.md)
+* [uptime](/reference/metricbeat/metricbeat-metricset-system-uptime.md)
+* [users](/reference/metricbeat/metricbeat-metricset-system-users.md)
+>>>>>>> f7e6a5061 (metricbeat/linux: align package metricsets with GA status (#52310)):docs/reference/metricbeat/metricbeat-module-system.md
