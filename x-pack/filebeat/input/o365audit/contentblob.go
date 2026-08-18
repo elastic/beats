@@ -13,7 +13,7 @@ import (
 
 	"github.com/Azure/go-autorest/autorest"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/o365audit/poll"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

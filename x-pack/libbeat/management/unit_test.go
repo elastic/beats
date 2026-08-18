@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 )
 
 func TestUnitUpdate(t *testing.T) {

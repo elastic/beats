@@ -27,9 +27,9 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/otelstorage"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend/memlog"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend/otelstorage"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

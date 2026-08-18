@@ -12,7 +12,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat"
 )
 
 func (in *s3PollerInput) createS3API(ctx context.Context) (*awsS3API, error) {

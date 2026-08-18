@@ -17,7 +17,7 @@
 
 package summarizer
 
-import "github.com/elastic/beats/v7/libbeat/beat"
+import "github.com/elastic/beats/v9/libbeat/beat"
 
 func synthType(event *beat.Event) string {
 	synthType, err := event.GetValue("synthetics.type")

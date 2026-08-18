@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v9/libbeat/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"

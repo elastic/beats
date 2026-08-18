@@ -20,9 +20,9 @@ package server
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v9/metricbeat/helper"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb/parse"
 )
 
 const (

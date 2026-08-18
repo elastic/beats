@@ -23,14 +23,14 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v9/pkg/autodiscover/utils"
 
-	"github.com/elastic/beats/v7/filebeat/fileset"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/filebeat/fileset"
+	"github.com/elastic/beats/v9/filebeat/harvester"
+	"github.com/elastic/beats/v9/libbeat/autodiscover"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v9/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"

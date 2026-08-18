@@ -39,12 +39,12 @@ import (
 
 	"github.com/elastic/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
-	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v9/libbeat/outputs"
+	_ "github.com/elastic/beats/v9/libbeat/outputs/codec/format"
+	_ "github.com/elastic/beats/v9/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v9/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"

@@ -9,7 +9,7 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

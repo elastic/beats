@@ -18,15 +18,15 @@
 package inputs
 
 import (
-	"github.com/elastic/beats/v7/filebeat/input/filestream"
-	"github.com/elastic/beats/v7/filebeat/input/kafka"
-	"github.com/elastic/beats/v7/filebeat/input/logv2"
-	"github.com/elastic/beats/v7/filebeat/input/net/tcp"
-	"github.com/elastic/beats/v7/filebeat/input/net/udp"
-	"github.com/elastic/beats/v7/filebeat/input/unix"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v9/filebeat/input/filestream"
+	"github.com/elastic/beats/v9/filebeat/input/kafka"
+	"github.com/elastic/beats/v9/filebeat/input/logv2"
+	"github.com/elastic/beats/v9/filebeat/input/net/tcp"
+	"github.com/elastic/beats/v9/filebeat/input/net/udp"
+	"github.com/elastic/beats/v9/filebeat/input/unix"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

@@ -18,7 +18,7 @@
 package sysinit
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v9/metricbeat/helper"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

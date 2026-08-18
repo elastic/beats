@@ -24,12 +24,12 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/acker"
+	"github.com/elastic/beats/v9/libbeat/common/backoff"
+	"github.com/elastic/beats/v9/libbeat/management/status"
+	"github.com/elastic/beats/v9/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

@@ -25,13 +25,13 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/otelconsumer"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/otel/otelconsumer"
+	"github.com/elastic/beats/v9/libbeat/outputs"
+	"github.com/elastic/beats/v9/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue/slabqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

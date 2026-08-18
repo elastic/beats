@@ -20,7 +20,7 @@ package v2
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v9/libbeat/feature"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

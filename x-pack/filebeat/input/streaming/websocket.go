@@ -25,9 +25,9 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	inputcursor "github.com/elastic/beats/v9/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"

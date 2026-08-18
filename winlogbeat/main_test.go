@@ -21,8 +21,8 @@ package main
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/system/template"
-	"github.com/elastic/beats/v7/winlogbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/tests/system/template"
+	"github.com/elastic/beats/v9/winlogbeat/cmd"
 )
 
 func TestTemplate(t *testing.T) {

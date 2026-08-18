@@ -12,8 +12,8 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v9/x-pack/heartbeat/scenarios/framework"
 )
 
 var scenarioDB = framework.NewScenarioDB()

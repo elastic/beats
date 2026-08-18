@@ -22,9 +22,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v9/filebeat/harvester"
+	"github.com/elastic/beats/v9/filebeat/input/file"
+	"github.com/elastic/beats/v9/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

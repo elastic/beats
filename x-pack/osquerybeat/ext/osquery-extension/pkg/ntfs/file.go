@@ -12,7 +12,7 @@ import (
 	"slices"
 	"strings"
 
-	elasticntfsfile "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_file"
+	elasticntfsfile "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_file"
 
 	"www.velocidex.com/golang/go-ntfs/parser"
 )

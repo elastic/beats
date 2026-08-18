@@ -14,12 +14,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/auditbeat/ab"
-	"github.com/elastic/beats/v7/auditbeat/helper/tty"
-	"github.com/elastic/beats/v7/libbeat/common/capabilities"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/beats/v9/auditbeat/ab"
+	"github.com/elastic/beats/v9/auditbeat/helper/tty"
+	"github.com/elastic/beats/v9/libbeat/common/capabilities"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	quark "github.com/elastic/go-quark"
 )

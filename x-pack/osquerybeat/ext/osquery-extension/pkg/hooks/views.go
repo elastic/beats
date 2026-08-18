@@ -10,7 +10,7 @@ import (
 
 	"github.com/osquery/osquery-go"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // View is a struct that represents data required to create a view in osquery

@@ -22,16 +22,16 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
-	"github.com/elastic/beats/v7/filebeat/fileset"
-	"github.com/elastic/beats/v7/filebeat/include"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/filebeat/beater"
+	"github.com/elastic/beats/v9/filebeat/fileset"
+	"github.com/elastic/beats/v9/filebeat/include"
+	"github.com/elastic/beats/v9/filebeat/input"
+	"github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
 
 	// Import processors.
-	_ "github.com/elastic/beats/v7/libbeat/processors/cache"
-	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/v9/libbeat/processors/cache"
+	_ "github.com/elastic/beats/v9/libbeat/processors/timestamp"
 )
 
 // Name of this beat

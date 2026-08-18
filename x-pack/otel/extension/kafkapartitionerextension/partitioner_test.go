@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/twmb/franz-go/pkg/kgo"
 
-	"github.com/elastic/beats/v7/libbeat/outputs/kafka"
+	"github.com/elastic/beats/v9/libbeat/outputs/kafka"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

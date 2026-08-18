@@ -10,13 +10,13 @@
 package generated
 
 import (
-	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl"
+	_ "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl"
 
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	samplecustomtable "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/sample_custom_table"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	samplecustomtable "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/sample_custom_table"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.

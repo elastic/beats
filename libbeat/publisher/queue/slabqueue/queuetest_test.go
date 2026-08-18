@@ -20,10 +20,10 @@ package slabqueue_test
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
+	"github.com/elastic/beats/v9/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue/slabqueue"
 )
 
 func makeTestQueue(sz int) queuetest.QueueFactory {

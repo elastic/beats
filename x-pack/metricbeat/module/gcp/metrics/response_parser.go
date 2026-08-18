@@ -11,7 +11,7 @@ import (
 
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"runtime/debug"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 

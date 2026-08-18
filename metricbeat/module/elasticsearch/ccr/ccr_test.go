@@ -28,9 +28,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v9/metricbeat/module/elasticsearch"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 )
 
 func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {

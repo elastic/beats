@@ -22,7 +22,7 @@ package kprobes
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v9/auditbeat/tracing"
 
 	tkbtf "github.com/elastic/tk-btf"
 

@@ -24,17 +24,17 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/metricbeat/beater"
-	"github.com/elastic/beats/v7/metricbeat/cmd/test"
-	"github.com/elastic/beats/v7/metricbeat/include"
-	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	"github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/ecs"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/metricbeat/beater"
+	"github.com/elastic/beats/v9/metricbeat/cmd/test"
+	"github.com/elastic/beats/v9/metricbeat/include"
+	"github.com/elastic/beats/v9/metricbeat/mb/module"
 
 	// import modules
-	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
+	_ "github.com/elastic/beats/v9/metricbeat/include/fields"
 )
 
 const (

@@ -23,7 +23,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/beats/v9/libbeat/processors/add_kubernetes_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"

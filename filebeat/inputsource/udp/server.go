@@ -20,8 +20,8 @@ package udp
 import (
 	"net"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/filebeat/inputsource/common/dgram"
+	"github.com/elastic/beats/v9/filebeat/inputsource"
+	"github.com/elastic/beats/v9/filebeat/inputsource/common/dgram"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

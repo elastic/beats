@@ -27,14 +27,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/mysql"
-	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
-	sqlmod "github.com/elastic/beats/v7/x-pack/metricbeat/module/sql"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/tests/compose"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/metricbeat/module/mysql"
+	"github.com/elastic/beats/v9/metricbeat/module/postgresql"
+	sqlmod "github.com/elastic/beats/v9/x-pack/metricbeat/module/sql"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/sql/query/cursor"
 )
 
 const testTableName = "cursor_test_events"

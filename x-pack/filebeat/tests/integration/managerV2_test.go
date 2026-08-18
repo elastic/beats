@@ -29,11 +29,11 @@ import (
 	"google.golang.org/grpc/credentials"
 	protobuf "google.golang.org/protobuf/proto"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/beats/v7/testing/certutil"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/libbeat/version"
+	"github.com/elastic/beats/v9/testing/certutil"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management/tests"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )

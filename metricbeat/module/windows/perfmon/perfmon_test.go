@@ -24,8 +24,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/metricbeat/helper/windows/pdh"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"

@@ -9,9 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
+	"github.com/elastic/beats/v9/x-pack/dockerlogbeat/logdriver"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
+	"github.com/elastic/beats/v9/x-pack/dockerlogbeat/pipelinemock"
 )
 
 func TestPipeReader(t *testing.T) {

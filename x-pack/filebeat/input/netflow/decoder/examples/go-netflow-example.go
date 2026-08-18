@@ -12,7 +12,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder"
 )
 
 func main() {

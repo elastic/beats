@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v9/heartbeat/monitors/plugin"
 )
 
 // Test all required plugins are exported by this module, since it's the

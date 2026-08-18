@@ -9,11 +9,11 @@ package app_insights
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/test"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/azure/test"
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 )
 
 var metrics = []map[string]interface{}{{

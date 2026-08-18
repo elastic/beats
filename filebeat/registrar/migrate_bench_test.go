@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	libfile "github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v9/filebeat/input/file"
+	libfile "github.com/elastic/beats/v9/libbeat/common/file"
 )
 
 var keep bool

@@ -14,9 +14,9 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v9/libbeat/common/match"
+	"github.com/elastic/beats/v9/libbeat/reader/parser"
+	"github.com/elastic/beats/v9/libbeat/reader/readfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

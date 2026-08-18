@@ -24,12 +24,12 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat/events"
+	"github.com/elastic/beats/v9/libbeat/idxmgmt/lifecycle"
+	"github.com/elastic/beats/v9/libbeat/outputs"
+	"github.com/elastic/beats/v9/libbeat/outputs/outil"
+	"github.com/elastic/beats/v9/libbeat/template"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

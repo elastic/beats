@@ -25,11 +25,11 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	loginp "github.com/elastic/beats/v9/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v9/libbeat/common/match"
+	"github.com/elastic/beats/v9/libbeat/reader/parser"
+	"github.com/elastic/beats/v9/libbeat/reader/readfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

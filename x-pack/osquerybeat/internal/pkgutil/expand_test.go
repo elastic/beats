@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/xar"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/xar"
 )
 
 // cpioEntry describes a single odc ("070707") cpio archive member.

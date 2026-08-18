@@ -14,7 +14,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/testactivedirectory"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/activedirectory/testactivedirectory"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 	ecad "github.com/elastic/entcollect/provider/ad"

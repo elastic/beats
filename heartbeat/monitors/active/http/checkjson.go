@@ -27,9 +27,9 @@ import (
 	"github.com/PaesslerAG/gval"
 	"github.com/PaesslerAG/jsonpath"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
-	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v9/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v9/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

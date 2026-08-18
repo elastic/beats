@@ -23,11 +23,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/licenser"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/cfgfile"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/licenser"
+	"github.com/elastic/beats/v9/libbeat/outputs/elasticsearch"
 )
 
 // BeatsRootCmd handles all application command line interface, parses user

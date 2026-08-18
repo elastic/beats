@@ -22,9 +22,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	bay "github.com/elastic/bayeux"
-	finput "github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	finput "github.com/elastic/beats/v9/filebeat/input"
+	"github.com/elastic/beats/v9/filebeat/input/inputtest"
+	"github.com/elastic/beats/v9/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"

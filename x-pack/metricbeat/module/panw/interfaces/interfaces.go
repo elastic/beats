@@ -8,9 +8,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/panw"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

@@ -16,7 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // UserProfile represents a user profile on the system.

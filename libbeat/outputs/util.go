@@ -20,11 +20,11 @@ package outputs
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v9/libbeat/management"
+	"github.com/elastic/beats/v9/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"

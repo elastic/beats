@@ -7,9 +7,9 @@ package tables
 import (
 	"github.com/osquery/osquery-go"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.

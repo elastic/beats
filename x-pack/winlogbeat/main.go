@@ -8,7 +8,7 @@ import (
 	"os"
 	_ "time/tzdata" // for timezone handling
 
-	"github.com/elastic/beats/v7/x-pack/winlogbeat/cmd"
+	"github.com/elastic/beats/v9/x-pack/winlogbeat/cmd"
 )
 
 func main() {

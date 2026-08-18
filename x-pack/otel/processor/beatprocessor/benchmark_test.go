@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat"
 
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.uber.org/zap"

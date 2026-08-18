@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

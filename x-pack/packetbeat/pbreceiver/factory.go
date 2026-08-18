@@ -12,21 +12,21 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/packetbeat/beater"
-	"github.com/elastic/beats/v7/packetbeat/cmd"
-	"github.com/elastic/beats/v7/packetbeat/include"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/packetbeat/beater"
+	"github.com/elastic/beats/v9/packetbeat/cmd"
+	"github.com/elastic/beats/v9/packetbeat/include"
 
 	// Import X-Pack modules.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
 
 	// Enable pipelines.
-	_ "github.com/elastic/beats/v7/x-pack/packetbeat/module"
+	_ "github.com/elastic/beats/v9/x-pack/packetbeat/module"
 
 	// This registers the Npcap installer on Windows.
-	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
+	_ "github.com/elastic/beats/v9/x-pack/packetbeat/npcap"
 
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 )
 
 const (

@@ -15,7 +15,7 @@ import (
 
 	"www.velocidex.com/golang/regparser"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 type Entry interface {

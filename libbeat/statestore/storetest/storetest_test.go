@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/beats/v7/libbeat/statestore/internal/storecompliance"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/internal/storecompliance"
 )
 
 func TestCompliance(t *testing.T) {

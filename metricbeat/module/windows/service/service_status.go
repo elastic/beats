@@ -29,7 +29,7 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v9/libbeat/common"
 
 	"errors"
 

@@ -20,8 +20,8 @@
 package journald
 
 import (
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

@@ -29,12 +29,12 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
 
 	//mage:import
 	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v9/dev-tools/mage/gotool"
 )
 
 var (

@@ -5,8 +5,8 @@
 package events
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

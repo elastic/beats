@@ -12,14 +12,14 @@ import (
 
 	"github.com/moby/moby/v2/daemon/logger"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
+	"github.com/elastic/beats/v9/x-pack/dockerlogbeat/logdriver"
 
 	"github.com/moby/moby/v2/daemon/server/backend"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	helper "github.com/elastic/beats/v7/pkg/autodiscover/docker"
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/acker"
+	helper "github.com/elastic/beats/v9/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v9/x-pack/dockerlogbeat/pipereader"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

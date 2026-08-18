@@ -11,18 +11,18 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	elasticamcacheapplication "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application"
-	elasticamcacheapplicationfile "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application_file"
-	elasticamcacheapplicationshortcut "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application_shortcut"
-	elasticamcachedevicepnp "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_device_pnp"
-	elasticamcachedriverbinary "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_binary"
-	elasticamcachedriverpackage "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_package"
-	elasticamcacheapplicationsview "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/amcache/elastic_amcache_applications_view"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache/tables"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticamcacheapplication "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application"
+	elasticamcacheapplicationfile "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application_file"
+	elasticamcacheapplicationshortcut "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application_shortcut"
+	elasticamcachedevicepnp "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_device_pnp"
+	elasticamcachedriverbinary "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_binary"
+	elasticamcachedriverpackage "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_package"
+	elasticamcacheapplicationsview "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/amcache/elastic_amcache_applications_view"
 )
 
 func init() {

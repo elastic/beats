@@ -22,7 +22,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v9/heartbeat/monitors/stdfields"
 )
 
 // FlappingThreshold defines how many consecutive checks with the same status

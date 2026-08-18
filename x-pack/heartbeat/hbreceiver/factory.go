@@ -12,18 +12,18 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/heartbeat/beater"
-	"github.com/elastic/beats/v7/heartbeat/cmd"
+	"github.com/elastic/beats/v9/heartbeat/beater"
+	"github.com/elastic/beats/v9/heartbeat/cmd"
 
 	// Import OSS monitor types.
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/tcp"
 
 	// Import X-Pack modules.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
 
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 )
 
 const (

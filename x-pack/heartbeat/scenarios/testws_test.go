@@ -14,7 +14,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v9/heartbeat/hbtest"
 )
 
 var testWsOnce = &sync.Once{}

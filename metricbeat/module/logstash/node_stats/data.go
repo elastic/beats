@@ -22,15 +22,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v9/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 
-	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/beats/v9/metricbeat/module/logstash"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 type jvm struct {

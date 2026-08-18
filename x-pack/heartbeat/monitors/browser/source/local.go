@@ -9,7 +9,7 @@ package source
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v9/heartbeat/ecserr"
 )
 
 type LocalSource struct {

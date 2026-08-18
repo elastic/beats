@@ -24,9 +24,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/filebeat/config"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	"github.com/elastic/beats/v9/filebeat/config"
+	"github.com/elastic/beats/v9/filebeat/input/file"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend/memlog"
 	helper "github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"

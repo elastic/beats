@@ -21,7 +21,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
 	"github.com/elastic/go-concert/unison"
 )
 

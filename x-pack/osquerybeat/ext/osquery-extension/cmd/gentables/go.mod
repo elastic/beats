@@ -1,4 +1,4 @@
-module github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/cmd/gentables
+module github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/cmd/gentables
 
 go 1.21
 

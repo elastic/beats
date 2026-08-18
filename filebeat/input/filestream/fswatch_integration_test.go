@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	loginp "github.com/elastic/beats/v9/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 

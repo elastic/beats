@@ -30,9 +30,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/mysql"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/mysql"
 )
 
 // init registers the MetricSet with the central registry.

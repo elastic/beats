@@ -28,10 +28,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/beats/v9/filebeat/input/journald/pkg/journalctl"
+	"github.com/elastic/beats/v9/filebeat/input/journald/pkg/journalfield"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"

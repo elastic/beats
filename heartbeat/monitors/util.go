@@ -23,11 +23,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/heartbeat/eventext"
+	"github.com/elastic/beats/v9/heartbeat/look"
+	"github.com/elastic/beats/v9/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers/wraputil"
+	"github.com/elastic/beats/v9/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

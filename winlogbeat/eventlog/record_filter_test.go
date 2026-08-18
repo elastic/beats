@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/beats/v9/winlogbeat/sys/winevent"
 )
 
 func TestParseLevels(t *testing.T) {

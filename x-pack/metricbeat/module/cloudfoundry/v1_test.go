@@ -11,8 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	cfcommon "github.com/elastic/beats/v9/x-pack/libbeat/common/cloudfoundry"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

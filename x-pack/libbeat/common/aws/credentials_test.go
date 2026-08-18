@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
+	"github.com/elastic/beats/v9/x-pack/libbeat/common/identityfederation"
 )
 
 func TestInitializeAWSConfigIdentityFederation(t *testing.T) {

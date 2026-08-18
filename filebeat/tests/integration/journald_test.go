@@ -41,7 +41,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 )
 
 //go:embed testdata/filebeat_journald.yml

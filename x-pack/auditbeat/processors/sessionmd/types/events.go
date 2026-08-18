@@ -6,7 +6,7 @@ package types
 
 //go:generate stringer -linecomment=true -type=Type,HookPoint,Field -output=gen_types_string.go
 
-import "github.com/elastic/beats/v7/auditbeat/helper/tty"
+import "github.com/elastic/beats/v9/auditbeat/helper/tty"
 
 type Type uint64
 

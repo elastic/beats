@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
+	elasticbrowserhistory "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 	"golang.org/x/net/publicsuffix"
 )
 

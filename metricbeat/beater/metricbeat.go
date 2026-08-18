@@ -21,13 +21,13 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	"github.com/elastic/beats/v9/libbeat/autodiscover"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/cfgfile"
+	"github.com/elastic/beats/v9/libbeat/management"
+	"github.com/elastic/beats/v9/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -35,13 +35,13 @@ import (
 	"github.com/gohugoio/hashstructure"
 
 	// include all metricbeat specific builders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
+	_ "github.com/elastic/beats/v9/metricbeat/autodiscover/builder/hints"
 
 	// include all metricbeat specific appenders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
+	_ "github.com/elastic/beats/v9/metricbeat/autodiscover/appender/kubernetes/token"
 
 	// Add metricbeat default processors
-	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
+	_ "github.com/elastic/beats/v9/metricbeat/processor/add_kubernetes_metadata"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.

@@ -18,10 +18,10 @@
 package actions
 
 import (
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/processors/actions/addfields"
+	"github.com/elastic/beats/v9/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/v9/libbeat/processors/script/javascript/module/processor/registry"
 )
 
 func init() {

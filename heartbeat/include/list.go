@@ -21,13 +21,13 @@ package include
 
 import (
 	// Import packages to perform 'func InitializeModule()' when in-use.
-	m0 "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
-	m1 "github.com/elastic/beats/v7/heartbeat/security"
+	m0 "github.com/elastic/beats/v9/heartbeat/autodiscover/builder/hints"
+	m1 "github.com/elastic/beats/v9/heartbeat/security"
 
 	// Import packages that perform 'func init()'.
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/tcp"
 )
 
 // InitializeModules initialize all of the modules.

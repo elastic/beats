@@ -5,7 +5,7 @@
 package panw
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 const (

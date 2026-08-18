@@ -23,7 +23,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

@@ -15,9 +15,9 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/otel/otelctx"
+	"github.com/elastic/beats/v9/libbeat/publisher"
 )
 
 func TestNewLogBatch(t *testing.T) {

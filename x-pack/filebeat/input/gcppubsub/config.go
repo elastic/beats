@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v9/filebeat/harvester"
+	"github.com/elastic/beats/v9/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 
 	"cloud.google.com/go/pubsub"

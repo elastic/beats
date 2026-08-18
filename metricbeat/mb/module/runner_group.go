@@ -21,9 +21,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v9/libbeat/cfgfile"
+	"github.com/elastic/beats/v9/libbeat/common/diagnostics"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 )
 
 type runnerGroup struct {

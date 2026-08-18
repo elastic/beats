@@ -13,7 +13,7 @@ import (
 
 	// Import the npcap package like packetbeat does to verify it does not load
 	// wpcap.dll automatically
-	_ "github.com/elastic/beats/v7/packetbeat/npcap"
+	_ "github.com/elastic/beats/v9/packetbeat/npcap"
 )
 
 func main() {

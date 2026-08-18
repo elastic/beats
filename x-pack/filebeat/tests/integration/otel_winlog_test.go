@@ -17,9 +17,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
-	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltestcol"
 )
 
 func TestWinlogInputOTelE2E(t *testing.T) {

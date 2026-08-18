@@ -20,12 +20,12 @@ package input
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/registrar"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v9/filebeat/channel"
+	"github.com/elastic/beats/v9/filebeat/registrar"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/cfgfile"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/libbeat/publisher/pipeline"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

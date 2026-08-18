@@ -25,9 +25,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v9/heartbeat/config"
+	"github.com/elastic/beats/v9/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v9/libbeat/esleg/eslegclient"
 )
 
 var DefaultDataStreams = "synthetics-*,heartbeat-*"

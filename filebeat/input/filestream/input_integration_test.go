@@ -39,7 +39,7 @@ import (
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

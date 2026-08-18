@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/lumberjack"
 )

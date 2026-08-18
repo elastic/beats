@@ -22,8 +22,8 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 
-	"github.com/elastic/beats/v7/filebeat/input/filestream"
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v9/filebeat/input/filestream"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltest"
 )
 
 // BenchmarkNReceiverIdleFootprint measures the steady-state resource footprint

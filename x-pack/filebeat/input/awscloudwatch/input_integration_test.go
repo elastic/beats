@@ -30,8 +30,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/stretchr/testify/assert"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	pubtest "github.com/elastic/beats/v9/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

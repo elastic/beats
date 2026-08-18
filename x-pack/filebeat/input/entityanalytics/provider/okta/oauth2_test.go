@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v9/libbeat/common"
 )
 
 func TestOAuth2ConfigValidation(t *testing.T) {

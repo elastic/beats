@@ -14,8 +14,8 @@ import (
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/sql"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/helper/sql"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )

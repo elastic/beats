@@ -8,12 +8,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/x-pack/filebeat/include"
-	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/filebeat/beater"
+	"github.com/elastic/beats/v9/filebeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/x-pack/filebeat/include"
+	inputs "github.com/elastic/beats/v9/x-pack/filebeat/input/default-inputs"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"

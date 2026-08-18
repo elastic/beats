@@ -20,11 +20,11 @@ package redis
 import (
 	rd "github.com/gomodule/redigo/redis"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v9/filebeat/channel"
+	"github.com/elastic/beats/v9/filebeat/harvester"
+	"github.com/elastic/beats/v9/filebeat/input"
+	"github.com/elastic/beats/v9/filebeat/input/file"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"

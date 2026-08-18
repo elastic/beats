@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	"github.com/elastic/beats/v9/x-pack/libbeat/common/nomad"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"

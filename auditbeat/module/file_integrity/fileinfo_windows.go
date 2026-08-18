@@ -28,7 +28,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v9/libbeat/common/file"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is

@@ -20,8 +20,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/libbeat/version"
 )
 
 func TestIndexTotalFieldsLimitNotReached(t *testing.T) {

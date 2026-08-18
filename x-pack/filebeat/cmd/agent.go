@@ -7,8 +7,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )

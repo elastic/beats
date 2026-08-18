@@ -25,8 +25,8 @@ package journald
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v9/filebeat/input/journald/pkg/journalctl"
+	input "github.com/elastic/beats/v9/filebeat/input/v2"
 )
 
 // Ensure, that journalReaderMock does implement journalReader.

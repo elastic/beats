@@ -12,9 +12,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/filebeat/channel"
+	"github.com/elastic/beats/v9/filebeat/input"
+	"github.com/elastic/beats/v9/libbeat/beat"
 
 	bay "github.com/elastic/bayeux"
 	conf "github.com/elastic/elastic-agent-libs/config"

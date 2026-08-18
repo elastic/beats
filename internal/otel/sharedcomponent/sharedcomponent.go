@@ -25,7 +25,7 @@
 // This is particularly useful when the component relies on an expensive shared
 // resource (e.g. cloud-metadata HTTP calls, Kubernetes API connections) that
 // should not be duplicated.
-package sharedcomponent // import "github.com/elastic/beats/v7/internal/otel/sharedcomponent"
+package sharedcomponent // import "github.com/elastic/beats/v9/internal/otel/sharedcomponent"
 
 import (
 	"container/ring"

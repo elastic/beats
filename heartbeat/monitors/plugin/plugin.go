@@ -25,11 +25,11 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/heartbeat/hbregistry"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/heartbeat/hbregistry"
+	"github.com/elastic/beats/v9/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v9/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v9/libbeat/beat"
 )
 
 // HashConfigFunc (optional) when set on a PluginFactory, overrides the config hash calculation

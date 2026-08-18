@@ -8,8 +8,8 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/acker"
 )
 
 // TxTracker implements a transaction tracker. Individual beat events which

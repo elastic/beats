@@ -11,7 +11,7 @@ import (
 
 	"github.com/teambition/rrule-go"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/config"
 )
 
 // RRULE-specific errors

@@ -32,10 +32,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v9/libbeat/management/status"
+	"github.com/elastic/beats/v9/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 

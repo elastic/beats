@@ -18,8 +18,8 @@
 package status
 
 import (
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

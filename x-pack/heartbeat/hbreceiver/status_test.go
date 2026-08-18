@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltest"
 )
 
 func TestReceiverStatus(t *testing.T) {

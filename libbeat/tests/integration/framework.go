@@ -52,8 +52,8 @@ import (
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
-	"github.com/elastic/beats/v7/dev-tools/testbin"
-	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/beats/v9/dev-tools/testbin"
+	"github.com/elastic/beats/v9/libbeat/common/proc"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"

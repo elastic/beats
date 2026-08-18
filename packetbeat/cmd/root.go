@@ -22,13 +22,13 @@ import (
 
 	"github.com/spf13/pflag"
 
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/packetbeat/beater"
-	"github.com/elastic/beats/v7/packetbeat/include"
+	cmd "github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/ecs"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/packetbeat/beater"
+	"github.com/elastic/beats/v9/packetbeat/include"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

@@ -28,11 +28,11 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/codec"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/outputs"
+	"github.com/elastic/beats/v9/libbeat/outputs/codec"
+	"github.com/elastic/beats/v9/libbeat/outputs/outil"
+	"github.com/elastic/beats/v9/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport"

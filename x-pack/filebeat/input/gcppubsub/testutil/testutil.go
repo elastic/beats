@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	"github.com/elastic/beats/v9/libbeat/tests/compose"
 
 	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/iterator"

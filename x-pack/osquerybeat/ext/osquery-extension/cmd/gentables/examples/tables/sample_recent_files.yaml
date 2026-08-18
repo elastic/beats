@@ -5,7 +5,7 @@ platforms:
   - windows
 group: jumplists
 
-implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
+implementation_package: github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/sampleimpl
 
 # Reference shared types - notice we reuse UserProfile and LnkMetadata
 # but NOT ApplicationID (different from jumplists)

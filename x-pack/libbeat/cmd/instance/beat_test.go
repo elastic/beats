@@ -14,11 +14,11 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	"github.com/elastic/beats/v7/filebeat/input/log"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
+	"github.com/elastic/beats/v9/filebeat/cmd"
+	"github.com/elastic/beats/v9/filebeat/input/log"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/management"
+	"github.com/elastic/beats/v9/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

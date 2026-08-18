@@ -12,10 +12,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
-	"github.com/elastic/beats/v7/auditbeat/helper/tty"
-	"github.com/elastic/beats/v7/libbeat/common/capabilities"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/auditbeat/helper/hasher"
+	"github.com/elastic/beats/v9/auditbeat/helper/tty"
+	"github.com/elastic/beats/v9/libbeat/common/capabilities"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 

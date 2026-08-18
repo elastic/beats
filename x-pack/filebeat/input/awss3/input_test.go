@@ -11,9 +11,9 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/management/status"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/management/status"
+	awscommon "github.com/elastic/beats/v9/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"

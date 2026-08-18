@@ -23,7 +23,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v9/libbeat/common/cleanup"
 )
 
 // RunWithPath uses the factory to create and configure a registry with a

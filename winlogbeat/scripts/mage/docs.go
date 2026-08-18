@@ -28,7 +28,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v9/dev-tools/mage"
 )
 
 const moduleDocsGlob = "module/*/_meta/docs.md"

@@ -14,7 +14,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

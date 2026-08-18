@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"time"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 var (

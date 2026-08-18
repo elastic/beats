@@ -5,7 +5,7 @@ platforms:
   - linux
   - darwin
 
-implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostgroups
+implementation_package: github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hostgroups
 
 columns:
   - name: gid

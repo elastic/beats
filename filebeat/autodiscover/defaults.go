@@ -22,8 +22,8 @@ package autodiscover
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/docker"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/providers/docker"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/providers/kubernetes"
 )
 
 // InitializeModule initializes this module.

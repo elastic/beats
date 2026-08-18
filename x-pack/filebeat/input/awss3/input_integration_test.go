@@ -30,7 +30,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

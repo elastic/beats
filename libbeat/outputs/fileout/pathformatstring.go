@@ -23,9 +23,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v9/libbeat/common/fmtstr"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat"
 )
 
 var isWindowsPath = os.PathSeparator == '\\'

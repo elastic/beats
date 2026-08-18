@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/v9/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

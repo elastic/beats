@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/scripts/msetlists"
+	"github.com/elastic/beats/v9/metricbeat/scripts/msetlists"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	_ "github.com/elastic/beats/v9/x-pack/metricbeat/include"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

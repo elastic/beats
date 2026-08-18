@@ -7,7 +7,7 @@ package hooks
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // HookFunc represents a function that executes a hook, any

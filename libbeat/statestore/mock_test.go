@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
 )
 
 type mockRegistry struct {

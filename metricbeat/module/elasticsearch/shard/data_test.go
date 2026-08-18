@@ -24,11 +24,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v9/metricbeat/module/elasticsearch"
 
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 )
 
 func TestStats(t *testing.T) {

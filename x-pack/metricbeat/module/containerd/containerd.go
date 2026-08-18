@@ -11,8 +11,8 @@ import (
 
 	"github.com/gohugoio/hashstructure"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // Licensed to Elasticsearch B.V. under one or more contributor

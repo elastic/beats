@@ -9,23 +9,23 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	packetbeatCmd "github.com/elastic/beats/v7/packetbeat/cmd"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	packetbeatCmd "github.com/elastic/beats/v9/packetbeat/cmd"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
 
 	// This registers the Npcap installer on Windows.
-	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
+	_ "github.com/elastic/beats/v9/x-pack/packetbeat/npcap"
 
 	// Enable pipelines.
-	_ "github.com/elastic/beats/v7/x-pack/packetbeat/module"
+	_ "github.com/elastic/beats/v9/x-pack/packetbeat/module"
 )
 
 // Name of this beat.

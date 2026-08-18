@@ -17,7 +17,7 @@
 
 package ab
 
-import "github.com/elastic/beats/v7/metricbeat/mb"
+import "github.com/elastic/beats/v9/metricbeat/mb"
 
 // Registry is the singleton Register instance where all ModuleFactory's and
 // MetricSetFactory's should be registered.

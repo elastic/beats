@@ -17,21 +17,21 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
+	"github.com/elastic/beats/v9/dev-tools/mage/target/test"
+	heartbeat "github.com/elastic/beats/v9/heartbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v9/dev-tools/mage/target/common"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	"github.com/elastic/beats/v9/dev-tools/mage/target/build"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/integtest/docker"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/test"
 )
 
 func init() {

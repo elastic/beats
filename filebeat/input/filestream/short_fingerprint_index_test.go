@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	loginp "github.com/elastic/beats/v9/filebeat/input/filestream/internal/input-logfile"
 )
 
 // rawEntry is the expected in-memory form of raw material added via AddRaw.

@@ -28,7 +28,7 @@ import (
 	"os"
 	_ "time/tzdata" // for timezone handling
 
-	"github.com/elastic/beats/v7/metricbeat/cmd"
+	"github.com/elastic/beats/v9/metricbeat/cmd"
 )
 
 func main() {

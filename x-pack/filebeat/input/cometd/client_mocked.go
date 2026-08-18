@@ -5,8 +5,8 @@
 package cometd
 
 import (
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/filebeat/channel"
+	"github.com/elastic/beats/v9/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

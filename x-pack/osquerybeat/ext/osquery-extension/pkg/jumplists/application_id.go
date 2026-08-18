@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	jumpliststypes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists"
+	jumpliststypes "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists"
 )
 
 // lookupApplicationID looks up the application name for a given application id.

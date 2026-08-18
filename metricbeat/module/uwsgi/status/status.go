@@ -27,8 +27,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/uwsgi"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/uwsgi"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

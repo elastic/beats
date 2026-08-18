@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v9/metricbeat/module/system"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )

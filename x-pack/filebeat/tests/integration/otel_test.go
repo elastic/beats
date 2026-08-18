@@ -35,11 +35,11 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/libbeat/features"
-	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
-	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
+	"github.com/elastic/beats/v9/libbeat/features"
+	esoutput "github.com/elastic/beats/v9/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"

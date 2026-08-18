@@ -28,7 +28,7 @@ import (
 
 	winio "github.com/Microsoft/go-winio"
 
-	"github.com/elastic/beats/v7/libbeat/api/npipe"
+	"github.com/elastic/beats/v9/libbeat/api/npipe"
 	"github.com/elastic/elastic-agent-libs/transport"
 )
 

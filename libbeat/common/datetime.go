@@ -25,7 +25,7 @@ import (
 	"hash"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
+	"github.com/elastic/beats/v9/libbeat/common/dtfmt"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

@@ -8,8 +8,8 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/system/template"
-	"github.com/elastic/beats/v7/x-pack/packetbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/tests/system/template"
+	"github.com/elastic/beats/v9/x-pack/packetbeat/cmd"
 )
 
 var systemTest *bool

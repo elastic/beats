@@ -8,7 +8,7 @@ import (
 	"os"
 	_ "time/tzdata" // for timezone handling
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
+	"github.com/elastic/beats/v9/x-pack/filebeat/cmd"
 )
 
 // The basic model of execution:

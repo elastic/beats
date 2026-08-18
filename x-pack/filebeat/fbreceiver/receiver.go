@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"sync"
 
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"

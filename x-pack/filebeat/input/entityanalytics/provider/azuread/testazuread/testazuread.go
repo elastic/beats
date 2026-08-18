@@ -13,8 +13,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
-	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
+	mockfetcher "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
 )
 
 // UserID is the ID of the first user in mockfetcher.UserResponse.

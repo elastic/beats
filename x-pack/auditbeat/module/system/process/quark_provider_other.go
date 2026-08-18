@@ -9,7 +9,7 @@ package process
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // NewFromQuark instantiates the module with quark's backend.

@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 const aggsRegex = "_(?:sum|count|unique|avg|min|max)$"

@@ -12,8 +12,8 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 // SessionKey is the key used to lookup sessions: exporter address + port

@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v9/libbeat/common/streambuf"
+	"github.com/elastic/beats/v9/packetbeat/protos/applayer"
 )
 
 func Test_UdpDatagramAddOnCompleteMessage(t *testing.T) {

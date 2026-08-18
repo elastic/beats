@@ -20,9 +20,9 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
 )
 
 func newOTelOutputController(

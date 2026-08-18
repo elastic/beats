@@ -26,9 +26,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v9/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

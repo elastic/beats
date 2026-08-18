@@ -23,8 +23,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/beats/v9/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"

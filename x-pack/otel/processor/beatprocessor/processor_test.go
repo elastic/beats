@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/internal/otel/sharedcomponent"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	_ "github.com/elastic/beats/v7/libbeat/cmd/instance" // needed for registering processors
-	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v9/internal/otel/sharedcomponent"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	_ "github.com/elastic/beats/v9/libbeat/cmd/instance" // needed for registering processors
+	"github.com/elastic/beats/v9/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 

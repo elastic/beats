@@ -45,8 +45,8 @@ import (
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/testing/testutils"
+	"github.com/elastic/beats/v9/dev-tools/mage"
+	"github.com/elastic/beats/v9/testing/testutils"
 )
 
 const (

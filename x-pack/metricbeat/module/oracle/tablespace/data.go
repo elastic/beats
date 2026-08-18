@@ -10,10 +10,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch

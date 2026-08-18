@@ -12,11 +12,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	fbroot "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
+	fbroot "github.com/elastic/beats/v9/x-pack/filebeat/cmd"
 
 	// initialize the plugin system before libbeat does, so we can overwrite it properly
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/management"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management/tests"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 

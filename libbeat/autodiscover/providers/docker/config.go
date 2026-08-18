@@ -22,8 +22,8 @@ package docker
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v9/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 

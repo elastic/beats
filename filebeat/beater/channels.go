@@ -20,10 +20,10 @@ package beater
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/filebeat/registrar"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/beats/v9/filebeat/input/file"
+	"github.com/elastic/beats/v9/filebeat/registrar"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 

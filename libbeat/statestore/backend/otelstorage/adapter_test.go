@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/extension/xextension/storage"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
 )
 
 func TestRoundTrip_StoreFromClient_Mock(t *testing.T) {

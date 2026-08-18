@@ -26,10 +26,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	loginp "github.com/elastic/beats/v9/filebeat/input/filestream/internal/input-logfile"
+	input "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/common/file"
+	"github.com/elastic/beats/v9/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

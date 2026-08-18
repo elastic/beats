@@ -21,7 +21,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v9/libbeat/common/backoff"
 )
 
 type Logouter interface {

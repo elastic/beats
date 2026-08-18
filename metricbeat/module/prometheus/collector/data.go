@@ -21,11 +21,11 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/helper/labelhash"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
 )
 
 // PromEvent stores a set of one or more metrics with the same labels

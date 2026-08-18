@@ -20,7 +20,7 @@ package add_formatted_index
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v9/libbeat/common/fmtstr"
 )
 
 // configuration for AddFormattedIndex processor.

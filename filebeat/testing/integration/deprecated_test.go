@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/testing/integration"
+	"github.com/elastic/beats/v9/libbeat/testing/integration"
 )
 
 func TestFilebeatDeprecated(t *testing.T) {

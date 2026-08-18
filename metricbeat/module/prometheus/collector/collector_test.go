@@ -33,11 +33,11 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
+	_ "github.com/elastic/beats/v9/metricbeat/module/prometheus"
 )
 
 func TestGetPromEventsFromMetricFamily(t *testing.T) {

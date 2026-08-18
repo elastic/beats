@@ -21,7 +21,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
 )
 
 // slot stores one event and the per-pipeline linked-list metadata used to

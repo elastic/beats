@@ -18,18 +18,18 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/winlogbeat/beater"
+	"github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/ecs"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/winlogbeat/beater"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register fields.
-	_ "github.com/elastic/beats/v7/winlogbeat/include"
+	_ "github.com/elastic/beats/v9/winlogbeat/include"
 
 	// Import processors and supporting modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/v9/libbeat/processors/timestamp"
 )
 
 const (

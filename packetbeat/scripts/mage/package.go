@@ -22,7 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
 )
 
 // CustomizePackaging modifies the device in the configuration files based on

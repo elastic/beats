@@ -12,14 +12,14 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/beater"
 
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/osquerybeat/include"
 
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 )
 
 const (

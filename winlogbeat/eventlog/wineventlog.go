@@ -29,8 +29,8 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	"github.com/elastic/beats/v9/winlogbeat/checkpoint"
+	win "github.com/elastic/beats/v9/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"

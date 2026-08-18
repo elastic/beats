@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v9/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

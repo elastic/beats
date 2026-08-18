@@ -13,8 +13,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 var (

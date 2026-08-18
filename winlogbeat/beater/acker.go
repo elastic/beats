@@ -22,7 +22,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v9/winlogbeat/checkpoint"
 )
 
 type eventACKer struct {

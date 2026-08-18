@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
-	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
+	awsauto "github.com/elastic/beats/v9/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

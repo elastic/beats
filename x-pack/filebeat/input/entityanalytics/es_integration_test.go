@@ -15,12 +15,12 @@ import (
 	"testing"
 	"time"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v9/libbeat/statestore"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend/es"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 )

@@ -9,7 +9,7 @@ import (
 
 	"go.opentelemetry.io/collector/confmap"
 
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 )
 
 // Config is config settings for metricbeat receiver.  The structure of

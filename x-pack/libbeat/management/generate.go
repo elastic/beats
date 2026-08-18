@@ -13,7 +13,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
 )
 
 const celInputPrefix = "cel-"

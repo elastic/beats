@@ -19,11 +19,11 @@ import (
 
 	"cloud.google.com/go/storage"
 
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
+	cursor "github.com/elastic/beats/v9/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/management/status"
+	"github.com/elastic/beats/v9/x-pack/libbeat/reader"
+	"github.com/elastic/beats/v9/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"

@@ -7,10 +7,10 @@ package logstashexporter
 import (
 	"go.opentelemetry.io/collector/component"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
 
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/logstash"
+	"github.com/elastic/beats/v9/libbeat/outputs"
+	"github.com/elastic/beats/v9/libbeat/outputs/logstash"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 

@@ -22,7 +22,7 @@ package memcache
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/beats/v9/libbeat/common/streambuf"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

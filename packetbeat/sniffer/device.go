@@ -27,7 +27,7 @@ import (
 
 	"github.com/google/gopacket/pcap"
 
-	"github.com/elastic/beats/v7/packetbeat/route"
+	"github.com/elastic/beats/v9/packetbeat/route"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )

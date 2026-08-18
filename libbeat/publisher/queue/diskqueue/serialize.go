@@ -25,9 +25,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/outputs/codec"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/outputs/codec"
+	"github.com/elastic/beats/v9/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-structform/cborl"
 	"github.com/elastic/go-structform/gotype"

@@ -26,12 +26,12 @@ import (
 	os0 "os"
 	"testing"
 
-	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/beats/v9/metricbeat/module/logstash"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 )
 
 func TestEventMapping(t *testing.T) {

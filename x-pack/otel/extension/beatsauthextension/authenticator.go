@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v9/libbeat/common/transport/kerberos"
 	krbclient "github.com/elastic/gokrb5/v8/client"
 	krbconfig "github.com/elastic/gokrb5/v8/config"
 	"github.com/elastic/gokrb5/v8/keytab"

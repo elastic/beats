@@ -21,7 +21,7 @@ import (
 	"os"
 	_ "time/tzdata" // for timezone handling
 
-	"github.com/elastic/beats/v7/packetbeat/cmd"
+	"github.com/elastic/beats/v9/packetbeat/cmd"
 )
 
 // Setups and Runs Packetbeat

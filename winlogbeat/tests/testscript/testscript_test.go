@@ -25,7 +25,7 @@ import (
 
 	"github.com/rogpeppe/go-internal/testscript"
 
-	"github.com/elastic/beats/v7/winlogbeat/cmd"
+	"github.com/elastic/beats/v9/winlogbeat/cmd"
 )
 
 var (

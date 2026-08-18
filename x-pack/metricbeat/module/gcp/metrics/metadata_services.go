@@ -7,11 +7,11 @@ package metrics
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/cloudsql"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/compute"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/dataproc"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/redis"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp/metrics/cloudsql"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp/metrics/compute"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp/metrics/dataproc"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp/metrics/redis"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

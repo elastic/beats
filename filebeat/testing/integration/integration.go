@@ -26,7 +26,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/testing/integration"
+	"github.com/elastic/beats/v9/libbeat/testing/integration"
 )
 
 // EnsureCompiled ensures that Filebeat is compiled and ready

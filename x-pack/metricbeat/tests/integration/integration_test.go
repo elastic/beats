@@ -10,8 +10,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/beats/v7/dev-tools/testbin"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/dev-tools/testbin"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 )
 
 func TestMain(m *testing.M) {

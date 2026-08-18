@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
+	"github.com/elastic/beats/v9/x-pack/libbeat/common/identityfederation"
 )
 
 // OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.

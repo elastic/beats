@@ -7,9 +7,9 @@ package aws
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v9/x-pack/libbeat/common/aws"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/template"
 )
 
 // Config for all aws autodiscover providers.

@@ -16,11 +16,11 @@ import (
 
 	"go.uber.org/zap/exp/zapslog"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/features"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/features"
+	"github.com/elastic/beats/v9/libbeat/statestore"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/entcollect"

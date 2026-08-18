@@ -14,9 +14,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/collections"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/kvstore"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

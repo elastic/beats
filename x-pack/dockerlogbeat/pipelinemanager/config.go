@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v9/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 

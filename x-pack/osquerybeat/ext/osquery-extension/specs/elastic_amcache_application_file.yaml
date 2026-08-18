@@ -5,7 +5,7 @@ platforms:
   - windows
 group: amcache
 
-implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
+implementation_package: github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
 
 columns:
   - name: timestamp

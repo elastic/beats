@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/entcollect"
 	ecjamf "github.com/elastic/entcollect/provider/jamf"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider"
 )
 
 func init() {

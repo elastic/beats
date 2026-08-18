@@ -4,7 +4,7 @@
 
 package cluster_settings
 
-import "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
+import "github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/metricset"
 
 const (
 	ClusterSettingsMetricSet = "cluster_settings"

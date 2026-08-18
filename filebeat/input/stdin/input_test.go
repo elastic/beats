@@ -22,7 +22,7 @@ package stdin
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
+	"github.com/elastic/beats/v9/filebeat/input/inputtest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

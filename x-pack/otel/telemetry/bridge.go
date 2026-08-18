@@ -17,11 +17,11 @@ import (
 	"go.opentelemetry.io/otel/metric/noop"
 	"go.uber.org/zap"
 
-	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
+	logreport "github.com/elastic/beats/v9/libbeat/monitoring/report/log"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-const scopeName = "github.com/elastic/beats/v7/x-pack/otel/telemetry"
+const scopeName = "github.com/elastic/beats/v9/x-pack/otel/telemetry"
 
 // RegistryBridge dynamically discovers metrics from beats monitoring registries
 // and bridges them into OTel async instruments. Instruments are auto-created

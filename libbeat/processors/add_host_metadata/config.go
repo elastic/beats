@@ -21,7 +21,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/processors/util"
+	"github.com/elastic/beats/v9/libbeat/processors/util"
 )
 
 // Config for add_host_metadata processor.

@@ -25,8 +25,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v9/libbeat/dashboards"
+	"github.com/elastic/beats/v9/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"

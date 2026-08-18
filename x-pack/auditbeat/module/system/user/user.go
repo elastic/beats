@@ -22,12 +22,12 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/auditbeat/ab"
-	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/beats/v9/auditbeat/ab"
+	"github.com/elastic/beats/v9/auditbeat/datastore"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

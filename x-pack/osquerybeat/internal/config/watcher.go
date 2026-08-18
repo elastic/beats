@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

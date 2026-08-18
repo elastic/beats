@@ -10,10 +10,10 @@
 package generated
 
 import (
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	hostgroups "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_groups"
-	hostusers "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_users"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	hostgroups "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_groups"
+	hostusers "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/host_users"
 )
 
 // RegisterViews registers all generated views with the hook manager.

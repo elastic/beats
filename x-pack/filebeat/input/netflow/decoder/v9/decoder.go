@@ -15,9 +15,9 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 const (

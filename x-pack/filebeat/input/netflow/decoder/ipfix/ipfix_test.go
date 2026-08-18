@@ -14,11 +14,11 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
-	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/test"
+	v9 "github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/v9"
 )
 
 func init() {

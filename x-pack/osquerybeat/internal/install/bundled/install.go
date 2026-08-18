@@ -13,13 +13,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifactformat"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pkgutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/zip"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/install/artifactformat"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/msiutil"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/pkgutil"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/tar"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/zip"
 )
 
 type Plan struct {

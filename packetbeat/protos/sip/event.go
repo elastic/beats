@@ -18,7 +18,7 @@
 package sip
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v9/libbeat/common"
 )
 
 // ProtocolFields contains SIP fields.

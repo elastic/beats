@@ -5,10 +5,10 @@
 package inputs
 
 import (
-	ossinputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	ossinputs "github.com/elastic/beats/v9/filebeat/input/default-inputs"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 )
 
 func Init(info beat.Info, store statestore.States) []v2.Plugin {

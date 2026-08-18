@@ -27,9 +27,9 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

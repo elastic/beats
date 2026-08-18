@@ -20,7 +20,7 @@ package beater
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v9/libbeat/autodiscover"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

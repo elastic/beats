@@ -26,20 +26,20 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/ecs"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/processors/actions/addfields"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	_ "github.com/elastic/beats/v9/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/v9/libbeat/processors/add_docker_metadata"
+	_ "github.com/elastic/beats/v9/libbeat/processors/add_host_metadata"
+	_ "github.com/elastic/beats/v9/libbeat/processors/add_kubernetes_metadata"
 )
 
 func TestGenerateProcessorList(t *testing.T) {

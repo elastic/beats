@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/panw"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

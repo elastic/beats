@@ -28,13 +28,13 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
-	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
+	vSphereClientUtil "github.com/elastic/beats/v9/metricbeat/module/vsphere/client"
 
-	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
+	"github.com/elastic/beats/v9/metricbeat/module/vsphere/security"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/vsphere"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

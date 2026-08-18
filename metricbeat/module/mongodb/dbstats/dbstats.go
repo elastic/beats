@@ -26,8 +26,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/mongodb"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

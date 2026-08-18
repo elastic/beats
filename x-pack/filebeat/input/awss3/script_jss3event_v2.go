@@ -11,7 +11,7 @@ import (
 
 	"github.com/dop251/goja"
 
-	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
+	"github.com/elastic/beats/v9/libbeat/common/encoding/xml"
 )
 
 func newJSS3EventV2Constructor(s *session) func(call goja.ConstructorCall) *goja.Object {

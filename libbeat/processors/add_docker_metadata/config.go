@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v9/pkg/autodiscover/docker"
 )
 
 // Config for docker processor.

@@ -22,9 +22,9 @@ import (
 	"io"
 	"regexp"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

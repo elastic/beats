@@ -21,7 +21,7 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v9/filebeat/harvester"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 

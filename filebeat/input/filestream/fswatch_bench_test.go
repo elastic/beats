@@ -28,8 +28,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/match"
+	loginp "github.com/elastic/beats/v9/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v9/libbeat/common/match"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

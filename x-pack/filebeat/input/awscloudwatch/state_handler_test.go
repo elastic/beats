@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/beats/v9/libbeat/statestore"
+	"github.com/elastic/beats/v9/libbeat/statestore/storetest"
 )
 
 func TestStateHandler(t *testing.T) {

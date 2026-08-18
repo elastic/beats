@@ -15,7 +15,7 @@ import (
 
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
 )
 
 // NpcapVersion specifies the version of the OEM Npcap installer to bundle with

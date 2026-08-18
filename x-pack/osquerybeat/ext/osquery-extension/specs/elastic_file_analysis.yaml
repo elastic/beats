@@ -4,7 +4,7 @@ description: Comprehensive security analysis of executable files on macOS (file 
 platforms:
   - darwin
 
-implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/fileanalysis
+implementation_package: github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/fileanalysis
 
 columns:
   - name: path

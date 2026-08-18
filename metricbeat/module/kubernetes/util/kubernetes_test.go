@@ -28,8 +28,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 
@@ -44,8 +44,8 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
+	kubernetes2 "github.com/elastic/beats/v9/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/v9/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -55,7 +55,7 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	k8smetafake "k8s.io/client-go/metadata/fake"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v9/pkg/autodiscover/kubernetes"
 )
 
 const (

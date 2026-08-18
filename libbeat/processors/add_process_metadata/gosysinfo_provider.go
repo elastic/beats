@@ -26,7 +26,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/capabilities"
+	"github.com/elastic/beats/v9/libbeat/common/capabilities"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )

@@ -31,7 +31,7 @@ import (
 	xstorage "go.opentelemetry.io/collector/extension/xextension/storage"
 	"go.uber.org/zap"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

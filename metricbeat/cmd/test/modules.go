@@ -23,10 +23,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/v7/metricbeat/beater"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v9/metricbeat/beater"
 	"github.com/elastic/elastic-agent-libs/testing"
 )
 

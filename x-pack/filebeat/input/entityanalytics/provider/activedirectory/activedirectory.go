@@ -17,12 +17,12 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/management/status"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/kvstore"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"

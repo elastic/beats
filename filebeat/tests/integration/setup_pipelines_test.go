@@ -30,7 +30,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 )
 
 func TestSetupNoModules(t *testing.T) {

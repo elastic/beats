@@ -22,8 +22,8 @@ package subscriptions
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {

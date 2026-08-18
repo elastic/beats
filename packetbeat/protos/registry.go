@@ -20,12 +20,12 @@ package protos
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v9/packetbeat/procs"
 )
 
 type ProtocolPlugin func(

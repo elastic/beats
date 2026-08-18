@@ -23,9 +23,9 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v9/libbeat/common/diagnostics"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	metrics "github.com/elastic/elastic-agent-system-metrics/metric/memory"

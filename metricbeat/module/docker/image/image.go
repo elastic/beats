@@ -22,8 +22,8 @@ import (
 
 	dockerclient "github.com/moby/moby/client"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/docker"
 )
 
 // init registers the MetricSet with the central registry.

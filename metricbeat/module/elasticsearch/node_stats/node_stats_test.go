@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v9/metricbeat/module/elasticsearch"
 
 	"github.com/stretchr/testify/require"
 )

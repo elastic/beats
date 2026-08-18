@@ -22,7 +22,7 @@ import (
 	types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	gomock "go.uber.org/mock/gomock"
 
-	beat "github.com/elastic/beats/v7/libbeat/beat"
+	beat "github.com/elastic/beats/v9/libbeat/beat"
 	logp "github.com/elastic/elastic-agent-libs/logp"
 )
 

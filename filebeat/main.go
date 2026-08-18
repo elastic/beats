@@ -21,8 +21,8 @@ import (
 	"os"
 	_ "time/tzdata" // for timezone handling
 
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
+	"github.com/elastic/beats/v9/filebeat/cmd"
+	inputs "github.com/elastic/beats/v9/filebeat/input/default-inputs"
 )
 
 // The basic model of execution:

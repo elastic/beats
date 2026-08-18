@@ -20,7 +20,7 @@ package inputest
 import (
 	"testing"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )

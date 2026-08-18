@@ -29,9 +29,9 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/libbeat/common/terminal"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/common/cli"
+	"github.com/elastic/beats/v9/libbeat/common/terminal"
 	"github.com/elastic/elastic-agent-libs/keystore"
 )
 

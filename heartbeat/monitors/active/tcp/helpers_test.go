@@ -31,11 +31,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/heartbeat/hbtest"
+	"github.com/elastic/beats/v9/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v9/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v9/libbeat/beat"
 )
 
 func testTCPConfigCheck(t *testing.T, configMap mapstr.M) *beat.Event {

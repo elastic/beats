@@ -18,7 +18,7 @@ import (
 
 	"github.com/Microsoft/go-winio/pkg/guid"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // DestListStreamName is the name of the stream that contains the destination list.

@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"time"
 
-	e "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
+	e "github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/events"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

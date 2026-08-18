@@ -7,8 +7,8 @@ package awss3
 import (
 	"github.com/zyedidia/generic/queue"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/acker"
 )
 
 type awsACKHandler struct {

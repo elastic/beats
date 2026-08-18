@@ -30,7 +30,7 @@ jobs:
 
         1. Extract the file path or scope from the issue:
            - Look for "File: <path>" in the issue body (e.g., "File: metricbeat/module/redis/test_redis.py")
-           - If the file is "N/A" or not available, look for "Scope: <path>" (e.g., "Scope: github.com/elastic/beats/v7/libbeat/publisher/pipeline")
+           - If the file is "N/A" or not available, look for "Scope: <path>" (e.g., "Scope: github.com/elastic/beats/v9/libbeat/publisher/pipeline")
            - For Scope paths, extract the relevant directory path after "beats/v7/" or "beats/"
 
         2. Match the path against `.github/CODEOWNERS`:
@@ -53,5 +53,5 @@ jobs:
 
         Examples:
         - File: metricbeat/module/redis/test_redis.py → CODEOWNERS: /metricbeat/module/redis @elastic/obs-infraobs-integrations → Label: Team:Integrations
-        - File: N/A, Scope: github.com/elastic/beats/v7/libbeat/publisher/pipeline → CODEOWNERS: /libbeat/ @elastic/elastic-agent-data-plane → Label: Team:Elastic-Agent-Data-Plane
-        - Scope: github.com/elastic/beats/v7/x-pack/metricbeat/module/cockroachdb/status → CODEOWNERS: /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations → Label: Team:Integrations
+        - File: N/A, Scope: github.com/elastic/beats/v9/libbeat/publisher/pipeline → CODEOWNERS: /libbeat/ @elastic/elastic-agent-data-plane → Label: Team:Elastic-Agent-Data-Plane
+        - Scope: github.com/elastic/beats/v9/x-pack/metricbeat/module/cockroachdb/status → CODEOWNERS: /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations → Label: Team:Integrations

@@ -10,7 +10,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // collect function collects all the system metric information into an instance of collectededData

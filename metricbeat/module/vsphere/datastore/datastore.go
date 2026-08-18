@@ -22,11 +22,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
-	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
-	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/vsphere"
+	vSphereClientUtil "github.com/elastic/beats/v9/metricbeat/module/vsphere/client"
+	"github.com/elastic/beats/v9/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/performance"

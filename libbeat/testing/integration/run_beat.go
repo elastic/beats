@@ -33,7 +33,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/beats/v9/libbeat/common/proc"
 )
 
 var (

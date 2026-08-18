@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 	"github.com/elastic/mito/lib/xml"
 
 	"github.com/elastic/elastic-agent-libs/logp"

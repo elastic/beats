@@ -10,7 +10,7 @@ import (
 	"github.com/osquery/osquery-go"
 	osquerygen "github.com/osquery/osquery-go/gen/osquery"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // ResilientClient is an extension of the osquery ExtensionManagerClient

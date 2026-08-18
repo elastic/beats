@@ -34,7 +34,7 @@ import (
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	"github.com/elastic/beats/v9/winlogbeat/sys/wineventlog"
 )
 
 const eventLogKeyName = `SYSTEM\CurrentControlSet\Services\EventLog`

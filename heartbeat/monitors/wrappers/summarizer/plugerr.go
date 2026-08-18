@@ -21,11 +21,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/heartbeat/ecserr"
+	"github.com/elastic/beats/v9/heartbeat/eventext"
+	"github.com/elastic/beats/v9/heartbeat/look"
+	"github.com/elastic/beats/v9/heartbeat/monitors/logger"
+	"github.com/elastic/beats/v9/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

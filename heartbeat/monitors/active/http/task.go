@@ -35,19 +35,19 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/beats/v9/heartbeat/ecserr"
+	"github.com/elastic/beats/v9/heartbeat/monitors/active/dialchain/tlsmeta"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
-	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/heartbeat/eventext"
+	"github.com/elastic/beats/v9/heartbeat/look"
+	"github.com/elastic/beats/v9/heartbeat/monitors"
+	"github.com/elastic/beats/v9/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v9/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v9/heartbeat/reason"
+	"github.com/elastic/beats/v9/libbeat/beat"
 )
 
 type requestFactory func() (*http.Request, error)

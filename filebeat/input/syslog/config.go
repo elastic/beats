@@ -23,13 +23,13 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
-	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
-	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
-	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
-	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v9/filebeat/harvester"
+	"github.com/elastic/beats/v9/filebeat/inputsource"
+	"github.com/elastic/beats/v9/filebeat/inputsource/common/streaming"
+	"github.com/elastic/beats/v9/filebeat/inputsource/tcp"
+	"github.com/elastic/beats/v9/filebeat/inputsource/udp"
+	"github.com/elastic/beats/v9/filebeat/inputsource/unix"
+	"github.com/elastic/beats/v9/libbeat/common/cfgtype"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

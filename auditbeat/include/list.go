@@ -21,6 +21,6 @@ package include
 
 import (
 	// Import packages that perform 'func init()'.
-	_ "github.com/elastic/beats/v7/auditbeat/module/auditd"
-	_ "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
+	_ "github.com/elastic/beats/v9/auditbeat/module/auditd"
+	_ "github.com/elastic/beats/v9/auditbeat/module/file_integrity"
 )

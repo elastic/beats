@@ -15,7 +15,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

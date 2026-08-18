@@ -17,10 +17,10 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/scheduler"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/osqdcli"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/scheduler"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

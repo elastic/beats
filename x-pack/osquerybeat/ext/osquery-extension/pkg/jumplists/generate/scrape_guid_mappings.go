@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 const guidMappingSourceUrl = "https://github.com/EricZimmerman/GuidMapping/raw/refs/heads/master/Resources/GuidToName.txt"

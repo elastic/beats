@@ -20,11 +20,11 @@ import (
 
 	"github.com/gofrs/flock"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fetch"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifactformat"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/bundled"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/fetch"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/install"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/install/artifactformat"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/install/bundled"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )

@@ -24,10 +24,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 
-	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
+	k "github.com/elastic/beats/v9/metricbeat/helper/kubernetes/ktest"
+	"github.com/elastic/beats/v9/metricbeat/helper/prometheus/ptest"
 )
 
 var filesFolder = "../_meta/test/KSM"

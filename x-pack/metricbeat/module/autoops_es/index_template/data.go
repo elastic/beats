@@ -7,14 +7,14 @@ package index_template
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
-	t "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/templates"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/events"
+	t "github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/templates"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/utils"
 )
 
 const templatePathPrefix = "/_index_template/"

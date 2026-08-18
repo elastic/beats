@@ -20,7 +20,7 @@ package parse
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // PassThruHostParser is a HostParser that sets the HostData URI, SanitizedURI,

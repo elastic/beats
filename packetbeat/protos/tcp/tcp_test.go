@@ -27,9 +27,9 @@ import (
 
 	"github.com/google/gopacket/layers"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/packetbeat/procs"
+	"github.com/elastic/beats/v9/packetbeat/protos"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"

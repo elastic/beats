@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v9/auditbeat/tracing"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

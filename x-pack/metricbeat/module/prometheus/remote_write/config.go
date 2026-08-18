@@ -8,7 +8,7 @@ import (
 	"errors"
 	"time"
 
-	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
+	rw "github.com/elastic/beats/v9/metricbeat/module/prometheus/remote_write"
 )
 
 type config struct {

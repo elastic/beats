@@ -25,22 +25,22 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/build"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/dashboards"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/docs"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/test"
 	// mage:import
-	winlogbeat "github.com/elastic/beats/v7/winlogbeat/scripts/mage"
+	winlogbeat "github.com/elastic/beats/v9/winlogbeat/scripts/mage"
 )
 
 func init() {

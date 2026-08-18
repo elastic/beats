@@ -10,7 +10,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v9/metricbeat/module/elasticsearch"
 )
 
 // The structure of error responses from the Cloud Connect API.

@@ -20,20 +20,20 @@ package cmd
 import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/beater"
-	"github.com/elastic/beats/v7/heartbeat/include"
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/heartbeat/beater"
+	"github.com/elastic/beats/v9/heartbeat/include"
+	cmd "github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/ecs"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
 
 	// Import packages that need to register themselves.
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v9/heartbeat/monitors/active/tcp"
 
 	// include all heartbeat specific autodiscovery builders
-	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
+	_ "github.com/elastic/beats/v9/heartbeat/autodiscover/builder/hints"
 )
 
 const (

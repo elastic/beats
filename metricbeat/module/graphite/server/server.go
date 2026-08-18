@@ -20,10 +20,10 @@ package server
 import (
 	"fmt"
 
-	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
-	"github.com/elastic/beats/v7/metricbeat/helper/server/tcp"
-	"github.com/elastic/beats/v7/metricbeat/helper/server/udp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	serverhelper "github.com/elastic/beats/v9/metricbeat/helper/server"
+	"github.com/elastic/beats/v9/metricbeat/helper/server/tcp"
+	"github.com/elastic/beats/v9/metricbeat/helper/server/udp"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry.

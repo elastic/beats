@@ -7,10 +7,10 @@ package host
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/auditbeat/ab"
-	"github.com/elastic/beats/v7/auditbeat/core"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/beats/v9/auditbeat/ab"
+	"github.com/elastic/beats/v9/auditbeat/core"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/module/system"
 )
 
 func TestData(t *testing.T) {

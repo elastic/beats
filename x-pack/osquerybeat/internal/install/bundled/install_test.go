@@ -7,8 +7,8 @@ package bundled
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifactformat"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/install/artifactformat"
 )
 
 func TestBuildPlan(t *testing.T) {

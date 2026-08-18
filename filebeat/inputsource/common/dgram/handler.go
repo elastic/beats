@@ -23,7 +23,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v9/filebeat/inputsource"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

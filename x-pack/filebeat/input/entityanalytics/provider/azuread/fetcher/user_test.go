@@ -10,7 +10,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/collections"
 )
 
 func TestUser_Merge(t *testing.T) {

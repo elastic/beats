@@ -9,7 +9,7 @@ package integration
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 )
 
 func TestMain(m *testing.M) {

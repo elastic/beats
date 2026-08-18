@@ -11,8 +11,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/testing/go-ech"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/testing/go-ech"
 )
 
 const filebeatFIPSConfig = `

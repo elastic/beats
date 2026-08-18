@@ -20,15 +20,15 @@ package sniffer
 import (
 	"github.com/google/gopacket/layers"
 
-	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/decoder"
-	"github.com/elastic/beats/v7/packetbeat/flows"
-	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/protos/icmp"
-	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
-	"github.com/elastic/beats/v7/packetbeat/protos/udp"
-	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/beats/v9/packetbeat/config"
+	"github.com/elastic/beats/v9/packetbeat/decoder"
+	"github.com/elastic/beats/v9/packetbeat/flows"
+	"github.com/elastic/beats/v9/packetbeat/procs"
+	"github.com/elastic/beats/v9/packetbeat/protos"
+	"github.com/elastic/beats/v9/packetbeat/protos/icmp"
+	"github.com/elastic/beats/v9/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v9/packetbeat/protos/udp"
+	"github.com/elastic/beats/v9/packetbeat/publish"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

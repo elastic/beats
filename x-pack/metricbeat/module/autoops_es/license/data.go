@@ -7,12 +7,12 @@ package license
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
-	utils "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/events"
+	utils "github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/utils"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 var (

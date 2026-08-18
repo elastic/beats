@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	hbconfig "github.com/elastic/beats/v9/heartbeat/config"
+	"github.com/elastic/beats/v9/heartbeat/monitors/maintwin"
+	"github.com/elastic/beats/v9/heartbeat/scheduler/schedule"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 

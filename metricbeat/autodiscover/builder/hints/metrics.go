@@ -29,13 +29,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v9/pkg/autodiscover/utils"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/libbeat/autodiscover"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 const (

@@ -8,7 +8,7 @@ package include
 
 import (
 	// Import packages that perform 'func init()'.
-	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/module/powershell"
-	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/module/security"
-	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/module/sysmon"
+	_ "github.com/elastic/beats/v9/x-pack/winlogbeat/module/powershell"
+	_ "github.com/elastic/beats/v9/x-pack/winlogbeat/module/security"
+	_ "github.com/elastic/beats/v9/x-pack/winlogbeat/module/sysmon"
 )
