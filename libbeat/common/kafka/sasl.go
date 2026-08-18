@@ -18,7 +18,6 @@
 package kafka
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/elastic/sarama"
@@ -32,6 +31,7 @@ const (
 	saslTypePlaintext   = sarama.SASLTypePlaintext
 	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
 	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
+	saslTypeOauthBearer = sarama.SASLTypeOAuth
 )
 
 func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
@@ -50,7 +50,5 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
 		config.Net.SASL.SCRAMClientGeneratorFunc = scramClient(saslTypeSCRAMSHA512)
 	default:
-		// This should never happen because `SaslMechanism` is checked on `Validate()`, keeping a panic to detect it earlier if it happens.
-		panic(fmt.Sprintf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism))
 	}
 }

@@ -122,8 +122,7 @@ func TestMinimalInput_RunSync_FullCycle(t *testing.T) {
 		},
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	ackClient := &ackingClient{inner: client}
 	s := &bboltSyncer{store: store, bucketName: bucketName}
