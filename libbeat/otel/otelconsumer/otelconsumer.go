@@ -48,6 +48,9 @@ const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
 
+	// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
+	esIndexAttribute = "elasticsearch.index"
+
 	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
 	// It is duplicated here to avoid importing the receivertest package
 	// (and pulling its testify/testing deps) into production binaries.
@@ -272,3 +275,158 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 func (out *otelConsumer) String() string {
 	return "otelconsumer"
 }
+<<<<<<< HEAD
+=======
+
+func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) error {
+	if id, ok := event.Content.Meta["_id"]; ok {
+		// Specify the id as an attribute used by the elasticsearchexporter
+		// to set the final document ID in Elasticsearch.
+		// When using the bodymap encoding in the exporter all attributes
+		// are stripped out of the final Elasticsearch document.
+		//
+		// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36882.
+		switch id := id.(type) {
+		case string:
+			logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+
+			// The receivertest package needs a unique attribute to track generated ids.
+			// When receivertest allows this to be customized we can remove this condition.
+			// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+			if isReceiverTest {
+				logRecord.Attributes().PutStr(receivertestUniqueIDAttrName, id)
+			}
+		}
+	}
+
+	// if pipeline field is set on event metadata
+	if s, ok := event.Content.Meta["pipeline"].(string); ok {
+		logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
+	}
+
+	beatEvent := event.Content.Fields
+	if beatEvent == nil {
+		beatEvent = mapstr.M{}
+	}
+	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
+
+	// Set the timestamp for when the event was first seen by the pipeline.
+	observedTimestamp := logRecord.Timestamp()
+	if eventMap, ok := tryToMapStr(beatEvent["event"]); ok {
+		switch created := eventMap["created"].(type) {
+		case time.Time:
+			observedTimestamp = pcommon.NewTimestampFromTime(created)
+		case common.Time:
+			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+		case string:
+			t, err := time.Parse(time.RFC3339Nano, created)
+			if err != nil {
+				t = time.Now()
+			}
+			observedTimestamp = pcommon.NewTimestampFromTime(t)
+		case nil:
+			// not set
+		default:
+			log.Warnf("Invalid 'event.created' type (%T); using log timestamp as observed timestamp.", created)
+		}
+	}
+	logRecord.SetObservedTimestamp(observedTimestamp)
+
+	// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
+	if ds, ok := tryToMapStr(beatEvent["data_stream"]); ok {
+		for _, sub := range [...]string{"dataset", "namespace", "type"} {
+			if vStr, ok := ds[sub].(string); ok {
+				logRecord.Attributes().PutStr("data_stream."+sub, vStr)
+			}
+		}
+		// temporary workaround for https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/49337
+		applyNonStandardDataStreamIndex(logRecord, ds)
+	}
+
+	// If raw_index is set on event metadata, propagate it as the
+	// Elasticsearch index, potentially overwriting the non-standard
+	// data stream index. This matches the behavior of the Beats
+	// index selector.
+	if s, ok := event.Content.Meta["raw_index"].(string); ok {
+		logRecord.Attributes().PutStr(esIndexAttribute, s)
+	}
+
+	bodyMap := logRecord.Body().SetEmptyMap()
+	capacity := len(beatEvent) + 1 // +1 for @timestamp added below
+	if beatInfo.IncludeMetadata {
+		capacity++ // +1 for @metadata map added below
+	}
+	bodyMap.EnsureCapacity(capacity)
+	if err := otelmap.FromMapstr(bodyMap, beatEvent); err != nil {
+		return err
+	}
+
+	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(event.Content.Timestamp))
+	if beatInfo.IncludeMetadata {
+		extra := [...]struct{ k, v string }{
+			{"beat", beatInfo.Beat},
+			{"version", beatInfo.Version},
+			{"type", "_doc"},
+		}
+		pmeta := bodyMap.PutEmpty("@metadata").SetEmptyMap()
+		pmeta.EnsureCapacity(len(event.Content.Meta) + len(extra))
+		if err := otelmap.FromMapstr(pmeta, event.Content.Meta); err != nil {
+			return err
+		}
+		for _, kv := range extra {
+			pmeta.PutStr(kv.k, kv.v)
+		}
+	}
+	return nil
+}
+
+// applyNonStandardDataStreamIndex is a WORKAROUND: elasticsearchexporter's MappingBodyMap
+// mode only routes data_stream.type "logs" and "metrics" via data_stream.* attributes; other
+// types (e.g. "synthetics") are rejected. This sets elasticsearch.index directly to bypass
+// that restriction. Remove this function and sanitizeDataStreamField when upstream adds support.
+func applyNonStandardDataStreamIndex(logRecord plog.LogRecord, ds mapstr.M) {
+	const (
+		// maxDataStreamBytes and disallowed* mirror the sanitisation constants in
+		// elasticsearchexporter so the computed index name matches exactly.
+		maxDataStreamBytes       = 100
+		disallowedNamespaceRunes = `\/*?"<>| ,#:`
+		disallowedDatasetRunes   = `-\/*?"<>| ,#:`
+	)
+	dsType, _ := ds["type"].(string)
+	if dsType == "" || dsType == "logs" || dsType == "metrics" {
+		return
+	}
+	dataset, _ := ds["dataset"].(string)
+	namespace, _ := ds["namespace"].(string)
+	sanitizedDataset := sanitizeDataStreamField(dataset, disallowedDatasetRunes, maxDataStreamBytes)
+	sanitizedNamespace := sanitizeDataStreamField(namespace, disallowedNamespaceRunes, maxDataStreamBytes)
+	logRecord.Attributes().PutStr(esIndexAttribute, fmt.Sprintf("%s-%s-%s", dsType, sanitizedDataset, sanitizedNamespace))
+}
+
+// sanitizeDataStreamField mirrors elasticsearchexporter's sanitizeDataStreamField:
+// it lower-cases the value, replaces disallowed runes with '_', and truncates to 100 bytes.
+// No suffix is appended (MappingBodyMap never adds one).
+func sanitizeDataStreamField(field, disallowed string, maxLength int) string {
+	field = strings.Map(func(r rune) rune {
+		if strings.ContainsRune(disallowed, r) {
+			return '_'
+		}
+		return unicode.ToLower(r)
+	}, field)
+	if len(field) > maxLength {
+		field = field[:maxLength]
+	}
+	return field
+}
+
+func tryToMapStr(v any) (mapstr.M, bool) {
+	switch m := v.(type) {
+	case mapstr.M:
+		return m, true
+	case map[string]any:
+		return mapstr.M(m), true
+	default:
+		return nil, false
+	}
+}
+>>>>>>> c0975987a (add support for `raw_index` mapping for otelconsumer (#52662))
