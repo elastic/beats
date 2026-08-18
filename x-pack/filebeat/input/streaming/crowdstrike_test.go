@@ -927,8 +927,7 @@ func TestFollowSessionRejectsCrossOriginResourceURLs(t *testing.T) {
 				ID:              "origin_test",
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
+			ctx := t.Context()
 
 			s, err := NewFalconHoseFollower(ctx, env, cfg, nil, &testPublisher{log}, nil, log, time.Now)
 			if err != nil {

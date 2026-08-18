@@ -526,7 +526,7 @@ func compareRenderedEvents(actual, expected RenderedEtwEvent, eventIndex int) []
 }
 
 // comparePropertyValues compares two property values recursively
-func comparePropertyValues(actual, expected interface{}) bool {
+func comparePropertyValues(actual, expected any) bool {
 	actualJSON, err1 := json.Marshal(actual)
 	expectedJSON, err2 := json.Marshal(expected)
 	return err1 == nil && err2 == nil && string(actualJSON) == string(expectedJSON)

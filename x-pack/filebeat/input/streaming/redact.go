@@ -47,8 +47,8 @@ func cloneMap(dst, src mapstr.M) {
 			d := make(mapstr.M, len(v))
 			dst[k] = d
 			cloneMap(d, v)
-		case map[string]interface{}:
-			d := make(map[string]interface{}, len(v))
+		case map[string]any:
+			d := make(map[string]any, len(v))
 			dst[k] = d
 			cloneMap(d, v)
 		case []mapstr.M:
@@ -59,10 +59,10 @@ func cloneMap(dst, src mapstr.M) {
 				a = append(a, d)
 			}
 			dst[k] = a
-		case []map[string]interface{}:
-			a := make([]map[string]interface{}, 0, len(v))
+		case []map[string]any:
+			a := make([]map[string]any, 0, len(v))
 			for _, m := range v {
-				d := make(map[string]interface{}, len(m))
+				d := make(map[string]any, len(m))
 				cloneMap(d, m)
 				a = append(a, d)
 			}
@@ -88,22 +88,22 @@ func walkMap(m mapstr.M, path string, fn func(parent mapstr.M, key string)) {
 	switch v := v.(type) {
 	case mapstr.M:
 		walkMap(v, rest, fn)
-	case map[string]interface{}:
+	case map[string]any:
 		walkMap(v, rest, fn)
 	case []mapstr.M:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []map[string]interface{}:
+	case []map[string]any:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []interface{}:
+	case []any:
 		for _, v := range v {
 			switch m := v.(type) {
 			case mapstr.M:
 				walkMap(m, rest, fn)
-			case map[string]interface{}:
+			case map[string]any:
 				walkMap(m, rest, fn)
 			}
 		}

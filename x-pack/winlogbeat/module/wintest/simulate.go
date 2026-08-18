@@ -195,8 +195,8 @@ func newError(body []byte) error {
 				Type     string `json:"type"`
 				Reason   string `json:"reason"`
 				CausedBy struct {
-					Type   string      `json:"type"`
-					Reason interface{} `json:"reason"`
+					Type   string `json:"type"`
+					Reason any    `json:"reason"`
 				} `json:"caused_by,omitempty"`
 			} `json:"caused_by,omitempty"`
 			Suppressed []struct {
@@ -223,12 +223,12 @@ func newError(body []byte) error {
 // marshalNormalizedJSON marshals test results ensuring that field
 // order remains consistent independent of field order returned by
 // ES to minimize diff noise during changes.
-func marshalNormalizedJSON(v interface{}) ([]byte, error) {
+func marshalNormalizedJSON(v any) ([]byte, error) {
 	msg, err := json.Marshal(v)
 	if err != nil {
 		return msg, err
 	}
-	var obj interface{}
+	var obj any
 	err = jsonUnmarshalUsingNumber(msg, &obj)
 	if err != nil {
 		return msg, err
@@ -240,7 +240,7 @@ func marshalNormalizedJSON(v interface{}) ([]byte, error) {
 // does not default to unmarshaling numeric values to float64 in order to
 // prevent low bit truncation of values greater than 1<<53.
 // See https://golang.org/cl/6202068 for details.
-func jsonUnmarshalUsingNumber(data []byte, v interface{}) error {
+func jsonUnmarshalUsingNumber(data []byte, v any) error {
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.UseNumber()
 	err := dec.Decode(v)
@@ -263,7 +263,7 @@ func jsonUnmarshalUsingNumber(data []byte, v interface{}) error {
 func ErrorMessage(msg json.RawMessage) error {
 	var event struct {
 		Error struct {
-			Message interface{}
+			Message any
 		}
 	}
 	err := json.Unmarshal(msg, &event)

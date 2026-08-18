@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"runtime"
 	"strings"
 	"sync"
@@ -51,7 +52,7 @@ type recurrenceQueryHandler struct {
 	osqueryVer   string
 
 	mx              sync.Mutex
-	previousResults map[string]map[string]map[string]interface{}
+	previousResults map[string]map[string]map[string]any
 }
 
 // newRecurrenceQueryHandler creates a new RRULE query handler.
@@ -65,7 +66,7 @@ func newRecurrenceQueryHandler(log *logp.Logger, cli *osqdcli.Client, configPlug
 		publisher:       pub,
 		profiles:        profiles,
 		osqueryVer:      osqueryVersion,
-		previousResults: make(map[string]map[string]map[string]interface{}),
+		previousResults: make(map[string]map[string]map[string]any),
 	}
 
 	h.scheduler = scheduler.New(log, h.executeQuery)
@@ -191,7 +192,7 @@ func platformMatches(selector, goos string) bool {
 	if selector == "" || selector == "all" {
 		return true
 	}
-	for _, platform := range strings.Split(selector, ",") {
+	for platform := range strings.SplitSeq(selector, ",") {
 		switch strings.TrimSpace(strings.ToLower(platform)) {
 		case "all":
 			return true
@@ -332,7 +333,7 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 
 	scheduleID := scheduledQuery.ScheduleID()
 
-	baseMeta := map[string]interface{}{
+	baseMeta := map[string]any{
 		"unix_time":                completedAt.Unix(),
 		"planned_schedule_time":    plannedScheduleTime.Format(time.RFC3339Nano),
 		"rrule_query":              true,
@@ -341,7 +342,7 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 	}
 
 	totalHits := 0
-	publish := func(typ, action string, rows []map[string]interface{}) {
+	publish := func(typ, action string, rows []map[string]any) {
 		if len(rows) == 0 {
 			return
 		}
@@ -369,15 +370,13 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 	return nil
 }
 
-func cloneRRuleMeta(meta map[string]interface{}) map[string]interface{} {
-	out := make(map[string]interface{}, len(meta)+2)
-	for k, v := range meta {
-		out[k] = v
-	}
+func cloneRRuleMeta(meta map[string]any) map[string]any {
+	out := make(map[string]any, len(meta)+2)
+	maps.Copy(out, meta)
 	return out
 }
 
-func (h *recurrenceQueryHandler) diffResults(name string, hits []map[string]interface{}, includeRemoved bool) ([]map[string]interface{}, []map[string]interface{}) {
+func (h *recurrenceQueryHandler) diffResults(name string, hits []map[string]any, includeRemoved bool) ([]map[string]any, []map[string]any) {
 	current := rowsByKey(hits)
 
 	h.mx.Lock()
@@ -389,8 +388,8 @@ func (h *recurrenceQueryHandler) diffResults(name string, hits []map[string]inte
 	return added, removed
 }
 
-func diffRows(previous, current map[string]map[string]interface{}, includeRemoved bool) ([]map[string]interface{}, []map[string]interface{}) {
-	var added []map[string]interface{}
+func diffRows(previous, current map[string]map[string]any, includeRemoved bool) ([]map[string]any, []map[string]any) {
+	var added []map[string]any
 	for key, row := range current {
 		if _, ok := previous[key]; !ok {
 			added = append(added, row)
@@ -399,7 +398,7 @@ func diffRows(previous, current map[string]map[string]interface{}, includeRemove
 	if !includeRemoved {
 		return added, nil
 	}
-	var removed []map[string]interface{}
+	var removed []map[string]any
 	for key, row := range previous {
 		if _, ok := current[key]; !ok {
 			removed = append(removed, row)
@@ -408,15 +407,15 @@ func diffRows(previous, current map[string]map[string]interface{}, includeRemove
 	return added, removed
 }
 
-func rowsByKey(rows []map[string]interface{}) map[string]map[string]interface{} {
-	out := make(map[string]map[string]interface{}, len(rows))
+func rowsByKey(rows []map[string]any) map[string]map[string]any {
+	out := make(map[string]map[string]any, len(rows))
 	for _, row := range rows {
 		out[rowKey(row)] = row
 	}
 	return out
 }
 
-func rowKey(row map[string]interface{}) string {
+func rowKey(row map[string]any) string {
 	raw, err := json.Marshal(row)
 	if err != nil {
 		return fmt.Sprintf("%v", row)
