@@ -1060,7 +1060,7 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 *Filebeat*
 
 // tag::known-issue-8.19-filestream-take-over[]
-- Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
+- Filestream "take over" mode does not work in versions 8.19.0-8.19.20. A fix will ship in the 8.19.21 release.
 // end::known-issue-8.19-filestream-take-over[]
 // tag::known-issue-8.19-filestream-clean-inactive-1[]
 - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
