@@ -137,14 +137,14 @@ func newParser(config *parserConfig, httpLogger, httpDetailedLogger *logp.Logger
 }
 
 //go:inline
-func (parser *parser) debugf(format string, args ...interface{}) {
+func (parser *parser) debugf(format string, args ...any) {
 	if parser.httpLogger.IsDebug() {
 		parser.httpLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
-func (parser *parser) detailedf(format string, args ...interface{}) {
+func (parser *parser) detailedf(format string, args ...any) {
 	if parser.httpDetailedLogger.IsDebug() {
 		parser.httpDetailedLogger.Debugf(format, args...)
 	}

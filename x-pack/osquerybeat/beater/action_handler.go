@@ -22,11 +22,11 @@ var (
 )
 
 type actionResultPublisher interface {
-	PublishActionResult(req map[string]interface{}, res map[string]interface{})
+	PublishActionResult(req map[string]any, res map[string]any)
 }
 
 type queryResultPublisher interface {
-	Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any)
 }
 
 type scheduledResponsePublisher interface {
@@ -34,11 +34,11 @@ type scheduledResponsePublisher interface {
 }
 
 type queryProfilePublisher interface {
-	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
+	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]any, reqData any)
 }
 
 type liveProfileRecorder interface {
-	RecordLiveProfile(query string, profile map[string]interface{})
+	RecordLiveProfile(query string, profile map[string]any)
 }
 
 type scheduledQueryPublisher interface {
@@ -53,7 +53,7 @@ type actionQueryPublisher interface {
 }
 
 type queryExecutor interface {
-	Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error)
+	Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error)
 }
 
 type namespaceProvider interface {
@@ -91,13 +91,13 @@ func (a *actionHandler) Name() string {
 }
 
 // Execute handles the action request.
-func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
+func (a *actionHandler) Execute(ctx context.Context, req map[string]any) (map[string]any, error) {
 
 	start := time.Now().UTC()
 	count, err := a.execute(ctx, req)
 	end := time.Now().UTC()
 
-	res := map[string]interface{}{
+	res := map[string]any{
 		"started_at":   start.Format(time.RFC3339Nano),
 		"completed_at": end.Format(time.RFC3339Nano),
 	}
@@ -110,7 +110,7 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{})
 	return res, nil
 }
 
-func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, error) {
+func (a *actionHandler) execute(ctx context.Context, req map[string]any) (int, error) {
 	ac, err := action.FromMap(req)
 	if err != nil {
 		return 0, fmt.Errorf("%w: %w", err, ErrQueryExecution)
@@ -132,7 +132,7 @@ func (a *actionHandler) namespace() string {
 	return config.DefaultNamespace
 }
 
-func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) (int, error) {
+func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]any) (int, error) {
 
 	if a.queryExec == nil {
 		return 0, ErrNoQueryExecutor

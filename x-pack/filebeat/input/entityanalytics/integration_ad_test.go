@@ -315,7 +315,7 @@ func startADIntegLDAPServer(t *testing.T, fix *adFixture) string {
 	ln.Close()
 
 	go func() { _ = s.Run(addr) }()
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		if s.Ready() {
 			break
 		}

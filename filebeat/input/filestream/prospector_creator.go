@@ -95,10 +95,6 @@ func newProspector(
 	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
 
 	logger := log.Named("filestream").With("id", config.ID)
-	err := checkConfigCompatibility(config)
-	if err != nil {
-		return nil, err
-	}
 
 	identifier, err := newFileIdentifier(
 		config.FileIdentity,
@@ -191,14 +187,4 @@ func newProspector(
 	default:
 	}
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
-}
-
-func checkConfigCompatibility(config config) error {
-	if config.FileIdentity != nil &&
-		config.FileIdentity.Name() == fingerprintName &&
-		!config.FileWatcher.Scanner.Fingerprint.Enabled {
-		return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
-	}
-
-	return nil
 }

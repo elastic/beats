@@ -170,7 +170,7 @@ func checkEvent(t *testing.T, target mb.Event, actual mb.Event) {
 func openQueue(t *testing.T, be backend) *quark.Queue {
 	attr := quark.DefaultQueueAttr()
 	attr.HoldTime = 25
-	attr.Flags &= ^quark.QQ_ALL_BACKENDS
+	attr.Flags &= ^(quark.QQ_EBPF | quark.QQ_KPROBE)
 	switch be {
 	case Ebpf:
 		attr.Flags |= quark.QQ_EBPF
@@ -351,8 +351,8 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb
 
 // getConfigForQuark enables quark and allows hashing so we can test
 // the cached hasher.
-func getConfigForQuark(be backend) map[string]interface{} {
-	config := map[string]interface{}{
+func getConfigForQuark(be backend) map[string]any {
+	config := map[string]any{
 		"module":   system.ModuleName,
 		"datasets": []string{"process"},
 

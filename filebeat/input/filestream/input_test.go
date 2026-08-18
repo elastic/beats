@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -39,6 +40,9 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	publishertest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -328,7 +332,7 @@ func TestTakeOverTags(t *testing.T) {
 type: filestream
 id: foo
 prospector.scanner.check_interval: 1s
-prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
 take_over.enabled: %t
 paths:
     - %s`, testCase.takeOver, filename)
@@ -337,6 +341,89 @@ paths:
 			for _, event := range events {
 				testCase.testFunc(t, event)
 			}
+		})
+	}
+}
+
+// TestParsersNormalizedInPlace checks that parsers do not share maps between
+// events when the processing chain normalizes them in place.
+func TestParsersNormalizedInPlace(t *testing.T) {
+	testCases := []struct {
+		name    string
+		parsers string
+		content string
+		want    []mapstr.M
+	}{
+		{
+			name: "ndjson",
+			parsers: `
+parsers:
+  - ndjson:
+      target: ""`,
+			content: `{"msg":"one","nested":{"k":"v1"},"n":1}
+{"msg":"two","nested":{"k":"v2"},"n":2}
+`,
+			want: []mapstr.M{
+				{"msg": "one", "nested": mapstr.M{"k": "v1"}, "n": int64(1)},
+				{"msg": "two", "nested": mapstr.M{"k": "v2"}, "n": int64(2)},
+			},
+		},
+		{
+			name: "multiline",
+			parsers: `
+parsers:
+  - multiline:
+      type: pattern
+      pattern: '^[[:space:]]'
+      negate: false
+      match: after`,
+			content: "one\n  continued\ntwo\n  continued\n",
+			want: []mapstr.M{
+				{"message": "one\n  continued"},
+				{"message": "two\n  continued"},
+			},
+		},
+		{
+			name: "container",
+			parsers: `
+parsers:
+  - container:
+      stream: all
+      format: docker`,
+			content: `{"log":"one\n","stream":"stdout","time":"2026-01-01T00:00:00.000000000Z"}
+{"log":"two\n","stream":"stderr","time":"2026-01-01T00:00:01.000000000Z"}
+`,
+			want: []mapstr.M{
+				{"message": "one\n", "stream": "stdout"},
+				{"message": "two\n", "stream": "stderr"},
+			},
+		},
+	}
+
+	logger := logptest.NewTestingLogger(t, "")
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			filename := filepath.Join(t.TempDir(), "log")
+			require.NoError(t, os.WriteFile(filename, []byte(testCase.content), 0o600))
+
+			cfg := fmt.Sprintf(`
+type: filestream
+id: %s
+prospector.scanner.check_interval: 1s
+file_identity.native: ~
+paths:
+    - %s%s`, testCase.name, filename, testCase.parsers)
+
+			runner := createFilestreamTestRunner(t, logger, testCase.name, cfg, int64(len(testCase.want)), true)
+			events := runner(t)
+
+			got := make([]mapstr.M, 0, len(events))
+			for _, event := range events {
+				// Offsets and paths differ per run.
+				delete(event.Fields, "log")
+				got = append(got, event.Fields)
+			}
+			assert.Equal(t, testCase.want, got)
 		})
 	}
 }
@@ -575,15 +662,15 @@ func runFilestreamBenchmark(b *testing.B, logger *logp.Logger, testID string, cf
 // Events should not be collected in benchmarks due to high extra costs of using the channel.
 //
 // returns a runner function that returns produced events.
-func createFilestreamTestRunner(b testing.TB, logger *logp.Logger, testID string, cfg string, eventLimit int64, collectEvents bool) func(t testing.TB) []beat.Event {
+func createFilestreamTestRunner(tb testing.TB, logger *logp.Logger, testID string, cfg string, eventLimit int64, collectEvents bool) func(t testing.TB) []beat.Event {
 	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
-	require.NoError(b, err)
+	require.NoError(tb, err)
 
-	p := Plugin(logger, createTestStore(b))
+	p := Plugin(logger, createTestStore(tb))
 	input, err := p.Manager.Create(c)
-	require.NoError(b, err)
+	require.NoError(tb, err)
 
-	ctx, cancel := context.WithCancel(b.Context())
+	ctx, cancel := context.WithCancel(tb.Context())
 	v2ctx := v2.Context{
 		ID:              testID,
 		IDWithoutName:   testID,
@@ -598,7 +685,7 @@ func createFilestreamTestRunner(b testing.TB, logger *logp.Logger, testID string
 	if collectEvents {
 		out = make([]beat.Event, 0, eventLimit)
 	}
-	connector, events := newTestPipeline(eventLimit, collectEvents)
+	connector, events := newTestPipeline(tb, logger, eventLimit, collectEvents)
 	go func() {
 		defer cancel()
 		for event := range events {
@@ -607,8 +694,9 @@ func createFilestreamTestRunner(b testing.TB, logger *logp.Logger, testID string
 	}()
 
 	return func(t testing.TB) []beat.Event {
+		defer func() { require.NoError(t, connector.Close(), "failed closing the test pipeline") }()
 		err := input.Run(v2ctx, connector)
-		require.NoError(b, err)
+		require.NoError(t, err, "filestream input failed")
 		return out
 	}
 }
@@ -648,54 +736,67 @@ func (s *testStore) CleanupInterval() time.Duration {
 	return time.Second
 }
 
-func newTestPipeline(eventLimit int64, collectEvents bool) (pc beat.PipelineConnector, out <-chan beat.Event) {
+func newTestPipeline(t testing.TB, logger *logp.Logger, eventLimit int64, collectEvents bool) (p *testPipeline, out <-chan beat.Event) {
+	support, err := processing.MakeDefaultSupport(true, nil)(beat.Info{Logger: logger}, logger, conf.NewConfig())
+	require.NoError(t, err, "failed building the event processing support")
+
 	var chBuf int64
 	if collectEvents {
 		chBuf = eventLimit
 	}
 	ch := make(chan beat.Event, chBuf)
-	return &testPipeline{limit: eventLimit, out: ch, collect: collectEvents}, ch
+	p = &testPipeline{out: ch, collect: collectEvents, support: support}
+	p.limit.Store(eventLimit)
+	p.ConnectFunc = func(cfg beat.ClientConfig) (beat.Client, error) {
+		procs, err := support.Create(cfg.Processing, false)
+		if err != nil {
+			return nil, err
+		}
+		return &publishertest.FakeClient{
+			PublishFunc: func(event beat.Event) {
+				processed, err := procs.Run(&event)
+				if !assert.NoError(t, err, "event processing failed") {
+					return
+				}
+				if processed != nil {
+					p.publish(*processed)
+				}
+			},
+			CloseFunc: func() error {
+				return processors.Close(procs)
+			},
+		}, nil
+	}
+	return p, ch
 }
 
 type testPipeline struct {
-	limit   int64
+	publishertest.FakeConnector
+	limit   atomic.Int64
+	mu      sync.Mutex
 	out     chan beat.Event
 	collect bool
+	support processing.Supporter
 }
 
-func (p *testPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
-	return p.Connect()
-}
-func (p *testPipeline) Connect() (beat.Client, error) {
-	return &testClient{p}, nil
+func (p *testPipeline) Close() error {
+	return p.support.Close()
 }
 
-func (p *testPipeline) Disconnect(ctx context.Context) error {
-	return nil
-}
-
-type testClient struct {
-	testPipeline *testPipeline
-}
-
-func (c *testClient) Publish(event beat.Event) {
-	newLimit := atomic.AddInt64(&c.testPipeline.limit, -1)
-	if newLimit < 0 {
+func (p *testPipeline) publish(event beat.Event) {
+	// Serialize collectors so the last sender cannot close out ahead of another.
+	if p.collect {
+		p.mu.Lock()
+		defer p.mu.Unlock()
+	}
+	remaining := p.limit.Add(-1)
+	if remaining < 0 {
 		return
 	}
-	if c.testPipeline.collect {
-		c.testPipeline.out <- event
+	if p.collect {
+		p.out <- event
 	}
-	if newLimit == 0 {
-		close(c.testPipeline.out)
+	if remaining == 0 {
+		close(p.out)
 	}
-}
-
-func (c *testClient) PublishAll(events []beat.Event) {
-	for _, e := range events {
-		c.Publish(e)
-	}
-}
-func (c *testClient) Close() error {
-	return nil
 }
