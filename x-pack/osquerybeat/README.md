@@ -90,6 +90,38 @@ To refresh those sources on demand:
 JUMPLISTS_REFRESH_SOURCES=true mage generate
 ```
 
+### Upgrade the bundled Osquery version
+
+The bundled release metadata is in `internal/distro/distro.go`. To upgrade it:
+
+```bash
+mage updateOsquery
+```
+
+The target selects the latest stable GitHub release, updates the version and
+official artifact checksums, and creates a changelog fragment. Set
+`OSQUERY_VERSION` to select a specific release:
+
+```bash
+OSQUERY_VERSION=5.23.1 mage updateOsquery
+```
+
+The target updates the Osquery version and all artifact checksums used by the
+branch.
+
+Review the generated fragment description, then verify the result:
+
+```bash
+go test ./internal/distro ./scripts/mage ./scripts/update_osquery
+mage fetchOsquerydForTesting
+```
+
+This verifies the current host artifact. The packaging jobs download and
+verify the complete supported platform matrix.
+
+Then run `mage updateOsqueryManager` in the integrations repository. Set
+`BEATS_PATH` to this checkout when the integrations schemas need unreleased
+osquerybeat extension specs.
 
 ### Cleanup
 
