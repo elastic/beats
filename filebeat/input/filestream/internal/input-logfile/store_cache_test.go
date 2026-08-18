@@ -402,6 +402,54 @@ func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
 	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
 }
 
+func TestStoreCache_InvalidStateReturnsErrorAndUnlocks(t *testing.T) {
+	setupStoreCacheTest(t)
+
+	logger, logs := newObserverLogger(t)
+	states := newCountingStateStore("invalid-state-backend")
+	const invalidState = storeCacheState(255)
+
+	globalStoreCache.mu.Lock()
+	globalStoreCache.entries[states.StoreKey()] = &storeCacheEntry{state: invalidState}
+	globalStoreCache.mu.Unlock()
+	t.Cleanup(func() {
+		if globalStoreCache.mu.TryLock() {
+			delete(globalStoreCache.entries, states.StoreKey())
+			globalStoreCache.mu.Unlock()
+			return
+		}
+		t.Error("could not clean up store because it is already locked")
+	})
+
+	result := make(chan error, 1)
+	go func() {
+		_, err := acquireStore(logger, states, "filestream")
+		result <- err
+	}()
+
+	select {
+	case err := <-result:
+		require.ErrorContains(
+			t,
+			err,
+			"unhandled filestream shared store cache state unknown(255)",
+			"an unknown state must return an error",
+		)
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for acquisition with an unknown cache state")
+	}
+
+	require.Eventually(t, func() bool {
+		return logs.FilterMessage("unhandled filestream shared store cache state").Len() == 1
+	}, time.Second, time.Millisecond, "an unknown state must be logged")
+
+	if !globalStoreCache.mu.TryLock() {
+		t.Fatal("store cache mutex remained locked after an unknown cache " +
+			"state. The clean up of this test might deadlock.")
+	}
+	globalStoreCache.mu.Unlock()
+}
+
 type countingStateStore struct {
 	registry      *statestore.Registry
 	storeForCalls atomic.Int32

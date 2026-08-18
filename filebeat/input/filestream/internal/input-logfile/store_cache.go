@@ -38,6 +38,19 @@ const (
 	storeDraining
 )
 
+func (s storeCacheState) String() string {
+	switch s {
+	case storeInitializing:
+		return "initializing"
+	case storeActive:
+		return "active"
+	case storeDraining:
+		return "draining"
+	default:
+		return fmt.Sprintf("unknown(%d)", s)
+	}
+}
+
 type storeCacheEntry struct {
 	state      storeCacheState
 	ready      chan struct{}
@@ -113,6 +126,14 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 					time.Since(started),
 				),
 			)
+		default:
+			state := entry.state
+			globalStoreCache.mu.Unlock()
+			logger.Errorw(
+				"unhandled filestream shared store cache state",
+				"store_cache_state", state.String(),
+			)
+			return nil, fmt.Errorf("unhandled filestream shared store cache state %s for backend %q", state, key)
 		}
 	}
 }
