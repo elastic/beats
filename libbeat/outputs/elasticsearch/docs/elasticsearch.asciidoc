@@ -746,7 +746,7 @@ Note:`queue` options can be set under +{beatname_lc}.yml+ or the `output` sectio
 Specifies the behavior when the elasticsearch cluster explicitly rejects documents, for example on mapping conflicts.
 
 ====== `drop`
-The default behaviour is that when an event is explicitly rejected by Elasticsearch, it is dropped.
+The default behavior is that when an event is explicitly rejected by Elasticsearch, it is dropped.
 
 ["source","yaml"]
 ------------------------------------------------------------------------------
