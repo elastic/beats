@@ -149,10 +149,7 @@ func newFlowsWorker(
 	ticksTimeout := 1
 	ticksPeriod := -1
 	if period > 0 {
-		tick = gcd(timeout, period)
-		if tick < time.Second {
-			tick = time.Second
-		}
+		tick = max(gcd(timeout, period), time.Second)
 
 		ticksTimeout = int(timeout / tick)
 		if ticksTimeout == 0 {
@@ -551,8 +548,8 @@ func formatHardwareAddr(addr net.HardwareAddr) string {
 	return string(buf)
 }
 
-func encodeStats(stats *flowStats, ints, uints, floats []string, enableDeltaFlowReporting bool) map[string]interface{} {
-	report := make(map[string]interface{})
+func encodeStats(stats *flowStats, ints, uints, floats []string, enableDeltaFlowReporting bool) map[string]any {
+	report := make(map[string]any)
 
 	i := 0
 	for _, mask := range stats.intFlags {

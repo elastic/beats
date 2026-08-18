@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type Var interface{}
+type Var any
 
 type flagsInfo struct {
 	i    int
