@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package azureblobstorage
 
 import (
@@ -83,6 +81,7 @@ type config struct {
 	// to the whole account (all containers), since the SDK client is created per
 	// container from these shared values.
 	Retry retryConfig `config:"retry"`
+
 	// clientOptions is used internally for testing purposes only and should not be
 	// configured by users. Every Azure client the input creates starts from these
 	// options.
@@ -177,9 +176,9 @@ type authConfig struct {
 	// OAuth2 uses OAuth 2.0 for authentication, typically with Azure Active Directory.
 	OAuth2 *OAuth2Config `config:"oauth2"`
 	// ManagedIdentity uses the managed identity of the Azure host that runs
-	// Filebeat, so no secret is stored in the config. It is not a pointer because
-	// a system-assigned identity needs no field, and go-ucfg leaves a pointer nil
-	// for a block written without a value.
+	// Filebeat, so the config holds no secret. It is a value and carries an Enabled
+	// field because go-ucfg leaves a pointer nil for a block with no fields set,
+	// which is how a system-assigned identity is written.
 	ManagedIdentity managedIdentityConfig `config:"managed_identity"`
 }
 
@@ -234,8 +233,9 @@ func (c config) Validate() error {
 	if c.Auth.ManagedIdentity.ClientID != "" && !c.Auth.ManagedIdentity.Enabled {
 		return errors.New("auth.managed_identity.enabled must be true to use auth.managed_identity.client_id")
 	}
-	// Managed identity is new, so nothing can rely on it losing to another method.
-	// Reject the combination instead of ignoring one of the two in silence.
+	// Managed identity is tried last, so a config that also sets
+	// auth.shared_credentials, auth.connection_string or auth.oauth2 would use
+	// that method and silently ignore managed identity.
 	if c.Auth.ManagedIdentity.Enabled && (c.Auth.SharedCredentials != nil || c.Auth.ConnectionString != nil || c.Auth.OAuth2 != nil) {
 		return errors.New("auth.managed_identity cannot be combined with another auth method")
 	}

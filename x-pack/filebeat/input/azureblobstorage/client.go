@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package azureblobstorage
 
 import (
@@ -40,9 +38,7 @@ func fetchServiceClientAndCreds(cfg config, retryCfg retryConfig, url string, lo
 		}
 		return fetchServiceClientWithTokenCreds(url, creds, storageOpts, oauth2Type)
 	case cfg.Auth.ManagedIdentity.Enabled:
-		// Note the options: this credential gets no retry policy, while the client
-		// secret credential above gets the storage one.
-		creds, err := newManagedIdentityCredential(cfg.Auth.ManagedIdentity, cfg.clientOptions, log)
+		creds, err := newManagedIdentityCredential(cfg.Auth.ManagedIdentity, storageOpts, log)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -98,10 +94,9 @@ func fetchServiceClientWithConnectionString(connectionString *connectionStringCo
 
 // newClientSecretCredential returns a credential for an Entra ID application.
 //
-// opts carry the input's retry policy, so the retry block also governs the token
-// requests this credential makes. That is how the input has always behaved for
-// oauth2. Note that it differs from newManagedIdentityCredential below, where the
-// SDK defaults matter.
+// opts holds the input's retry policy, so the retry block also governs the token
+// requests this credential makes. newManagedIdentityCredential discards the policy
+// instead, because the SDK tunes retries for the token endpoint it uses.
 func newClientSecretCredential(cfg *OAuth2Config, opts azcore.ClientOptions) (*azidentity.ClientSecretCredential, error) {
 	creds, err := azidentity.NewClientSecretCredential(cfg.TenantID, cfg.ClientID, cfg.ClientSecret,
 		&azidentity.ClientSecretCredentialOptions{ClientOptions: opts},
@@ -114,16 +109,16 @@ func newClientSecretCredential(cfg *OAuth2Config, opts azcore.ClientOptions) (*a
 
 // newManagedIdentityCredential returns a credential for the managed identity of
 // the Azure host that runs Filebeat. An empty ClientID selects the
-// system-assigned identity of the host.
-//
-// opts must not carry the input's retry policy. When the credential reads tokens
-// from IMDS, the Azure SDK fills every retry field that is still zero with values
-// that suit the token endpoint. Those values are more patient than the ones that
-// suit Azure Storage, which matters on a host that has just started and does not
-// serve tokens yet. Nothing else covers a failed token request, because the SDK
-// marks a credential failure as non-retriable and the storage retry policy
-// therefore gives up at once.
+// system-assigned identity of the host. Any retry policy in opts is discarded,
+// see below.
 func newManagedIdentityCredential(cfg managedIdentityConfig, opts azcore.ClientOptions, log *logp.Logger) (*azidentity.ManagedIdentityCredential, error) {
+	// Drop the storage retry policy so the SDK applies its own, which suits the
+	// token endpoint: 6 retries, a 2s initial delay, and 404 and 410 treated as
+	// retryable while Azure attaches an identity to a host that has just started.
+	// Nothing else covers a failed token request, because the SDK marks a credential
+	// failure as non-retriable, so the storage retry policy stops at once.
+	opts.Retry = policy.RetryOptions{}
+
 	credOpts := &azidentity.ManagedIdentityCredentialOptions{ClientOptions: opts}
 	if cfg.ClientID != "" {
 		credOpts.ID = azidentity.ClientID(cfg.ClientID)

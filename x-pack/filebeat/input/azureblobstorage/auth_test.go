@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// This file was contributed to by generative AI
-
 package azureblobstorage
 
 import (
@@ -571,8 +569,12 @@ func Test_OAuth2(t *testing.T) {
 func clearManagedIdentityEnv(t *testing.T) {
 	t.Helper()
 	for _, k := range []string{
-		"IDENTITY_ENDPOINT", "IDENTITY_HEADER", "IDENTITY_SERVER_THUMBPRINT",
-		"MSI_ENDPOINT", "MSI_SECRET", "IMDS_ENDPOINT",
+		"IDENTITY_ENDPOINT",
+		"IDENTITY_HEADER",
+		"IDENTITY_SERVER_THUMBPRINT",
+		"MSI_ENDPOINT",
+		"MSI_SECRET",
+		"IMDS_ENDPOINT",
 	} {
 		t.Setenv(k, "")
 		require.NoError(t, os.Unsetenv(k), "unsetting %s should succeed", k)
@@ -704,12 +706,9 @@ func (t *failingTokenTransporter) Do(req *http.Request) (*http.Response, error) 
 	}, nil
 }
 
-// Test_ManagedIdentityRetriesTokenRequests checks that the credential keeps its
-// own retry policy for token requests. The input retry block belongs to Azure
-// Storage, so a config that turns storage retries off must not stop the
-// credential from retrying a token request. Nothing else protects the token
-// request, because the Azure SDK marks a credential failure as non-retriable and
-// the storage retry policy therefore gives up at once.
+// Test_ManagedIdentityRetriesTokenRequests checks that newManagedIdentityCredential
+// discards the storage retry policy, so turning storage retries off in the config
+// does not stop the credential from retrying a token request.
 func Test_ManagedIdentityRetriesTokenRequests(t *testing.T) {
 	clearManagedIdentityEnv(t)
 
