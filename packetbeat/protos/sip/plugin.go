@@ -88,14 +88,14 @@ func New(
 }
 
 //go:inline
-func (p *plugin) debugf(format string, args ...interface{}) {
+func (p *plugin) debugf(format string, args ...any) {
 	if p.isDebug {
 		p.sipLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
-func (p *plugin) detailedf(format string, args ...interface{}) {
+func (p *plugin) detailedf(format string, args ...any) {
 	if p.isDetailed {
 		p.sipDetailedLogger.Debugf(format, args...)
 	}
@@ -589,7 +589,7 @@ func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *Prot
 	fields.AuthScheme = auth[:pos]
 
 	pos += 1
-	for _, param := range bytes.Split(auth[pos:], []byte(",")) {
+	for param := range bytes.SplitSeq(auth[pos:], []byte(",")) {
 		kv := bytes.SplitN(param, []byte("="), 2)
 		if len(kv) != 2 {
 			continue
@@ -638,7 +638,7 @@ func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields, si
 	fields.SDPBodyOriginal = msg.body
 
 	var isInMedia bool
-	for _, line := range bytes.Split(msg.body, []byte("\r\n")) {
+	for line := range bytes.SplitSeq(msg.body, []byte("\r\n")) {
 		kv := bytes.SplitN(line, []byte("="), 2)
 		if len(kv) != 2 {
 			continue
@@ -761,7 +761,7 @@ func parseFromToContact(fromTo common.NetString) (displayInfo, uri common.NetStr
 
 	// parse the header params
 	pos = endURIPos + 1
-	for _, param := range bytes.Split(fromTo[pos:], []byte(";")) {
+	for param := range bytes.SplitSeq(fromTo[pos:], []byte(";")) {
 		kv := bytes.SplitN(param, []byte("="), 2)
 		if len(kv) != 2 {
 			continue
@@ -844,7 +844,7 @@ loop:
 	}
 
 	if hasParams {
-		for _, param := range bytes.Split(uri[epos+1:], []byte(";")) {
+		for param := range bytes.SplitSeq(uri[epos+1:], []byte(";")) {
 			kv := bytes.Split(param, []byte("="))
 			if len(kv) != 2 {
 				continue

@@ -100,7 +100,7 @@ func (f *fakePoll) PagedSearchQuery(t testing.TB, lb poll.Transaction, db []blob
 	return f.deliverResult(t, lb, result, nextUrl)
 }
 
-func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg interface{}, nextUrl string) (urls []string, next poll.Transaction) {
+func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg any, nextUrl string) (urls []string, next poll.Transaction) {
 	js, err := json.Marshal(msg)
 	if !assert.NoError(t, err) {
 		t.Fatal(err)

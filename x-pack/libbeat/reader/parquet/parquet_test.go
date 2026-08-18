@@ -114,7 +114,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	data := make(map[string]bool)
 	// creates a new Arrow schema
 	fields := make([]arrow.Field, 0, numCols)
-	for i := 0; i < numCols; i++ {
+	for i := range numCols {
 		fieldType := arrow.PrimitiveTypes.Int32
 		field := arrow.Field{Name: fmt.Sprintf("col%d", i), Type: fieldType, Nullable: true}
 		fields = append(fields, field)
@@ -142,7 +142,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	for rowIdx := int64(0); rowIdx < int64(numRows); rowIdx++ {
 		// creates an Arrow record with random data
 		var recordColumns []arrow.Array
-		for colIdx := 0; colIdx < numCols; colIdx++ {
+		for range numCols {
 			randData := []int32{r.Int31()}
 			builder := array.NewInt32Builder(memoryPool)
 			builder.AppendValues(randData, nil)
