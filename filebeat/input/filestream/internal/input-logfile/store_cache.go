@@ -142,15 +142,16 @@ func initializeStoreCacheEntry(
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	entry.cleanerWg.Add(1)
 	s.onClose = func() { globalStoreCache.storeClosed(key, entry) }
-	entry.ackCH = newUpdateChan()
+	ackCH := newUpdateChan()
+	ackUpdater := newUpdateWriter(s, ackCH)
 
 	globalStoreCache.mu.Lock()
 	if globalStoreCache.entries[key] != entry || entry.initErr != nil {
 		initErr := entry.initErr
 		globalStoreCache.mu.Unlock()
 		cancel()
+		ackUpdater.Close()
 		s.Release()
 		if initErr == nil {
 			initErr = errors.New("filestream shared store cache entry was reset")
@@ -158,7 +159,9 @@ func initializeStoreCacheEntry(
 		return nil, initErr
 	}
 
-	entry.store, entry.interval, entry.cancel = s, interval, cancel
+	entry.cleanerWg.Add(1)
+	entry.store, entry.ackCH, entry.ackUpdater = s, ackCH, ackUpdater
+	entry.interval, entry.cancel = interval, cancel
 	entry.state, entry.users = storeActive, 1
 	s.cacheEntry = entry
 	s.Retain()
@@ -169,7 +172,6 @@ func initializeStoreCacheEntry(
 		"store_users_count", 1,
 	)
 
-	entry.ackUpdater = newUpdateWriter(s, entry.ackCH)
 	go func() {
 		defer entry.cleanerWg.Done()
 		defer entry.store.Release()

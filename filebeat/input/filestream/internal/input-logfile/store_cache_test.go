@@ -236,6 +236,39 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 	require.Equal(t, int32(1), states.storeForCalls.Load())
 }
 
+func TestStoreCache_InitializationResetDoesNotLeakCleanerWaitGroup(t *testing.T) {
+	setupStoreCacheTest(t)
+
+	logger := logp.NewNopLogger()
+	states := newBlockingStateStore("reset-backend", nil)
+	result := make(chan error, 1)
+	go func() {
+		_, err := acquireStore(logger, states, "filestream")
+		result <- err
+	}()
+	<-states.firstStoreForStarted
+
+	globalStoreCache.mu.Lock()
+	entry := globalStoreCache.entries[states.StoreKey()]
+	globalStoreCache.mu.Unlock()
+	require.NotNil(t, entry, "blocked initialization must have a cache entry")
+
+	resetStoreCacheForTest()
+	close(states.releaseFirstStoreFor)
+	require.ErrorContains(t, <-result, "filestream shared store cache entry was reset", "reset initialization must return an error")
+
+	cleanerDone := make(chan struct{})
+	go func() {
+		entry.cleanerWg.Wait()
+		close(cleanerDone)
+	}()
+	select {
+	case <-cleanerDone:
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for reset initialization cleaner accounting")
+	}
+}
+
 func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 	setupStoreCacheTest(t)
 
@@ -284,20 +317,46 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 	releaseAcquiredStore(logger, retried)
 }
 
-func TestStoreCache_DifferentBackendsAreIsolated(t *testing.T) {
+func TestStoreCache_DifferentBackendsInitializeIndependently(t *testing.T) {
 	setupStoreCacheTest(t)
 
 	logger, logs := newObserverLogger(t)
-	firstStates := newCountingStateStore("first-backend")
+	firstStates := newBlockingStateStore("first-backend", nil)
 	secondStates := newCountingStateStore("second-backend")
 
-	first, err := acquireStore(logger, firstStates, "filestream")
-	require.NoError(t, err)
-	second, err := acquireStore(logger, secondStates, "filestream")
-	require.NoError(t, err)
+	type acquireResult struct {
+		store *store
+		err   error
+	}
+	firstResult := make(chan acquireResult, 1)
+	go func() {
+		s, err := acquireStore(logger, firstStates, "filestream")
+		firstResult <- acquireResult{store: s, err: err}
+	}()
+	<-firstStates.firstStoreForStarted
+
+	secondResult := make(chan acquireResult, 1)
+	go func() {
+		s, err := acquireStore(logger, secondStates, "filestream")
+		secondResult <- acquireResult{store: s, err: err}
+	}()
+	var second *store
+	select {
+	case result := <-secondResult:
+		require.NoError(t, result.err, "a different backend must initialize while the first backend is blocked")
+		second = result.store
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for a different backend to initialize")
+	}
+	require.Equal(t, 2, storeCacheEntryCount(), "both backend cache entries must exist while the first initialization is blocked")
+
+	close(firstStates.releaseFirstStoreFor)
+	result := <-firstResult
+	require.NoError(t, result.err, "the initially blocked backend must finish after being released")
+	first := result.store
 	require.NotSame(t, first, second)
 
-	require.Equal(t, 2, storeCacheEntryCount())
+	require.Equal(t, 2, storeCacheEntryCount(), "both backend cache entries must remain active")
 	require.True(t, snapshotStoreCacheEntry(firstStates.StoreKey()).found)
 	require.True(t, snapshotStoreCacheEntry(secondStates.StoreKey()).found)
 	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
