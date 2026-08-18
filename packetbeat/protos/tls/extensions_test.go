@@ -168,7 +168,7 @@ func TestParseSupportedVersions(t *testing.T) {
 	for _, testCase := range []struct {
 		title    string
 		data     string
-		expected interface{}
+		expected any
 	}{
 		{
 			title:    "negotiation",

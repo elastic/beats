@@ -29,19 +29,19 @@ import (
 
 type logWrapper testing.T
 
-func (l *logWrapper) Errorf(format string, args ...interface{}) {
+func (l *logWrapper) Errorf(format string, args ...any) {
 	l.Logf("error: "+format, args...)
 }
 
-func (l *logWrapper) Warnf(format string, args ...interface{}) {
+func (l *logWrapper) Warnf(format string, args ...any) {
 	l.Logf("warning: "+format, args...)
 }
 
-func (l *logWrapper) Infof(format string, args ...interface{}) {
+func (l *logWrapper) Infof(format string, args ...any) {
 	l.Logf("info: "+format, args...)
 }
 
-func (l *logWrapper) Debugf(format string, args ...interface{}) {
+func (l *logWrapper) Debugf(format string, args ...any) {
 	l.Logf("debug: "+format, args...)
 }
 
@@ -216,7 +216,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow", flow)
-	for field, expected := range map[string]interface{}{
+	for field, expected := range map[string]any{
 		"source.ip":           localIP,
 		"source.port":         localPort,
 		"source.packets":      uint64(1),
@@ -335,7 +335,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow 0", flow)
-	for field, expected := range map[string]interface{}{
+	for field, expected := range map[string]any{
 		"source.ip":           localIP,
 		"source.port":         localPort,
 		"source.packets":      uint64(1),
@@ -378,7 +378,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	// we have a truncated flow with no directionality,
 	// so just report what we can
 	t.Log("read flow 1", flow)
-	for field, expected := range map[string]interface{}{
+	for field, expected := range map[string]any{
 		"source.ip":         localIP,
 		"source.port":       localPort,
 		"client.ip":         localIP,
@@ -458,7 +458,7 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow", flow)
-	for field, expected := range map[string]interface{}{
+	for field, expected := range map[string]any{
 		"source.ip":           localIP,
 		"source.port":         localPort,
 		"source.packets":      uint64(1),
@@ -525,7 +525,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow", flow)
-	for field, expected := range map[string]interface{}{
+	for field, expected := range map[string]any{
 		"source.ip":           remoteIP,
 		"source.port":         remotePort,
 		"source.packets":      uint64(1),
@@ -551,7 +551,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 	}
 }
 
-func assertValue(t *testing.T, ev beat.Event, expected interface{}, field string) bool {
+func assertValue(t *testing.T, ev beat.Event, expected any, field string) bool {
 	value, err := ev.GetValue(field)
 	return assert.Nil(t, err, field) && assert.Equal(t, expected, value, field)
 }
@@ -582,11 +582,8 @@ func callExecve(meta tracing.Metadata, args []string) *execveCall {
 	ptr := &execveCall{
 		Meta: meta,
 	}
-	lim := len(args)
-	if lim > maxProgArgs {
-		lim = maxProgArgs
-	}
-	for i := 0; i < lim; i++ {
+	lim := min(len(args), maxProgArgs)
+	for i := range lim {
 		ptr.Ptrs[i] = 1
 	}
 	if lim < len(args) {

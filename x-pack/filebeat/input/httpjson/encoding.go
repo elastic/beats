@@ -99,10 +99,10 @@ func encodeAsForm(trReq transformable) ([]byte, error) {
 // decodeAsNdjson decodes the message in p as a JSON object stream
 // It is more relaxed than NDJSON.
 func decodeAsNdjson(p []byte, dst *response) error {
-	var results []interface{}
+	var results []any
 	dec := json.NewDecoder(bytes.NewReader(p))
 	for dec.More() {
-		var o interface{}
+		var o any
 		if err := dec.Decode(&o); err != nil {
 			return textContextError{error: err, body: p}
 		}
@@ -114,7 +114,7 @@ func decodeAsNdjson(p []byte, dst *response) error {
 
 // decodeAsCSV decodes p as a headed CSV document into dst.
 func decodeAsCSV(p []byte, dst *response) error {
-	var results []interface{}
+	var results []any
 
 	r := csv.NewReader(bytes.NewReader(p))
 
@@ -130,7 +130,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 
 	event, err := r.Read()
 	for ; err == nil; event, err = r.Read() {
-		o := make(map[string]interface{}, len(header))
+		o := make(map[string]any, len(header))
 		if len(header) != len(event) {
 			// sanity check, csv.Reader should fail on this scenario
 			// and this code path should be unreachable
@@ -155,7 +155,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 
 // decodeAsZip decodes p as a ZIP archive into dst.
 func decodeAsZip(p []byte, dst *response) error {
-	var results []interface{}
+	var results []any
 	r, err := zip.NewReader(bytes.NewReader(p), int64(len(p)))
 	if err != nil {
 		return err
@@ -171,7 +171,7 @@ func decodeAsZip(p []byte, dst *response) error {
 
 		dec := json.NewDecoder(rc)
 		for dec.More() {
-			var o interface{}
+			var o any
 			if err := dec.Decode(&o); err != nil {
 				rc.Close()
 				return textContextError{error: err, body: p}

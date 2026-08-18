@@ -31,7 +31,7 @@ type Action struct {
 	Profile *bool
 }
 
-func FromMap(m map[string]interface{}) (a Action, err error) {
+func FromMap(m map[string]any) (a Action, err error) {
 	if len(m) == 0 {
 		return a, ErrActionRequest
 	}
@@ -52,8 +52,8 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		profile   *bool
 	)
 	if v, ok := m["data"]; ok {
-		var data map[string]interface{}
-		if data, ok = v.(map[string]interface{}); !ok {
+		var data map[string]any
+		if data, ok = v.(map[string]any); !ok {
 			return a, fmt.Errorf("invalid data: %w", ErrActionRequest)
 		}
 
@@ -71,7 +71,7 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		}
 		// Parse optional ECS Mapping
 		if v, ok := data["ecs_mapping"]; ok && v != nil {
-			m, ok := v.(map[string]interface{})
+			m, ok := v.(map[string]any)
 			if !ok {
 				return a, fmt.Errorf("invalid ECS mapping: %w", ErrActionRequest)
 			}
@@ -167,20 +167,20 @@ func platformMatches(goos string, platforms []string) bool {
 	return false
 }
 
-func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
+func parseECSMapping(m map[string]any) (ecsm ecs.Mapping, err error) {
 	ecsm = make(ecs.Mapping)
 	for k, v := range m {
 		k = strings.TrimSpace(k)
 		if k == "" {
 			return ecsm, ErrActionRequest
 		}
-		valmap, ok := v.(map[string]interface{})
+		valmap, ok := v.(map[string]any)
 		if !ok {
 			return ecsm, ErrActionRequest
 		}
 
 		var (
-			val   interface{}
+			val   any
 			field string
 		)
 
@@ -210,7 +210,7 @@ func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
 	return ecsm, err
 }
 
-func convertToInt64(i interface{}) (int64, error) {
+func convertToInt64(i any) (int64, error) {
 	switch v := i.(type) {
 	case int8:
 		return int64(v), nil

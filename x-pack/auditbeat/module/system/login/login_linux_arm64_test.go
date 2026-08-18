@@ -265,7 +265,7 @@ func TestBtmp(t *testing.T) {
 		"Timestamp is not equal: %+v", events[3].Timestamp)
 }
 
-func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue interface{}) {
+func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue any) {
 	value, err := mapstr.GetValue(fieldName)
 	if assert.NoError(t, err) {
 		switch v := value.(type) {
@@ -277,8 +277,8 @@ func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue
 	}
 }
 
-func getBaseConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getBaseConfig() map[string]any {
+	return map[string]any{
 		"module":        system.ModuleName,
 		"datasets":      []string{"login"},
 		"logging.level": "debug",
@@ -288,7 +288,7 @@ func getBaseConfig() map[string]interface{} {
 // setupTestDir creates a temporary directory, copies the test files into it,
 // and returns the path.
 func setupTestDir(t *testing.T) string {
-	tmp, err := ioutil.TempDir("", "auditbeat-login-test-dir")
+	tmp, err := os.MkdirTemp("", "auditbeat-login-test-dir")
 	if err != nil {
 		t.Fatal("failed to create temp dir")
 	}
