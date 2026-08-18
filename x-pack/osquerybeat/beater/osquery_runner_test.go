@@ -144,7 +144,7 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	inputConfigs := []config.InputConfig{
 		{
 			Osquery: &config.OsqueryConfig{
-				Options: map[string]interface{}{
+				Options: map[string]any{
 					"foo": "bar",
 				},
 			},

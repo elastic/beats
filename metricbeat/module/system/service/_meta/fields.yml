@@ -1,6 +1,6 @@
 - name: service
   type: group
-  release: beta
+  release: ga
   description: >
     metrics for system services
   fields:

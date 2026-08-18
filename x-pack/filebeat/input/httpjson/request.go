@@ -79,7 +79,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 
 			if rf.saveFirstResponse {
 				// store first response in transform context
-				var bodyMap map[string]interface{}
+				var bodyMap map[string]any
 				body, err := io.ReadAll(httpResp.Body)
 				if err != nil {
 					err = fmt.Errorf("failed to read http response body: %w", err)
@@ -628,7 +628,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		}
 
 		// get replace values from collected json
-		var v interface{}
+		var v any
 		if err := json.Unmarshal(b, &v); err != nil {
 			return nil, fmt.Errorf("cannot unmarshal data: %w", textContextError{error: err, body: b})
 		}
@@ -638,7 +638,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		}
 
 		switch tresp := values.(type) {
-		case []interface{}:
+		case []any:
 			for _, v := range tresp {
 				switch v.(type) {
 				case float64, string:
@@ -950,7 +950,7 @@ const (
 )
 
 func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
-	var val interface{}
+	var val any
 
 	switch keys := processExpression(expression); keys[0] {
 	case lastResponse:
@@ -1013,7 +1013,7 @@ func responseToMap(r *response) (mapstr.M, error) {
 	if r.body == nil {
 		return nil, fmt.Errorf("response body is empty for request url: %s", &r.url)
 	}
-	respMap := map[string]interface{}{
+	respMap := map[string]any{
 		"header": make(mapstr.M),
 		"body":   r.body,
 	}
@@ -1025,7 +1025,7 @@ func responseToMap(r *response) (mapstr.M, error) {
 	return respMap, nil
 }
 
-func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error) {
+func iterateRecursive(m mapstr.M, keys []string, depth int) (any, error) {
 	val := m[keys[depth]]
 
 	if val == nil {
@@ -1044,7 +1044,7 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	case reflect.String:
 		return v.String(), nil
 	case reflect.Map:
-		nextMap, ok := v.Interface().(map[string]interface{})
+		nextMap, ok := v.Interface().(map[string]any)
 		if !ok {
 			return nil, errors.New("unable to parse the value of the given expression")
 		}
