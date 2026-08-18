@@ -933,6 +933,10 @@ Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be m
 
 ## network_summary [_network_summary]
 
+```{applies_to}
+stack: beta
+```
+
 Metrics relating to global network activity
 
 **`system.network_summary.ip.*`**
@@ -2293,6 +2297,10 @@ raid
 
 ## service [_service]
 
+```{applies_to}
+stack: beta
+```
+
 metrics for system services
 
 **`system.service.name`**
@@ -2646,6 +2654,10 @@ All UDP connections
 
 
 ## users [_users]
+
+```{applies_to}
+stack: beta
+```
 
 Logged-in user session data
 

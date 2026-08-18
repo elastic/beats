@@ -1,7 +1,3 @@
-<<<<<<< HEAD:metricbeat/module/system/users/_meta/docs.asciidoc
-=======
-
->>>>>>> f7e6a5061 (metricbeat/linux: align package metricsets with GA status (#52310)):metricbeat/module/system/users/_meta/docs.md
 The system/users metricset reports logged in users and associated sessions via dbus and logind, which is a systemd component. By default, the metricset will look in `/var/run/dbus/` for a system socket, although a new path can be selected with `DBUS_SYSTEM_BUS_ADDRESS`.
 
 This metricset is available on:
