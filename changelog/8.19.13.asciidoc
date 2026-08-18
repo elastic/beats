@@ -101,11 +101,4 @@ The 8.19.13 release adds the following new and notable features.
 
 * Restore suppression of repeated channel-not-found open errors in Winlogbeat eventlog runner. https://github.com/elastic/beats/pull/48999[#48999] https://github.com/elastic/beats/issues/48979[#48979]
 
-[discrete]
-=== Known issues
-
-**Filebeat**
-
-* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
-
 // end 8.19.13 relnotes

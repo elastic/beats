@@ -123,11 +123,4 @@ The 8.19.17 release adds the following new and notable features.
 
 * Treat RPC_S_UNKNOWN_IF (1717) as a recoverable error so Winlogbeat reopens the event log session instead of exiting on this transient RPC error. https://github.com/elastic/beats/pull/51031[#51031]
 
-[discrete]
-=== Known issues
-
-**Filebeat**
-
-* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
-
 // end 8.19.17 relnotes

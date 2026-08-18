@@ -76,11 +76,4 @@ Review important information about the  8.19.18 release.
 
 * Fix missing `state_service` and `state_storageclass` events when `kube-state-metrics` denylists `*_created`. https://github.com/elastic/beats/pull/51255[#51255] https://github.com/elastic/beats/issues/34074[#34074]
 
-[discrete]
-=== Known issues
-
-**Filebeat**
-
-* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
-
 // end 8.19.18 relnotes

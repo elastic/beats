@@ -28,11 +28,4 @@ The 8.19.7 release adds the following new and notable features.
 
 * Fix potential Filebeat panic during memory queue shutdown. https://github.com/elastic/beats/pull/47248[#47248]
 
-[discrete]
-=== Known issues
-
-**Filebeat**
-
-* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
-
 // end 8.19.7 relnotes

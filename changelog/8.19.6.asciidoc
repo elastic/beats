@@ -39,11 +39,4 @@ Review important information about the  8.19.6 release.
 * Add a fix to handle blank content-type headers in HTTP responses for Prometheus. https://github.com/elastic/beats/pull/47027[#47027] 
 * Add pagination support to the device health metricset in the meraki module. https://github.com/elastic/beats/pull/46938[#46938] 
 
-[discrete]
-=== Known issues
-
-**Filebeat**
-
-* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
-
 // end 8.19.6 relnotes

@@ -105,11 +105,4 @@ only path. https://github.com/elastic/beats/pull/50731[#50731]
 
 * Fix panic in Azure module when all configured resources match no Azure resources. https://github.com/elastic/beats/pull/50587[#50587] 
 
-[discrete]
-=== Known issues
-
-**Filebeat**
-
-* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
-
 // end 8.19.16 relnotes

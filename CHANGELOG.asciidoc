@@ -11,6 +11,13 @@
 https://github.com/elastic/beats/compare/v8.19.19\...v8.19.20[View commits]
 
 [discrete]
+=== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.20]]
 === Security updates
 
@@ -89,6 +96,13 @@ https://github.com/elastic/beats/compare/v8.19.19\...v8.19.20[View commits]
 https://github.com/elastic/beats/compare/v8.19.18\...v8.19.19[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[enhancements-8.19.19]]
 ==== Enhancements
 
@@ -152,6 +166,13 @@ https://github.com/elastic/beats/compare/v8.19.18\...v8.19.19[View commits]
 https://github.com/elastic/beats/compare/v8.19.17\...v8.19.18[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[enhancements-8.19.18]]
 ==== Enhancements
 
@@ -205,6 +226,13 @@ https://github.com/elastic/beats/compare/v8.19.17\...v8.19.18[View commits]
 === Beats version 8.19.17
 
 https://github.com/elastic/beats/compare/v8.19.16\...v8.19.17[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[security-updates-8.19.17]]
@@ -303,6 +331,13 @@ upgrade to 8.19.17.
 https://github.com/elastic/beats/compare/v8.19.15\...v8.19.16[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.16]]
 ==== Security updates
 
@@ -381,6 +416,13 @@ https://github.com/elastic/beats/compare/v8.19.15\...v8.19.16[View commits]
 https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.15]]
 ==== Security updates
 
@@ -439,6 +481,13 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 === Beats version 8.19.14
 
 https://github.com/elastic/beats/compare/v8.19.13\...v8.19.14[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.14]]
@@ -516,6 +565,13 @@ of values intended to be secret.
 === Beats version 8.19.13
 
 https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[security-updates-8.19.13]]
@@ -598,6 +654,13 @@ https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
 https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.12]]
 ==== Security updates
 
@@ -656,6 +719,13 @@ https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[bug-fixes-8.19.11]]
 ==== Bug fixes
 
@@ -685,6 +755,13 @@ https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
 === Beats version 8.19.10
 
 https://github.com/elastic/beats/compare/v8.19.9\...v8.19.10[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.10]]
@@ -724,6 +801,13 @@ The 8.19.10 release adds the following new and notable features.
 [[release-notes-8.19.9]]
 === Beats version 8.19.9
 https://github.com/elastic/beats/compare/v8.19.8\...v8.19.9[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.9]]
@@ -770,6 +854,13 @@ The 8.19.9 release adds the following new and notable features.
 https://github.com/elastic/beats/compare/v8.19.7\...v8.19.8[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[bug-fixes-8.19.8]]
 ==== Bug fixes
 
@@ -793,6 +884,13 @@ https://github.com/elastic/beats/compare/v8.19.7\...v8.19.8[View commits]
 [[release-notes-8.19.7]]
 === Beats version 8.19.7
 https://github.com/elastic/beats/compare/v8.19.6\...v8.19.7[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.7]]
@@ -823,6 +921,13 @@ The 8.19.7 release adds the following new and notable features.
 [[release-notes-8.19.6]]
 === Beats version 8.19.6
 https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[enhancements-8.19.6]]

@@ -46,11 +46,4 @@ Review important information about the  8.19.11 release.
 * Fix Thrift struct parser oob bug. https://github.com/elastic/beats/pull/48498[#48498]
 * Clean up and add checks to SIP parser. https://github.com/elastic/beats/pull/48514[#48514]
 * Fix potential array access panics &amp; infinite loops in PostgreSQL parser. https://github.com/elastic/beats/pull/48528[#48528]
-[discrete]
-=== Known issues
-
-**Filebeat**
-
-* Filestream “take over” mode does not work in 8.19.x; a fix will ship in the 8.19.21 release.
-
 // end 8.19.11 relnotes
