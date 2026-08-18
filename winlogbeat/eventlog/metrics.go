@@ -44,7 +44,7 @@ var (
 // incrementMetric increments a value in the specified expvar.Map. The key
 // should be a windows syscall.Errno or a string. Any other types will be
 // reported under the "other" key.
-func incrementMetric(v *expvar.Map, key interface{}) {
+func incrementMetric(v *expvar.Map, key any) {
 	switch t := key.(type) {
 	default:
 		v.Add("other", 1)

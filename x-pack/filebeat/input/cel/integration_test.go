@@ -33,7 +33,7 @@ func TestCheckinV2(t *testing.T) {
 	// make sure there is an ES instance running
 	integration.EnsureESIsRunning(t)
 	esConnectionDetails := integration.GetESURL(t, "http")
-	outputHosts := []interface{}{fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())}
+	outputHosts := []any{fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())}
 	outputUsername := esConnectionDetails.User.Username()
 	outputPassword, _ := esConnectionDetails.User.Password()
 	outputProtocol := esConnectionDetails.Scheme
@@ -68,7 +68,7 @@ func TestCheckinV2(t *testing.T) {
 				Id:   "default",
 				Type: "elasticsearch",
 				Name: "elasticsearch",
-				Source: integration.RequireNewStruct(t, map[string]interface{}{
+				Source: integration.RequireNewStruct(t, map[string]any{
 					"type":                  "elasticsearch",
 					"hosts":                 outputHosts,
 					"username":              outputUsername,
@@ -89,7 +89,7 @@ func TestCheckinV2(t *testing.T) {
 				Id:   "cel-cel-1e8b33de-d54a-45cd-90da-23ed71c482e5",
 				Type: "cel",
 				Name: "cel-1",
-				Source: integration.RequireNewStruct(t, map[string]interface{}{
+				Source: integration.RequireNewStruct(t, map[string]any{
 					"use_output": "default",
 					"revision":   0,
 				}),
@@ -108,7 +108,7 @@ func TestCheckinV2(t *testing.T) {
 						DataStream: &proto.DataStream{
 							Dataset: "cel.cel",
 						},
-						Source: integration.RequireNewStruct(t, map[string]interface{}{
+						Source: integration.RequireNewStruct(t, map[string]any{
 							"interval":                        "10s",
 							"program":                         `bytes(get(state.url).Body).as(body,{"events":[body.decode_json()]})`,
 							"redact.delete":                   false,
@@ -122,7 +122,7 @@ func TestCheckinV2(t *testing.T) {
 						DataStream: &proto.DataStream{
 							Dataset: "cel.cel",
 						},
-						Source: integration.RequireNewStruct(t, map[string]interface{}{
+						Source: integration.RequireNewStruct(t, map[string]any{
 							"interval":                        "10s",
 							"program":                         `bytes(get(state.url).Body).as(body,{"events":[body.decode_json()]})`,
 							"redact.delete":                   false,
@@ -150,7 +150,7 @@ func TestCheckinV2(t *testing.T) {
 				Id:   "default",
 				Type: "elasticsearch",
 				Name: "elasticsearch",
-				Source: integration.RequireNewStruct(t, map[string]interface{}{
+				Source: integration.RequireNewStruct(t, map[string]any{
 					"type":                  "elasticsearch",
 					"hosts":                 outputHosts,
 					"username":              outputUsername,
@@ -171,7 +171,7 @@ func TestCheckinV2(t *testing.T) {
 				Id:   "cel-cel-1e8b33de-d54a-45cd-90da-23ed71c482e5",
 				Type: "cel",
 				Name: "cel-1",
-				Source: integration.RequireNewStruct(t, map[string]interface{}{
+				Source: integration.RequireNewStruct(t, map[string]any{
 					"use_output": "default",
 					"revision":   0,
 				}),
@@ -190,7 +190,7 @@ func TestCheckinV2(t *testing.T) {
 						DataStream: &proto.DataStream{
 							Dataset: "cel.cel",
 						},
-						Source: integration.RequireNewStruct(t, map[string]interface{}{
+						Source: integration.RequireNewStruct(t, map[string]any{
 							"interval":                        "10s",
 							"program":                         `bytes(get(state.url).Body).as(body,{"events":[body.decode_json()]})`,
 							"redact.delete":                   false,
@@ -216,7 +216,7 @@ func TestCheckinV2(t *testing.T) {
 				Id:   "default",
 				Type: "elasticsearch",
 				Name: "elasticsearch",
-				Source: integration.RequireNewStruct(t, map[string]interface{}{
+				Source: integration.RequireNewStruct(t, map[string]any{
 					"type":                  "elasticsearch",
 					"hosts":                 outputHosts,
 					"username":              outputUsername,
@@ -284,13 +284,13 @@ func TestCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !reflect.DeepEqual(map[string]interface{}{
-				"streams": map[string]interface{}{
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+			if !reflect.DeepEqual(map[string]any{
+				"streams": map[string]any{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
@@ -310,13 +310,13 @@ func TestCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !reflect.DeepEqual(map[string]interface{}{
-				"streams": map[string]interface{}{
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+			if !reflect.DeepEqual(map[string]any{
+				"streams": map[string]any{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]any{
 						"status": "DEGRADED",
 						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
@@ -335,13 +335,13 @@ func TestCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !reflect.DeepEqual(map[string]interface{}{
-				"streams": map[string]interface{}{
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+			if !reflect.DeepEqual(map[string]any{
+				"streams": map[string]any{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]any{
 						"status": "DEGRADED",
 						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]any{
 						"status": "DEGRADED",
 						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
@@ -361,13 +361,13 @@ func TestCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !reflect.DeepEqual(map[string]interface{}{
-				"streams": map[string]interface{}{
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+			if !reflect.DeepEqual(map[string]any{
+				"streams": map[string]any{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
@@ -386,13 +386,13 @@ func TestCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !reflect.DeepEqual(map[string]interface{}{
-				"streams": map[string]interface{}{
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+			if !reflect.DeepEqual(map[string]any{
+				"streams": map[string]any{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]any{
 						"status": "DEGRADED",
 						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
@@ -410,9 +410,9 @@ func TestCheckinV2(t *testing.T) {
 				return false, oneStream
 			}
 
-			if !reflect.DeepEqual(map[string]interface{}{
-				"streams": map[string]interface{}{
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+			if !reflect.DeepEqual(map[string]any{
+				"streams": map[string]any{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
@@ -442,13 +442,13 @@ func TestCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !reflect.DeepEqual(map[string]interface{}{
-				"streams": map[string]interface{}{
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+			if !reflect.DeepEqual(map[string]any{
+				"streams": map[string]any{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
-					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]any{
 						"status": "HEALTHY",
 						"error":  "",
 					},
@@ -496,7 +496,7 @@ func TestCheckinV2(t *testing.T) {
 	}
 }
 
-func extractStateAndPayload(observed *proto.CheckinObserved, inputID string) (proto.State, map[string]interface{}) {
+func extractStateAndPayload(observed *proto.CheckinObserved, inputID string) (proto.State, map[string]any) {
 	for _, unit := range observed.GetUnits() {
 		if unit.Id == inputID {
 			return unit.GetState(), unit.Payload.AsMap()
