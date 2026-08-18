@@ -118,7 +118,7 @@ func (e *eventLogger) run(
 	// Initialize per event log metrics.
 	initMetrics(api.Name())
 
-	pipeline = pipetool.WithACKer(pipeline, acker.EventPrivateReporter(func(_ int, private []interface{}) {
+	pipeline = pipetool.WithACKer(pipeline, acker.EventPrivateReporter(func(_ int, private []any) {
 		eventACKer.ACKEvents(private)
 	}))
 

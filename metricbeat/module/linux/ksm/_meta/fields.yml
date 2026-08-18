@@ -1,6 +1,6 @@
 - name: ksm
   type: group
-  release: beta
+  release: ga
   description: >
     ksm
   fields:
