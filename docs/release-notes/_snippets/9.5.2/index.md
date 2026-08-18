@@ -15,13 +15,13 @@
 
 **All**
 
-* Add support for index in inputs for beatreceivers. [#52662](https://github.com/elastic/beats/pull/52662) [#52310](https://github.com/elastic/beats/pull/52310) [#52659](https://github.com/elastic/beats/issues/52659)
+* Add support for index in inputs for beatreceivers. [#52662](https://github.com/elastic/beats/pull/52662) 
 
 **Filebeat**
 
-* Add user-agent to httpjson pagination requests. [#52662](https://github.com/elastic/beats/pull/52662) [#52310](https://github.com/elastic/beats/pull/52310) [#52659](https://github.com/elastic/beats/issues/52659)
+* Add user-agent to httpjson pagination requests. [#52484](https://github.com/elastic/beats/pull/52484) 
 
 **Metricbeat**
 
-* Recreate Kubernetes metadata watchers after their final metricset owner stops. [#52662](https://github.com/elastic/beats/pull/52662) [#52310](https://github.com/elastic/beats/pull/52310) [#51833](https://github.com/elastic/beats/issues/51833)
+* Recreate Kubernetes metadata watchers after their final metricset owner stops. [#52028](https://github.com/elastic/beats/pull/52028) [#51833](https://github.com/elastic/beats/issues/51833)
 

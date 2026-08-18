@@ -5,8 +5,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/52662
-        - https://github.com/elastic/beats/pull/52310
+        - https://github.com/elastic/beats/pull/52028
       issue:
         - https://github.com/elastic/beats/issues/51833
       impact: ""
@@ -33,10 +32,8 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/52662
-        - https://github.com/elastic/beats/pull/52310
-      issue:
-        - https://github.com/elastic/beats/issues/52659
+        - https://github.com/elastic/beats/pull/52488
+      issue: []
       impact: ""
       action: ""
       timestamp: 1786035917
@@ -48,10 +45,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52662
-        - https://github.com/elastic/beats/pull/52310
-      issue:
-        - https://github.com/elastic/beats/issues/52659
+        - https://github.com/elastic/beats/pull/52484
+      issue: []
       impact: ""
       action: ""
       timestamp: 1786038679
@@ -64,10 +59,8 @@ entries:
         Only the name changes. The `file_identity.fingerprint.growing` setting, its default, and the behavior it controls are unchanged.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52662
-        - https://github.com/elastic/beats/pull/52310
-      issue:
-        - https://github.com/elastic/beats/issues/52659
+        - https://github.com/elastic/beats/pull/52491
+      issue: []
       impact: ""
       action: ""
       timestamp: 1786106224
@@ -80,9 +73,7 @@ entries:
       component: all
       pr:
         - https://github.com/elastic/beats/pull/52662
-        - https://github.com/elastic/beats/pull/52310
-      issue:
-        - https://github.com/elastic/beats/issues/52659
+      issue: []
       impact: ""
       action: ""
       timestamp: 1786994745
