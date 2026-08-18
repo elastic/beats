@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 #
 # This script is executed by the DRA stage.
-# It prepares the required files to be consumed by the release-manager
+# It prepares the required files to be consumed 
+# by the elastic/dra-prep-buildkite-plugin.
 # It can be published as snapshot or staging, for such you use
-# the paramater $0 "snapshot" or $0 "staging"
+# the parameter $0 "snapshot" or $0 "staging"
 #
 set -ueo pipefail
 
 readonly TYPE=${1:-snapshot}
 readonly VERSION_QUALIFIER="${VERSION_QUALIFIER:-""}"
 
-# rename dependencies.csv to the name expected by release-manager.
+# rename dependencies.csv to the versioned name dractl's CSV classifier expects.
 VERSION=$(make get-version)
 FINAL_VERSION=$VERSION-SNAPSHOT
 if [ "$TYPE" != "snapshot" ] ; then
