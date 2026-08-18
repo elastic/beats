@@ -205,9 +205,7 @@ func initializeStoreCacheEntry(
 }
 
 func releaseAcquiredStore(logger *logp.Logger, s *store) {
-	logger = logger.
-		Named("filestream.store_cache").
-		WithLazy(zap.String("filestream_store_key", s.cacheEntry.key))
+	logger = logger.Named("filestream.store_cache")
 
 	globalStoreCache.mu.Lock()
 	entry := s.cacheEntry
@@ -216,6 +214,8 @@ func releaseAcquiredStore(logger *logp.Logger, s *store) {
 		s.Release()
 		return
 	}
+	logger = logger.WithLazy(zap.String("filestream_store_key", s.cacheEntry.key))
+
 	entry.users--
 	users := entry.users
 	if entry.users > 0 {
