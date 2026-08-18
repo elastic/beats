@@ -23,8 +23,10 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -275,8 +277,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 func (out *otelConsumer) String() string {
 	return "otelconsumer"
 }
-<<<<<<< HEAD
-=======
 
 func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) error {
 	if id, ok := event.Content.Meta["_id"]; ok {
@@ -429,4 +429,3 @@ func tryToMapStr(v any) (mapstr.M, bool) {
 		return nil, false
 	}
 }
->>>>>>> c0975987a (add support for `raw_index` mapping for otelconsumer (#52662))
