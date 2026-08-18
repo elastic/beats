@@ -11,7 +11,7 @@ set -ueo pipefail
 readonly TYPE=${1:-snapshot}
 readonly VERSION_QUALIFIER="${VERSION_QUALIFIER:-""}"
 
-# rename dependencies.csv to the versioned name dractl's CSV classifier expects.
+# rename dependencies.csv to the versioned name dra-prep plugin's CSV classifier expects.
 VERSION=$(make get-version)
 FINAL_VERSION=$VERSION-SNAPSHOT
 if [ "$TYPE" != "snapshot" ] ; then
