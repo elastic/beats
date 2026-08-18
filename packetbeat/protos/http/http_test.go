@@ -1012,8 +1012,8 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
-	if rawMessageObscured < 0 {
+	found := bytes.Contains(msg, []byte("uthorization:*"))
+	if !found {
 		t.Error("Obscured authorization string not found: " + string(msg[:]))
 	}
 }
@@ -1047,8 +1047,8 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
-	if rawMessageObscured < 0 {
+	found := bytes.Contains(msg, []byte("uthorization:*"))
+	if !found {
 		t.Error("Failed to redact proxy-authorization header: " + string(msg[:]))
 	}
 }
@@ -2084,7 +2084,7 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 	const BodySize = 10 * 1024 * PacketSize
 	const numPackets = BodySize / PacketSize
 	bodyPayload := &protos.Packet{Payload: make([]byte, PacketSize)}
-	for i := 0; i < PacketSize; i++ {
+	for i := range PacketSize {
 		bodyPayload.Payload[i] = byte(0x30 + (i % 10))
 	}
 
@@ -2101,7 +2101,7 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 		private := protos.ProtocolData(&httpConnectionData{})
 		private = http.Parse(&headPkt, tcptuple, 0, private)
 
-		for j := 0; j < numPackets; j++ {
+		for range numPackets {
 			private = http.Parse(bodyPayload, tcptuple, 0, private)
 		}
 		http.ReceivedFin(tcptuple, 1, private)

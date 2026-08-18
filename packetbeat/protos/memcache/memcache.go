@@ -156,7 +156,7 @@ func New(
 	return p, nil
 }
 
-func (mc *memcache) debugf(format string, args ...interface{}) {
+func (mc *memcache) debugf(format string, args ...any) {
 	if mc.isDebug {
 		mc.logger.Debugf(format, args...)
 	}
@@ -311,10 +311,7 @@ func mergeValueMessages(mc *memcache, prev, msg *message) (bool, error) {
 		if mc.config.maxValues < 0 {
 			delta = len(msg.values)
 		} else if len(prev.values) < mc.config.maxValues {
-			delta = mc.config.maxValues - len(prev.values)
-			if delta > len(prev.values) {
-				delta = len(prev.values)
-			}
+			delta = min(mc.config.maxValues-len(prev.values), len(prev.values))
 		}
 
 		prev.values = append(prev.values, msg.values[0:delta]...)

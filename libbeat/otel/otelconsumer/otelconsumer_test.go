@@ -343,6 +343,29 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, event4.Meta["_id"], docID)
 	})
 
+	t.Run("sets the elasticsearch.index attribute from raw_index metadata", func(t *testing.T) {
+		eventWithRawIndex := beat.Event{
+			Meta:   mapstr.M{"raw_index": "logs.ecs"},
+			Fields: mapstr.M{"message": "hello"},
+		}
+		batch := outest.NewBatch(eventWithRawIndex)
+
+		var indexAttr string
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			attr, ok := record.Attributes().Get(esIndexAttribute)
+			assert.True(t, ok, "elasticsearch.index attribute should be set")
+			indexAttr = attr.AsString()
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, "logs.ecs", indexAttr)
+	})
+
 	t.Run("sets the receivertest doc id attribute", func(t *testing.T) {
 		batch := outest.NewBatch(event4)
 

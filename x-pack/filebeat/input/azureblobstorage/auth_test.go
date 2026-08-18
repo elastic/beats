@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -62,14 +63,14 @@ func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 
 			switch action {
 			case "v2.0/.well-known/openid-configuration":
-				return createJSONResponse(map[string]interface{}{
+				return createJSONResponse(map[string]any{
 					"token_endpoint":         "https://login.microsoftonline.com/" + tenant_id + "/oauth2/v2.0/token",
 					"authorization_endpoint": "https://login.microsoftonline.com/" + tenant_id + "/oauth2/v2.0/authorize",
 					"issuer":                 "https://login.microsoftonline.com/" + tenant_id + "/v2.0",
 				}, 200)
 
 			case "oauth2/v2.0/token":
-				return createJSONResponse(map[string]interface{}{
+				return createJSONResponse(map[string]any{
 					"token_type":   "Bearer",
 					"expires_in":   3600,
 					"access_token": "mock_access_token_123",
@@ -82,7 +83,7 @@ func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 	return t.rt.RoundTrip(req)
 }
 
-func createJSONResponse(data interface{}, statusCode int) (*http.Response, error) {
+func createJSONResponse(data any, statusCode int) (*http.Response, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
@@ -164,20 +165,20 @@ func Test_ListBlobsRetriesOnTransientError(t *testing.T) {
 		failListBlobs: 3,
 	}
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"account_name": "beatsblobnew",
-		"auth.oauth2": map[string]interface{}{
+		"auth.oauth2": map[string]any{
 			"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
 			"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
 			"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
 		},
 		"max_workers": 2,
 		"poll":        false,
-		"containers": []map[string]interface{}{
+		"containers": []map[string]any{
 			{"name": beatsContainer},
 		},
 		// Keep the backoff tiny so the test stays fast.
-		"retry": map[string]interface{}{
+		"retry": map[string]any{
 			"max_retries":         10,
 			"initial_retry_delay": "1ms",
 			"max_retry_delay":     "5ms",
@@ -260,12 +261,7 @@ func (r *recordingStatusReporter) UpdateStatus(s status.Status, _ string) {
 func (r *recordingStatusReporter) has(target status.Status) bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	for _, s := range r.statuses {
-		if s == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(r.statuses, target)
 }
 
 // last returns the most recently reported status, if any.
@@ -293,15 +289,15 @@ func Test_ListBlobsNonFatalWhilePolling(t *testing.T) {
 	}))
 	t.Cleanup(serv.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"account_name":                        "beatsblobnew",
 		"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
 		"max_workers":                         1,
-		"containers": []map[string]interface{}{
+		"containers": []map[string]any{
 			{"name": beatsContainer},
 		},
 		// Keep the retry backoff tiny so the failing list call returns quickly.
-		"retry": map[string]interface{}{
+		"retry": map[string]any{
 			"max_retries":         1,
 			"initial_retry_delay": "1ms",
 			"max_retry_delay":     "5ms",
@@ -377,16 +373,16 @@ func Test_ListBlobsRecoversToRunningOnEmptyPoll(t *testing.T) {
 	}))
 	t.Cleanup(serv.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"account_name":                        "beatsblobnew",
 		"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
 		"max_workers":                         1,
 		"poll":                                true,
-		"containers": []map[string]interface{}{
+		"containers": []map[string]any{
 			{"name": beatsContainer},
 		},
 		// Keep the retry backoff tiny so the failing list call returns quickly.
-		"retry": map[string]interface{}{
+		"retry": map[string]any{
 			"max_retries":         1,
 			"initial_retry_delay": "1ms",
 			"max_retry_delay":     "5ms",
@@ -432,15 +428,15 @@ func Test_ListBlobsRecoversToRunningOnEmptyPoll(t *testing.T) {
 func Test_OAuth2(t *testing.T) {
 	tests := []struct {
 		name        string
-		baseConfig  map[string]interface{}
+		baseConfig  map[string]any
 		mockHandler func() http.Handler
 		expected    map[string]bool
 	}{
 		{
 			name: "OAuth2TConfig",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name": "beatsblobnew",
-				"auth.oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]any{
 					"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
 					"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
 					"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
@@ -448,7 +444,7 @@ func Test_OAuth2(t *testing.T) {
 				"max_workers":   2,
 				"poll":          true,
 				"poll_interval": "30s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -520,7 +516,7 @@ func Test_OAuth2(t *testing.T) {
 					cancel()
 					return
 				case got := <-chanClient.Channel:
-					var val interface{}
+					var val any
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)

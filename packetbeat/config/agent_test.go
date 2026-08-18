@@ -93,9 +93,9 @@ streams:
 	require.Equal(t, config.Flows.Index, "logs-packet.flow-default")
 	require.Len(t, config.ProtocolsList, 2)
 
-	var protocol map[string]interface{}
+	var protocol map[string]any
 	require.NoError(t, config.ProtocolsList[0].Unpack(&protocol))
-	require.Len(t, protocol["processors"].([]interface{}), 3)
+	require.Len(t, protocol["processors"].([]any), 3)
 	require.Equal(t, "default_route", config.Interfaces[0].Device)
 	require.Equal(t, "en1", config.Interfaces[1].Device)
 	require.Equal(t, "en2", config.Interfaces[2].Device)

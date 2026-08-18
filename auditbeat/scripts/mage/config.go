@@ -65,7 +65,7 @@ func configFileParams(dirs ...string) (devtools.ConfigFileParams, error) {
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
 	p.Templates = append(p.Templates, "build/config.modules.yml.tmpl")
-	p.ExtraVars = map[string]interface{}{
+	p.ExtraVars = map[string]any{
 		"ArchBits": archBits,
 	}
 	return p, nil
