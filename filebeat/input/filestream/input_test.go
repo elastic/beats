@@ -48,6 +48,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-concert/unison"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -419,7 +420,18 @@ func createFilestreamTestRunner(b testing.TB, logger *logp.Logger, testID string
 	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
 	require.NoError(b, err)
 
+<<<<<<< HEAD
 	p := Plugin(logger, createTestStore(b))
+=======
+	p := Plugin(logger, createTestStore(tb))
+	var group unison.TaskGroup
+	require.NoError(tb, p.Manager.Init(&group))
+	tb.Cleanup(func() {
+		require.NoError(tb, group.Stop())
+		//nolint:errcheck // It's a test, let it panic if the casting fails
+		p.Manager.(*loginp.InputManager).Close()
+	})
+>>>>>>> 1a6f65bf0 ([Filebeat] share Filestream state stores per registry backend (#52326))
 	input, err := p.Manager.Create(c)
 	require.NoError(b, err)
 
@@ -482,6 +494,10 @@ func (s *testStore) Close() {
 
 func (s *testStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
+}
+
+func (s *testStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testStore) CleanupInterval() time.Duration {

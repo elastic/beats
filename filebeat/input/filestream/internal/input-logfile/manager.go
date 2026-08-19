@@ -18,7 +18,6 @@
 package input_logfile
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -65,13 +64,13 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
-	initOnce   sync.Once
-	initErr    error
-	store      *store
-	ackUpdater *updateWriter
-	ackCH      *updateChan
-	idsMux     sync.Mutex
-	ids        map[string]struct{}
+	initOnce  sync.Once
+	closeOnce sync.Once
+	initErr   error
+	store     *store
+	ackCH     *updateChan
+	idsMux    sync.Mutex
+	ids       map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -89,73 +88,43 @@ var errNoInputRunner = errors.New("no input runner available")
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
-func (cim *InputManager) init() error {
+func (cim *InputManager) Init(group unison.Group) error {
 	cim.initOnce.Do(func() {
+		if group == nil {
+			cim.initErr = errors.New("input manager Init must be called before Create")
+			return
+		}
 
 		log := cim.Logger.With("input_type", cim.Type)
 
 		var store *store
-		store, cim.initErr = openStore(log, cim.StateStore, cim.Type)
+		store, cim.initErr = acquireStore(log, cim.StateStore, cim.Type)
 		if cim.initErr != nil {
 			return
 		}
 
 		cim.store = store
-		cim.ackCH = newUpdateChan()
-		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
+		cim.ackCH = store.cacheEntry.ackCH
 		cim.ids = map[string]struct{}{}
 	})
 
 	return cim.initErr
 }
 
-// Init starts background processes for deleting old entries from the
-// persistent store if mode is ModeRun.
-func (cim *InputManager) Init(group unison.Group) error {
-	if err := cim.init(); err != nil {
-		return err
-	}
-
-	log := cim.Logger.With("input_type", cim.Type)
-
-	store := cim.getRetainedStore()
-	cleaner := &cleaner{log: log}
-	// TL;DR: If Filebeat shuts down too quickly, the function passed to
-	// `group.Go` will never run, therefore this instance of store will
-	// never be released, locking Filebeat's shutdown process.
-	//
-	// To circumvent that, we wait for `group.Go` to start our function.
-	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
-	waitRunning := make(chan struct{})
-	err := group.Go(func(canceler context.Context) error {
-		waitRunning <- struct{}{}
-		defer cim.shutdown()
-		defer store.Release()
-		interval := cim.StateStore.CleanupInterval()
-		if interval <= 0 {
-			interval = 5 * time.Minute
+// Close releases the store acquired by Init. It must be called after all inputs
+// managed by cim have stopped.
+func (cim *InputManager) Close() {
+	cim.closeOnce.Do(func() {
+		if cim.store != nil {
+			releaseAcquiredStore(cim.Logger, cim.store)
 		}
-		cleaner.run(canceler, store, interval)
-		return nil
 	})
-	if err != nil {
-		store.Release()
-		cim.shutdown()
-		return fmt.Errorf("can not start registry cleanup process: %w", err)
-	}
-	<-waitRunning
-	return nil
-}
-
-func (cim *InputManager) shutdown() {
-	cim.ackUpdater.Close()
-	cim.store.Release()
 }
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
-	if err := cim.init(); err != nil {
+	if err := cim.Init(nil); err != nil {
 		return nil, err
 	}
 
