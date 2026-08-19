@@ -29,7 +29,7 @@ When a disk queue reaches its configured capacity, inputs can block until
 the output acknowledges events. The queue then accepts the blocked event without
 updating its metrics. When the event is later removed, the
 `queue.filled.events`, `queue.filled.bytes` and `queue.filled.pct`
-metrics may report incorrect values. Event delivery is unaffected.
+metrics might report incorrect values. Event delivery is unaffected.
 
 **Resolved**
 To apply the fix, upgrade to version v8.19.21, v9.5.3, v9.4.6, or any later release.

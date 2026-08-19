@@ -1154,7 +1154,7 @@ func TestDiskQueueMetricsAfterBlockedPublish(t *testing.T) {
 	assert.LessOrEqual(
 		t,
 		snapshot.Ints["queue.filled.bytes"],
-		int64(settings.MaxBufferSize),
+		int64(settings.MaxBufferSize), //nolint:gosec // it's a safe conversion
 		"Filled byte count should not exceed queue capacity",
 	)
 
