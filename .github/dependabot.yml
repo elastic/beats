@@ -8,9 +8,11 @@ updates:
     labels:
       - automation
       - dependabot
+      - skip-changelog
+      - Team:Core
+      - backport-active-all
     allow:
       # Team:Elastic-Agent-Data-Plane
-      - dependency-name: github.com/elastic/elastic-agent-autodiscover
       - dependency-name: github.com/elastic/elastic-agent-client/*
       - dependency-name: github.com/elastic/elastic-agent-libs
       - dependency-name: github.com/elastic/elastic-agent-shipper-client

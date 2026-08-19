@@ -40,6 +40,7 @@ import (
 	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
 	"go.opentelemetry.io/collector/service/telemetry/otelconftelemetry"
+	"gopkg.in/yaml.v3"
 )
 
 type Collector struct {
@@ -67,13 +68,15 @@ func New(tb testing.TB, configYAML string) *Collector {
 	metricsOffFile := filepath.Join(configDir, "metrics-off.yaml")
 	require.NoError(tb, os.WriteFile(metricsOffFile, []byte(metricsOffConfig), 0o644))
 
+	level := telemetryLogsLevel(tb, configYAML)
+
 	var zapBuf zaptest.Buffer
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapBuf)),
-		zapcore.DebugLevel,
+		level,
 	)
-	observed, observer := observer.New(zapcore.DebugLevel)
+	observed, observer := observer.New(level)
 	core := zapcore.NewTee(zapCore, observed)
 
 	settings := newCollectorSettings([]string{"file:" + configFile, "file:" + metricsOffFile}, core)
@@ -106,6 +109,35 @@ func New(tb testing.TB, configYAML string) *Collector {
 
 func (c *Collector) ObservedLogs() *observer.ObservedLogs {
 	return c.observer
+}
+
+// telemetryLogsLevel extracts service.telemetry.logs.level from the collector
+// config so test logging honors what each test actually configured instead of
+// always running at debug level regardless of the config. Defaults to
+// DebugLevel when the field is absent or unparseable.
+func telemetryLogsLevel(tb testing.TB, configYAML string) zapcore.Level {
+	tb.Helper()
+
+	var cfg struct {
+		Service struct {
+			Telemetry struct {
+				Logs struct {
+					Level string `yaml:"level"`
+				} `yaml:"logs"`
+			} `yaml:"telemetry"`
+		} `yaml:"service"`
+	}
+	if err := yaml.Unmarshal([]byte(configYAML), &cfg); err != nil {
+		return zapcore.DebugLevel
+	}
+	if cfg.Service.Telemetry.Logs.Level == "" {
+		return zapcore.DebugLevel
+	}
+	level, err := zapcore.ParseLevel(cfg.Service.Telemetry.Logs.Level)
+	if err != nil {
+		return zapcore.DebugLevel
+	}
+	return level
 }
 
 // Shutdown stops the collector and blocks until it has fully exited. Blocking

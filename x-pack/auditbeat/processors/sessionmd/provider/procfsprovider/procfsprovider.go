@@ -73,7 +73,7 @@ func (p prvdr) Sync(ev *beat.Event, pid uint32) error {
 			// possible from the event
 			pe.ProcfsLookupFail = true
 			pe.PIDs.Tgid = pid
-			var intr interface{}
+			var intr any
 			var i int
 			var ok bool
 			var parent types.Process

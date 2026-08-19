@@ -86,7 +86,7 @@ type Manager interface {
 	UnregisterAction(action Action)
 
 	// SetPayload Allows to add additional metadata to future requests made by the manager.
-	SetPayload(map[string]interface{})
+	SetPayload(map[string]any)
 
 	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
 	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook DiagnosticHook)
@@ -181,6 +181,6 @@ func (n *FallbackManager) Start() error                       { return nil }
 func (n *FallbackManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *FallbackManager) RegisterAction(action Action)       {}
 func (n *FallbackManager) UnregisterAction(action Action)     {}
-func (n *FallbackManager) SetPayload(map[string]interface{})  {}
+func (n *FallbackManager) SetPayload(map[string]any)          {}
 func (n *FallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ DiagnosticHook) {
 }

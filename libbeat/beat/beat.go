@@ -163,6 +163,16 @@ type BeatConfig struct {
 	Output config.Namespace `config:"output"`
 }
 
+// SetupPipelinesEnabled reports whether Beats should load ingest pipelines
+// during normal publishing.
+func SetupPipelinesEnabled(cfg *config.C) bool {
+	if cfg == nil {
+		return true
+	}
+	enabled, err := cfg.Bool("setup.pipelines.enabled", -1)
+	return err != nil || enabled
+}
+
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.
 type OverwritePipelinesCallback func(*config.C) error

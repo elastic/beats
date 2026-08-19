@@ -96,7 +96,7 @@ func TestConfigPluginNew(t *testing.T) {
 
 func TestFlattenECSMapping(t *testing.T) {
 	const mapping = `{"user":{"custom":{"shoeSize":{"value":45}},"id":{"field":"uid"},"name":{"field":"username"}}}`
-	var m map[string]interface{}
+	var m map[string]any
 	err := json.Unmarshal([]byte(mapping), &m)
 	if err != nil {
 		t.Fatal(err)
@@ -122,13 +122,13 @@ func TestFlattenECSMapping(t *testing.T) {
 	}
 }
 
-func generateTestMapping(depth int, k string, v interface{}) map[string]interface{} {
-	m := make(map[string]interface{})
+func generateTestMapping(depth int, k string, v any) map[string]any {
+	m := make(map[string]any)
 	res := m
 	key := 'a'
 
-	for i := 0; i < depth; i++ {
-		newmap := make(map[string]interface{})
+	for range depth {
+		newmap := make(map[string]any)
 		m[string(key)] = newmap
 		m = newmap
 		key += 1
@@ -176,41 +176,41 @@ func TestFlattenECSMappingMoreEdges(t *testing.T) {
 	}
 
 	values := map[string]struct {
-		m   interface{}
+		m   any
 		err error
 	}{
 		"empty field": {
-			map[string]interface{}{
+			map[string]any{
 				"field": "",
 			},
 			ErrECSMappingIsInvalid,
 		},
 		"empty field with whitespaces": {
-			map[string]interface{}{
+			map[string]any{
 				"field": "   ",
 			},
 			ErrECSMappingIsInvalid,
 		},
 		"nil field": {
-			map[string]interface{}{
+			map[string]any{
 				"field": nil,
 			},
 			ErrECSMappingIsInvalid,
 		},
 		"empty string value": {
-			map[string]interface{}{
+			map[string]any{
 				"value": "",
 			},
 			nil,
 		},
 		"empty string value with whitespaces": {
-			map[string]interface{}{
+			map[string]any{
 				"value": "   ",
 			},
 			nil,
 		},
 		"nil value": {
-			map[string]interface{}{
+			map[string]any{
 				"value": nil,
 			},
 			nil,
@@ -265,17 +265,17 @@ func TestSet(t *testing.T) {
 					ID:       "users",
 					Query:    "select * from users limit 2",
 					Interval: 60,
-					ECSMapping: map[string]interface{}{
-						"user": map[string]interface{}{
-							"custom": map[string]interface{}{
-								"shoeSize": map[string]interface{}{
+					ECSMapping: map[string]any{
+						"user": map[string]any{
+							"custom": map[string]any{
+								"shoeSize": map[string]any{
 									"value": 45,
 								},
 							},
-							"id": map[string]interface{}{
+							"id": map[string]any{
 								"field": "uid",
 							},
-							"name": map[string]interface{}{
+							"name": map[string]any{
 								"field": "username",
 							},
 						},
@@ -826,7 +826,9 @@ func TestSet_PackConflictingScheduleDefaultsRejected(t *testing.T) {
 	}
 }
 
-func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
+func TestSet_PackMixedNativeUnscheduledAccepted(t *testing.T) {
+	// Native interval mixed with unscheduled queries must not fail policy application;
+	// see https://github.com/elastic/beats/issues/51450
 	logger := logp.NewLogger("config_test")
 	cfgp := NewConfigPlugin(logger)
 	inputs := []config.InputConfig{
@@ -840,6 +842,37 @@ func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
 						Queries: map[string]config.Query{
 							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
 							"idle":   {Query: "select 2"},
+						},
+					},
+				},
+			},
+		},
+	}
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfgp.Count() != 2 {
+		t.Fatalf("expected 2 queries registered, got %d", cfgp.Count())
+	}
+}
+
+func TestSet_PackMixedRRuleScheduleModesRejected(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+	inputs := []config.InputConfig{
+		{
+			Name:       "osquery-manager-1",
+			Type:       "osquery",
+			Datastream: config.DatastreamConfig{Namespace: "default"},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					"mixed": {
+						Queries: map[string]config.Query{
+							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
+							"rrule": {Query: "select 2", RRuleSchedule: &config.RRuleScheduleConfig{
+								RRule:     "FREQ=DAILY",
+								StartDate: "2024-01-01T00:00:00Z",
+							}},
 						},
 					},
 				},

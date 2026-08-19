@@ -19,13 +19,13 @@ import (
 )
 
 type mockExecutor struct {
-	result []map[string]interface{}
+	result []map[string]any
 	err    error
 
 	receivedSql string
 }
 
-func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) ([]map[string]interface{}, error) {
+func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) ([]map[string]any, error) {
 	e.receivedSql = sql
 
 	return e.result, e.err
@@ -40,14 +40,14 @@ type mockPublisher struct {
 	packID     string
 	packName   string
 	queryName  string
-	meta       map[string]interface{}
-	hits       []map[string]interface{}
+	meta       map[string]any
+	hits       []map[string]any
 	ecsm       ecs.Mapping
-	reqData    interface{}
-	profile    map[string]interface{}
+	reqData    any
+	profile    map[string]any
 }
 
-func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
 	p.index = index
 	p.idValue = idValue
 	p.idFieldKey = idFieldKey
@@ -62,7 +62,7 @@ func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID,
 	p.reqData = reqData
 }
 
-func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]any, reqData any) {
 	p.profile = profile
 }
 
@@ -78,9 +78,9 @@ func TestActionHandlerExecute(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		nonMatchingPlatform = "linux"
 	}
-	request := map[string]interface{}{
+	request := map[string]any{
 		"id": actionID,
-		"data": map[string]interface{}{
+		"data": map[string]any{
 			"query": actionSQL,
 		},
 	}
@@ -90,7 +90,7 @@ func TestActionHandlerExecute(t *testing.T) {
 		QueryExecutor queryExecutor
 		Publisher     actionQueryPublisher
 
-		Request map[string]interface{}
+		Request map[string]any
 		Err     error
 		Skipped bool
 	}{
@@ -115,9 +115,9 @@ func TestActionHandlerExecute(t *testing.T) {
 			Name:          "skips non matching platform",
 			QueryExecutor: &mockExecutor{},
 			Publisher:     &mockPublisher{},
-			Request: map[string]interface{}{
+			Request: map[string]any{
 				"id": actionID,
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query":    actionSQL,
 					"platform": nonMatchingPlatform,
 				},

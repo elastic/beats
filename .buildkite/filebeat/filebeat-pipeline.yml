@@ -25,8 +25,8 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
   # Integration Tests
-  K8S_VERSION: "v1.33.0"
-  ASDF_KIND_VERSION: "0.27.0"
+  K8S_VERSION: "v1.36.1"
+  ASDF_KIND_VERSION: "0.32.0"
 
   # Unit tests
   RACE_DETECTOR: "true"

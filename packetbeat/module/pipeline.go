@@ -42,7 +42,7 @@ var errNoFS = errors.New("no embedded file system")
 
 type pipeline struct {
 	id       string
-	contents map[string]interface{}
+	contents map[string]any
 }
 
 // UploadPipelines reads all pipelines embedded in the Packetbeat executable
@@ -148,9 +148,9 @@ func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipel
 	return loaded, nil
 }
 
-func applyTemplates(prefix string, version string, filename string, original []byte) (converted map[string]interface{}, err error) {
-	vars := map[string]interface{}{
-		"builtin": map[string]interface{}{
+func applyTemplates(prefix string, version string, filename string, original []byte) (converted map[string]any, err error) {
+	vars := map[string]any{
+		"builtin": map[string]any{
 			"prefix":      prefix,
 			"module":      "",
 			"fileset":     "",
@@ -163,7 +163,7 @@ func applyTemplates(prefix string, version string, filename string, original []b
 		return nil, fmt.Errorf("failed to apply template: %w", err)
 	}
 
-	var content map[string]interface{}
+	var content map[string]any
 	switch extension := strings.ToLower(filepath.Ext(filename)); extension {
 	case ".json":
 		if err = json.Unmarshal([]byte(encodedString), &content); err != nil {
@@ -178,7 +178,7 @@ func applyTemplates(prefix string, version string, filename string, original []b
 			return nil, fmt.Errorf("failed to sanitize the YAML pipeline file: %s: %w", filename, err)
 		}
 		//nolint:errcheck // ignore
-		content = newContent.(map[string]interface{})
+		content = newContent.(map[string]any)
 	default:
 		return nil, fmt.Errorf("unsupported extension '%s' for pipeline file: %s", extension, filename)
 	}

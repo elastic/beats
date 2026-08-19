@@ -32,19 +32,19 @@ import (
 
 func TestGetVertexClusterUUID(t *testing.T) {
 	tests := map[string]struct {
-		vertex              map[string]interface{}
+		vertex              map[string]any
 		overrideClusterUUID string
 		expectedClusterUUID string
 	}{
 		"vertex_and_override": {
-			map[string]interface{}{
+			map[string]any{
 				"cluster_uuid": "v",
 			},
 			"o",
 			"v",
 		},
 		"vertex_only": {
-			vertex: map[string]interface{}{
+			vertex: map[string]any{
 				"cluster_uuid": "v",
 			},
 			expectedClusterUUID: "v",
@@ -66,7 +66,7 @@ func TestGetVertexClusterUUID(t *testing.T) {
 }
 
 func TestXPackEnabledMetricSets(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":        logstash.ModuleName,
 		"hosts":         []string{"foobar:9600"},
 		"xpack.enabled": true,

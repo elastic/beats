@@ -157,12 +157,14 @@ func (p *addCloudMetadata) Close() error {
 
 // RunPdata enriches the given pcommon.Map directly with cloud metadata,
 // avoiding the round-trip conversion to/from mapstr.M used by the standard Run path.
+// It reads p.metadata without cloning: PutAtPath copies values into pdata so
+// there is no aliasing between the cached metadata and the log record.
 func (p *addCloudMetadata) RunPdata(body pcommon.Map) (bool, error) {
-	meta := p.getMeta()
-	if len(meta) == 0 {
+	p.init()
+	if len(p.metadata) == 0 {
 		return false, nil
 	}
-	for key, metaVal := range meta {
+	for key, metaVal := range p.metadata {
 		if !p.initData.overwrite {
 			if _, exists := otelmap.GetAtPath(key, body); exists {
 				continue

@@ -1,0 +1,531 @@
+version: 9.4.4
+entries:
+    - kind: enhancement
+      summary: Optimize filestream logger performance
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50118
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777530175
+      file:
+        name: 1777530175-orestisfl-reduce-harvester-logger-clones.yaml
+        checksum: 1c039070dd9aa735b5bf6c1aec223b4c7db3fd2d
+    - kind: bug-fix
+      summary: Filestream now defers shutdown until it reaches EOF or a configurable timeout. The new `read_until_eof` option (enabled by default) lets you opt out.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50324
+      issue:
+        - https://github.com/elastic/beats/issues/40447
+      impact: ""
+      action: ""
+      timestamp: 1778068402
+      file:
+        name: 1778068402-filestream-read-until-eof.yaml
+        checksum: 24985b630752c7b99d9939b33ca5003f7117534d
+    - kind: enhancement
+      summary: Add an `input_type` resource attribute to CEL input OTel metrics for consistent filtering across custom and HTTP client metrics.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50645
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778632723
+      file:
+        name: 1778632723-filebeat-otel-input-type-resource-attribute.yaml
+        checksum: 0114fa6359b27702278d0488979520b2a08891d6
+    - kind: bug-fix
+      summary: Fix a race condition during metricset closure
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50834
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779368469
+      file:
+        name: 1779368469-fix-race-mb.yaml
+        checksum: a0942ca68e719128c7513cfbbff1df940f80c683
+    - kind: enhancement
+      summary: Add consumer-group and network timeout options to the Filebeat Kafka input.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51173
+      issue:
+        - https://github.com/elastic/beats/issues/51172
+      impact: ""
+      action: ""
+      timestamp: 1781034715
+      file:
+        name: 1781034715-filebeat-kafka-input-consumer-timeouts.yaml
+        checksum: ff8fc1cdb6c1fec5f6a4248cd7974f8fb26580ef
+    - kind: bug-fix
+      summary: Fix missing `state_service` and `state_storageclass` events when `kube-state-metrics` denylists `*_created`.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51255
+      issue:
+        - https://github.com/elastic/beats/issues/34074
+      impact: ""
+      action: ""
+      timestamp: 1781519050
+      file:
+        name: 1781519050-fix-missing-state-service-storageclass-events.yaml
+        checksum: 2f95b9d3f7a9d77171d0914f79080c83d752f4e3
+    - kind: enhancement
+      summary: Remove unsupported ciphers for FIPS mode.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51326
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781712124
+      file:
+        name: 1781712124-hb-fips-mode.yaml
+        checksum: a84424871c1811162f915aa134944fd7f83aed6d
+    - kind: enhancement
+      summary: Use native Go for Linux FIPS builds
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51345
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781782084
+      file:
+        name: 1781782084-use-native-go-for-linux-fips-builds.yaml
+        checksum: a0d19fe8ee561496dba68dd092d48ed3a7e7060a
+    - kind: feature
+      summary: 'Add sign-in activity enrichment for Azure AD users via `enrich_with: sign_in_activity`'
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51390
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781889080
+      file:
+        name: 1781889080-azuread-sign-in-activity-enrichment.yaml
+        checksum: 4e6ef88468f97ace6a3e3e4b1db9d53228a44acb
+    - kind: bug-fix
+      summary: Fix DPoP resource client signing method assignment in CEL and HTTP JSON input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51433
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782162059
+      file:
+        name: 1782162059-s11759-cel-httpjson.yaml
+        checksum: a5bf1c19c929b1df504c3aef65333b6d4b98ff97
+    - kind: bug-fix
+      summary: Validate CrowdStrike streaming resource URL origins against the configured discover URL.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51435
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782164854
+      file:
+        name: 1782164854-crowdstrike-streaming-validate-resource-origins.yaml
+        checksum: f93db205ade7d2d5e75d261e7845a22982d42792
+    - kind: bug-fix
+      summary: Use constant-time comparison for `http_endpoint` basic auth and secret header validation.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51436
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782166371
+      file:
+        name: 1782166371-http_endpoint-constant-time-auth.yaml
+        checksum: 608269d8f9f2e3de54a38d510b9499debf04409b
+    - kind: bug-fix
+      summary: Validate that HTTPJSON pagination URLs share the configured request URL origin.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51437
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782167932
+      file:
+        name: 1782167932-httpjson-pagination-origin-validation.yaml
+        checksum: 301be1c5d0aa2ccfa089a56cf86398f6246da962
+    - kind: bug-fix
+      summary: Fix a rare crash when Osquery restarts after a configuration change
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/51520
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782246918
+      file:
+        name: 1782246918-fix-osquerybeat-runner-cancel-data-race.yaml
+        checksum: 7c5bc40f8e39c0ca169253003d1c0317e8a535b2
+    - kind: bug-fix
+      summary: Fix data race in the `elasticsearch_storage` OTel extension.
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/51501
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782324121
+      file:
+        name: 1782324121-fix-elasticsearchstorage-extension-race.yaml
+        checksum: ea40054c4f22115595320469389e44fb4e29d1ff
+    - kind: bug-fix
+      summary: Fix Filebeat duplicating events after a normal shutdown caused by a race in the registrar
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51517
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782376956
+      file:
+        name: 1782376956-fix-filebeat-duplicating-events-after-a-normal-shutdown-caused-by-a-race-in-the-registrar.yaml
+        checksum: aafa4e2e9d03fbffd3a028c3f90593cf1bcee26a
+    - kind: enhancement
+      summary: Upgrade `github.com/elastic/go-lumber` to v0.2.0.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51518
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782382102
+      file:
+        name: 1782382102-go-lumber-v0.2.0.yaml
+        checksum: ac33b77de6f462e73e3793efc15fedcf47789adb
+    - kind: bug-fix
+      summary: Avoid slice-bounds panic when sorting copytruncate rotated files by date
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51570
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782459050
+      file:
+        name: 1782459050-fix-filestream-copytruncate-date-sorter-panic.yaml
+        checksum: a6905d37f5a8f70326bf1e6da981f03105bd7a94
+    - kind: bug-fix
+      summary: Fix registry corruption issue with multiple metricbeat receivers.
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/51591
+      issue:
+        - https://github.com/elastic/elastic-agent/issues/15154
+      impact: ""
+      action: ""
+      timestamp: 1782499306
+      file:
+        name: 1782499306-remove-global-paths-from-metricbeat.yaml
+        checksum: 0ffe1f4f67925689d994dc6b0341991889385ce9
+    - kind: bug-fix
+      summary: Fix type loss in HTTP JSON template transform handling.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51593
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782697626
+      file:
+        name: 1782697626-i19811-httpjson.yaml
+        checksum: f5d113ec8dcc3cc3d73e56b5e2c4f34653f24eeb
+    - kind: other
+      summary: Bump Node.js to 22.23.1 and npm to 11.18.0 in the Heartbeat synthetics Docker image.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51658
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782832304
+      file:
+        name: 1782832304-bump-heartbeat-nodejs-22.23-npm-11.18.yaml
+        checksum: a34c97a99077aa54a8a97e421c7764e89fbb11c2
+    - kind: bug-fix
+      summary: Fix filestream data loss when a harvester closes before ingesting any data
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51675
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782902506
+      file:
+        name: 1782902506-fix-filestream-offset-0-harvester-close.yaml
+        checksum: 4e0162f0819026c2b9c0640987d2154bbc5d13a2
+    - kind: enhancement
+      summary: Add a configurable retry policy to the Azure Blob Storage input.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51701
+      issue:
+        - https://github.com/elastic/beats/issues/44629
+      impact: ""
+      action: ""
+      timestamp: 1783054266
+      file:
+        name: 1783054266-azureblobstorage-configurable-retries.yaml
+        checksum: f467e74d3ff416caec3f367a95f68f39d835d036
+    - kind: bug-fix
+      summary: Fix goroutine leak when processor construction fails.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51687
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783070100
+      file:
+        name: 1783070100-close-processors-on-construction-errors.yaml
+        checksum: 6bef0c70d07fc8850ff53ef5906a99666aa8c4a1
+    - kind: bug-fix
+      summary: fix data races in the `add_docker_metadata` cache initialization
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51688
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783070200
+      file:
+        name: 1783070200-fix-add-docker-metadata-cgroup-cache-races.yaml
+        checksum: c3324d9849e8d4bd83193bfef21eb283cb7c597c
+    - kind: bug-fix
+      summary: Fix CrowdStrike streaming input retry cap so max_attempts and infinite_retries are honoured.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51712
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783081692
+      file:
+        name: 1783081692-fix-crowdstrike-streaming-retry-cap.yaml
+        checksum: d356cf72c853d04c6e2632aef2e0c3fb62c161d7
+    - kind: bug-fix
+      summary: Load the Npcap `wpcap.dll` lazily to avoid blocking Npcap upgrades on Windows.
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51716
+      issue:
+        - https://github.com/elastic/elastic-agent/issues/14517
+      impact: ""
+      action: ""
+      timestamp: 1783113269
+      file:
+        name: 1783113269-fix-packetbeat-lazy-load-wpcap-dll.yaml
+        checksum: 6ca81c676c7d94c1af189ef195fb88b50c8f3c71
+    - kind: bug-fix
+      summary: Fix `winlog` input crash and event loss during shutdown
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51728
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783321186
+      file:
+        name: 1783321186-fix-winlog-shutdown-render-crash.yaml
+        checksum: c3dbb91d50c9b4dbd7fe82e6abeadf42349541f8
+    - kind: bug-fix
+      summary: Fix a data race in the `rate_limit` processor when configured with fields and run concurrently.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51736
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783323647
+      file:
+        name: 1783323647-ratelimit-fields-data-race.yaml
+        checksum: 98a3f0c489de323bf85a55165c053cd3c225c8ef
+    - kind: bug-fix
+      summary: Fix data races in the backoff accounting of the `add_session_metadata` processor's `kernel_tracing` provider.
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51745
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783323813
+      file:
+        name: 1783323813-fix-add-session-metadata-kerneltracing-backoff-race.yaml
+        checksum: c2b3fd537e4f56de51b91267c9422f0843b77a62
+    - kind: bug-fix
+      summary: Close Beat processors on Beat OTel processor shutdown to avoid leaking resources on collector reloads.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51743
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783323892
+      file:
+        name: 1783323892-beatprocessor-close-on-shutdown.yaml
+        checksum: 88a7b87ad1976db5024165215424eef3db9d7084
+    - kind: bug-fix
+      summary: Fix a startup data race in the `add_kubernetes_metadata` processor
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51739
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783324408
+      file:
+        name: 1783324408-fix-add-kubernetes-metadata-async-init-race.yaml
+        checksum: c1d556f05d1e9cd090a1e713db71a81b45eddcee
+    - kind: bug-fix
+      summary: Make the CrowdStrike streaming input self-heal from transient discover failures.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51737
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783326685
+      file:
+        name: 1783326685-crowdstrike-streaming-self-heal-transient.yaml
+        checksum: bb7102166aeafd0ee6d6dde6a24422c1f8cdb619
+    - kind: bug-fix
+      summary: Emit `pack_name` and `query_name` in Osquerybeat scheduled query results.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/51781
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783335960
+      file:
+        name: 1783335960-osquerybeat-pack-name-query-name.yaml
+        checksum: 86b8f63eb4d22cdd3fcfddde8f3780eb4cff6682
+    - kind: enhancement
+      summary: Add `group_instance_id` (KIP-345 static group membership) to the Filebeat Kafka input.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51772
+      issue:
+        - https://github.com/elastic/beats/issues/51768
+      impact: ""
+      action: ""
+      timestamp: 1783416326
+      file:
+        name: 1783416326-filebeat-kafka-group-instance-id.yaml
+        checksum: b4e83f58d4c40ed0cb821a7031f61b6d7e988b51
+    - kind: bug-fix
+      summary: Prevent Filebeat startup failure when `meta.json` is left empty after migration
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51791
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783441656
+      file:
+        name: 1783441656-make-creation-of-meta.json-atomic.yaml
+        checksum: 6d3d74e8fc87eaf131907894ce82f36d74789ed3
+    - kind: bug-fix
+      summary: Synchronize Filebeat Run and Shutdown functions.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51800
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783461968
+      file:
+        name: 1783461968-filebeat-sync-run-and-shutdown-functions.yaml
+        checksum: ec0b857df9dfb4307ee8a939bfc35b03785729ae
+    - kind: bug-fix
+      summary: Fix `aws-s3` input not performing `backup_to_bucket` and `delete_after_backup` in polling mode
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49734
+      issue:
+        - https://github.com/elastic/beats/issues/46672
+      impact: ""
+      action: ""
+      timestamp: 1783515049
+      file:
+        name: 1783515049-fix-s3-poller-backup-delete.yaml
+        checksum: 2df3c8e53330d4c6e1c39f5210ed6ca23cbee077
+    - kind: bug-fix
+      summary: Prevent statestore startup failure when `meta.json` is left empty after an unclean shutdown
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51897
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783957443
+      file:
+        name: 1783957443-statestore-atomic-create-meta.json.yaml
+        checksum: 1e507904f5ef0c6aa605cf1458abe4ae3bb1c3d7
+    - kind: bug-fix
+      summary: update `elastic-agent-libs` to v0.46.1
+      description: Fixed an issue where malformed TLS keys could be printed in the error logs during loading failures.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51921
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784030419
+      file:
+        name: 1784030419-update-elastic-agent-libs-to-v0.46.1.yaml
+        checksum: 322dd3d0f59846ea4895cd68e0a630e75f5ebbf6
+    - kind: bug-fix
+      summary: Fix goroutine leak in request trace logging infrastructure.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51950
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1784080439
+      file:
+        name: 1784080439-49092-lumberjack.yaml
+        checksum: 5f66e838b3ec7c9b489b61a8a9c08b1316092e4a

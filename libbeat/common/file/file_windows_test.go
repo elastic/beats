@@ -20,7 +20,6 @@
 package file
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -28,7 +27,7 @@ import (
 )
 
 func TestGetOSState(t *testing.T) {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp("", "")
 	assert.NoError(t, err)
 
 	fileinfo, err := file.Stat()
@@ -42,7 +41,7 @@ func TestGetOSState(t *testing.T) {
 }
 
 func TestGetOSStateStat(t *testing.T) {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp("", "")
 	assert.NoError(t, err)
 
 	fileinfo, err := os.Stat(file.Name())

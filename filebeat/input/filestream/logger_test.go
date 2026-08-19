@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -55,8 +56,8 @@ func TestLoggerWithEvent(t *testing.T) {
 			loggerLevel: zapcore.InfoLevel,
 			emit:        func(l *logp.Logger) { l.Warnf("hello") },
 			wantEntries: 1,
-			wantFields:  map[string]string{"operation": "create", "source_file": "src-1"},
-			wantAbsent:  []string{"fingerprint", "os_id", "new_path", "old_path"},
+			wantFields:  map[string]string{"operation": "create"},
+			wantAbsent:  []string{"source_file", "fingerprint", "os_id", "new_path", "old_path"},
 		},
 		{
 			name:        "warnf with all event fields populates every key",
@@ -65,13 +66,11 @@ func TestLoggerWithEvent(t *testing.T) {
 			emit:        func(l *logp.Logger) { l.Warnf("hello") },
 			wantEntries: 1,
 			wantFields: map[string]string{
-				"operation":   "rename",
-				"source_file": "src-2",
-				"fingerprint": "abc123",
-				"new_path":    "/var/log/new.log",
-				"old_path":    "/var/log/old.log",
+				"operation": "rename",
+				"new_path":  "/var/log/new.log",
+				"old_path":  "/var/log/old.log",
 			},
-			wantAbsent: []string{"os_id"},
+			wantAbsent: []string{"source_file", "fingerprint", "os_id"},
 		},
 		{
 			name:        "debugf is a no-op when debug logging is disabled",
@@ -86,7 +85,8 @@ func TestLoggerWithEvent(t *testing.T) {
 			loggerLevel: zapcore.DebugLevel,
 			emit:        func(l *logp.Logger) { l.Debugf("noisy %d", 1) },
 			wantEntries: 1,
-			wantFields:  map[string]string{"operation": "create", "source_file": "src-1"},
+			wantFields:  map[string]string{"operation": "create"},
+			wantAbsent:  []string{"source_file", "fingerprint"},
 		},
 	}
 
@@ -119,4 +119,71 @@ func TestLoggerWithEvent(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestLoggerWithEventAllocs guards the per-FS-event enrichment allocation
+// count: the fields slice plus the WithLazy logger clone.
+func TestLoggerWithEventAllocs(t *testing.T) {
+	logger := logp.NewNopLogger()
+	event := loginp.FSEvent{
+		Op:      loginp.OpRename,
+		SrcID:   "filestream::my-input-id::fingerprint::2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+		NewPath: "/var/log/new.log",
+		OldPath: "/var/log/old.log",
+		Descriptor: loginp.FileDescriptor{
+			Fingerprint: loginp.FingerprintID{
+				Sum: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+			},
+		},
+	}
+
+	allocs := testing.AllocsPerRun(1000, func() {
+		loggerWithEvent(logger, event)
+	})
+	assert.LessOrEqual(t, allocs, 8.0, "loggerWithEvent allocated more than expected")
+}
+
+func BenchmarkLoggerWithEvent(b *testing.B) {
+	event := loginp.FSEvent{
+		Op:      loginp.OpWrite,
+		SrcID:   "filestream::my-input-id::fingerprint::2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+		NewPath: "/var/log/app/application.log",
+		Descriptor: loginp.FileDescriptor{
+			Fingerprint: loginp.FingerprintID{
+				Sum: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+			},
+		},
+	}
+
+	b.Run("debug_suppressed", func(b *testing.B) {
+		core := zapcore.NewCore(
+			zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+			zapcore.AddSync(io.Discard),
+			zapcore.InfoLevel,
+		)
+		logger, err := logp.NewZapLogger(zap.New(core))
+		require.NoError(b, err, "constructing zap logger")
+
+		b.ReportAllocs()
+		for b.Loop() {
+			log := loggerWithEvent(logger, event)
+			log.Debugf("File %s has been updated", event.NewPath)
+		}
+	})
+
+	b.Run("emitted", func(b *testing.B) {
+		core := zapcore.NewCore(
+			zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+			zapcore.AddSync(io.Discard),
+			zapcore.DebugLevel,
+		)
+		logger, err := logp.NewZapLogger(zap.New(core))
+		require.NoError(b, err, "constructing zap logger")
+
+		b.ReportAllocs()
+		for b.Loop() {
+			log := loggerWithEvent(logger, event)
+			log.Debugf("File %s has been updated", event.NewPath)
+		}
+	})
 }
