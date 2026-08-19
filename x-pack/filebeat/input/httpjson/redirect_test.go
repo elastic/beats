@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -739,4 +740,5 @@ func newTestStore() *testStore {
 
 func (s *testStore) Close()                                     { s.registry.Close() }
 func (s *testStore) StoreFor(string) (*statestore.Store, error) { return s.registry.Get("filebeat") }
+func (s *testStore) StoreKey() string                           { return fmt.Sprintf("test:%p", s.registry) }
 func (s *testStore) CleanupInterval() time.Duration             { return 0 }
