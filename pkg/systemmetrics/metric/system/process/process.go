@@ -30,12 +30,12 @@ import (
 
 	psutil "github.com/shirou/gopsutil/v4/process"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/network"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
-	"github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/network"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
@@ -218,7 +218,7 @@ func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState)
 			return procMap, proclist, err
 		}
 		nonFatalErr = fmt.Errorf("error for pid %d: %w", pid, err)
-		procStats.Logger.Debugf(err.Error())
+		procStats.Logger.Debug(err.Error())
 	}
 	if !saved {
 		procStats.Logger.Debugf("Process name does not match the provided regex; PID=%d; name=%s", pid, status.Name)
@@ -268,7 +268,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 			return status, true, fmt.Errorf("FillPidMetrics failed for PID %d: %w", pid, err)
 		}
 		wrappedErr = errors.Join(wrappedErr, err)
-		procStats.Logger.Debugf(wrappedErr.Error())
+		procStats.Logger.Debug(wrappedErr.Error())
 	}
 
 	if status.CPU.Total.Ticks.Exists() {
@@ -298,7 +298,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if _, isExcluded := procStats.excludedPIDs[uint64(pid)]; !isExcluded { //nolint:gosec // G115 — PID is non-negative
 		status, err = FillMetricsRequiringMoreAccess(pid, status)
 		if err != nil {
-			procStats.Logger.Debugf("error calling FillMetricsRequiringMoreAccess for pid %d: %w", pid, err)
+			procStats.Logger.Debugf("error calling FillMetricsRequiringMoreAccess for pid %d: %s", pid, err)
 		}
 
 		// Generate `status.Cmdline` here for compatibility because on Windows
@@ -313,13 +313,13 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		procHandle, err := sysinfo.Process(pid)
 		// treat this as a soft error
 		if err != nil {
-			procStats.Logger.Debugf("error initializing process handler for pid %d while trying to fetch network data: %w", pid, err)
+			procStats.Logger.Debugf("error initializing process handler for pid %d while trying to fetch network data: %s", pid, err)
 		} else {
 			procNet, ok := procHandle.(sysinfotypes.NetworkCounters)
 			if ok {
 				status.Network, err = procNet.NetworkCounters()
 				if err != nil {
-					procStats.Logger.Debugf("error fetching network counters for process %d: %w", pid, err)
+					procStats.Logger.Debugf("error fetching network counters for process %d: %s", pid, err)
 				}
 			}
 		}

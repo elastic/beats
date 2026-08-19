@@ -26,8 +26,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/testhelpers"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 )
 
 var testFileList = []string{

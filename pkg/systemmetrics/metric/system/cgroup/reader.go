@@ -26,10 +26,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgv1"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgv2"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgv1"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgv2"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // StatsV1 contains metrics and limits from each of the cgroup subsystems.

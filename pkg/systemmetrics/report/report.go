@@ -28,13 +28,13 @@ import (
 	"github.com/shirou/gopsutil/v4/common"
 	psprocess "github.com/shirou/gopsutil/v4/process"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cpu"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cpu"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func MemStatsReporter(logger *logp.Logger, processStats *process.Stats) func(monitoring.Mode, monitoring.Visitor) {

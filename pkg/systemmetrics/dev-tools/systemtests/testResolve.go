@@ -20,8 +20,8 @@ package systemtests
 import (
 	"os"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // DockerTestResolver is a resolver meant for use with the containerized system tests.

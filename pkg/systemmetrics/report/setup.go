@@ -25,9 +25,9 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 )
 
 var (

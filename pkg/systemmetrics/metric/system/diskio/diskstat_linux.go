@@ -26,9 +26,9 @@ import (
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 // IOStat carries disk statistics for all devices

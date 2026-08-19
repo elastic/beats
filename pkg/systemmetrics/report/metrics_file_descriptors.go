@@ -25,9 +25,9 @@ import (
 	"github.com/shirou/gopsutil/v4/common"
 	psprocess "github.com/shirou/gopsutil/v4/process"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 )
 
 func SetupLinuxBSDFDMetrics(logger *logp.Logger, reg *monitoring.Registry, processStats *process.Stats) {

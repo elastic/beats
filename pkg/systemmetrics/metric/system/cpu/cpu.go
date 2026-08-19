@@ -24,9 +24,9 @@ import (
 
 	"github.com/shirou/gopsutil/v4/load"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 // Load returns CPU load information for the previous 1, 5, and 15 minute

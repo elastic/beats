@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 )
 
 func TestOmitZeroJSON(t *testing.T) {

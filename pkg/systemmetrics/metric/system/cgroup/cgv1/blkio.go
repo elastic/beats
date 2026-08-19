@@ -26,7 +26,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon"
 )
 
 // BlockIOSubsystem contains limits and metrics from the "blkio" subsystem. The

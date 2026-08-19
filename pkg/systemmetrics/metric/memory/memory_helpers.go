@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 // ParseMeminfo parses the contents of /proc/meminfo into a hashmap

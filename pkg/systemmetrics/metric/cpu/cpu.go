@@ -21,9 +21,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric"
 )
 
 // CPU manages the CPU metrics from /proc/stat

@@ -28,8 +28,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // ReportSensors returns the metrics from all the known sensors.

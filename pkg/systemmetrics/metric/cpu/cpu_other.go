@@ -19,7 +19,7 @@
 
 package cpu
 
-import "github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+import "github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 
 /*
 The below code implements a "metrics tracker" that gives us the ability to

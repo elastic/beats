@@ -28,8 +28,8 @@ import (
 
 	xsyswindows "golang.org/x/sys/windows"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	gowindows "github.com/elastic/go-windows"
 	"github.com/elastic/gosigar/sys/windows"
 )

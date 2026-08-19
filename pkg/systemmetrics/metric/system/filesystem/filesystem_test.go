@@ -23,9 +23,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/dev-tools/systemtests"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 )
 
 func TestFileSystemList(t *testing.T) {

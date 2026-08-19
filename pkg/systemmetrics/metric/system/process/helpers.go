@@ -21,10 +21,10 @@ import (
 	"math"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
-	"github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 // unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch

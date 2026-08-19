@@ -29,8 +29,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // cgroupCntainerCache is a performance helper used for
@@ -285,7 +285,7 @@ func isCgroupNSPrivate(logger *logp.Logger) bool {
 	// detecting the environment we're running under.
 	raw, err := os.ReadFile("/proc/self/cgroup")
 	if err != nil {
-		logger.Debugf("error reading /proc/self/cgroup to detect docker namespace settings: %w", err)
+		logger.Debugf("error reading /proc/self/cgroup to detect docker namespace settings: %s", err)
 		return false
 	}
 	// if we have a path of just "/" that means we're in our own private namespace

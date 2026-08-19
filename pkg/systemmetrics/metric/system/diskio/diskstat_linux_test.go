@@ -27,7 +27,7 @@ import (
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
 )
 
 func Test_GetCLKTCK(t *testing.T) {

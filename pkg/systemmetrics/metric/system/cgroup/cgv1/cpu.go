@@ -23,8 +23,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 )
 
 // CPUSubsystem contains metrics and limits from the "cpu" subsystem. This

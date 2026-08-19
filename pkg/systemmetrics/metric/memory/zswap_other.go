@@ -19,7 +19,7 @@
 
 package memory
 
-import "github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+import "github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 
 // getZswapDebugMetrics is a no-op on non-Linux platforms.
 func getZswapDebugMetrics(_ resolve.Resolver) ZswapDebugMetrics {

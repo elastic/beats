@@ -34,8 +34,8 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // Uvmexp wraps memory data from sysctl

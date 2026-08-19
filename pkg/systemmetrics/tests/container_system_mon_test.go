@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
+
 package tests
 
 import (
@@ -31,7 +33,7 @@ import (
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/dev-tools/systemtests"
 )
 
 // These tests are designed for the case of monitoring a host system from inside docker via a /hostfs

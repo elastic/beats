@@ -26,8 +26,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 )
 
 // IOSubsystem is the replacement for the bulkio controller in cgroupsV1

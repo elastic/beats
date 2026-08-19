@@ -26,9 +26,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestExamples(t *testing.T) {
