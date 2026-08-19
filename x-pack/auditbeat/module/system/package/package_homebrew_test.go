@@ -76,6 +76,24 @@ func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValu
 	}
 }
 
+// TestHomebrewJWSFormula verifies that a receipt whose source.path points to a
+// non-.rb file (e.g. Homebrew 4.0's formula.jws.json API cache) does not
+// produce a "bufio.Scanner: token too long" error.
+func TestHomebrewJWSFormula(t *testing.T) {
+	packages, err := listBrewPackages("testdata/homebrew2/")
+	if !assert.NoError(t, err) {
+		return
+	}
+	if assert.Len(t, packages, 1) {
+		pkg := packages[0]
+		assert.Equal(t, "jws-package", pkg.Name)
+		assert.Equal(t, "1.0.0", pkg.Version)
+		assert.Empty(t, pkg.Summary)
+		assert.Empty(t, pkg.URL)
+		assert.NoError(t, pkg.error, "unexpected package error")
+	}
+}
+
 func TestHomebrewNotExist(t *testing.T) {
 
 	oldPath := homebrewCellarPath

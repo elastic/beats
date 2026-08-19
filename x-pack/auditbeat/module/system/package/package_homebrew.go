@@ -8,11 +8,12 @@ package pkg
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path"
-	"strings"
+	"path/filepath"
 )
 
 // InstallReceiptSource represents the "source" object in Homebrew's INSTALL_RECEIPT.json.
@@ -46,11 +47,14 @@ func listBrewPackages(brewCellarPath string) ([]*Package, error) {
 			if !version.IsDir() {
 				continue
 			}
+
 			pkg := &Package{
 				Name:    packageDir.Name(),
 				Version: version.Name(),
 				Type:    "brew",
 			}
+			packages = append(packages, pkg)
+
 			if info, err := version.Info(); err == nil {
 				pkg.InstallTime = info.ModTime()
 			}
@@ -76,33 +80,43 @@ func listBrewPackages(brewCellarPath string) ([]*Package, error) {
 				formulaPath = path.Join(brewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
 			}
 
-			file, err := os.Open(formulaPath)
-			if err != nil {
-				pkg.error = fmt.Errorf("error reading %v: %w", formulaPath, err)
-			} else {
-				defer file.Close()
-
-				scanner := bufio.NewScanner(file)
-				count := 15 // only look into the first few lines of the formula
-				for scanner.Scan() {
-					count--
-					if count == 0 {
-						break
-					}
-					line := scanner.Text()
-					if strings.HasPrefix(line, "  desc ") {
-						pkg.Summary = strings.Trim(line[7:], " \"")
-					} else if strings.HasPrefix(line, "  homepage ") {
-						pkg.URL = strings.Trim(line[11:], " \"")
-					}
-				}
-				if err = scanner.Err(); err != nil {
-					pkg.error = fmt.Errorf("error parsing %v: %w", formulaPath, err)
-				}
+			if filepath.Ext(formulaPath) == ".rb" {
+				readFormula(pkg, formulaPath)
 			}
-
-			packages = append(packages, pkg)
 		}
 	}
 	return packages, nil
+}
+
+// readFormula reads the desc and homepage fields from the first few lines of a
+// Homebrew Ruby formula file and stores them in dst.
+func readFormula(dst *Package, path string) {
+	file, err := os.Open(path)
+	if err != nil {
+		dst.error = fmt.Errorf("error reading %v: %w", path, err)
+		return
+	}
+	defer file.Close()
+
+	const (
+		desc     = "  desc "
+		homepage = "  homepage "
+	)
+	scanner := bufio.NewScanner(file)
+	count := 15 // only look into the first few lines of the formula
+	for scanner.Scan() {
+		count--
+		if count == 0 {
+			break
+		}
+		line := scanner.Bytes()
+		if after, ok := bytes.CutPrefix(line, []byte(desc)); ok {
+			dst.Summary = string(bytes.Trim(after, ` "`))
+		} else if after, ok := bytes.CutPrefix(line, []byte(homepage)); ok {
+			dst.URL = string(bytes.Trim(after, ` "`))
+		}
+	}
+	if err = scanner.Err(); err != nil {
+		dst.error = fmt.Errorf("error parsing %v: %w", path, err)
+	}
 }
