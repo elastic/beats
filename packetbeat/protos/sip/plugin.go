@@ -638,41 +638,40 @@ func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields, si
 	fields.SDPBodyOriginal = msg.body
 
 	var isInMedia bool
-	for _, line := range bytes.Split(msg.body, []byte("\r\n")) {
+	for line := range bytes.SplitSeq(msg.body, []byte("\r\n")) {
 		kv := bytes.SplitN(line, []byte("="), 2)
 		if len(kv) != 2 {
 			continue
 		}
-		kv[1] = bytes.TrimSpace(kv[1])
-		ch := string(bytes.ToLower(bytes.TrimSpace(kv[0])))
-		switch ch {
+		key := string(bytes.ToLower(bytes.TrimSpace(kv[0])))
+		val := bytes.TrimSpace(kv[1])
+		switch key {
 		case "v":
-			fields.SDPVersion = string(kv[1])
+			fields.SDPVersion = string(val)
 		case "o":
-			var pos int
-			if len(kv[1]) < 1 {
+			if len(val) == 0 {
 				// invalid key/value pair (i.e "o=")
 				continue
 			}
-			if kv[1][pos] == '"' {
-
-				endUserPos := bytes.IndexByte(kv[1][pos+1:], '"')
-				if endUserPos == -1 {
+			hasQuotedUser := false
+			if after, ok := bytes.CutPrefix(val, []byte{'"'}); ok {
+				var user []byte
+				user, val, ok = bytes.Cut(after, []byte{'"'})
+				if !ok {
 					// unquoted key/value pair
 					continue
 				}
-				if !bytes.Equal(kv[1][pos+1:endUserPos], []byte("-")) {
-					fields.SDPOwnerUsername = kv[1][pos+1 : endUserPos]
+				hasQuotedUser = true
+				if !bytes.Equal(user, []byte("-")) {
+					fields.SDPOwnerUsername = user
 				}
-				pos = endUserPos + 1
 			}
-			nParts := func() int {
-				if pos == 0 {
-					return 4
-				}
-				return 3 // already have user
-			}()
-			parts := bytes.SplitN(kv[1][pos:], []byte(" "), nParts)
+			nParts := 3
+			if !hasQuotedUser {
+				// Do not yet have user.
+				nParts = 4
+			}
+			parts := bytes.SplitN(val, []byte(" "), nParts)
 			if len(parts) != nParts {
 				if sipLogger.IsDebug() {
 					sipLogger.Debug("malformed owner SDP line")
@@ -694,16 +693,16 @@ func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields, si
 			pbf.AddUser(string(fields.SDPOwnerUsername))
 			pbf.AddIP(string(fields.SDPOwnerIP))
 		case "s":
-			if !bytes.Equal(kv[1], []byte("-")) {
-				fields.SDPSessName = kv[1]
+			if !bytes.Equal(val, []byte("-")) {
+				fields.SDPSessName = val
 			}
 		case "c":
 			if isInMedia {
 				continue
 			}
-			fields.SDPConnInfo = kv[1]
+			fields.SDPConnInfo = val
 			fields.SDPConnAddr = func() common.NetString {
-				p := bytes.Split(kv[1], []byte(" "))
+				p := bytes.Split(val, []byte(" "))
 				return p[len(p)-1]
 			}()
 			pbf.AddHost(string(fields.SDPConnAddr))
