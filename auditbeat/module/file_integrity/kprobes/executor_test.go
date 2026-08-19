@@ -107,10 +107,8 @@ func Test_executor(t *testing.T) {
 	errChannel := make(chan error, 1)
 	wg := sync.WaitGroup{}
 	start := make(chan struct{})
-	for i := 0; i < 4; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 4 {
+		wg.Go(func() {
 			<-start
 			if runErr := exec.Run(atomicCheck); runErr != nil {
 				select {
@@ -118,7 +116,7 @@ func Test_executor(t *testing.T) {
 				default:
 				}
 			}
-		}()
+		})
 	}
 	time.Sleep(1 * time.Second)
 	close(start)

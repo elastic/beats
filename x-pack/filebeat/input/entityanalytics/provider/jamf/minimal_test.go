@@ -24,7 +24,7 @@ import (
 //     least the duration fields are wired through end-to-end.
 func TestMinimalConfigRoundTrip(t *testing.T) {
 	const wantFields = 8
-	if got := reflect.TypeOf(ecjamf.Config{}).NumField(); got != wantFields {
+	if got := reflect.TypeFor[ecjamf.Config]().NumField(); got != wantFields {
 		t.Fatalf("ecjamf.Config has %d exported fields, want %d; "+
 			"update localConf inside minimalProvider and this test", got, wantFields)
 	}

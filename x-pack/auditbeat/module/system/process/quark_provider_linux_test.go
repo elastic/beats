@@ -351,8 +351,8 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb
 
 // getConfigForQuark enables quark and allows hashing so we can test
 // the cached hasher.
-func getConfigForQuark(be backend) map[string]interface{} {
-	config := map[string]interface{}{
+func getConfigForQuark(be backend) map[string]any {
+	config := map[string]any{
 		"module":   system.ModuleName,
 		"datasets": []string{"process"},
 

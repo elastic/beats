@@ -2,18 +2,13 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-network_summary.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # System network_summary metricset [metricbeat-metricset-system-network_summary]
-
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
 
 The System `network_summary` metricset provides network IO metrics collected from the operating system. These events are global and sorted by protocol.
 

@@ -96,7 +96,7 @@ func (s *RecurrenceSchedule) minimumInterval() (time.Duration, bool) {
 	found := false
 
 	// Sample a bounded number of upcoming occurrences to keep this validation cheap.
-	for i := 0; i < 16; i++ {
+	for range 16 {
 		next := s.rule.After(current, false)
 		if next.IsZero() {
 			break
@@ -243,7 +243,7 @@ func (s *RecurrenceSchedule) String() string {
 }
 
 // Unpack implements the config unpacker interface
-func (s *RecurrenceSchedule) Unpack(cfg map[string]interface{}) error {
+func (s *RecurrenceSchedule) Unpack(cfg map[string]any) error {
 	if v, ok := cfg["rrule"].(string); ok {
 		s.RRule = v
 	}
