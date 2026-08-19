@@ -48,6 +48,9 @@ const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
 
+	// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
+	esIndexAttribute = "elasticsearch.index"
+
 	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
 	// It is duplicated here to avoid importing the receivertest package
 	// (and pulling its testify/testing deps) into production binaries.
@@ -226,6 +229,14 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 
 		}
+		// If raw_index is set on event metadata, propagate it as the
+		// Elasticsearch index, potentially overwriting the non-standard
+		// data stream index. This matches the behavior of the Beats
+		// index selector.
+		if s, ok := event.Content.Meta["raw_index"].(string); ok {
+			logRecord.Attributes().PutStr(esIndexAttribute, s)
+		}
+
 		if err := logRecord.Body().SetEmptyMap().FromRaw(map[string]any(beatEvent)); err != nil {
 			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
 		}
