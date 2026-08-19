@@ -66,6 +66,61 @@ func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, response
 	p.profile = profile
 }
 
+// Kibana stamps the originating space on the action document, and the osquery read
+// paths filter results by space_id. A result published with an empty space id is
+// invisible from any named space, so assert the value survives the round trip.
+func TestActionHandlerExecuteSpaceID(t *testing.T) {
+	ctx := context.Background()
+	actionID := uuid.Must(uuid.NewV4()).String()
+
+	tests := []struct {
+		Name    string
+		Request map[string]any
+		SpaceID string
+	}{
+		{
+			Name: "space id is forwarded to the publisher",
+			Request: map[string]any{
+				"id":       actionID,
+				"space_id": "my-space",
+				"data": map[string]any{
+					"query": "select * from uptime",
+				},
+			},
+			SpaceID: "my-space",
+		},
+		{
+			Name: "action without a space id publishes an empty one",
+			Request: map[string]any{
+				"id": actionID,
+				"data": map[string]any{
+					"query": "select * from uptime",
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.Name, func(t *testing.T) {
+			publisher := &mockPublisher{}
+			ac := &actionHandler{
+				log:       logp.NewLogger("action_test"),
+				inputType: osqueryInputType,
+				queryExec: &mockExecutor{},
+				publisher: publisher,
+			}
+
+			if _, err := ac.Execute(ctx, tc.Request); err != nil {
+				t.Fatal("Unexpected error:", err)
+			}
+
+			if diff := cmp.Diff(tc.SpaceID, publisher.spaceID); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
 func TestActionHandlerExecute(t *testing.T) {
 	validLogger := logp.NewLogger("action_test")
 	inputType := osqueryInputType

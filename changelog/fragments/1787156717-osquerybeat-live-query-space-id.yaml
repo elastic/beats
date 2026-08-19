@@ -1,0 +1,23 @@
+kind: bug-fix
+
+summary: Carry the originating Kibana space id on osquery live query results.
+
+description: |
+  Kibana stamps `space_id` on the Fleet action it sends for a live query, and its
+  osquery read paths filter results by that field. In the default space the filter
+  also matches documents where the field is absent; in a named space it is an exact
+  term match, so a result without `space_id` is excluded from the search.
+
+  osquerybeat parsed the action without reading `space_id` and published live query
+  results with an empty space id, so those documents were written without the field.
+  Reading from a named space, the search returned no hits and the UI reported that
+  the agent had sent no data, even though the results were indexed. Scheduled pack
+  results were unaffected because that path already propagates the space id.
+
+  `action.FromMap` now parses `space_id`, and the live query handler passes it to the
+  publisher. Actions without the field are unchanged, so older Kibana versions keep
+  their current behaviour.
+
+component: osquerybeat
+
+# pr: https://github.com/elastic/beats/pull/xxxx
