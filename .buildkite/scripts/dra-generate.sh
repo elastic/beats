@@ -64,14 +64,7 @@ TRIG
   - label: ":memo: Annotate DRA summary (${WORKFLOW})"
     key: "dra-annotate-${WORKFLOW}"
     depends_on: "dra-prep-${WORKFLOW}"
-    command: |
-      set -euo pipefail
-      buildkite-agent artifact download "artifacts/dra/beats/*/manifest-*.json" . --step "dra-prep-${WORKFLOW}"
-      manifest=\$(find artifacts/dra/beats -name "manifest-*.json" | head -1)
-      build_id=\$(jq -r '.build_id' "\${manifest}")
-      version=\$(jq -r '.version' "\${manifest}")
-      url="https://artifacts-${WORKFLOW}.elastic.co/dra-builds/\${BUILDKITE_PIPELINE_SLUG}/\${BUILDKITE_BUILD_NUMBER}/\${build_id}/summary-\${version}.html"
-      printf "**${WORKFLOW} summary link:** [%s](%s)\n" "\${url}" "\${url}" | buildkite-agent annotate --style=success --append
+    command: ".buildkite/scripts/dra-annotate.sh ${WORKFLOW}"
     agents:
       provider: gcp
       image: "${IMAGE_UBUNTU_X86_64}"
