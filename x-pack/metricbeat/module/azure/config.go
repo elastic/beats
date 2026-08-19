@@ -82,10 +82,10 @@ type Config struct {
 }
 
 // InitDefaults initializes default values before configuration is unpacked.
-func (c *Config) InitDefaults() {
-	c.BillingUsageLookback = defaultBillingUsageLookback
-	c.BillingForecastWindow = defaultBillingForecastWindow
-	c.DefaultTimeGrain = defaultTimeGrain
+func (conf *Config) InitDefaults() {
+	conf.BillingUsageLookback = defaultBillingUsageLookback
+	conf.BillingForecastWindow = defaultBillingForecastWindow
+	conf.DefaultTimeGrain = defaultTimeGrain
 }
 
 func validateBillingDuration(name string, value time.Duration) error {

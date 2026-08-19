@@ -7,6 +7,7 @@
 package azure
 
 import (
+	"maps"
 	"testing"
 	"time"
 
@@ -108,9 +109,7 @@ func validConfig(values map[string]any) map[string]any {
 		"subscription_id": "subscription",
 		"period":          "1m",
 	}
-	for key, value := range values {
-		cfg[key] = value
-	}
+	maps.Copy(cfg, values)
 	return cfg
 }
 
