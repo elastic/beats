@@ -332,7 +332,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	// Update
 	// Repeat the write if no event is received. Under macOS often
 	// the write fails to generate a write event for non-recursive watcher
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		f, err := os.OpenFile(fpath, os.O_RDWR|os.O_APPEND, 0o640)
 		assertNoError(t, err)
 		f.WriteString(" world\n")

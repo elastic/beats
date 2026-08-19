@@ -71,7 +71,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 			beatVersion := getVersion("")
 			esVersion := getVersion(test.esVersion)
 
-			indexSettings := map[string]interface{}{}
+			indexSettings := map[string]any{}
 			if test.set > 0 {
 				indexSettings[settingKey] = test.set
 			}
@@ -132,7 +132,7 @@ func (t *unitTestTemplate) Has(path string) bool {
 	return has
 }
 
-func (t *unitTestTemplate) Get(path string) interface{} {
+func (t *unitTestTemplate) Get(path string) any {
 	t.t.Helper()
 	val, err := t.data.GetValue(path)
 	if err != nil {
@@ -149,7 +149,7 @@ func (t *unitTestTemplate) AssertMissing(path string) {
 	}
 }
 
-func (t *unitTestTemplate) Assert(path string, val interface{}) {
+func (t *unitTestTemplate) Assert(path string, val any) {
 	t.t.Helper()
 	assert.Equal(t.t, val, t.Get(path))
 }

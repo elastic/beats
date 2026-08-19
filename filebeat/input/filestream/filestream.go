@@ -19,270 +19,116 @@ package filestream
 
 import (
 	"compress/gzip"
-	"context"
 	"errors"
 	"io"
 	"os"
 	"sync"
-	"sync/atomic"
-	"time"
 
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/go-concert/unison"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
 	ErrClosed       = errors.New("reader closed")
 	ErrFileTruncate = errors.New("detected file being truncated")
-	ErrInactive     = errors.New("inactive file, reader closed")
+
+	// ErrWouldBlock is returned by Read when the file has no data available
+	// right now. Reading is non-blocking: the harvester runner's waker decides
+	// when to retry, so the read path never waits on a backoff.
+	ErrWouldBlock = errors.New("no data available, would block")
 )
 
-// logFile contains all log related data
+// logFile is a non-blocking reader over a single open file.
+//
+// The file handle is owned by the harvester session, so Close does NOT close it.
+// The close-on-state-change conditions (inactive/removed/renamed and
+// close-after-interval) are evaluated by the harvester runner's waker, so logFile
+// only reports end of data: io.EOF when close_on_eof (or a GZIP file) reaches the
+// end, ErrFileTruncate when the file shrank, or ErrWouldBlock when an active file
+// has nothing to read yet.
 type logFile struct {
 	file      File
 	log       *logp.Logger
 	readerCtx ctxtool.CancelContext
 
-	closeAfterInterval time.Duration
-	closeOnEOF         bool
+	closeOnEOF bool
 
-	checkInterval time.Duration
-	closeInactive time.Duration
-	closeRemoved  bool
-	closeRenamed  bool
-
-	isInactive atomic.Bool
-
-	// offsetMutx is a mutex to ensure 'offset' and 'lastTimeRead' are
-	// atomically updated. Atomically updating them prevents issues
-	// detecting when the file is inactive by [shouldBeClosed].
-	offsetMutx   sync.Mutex
-	offset       int64
-	lastTimeRead time.Time
-
-	backoff backoff.Backoff
-	tg      *unison.TaskGroup
-
-	readUntilEOFOnce sync.Once
+	offsetMutx sync.Mutex
+	offset     int64
 }
 
-// newFileReader creates a new log instance to read log sources.
-//
-// readUntilEOF controls the second return value:
-//   - true: returns a closure that switches the reader into readUntilEOF
-//     mode when invoked. It stops the file-monitoring goroutines started
-//     by startFileMonitoringIfNeeded (periodicStateCheck and
-//     closeIfTimeout), replaces readerCtx with the context passed to the
-//     closure, and sets closeOnEOF to true. From that point Read returns
-//     either when the file reaches EOF or when the supplied context is
-//     cancelled.
-//   - false: returns a no-op closure. The reader's lifecycle is governed
-//     entirely by closerConfig.
+// newFileReader creates a new log instance to read log sources
 func newFileReader(
 	log *logp.Logger,
 	canceler input.Canceler,
 	f File,
-	config readerConfig,
 	closerConfig closerConfig,
-	readUntilEOF bool,
-) (*logFile, func(ctxtool.CancelContext), error) {
+) (*logFile, error) {
 	offset, err := f.Seek(0, io.SeekCurrent)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	readerCtx := ctxtool.WithCancelContext(ctxtool.FromCanceller(canceler))
-	tg := unison.TaskGroupWithCancel(readerCtx)
-
-	l := &logFile{
-		file:               f,
-		log:                log,
-		closeAfterInterval: closerConfig.Reader.AfterInterval,
-		closeOnEOF:         closerConfig.Reader.OnEOF,
-		checkInterval:      closerConfig.OnStateChange.CheckInterval,
-		closeInactive:      closerConfig.OnStateChange.Inactive,
-		closeRemoved:       closerConfig.OnStateChange.Removed,
-		closeRenamed:       closerConfig.OnStateChange.Renamed,
-		offset:             offset,
-		lastTimeRead:       time.Now(),
-		backoff:            backoff.NewExpBackoff(config.Backoff.Init, config.Backoff.Max),
-		readerCtx:          readerCtx,
-		tg:                 tg,
-	}
-
-	startReadUntilEOF := func(ctxtool.CancelContext) {}
-	if readUntilEOF {
-		startReadUntilEOF = l.startReadUntilEOF
-	}
-
-	l.startFileMonitoringIfNeeded()
-
-	return l, startReadUntilEOF, nil
+	return &logFile{
+		file:       f,
+		log:        log,
+		closeOnEOF: closerConfig.Reader.OnEOF,
+		offset:     offset,
+		readerCtx:  ctxtool.WithCancelContext(ctxtool.FromCanceller(canceler)),
+	}, nil
 }
 
-// Read reads from the reader and updates the offset
-// The total number of bytes read is returned.
-// If the file is inactive, ErrInactive is returned
-// If f.readerCtx is cancelled for any reason, then
-// ErrClosed is returned
+// Read reads from the file into buf without blocking. It returns:
+//   - the bytes read with a nil error when data was available;
+//   - io.EOF when close_on_eof (or a GZIP file) reaches the end;
+//   - ErrFileTruncate when the file shrank;
+//   - ErrWouldBlock when an active file has no data right now;
+//   - ErrClosed when the reader's context was cancelled.
 func (f *logFile) Read(buf []byte) (int, error) {
+	if f.readerCtx.Err() != nil {
+		return 0, ErrClosed
+	}
+
 	totalN := 0
 
-	for f.readerCtx.Err() == nil {
-		n, err := f.file.Read(buf)
-		if n > 0 {
-			f.updateOffset(n)
-		}
-		totalN += n
+	n, err := f.file.Read(buf)
+	if n > 0 {
+		f.updateOffset(n)
+	}
+	totalN += n
 
-		// Read from source completed without error
-		// Either end reached or buffer full
-		if err == nil {
-			// reset backoff for next read
-			f.backoff.Reset()
-			return totalN, nil
-		}
-
-		// Move buffer forward for next read
-		buf = buf[n:]
-
-		// Checks if an error happened or buffer is full
-		// If buffer is full, cannot continue reading.
-		// Can happen if n == bufferSize + io.EOF error
-		err = f.errorChecks(err)
-		if err != nil || len(buf) == 0 {
-			return totalN, err
-		}
-
-		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())
-		f.backoff.Wait(f.readerCtx)
+	// Read from source completed without error
+	// Either end reached or buffer full
+	if err == nil {
+		return totalN, nil
 	}
 
-	// `f.isInactive` is set in a different goroutine, however it is the same
-	// goroutine that cancels `f.readerCtx`. The timer goroutine that checks
-	// for inactivity first sets `f.isInactive`, then it cancels `f.readerCtx`,
-	// once the execution comes back to this method, the for loop condition
-	// evaluates to false and the correct value from `f.isInactive` is read.
-	if f.isInactive.Load() {
-		return 0, ErrInactive
+	// Move buffer forward for next read
+	buf = buf[n:]
+
+	// Checks if an error happened or buffer is full
+	// If buffer is full, cannot continue reading.
+	// Can happen if n == bufferSize + io.EOF error
+	err = f.errorChecks(err)
+	if err != nil || len(buf) == 0 {
+		return totalN, err
 	}
 
-	return 0, ErrClosed
-}
-
-func (f *logFile) startFileMonitoringIfNeeded() {
-	if f.closeInactive > 0 || f.closeRemoved || f.closeRenamed {
-		err := f.tg.Go(func(ctx context.Context) error {
-			f.periodicStateCheck(ctx)
-			return nil
-		})
-		if err != nil {
-			f.log.Errorf("failed to start file monitoring: %v", err)
-		}
+	// Active file at EOF: deliver whatever was read this call, otherwise
+	// signal that no data is available right now so the worker can yield.
+	//
+	// ErrWouldBlock must mean "zero progress this read": if we returned it
+	// together with bytes, LineReader.advance buffers those bytes but then
+	// returns early on the error, skipping the newline scan that may have
+	// just completed a line. Returning nil whenever totalN > 0 lets the
+	// pipeline process the data and reserves ErrWouldBlock for a truly empty
+	// read. (totalN is never negative: it only accumulates io.Reader counts.)
+	if totalN > 0 {
+		return totalN, nil
 	}
-
-	if f.closeAfterInterval > 0 {
-		err := f.tg.Go(func(ctx context.Context) error {
-			f.closeIfTimeout(ctx)
-			return nil
-		})
-		if err != nil {
-			f.log.Errorf("failed to schedule a file close: %v", err)
-		}
-	}
-}
-
-func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
-	if err := timed.Wait(ctx, f.closeAfterInterval); err == nil {
-		f.readerCtx.Cancel()
-	}
-}
-
-func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
-	err := timed.Periodic(ctx, f.checkInterval, func() error {
-		if f.shouldBeClosed() {
-			f.readerCtx.Cancel()
-		}
-		return nil
-	})
-	if err != nil {
-		if !errors.Is(err, context.Canceled) {
-			f.log.Errorf("failed to schedule a periodic state check: %s", err)
-		}
-	}
-}
-
-func (f *logFile) shouldBeClosed() bool {
-	if f.closeInactive > 0 {
-		f.offsetMutx.Lock()
-		if time.Since(f.lastTimeRead) > f.closeInactive {
-			f.isInactive.Store(true)
-			f.log.Debugf("'%s' is inactive", f.file.Name())
-			f.offsetMutx.Unlock()
-			return true
-		}
-		f.offsetMutx.Unlock()
-	}
-
-	if !f.closeRemoved && !f.closeRenamed {
-		return false
-	}
-
-	info, statErr := f.file.Stat()
-	if statErr != nil {
-		// return early if the file does not exist anymore and the reader should be closed
-		if f.closeRemoved && errors.Is(statErr, os.ErrNotExist) {
-			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
-			return true
-		}
-
-		// If an unexpected error happens we keep the reader open hoping once everything will go back to normal.
-		f.log.Errorf("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
-		return false
-	}
-
-	if f.closeRenamed {
-		// Check if the file can still be found under the same path
-		if !isSameFile(f.file.Name(), info) {
-			f.log.Debugf("close.on_state_change.renamed is enabled and file %s has been renamed", f.file.Name())
-			return true
-		}
-	}
-
-	if f.closeRemoved {
-		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		if file.IsRemoved(f.file.OSFile()) {
-			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
-			return true
-		}
-	}
-
-	return false
-}
-
-// startReadUntilEOF switches the reader into readUntilEOF mode: the only
-// conditions that terminate Read from now on are reaching EOF on the
-// underlying file or the caller-supplied ctx being cancelled. It:
-//   - stops the file-monitoring goroutines spawned by startFileMonitoringIfNeeded
-//     (inactive / removed / renamed / after_interval checks).
-//   - swaps readerCtx with the caller-supplied ctx so Read's loop is driven by
-//     the new context (which owns the readUntilEOF timeout).
-//   - sets closeOnEOF=true so the next EOF terminates Read instead of parking
-//     in the backoff wait.
-//
-// startReadUntilEOF is idempotent: only the first call has any effect.
-func (f *logFile) startReadUntilEOF(ctx ctxtool.CancelContext) {
-	f.readUntilEOFOnce.Do(func() {
-		_ = f.tg.Stop()
-		f.readerCtx = ctx
-		f.closeOnEOF = true
-	})
+	return 0, ErrWouldBlock
 }
 
 func isSameFile(path string, info os.FileInfo) bool {
@@ -335,20 +181,26 @@ func (f *logFile) handleEOF() error {
 	return nil
 }
 
-// Close stops reader activity, closes the underlying file handle, and waits
-// for background monitoring goroutines to exit before returning.
+// Close cancels the reader. It does NOT close the underlying file handle, which
+// is owned by the harvester session.
 func (f *logFile) Close() error {
 	f.readerCtx.Cancel()
-	err := f.file.Close()
-	_ = f.tg.Stop() // Wait until all resources are released for sure.
 	f.log.Debugf("Closed reader. Path='%s'", f.file.Name())
-	return err
+	return nil
 }
 
-// updateOffset updates the offset and lastTimeRead atomically
+// updateOffset advances the tracked read offset.
 func (f *logFile) updateOffset(delta int) {
 	f.offsetMutx.Lock()
 	f.offset += int64(delta)
-	f.lastTimeRead = time.Now()
 	f.offsetMutx.Unlock()
+}
+
+// ReadOffset returns how far into the file the reader has consumed: the start
+// offset plus every byte handed to the pipeline, including bytes buffered for an
+// as-yet-incomplete trailing line.
+func (f *logFile) ReadOffset() int64 {
+	f.offsetMutx.Lock()
+	defer f.offsetMutx.Unlock()
+	return f.offset
 }

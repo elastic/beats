@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -189,11 +190,8 @@ func TestReaderEncodings(t *testing.T) {
 				for lineTerminatorName, lineTerminator := range lineTerminators {
 					lineTerminatorIsInvalid := false
 					if invalidLineTerminatorForEncoding, ok := invalidLineTerminatorForEncoding[test.encoding]; ok {
-						for _, invalidLineTerminator := range invalidLineTerminatorForEncoding {
-							if invalidLineTerminator == lineTerminator {
-								lineTerminatorIsInvalid = true
-								break
-							}
+						if slices.Contains(invalidLineTerminatorForEncoding, lineTerminator) {
+							lineTerminatorIsInvalid = true
 						}
 					}
 					if lineTerminatorIsInvalid {
@@ -269,7 +267,7 @@ func TestReadRandomLineLengths(t *testing.T) {
 	numLines := 100
 
 	lineLengths := make([]int, numLines)
-	for i := 0; i < numLines; i++ {
+	for i := range numLines {
 		lineLengths[i] = rand.Intn(maxLength-minLength) + minLength
 	}
 
@@ -281,7 +279,7 @@ func testReadLineLengths(t *testing.T, lineLengths []int) {
 	var lines [][]byte
 	for _, lineLength := range lineLengths {
 		inputLine := make([]byte, lineLength+1)
-		for i := 0; i < lineLength; i++ {
+		for i := range lineLength {
 			char := rand.Intn('z'-'A') + 'A'
 			inputLine[i] = byte(char)
 		}
@@ -369,7 +367,7 @@ func setupTestMaxBytesLimit(lineMaxLimit, lineLen int, nl []byte) (lines []strin
 
 	var b strings.Builder
 
-	for i := 0; i < lineCount; i++ {
+	for i := range lineCount {
 		var sz int
 		// Non-empty line
 		if randomBool(rnd) {
@@ -488,7 +486,7 @@ func TestBufferSize(t *testing.T) {
 		t.Fatal("failed to initialize reader:", err)
 	}
 
-	for i := 0; i < len(lines); i++ {
+	for i := range lines {
 		b, n, err := reader.Next()
 		if err != nil {
 			if errors.Is(err, io.EOF) {

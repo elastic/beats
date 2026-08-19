@@ -75,8 +75,8 @@ make check                   # Full check suite (lint, headers, go mod, python)
 ### Linting
 
 ```bash
-# Running golangci-lint for the whole codebase is slow, prefer running only on changed files by default
-golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 --whole-files --new-from-merge-base upstream/main
+# Running golangci-lint for the whole codebase is slow, prefer running only on changed lines by default.
+golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 --new-from-merge-base upstream/main
 ```
 
 ## Architecture

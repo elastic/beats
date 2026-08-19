@@ -399,7 +399,7 @@ func requireImplements[T any](t *testing.T, v any) T {
 
 func TestConditionErrorClosesProcessor(t *testing.T) {
 	cons, p := newMockCloserConstructor()
-	wrapped := NewConditional(SafeWrap(cons))
+	wrapped := NewConditional(SafeWrap("test-cond-close-on-error", cons))
 
 	cfg, err := conf.NewConfigFrom(map[string]any{"when": map[string]any{}})
 	require.NoError(t, err)

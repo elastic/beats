@@ -516,7 +516,7 @@ func reportEvent(source string, eventType uint16, eventID uint32, sid *windows.S
 }
 
 // readNDJSON reads all *.ndjson files in dir and returns the parsed events.
-func readNDJSON(script *testscript.TestScript, dir string) []map[string]interface{} {
+func readNDJSON(script *testscript.TestScript, dir string) []map[string]any {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -525,7 +525,7 @@ func readNDJSON(script *testscript.TestScript, dir string) []map[string]interfac
 		script.Fatalf("readNDJSON: ReadDir(%q): %v", dir, err)
 	}
 
-	var events []map[string]interface{}
+	var events []map[string]any
 	for _, entry := range entries {
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".ndjson") {
 			continue
@@ -534,12 +534,12 @@ func readNDJSON(script *testscript.TestScript, dir string) []map[string]interfac
 		if err != nil {
 			script.Fatalf("readNDJSON: ReadFile: %v", err)
 		}
-		for _, line := range strings.Split(string(data), "\n") {
+		for line := range strings.SplitSeq(string(data), "\n") {
 			line = strings.TrimSpace(line)
 			if line == "" {
 				continue
 			}
-			var evt map[string]interface{}
+			var evt map[string]any
 			if err := json.Unmarshal([]byte(line), &evt); err != nil {
 				script.Fatalf("readNDJSON: Unmarshal: %v\nline: %s", err, line)
 			}
@@ -550,7 +550,7 @@ func readNDJSON(script *testscript.TestScript, dir string) []map[string]interfac
 }
 
 // getField retrieves a value from a nested map using dot-separated field names.
-func getField(evt map[string]interface{}, field string) (interface{}, bool) {
+func getField(evt map[string]any, field string) (any, bool) {
 	parts := strings.SplitN(field, ".", 2)
 	val, ok := evt[parts[0]]
 	if !ok {
@@ -559,7 +559,7 @@ func getField(evt map[string]interface{}, field string) (interface{}, bool) {
 	if len(parts) == 1 {
 		return val, true
 	}
-	nested, ok := val.(map[string]interface{})
+	nested, ok := val.(map[string]any)
 	if !ok {
 		return nil, false
 	}

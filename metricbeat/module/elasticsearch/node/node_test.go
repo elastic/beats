@@ -66,7 +66,7 @@ func TestFetch(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := map[string]interface{}{
+			config := map[string]any{
 				"module":     elasticsearch.ModuleName,
 				"metricsets": []string{"node"},
 				"hosts":      []string{server.URL},

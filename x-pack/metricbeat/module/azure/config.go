@@ -8,6 +8,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,6 +32,13 @@ var (
 		"https://management.microsoftazure.de/": "https://login.microsoftonline.de/",
 	}
 )
+
+func normalizeResourceManagerEndpoint(endpoint string) string {
+	if endpoint == "" {
+		return ""
+	}
+	return strings.TrimRight(endpoint, "/") + "/"
+}
 
 // Config options
 type Config struct {
@@ -126,12 +134,13 @@ func (conf *Config) Validate() error {
 		conf.ResourceManagerEndpoint = DefaultBaseURI
 	}
 	if conf.ActiveDirectoryEndpoint == "" {
-		ok, err := AzureEnvs.HasKey(conf.ResourceManagerEndpoint)
+		lookupKey := normalizeResourceManagerEndpoint(conf.ResourceManagerEndpoint)
+		ok, err := AzureEnvs.HasKey(lookupKey)
 		if err != nil {
 			return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 		}
 		if ok {
-			add, err := AzureEnvs.GetValue(conf.ResourceManagerEndpoint)
+			add, err := AzureEnvs.GetValue(lookupKey)
 			if err != nil {
 				return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 			}

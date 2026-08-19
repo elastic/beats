@@ -1114,8 +1114,8 @@ func kernErrorDesc(retval int32) string {
 }
 
 func readCString(buf []byte) string {
-	if pos := bytes.IndexByte(buf, 0); pos != -1 {
-		return string(buf[:pos])
+	if before, _, ok := bytes.Cut(buf, []byte{0}); ok {
+		return string(before)
 	}
 	return string(buf) + " ..."
 }
