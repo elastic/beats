@@ -20,4 +20,4 @@ description: |
 
 component: osquerybeat
 
-# pr: https://github.com/elastic/beats/pull/xxxx
+pr: https://github.com/elastic/beats/pull/52705
