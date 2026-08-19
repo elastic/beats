@@ -19,7 +19,7 @@ summary: Restore osquery-extension compatibility with Linux systems on glibc bef
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  Building SQLite with SQLITE_DISABLE_LFS on 64-bit Linux avoids a dependeny
+  Building SQLite with SQLITE_DISABLE_LFS on 64-bit Linux avoids a dependency
   on glibc 2.28. Functionality is unchanged but compatibility is restored for
   glibc 2.27 systems, such as Ubuntu 18.04.
 
