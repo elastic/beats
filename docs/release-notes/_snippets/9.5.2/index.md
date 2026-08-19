@@ -7,7 +7,7 @@
 
 **Filebeat**
 
-* Update github.com/apache/thrift to v0.24.0. [#52330](https://github.com/elastic/beats/pull/52330) 
+* Update `github.com/apache/thrift` to v0.24.0. [#52330](https://github.com/elastic/beats/pull/52330) 
 
 
 ### Fixes [beats-9.5.2-fixes]
@@ -15,11 +15,11 @@
 
 **All**
 
-* Add support for index in inputs for beatreceivers. [#52662](https://github.com/elastic/beats/pull/52662) 
+* Add support for index in inputs for Beat receivers. [#52662](https://github.com/elastic/beats/pull/52662) 
 
 **Filebeat**
 
-* Add user-agent to httpjson pagination requests. [#52484](https://github.com/elastic/beats/pull/52484) 
+* Add User-Agent to `httpjson` pagination requests. [#52484](https://github.com/elastic/beats/pull/52484) 
 
 **Metricbeat**
 
