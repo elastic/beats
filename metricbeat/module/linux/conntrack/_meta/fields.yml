@@ -1,6 +1,6 @@
 - name: conntrack
   type: group
-  release: beta
+  release: ga
   description: >
     conntrack
   fields:
