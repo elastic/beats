@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"math"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

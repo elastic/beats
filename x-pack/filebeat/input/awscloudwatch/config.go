@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v9/filebeat/harvester"
+	awscommon "github.com/elastic/beats/v9/x-pack/libbeat/common/aws"
 )
 
 const (

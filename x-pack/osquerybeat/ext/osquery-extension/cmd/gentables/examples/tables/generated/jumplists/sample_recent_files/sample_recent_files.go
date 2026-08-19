@@ -16,10 +16,10 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/cmd/gentables/examples/tables/generated/jumplists"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/cmd/gentables/examples/tables/generated/jumplists"
 )
 
 var (

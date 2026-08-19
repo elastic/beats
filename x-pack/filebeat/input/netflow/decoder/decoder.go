@@ -16,9 +16,9 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/protocol"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/netflow/decoder/record"
 )
 
 // Decoder is a NetFlow decoder that accepts network packets from an Exporter

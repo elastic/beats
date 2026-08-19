@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/capabilities"
+	"github.com/elastic/beats/v9/libbeat/common/capabilities"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

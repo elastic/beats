@@ -20,7 +20,7 @@ package filestream
 import (
 	"slices"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	loginp "github.com/elastic/beats/v9/filebeat/input/filestream/internal/input-logfile"
 )
 
 // shortFingerprintSet manages a set of entries whose fingerprint is still in the growing phase.

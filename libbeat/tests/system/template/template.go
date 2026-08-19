@@ -21,9 +21,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
-	"github.com/elastic/beats/v7/libbeat/template"
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v9/libbeat/asset"
+	"github.com/elastic/beats/v9/libbeat/template"
+	"github.com/elastic/beats/v9/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )

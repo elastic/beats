@@ -13,7 +13,7 @@ import (
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // ConnectionDetails contains all possible data that can be used to create a connection with

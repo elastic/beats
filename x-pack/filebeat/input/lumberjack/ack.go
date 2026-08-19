@@ -7,8 +7,8 @@ package lumberjack
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/acker"
 )
 
 // batchACKTracker invokes batchACK when all events associated to the batch

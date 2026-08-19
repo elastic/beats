@@ -25,15 +25,15 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
+	"github.com/elastic/beats/v9/dev-tools/mage/target/build"
 
 	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/common"
 	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/integtest/docker"
 	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/elastic/beats/v9/dev-tools/mage/target/test"
 )
 
 // Build builds the Beat binary.

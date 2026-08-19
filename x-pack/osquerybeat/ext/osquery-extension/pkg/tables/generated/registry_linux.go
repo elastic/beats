@@ -10,20 +10,20 @@
 package generated
 
 import (
-	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
-	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostgroups"
-	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostprocesses"
-	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostusers"
+	_ "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
+	_ "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hostgroups"
+	_ "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hostprocesses"
+	_ "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hostusers"
 
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
-	elastichostgroups "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_groups"
-	elastichostprocesses "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_processes"
-	elastichostusers "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_users"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
+	elastichostgroups "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_groups"
+	elastichostprocesses "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_processes"
+	elastichostusers "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_users"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.

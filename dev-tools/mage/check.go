@@ -36,9 +36,9 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
-	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/processors/dissect"
+	"github.com/elastic/beats/v9/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v9/libbeat/dashboards"
+	"github.com/elastic/beats/v9/libbeat/processors/dissect"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

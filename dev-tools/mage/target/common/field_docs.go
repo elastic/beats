@@ -18,7 +18,7 @@
 package common
 
 import (
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
 )
 
 // FieldDocs generates exported-fields documentation from fields.yml.

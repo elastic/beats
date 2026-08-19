@@ -18,8 +18,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/lumberjack"
 )

@@ -14,8 +14,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/kvstore"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

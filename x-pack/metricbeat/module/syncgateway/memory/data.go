@@ -5,8 +5,8 @@
 package memory
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/syncgateway"
 )
 
 func eventMapping(r mb.ReporterV2, content *syncgateway.SgResponse) {

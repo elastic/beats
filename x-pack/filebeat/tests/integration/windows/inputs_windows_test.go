@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	fbint "github.com/elastic/beats/v7/filebeat/testing/integration"
-	lbint "github.com/elastic/beats/v7/libbeat/testing/integration"
+	fbint "github.com/elastic/beats/v9/filebeat/testing/integration"
+	lbint "github.com/elastic/beats/v9/libbeat/testing/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

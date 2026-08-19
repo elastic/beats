@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
 )
 
 // TestEventAccumulator defined a list of events for testing

@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/o365audit/auth"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )

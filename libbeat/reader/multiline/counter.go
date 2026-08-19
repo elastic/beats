@@ -21,7 +21,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v9/libbeat/reader"
 )
 
 type counterReader struct {

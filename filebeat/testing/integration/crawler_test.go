@@ -31,7 +31,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	libbeatintegration "github.com/elastic/beats/v7/libbeat/testing/integration"
+	libbeatintegration "github.com/elastic/beats/v9/libbeat/testing/integration"
 )
 
 var crawlerReportOptions = libbeatintegration.ReportOptions{

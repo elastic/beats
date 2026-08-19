@@ -13,7 +13,7 @@ import (
 	"go.opentelemetry.io/collector/processor"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
-	"github.com/elastic/beats/v7/internal/otel/sharedcomponent"
+	"github.com/elastic/beats/v9/internal/otel/sharedcomponent"
 )
 
 const (

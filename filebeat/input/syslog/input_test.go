@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v9/filebeat/input/inputtest"
+	"github.com/elastic/beats/v9/filebeat/inputsource"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

@@ -7,12 +7,12 @@ package firestore
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
+	_ "github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp"
+	_ "github.com/elastic/beats/v9/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func init() {

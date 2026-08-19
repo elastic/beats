@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
 )
 
 func TestWinlogbeatPackageArgs(t *testing.T) {

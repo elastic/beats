@@ -11,16 +11,16 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/x-pack/filebeat/include"
-	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	fbcmd "github.com/elastic/beats/v9/filebeat/cmd"
+	cmd "github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/x-pack/filebeat/include"
+	inputs "github.com/elastic/beats/v9/x-pack/filebeat/input/default-inputs"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management"
 
 	// Register the includes.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
 )
 
 // Name is the name of the beat

@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 

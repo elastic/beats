@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/template"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

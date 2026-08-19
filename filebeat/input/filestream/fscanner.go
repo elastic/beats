@@ -33,10 +33,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	commonfile "github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v9/filebeat/input/file"
+	loginp "github.com/elastic/beats/v9/filebeat/input/filestream/internal/input-logfile"
+	commonfile "github.com/elastic/beats/v9/libbeat/common/file"
+	"github.com/elastic/beats/v9/libbeat/common/match"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

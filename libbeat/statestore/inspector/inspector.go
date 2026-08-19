@@ -25,7 +25,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 )
 
 // Handler serves a web-interface for inspecting and manipulating a state

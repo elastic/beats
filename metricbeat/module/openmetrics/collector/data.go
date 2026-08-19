@@ -26,9 +26,9 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/helper/labelhash"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // OpenMetricEvent stores a set of one or more metrics with the same labels

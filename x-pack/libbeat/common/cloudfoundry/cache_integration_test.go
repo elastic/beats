@@ -15,7 +15,7 @@ import (
 
 	"github.com/cloudfoundry-community/go-cfclient"
 
-	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
+	cftest "github.com/elastic/beats/v9/x-pack/libbeat/common/cloudfoundry/test"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

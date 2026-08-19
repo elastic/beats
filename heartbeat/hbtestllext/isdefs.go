@@ -27,8 +27,8 @@ import (
 	"github.com/elastic/go-lookslike/llpath"
 	"github.com/elastic/go-lookslike/llresult"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v9/heartbeat/ecserr"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers/monitorstate"
 )
 
 // IsTime checks that the value is a time.Time instance.

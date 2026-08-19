@@ -20,8 +20,8 @@ package input
 import (
 	"time"
 
-	cfg "github.com/elastic/beats/v7/filebeat/config"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	cfg "github.com/elastic/beats/v9/filebeat/config"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

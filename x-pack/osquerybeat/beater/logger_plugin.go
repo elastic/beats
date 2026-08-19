@@ -10,7 +10,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/logger"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/osqlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

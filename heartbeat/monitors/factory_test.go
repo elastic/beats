@@ -28,12 +28,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/beats/v7/libbeat/processors/util"
+	hbconfig "github.com/elastic/beats/v9/heartbeat/config"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat/events"
+	"github.com/elastic/beats/v9/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v9/libbeat/processors/add_data_stream"
+	"github.com/elastic/beats/v9/libbeat/processors/util"
 )
 
 func testBeatInfo(t *testing.T) beat.Info {

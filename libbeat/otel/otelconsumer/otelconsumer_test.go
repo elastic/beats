@@ -42,14 +42,14 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
-	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
-	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/libbeat/otel/otelctx"
+	"github.com/elastic/beats/v9/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v9/libbeat/outputs"
+	_ "github.com/elastic/beats/v9/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
+	"github.com/elastic/beats/v9/libbeat/outputs/outest"
+	"github.com/elastic/beats/v9/libbeat/publisher"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"

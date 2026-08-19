@@ -14,17 +14,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beatmonitoring"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
+	"github.com/elastic/beats/v9/libbeat/management"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/osqd"
 )
 
 // Mock osqueryd implementation for testing

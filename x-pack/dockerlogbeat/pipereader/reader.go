@@ -13,7 +13,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
+	"github.com/elastic/beats/v9/x-pack/dockerlogbeat/logdriver"
 )
 
 // PipeReader reads from the FIFO pipe we get from the docker container

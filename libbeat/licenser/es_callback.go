@@ -20,7 +20,7 @@ package licenser
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v9/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

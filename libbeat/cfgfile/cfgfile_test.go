@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v9/libbeat/management"
 )
 
 type TestConfig struct {

@@ -8,7 +8,7 @@ import (
 	"os"
 	_ "time/tzdata" // for timezone handling
 
-	"github.com/elastic/beats/v7/x-pack/heartbeat/cmd"
+	"github.com/elastic/beats/v9/x-pack/heartbeat/cmd"
 )
 
 func main() {

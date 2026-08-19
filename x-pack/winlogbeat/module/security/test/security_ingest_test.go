@@ -13,7 +13,7 @@ package test
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/winlogbeat/module"
+	"github.com/elastic/beats/v9/x-pack/winlogbeat/module"
 )
 
 // Ignore these fields because they can be different on different versions

@@ -11,7 +11,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 func discoverUsers(log *logger.Logger) []string {

@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v9/heartbeat/reason"
 )
 
 // RTT formats a round-trip-time given as time.Duration into an

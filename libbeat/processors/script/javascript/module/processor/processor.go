@@ -23,9 +23,9 @@ import (
 
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
-	"github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/v9/libbeat/processors/script/javascript/module/processor/registry"
 )
 
 // beatProcessor wraps a processor for javascript.

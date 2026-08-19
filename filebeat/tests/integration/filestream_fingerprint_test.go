@@ -35,8 +35,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/filebeat/testing/gziptest"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 )
 
 const (

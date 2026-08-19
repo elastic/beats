@@ -13,11 +13,11 @@ import (
 	"github.com/googleapis/gax-go/v2"
 	"golang.org/x/sync/errgroup"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v9/filebeat/input/v2/input-cursor"
+	stateless "github.com/elastic/beats/v9/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 

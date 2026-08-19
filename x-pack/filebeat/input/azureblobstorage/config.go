@@ -11,9 +11,9 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
+	"github.com/elastic/beats/v9/libbeat/common/match"
+	"github.com/elastic/beats/v9/libbeat/reader/parser"
+	"github.com/elastic/beats/v9/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

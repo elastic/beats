@@ -22,8 +22,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/idxmgmt"
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v9/libbeat/idxmgmt"
+	"github.com/elastic/beats/v9/libbeat/version"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 

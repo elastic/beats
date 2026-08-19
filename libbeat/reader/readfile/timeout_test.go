@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v9/libbeat/reader"
 )
 
 func msg(s string) reader.Message {

@@ -9,9 +9,9 @@ package mixer
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio"
+	_ "github.com/elastic/beats/v9/x-pack/metricbeat/module/istio"
 )
 
 func TestData(t *testing.T) {

@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	reason2 "github.com/elastic/beats/v7/heartbeat/reason"
+	reason2 "github.com/elastic/beats/v9/heartbeat/reason"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

@@ -20,7 +20,7 @@ package memqueue
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
 )
 
 // runLoop internal state. These fields could mostly be local variables

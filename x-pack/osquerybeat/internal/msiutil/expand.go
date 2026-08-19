@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/command"
 )
 
 // Expand runs msiextract to extract the MSI.

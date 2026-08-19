@@ -272,7 +272,7 @@ func VerifyNoLeaks(t *testing.T) {
 		// heartbeat's ICMP monitor lazily starts a process-wide singleton receive
 		// loop on first use and never stops it, since a real heartbeat process
 		// runs the loop forever. See heartbeat/monitors/active/icmp/stdloop.go.
-		goleak.IgnoreAnyFunction("github.com/elastic/beats/v7/heartbeat/monitors/active/icmp.(*stdICMPLoop).runICMPRecv"),
+		goleak.IgnoreAnyFunction("github.com/elastic/beats/v9/heartbeat/monitors/active/icmp.(*stdICMPLoop).runICMPRecv"),
 		// HTTP persistent-connection goroutines exit naturally after the TCP close
 		// handshake completes, but may still be observed by goleak immediately after
 		// a response body is closed. Seen in tests that call monitoring endpoints

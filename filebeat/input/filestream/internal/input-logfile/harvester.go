@@ -18,7 +18,7 @@
 package input_logfile
 
 import (
-	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	inputv2 "github.com/elastic/beats/v9/filebeat/input/v2"
 )
 
 // Harvester collects the lines from a configured source. It is operated by the

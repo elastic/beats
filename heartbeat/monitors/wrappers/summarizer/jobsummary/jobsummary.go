@@ -20,7 +20,7 @@ package jobsummary
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers/monitorstate"
 )
 
 // JobSummary is the struct that is serialized in the `summary` field in the emitted event.

@@ -18,10 +18,10 @@
 package inputs
 
 import (
-	"github.com/elastic/beats/v7/filebeat/input/journald"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v9/filebeat/input/journald"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 )
 
 // inputs that are only supported on linux

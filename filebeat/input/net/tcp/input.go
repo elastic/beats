@@ -25,14 +25,14 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	netinput "github.com/elastic/beats/v7/filebeat/input/net"
-	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
-	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	netinput "github.com/elastic/beats/v9/filebeat/input/net"
+	"github.com/elastic/beats/v9/filebeat/input/netmetrics"
+	input "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/filebeat/inputsource"
+	"github.com/elastic/beats/v9/filebeat/inputsource/common/streaming"
+	"github.com/elastic/beats/v9/filebeat/inputsource/tcp"
+	"github.com/elastic/beats/v9/libbeat/feature"
+	"github.com/elastic/beats/v9/libbeat/management/status"
 	"github.com/elastic/go-concert/ctxtool"
 
 	conf "github.com/elastic/elastic-agent-libs/config"

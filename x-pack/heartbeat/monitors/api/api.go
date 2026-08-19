@@ -15,11 +15,11 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/heartbeat/security"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
+	"github.com/elastic/beats/v9/heartbeat/ecserr"
+	"github.com/elastic/beats/v9/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v9/heartbeat/security"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/x-pack/heartbeat/monitors/browser"
 )
 
 func init() {

@@ -7,8 +7,8 @@ package http_endpoint
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/acker"
 )
 
 // newEventACKHandler returns a beat ACKer that can receive callbacks when

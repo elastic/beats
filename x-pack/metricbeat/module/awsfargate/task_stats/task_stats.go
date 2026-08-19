@@ -15,10 +15,10 @@ import (
 
 	dcontainer "github.com/moby/moby/api/types/container"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/docker/cpu"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/awsfargate"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

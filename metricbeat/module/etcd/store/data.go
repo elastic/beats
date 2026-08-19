@@ -20,8 +20,8 @@ package store
 import (
 	"encoding/json"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstriface"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

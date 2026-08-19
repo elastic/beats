@@ -35,14 +35,14 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	k8sresource "k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
-	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v9/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v9/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	kubernetes2 "github.com/elastic/beats/v9/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // Resource metadata keys are composed of multiple parts - usually just the namespace and name. This string is the

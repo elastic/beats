@@ -5,7 +5,7 @@ platforms:
   - windows
 group: jumplists
 
-implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists
+implementation_package: github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists
 
 shared_types:
   - ApplicationID

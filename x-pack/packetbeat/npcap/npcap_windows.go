@@ -15,7 +15,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/elastic/beats/v7/packetbeat/npcap"
+	"github.com/elastic/beats/v9/packetbeat/npcap"
 )
 
 //go:embed installer/*.exe

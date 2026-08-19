@@ -9,7 +9,7 @@ package etw
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/reader/etw"
+	"github.com/elastic/beats/v9/libbeat/reader/etw"
 )
 
 var validTraceLevel = map[string]bool{

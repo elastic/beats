@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"

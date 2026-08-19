@@ -22,7 +22,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v9/winlogbeat/sys"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

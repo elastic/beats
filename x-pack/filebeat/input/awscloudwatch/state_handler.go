@@ -10,7 +10,7 @@ import (
 
 	"github.com/zyedidia/generic/heap"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

@@ -25,9 +25,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors/add_process_metadata"
+	"github.com/elastic/beats/v9/auditbeat/module/file_integrity/kprobes"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/processors/add_process_metadata"
 
 	"golang.org/x/sys/unix"
 

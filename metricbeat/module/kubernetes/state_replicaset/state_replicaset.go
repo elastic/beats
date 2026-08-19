@@ -18,10 +18,10 @@
 package state_replicaset
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/helper/kubernetes"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/v9/metricbeat/helper/kubernetes"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/kubernetes/util"
 )
 
 // mapping stores the state metrics we want to fetch and will be used by this metricset

@@ -29,8 +29,8 @@ import (
 	"text/template"
 	"text/template/parse"
 
-	"github.com/elastic/beats/v7/winlogbeat/sys"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/beats/v9/winlogbeat/sys"
+	"github.com/elastic/beats/v9/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

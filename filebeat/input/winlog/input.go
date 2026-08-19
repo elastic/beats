@@ -20,16 +20,16 @@ package winlog
 import (
 	"fmt"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	input "github.com/elastic/beats/v9/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v9/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v9/libbeat/feature"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/elastic/beats/v9/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v9/winlogbeat/eventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

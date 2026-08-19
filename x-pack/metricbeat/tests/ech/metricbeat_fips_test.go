@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/testing/go-ech"
+	"github.com/elastic/beats/v9/testing/go-ech"
 )
 
 const metricbeatFIPSConfig = `

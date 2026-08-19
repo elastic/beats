@@ -23,8 +23,8 @@ import (
 
 	"golang.org/x/time/rate"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	filebeat "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
+	filebeat "github.com/elastic/beats/v9/x-pack/filebeat/cmd"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/monitoring"

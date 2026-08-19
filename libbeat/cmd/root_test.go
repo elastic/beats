@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v9/libbeat/cmd/instance"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 

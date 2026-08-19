@@ -26,9 +26,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v9/libbeat/autodiscover/template"
+	dk "github.com/elastic/beats/v9/libbeat/tests/docker"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"

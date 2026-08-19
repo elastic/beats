@@ -7,7 +7,7 @@
 package iptables
 
 import (
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v9/libbeat/asset"
 )
 
 func init() {

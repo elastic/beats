@@ -25,12 +25,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/cleanup"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v9/libbeat/common/cleanup"
+	"github.com/elastic/beats/v9/libbeat/common/file"
+	"github.com/elastic/beats/v9/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v9/libbeat/statestore"
 
-	inpFile "github.com/elastic/beats/v7/filebeat/input/file"
+	inpFile "github.com/elastic/beats/v9/filebeat/input/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"

@@ -12,12 +12,12 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/metricset"
 )
 
 var (

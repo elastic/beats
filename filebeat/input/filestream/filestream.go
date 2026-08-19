@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/go-concert/ctxtool"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	input "github.com/elastic/beats/v9/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

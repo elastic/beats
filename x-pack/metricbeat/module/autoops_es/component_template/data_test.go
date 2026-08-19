@@ -10,12 +10,12 @@ package component_template
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/utils"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/autoops_es/metricset"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

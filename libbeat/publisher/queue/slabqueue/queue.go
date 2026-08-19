@@ -23,7 +23,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
 )
 
 // DefaultGetDebounce is the coalescing window a newly connected queue starts

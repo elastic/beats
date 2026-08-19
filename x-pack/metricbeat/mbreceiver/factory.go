@@ -12,19 +12,19 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/metricbeat/beater"
-	"github.com/elastic/beats/v7/metricbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/publisher/processing"
+	"github.com/elastic/beats/v9/metricbeat/beater"
+	"github.com/elastic/beats/v9/metricbeat/cmd"
 
 	// Import OSS modules.
-	"github.com/elastic/beats/v7/metricbeat/include"
-	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
+	"github.com/elastic/beats/v9/metricbeat/include"
+	_ "github.com/elastic/beats/v9/metricbeat/include/fields"
 
 	// Import X-Pack modules.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/metricbeat/include"
 
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 )
 
 const (

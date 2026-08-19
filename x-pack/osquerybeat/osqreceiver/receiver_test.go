@@ -20,7 +20,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltest"
 )
 
 // NOTE: TestNewReceiver, TestMultipleReceivers, and the "running input"

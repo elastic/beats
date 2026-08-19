@@ -21,7 +21,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
 )
 
 var logResponses = flag.Bool("log_response", false, "use to log users/devices returned from the API")

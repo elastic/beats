@@ -37,7 +37,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v9/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 

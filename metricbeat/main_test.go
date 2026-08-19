@@ -24,9 +24,9 @@ import (
 	"os"
 	"testing"
 
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/tests/system/template"
-	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
+	cmd "github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/tests/system/template"
+	mbcmd "github.com/elastic/beats/v9/metricbeat/cmd"
 )
 
 var (

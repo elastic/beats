@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/processors/util"
+	"github.com/elastic/beats/v9/libbeat/autodiscover"
+	"github.com/elastic/beats/v9/libbeat/processors/util"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

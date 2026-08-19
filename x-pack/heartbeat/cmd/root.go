@@ -9,19 +9,19 @@ import (
 
 	"github.com/spf13/cobra"
 
-	heartbeatCmd "github.com/elastic/beats/v7/heartbeat/cmd"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
+	heartbeatCmd "github.com/elastic/beats/v9/heartbeat/cmd"
+	"github.com/elastic/beats/v9/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	ucfg "github.com/elastic/go-ucfg"
 
-	_ "github.com/elastic/beats/v7/heartbeat/include"
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	_ "github.com/elastic/beats/v9/heartbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management"
 )
 
 // RootCmd to handle beats cli

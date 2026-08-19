@@ -22,10 +22,10 @@ package controllermanager
 import (
 	"testing"
 
-	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	k "github.com/elastic/beats/v9/metricbeat/helper/kubernetes/ktest"
+	"github.com/elastic/beats/v9/metricbeat/helper/prometheus/ptest"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v9/metricbeat/module/kubernetes"
 )
 
 func TestEventMapping(t *testing.T) {

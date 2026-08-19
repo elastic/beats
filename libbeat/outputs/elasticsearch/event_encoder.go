@@ -22,13 +22,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat/events"
+	"github.com/elastic/beats/v9/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v9/libbeat/outputs"
+	"github.com/elastic/beats/v9/libbeat/outputs/outil"
+	"github.com/elastic/beats/v9/libbeat/publisher"
+	"github.com/elastic/beats/v9/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

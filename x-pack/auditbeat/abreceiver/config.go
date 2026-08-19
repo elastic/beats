@@ -7,7 +7,7 @@ package abreceiver
 import (
 	"fmt"
 
-	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	xpInstance "github.com/elastic/beats/v9/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/confmap"
 )

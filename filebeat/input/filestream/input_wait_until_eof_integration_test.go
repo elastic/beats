@@ -31,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	testingintegration "github.com/elastic/beats/v7/filebeat/testing/integration"
+	testingintegration "github.com/elastic/beats/v9/filebeat/testing/integration"
 )
 
 func TestWaitUntilEOF(t *testing.T) {

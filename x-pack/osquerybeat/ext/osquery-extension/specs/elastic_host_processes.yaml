@@ -4,7 +4,7 @@ description: Host system running processes from /proc (e.g. when running in a co
 platforms:
   - linux
 
-implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostprocesses
+implementation_package: github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hostprocesses
 
 columns:
   - name: pid

@@ -13,9 +13,9 @@ import (
 	"github.com/prometheus/procfs"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/auditbeat/helper/tty"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
+	"github.com/elastic/beats/v9/auditbeat/helper/tty"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/processors/sessionmd/timeutils"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

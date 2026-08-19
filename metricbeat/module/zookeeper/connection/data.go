@@ -24,7 +24,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

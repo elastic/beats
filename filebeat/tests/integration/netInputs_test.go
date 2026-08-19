@@ -29,8 +29,8 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v9/filebeat/input/net/nettest"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 )
 
 func TestNetInputs(t *testing.T) {

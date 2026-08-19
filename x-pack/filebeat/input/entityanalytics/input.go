@@ -7,20 +7,20 @@ package entityanalytics
 import (
 	"fmt"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
+	v2 "github.com/elastic/beats/v9/filebeat/input/v2"
+	"github.com/elastic/beats/v9/libbeat/feature"
+	"github.com/elastic/beats/v9/libbeat/statestore"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// For provider registration.
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta"
+	_ "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/activedirectory"
+	_ "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/azuread"
+	_ "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/jamf"
+	_ "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/okta"
 )
 
 // Name of this input.

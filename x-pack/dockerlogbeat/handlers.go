@@ -12,7 +12,7 @@ import (
 
 	"github.com/moby/moby/v2/daemon/logger"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
+	"github.com/elastic/beats/v9/x-pack/dockerlogbeat/pipelinemanager"
 
 	"github.com/moby/moby/v2/pkg/ioutils"
 )

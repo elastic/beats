@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

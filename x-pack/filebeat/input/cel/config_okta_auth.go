@@ -26,7 +26,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/dpop"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/internal/dpop"
 )
 
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.

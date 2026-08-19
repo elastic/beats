@@ -26,7 +26,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
+	"github.com/elastic/beats/v9/libbeat/beatmonitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 

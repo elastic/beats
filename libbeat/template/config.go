@@ -18,8 +18,8 @@
 package template
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/mapping"
 )
 
 // TemplateConfig holds config information about the Elasticsearch template

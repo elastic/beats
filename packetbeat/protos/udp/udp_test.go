@@ -24,15 +24,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/packetbeat/protos"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	// import plugins for testing
-	_ "github.com/elastic/beats/v7/packetbeat/protos/http"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/mysql"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/redis"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/http"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/mysql"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/redis"
 
 	"github.com/stretchr/testify/assert"
 )

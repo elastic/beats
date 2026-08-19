@@ -20,7 +20,7 @@
 package decode_xml_wineventlog
 
 import (
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/beats/v9/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

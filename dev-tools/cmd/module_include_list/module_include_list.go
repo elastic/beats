@@ -29,8 +29,8 @@ import (
 	"strings"
 	"text/template"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/licenses"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
+	"github.com/elastic/beats/v9/licenses"
 )
 
 var usageText = `

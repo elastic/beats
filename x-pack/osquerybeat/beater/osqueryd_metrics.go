@@ -13,8 +13,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/osqdcli"
 )
 
 const (

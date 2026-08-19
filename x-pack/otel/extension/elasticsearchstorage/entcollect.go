@@ -9,8 +9,8 @@ import (
 
 	"github.com/elastic/entcollect"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend/es"
 )
 
 var _ entcollect.Registry = (*elasticStorage)(nil)

@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management/tests"
 )
 
 func TestLogStatusReporter(t *testing.T) {

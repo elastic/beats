@@ -1,5 +1,5 @@
 dist:
-  module: github.com/elastic/beats/v7/x-pack/otel/distributions/beats-otel-collector
+  module: github.com/elastic/beats/v9/x-pack/otel/distributions/beats-otel-collector
   name: beats-otel-collector
   description: OpenTelemetry Collector distribution with Beats components
   version: 0.0.1
@@ -13,12 +13,12 @@ extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.157.0
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/otel/extension/kafkapartitionerextension
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/otel/extension/beatsauthextension
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/otel/extension/elasticsearchstorage
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/otel/extension/kafkapartitionerextension
 
 connectors:
 
@@ -33,18 +33,18 @@ receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/httpcheckreceiver v0.157.0
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/heartbeat/hbreceiver
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/packetbeat/pbreceiver
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/auditbeat/abreceiver
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/filebeat/fbreceiver
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/heartbeat/hbreceiver
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/metricbeat/mbreceiver
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/osquerybeat/osqreceiver
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/packetbeat/pbreceiver
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.157.0
@@ -56,8 +56,8 @@ processors:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.157.0
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/otel/processor/beatprocessor
 
 exporters:
   - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.157.0
@@ -67,8 +67,8 @@ exporters:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.157.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.157.0
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter
+  - gomod: github.com/elastic/beats/v9 v7.0.0-alpha
+    import: github.com/elastic/beats/v9/x-pack/otel/exporter/logstashexporter
 
 providers:
   - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.63.0
@@ -87,4 +87,4 @@ replaces:
   - github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
   - github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
   # Replaces for beats otel components
-  - github.com/elastic/beats/v7 => ../../../../../
+  - github.com/elastic/beats/v9 => ../../../../../

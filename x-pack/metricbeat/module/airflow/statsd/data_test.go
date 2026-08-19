@@ -15,11 +15,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/auditbeat/core"
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
+	"github.com/elastic/beats/v9/auditbeat/core"
+	_ "github.com/elastic/beats/v9/libbeat/processors/actions"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v9/metricbeat/mb/testing"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/statsd/server"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

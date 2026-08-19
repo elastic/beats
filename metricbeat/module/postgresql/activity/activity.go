@@ -23,8 +23,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/postgresql"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

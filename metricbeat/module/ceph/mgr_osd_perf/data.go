@@ -20,7 +20,7 @@ package mgr_osd_perf
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/beats/v9/metricbeat/module/ceph/mgr"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

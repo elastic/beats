@@ -33,8 +33,8 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
-	testingintegration "github.com/elastic/beats/v7/filebeat/testing/integration"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	testingintegration "github.com/elastic/beats/v9/filebeat/testing/integration"
+	"github.com/elastic/beats/v9/libbeat/tests/integration"
 )
 
 // TestFilestreamReadUntilEOFOnInputStop exercises the read_until_eof feature

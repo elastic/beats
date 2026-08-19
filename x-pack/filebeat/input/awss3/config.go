@@ -17,13 +17,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
+	"github.com/elastic/beats/v9/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v9/libbeat/common/match"
+	"github.com/elastic/beats/v9/libbeat/reader/parser"
+	"github.com/elastic/beats/v9/libbeat/reader/readfile"
+	"github.com/elastic/beats/v9/libbeat/reader/readfile/encoding"
+	awscommon "github.com/elastic/beats/v9/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v9/x-pack/libbeat/reader/decoder"
 )
 
 type config struct {

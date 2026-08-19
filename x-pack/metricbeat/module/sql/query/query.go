@@ -13,10 +13,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/sql"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	sqlmod "github.com/elastic/beats/v7/x-pack/metricbeat/module/sql"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
+	"github.com/elastic/beats/v9/metricbeat/helper/sql"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	sqlmod "github.com/elastic/beats/v9/x-pack/metricbeat/module/sql"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/sql/query/cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

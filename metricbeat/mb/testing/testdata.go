@@ -33,13 +33,13 @@ import (
 	"github.com/gohugoio/hashstructure"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
-	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
+	"github.com/elastic/beats/v9/libbeat/asset"
+	"github.com/elastic/beats/v9/libbeat/mapping"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb/testing/flags"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
+	_ "github.com/elastic/beats/v9/metricbeat/include/fields"
 )
 
 const (

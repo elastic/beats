@@ -14,7 +14,7 @@ import (
 
 	flatbuffers "github.com/google/flatbuffers/go"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package/schema"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/module/system/package/schema"
 )
 
 // Requires the Google flatbuffer compiler and Elastic go-licenser.

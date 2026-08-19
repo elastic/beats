@@ -10,9 +10,9 @@
 package generated
 
 import (
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	elasticamcacheapplicationsview "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/amcache/elastic_amcache_applications_view"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/hooks"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticamcacheapplicationsview "github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/amcache/elastic_amcache_applications_view"
 )
 
 // RegisterViews registers all generated views with the hook manager.

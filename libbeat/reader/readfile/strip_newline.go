@@ -21,7 +21,7 @@ import (
 	"bytes"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v9/libbeat/reader"
 )
 
 // StripNewline reader removes the last trailing newline characters from

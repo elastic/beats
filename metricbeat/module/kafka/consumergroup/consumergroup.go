@@ -20,8 +20,8 @@ package consumergroup
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/module/kafka"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

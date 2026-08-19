@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/beats/v9/metricbeat/module/kafka"
 	"github.com/elastic/sarama"
 )
 

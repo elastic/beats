@@ -22,7 +22,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/v7/testing/testflag"
+	"github.com/elastic/beats/v9/testing/testflag"
 )
 
 func TestMain(m *testing.M) {

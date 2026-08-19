@@ -13,8 +13,8 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
+	xcollector "github.com/elastic/beats/v9/x-pack/metricbeat/module/prometheus/collector"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

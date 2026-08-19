@@ -9,10 +9,10 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pkgutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/zip"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/msiutil"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/pkgutil"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/tar"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/zip"
 )
 
 type Format string

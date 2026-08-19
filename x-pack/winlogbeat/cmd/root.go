@@ -5,15 +5,15 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	winlogbeatCmd "github.com/elastic/beats/v7/winlogbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/cmd"
+	winlogbeatCmd "github.com/elastic/beats/v9/winlogbeat/cmd"
 
 	// Register fields.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/winlogbeat/include"
 
 	// Enable pipelines.
-	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/module"
+	_ "github.com/elastic/beats/v9/x-pack/winlogbeat/module"
 )
 
 // Name of this beat.

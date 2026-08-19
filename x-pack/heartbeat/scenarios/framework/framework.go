@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v9/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v9/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers/monitorstate"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
@@ -24,11 +24,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
-	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	beatversion "github.com/elastic/beats/v7/libbeat/version"
+	hbconfig "github.com/elastic/beats/v9/heartbeat/config"
+	"github.com/elastic/beats/v9/heartbeat/monitors"
+	"github.com/elastic/beats/v9/heartbeat/scheduler"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	beatversion "github.com/elastic/beats/v9/libbeat/version"
 )
 
 type (

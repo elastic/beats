@@ -20,7 +20,7 @@ package channel
 import (
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat"
 )
 
 type outlet struct {

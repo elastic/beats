@@ -28,10 +28,10 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
+	"github.com/elastic/beats/v9/filebeat/input/journald/pkg/journalctl"
+	"github.com/elastic/beats/v9/filebeat/input/journald/pkg/journalfield"
 
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/beats/v9/libbeat/reader/parser"
 )
 
 // includeMatchesWarnOnce allow for a config deprecation warning to be

@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/ebpf/sys"
+	"github.com/elastic/beats/v9/libbeat/ebpf/sys"
 	"github.com/elastic/ebpfevents"
 )
 

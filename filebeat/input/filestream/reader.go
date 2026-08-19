@@ -21,7 +21,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v9/libbeat/reader"
 )
 
 // EOFLookaheadReader wraps a reader to provide a one-message lookahead buffer.

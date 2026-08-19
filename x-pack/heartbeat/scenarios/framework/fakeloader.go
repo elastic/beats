@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v9/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v9/heartbeat/monitors/wrappers/monitorstate"
 )
 
 // Simulated state loader, close enough to test logic related to loading state from ES

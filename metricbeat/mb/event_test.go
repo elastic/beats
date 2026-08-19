@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v9/libbeat/beat/events"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

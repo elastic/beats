@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/kvstore"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
 )
 
 var (

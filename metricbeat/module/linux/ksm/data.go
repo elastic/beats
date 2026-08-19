@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/metricbeat/module/linux"
+	"github.com/elastic/beats/v9/metricbeat/module/linux"
 )
 
 type ksmData struct {

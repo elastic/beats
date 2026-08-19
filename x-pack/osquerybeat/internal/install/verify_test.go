@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

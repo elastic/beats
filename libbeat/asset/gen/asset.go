@@ -27,7 +27,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v9/libbeat/asset"
 )
 
 var Template = template.Must(template.New("normalizations").Parse(`
@@ -38,7 +38,7 @@ var Template = template.Must(template.New("normalizations").Parse(`
 package {{ .Package }}
 
 import (
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v9/libbeat/asset"
 )
 
 func init() {

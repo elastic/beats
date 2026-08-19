@@ -16,7 +16,7 @@ import (
 
 	golnk "github.com/parsiya/golnk"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 // LnkSignature is the signature for a LNK file.

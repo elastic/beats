@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
+	lbmanagement "github.com/elastic/beats/v9/libbeat/management"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -26,8 +26,8 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management/tests"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/cmd"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"

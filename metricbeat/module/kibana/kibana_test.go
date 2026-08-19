@@ -25,11 +25,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/metricbeat/module/kibana"
+	"github.com/elastic/beats/v9/metricbeat/module/kibana"
 	"github.com/elastic/elastic-agent-libs/version"
 
 	// Make sure metricsets are registered in mb.Registry
-	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
+	_ "github.com/elastic/beats/v9/metricbeat/module/kibana/stats"
 )
 
 func TestIsStatsAPIAvailable(t *testing.T) {

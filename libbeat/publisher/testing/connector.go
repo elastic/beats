@@ -21,7 +21,7 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/beat"
 )
 
 // ClientCounter can be used to create a beat.PipelineConnector that count

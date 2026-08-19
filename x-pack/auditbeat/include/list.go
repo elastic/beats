@@ -8,16 +8,16 @@ package include
 
 import (
 	// Import packages to perform 'func InitializeModule()' when in-use.
-	m0 "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd"
+	m0 "github.com/elastic/beats/v9/x-pack/auditbeat/processors/sessionmd"
 
 	// Import packages that perform 'func init()'.
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/host"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/login"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/process"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/user"
+	_ "github.com/elastic/beats/v9/x-pack/auditbeat/module/system"
+	_ "github.com/elastic/beats/v9/x-pack/auditbeat/module/system/host"
+	_ "github.com/elastic/beats/v9/x-pack/auditbeat/module/system/login"
+	_ "github.com/elastic/beats/v9/x-pack/auditbeat/module/system/package"
+	_ "github.com/elastic/beats/v9/x-pack/auditbeat/module/system/process"
+	_ "github.com/elastic/beats/v9/x-pack/auditbeat/module/system/socket"
+	_ "github.com/elastic/beats/v9/x-pack/auditbeat/module/system/user"
 )
 
 // InitializeModules initialize all of the modules.

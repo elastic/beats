@@ -13,7 +13,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/azure"
 )
 
 // concurrentMapMetrics fetches concurrently metric definitions and writes them in MetricDefinitionsChan channel

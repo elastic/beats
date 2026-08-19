@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

@@ -25,8 +25,8 @@ import (
 
 	"go.opentelemetry.io/collector/extension/xextension/storage"
 
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v9/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v9/libbeat/statestore/backend"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

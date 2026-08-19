@@ -24,21 +24,21 @@ import (
 
 	"github.com/gohugoio/hashstructure"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/cfgfile"
+	"github.com/elastic/beats/v9/libbeat/management/status"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/flows"
-	"github.com/elastic/beats/v7/packetbeat/npcap"
-	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/publish"
-	"github.com/elastic/beats/v7/packetbeat/sniffer"
+	"github.com/elastic/beats/v9/packetbeat/config"
+	"github.com/elastic/beats/v9/packetbeat/flows"
+	"github.com/elastic/beats/v9/packetbeat/npcap"
+	"github.com/elastic/beats/v9/packetbeat/procs"
+	"github.com/elastic/beats/v9/packetbeat/protos"
+	"github.com/elastic/beats/v9/packetbeat/publish"
+	"github.com/elastic/beats/v9/packetbeat/sniffer"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 

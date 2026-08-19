@@ -24,10 +24,10 @@ import (
 	"os"
 	"testing"
 
-	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
-	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/tests/system/template"
+	fbcmd "github.com/elastic/beats/v9/filebeat/cmd"
+	inputs "github.com/elastic/beats/v9/filebeat/input/default-inputs"
+	cmd "github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/tests/system/template"
 )
 
 var (

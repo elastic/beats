@@ -14,10 +14,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
-	"github.com/elastic/beats/v7/x-pack/filebeat/processors/aws_vpcflow/internal/strings"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v9/libbeat/processors/script/javascript/module/processor/registry"
+	"github.com/elastic/beats/v9/x-pack/filebeat/processors/aws_vpcflow/internal/strings"
 )
 
 const (

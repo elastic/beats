@@ -24,7 +24,7 @@ import (
 	"sort"
 	"strings"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v9/dev-tools/mage"
 )
 
 // ModuleDocs collects documentation from modules (both OSS and X-Pack).

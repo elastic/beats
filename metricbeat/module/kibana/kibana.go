@@ -25,12 +25,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/helper"
+	"github.com/elastic/beats/v9/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	s "github.com/elastic/beats/v9/libbeat/common/schema"
+	c "github.com/elastic/beats/v9/libbeat/common/schema/mapstriface"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 

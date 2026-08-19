@@ -29,10 +29,10 @@ import (
 	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
-	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
-	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
+	"github.com/elastic/beats/v9/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v9/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v9/pkg/autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v9/pkg/autodiscover/utils"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"

@@ -22,7 +22,7 @@ import (
 	"crypto/x509"
 	"net"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v9/filebeat/inputsource"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 

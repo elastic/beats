@@ -23,8 +23,8 @@ import (
 	"strings"
 	"testing"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v9/metricbeat/helper/prometheus/ptest"
 )
 
 func getFiles(folder string) ([]string, error) {

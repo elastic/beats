@@ -20,7 +20,7 @@ package security
 import (
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common/seccomp"
+	"github.com/elastic/beats/v9/libbeat/common/seccomp"
 	seccomptypes "github.com/elastic/go-seccomp-bpf"
 )
 

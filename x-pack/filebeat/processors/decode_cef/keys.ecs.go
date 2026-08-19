@@ -8,7 +8,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
+	"github.com/elastic/beats/v9/x-pack/filebeat/processors/decode_cef/cef"
 )
 
 type mappedField struct {

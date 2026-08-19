@@ -31,8 +31,8 @@ import (
 
 	"k8s.io/client-go/transport"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information

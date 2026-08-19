@@ -14,18 +14,18 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	auditbeatcmd "github.com/elastic/beats/v7/auditbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/include"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	auditbeatcmd "github.com/elastic/beats/v9/auditbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/common/reload"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/x-pack/auditbeat/include"
+	"github.com/elastic/beats/v9/x-pack/libbeat/management"
 
 	// Register base auditbeat includes.
-	_ "github.com/elastic/beats/v7/auditbeat/include"
+	_ "github.com/elastic/beats/v9/auditbeat/include"
 
 	// Register libbeat x-pack modules.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v9/x-pack/libbeat/include"
 )
 
 // Name of the beat

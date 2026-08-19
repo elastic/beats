@@ -18,8 +18,8 @@
 package memory
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/beats/v9/libbeat/common"
+	"github.com/elastic/beats/v9/metricbeat/module/docker"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
 

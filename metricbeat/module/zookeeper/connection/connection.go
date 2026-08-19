@@ -20,9 +20,9 @@ package connection
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/zookeeper"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb/parse"
+	"github.com/elastic/beats/v9/metricbeat/module/zookeeper"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

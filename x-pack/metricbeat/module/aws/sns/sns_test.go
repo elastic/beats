@@ -7,12 +7,12 @@ package sns
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
+	_ "github.com/elastic/beats/v9/x-pack/metricbeat/module/aws"
+	_ "github.com/elastic/beats/v9/x-pack/metricbeat/module/aws/cloudwatch"
 )
 
 func init() {

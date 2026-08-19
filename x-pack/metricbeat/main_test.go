@@ -9,9 +9,9 @@ import (
 	"os"
 	"testing"
 
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/tests/system/template"
-	mbcmd "github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
+	cmd "github.com/elastic/beats/v9/libbeat/cmd"
+	"github.com/elastic/beats/v9/libbeat/tests/system/template"
+	mbcmd "github.com/elastic/beats/v9/x-pack/metricbeat/cmd"
 )
 
 var (

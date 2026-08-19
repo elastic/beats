@@ -7,8 +7,8 @@ package task_stats
 import (
 	dcontainer "github.com/moby/moby/api/types/container"
 
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
-	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
+	"github.com/elastic/beats/v9/metricbeat/module/docker"
+	"github.com/elastic/beats/v9/metricbeat/module/docker/cpu"
 )
 
 func getCPUStats(taskStats dcontainer.StatsResponse) cpu.CPUStats {

@@ -7,7 +7,7 @@ package module
 import (
 	"embed"
 
-	"github.com/elastic/beats/v7/winlogbeat/module"
+	"github.com/elastic/beats/v9/winlogbeat/module"
 )
 
 // pipelineFS holds the yml representation of the ingest node pipelines

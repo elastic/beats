@@ -14,8 +14,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/cpio"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/xar"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/cpio"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/xar"
 )
 
 var ErrPayloadNotFound = errors.New("pkg Payload file not found")

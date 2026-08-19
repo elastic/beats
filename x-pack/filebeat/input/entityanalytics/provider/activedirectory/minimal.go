@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/entcollect"
 	ecad "github.com/elastic/entcollect/provider/ad"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider"
 )
 
 func init() {

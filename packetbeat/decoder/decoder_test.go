@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/packetbeat/flows"
-	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v9/packetbeat/flows"
+	"github.com/elastic/beats/v9/packetbeat/protos"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/google/gopacket"

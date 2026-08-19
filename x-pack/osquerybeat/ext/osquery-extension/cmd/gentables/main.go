@@ -1344,9 +1344,9 @@ func generateStaticTablesRegistry(tableSpecs []spec, outDir string) error {
 			data.ImplImports = implPkgList
 			for _, s := range tables {
 				pkgName := toPackageName(s.Name)
-				importPath := fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s", s.Name)
+				importPath := fmt.Sprintf("github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s", s.Name)
 				if s.Group != "" {
-					importPath = fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s/%s", s.Group, s.Name)
+					importPath = fmt.Sprintf("github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/%s/%s", s.Group, s.Name)
 				}
 				data.TableImports = append(data.TableImports, importEntry{
 					Alias: pkgName,
@@ -1402,9 +1402,9 @@ func generateStaticViewsRegistry(viewSpecs []spec, outDir string) error {
 		if len(views) > 0 {
 			for _, s := range views {
 				pkgName := toPackageName(s.Name)
-				importPath := fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s", s.Name)
+				importPath := fmt.Sprintf("github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s", s.Name)
 				if s.Group != "" {
-					importPath = fmt.Sprintf("github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s/%s", s.Group, s.Name)
+					importPath = fmt.Sprintf("github.com/elastic/beats/v9/x-pack/osquerybeat/ext/osquery-extension/pkg/views/generated/%s/%s", s.Group, s.Name)
 				}
 				data.ViewImports = append(data.ViewImports, importEntry{
 					Alias: pkgName,

@@ -30,7 +30,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v9/libbeat/common/match"
 )
 
 // MaxValidFileSizeLimit is the largest possible value for `max_file_size`.

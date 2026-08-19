@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v9/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

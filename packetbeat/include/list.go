@@ -21,24 +21,24 @@ package include
 
 import (
 	// Import packages to perform 'func InitializeModule()' when in-use.
-	m0 "github.com/elastic/beats/v7/packetbeat/processor/add_kubernetes_metadata"
+	m0 "github.com/elastic/beats/v9/packetbeat/processor/add_kubernetes_metadata"
 
 	// Import packages that perform 'func init()'.
-	_ "github.com/elastic/beats/v7/packetbeat/protos/amqp"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/cassandra"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/dhcpv4"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/dns"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/http"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/icmp"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/memcache"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/mongodb"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/mysql"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/nfs"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/pgsql"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/redis"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/sip"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/thrift"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/tls"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/amqp"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/cassandra"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/dhcpv4"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/dns"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/http"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/icmp"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/memcache"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/mongodb"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/mysql"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/nfs"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/pgsql"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/redis"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/sip"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/thrift"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/tls"
 )
 
 // InitializeModules initialize all of the modules.

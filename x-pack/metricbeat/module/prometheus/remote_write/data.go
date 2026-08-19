@@ -14,11 +14,11 @@ import (
 
 	"github.com/prometheus/common/model"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
+	"github.com/elastic/beats/v9/libbeat/common/cfgwarn"
+	p "github.com/elastic/beats/v9/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	rw "github.com/elastic/beats/v9/metricbeat/module/prometheus/remote_write"
+	"github.com/elastic/beats/v9/x-pack/metricbeat/module/prometheus/collector"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

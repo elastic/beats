@@ -20,9 +20,9 @@ package idxmgmt
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
-	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/idxmgmt/lifecycle"
+	"github.com/elastic/beats/v9/libbeat/template"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 

@@ -20,9 +20,9 @@ package monitors
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/beats/v9/libbeat/beat"
+	"github.com/elastic/beats/v9/libbeat/common/acker"
+	"github.com/elastic/beats/v9/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

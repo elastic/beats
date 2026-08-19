@@ -24,8 +24,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v9/heartbeat/monitors"
+	"github.com/elastic/beats/v9/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 

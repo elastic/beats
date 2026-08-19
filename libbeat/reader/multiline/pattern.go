@@ -24,9 +24,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v9/libbeat/common/match"
+	"github.com/elastic/beats/v9/libbeat/reader"
+	"github.com/elastic/beats/v9/libbeat/reader/readfile"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

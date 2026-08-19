@@ -10,7 +10,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb"
 )
 
 // extract is the E of a ETL processing. Gets all the performance information into an instance of extractedData

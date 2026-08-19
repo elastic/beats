@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/libbeat/processors/util"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
+	"github.com/elastic/beats/v9/heartbeat/config"
+	"github.com/elastic/beats/v9/libbeat/processors/util"
+	"github.com/elastic/beats/v9/x-pack/heartbeat/scenarios/framework"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

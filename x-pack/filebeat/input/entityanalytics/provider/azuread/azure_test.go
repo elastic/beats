@@ -12,9 +12,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
-	mockauth "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
-	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/internal/collections"
+	mockauth "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
+	mockfetcher "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	legacyokta "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/testokta"
+	legacyokta "github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
+	"github.com/elastic/beats/v9/x-pack/filebeat/input/entityanalytics/provider/okta/testokta"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 	ecokta "github.com/elastic/entcollect/provider/okta"

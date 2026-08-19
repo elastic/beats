@@ -24,8 +24,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v9/metricbeat/mb"
+	"github.com/elastic/beats/v9/metricbeat/mb/parse"
 )
 
 var hostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()

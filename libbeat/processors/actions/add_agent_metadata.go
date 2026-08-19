@@ -18,9 +18,9 @@
 package actions
 
 import (
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions/addagentmetadata"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	"github.com/elastic/beats/v9/libbeat/processors"
+	"github.com/elastic/beats/v9/libbeat/processors/actions/addagentmetadata"
+	"github.com/elastic/beats/v9/libbeat/processors/checks"
 )
 
 func init() {

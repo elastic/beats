@@ -26,9 +26,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/goleak"
 
-	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	_ "github.com/elastic/beats/v7/packetbeat/protos/dns"
+	"github.com/elastic/beats/v9/packetbeat/config"
+	"github.com/elastic/beats/v9/packetbeat/protos"
+	_ "github.com/elastic/beats/v9/packetbeat/protos/dns"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )

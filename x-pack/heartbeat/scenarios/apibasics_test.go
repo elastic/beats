@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
-	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
+	"github.com/elastic/beats/v9/x-pack/heartbeat/scenarios/framework"
 )
 
 // TestAPISummaries runs a real inline apiJourney end-to-end through the agent.

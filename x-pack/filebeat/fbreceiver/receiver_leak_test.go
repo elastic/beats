@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v9/x-pack/otel/oteltest"
 )
 
 func TestLeak(t *testing.T) {

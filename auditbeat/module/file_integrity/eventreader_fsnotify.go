@@ -28,7 +28,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/monitor"
+	"github.com/elastic/beats/v9/auditbeat/module/file_integrity/monitor"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
