@@ -26,14 +26,9 @@ func TestConfigInitDefaults(t *testing.T) {
 }
 
 func TestConfigUnpackAppliesDefaults(t *testing.T) {
-	rawConfig, err := config.NewConfigFrom(map[string]any{
-		"client_id":              "client",
-		"client_secret":          "secret",
-		"tenant_id":              "tenant",
-		"subscription_id":        "subscription",
-		"period":                 "1m",
+	rawConfig, err := config.NewConfigFrom(validConfig(map[string]any{
 		"billing_usage_lookback": "72h",
-	})
+	}))
 	require.NoError(t, err, "expected the test configuration to be created")
 
 	var cfg Config
@@ -42,6 +37,81 @@ func TestConfigUnpackAppliesDefaults(t *testing.T) {
 	assert.Equal(t, 72*time.Hour, cfg.BillingUsageLookback, "expected the configured billing usage lookback")
 	assert.Equal(t, 30*24*time.Hour, cfg.BillingForecastWindow, "expected the default billing forecast window")
 	assert.Equal(t, "PT5M", cfg.DefaultTimeGrain, "expected the default resource time grain")
+}
+
+func TestConfigUnpackValidatesBillingDurations(t *testing.T) {
+	tests := []struct {
+		name    string
+		values  map[string]any
+		wantErr string
+	}{
+		{
+			name: "accepts positive whole-day durations",
+			values: map[string]any{
+				"billing_usage_lookback":  "72h",
+				"billing_forecast_window": "336h",
+			},
+		},
+		{
+			name:    "rejects zero usage lookback",
+			values:  map[string]any{"billing_usage_lookback": "0s"},
+			wantErr: "billing_usage_lookback must be a positive multiple of 24h, got 0s",
+		},
+		{
+			name:    "rejects negative usage lookback",
+			values:  map[string]any{"billing_usage_lookback": "-24h"},
+			wantErr: "billing_usage_lookback must be a positive multiple of 24h, got -24h0m0s",
+		},
+		{
+			name:    "rejects partial-day usage lookback",
+			values:  map[string]any{"billing_usage_lookback": "36h"},
+			wantErr: "billing_usage_lookback must be a positive multiple of 24h, got 36h0m0s",
+		},
+		{
+			name:    "rejects zero forecast window",
+			values:  map[string]any{"billing_forecast_window": "0s"},
+			wantErr: "billing_forecast_window must be a positive multiple of 24h, got 0s",
+		},
+		{
+			name:    "rejects negative forecast window",
+			values:  map[string]any{"billing_forecast_window": "-24h"},
+			wantErr: "billing_forecast_window must be a positive multiple of 24h, got -24h0m0s",
+		},
+		{
+			name:    "rejects partial-day forecast window",
+			values:  map[string]any{"billing_forecast_window": "36h"},
+			wantErr: "billing_forecast_window must be a positive multiple of 24h, got 36h0m0s",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rawConfig, err := config.NewConfigFrom(validConfig(test.values))
+			require.NoError(t, err, "expected the test configuration to be created")
+
+			var cfg Config
+			err = rawConfig.Unpack(&cfg)
+			if test.wantErr == "" {
+				assert.NoError(t, err, "expected the billing durations to be accepted")
+				return
+			}
+			assert.ErrorContains(t, err, test.wantErr, "expected the invalid billing duration to be rejected")
+		})
+	}
+}
+
+func validConfig(values map[string]any) map[string]any {
+	cfg := map[string]any{
+		"client_id":       "client",
+		"client_secret":   "secret",
+		"tenant_id":       "tenant",
+		"subscription_id": "subscription",
+		"period":          "1m",
+	}
+	for key, value := range values {
+		cfg[key] = value
+	}
+	return cfg
 }
 
 func TestGroupMetricsDefinitionsByResourceId(t *testing.T) {

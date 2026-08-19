@@ -17,8 +17,9 @@ const (
 	// DefaultBaseURI is the default URI used for the service Insights
 	DefaultBaseURI = "https://management.azure.com/"
 
-	defaultBillingUsageLookback  = 24 * time.Hour
-	defaultBillingForecastWindow = 30 * 24 * time.Hour
+	billingDay                   = 24 * time.Hour
+	defaultBillingUsageLookback  = billingDay
+	defaultBillingForecastWindow = 30 * billingDay
 	defaultTimeGrain             = "PT5M"
 )
 
@@ -53,11 +54,11 @@ type Config struct {
 	// specific to billing
 	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
-	// BillingUsageLookback controls how far back (as a duration) the billing metricset
-	// queries usage data. Defaults to 24h (previous full day). Increase to 72h to capture
-	// Azure's documented up-to-72h cost data updates.
+	// BillingUsageLookback controls how far back the billing metricset queries usage data.
+	// It must be a positive multiple of 24h and defaults to the previous full day.
 	BillingUsageLookback time.Duration `config:"billing_usage_lookback"`
-	// BillingForecastWindow controls the length of the forecast period. Defaults to 720h (30 days).
+	// BillingForecastWindow controls the length of the forecast period. It must be a
+	// positive multiple of 24h and defaults to 720h (30 days).
 	BillingForecastWindow time.Duration `config:"billing_forecast_window"`
 	// Use BatchApi for metric values collection
 	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
@@ -77,6 +78,13 @@ func (c *Config) InitDefaults() {
 	c.BillingUsageLookback = defaultBillingUsageLookback
 	c.BillingForecastWindow = defaultBillingForecastWindow
 	c.DefaultTimeGrain = defaultTimeGrain
+}
+
+func validateBillingDuration(name string, value time.Duration) error {
+	if value <= 0 || value%billingDay != 0 {
+		return fmt.Errorf("%s must be a positive multiple of 24h, got %s", name, value)
+	}
+	return nil
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
@@ -108,6 +116,12 @@ type DimensionConfig struct {
 }
 
 func (conf *Config) Validate() error {
+	if err := validateBillingDuration("billing_usage_lookback", conf.BillingUsageLookback); err != nil {
+		return err
+	}
+	if err := validateBillingDuration("billing_forecast_window", conf.BillingForecastWindow); err != nil {
+		return err
+	}
 	if conf.ResourceManagerEndpoint == "" {
 		conf.ResourceManagerEndpoint = DefaultBaseURI
 	}
