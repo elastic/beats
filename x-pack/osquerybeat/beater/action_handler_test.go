@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type mockExecutor struct {
@@ -104,7 +105,7 @@ func TestActionHandlerExecuteSpaceID(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			publisher := &mockPublisher{}
 			ac := &actionHandler{
-				log:       logp.NewLogger("action_test"),
+				log:       logptest.NewTestingLogger(t, "action_test"),
 				inputType: osqueryInputType,
 				queryExec: &mockExecutor{},
 				publisher: publisher,
