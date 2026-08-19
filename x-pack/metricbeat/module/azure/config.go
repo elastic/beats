@@ -16,6 +16,10 @@ import (
 const (
 	// DefaultBaseURI is the default URI used for the service Insights
 	DefaultBaseURI = "https://management.azure.com/"
+
+	defaultBillingUsageLookback  = 24 * time.Hour
+	defaultBillingForecastWindow = 30 * 24 * time.Hour
+	defaultTimeGrain             = "PT5M"
 )
 
 var (
@@ -68,11 +72,11 @@ type Config struct {
 	DefaultTimeGrain string `config:"default_timegrain"` // defaults to PT5M
 }
 
-// createDefaultConfig creates a default config for the metricset.
-func createDefaultConfig() Config {
-	return Config{
-		DefaultTimeGrain: "PT5M",
-	}
+// InitDefaults initializes default values before configuration is unpacked.
+func (c *Config) InitDefaults() {
+	c.BillingUsageLookback = defaultBillingUsageLookback
+	c.BillingForecastWindow = defaultBillingForecastWindow
+	c.DefaultTimeGrain = defaultTimeGrain
 }
 
 // ResourceConfig contains resource and metric list specific configuration.

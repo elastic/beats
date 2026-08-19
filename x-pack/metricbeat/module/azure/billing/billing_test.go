@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 func TestUsagePeriodFrom(t *testing.T) {
@@ -78,31 +76,5 @@ func TestForecastPeriodFrom(t *testing.T) {
 
 		assert.Equal(t, expectedStartTime, actualStartTime)
 		assert.Equal(t, expectedEndTime, actualEndTime)
-	})
-}
-
-func TestApplyBillingDefaults(t *testing.T) {
-	t.Run("sets usage lookback and forecast window when both are unset", func(t *testing.T) {
-		cfg := azure.Config{}
-		applyBillingDefaults(&cfg)
-
-		assert.Equal(t, defaultUsageLookback, cfg.BillingUsageLookback)
-		assert.Equal(t, defaultForecastWindow, cfg.BillingForecastWindow)
-	})
-
-	t.Run("does not override an explicitly configured usage lookback", func(t *testing.T) {
-		cfg := azure.Config{BillingUsageLookback: 72 * time.Hour}
-		applyBillingDefaults(&cfg)
-
-		assert.Equal(t, 72*time.Hour, cfg.BillingUsageLookback)
-		assert.Equal(t, defaultForecastWindow, cfg.BillingForecastWindow)
-	})
-
-	t.Run("does not override an explicitly configured forecast window", func(t *testing.T) {
-		cfg := azure.Config{BillingForecastWindow: 14 * 24 * time.Hour}
-		applyBillingDefaults(&cfg)
-
-		assert.Equal(t, defaultUsageLookback, cfg.BillingUsageLookback)
-		assert.Equal(t, 14*24*time.Hour, cfg.BillingForecastWindow)
 	})
 }

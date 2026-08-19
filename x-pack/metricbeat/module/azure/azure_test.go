@@ -12,7 +12,37 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/config"
 )
+
+func TestConfigInitDefaults(t *testing.T) {
+	var cfg Config
+	cfg.InitDefaults()
+
+	assert.Equal(t, 24*time.Hour, cfg.BillingUsageLookback, "expected the default billing usage lookback")
+	assert.Equal(t, 30*24*time.Hour, cfg.BillingForecastWindow, "expected the default billing forecast window")
+	assert.Equal(t, "PT5M", cfg.DefaultTimeGrain, "expected the default resource time grain")
+}
+
+func TestConfigUnpackAppliesDefaults(t *testing.T) {
+	rawConfig, err := config.NewConfigFrom(map[string]any{
+		"client_id":              "client",
+		"client_secret":          "secret",
+		"tenant_id":              "tenant",
+		"subscription_id":        "subscription",
+		"period":                 "1m",
+		"billing_usage_lookback": "72h",
+	})
+	require.NoError(t, err, "expected the test configuration to be created")
+
+	var cfg Config
+	require.NoError(t, rawConfig.Unpack(&cfg), "expected the configuration to unpack")
+
+	assert.Equal(t, 72*time.Hour, cfg.BillingUsageLookback, "expected the configured billing usage lookback")
+	assert.Equal(t, 30*24*time.Hour, cfg.BillingForecastWindow, "expected the default billing forecast window")
+	assert.Equal(t, "PT5M", cfg.DefaultTimeGrain, "expected the default resource time grain")
+}
 
 func TestGroupMetricsDefinitionsByResourceId(t *testing.T) {
 

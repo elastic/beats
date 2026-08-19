@@ -16,16 +16,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const (
-	// defaultUsageLookback is the usage query window when billing_usage_lookback is unset.
-	// It matches the original hardcoded behaviour: query the single previous full UTC day.
-	defaultUsageLookback = 24 * time.Hour
-
-	// defaultForecastWindow is the forecast query window when billing_forecast_window is unset.
-	// It matches the original hardcoded behaviour: 30 days forward from the forecast start date.
-	defaultForecastWindow = 30 * 24 * time.Hour
-)
-
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
 // the MetricSet for each host defined in the module's configuration. After the
@@ -52,7 +42,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
-	applyBillingDefaults(&config)
 	// instantiate monitor client
 	billingClient, err := NewClient(config, base.Logger())
 	if err != nil {
@@ -63,17 +52,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		client:        billingClient,
 		log:           base.Logger().Named("azure billing"),
 	}, nil
-}
-
-// applyBillingDefaults fills in default values for billing-specific duration
-// config fields that were not explicitly set by the user.
-func applyBillingDefaults(cfg *azure.Config) {
-	if cfg.BillingUsageLookback == 0 {
-		cfg.BillingUsageLookback = defaultUsageLookback
-	}
-	if cfg.BillingForecastWindow == 0 {
-		cfg.BillingForecastWindow = defaultForecastWindow
-	}
 }
 
 // TimeIntervalOptions represents the options used to retrieve the billing data.

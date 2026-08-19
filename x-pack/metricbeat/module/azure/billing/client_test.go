@@ -26,8 +26,8 @@ var (
 )
 
 func TestClient(t *testing.T) {
-	usageStart, usageEnd := usageIntervalFrom(time.Now(), defaultUsageLookback)
-	forecastStart, forecastEnd := forecastIntervalFrom(time.Now(), defaultForecastWindow)
+	usageStart, usageEnd := usageIntervalFrom(time.Now(), 24*time.Hour)
+	forecastStart, forecastEnd := forecastIntervalFrom(time.Now(), 30*24*time.Hour)
 	opts := TimeIntervalOptions{
 		usageStart:    usageStart,
 		usageEnd:      usageEnd,
