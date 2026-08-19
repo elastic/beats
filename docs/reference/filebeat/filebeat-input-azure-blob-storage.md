@@ -125,7 +125,7 @@ $$$supported-attributes$$$
 2. [auth.oauth2](#attrib-auth-oauth2)
 3. [auth.shared_credentials.account_key](#attrib-auth-shared-account-key)
 4. [auth.connection_string.uri](#attrib-auth-connection-string)
-5. [auth.managed_identity](#attrib-auth-managed-identity) {applies_to}`stack: ga 9.4.6+` (9.4.6+, 9.5.2+, 9.6.0+)
+5. [auth.managed_identity](#attrib-auth-managed-identity) {applies_to}`stack: ga 9.4.6+`
 6. [storage_url](#attrib-storage-url)
 7. [containers](#attrib-containers)
 8. [name](#attrib-container-name)
@@ -188,7 +188,7 @@ This attribute contains the **access key**, found under the `Access keys` sectio
 This attribute contains the **connection string**, found under the `Access keys` section on Azure Clound, under the respective storage account. A single storage account can contain multiple containers, and they will all use this common connection string.
 
 ::::{note}
-Configure exactly one authentication method. If more than one is present, the input uses the first of `auth.shared_credentials`, `auth.connection_string` and `auth.oauth2` that is configured, whatever order they appear in the configuration file. `auth.managed_identity` cannot be combined with another method, and the input rejects such a configuration at startup.
+Configure exactly one authentication method. If more than one method is present, the input checks `auth.shared_credentials` first, then `auth.connection_string`, then `auth.oauth2`, and uses the first one it finds. This order is fixed, so the order in which the methods appear in the configuration file makes no difference. `auth.managed_identity` cannot be combined with another method, and the input rejects such a configuration at startup.
 ::::
 
 
@@ -198,18 +198,14 @@ Configure exactly one authentication method. If more than one is present, the in
 stack: ga 9.4.6+
 ```
 
-:::{important}
-Available in {{filebeat}} 9.4.6 and later 9.4.x releases, in 9.5.2 and later 9.5.x releases, and in 9.6.0 and later. It is not available in 9.5.0 or 9.5.1.
-:::
-
 Use the managed identity of the Azure host that runs {{filebeat}}. Azure gives the token to the host, so the configuration holds no key and no secret.
 
 This works on hosts that Azure provides an identity for, such as Azure Virtual Machines, Virtual Machine Scale Sets, Azure Kubernetes Service, Container Apps, App Service, Azure Functions and Azure Arc enabled servers. It does not work on a host outside Azure. For an agent that runs outside Azure, use [auth.oauth2](#attrib-auth-oauth2) instead.
 
 This attribute has the following sub-attributes:
 
-1. `enabled`: Set it to `true` to use managed identity authentication.
-2. `client_id`: The client ID of a user-assigned managed identity. Leave it empty to use the system-assigned identity of the host.
+* `enabled`: Set it to `true` to use managed identity authentication.
+* `client_id`: The client ID of a user-assigned managed identity. Leave it empty to use the system-assigned identity of the host.
 
 A sample configuration that uses the system-assigned identity of the host:
 
@@ -238,9 +234,7 @@ filebeat.inputs:
   - name: container_1
 ```
 
-::::{note}
-Assign the `Storage Blob Data Reader` role to the identity, on the storage account or on the container. The input lists blobs and reads blobs, so it needs no write permission.
-::::
+Assign the `Storage Blob Data Reader` role to the identity on the storage account or on the container. The input lists blobs and reads blobs, so it doesn't need the write permission.
 
 To learn how to give an Azure resource a managed identity, refer to the Azure documentation on [managed identities for Azure resources](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview).
 
