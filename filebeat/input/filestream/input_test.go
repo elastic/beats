@@ -420,18 +420,14 @@ func createFilestreamTestRunner(b testing.TB, logger *logp.Logger, testID string
 	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
 	require.NoError(b, err)
 
-<<<<<<< HEAD
 	p := Plugin(logger, createTestStore(b))
-=======
-	p := Plugin(logger, createTestStore(tb))
 	var group unison.TaskGroup
-	require.NoError(tb, p.Manager.Init(&group))
-	tb.Cleanup(func() {
-		require.NoError(tb, group.Stop())
+	require.NoError(b, p.Manager.Init(&group))
+	b.Cleanup(func() {
+		require.NoError(b, group.Stop())
 		//nolint:errcheck // It's a test, let it panic if the casting fails
 		p.Manager.(*loginp.InputManager).Close()
 	})
->>>>>>> 1a6f65bf0 ([Filebeat] share Filestream state stores per registry backend (#52326))
 	input, err := p.Manager.Create(c)
 	require.NoError(b, err)
 

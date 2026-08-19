@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -436,8 +437,6 @@ paths:
 	})
 }
 
-<<<<<<< HEAD
-=======
 func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 	setupStoreCacheTest(t)
 
@@ -541,130 +540,17 @@ func initInputManager(t *testing.T, cim *InputManager) {
 		cim.StateStore = store
 	}
 	var group unison.TaskGroup
-	require.NoError(t, cim.Init(&group))
+	logger := cim.Logger
+	cim.Logger = logp.NewNopLogger()
+	err := cim.Init(&group)
+	cim.Logger = logger
+	require.NoError(t, err)
 	t.Cleanup(func() {
 		require.NoError(t, group.Stop())
 		cim.Close()
 	})
 }
 
-// TestInputManager_Create_BackoffConfig asserts InputManager.Create wires the
-// filestream input's backoff config (independently parsed here, like
-// read_until_eof and harvester_limit) into the harvesterRunner it builds:
-// defaulted when absent, and taken from the config when set.
-func TestInputManager_Create_BackoffConfig(t *testing.T) {
-	newManager := func(t *testing.T) *InputManager {
-		t.Helper()
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		testStore, err := storeReg.Get("test")
-		require.NoError(t, err)
-		log, _ := newBufferLogger()
-		manager := &InputManager{
-			Logger:     log,
-			StateStore: testStateStore{Store: testStore},
-			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
-				var wg sync.WaitGroup
-				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
-			},
-		}
-		initInputManager(t, manager)
-		return manager
-	}
-
-	t.Run("defaulted when absent from config", func(t *testing.T) {
-		cim := newManager(t)
-		cfg := config.MustNewConfigFrom(`
-type: filestream
-id: backoff-default
-paths:
-  - /var/log/foo
-`)
-		inp, err := cim.Create(cfg)
-		require.NoError(t, err)
-
-		mi, ok := inp.(*managedInput)
-		require.True(t, ok)
-		assert.Equal(t, DefaultBackoffConfig(), mi.backoff)
-	})
-
-	t.Run("taken from config when set", func(t *testing.T) {
-		cim := newManager(t)
-		cfg := config.MustNewConfigFrom(`
-type: filestream
-id: backoff-custom
-paths:
-  - /var/log/foo
-backoff:
-  init: 5s
-  max: 30s
-`)
-		inp, err := cim.Create(cfg)
-		require.NoError(t, err)
-
-		mi, ok := inp.(*managedInput)
-		require.True(t, ok)
-		assert.Equal(t, BackoffConfig{Init: 5 * time.Second, Max: 30 * time.Second}, mi.backoff)
-	})
-}
-
-// TestInputManager_Create_StateCheckInterval asserts InputManager.Create wires
-// close.on_state_change.check_interval (independently parsed here, like
-// backoff and read_until_eof) into the harvesterRunner it builds: defaulted
-// when absent, and taken from the config when set.
-func TestInputManager_Create_StateCheckInterval(t *testing.T) {
-	newManager := func(t *testing.T) *InputManager {
-		t.Helper()
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		testStore, err := storeReg.Get("test")
-		require.NoError(t, err)
-		log, _ := newBufferLogger()
-		manager := &InputManager{
-			Logger:     log,
-			StateStore: testStateStore{Store: testStore},
-			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
-				var wg sync.WaitGroup
-				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
-			},
-		}
-		initInputManager(t, manager)
-		return manager
-	}
-
-	t.Run("defaulted when absent from config", func(t *testing.T) {
-		cim := newManager(t)
-		cfg := config.MustNewConfigFrom(`
-type: filestream
-id: check-interval-default
-paths:
-  - /var/log/foo
-`)
-		inp, err := cim.Create(cfg)
-		require.NoError(t, err)
-
-		mi, ok := inp.(*managedInput)
-		require.True(t, ok)
-		assert.Equal(t, DefaultStateCheckInterval, mi.stateCheckInterval)
-	})
-
-	t.Run("taken from config when set", func(t *testing.T) {
-		cim := newManager(t)
-		cfg := config.MustNewConfigFrom(`
-type: filestream
-id: check-interval-custom
-paths:
-  - /var/log/foo
-close.on_state_change.check_interval: 20s
-`)
-		inp, err := cim.Create(cfg)
-		require.NoError(t, err)
-
-		mi, ok := inp.(*managedInput)
-		require.True(t, ok)
-		assert.Equal(t, 20*time.Second, mi.stateCheckInterval)
-	})
-}
-
->>>>>>> 1a6f65bf0 ([Filebeat] share Filestream state stores per registry backend (#52326))
 func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	buf := &bytes.Buffer{}
 	encoderConfig := zap.NewProductionEncoderConfig()
