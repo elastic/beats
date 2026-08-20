@@ -288,21 +288,21 @@ func mapBatchMetricValues(client *BatchClient, metricValues azmetrics.MetricData
 }
 
 // processStore collects and return the metric values of the store using the batchAPI. After the metric values are collected, the store gets cleared.
-func processStore(client *BatchClient, criteria ResDefGroupingCriteria, store *MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+func processStore(client *BatchClient, criteria ResDefGroupingCriteria, store *MetricStore, referenceTime time.Time, report mb.ReporterV2, lookbackStart *time.Time) []Metric {
 	groupedMetrics := map[ResDefGroupingCriteria][]Metric{
 		criteria: store.GetMetrics(),
 	}
-	metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
+	metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, report, lookbackStart)
 	store.ClearMetrics()
 	return metricValues
 }
 
 // processAllStores collects and return the metrics of all the stores using the batchAPI
-func processAllStores(client *BatchClient, stores map[ResDefGroupingCriteria]*MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+func processAllStores(client *BatchClient, stores map[ResDefGroupingCriteria]*MetricStore, referenceTime time.Time, report mb.ReporterV2, lookbackStart *time.Time) []Metric {
 	var metricValues []Metric
 	for criteria, store := range stores {
 		if store.Size() > 0 {
-			metricValues = append(metricValues, processStore(client, criteria, store, referenceTime, report)...)
+			metricValues = append(metricValues, processStore(client, criteria, store, referenceTime, report, lookbackStart)...)
 		}
 	}
 	return metricValues

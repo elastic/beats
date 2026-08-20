@@ -94,6 +94,13 @@ The azure credentials keys can be used if configured `AZURE_CLIENT_ID`, `AZURE_C
 
 If this option is already set for a standard cloud, remove it, as the previously documented audience values were incorrect. The metrics batch API (`enable_batch_api`) is not supported for custom environments.
 
+`lookback_window`
+:   *duration* Optional, default `30m`. On restart, the module will backfill metrics from the last completed collection end time up to this duration. This prevents gaps in metric data caused by agent restarts or brief downtime. Set to `0` to disable. Any overlap with already-indexed data is handled by Elasticsearch document ID deduplication.
+
+    **TSDB constraint:** Elasticsearch TSDB rejects documents with `@timestamp` older than `index.time_series.look_back_time` (default `2h`). Setting `lookback_window` beyond `look_back_time` causes backfilled metrics to be silently dropped by Elasticsearch. Keep `lookback_window` within `look_back_time`, or raise `look_back_time` on the target data stream to match. See [Time series index settings](https://www.elastic.co/docs/reference/elasticsearch/index-settings/time-series) for how to adjust `look_back_time`.
+
+    **Performance constraint:** A large `lookback_window` combined with many resources or metrics means the first collection after a restart queries a wide time range across all resources. Keep `lookback_window` proportional to your typical restart duration — for most deployments the default `30m` is a good starting point.
+
 
 ## Metricsets [_metricsets_10]
 
@@ -175,6 +182,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
   resources:
     - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
       metrics:
@@ -190,6 +198,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -200,6 +209,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -210,6 +220,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -220,6 +231,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -230,6 +242,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -240,6 +253,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -250,6 +264,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  lookback_window: 30m
 
 - module: azure
   metricsets:
