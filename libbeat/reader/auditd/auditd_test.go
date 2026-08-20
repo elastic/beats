@@ -62,7 +62,7 @@ func (t *testReader) Next() (reader.Message, error) {
 }
 
 // auditdLogField returns the value of a field within msg.Fields["auditd"]["log"].
-func auditdLogField(fields mapstr.M, key string) (interface{}, bool) {
+func auditdLogField(fields mapstr.M, key string) (any, bool) {
 	auditd, ok := fields["auditd"].(mapstr.M)
 	if !ok {
 		return nil, false

@@ -309,3 +309,8 @@ func stripNewLineWin(msg *reader.Message) {
 func (p *DockerJSONReader) Close() error {
 	return p.reader.Close()
 }
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *DockerJSONReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
+}
