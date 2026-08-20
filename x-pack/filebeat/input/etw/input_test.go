@@ -219,8 +219,7 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 	}
 
 	// Setup cancellation
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
+	ctx := t.Context()
 
 	// Setup input
 	inputCtx := input.Context{

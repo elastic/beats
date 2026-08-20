@@ -134,7 +134,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 	}
 	defer bb.Free()
 
-	for i := 0; i < propertyCount; i++ {
+	for i := range propertyCount {
 		property := EvtSystemPropertyID(i)
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
@@ -197,7 +197,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 // renderUser returns the event/user data values. This does not provide the
 // parameter names. It computes a fingerprint of the values types to help the
 // caller match the correct names to the returned values.
-func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
+func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, event *winevent.Event) (values []any, fingerprint uint64, err error) {
 	bb, propertyCount, err := r.render(r.userContext, handle)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get user values: %w", err)
@@ -216,8 +216,8 @@ func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, eve
 		return nil, 0, fmt.Errorf("failed to hash property count: %w", err)
 	}
 
-	values = make([]interface{}, propertyCount)
-	for i := 0; i < propertyCount; i++ {
+	values = make([]any, propertyCount)
+	for i := range propertyCount {
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
 		binary.Write(argumentHash, binary.LittleEndian, uint32(evtVar.Type)) //nolint:errcheck // Hash writes never fail.
@@ -280,7 +280,7 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.Pooled
 }
 
 // addEventData adds the event/user data values to the event.
-func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, event *winevent.Event) {
+func (r *Renderer) addEventData(evtMeta *EventMetadata, values []any, event *winevent.Event) {
 	if len(values) == 0 {
 		return
 	}
@@ -341,7 +341,7 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 
 // formatMessage adds the message to the event.
 func (r *Renderer) formatMessage(publisherMeta *PublisherMetadata,
-	eventMeta *EventMetadata, eventHandle EvtHandle, values []interface{},
+	eventMeta *EventMetadata, eventHandle EvtHandle, values []any,
 	eventID uint16) (string, error,
 ) {
 	if eventMeta != nil {
@@ -362,7 +362,7 @@ func (r *Renderer) formatMessage(publisherMeta *PublisherMetadata,
 
 // formatMessageFromTemplate creates the message by executing the stored Go
 // text/template with the event/user data values.
-func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values []interface{}) (string, error) {
+func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values []any) (string, error) {
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
 

@@ -141,7 +141,6 @@ audit_rules: |
 		}
 
 		for _, tc := range tcs {
-			tc := tc
 			t.Run(tc.name, func(t *testing.T) {
 				config := defaultConfig
 				config.SocketType = tc.socketType

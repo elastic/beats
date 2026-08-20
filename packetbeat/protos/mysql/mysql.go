@@ -895,7 +895,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			return nil
 		}
 		// First call or rebound (1)
-		for stmtPos := 0; stmtPos < nparam; stmtPos++ {
+		for range nparam {
 			paramType = data[offset]
 			offset++
 			nparamType = append(nparamType, paramType)
@@ -919,7 +919,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		}
 	}
 
-	for stmtPos := 0; stmtPos < nparam; stmtPos++ {
+	for stmtPos := range nparam {
 		paramType = nparamType[stmtPos]
 		// dissect parameter on paramType
 		switch paramType {

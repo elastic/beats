@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"testing"
 
@@ -368,13 +369,7 @@ func TestArgsExtensionsRequire(t *testing.T) {
 
 	args := osq.args(nil)
 	want := "--extensions_require=ext_one,ext_two"
-	found := false
-	for _, a := range args {
-		if a == want {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(args, want)
 	if !found {
 		t.Fatalf("expected %q in osqueryd args, got: %v", want, args)
 	}
