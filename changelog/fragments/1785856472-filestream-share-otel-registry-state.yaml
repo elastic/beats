@@ -1,0 +1,9 @@
+kind: enhancement
+summary: Reduce Filestream memory use with multiple Filebeat receivers
+description: >
+  Filebeat now shares Filestream registry state between Filebeat
+  receiver instances that use the same persistent registry. This avoids
+  keeping a separate in-memory copy of the same state for each receiver, reducing
+  memory use in workloads with a large number of inputs, like
+  Kubernetes.
+component: filebeat

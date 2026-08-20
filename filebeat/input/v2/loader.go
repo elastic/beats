@@ -73,6 +73,16 @@ func (l *Loader) Init(group unison.Group) error {
 	return nil
 }
 
+// Close releases resources owned by input managers that support explicit shutdown.
+// Call Close after stopping the task group passed to Init.
+func (l *Loader) Close() {
+	for _, p := range l.registry {
+		if manager, ok := p.Manager.(interface{ Close() }); ok {
+			manager.Close()
+		}
+	}
+}
+
 // Configure creates a new input from a Config object.
 // The loader reads the input type name from the cfg object and tries to find a
 // matching plugin. If a plugin is found, the plugin it's InputManager is used to create
