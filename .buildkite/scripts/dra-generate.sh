@@ -49,7 +49,7 @@ annotate_step=""
 if [[ "${DRA_UPLOAD}" == "true" ]]; then
   trigger_step=$(cat <<TRIG
 
-  - label: ":pipeline: Trigger DRA processing (${WORKFLOW})"
+  - label: ":pipeline: DRA processing for beats (${WORKFLOW})"
     trigger: "unified-release-dra-processing"
     depends_on: "dra-prep-${WORKFLOW}"
     build:
