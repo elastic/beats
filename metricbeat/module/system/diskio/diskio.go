@@ -162,6 +162,9 @@ func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 func (m *MetricSet) diagDiskstats() []byte {
-	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	sys, ok := m.Module().(resolve.Resolver)
+	if !ok {
+		return fmt.Appendf(nil, "Error fetching data: module %T does not implement resolve.Resolver", m.Module())
+	}
 	return diagnostics.GetRawFileOrErrorString(sys, "/proc/diskstats")
 }

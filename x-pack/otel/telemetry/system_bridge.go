@@ -6,6 +6,7 @@ package telemetry
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"go.opentelemetry.io/collector/component"
@@ -63,8 +64,13 @@ func AcquireSystemBridge(settings component.TelemetrySettings) (func(), error) {
 		processReg := reg.GetOrCreateRegistry("beat")
 		systemReg := reg.GetOrCreateRegistry("system")
 
-		err := metricreport.SetupMetricsOptions(metricreport.MetricOptions{
-			Logger:         logp.NewLogger("system-bridge"),
+		logger, err := logp.NewZapLogger(settings.Logger.Named("system-bridge"))
+		if err != nil {
+			return nil, fmt.Errorf("failed to adapt the collector logger: %w", err)
+		}
+
+		err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
+			Logger:         logger,
 			Name:           "beat",
 			SystemMetrics:  systemReg,
 			ProcessMetrics: processReg,

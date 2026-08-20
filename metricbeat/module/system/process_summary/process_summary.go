@@ -144,7 +144,7 @@ func threadStats(sys resolve.Resolver) (mapstr.M, error) {
 			}
 			procsInt, err := strconv.ParseInt(fields[1], 10, 64)
 			if err != nil {
-				return nil, fmt.Errorf("Error parsing value %s from %s: %w", fields[0], statPath, err)
+				return nil, fmt.Errorf("error parsing value %s from %s: %w", fields[0], statPath, err)
 			}
 
 			threadData[keyFields[1]] = procsInt

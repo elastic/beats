@@ -56,7 +56,11 @@ var (
 
 	// cgroups resolver, turned to a stub function to make testing easier.
 	initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
-		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+		return cgroup.NewReaderOptions(cgroup.ReaderOptions{
+			RootfsMountpoint:  rootfsMountpoint,
+			IgnoreRootCgroups: ignoreRootCgroups,
+			Logger:            logp.NewNopLogger(),
+		})
 	}
 
 	instanceID atomic.Uint32
@@ -244,7 +248,7 @@ func pidToInt(value any) (pid int, err error) {
 		}
 	case uint, uintptr, uint8, uint16, uint32, uint64:
 		pidu64 := reflect.ValueOf(v).Uint()
-		if pid = int(pidu64); pid < 0 || uint64(pid) != pidu64 {
+		if pid = int(pidu64); pid < 0 || uint64(pid) != pidu64 { //nolint:gosec // the conversion is range checked on this very line
 			return 0, fmt.Errorf("integer out of range: %d", pidu64)
 		}
 	default:
@@ -332,8 +336,8 @@ type addProcessMetadataCloser struct {
 }
 
 func (p *addProcessMetadataCloser) Close() error {
-	if p.addProcessMetadata.cgroupsCache != nil {
-		p.addProcessMetadata.cgroupsCache.StopJanitor()
+	if p.cgroupsCache != nil {
+		p.cgroupsCache.StopJanitor()
 	}
 	return nil
 }

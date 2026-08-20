@@ -22,7 +22,6 @@ package testutil
 import (
 	"flag"
 	"fmt"
-	"math/rand"
 	"testing"
 	"time"
 
@@ -34,6 +33,12 @@ var (
 	SeedFlag = flag.Int64("seed", 0, "Randomization seed")
 )
 
+// SeedPRNG reports the randomization seed for the test.
+//
+// It does not actually seed a PRNG: the global source of the top-level
+// math/rand functions cannot be seeded since Go 1.24, and math/rand/v2 never
+// allowed it. Tests that need a reproducible sequence have to build their own
+// *rand.Rand from SeedFlag and use it explicitly.
 func SeedPRNG(t *testing.T) {
 	seed := *SeedFlag
 	if seed == 0 {
@@ -41,7 +46,6 @@ func SeedPRNG(t *testing.T) {
 	}
 
 	t.Logf("reproduce test with `go test ... -seed %v`", seed)
-	rand.New(rand.NewSource(seed))
 }
 
 func GenerateEvents(numEvents, fieldsPerLevel, depth int) []beat.Event {

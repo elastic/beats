@@ -59,7 +59,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	normAvgs := load.NormalizedAverages()
 
 	event := mapstr.M{
-		"cores": numcpu.NumCPU(),
+		"cores": numcpu.NumCPUWithLogger(m.Logger()),
 		"1":     avgs.OneMinute,
 		"5":     avgs.FiveMinute,
 		"15":    avgs.FifteenMinute,

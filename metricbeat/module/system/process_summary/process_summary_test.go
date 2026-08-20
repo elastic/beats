@@ -104,7 +104,8 @@ func TestStateNames(t *testing.T) {
 		if key == "total" {
 			continue
 		}
-		if _, ok := val.(int); !ok {
+		count, ok := val.(int)
+		if !ok {
 			continue
 		}
 		// Check to make sure the values we got actually exist
@@ -117,7 +118,7 @@ func TestStateNames(t *testing.T) {
 		}
 		assert.True(t, exists, "could not find value %s in event #%v", key, event.StringToPrint())
 
-		sum = val.(int) + sum
+		sum = count + sum
 	}
 	assert.Equal(t, total, sum)
 

@@ -72,7 +72,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Sample the current cpu counter
-	m.stats.OpenSampling()
+	if err := m.stats.OpenSampling(); err != nil {
+		return fmt.Errorf("open disk io sampling: %w", err)
+	}
 
 	// Store the last cpu counter when finished
 	defer m.stats.CloseSampling()

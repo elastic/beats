@@ -22,7 +22,6 @@ package rapl
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -82,7 +81,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("module %T does not implement resolve.Resolver", base.Module())
+	}
 	CPUList, err := getMSRCPUs(sys)
 	if err != nil {
 		return nil, fmt.Errorf("error getting list of CPUs to query: %w", err)
@@ -171,7 +173,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 			joules, err := handler.ReadEnergyStatus(domain)
 			// This is a bit hard to check for, as many of the registers are model-specific
 			// Unless we want to maintain a map of every CPU, we sort of have to play it fast and loose.
-			if err == rapl.ErrMSRDoesNotExist {
+			if errors.Is(err, rapl.ErrMSRDoesNotExist) {
 				continue
 			}
 			if err != nil {
@@ -230,7 +232,7 @@ func topoPkgCPUMap(hostfs resolve.Resolver) (map[int][]int, error) {
 	sysdir := "/sys/devices/system/cpu/"
 	cpuMap := make(map[int][]int)
 
-	files, err := ioutil.ReadDir(hostfs.ResolveHostFS(sysdir))
+	files, err := os.ReadDir(hostfs.ResolveHostFS(sysdir))
 	if err != nil {
 		return nil, err
 	}
