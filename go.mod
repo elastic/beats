@@ -96,7 +96,11 @@ require (
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
+<<<<<<< HEAD
 	github.com/lib/pq v1.10.3
+=======
+	github.com/lib/pq v1.12.3
+>>>>>>> 810f67a7e (build(deps): bump github.com/lib/pq from 1.10.9 to 1.12.3 (#50538))
 	github.com/magefile/mage v1.17.2
 	github.com/mattn/go-colorable v0.1.14
 	github.com/miekg/dns v1.1.72
