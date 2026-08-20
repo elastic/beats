@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.6
 
 require (
-	cloud.google.com/go/bigquery v1.79.1
+	cloud.google.com/go/bigquery v1.80.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -284,7 +284,7 @@ require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.1 // indirect
-	cloud.google.com/go/auth v0.23.0 // indirect
+	cloud.google.com/go/auth v0.23.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.13.0 // indirect
