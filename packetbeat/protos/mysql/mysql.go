@@ -916,7 +916,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_TINY
 		case 0x01:
 			if dataLen < paramOffset+1 {
-				mysql.mysqlLogger.Debug("Data too small")
+				logp.Debug("mysql", "Data too small")
 				return nil
 			}
 			valueString := strconv.Itoa(int(data[paramOffset]))
@@ -967,7 +967,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x07, 0x0c, 0x0a:
 			var year, month, day, hour, minute, second string
 			if dataLen <= paramOffset {
-				mysql.mysqlLogger.Debug("Data too small")
+				logp.Debug("mysql", "Data too small")
 				return nil
 			}
 			paramLen := int(data[paramOffset])
@@ -999,7 +999,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_TIME
 		case 0x0b:
 			if dataLen <= paramOffset {
-				mysql.mysqlLogger.Debug("Data too small")
+				logp.Debug("mysql", "Data too small")
 				return nil
 			}
 			paramLen := int(data[paramOffset])
@@ -1015,7 +1015,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_STRING
 		case 0xf6, 0xfc, 0xfd, 0xfe:
 			if dataLen <= paramOffset {
-				mysql.mysqlLogger.Debug("Data too small")
+				logp.Debug("mysql", "Data too small")
 				return nil
 			}
 			paramLen := int(data[paramOffset])
@@ -1023,7 +1023,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			switch paramLen {
 			case 0xfc: /* 252 - 64k chars */
 				if dataLen < paramOffset+2 {
-					mysql.mysqlLogger.Debug("Data too small")
+					logp.Debug("mysql", "Data too small")
 					return nil
 				}
 				paramLen16 := int(binary.LittleEndian.Uint16(data[paramOffset : paramOffset+2]))
@@ -1036,7 +1036,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramOffset += paramLen16
 			case 0xfd: /* 64k - 16M chars */
 				if dataLen < paramOffset+3 {
-					mysql.mysqlLogger.Debug("Data too small")
+					logp.Debug("mysql", "Data too small")
 					return nil
 				}
 				paramLen24 := int(leUint24(data[paramOffset : paramOffset+3]))
