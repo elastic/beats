@@ -19,10 +19,12 @@ package remote_write
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
@@ -35,6 +37,33 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+type legacyFlowGenerator struct {
+	started  chan struct{}
+	stopped  chan struct{}
+	generate chan model.Samples
+}
+
+func newLegacyFlowGenerator() *legacyFlowGenerator {
+	return &legacyFlowGenerator{
+		started:  make(chan struct{}, 1),
+		stopped:  make(chan struct{}, 1),
+		generate: make(chan model.Samples, 1),
+	}
+}
+
+func (g *legacyFlowGenerator) Start() {
+	g.started <- struct{}{}
+}
+
+func (g *legacyFlowGenerator) Stop() {
+	g.stopped <- struct{}{}
+}
+
+func (g *legacyFlowGenerator) GenerateEvents(samples model.Samples) map[string]mb.Event {
+	g.generate <- samples
+	return map[string]mb.Event{"legacy": {RootFields: mapstr.M{"flow": "legacy"}}}
+}
 
 // TestGenerateEventsCounter tests counter simple cases
 func TestGenerateEventsCounter(t *testing.T) {
@@ -277,7 +306,7 @@ func TestMetricsCount(t *testing.T) {
 // createTestWriteRequest creates a prompb.WriteRequest with the given number of samples
 func createTestWriteRequest(numSamples int) *prompb.WriteRequest {
 	samples := make([]prompb.Sample, numSamples)
-	for i := 0; i < numSamples; i++ {
+	for i := range numSamples {
 		samples[i] = prompb.Sample{
 			Value:     float64(i),
 			Timestamp: int64(i * 1000),
@@ -306,10 +335,9 @@ func encodeWriteRequest(req *prompb.WriteRequest) ([]byte, error) {
 	return snappy.Encode(nil, data), nil
 }
 
-// newTestMetricSet creates a MetricSet for testing using the mbtest infrastructure
-// to ensure proper initialization (including logger)
-func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
-	config := map[string]interface{}{
+// newTestMetricSetBase creates a MetricSet without starting the owner loop.
+func newTestMetricSetBase(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"remote_write"},
 	}
@@ -318,13 +346,116 @@ func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes 
 	m, ok := ms.(*MetricSet)
 	require.True(t, ok, "expected *MetricSet, got %T", ms)
 
-	// Override the size limits for testing
 	m.maxCompressedBodyBytes = maxCompressedBodyBytes
 	m.maxDecodedBodyBytes = maxDecodedBodyBytes
-	// Ensure events channel exists for the handler
-	m.events = make(chan mb.Event, 100)
-
+	setOwnerLoopTestSeams(m, ownerLoopSeams{skipHTTPServer: true})
+	t.Cleanup(func() { clearOwnerLoopTestSeams(m) })
 	return m
+}
+
+// newTestMetricSet creates a MetricSet for testing using the mbtest infrastructure
+// to ensure proper initialization (including logger)
+func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
+	m := newTestMetricSetBase(t, maxCompressedBodyBytes, maxDecodedBodyBytes)
+	startOwnerLoop(t, m, newTestPushReporter(nil))
+	return m
+}
+
+func TestDefaultGeneratorUsesLegacyEventsFlow(t *testing.T) {
+	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
+
+	assert.False(t, m.useOwnerLoop, "default OSS generator must preserve the legacy events flow")
+	assert.NotNil(t, m.events, "legacy mode must allocate the events channel")
+	assert.Nil(t, m.batches, "legacy mode must not allocate the owner-loop batches channel")
+}
+
+func TestLegacyHandlerGeneratesAndForwardsWithoutOwnerLoop(t *testing.T) {
+	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
+	gen := newLegacyFlowGenerator()
+	m.setPromEventsGenerator(gen)
+
+	body, err := encodeWriteRequest(createTestWriteRequest(1))
+	require.NoError(t, err, "write request must encode")
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(body))
+	rec := httptest.NewRecorder()
+	handlerDone := make(chan struct{})
+	go func() {
+		m.handleFunc(rec, req)
+		close(handlerDone)
+	}()
+
+	select {
+	case <-gen.started:
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must start the generator")
+	}
+	select {
+	case samples := <-gen.generate:
+		assert.Len(t, samples, 1, "legacy handler must generate the decoded request")
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must call GenerateEvents directly")
+	}
+	select {
+	case event := <-m.events:
+		assert.Equal(t, "legacy", event.RootFields["flow"], "legacy event must enter the events channel")
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must forward generated events")
+	}
+	select {
+	case <-handlerDone:
+	case <-time.After(time.Second):
+		t.Fatal("legacy handler must return after forwarding events")
+	}
+	assert.Equal(t, http.StatusAccepted, rec.Code, "legacy handler must return 202")
+	m.startLegacyGenerator()
+	select {
+	case <-gen.started:
+		t.Fatal("legacy generator Start must run exactly once")
+	default:
+	}
+
+	require.NoError(t, m.Close(), "legacy metricset must close")
+	select {
+	case <-gen.stopped:
+	case <-time.After(time.Second):
+		t.Fatal("Close must stop a generator started by the legacy handler")
+	}
+	require.NoError(t, m.Close(), "repeated legacy Close must succeed")
+	select {
+	case <-gen.stopped:
+		t.Fatal("legacy generator Stop must run exactly once")
+	default:
+	}
+}
+
+func TestLegacyHandlerRejectsRequestsAfterClose(t *testing.T) {
+	m := newTestMetricSetBase(t, 1024*1024, 10*1024*1024)
+	gen := newLegacyFlowGenerator()
+	m.setPromEventsGenerator(gen)
+
+	require.NoError(t, m.Close(), "legacy Close must succeed before the first request")
+	require.NoError(t, m.Close(), "legacy Close must be idempotent")
+
+	body, err := encodeWriteRequest(createTestWriteRequest(1))
+	require.NoError(t, err, "write request must encode")
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	req := httptest.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
+	rec := httptest.NewRecorder()
+	m.handleFunc(rec, req)
+
+	assert.Equal(t, http.StatusServiceUnavailable, rec.Code, "post-Close requests must be rejected")
+	assert.Equal(t, "remote write metricset closed\n", rec.Body.String(), "post-Close response must be stable")
+	select {
+	case <-gen.started:
+		t.Fatal("post-Close request must not restart the generator")
+	default:
+	}
+	select {
+	case <-gen.generate:
+		t.Fatal("post-Close request must not use the generator")
+	default:
+	}
 }
 
 func TestHandleFuncDecodedSizeLimit(t *testing.T) {
@@ -363,7 +494,7 @@ func TestHandleFuncDecodedSizeLimit(t *testing.T) {
 			require.NoError(t, err)
 
 			// Create HTTP request
-			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+			req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(body))
 			rec := httptest.NewRecorder()
 
 			// Call the handler
@@ -425,7 +556,7 @@ func TestHandleFuncCompressedSizeLimit(t *testing.T) {
 			}
 
 			// Create HTTP request
-			req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+			req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(body))
 			rec := httptest.NewRecorder()
 
 			// Call the handler
@@ -447,7 +578,7 @@ func TestHandleFuncInvalidSnappyData(t *testing.T) {
 	// Send data with an invalid truncated varint header that will fail at snappy.DecodedLen. We simulate only one sample scenario.
 	// A byte with high bit set (0x80+) indicates continuation, but with no following byte it's invalid
 	invalidData := []byte{0x80, 0x80, 0x80, 0x80, 0x80, 0x80}
-	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(invalidData))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(invalidData))
 	rec := httptest.NewRecorder()
 
 	m.handleFunc(rec, req)
