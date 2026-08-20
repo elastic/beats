@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !(linux || darwin || windows) || agentbeat
+//go:build !securityonly
 
-package autodiscover
+package beater
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	// does nothing if kubernetes and docker are not supported
-}
+import (
+	// Add filebeat level processors
+	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
+)

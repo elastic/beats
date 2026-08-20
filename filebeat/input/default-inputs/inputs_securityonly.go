@@ -15,11 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !(linux || darwin || windows) || agentbeat
+//go:build securityonly
 
-package autodiscover
+package inputs
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	// does nothing if kubernetes and docker are not supported
+import (
+	"github.com/elastic/beats/v7/filebeat/input/filestream"
+	"github.com/elastic/beats/v7/filebeat/input/logv2"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+)
+
+func Init(info beat.Info, components statestore.States) []v2.Plugin {
+	return []v2.Plugin{
+		filestream.Plugin(info.Logger, components),
+		logv2.LogPluginV2(info.Logger),
+	}
 }

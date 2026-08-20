@@ -34,14 +34,6 @@ import (
 
 	"github.com/gohugoio/hashstructure"
 
-	// include all metricbeat specific builders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
-
-	// include all metricbeat specific appenders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
-
-	// Add metricbeat default processors
-	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.
