@@ -23,9 +23,9 @@ import (
 	"strconv"
 	"strings"
 
+	util "github.com/elastic/beats/v7/pkg/systemmetrics/metric"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	util "github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux

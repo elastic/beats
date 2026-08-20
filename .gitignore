@@ -56,3 +56,8 @@ GEMINI.md
 
 # Local-only Salesforce live-test credentials (copy from sf-creds.env.example)
 x-pack/filebeat/input/salesforce/sf-creds*.env
+
+pkg/systemmetrics/metric/system/cgroup/testdata/amzn2
+pkg/systemmetrics/metric/system/cgroup/testdata/docker
+pkg/systemmetrics/metric/system/cgroup/testdata/docker2
+pkg/systemmetrics/metric/system/cgroup/testdata/ubuntu1804
