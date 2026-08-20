@@ -2,17 +2,13 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-linux.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Linux module [metricbeat-module-linux]
-
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
 
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -56,10 +52,10 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [conntrack](/reference/metricbeat/metricbeat-metricset-linux-conntrack.md)  {applies_to}`stack: beta`
-* [iostat](/reference/metricbeat/metricbeat-metricset-linux-iostat.md)  {applies_to}`stack: beta`
-* [ksm](/reference/metricbeat/metricbeat-metricset-linux-ksm.md)  {applies_to}`stack: beta`
-* [memory](/reference/metricbeat/metricbeat-metricset-linux-memory.md)  {applies_to}`stack: beta`
-* [pageinfo](/reference/metricbeat/metricbeat-metricset-linux-pageinfo.md)  {applies_to}`stack: beta`
+* [conntrack](/reference/metricbeat/metricbeat-metricset-linux-conntrack.md)
+* [iostat](/reference/metricbeat/metricbeat-metricset-linux-iostat.md)
+* [ksm](/reference/metricbeat/metricbeat-metricset-linux-ksm.md)
+* [memory](/reference/metricbeat/metricbeat-metricset-linux-memory.md)
+* [pageinfo](/reference/metricbeat/metricbeat-metricset-linux-pageinfo.md)
 * [pressure](/reference/metricbeat/metricbeat-metricset-linux-pressure.md)  {applies_to}`stack: beta`
 * [rapl](/reference/metricbeat/metricbeat-metricset-linux-rapl.md)  {applies_to}`stack: beta`

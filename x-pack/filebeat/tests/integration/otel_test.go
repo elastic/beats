@@ -1177,7 +1177,8 @@ exporters:
 `
 	logFilePath := filepath.Join(t.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
-	receiverRenderedConfig := fmt.Sprintf(receiverConfig,
+	receiverRenderedConfig := fmt.Sprintf(
+		receiverConfig,
 		logFilePath,
 		t.TempDir(),
 		receiverIndex,
@@ -1319,7 +1320,8 @@ service:
 	})
 	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
 
-	require.EventuallyWithT(t,
+	require.EventuallyWithT(
+		t,
 		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
@@ -1342,7 +1344,8 @@ service:
 	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
 
 	// wait for more docs to be published.
-	require.EventuallyWithTf(t,
+	require.EventuallyWithTf(
+		t,
 		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
@@ -1882,13 +1885,15 @@ service:
 	// Verify openStore was called for httpjson input
 	require.Eventually(t, func() bool {
 		return collector.ObservedLogs().FilterMessageSnippet(
-			"input-cursor::openStore: prefix: httpjson inputID: "+inputID).Len() >= 1
+			"input-cursor::openStore: prefix: httpjson inputID: "+inputID,
+		).Len() >= 1
 	}, 30*time.Second, 100*time.Millisecond, "expected openStore log for httpjson input")
 
 	// Verify initial store read found 0 keys (first run, no previous state in ES)
 	require.Eventually(t, func() bool {
 		return collector.ObservedLogs().FilterMessageSnippet(
-			"input-cursor store read 0 keys").Len() >= 1
+			"input-cursor store read 0 keys",
+		).Len() >= 1
 	}, 30*time.Second, 100*time.Millisecond, "expected initial store read with 0 keys")
 
 	// Wait for at least 2 polling cycles to ensure cursor is persisted to ES
@@ -1909,7 +1914,8 @@ service:
 	// Verify cursor was restored from ES: the store should now read 1 key
 	require.Eventually(t, func() bool {
 		return collector2.ObservedLogs().FilterMessageSnippet(
-			"input-cursor store read 1 keys").Len() >= 1
+			"input-cursor store read 1 keys",
+		).Len() >= 1
 	}, 60*time.Second, 100*time.Millisecond,
 		"expected store to read 1 key after restart, proving cursor was restored from ES")
 
@@ -2437,4 +2443,123 @@ exporters:
 		FilterMessageSnippet(`"should_not_be_added"`).
 		Len()
 	assert.Equal(t, 0, matchingNotAdded, "expected `should_not_be_added` field to be absent")
+}
+
+// TestFilestreamRawIndexRoutingE2E verifies that setting index: in the
+// filestream input config correctly routes events to the named index for both
+// the classic filebeat path (via @metadata.raw_index) and the filebeatreceiver
+// path (via the elasticsearch.index log record attribute set by otelconsumer).
+func TestFilestreamRawIndexRoutingE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	const numEvents = 1
+
+	suffix := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")[:16]
+	targetIndex := "log." + suffix
+
+	esHost := integration.GetESURL(t, "http")
+	esUser := esHost.User.Username()
+	esPassword, _ := esHost.User.Password()
+	esURL := fmt.Sprintf("%s://%s", esHost.Scheme, esHost.Host)
+	es := integration.GetESClient(t, "http")
+
+	t.Cleanup(func() {
+		_, _ = es.Indices.Delete([]string{targetIndex})
+	})
+
+	fbLogPath := filepath.Join(t.TempDir(), "fb.log")
+	writeEventsToLogFile(t, fbLogPath, numEvents)
+
+	otelLogPath := filepath.Join(t.TempDir(), "otel.log")
+	writeEventsToLogFile(t, otelLogPath, numEvents)
+
+	// Filebeat path: index: in the filestream input sets @metadata.raw_index,
+	// which the elasticsearch output uses to route events to the target index.
+	beatsCfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    paths:
+      - %s
+    prospector.scanner.fingerprint.enabled: false
+    file_identity.native: ~
+    index: %s
+    fields:
+      data_stream: process
+output:
+  elasticsearch:
+    hosts:
+      - %s
+    username: %s
+    password: %s
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+setup.ilm.enabled: false
+`, fbLogPath, targetIndex, esHost.Host, esUser, esPassword)
+
+	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	filebeat.WriteConfigFile(beatsCfg)
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	// Filebeatreceiver path: same index: setting produces @metadata.raw_index,
+	// which otelconsumer propagates to the elasticsearch.index log record
+	// attribute. logs_index must be omitted so the exporter uses its
+	// dynamicDocumentRouter (which checks elasticsearch.index) rather than the
+	// staticDocumentRouter (which ignores all attributes).
+	otelCfg := fmt.Sprintf(`
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-otel-input-id
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+          index: %s
+          fields:
+            data_stream: otel
+    logging:
+      level: info
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    path.home: %s
+exporters:
+  elasticsearch/log:
+    endpoints:
+      - %s
+    compression: none
+    user: %s
+    password: %s
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+`, otelLogPath, targetIndex, t.TempDir(), esURL, esUser, esPassword)
+
+	oteltestcol.New(t, otelCfg)
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			docs, err := estools.GetAllLogsForIndexWithContext(findCtx, es, targetIndex)
+			assert.NoError(ct, err)
+			assert.Equal(ct, numEvents*2, docs.Hits.Total.Value,
+				"expected %d events in %s index, got %d", numEvents*2, targetIndex, docs.Hits.Total.Value)
+		},
+		2*time.Minute, 1*time.Second,
+		"expected %d events (1 from filebeat, 1 from filebeatreceiver) in %s index", numEvents*2, targetIndex)
 }

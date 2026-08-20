@@ -10,6 +10,12 @@ services:
   beat:
     build: ../../metricbeat
     environment:
+      - ES_USER=metricbeat_user
+      - ES_PASS=testing
+      - ES_SUPERUSER_USER=admin
+      - ES_SUPERUSER_PASS=testing
+      - KIBANA_USER=beats
+      - KIBANA_PASS=testing
       - BEAT_STRICT_PERMS=false
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/x-pack/metricbeat
@@ -30,11 +36,17 @@ services:
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-9.4.3}-1
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-9.5.1}-1
     build:
       context: ../../metricbeat/module/kibana/_meta
       args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-9.4.3}
+        KIBANA_VERSION: ${KIBANA_VERSION:-9.5.1}
+    environment:
+      ELASTICSEARCH_USERNAME: kibana_system_user
+      ELASTICSEARCH_PASSWORD: ${ES_PASS:-testing}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u ${KIBANA_USER:-beats}:${KIBANA_PASS:-testing} -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      retries: 600
     depends_on:
       - elasticsearch
     ports:
