@@ -30,6 +30,11 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+>>>>>>> 99f684480 (packetbeat/protos: fix panics in SIP, TLS JA3, MySQL execute, and HTTP chunked parsers (#52686))
 )
 
 func TestParseURI(t *testing.T) {
@@ -119,6 +124,7 @@ func TestMalformedBodyFiends(t *testing.T) {
 	}{
 		{msg: &message{body: []byte("\r\no="), contentType: []byte("application/sdp"), hasContentLength: true}},
 		{msg: &message{body: []byte("\r\no=\"00000000"), contentType: []byte("application/sdp"), hasContentLength: true}},
+		{msg: &message{body: []byte("o=\"\" 1 1 IN IP4 1.1.1.1\r\n"), contentType: []byte("application/sdp"), hasContentLength: true}},
 	}
 
 	// test is mostly that we don't crash
@@ -135,7 +141,11 @@ func TestParseUDP(t *testing.T) {
 		gotEvent = &evt
 	}
 	const data = "INVITE sip:test@10.0.2.15:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-0\r\nFrom: \"DVI4/8000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>\r\nCall-ID: 1-2187@10.0.2.20\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@10.0.2.20:5060\r\nMax-Forwards: 70\r\nContent-Type: application/sdp\r\nContent-Length:   123\r\n\r\nv=0\r\no=- 42 42 IN IP4 10.0.2.20\r\ns=-\r\nc=IN IP4 10.0.2.20\r\nt=0 0\r\nm=audio 6000 RTP/AVP 5\r\na=rtpmap:5 DVI4/8000\r\na=recvonly\r\n"
+<<<<<<< HEAD
 	p, _ := New(true, reporter, &procs.ProcessesWatcher{}, nil)
+=======
+	p, _ := New(true, reporter, &procs.ProcessesWatcher{}, nil, logp.NewNopLogger() /*logptest.NewTestingLogger(t, "")*/)
+>>>>>>> 99f684480 (packetbeat/protos: fix panics in SIP, TLS JA3, MySQL execute, and HTTP chunked parsers (#52686))
 	plugin := p.(*plugin)
 	plugin.ParseUDP(&protos.Packet{
 		Ts:      time.Now(),

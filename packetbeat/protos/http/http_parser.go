@@ -551,7 +551,7 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 		return false, true, false
 	}
 	line := string(s.data[:i])
-	chunkLength, err := strconv.ParseInt(line, 16, 32)
+	chunkLength, err := strconv.ParseUint(line, 16, 32)
 	if err != nil {
 		logp.Warn("Failed to understand chunked body start line")
 		return false, false, false
