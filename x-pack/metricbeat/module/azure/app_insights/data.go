@@ -13,9 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-	"github.com/Azure/go-autorest/autorest/date"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -46,51 +43,79 @@ type MetricValue struct {
 	Value       map[string]interface{}
 	Segments    []MetricValue
 	Interval    string
-	Start       *date.Time
-	End         *date.Time
+	Start       *time.Time
+	End         *time.Time
 }
 
-func mapMetricValues(metricValues insights.ListMetricsResultsItem) []MetricValue {
+func mapMetricValues(metricValues ListMetricsResultsItem) []MetricValue {
 	var mapped []MetricValue
 	for _, item := range *metricValues.Value {
+		// The API can omit body or value entirely; skip such items rather
+		// than panic on a nil deref while reading Start/End/etc.
+		if item.Body == nil || item.Body.Value == nil {
+			continue
+		}
+		info := item.Body.Value
 		metricValue := MetricValue{
-			Start:       item.Body.Value.Start,
-			End:         item.Body.Value.End,
+			Start:       info.Start,
+			End:         info.End,
 			Value:       map[string]interface{}{},
 			SegmentName: map[string]string{},
+			Interval:    formatInterval(info.Start, info.End),
 		}
-		metricValue.Interval = fmt.Sprintf("%sTO%s", item.Body.Value.Start, item.Body.Value.End)
-		if item.Body != nil && item.Body.Value != nil {
-			if item.Body.Value.AdditionalProperties != nil {
-				metrics := getAdditionalPropMetric(item.Body.Value.AdditionalProperties)
-				for key, metric := range metrics {
-					if isSegment(key) {
-						metricValue.SegmentName[key] = metric.(string)
-					} else {
-						metricValue.Value[key] = metric
+		if info.AdditionalProperties != nil {
+			metrics := getAdditionalPropMetric(info.AdditionalProperties)
+			for key, metric := range metrics {
+				if isSegment(key) {
+					// The App Insights API may return non-string scalars
+					// (or null) for segment fields; skip those rather
+					// than panic on a failed type assertion.
+					s, ok := metric.(string)
+					if !ok {
+						continue
 					}
+					metricValue.SegmentName[key] = s
+				} else {
+					metricValue.Value[key] = metric
 				}
 			}
-			if item.Body.Value.Segments != nil {
-				for _, segment := range *item.Body.Value.Segments {
-					metVal := mapSegment(segment, metricValue.SegmentName)
-					metricValue.Segments = append(metricValue.Segments, metVal)
-				}
-			}
-			mapped = append(mapped, metricValue)
 		}
-
+		if info.Segments != nil {
+			for _, segment := range *info.Segments {
+				metVal := mapSegment(segment, metricValue.SegmentName)
+				metricValue.Segments = append(metricValue.Segments, metVal)
+			}
+		}
+		mapped = append(mapped, metricValue)
 	}
 	return mapped
 }
 
-func mapSegment(segment insights.MetricsSegmentInfo, parentSeg map[string]string) MetricValue {
+// formatInterval renders the start/end pair the same way the legacy
+// (autorest) date.Time.String() did so that the MetricValue.Interval string
+// stays in a familiar format for any downstream consumers.
+func formatInterval(start, end *time.Time) string {
+	var s, e string
+	if start != nil {
+		s = start.Format(time.RFC3339Nano)
+	}
+	if end != nil {
+		e = end.Format(time.RFC3339Nano)
+	}
+	return fmt.Sprintf("%sTO%s", s, e)
+}
+
+func mapSegment(segment MetricsSegmentInfo, parentSeg map[string]string) MetricValue {
 	metricValue := MetricValue{Value: map[string]interface{}{}, SegmentName: map[string]string{}}
 	if segment.AdditionalProperties != nil {
 		metrics := getAdditionalPropMetric(segment.AdditionalProperties)
 		for key, metric := range metrics {
 			if isSegment(key) {
-				metricValue.SegmentName[key] = metric.(string)
+				s, ok := metric.(string)
+				if !ok {
+					continue
+				}
+				metricValue.SegmentName[key] = s
 			} else {
 				metricValue.Value[key] = metric
 			}
@@ -129,7 +154,7 @@ func newMetricTimeKey(start, end time.Time) metricTimeKey {
 	return metricTimeKey{Start: start, End: end}
 }
 
-func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId string, namespace string) []mb.Event {
+func EventsMapping(metricValues ListMetricsResultsItem, applicationId string, namespace string) []mb.Event {
 	var events []mb.Event
 	if metricValues.Value == nil {
 		return events
@@ -140,7 +165,17 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 	groupedByDimensions := groupMetricsByDimension(mValues)
 
 	for _, group := range groupedByDimensions {
-		event := createGroupEvent(group, newMetricTimeKey(group[0].Start.Time, group[0].End.Time), applicationId, namespace)
+		// Guard against nil Start/End: the SDK can return null timestamps,
+		// and the IsZero() safety check inside createGroupEvent will then
+		// correctly drop the event instead of us panicking on a nil deref.
+		var start, end time.Time
+		if group[0].Start != nil {
+			start = *group[0].Start
+		}
+		if group[0].End != nil {
+			end = *group[0].End
+		}
+		event := createGroupEvent(group, newMetricTimeKey(start, end), applicationId, namespace)
 
 		// Only add events that have metric values.
 		if len(event.MetricSetFields) > 0 {
@@ -153,6 +188,13 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 // groupMetricsByDimension groups the given metrics by their dimension keys.
 func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
 	keys := make(map[string][]MetricValue)
+
+	// Empty input is valid (e.g. the API returned "value": [] for a window
+	// with no data, or every item was filtered out upstream). Return an
+	// empty map rather than panicking on metrics[0].
+	if len(metrics) == 0 {
+		return keys
+	}
 
 	var stack []MetricValue
 	stack = append(stack, metrics...)
@@ -180,8 +222,17 @@ func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
 		// Generate a sorted key from the segment names to ensure consistent dimension keys
 		sortedSegmentsKey := getSortedKeys(metric.SegmentName)
 
-		// Construct a dimension key using the default times and sorted segment names
-		dimensionKey := createDimensionKey(firstStart.Unix(), firstEnd.Unix(), sortedSegmentsKey)
+		// Construct a dimension key using the default times and sorted segment names.
+		// Guard against nil firstStart/firstEnd to avoid a nil-pointer panic when
+		// the very first metric (and any subsequent one) has no Start/End set.
+		var startUnix, endUnix int64
+		if firstStart != nil {
+			startUnix = firstStart.Unix()
+		}
+		if firstEnd != nil {
+			endUnix = firstEnd.Unix()
+		}
+		dimensionKey := createDimensionKey(startUnix, endUnix, sortedSegmentsKey)
 
 		// If the metric has child segments, process them
 		// This is usually the case for segments that don't have actual metric values
@@ -331,8 +382,8 @@ func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interfac
 }
 
 func cleanMetricNames(metric string) string {
-	metric = strings.Replace(metric, "/", "_", -1)
-	metric = strings.Replace(metric, " ", "_", -1)
+	metric = strings.ReplaceAll(metric, "/", "_")
+	metric = strings.ReplaceAll(metric, " ", "_")
 	metric = azure.ReplaceUpperCase(metric)
 	obj := strings.Split(metric, ".")
 	for index := range obj {
@@ -343,7 +394,7 @@ func cleanMetricNames(metric string) string {
 	metric = strings.ToLower(strings.Join(obj, "_"))
 	aggsRegex := regexp.MustCompile(aggsRegex)
 	metric = aggsRegex.ReplaceAllStringFunc(metric, func(str string) string {
-		return strings.Replace(str, "_", ".", -1)
+		return strings.ReplaceAll(str, "_", ".")
 	})
 	return metric
 }

@@ -10,10 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 )
 
 var validateTests = []struct {
@@ -55,7 +54,7 @@ var validateTests = []struct {
 		cfg: conf{
 			SyncInterval: 24 * time.Hour, UpdateInterval: 15 * time.Minute,
 			Tracer: &tracerConfig{
-				Enabled: ptrTo(false),
+				Enabled: new(false),
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			},
 		},
@@ -66,25 +65,22 @@ var validateTests = []struct {
 		cfg: conf{
 			SyncInterval: 24 * time.Hour, UpdateInterval: 15 * time.Minute,
 			Tracer: &tracerConfig{
-				Enabled: ptrTo(true),
+				Enabled: new(true),
 				Logger:  lumberjack.Logger{Filename: "jamf/logs/path.log"},
 			},
 		},
 	},
 	{
-		name: "invalid_path",
+		name: "invalid_path_accepted_at_config_time",
 		cfg: conf{
 			SyncInterval: 24 * time.Hour, UpdateInterval: 15 * time.Minute,
 			Tracer: &tracerConfig{
-				Enabled: ptrTo(true),
+				Enabled: new(true),
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			},
 		},
-		wantErr: errors.New(`request tracer path must be within "jamf" path`),
 	},
 }
-
-func ptrTo[T any](v T) *T { return &v }
 
 func TestConfValidate(t *testing.T) {
 	for _, test := range validateTests {
@@ -110,32 +106,32 @@ func sameError(a, b error) bool {
 
 var keepAliveTests = []struct {
 	name    string
-	input   map[string]interface{}
+	input   map[string]any
 	want    httpcommon.WithKeepaliveSettings
 	wantErr error
 }{
 	{
 		name:  "keep_alive_none", // Default to the old behaviour of true.
-		input: map[string]interface{}{},
+		input: map[string]any{},
 		want:  httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_true",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": true,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_false",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": false,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: false},
 	},
 	{
 		name: "keep_alive_invalid_max",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable":              false,
 			"request.keep_alive.max_idle_connections": -1,
 		},

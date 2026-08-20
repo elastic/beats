@@ -56,7 +56,7 @@ func TestLogStatusReporter(t *testing.T) {
 		State:          proto.State_HEALTHY,
 		Config: &proto.UnitExpectedConfig{
 			Type: "file",
-			Source: tests.RequireNewStruct(map[string]interface{}{
+			Source: tests.RequireNewStruct(map[string]any{
 				"type":            "file",
 				"enabled":         true,
 				"path":            outPath,
@@ -164,11 +164,11 @@ func getInputStream(id string, path string, stateIdx int) proto.UnitExpected {
 		Config: &proto.UnitExpectedConfig{
 			Streams: []*proto.Stream{{
 				Id: "filebeat/log-default-system",
-				Source: tests.RequireNewStruct(map[string]interface{}{
+				Source: tests.RequireNewStruct(map[string]any{
 					"enabled":        true,
 					"symlinks":       true,
 					"type":           "log",
-					"paths":          []interface{}{path},
+					"paths":          []any{path},
 					"scan_frequency": "500ms",
 				}),
 			}},

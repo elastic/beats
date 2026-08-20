@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestOnlyOneOfExpressionCondition(t *testing.T) {
@@ -119,6 +120,7 @@ func TestCheckJsonExpression(t *testing.T) {
 						Expression:  test.expression,
 					},
 				},
+				logptest.NewTestingLogger(t, ""),
 			)
 
 			require.NoError(t, err)
@@ -216,7 +218,7 @@ func TestCheckJsonCondition(t *testing.T) {
 			}
 			defer res.Body.Close()
 
-			checker, err := checkJson([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
+			checker, err := checkJson([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}}, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)

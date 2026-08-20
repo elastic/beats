@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -48,7 +49,6 @@ func TestConfigAcceptValid(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
 			logger := logptest.NewTestingLogger(t, "")
@@ -81,7 +81,6 @@ func TestConfigInvalid(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
@@ -138,7 +137,6 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test.cfg)
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
@@ -154,6 +152,79 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 			if !test.expectError && err != nil {
 				t.Fatalf("could not create config: %s", err)
 			}
+		})
+	}
+}
+
+func TestIdempotentConfig(t *testing.T) {
+	tests := []struct {
+		name        string
+		cfg         mapstr.M
+		expectError bool
+	}{
+		{
+			name: "valid idempotent config",
+			cfg: mapstr.M{
+				"topic":         "foo",
+				"idempotent":    true,
+				"required_acks": -1,
+			},
+		},
+		{
+			name: "idempotent allows infinite retries",
+			cfg: mapstr.M{
+				"topic":         "foo",
+				"idempotent":    true,
+				"required_acks": -1,
+				"max_retries":   -1,
+			},
+		},
+		{
+			name: "idempotent rejects required_acks 1",
+			cfg: mapstr.M{
+				"topic":         "foo",
+				"idempotent":    true,
+				"required_acks": 1,
+			},
+			expectError: true,
+		},
+		{
+			name: "idempotent rejects missing required_acks",
+			cfg: mapstr.M{
+				"topic":      "foo",
+				"idempotent": true,
+			},
+			expectError: true,
+		},
+		{
+			name: "idempotent rejects kafka version below 0.11",
+			cfg: mapstr.M{
+				"topic":         "foo",
+				"idempotent":    true,
+				"required_acks": -1,
+				"version":       "0.10",
+			},
+			expectError: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c := config.MustNewConfigFrom(test.cfg)
+			assert.NoError(t, c.SetString("hosts", 0, "localhost"), "setting hosts should succeed")
+
+			cfg, err := ReadConfig(c)
+			if test.expectError {
+				assert.Error(t, err, "expected invalid idempotent config to be rejected")
+				return
+			}
+			assert.NoError(t, err, "expected valid idempotent config to unpack")
+
+			sc, err := newSaramaConfig(logptest.NewTestingLogger(t, ""), cfg)
+			assert.NoError(t, err, "expected sarama config creation to succeed")
+			assert.True(t, sc.Producer.Idempotent, "Producer.Idempotent should be enabled")
+			assert.Equal(t, 1, sc.Net.MaxOpenRequests, "MaxOpenRequests must be 1 when idempotent")
+			assert.Equal(t, sarama.WaitForAll, sc.Producer.RequiredAcks, "RequiredAcks must be WaitForAll")
 		})
 	}
 }
@@ -232,39 +303,39 @@ func TestBackoffFunc(t *testing.T) {
 
 func TestTopicSelection(t *testing.T) {
 	cases := map[string]struct {
-		cfg   map[string]interface{}
+		cfg   map[string]any
 		event beat.Event
 		want  string
 	}{
 		"topic configured": {
-			cfg:  map[string]interface{}{"topic": "test"},
+			cfg:  map[string]any{"topic": "test"},
 			want: "test",
 		},
 		"topic must keep case": {
-			cfg:  map[string]interface{}{"topic": "Test"},
+			cfg:  map[string]any{"topic": "Test"},
 			want: "Test",
 		},
 		"topics setting": {
-			cfg: map[string]interface{}{
-				"topics": []map[string]interface{}{{"topic": "test"}},
+			cfg: map[string]any{
+				"topics": []map[string]any{{"topic": "test"}},
 			},
 			want: "test",
 		},
 		"topics setting must keep case": {
-			cfg: map[string]interface{}{
-				"topics": []map[string]interface{}{{"topic": "Test"}},
+			cfg: map[string]any{
+				"topics": []map[string]any{{"topic": "Test"}},
 			},
 			want: "Test",
 		},
 		"use event field": {
-			cfg: map[string]interface{}{"topic": "test-%{[field]}"},
+			cfg: map[string]any{"topic": "test-%{[field]}"},
 			event: beat.Event{
 				Fields: mapstr.M{"field": "from-event"},
 			},
 			want: "test-from-event",
 		},
 		"use event field must keep case": {
-			cfg: map[string]interface{}{"topic": "Test-%{[field]}"},
+			cfg: map[string]any{"topic": "Test-%{[field]}"},
 			event: beat.Event{
 				Fields: mapstr.M{"field": "From-Event"},
 			},

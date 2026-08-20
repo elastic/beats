@@ -22,6 +22,7 @@ package perfmon
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 	"unicode"
@@ -188,10 +189,8 @@ func (re *Reader) getCounterPaths() ([]string, error) {
 
 func (re *Reader) getCounter(query string) (bool, PerfCounter) {
 	for _, counter := range re.counters {
-		for _, childQuery := range counter.ChildQueries {
-			if childQuery == query {
-				return true, counter
-			}
+		if slices.Contains(counter.ChildQueries, query) {
+			return true, counter
 		}
 	}
 	return false, PerfCounter{}
@@ -280,7 +279,7 @@ func mapCounterPathLabel(namespace string, label string, path string) string {
 		obj[index] = strings.TrimSuffix(obj[index], "_")
 	}
 	label = strings.ToLower(strings.Join(obj, "_"))
-	label = strings.Replace(label, "__", "_", -1)
+	label = strings.ReplaceAll(label, "__", "_")
 	return namespace + "." + label
 }
 
@@ -288,16 +287,16 @@ func mapCounterPathLabel(namespace string, label string, path string) string {
 func replaceUpperCase(src string) string {
 	replaceUpperCaseRegexp := regexp.MustCompile(replaceUpperCaseRegex)
 	return replaceUpperCaseRegexp.ReplaceAllStringFunc(src, func(str string) string {
-		var newStr string
+		var newStr strings.Builder
 		for _, r := range str {
 			// split into fields based on class of unicode character
 			if unicode.IsUpper(r) {
-				newStr += "_" + strings.ToLower(string(r))
+				newStr.WriteString("_" + strings.ToLower(string(r)))
 			} else {
-				newStr += string(r)
+				newStr.WriteString(string(r))
 			}
 		}
-		return newStr
+		return newStr.String()
 	})
 }
 

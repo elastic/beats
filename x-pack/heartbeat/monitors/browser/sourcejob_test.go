@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
@@ -27,7 +28,7 @@ func TestValidLocal(t *testing.T) {
 	timeout := 30
 	_, filename, _, _ := runtime.Caller(0)
 	path := path.Join(filepath.Dir(filename), "source/fixtures/todos")
-	testParams := map[string]interface{}{
+	testParams := map[string]any{
 		"key1": "value1",
 		"key2": "value2",
 	}
@@ -53,7 +54,7 @@ func TestValidLocal(t *testing.T) {
 func TestValidInline(t *testing.T) {
 	timeout := 30
 	script := "a script"
-	testParams := map[string]interface{}{
+	testParams := map[string]any{
 		"key1": "value1",
 		"key2": "value2",
 	}
@@ -116,9 +117,9 @@ func TestEmptySource(t *testing.T) {
 }
 
 func TestExtraArgs(t *testing.T) {
-	playWrightOpts := map[string]interface{}{
+	playWrightOpts := map[string]any{
 		"simpleOption": "simpleValue",
-		"extraHTTPHeaders": map[string]interface{}{
+		"extraHTTPHeaders": map[string]any{
 			"foo": "bar",
 		},
 	}
@@ -168,7 +169,7 @@ func TestExtraArgs(t *testing.T) {
 		},
 		{
 			"override throttling - JSON format",
-			&Config{Throttling: map[string]interface{}{
+			&Config{Throttling: map[string]any{
 				"download": 10,
 				"upload":   3,
 				"latency":  20,
@@ -180,6 +181,28 @@ func TestExtraArgs(t *testing.T) {
 			"ignore_https_errors",
 			&Config{IgnoreHTTPSErrors: true},
 			[]string{"--ignore-https-errors"},
+			false,
+		},
+		{
+			"certificate_error_spki_allowlist",
+			&Config{CertificateErrorSpkiAllowlist: []string{
+				"-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----",
+				"/path/to/server.crt",
+			}},
+			[]string{
+				"--certificate-error-spki-allowlist",
+				"-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----",
+				"/path/to/server.crt",
+			},
+			false,
+		},
+		{
+			"certificate_error_spki_allowlist is omitted for API journeys",
+			&Config{
+				Type:                          "api",
+				CertificateErrorSpkiAllowlist: []string{"/path/to/server.crt"},
+			},
+			[]string{},
 			false,
 		},
 		{
@@ -266,7 +289,7 @@ func TestFilterDevFlags(t *testing.T) {
 	variadicGen := func(flag string, n int) []string {
 		params := []string{"dummy"}
 		params = append(params, flag)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			params = append(params, fmt.Sprintf("flag-%d", i))
 		}
 
@@ -409,7 +432,7 @@ func TestDisabledSourceDecoding(t *testing.T) {
 func TestUpdateParams(t *testing.T) {
 	timeout := 30
 	script := "a script"
-	testParams := map[string]interface{}{
+	testParams := map[string]any{
 		"key1": "value1",
 		"key2": "value2",
 	}
@@ -447,4 +470,70 @@ func TestUpdateParams(t *testing.T) {
 
 	e = s.Close()
 	require.NoError(t, e)
+}
+
+// extraArgs must elide browser-only CLI flags for `api` monitors (and its
+// Fleet-emitted alias `synthetics/api`) while still forwarding flags that
+// apply to both types.
+func TestExtraArgsForAPIMonitor(t *testing.T) {
+	for _, monType := range []string{"api", "synthetics/api"} {
+		t.Run(monType, func(t *testing.T) {
+			cfg := conf.MustNewConfigFrom(mapstr.M{
+				"type":     monType,
+				"name":     "My API monitor",
+				"id":       "myApiId",
+				"schedule": "@every 1m",
+				"source": mapstr.M{
+					"inline": mapstr.M{
+						"script": "// api journey",
+					},
+				},
+				// Browser-only — should NOT make it into the CLI invocation.
+				"sandbox":     true,
+				"screenshots": "on",
+				"throttling":  false,
+				// Honored for both types.
+				"ignore_https_errors": true,
+				"playwright_options":  mapstr.M{"ignoreHTTPSErrors": true},
+			})
+
+			sj, err := NewSourceJob(cfg)
+			require.NoError(t, err)
+			args := sj.extraArgs(false)
+
+			assert.NotContains(t, args, "--sandbox", "api journeys must not receive --sandbox")
+			assert.NotContains(t, args, "--screenshots", "api journeys must not receive --screenshots")
+			assert.NotContains(t, args, "--no-throttling", "api journeys must not receive --no-throttling")
+			assert.NotContains(t, args, "--throttling", "api journeys must not receive --throttling")
+
+			assert.Contains(t, args, "--ignore-https-errors", "api journeys must still honor --ignore-https-errors")
+			assert.Contains(t, args, "--playwright-options", "api journeys must still receive --playwright-options")
+		})
+	}
+}
+
+// Browser monitors must keep receiving all existing flags (regression guard).
+func TestExtraArgsForBrowserMonitorUnchanged(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"type":        "browser",
+		"name":        "My Browser monitor",
+		"id":          "myBrowserId",
+		"schedule":    "@every 1m",
+		"sandbox":     true,
+		"screenshots": "on",
+		"throttling":  false,
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "// browser journey",
+			},
+		},
+	})
+
+	sj, err := NewSourceJob(cfg)
+	require.NoError(t, err)
+	args := sj.extraArgs(false)
+
+	assert.Contains(t, args, "--sandbox")
+	assert.Contains(t, args, "--screenshots")
+	assert.Contains(t, args, "--no-throttling")
 }

@@ -20,6 +20,8 @@ package flows
 import (
 	"sync"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Table with single produce and single consumer workers.
@@ -39,6 +41,7 @@ type flowMetaTable struct {
 
 	// TODO: create snapshot of table for concurrent iteration
 	// tablesSnapshot flowTableList
+	logger *logp.Logger
 }
 
 // Shared flow table.
@@ -55,6 +58,8 @@ type flowTable struct {
 
 	// TODO: create snapshot of table for concurrent iteration
 	// flowsSnapshot flowList
+
+	logger *logp.Logger
 }
 
 type flowTableList struct {
@@ -69,7 +74,7 @@ type flowList struct {
 func (t *flowMetaTable) get(id *FlowID, counter *counterReg) Flow {
 	sub := t.table[id.flowIDMeta]
 	if sub == nil {
-		sub = &flowTable{table: make(map[string]*biFlow)}
+		sub = &flowTable{table: make(map[string]*biFlow), logger: t.logger}
 		t.table[id.flowIDMeta] = sub
 		t.tables.append(sub)
 	}
@@ -85,7 +90,7 @@ func (t *flowTable) get(id *FlowID, counter *counterReg) Flow {
 	dir := flowDirForward
 	bf := t.table[string(id.flowID)]
 	if bf == nil || !bf.isAlive() {
-		debugf("create new flow")
+		t.logger.Debug("create new flow")
 
 		bf = newBiFlow(id.rawFlowID.clone(), ts, id.dir)
 		t.table[string(bf.id.flowID)] = bf

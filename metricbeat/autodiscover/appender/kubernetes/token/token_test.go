@@ -18,13 +18,12 @@
 package token
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -48,7 +47,7 @@ func TestTokenAppender(t *testing.T) {
 		{
 			event: bus.Event{},
 			result: mapstr.M{
-				"headers": map[string]interface{}{
+				"headers": map[string]any{
 					"Authorization": "Bearer foo bar",
 				},
 			},
@@ -62,8 +61,8 @@ token_path: "test"
 			event: bus.Event{},
 			result: mapstr.M{
 				"module": "prometheus",
-				"hosts":  []interface{}{"1.2.3.4:8080"},
-				"headers": map[string]interface{}{
+				"hosts":  []any{"1.2.3.4:8080"},
+				"headers": map[string]any{
 					"Authorization": "Bearer foo bar",
 				},
 			},
@@ -100,7 +99,7 @@ token_path: "test"
 		assert.Len(t, cfgs, 1)
 
 		out := mapstr.M{}
-		cfgs[0].Unpack(&out)
+		cfgs[0].Unpack(&out) //nolint:errcheck // test assertion follows
 
 		assert.Equal(t, out, test.result)
 		deleteFile("test")
@@ -108,7 +107,7 @@ token_path: "test"
 }
 
 func writeFile(name, message string) {
-	ioutil.WriteFile(name, []byte(message), os.ModePerm)
+	os.WriteFile(name, []byte(message), os.ModePerm) //nolint:errcheck // test helper
 }
 
 func deleteFile(name string) {

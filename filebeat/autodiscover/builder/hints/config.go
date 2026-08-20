@@ -27,11 +27,11 @@ type config struct {
 }
 
 func defaultConfig() config {
-	defaultCfgRaw := map[string]interface{}{
+	defaultCfgRaw := map[string]any{
 		"type": "filestream",
 		"id":   "container-logs-${data.container.id}",
-		"prospector": map[string]interface{}{
-			"scanner": map[string]interface{}{
+		"prospector": map[string]any{
+			"scanner": map[string]any{
 				"fingerprint.enabled": true,
 				"symlinks":            true,
 			},
@@ -51,9 +51,9 @@ func defaultConfig() config {
 				"kubernetes-container-logs-${data.container.id}",
 			},
 		},
-		"parsers": []interface{}{
-			map[string]interface{}{
-				"container": map[string]interface{}{
+		"parsers": []any{
+			map[string]any{
+				"container": map[string]any{
 					"stream": "all",
 					"format": "auto",
 				},

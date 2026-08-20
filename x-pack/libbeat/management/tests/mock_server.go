@@ -47,7 +47,7 @@ func NewMockServer(t *testing.T, canStop func(string) bool, inputConfig *proto.U
 				Version: "1.17.0",
 			},
 		},
-		Source: RequireNewStruct(map[string]interface{}{
+		Source: RequireNewStruct(map[string]any{
 			"type":            "file",
 			"enabled":         true,
 			"path":            outPath,
@@ -148,7 +148,7 @@ func checkUnitStateHealthy(units []*proto.UnitObserved) bool {
 }
 
 // RequireNewStruct converts a mapstr to a protobuf struct
-func RequireNewStruct(v map[string]interface{}) *structpb.Struct {
+func RequireNewStruct(v map[string]any) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
 		panic(err)

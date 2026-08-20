@@ -14,7 +14,7 @@
 # - enabled: Set to true to enable user-password authentication
 # - client.id: Client ID for user-password authentication
 # - client.secret: Client secret for user-password authentication
-# - token_url: Token URL for user-password authentication
+# - token_url: Salesforce OAuth host or canonical token endpoint for user-password authentication
 # - username: Username for user-password authentication
 # - password: Password for user-password authentication
 
@@ -24,7 +24,7 @@
 # - client.username: Username for JWT authentication
 # - client.key_path: Path to client key for JWT authentication
 # - url: Audience URL for JWT authentication
-# - token_url: Token URL for JWT authentication
+# - token_url: Salesforce OAuth host or canonical token endpoint for JWT authentication
 
 # Event Monitoring:
 # - real_time: Set to true to enable real-time logging using object type data collection

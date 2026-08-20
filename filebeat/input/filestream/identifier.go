@@ -74,6 +74,14 @@ func (f fileSource) Name() string {
 	return f.fileID
 }
 
+// LogPath returns the path used in logs.
+func (f fileSource) LogPath() string {
+	if f.newPath != "" {
+		return f.newPath
+	}
+	return f.oldPath
+}
+
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {
@@ -114,7 +122,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().Identifier(),
+		fileID:              formatIdentity(i.name, e.Descriptor.Info.GetOSState().Identifier()),
 		identifierGenerator: i.name,
 	}
 }
@@ -153,7 +161,7 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              p.name + identitySep + path,
+		fileID:              formatIdentity(p.name, path),
 		identifierGenerator: p.name,
 	}
 }

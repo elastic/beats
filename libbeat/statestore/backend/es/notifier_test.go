@@ -30,7 +30,7 @@ import (
 
 func createTestConfigs(t *testing.T, n int) []*conf.C {
 	var res []*conf.C
-	for i := 0; i < n; i++ {
+	for i := range n {
 		c, err := conf.NewConfigFrom(map[string]any{
 			"id": i,
 		})
@@ -174,7 +174,7 @@ func TestConcurrentSubscribeAndNotify(t *testing.T) {
 	const count = 10
 	wgSub.Add(count)
 	wg.Add(count)
-	for i := 0; i < count; i++ {
+	for range count {
 		go func() {
 			defer wgSub.Done()
 			mxSub.Lock()
@@ -204,7 +204,7 @@ func TestConcurrentSubscribeAndNotify(t *testing.T) {
 	// Wait for all
 	wgWait(t, &wg)
 	expected := make([]*conf.C, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		expected[i] = c
 	}
 	assert.Equal(t, expected, received)

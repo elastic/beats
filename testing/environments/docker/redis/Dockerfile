@@ -1,2 +1,2 @@
-FROM redis:5.0.8-alpine
-HEALTHCHECK --interval=1s --retries=600 CMD nc -z localhost 6379
+FROM redis:7.2.4-alpine
+HEALTHCHECK --interval=1s CMD nc -z localhost 6379

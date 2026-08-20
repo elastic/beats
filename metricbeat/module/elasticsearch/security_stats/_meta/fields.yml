@@ -1,0 +1,63 @@
+- name: security.stats
+  type: group
+  description: >
+    Per-node security statistics collected from the Elasticsearch Security Stats
+    API (`GET /_security/stats`). Available since Elasticsearch 9.2.
+  release: ga
+  version:
+    ga: 9.2.0
+  fields:
+    - name: dls
+      type: group
+      description: >
+        Document Level Security (DLS) counters.
+      fields:
+        - name: cache
+          type: group
+          description: >
+            Per-node cache used to materialize the bitsets that enforce DLS
+            queries. Sourced from the `roles.dls.bit_set_cache` block in
+            the `GET /_security/stats` response.
+          fields:
+            - name: entries.count
+              type: long
+              metric_type: gauge
+              description: >
+                Current number of cached entries on this node.
+            - name: memory.bytes
+              type: long
+              format: bytes
+              metric_type: gauge
+              description: >
+                Current memory consumed by the DLS cache on this node, in
+                bytes.
+            - name: hits.count
+              type: long
+              metric_type: counter
+              description: >
+                Number of cache lookups served from the cache since node
+                startup.
+            - name: misses.count
+              type: long
+              metric_type: counter
+              description: >
+                Number of cache lookups that had to materialize an entry
+                since node startup.
+            - name: evictions.count
+              type: long
+              metric_type: counter
+              description: >
+                Number of entries evicted (due to size limit or
+                expiration) since node startup.
+            - name: hits.time.ms
+              type: long
+              metric_type: counter
+              description: >
+                Cumulative time spent serving cache hits since node startup,
+                in milliseconds.
+            - name: misses.time.ms
+              type: long
+              metric_type: counter
+              description: >
+                Cumulative time spent materializing entries on cache misses
+                since node startup, in milliseconds.

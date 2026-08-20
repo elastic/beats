@@ -34,10 +34,10 @@ type event struct {
 
 // Meta defines common event metadata to be stored in '@metadata'
 type meta struct {
-	Beat    string                 `struct:"beat"`
-	Type    string                 `struct:"type"`
-	Version string                 `struct:"version"`
-	Fields  map[string]interface{} `struct:",inline"`
+	Beat    string         `struct:"beat"`
+	Type    string         `struct:"type"`
+	Version string         `struct:"version"`
+	Fields  map[string]any `struct:",inline"`
 }
 
 func makeEvent(index, version string, in *beat.Event) event {

@@ -19,6 +19,7 @@ package wineventlog
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/xml"
 	"flag"
 	"fmt"
@@ -26,11 +27,14 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
+	"unsafe"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
@@ -145,6 +149,24 @@ func TestWinEventLog(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestOffsetSupportsWindowsPointerArchitectures(t *testing.T) {
+	buffer := make([]byte, 16)
+	ptr := uintptr(unsafe.Pointer(&buffer[8]))
+	reader := &bytes.Buffer{}
+	switch runtime.GOARCH {
+	case "amd64", "arm64":
+		require.NoError(t, binary.Write(reader, binary.LittleEndian, uint64(ptr)), "write 64-bit pointer")
+	case "386":
+		require.NoError(t, binary.Write(reader, binary.LittleEndian, uint32(ptr)), "write 32-bit pointer")
+	default:
+		t.Skipf("unsupported Windows test architecture %q", runtime.GOARCH)
+	}
+
+	got, err := offset(buffer, reader)
+	require.NoError(t, err, "offset should support %s pointer layout", runtime.GOARCH)
+	assert.Equal(t, uint64(8), got, "offset should point inside the render buffer")
 }
 
 // unmarshalXMLEvents unmarshals a complete set of events from the XML data

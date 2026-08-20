@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -60,7 +59,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -68,7 +66,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/filewatcher"
+
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -87,6 +85,24 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
+// beaterStopGracePeriod bounds how long the framework waits for a Beater's Run
+// to return after Stop before disconnecting the publisher pipeline itself, as a
+// backstop against a beater that is stuck (for example, blocked in a guaranteed
+// Publish). The disconnect is the normal (graceful) one, so already-queued
+// events still drain and the stuck publish is released so Run can return.
+// Correctly-behaved beaters return well within this window, so this timeout is
+// not reached on a normal shutdown. It is used only when the Beater does not
+// report a shutdown drain bound (Beat.ShutdownTimeout); when it does, the
+// watchdog waits that drain plus beaterStopGraceMargin instead. See
+// https://github.com/elastic/beats/issues/49794.
+const beaterStopGracePeriod = 30 * time.Second
+
+// beaterStopGraceMargin is added on top of a Beater's reported shutdown drain
+// bound (Beat.ShutdownTimeout) to derive the watchdog timeout, leaving a small
+// window for the Beater's remaining cleanup after the drain before the
+// pipeline is force-disconnected.
+const beaterStopGraceMargin = time.Second
+
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
@@ -97,6 +113,8 @@ type Beat struct {
 
 	keystore   keystore.Keystore
 	processors processing.Supporter
+
+	hostnameOverride string
 
 	InputQueueSize int // Size of the producer queue used by most queues.
 
@@ -111,6 +129,7 @@ type beatConfig struct {
 
 	// beat top-level settings
 	Name      string `config:"name"`
+	Hostname  string `config:"hostname"`
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
@@ -185,6 +204,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
+				//nolint:forbidigo // top-level panic handler in Run; no *logp.Logger is in scope here.
 				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
@@ -265,10 +285,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 func (b *Beat) InitWithSettings(settings Settings) error {
 	err := b.handleFlags()
 	if err != nil {
-		return err
-	}
-
-	if err := plugin.Initialize(); err != nil {
 		return err
 	}
 
@@ -390,7 +406,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
-		Paths:          b.Info.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
@@ -467,6 +482,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
 		}
+		if err := b.API.AttachStateInspector(); err != nil {
+			return fmt.Errorf("failed to attach state inspector: %w", err)
+		}
 	}
 
 	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
@@ -513,18 +531,43 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	ctxDashboards, cancelDashboards := context.WithCancel(context.Background())
 
-	// On Stop, the manager will trigger the callback to shut down the
-	// publisher pipeline and then notify the beater.
+	// runReturned is closed once beater.Run returns, letting the shutdown
+	// watchdog below tell a prompt stop from a hung beater.
+	runReturned := make(chan struct{})
+
+	// On Stop, the manager notifies the beater so it can close its inputs and
+	// finalize acknowledgments. The publisher pipeline is disconnected only
+	// after beater.Run returns (below), so the Beater owns shutdown sequencing
+	// and the pipeline is not torn down out from under still-running inputs.
+	// See issue https://github.com/elastic/beats/issues/49794.
+	// Size the watchdog grace from the Beater's reported shutdown drain (set by
+	// the Creator) so a configured shutdown_timeout is not cut short: wait the
+	// full drain plus a 1s margin for the rest of the Beater's cleanup before
+	// forcing a disconnect. Beaters that report no drain fall back to the
+	// default grace period. Read here in the main goroutine, before the stop
+	// callback can run, so there is no race with the Creator that set it.
+	watchdogGrace := beaterStopGracePeriod
+	if b.ShutdownTimeout > 0 {
+		watchdogGrace = b.ShutdownTimeout + beaterStopGraceMargin
+	}
+
 	var stopOnce sync.Once
 	b.Manager.SetStopCallback(
 		func() {
 			stopOnce.Do(func() {
 				b.Instrumentation.Tracer().Close()
-				// If the publisher has a Close() method, call it before stopping the beater.
-				if c, ok := b.Publisher.(io.Closer); ok {
-					c.Close()
-				}
 				beater.Stop()
+				// Backstop: if Run does not return promptly (e.g. the beater is
+				// blocked in a guaranteed Publish), disconnect the pipeline
+				// after a grace period so the blocked publish is released and
+				// shutdown can complete. A prompt shutdown closes runReturned
+				// first and never reaches the timeout.
+				go runShutdownWatchdog(runReturned, watchdogGrace, func() {
+					logger.Warnf("Beater did not return within %s of being told to stop; forcing publisher pipeline disconnect", watchdogGrace)
+					if b.Publisher != nil {
+						_ = b.Publisher.Disconnect(context.Background())
+					}
+				})
 			})
 		})
 
@@ -540,6 +583,20 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	logger.Infof("%s start running.", b.Info.Beat)
 
 	err = beater.Run(&b.Beat)
+	// Signal the watchdog that Run returned, so it does not force a disconnect.
+	close(runReturned)
+
+	// The beater has returned: it has stopped its inputs and finalized its
+	// clients. Now disconnect the publisher pipeline so it can flush and
+	// acknowledge any outstanding events before we exit. Disconnect is
+	// idempotent, so a beater that already drained the pipeline itself with its
+	// own bounded timeout reaches this as a harmless no-op.
+	if b.Publisher != nil {
+		if derr := b.Publisher.Disconnect(context.Background()); derr != nil {
+			logger.Errorf("error disconnecting publisher pipeline: %v", derr)
+		}
+	}
+
 	if b.shouldReexec {
 		if err := b.reexec(); err != nil {
 			return fmt.Errorf("could not restart %s: %w", b.Info.Beat, err)
@@ -665,7 +722,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat, b.Info.Logger)
+			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info)
 			if err != nil {
 				return err
 			}
@@ -741,12 +798,34 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags converts -flag to --flags, parses the command line
-// flags, and it invokes the HandleFlags callback if implemented by
-// the Beat.
+// HostnameFlag holds the value of the --hostname flag.
+var HostnameFlag string
+
+// handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	flag.Parse()
 	return cfgfile.HandleFlags()
+}
+
+// ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
+// hostname override used by processors (add_host_metadata, add_observer_metadata).
+// It is a no-op when h is empty or blank.
+func (b *Beat) ApplyHostname(h, source string) {
+	if strings.TrimSpace(h) == "" {
+		return
+	}
+	beat.SetHostnameOverride(h)
+	h = beat.GetHostnameOverride()
+	b.Info.Hostname = h
+	b.Info.FQDN = h
+	b.hostnameOverride = h
+	if b.Info.Logger != nil {
+		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
+	}
+}
+
+// HostnameOverride returns the hostname override of this beat, or "" when it has none.
+func (b *Beat) HostnameOverride() string {
+	return b.hostnameOverride
 }
 
 // config reads the configuration file from disk, parses the common options
@@ -767,7 +846,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths
+	b.Info.Paths = paths.Paths //nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -812,6 +891,13 @@ func (b *Beat) configure(settings Settings) error {
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
+
+	hostname := b.Config.Hostname
+	if HostnameFlag != "" {
+		hostname = HostnameFlag
+	}
+	b.ApplyHostname(hostname, "hostname config")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -841,23 +927,25 @@ func (b *Beat) configure(settings Settings) error {
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return fmt.Errorf("failed to get host information: %w", err)
-	}
+	if b.hostnameOverride == "" {
+		// Try to get the host's FQDN and set it.
+		h, err := sysinfo.Host()
+		if err != nil {
+			return fmt.Errorf("failed to get host information: %w", err)
+		}
 
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
+		fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
 
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+		fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// initialize config manager
@@ -1206,65 +1294,10 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	if !extendedTLSCfg.Reload.Enabled {
 		return nil
 	}
-	logger.Debug("exit on CA certs change enabled")
 
-	possibleFilesToWatch := append(
-		extendedTLSCfg.CAs,
-		extendedTLSCfg.Certificate.Certificate,
-		extendedTLSCfg.Certificate.Key,
-	)
-
-	filesToWatch := []string{}
-	for _, f := range possibleFilesToWatch {
-		if f == "" {
-			continue
-		}
-		if tlscommon.IsPEMString(f) {
-			// That's an embedded cert, we're only interested in files
-			continue
-		}
-
-		logger.Debugf("watching '%s' for changes", f)
-		filesToWatch = append(filesToWatch, f)
-	}
-
-	// If there are no files to watch, don't do anything.
-	if len(filesToWatch) == 0 {
-		logger.Debug("no files to watch, filewatcher will not be started")
-		return nil
-	}
-
-	watcher := filewatcher.New(filesToWatch...)
-	// Ignore the first scan as it will always return
-	// true for files changed. The output has not been
-	// started yet, so even if the files have changed since
-	// the Beat started, they don't need to be reloaded
-	_, _, _ = watcher.Scan()
-
-	// Watch for file changes while the Beat is alive
-	go func() {
-		ticker := time.Tick(extendedTLSCfg.Reload.Period)
-
-		for {
-			<-ticker
-			files, changed, err := watcher.Scan()
-			if err != nil {
-				logger.Warnf("could not scan certificate files: %s", err.Error())
-			}
-
-			if changed {
-				logger.Infof(
-					"some of the following files have been modified: %v, restarting %s.",
-					files, b.Info.Beat)
-
-				b.shouldReexec = true
-				b.Manager.Stop()
-
-				// we're done, finish the goroutine just for the sake of it
-				return
-			}
-		}
-	}()
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
+		"TLS certificates and CAs are now automatically reloaded using 'ssl.certificate_reload'. " +
+		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 
 	return nil
 }
@@ -1507,6 +1540,7 @@ func InitPaths(cfg *config.C) error {
 		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
+	//nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %w", err)
 	}
@@ -1577,4 +1611,17 @@ func (bc *beatConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// runShutdownWatchdog releases the publisher pipeline if a Beater's Run does not
+// return within grace after it was told to stop, as a backstop against a hung
+// beater (for example one blocked in a guaranteed Publish). It returns
+// immediately once runReturned is closed — the normal, prompt shutdown — and
+// otherwise calls disconnect once after the grace period.
+func runShutdownWatchdog(runReturned <-chan struct{}, grace time.Duration, disconnect func()) {
+	select {
+	case <-runReturned:
+	case <-time.After(grace):
+		disconnect()
+	}
 }

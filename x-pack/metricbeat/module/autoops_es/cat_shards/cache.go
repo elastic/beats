@@ -63,7 +63,8 @@ var (
 				IsUsable: func(obj *NodeIndexShards) bool {
 					return obj.IndexingIndexTotal != nil && obj.IndexingIndexTotalTime != nil
 				},
-				WriteValue: func(obj *NodeIndexShards, value float64) { obj.IndexLatencyInMillis = &value },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.IndexLatencyInMillis = &value },
+				MaxValueMillis: utils.SamplingIntervalMillis[NodeIndexShards],
 			},
 			{
 				CalculateValue: utils.CalculateLatency,
@@ -73,7 +74,8 @@ var (
 				IsUsable: func(obj *NodeIndexShards) bool {
 					return obj.MergesTotal != nil && obj.MergesTotalTime != nil
 				},
-				WriteValue: func(obj *NodeIndexShards, value float64) { obj.MergeLatencyInMillis = &value },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.MergeLatencyInMillis = &value },
+				MaxValueMillis: utils.SamplingIntervalMillis[NodeIndexShards],
 			},
 			{
 				CalculateValue: utils.CalculateLatency,
@@ -83,7 +85,8 @@ var (
 				IsUsable: func(obj *NodeIndexShards) bool {
 					return obj.SearchQueryTotal != nil && obj.SearchQueryTime != nil
 				},
-				WriteValue: func(obj *NodeIndexShards, value float64) { obj.SearchLatencyInMillis = &value },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.SearchLatencyInMillis = &value },
+				MaxValueMillis: utils.SamplingIntervalMillis[NodeIndexShards],
 			},
 		},
 	}
@@ -121,6 +124,7 @@ func enrichIndexMetadata(nodeIndexShards *NodeIndexShards, indexMetadata map[str
 	if metadata, found := indexMetadata[nodeIndexShards.Index]; found {
 		nodeIndexShards.Aliases = metadata.aliases
 		nodeIndexShards.Attributes = metadata.attributes
+		nodeIndexShards.DataStream = metadata.dataStream
 		nodeIndexShards.IndexType = &metadata.indexType
 		nodeIndexShards.IsHidden = &metadata.hidden
 		nodeIndexShards.IsOpen = &metadata.open

@@ -34,6 +34,9 @@ type EventLog interface {
 	// from the first event specify a zero-valued EventLogState.
 	Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error
 
+	// Checkpoint returns the last successfully read event state.
+	Checkpoint() checkpoint.EventLogState
+
 	// Read records from the event log. If io.EOF is returned you should stop
 	// reading and close the log.
 	Read() ([]Record, error)

@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Disable Winlogbeat record ID gap detection when using xml_query so filtered queries do not loop on non-contiguous record IDs.
-component: winlogbeat

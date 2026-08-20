@@ -256,11 +256,8 @@ func handshakePayload(secLayer byte, maxSize uint32, authzid []byte) []byte {
 	selectedSecurity := secLayer
 	var truncatedSize uint32
 	if selectedSecurity != 0 {
-		// Only 3 bytes available for max size, set to 0x00FFFFFF per RFC 4752.
-		truncatedSize = 0b00000000_11111111_11111111_11111111
-		if truncatedSize > maxSize {
-			truncatedSize = maxSize
-		}
+		// Only 3 bytes available for max size, set to 0x00FFFFFF per RFC 4752, sections 3.1 and 3.2.
+		truncatedSize = min(0x00_FF_FF_FF, maxSize)
 	}
 	payload := make([]byte, 4, 4+len(authzid))
 	binary.BigEndian.PutUint32(payload, truncatedSize)
@@ -283,6 +280,10 @@ func newLDAPGSSAPIClientWithCBT(secChannelBindings []byte) (*ldapGSSAPIClientCBT
 		return nil, err
 	}
 	return &ldapGSSAPIClientCBT{creds: creds, cbt: secChannelBindings}, nil
+}
+
+func (c *ldapGSSAPIClientCBT) InitSecContextWithOptions(target string, token []byte, _ []int) ([]byte, bool, error) {
+	return c.InitSecContext(target, token)
 }
 
 func (c *ldapGSSAPIClientCBT) InitSecContext(target string, token []byte) ([]byte, bool, error) {

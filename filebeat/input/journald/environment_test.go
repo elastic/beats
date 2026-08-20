@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
@@ -79,12 +80,12 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-		e.plugin = Plugin(logp.L(), e.stateStore)
+		e.plugin = Plugin(logptest.NewTestingLogger(e.t, ""), e.stateStore)
 	})
 	return e.plugin.Manager
 }
 
-func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Input {
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
@@ -237,6 +238,10 @@ func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
+}
+
 func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
 }
@@ -320,6 +325,7 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
+	//nolint:gosec // cancel is passed to the mockClient
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &mockClient{
 		canceler:   cancel,
@@ -331,6 +337,19 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	return c, nil
 }
 
+func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, c := range pc.clients {
+		if err := c.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
 	if !blocking {
 		return config.EventListener
@@ -340,7 +359,7 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 }
 
 func blockingACKer(starter context.Context) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		for starter.Err() == nil {
 		}
 	})

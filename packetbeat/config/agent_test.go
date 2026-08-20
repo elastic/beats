@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestAgentInputNormalization(t *testing.T) {
@@ -85,16 +86,16 @@ streams:
       type: logs
 `)
 	require.NoError(t, err)
-	config, err := NewAgentConfig(cfg)
+	config, err := NewAgentConfig(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	require.Equal(t, config.Flows.Timeout, "10s")
 	require.Equal(t, config.Flows.Index, "logs-packet.flow-default")
 	require.Len(t, config.ProtocolsList, 2)
 
-	var protocol map[string]interface{}
+	var protocol map[string]any
 	require.NoError(t, config.ProtocolsList[0].Unpack(&protocol))
-	require.Len(t, protocol["processors"].([]interface{}), 3)
+	require.Len(t, protocol["processors"].([]any), 3)
 	require.Equal(t, "default_route", config.Interfaces[0].Device)
 	require.Equal(t, "en1", config.Interfaces[1].Device)
 	require.Equal(t, "en2", config.Interfaces[2].Device)

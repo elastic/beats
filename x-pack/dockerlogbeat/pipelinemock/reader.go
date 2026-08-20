@@ -10,9 +10,10 @@ import (
 	"io"
 	"testing"
 
-	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
 )
 
 // CreateTestInputFromLine returns a ReadCloser based on an input string
@@ -40,7 +41,7 @@ func encodeLog(t *testing.T, out io.Writer, entry *logdriver.LogEntry) {
 	require.NoError(t, err)
 
 	sizeBytes := make([]byte, 4)
-	binary.BigEndian.PutUint32(sizeBytes, uint32(len(rawBytes)))
+	binary.BigEndian.PutUint32(sizeBytes, uint32(len(rawBytes))) //nolint:gosec // test helper with controlled input, length cannot exceed uint32 bounds
 
 	_, err = out.Write(sizeBytes)
 	require.NoError(t, err)

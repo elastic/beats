@@ -21,6 +21,11 @@ PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/
 # makefile targets. After all Beats converge to primarily using Mage we can
 # remove this and treat all sub-projects the same.
 PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG) x-pack/libbeat
+# PROJECTS_CLEAN includes generated artifact owners that are not part of the
+# broader root-level project loops.
+PROJECTS_CLEAN=$(PROJECTS) $(PROJECTS_XPACK_MAGE) x-pack/otel
+# PROJECTS_CHECK includes projects that support the root-level check contract.
+PROJECTS_CHECK=$(filter-out x-pack/otel,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE))
 
 #
 # Includes
@@ -75,13 +80,13 @@ update: notice
 .PHONY: clean
 clean: mage
 	@rm -rf build
-	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
+	@$(foreach var,$(PROJECTS_CLEAN),$(MAKE) -C $(var) clean || exit 1;)
 	@-mage -clean
 
 ## check : TBD.
 .PHONY: check
 check:
-	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
+	@$(foreach var,$(PROJECTS_CHECK),$(MAKE) -C $(var) check || exit 1;)
 	$(MAKE) check-python
 	# check if vendor folder does not exists
 	[ ! -d vendor ]

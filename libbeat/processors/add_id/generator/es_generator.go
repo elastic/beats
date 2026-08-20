@@ -87,10 +87,7 @@ func timestamp(clockTS, lastTS uint64, seq uint64) uint64 {
 	// Don't let timestamp go backwards, at least "on our watch" (while this process is running).  We are still vulnerable if we are
 	// shut down, clock goes backwards, and we restart... for this we randomize the sequenceNumber on init to decrease chance of
 	// collision.
-	newTS := lastTS
-	if clockTS > lastTS {
-		newTS = clockTS
-	}
+	newTS := max(clockTS, lastTS)
 
 	// Always force the clock to increment whenever sequence number is 0, in case we have a long time-slip backwards.
 	if seq == 0 {

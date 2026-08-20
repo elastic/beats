@@ -56,7 +56,7 @@ type stream struct {
 // PerfChannel represents a channel to receive perf events.
 type PerfChannel struct {
 	done    chan struct{}
-	sampleC chan interface{}
+	sampleC chan any
 	errC    chan error
 	lostC   chan uint64
 
@@ -289,7 +289,7 @@ func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 }
 
 // C returns the channel to read samples from.
-func (c *PerfChannel) C() <-chan interface{} {
+func (c *PerfChannel) C() <-chan any {
 	return c.sampleC
 }
 
@@ -312,7 +312,7 @@ func (c *PerfChannel) Run() error {
 	if !atomic.CompareAndSwapUintptr(&c.running, 0, 1) {
 		return ErrAlreadyRunning
 	}
-	c.sampleC = make(chan interface{}, c.sizeSampleC)
+	c.sampleC = make(chan any, c.sizeSampleC)
 	c.errC = make(chan error, c.sizeErrC)
 	c.lostC = make(chan uint64, c.sizeLostC)
 
@@ -375,7 +375,7 @@ func (ctx doneWrapperContext) Err() error {
 }
 
 // Value always returns nil.
-func (ctx doneWrapperContext) Value(key interface{}) interface{} {
+func (ctx doneWrapperContext) Value(key any) any {
 	return nil
 }
 

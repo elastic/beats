@@ -18,6 +18,8 @@
 package pipetool
 
 import (
+	"context"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -45,6 +47,10 @@ func (p *connectEditPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, e
 	return p.parent.ConnectWith(cfg)
 }
 
+func (p *connectEditPipeline) Disconnect(ctx context.Context) error {
+	return p.parent.Disconnect(ctx)
+}
+
 // wrapClientPipeline applies edit to the beat.Client returned by Connect and ConnectWith.
 // The edit function can wrap the client to add additional functionality to clients
 // that connect to the pipeline.
@@ -66,6 +72,10 @@ func (p *wrapClientPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, er
 		client = p.wrapper(client)
 	}
 	return client, err
+}
+
+func (p *wrapClientPipeline) Disconnect(ctx context.Context) error {
+	return p.parent.Disconnect(ctx)
 }
 
 // WithClientConfigEdit creates a pipeline connector, that allows the

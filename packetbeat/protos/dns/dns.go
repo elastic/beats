@@ -224,8 +224,8 @@ func init() {
 	protos.Register("dns", New)
 }
 
-func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
-	p := &dnsPlugin{logger: logp.NewLogger("dns")}
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C, logger *logp.Logger) (protos.Plugin, error) {
+	p := &dnsPlugin{logger: logger.Named("dns")}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -513,8 +513,8 @@ func addDNSToMapStr(m mapstr.M, pbf *pb.Fields, dns *mkdns.Msg, authority bool, 
 			qMapStr["etld_plus_one"] = eTLDPlusOne
 			qMapStr["registered_domain"] = eTLDPlusOne
 
-			if idx := strings.IndexByte(eTLDPlusOne, '.'); idx != -1 {
-				qMapStr["top_level_domain"] = eTLDPlusOne[idx+1:]
+			if _, after, ok := strings.Cut(eTLDPlusOne, "."); ok {
+				qMapStr["top_level_domain"] = after
 			}
 
 			subdomain := strings.TrimRight(strings.TrimSuffix(q.Name, eTLDPlusOne), ".")

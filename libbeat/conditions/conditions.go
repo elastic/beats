@@ -28,15 +28,15 @@ const logName = "conditions"
 
 // Config represents a configuration for a condition, as you would find it in the config files.
 type Config struct {
-	Equals    *Fields                `config:"equals"`
-	Contains  *Fields                `config:"contains"`
-	Regexp    *Fields                `config:"regexp"`
-	Range     *Fields                `config:"range"`
-	HasFields []string               `config:"has_fields"`
-	Network   map[string]interface{} `config:"network"`
-	OR        []Config               `config:"or"`
-	AND       []Config               `config:"and"`
-	NOT       *Config                `config:"not"`
+	Equals    *Fields        `config:"equals"`
+	Contains  *Fields        `config:"contains"`
+	Regexp    *Fields        `config:"regexp"`
+	Range     *Fields        `config:"range"`
+	HasFields []string       `config:"has_fields"`
+	Network   map[string]any `config:"network"`
+	OR        []Config       `config:"or"`
+	AND       []Config       `config:"and"`
+	NOT       *Config        `config:"not"`
 }
 
 // Condition is the interface for all defined conditions
@@ -48,7 +48,7 @@ type Condition interface {
 // ValuesMap provides a common interface to read matchers for condition checking
 type ValuesMap interface {
 	// GetValue returns the given field from the map
-	GetValue(string) (interface{}, error)
+	GetValue(string) (any, error)
 }
 
 // NewCondition takes a Config and turns it into a real Condition

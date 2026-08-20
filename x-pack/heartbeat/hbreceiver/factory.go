@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 
 	// Import OSS monitor types.
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
@@ -42,7 +41,6 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("could not convert otel config to heartbeat config")
 	}
 	settings := cmd.HeartbeatSettings()
-	settings.Processing = processing.MakeDefaultSupport(true, nil, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
 
 	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())

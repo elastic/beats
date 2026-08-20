@@ -35,6 +35,8 @@ type transactions struct {
 	onTransaction transactionHandler
 
 	watcher *procs.ProcessesWatcher
+
+	logger *logp.Logger
 }
 
 type transactionConfig struct {
@@ -48,10 +50,11 @@ type messageList struct {
 	head, tail *message
 }
 
-func (trans *transactions) init(c *transactionConfig, watcher *procs.ProcessesWatcher, cb transactionHandler) {
+func (trans *transactions) init(c *transactionConfig, watcher *procs.ProcessesWatcher, cb transactionHandler, logger *logp.Logger) {
 	trans.config = c
 	trans.watcher = watcher
 	trans.onTransaction = cb
+	trans.logger = logger
 }
 
 func (trans *transactions) onMessage(
@@ -65,15 +68,11 @@ func (trans *transactions) onMessage(
 	msg.CmdlineTuple = trans.watcher.FindProcessesTupleTCP(&msg.Tuple)
 
 	if msg.IsRequest {
-		if isDebug {
-			debugf("Received request with tuple: %s", tuple)
-		}
-		err = trans.onRequest(tuple, dir, msg)
+		trans.logger.Debugf("Received request with tuple: %s", tuple)
+		err = trans.onRequest(msg)
 	} else {
-		if isDebug {
-			debugf("Received response with tuple: %s", tuple)
-		}
-		err = trans.onResponse(tuple, dir, msg)
+		trans.logger.Debugf("Received response with tuple: %s", tuple)
+		err = trans.onResponse(msg)
 	}
 
 	return err
@@ -82,8 +81,6 @@ func (trans *transactions) onMessage(
 // onRequest handles request messages, merging with incomplete requests
 // and adding non-merged requests into the correlation list.
 func (trans *transactions) onRequest(
-	tuple *common.IPPortTuple,
-	dir uint8,
 	msg *message,
 ) error {
 	prev := trans.requests.last()
@@ -107,8 +104,6 @@ func (trans *transactions) onRequest(
 // onRequest handles response messages, merging with incomplete requests
 // and adding non-merged responses into the correlation list.
 func (trans *transactions) onResponse(
-	tuple *common.IPPortTuple,
-	dir uint8,
 	msg *message,
 ) error {
 	prev := trans.responses.last()
@@ -156,9 +151,7 @@ func (trans *transactions) correlate() error {
 			}
 
 			if resp.header["op"] == "EVENT" {
-				if isDebug {
-					logp.Debug("cassandra", "server pushed message,%v", resp.header)
-				}
+				trans.logger.Debugf("server pushed message,%v", resp.header)
 
 				responses.pop()
 
@@ -169,7 +162,7 @@ func (trans *transactions) correlate() error {
 				return nil
 			}
 
-			logp.Warn("Response from unknown transaction. Ignoring. %v", resp.header)
+			trans.logger.Warnf("Response from unknown transaction. Ignoring. %v", resp.header)
 			responses.pop()
 		}
 		return nil

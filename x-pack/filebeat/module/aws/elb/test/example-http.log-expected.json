@@ -99,7 +99,6 @@
         "tags": [
             "forwarded"
         ],
-        "url.domain": null,
         "url.original": "http://www.example.com:80-",
         "url.path": "",
         "url.scheme": "http",

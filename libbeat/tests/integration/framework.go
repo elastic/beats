@@ -54,6 +54,7 @@ import (
 
 	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
@@ -171,6 +172,11 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 	return b
 }
 
+// NewFilebeat is a shorthand for NewBeat(t,"filebeat","../../filebeat.test")
+func NewFilebeat(t *testing.T) *BeatProc {
+	return NewBeat(t, "filebeat", "../../filebeat.test")
+}
+
 // Start starts the Beat process
 // args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
@@ -186,14 +192,12 @@ func (b *BeatProc) Start(args ...string) {
 	var done atomic.Bool
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for !done.Load() {
 				b.startBeat()
 				b.waitBeatToExit()
 			}
-		}()
+		})
 	} else {
 		b.startBeat()
 	}
@@ -278,7 +282,11 @@ func (b *BeatProc) waitBeatToExit() {
 	}
 	defer b.waitingMutex.Unlock()
 
-	if err := b.Cmd.Wait(); err != nil {
+	err := b.Cmd.Wait()
+	// Check before any potential Fatalf so a data race is reported with a
+	// clear message even when it also caused a non-zero exit code.
+	b.checkForDataRace()
+	if err != nil {
 		exitCode := "unknown"
 		if b.Cmd.ProcessState != nil {
 			exitCode = strconv.Itoa(b.Cmd.ProcessState.ExitCode())
@@ -316,6 +324,7 @@ func (b *BeatProc) stopNonsynced() {
 		}
 		defer b.waitingMutex.Unlock()
 		err := b.Cmd.Wait()
+		b.checkForDataRace()
 		if err != nil {
 			if b.expectedErrorCode != 0 {
 				if b.Cmd.ProcessState.ExitCode() != b.expectedErrorCode {
@@ -640,6 +649,48 @@ func (b *BeatProc) WaitLogsContainsAnyOrder(msgs []string, timeout time.Duration
 		100*time.Millisecond,
 		msg,
 	)
+}
+
+// MonitoringPort waits for the Beat's HTTP monitoring server to log its
+// listening address and returns the ephemeral port it bound to.
+//
+// Configure the Beat with `http.port: 0` so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port.
+func (b *BeatProc) MonitoringPort(timeout time.Duration) int {
+	return b.portFromLog(timeout, MonitoringEndpointSnippet, ParseMonitoringPort,
+		"Beat monitoring endpoint did not log its listening address")
+}
+
+// SocketListeningPort waits for a tcp or udp input to log its listening address
+// and returns the ephemeral port it bound to.
+//
+// Configure the input with host: <ip>:0 so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port.
+func (b *BeatProc) SocketListeningPort(timeout time.Duration) int {
+	return b.portFromLog(timeout, SocketListeningSnippet, ParseSocketListeningPort,
+		"input did not log its listening address")
+}
+
+// portFromLog polls the Beat's logs until a line containing snippet appears and
+// parse can extract a port from it, then returns that port.
+func (b *BeatProc) portFromLog(timeout time.Duration, snippet string, parse func(string) (int, error), failMsg string) int {
+	b.t.Helper()
+	var port int
+	require.Eventuallyf(b.t, func() bool {
+		line := b.GetLogLine(snippet)
+		if line == "" {
+			return false
+		}
+		p, err := parse(line)
+		if err != nil {
+			return false
+		}
+		port = p
+		return true
+	}, timeout, 100*time.Millisecond, failMsg)
+	return port
 }
 
 // WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
@@ -1093,6 +1144,36 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 	return io.ReadAll(f)
 }
 
+// raceDetectorMarker is the header the Go race detector prints to stderr when
+// it detects a data race. It is only emitted when the binary was built with
+// -race (see testbin.RaceDetectorEnvVar). The marker is written as the race
+// happens, independently of the process exit code, so without explicitly
+// scanning for it a race can go unnoticed when the Beat is stopped by a signal.
+const raceDetectorMarker = "WARNING: DATA RACE"
+
+// checkForDataRace scans the Beat's stderr for a race detector report and fails
+// the test if one is found. It only does work when the Beat binary was built
+// with the race detector (testbin.RaceDetectorEnvVar=true); otherwise the
+// marker can never appear, so the stderr read is skipped.
+//
+// It must be called after the process has exited (Cmd.Wait returned) so stderr
+// is fully flushed, and before the next startBeat truncates the file.
+func (b *BeatProc) checkForDataRace() {
+	b.t.Helper()
+	if !testbin.RaceDetectorEnabled() {
+		return
+	}
+	data, err := os.ReadFile(b.stderr.Name())
+	if err != nil {
+		b.t.Logf("could not read stderr to check for data races: %s", err)
+		return
+	}
+	if idx := bytes.Index(data, []byte(raceDetectorMarker)); idx != -1 {
+		b.t.Errorf("data race detected while running %q (binary built with -race):\n%s",
+			b.beatName, data[idx:])
+	}
+}
+
 func reportErrors(t *testing.T, tempDir string, beatName string) {
 	var maxlen int64 = 1024
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
@@ -1292,7 +1373,18 @@ func (b *BeatProc) RemoveOutputFile() {
 //	func TestMain(m *testing.M) {
 //	    integration.TestMainWithBuild(m, "filebeat")
 //	}
+//
+// Running with -race (go test -race) auto-enables INTEG_RACE_DETECTOR so the
+// Beat is also built with -race and its stderr is scanned for race reports;
+// setting INTEG_RACE_DETECTOR=true directly has the same effect.
 func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
+	if raceBuildEnabled {
+		if err := os.Setenv(testbin.RaceDetectorEnvVar, "true"); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to enable %s for -race build: %s\n", testbin.RaceDetectorEnvVar, err)
+			os.Exit(1)
+		}
+	}
+
 	beatRoot, err := filepath.Abs("../../")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
@@ -1337,4 +1429,46 @@ func GetEventsFromFileOutput[E any](b *BeatProc, n int, waitForFile bool) []E {
 	}
 
 	return events
+}
+
+// GetMetricsFromLogs finds the next 'Non-zero metrics in the last' log entry
+// and parses [metricName] as E, [metricName] must use the dotted path
+// notation. Ex: 'monitoring.metrics.filebeat.filestream'.
+// GetMetricsFromLogs uses our elastic-agent-libs/config to
+// easily parse the metrics JSON using the dotted notation.
+// On error, t.Fatal is called, however error accessing the metric
+// is ignored because some monitoring metrics entries might not contain
+// all metrics.
+func GetMetricsFromLogs[E any](b *BeatProc, metricName string) E {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	var found bool
+	var line string
+	var m E
+	found, b.logFileOffset, line = b.searchStrInLogs(logFile, "Non-zero metrics in the last", b.logFileOffset)
+	if found {
+		var event map[string]any
+		if err := json.Unmarshal([]byte(line), &event); err != nil {
+			b.t.Fatalf("cannot parse log metrics as JSON: %s", err)
+		}
+
+		cc, err := config.NewConfigFrom(event)
+		if err != nil {
+			b.t.Fatal(err)
+		}
+		if has, err := cc.Has(metricName, -1); has && err == nil {
+			child, err := cc.Child(metricName, -1)
+			if err != nil {
+				b.t.Fatalf("cannot get %q: %s", metricName, err)
+			}
+			if err := child.Unpack(&m); err != nil {
+				b.t.Fatalf("cannot parse metrics: %s", err)
+			}
+
+			return m
+		}
+	}
+
+	return m
 }

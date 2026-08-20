@@ -25,8 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -42,10 +42,10 @@ func TestMain(m *testing.M) {
 }
 
 func TestGenerateHints(t *testing.T) {
-	customDockerCfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	customDockerCfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"type": "docker",
-			"containers": map[string]interface{}{
+			"containers": map[string]any{
 				"ids": []string{
 					"${data.container.id}",
 				},
@@ -54,16 +54,16 @@ func TestGenerateHints(t *testing.T) {
 		},
 	})
 
-	customContainerCfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	customContainerCfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"type": "container",
 			"paths": []string{
 				"/var/lib/docker/containers/${data.container.id}/*-json.log",
 			},
 			"close_timeout": "true",
-			"processors": []interface{}{
-				map[string]interface{}{
-					"add_tags": map[string]interface{}{
+			"processors": []any{
+				map[string]any{
+					"add_tags": map[string]any{
 						"tags":   []string{"web"},
 						"target": "environment",
 					},
@@ -72,12 +72,12 @@ func TestGenerateHints(t *testing.T) {
 		},
 	})
 
-	customFilestreamCfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	customFilestreamCfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"type": "filestream",
 			"id":   "kubernetes-container-logs-${data.kubernetes.container.id}",
-			"prospector": map[string]interface{}{
-				"scanner": map[string]interface{}{
+			"prospector": map[string]any{
+				"scanner": map[string]any{
 					"fingerprint.enabled": true,
 					"symlinks":            true,
 				},
@@ -86,9 +86,9 @@ func TestGenerateHints(t *testing.T) {
 			"paths": []string{
 				"/var/log/containers/*-${data.kubernetes.container.id}.log",
 			},
-			"parsers": []interface{}{
-				map[string]interface{}{
-					"container": map[string]interface{}{
+			"parsers": []any{
+				map[string]any{
+					"container": map[string]any{
 						"stream": "all",
 						"format": "auto",
 					},
@@ -99,8 +99,8 @@ func TestGenerateHints(t *testing.T) {
 
 	defaultCfg := conf.NewConfig()
 
-	defaultDisabled := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	defaultDisabled := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"enabled": "false",
 		},
 	})
@@ -296,8 +296,8 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
 					"close_timeout": "true",
 				},
@@ -329,11 +329,11 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"include_lines": []interface{}{"^test", "^test1"},
-					"exclude_lines": []interface{}{"^test2", "^test3"},
+					"include_lines": []any{"^test", "^test1"},
+					"exclude_lines": []any{"^test2", "^test3"},
 					"close_timeout": "true",
 				},
 			},
@@ -368,18 +368,18 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"exclude_lines": []interface{}{"^test1", "^test2"},
+					"exclude_lines": []any{"^test1", "^test2"},
 					"close_timeout": "true",
 				},
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"include_lines": []interface{}{"^test1", "^test2"},
+					"include_lines": []any{"^test1", "^test2"},
 					"close_timeout": "true",
 				},
 			},
@@ -412,10 +412,10 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"multiline": map[string]interface{}{
+					"multiline": map[string]any{
 						"pattern": "^test",
 						"negate":  "true",
 					},
@@ -451,30 +451,30 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"id":    "kubernetes-container-logs-abc",
-					"paths": []interface{}{"/var/log/containers/*-abc.log"},
-					"parsers": []interface{}{
-						map[string]interface{}{
-							"container": map[string]interface{}{
+					"paths": []any{"/var/log/containers/*-abc.log"},
+					"parsers": []any{
+						map[string]any{
+							"container": map[string]any{
 								"format": "auto",
 								"stream": "all",
 							},
 						},
-						map[string]interface{}{
-							"multiline": map[string]interface{}{
+						map[string]any{
+							"multiline": map[string]any{
 								"pattern": "^test",
 								"negate":  "true",
 							},
 						},
 					},
-					"prospector": map[string]interface{}{
-						"scanner": map[string]interface{}{
+					"prospector": map[string]any{
+						"scanner": map[string]any{
 							"symlinks": true,
-							"fingerprint": map[string]interface{}{
+							"fingerprint": map[string]any{
 								"enabled": true,
 							},
 						},
 					},
-					"file_identity": map[string]interface{}{
+					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
 					"type": "filestream",
@@ -509,30 +509,30 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"id":    "kubernetes-container-logs-abc",
-					"paths": []interface{}{"/var/log/containers/*-abc.log"},
-					"parsers": []interface{}{
-						map[string]interface{}{
-							"container": map[string]interface{}{
+					"paths": []any{"/var/log/containers/*-abc.log"},
+					"parsers": []any{
+						map[string]any{
+							"container": map[string]any{
 								"format": "auto",
 								"stream": "all",
 							},
 						},
-						map[string]interface{}{
-							"ndjson": map[string]interface{}{
+						map[string]any{
+							"ndjson": map[string]any{
 								"add_error_key": true,
 								"expand_keys":   true,
 							},
 						},
 					},
-					"prospector": map[string]interface{}{
-						"scanner": map[string]interface{}{
+					"prospector": map[string]any{
+						"scanner": map[string]any{
 							"symlinks": true,
-							"fingerprint": map[string]interface{}{
+							"fingerprint": map[string]any{
 								"enabled": true,
 							},
 						},
 					},
-					"file_identity": map[string]interface{}{
+					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
 					"type": "filestream",
@@ -567,18 +567,18 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "container",
-					"paths": []interface{}{
+					"paths": []any{
 						"/var/lib/docker/containers/abc/*-json.log",
 					},
 					"close_timeout": "true",
-					"json": map[string]interface{}{
+					"json": map[string]any{
 						"add_error_key": true,
 						"expand_keys":   true,
 					},
-					"processors": []interface{}{
-						map[string]interface{}{
-							"add_tags": map[string]interface{}{
-								"tags":   []interface{}{"web"},
+					"processors": []any{
+						map[string]any{
+							"add_tags": map[string]any{
+								"tags":   []any{"web"},
 								"target": "environment",
 							},
 						},
@@ -611,10 +611,10 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"multiline": map[string]interface{}{
+					"multiline": map[string]any{
 						"pattern": "^test",
 						"negate":  "true",
 					},
@@ -640,7 +640,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -653,17 +653,17 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
 					"close_timeout": "true",
-					"processors": []interface{}{
-						map[string]interface{}{
-							"dissect": map[string]interface{}{
+					"processors": []any{
+						map[string]any{
+							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"drop_event": nil,
 						},
 					},
@@ -689,7 +689,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -702,23 +702,23 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "container",
-					"paths": []interface{}{
+					"paths": []any{
 						"/var/lib/docker/containers/abc/*-json.log",
 					},
 					"close_timeout": "true",
-					"processors": []interface{}{
-						map[string]interface{}{
-							"add_tags": map[string]interface{}{
-								"tags":   []interface{}{"web"},
+					"processors": []any{
+						map[string]any{
+							"add_tags": map[string]any{
+								"tags":   []any{"web"},
 								"target": "environment",
 							},
 						},
-						map[string]interface{}{
-							"dissect": map[string]interface{}{
+						map[string]any{
+							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"drop_event": nil,
 						},
 					},
@@ -750,24 +750,24 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
 					},
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
@@ -801,24 +801,24 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
 					},
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": false,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
@@ -853,24 +853,24 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "stdout",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
 					},
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "stderr",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
@@ -1264,8 +1264,8 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			len:  1,
 			result: mapstr.M{
 				"type": "docker",
-				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+				"containers": map[string]any{
+					"paths": []any{"/var/lib/docker/containers/abc/*-json.log"},
 				},
 				"close_timeout": "true",
 			},
@@ -1292,7 +1292,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -1305,17 +1305,17 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: mapstr.M{
 				"type": "docker",
-				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
+				"containers": map[string]any{
+					"paths": []any{"/var/log/pods/12345/foobar/*.log"},
 				},
 				"close_timeout": "true",
-				"processors": []interface{}{
-					map[string]interface{}{
-						"dissect": map[string]interface{}{
+				"processors": []any{
+					map[string]any{
+						"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 							"tokenizer": "%{key1} %{key2}",
 						},
 					},
-					map[string]interface{}{
+					map[string]any{
 						"drop_event": nil,
 					},
 				},
@@ -1349,24 +1349,24 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: mapstr.M{
 				"module": "apache",
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"enabled": true,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
 				},
-				"access": map[string]interface{}{
+				"access": map[string]any{
 					"enabled": true,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -1402,24 +1402,24 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: mapstr.M{
 				"module": "apache",
-				"access": map[string]interface{}{
+				"access": map[string]any{
 					"enabled": true,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
 				},
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"enabled": false,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -1429,10 +1429,10 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := conf.NewConfigFrom(map[string]interface{}{
-			"default_config": map[string]interface{}{
+		cfg, _ := conf.NewConfigFrom(map[string]any{
+			"default_config": map[string]any{
 				"type": "docker",
-				"containers": map[string]interface{}{
+				"containers": map[string]any{
 					"paths": []string{
 						test.path,
 					},

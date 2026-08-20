@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/moby/moby/api/types/container"
@@ -76,7 +76,7 @@ func (c Client) imagePull(img string) (err error) {
 		// Image already available, do nothing
 		return nil
 	}
-	for retry := 0; retry < 3; retry++ {
+	for range 3 {
 		err = func() error {
 			respBody, err := c.cli.ImagePull(ctx, img, client.ImagePullOptions{})
 			if err != nil {

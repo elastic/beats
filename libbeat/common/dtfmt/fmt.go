@@ -36,7 +36,7 @@ type Formatter struct {
 }
 
 var ctxPool = &sync.Pool{
-	New: func() interface{} { return &ctx{} },
+	New: func() any { return &ctx{} },
 }
 
 func newCtx() *ctx {

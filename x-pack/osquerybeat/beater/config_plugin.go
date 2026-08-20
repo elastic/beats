@@ -17,14 +17,19 @@ import (
 )
 
 const (
-	configName                  = "osq_config"
-	defaultScheduleSplayPercent = 10
-	defaultScheduleMaxDrift     = 60 // seconds; osquery's default for splay drift compensation
-	maxECSMappingDepth          = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
+	configName         = "osq_config"
+	maxECSMappingDepth = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
 
 	keyField = "field"
 	keyValue = "value"
 )
+
+// nativeOsqueryOptionDefaults are applied to the options map when building the
+// config for osqueryd, only when each key is not already set in the native config.
+var nativeOsqueryOptionDefaults = map[string]any{
+	"schedule_splay_percent": 10,
+	"schedule_max_drift":     60,
+}
 
 var (
 	ErrECSMappingIsInvalid = errors.New("ECS mapping is invalid")
@@ -34,7 +39,7 @@ var (
 type QueryInfo struct {
 	Query      string
 	ECSMapping ecs.Mapping
-	// ScheduleID is the policy-defined schedule id for this query (optional)
+	// ScheduleID is the policy-defined schedule id for this query (optional; from Kibana)
 	ScheduleID string
 	// StartDate is the start date for native schedules (RFC3339); required for schedule_execution_count
 	StartDate string
@@ -43,8 +48,13 @@ type QueryInfo struct {
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
 	Interval int
 	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
-	PackID  string
-	Profile bool // whether to collect and publish profile for this query
+	PackID string
+	// PackName is the policy-defined human-readable pack name for pack queries; empty for top-level schedule queries.
+	PackName string
+	// QueryName is the query's config map key (pack query name or top-level schedule name).
+	QueryName string
+	// Profile is whether to collect and publish profile for this query.
+	Profile bool
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -75,6 +85,16 @@ type ConfigPlugin struct {
 	// Osquery configuration
 	osqueryConfig *config.OsqueryConfig
 
+	// globalProfileEnabled is the fleet-wide profiling default from
+	// elastic_options.profiling.profiling_all. Per-query overrides are resolved into
+	// QueryInfo.Profile at Set() time; this is used for live (ad-hoc) queries.
+	globalProfileEnabled bool
+
+	// onGenerateConfigApplied, if set, is invoked after osqueryd pulls generated config
+	// and pending query metadata is promoted (see GenerateConfig). Used so RRULE
+	// scheduling advances in lockstep with native osqueryd schedule application.
+	onGenerateConfigApplied func()
+
 	// Raw config bytes cached
 	configString string
 
@@ -87,16 +107,45 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
 		log:          log.With("ctx", "config"),
 		queryInfoMap: make(queryInfoMap),
+		// Profiling is enabled by default (see config.ProfilingAllOrDefault); keep the
+		// live/ad-hoc default consistent before the first successful Set() applies policy.
+		globalProfileEnabled: true,
 	}
 
 	return p
 }
 
+// Set replaces the in-memory osquery policy, rebuilds query lookup state, and resets the cached
+// osqueryd config string. Validation errors (invalid ECS mapping, incompatible native vs RRULE
+// scheduling, pack schedule defaults, and so on) are returned immediately: callers that treat
+// a failed Set as fatal—such as runOsquery's input loop—will stop the osquery runner until policy
+// is corrected and a new input arrives.
 func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
 	return p.set(inputs)
+}
+
+// EffectiveOsqueryConfig returns the osquery policy snapshot last applied successfully by Set,
+// including merged pack-level schedule defaults. RRULE execution should read this snapshot only
+// after osqueryd has applied generated config (for example from a post-GenerateConfig hook), so
+// native and RRULE schedules stay aligned. Do not assume inputs[0].Osquery remains the canonical
+// merged struct across refactors.
+func (p *ConfigPlugin) EffectiveOsqueryConfig() *config.OsqueryConfig {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.osqueryConfig
+}
+
+// SetOnGenerateConfigApplied registers a callback invoked after a successful
+// GenerateConfig once staged query metadata has been applied. The callback must
+// not call back into ConfigPlugin methods that take the write lock while the
+// plugin still holds it; GenerateConfig invokes this only after releasing the lock.
+func (p *ConfigPlugin) SetOnGenerateConfigApplied(fn func()) {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+	p.onGenerateConfigApplied = fn
 }
 
 func (p *ConfigPlugin) Count() int {
@@ -135,6 +184,14 @@ func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
 	return false
 }
 
+// GlobalProfileEnabled returns the fleet-wide profiling default applied to queries
+// that do not set their own profile override (notably live ad-hoc queries).
+func (p *ConfigPlugin) GlobalProfileEnabled() bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.globalProfileEnabled
+}
+
 func (p *ConfigPlugin) GetNamespace() string {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
@@ -145,10 +202,9 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 	p.log.Debug("configPlugin GenerateConfig is called")
 
 	p.mx.Lock()
-	defer p.mx.Unlock()
-
 	c, err := p.render()
 	if err != nil {
+		p.mx.Unlock()
 		return nil, err
 	}
 
@@ -158,11 +214,19 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 		p.newQueryInfoMap = nil
 	}
 
+	onApplied := p.onGenerateConfigApplied
 	p.log.Debug("Osqueryd configuration:", c)
 
-	return map[string]string{
+	res := map[string]string{
 		configName: c,
-	}, nil
+	}
+	p.mx.Unlock()
+
+	if onApplied != nil {
+		onApplied()
+	}
+
+	return res, nil
 }
 
 func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig {
@@ -170,16 +234,13 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 		osqueryConfig = &config.OsqueryConfig{}
 	}
 	if osqueryConfig.Options == nil {
-		osqueryConfig.Options = make(map[string]interface{})
+		osqueryConfig.Options = make(map[string]any)
 	}
-	// Apply native schedule defaults only when not explicitly set.
-	const scheduleSplayPercentKey = "schedule_splay_percent"
-	if _, ok := osqueryConfig.Options[scheduleSplayPercentKey]; !ok {
-		osqueryConfig.Options[scheduleSplayPercentKey] = defaultScheduleSplayPercent
-	}
-	const scheduleMaxDriftKey = "schedule_max_drift"
-	if _, ok := osqueryConfig.Options[scheduleMaxDriftKey]; !ok {
-		osqueryConfig.Options[scheduleMaxDriftKey] = defaultScheduleMaxDrift
+	// Apply native osquery option defaults only when not already set in config
+	for k, v := range nativeOsqueryOptionDefaults {
+		if _, ok := osqueryConfig.Options[k]; !ok {
+			osqueryConfig.Options[k] = v
+		}
 	}
 	return osqueryConfig
 }
@@ -205,6 +266,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
 	namespaces := make(map[string]string)
+	globalProfile := config.GetProfilingEnabled(inputs)
 
 	// Set the members if no errors
 	defer func() {
@@ -215,6 +277,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
 		p.queriesCount = queriesCount
+		p.globalProfileEnabled = globalProfile
 	}()
 
 	// Return if no inputs, all the members will be reset by deferred call above
@@ -234,8 +297,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		osqueryConfig = inputs[0].Osquery
 	}
 
-	// Common code to register query with lookup maps, enforce snapshot and increment queries count
-	registerQuery := func(name, ns string, qi config.Query, packID string) (config.Query, error) {
+	// Common code to register query with lookup maps, enforce snapshot and increment queries count.
+	// queryName is the config map key (pack query name or top-level schedule name); packID/packName
+	// are the pack identifiers for pack queries and empty for top-level schedule queries.
+	registerQuery := func(name, ns string, qi config.Query, packID, packName, queryName string) (config.Query, error) {
 		var ecsm ecs.Mapping
 		ecsm, err = flattenECSMapping(qi.ECSMapping)
 		if err != nil {
@@ -250,7 +315,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
 			PackID:     packID,
-			Profile:    qi.Profile,
+			PackName:   packName,
+			QueryName:  queryName,
+			Profile:    config.ResolveProfiling(globalProfile, qi.Profiling),
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -265,7 +332,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
 	for name, qi := range osqueryConfig.Schedule {
-		qi, err = registerQuery(name, p.namespace, qi, "")
+		if err := config.ValidateQueryScheduleMode(qi); err != nil {
+			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
+		}
+		qi, err = registerQuery(name, p.namespace, qi, "", "", name)
 		if err != nil {
 			return err
 		}
@@ -274,16 +344,30 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's packs queries, add flattened ECS mappings to lookup map
 	for packName, pack := range osqueryConfig.Packs {
+		if err := config.ValidatePackScheduleDefaults(pack); err != nil {
+			return fmt.Errorf("osquery.packs[%q]: %w", packName, err)
+		}
 		packID := pack.PackID
 		if packID == "" {
 			packID = packName
 		}
 		for name, qi := range pack.Queries {
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
+			qi, err = config.MergeQueryWithPackScheduleDefaults(pack, qi)
+			if err != nil {
+				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
+			}
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID, pack.PackName, name)
 			if err != nil {
 				return err
 			}
 			pack.Queries[name] = qi
+		}
+		if err := config.ValidatePackQueriesAfterMerge(pack); err != nil {
+			return fmt.Errorf("osquery.packs[%q]: %w", packName, err)
+		}
+		if names := config.UnscheduledQueryNamesInNativePack(pack); len(names) > 0 {
+			p.log.Warnf("osquery.packs[%q]: queries %v have no interval or rrule_schedule; "+
+				"if a query name contains dots it is split by config parsing and the query will not run, rename it without dots", packName, names)
 		}
 	}
 
@@ -297,15 +381,17 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		}
 		for _, stream := range input.Streams {
 			qi := config.Query{
-				Query:      stream.Query,
-				Interval:   stream.Interval,
+				Query: stream.Query,
+				NativeSchedule: config.NativeSchedule{
+					Interval: stream.Interval,
+				},
 				Platform:   stream.Platform,
 				Version:    stream.Version,
 				ECSMapping: stream.ECSMapping,
-				Profile:    stream.Profile,
+				Profiling:  stream.Profiling,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name, "", stream.ID)
 			if err != nil {
 				return err
 			}
@@ -330,7 +416,7 @@ func getPackQueryName(packName, queryName string) string {
 // Due to current configuration passing between the agent and beats the keys that contain dots (".")
 // are split into the nested tree-like structure.
 // This converts this dynamic map[string]interface{} tree into strongly typed flat map.
-func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
+func flattenECSMapping(m map[string]any) (ecs.Mapping, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -347,7 +433,7 @@ func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
 	return ecsm, nil
 }
 
-func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) error {
+func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 
 	if path[len(path)-1] == keyField {
 		if s, ok := v.(string); ok {
@@ -376,7 +462,7 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 			Value: v,
 		}
 		return nil
-	} else if m, ok := v.(map[string]interface{}); ok {
+	} else if m, ok := v.(map[string]any); ok {
 		if depth < maxECSMappingDepth {
 			for k, v := range m {
 				if strings.TrimSpace(k) == "" {

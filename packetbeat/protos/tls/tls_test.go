@@ -70,7 +70,7 @@ func testInit() (*eventStore, *tlsPlugin) {
 	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 
 	results := &eventStore{}
-	tls, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil)
+	tls, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil, logp.NewNopLogger())
 	if err != nil {
 		return nil, nil
 	}
@@ -217,7 +217,7 @@ func TestOCSPStatus(t *testing.T) {
 
 	for i, test := range []struct {
 		msg  string
-		want interface{}
+		want any
 	}{
 		// Packets from https://github.com/elastic/beats/issues/29962#issue-1112502582
 		//

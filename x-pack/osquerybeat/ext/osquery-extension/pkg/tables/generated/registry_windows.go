@@ -13,6 +13,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache"
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists"
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/ntfs"
 
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
@@ -27,6 +28,9 @@ import (
 	elasticamcachedriverpackage "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_package"
 	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 	elasticjumplists "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/elastic_jumplists"
+	elasticntfsfile "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_file"
+	elasticntfspartitions "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_partitions"
+	elasticntfsvolumes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_volumes"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.
@@ -110,6 +114,36 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, 
 		} else {
 			server.RegisterPlugin(table.NewPlugin("elastic_jumplists", elasticjumplists.Columns(), genFunc))
 			log.Infof("Registered table: elastic_jumplists")
+		}
+	}
+	{
+		// Returns information about files on NTFS volumes, parsed from the $MFT file on Windows systems.
+		genFunc, err := elasticntfsfile.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_ntfs_file: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_ntfs_file", elasticntfsfile.Columns(), genFunc))
+			log.Infof("Registered table: elastic_ntfs_file")
+		}
+	}
+	{
+		// Windows disk partition layout information from IOCTL_DISK_GET_DRIVE_LAYOUT_EX
+		genFunc, err := elasticntfspartitions.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_ntfs_partitions: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_ntfs_partitions", elasticntfspartitions.Columns(), genFunc))
+			log.Infof("Registered table: elastic_ntfs_partitions")
+		}
+	}
+	{
+		// Windows mounted volume information including device type, drive letter, and filesystem
+		genFunc, err := elasticntfsvolumes.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_ntfs_volumes: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_ntfs_volumes", elasticntfsvolumes.Columns(), genFunc))
+			log.Infof("Registered table: elastic_ntfs_volumes")
 		}
 	}
 }

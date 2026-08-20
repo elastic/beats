@@ -1,0 +1,163 @@
+version: 9.4.1
+entries:
+    - kind: bug-fix
+      summary: Fix Long decoding error in painless script for windows ingest pipeline
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49869
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775088009
+      file:
+        name: 1775088009-sdh6727.yaml
+        checksum: 799f226d9915f987cf30b72fa3023c6a0ca32e2d
+    - kind: bug-fix
+      summary: Fix race condition during multiline parser shutdown
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49980
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775602464
+      file:
+        name: 1775602464-fix-race-condition-during-multiline-shutdown.yaml
+        checksum: 48a2c76d58f0b688bd292e721c2604747812a4a0
+    - kind: upgrade
+      summary: Update github.com/prometheus/prometheus to v0.311.3
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50382
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777046500
+      file:
+        name: 1777046500-align-prometheus-with-otel-collector-contrib.yaml
+        checksum: ed43757d11c6ca775ff9d36b61e69421a87c1534
+    - kind: enhancement
+      summary: Cache add_locale processor and refresh only when zone or offset changes
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50343
+      issue:
+        - https://github.com/elastic/beats/issues/50322
+      impact: ""
+      action: ""
+      timestamp: 1777305272
+      file:
+        name: 1777305272-add-locale-cache-on-change.yaml
+        checksum: fd1fef1693aa9cc9a3914e16d53adadd7b1f229a
+    - kind: bug-fix
+      summary: Fix Okta entity analytics OAuth2 config unpacking for jwk_json and jwk_pem fields.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50406
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777491987
+      file:
+        name: 1777491987-fix-okta-jwk-config-unpacking.yaml
+        checksum: 02f863ff559b46afa125c60b85ce3d934f4052f0
+    - kind: bug-fix
+      summary: Disable Winlogbeat record ID gap detection when using xml_query so filtered queries do not loop on non-contiguous record IDs.
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50443
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777582712
+      file:
+        name: 1777582712-winlogbeat-xml-query-gap-detection.yaml
+        checksum: 6341ed4617e9e462c9f4b35c9a718c984f36081d
+    - kind: bug-fix
+      summary: Fix Active Directory entity analytics to emit device attributes under activedirectory.device.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50472
+      issue:
+        - https://github.com/elastic/beats/issues/50471
+      impact: ""
+      action: ""
+      timestamp: 1777850001
+      file:
+        name: 1777850001-fix-ad-device-field-layout.yaml
+        checksum: fe22169b5c4dac4f390b66feb2cd9c22c1155396
+    - kind: bug-fix
+      summary: Fix OTel map conversion for []time.Duration fields to avoid dropping duration slices.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50486
+      issue:
+        - https://github.com/elastic/beats/issues/50474
+      impact: ""
+      action: ""
+      timestamp: 1777914810
+      file:
+        name: 1777914810-fix-otel-duration-slice-conversion.yaml
+        checksum: ea9a428f61a5003f2f96c7fa7b33cb323484785e
+    - kind: bug-fix
+      summary: Fix handling of OAuth2.0 timeouts in CrowdStrike streaming input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50492
+      issue:
+        - https://github.com/elastic/beats/issues/49988
+      impact: ""
+      action: ""
+      timestamp: 1777958918
+      file:
+        name: 1777958918-49988-streaming.yaml
+        checksum: b7380c69a8f2cc5ccf373c2d2711fc64984624d9
+    - kind: security
+      summary: Update github.com/Azure/go-ntlmssp to v0.1.1
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50497
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777989951
+      file:
+        name: 1777989951-update-go-ntlmssp-to-v0.1.1.yaml
+        checksum: 9af50518a93806fdb22098292cf0188b1b665a34
+    - kind: bug-fix
+      summary: Fix a deadlock in beat otel receiver shutdown
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50528
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778139984
+      file:
+        name: 1778139984-fix-otel-bridge-deadlock.yaml
+        checksum: 494345e7854eafdb848b37bf47ef5177fc710b04
+    - kind: bug-fix
+      summary: Fix OTel Beat processor to honor `when` conditions
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50555
+      issue:
+        - https://github.com/elastic/beats/issues/50549
+      impact: ""
+      action: ""
+      timestamp: 1778182489
+      file:
+        name: 1778182489-honor-when-conditions-in-beatprocessor.yaml
+        checksum: fd03b64a79b0286fde8da4dd2ac953d90c32af8d

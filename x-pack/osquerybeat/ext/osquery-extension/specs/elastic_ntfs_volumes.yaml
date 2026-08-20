@@ -1,0 +1,37 @@
+type: table
+name: elastic_ntfs_volumes
+description: Windows mounted volume information including device type, drive letter, and filesystem
+platforms:
+  - windows
+group: ntfs
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/ntfs
+
+columns:
+  - name: device
+    type: TEXT
+    description: Volume device path (e.g. \\.\C:)
+  - name: device_type
+    type: TEXT
+    description: Volume device type (e.g. "CD_ROM", "DISK", "MASS_STORAGE", "VIRTUAL_DISK", "DVD")
+  - name: drive_letter
+    type: TEXT
+    description: Volume drive letter (e.g. C:)
+  - name: volume_label
+    type: TEXT
+    description: Volume label (e.g. "OS")
+  - name: file_system_name
+    type: TEXT
+    description: Volume file system name (e.g. "NTFS")
+
+documentation:
+  description: |
+    Returns all volumes detected on the system
+  examples:
+    - title: List all volumes
+      query: |
+        SELECT * FROM elastic_ntfs_volumes;
+  notes:
+    - "Windows only"
+  related_tables:
+    - elastic_ntfs_partitions

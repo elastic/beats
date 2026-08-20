@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -99,10 +100,17 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
+	}
+
+	if config.Matches.legacyFormat {
+		includeMatchesWarnOnce.Do(func() {
+			logger.Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
+				"include_matches config to the new more expressive format."))
+		})
 	}
 
 	paths := config.Paths
@@ -145,7 +153,7 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		ID:                 config.ID,
 		Since:              config.Since,
 		Seek:               config.Seek,
-		Matches:            journalfield.IncludeMatches(config.Matches),
+		Matches:            config.Matches.IncludeMatches,
 		Units:              config.Units,
 		Transports:         config.Transports,
 		Identifiers:        config.Identifiers,
@@ -218,6 +226,10 @@ func (inp *journald) Run(
 		return wrappedErr
 	}
 
+	// Let the reader report Degraded when journalctl gets stuck in a
+	// crash/restart loop and Running when it recovers.
+	reader.SetStatusReporter(ctx)
+
 	defer reader.Close()
 
 	parser := inp.Parsers.Create(
@@ -248,7 +260,7 @@ func (inp *journald) Run(
 		}
 
 		event := entry.ToEvent()
-		if err := publisher.Publish(event, event.Private); err != nil {
+		if err := publisher.Publish(event, getCursorUpdate(event.Private)); err != nil {
 			msg := fmt.Sprintf("could not publish event: %s", err)
 			ctx.UpdateStatus(status.Failed, msg)
 			logger.Errorf("%s", msg)
@@ -277,6 +289,22 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 	return cp
 }
 
+// getCursorUpdate returns the journald checkpoint to persist for a
+// published event. Multiline parsers aggregate per-line checkpoints in Private
+// as []any; the last entry is the furthest read position in the journal.
+func getCursorUpdate(priv any) any {
+	switch v := priv.(type) {
+	case []any:
+		// This should never happen, but better safe than panic.
+		if len(v) == 0 {
+			return nil
+		}
+		return v[len(v)-1]
+	default:
+		return priv
+	}
+}
+
 // readerAdapter wraps journalread.Reader and adds two functionalities:
 //   - Allows it to behave like a reader.Reader
 //   - Translates the fields names from the journald format to something
@@ -290,6 +318,16 @@ type readerAdapter struct {
 
 func (r *readerAdapter) Close() error {
 	return r.r.Close()
+}
+
+// SetReadDeadline delegates to the underlying journal reader if it honors
+// deadlines, letting the multiline timeout be enforced synchronously without a
+// goroutine (see reader.DeadlineSetter).
+func (r *readerAdapter) SetReadDeadline(t time.Time) bool {
+	if d, ok := r.r.(reader.DeadlineSetter); ok {
+		return d.SetReadDeadline(t)
+	}
+	return false
 }
 
 func (r *readerAdapter) Next() (reader.Message, error) {

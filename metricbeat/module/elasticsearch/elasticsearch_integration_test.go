@@ -26,7 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"strings"
@@ -48,6 +48,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/security_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
@@ -63,6 +64,7 @@ var metricSets = []string{
 	"ml_job",
 	"node",
 	"node_stats",
+	"security_stats",
 	"shard",
 }
 
@@ -153,20 +155,24 @@ func TestGetAllIndices(t *testing.T) {
 }
 
 // GetConfig returns config for elasticsearch module
-func getConfigForMetricset(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfigForMetricset(metricset string, host string) map[string]any {
+	return map[string]any{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{metricset},
 		"hosts":                      []string{host},
+		"username":                   os.Getenv("ES_SUPERUSER_USER"),
+		"password":                   os.Getenv("ES_SUPERUSER_PASS"),
 		"index_recovery.active_only": false,
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": metricSets,
 		"hosts":      []string{host},
+		"username":   os.Getenv("ES_SUPERUSER_USER"),
+		"password":   os.Getenv("ES_SUPERUSER_PASS"),
 		// index_recovery.active_only is part of the config of the index_recovery Metricset and it is required during the
 		// test of that particular metricset to get some data from the ES node (instead of an empty JSON if set to true)
 		"index_recovery.active_only": false,
@@ -200,6 +206,7 @@ func createIndex(host string, isHidden bool) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("could not build create index request: %w", err)
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -240,6 +247,7 @@ func enableTrialLicense(host string, version *version.V) error {
 	if err != nil {
 		return err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -271,6 +279,7 @@ func checkTrialLicenseEnabled(host string, version *version.V) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -369,6 +378,7 @@ func checkCCRStatsExists(host string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -384,7 +394,7 @@ func checkCCRStatsExists(host string) (bool, error) {
 
 	var data struct {
 		FollowStats struct {
-			Indices []map[string]interface{} `json:"indices"`
+			Indices []map[string]any `json:"indices"`
 		} `json:"follow_stats"`
 	}
 	err = json.Unmarshal(body, &data)
@@ -437,6 +447,7 @@ func checkExists(url string) bool {
 	if err != nil {
 		return false
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -547,6 +558,14 @@ func checkSkip(t *testing.T, metricset string, ver *version.V) {
 		checkSkipFeature("CCR", elasticsearch.CCRStatsAPIAvailableVersion)
 	case "enrich":
 		checkSkipFeature("Enrich", elasticsearch.EnrichStatsAPIAvailableVersion)
+	case "security_stats":
+		checkSkipFeature("Security Stats", elasticsearch.SecurityStatsAPIAvailableVersion)
+		// /_security/stats is only served when xpack.security.enabled=true,
+		// and the shared metricbeat compose stack runs with security
+		// disabled. Skip unconditionally until a follow-up PR introduces
+		// an x-pack-security-enabled compose stack to exercise this
+		// metricset's live response shape end-to-end.
+		t.Skip("/_security/stats requires xpack.security.enabled=true on the test cluster (deferred to a follow-up compose change)")
 	}
 }
 
@@ -555,6 +574,7 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 	if err != nil {
 		return nil, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -579,7 +599,11 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 		return nil, err
 	}
 
-	return version.New(v.(string))
+	vs, ok := v.(string)
+	if !ok {
+		return nil, fmt.Errorf("version.number is not a string: %T", v)
+	}
+	return version.New(vs)
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
@@ -595,6 +619,7 @@ func httpSendJSON(host, path, method string, body []byte) ([]byte, *http.Respons
 	if err != nil {
 		return nil, nil, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -630,15 +655,10 @@ func waitForSuccess(f checkSuccessFunction, retryInterval time.Duration, numAtte
 	return false, nil
 }
 
-func randString(len int) string {
-	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	b := make([]byte, len)
-	aIdx := int('a')
+func randString(n int) string {
+	b := make([]byte, n)
 	for i := range b {
-		charIdx := aIdx + rand.Intn(26)
-		b[i] = byte(charIdx)
+		b[i] = byte('a' + rand.IntN(26))
 	}
-
 	return string(b)
 }

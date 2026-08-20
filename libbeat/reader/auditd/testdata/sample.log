@@ -1,0 +1,4 @@
+type=SYSCALL msg=audit(1481077231.371:479): arch=c000003e syscall=59 success=yes exit=0 a0=1def880 a1=1df0fd0 a2=1d3e5f0 a3=7fff70ed9310 items=2 ppid=1299 pid=1360 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="auditctl" exe="/sbin/auditctl" key=(null)
+type=EXECVE msg=audit(1481077231.371:479): argc=7 a0="auditctl" a1="-a" a2="exit,always" a3="-F" a4="arch=b32" a5="-S" a6="execve"
+type=USER_LOGIN msg=audit(1489636960.072:19623791): pid=28281 uid=0 auid=700 ses=6793 msg='op=login acct="root" exe="/usr/sbin/sshd" hostname=1.2.3.4 addr=1.2.3.4 terminal=sshd res=success'
+type=AVC msg=audit(1226874073.147:96): avc:  denied  { getattr } for  pid=2465 comm="httpd" path="/var/www/html/file1" dev=dm-0 ino=284133 scontext=unconfined_u:system_r:httpd_t:s0 tcontext=unconfined_u:object_r:samba_share_t:s0 tclass=file

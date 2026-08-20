@@ -32,7 +32,7 @@ After enabling the module, open `modules.d/sql.yml` and set the required fields:
 :   The driver can be any driver that has a {{metricbeat}} module, such as `mssql` or `postgres`.
 
 `fetch_from_all_databases`
-:   Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will enable execution `sql_queries` or `sql_query` for all databases in a server. Currently only `mssql` driver supports this feature. For other drivers, if enabled, "fetch from all databases feature is not supported for driver: <driver_name>" error would be logged.
+:   Expects either `true` or `false` and it is by default set to `false`. Setting this to true enables execution of `sql_queries` or `sql_query` for all databases on a server. Currently only `mssql` driver supports this feature. For other drivers, if enabled, "fetch from all databases feature is not supported for driver: <driver_name>" error would be logged.
 
 `raw_data.enabled`
 :   Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will generate event results in a new field format.

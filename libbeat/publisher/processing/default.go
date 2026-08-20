@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The
@@ -149,9 +148,13 @@ var WithECS = WithFields(mapstr.M{
 
 // WithHost modifier adds `host.name` builtin fields to a processing pipeline
 var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
+	name := info.Name
+	if override := beat.GetHostnameOverride(); override != "" {
+		name = override
+	}
 	return mapstr.M{
 		"host": mapstr.M{
-			"name": info.Name,
+			"name": name,
 		},
 	}
 })
@@ -287,7 +290,7 @@ func (b *builder) Processors() []string {
 //  9. (P) timeseries mangling
 //  10. (P) (if publish/debug enabled) log event
 //  11. (P) (if output disabled) dropEvent
-func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
+func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
 	var (
 		// pipeline processors
 		processors = newGroup("processPipeline", b.log)
@@ -325,10 +328,10 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	// setup 1: generalize/normalize output (P)
 	if cfg.EventNormalization != nil {
 		if *cfg.EventNormalization {
-			processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
+			processors.add(newGeneralizeProcessor(cfg.KeepNull, cfg.NormalizeInPlace, b.log))
 		}
 	} else if !b.skipNormalize {
-		processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
+		processors.add(newGeneralizeProcessor(cfg.KeepNull, cfg.NormalizeInPlace, b.log))
 	}
 
 	// setup 2: add Meta from client config (C)
@@ -383,7 +386,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	// setup 8: pipeline processors list
 	if b.processors != nil {
 		// function processor hides implementation of processors.PathSetter
-		err := b.processors.SetPaths(paths)
+		err := b.processors.SetPaths(b.info.Paths)
 		if err != nil {
 			return nil, fmt.Errorf("failed setting paths for global processors: %w", err)
 		}
@@ -407,7 +410,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		processors.add(dropDisabledProcessor)
 	}
 
-	err := processors.SetPaths(paths)
+	err := processors.SetPaths(b.info.Paths)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set paths for processing pipeline: %w", err)
 	}

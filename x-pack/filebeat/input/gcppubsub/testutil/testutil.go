@@ -125,7 +125,7 @@ func PublishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string 
 	defer topic.Stop()
 
 	messageIDs := make([]string, numMsgs)
-	for i := 0; i < numMsgs; i++ {
+	for i := range numMsgs {
 		result := topic.Publish(ctx, &pubsub.Message{
 			Data: []byte(time.Now().UTC().Format(time.RFC3339Nano) + ": hello world " + strconv.Itoa(i)),
 		})

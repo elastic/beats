@@ -42,9 +42,6 @@ mage docker:composeBuild
 # Bring up all containers, wait until they are healthy, and put them in the background.
 mage docker:composeUp
 
-# Build the test binary
-mage buildSystemTestBinary
-
 # Run all integration tests.
 go test ./filebeat/...  -tags integration
 

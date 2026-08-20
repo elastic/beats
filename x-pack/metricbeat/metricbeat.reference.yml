@@ -400,6 +400,15 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  # billing_usage_lookback controls how far back usage data is queried on each fetch.
+  # It must be a positive multiple of 24h.
+  # Defaults to 24h (previous full day). Azure Cost Management data can be updated for up
+  # to 72 hours after a billing period closes, so setting this to 72h ensures late
+  # corrections are captured.
+  #billing_usage_lookback: 72h
+  # billing_forecast_window controls the length of the forecast period. It must be a positive
+  # multiple of 24h and defaults to 720h (30 days).
+  #billing_forecast_window: 720h
 
 - module: azure
   metricsets:
@@ -791,7 +800,7 @@ metricbeat.modules:
   #paths:
   #  - path: "/foo"
   #    namespace: "foo"
-  #    fields: # added to the the response in root. overwrites existing fields
+  #    fields: # added to the response in root. overwrites existing fields
   #      key: "value"
 
 #-------------------------------- IBM MQ Module --------------------------------
@@ -1977,7 +1986,10 @@ metricbeat.modules:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
+#      wait_for_metadata: false
+#      wait_for_metadata_timeout: 30s
+#      wait_for_metadata_retry_period: 10s
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -3442,6 +3454,30 @@ logging.files:
 # Controls the fraction of mutex contention events that are reported in the
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
+
+# WARNING: Internal debugging tool. Not a supported product feature.
+#
+# This setting is intended for use by Elastic engineers during development
+# and troubleshooting. It has no authentication and may be changed or
+# removed in any release without notice.
+#
+# When enabled, the following endpoints are exposed on the HTTP listener:
+#   GET    /debug/state-inspector/states        JSON dump of every state entry
+#   GET    /debug/state-inspector/states.html   Browser UI for the same
+#   DELETE /debug/state-inspector/states/<key>  Permanently delete a state entry
+#
+# The state store may contain sensitive information such as source file
+# paths, S3 object keys, AWS account identifiers, and source hostnames,
+# all of which will be returned to any client that can reach the endpoint.
+# Deleting state entries can cause duplicate processing, gaps in ingestion,
+# or data loss; for active inputs, deletes may be transient and silently
+# overwritten by the in-memory registrar.
+#
+# If you must enable this for troubleshooting, bind http.host to a loopback
+# address (127.0.0.1), a Unix socket, or a Windows named pipe, and disable
+# it again as soon as you are done.
+#
+#http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
 

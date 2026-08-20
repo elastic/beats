@@ -28,7 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 )
@@ -37,7 +37,6 @@ import (
 var dataFlag = flag.Bool("data", false, "Write updated data.json files")
 
 func TestCreateEvent(t *testing.T) {
-	logp.TestingSetup()
 
 	// Build biflow event.
 	start := time.Unix(1542292881, 0)
@@ -50,7 +49,7 @@ func TestCreateEvent(t *testing.T) {
 	port1 := uint16(38901)
 	port2 := uint16(80)
 
-	id := newFlowID()
+	id := newFlowID(logptest.NewTestingLogger(t, ""))
 	id.AddEth(mac1, mac2)
 	id.AddVLan(vlan)
 	id.AddIPv4(ip1, ip2)
@@ -68,33 +67,33 @@ func TestCreateEvent(t *testing.T) {
 	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, false)
 
 	// Validate the contents of the event.
-	validate := lookslike.MustCompile(map[string]interface{}{
-		"source": map[string]interface{}{
+	validate := lookslike.MustCompile(map[string]any{
+		"source": map[string]any{
 			"mac":     "01-02-03-04-05-06",
 			"ip":      "203.0.113.3",
 			"port":    port1,
 			"bytes":   uint64(10),
 			"packets": uint64(1),
 		},
-		"destination": map[string]interface{}{
+		"destination": map[string]any{
 			"mac":     "06-05-04-03-02-01",
 			"ip":      "198.51.100.2",
 			"port":    port2,
 			"bytes":   uint64(460),
 			"packets": uint64(2),
 		},
-		"flow": map[string]interface{}{
+		"flow": map[string]any{
 			"id":    isdef.KeyPresent,
 			"final": true,
 			"vlan":  isdef.KeyPresent,
 		},
-		"network": map[string]interface{}{
+		"network": map[string]any{
 			"bytes":     uint64(470),
 			"packets":   uint64(3),
 			"type":      "ipv4",
 			"transport": "tcp",
 		},
-		"event": map[string]interface{}{
+		"event": map[string]any{
 			"start":    isdef.KeyPresent,
 			"end":      isdef.KeyPresent,
 			"duration": isdef.KeyPresent,

@@ -85,11 +85,9 @@ func newEventConsumer(
 		done:       make(chan struct{}),
 	}
 
-	c.wg.Add(1)
-	go func() {
-		defer c.wg.Done()
+	c.wg.Go(func() {
 		c.run()
-	}()
+	})
 
 	// Even though we start a goroutine here, we don't include it in the
 	// waitGroup used for shutdown: if the queue itself is not closed yet,
@@ -116,7 +114,7 @@ func (c *eventConsumer) run() {
 		// The batches waiting to be retried.
 		retryBatches []*ttlBatch
 
-		// The batch read from the queue and waiting to be sent, if any
+		// The batch read from the queue and waiting to be sent, if any.
 		queueBatch *ttlBatch
 
 		// The output channel (and associated parameters) that will receive
@@ -195,6 +193,22 @@ outerLoop:
 			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
+			// Release any batches we're still holding so the underlying
+			// queue can reclaim its backing storage without firing
+			// producer ACK callbacks. Release is the abandonment
+			// path: slabqueue returns its slot indices to the pool's
+			// free list; memqueue advances ackLoop past the batch
+			// without invoking input ACK handlers; diskqueue is a
+			// no-op (events stay on disk for next-process recovery).
+			// We must NOT call Drop here — Drop signals successful
+			// delivery and would falsely advance input registries for
+			// events the consumer is abandoning.
+			if queueBatch != nil {
+				queueBatch.Release()
+			}
+			for _, rb := range retryBatches {
+				rb.Release()
+			}
 			break outerLoop
 		}
 	}

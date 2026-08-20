@@ -42,7 +42,7 @@ type esclient interface {
 		path string,
 		pipeline string,
 		params map[string]string,
-		body interface{},
+		body any,
 	) (int, []byte, error)
 }
 
@@ -113,7 +113,7 @@ func (mux *esClientMux) Request(
 	method, path string,
 	pipeline string,
 	params map[string]string,
-	body interface{},
+	body any,
 ) (int, []byte, error) {
 	c := mux.clients[mux.idx]
 

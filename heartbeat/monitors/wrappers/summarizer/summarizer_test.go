@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -149,7 +150,7 @@ func TestSummarizer(t *testing.T) {
 				return nil, retErr
 			}
 
-			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false, logptest.NewTestingLogger(t, ""))
 			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(tt.maxAttempts)}
 
 			rcvdStatuses := ""
@@ -160,7 +161,7 @@ func TestSummarizer(t *testing.T) {
 			i := 0
 			var lastSummary *jobsummary.JobSummary
 			for {
-				s := NewSummarizer(job, sf, tracker)
+				s := NewSummarizer(job, sf, tracker, logptest.NewTestingLogger(t, ""))
 				// Shorten retry delay to make tests run faster
 				s.retryDelay = 2 * time.Millisecond
 				wrapped := s.Wrap(job)
@@ -252,7 +253,7 @@ func TestSummarizerPluginOrder(t *testing.T) {
 			t.Parallel()
 
 			// Monitor setup
-			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false, logptest.NewTestingLogger(t, ""))
 			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(tt.maxAttempts)}
 
 			// Test locals
@@ -282,7 +283,7 @@ func TestSummarizerPluginOrder(t *testing.T) {
 				return nil, fmt.Errorf("dummyerr")
 			}
 
-			s := NewSummarizer(job, sf, tracker)
+			s := NewSummarizer(job, sf, tracker, logptest.NewTestingLogger(t, ""))
 			// Shorten retry delay to make tests run faster
 			s.retryDelay = 2 * time.Millisecond
 			// Add mock plugin
@@ -322,7 +323,7 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 	t.Parallel()
 
 	// Monitor setup
-	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false, logptest.NewTestingLogger(t, ""))
 	sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(2)}
 
 	// We simplify these to always down
@@ -343,7 +344,7 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 
 	var retryStart time.Time
 
-	s := NewSummarizer(job, sf, tracker)
+	s := NewSummarizer(job, sf, tracker, logptest.NewTestingLogger(t, ""))
 	// Shorten retry delay to make tests run faster
 	s.retryDelay = 2 * time.Millisecond
 	// Add mock plugin

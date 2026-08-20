@@ -31,10 +31,10 @@ func newIndexSupporter(info beat.Info) *IdxSupport {
 func (s *IdxSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, error) {
 	//copy the config object we get before we send it to the BuildSelector
 	bsCfg := config.NewConfig()
-	if cfg.HasField("indicies") {
+	if cfg.HasField("indices") {
 		sub, err := cfg.Child("indices", -1)
 		if err != nil {
-			return nil, fmt.Errorf("error getting indicies field: %w", err)
+			return nil, fmt.Errorf("error getting indices field: %w", err)
 		}
 		bsCfg.SetChild("indices", -1, sub)
 	}

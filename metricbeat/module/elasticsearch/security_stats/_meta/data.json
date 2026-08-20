@@ -1,0 +1,57 @@
+{
+    "@timestamp": "2026-04-27T20:00:00.000Z",
+    "elasticsearch": {
+        "cluster": {
+            "id": "WocBBA0QRma0sGpdQ7vLfQ",
+            "name": "docker-cluster"
+        },
+        "node": {
+            "id": "f5i3v9hMT_q__q6B9WOo5A",
+            "name": "instance-0000000019",
+            "roles": ["data_hot", "ingest"],
+            "version": "9.2.0"
+        },
+        "security": {
+            "stats": {
+                "dls": {
+                    "cache": {
+                        "entries": {
+                            "count": 12
+                        },
+                        "memory": {
+                            "bytes": 4096
+                        },
+                        "hits": {
+                            "count": 8421,
+                            "time": {
+                                "ms": 51
+                            }
+                        },
+                        "misses": {
+                            "count": 137,
+                            "time": {
+                                "ms": 219
+                            }
+                        },
+                        "evictions": {
+                            "count": 4
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "event": {
+        "dataset": "elasticsearch.security.stats",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
+    "metricset": {
+        "name": "security_stats",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.19.0.2:9200",
+        "type": "elasticsearch"
+    }
+}

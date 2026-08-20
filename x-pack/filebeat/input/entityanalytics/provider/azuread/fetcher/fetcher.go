@@ -41,6 +41,12 @@ type Fetcher interface {
 	// failure occurred. This endpoint does not support delta queries.
 	UserMFADetails(ctx context.Context) (map[uuid.UUID]*MFARegistrationDetails, error)
 
+	// UserSignInActivity fetches sign-in activity for all users from the
+	// /users?$select=id,signInActivity endpoint. A map from user UUID to
+	// SignInActivityDetails is returned, or an error if a failure occurred.
+	// This endpoint does not support delta queries.
+	UserSignInActivity(ctx context.Context) (map[uuid.UUID]*SignInActivityDetails, error)
+
 	// SetLogger sets the logger on the Fetcher.
 	SetLogger(logger *logp.Logger)
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -42,11 +41,11 @@ type Module interface {
 // data path it was created for. All SQL module instances created by the same
 // ModuleBuilder share a single sharedRegistryState via pointer.
 //
-// Path-Aware Caching: In production, paths.Resolve(paths.Data, "sql-cursor")
+// Path-Aware Caching: In production, m.Paths.Resolve(paths.Data, "sql-cursor")
 // never changes, so the registry is created once and reused for the entire
 // lifetime of the Beat process — identical behaviour to sync.Once.
-// In integration tests, each test overrides paths.Paths.Data to a unique
-// t.TempDir(), causing the resolved path to change. When a path change is
+// In integration tests, each test uses a module whose per-instance data path is
+// a unique t.TempDir(), causing the resolved path to change. When a path change is
 // detected, a new registry is created at the new location, giving each test
 // an isolated cursor store without any cross-test state leakage.
 type sharedRegistryState struct {
@@ -98,7 +97,7 @@ func ModuleBuilder() mb.ModuleFactory {
 // should use registry.Get("cursor-state") to obtain a ref-counted Store handle.
 //
 // Path-aware caching: The method resolves the current data path via
-// paths.Resolve(paths.Data, "sql-cursor"). If the resolved path matches the
+// m.Paths.Resolve(paths.Data, "sql-cursor"). If the resolved path matches the
 // path used to create the cached registry, the cached registry is returned
 // immediately. If the path has changed (which only happens in tests), a new
 // registry is created at the new location.
@@ -115,14 +114,14 @@ func (m *module) GetCursorRegistry() (*statestore.Registry, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	dataPath := paths.Resolve(paths.Data, "sql-cursor")
+	dataPath := m.Paths.Resolve(paths.Data, "sql-cursor")
 
 	// Return the cached registry if it was created for the same data path.
 	if s.registry != nil && s.dataPath == dataPath {
 		return s.registry, s.err
 	}
 
-	logger := logp.NewLogger("sql.cursor")
+	logger := m.Logger.Named("sql.cursor")
 
 	reg, err := memlog.New(logger.Named("memlog"), memlog.Settings{
 		Root:     dataPath,

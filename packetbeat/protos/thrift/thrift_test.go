@@ -30,10 +30,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func thriftForTests() *thriftPlugin {
-	t := &thriftPlugin{}
+	logger := logp.NewNopLogger()
+	t := &thriftPlugin{
+		logger:               logger.Named("thrift"),
+		thriftDetailedLogger: logger.Named("thriftdetailed"),
+	}
 	config := defaultConfig
 	t.init(true, nil, &procs.ProcessesWatcher{}, &config)
 	return t
@@ -81,6 +86,9 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	var m *thriftMessage
 
 	var thrift thriftPlugin
+	logger := logp.NewNopLogger()
+	thrift.logger = logger.Named("thrift")
+	thrift.thriftDetailedLogger = logger.Named("thriftdetailed")
 	thrift.InitDefaults()
 
 	data, _ = hex.DecodeString("800100010000000470696e670000000000")
@@ -161,6 +169,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	var _old int
 
 	var thrift thriftPlugin
+	logger := logp.NewNopLogger()
+	thrift.logger = logger.Named("thrift")
+	thrift.thriftDetailedLogger = logger.Named("thriftdetailed")
 	thrift.InitDefaults()
 
 	data, _ = hex.DecodeString("08000100000001")
@@ -437,6 +448,9 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	var m *thriftMessage
 
 	var thrift thriftPlugin
+	logger := logp.NewNopLogger()
+	thrift.logger = logger.Named("thrift")
+	thrift.thriftDetailedLogger = logger.Named("thriftdetailed")
 	thrift.InitDefaults()
 
 	data, _ = hex.DecodeString("800100010000000470696e670000000000")

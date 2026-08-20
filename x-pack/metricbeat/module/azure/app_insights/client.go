@@ -8,52 +8,47 @@ package app_insights
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Client represents the azure client which will make use of the azure sdk go metrics related clients
+// Client represents the azure client which calls the Application Insights
+// metrics endpoint via the configured Service.
 type Client struct {
 	Service Service
 	Config  Config
 	Log     *logp.Logger
 }
 
-// NewClient instantiates the an Azure monitoring client
+// NewClient instantiates an Application Insights client.
 func NewClient(config Config, logger *logp.Logger) (*Client, error) {
 	service, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
-	client := &Client{
+	return &Client{
 		Service: service,
 		Config:  config,
-	}
-	return client, nil
+	}, nil
 }
 
-// GetMetricValues returns the specified app insights metric data points.
-func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error) {
-	var bodyMetrics []insights.MetricsPostBodySchema
-	var result insights.ListMetricsResultsItem
+// GetMetricValues returns the configured Application Insights metric data points.
+func (client *Client) GetMetricValues() (ListMetricsResultsItem, error) {
+	var bodyMetrics []MetricsBatchRequestItem
+	var result ListMetricsResultsItem
 	for _, metrics := range client.Config.Metrics {
 		metrics := metrics
-		var aggregations []insights.MetricsAggregation
-		var segments []insights.MetricsSegment
-		for _, agg := range metrics.Aggregation {
-			aggregations = append(aggregations, insights.MetricsAggregation(agg))
-		}
-		for _, seg := range metrics.Segment {
-			segments = append(segments, insights.MetricsSegment(seg))
-		}
+		// Clone so each batch entry owns its slices; sharing the same backing
+		// array across requests would couple unrelated metric configs together.
+		aggregations := slices.Clone(metrics.Aggregation)
+		segments := slices.Clone(metrics.Segment)
 		for _, metric := range metrics.ID {
-			bodyMetric := insights.MetricsPostBodySchemaParameters{
-				MetricID:    insights.MetricID(metric),
+			params := MetricsBatchParameters{
+				MetricID:    metric,
 				Timespan:    calculateTimespan(client.Config.Period),
 				Aggregation: &aggregations,
 				Interval:    &metrics.Interval,
@@ -66,15 +61,15 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 			if err != nil {
 				return result, fmt.Errorf("could not generate identifier in client: %w", err)
 			}
-			strId := id.String()
-			bodyMetrics = append(bodyMetrics, insights.MetricsPostBodySchema{ID: &strId, Parameters: &bodyMetric})
+			strID := id.String()
+			bodyMetrics = append(bodyMetrics, MetricsBatchRequestItem{ID: &strID, Parameters: &params})
 		}
 	}
 	result, err := client.Service.GetMetricValues(client.Config.ApplicationId, bodyMetrics)
-	if err == nil {
-		return result, nil
+	if err != nil {
+		return result, fmt.Errorf("could not retrieve app insights metrics from service: %w", err)
 	}
-	return result, fmt.Errorf("could not retrieve app insights metrics from service: %w", err)
+	return result, nil
 }
 
 func calculateTimespan(duration time.Duration) *string {

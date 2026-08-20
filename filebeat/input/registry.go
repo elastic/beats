@@ -34,6 +34,7 @@ type Context struct {
 	Done              chan struct{}
 	BeatDone          chan struct{}
 	Meta              map[string]string
+	UserAgent         string
 	GetStatusReporter GetStatusReporter
 }
 

@@ -110,7 +110,7 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 	go func() {
 		// Publish 2 events, this will make the queue full, but
 		// both will be accepted
-		for i := 0; i < 2; i++ {
+		for i := range 2 {
 			id, ok := p.Publish(fmt.Sprintf("Event %d", i))
 			if !ok {
 				t.Errorf("failed to publish to the queue, event ID: %v", id)
@@ -182,9 +182,8 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// This needs to run in a goroutine because the buffered
 	// event will block until the queue handles it.
 	var wgProducer sync.WaitGroup
-	wgProducer.Add(1)
-	go func() {
-		for i := 0; i < 4; i++ {
+	wgProducer.Go(func() {
+		for i := range 4 {
 			event := i
 			// For proper navigation of the race conditions inherent to this
 			// test: increment active events before the publish attempt, then
@@ -196,8 +195,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 				activeEvents.Add(-1)
 			}
 		}
-		wgProducer.Done()
-	}()
+	})
 
 	// This sleep is regrettable, but there's no deterministic way to know when
 	// the producer code has buffered an event in the queue's channel.
@@ -216,7 +214,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// requests -- if only 2 events entered the queue, then the second
 	// Get call will block until the queue itself is cancelled.
 	go func() {
-		for i := 0; i < 2; i++ {
+		for range 2 {
 			batch, err := q.Get(2)
 			// Only error to worry about is queue closing, which isn't
 			// a test failure.
@@ -245,7 +243,7 @@ func TestDoubleClose(t *testing.T) {
 	p := q.Producer(queue.ProducerConfig{})
 
 	// Write some events to the queue synchronously
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		event := i
 		_, ok := p.Publish(event)
 		assert.True(t, ok)
@@ -253,14 +251,12 @@ func TestDoubleClose(t *testing.T) {
 
 	// Keep writing to the queue as long as we're successful
 	var wgProducer sync.WaitGroup
-	wgProducer.Add(1)
-	go func() {
+	wgProducer.Go(func() {
 		queueOpen := true
 		for queueOpen {
 			_, queueOpen = p.Publish(0)
 		}
-		wgProducer.Done()
-	}()
+	})
 
 	// Close the queue without force, then with it enabled
 	// Both should succeed
@@ -303,17 +299,17 @@ func TestBatchFreeEntries(t *testing.T) {
 	// Slight concurrency subtlety: we check events are non-nil after the queue
 	// reads, since if we do it before we have no way to be sure the insert
 	// has been completed.
-	for i := 0; i < queueSize; i++ {
+	for i := range queueSize {
 		require.NotNil(t, testQueue.buf[i].event, "All queue events must be non-nil")
 	}
 	batch2.FreeEntries()
-	for i := 0; i < batchSize; i++ {
+	for i := range batchSize {
 		require.NotNilf(t, testQueue.buf[i].event, "Queue index %v: batch 1's events should be unaffected by calling FreeEntries on Batch 2", i)
 		require.Nilf(t, testQueue.buf[batchSize+i].event, "Queue index %v: batch 2's events should be nil after FreeEntries", batchSize+i)
 	}
 	batch1.FreeEntries()
-	for i := 0; i < queueSize; i++ {
-		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
+	for i := range queueSize {
+		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches", i)
 	}
 }
 
@@ -366,9 +362,7 @@ func TestProducerShutdown(t *testing.T) {
 		go publishWorker()
 	}
 	// Start a reader to continuously drain the queue and acknowledge the events
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		// Continuously read and acknowledge events from the queue
 		for {
 			batch, err := testQueue.Get(queueSize)
@@ -378,7 +372,7 @@ func TestProducerShutdown(t *testing.T) {
 				return
 			}
 		}
-	}()
+	})
 
 	// Wait for the queue to go through at least one full rotation
 	require.Eventually(
@@ -408,6 +402,7 @@ func TestProducerShutdown(t *testing.T) {
 }
 
 func BenchmarkProducerThroughput(b *testing.B) {
+	b.ReportAllocs()
 	const queueSize = 10000
 	const publishWorkers = 10
 	testQueue := NewQueue[int](

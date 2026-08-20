@@ -66,19 +66,19 @@ func (t ConfigFileType) IsDocker() bool { return t&DockerConfigType > 0 }
 // ConfigFileParams defines the files that make up each config file.
 type ConfigFileParams struct {
 	Templates                []string // List of files or globs to load.
-	ExtraVars                map[string]interface{}
+	ExtraVars                map[string]any
 	Short, Reference, Docker ConfigParams
 }
 
 type ConfigParams struct {
 	Template string
-	Deps     []interface{}
+	Deps     []any
 }
 
 func DefaultConfigFileParams() ConfigFileParams {
 	return ConfigFileParams{
 		Templates: []string{LibbeatDir("_meta/config/*.tmpl")},
-		ExtraVars: map[string]interface{}{},
+		ExtraVars: map[string]any{},
 		Short: ConfigParams{
 			Template: LibbeatDir("_meta/config/default.short.yml.tmpl"),
 		},
@@ -124,17 +124,17 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigFileParams, typ ConfigFileType) error {
 	// Determine what type to build and set some parameters.
 	var confFile ConfigParams
-	var tmplParams map[string]interface{}
+	var tmplParams map[string]any
 	switch typ {
 	case ShortConfigType:
 		confFile = confParams.Short
-		tmplParams = map[string]interface{}{}
+		tmplParams = map[string]any{}
 	case ReferenceConfigType:
 		confFile = confParams.Reference
-		tmplParams = map[string]interface{}{"Reference": true}
+		tmplParams = map[string]any{"Reference": true}
 	case DockerConfigType:
 		confFile = confParams.Docker
-		tmplParams = map[string]interface{}{"Docker": true}
+		tmplParams = map[string]any{"Docker": true}
 	default:
 		panic(fmt.Errorf("Invalid config file type: %v", typ))
 	}
@@ -146,7 +146,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	// Rather than adding more "ExcludeX"/"UseX" options consider overwriting
 	// one of the libbeat templates in your project by adding a file with the
 	// same name to your _meta/config directory.
-	params := map[string]interface{}{
+	params := map[string]any{
 		"GOOS":                           EnvOr("DEV_OS", "linux"),
 		"GOARCH":                         EnvOr("DEV_ARCH", "amd64"),
 		"CI":                             EnvOr("CI", ""),
@@ -172,7 +172,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 		// include is necessary because you cannot pipe 'template' to a function
 		// since 'template' is an action. This allows you to include a
 		// template and indent it (e.g. {{ include "x.tmpl" . | indent 4 }}).
-		"include": func(name string, data interface{}) (string, error) {
+		"include": func(name string, data any) (string, error) {
 			buf := bytes.NewBuffer(nil)
 			if err := tmpl.ExecuteTemplate(buf, name, data); err != nil {
 				return "", err
@@ -196,7 +196,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 		}
 	}
 
-	data, err := ioutil.ReadFile(confFile.Template)
+	data, err := os.ReadFile(confFile.Template)
 	if err != nil {
 		return fmt.Errorf("failed to read config template %q: %w", confFile.Template, err)
 	}
@@ -265,7 +265,7 @@ type moduleFieldsYmlData []struct {
 }
 
 func readModuleFieldsYml(path string) (title string, useShort bool, err error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", false, err
 	}
@@ -327,7 +327,7 @@ func GenerateModuleReferenceConfig(out string, moduleDirs ...string) error {
 
 			var data []byte
 			for _, f := range files {
-				data, err = ioutil.ReadFile(f)
+				data, err = os.ReadFile(f)
 				if err != nil {
 					if os.IsNotExist(err) {
 						continue
@@ -361,9 +361,9 @@ func GenerateModuleReferenceConfig(out string, moduleDirs ...string) error {
 		return moduleConfigs[i].ID < moduleConfigs[j].ID
 	})
 
-	config := MustExpand(moduleConfigTemplate, map[string]interface{}{
+	config := MustExpand(moduleConfigTemplate, map[string]any{
 		"Modules": moduleConfigs,
 	})
 
-	return ioutil.WriteFile(createDir(out), []byte(config), 0644)
+	return os.WriteFile(createDir(out), []byte(config), 0644)
 }

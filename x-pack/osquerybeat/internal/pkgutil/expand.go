@@ -7,6 +7,7 @@ package pkgutil
 import (
 	"compress/gzip"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -66,16 +67,23 @@ func expandPayload(f *xar.File, dstDir string) error {
 			continue
 		}
 
+		// Reject entries whose path escapes the destination directory to
+		// guard against path traversal (CWE-22).
+		if !filepath.IsLocal(entry.FilePath) {
+			return fmt.Errorf("illegal file path in pkg payload: %v", entry.FilePath)
+		}
+		fp := filepath.Join(dstDir, entry.FilePath)
+
 		body := entry.Body
 		// Ignore symlinks, not needed for our purposes
 		if entry.FileMode.IsDir() {
-			err = os.MkdirAll(filepath.Join(dstDir, entry.FilePath), entry.FileMode.Perm())
+			err = os.MkdirAll(fp, entry.FileMode.Perm())
 			if err != nil {
 				return err
 			}
 		} else if entry.FileMode.IsRegular() {
 			body = nil
-			err := writeFile(dstDir, &entry)
+			err := writeFile(fp, &entry)
 			if err != nil {
 				return err
 			}
@@ -94,8 +102,7 @@ func expandPayload(f *xar.File, dstDir string) error {
 	return nil
 }
 
-func writeFile(dstDir string, entry *cpio.Entry) error {
-	fp := filepath.Join(dstDir, entry.FilePath)
+func writeFile(fp string, entry *cpio.Entry) error {
 	err := writeFileContent(fp, entry.Body, entry.FileMode.Perm())
 	if err != nil {
 		return err

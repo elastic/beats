@@ -46,7 +46,7 @@ func TestMakeClientParams(t *testing.T) {
 }
 
 func TestMakeReporter(t *testing.T) {
-	c, err := conf.NewConfigFrom(map[string]interface{}{
+	c, err := conf.NewConfigFrom(map[string]any{
 		"hosts": []string{"127.0.0.1"},
 	})
 	require.NoError(t, err)

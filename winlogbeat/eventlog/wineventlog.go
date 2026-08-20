@@ -247,6 +247,10 @@ func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *moni
 	return err
 }
 
+func (l *winEventLog) Checkpoint() checkpoint.EventLogState {
+	return l.lastRead
+}
+
 func (l *winEventLog) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
 	var bookmark win.Bookmark
 	if len(state.Bookmark) > 0 {

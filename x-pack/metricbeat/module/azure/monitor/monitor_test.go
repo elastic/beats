@@ -13,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -56,7 +57,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	module, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	assert.Nil(t, module)
 	assert.Nil(t, metricsets)
 	assert.Error(t, err, "no resource options defined: module azure - monitor metricset")
@@ -64,7 +65,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	module, metricsets, err = mb.NewModule(c, mb.Registry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	if err != nil {
 		t.Fatal(err)
 	}

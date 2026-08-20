@@ -36,7 +36,8 @@ cd filebeat  # or any beat directory
 go test -v -race -run TestName ./path/to/package/...
 
 # Stress test to find flaky tests (runs a test repeatedly with x/tools/cmd/stress)
-script/stresstest.sh [--tags integration] [--race] ./path/to/package ^TestName$ -p 32
+# It runs FOREVER (stress -timeout is per-run, not total); bound it with an outer `timeout`.
+timeout 5m script/stresstest.sh [--tags integration] [--race] ./path/to/package ^TestName$ -p 32 [-failfast]
 ```
 
 ### Integration Tests
@@ -74,8 +75,8 @@ make check                   # Full check suite (lint, headers, go mod, python)
 ### Linting
 
 ```bash
-# Running golangci-lint for the whole codebase is slow, prefer running only on changed files by default
-golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 --whole-files --new-from-merge-base upstream/main
+# Running golangci-lint for the whole codebase is slow, prefer running only on changed lines by default.
+golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 --new-from-merge-base upstream/main
 ```
 
 ## Architecture

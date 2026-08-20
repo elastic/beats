@@ -77,8 +77,8 @@ func TestFetchHTTP(t *testing.T) {
 	assert.Len(t, totals, 1)
 }
 
-func getConfig(scheme string, host string) map[string]interface{} {
-	conf := map[string]interface{}{
+func getConfig(scheme string, host string) map[string]any {
+	conf := map[string]any{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 	}

@@ -130,7 +130,7 @@ func threadStats(sys resolve.Resolver) (mapstr.M, error) {
 		return nil, fmt.Errorf("error reading procfs file %s: %w", statPath, err)
 	}
 	threadData := mapstr.M{}
-	for _, line := range strings.Split(string(procData), "\n") {
+	for line := range strings.SplitSeq(string(procData), "\n") {
 		// look for format procs_[STATE] [COUNT]
 		fields := strings.Fields(line)
 		if len(fields) < 2 {

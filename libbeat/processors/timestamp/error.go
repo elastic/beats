@@ -25,7 +25,7 @@ import (
 
 type parseError struct {
 	field  string
-	time   interface{}
+	time   any
 	causes []error
 }
 

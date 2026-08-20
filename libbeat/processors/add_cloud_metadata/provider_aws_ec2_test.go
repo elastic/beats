@@ -31,10 +31,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -135,7 +138,6 @@ var genericInstanceIDResponse getInstanceIDFunc = func(ctx context.Context, para
 }
 
 func TestMain(m *testing.M) {
-	logp.TestingSetup()
 	code := m.Run()
 	os.Exit(code)
 }
@@ -420,11 +422,29 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 				t.Fatalf("error creating new metadata processor: %s", err.Error())
 			}
 
-			actual, err := cmp.Run(&beat.Event{Fields: tc.previousEvent})
+			// Clone before Run: addMeta mutates event.Fields in place, which
+			// would corrupt tc.previousEvent before the RunPdata body is seeded.
+			inputForRun := tc.previousEvent.Clone()
+			inputForPdata := tc.previousEvent.Clone()
+
+			actual, err := cmp.Run(&beat.Event{Fields: inputForRun})
 			if err != nil {
 				t.Fatalf("error running processor: %s", err.Error())
 			}
 			assert.Equal(t, tc.expectedEvent, actual.Fields)
+
+			// RunPdata path: assert Run == RunPdata.
+			pp, ok := cmp.(processors.PdataProcessor)
+			require.True(t, ok, "processor must implement PdataProcessor")
+			body := pcommon.NewMap()
+			require.NoError(t, otelmap.FromMapstr(body, inputForPdata))
+			drop, err := pp.RunPdata(body)
+			require.NoError(t, err)
+			require.False(t, drop)
+			legacyNorm := pcommon.NewMap()
+			require.NoError(t, otelmap.FromMapstr(legacyNorm, actual.Fields))
+			assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
+				"Run and RunPdata must produce identical output")
 		})
 	}
 }
@@ -514,7 +534,7 @@ func Test_getTags(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tags := getTags(ctx, tt.imdsClient, tt.ec2Client, instanceId, logger)
-			assert.Equal(t, tags, tt.want)
+			assert.Equal(t, tt.want, tags)
 		})
 	}
 }

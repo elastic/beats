@@ -18,6 +18,8 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -31,6 +33,7 @@ type minimalStateInput struct {
 	fullSyncInterval time.Duration
 	incrSyncInterval time.Duration
 	logger           *logp.Logger
+	store            statestore.States
 	path             *paths.Path
 }
 
@@ -62,22 +65,13 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	}
 	defer client.Close()
 
-	dataDir := n.path.Resolve(paths.Data, "kvstore")
-	if err = os.MkdirAll(dataDir, 0700); err != nil {
-		return fmt.Errorf("kvstore: unable to make data directory: %w", err)
-	}
-	// TODO: bbolt is a stopgap; the OTel path uses the
-	// elasticsearchstorage extension and this will follow once
-	// ES-backed state is available to Beats inputs.
-	filename := filepath.Join(dataDir, runCtx.ID+".db")
-	store, err := kvstore.NewStore(log, filename, 0600)
+	syncer, err := n.newSyncer(runCtx, log)
 	if err != nil {
 		return err
 	}
-	defer store.Close()
+	defer syncer.close()
 
 	slogger := slogLogger(log)
-	bucketName := "entcollect." + n.providerName
 
 	syncTimer := time.NewTimer(0) // fire immediately on first run
 	incrTimer := time.NewTimer(n.incrSyncInterval)
@@ -93,7 +87,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			return nil
 
 		case <-syncTimer.C:
-			if err := n.runSync(runCtx, store, client, slogger, bucketName, true); err != nil {
+			if err := syncer.runSync(runCtx, n.provider, client, slogger, true); err != nil {
 				log.Errorw("Error running full sync", "error", err)
 			}
 			syncTimer.Reset(n.fullSyncInterval)
@@ -108,7 +102,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			incrTimer.Reset(n.incrSyncInterval)
 
 		case <-incrTimer.C:
-			if err := n.runSync(runCtx, store, client, slogger, bucketName, false); err != nil {
+			if err := syncer.runSync(runCtx, n.provider, client, slogger, false); err != nil {
 				log.Errorw("Error running incremental sync", "error", err)
 			}
 			incrTimer.Reset(n.incrSyncInterval)
@@ -117,31 +111,65 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	}
 }
 
-func (n *minimalStateInput) runSync(
-	runCtx v2.Context,
-	store *kvstore.Store,
-	client beat.Client,
-	slogger *slog.Logger,
-	bucketName string,
-	full bool,
-) error {
+// syncer abstracts state storage for sync operations. The bbolt
+// implementation uses transactions for atomicity; the ES-backed
+// implementation relies on entcollect.Buffer for batching without
+// transactional guarantees.
+type syncer interface {
+	runSync(runCtx v2.Context, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) error
+	close()
+}
+
+func (n *minimalStateInput) newSyncer(runCtx v2.Context, log *logp.Logger) (syncer, error) {
+	if features.IsElasticsearchStateStoreEnabledForInput(Name) {
+		if n.store == nil {
+			return nil, errors.New("ES state store enabled but no statestore was injected")
+		}
+		return n.newESSyncer(runCtx, log)
+	}
+	return n.newBBoltSyncer(runCtx, log)
+}
+
+// bboltSyncer uses local bbolt storage with transactional semantics.
+type bboltSyncer struct {
+	store      *kvstore.Store
+	bucketName string
+}
+
+func (n *minimalStateInput) newBBoltSyncer(runCtx v2.Context, log *logp.Logger) (*bboltSyncer, error) {
+	dataDir := n.path.Resolve(paths.Data, "kvstore")
+	if err := os.MkdirAll(dataDir, 0o700); err != nil {
+		return nil, fmt.Errorf("kvstore: unable to make data directory: %w", err)
+	}
+	filename := filepath.Join(dataDir, runCtx.ID+".db")
+	store, err := kvstore.NewStore(log, filename, 0o600)
+	if err != nil {
+		return nil, err
+	}
+	return &bboltSyncer{
+		store:      store,
+		bucketName: "entcollect." + n.providerName,
+	}, nil
+}
+
+func (s *bboltSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) error {
 	ctx := v2.GoContextFromCanceler(runCtx.Cancelation)
-	tx, err := store.BeginTx(true)
+	tx, err := s.store.BeginTx(true)
 	if err != nil {
 		return fmt.Errorf("unable to begin transaction: %w", err)
 	}
 	defer tx.Rollback() //nolint:errcheck // best-effort cleanup
 
-	es := kvstore.NewEntcollectStore(tx, bucketName)
+	es := kvstore.NewEntcollectStore(tx, s.bucketName)
 	buf := entcollect.NewBuffer(es)
 
 	tracker := kvstore.NewTxTracker(ctx)
 	pub := kvstore.NewPublisher(client, runCtx.ID, tracker)
 
 	if full {
-		err = n.provider.FullSync(ctx, buf, pub, slogger)
+		err = provider.FullSync(ctx, buf, pub, slogger)
 	} else {
-		err = n.provider.IncrementalSync(ctx, buf, pub, slogger)
+		err = provider.IncrementalSync(ctx, buf, pub, slogger)
 	}
 
 	// Always wait for in-flight events to be ACKed, even on error.
@@ -164,6 +192,66 @@ func (n *minimalStateInput) runSync(
 		return fmt.Errorf("unable to commit transaction: %w", err)
 	}
 	return nil
+}
+
+func (s *bboltSyncer) close() {
+	s.store.Close()
+}
+
+// esSyncer uses the Elasticsearch-backed state store for agentless
+// deployments. No transactional atomicity — entcollect.Buffer
+// provides application-level batching.
+type esSyncer struct {
+	store *statestore.Store
+}
+
+func (n *minimalStateInput) newESSyncer(runCtx v2.Context, log *logp.Logger) (*esSyncer, error) {
+	s, err := n.store.StoreFor(Name)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open ES state store: %w", err)
+	}
+	s.SetID(runCtx.ID)
+	log.Infof("Using Elasticsearch-backed state store (index: agentless-state-%s)", runCtx.ID)
+	return &esSyncer{store: s}, nil
+}
+
+func (s *esSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) error {
+	ctx := v2.GoContextFromCanceler(runCtx.Cancelation)
+
+	es := kvstore.NewStateStoreAdapter(s.store)
+	buf := entcollect.NewBuffer(es)
+
+	tracker := kvstore.NewTxTracker(ctx)
+	pub := kvstore.NewPublisher(client, runCtx.ID, tracker)
+
+	var err error
+	if full {
+		err = provider.FullSync(ctx, buf, pub, slogger)
+	} else {
+		err = provider.IncrementalSync(ctx, buf, pub, slogger)
+	}
+
+	// Always wait for in-flight events to be ACKed, even on error.
+	tracker.Wait()
+
+	if err != nil {
+		buf.Discard()
+		return err
+	}
+
+	if ctx.Err() != nil {
+		buf.Discard()
+		return ctx.Err()
+	}
+
+	if err := buf.Commit(); err != nil {
+		return fmt.Errorf("unable to commit buffer: %w", err)
+	}
+	return nil
+}
+
+func (s *esSyncer) close() {
+	s.store.Close()
 }
 
 // slogLogger bridges logp.Logger to *slog.Logger using zapslog.

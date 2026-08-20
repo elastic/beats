@@ -76,6 +76,7 @@ func parseResolvedIndicesResponse(response *resolvedApiResponse) map[string]Inde
 			system:     isSystem,
 			hidden:     isHidden,
 			aliases:    dataStreamAndAliasesCombined(index.DataStream, index.Aliases, maxAliasesPerIndex),
+			dataStream: index.DataStream,
 			attributes: attributes,
 		}
 	}

@@ -31,7 +31,7 @@ The following cloud providers are supported:
 
 The Alibaba Cloud and Tencent cloud providers are disabled by default, because they require to access a remote host. The `providers` setting allows users to select a list of default providers to query.
 
-Cloud providers tend to maintain metadata services compliant with other cloud providers. For example, Openstack supports [EC2 compliant metadat service](https://docs.openstack.org/nova/latest/user/metadata.html#ec2-compatible-metadata). This makes it impossible to differentiate cloud provider (`cloud.provider` property) with auto discovery (when `providers` configuration is omitted). The processor implementation incorporates a priority mechanism where priority is given to some providers over others when there are multiple successful metadata results. Currently, `aws/ec2` and `azure` have priority over any other provider as their metadata retrival rely on SDKs. The expectation here is that SDK methods should fail if run in an environment not configured accordingly (ex:- missing configurations or credentials).
+Cloud providers tend to maintain metadata services compliant with other cloud providers. For example, Openstack supports [EC2 compliant metadata service](https://docs.openstack.org/nova/latest/user/metadata.html#ec2-compatible-metadata). This makes it impossible to differentiate cloud provider (`cloud.provider` property) with auto discovery (when `providers` configuration is omitted). The processor implementation incorporates a priority mechanism where priority is given to some providers over others when there are multiple successful metadata results. Currently, `aws/ec2` and `azure` have priority over any other provider as their metadata retrieval rely on SDKs. The expectation here is that SDK methods should fail if run in an environment not configured accordingly (ex:- missing configurations or credentials).
 
 
 ## Configurations [_configurations]
@@ -55,13 +55,13 @@ List of names the `providers` setting supports:
 * "azure" for Azure Virtual Machine (enabled by default). If the virtual machine is part of an AKS managed cluster, the fields `orchestrator.cluster.name` and `orchestrator.cluster.id` can also be retrieved. "TENANT_ID", "CLIENT_ID" and "CLIENT_SECRET" environment variables need to be set for authentication purposes. If not set we fallback to [DefaultAzureCredential](https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication?tabs=bash#2-authenticate-with-azure) and user can choose different authentication methods (e.g. workload identity).
 * "digitalocean" for Digital Ocean (enabled by default).
 * "aws", or "ec2" for Amazon Web Services (enabled by default).
-* "gcp" for Google Copmute Enging (enabled by default).
+* "gcp" for Google Compute Engine (enabled by default).
 * "openstack", "nova", or "huawei" for Openstack Nova (enabled by default).
 * "openstack-ssl", or "nova-ssl" for Openstack Nova when SSL metadata APIs are enabled (enabled by default).
 * "tencent", or "qcloud" for Tencent Cloud (disabled by default).
 * "hetzner" for Hetzner Cloud (enabled by default).
 
-For example, configuration below only utilize `aws` metadata retrival mechanism,
+For example, configuration below only utilize `aws` metadata retrieval mechanism,
 
 ```yaml
 processors:

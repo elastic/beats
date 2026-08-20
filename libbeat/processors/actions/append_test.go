@@ -32,26 +32,26 @@ import (
 
 func Test_cleanEmptyValues(t *testing.T) {
 	type args struct {
-		dirtyArr []interface{}
+		dirtyArr []any
 	}
 	tests := []struct {
 		description  string
 		args         args
-		wantCleanArr []interface{}
+		wantCleanArr []any
 	}{
 		{
 			description: "array with empty values",
 			args: args{
-				dirtyArr: []interface{}{"asdf", "", 12, "", nil},
+				dirtyArr: []any{"asdf", "", 12, "", nil},
 			},
-			wantCleanArr: []interface{}{"asdf", 12},
+			wantCleanArr: []any{"asdf", 12},
 		},
 		{
 			description: "array with no empty values",
 			args: args{
-				dirtyArr: []interface{}{"asdf", "asd", 12, 123},
+				dirtyArr: []any{"asdf", "asd", 12, 123},
 			},
-			wantCleanArr: []interface{}{"asdf", "asd", 12, 123},
+			wantCleanArr: []any{"asdf", "asd", 12, 123},
 		},
 	}
 	for _, tt := range tests {
@@ -72,7 +72,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 	type args struct {
 		target string
 		fields []string
-		values []interface{}
+		values []any
 		event  *beat.Event
 	}
 	tests := []struct {
@@ -207,7 +207,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				config: appendProcessorConfig{
 					Fields:            []string{"array-one", "array-two", "concrete-field"},
 					TargetField:       "target",
-					Values:            []interface{}{"value1", "value2"},
+					Values:            []any{"value1", "value2"},
 					IgnoreMissing:     false,
 					IgnoreEmptyValues: false,
 					FailOnError:       true,
@@ -219,8 +219,8 @@ func Test_appendProcessor_Run(t *testing.T) {
 					Meta: mapstr.M{},
 					Fields: mapstr.M{
 						"concrete-field": "some-value",
-						"array-one":      []interface{}{"one", "", "two", "three"},
-						"array-two":      []interface{}{"four", "five", ""},
+						"array-one":      []any{"one", "", "two", "three"},
+						"array-two":      []any{"four", "five", ""},
 					},
 				},
 			},
@@ -229,9 +229,9 @@ func Test_appendProcessor_Run(t *testing.T) {
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
 					"concrete-field": "some-value",
-					"array-one":      []interface{}{"one", "", "two", "three"},
-					"array-two":      []interface{}{"four", "five", ""},
-					"target":         []interface{}{"one", "", "two", "three", "four", "five", "", "some-value", "value1", "value2"},
+					"array-one":      []any{"one", "", "two", "three"},
+					"array-two":      []any{"four", "five", ""},
+					"target":         []any{"one", "", "two", "three", "four", "five", "", "some-value", "value1", "value2"},
 				},
 			},
 		},
@@ -258,7 +258,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
 					"field":  "I'm being appended",
-					"target": []interface{}{"scaler-value", "I'm being appended"},
+					"target": []any{"scaler-value", "I'm being appended"},
 				},
 			},
 		},
@@ -268,7 +268,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				event: &beat.Event{
 					Meta: mapstr.M{},
 					Fields: mapstr.M{
-						"target": []interface{}{"value1", "value2"},
+						"target": []any{"value1", "value2"},
 						"field":  "I'm being appended",
 					},
 				},
@@ -277,7 +277,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				logger: log,
 				config: appendProcessorConfig{
 					Fields:      []string{"field"},
-					Values:      []interface{}{"value3", "value4"},
+					Values:      []any{"value3", "value4"},
 					TargetField: "target",
 				},
 			},
@@ -286,7 +286,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
 					"field":  "I'm being appended",
-					"target": []interface{}{"value1", "value2", "I'm being appended", "value3", "value4"},
+					"target": []any{"value1", "value2", "I'm being appended", "value3", "value4"},
 				},
 			},
 		},
@@ -304,14 +304,14 @@ func Test_appendProcessor_Run(t *testing.T) {
 				logger: log,
 				config: appendProcessorConfig{
 					TargetField: "tags",
-					Values:      []interface{}{"foo_bar"},
+					Values:      []any{"foo_bar"},
 				},
 			},
 			wantErr: false,
 			want: &beat.Event{
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
-					"tags": []interface{}{"forwarded", "another-tag-from-the-tags-field", "foo_bar"},
+					"tags": []any{"forwarded", "another-tag-from-the-tags-field", "foo_bar"},
 				},
 			},
 		},
@@ -321,7 +321,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				event: &beat.Event{
 					Meta: mapstr.M{},
 					Fields: mapstr.M{
-						"target": []interface{}{"one"},
+						"target": []any{"one"},
 						"field":  []string{"two", "two"},
 					},
 				},
@@ -338,7 +338,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 			want: &beat.Event{
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
-					"target": []interface{}{"one", "two"},
+					"target": []any{"one", "two"},
 					"field":  []string{"two", "two"},
 				},
 			},
@@ -350,7 +350,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				config: appendProcessorConfig{
 					Fields:            []string{"array.one", "array.two", "concrete-field"},
 					TargetField:       "target",
-					Values:            []interface{}{"value1", "value2"},
+					Values:            []any{"value1", "value2"},
 					IgnoreMissing:     false,
 					IgnoreEmptyValues: false,
 					FailOnError:       true,
@@ -363,8 +363,8 @@ func Test_appendProcessor_Run(t *testing.T) {
 					Fields: mapstr.M{
 						"concrete-field": "some-value",
 						"array": mapstr.M{
-							"one": []interface{}{"one", "", "two", "three"},
-							"two": []interface{}{"four", "five", ""},
+							"one": []any{"one", "", "two", "three"},
+							"two": []any{"four", "five", ""},
 						},
 					},
 				},
@@ -375,10 +375,10 @@ func Test_appendProcessor_Run(t *testing.T) {
 				Fields: mapstr.M{
 					"concrete-field": "some-value",
 					"array": mapstr.M{
-						"one": []interface{}{"one", "", "two", "three"},
-						"two": []interface{}{"four", "five", ""},
+						"one": []any{"one", "", "two", "three"},
+						"two": []any{"four", "five", ""},
 					},
-					"target": []interface{}{"one", "", "two", "three", "four", "five", "", "some-value", "value1", "value2"},
+					"target": []any{"one", "", "two", "three", "four", "five", "", "some-value", "value1", "value2"},
 				},
 			},
 		},
@@ -389,7 +389,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				config: appendProcessorConfig{
 					Fields:            []string{"array-one", "array-two", "concrete-field"},
 					TargetField:       "target",
-					Values:            []interface{}{"value1", nil, "value2", "", nil},
+					Values:            []any{"value1", nil, "value2", "", nil},
 					IgnoreMissing:     false,
 					IgnoreEmptyValues: true,
 					FailOnError:       true,
@@ -401,8 +401,8 @@ func Test_appendProcessor_Run(t *testing.T) {
 					Meta: mapstr.M{},
 					Fields: mapstr.M{
 						"concrete-field": "",
-						"array-one":      []interface{}{"one", "", "two", "three"},
-						"array-two":      []interface{}{"four", "five", ""},
+						"array-one":      []any{"one", "", "two", "three"},
+						"array-two":      []any{"four", "five", ""},
 					},
 				},
 			},
@@ -411,9 +411,9 @@ func Test_appendProcessor_Run(t *testing.T) {
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
 					"concrete-field": "",
-					"array-one":      []interface{}{"one", "", "two", "three"},
-					"array-two":      []interface{}{"four", "five", ""},
-					"target":         []interface{}{"one", "two", "three", "four", "five", "value1", "value2"},
+					"array-one":      []any{"one", "", "two", "three"},
+					"array-two":      []any{"four", "five", ""},
+					"target":         []any{"one", "two", "three", "four", "five", "value1", "value2"},
 				},
 			},
 		},
@@ -475,7 +475,7 @@ func TestAppendSafety(t *testing.T) {
 		config      appendProcessorConfig
 		fields      mapstr.M
 		wantErr     bool
-		wantTarget  []interface{} // if non-nil, assert target field equals this
+		wantTarget  []any // if non-nil, assert target field equals this
 	}{
 		{
 			description: "multiple source fields, middle missing, FailOnError=true",
@@ -514,7 +514,7 @@ func TestAppendSafety(t *testing.T) {
 				TargetField: "target",
 				FailOnError: true,
 			},
-			fields:  mapstr.M{"target": []interface{}{"original"}, "field_a": "a"},
+			fields:  mapstr.M{"target": []any{"original"}, "field_a": "a"},
 			wantErr: true,
 		},
 		{
@@ -535,7 +535,7 @@ func TestAppendSafety(t *testing.T) {
 				FailOnError: true,
 			},
 			fields:     mapstr.M{"source": "hello"},
-			wantTarget: []interface{}{"hello"},
+			wantTarget: []any{"hello"},
 		},
 		{
 			description: "target field exists, Delete+PutValue on same path succeeds",
@@ -545,18 +545,18 @@ func TestAppendSafety(t *testing.T) {
 				FailOnError: true,
 			},
 			fields:     mapstr.M{"target": "existing-scalar", "source": "new-value"},
-			wantTarget: []interface{}{"existing-scalar", "new-value"},
+			wantTarget: []any{"existing-scalar", "new-value"},
 		},
 		{
 			description: "multiple source fields, all present, all values appended",
 			config: appendProcessorConfig{
 				Fields:      []string{"field_a", "field_b", "field_c"},
 				TargetField: "target",
-				Values:      []interface{}{"static"},
+				Values:      []any{"static"},
 				FailOnError: true,
 			},
-			fields:     mapstr.M{"field_a": "a", "field_b": []interface{}{"b1", "b2"}, "field_c": "c"},
-			wantTarget: []interface{}{"a", "b1", "b2", "c", "static"},
+			fields:     mapstr.M{"field_a": "a", "field_b": []any{"b1", "b2"}, "field_c": "c"},
+			wantTarget: []any{"a", "b1", "b2", "c", "static"},
 		},
 		{
 			description: "IgnoreMissing=true skips missing fields, appends the rest",
@@ -567,7 +567,7 @@ func TestAppendSafety(t *testing.T) {
 				IgnoreMissing: true,
 			},
 			fields:     mapstr.M{"field_a": "a", "field_c": "c"},
-			wantTarget: []interface{}{"a", "c"},
+			wantTarget: []any{"a", "c"},
 		},
 	}
 
@@ -616,47 +616,47 @@ func TestAppendSafety(t *testing.T) {
 
 func Test_removeDuplicates(t *testing.T) {
 	type args struct {
-		dirtyArr []interface{}
+		dirtyArr []any
 	}
 	tests := []struct {
 		description  string
 		args         args
-		wantCleanArr []interface{}
+		wantCleanArr []any
 	}{
 		{
 			description: "clean up integer array with duplicate values",
 			args: args{
-				dirtyArr: []interface{}{1, 1, 4, 2, 3, 3, 3, 2, 3, 3, 4, 5},
+				dirtyArr: []any{1, 1, 4, 2, 3, 3, 3, 2, 3, 3, 4, 5},
 			},
-			wantCleanArr: []interface{}{1, 4, 2, 3, 5},
+			wantCleanArr: []any{1, 4, 2, 3, 5},
 		},
 		{
 			description: "clean up string array with duplicate values",
 			args: args{
-				dirtyArr: []interface{}{"a", "b", "test", "a", "b"},
+				dirtyArr: []any{"a", "b", "test", "a", "b"},
 			},
-			wantCleanArr: []interface{}{"a", "b", "test"},
+			wantCleanArr: []any{"a", "b", "test"},
 		},
 		{
 			description: "clean up string array without duplicate values",
 			args: args{
-				dirtyArr: []interface{}{"a", "b", "test", "c", "d"},
+				dirtyArr: []any{"a", "b", "test", "c", "d"},
 			},
-			wantCleanArr: []interface{}{"a", "b", "test", "c", "d"},
+			wantCleanArr: []any{"a", "b", "test", "c", "d"},
 		},
 		{
 			description: "clean up integer array without duplicate values",
 			args: args{
-				dirtyArr: []interface{}{1, 2, 3, 4, 5},
+				dirtyArr: []any{1, 2, 3, 4, 5},
 			},
-			wantCleanArr: []interface{}{1, 2, 3, 4, 5},
+			wantCleanArr: []any{1, 2, 3, 4, 5},
 		},
 		{
 			description: "clean up non-comparable values without panic",
 			args: args{
-				dirtyArr: []interface{}{[]string{"a", "b"}, []string{"a", "b"}, "test"},
+				dirtyArr: []any{[]string{"a", "b"}, []string{"a", "b"}, "test"},
 			},
-			wantCleanArr: []interface{}{[]string{"a", "b"}, "test"},
+			wantCleanArr: []any{[]string{"a", "b"}, "test"},
 		},
 	}
 	for _, tt := range tests {

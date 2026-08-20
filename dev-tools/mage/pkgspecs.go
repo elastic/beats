@@ -20,7 +20,8 @@ package mage
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
+
 	"log"
 	"path/filepath"
 
@@ -93,7 +94,7 @@ func LoadNamedSpec(name string, files ...string) error {
 func LoadSpecs(files ...string) (map[string][]OSPackageArgs, error) {
 	var data [][]byte
 	for _, file := range files {
-		d, err := ioutil.ReadFile(file)
+		d, err := os.ReadFile(file)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read from spec file: %w", err)
 		}

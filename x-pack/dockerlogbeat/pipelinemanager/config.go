@@ -63,7 +63,7 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 func (cfg ContainerOutputConfig) CreateConfig() (*config.C, error) {
 
 	// the use of typeconv is a hacky shim so we can impliment `omitempty` where needed.
-	var tmp map[string]interface{}
+	var tmp map[string]any
 	err := typeconv.Convert(&tmp, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error converting config struct to interface: %w", err)

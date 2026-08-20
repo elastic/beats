@@ -2,7 +2,7 @@
   {
     "@timestamp": "2023-01-17T21:15:02.549Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credentials-were-read",
@@ -71,7 +71,7 @@
   {
     "@timestamp": "2023-01-17T17:52:51.488Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credentials-were-read",
@@ -140,7 +140,7 @@
   {
     "@timestamp": "2023-01-17T15:35:00.493Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credentials-were-read",
@@ -209,7 +209,7 @@
   {
     "@timestamp": "2023-01-17T15:06:28.132Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credentials-were-read",
@@ -278,7 +278,7 @@
   {
     "@timestamp": "2023-01-17T14:55:56.297Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credentials-were-read",

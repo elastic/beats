@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	dockertest "github.com/elastic/beats/v7/libbeat/tests/docker"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -61,17 +61,18 @@ func TestAddDockerMetadata(t *testing.T) {
 	labels := map[string]string{"label": "foo"}
 	id, err := testClient.ContainerStart(image, cmd, labels)
 	require.NoError(t, err)
-	defer testClient.ContainerRemove(id)
+	defer testClient.ContainerRemove(id) //nolint:errcheck // test cleanup
 
 	info, err := testClient.ContainerInspect(id)
 	require.NoError(t, err)
 	pid := info.State.Pid
 
-	config, err := config.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]any{
 		"match_fields": []string{"cid"},
 	})
+	require.NoError(t, err)
 	watcherConstructor := newWatcherWith(client)
-	processor, err := buildDockerMetadataProcessor(logp.L(), config, watcherConstructor)
+	processor, err := buildDockerMetadataProcessor(logp.L(), config, watcherConstructor) //nolint:forbidigo // integration test setup
 	require.NoError(t, err)
 
 	t.Run("match container by container id", func(t *testing.T) {

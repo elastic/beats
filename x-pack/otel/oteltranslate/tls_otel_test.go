@@ -5,7 +5,6 @@
 package oteltranslate
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -65,17 +64,20 @@ ssl:
 
 	})
 
-	t.Run("when unsupported configuration restart_on_cert_change.enabled is used", func(t *testing.T) {
+	t.Run("when restart_on_cert_change.enabled is set", func(t *testing.T) {
 		input := `
 ssl:
   verification_mode: none
   restart_on_cert_change.enabled: true
 `
 		cfg := config.MustNewConfigFrom(input)
-		_, err := TLSCommonToOTel(cfg, logger)
-		require.Error(t, err)
-		require.ErrorIs(t, err, errors.ErrUnsupported)
-
+		got, err := TLSCommonToOTel(cfg, logger)
+		require.NoError(t, err)
+		assert.Equal(t, map[string]any{
+			"insecure_skip_verify": true,
+			"min_version":          "1.2",
+			"max_version":          "1.3",
+		}, got)
 	})
 
 	t.Run("when unsupported tls version is passed", func(t *testing.T) {

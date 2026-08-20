@@ -97,7 +97,7 @@ func NewHarvester(conn rd.Conn, logger *logp.Logger) (*Harvester, error) {
 // 4) "connected"
 // 5) (integer) 100
 
-func (h *Harvester) parseReplicationRole(reply []interface{}) (string, error) {
+func (h *Harvester) parseReplicationRole(reply []any) (string, error) {
 	role, ok := reply[0].([]byte)
 	if !ok {
 		return "", fmt.Errorf("unexpected type for role response: %T", reply[0])

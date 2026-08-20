@@ -64,7 +64,7 @@ $$$dashboard-subcommand$$$**`dashboard`**
 
     To load the dashboard, copy the generated `dashboard.json` file into the `kibana/6/dashboard` directory of Filebeat, and run `filebeat setup --dashboards` to import the dashboard.
 
-    If {{kib}} is not running on `localhost:5061`, you must also adjust the Filebeat configuration under `setup.kibana`.
+    If {{kib}} is not running on `localhost:5601`, you must also adjust the Filebeat configuration under `setup.kibana`.
 
 
 $$$template-subcommand$$$**`template`**
@@ -263,9 +263,6 @@ filebeat [FLAGS]
     The `--once` option is not currently supported with the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input type.
 
 
-**`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
-
 Also see [Global flags](#global-flags).
 
 **EXAMPLE**
@@ -424,6 +421,9 @@ These global flags are available whenever you run Filebeat.
 
 **`--environment`**
 :   For logging purposes, specifies the environment that Filebeat is running in. This setting is used to select a default log output when no log output is configured. Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`. If `systemd` or `container` is specified, Filebeat will log to stdout and stderr by default.
+
+{applies_to}`stack: ga 9.6` **`--hostname HOSTNAME`**
+:   Sets the hostname reported in `host.name` and `observer.hostname` (when `add_observer_metadata` is configured). Use this when the host cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
 
 **`--path.config`**
 :   Sets the path for configuration files. See the [Directory layout](/reference/filebeat/directory-layout.md) section for details.

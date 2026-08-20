@@ -13,7 +13,7 @@ metadata:
 
 spec:
   type: library
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   lifecycle: production
 
@@ -30,7 +30,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -62,7 +62,7 @@ spec:
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
         SLACK_NOTIFICATIONS_ALL_BRANCHES: "false"  # only notify for failures on `main` or \d+.\d+ (release) branches
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
@@ -80,7 +80,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -109,10 +109,12 @@ spec:
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -127,7 +129,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -156,10 +158,12 @@ spec:
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -174,7 +178,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -203,10 +207,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -221,7 +227,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -250,10 +256,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -268,7 +276,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -297,10 +305,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -315,7 +325,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -344,10 +354,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -362,7 +374,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -391,10 +403,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -409,7 +423,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -437,10 +451,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -455,7 +471,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -484,10 +500,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -502,7 +520,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -531,10 +549,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -549,7 +569,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -578,10 +598,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -596,7 +618,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -625,10 +647,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -643,7 +667,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -672,10 +696,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -690,7 +716,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -719,10 +745,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -736,7 +764,7 @@ metadata:
       url: https://buildkite.com/elastic/beats-xpack-elastic-agent-package-7-17
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -752,12 +780,14 @@ spec:
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
@@ -771,7 +801,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -789,10 +819,12 @@ spec:
         filter_enabled: true
       repository: elastic/beats
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -807,7 +839,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -836,10 +868,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -854,7 +888,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -883,10 +917,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -901,7 +937,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -930,10 +966,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -948,7 +986,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -977,10 +1015,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -995,7 +1035,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -1024,10 +1064,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 # TODO: Remove the following pipeline once agentbeat is no longer required by any supported version.
 ---
@@ -1043,7 +1085,7 @@ metadata:
 
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -1072,11 +1114,12 @@ spec:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
-
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1090,7 +1133,7 @@ metadata:
       url: https://buildkite.com/elastic/beats-packaging-pipeline
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -1120,12 +1163,14 @@ spec:
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
         SLACK_NOTIFICATIONS_SKIP_FOR_RETRIES: 'true'
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1139,7 +1184,7 @@ metadata:
       url: https://buildkite.com/elastic/beats-ironbank-validation
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -1156,12 +1201,14 @@ spec:
       provider_settings:
         trigger_mode: none
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1175,7 +1222,7 @@ metadata:
       url: https://buildkite.com/elastic/beats-aws-tests
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -1190,10 +1237,42 @@ spec:
       provider_settings:
         trigger_mode: none
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         release-eng:
           access_level: BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: beats-tests
+  description: 'Runs of Beats tests'
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-tests
+spec:
+  type: buildkite-pipeline
+  owner: group:streams
+  system: platform-ingest
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-tests
+      description: 'Runs of Beats tests'
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/beats-tests-pipeline.yml"
+      cancel_intermediate_builds: false
+      provider_settings:
+        trigger_mode: none
+      teams:
+        streams:
+          access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
 
@@ -1209,7 +1288,7 @@ metadata:
       url: https://buildkite.com/elastic/beats-pipeline-scheduler
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -1234,6 +1313,12 @@ spec:
           message: Daily trigger of Beats AWS tests
           env:
             PIPELINES_TO_TRIGGER: 'beats-aws-tests'
+        Daily run of Beats tests:
+          branch: main
+          cronline: 0 04 * * *
+          message: Daily trigger of Beats tests
+          env:
+            PIPELINES_TO_TRIGGER: 'beats-tests'
       skip_intermediate_builds: true
       provider_settings:
         trigger_mode: none
@@ -1242,12 +1327,14 @@ spec:
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1261,7 +1348,7 @@ metadata:
       url: https://buildkite.com/elastic/beats-version-bump
 spec:
   type: buildkite-pipeline
-  owner: group:ingest-fp
+  owner: group:streams
   system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
@@ -1278,9 +1365,9 @@ spec:
       provider_settings:
         trigger_mode: none
       teams:
-        ingest-fp:
+        streams:
           access_level: MANAGE_BUILD_AND_READ
-        release-eng:
+        artifact-management:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ

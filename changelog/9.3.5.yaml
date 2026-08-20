@@ -1,0 +1,496 @@
+version: 9.3.5
+entries:
+    - kind: bug-fix
+      summary: Filestream only reports degraded status for permanent harvester errors.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49481
+      issue:
+        - https://github.com/elastic/beats/issues/49451
+      impact: ""
+      action: ""
+      timestamp: 1773680180
+      file:
+        name: 1773680180-filestream-permanent-harvester-errors.yaml
+        checksum: 4c6a27ae6b870bb028c42ed93107e0d99b60ff71
+    - kind: bug-fix
+      summary: Fix bulk indexing failures that could occur when using the Elasticsearch output with some non-Elastic backends.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49557
+      issue:
+        - https://github.com/elastic/beats/issues/49558
+      impact: ""
+      action: ""
+      timestamp: 1773900000
+      file:
+        name: 1773900000-fix-bulk-raw-encoding-double-newline.yaml
+        checksum: ebc2c2cee40a5f0448ebcd50f4b28ef019fea5f6
+    - kind: bug-fix
+      summary: Fix internal processing time metric for azureeventhub input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/40547
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775074566
+      file:
+        name: 1775074566-fix-processing-time-metric.yaml
+        checksum: 1bdc99004d7e25d45dc325bd388fc6a8f934ae99
+    - kind: bug-fix
+      summary: Fix Long decoding error in painless script for windows ingest pipeline
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49869
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775088009
+      file:
+        name: 1775088009-sdh6727.yaml
+        checksum: 799f226d9915f987cf30b72fa3023c6a0ca32e2d
+    - kind: bug-fix
+      summary: Fix race condition during multiline parser shutdown
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49980
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775602464
+      file:
+        name: 1775602464-fix-race-condition-during-multiline-shutdown.yaml
+        checksum: 48a2c76d58f0b688bd292e721c2604747812a4a0
+    - kind: security
+      summary: Update to Go 1.25.9.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50049
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776193328
+      file:
+        name: 1776193328-update-to-go-1.25.9.yaml
+        checksum: 786f0aff8e9a5de23d56e4e14808f0387c51084d
+    - kind: security
+      summary: Bump aws-sdk-go-v2/service/cloudwatchlogs to v1.65.0 to fix GHSA-xmrv-pmrh-hhx2
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50215
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776709378
+      file:
+        name: 1776709378-bump-aws-sdk-go-v2-cloudwatchlogs-s3-ghsa-xmrv-pmrh-hhx2.yaml
+        checksum: 53709575a81b91898bfebaa50c962f57facfa7ee
+    - kind: bug-fix
+      summary: Fix conversion of time duration fields such as event.duration when using Beats receivers
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50302
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777045487
+      file:
+        name: 1777045487-fix-otel-duration-conversion.yaml
+        checksum: 8dadb6a1a3fac8348a2072a056f446075b31234b
+    - kind: upgrade
+      summary: Update github.com/prometheus/prometheus to v0.311.3
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50382
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777046500
+      file:
+        name: 1777046500-align-prometheus-with-otel-collector-contrib.yaml
+        checksum: ed43757d11c6ca775ff9d36b61e69421a87c1534
+    - kind: enhancement
+      summary: Migrate azure/app_insights metricset off the deprecated track-1 Azure SDK and go-autorest, using azcore directly.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50392
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777275227
+      file:
+        name: 1777275227-azure-app-insights-drop-deprecated-sdk.yaml
+        checksum: 7808b52b2b30e779ed56c76a2b6a901591b567fa
+    - kind: enhancement
+      summary: Cache add_locale processor and refresh only when zone or offset changes
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50343
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777305272
+      file:
+        name: 1777305272-add-locale-cache-on-change.yaml
+        checksum: fd1fef1693aa9cc9a3914e16d53adadd7b1f229a
+    - kind: feature
+      summary: Add `elasticsearch/security_stats` metricset for the Elasticsearch module
+      description: |
+        Adds a new `security_stats` metricset to the Elasticsearch module that
+        scrapes the per-node `GET /_security/stats` endpoint (available since
+        Elasticsearch 9.2). The first metric exposed is the Document Level Security
+        cache (entries, memory, hits, misses, evictions, hit/miss latency), enabling
+        fleet-wide observability of DLS cache health from Stack Monitoring. Each
+        event is enriched with node name, roles, and version via a single
+        filter-path-scoped /_nodes call per scrape so consumers can slice by node,
+        role, or stack version without joining across data streams.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50674
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777351182
+      file:
+        name: 1777351182-add-elasticsearch-security-stats-metricset.yaml
+        checksum: 4e231d0e9d67537442171cbec9109ea7778b438b
+    - kind: bug-fix
+      summary: Re-evaluate url_program on each websocket reconnect using evolved cursor state.
+      description: |
+        The streaming input now re-evaluates url_program before each websocket
+        reconnection (both error recovery and OAuth2 token refresh), allowing
+        cursor state accumulated during the session to influence the reconnect URL.
+        Previously url_program was evaluated once at startup and the result was
+        reused for all subsequent connections. The process function also now returns
+        the evolved cursor so that callers can propagate it into the shared state.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50383
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777418848
+      file:
+        name: 1777418848-streaming-url-program-reconnect.yaml
+        checksum: 134b2968b3260a8467665d246fa9b92ccffcabff
+    - kind: bug-fix
+      summary: Reduce allocation pressure in httpjson cursor update and split paths.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50384
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777430032
+      file:
+        name: 1777430032-reduce-httpjson-cursor-update-allocs.yaml
+        checksum: 7764eb80d8a6d3ac85de042d2ac886d1d61d2052
+    - kind: bug-fix
+      summary: Release the bolt file lock when the last datastore bucket is closed.
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50386
+      issue:
+        - https://github.com/elastic/beats/issues/50381
+      impact: ""
+      action: ""
+      timestamp: 1777458291
+      file:
+        name: 1777458291-auditbeat-datastore-per-path.yaml
+        checksum: a22829419a7f6fbdc65d43d17ff21bf44c5d05fa
+    - kind: bug-fix
+      summary: Fix Okta entity analytics OAuth2 config unpacking for jwk_json and jwk_pem fields.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50406
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777491987
+      file:
+        name: 1777491987-fix-okta-jwk-config-unpacking.yaml
+        checksum: 02f863ff559b46afa125c60b85ce3d934f4052f0
+    - kind: bug-fix
+      summary: Fix token refresh for jwk_pem/jwk_file in cel, httpjson, okta inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50433
+      issue:
+        - https://github.com/elastic/beats/issues/50426
+      impact: ""
+      action: ""
+      timestamp: 1777549938
+      file:
+        name: 1777549938-fix-okta-oauth2-pem-file-auth-token-refresh.yaml
+        checksum: d5321ff6edce965120b517aad585667c84c44a45
+    - kind: bug-fix
+      summary: Disable Winlogbeat record ID gap detection when using xml_query so filtered queries do not loop on non-contiguous record IDs.
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50443
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777582712
+      file:
+        name: 1777582712-winlogbeat-xml-query-gap-detection.yaml
+        checksum: 6341ed4617e9e462c9f4b35c9a718c984f36081d
+    - kind: bug-fix
+      summary: Fix Active Directory entity analytics to emit device attributes under activedirectory.device.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50472
+      issue:
+        - https://github.com/elastic/beats/issues/50471
+      impact: ""
+      action: ""
+      timestamp: 1777850001
+      file:
+        name: 1777850001-fix-ad-device-field-layout.yaml
+        checksum: fe22169b5c4dac4f390b66feb2cd9c22c1155396
+    - kind: bug-fix
+      summary: Fix OTel map conversion for []time.Duration fields to avoid dropping duration slices.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50486
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777914810
+      file:
+        name: 1777914810-fix-otel-duration-slice-conversion.yaml
+        checksum: ea9a428f61a5003f2f96c7fa7b33cb323484785e
+    - kind: bug-fix
+      summary: Fix handling of OAuth2.0 timeouts in CrowdStrike streaming input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50492
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777958918
+      file:
+        name: 1777958918-49988-streaming.yaml
+        checksum: b7380c69a8f2cc5ccf373c2d2711fc64984624d9
+    - kind: bug-fix
+      summary: Fix panic in azure module when all configured resources match no Azure resources
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50498
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777989631
+      file:
+        name: 1777989631-fix-azure-batch-client-panic-on-empty-resources.yaml
+        checksum: 3422d836d5dd2f3cabdbcc9d012a7a5e3af70222
+    - kind: security
+      summary: Update github.com/Azure/go-ntlmssp to v0.1.1
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50497
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777989951
+      file:
+        name: 1777989951-update-go-ntlmssp-to-v0.1.1.yaml
+        checksum: 9af50518a93806fdb22098292cf0188b1b665a34
+    - kind: bug-fix
+      summary: Accept string values for secret_state to support Fleet secret resolution.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50508
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778038687
+      file:
+        name: 1778038687-cel-secret-state-unpack.yaml
+        checksum: 27d24d2dda4d24ca098fca6a83b3ee0eacff46af
+    - kind: bug-fix
+      summary: Initialize disk queue frame IDs from persisted state
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50534
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778107949
+      file:
+        name: 1778107949-fix-disk-queue-initialisation.yaml
+        checksum: 121598d28e18623f7d964d7a4bc3851a787fe892
+    - kind: bug-fix
+      summary: Respect max_bytes/message_max_bytes when reading the first chunk of CRI partial lines
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50552
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778172750
+      file:
+        name: 1778172750-fix-cri-max-bytes-first-chunk.yaml
+        checksum: e92b3915f385dc62592a814d6995c86feb74320b
+    - kind: bug-fix
+      summary: Fix OTel Beat processor to honor `when` conditions
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50555
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778182489
+      file:
+        name: 1778182489-honor-when-conditions-in-beatprocessor.yaml
+        checksum: fd03b64a79b0286fde8da4dd2ac953d90c32af8d
+    - kind: bug-fix
+      summary: |
+        When Filestream is migrating the registry key from inputs that did
+        not have an ID, match files by path and file identity instead of
+        only path. Matching only by path could lead to rotated/moved files
+        having the wrong offset.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50599
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778513575
+      file:
+        name: 1778513575-prevent-stale-filestream-global-registry-state-migration.yaml
+        checksum: 75c2c3e4d8943ecb850f5c9f49774c665e7b6913
+    - kind: security
+      summary: Upgrade npm to v11 in non-wolfi heartbeat Docker images
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50598
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778525715
+      file:
+        name: 1778525715-upgrade-npm-heartbeat-docker.yaml
+        checksum: 6959a3fcf5e454261dcdb7f6ab813ee646d8500a
+    - kind: enhancement
+      summary: Update ebpfevents to 0.9.0
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50609
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778571333
+      file:
+        name: 1778571333-update-ebpfevents-090.yaml
+        checksum: b6758d123c541770d866588f1dfbbaf7576e0442
+    - kind: bug-fix
+      summary: Fix race in pipeline client between Publish and Close that could skip waiting for event acks
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50625
+      issue:
+        - https://github.com/elastic/beats/issues/49390
+      impact: ""
+      action: ""
+      timestamp: 1778595030
+      file:
+        name: 1778595030-fix-pipeline-client-close-race.yaml
+        checksum: 2fb2cdbd67b7082cfdfec0832fe866104b8aad24
+    - kind: enhancement
+      summary: Match http.ServeMux redirect status code for path cleaning in http_endpoint mux.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50686
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778709908
+      file:
+        name: 1778709908-match-servemux-redirect-status.yaml
+        checksum: ea86ae35c0182c55bce294e0e8fef204dbfc90ef
+    - kind: feature
+      summary: Update Go to 1.26.3
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50644
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778788830
+      file:
+        name: 1778788830-update-go-to-1.26.yaml
+        checksum: 6e90a46e8a3271a33dca99e3f1ee16bebdd138c5
+    - kind: bug-fix
+      summary: Elasticsearch module cluster state requests no longer append local=true.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50723
+      issue:
+        - https://github.com/elastic/beats/issues/50722
+      impact: ""
+      action: ""
+      timestamp: 1778848622
+      file:
+        name: 1778848622-metricbeat-elasticsearch-cluster-state-no-local.yaml
+        checksum: c8ef56d25c7069857ab6d0b15e4710d3d96fd6df
+    - kind: bug-fix
+      summary: Fixes UDP input crashes on Windows when oversized datagrams are received.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50770
+      issue:
+        - https://github.com/elastic/beats/issues/50718
+      impact: ""
+      action: ""
+      timestamp: 1779131096
+      file:
+        name: 1779131096-fix-udp-input-nil-remote-addr-panic.yaml
+        checksum: f22f6be948526c5e37565d2e6809844263c77bfe
+    - kind: bug-fix
+      summary: Make CrowdStrike streaming input cancel refresh goroutines on session reconnect.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50803
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779249109
+      file:
+        name: 1779249109-fix-crowdstrike-refresh-goroutine-leak.yaml
+        checksum: 5f2e5ed8be0cff3b3a103e3b1823d0b6929a355d

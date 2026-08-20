@@ -51,6 +51,7 @@ type UnassignedShard struct {
 type IndexMetadata struct {
 	indexType  string
 	aliases    []string
+	dataStream string
 	hidden     bool
 	system     bool
 	open       bool
@@ -66,6 +67,7 @@ type NodeIndexShards struct {
 	IndexType                *string           `json:"index_type"`
 	Aliases                  []string          `json:"aliases"`
 	Attributes               []string          `json:"attributes"`
+	DataStream               string            `json:"data_stream"`
 	IsHidden                 *bool             `json:"is_hidden"`
 	IsOpen                   *bool             `json:"is_open"`
 	IsSystem                 *bool             `json:"is_system"`

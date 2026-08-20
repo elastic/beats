@@ -112,4 +112,5 @@ The following metricsets are available:
 * [node](/reference/metricbeat/metricbeat-metricset-elasticsearch-node.md)
 * [node_stats](/reference/metricbeat/metricbeat-metricset-elasticsearch-node_stats.md)
 * [pending_tasks](/reference/metricbeat/metricbeat-metricset-elasticsearch-pending_tasks.md)
+* [security_stats](/reference/metricbeat/metricbeat-metricset-elasticsearch-security_stats.md)  {applies_to}`stack: ga 9.2.0`
 * [shard](/reference/metricbeat/metricbeat-metricset-elasticsearch-shard.md)

@@ -117,7 +117,7 @@ func NewRegistryBridge(settings component.TelemetrySettings, receiverID string, 
 	if inputsRegistry != nil {
 		snapshot := monitoring.CollectStructSnapshot(inputsRegistry, monitoring.Full, false)
 		for _, entry := range snapshot {
-			data, ok := entry.(map[string]interface{})
+			data, ok := entry.(map[string]any)
 			if !ok {
 				continue
 			}
@@ -160,15 +160,22 @@ func NewRegistryBridge(settings component.TelemetrySettings, receiverID string, 
 // Shutdown unregisters the async callback and waits for any pending
 // re-registration goroutines to complete.
 func (b *RegistryBridge) Shutdown() {
-	// Mark closed and unregister first so no new callbacks fire and no
-	// in-flight createAndReRegister goroutine re-registers after we wait.
+	// Mark closed under the lock so any in-flight createAndReRegister sees it
+	// and bails out, then release before calling Unregister.
+	//
+	// Unregister blocks until any in-flight callback returns. Our callback
+	// path (collectStats / collectInputs) takes b.mu.RLock, so holding the
+	// write lock across Unregister deadlocks: Unregister waits for the
+	// callback, the callback waits for the lock.
 	b.mu.Lock()
 	b.closed = true
-	if b.registration != nil {
-		_ = b.registration.Unregister()
-		b.registration = nil
-	}
+	reg := b.registration
+	b.registration = nil
 	b.mu.Unlock()
+
+	if reg != nil {
+		_ = reg.Unregister()
+	}
 
 	// Wait for any in-flight re-registration goroutines to drain.
 	b.reRegWg.Wait()
@@ -477,7 +484,7 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 	for _, entry := range snapshot {
 		// Each input sub-registry is collected as a map[string]interface{}.
 		// Skip any unexpected non-map entries defensively.
-		data, ok := entry.(map[string]interface{})
+		data, ok := entry.(map[string]any)
 		if !ok {
 			continue
 		}
@@ -531,7 +538,7 @@ func (b *RegistryBridge) collectInputs(obs metric.Observer) {
 
 // toInt64Value converts a monitoring snapshot value to int64. Returns false for
 // non-numeric types.
-func toInt64Value(v interface{}) (int64, bool) {
+func toInt64Value(v any) (int64, bool) {
 	switch n := v.(type) {
 	case int64:
 		return n, true

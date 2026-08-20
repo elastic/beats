@@ -92,8 +92,8 @@ func (mr *runner) Start() {
 func (mr *runner) Stop() {
 	mr.stopOnce.Do(func() {
 		close(mr.done)
-		mr.client.Close()
 		mr.wg.Wait()
+		mr.client.Close()
 		moduleList.Remove(mr.mod.Name())
 	})
 }
@@ -110,7 +110,7 @@ func (mr *runner) Diagnostics() []diagnostics.DiagnosticSetup {
 		// create and append a filepath specific to the module/metricset combination
 		// This keeps diagnostic dumps cleaner and easier to parse.
 		diags := diagHandler.Diagnostics()
-		pathPrefix := fmt.Sprintf("%s-%s", mr.mod.Name(), ms.MetricSet.Name())
+		pathPrefix := fmt.Sprintf("%s-%s", mr.mod.Name(), ms.Name())
 		for _, diag := range diags {
 			fullpath := filepath.Join(pathPrefix, diag.Filename)
 			diag.Filename = fullpath

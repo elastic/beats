@@ -21,11 +21,11 @@ package entropy
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
+
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -51,8 +51,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	base.Logger().Warn(cfgwarn.Beta("The system entropy metricset is beta."))
-
 	sys := base.Module().(resolve.Resolver)
 
 	return &MetricSet{
@@ -85,7 +83,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 func getEntropyData(path string) (int, error) {
 	//This will be a number in the range 0 to 4096.
-	raw, err := ioutil.ReadFile(path)
+	raw, err := os.ReadFile(path)
 	if err != nil {
 		return 0, fmt.Errorf("error reading from random: %w", err)
 	}

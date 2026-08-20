@@ -104,7 +104,7 @@ var (
 var reStats *regexp.Regexp = regexp.MustCompile(`cluster_manager.*|filesystem.*|access_log_file.*|runtime.*|listener_manager.*|stats.*|server.*|http2\..*`)
 
 func eventMapping(response []byte) (mapstr.M, error) {
-	data := map[string]interface{}{}
+	data := map[string]any{}
 	var events mapstr.M
 	var err error
 
@@ -118,7 +118,7 @@ func eventMapping(response []byte) (mapstr.M, error) {
 
 func findStats(data mapstr.M, response []byte) mapstr.M {
 	matches := reStats.FindAllString(string(response), -1)
-	for i := 0; i < len(matches); i++ {
+	for i := range matches {
 		entries := strings.Split(matches[i], ": ")
 		if len(entries) == 2 {
 			temp := strings.Split(entries[0], ".")

@@ -21,9 +21,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -33,6 +37,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+var _ processors.PdataProcessor = (*dropFields)(nil)
 
 type dropFields struct {
 	Fields        []string
@@ -72,8 +78,8 @@ func newDropFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 	// Parse regexp containing fields and removes them from initial config
 	regexpFields := make([]match.Matcher, 0)
-	for i := len(configFields) - 1; i >= 0; i-- {
-		field := configFields[i]
+	for i, v := range slices.Backward(configFields) {
+		field := v
 		if strings.HasPrefix(field, "/") && strings.HasSuffix(field, "/") && len(field) > 2 {
 			configFields = append(configFields[:i], configFields[i+1:]...)
 
@@ -116,6 +122,26 @@ func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error)
 			*errs = append(*errs, fmt.Errorf("failed to drop field [%v], error: %w", field, err))
 		}
 	}
+}
+
+func (f *dropFields) RunPdata(body pcommon.Map) (bool, error) {
+	var errs []error
+
+	for _, field := range f.Fields {
+		if !otelmap.DeleteAtPath(field, body) && !f.IgnoreMissing {
+			errs = append(errs, fmt.Errorf("failed to drop field [%v], error: %w", field, mapstr.ErrKeyNotFound))
+		}
+	}
+
+	for _, regex := range f.RegexpFields {
+		for _, field := range otelmap.FlattenKeys(body) {
+			if regex.MatchString(field) {
+				otelmap.DeleteAtPath(field, body)
+			}
+		}
+	}
+
+	return false, errors.Join(errs...)
 }
 
 func (f *dropFields) String() string {

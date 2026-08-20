@@ -40,17 +40,15 @@ func TestConf_Validate(t *testing.T) {
 			},
 			WantErr: ErrProviderUnknown.Error(),
 		},
-		"err-minimal-state-legacy-only-provider": {
+		"ok-minimal-state-provider-azure": {
 			In: conf{
 				Provider:        azuread.Name,
 				UseMinimalState: true,
 			},
-			WantErr: ErrProviderUnknown.Error(),
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

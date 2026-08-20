@@ -36,7 +36,7 @@ type Message struct {
 	// Private is for input-specific data. The input that populates this field
 	// is fully responsible for its management. No guarantees are given about
 	// the content of this field as other components are able to modify it.
-	Private interface{}
+	Private any
 }
 
 // IsEmpty returns true in case the message is empty

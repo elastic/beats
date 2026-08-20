@@ -6,15 +6,14 @@ package http_endpoint
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	confpkg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/lumberjack"
 )
 
 func Test_validateConfig(t *testing.T) {
@@ -56,18 +55,17 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
+				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
 			},
 		},
 		{
-			name: "invalid log destination",
+			name: "invalid_log_destination_accepted_at_config_time",
 			config: config{
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
+				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
 			},
-			wantError: fmt.Errorf(`request tracer path must be within %q path accessing config`, inputName),
 		},
 	}
 
@@ -94,8 +92,6 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
-
-func ptrTo[T any](v T) *T { return &v }
 
 func TestApplyInFlightDefaults(t *testing.T) {
 	tests := []struct {

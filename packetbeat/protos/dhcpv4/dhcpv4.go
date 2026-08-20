@@ -51,11 +51,18 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
-	return newPlugin(testMode, results, watcher, cfg)
+	return newPlugin(testMode, results, watcher, cfg, logger)
 }
 
-func newPlugin(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (*dhcpv4Plugin, error) {
+func newPlugin(
+	testMode bool,
+	results protos.Reporter,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
+	logger *logp.Logger,
+) (*dhcpv4Plugin, error) {
 	config := defaultConfig
 
 	if !testMode {
@@ -68,7 +75,7 @@ func newPlugin(testMode bool, results protos.Reporter, watcher *procs.ProcessesW
 		dhcpv4Config: config,
 		report:       results,
 		watcher:      watcher,
-		log:          logp.NewLogger("dhcpv4"),
+		log:          logger.Named("dhcpv4"),
 	}, nil
 }
 

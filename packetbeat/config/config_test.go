@@ -26,6 +26,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var fromStaticTests = []struct {
@@ -63,11 +64,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -106,11 +107,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -139,11 +140,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -178,11 +179,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -220,11 +221,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -269,11 +270,11 @@ protocols:
 			},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -323,11 +324,11 @@ protocols:
 			},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -367,11 +368,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -410,11 +411,11 @@ protocols:
 			}},
 			Protocols: map[string]*config.C{},
 			ProtocolsList: []*config.C{
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"enabled": true,
 					"type":    "icmp",
 				}),
-				config.MustNewConfigFrom(map[string]interface{}{
+				config.MustNewConfigFrom(map[string]any{
 					"type": "amqp",
 					"ports": []int{
 						5672,
@@ -454,7 +455,7 @@ protocols:
 				{
 					Device:      "any",
 					Type:        "af_packet",
-					FanoutGroup: pointer(uint16(1)),
+					FanoutGroup: new(uint16(1)),
 				},
 			},
 		},
@@ -484,7 +485,7 @@ func TestFromStatic(t *testing.T) {
 				t.Fatalf("failed to construct config.C: %v", err)
 			}
 			got := test.cli
-			got, err = got.FromStatic(cfg)
+			got, err = got.FromStatic(cfg, logptest.NewTestingLogger(t, ""))
 			if !sameErr(err, test.wantErr) {
 				if err != nil {
 					t.Fatalf("failed to construct config.C: %v", err)
@@ -530,7 +531,7 @@ func cliOptions(file string, loop int, topSpeed, step bool, dump string) Config 
 }
 
 func configC(a, b *config.C) bool {
-	var ma, mb map[string]interface{}
+	var ma, mb map[string]any
 	err := a.Unpack(&ma)
 	if err != nil {
 		panic(err)
@@ -540,9 +541,4 @@ func configC(a, b *config.C) bool {
 		panic(err)
 	}
 	return cmp.Equal(ma, mb)
-}
-
-// pointer returns a pointer to val.
-func pointer[T any](val T) *T {
-	return &val
 }
