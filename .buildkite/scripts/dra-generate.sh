@@ -90,6 +90,7 @@ steps:
     artifact_paths:
       - "artifacts/dra/beats/*/manifest-*.json"
     plugins:
+      # Must match *google_oidc_plugin in packaging.pipeline.yml
       - elastic/oblt-google-auth#v1.3.1:
           lifetime: 10800
           project-id: "elastic-observability-ci"
