@@ -180,12 +180,6 @@ func stripNodePrefix(line string) (string, string) {
 }
 
 var (
-	// auidSesRe extracts the raw numeric value of auid= and ses= fields from a
-	// log line. auparse normalises auid=4294967295 and ses=4294967295 (the
-	// kernel's sentinel for "not set") to the string "unset". Restoring the raw
-	// numeric value preserves the original audit record value in auditd.log.*.
-	auidSesRe = regexp.MustCompile(`\b(auid|ses)=(\d+)\b`)
-
 	innerMsgRe = regexp.MustCompile(`\bmsg='([^']*)'`)
 
 	// innerMsgKVRe extracts individual key=value pairs from inner msg content.
