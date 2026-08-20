@@ -94,6 +94,24 @@ func TestHomebrewJWSFormula(t *testing.T) {
 	}
 }
 
+// TestHomebrewMissingRb verifies that a missing fallback .rb formula file does
+// not produce a pipeline error, as Homebrew 4.0 no longer installs .rb files
+// into the cellar.
+func TestHomebrewMissingRb(t *testing.T) {
+	packages, err := listBrewPackages("testdata/homebrew3/")
+	if !assert.NoError(t, err) {
+		return
+	}
+	if assert.Len(t, packages, 1) {
+		pkg := packages[0]
+		assert.Equal(t, "missing-rb-package", pkg.Name)
+		assert.Equal(t, "1.0.0", pkg.Version)
+		assert.Empty(t, pkg.Summary)
+		assert.Empty(t, pkg.URL)
+		assert.NoError(t, pkg.error, "unexpected package error")
+	}
+}
+
 func TestHomebrewNotExist(t *testing.T) {
 
 	oldPath := homebrewCellarPath

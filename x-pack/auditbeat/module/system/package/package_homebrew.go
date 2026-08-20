@@ -10,7 +10,9 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -93,7 +95,9 @@ func listBrewPackages(brewCellarPath string) ([]*Package, error) {
 func readFormula(dst *Package, path string) {
 	file, err := os.Open(path)
 	if err != nil {
-		dst.error = fmt.Errorf("error reading %v: %w", path, err)
+		if !errors.Is(err, fs.ErrNotExist) {
+			dst.error = fmt.Errorf("error reading %v: %w", path, err)
+		}
 		return
 	}
 	defer file.Close()
