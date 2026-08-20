@@ -60,6 +60,9 @@ func NewInputManager(configure func(*conf.C) (Input, error)) InputManager {
 // Init does nothing. Init is required to fullfil the v2.InputManager interface.
 func (m InputManager) Init(_ unison.Group) error { return nil }
 
+// Close is a no-op; stateless inputs hold no resources to release.
+func (m InputManager) Close() {}
+
 // Create configures a transient input and ensures that the final input can be used with
 // with the filebeat input architecture.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {

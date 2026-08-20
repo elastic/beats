@@ -52,6 +52,8 @@ func (im *cloudwatchInputManager) Init(grp unison.Group) error {
 	return nil
 }
 
+func (im *cloudwatchInputManager) Close() {}
+
 func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {

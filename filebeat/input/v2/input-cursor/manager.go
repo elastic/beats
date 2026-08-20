@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -67,6 +68,7 @@ type InputManager struct {
 	initErr      error
 	store        *store
 	cleanerGroup unison.Group // saved from Init() for deferred cleaner start
+	closeOnce    sync.Once
 }
 
 // Source describe a source the input can collect data from.
@@ -135,7 +137,6 @@ func (cim *InputManager) startCleaner(group unison.Group) error {
 	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
 		waitRunning <- struct{}{}
-		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
 		if interval <= 0 {
@@ -146,7 +147,6 @@ func (cim *InputManager) startCleaner(group unison.Group) error {
 	})
 	if err != nil {
 		store.Release()
-		cim.shutdown()
 		return fmt.Errorf("can not start registry cleanup process: %w", err)
 	}
 
@@ -154,8 +154,14 @@ func (cim *InputManager) startCleaner(group unison.Group) error {
 	return nil
 }
 
-func (cim *InputManager) shutdown() {
-	cim.store.Release()
+// Close releases the store acquired during Init or Create. It must be called
+// after the task group passed to Init has been stopped and all inputs have finished.
+func (cim *InputManager) Close() {
+	cim.closeOnce.Do(func() {
+		if cim.store != nil {
+			cim.store.Release()
+		}
+	})
 }
 
 // Create builds a new v2.Input using the provided Configure function.

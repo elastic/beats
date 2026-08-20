@@ -28,10 +28,11 @@ import (
 )
 
 // MockInputManager can be used as InputManager replacement in tests that require a new Input Manager.
-// The OnInit and OnConfigure functions are executed if the corresponding methods get called.
+// The OnInit, OnConfigure, and OnClose functions are executed if the corresponding methods get called.
 type MockInputManager struct {
 	OnInit      func() error
 	OnConfigure InputConfigurer
+	OnClose     func()
 }
 
 // InputConfigurer describes the interface for user supplied functions, that is
@@ -61,6 +62,13 @@ func (m *MockInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return m.OnConfigure(cfg)
 	}
 	return nil, errors.New("oops, OnConfigure not implemented ")
+}
+
+// Close calls OnClose if set.
+func (m *MockInputManager) Close() {
+	if m.OnClose != nil {
+		m.OnClose()
+	}
 }
 
 // Name return the `Type` field of MockInput. It is required to satisfy the v2.Input interface.

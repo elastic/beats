@@ -69,6 +69,9 @@ func (m *eventHubInputManager) Init(unison.Group) error {
 	return nil
 }
 
+// Close is a no-op; this manager holds no resources to release.
+func (m *eventHubInputManager) Close() {}
+
 // Create creates a new azure-eventhub input based on the configuration.
 func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 

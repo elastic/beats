@@ -38,6 +38,9 @@ func (m *Manager) Init(grp unison.Group) error {
 	return nil
 }
 
+// Close is a no-op; this manager holds no resources to release.
+func (m *Manager) Close() {}
+
 // Create makes a new v2.Input using the provided config.C which will be
 // used in the Manager's Configure function.
 func (m *Manager) Create(c *config.C) (v2.Input, error) {

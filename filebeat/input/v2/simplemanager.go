@@ -41,6 +41,9 @@ func ConfigureWith(fn func(*conf.C, *logp.Logger) (Input, error), logger *logp.L
 // For the kafka input no special initialization is required.
 func (*simpleInputManager) Init(grp unison.Group) error { return nil }
 
+// Close is a no-op for simpleInputManager; it holds no resources to release.
+func (*simpleInputManager) Close() {}
+
 // Create builds a new Input instance from the given configuration, or returns
 // an error if the configuration is invalid.
 func (manager *simpleInputManager) Create(cfg *conf.C) (Input, error) {

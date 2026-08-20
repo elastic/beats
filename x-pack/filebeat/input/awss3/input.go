@@ -40,6 +40,8 @@ func (im *s3InputManager) Init(grp unison.Group) error {
 	return nil
 }
 
+func (im *s3InputManager) Close() {}
+
 func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {

@@ -70,6 +70,7 @@ func TestManager_Init(t *testing.T) {
 
 		err := manager.Init(&grp)
 		require.NoError(t, err)
+		t.Cleanup(func() { manager.Close() })
 
 		time.Sleep(200 * time.Millisecond)
 		_ = grp.Stop()
@@ -102,6 +103,7 @@ func TestManager_Init(t *testing.T) {
 
 		err := manager.Init(&grp)
 		require.NoError(t, err)
+		t.Cleanup(func() { manager.Close() })
 
 		for len(store.snapshot()) > 0 {
 			time.Sleep(1 * time.Millisecond)

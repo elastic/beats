@@ -106,6 +106,9 @@ func NewManager(fn func(*conf.C) (Input, error)) v2.InputManager {
 // Init Noop, it is required to fulfil the v2.InputManager interface.
 func (*manager) Init(grp unison.Group) error { return nil }
 
+// Close is a no-op; net managers hold no resources to release.
+func (*manager) Close() {}
+
 // Create creates a new Input instance from the given configuration
 // by calling the manager's configure callback, or returns
 // an error if the configuration is invalid.

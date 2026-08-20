@@ -80,6 +80,9 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	return m.cursor.Create(cfg)
 }
 
+// Close releases resources held by the underlying cursor input manager.
+func (m InputManager) Close() { m.cursor.Close() }
+
 func dataStreamName(cfg *conf.C) string {
 	var probe struct {
 		DataStream struct {

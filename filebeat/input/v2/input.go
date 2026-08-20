@@ -58,6 +58,10 @@ type InputManager interface {
 	// The input must establish any connection for data collection yet. The Beat
 	// will use the Test/Run methods of the input.
 	Create(*conf.C) (Input, error)
+
+	// Close releases any resources held by the InputManager. It is called after
+	// the task group passed to Init has been stopped and all inputs have finished.
+	Close()
 }
 
 // Input is a configured input object that can be used to test or start

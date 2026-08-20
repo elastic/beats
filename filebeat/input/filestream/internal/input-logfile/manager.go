@@ -70,6 +70,7 @@ type InputManager struct {
 	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
 	initOnce   sync.Once
+	closeOnce  sync.Once
 	initErr    error
 	store      *store
 	ackUpdater *updateWriter
@@ -133,7 +134,6 @@ func (cim *InputManager) Init(group unison.Group) error {
 	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
 		waitRunning <- struct{}{}
-		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
 		if interval <= 0 {
@@ -144,7 +144,6 @@ func (cim *InputManager) Init(group unison.Group) error {
 	})
 	if err != nil {
 		store.Release()
-		cim.shutdown()
 		return fmt.Errorf("can not start registry cleanup process: %w", err)
 	}
 	<-waitRunning
@@ -154,6 +153,12 @@ func (cim *InputManager) Init(group unison.Group) error {
 func (cim *InputManager) shutdown() {
 	cim.ackUpdater.Close()
 	cim.store.Release()
+}
+
+// Close releases the ack writer and persistent store acquired during Init.
+// It must be called after the task group passed to Init has been stopped.
+func (cim *InputManager) Close() {
+	cim.closeOnce.Do(cim.shutdown)
 }
 
 // Create builds a new v2.Input using the provided Configure function.

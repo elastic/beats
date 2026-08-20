@@ -54,6 +54,13 @@ func (m *manager) Init(grp unison.Group) error {
 	return nil
 }
 
+// Close releases resources held by the provider, if one was configured.
+func (m *manager) Close() {
+	if m.provider != nil {
+		m.provider.Close()
+	}
+}
+
 // Create will unpack the provided configuration and set up the identity provider
 // for this input.
 func (m *manager) Create(cfg *config.C) (v2.Input, error) {

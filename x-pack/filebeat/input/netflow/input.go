@@ -51,6 +51,8 @@ func (im *netflowInputManager) Init(_ unison.Group) error {
 	return nil
 }
 
+func (im *netflowInputManager) Close() {}
+
 func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	inputCfg := defaultConfig
 	if err := cfg.Unpack(&inputCfg); err != nil {
