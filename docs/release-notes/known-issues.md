@@ -22,7 +22,7 @@ Known issues are significant defects or limitations that may impact your impleme
 % :::
 
 :::{dropdown} Disk queue filled metrics can underflow after blocked publishes
-**Applies to**: Beats version < v8.15.0.
+**Applies to**: Beats version v8.15.0+.
 
 **Details**
 When a disk queue reaches its configured capacity, inputs can block until
