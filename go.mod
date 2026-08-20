@@ -3,9 +3,15 @@ module github.com/elastic/beats/v7
 go 1.26.6
 
 require (
+<<<<<<< HEAD
 	cloud.google.com/go/bigquery v1.75.0
 	cloud.google.com/go/monitoring v1.24.3
 	cloud.google.com/go/pubsub v1.50.2
+=======
+	cloud.google.com/go/bigquery v1.80.0
+	cloud.google.com/go/monitoring v1.30.0
+	cloud.google.com/go/pubsub v1.51.0
+>>>>>>> 7a4cb7f5f (build(deps): bump the gcp-sdks group with 2 updates (#52729))
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
@@ -282,7 +288,11 @@ require (
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.1 // indirect
+<<<<<<< HEAD
 	cloud.google.com/go/auth v0.20.0 // indirect
+=======
+	cloud.google.com/go/auth v0.23.1 // indirect
+>>>>>>> 7a4cb7f5f (build(deps): bump the gcp-sdks group with 2 updates (#52729))
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.6.0 // indirect

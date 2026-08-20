@@ -223,11 +223,19 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go@v0.123.0/LICEN
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/bigquery
+<<<<<<< HEAD
 Version: v1.75.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/cloud.google.com/go/bigquery@v1.75.0/LICENSE:
+=======
+Version: v1.80.0
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/bigquery@v1.80.0/LICENSE:
+>>>>>>> 7a4cb7f5f (build(deps): bump the gcp-sdks group with 2 updates (#52729))
 
 
                                  Apache License
@@ -32331,11 +32339,19 @@ Contents of probable licence file $GOMODCACHE/cel.dev/expr@v0.25.1/LICENSE:
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/auth
+<<<<<<< HEAD
 Version: v0.20.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/cloud.google.com/go/auth@v0.20.0/LICENSE:
+=======
+Version: v0.23.1
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/auth@v0.23.1/LICENSE:
+>>>>>>> 7a4cb7f5f (build(deps): bump the gcp-sdks group with 2 updates (#52729))
 
 
                                  Apache License
