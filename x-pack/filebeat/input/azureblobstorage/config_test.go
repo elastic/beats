@@ -5,7 +5,7 @@
 package azureblobstorage
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 
@@ -37,7 +37,7 @@ var configTests = []struct {
 				},
 			},
 		},
-		wantErr: fmt.Errorf("client_id, client_secret and tenant_id are required for OAuth2 auth accessing config"),
+		wantErr: errors.New("client_id, client_secret and tenant_id are required for OAuth2 auth accessing config"),
 	},
 	{
 		name: "valid_oauth2_config",
@@ -89,7 +89,7 @@ var configTests = []struct {
 				"initial_retry_delay": "-1s",
 			},
 		},
-		wantErr: fmt.Errorf("retry.initial_retry_delay must not be negative, got -1s accessing config"),
+		wantErr: errors.New("retry.initial_retry_delay must not be negative, got -1s accessing config"),
 	},
 	{
 		name: "max_retry_delay_below_initial",
@@ -106,7 +106,91 @@ var configTests = []struct {
 				"max_retry_delay":     "5s",
 			},
 		},
-		wantErr: fmt.Errorf("retry.max_retry_delay (5s) must not be smaller than retry.initial_retry_delay (30s) accessing config"),
+		wantErr: errors.New("retry.max_retry_delay (5s) must not be smaller than retry.initial_retry_delay (30s) accessing config"),
+	},
+	{
+		name: "valid_managed_identity_system_assigned",
+		config: map[string]any{
+			"account_name":                  "beatsblobnew",
+			"auth.managed_identity.enabled": true,
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+	},
+	{
+		name: "valid_managed_identity_user_assigned",
+		config: map[string]any{
+			"account_name":                    "beatsblobnew",
+			"auth.managed_identity.enabled":   true,
+			"auth.managed_identity.client_id": "12345678-90ab-cdef-1234-567890abcdef",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+	},
+	{
+		name: "managed_identity_client_id_without_enabled",
+		config: map[string]any{
+			"account_name":                    "beatsblobnew",
+			"auth.managed_identity.client_id": "12345678-90ab-cdef-1234-567890abcdef",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity.enabled must be true to use auth.managed_identity.client_id accessing config"),
+	},
+	{
+		name: "managed_identity_with_shared_key",
+		config: map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.managed_identity.enabled":       true,
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity cannot be combined with another auth method accessing config"),
+	},
+	{
+		name: "managed_identity_with_connection_string",
+		config: map[string]any{
+			"account_name":                  "beatsblobnew",
+			"auth.managed_identity.enabled": true,
+			"auth.connection_string.uri":    "https://beatsblobnew.blob.core.windows.net/",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity cannot be combined with another auth method accessing config"),
+	},
+	{
+		name: "managed_identity_with_oauth2",
+		config: map[string]any{
+			"account_name":                  "beatsblobnew",
+			"auth.managed_identity.enabled": true,
+			"auth.oauth2": map[string]any{
+				"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
+				"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
+				"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
+			},
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity cannot be combined with another auth method accessing config"),
 	},
 }
 
