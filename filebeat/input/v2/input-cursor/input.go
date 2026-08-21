@@ -123,9 +123,6 @@ func (inp *managedInput) Run(
 	inp.manager.mu.Lock()
 	store := inp.manager.store
 	inp.manager.mu.Unlock()
-	if store == nil {
-		return errors.New("input manager is closed")
-	}
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {

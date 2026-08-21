@@ -104,15 +104,13 @@ func (cim *InputManager) ensureSetup(inputID string) error {
 		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
 	log := cim.Logger.With("input_type", cim.Type)
-	// Use a null-byte delimiter to prevent collisions between backend keys or
-	// type names that themselves contain "::".
-	key := cim.StateStore.StoreKey() + "\x00" + cim.Type
+	key := cim.StateStore.StoreKey() + "::" + cim.Type
 	interval := cim.StateStore.CleanupInterval()
+	if interval <= 0 {
+		interval = 5 * time.Minute
+	}
 	cim.mu.Unlock()
 
-	// Only start the background cleaner when a positive cleanup interval is
-	// configured. Tests that use in-memory stores with no GCPeriod get a
-	// functional store without the extra goroutine.
 	var runFn func(context.Context, *store)
 	if interval > 0 {
 		runFn = func(ctx context.Context, s *store) {
@@ -208,10 +206,14 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
 	cim.mu.Lock()
 	store := cim.store
+	if store != nil {
+		store.Retain()
+	}
 	cim.mu.Unlock()
 	if store == nil {
 		return nil, errors.New("input manager is closed")
 	}
+	defer store.Release()
 	resource := store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {

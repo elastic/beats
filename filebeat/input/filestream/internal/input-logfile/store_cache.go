@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"context"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -54,10 +55,10 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 		WithLazy(zap.String("filestream_store_key", key))
 
 	interval := states.CleanupInterval()
+	if interval <= 0 {
+		interval = 5 * time.Minute
+	}
 
-	// Only start the background cleaner when a positive cleanup interval is
-	// configured. Tests that use in-memory stores with no GCPeriod get a
-	// functional store without the extra goroutine.
 	var runFn func(context.Context, *logfileEntry)
 	if interval > 0 {
 		runFn = func(ctx context.Context, e *logfileEntry) {
