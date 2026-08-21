@@ -33192,11 +33192,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/iam
-Version: v1.11.0
+Version: v1.13.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.11.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.13.0/LICENSE:
 
 
                                  Apache License
@@ -34040,11 +34040,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/longrunning@v1
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/pubsub/v2
-Version: v2.6.0
+Version: v2.6.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub/v2@v2.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub/v2@v2.6.1/LICENSE:
 
 
                                  Apache License

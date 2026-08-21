@@ -18,8 +18,8 @@ cloud.google.com/go/compute/metadata v0.9.0 h1:pDUj4QMoPejqq20dK0Pg2N4yG9zIkYGdB
 cloud.google.com/go/compute/metadata v0.9.0/go.mod h1:E0bWwX5wTnLPedCKqk3pJmVgCBSM6qQI1yTBdEb3C10=
 cloud.google.com/go/datacatalog v1.32.0 h1:fyYn8ODkGil5y3zTIqgIhOfzTu1ACaU2o+C750CO6Ac=
 cloud.google.com/go/datacatalog v1.32.0/go.mod h1:DE272tynQUwheJeQAyVfV+nO8yrdkuDyOgH2LtOrkWM=
-cloud.google.com/go/iam v1.11.0 h1:KieQ9Pb+LLPak1O3Rv3GgCxhnmkYf7Xyh0P5HfF1jFM=
-cloud.google.com/go/iam v1.11.0/go.mod h1:KP+nKGugNJW4LcLx1uEZcq1ok5sQHFaQehQNl4QDgV4=
+cloud.google.com/go/iam v1.13.0 h1:ufT3FPT5rFFXu6UtLkNoxaOaV5EuA1dsSkmemCSTo6U=
+cloud.google.com/go/iam v1.13.0/go.mod h1:gHXdDEiPDvqd1q1KwBDGQlgZY/BwY760zU2LhOZS5w0=
 cloud.google.com/go/kms v1.31.0 h1:LS8N92OxFDgOLg5NCo3OmbvjtQAIVT5gUHVLKIDHaFE=
 cloud.google.com/go/kms v1.31.0/go.mod h1:YIyXZym11R5uovJJt4oN5eUL3oPmirF3yKeIh6QAf4U=
 cloud.google.com/go/logging v1.18.0 h1:KhzZq+1cSkPH9YUaKLLhLtQxIHitVayBmk0sGfoM9+k=
@@ -30,8 +30,8 @@ cloud.google.com/go/monitoring v1.30.0 h1:r/d+JUbyKmJ8b07iznuKfzVzrIXTWxHQ3lBRm3
 cloud.google.com/go/monitoring v1.30.0/go.mod h1:htlUR0QWVMrjFzZmN4LGnMAve9xB/eduwjmINxVZ8RM=
 cloud.google.com/go/pubsub v1.51.0 h1:XOaCejsqX7EEtUdQz+WPag66wWsUUGliyCOfGPKfo90=
 cloud.google.com/go/pubsub v1.51.0/go.mod h1:NERXf11sd82UV3VnflcUj8POIyQUXT/QwrKlxD8di/I=
-cloud.google.com/go/pubsub/v2 v2.6.0 h1:8pjR0id+GTB+krKx5G6AGJoYrHog58w2Q89PCOrfM64=
-cloud.google.com/go/pubsub/v2 v2.6.0/go.mod h1:4anqvV/w8Pcgu2tO0qr2XgsF3GXHowzryfQ5gOnVmWY=
+cloud.google.com/go/pubsub/v2 v2.6.1 h1:jX6gnC4n8BgYx6MOYICgbbaXZpr1vKeNOE3Bn17P5zg=
+cloud.google.com/go/pubsub/v2 v2.6.1/go.mod h1:1y2lZnKfUFPZz0PU4YmXyk4lA11+xmYA42zbC32RkxQ=
 cloud.google.com/go/redis v1.25.0 h1:tRuy6PJgMyZanP+Jrs7NTMzA4lSoRlmRSvb5txGsE7k=
 cloud.google.com/go/redis v1.25.0/go.mod h1:ebtw9WLFKswecHO2ifNykuteNJNwoPqMCHz4UI11kF4=
 cloud.google.com/go/storage v1.62.3 h1:SZq1t23NCI+e96dH77Dg3PEfsNNEjqO8zE5AnD8gVD0=
