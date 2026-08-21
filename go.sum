@@ -384,8 +384,8 @@ github.com/elastic/elastic-agent-libs v0.46.3 h1:TaD1qPDWgokwODbgayIeiQ1+vkONFbo
 github.com/elastic/elastic-agent-libs v0.46.3/go.mod h1:axkpqDCCzAky6G4D/cklgtZQa3jTNGAMVHVkU0u6YbU=
 github.com/elastic/elastic-agent-system-metrics v0.14.5 h1:ua8iMOqAIWw8iK0hnlP1u9HK/EkX08CvxxMRyIdM6IA=
 github.com/elastic/elastic-agent-system-metrics v0.14.5/go.mod h1:NyNMrdqMfznb/Zy8EmIAHlJpX6HuRlNW+bBL9UN7WQY=
-github.com/elastic/elastic-transport-go/v8 v8.8.0 h1:7k1Ua+qluFr6p1jfJjGDl97ssJS/P7cHNInzfxgBQAo=
-github.com/elastic/elastic-transport-go/v8 v8.8.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
+github.com/elastic/elastic-transport-go/v8 v8.9.0 h1:KeT/2P54F0xS0S8Y3Pf+tFDg4HmBgReQMB+BMz8dDAs=
+github.com/elastic/elastic-transport-go/v8 v8.9.0/go.mod h1:ssMTvNS2hwf7CaiGsRRsx4gQHFZ/jS/DkLcISxekWzc=
 github.com/elastic/entcollect v0.0.0-20260720203654-e61fb8788d9a h1:PDyVDzY+UeUEXQe0gv1sHCpJlZ4DlDhrgZ994v30XhU=
 github.com/elastic/entcollect v0.0.0-20260720203654-e61fb8788d9a/go.mod h1:ZcfSL3oNJg0mhiYrWNJnf/NeetQHr7HlkY4iWCjSGWo=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
@@ -396,8 +396,8 @@ github.com/elastic/go-concert v0.3.1 h1:dqtq2+xA8w7BZunI7j3Hs43CjWod7/nNRD8ByPx4
 github.com/elastic/go-concert v0.3.1/go.mod h1:bQ/sGkdR0I8IdzLuxDcrczc+caloItvAqw23jISl9sQ=
 github.com/elastic/go-docappender/v2 v2.14.1 h1:Nl3TF9B2Q5vA/P6PKNXjyhLGiJmuOMpIfN6eO7UvOg4=
 github.com/elastic/go-docappender/v2 v2.14.1/go.mod h1:VRq9W2+tHEMKp5rCAVQL1Y+Jbi5jgKVG/OWdGaiyPc0=
-github.com/elastic/go-elasticsearch/v8 v8.19.0 h1:VmfBLNRORY7RZL+9hTxBD97ehl9H8Nxf2QigDh6HuMU=
-github.com/elastic/go-elasticsearch/v8 v8.19.0/go.mod h1:F3j9e+BubmKvzvLjNui/1++nJuJxbkhHefbaT0kFKGY=
+github.com/elastic/go-elasticsearch/v8 v8.19.7 h1:fMsWcVgPDJMtyptspSmn4SDHykovo4ppaAbBNLK9mKE=
+github.com/elastic/go-elasticsearch/v8 v8.19.7/go.mod h1:jeWebApE1oFEW/hKZqx/IRYmP/aa2+WMJkOfk+AduSI=
 github.com/elastic/go-freelru v0.16.0 h1:gG2HJ1WXN2tNl5/p40JS/l59HjvjRhjyAa+oFTRArYs=
 github.com/elastic/go-freelru v0.16.0/go.mod h1:bSdWT4M0lW79K8QbX6XY2heQYSCqD7THoYf82pT/H3I=
 github.com/elastic/go-libaudit/v2 v2.6.2 h1:1PM6wVBTJHJQYsKl8jfA9/Aw9pFty5uUezPiUfKtOI4=
