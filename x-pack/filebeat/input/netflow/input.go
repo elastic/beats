@@ -157,7 +157,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		client, err := connector.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 			Processing: beat.ProcessingConfig{
-				EventNormalization: boolPtr(false),
+				EventNormalization: new(false),
 			},
 			EventListener: nil,
 		})
@@ -270,4 +270,5 @@ func (n *netflowInput) stop() {
 	n.started = false
 }
 
-func boolPtr(b bool) *bool { return &b }
+//go:fix inline
+func boolPtr(b bool) *bool { return new(b) }
