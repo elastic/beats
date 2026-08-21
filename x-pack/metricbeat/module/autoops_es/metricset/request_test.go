@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package metricset
 
@@ -14,8 +13,10 @@ import (
 )
 
 // Helper function to get a pointer to a string.
+//
+//go:fix inline
 func stringPtr(s string) *string {
-	return &s
+	return new(s)
 }
 
 func TestGetCloudConnectedModeAPIURL(t *testing.T) {
@@ -26,12 +27,12 @@ func TestGetCloudConnectedModeAPIURL(t *testing.T) {
 	}{
 		{
 			name:        "env var set to custom value",
-			envVarValue: stringPtr("http://custom.api.url.from.test"),
+			envVarValue: new("http://custom.api.url.from.test"),
 			expectedURL: "http://custom.api.url.from.test",
 		},
 		{
 			name:        "env var set to empty string",
-			envVarValue: stringPtr(""),                        // Explicitly set to empty
+			envVarValue: new(""),                              // Explicitly set to empty
 			expectedURL: DEFAULT_CLOUD_CONNECTED_MODE_API_URL, // Should fall back to default
 		},
 		{
