@@ -60,7 +60,7 @@ func TestRetrieveHetznerMetadata(t *testing.T) {
 	server := httptest.NewServer(hetznerMetadataHandler())
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"host": server.Listener.Addr().String(),
 	})
 

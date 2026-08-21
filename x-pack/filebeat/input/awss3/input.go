@@ -73,4 +73,6 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 }
 
 // boolPtr returns a pointer to b.
-func boolPtr(b bool) *bool { return &b }
+//
+//go:fix inline
+func boolPtr(b bool) *bool { return new(b) }

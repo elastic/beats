@@ -197,7 +197,7 @@ func TestCacheRegistry_TypedCaches(t *testing.T) {
 	logger := logp.NewLogger("test")
 	registry := NewCacheRegistry(logger, 5*time.Minute)
 
-	computeInstance := &computepb.Instance{Name: stringPtr("test-instance")}
+	computeInstance := &computepb.Instance{Name: new("test-instance")}
 	registry.Compute.data["instance1"] = computeInstance
 	retrieved, found := registry.Compute.Get("instance1")
 	assert.True(t, found)
@@ -223,6 +223,8 @@ func TestCacheRegistry_TypedCaches(t *testing.T) {
 }
 
 // Helper function for string pointers
+//
+//go:fix inline
 func stringPtr(s string) *string {
-	return &s
+	return new(s)
 }
