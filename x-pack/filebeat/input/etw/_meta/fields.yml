@@ -68,7 +68,7 @@
           required: false
           description: >
             The keywords defined in the event. Keywords are used to indicate
-            an event's membership in a set of event categories. This keywords are
+            an event's membership in a set of event categories. These keywords are
             a list of keywords, each keyword is a string that represents a
             specific keyword.
 

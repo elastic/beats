@@ -18,7 +18,7 @@ The root field containing all MSSQL fields
 
 ## database [_database]
 
-The database that the metrics is being referred to
+The database that the metrics refer to
 
 **`mssql.database.id`**
 :   Unique ID of the database inside MSSQL
