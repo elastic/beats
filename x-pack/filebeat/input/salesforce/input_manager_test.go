@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-func makeTestStore(data map[string]interface{}) *statestore.Store {
+func makeTestStore(data map[string]any) *statestore.Store {
 	memstore := &storetest.MapStore{Table: data}
 	reg := statestore.NewRegistry(&storetest.MemoryStore{
 		Stores: map[string]*storetest.MapStore{

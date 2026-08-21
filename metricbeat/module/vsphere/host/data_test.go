@@ -54,7 +54,7 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	var metricDataTest = metricData{
-		perfMetrics: map[string]interface{}{
+		perfMetrics: map[string]any{
 			"disk.capacity.usage.average": int64(100),
 			"disk.deviceLatency.average":  int64(5),
 			"disk.maxTotalLatency.latest": int64(3),
