@@ -309,13 +309,13 @@ paths:
 	require.NoError(t, err, "disabled filestream must not trigger state takeover")
 
 	states := backend.Stores[""].Table
-	require.Contains(
+	assert.Contains(
 		t,
 		states,
 		"filebeat::logs::native::1-1",
 		"disabled filestream must leave legacy state unchanged",
 	)
-	require.NotContains(
+	assert.NotContains(
 		t,
 		states,
 		"filestream::disabled-filestream::native::1-1",
