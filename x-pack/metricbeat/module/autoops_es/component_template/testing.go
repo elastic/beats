@@ -52,5 +52,6 @@ func getTemplateResponse(t *testing.T, templateNames []string, ignoredNames []st
 		added++
 	}
 
-	return []byte(mappings.String() + "]}")
+	mappings.WriteString("]}")
+	return []byte(mappings.String())
 }
