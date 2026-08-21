@@ -124,20 +124,41 @@ func TestFilebeatTakeOverAfterRestart(t *testing.T) {
 	events := integration.GetEventsFromFileOutput[takeOverEvent](filebeat, totalEvents, true)
 	require.Len(t, events, totalEvents, "unexpected number of published events")
 
-	// First events are from the Log input
+	// First 25 events are from the Log input
 	for i := range batchSize {
-		isLogInput := events[i].Input.Type != "log"
-		hasLogInputPrefix := strings.HasPrefix(events[i].Message, "Log input event")
-		if isLogInput || !hasLogInputPrefix {
-			t.Errorf("Event %02d is not from the Log input", i)
+		evtInpType := events[i].Input.Type
+		inpTyp := "log"
+		if evtInpType != inpTyp {
+			t.Errorf(
+				"Event %02d is not from the %q input. input.type: %q",
+				i, inpTyp, evtInpType,
+			)
+		}
+
+		msg := events[i].Message
+		prefix := "Log input event"
+		if !strings.HasPrefix(msg, prefix) {
+			t.Errorf("Message from event %02d does not contain the "+
+				"%q prefix. Full message: %q", i, prefix, msg)
 		}
 	}
 
+	// The next 25 events are from the Filestream input
 	for i := batchSize; i < totalEvents; i++ {
-		isFilestreamEvent := events[i].Input.Type != "filestream"
-		hasFilestreamPrefix := strings.HasPrefix(events[i].Message, "Filestream input event")
-		if isFilestreamEvent || !hasFilestreamPrefix {
-			t.Errorf("Event %02d is not from the Filestream input", i)
+		evtInpType := events[i].Input.Type
+		inpTyp := "filestream"
+		if evtInpType != inpTyp {
+			t.Errorf(
+				"Event %02d is not from the %q input. input.type: %q",
+				i, inpTyp, evtInpType,
+			)
+		}
+
+		msg := events[i].Message
+		prefix := "Filestream input event"
+		if !strings.HasPrefix(msg, prefix) {
+			t.Errorf("Message from event %02d does not contain the "+
+				"%q prefix. Full message: %q", i, prefix, msg)
 		}
 	}
 }
