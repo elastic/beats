@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package statemanager provides shared building blocks for stateful inputs
-// that maintain per-source state in a persistent registry.
 package statemanager
 
 import (
@@ -186,9 +184,6 @@ func (c *Cache[T]) newRelease(e *cacheEntry[T]) func() {
 				c.mu.Unlock()
 				return
 			}
-			// Mark as draining while still in the map so that concurrent
-			// Acquires can wait for the drain to complete rather than racing
-			// to open a new store on top of an old one that is still flushing.
 			e.state = cacheDraining
 			cancel := e.cancel
 			value := e.value
@@ -199,13 +194,14 @@ func (c *Cache[T]) newRelease(e *cacheEntry[T]) func() {
 			}
 			e.wg.Wait()
 
+			if c.closeFn != nil {
+				c.closeFn(value)
+			}
+
 			c.mu.Lock()
 			delete(c.entries, e.key)
 			c.mu.Unlock()
 
-			if c.closeFn != nil {
-				c.closeFn(value)
-			}
 			close(e.drained)
 		})
 	}

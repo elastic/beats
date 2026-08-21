@@ -24,13 +24,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/go-concert/unison"
 )
 
 // MockInputManager can be used as InputManager replacement in tests that require a new Input Manager.
-// The OnInit, OnConfigure, and OnClose functions are executed if the corresponding methods get called.
+// The OnConfigure and OnClose functions are executed if the corresponding methods get called.
 type MockInputManager struct {
-	OnInit      func() error
 	OnConfigure InputConfigurer
 	OnClose     func()
 }
@@ -45,14 +43,6 @@ type MockInput struct {
 	Type   string
 	OnTest func(v2.TestContext) error
 	OnRun  func(v2.Context, beat.PipelineConnector) error
-}
-
-// Init returns nil if OnInit is not set. Otherwise the return value of OnInit is returned.
-func (m *MockInputManager) Init(_ unison.Group) error {
-	if m.OnInit != nil {
-		return m.OnInit()
-	}
-	return nil
 }
 
 // Create fails with an error if OnConfigure is not set. Otherwise the return
