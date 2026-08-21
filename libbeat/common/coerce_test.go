@@ -25,7 +25,7 @@ import (
 
 func TestTryToInt(t *testing.T) {
 	tests := []struct {
-		input   interface{}
+		input   any
 		result  int
 		resultB bool
 	}{

@@ -121,7 +121,7 @@ func generateLogFiles(
 	}
 
 	filenames := make([]string, 0, files)
-	for i := 0; i < files; i++ {
+	for range files {
 		id, err := uuid.NewV4()
 		if err != nil {
 			t.Fatalf("failed to generate a unique filename: %s", err)
@@ -148,7 +148,7 @@ func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGene
 	}
 	defer file.Close()
 
-	writeLines(t, file, filename, 0, lines, generator)
+	WriteLines(t, file, filename, 0, lines, generator)
 }
 
 // AppendLogFile appends a given line count to an existing file
@@ -175,7 +175,7 @@ func AppendLogFile(t *testing.T, filename string, lines int, generator LogGenera
 		t.Fatalf("failed to count lines in %q: %s", filename, err)
 	}
 
-	writeLines(t, file, filename, offset, lines, generator)
+	WriteLines(t, file, filename, offset, lines, generator)
 }
 
 // GenerateGZIPLogFile generates a single gzip-compressed log file with the
@@ -192,18 +192,42 @@ func GenerateGZIPLogFile(t *testing.T, filename string, lines int, generator Log
 	gw := gzip.NewWriter(file)
 	defer gw.Close()
 
-	writeLines(t, gw, filename, 0, lines, generator)
+	WriteLines(t, gw, filename, 0, lines, generator)
 }
 
-// writeLines writes generated lines to the provided writer.
+// WriteLines writes generated lines to the provided writer.
 // It is shared between GenerateLogFile and GenerateGZIPLogFile to
 // avoid duplicating the core writing logic.
-func writeLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
+func WriteLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
 	for i := offset + 1; i <= offset+lines; i++ {
 		line := generator.GenerateLine(filename, i) + "\n"
 		if _, err := w.Write([]byte(line)); err != nil {
 			t.Fatalf("cannot write a generated log line to %s: %s", filename, err)
 			return
 		}
+	}
+}
+
+// RotateFile renames src to dst, simulating a log rotation.
+func RotateFile(t *testing.T, src, dst string) {
+	t.Helper()
+	if err := os.Rename(src, dst); err != nil {
+		t.Fatalf("RotateFile(%q -> %q): %v", src, dst, err)
+	}
+}
+
+// TruncateFile truncates path to zero bytes.
+func TruncateFile(t *testing.T, path string) {
+	t.Helper()
+	if err := os.Truncate(path, 0); err != nil {
+		t.Fatalf("TruncateFile(%q): %v", path, err)
+	}
+}
+
+// CreateSymlink creates a symbolic link at linkPath pointing to target.
+func CreateSymlink(t *testing.T, target, linkPath string) {
+	t.Helper()
+	if err := os.Symlink(target, linkPath); err != nil {
+		t.Fatalf("CreateSymlink(%q -> %q): %v", target, linkPath, err)
 	}
 }

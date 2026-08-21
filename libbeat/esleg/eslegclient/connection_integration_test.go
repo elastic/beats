@@ -70,7 +70,7 @@ func TestConnectWithProxy(t *testing.T) {
 	defer proxy.Close()
 
 	// Use connectTestEs instead of getTestingElasticsearch to make use of makeES
-	client, err := connectTestEs(t, map[string]interface{}{
+	client, err := connectTestEs(t, map[string]any{
 		"hosts":   "http://" + wrongPort.Addr().String(),
 		"timeout": 5, // seconds
 	})
@@ -79,7 +79,7 @@ func TestConnectWithProxy(t *testing.T) {
 	t.Cleanup(cancel)
 	assert.Error(t, client.Connect(ctx), "it should fail without proxy")
 
-	client, err = connectTestEs(t, map[string]interface{}{
+	client, err = connectTestEs(t, map[string]any{
 		"hosts":     "http://" + wrongPort.Addr().String(),
 		"proxy_url": proxy.URL,
 		"timeout":   5, // seconds
@@ -88,8 +88,8 @@ func TestConnectWithProxy(t *testing.T) {
 	assert.NoError(t, client.Connect(ctx))
 }
 
-func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+func connectTestEs(t *testing.T, cfg any) (*Connection, error) {
+	config, err := conf.NewConfigFrom(map[string]any{
 		"username": eslegtest.GetUser(),
 		"password": eslegtest.GetPass(),
 	})

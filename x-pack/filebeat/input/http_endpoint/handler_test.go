@@ -23,13 +23,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/lumberjack"
 )
 
 var withTraces = flag.Bool("log-traces", false, "specify logging request traces during tests")
@@ -858,15 +858,13 @@ func TestConcurrentRequestsExceedHighWater(t *testing.T) {
 	var wg sync.WaitGroup
 	var slowReqStatus, fastReqStatus int
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		req := httptest.NewRequest(http.MethodPost, "/", slowBody)
 		req.Header.Set("Content-Type", "application/json")
 		respRec := httptest.NewRecorder()
 		h.ServeHTTP(respRec, req)
 		slowReqStatus = respRec.Code
-	}()
+	})
 
 	// Wait until the slow request has accumulated enough in-flight bytes
 	// to cross the high-water mark before sending the second request.
@@ -876,15 +874,13 @@ func TestConcurrentRequestsExceedHighWater(t *testing.T) {
 
 	// Send a fast request while the slow one is still reading.
 	// This should be rejected because in-flight is above high water mark (30).
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
 		req.Header.Set("Content-Type", "application/json")
 		respRec := httptest.NewRecorder()
 		h.ServeHTTP(respRec, req)
 		fastReqStatus = respRec.Code
-	}()
+	})
 
 	wg.Wait()
 

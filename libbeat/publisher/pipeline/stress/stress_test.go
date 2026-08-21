@@ -22,7 +22,7 @@ package stress_test
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+
 	"os"
 	"path/filepath"
 	"strings"
@@ -66,14 +66,20 @@ func TestPipeline(t *testing.T) {
 		configTest(t, "pipeline", pipelineConfigs, func(t *testing.T, pipeline string) {
 			configTest(t, "out", outConfigs, func(t *testing.T, out string) {
 
+				// Reset and snapshot the global ack counter so each
+				// scenario reports its own throughput.
+				stress.AckedEventCount.Store(0)
+				start := time.Now()
 				if testing.Verbose() {
-					start := time.Now()
 					fmt.Printf("%v Start stress test %v\n", start.Format(time.RFC3339), t.Name())
-					defer func() {
-						end := time.Now()
-						fmt.Printf("%v Finished stress test %v. Duration=%v\n", end.Format(time.RFC3339), t.Name(), end.Sub(start))
-					}()
 				}
+				defer func() {
+					elapsed := time.Since(start)
+					acked := stress.AckedEventCount.Load()
+					rate := float64(acked) / elapsed.Seconds()
+					fmt.Printf("STRESS %v: acked=%d duration=%v rate=%.0f events/s\n",
+						t.Name(), acked, elapsed.Round(time.Millisecond), rate)
+				}()
 
 				config, err := common.LoadFiles(gen, pipeline, out)
 				if err != nil {
@@ -84,15 +90,15 @@ func TestPipeline(t *testing.T) {
 				name = strings.Replace(name, "/", "-", -1)
 				name = strings.Replace(name, "\\", "-", -1)
 
-				dir, err := ioutil.TempDir("", "")
+				dir, err := os.MkdirTemp("", "")
 				if err != nil {
 					t.Fatal(err)
 				}
 				defer os.RemoveAll(dir)
 
 				// Merge test info into config object
-				config.Merge(map[string]interface{}{
-					"test": map[string]interface{}{
+				config.Merge(map[string]any{
+					"test": map[string]any{
 						"tmpdir": dir,
 						"name":   name,
 					},
@@ -113,7 +119,6 @@ func TestPipeline(t *testing.T) {
 
 func configTest(t *testing.T, typ string, configs []string, fn func(t *testing.T, config string)) {
 	for _, config := range configs {
-		config := config
 		t.Run(testName(typ, config), func(t *testing.T) {
 			t.Parallel()
 			fn(t, config)

@@ -55,7 +55,7 @@ func (fs *PathFormatString) Run(timestamp time.Time) (string, error) {
 // (which must be a string). Unpack method satisfies go-ucfg.Unpacker interface
 // required by config.C, in order to use PathFormatString with
 // `common.(*Config).Unpack()`.
-func (fs *PathFormatString) Unpack(v interface{}) error {
+func (fs *PathFormatString) Unpack(v any) error {
 	path, ok := v.(string)
 	if !ok {
 		return nil

@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//nolint:gosec // There are no secrets in this file.
 package okta
 
 import (
@@ -27,7 +28,7 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 		{
 			name: "valid oauth2 config with jwk_json",
 			config: &oAuth2Config{
-				Enabled:  boolPtr(true),
+				Enabled:  new(true),
 				ClientID: "test-client",
 				Scopes:   []string{"okta.users.read"},
 				TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -48,7 +49,7 @@ func TestOAuth2ConfigValidation(t *testing.T) {
 		{
 			name: "valid oauth2 config with jwk_pem",
 			config: &oAuth2Config{
-				Enabled:  boolPtr(true),
+				Enabled:  new(true),
 				ClientID: "test-client",
 				Scopes:   []string{"okta.users.read"},
 				TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -88,7 +89,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - bad jwk_pem data",
 			config: &oAuth2Config{
-				Enabled:    boolPtr(true),
+				Enabled:    new(true),
 				ClientID:   "test-client",
 				Scopes:     []string{"okta.users.read"},
 				TokenURL:   "https://test.okta.com/oauth2/v1/token",
@@ -99,7 +100,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "valid oauth2 config with client secret",
 			config: &oAuth2Config{
-				Enabled:      boolPtr(true),
+				Enabled:      new(true),
 				ClientID:     "test-client",
 				ClientSecret: "test-secret",
 				Scopes:       []string{"okta.users.read"},
@@ -110,7 +111,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - missing client.id",
 			config: &oAuth2Config{
-				Enabled:     boolPtr(true),
+				Enabled:     new(true),
 				Scopes:      []string{"okta.users.read"},
 				TokenURL:    "https://test.okta.com/oauth2/v1/token",
 				OktaJWKJSON: common.JSONBlob(`{"kty": "RSA"}`),
@@ -120,7 +121,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - missing scopes",
 			config: &oAuth2Config{
-				Enabled:     boolPtr(true),
+				Enabled:     new(true),
 				ClientID:    "test-client",
 				TokenURL:    "https://test.okta.com/oauth2/v1/token",
 				OktaJWKJSON: common.JSONBlob(`{"kty": "RSA"}`),
@@ -130,7 +131,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - missing token_url",
 			config: &oAuth2Config{
-				Enabled:     boolPtr(true),
+				Enabled:     new(true),
 				ClientID:    "test-client",
 				Scopes:      []string{"okta.users.read"},
 				OktaJWKJSON: common.JSONBlob(`{"kty": "RSA"}`),
@@ -140,7 +141,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - mixing client secret and JWT keys",
 			config: &oAuth2Config{
-				Enabled:      boolPtr(true),
+				Enabled:      new(true),
 				ClientID:     "test-client",
 				ClientSecret: "test-secret",
 				Scopes:       []string{"okta.users.read"},
@@ -152,7 +153,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		{
 			name: "invalid - no authentication method provided",
 			config: &oAuth2Config{
-				Enabled:  boolPtr(true),
+				Enabled:  new(true),
 				ClientID: "test-client",
 				Scopes:   []string{"okta.users.read"},
 				TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -187,14 +188,14 @@ func TestOAuth2ConfigIsEnabled(t *testing.T) {
 		{
 			name: "enabled explicitly",
 			config: &oAuth2Config{
-				Enabled: boolPtr(true),
+				Enabled: new(true),
 			},
 			want: true,
 		},
 		{
 			name: "disabled explicitly",
 			config: &oAuth2Config{
-				Enabled: boolPtr(false),
+				Enabled: new(false),
 			},
 			want: false,
 		},
@@ -226,7 +227,7 @@ func TestConfValidationWithOAuth2(t *testing.T) {
 			config: conf{
 				OktaDomain: "test.okta.com",
 				OAuth2: &oAuth2Config{
-					Enabled:  boolPtr(true),
+					Enabled:  new(true),
 					ClientID: "test-client",
 					Scopes:   []string{"okta.users.read"},
 					TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -275,7 +276,7 @@ func TestConfValidationWithOAuth2(t *testing.T) {
 				OktaDomain: "test.okta.com",
 				OktaToken:  "test-token",
 				OAuth2: &oAuth2Config{
-					Enabled:  boolPtr(true),
+					Enabled:  new(true),
 					ClientID: "test-client",
 					Scopes:   []string{"okta.users.read"},
 					TokenURL: "https://test.okta.com/oauth2/v1/token",
@@ -323,7 +324,7 @@ func TestGetAuthToken(t *testing.T) {
 			name: "oauth2 enabled",
 			config: conf{
 				OAuth2: &oAuth2Config{
-					Enabled: boolPtr(true),
+					Enabled: new(true),
 				},
 			},
 			expected: "",
@@ -333,7 +334,7 @@ func TestGetAuthToken(t *testing.T) {
 			config: conf{
 				OktaToken: "test-token",
 				OAuth2: &oAuth2Config{
-					Enabled: boolPtr(false),
+					Enabled: new(false),
 				},
 			},
 			expected: "test-token",
@@ -354,10 +355,6 @@ func TestGetAuthToken(t *testing.T) {
 			assert.Equal(t, tt.expected, got)
 		})
 	}
-}
-
-func boolPtr(b bool) *bool {
-	return &b
 }
 
 // testOktaJWKJSON is a JWK JSON obtained from the Okta integration.
@@ -398,7 +395,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 func TestOktaTokenSource_Token(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"access_token": "mock",
 			"token_type":   "Bearer",
 			"expires_in":   3600,
@@ -445,5 +442,50 @@ func TestOktaTokenSource_Token(t *testing.T) {
 				t.Errorf("unexpected access token: got %q want %q", tok.AccessToken, "mock")
 			}
 		})
+	}
+}
+
+// TestFetchOktaOauthClient_JWKJSONRoundTrip exercises the full
+// fetchOktaOauthClient path with jwk_json to verify that the JWK
+// bytes survive into the token source for refresh. Previously
+// jwkData was only stored for the jwk_file case, causing token
+// refresh to fail with "unexpected end of JSON input".
+func TestFetchOktaOauthClient_JWKJSONRoundTrip(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/token":
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"access_token": "mock-access-token",
+				"token_type":   "Bearer",
+				"expires_in":   3600,
+			})
+		case "/resource":
+			w.WriteHeader(http.StatusOK)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer srv.Close()
+
+	cfg := &oAuth2Config{
+		ClientID:    "test-client-id",
+		Scopes:      []string{"okta.users.read"},
+		TokenURL:    srv.URL + "/token",
+		OktaJWKJSON: common.JSONBlob(testOktaJWKJSON),
+	}
+
+	client, err := cfg.fetchOktaOauthClient(context.Background(), srv.Client())
+	if err != nil {
+		t.Fatalf("fetchOktaOauthClient() error: %v", err)
+	}
+
+	resp, err := client.Get(srv.URL + "/resource") //nolint:noctx // No need for a context here.
+	if err != nil {
+		t.Fatalf("GET /resource error: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("GET /resource status = %d; want %d", resp.StatusCode, http.StatusOK)
 	}
 }

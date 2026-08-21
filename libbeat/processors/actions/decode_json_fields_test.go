@@ -32,14 +32,14 @@ import (
 )
 
 var fields = [1]string{"msg"}
-var testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+var testConfig, _ = conf.NewConfigFrom(map[string]any{
 	"fields":       fields,
 	"processArray": false,
 })
 
 func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 	// All fields defined in config should be allowed.
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"decode_json_fields": &config{
 			// Rely on zero values for all fields that don't have validation.
 			MaxDepth: 1,
@@ -50,8 +50,8 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Unknown fields should not be allowed.
-	cfg = conf.MustNewConfigFrom(map[string]interface{}{
-		"decode_json_fields": map[string]interface{}{
+	cfg = conf.MustNewConfigFrom(map[string]any{
+		"decode_json_fields": map[string]any{
 			"fields":     []string{"required"},
 			"extraneous": "field",
 		},
@@ -128,7 +128,7 @@ func TestDocumentID(t *testing.T) {
 		"msg": `{"log": "message", "myid": "myDocumentID"}`,
 	}
 
-	config := conf.MustNewConfigFrom(map[string]interface{}{
+	config := conf.MustNewConfigFrom(map[string]any{
 		"fields":      []string{"msg"},
 		"document_id": "myid",
 	})
@@ -143,7 +143,7 @@ func TestDocumentID(t *testing.T) {
 	require.NoError(t, err)
 
 	wantFields := mapstr.M{
-		"msg": map[string]interface{}{"log": "message"},
+		"msg": map[string]any{"log": "message"},
 	}
 	wantMeta := mapstr.M{
 		"_id": "myDocumentID",
@@ -162,7 +162,7 @@ func TestValidJSONDepthOne(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := mapstr.M{
-		"msg": map[string]interface{}{
+		"msg": map[string]any{
 			"log":    "{\"level\":\"info\"}",
 			"stream": "stderr",
 			"count":  3,
@@ -179,7 +179,7 @@ func TestValidJSONDepthTwo(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]any{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -188,8 +188,8 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := mapstr.M{
-		"msg": map[string]interface{}{
-			"log": map[string]interface{}{
+		"msg": map[string]any{
+			"log": map[string]any{
 				"level": "info",
 			},
 			"stream": "stderr",
@@ -207,7 +207,7 @@ func TestTargetOption(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]any{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -217,8 +217,8 @@ func TestTargetOption(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := mapstr.M{
-		"doc": map[string]interface{}{
-			"log": map[string]interface{}{
+		"doc": map[string]any{
+			"log": map[string]any{
 				"level": "info",
 			},
 			"stream": "stderr",
@@ -237,7 +237,7 @@ func TestTargetRootOption(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]any{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -247,7 +247,7 @@ func TestTargetRootOption(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := mapstr.M{
-		"log": map[string]interface{}{
+		"log": map[string]any{
 			"level": "info",
 		},
 		"stream":   "stderr",
@@ -268,7 +268,7 @@ func TestTargetMetadata(t *testing.T) {
 		Meta: mapstr.M{},
 	}
 
-	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]any{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -286,8 +286,8 @@ func TestTargetMetadata(t *testing.T) {
 	actual, _ := p.Run(event)
 
 	expectedMeta := mapstr.M{
-		"json": map[string]interface{}{
-			"log": map[string]interface{}{
+		"json": map[string]any{
+			"log": map[string]any{
 				"level": "info",
 			},
 			"stream": "stderr",
@@ -348,7 +348,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 				  }`,
 			}
 
-			testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+			testConfig, _ = conf.NewConfigFrom(map[string]any{
 				"fields":        fields,
 				"process_array": true,
 				"max_depth":     testCase.MaxDepth,
@@ -367,7 +367,7 @@ func TestArrayWithArraysDisabled(t *testing.T) {
 		  }`,
 	}
 
-	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]any{
 		"fields":        fields,
 		"max_depth":     10,
 		"process_array": false,
@@ -391,7 +391,7 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 		  }`,
 	}
 
-	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]any{
 		"fields":        fields,
 		"max_depth":     10,
 		"process_array": true,
@@ -415,7 +415,7 @@ func TestArrayWithInvalidArray(t *testing.T) {
 		  }`,
 	}
 
-	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]any{
 		"fields":        fields,
 		"max_depth":     10,
 		"process_array": true,
@@ -452,7 +452,7 @@ func TestAddErrKeyOption(t *testing.T) {
 				"msg": "{\"@timestamp\":\"{}\"}",
 			}
 
-			testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
+			testConfig, _ = conf.NewConfigFrom(map[string]any{
 				"fields":         fields,
 				"add_error_key":  test.addErrOption,
 				"overwrite_keys": true,
@@ -467,7 +467,7 @@ func TestAddErrKeyOption(t *testing.T) {
 }
 
 func TestExpandKeys(t *testing.T) {
-	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]any{
 		"fields":      fields,
 		"expand_keys": true,
 		"target":      "",
@@ -476,7 +476,7 @@ func TestExpandKeys(t *testing.T) {
 	expected := mapstr.M{
 		"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`,
 		"a": mapstr.M{
-			"b": map[string]interface{}{
+			"b": map[string]any{
 				"c": "c",
 				"d": "d",
 			},
@@ -487,7 +487,7 @@ func TestExpandKeys(t *testing.T) {
 }
 
 func TestExpandKeysWithTarget(t *testing.T) {
-	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]any{
 		"fields":      fields,
 		"expand_keys": true,
 		"target":      "my_target",
@@ -495,9 +495,9 @@ func TestExpandKeysWithTarget(t *testing.T) {
 	input := mapstr.M{"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`}
 	expected := mapstr.M{
 		"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`,
-		"my_target": map[string]interface{}{
+		"my_target": map[string]any{
 			"a": mapstr.M{
-				"b": map[string]interface{}{
+				"b": map[string]any{
 					"c": "c",
 					"d": "d",
 				},
@@ -511,7 +511,7 @@ func TestExpandKeysWithTarget(t *testing.T) {
 func TestExpandKeysError(t *testing.T) {
 	for _, target := range []string{"", "my_target"} {
 		t.Run(fmt.Sprintf("target set to '%s'", target), func(t *testing.T) {
-			testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+			testConfig := conf.MustNewConfigFrom(map[string]any{
 				"fields":        fields,
 				"expand_keys":   true,
 				"add_error_key": true,
@@ -541,7 +541,7 @@ func TestExpandKeysError(t *testing.T) {
 }
 
 func TestOverwriteMetadata(t *testing.T) {
-	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]any{
 		"fields":         fields,
 		"target":         "",
 		"overwrite_keys": true,
@@ -560,7 +560,7 @@ func TestOverwriteMetadata(t *testing.T) {
 }
 
 func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
-	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]any{
 		"fields":        "message",
 		"add_error_key": true,
 	})

@@ -54,7 +54,7 @@ func TestStore_Has(t *testing.T) {
 		assert.Error(t, err)
 	})
 	t.Run("return result from backend", func(t *testing.T) {
-		data := map[string]interface{}{"known_key": "test"}
+		data := map[string]any{"known_key": "test"}
 		store := makeTestStore(t, data)
 		defer store.Close()
 
@@ -71,7 +71,7 @@ func TestStore_Has(t *testing.T) {
 func TestStore_Get(t *testing.T) {
 	t.Run("fails if store has been closed", func(t *testing.T) {
 		store := makeClosedTestStore(t)
-		var tmp interface{}
+		var tmp any
 		assertClosed(t, store.Get("test", &tmp))
 	})
 	t.Run("error is passed through", func(t *testing.T) {
@@ -82,16 +82,16 @@ func TestStore_Get(t *testing.T) {
 		defer store.Close()
 
 		ms.OnGet("test").Return(errors.New("oops"))
-		var tmp interface{}
+		var tmp any
 		err := store.Get("test", &tmp)
 		assert.Error(t, err)
 	})
 	t.Run("return result from backend", func(t *testing.T) {
-		data := map[string]interface{}{"known_key": "test"}
+		data := map[string]any{"known_key": "test"}
 		store := makeTestStore(t, data)
 		defer store.Close()
 
-		var got interface{}
+		var got any
 		err := store.Get("known_key", &got)
 		assert.NoError(t, err)
 		assert.Equal(t, "test", got)
@@ -101,7 +101,7 @@ func TestStore_Get(t *testing.T) {
 func TestStore_Set(t *testing.T) {
 	t.Run("fails if store has been closed", func(t *testing.T) {
 		store := makeClosedTestStore(t)
-		var tmp interface{}
+		var tmp any
 		assertClosed(t, store.Set("test", &tmp))
 	})
 	t.Run("error is passed through", func(t *testing.T) {
@@ -116,7 +116,7 @@ func TestStore_Set(t *testing.T) {
 		assert.Error(t, err)
 	})
 	t.Run("set key in backend", func(t *testing.T) {
-		data := map[string]interface{}{}
+		data := map[string]any{}
 		store := makeTestStore(t, data)
 		defer store.Close()
 
@@ -142,7 +142,7 @@ func TestStore_Remove(t *testing.T) {
 		assert.Error(t, store.Remove("test"))
 	})
 	t.Run("remove key from backend", func(t *testing.T) {
-		data := map[string]interface{}{"key": "test"}
+		data := map[string]any{"key": "test"}
 		store := makeTestStore(t, data)
 
 		err := store.Remove("key")
@@ -159,16 +159,16 @@ func TestStore_Each(t *testing.T) {
 		}))
 	})
 	t.Run("correctly iterate pairs", func(t *testing.T) {
-		data := map[string]interface{}{
-			"a": map[string]interface{}{"field": "hello"},
-			"b": map[string]interface{}{"field": "test"},
+		data := map[string]any{
+			"a": map[string]any{"field": "hello"},
+			"b": map[string]any{"field": "test"},
 		}
 		store := makeTestStore(t, data)
 		defer store.Close()
 
-		got := map[string]interface{}{}
+		got := map[string]any{}
 		err := store.Each(func(key string, dec ValueDecoder) (bool, error) {
-			var tmp interface{}
+			var tmp any
 			if err := dec.Decode(&tmp); err != nil {
 				t.Fatalf("failed to read value from store: %v", err)
 			}
@@ -181,7 +181,7 @@ func TestStore_Each(t *testing.T) {
 	})
 }
 
-func makeTestStore(t *testing.T, data map[string]interface{}) *Store {
+func makeTestStore(t *testing.T, data map[string]any) *Store {
 	memstore := &storetest.MapStore{Table: data}
 	reg := NewRegistry(&storetest.MemoryStore{
 		Stores: map[string]*storetest.MapStore{

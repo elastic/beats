@@ -21,9 +21,9 @@ package index
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -63,7 +63,7 @@ func TestMapper(t *testing.T) {
 			URI:          server.URL,
 			SanitizedURI: server.URL,
 			Host:         server.URL,
-		}, logptest.NewTestingLogger(t, ""))
+		}, logptest.NewTestingLogger(t, ""), "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -74,12 +74,12 @@ func TestMapper(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	httpClient, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{}, logptest.NewTestingLogger(t, ""))
+	httpClient, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{}, logptest.NewTestingLogger(t, ""), "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	input, err := ioutil.ReadFile("./_meta/test/empty.512.json")
+	input, err := os.ReadFile("./_meta/test/empty.512.json")
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -96,16 +96,16 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	}
 	rootHandler := func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "_stats") {
-			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/stats.%s.json", esVersion))
+			input, _ := os.ReadFile(fmt.Sprintf("./_meta/test/stats.%s.json", esVersion))
 			w.Write(input)
 			return
 		} else if r.URL.Path != "/" {
-			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/settings.%s.json", esVersion))
+			input, _ := os.ReadFile(fmt.Sprintf("./_meta/test/settings.%s.json", esVersion))
 			w.Write(input)
 			return
 		}
 
-		input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/root.%s.json", esVersion))
+		input, _ := os.ReadFile(fmt.Sprintf("./_meta/test/root.%s.json", esVersion))
 		w.Write(input)
 
 	}
@@ -121,13 +121,13 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 
 	mux.Handle("/_xpack/usage", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/xpack-usage.%s.json", esVersion))
+			input, _ := os.ReadFile(fmt.Sprintf("./_meta/test/xpack-usage.%s.json", esVersion))
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/state/routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/cluster_state.%s.json", esVersion))
+			input, _ := os.ReadFile(fmt.Sprintf("./_meta/test/cluster_state.%s.json", esVersion))
 			w.Write(input)
 		}))
 
@@ -147,8 +147,8 @@ func TestData(t *testing.T) {
 		t.Fatal("errors writing events to data.json file", err)
 	}
 }
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": []string{"index"},
 		"hosts":      []string{host},

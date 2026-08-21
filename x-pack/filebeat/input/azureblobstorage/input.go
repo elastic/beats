@@ -84,6 +84,7 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
 			PathPrefix:               container.PathPrefix,
+			Retry:                    config.Retry,
 		})
 	}
 
@@ -212,7 +213,7 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 		cancel()
 	}()
 
-	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
+	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, currentSource.Retry, input.serviceURL, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
 		inputCtx.UpdateStatus(status.Failed, "failed to get service client: "+err.Error())

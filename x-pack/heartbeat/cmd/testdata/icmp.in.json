@@ -1,0 +1,191 @@
+{
+  "source": {
+    "data_stream": {
+      "namespace": "test"
+    },
+    "id": "synthetics/icmp-synthetics-61a33841-f1ef-4480-ac50-afff913a0448-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+    "meta": {
+      "package": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      }
+    },
+    "name": "1.1.1.1-test",
+    "package_policy_id": "61a33841-f1ef-4480-ac50-afff913a0448-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+    "policy": {
+      "revision": 6
+    },
+    "revision": 1,
+    "streams": [
+      {
+        "__ui": null,
+        "data_stream": {
+          "dataset": "icmp",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "enabled": true,
+        "hosts": "1.1.1.1",
+        "id": "61a33841-f1ef-4480-ac50-afff913a0448",
+        "ipv4": true,
+        "ipv6": false,
+        "maintenance_windows": null,
+        "max_attempts": 2,
+        "mode": "all",
+        "name": "1.1.1.1",
+        "origin": "ui",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "config_id": "61a33841-f1ef-4480-ac50-afff913a0448",
+                "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                "meta": {
+                  "space_id": "default"
+                },
+                "monitor": {
+                  "fleet_managed": true,
+                  "interval": 180
+                }
+              },
+              "target": ""
+            }
+          }
+        ],
+        "run_from": {
+          "geo": {
+            "name": "test"
+          },
+          "id": "9ba26c7d-917b-465f-8461-b577fdd37a9f"
+        },
+        "schedule": "@every 3m",
+        "tags": [
+          "test"
+        ],
+        "timeout": "12s",
+        "type": "icmp",
+        "wait": "3s"
+      }
+    ],
+    "type": "synthetics/icmp"
+  },
+  "id": "synthetics/icmp-synthetics-61a33841-f1ef-4480-ac50-afff913a0448-9ba26c7d-917b-465f-8461-b577fdd37a9f",
+  "type": "synthetics/icmp",
+  "name": "1.1.1.1-test",
+  "revision": 1,
+  "meta": {
+    "source": {
+      "package": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      }
+    },
+    "package": {
+      "source": {
+        "name": "synthetics",
+        "policy_template": "synthetics",
+        "release": "ga",
+        "version": "1.6.1"
+      },
+      "name": "synthetics",
+      "version": "1.6.1"
+    }
+  },
+  "data_stream": {
+    "source": {
+      "namespace": "test"
+    },
+    "namespace": "test"
+  },
+  "streams": [
+    {
+      "source": {
+        "__ui": null,
+        "data_stream": {
+          "dataset": "icmp",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "enabled": true,
+        "hosts": "1.1.1.1",
+        "id": "61a33841-f1ef-4480-ac50-afff913a0448",
+        "ipv4": true,
+        "ipv6": false,
+        "maintenance_windows": null,
+        "max_attempts": 2,
+        "mode": "all",
+        "name": "1.1.1.1",
+        "origin": "ui",
+        "processors": [
+          {
+            "add_fields": {
+              "fields": {
+                "config_id": "61a33841-f1ef-4480-ac50-afff913a0448",
+                "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                "meta": {
+                  "space_id": "default"
+                },
+                "monitor": {
+                  "fleet_managed": true,
+                  "interval": 180
+                }
+              },
+              "target": ""
+            }
+          }
+        ],
+        "run_from": {
+          "geo": {
+            "name": "test"
+          },
+          "id": "9ba26c7d-917b-465f-8461-b577fdd37a9f"
+        },
+        "schedule": "@every 3m",
+        "tags": [
+          "test"
+        ],
+        "timeout": "12s",
+        "type": "icmp",
+        "wait": "3s"
+      },
+      "id": "61a33841-f1ef-4480-ac50-afff913a0448",
+      "data_stream": {
+        "source": {
+          "dataset": "icmp",
+          "elasticsearch": {
+            "privileges": {
+              "indices": [
+                "auto_configure",
+                "create_doc",
+                "read"
+              ]
+            }
+          },
+          "type": "synthetics"
+        },
+        "dataset": "icmp",
+        "type": "synthetics"
+      }
+    }
+  ]
+}

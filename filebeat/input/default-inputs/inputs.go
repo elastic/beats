@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !securityonly
+
 package inputs
 
 import (
@@ -30,10 +32,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func Init(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
+func Init(info beat.Info, components statestore.States) []v2.Plugin {
 	return append(
-		genericInputs(log, components),
-		osInputs(info, log, components)...,
+		genericInputs(info.Logger, components),
+		osInputs(info, components)...,
 	)
 }
 

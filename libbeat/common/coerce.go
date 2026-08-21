@@ -21,7 +21,7 @@ import "strconv"
 
 // TryToInt tries to coerce the given interface to an int. On success it returns
 // the int value and true.
-func TryToInt(number interface{}) (int, bool) {
+func TryToInt(number any) (int, bool) {
 	var rtn int
 	switch v := number.(type) {
 	case int:
@@ -59,7 +59,7 @@ func TryToInt(number interface{}) (int, bool) {
 // TryToFloat64 tries to coerce the given interface to an float64. It accepts
 // a float32, float64, or string. On success it returns the float64 value and
 // true.
-func TryToFloat64(number interface{}) (float64, bool) {
+func TryToFloat64(number any) (float64, bool) {
 	var rtn float64
 	switch v := number.(type) {
 	case float32:

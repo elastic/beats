@@ -21,6 +21,10 @@ import (
 	"fmt"
 	"sync"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -28,20 +32,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/gohugoio/hashstructure"
-
-	// include all metricbeat specific builders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
-
-	// include all metricbeat specific appenders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
-
-	// Add metricbeat default processors
-	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.
@@ -58,6 +50,7 @@ type Metricbeat struct {
 	// Options
 	moduleOptions []module.Option
 	logger        *logp.Logger
+	userAgent     string
 }
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -159,6 +152,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		registry:          registry,
 		paths:             b.Info.Paths,
 		logger:            b.Info.Logger,
+		userAgent:         b.Info.UserAgent,
 		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
 
@@ -176,7 +170,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 
 	if b.API != nil {
 		if err := inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry()); err != nil {
-			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+			return nil, fmt.Errorf("failed to attach input API to monitoring endpoint server: %w", err)
 		}
 	}
 	return metricbeat, nil
@@ -217,7 +211,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 			continue
 		}
 
-		var h map[string]interface{}
+		var h map[string]any
 		err := moduleCfg.Unpack(&h)
 		if err != nil {
 			return fmt.Errorf("could not unpack config: %w", err)
@@ -266,12 +260,10 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		<-bt.done
 		modules.Stop()
-	}()
+	})
 
 	// Start the manager after all the reload hooks are configured,
 	// the Manager is stopped at the end of the execution.
@@ -288,23 +280,19 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}
 
 		go moduleReloader.Run(factory)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			<-bt.done
 			moduleReloader.Stop()
-		}()
+		})
 	}
 
 	// Autodiscover (metricbeat.autodiscover)
 	if bt.autodiscover != nil {
 		bt.autodiscover.Start()
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			<-bt.done
 			bt.autodiscover.Stop()
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -327,5 +315,5 @@ func (bt *Metricbeat) Stop() {
 
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
-	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.paths, bt.logger)
+	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.paths, &beat.Info{Logger: bt.logger, Paths: bt.paths, UserAgent: bt.userAgent})
 }

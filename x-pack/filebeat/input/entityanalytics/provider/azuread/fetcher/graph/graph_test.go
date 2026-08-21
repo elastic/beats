@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -21,13 +20,14 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/lumberjack"
 )
 
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
@@ -78,15 +78,15 @@ var devicesResponse1 = apiDeviceResponse{
 			"displayName":            "DESKTOP-LK3PESR",
 			"operatingSystem":        "Windows",
 			"operatingSystemVersion": "10.0.19043.1237",
-			"physicalIds":            []interface{}{},
-			"extensionAttributes": map[string]interface{}{
+			"physicalIds":            []any{},
+			"extensionAttributes": map[string]any{
 				"extensionAttribute1": "BYOD-Device",
 				"extensionAttribute2": nil,
 				"extensionAttribute3": nil,
 				"extensionAttribute4": nil,
 			},
-			"alternativeSecurityIds": []interface{}{
-				map[string]interface{}{
+			"alternativeSecurityIds": []any{
+				map[string]any{
 					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
 					"identityProvider": nil,
 					"key":              "WAA1ADAAOQA6AD...QBnAD0A",
@@ -105,15 +105,15 @@ var devicesResponse2 = apiDeviceResponse{
 			"displayName":            "DESKTOP-LETW452G",
 			"operatingSystem":        "Windows",
 			"operatingSystemVersion": "10.0.19043.1337",
-			"physicalIds":            []interface{}{},
-			"extensionAttributes": map[string]interface{}{
+			"physicalIds":            []any{},
+			"extensionAttributes": map[string]any{
 				"extensionAttribute1": "BYOD-Device",
 				"extensionAttribute2": nil,
 				"extensionAttribute3": nil,
 				"extensionAttribute4": nil,
 			},
-			"alternativeSecurityIds": []interface{}{
-				map[string]interface{}{
+			"alternativeSecurityIds": []any{
+				map[string]any{
 					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
 					"identityProvider": nil,
 					"key":              "DGFSGHSGGTH345A...35DSFH0A",
@@ -171,6 +171,32 @@ var mfaResponse2 = apiMFAResponse{
 			MethodsRegistered:     []string{},
 			UserPreferredMethodForSecondaryAuthentication: "",
 			UserType: "member",
+		},
+	},
+}
+
+var signInActivityResponse1 = apiSignInActivityResponse{
+	Users: []signInActivityAPI{
+		{
+			ID: "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+			SignInActivity: &signInActivityDetails{
+				LastSignInDateTime:               "2024-01-15T08:00:00Z",
+				LastSignInRequestId:              "req-id-1",
+				LastNonInteractiveSignInDateTime: "2024-01-15T08:30:00Z",
+			},
+		},
+	},
+}
+
+var signInActivityResponse2 = apiSignInActivityResponse{
+	Users: []signInActivityAPI{
+		{
+			ID: "d897d560-3d17-4dae-81b3-c898fe82bf84",
+			SignInActivity: &signInActivityDetails{
+				LastSignInDateTime:               "2024-01-14T10:00:00Z",
+				LastSignInRequestId:              "req-id-2",
+				LastNonInteractiveSignInDateTime: "2024-01-14T11:00:00Z",
+			},
 		},
 	},
 }
@@ -307,6 +333,29 @@ func (s *testServer) setup(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+
+		var data []byte
+		var err error
+
+		skipToken := r.URL.Query().Get("$skiptoken")
+		switch skipToken {
+		case "":
+			signInActivityResponse1.NextLink = "http://" + s.addr + "/users?$skiptoken=test"
+			data, err = json.Marshal(&signInActivityResponse1)
+		case "test":
+			signInActivityResponse2.NextLink = ""
+			data, err = json.Marshal(&signInActivityResponse2)
+		default:
+			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
+		}
+		require.NoError(t, err)
+
+		_, err = w.Write(data)
+		require.NoError(t, err)
+	})
+
 	mux.HandleFunc("/reports/authenticationMethods/userRegistrationDetails", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 
@@ -385,7 +434,7 @@ func TestGraph_Groups(t *testing.T) {
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -406,7 +455,7 @@ func TestGraph_Users(t *testing.T) {
 	wantUsers := []*fetcher.User{
 		{
 			ID: uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
-			Fields: map[string]interface{}{
+			Fields: map[string]any{
 				"userPrincipalName": "user.one@example.com",
 				"mail":              "user.one@example.com",
 				"displayName":       "User One",
@@ -421,7 +470,7 @@ func TestGraph_Users(t *testing.T) {
 		},
 		{
 			ID: uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
-			Fields: map[string]interface{}{
+			Fields: map[string]any{
 				"userPrincipalName": "user.two@example.com",
 				"mail":              "user.two@example.com",
 				"displayName":       "User Two",
@@ -449,7 +498,7 @@ func TestGraph_Users(t *testing.T) {
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -470,21 +519,21 @@ func TestGraph_Devices(t *testing.T) {
 	wantDevices := []*fetcher.Device{
 		{
 			ID: uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
-			Fields: map[string]interface{}{
+			Fields: map[string]any{
 				"accountEnabled":         true,
 				"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
 				"displayName":            "DESKTOP-LK3PESR",
 				"operatingSystem":        "Windows",
 				"operatingSystemVersion": "10.0.19043.1237",
-				"physicalIds":            []interface{}{},
-				"extensionAttributes": map[string]interface{}{
+				"physicalIds":            []any{},
+				"extensionAttributes": map[string]any{
 					"extensionAttribute1": "BYOD-Device",
 					"extensionAttribute2": nil,
 					"extensionAttribute3": nil,
 					"extensionAttribute4": nil,
 				},
-				"alternativeSecurityIds": []interface{}{
-					map[string]interface{}{
+				"alternativeSecurityIds": []any{
+					map[string]any{
 						"type":             "2", // Rendered as string to avoid in-flight conversion to float.
 						"identityProvider": nil,
 						"key":              "WAA1ADAAOQA6AD...QBnAD0A",
@@ -501,21 +550,21 @@ func TestGraph_Devices(t *testing.T) {
 		},
 		{
 			ID: uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
-			Fields: map[string]interface{}{
+			Fields: map[string]any{
 				"accountEnabled":         true,
 				"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
 				"displayName":            "DESKTOP-LETW452G",
 				"operatingSystem":        "Windows",
 				"operatingSystemVersion": "10.0.19043.1337",
-				"physicalIds":            []interface{}{},
-				"extensionAttributes": map[string]interface{}{
+				"physicalIds":            []any{},
+				"extensionAttributes": map[string]any{
 					"extensionAttribute1": "BYOD-Device",
 					"extensionAttribute2": nil,
 					"extensionAttribute3": nil,
 					"extensionAttribute4": nil,
 				},
-				"alternativeSecurityIds": []interface{}{
-					map[string]interface{}{
+				"alternativeSecurityIds": []any{
+					map[string]any{
 						"type":             "2", // Rendered as string to avoid in-flight conversion to float.
 						"identityProvider": nil,
 						"key":              "DGFSGHSGGTH345A...35DSFH0A",
@@ -559,7 +608,7 @@ func TestGraph_Devices(t *testing.T) {
 			require.NoError(t, err)
 			auth := mock.New(mock.DefaultTokenValue)
 
-			f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+			f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -570,7 +619,7 @@ func TestGraph_Devices(t *testing.T) {
 			// Using go-cmp because testify is too weak for this comparison.
 			// reflect.DeepEqual works, but won't show a reasonable diff.
 			exporter := cmp.Exporter(func(t reflect.Type) bool {
-				return t == reflect.TypeOf(collections.UUIDSet{})
+				return t == reflect.TypeFor[collections.UUIDSet]()
 			})
 			if !cmp.Equal(wantDevices, gotDevices, exporter) {
 				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(wantDevices, gotDevices, exporter))
@@ -622,7 +671,7 @@ func TestGraph_UserMFADetails(t *testing.T) {
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -631,6 +680,47 @@ func TestGraph_UserMFADetails(t *testing.T) {
 
 	require.NoError(t, gotErr)
 	require.Equal(t, wantMFA, gotMFA)
+}
+
+func TestGraph_UserSignInActivity(t *testing.T) {
+	var testSrv testServer
+	testSrv.setup(t)
+	defer testSrv.srv.Close()
+
+	wantSignInActivity := map[uuid.UUID]*fetcher.SignInActivityDetails{
+		uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+			LastSignInDateTime:               "2024-01-15T08:00:00Z",
+			LastSignInRequestId:              "req-id-1",
+			LastNonInteractiveSignInDateTime: "2024-01-15T08:30:00Z",
+		},
+		uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+			LastSignInDateTime:               "2024-01-14T10:00:00Z",
+			LastSignInRequestId:              "req-id-2",
+			LastNonInteractiveSignInDateTime: "2024-01-14T11:00:00Z",
+		},
+	}
+
+	rawConf := graphConf{
+		APIEndpoint: "http://" + testSrv.addr,
+	}
+	if *trace {
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
+	c, err := config.NewConfigFrom(&rawConf)
+	require.NoError(t, err)
+	auth := mock.New(mock.DefaultTokenValue)
+
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	gotSignInActivity, gotErr := f.UserSignInActivity(ctx)
+
+	require.NoError(t, gotErr)
+	require.Equal(t, wantSignInActivity, gotSignInActivity)
 }
 
 var formatQueryTests = []struct {
@@ -737,12 +827,11 @@ var validateConfigTests = []struct {
 		},
 	},
 	{
-		name: "invalid_path",
+		name: "invalid_path_accepted_at_config_time",
 		config: map[string]any{
 			"tracer.enabled":  true,
 			"tracer.filename": "/var/logs/path.log",
 		},
-		wantErr: errors.New(`request tracer path must be within "azure-ad" path accessing 'tracer'`),
 	},
 }
 

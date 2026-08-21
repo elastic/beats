@@ -31,16 +31,10 @@ import (
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	//mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
-
-func init() {
-	unittest.RegisterPythonTestDeps(Fields)
-}
 
 // Build builds the Beat binary.
 func Build() error {
@@ -73,9 +67,27 @@ func AssembleDarwinUniversal() error {
 	return build.AssembleDarwinUniversal()
 }
 
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+}
+
+// GoFIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests.
+func GoFIPSOnlyUnitTest() error {
+	ctx := context.Background()
+	return devtools.GoTest(ctx, devtools.DefaultGoFIPSOnlyTestArgs())
+}
+
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
-	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+	mg.SerialDeps(GoIntegTest)
 }
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
@@ -87,15 +99,4 @@ func GoIntegTest(ctx context.Context) error {
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
 	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
 	return devtools.GoIntegTestFromHost(ctx, args)
-}
-
-// PythonIntegTest starts the docker containers and executes the Python integration tests.
-func PythonIntegTest(ctx context.Context) error {
-	mg.Deps(Fields, devtools.BuildSystemTestBinary)
-	args := devtools.DefaultPythonTestIntegrationFromHostArgs()
-	// ES_USER must be admin in order for the integration tests to function because they require
-	// indices:data/read/search
-	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
-	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
-	return devtools.PythonIntegTestFromHost(args)
 }

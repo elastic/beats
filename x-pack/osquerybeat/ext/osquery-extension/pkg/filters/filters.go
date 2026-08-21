@@ -211,13 +211,26 @@ func GetConstraintFilters(queryContext table.QueryContext) []Filter {
 	return results
 }
 
+// GetColumnConstraints gets the constraints for a specific column and operator from the query context
+func GetColumnConstraints(queryContext table.QueryContext, columnName string, operator table.Operator) []Filter {
+	var filters []Filter
+	if clist, ok := queryContext.Constraints[columnName]; ok {
+		for _, constraint := range clist.Constraints {
+			if constraint.Operator == operator {
+				filters = append(filters, Filter{ColumnName: columnName, Operator: operator, Expression: constraint.Expression})
+			}
+		}
+	}
+	return filters
+}
+
 // GetValueByTag gets the value of a field by its tag
 func GetValueByOsqueryTag(s any, tagValue string) (reflect.Value, error) {
 	// Get the Value of the struct
 	v := reflect.ValueOf(s)
 
 	// If s is a pointer, we need to get the element it points to
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 
@@ -246,7 +259,7 @@ func GetValueByOsqueryTag(s any, tagValue string) (reflect.Value, error) {
 		// and the tag will be empty.  We need to recurse into the embedded struct and look for the tag there.
 		if fieldType.Anonymous && tag == "" {
 			// Handle pointer to struct if necessary
-			if fieldValue.Kind() == reflect.Ptr {
+			if fieldValue.Kind() == reflect.Pointer {
 				if fieldValue.IsNil() {
 					continue
 				}

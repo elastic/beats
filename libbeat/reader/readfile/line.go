@@ -23,14 +23,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
+	"time"
 
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-const unlimited = 0
 
 // LineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
@@ -51,6 +52,12 @@ type LineReader struct {
 	decoder      transform.Transformer
 	tempBuffer   []byte
 	logger       *logp.Logger
+
+	// mu serializes Next against Close. The multiline TimeoutReader runs Next in
+	// a background goroutine and can call Close while that goroutine is still
+	// inside Next; without this lock Close would recycle tempBuffer (returning it
+	// to the shared pool and niling the field) while Next is still reading it.
+	mu sync.Mutex
 }
 
 // NewLineReader creates a new reader object
@@ -77,8 +84,8 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		collectOnEOF: config.CollectOnEOF,
 		inBuffer:     streambuf.New(nil),
 		outBuffer:    streambuf.New(nil),
-		tempBuffer:   make([]byte, config.BufferSize),
-		logger:       logger.Named("reader_line"),
+		tempBuffer:   getTempBuffer(config.BufferSize),
+		logger:       logger,
 	}, nil
 }
 
@@ -89,6 +96,12 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 // configured with maxBytes n may be larger than the length of b due
 // to skipped lines.
 func (r *LineReader) Next() (b []byte, n int, err error) {
+	// Hold mu for the duration of the read so a concurrent Close cannot recycle
+	// tempBuffer out from under us. mu is uncontended unless this reader is being
+	// driven by the multiline TimeoutReader's background goroutine.
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
@@ -246,11 +259,9 @@ func (r *LineReader) advance() error {
 	r.inBuffer.Reset()
 
 	// Continue scanning input buffer from last position + 1
-	r.inOffset = idx + 1 - sz
-	if r.inOffset < 0 {
+	r.inOffset = max(idx+1-sz,
 		// Fix inOffset if newline has encoding > 8bits + firl line has been decoded
-		r.inOffset = 0
-	}
+		0)
 
 	return err
 }
@@ -328,5 +339,28 @@ func (r *LineReader) decode(end int) (int, error) {
 }
 
 func (r *LineReader) Close() error {
-	return r.reader.Close()
+	// Close the underlying reader first. If a Next is in flight (e.g. the
+	// multiline TimeoutReader's background goroutine), closing the source
+	// unblocks its pending Read so that Next returns and releases r.mu.
+	err := r.reader.Close()
+
+	// Now reclaim the scratch buffer. Taking r.mu guarantees no Next is still
+	// reading tempBuffer before we return it to the pool. Its contents have
+	// always been copied into the streambufs, so nothing downstream references
+	// it.
+	r.mu.Lock()
+	putTempBuffer(r.tempBuffer)
+	r.tempBuffer = nil
+	r.mu.Unlock()
+
+	return err
+}
+
+// SetReadDeadline delegates to the wrapped io.Reader if it honors deadlines, so
+// a synchronous timeout can bound the underlying blocking read.
+func (r *LineReader) SetReadDeadline(t time.Time) bool {
+	if d, ok := r.reader.(reader.DeadlineSetter); ok {
+		return d.SetReadDeadline(t)
+	}
+	return false
 }

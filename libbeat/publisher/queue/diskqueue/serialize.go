@@ -87,7 +87,7 @@ func (e *eventEncoder) reset() {
 	e.folder = folder
 }
 
-func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
+func (e *eventEncoder) encode(evt any) ([]byte, error) {
 	switch v := evt.(type) {
 	case publisher.Event:
 		if e.serializationFormat != SerializationCBOR {

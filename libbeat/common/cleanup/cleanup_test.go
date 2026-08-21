@@ -51,7 +51,6 @@ func TestIfBool(t *testing.T) {
 	}
 
 	for _, test := range testcases {
-		test := test
 		t.Run(test.title, func(t *testing.T) {
 			executed := false
 			func() {

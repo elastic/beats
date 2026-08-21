@@ -33,12 +33,12 @@ func TestUnmarshal(t *testing.T) {
 	tests := []struct {
 		Name   string
 		Input  string
-		Output map[string]interface{}
+		Output map[string]any
 	}{
 		{
 			Name:  "Top level int, float, string, bool",
 			Input: `{"a": 3, "b": 2.0, "c": "hello", "d": true}`,
-			Output: map[string]interface{}{
+			Output: map[string]any{
 				"a": int64(3),
 				"b": float64(2),
 				"c": "hello",
@@ -48,10 +48,10 @@ func TestUnmarshal(t *testing.T) {
 		{
 			Name:  "Nested objects with ints",
 			Input: `{"a": 3, "b": {"c": {"d": 5}}}`,
-			Output: map[string]interface{}{
+			Output: map[string]any{
 				"a": int64(3),
-				"b": map[string]interface{}{
-					"c": map[string]interface{}{
+				"b": map[string]any{
+					"c": map[string]any{
 						"d": int64(5),
 					},
 				},
@@ -60,10 +60,10 @@ func TestUnmarshal(t *testing.T) {
 		{
 			Name:  "Array of floats",
 			Input: `{"a": 3, "b": {"c": [4.0, 4.1, 4.2]}}`,
-			Output: map[string]interface{}{
+			Output: map[string]any{
 				"a": int64(3),
-				"b": map[string]interface{}{
-					"c": []interface{}{
+				"b": map[string]any{
+					"c": []any{
 						float64(4.0), float64(4.1), float64(4.2),
 					},
 				},
@@ -72,10 +72,10 @@ func TestUnmarshal(t *testing.T) {
 		{
 			Name:  "Array of mixed ints and floats",
 			Input: `{"a": 3, "b": {"c": [4, 4.1, 4.2]}}`,
-			Output: map[string]interface{}{
+			Output: map[string]any{
 				"a": int64(3),
-				"b": map[string]interface{}{
-					"c": []interface{}{
+				"b": map[string]any{
+					"c": []any{
 						int64(4), float64(4.1), float64(4.2),
 					},
 				},
@@ -84,7 +84,7 @@ func TestUnmarshal(t *testing.T) {
 		{
 			Name:  "Negative values",
 			Input: `{"a": -3, "b": -1.0}`,
-			Output: map[string]interface{}{
+			Output: map[string]any{
 				"a": int64(-3),
 				"b": float64(-1),
 			},
@@ -92,9 +92,9 @@ func TestUnmarshal(t *testing.T) {
 		{
 			Name:  "Key collision",
 			Input: `{"log.level":"info","log":{"source":"connectors-py-default"},"log":{"logger":"agent_component.cli"}}`,
-			Output: map[string]interface{}{
+			Output: map[string]any{
 				"log.level": "info",
-				"log": map[string]interface{}{
+				"log": map[string]any{
 					"logger": "agent_component.cli",
 				},
 			},
@@ -103,7 +103,7 @@ func TestUnmarshal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			var output map[string]interface{}
+			var output map[string]any
 			err := unmarshal([]byte(test.Input), &output)
 			assert.NoError(t, err)
 			assert.Equal(t, test.Output, output)

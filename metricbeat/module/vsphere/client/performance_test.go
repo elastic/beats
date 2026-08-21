@@ -64,7 +64,7 @@ func TestGetPerfMetrics(t *testing.T) {
 	tests := []struct {
 		name            string
 		mockPerfManager func(manager *MockPerfManager)
-		assertResults   func(t2 *testing.T, metricsMap map[string]interface{}, err error)
+		assertResults   func(t2 *testing.T, metricsMap map[string]any, err error)
 	}{
 		{
 			name: "success (percentage metric)",
@@ -101,9 +101,9 @@ func TestGetPerfMetrics(t *testing.T) {
 					},
 				}, nil)
 			},
-			assertResults: func(t2 *testing.T, metricMap map[string]interface{}, err error) {
+			assertResults: func(t2 *testing.T, metricMap map[string]any, err error) {
 				require.NoError(t, err)
-				assert.InDeltaMapValues(t, map[string]interface{}{
+				assert.InDeltaMapValues(t, map[string]any{
 					"metric1": 53.2,
 				}, metricMap, 0)
 			},
@@ -143,9 +143,9 @@ func TestGetPerfMetrics(t *testing.T) {
 					},
 				}, nil)
 			},
-			assertResults: func(t2 *testing.T, metricMap map[string]interface{}, err error) {
+			assertResults: func(t2 *testing.T, metricMap map[string]any, err error) {
 				require.NoError(t, err)
-				assert.InDeltaMapValues(t, map[string]interface{}{
+				assert.InDeltaMapValues(t, map[string]any{
 					"metric1": 1024,
 				}, metricMap, 0)
 			},
@@ -163,9 +163,9 @@ func TestGetPerfMetrics(t *testing.T) {
 					},
 				}).Return(nil, nil)
 			},
-			assertResults: func(t2 *testing.T, metricMap map[string]interface{}, err error) {
+			assertResults: func(t2 *testing.T, metricMap map[string]any, err error) {
 				require.NoError(t, err)
-				assert.InDeltaMapValues(t, map[string]interface{}{}, metricMap, 0)
+				assert.InDeltaMapValues(t, map[string]any{}, metricMap, 0)
 			},
 		},
 		{
@@ -191,7 +191,7 @@ func TestGetPerfMetrics(t *testing.T) {
 					},
 				}).Return(nil, errors.New("query error"))
 			},
-			assertResults: func(t *testing.T, metricMap map[string]interface{}, err error) {
+			assertResults: func(t *testing.T, metricMap map[string]any, err error) {
 				assert.Error(t, err, "query error")
 			},
 		},
@@ -219,7 +219,7 @@ func TestGetPerfMetrics(t *testing.T) {
 				}).Return(mSamples, nil)
 				manager.EXPECT().ToMetricSeries(gomock.Any(), mSamples).Return(nil, errors.New("ToMetricSeries error"))
 			},
-			assertResults: func(t2 *testing.T, metricMap map[string]interface{}, err error) {
+			assertResults: func(t2 *testing.T, metricMap map[string]any, err error) {
 				assert.Error(t, err, "ToMetricSeries error")
 			},
 		},

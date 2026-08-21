@@ -5,44 +5,45 @@
 package azureblobstorage
 
 import (
-	"fmt"
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var configTests = []struct {
 	name    string
-	config  map[string]interface{}
+	config  map[string]any
 	wantErr error
 }{
 	{
 		name: "invalid_oauth2_config",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"account_name": "beatsblobnew",
-			"auth.oauth2": map[string]interface{}{
+			"auth.oauth2": map[string]any{
 				"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
 				"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
 			},
 			"max_workers":   2,
 			"poll":          true,
 			"poll_interval": "10s",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{
 					"name": beatsContainer,
 				},
 			},
 		},
-		wantErr: fmt.Errorf("client_id, client_secret and tenant_id are required for OAuth2 auth accessing config"),
+		wantErr: errors.New("client_id, client_secret and tenant_id are required for OAuth2 auth accessing config"),
 	},
 	{
 		name: "valid_oauth2_config",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"account_name": "beatsblobnew",
-			"auth.oauth2": map[string]interface{}{
+			"auth.oauth2": map[string]any{
 				"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
 				"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
 				"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
@@ -50,17 +51,150 @@ var configTests = []struct {
 			"max_workers":   2,
 			"poll":          true,
 			"poll_interval": "10s",
-			"containers": []map[string]interface{}{
+			"containers": []map[string]any{
 				{
 					"name": beatsContainer,
 				},
 			},
 		},
 	},
+	{
+		name: "valid_retry_config",
+		config: map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+			"retry": map[string]any{
+				"max_retries":         20,
+				"initial_retry_delay": "1s",
+				"max_retry_delay":     "30s",
+			},
+		},
+	},
+	{
+		name: "negative_initial_retry_delay",
+		config: map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+			"retry": map[string]any{
+				"initial_retry_delay": "-1s",
+			},
+		},
+		wantErr: errors.New("retry.initial_retry_delay must not be negative, got -1s accessing config"),
+	},
+	{
+		name: "max_retry_delay_below_initial",
+		config: map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+			"retry": map[string]any{
+				"initial_retry_delay": "30s",
+				"max_retry_delay":     "5s",
+			},
+		},
+		wantErr: errors.New("retry.max_retry_delay (5s) must not be smaller than retry.initial_retry_delay (30s) accessing config"),
+	},
+	{
+		name: "valid_managed_identity_system_assigned",
+		config: map[string]any{
+			"account_name":                  "beatsblobnew",
+			"auth.managed_identity.enabled": true,
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+	},
+	{
+		name: "valid_managed_identity_user_assigned",
+		config: map[string]any{
+			"account_name":                    "beatsblobnew",
+			"auth.managed_identity.enabled":   true,
+			"auth.managed_identity.client_id": "12345678-90ab-cdef-1234-567890abcdef",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+	},
+	{
+		name: "managed_identity_client_id_without_enabled",
+		config: map[string]any{
+			"account_name":                    "beatsblobnew",
+			"auth.managed_identity.client_id": "12345678-90ab-cdef-1234-567890abcdef",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity.enabled must be true to use auth.managed_identity.client_id accessing config"),
+	},
+	{
+		name: "managed_identity_with_shared_key",
+		config: map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.managed_identity.enabled":       true,
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity cannot be combined with another auth method accessing config"),
+	},
+	{
+		name: "managed_identity_with_connection_string",
+		config: map[string]any{
+			"account_name":                  "beatsblobnew",
+			"auth.managed_identity.enabled": true,
+			"auth.connection_string.uri":    "https://beatsblobnew.blob.core.windows.net/",
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity cannot be combined with another auth method accessing config"),
+	},
+	{
+		name: "managed_identity_with_oauth2",
+		config: map[string]any{
+			"account_name":                  "beatsblobnew",
+			"auth.managed_identity.enabled": true,
+			"auth.oauth2": map[string]any{
+				"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
+				"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
+				"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
+			},
+			"containers": []map[string]any{
+				{
+					"name": beatsContainer,
+				},
+			},
+		},
+		wantErr: errors.New("auth.managed_identity cannot be combined with another auth method accessing config"),
+	},
 }
 
 func TestConfig(t *testing.T) {
-	logp.TestingSetup()
 	for _, test := range configTests {
 		t.Run(test.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -77,4 +211,74 @@ func TestConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestRetryConfig checks that the retry block unpacks into the config and maps
+// onto the Azure SDK retry options, and that any option left unset keeps the
+// SDK-matching default seeded by defaultConfig (including for a partial block).
+func TestRetryConfig(t *testing.T) {
+	t.Run("explicit", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{"name": beatsContainer},
+			},
+			"retry": map[string]any{
+				"max_retries":         20,
+				"initial_retry_delay": "1s",
+				"max_retry_delay":     "30s",
+			},
+		})
+		c := defaultConfig()
+		require.NoError(t, cfg.Unpack(&c), "unpacking a valid retry config should succeed")
+
+		assert.Equal(t, int32(20), c.Retry.MaxRetries, "max_retries should unpack")
+		assert.Equal(t, time.Second, c.Retry.InitialRetryDelay, "initial_retry_delay should unpack")
+		assert.Equal(t, 30*time.Second, c.Retry.MaxRetryDelay, "max_retry_delay should unpack")
+
+		got := azureRetryOptions(c.Retry)
+		assert.Equal(t, int32(20), got.MaxRetries, "MaxRetries should map through")
+		assert.Equal(t, time.Second, got.RetryDelay, "RetryDelay should map through")
+		assert.Equal(t, 30*time.Second, got.MaxRetryDelay, "MaxRetryDelay should map through")
+	})
+
+	t.Run("defaults", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{"name": beatsContainer},
+			},
+		})
+		c := defaultConfig()
+		require.NoError(t, cfg.Unpack(&c), "unpacking a config without a retry block should succeed")
+
+		// Omitting the retry block keeps the seeded SDK-matching defaults, so
+		// behaviour is identical to not configuring retries at all.
+		assert.Equal(t, int32(defaultMaxRetries), c.Retry.MaxRetries, "an unset max_retries must keep the default")
+		assert.Equal(t, defaultInitialRetryDelay, c.Retry.InitialRetryDelay, "an unset initial_retry_delay must keep the default")
+		assert.Equal(t, defaultMaxRetryDelay, c.Retry.MaxRetryDelay, "an unset max_retry_delay must keep the default")
+	})
+
+	t.Run("partial", func(t *testing.T) {
+		// A partial retry block overrides only the provided field and keeps the
+		// seeded defaults for the rest.
+		cfg := conf.MustNewConfigFrom(map[string]any{
+			"account_name":                        "beatsblobnew",
+			"auth.shared_credentials.account_key": "someKey",
+			"containers": []map[string]any{
+				{"name": beatsContainer},
+			},
+			"retry": map[string]any{
+				"max_retries": 7,
+			},
+		})
+		c := defaultConfig()
+		require.NoError(t, cfg.Unpack(&c), "unpacking a partial retry config should succeed")
+
+		assert.Equal(t, int32(7), c.Retry.MaxRetries, "an explicit max_retries must be preserved")
+		assert.Equal(t, defaultInitialRetryDelay, c.Retry.InitialRetryDelay, "an omitted initial_retry_delay must keep the default")
+		assert.Equal(t, defaultMaxRetryDelay, c.Retry.MaxRetryDelay, "an omitted max_retry_delay must keep the default")
+	})
 }

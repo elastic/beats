@@ -483,7 +483,38 @@ This configures what types of TLS renegotiation are supported. The valid options
 
 
 
+### `certificate_reload.enabled` [certificate_reload_enabled]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+If set to `true`, Metricbeat will automatically reload TLS certificates, keys, and CA certificates from disk whenever they change, without requiring a restart. The default value is:
+
+* {applies_to}`stack: ga 9.3-9.4` `false`
+* {applies_to}`stack: ga 9.5+` `true`
+
+Certificate reload is checked on each TLS handshake. The files are re-read at most once per `certificate_reload.reload_interval`.
+
+
+### `certificate_reload.reload_interval` [certificate_reload_reload_interval]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+How often Metricbeat checks whether the certificate, key, or CA files have changed on disk. The default value is `5s`.
+
+
 ### `restart_on_cert_change.enabled` [exit_on_cert_change_enabled]
+
+```{applies_to}
+stack: deprecated 9.5+
+```
+
+:::{note}
+This setting is deprecated in 9.5.0. Use [`certificate_reload.enabled`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
+:::
 
 If set to `true` Metricbeat will restart if any file listed by `key`, `certificate`, or `certificate_authorities` is modified.
 
@@ -493,12 +524,20 @@ This feature is NOT supported on Windows. The default value is `false`.
 
 
 ::::{note}
-This feature requres the `execve` system call to be enabled. If you have a custom seccomp policy in place, make sure to allow for `execve`.
+This feature requires the `execve` system call to be enabled. If you have a custom seccomp policy in place, make sure to allow for `execve`.
 ::::
 
 
 
 ### `restart_on_cert_change.period` [restart_on_cert_change_period]
+
+```{applies_to}
+stack: deprecated 9.5+
+```
+
+:::{note} 
+This setting is deprecated in 9.5.0. Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) instead.
+:::
 
 Specifies how often the files are checked for changes. Do not set the period to less than 1s because the modification time of files is often stored in seconds. Setting the period to less than 1s will result in validation error and Metricbeat will not start. The default value is 1m.
 

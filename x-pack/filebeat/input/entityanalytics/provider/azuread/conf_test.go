@@ -51,6 +51,14 @@ func TestConf_Validate(t *testing.T) {
 			},
 			WantErr: "",
 		},
+		"valid-enrich-sign-in-activity": {
+			In: conf{
+				SyncInterval:   defaultSyncInterval,
+				UpdateInterval: defaultUpdateInterval,
+				EnrichWith:     []string{"sign_in_activity"},
+			},
+			WantErr: "",
+		},
 		"err-invalid-enrich": {
 			In: conf{
 				SyncInterval:   defaultSyncInterval,
@@ -62,7 +70,6 @@ func TestConf_Validate(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

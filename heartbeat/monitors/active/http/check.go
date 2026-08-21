@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const cfgPositive = "positive"
@@ -73,7 +74,7 @@ var (
 	errBodyIllegalBody       = errors.New("unsupported content under check.body")
 )
 
-func makeValidateResponse(config *responseParameters) (multiValidator, error) {
+func makeValidateResponse(config *responseParameters, logger *logp.Logger) (multiValidator, error) {
 	var respValidators []respValidator
 	var bodyValidators []bodyValidator
 
@@ -98,7 +99,7 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	}
 
 	if len(config.RecvJSON) > 0 {
-		jsonChecks, err := checkJson(config.RecvJSON)
+		jsonChecks, err := checkJson(config.RecvJSON, logger)
 		if err != nil {
 			return multiValidator{}, fmt.Errorf("could not load JSON check: %w", err)
 		}
@@ -138,7 +139,7 @@ func checkHeaders(headers map[string]string) respValidator {
 	}
 }
 
-func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err error) {
+func parseBody(b any) (positiveMatch, negativeMatch []match.Matcher, err error) {
 	// run through this code block if there is only string
 	if pat, ok := b.(string); ok {
 		return append(positiveMatch, match.MustCompile(pat)), negativeMatch, nil
@@ -146,7 +147,7 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err
 
 	// run through this code block if there is no positive or negative keyword in response body
 	// in this case, there's only plain body
-	if p, ok := b.([]interface{}); ok {
+	if p, ok := b.([]any); ok {
 		for _, pp := range p {
 			if pat, ok := pp.(string); ok {
 				positiveMatch = append(positiveMatch, match.MustCompile(pat))
@@ -157,12 +158,12 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err
 
 	// run through this part if there exists positive/negative keyword in response body
 	// in this case, there will be 3 possibilities: positive + negative / positive / negative
-	if m, ok := b.(map[string]interface{}); ok {
+	if m, ok := b.(map[string]any); ok {
 		for checkType, v := range m {
 			if checkType != cfgPositive && checkType != cfgNegative {
 				return positiveMatch, negativeMatch, errBodyNoValidCheckType
 			}
-			if params, ok := v.([]interface{}); ok {
+			if params, ok := v.([]any); ok {
 				for _, param := range params {
 					if pat, ok := param.(string); ok {
 						if checkType == cfgPositive {

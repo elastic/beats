@@ -342,7 +342,7 @@ func newTestStore(t *testing.T, beatPaths *paths.Path, logger *logp.Logger) (*St
 	t.Helper()
 
 	if beatPaths == nil {
-		beatPaths = paths.Paths
+		beatPaths = paths.New()
 	}
 
 	dataPath := beatPaths.Resolve(paths.Data, "sql-cursor")

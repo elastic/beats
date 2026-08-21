@@ -18,7 +18,6 @@
 package input_logfile
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -33,6 +32,10 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// DefaultStateCheckInterval is the default for close.on_state_change.check_interval,
+// matching defaultCloserConfig in the filestream package.
+const DefaultStateCheckInterval = 5 * time.Second
 
 // InputManager is used to create, manage, and coordinate stateful inputs and
 // their persistent state.
@@ -65,13 +68,13 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
-	initOnce   sync.Once
-	initErr    error
-	store      *store
-	ackUpdater *updateWriter
-	ackCH      *updateChan
-	idsMux     sync.Mutex
-	ids        map[string]struct{}
+	initOnce  sync.Once
+	closeOnce sync.Once
+	initErr   error
+	store     *store
+	ackCH     *updateChan
+	idsMux    sync.Mutex
+	ids       map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -79,6 +82,8 @@ type InputManager struct {
 // the source in the persistent state store.
 type Source interface {
 	Name() string
+	// LogPath returns the path used in logs.
+	LogPath() string
 }
 
 var errNoInputRunner = errors.New("no input runner available")
@@ -87,87 +92,67 @@ var errNoInputRunner = errors.New("no input runner available")
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
-func (cim *InputManager) init() error {
+func (cim *InputManager) Init(group unison.Group) error {
 	cim.initOnce.Do(func() {
+		if group == nil {
+			cim.initErr = errors.New("input manager Init must be called before Create")
+			return
+		}
 
 		log := cim.Logger.With("input_type", cim.Type)
 
 		var store *store
-		store, cim.initErr = openStore(log, cim.StateStore, cim.Type)
+		store, cim.initErr = acquireStore(log, cim.StateStore, cim.Type)
 		if cim.initErr != nil {
 			return
 		}
 
 		cim.store = store
-		cim.ackCH = newUpdateChan()
-		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
+		cim.ackCH = store.cacheEntry.ackCH
 		cim.ids = map[string]struct{}{}
 	})
 
 	return cim.initErr
 }
 
-// Init starts background processes for deleting old entries from the
-// persistent store if mode is ModeRun.
-func (cim *InputManager) Init(group unison.Group) error {
-	if err := cim.init(); err != nil {
-		return err
-	}
-
-	log := cim.Logger.With("input_type", cim.Type)
-
-	store := cim.getRetainedStore()
-	cleaner := &cleaner{log: log}
-	// TL;DR: If Filebeat shuts down too quickly, the function passed to
-	// `group.Go` will never run, therefore this instance of store will
-	// never be released, locking Filebeat's shutdown process.
-	//
-	// To circumvent that, we wait for `group.Go` to start our function.
-	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
-	waitRunning := make(chan struct{})
-	err := group.Go(func(canceler context.Context) error {
-		waitRunning <- struct{}{}
-		defer cim.shutdown()
-		defer store.Release()
-		interval := cim.StateStore.CleanupInterval()
-		if interval <= 0 {
-			interval = 5 * time.Minute
+// Close releases the store acquired by Init. It must be called after all inputs
+// managed by cim have stopped.
+func (cim *InputManager) Close() {
+	cim.closeOnce.Do(func() {
+		if cim.store != nil {
+			releaseAcquiredStore(cim.Logger, cim.store)
 		}
-		cleaner.run(canceler, store, interval)
-		return nil
 	})
-	if err != nil {
-		store.Release()
-		cim.shutdown()
-		return fmt.Errorf("can not start registry cleanup process: %w", err)
-	}
-	<-waitRunning
-	return nil
-}
-
-func (cim *InputManager) shutdown() {
-	cim.ackUpdater.Close()
-	cim.store.Release()
 }
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
-	if err := cim.init(); err != nil {
+	if err := cim.Init(nil); err != nil {
 		return nil, err
 	}
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                  string         `config:"id"`
-		CleanInactive       time.Duration  `config:"clean_inactive" validate:"min=-1"`
-		HarvesterLimit      uint64         `config:"harvester_limit"`
-		AllowIDDuplication  bool           `config:"allow_deprecated_id_duplication"`
-		TakeOver            TakeOverConfig `config:"take_over"`
-		LegacyCleanInactive bool           `config:"legacy_clean_inactive"`
+		ID                  string             `config:"id"`
+		CleanInactive       time.Duration      `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit      uint64             `config:"harvester_limit"`
+		AllowIDDuplication  bool               `config:"allow_deprecated_id_duplication"`
+		TakeOver            TakeOverConfig     `config:"take_over"`
+		LegacyCleanInactive bool               `config:"legacy_clean_inactive"`
+		ReadUntilEOF        ReadUntilEOFConfig `config:"read_until_eof"`
+		Backoff             BackoffConfig      `config:"backoff"`
+		Close               struct {
+			OnStateChange struct {
+				CheckInterval time.Duration `config:"check_interval" validate:"nonzero"`
+			} `config:"on_state_change"`
+		} `config:"close"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
+		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
+		Backoff:       DefaultBackoffConfig(),
 	}
+	settings.Close.OnStateChange.CheckInterval = DefaultStateCheckInterval
 
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
@@ -282,11 +267,21 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		id:                     settings.ID,
 		prospector:             prospector,
 		harvester:              harvester,
+		readUntilEOF:           settings.ReadUntilEOF,
+		backoff:                settings.Backoff,
+		stateCheckInterval:     settings.Close.OnStateChange.CheckInterval,
 		sourceIdentifier:       srcIdentifier,
 		previousSrcIdentifiers: previousSrcIdentifiers,
 		cleanTimeout:           settings.CleanInactive,
 		harvesterLimit:         settings.HarvesterLimit,
 	}, nil
+}
+
+func DefaultReadUntilEOFConfig() ReadUntilEOFConfig {
+	return ReadUntilEOFConfig{
+		Enabled: true,
+		Timeout: time.Minute,
+	}
 }
 
 func (cim *InputManager) Delete(cfg *conf.C) error {
@@ -407,4 +402,29 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 
 func (t *TakeOverConfig) FromFilestream() bool {
 	return len(t.FromIDs) != 0
+}
+
+// ReadUntilEOFConfig configures the behaviour to keep reading the current
+// file until EOF before the input shuts down. If Timeout elapses before EOF
+// is reached, the input shuts down anyway.
+type ReadUntilEOFConfig struct {
+	Enabled bool `config:"enabled"`
+	// Timeout is the maximum time to wait for EOF to be reached.
+	Timeout time.Duration `config:"timeout" validate:"min=1"`
+}
+
+// BackoffConfig configures how aggressively the waker polls a parked (idle,
+// caught up to EOF) source for new data: Init is the first wait, doubling on
+// every still-idle poll up to Max, and resetting to Init as soon as a read
+// makes progress. See harvesterRunner.growBackoff.
+type BackoffConfig struct {
+	Init time.Duration `config:"init" validate:"nonzero"`
+	Max  time.Duration `config:"max" validate:"nonzero"`
+}
+
+func DefaultBackoffConfig() BackoffConfig {
+	return BackoffConfig{
+		Init: 2 * time.Second,
+		Max:  10 * time.Second,
+	}
 }

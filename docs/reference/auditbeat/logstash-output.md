@@ -132,9 +132,12 @@ The default value is `1`.
 ### `loadbalance` [loadbalance]
 
 When `loadbalance: true` is set, Auditbeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Auditbeat can connect to at least one of its configured hosts.
-Use the `worker` or `workers` setting to specify the number of connections per host.
 
-When `loadbalance: false` is set, Auditbeat sends data to a single host at a time. The target host is chosen at random from the list of configured hosts, and all data is sent to that target until the connection fails, when a new target is selected. Data will still be sent as long as Auditbeat can connect to at least one of its configured hosts. To rotate through the list of configured hosts over time, use this option in conjunction with the `ttl` setting to close the connection at the configured interval and choose a new target host.
+Set `loadbalance: false` to send data to one host at a time. Auditbeat connects to the first configured host and sends all data to that host. If the connection fails, Auditbeat fails over to the next configured host. As long as Auditbeat can connect to at least one configured host, it continues to send data.
+
+To rotate through the list of configured hosts over time, use this option in conjunction with the `ttl` setting to close the connection at the configured interval and reconnect to the next host in the list.
+
+Use the `worker` or `workers` setting to specify the number of concurrent connections per active host.
 
 The default value is `false`.
 
@@ -148,7 +151,7 @@ output.logstash:
 
 ### `ttl` [_ttl]
 
-Time to live for a connection to {{ls}} after which the connection will be re-established. Useful when {{ls}} hosts represent load balancers. Since the connections to {{ls}} hosts are sticky, operating behind load balancers can lead to uneven load distribution between the instances. Specifying a TTL on the connection allows to achieve equal connection distribution between the instances.  Specifying a TTL of 0 will disable this feature.
+Time to live for a connection to {{ls}} after which the connection will be re-established. Useful when {{ls}} hosts represent load balancers. Since the connections to {{ls}} hosts are sticky, operating behind load balancers can lead to uneven load distribution between the instances. Specifying a TTL on the connection allows you to achieve equal connection distribution between the instances.  Specifying a TTL of 0 will disable this feature.
 
 The default value is 0. This setting accepts [duration](/reference/libbeat/config-file-format-type.md#_duration) data type values.
 

@@ -20,7 +20,6 @@
 package file
 
 import (
-	"io/ioutil"
 	"math"
 	"os"
 	"runtime"
@@ -30,7 +29,7 @@ import (
 )
 
 func TestGetOSFileState(t *testing.T) {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp("", "")
 	assert.NoError(t, err)
 
 	fileinfo, err := file.Stat()
@@ -49,7 +48,7 @@ func TestGetOSFileState(t *testing.T) {
 }
 
 func TestGetOSFileStateStat(t *testing.T) {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp("", "")
 	assert.NoError(t, err)
 
 	fileinfo, err := os.Stat(file.Name())
@@ -68,7 +67,7 @@ func TestGetOSFileStateStat(t *testing.T) {
 }
 
 func TestRemoved(t *testing.T) {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp("", "")
 	assert.NoError(t, err)
 
 	assert.NoError(t, os.Remove(file.Name()))

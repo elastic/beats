@@ -39,13 +39,17 @@ type EventConverter interface {
 type GenericEventConverter struct {
 	log      *logp.Logger
 	keepNull bool
+	inPlace  bool
 }
 
-// NewGenericEventConverter creates an EventConverter with the given configuration options
-func NewGenericEventConverter(keepNull bool, logger *logp.Logger) *GenericEventConverter {
+// NewGenericEventConverter creates an EventConverter with the given configuration
+// options. With inPlace it reuses the maps of the event that it converts instead
+// of copying them, so the caller must exclusively own every reachable map.
+func NewGenericEventConverter(keepNull, inPlace bool, logger *logp.Logger) *GenericEventConverter {
 	return &GenericEventConverter{
 		log:      logger.Named("event"),
 		keepNull: keepNull,
+		inPlace:  inPlace,
 	}
 }
 
@@ -69,7 +73,12 @@ func (e *GenericEventConverter) Convert(m mapstr.M) mapstr.M {
 func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr.M, []error) {
 	var errs []error
 
-	out := make(mapstr.M, len(m))
+	reuse := e.inPlace && m != nil
+	out := m
+	if !reuse {
+		out = make(mapstr.M, len(m))
+	}
+
 	for key, value := range m {
 		v, err := e.normalizeValue(value, append(keys, key)...)
 		if len(err) > 0 {
@@ -80,6 +89,9 @@ func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr
 		if !e.keepNull && v == nil {
 			if e.log.IsDebug() {
 				e.log.Debugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
+			}
+			if reuse {
+				delete(out, key)
 			}
 			continue
 		}
@@ -108,7 +120,7 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 
 // normalizemMapStringSlice normalizes each individual map[string]interface{} and
 // returns a []mapstr.M.
-func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interface{}, keys ...string) ([]mapstr.M, []error) {
+func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]any, keys ...string) ([]mapstr.M, []error) {
 	var errs []error
 
 	out := make([]mapstr.M, 0, len(maps))
@@ -124,12 +136,12 @@ func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interf
 }
 
 // normalizeSlice normalizes each element of the slice and returns a []interface{}.
-func (e *GenericEventConverter) normalizeSlice(v reflect.Value, keys ...string) (interface{}, []error) {
+func (e *GenericEventConverter) normalizeSlice(v reflect.Value, keys ...string) (any, []error) {
 	var errs []error
-	var sliceValues []interface{}
+	var sliceValues []any
 
 	n := v.Len()
-	for i := 0; i < n; i++ {
+	for i := range n {
 		sliceValue, err := e.normalizeValue(v.Index(i).Interface(), append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
@@ -141,7 +153,7 @@ func (e *GenericEventConverter) normalizeSlice(v reflect.Value, keys ...string) 
 	return sliceValues, errs
 }
 
-func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
+func (e *GenericEventConverter) normalizeValue(value any, keys ...string) (any, []error) {
 	if value == nil {
 		return nil, nil
 	}
@@ -166,14 +178,14 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		value = times
 	}
 
-	switch value.(type) {
+	switch v := value.(type) {
 	case encoding.TextMarshaler:
-		if reflect.ValueOf(value).Kind() == reflect.Ptr && reflect.ValueOf(value).IsNil() {
+		if reflect.ValueOf(v).Kind() == reflect.Pointer && reflect.ValueOf(v).IsNil() {
 			return nil, nil
 		}
-		text, err := value.(encoding.TextMarshaler).MarshalText()
+		text, err := v.MarshalText()
 		if err != nil {
-			return nil, []error{fmt.Errorf("key=%v: error converting %T to string: %w", joinKeys(keys...), value, err)}
+			return nil, []error{fmt.Errorf("key=%v: error converting %T to string: %w", joinKeys(keys...), v, err)}
 		}
 		return string(text), nil
 	case string, []string:
@@ -182,24 +194,23 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 	case []int, []int8, []int16, []int32, []int64:
 	case uint, uint8, uint16, uint32:
 	case uint64:
-		return value.(uint64) &^ (1 << 63), nil
+		return v &^ (1 << 63), nil
 	case []uint, []uint8, []uint16, []uint32:
 	case []uint64:
-		arr := value.([]uint64)
 		mask := false
-		for _, v := range arr {
-			if v >= (1 << 63) {
+		for _, u := range v {
+			if u >= (1 << 63) {
 				mask = true
 				break
 			}
 		}
 		if !mask {
-			return value, nil
+			return v, nil
 		}
 
-		tmp := make([]uint64, len(arr))
-		for i, v := range arr {
-			tmp[i] = v &^ (1 << 63)
+		tmp := make([]uint64, len(v))
+		for i, u := range v {
+			tmp[i] = u &^ (1 << 63)
 		}
 		return tmp, nil
 
@@ -209,45 +220,51 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 	case []complex64, []complex128:
 	case Time, []Time:
 	case mapstr.M:
-		return e.normalizeMap(value.(mapstr.M), keys...)
+		return e.normalizeMap(v, keys...)
 	case []mapstr.M:
-		return e.normalizeMapStrSlice(value.([]mapstr.M), keys...)
-	case map[string]interface{}:
-		return e.normalizeMap(value.(map[string]interface{}), keys...)
-	case []map[string]interface{}:
-		return e.normalizeMapStringSlice(value.([]map[string]interface{}), keys...)
+		return e.normalizeMapStrSlice(v, keys...)
+	case map[string]any:
+		return e.normalizeMap(v, keys...)
+	case []map[string]any:
+		return e.normalizeMapStringSlice(v, keys...)
+	case map[string]string:
+		out := make(mapstr.M, len(v))
+		for key, s := range v {
+			out[key] = s
+		}
+		return out, nil
 	default:
-		v := reflect.ValueOf(value)
+		rv := reflect.ValueOf(v)
 
-		switch v.Type().Kind() {
-		case reflect.Ptr:
+		switch rv.Type().Kind() {
+		case reflect.Pointer:
 			// Dereference pointers.
-			return e.normalizeValue(followPointer(value), keys...)
+			return e.normalizeValue(followPointer(v), keys...)
 		case reflect.Bool:
-			return v.Bool(), nil
+			return rv.Bool(), nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			return v.Int(), nil
+			return rv.Int(), nil
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			return v.Uint() &^ (1 << 63), nil
+			return rv.Uint() &^ (1 << 63), nil
 		case reflect.Float32, reflect.Float64:
-			return v.Float(), nil
+			return rv.Float(), nil
 		case reflect.Complex64, reflect.Complex128:
-			return v.Complex(), nil
+			return rv.Complex(), nil
 		case reflect.String:
-			return v.String(), nil
+			return rv.String(), nil
 		case reflect.Array, reflect.Slice:
-			return e.normalizeSlice(v, keys...)
+			return e.normalizeSlice(rv, keys...)
 		case reflect.Map, reflect.Struct:
 			var m mapstr.M
-			err := marshalUnmarshal(value, &m)
+			err := marshalUnmarshal(v, &m)
 			if err != nil {
-				return m, []error{fmt.Errorf("key=%v: error converting %T to mapstr.M: %w", joinKeys(keys...), value, err)}
+				return m, []error{fmt.Errorf("key=%v: error converting %T to mapstr.M: %w", joinKeys(keys...), v, err)}
 			}
 			return m, nil
 		default:
 			// Drop Uintptr, UnsafePointer, Chan, Func, Interface, and any other
 			// types not specifically handled above.
-			return nil, []error{fmt.Errorf("key=%v: error unsupported type=%T value=%#v", joinKeys(keys...), value, value)}
+			return nil, []error{fmt.Errorf("key=%v: error unsupported type=%T value=%#v", joinKeys(keys...), v, v)}
 		}
 	}
 
@@ -256,7 +273,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 
 // marshalUnmarshal converts an interface to a mapstr.M by marshalling to JSON
 // then unmarshalling the JSON object into a mapstr.M.
-func marshalUnmarshal(in interface{}, out interface{}) error {
+func marshalUnmarshal(in any, out any) error {
 	// Decode and encode as JSON to normalized the types.
 	marshaled, err := json.Marshal(in)
 	if err != nil {
@@ -273,8 +290,8 @@ func marshalUnmarshal(in interface{}, out interface{}) error {
 // followPointer accepts an interface{} and if the interface is a pointer then
 // the value that v points to is returned. If v is not a pointer then v is
 // returned.
-func followPointer(v interface{}) interface{} {
-	if v == nil || reflect.TypeOf(v).Kind() != reflect.Ptr {
+func followPointer(v any) any {
+	if v == nil || reflect.TypeOf(v).Kind() != reflect.Pointer {
 		return v
 	}
 
@@ -304,10 +321,10 @@ func DeDot(s string) string {
 
 // DeDotJSON replaces in keys all . with _
 // This helps when sending data to Elasticsearch to prevent object and key collisions.
-func DeDotJSON(json interface{}) interface{} {
+func DeDotJSON(json any) any {
 	switch json := json.(type) {
-	case map[string]interface{}:
-		result := map[string]interface{}{}
+	case map[string]any:
+		result := map[string]any{}
 		for key, value := range json {
 			result[DeDot(key)] = DeDotJSON(value)
 		}
@@ -318,8 +335,8 @@ func DeDotJSON(json interface{}) interface{} {
 			result[DeDot(key)] = DeDotJSON(value)
 		}
 		return result
-	case []interface{}:
-		result := make([]interface{}, len(json))
+	case []any:
+		result := make([]any, len(json))
 		for i, value := range json {
 			result[i] = DeDotJSON(value)
 		}

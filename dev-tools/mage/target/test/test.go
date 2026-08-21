@@ -20,12 +20,12 @@ package test
 import "github.com/magefile/mage/mg"
 
 var (
-	testDeps []interface{}
+	testDeps []any
 )
 
 // RegisterDeps registers dependencies of the Test target (register your targets
 // that execute tests).
-func RegisterDeps(deps ...interface{}) {
+func RegisterDeps(deps ...any) {
 	testDeps = append(testDeps, deps...)
 }
 

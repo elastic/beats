@@ -62,7 +62,7 @@ func NewFileClientHandler(c FileClient, info beat.Info, cfg RawConfig) (*FileCli
 		lifecycleCfg = DefaultILMConfig(info).ILM
 		err = cfg.ILM.Unpack(&lifecycleCfg)
 	} else {
-		info.Logger.Infof("No lifecycle config has been explicitly enabled, defauling to ILM")
+		info.Logger.Infof("No lifecycle config has been explicitly enabled, defaulting to ILM")
 	}
 
 	if err != nil {

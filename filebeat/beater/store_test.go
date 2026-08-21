@@ -52,6 +52,7 @@ func TestOpenStateStore_SamePathSharesRegistry(t *testing.T) {
 	s2 := testOpenStore(t, dir)
 
 	assert.Same(t, s1.shared, s2.shared, "stores with the same path should share the same sharedRegistries")
+	assert.Equal(t, s1.StoreKey(), s2.StoreKey(), "stores with the same backend should have the same key")
 
 	globalMu.Lock()
 	assert.Equal(t, 2, s1.shared.refCount)
@@ -59,6 +60,37 @@ func TestOpenStateStore_SamePathSharesRegistry(t *testing.T) {
 
 	s1.Close()
 	s2.Close()
+}
+
+func TestFilebeatStore_StoreKeyMatchesBackendAndPath(t *testing.T) {
+	beatPaths := paths.New()
+	beatPaths.Data = t.TempDir()
+	cfg := config.Registry{
+		Path:        "registry",
+		Permissions: 0o600,
+		Backend:     "memlog",
+	}
+	expected := storeKey(beatPaths.Resolve(paths.Data, cfg.Path), cfg.Backend)
+
+	first, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "first", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer first.Close()
+	second, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "second", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer second.Close()
+
+	assert.Equal(t, expected, first.StoreKey())
+	assert.Equal(t, expected, second.StoreKey())
 }
 
 func TestOpenStateStore_DifferentPathsGetDifferentRegistries(t *testing.T) {
@@ -69,6 +101,7 @@ func TestOpenStateStore_DifferentPathsGetDifferentRegistries(t *testing.T) {
 	s2 := testOpenStore(t, dir2)
 
 	assert.NotSame(t, s1.shared, s2.shared, "stores with different paths should not share registries")
+	assert.NotEqual(t, s1.StoreKey(), s2.StoreKey(), "stores with different backends should have different keys")
 
 	s1.Close()
 	s2.Close()
@@ -121,7 +154,7 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 
 	// Open stores concurrently
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go func(i int) {
 			defer wg.Done()
 			stores[i] = testOpenStore(t, dir)
@@ -140,7 +173,7 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 
 	// Close all concurrently
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go func(i int) {
 			defer wg.Done()
 			stores[i].Close()

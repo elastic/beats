@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -47,6 +48,10 @@ type testParser struct {
 }
 
 var testParserConfig = parserConfig{}
+
+func newParserForTest(config *parserConfig, logger *logp.Logger) *parser {
+	return newParser(config, logger.Named("http"), logger.Named("httpdetailed"))
+}
 
 type eventStore struct {
 	events []beat.Event
@@ -76,7 +81,7 @@ func (tp *testParser) parse() (*message, bool, bool) {
 		tp.payloads = tp.payloads[1:]
 	}
 
-	parser := newParser(&tp.http.parserConfig)
+	parser := newParserForTest(&tp.http.parserConfig, logp.NewNopLogger())
 	ok, complete := parser.parse(st, 0)
 	return st.message, ok, complete
 }
@@ -87,7 +92,7 @@ func httpModForTests(store *eventStore) *httpPlugin {
 		callback = store.publish
 	}
 
-	http, err := New(false, callback, &procs.ProcessesWatcher{}, conf.NewConfig())
+	http, err := New(false, callback, &procs.ProcessesWatcher{}, conf.NewConfig(), logp.NewNopLogger())
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +105,7 @@ func testParse(http *httpPlugin, data string) (*message, bool, bool) {
 }
 
 func testParseStream(http *httpPlugin, st *stream, extraLen int) (bool, bool) {
-	parser := newParser(&http.parserConfig)
+	parser := newParserForTest(&http.parserConfig, logp.NewNopLogger())
 	return parser.parse(st, extraLen)
 }
 
@@ -615,7 +620,6 @@ func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
 }
 
 func TestEatBodyChunked(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
 
 	msgs := [][]byte{
 		[]byte("03\r"),
@@ -632,7 +636,7 @@ func TestEatBodyChunked(t *testing.T) {
 		chunkedLength: 5,
 		contentLength: 0,
 	}
-	parser := newParser(&testParserConfig)
+	parser := newParserForTest(&testParserConfig, logptest.NewTestingLogger(t, ""))
 
 	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != false || ok != true || complete != false {
@@ -703,7 +707,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		chunkedLength: 5,
 		contentLength: 0,
 	}
-	parser := newParser(&testParserConfig)
+	parser := newParserForTest(&testParserConfig, logptest.NewTestingLogger(t, ""))
 
 	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != true || ok != true || complete != false {
@@ -740,6 +744,17 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != true {
 		t.Error("Wrong return values", ok, complete)
+	}
+}
+
+func TestParseBodyChunkedStartNegativeLength(t *testing.T) {
+	st := &stream{data: []byte("-1\r\n")}
+	msg := &message{}
+	parser := newParserForTest(&testParserConfig, logptest.NewTestingLogger(t, ""))
+
+	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
+	if cont != false || ok != false || complete != false {
+		t.Errorf("parseBodyChunkedStart(negative chunk) = (%v, %v, %v); want (false, false, false)", cont, ok, complete)
 	}
 }
 
@@ -984,8 +999,8 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
-	if rawMessageObscured < 0 {
+	found := bytes.Contains(msg, []byte("uthorization:*"))
+	if !found {
 		t.Error("Obscured authorization string not found: " + string(msg[:]))
 	}
 }
@@ -1019,8 +1034,8 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
-	if rawMessageObscured < 0 {
+	found := bytes.Contains(msg, []byte("uthorization:*"))
+	if !found {
 		t.Error("Failed to redact proxy-authorization header: " + string(msg[:]))
 	}
 }
@@ -1933,7 +1948,7 @@ func TestExtractHostHeader(t *testing.T) {
 
 func benchmarkHTTPMessage(b *testing.B, data []byte) {
 	http := httpModForTests(nil)
-	parser := newParser(&http.parserConfig)
+	parser := newParserForTest(&http.parserConfig, logp.NewNopLogger())
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data, message: new(message)}
@@ -1992,7 +2007,7 @@ func BenchmarkHTTPSplitResponse(b *testing.B) {
 		"\r\n")
 
 	http := httpModForTests(nil)
-	parser := newParser(&http.parserConfig)
+	parser := newParserForTest(&http.parserConfig, logp.NewNopLogger())
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data1, message: new(message)}
@@ -2056,7 +2071,7 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 	const BodySize = 10 * 1024 * PacketSize
 	const numPackets = BodySize / PacketSize
 	bodyPayload := &protos.Packet{Payload: make([]byte, PacketSize)}
-	for i := 0; i < PacketSize; i++ {
+	for i := range PacketSize {
 		bodyPayload.Payload[i] = byte(0x30 + (i % 10))
 	}
 
@@ -2073,7 +2088,7 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 		private := protos.ProtocolData(&httpConnectionData{})
 		private = http.Parse(&headPkt, tcptuple, 0, private)
 
-		for j := 0; j < numPackets; j++ {
+		for range numPackets {
 			private = http.Parse(bodyPayload, tcptuple, 0, private)
 		}
 		http.ReceivedFin(tcptuple, 1, private)

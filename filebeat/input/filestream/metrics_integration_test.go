@@ -35,7 +35,7 @@ func TestFilestreamMetrics(t *testing.T) {
 
 	testlogName := "test.log"
 	id := uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -44,9 +44,9 @@ func TestFilestreamMetrics(t *testing.T) {
 		"prospector.scanner.fingerprint.enabled": false,
 		"file_identity.native":                   map[string]any{},
 		"message_max_bytes":                      20,
-		"parsers": []map[string]interface{}{
+		"parsers": []map[string]any{
 			{
-				"multiline": map[string]interface{}{
+				"multiline": map[string]any{
 					"type":      "pattern",
 					"pattern":   "^multiline",
 					"negate":    true,
@@ -88,7 +88,7 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 
 	testlogName := "test.log"
 	id := uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -129,7 +129,7 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 
 	testlogName := "test.log"
 	id := uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -137,9 +137,9 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 		"close.on_state_change.inactive":         "2s",
 		"prospector.scanner.fingerprint.enabled": false,
 		"file_identity.native":                   map[string]any{},
-		"parsers": []map[string]interface{}{
+		"parsers": []map[string]any{
 			{
-				"multiline": map[string]interface{}{
+				"multiline": map[string]any{
 					"type":      "pattern",
 					"pattern":   "^multiline",
 					"negate":    true,

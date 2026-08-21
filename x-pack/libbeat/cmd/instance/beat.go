@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -73,10 +72,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// begin code similar to configure
-	if err = plugin.Initialize(); err != nil {
-		return nil, fmt.Errorf("error initializing plugins: %w", err)
-	}
-
 	b.InputQueueSize = settings.InputQueueSize
 
 	cfOpts := []ucfg.Option{
@@ -97,31 +92,37 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 	}
 
+	// Set the default shutdown timeout to 5s. The beat default is 1s, which can be too short for the otel pipeline.
+	switch beatSection := receiverConfig[b.Info.Beat].(type) {
+	case map[string]any:
+		if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
+			beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
+		}
+	case nil:
+		receiverConfig[b.Info.Beat] = map[string]any{
+			"shutdown_timeout": receiverPublisherCloseTimeout.String(),
+		}
+	}
+
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("error converting receiver config to ucfg: %w", err)
 	}
 
 	cfg := (*config.C)(tmp)
-	if settings.Name == "filebeat" {
-		partialConfig := struct {
-			Path paths.Path `config:"path"`
-		}{}
+	partialConfig := struct {
+		Path paths.Path `config:"path"`
+	}{}
 
-		if err := cfg.Unpack(&partialConfig); err != nil {
-			return nil, fmt.Errorf("error extracting default paths: %w", err)
-		}
-		p := paths.New()
-		if err := p.InitPaths(&partialConfig.Path); err != nil {
-			return nil, fmt.Errorf("error initializing default paths: %w", err)
-		}
-		b.Info.Paths = p
-	} else {
-		if err := instance.InitPaths(cfg); err != nil {
-			return nil, fmt.Errorf("error initializing paths: %w", err)
-		}
-		b.Info.Paths = paths.Paths
+	if err := cfg.Unpack(&partialConfig); err != nil {
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
+
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error initializing default paths: %w", err)
+	}
+	b.Info.Paths = p
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -156,6 +157,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	b.RawConfig = cfg
+
+	// Periodic metrics snapshots are expensive to collect and mostly
+	// redundant under a receiver, where metrics are already exported
+	// through the otel telemetry provider. Default them off.
+	b.Config.MetricLogging = config.MustNewConfigFrom(map[string]any{"period": 0})
+
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
@@ -170,6 +177,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("could not parse features: %w", err)
 	}
+
+	b.ApplyHostname(b.Config.Hostname, "config hostname field")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -193,15 +203,17 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	fqdn, err := fqdnOnce()
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+	if b.HostnameOverride() == "" {
+		// Try to get the host's FQDN and set it.
+		fqdn, err := fqdnOnce()
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// register NewOtelManager
@@ -270,22 +282,13 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
-	var intakeQueueID string
-	if queueID, ok := receiverConfig["shared_intake_queue"]; ok {
-		if queueStrID, ok := queueID.(string); ok {
-			intakeQueueID = queueStrID
-		} else {
-			return nil, fmt.Errorf("shared_intake_queue must be a string")
-		}
-	}
-
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
 	}
-	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
+	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}

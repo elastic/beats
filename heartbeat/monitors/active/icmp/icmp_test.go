@@ -25,6 +25,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
@@ -53,7 +55,7 @@ func TestICMPFields(t *testing.T) {
 			hbtest.SummaryStateChecks(1, 0),
 			hbtest.URLChecks(t, hostURL),
 			hbtest.ResolveChecks(ip),
-			lookslike.MustCompile(map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
 				"icmp.requests": 1,
 				"icmp.rtt":      look.RTT(testMockLoop.pingRtt),
 			}),
@@ -72,7 +74,7 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, nil)
+	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))
 	_, _ = wrapped[0](e)
 	return tl, e
 }

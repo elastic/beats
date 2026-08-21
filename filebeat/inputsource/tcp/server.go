@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
@@ -79,11 +80,14 @@ func (s *Server) createServer() (net.Listener, error) {
 			return nil, err
 		}
 	} else {
-		l, err = net.Listen(network, s.config.Host)
+		l, err = (&net.ListenConfig{}).Listen(context.Background(), network, s.config.Host)
 		if err != nil {
 			return nil, err
 		}
 	}
+
+	// Log the bound address so an ephemeral (host ...:0) port can be discovered.
+	s.logger.Infof("Started listening for TCP connection on: %s", l.Addr())
 
 	if s.config.MaxConnections > 0 {
 		return netutil.LimitListener(l, s.config.MaxConnections), nil

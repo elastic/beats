@@ -32,9 +32,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -56,7 +56,7 @@ type Provider struct {
 	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
 	templates     template.Mapper
-	stop          chan interface{}
+	stop          chan any
 	startListener bus.Listener
 	stopListener  bus.Listener
 	stoppers      map[string]*time.Timer
@@ -125,7 +125,7 @@ func AutodiscoverBuilder(
 		appenders:     appenders,
 		templates:     mapper,
 		watcher:       watcher,
-		stop:          make(chan interface{}),
+		stop:          make(chan any),
 		startListener: start,
 		stopListener:  stop,
 		stoppers:      make(map[string]*time.Timer),

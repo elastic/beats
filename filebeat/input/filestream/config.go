@@ -49,9 +49,11 @@ const (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID           string            `config:"id"`
-	Paths        []string          `config:"paths"`
-	Close        closerConfig      `config:"close"`
+	ID           string                    `config:"id"`
+	Paths        []string                  `config:"paths"`
+	Close        closerConfig              `config:"close"`
+	ReadUntilEOF loginp.ReadUntilEOFConfig `config:"read_until_eof"`
+
 	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
 	FileIdentity *conf.Namespace   `config:"file_identity"`
 
@@ -68,6 +70,9 @@ type config struct {
 	// Disabled by default.
 	IncludeFileOwnerName      bool `config:"include_file_owner_name"`
 	IncludeFileOwnerGroupName bool `config:"include_file_owner_group_name"`
+	// IncludeFileFingerprint controls whether log.file.fingerprint is added
+	// to published events. Enabled by default.
+	IncludeFileFingerprint bool `config:"include_file_fingerprint"`
 
 	// -1 means that registry will never be cleaned, disabling clean_inactive.
 	// Setting it to 0 also disables clean_inactive
@@ -121,7 +126,7 @@ type stateChangeCloserConfig struct {
 }
 
 type readerConfig struct {
-	Backoff        backoffConfig           `config:"backoff"`
+	Backoff        loginp.BackoffConfig    `config:"backoff"`
 	BufferSize     int                     `config:"buffer_size"`
 	Encoding       string                  `config:"encoding"`
 	ExcludeLines   []match.Matcher         `config:"exclude_lines"`
@@ -131,11 +136,6 @@ type readerConfig struct {
 	Tail           bool                    `config:"seek_to_tail"`
 
 	Parsers parser.Config `config:",inline"`
-}
-
-type backoffConfig struct {
-	Init time.Duration `config:"init" validate:"nonzero"`
-	Max  time.Duration `config:"max" validate:"nonzero"`
 }
 
 type rotationConfig struct {
@@ -154,8 +154,10 @@ func defaultConfig() config {
 		Reader:                    defaultReaderConfig(),
 		Paths:                     []string{},
 		Close:                     defaultCloserConfig(),
+		ReadUntilEOF:              loginp.DefaultReadUntilEOFConfig(),
 		IncludeFileOwnerName:      false,
 		IncludeFileOwnerGroupName: false,
+		IncludeFileFingerprint:    true,
 		CleanInactive:             -1,
 		CleanRemoved:              true,
 		HarvesterLimit:            0,
@@ -168,7 +170,7 @@ func defaultConfig() config {
 func defaultCloserConfig() closerConfig {
 	return closerConfig{
 		OnStateChange: stateChangeCloserConfig{
-			CheckInterval: 5 * time.Second,
+			CheckInterval: loginp.DefaultStateCheckInterval,
 			Removed:       defaultCloserOnStateChangeRemoved(),
 			Inactive:      5 * time.Minute,
 			Renamed:       false,
@@ -182,10 +184,7 @@ func defaultCloserConfig() closerConfig {
 
 func defaultReaderConfig() readerConfig {
 	return readerConfig{
-		Backoff: backoffConfig{
-			Init: 2 * time.Second,
-			Max:  10 * time.Second,
-		},
+		Backoff:        loginp.DefaultBackoffConfig(),
 		BufferSize:     16 * humanize.KiByte,
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
@@ -311,12 +310,12 @@ func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 	return nil
 }
 
-func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]interface{} {
-	var cfgs []map[string]interface{}
+func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]any {
+	var cfgs []map[string]any
 
 	for _, id := range duplicates {
 		for _, dupcfgs := range ids[id] {
-			toJson := map[string]interface{}{}
+			toJson := map[string]any{}
 			err := dupcfgs.Unpack(&toJson)
 			if err != nil {
 				toJson[id] = fmt.Sprintf("failed to unpack config: %v", err)

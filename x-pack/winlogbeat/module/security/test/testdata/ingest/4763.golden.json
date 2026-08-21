@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-12-19T08:34:23.1623432Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "deleted-distribution-group-account",

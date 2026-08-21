@@ -17,7 +17,7 @@
     - name: proposals_committed.count
       type: long
       description: >
-        Number of consensus proposals commited
+        Number of consensus proposals committed
 
     - name: proposals_pending.count
       type: long

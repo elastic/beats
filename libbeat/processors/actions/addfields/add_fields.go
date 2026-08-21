@@ -21,11 +21,17 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+var _ processors.PdataProcessor = (*addFields)(nil)
 
 type addFields struct {
 	fields    mapstr.M
@@ -78,6 +84,17 @@ func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	return event, nil
+}
+
+func (af *addFields) RunPdata(body pcommon.Map) (bool, error) {
+	if len(af.fields) == 0 {
+		return false, nil
+	}
+	// af.shared is not needed here: pcommon.Map is an owned type whose values
+	// are copied by value into pdata storage, so no aliasing back into
+	// af.fields is possible. mapstr.M requires the clone because nested maps
+	// are reference types that downstream processors can mutate.
+	return false, otelmap.MergeMapstrIntoPdata(af.fields, body, af.overwrite)
 }
 
 func (af *addFields) String() string {

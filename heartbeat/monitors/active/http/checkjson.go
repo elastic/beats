@@ -34,14 +34,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type jsonChecker func(interface{}) bool
+type jsonChecker func(any) bool
 type compiledJsonCheck struct {
 	description string
 	check       jsonChecker
 	source      string
 }
 
-func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
+func checkJson(checks []*jsonResponseCheck, logger *logp.Logger) (bodyValidator, error) {
 	var expressionChecks []compiledJsonCheck
 	var conditionChecks []compiledJsonCheck
 
@@ -52,7 +52,7 @@ func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
 				return nil, fmt.Errorf("could not compile gval expression '%s': %w", check.Expression, err)
 			}
 
-			checkFn := func(d interface{}) bool {
+			checkFn := func(d any) bool {
 				matches, err := eval.EvalBool(context.Background(), d)
 				if err != nil {
 					// Conditions cannot match array root JSON responses
@@ -68,8 +68,6 @@ func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
 				source:      check.Expression,
 			})
 		} else if check.Condition != nil {
-			// TODO: use local logger here
-			logger := logp.NewLogger("")
 			logger.Warn(cfgwarn.Deprecate("8.0.0", "JSON conditions are deprecated, use 'expression' instead."))
 			// TODO: use local logger here
 			cond, err := conditions.NewCondition(check.Condition, logger)
@@ -77,8 +75,8 @@ func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
 				return nil, fmt.Errorf("could not load JSON condition '%s': %w", check.Description, err)
 			}
 
-			checkFn := func(d interface{}) bool {
-				ms, ok := d.(map[string]interface{})
+			checkFn := func(d any) bool {
+				ms, ok := d.(map[string]any)
 				if ok {
 					return cond.Check(mapstr.M(ms))
 				} else {
@@ -118,10 +116,7 @@ func createJsonCheck(expressionChecks []compiledJsonCheck, conditionChecks []com
 		}
 
 		if len(validationFailures) > 0 {
-			bodyTrunc := len(body)
-			if bodyTrunc > 2048 {
-				bodyTrunc = 2048
-			}
+			bodyTrunc := min(len(body), 2048)
 			return fmt.Errorf(
 				"JSON body did not match %d expressions or conditions '%s'. Received JSON (first 2048 chars): %s",
 				len(validationFailures),
@@ -134,7 +129,7 @@ func createJsonCheck(expressionChecks []compiledJsonCheck, conditionChecks []com
 	}
 }
 
-func decodeJson(body string, forCondition bool) (result interface{}, err error) {
+func decodeJson(body string, forCondition bool) (result any, err error) {
 	decoder := json.NewDecoder(strings.NewReader(body))
 	// Condition checks need to convert the parsed numeric
 	// values in a way appropriate for the condition evaluator. GVal only works if
@@ -149,7 +144,7 @@ func decodeJson(body string, forCondition bool) (result interface{}, err error) 
 	}
 
 	if forCondition {
-		if resMap, ok := result.(map[string]interface{}); ok {
+		if resMap, ok := result.(map[string]any); ok {
 			jsontransform.TransformNumbers(resMap)
 			return resMap, nil
 		} else {
@@ -160,7 +155,7 @@ func decodeJson(body string, forCondition bool) (result interface{}, err error) 
 	return result, nil
 }
 
-func runCompiledJSONChecks(decodedBody interface{}, compiledChecks []compiledJsonCheck) []string {
+func runCompiledJSONChecks(decodedBody any, compiledChecks []compiledJsonCheck) []string {
 	var errorDescs []string
 	for _, compiledCheck := range compiledChecks {
 		ok := compiledCheck.check(decodedBody)

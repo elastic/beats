@@ -17,8 +17,13 @@ The operating system features that power this feature are as follows.
   * `ReadDirectoryChangesW` is used.
   * {applies_to}`stack: preview 9.2.0` Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges.
 
-The file integrity module should not be used to monitor paths on network file systems.
+    :::{admonition} ETW backend behavior
+    Process and user information attached to ETW-backed file events can vary depending on the underlying ETW event type.
 
+    Create and open operations typically include richer execution context, so Auditbeat can attach additional process metadata and user and security information. Update operations, such as file content writes or attribute changes, often use a smaller event payload that only includes basic identifiers like the process ID (PID).
+    :::
+
+The file integrity module should not be used to monitor paths on network file systems.
 
 ## Configuration options [_configuration_options_18]
 

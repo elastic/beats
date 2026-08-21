@@ -19,6 +19,7 @@ package summarizer
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -31,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -125,7 +127,6 @@ func TestSummarizer(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			dummyErr := fmt.Errorf("dummyerr")
@@ -149,18 +150,18 @@ func TestSummarizer(t *testing.T) {
 				return nil, retErr
 			}
 
-			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false, logptest.NewTestingLogger(t, ""))
 			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(tt.maxAttempts)}
 
-			rcvdStatuses := ""
-			rcvdStates := ""
-			rcvdAttempts := ""
+			var rcvdStatuses strings.Builder
+			var rcvdStates strings.Builder
+			var rcvdAttempts strings.Builder
 			rcvdEvents := []*beat.Event{}
 			rcvdSummaries := []*jobsummary.JobSummary{}
 			i := 0
 			var lastSummary *jobsummary.JobSummary
 			for {
-				s := NewSummarizer(job, sf, tracker)
+				s := NewSummarizer(job, sf, tracker, logptest.NewTestingLogger(t, ""))
 				// Shorten retry delay to make tests run faster
 				s.retryDelay = 2 * time.Millisecond
 				wrapped := s.Wrap(job)
@@ -169,12 +170,12 @@ func TestSummarizer(t *testing.T) {
 					rcvdEvents = append(rcvdEvents, event)
 					eventStatus, _ := event.GetValue("monitor.status")
 					eventStatusStr := eventStatus.(string)
-					rcvdStatuses += eventStatusStr[:1]
+					rcvdStatuses.WriteString(eventStatusStr[:1])
 					state, _ := event.GetValue("state")
 					if state != nil {
-						rcvdStates += string(state.(*monitorstate.State).Status)[:1]
+						rcvdStates.WriteString(string(state.(*monitorstate.State).Status)[:1])
 					} else {
-						rcvdStates += "_"
+						rcvdStates.WriteString("_")
 					}
 					summaryIface, _ := event.GetValue("summary")
 					summary := summaryIface.(*jobsummary.JobSummary)
@@ -196,7 +197,7 @@ func TestSummarizer(t *testing.T) {
 
 					if summary == nil {
 						// note missing summaries
-						rcvdAttempts += "!"
+						rcvdAttempts.WriteString("!")
 					} else if lastSummary != nil {
 						if summary.Attempt > 1 {
 							require.Equal(t, lastSummary.RetryGroup, summary.RetryGroup)
@@ -205,7 +206,7 @@ func TestSummarizer(t *testing.T) {
 						}
 					}
 
-					rcvdAttempts += fmt.Sprintf("%d", summary.Attempt)
+					rcvdAttempts.WriteString(fmt.Sprintf("%d", summary.Attempt))
 					lastSummary = summary
 				}
 				i += len(events)
@@ -213,9 +214,9 @@ func TestSummarizer(t *testing.T) {
 					break
 				}
 			}
-			require.Equal(t, tt.statusSequence, rcvdStatuses)
-			require.Equal(t, tt.expectedStates, rcvdStates)
-			require.Equal(t, tt.expectedAttempts, rcvdAttempts)
+			require.Equal(t, tt.statusSequence, rcvdStatuses.String())
+			require.Equal(t, tt.expectedStates, rcvdStates.String())
+			require.Equal(t, tt.expectedAttempts, rcvdAttempts.String())
 			require.Len(t, rcvdEvents, len(tt.statusSequence))
 			require.Len(t, rcvdSummaries, tt.expectedSummaries)
 		})
@@ -247,12 +248,11 @@ func TestSummarizerPluginOrder(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			// Monitor setup
-			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false, logptest.NewTestingLogger(t, ""))
 			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(tt.maxAttempts)}
 
 			// Test locals
@@ -282,7 +282,7 @@ func TestSummarizerPluginOrder(t *testing.T) {
 				return nil, fmt.Errorf("dummyerr")
 			}
 
-			s := NewSummarizer(job, sf, tracker)
+			s := NewSummarizer(job, sf, tracker, logptest.NewTestingLogger(t, ""))
 			// Shorten retry delay to make tests run faster
 			s.retryDelay = 2 * time.Millisecond
 			// Add mock plugin
@@ -322,7 +322,7 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 	t.Parallel()
 
 	// Monitor setup
-	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false, logptest.NewTestingLogger(t, ""))
 	sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(2)}
 
 	// We simplify these to always down
@@ -343,7 +343,7 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 
 	var retryStart time.Time
 
-	s := NewSummarizer(job, sf, tracker)
+	s := NewSummarizer(job, sf, tracker, logptest.NewTestingLogger(t, ""))
 	// Shorten retry delay to make tests run faster
 	s.retryDelay = 2 * time.Millisecond
 	// Add mock plugin
@@ -361,7 +361,7 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 
 	retryElapsed := time.Since(retryStart)
 	require.False(t, retryStart.IsZero())
-	var rcvdDuration interface{}
+	var rcvdDuration any
 	for _, event := range events {
 		summaryIface, _ := event.GetValue("summary")
 		summary := summaryIface.(*jobsummary.JobSummary)

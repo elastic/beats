@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Match http.ServeMux redirect status code for path cleaning in http_endpoint mux.
-component: filebeat

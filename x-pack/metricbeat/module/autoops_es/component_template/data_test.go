@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package component_template
 
@@ -86,16 +85,16 @@ func expectValidParsedDetailedTemplates(t *testing.T, data metricset.FetcherData
 
 	auto_ops_testing.CheckEventWithoutTransactionId(t, event2, data.ClusterInfo)
 
-	simpleMapping, err := utils.DeserializeData[map[string]interface{}]([]byte(getMappingObject(t, "simple-response")))
+	simpleMapping, err := utils.DeserializeData[map[string]any]([]byte(getMappingObject(t, "simple-response")))
 	require.NoError(t, err)
-	simple, err := templateSchema.Apply((*simpleMapping)["component_template"].(map[string]interface{}))
+	simple, err := templateSchema.Apply((*simpleMapping)["component_template"].(map[string]any))
 	require.NoError(t, err)
 
 	simpleTemplate := mapstr.M{"template": simple}
 
-	detailedMapping, err := utils.DeserializeData[map[string]interface{}]([]byte(getMappingObject(t, "detailed-response")))
+	detailedMapping, err := utils.DeserializeData[map[string]any]([]byte(getMappingObject(t, "detailed-response")))
 	require.NoError(t, err)
-	detailed, err := templateSchema.Apply((*detailedMapping)["component_template"].(map[string]interface{}))
+	detailed, err := templateSchema.Apply((*detailedMapping)["component_template"].(map[string]any))
 	require.NoError(t, err)
 
 	detailedTemplate := mapstr.M{"template": detailed}

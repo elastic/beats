@@ -19,6 +19,8 @@ package mongodb
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 	"time"
 
@@ -36,8 +38,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var debugf = logp.MakeDebug("mongodb")
-
 type mongodbPlugin struct {
 	// config
 	ports        []int
@@ -52,6 +52,8 @@ type mongodbPlugin struct {
 
 	results protos.Reporter
 	watcher *procs.ProcessesWatcher
+	logger  *logp.Logger
+	isDebug bool
 }
 
 type transactionKey struct {
@@ -70,8 +72,11 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &mongodbPlugin{}
+	p.logger = logger.Named("mongodb")
+	p.isDebug = p.logger.IsDebug()
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -85,8 +90,15 @@ func New(
 	return p, nil
 }
 
+//go:inline
+func (mongodb *mongodbPlugin) debugf(format string, v ...any) {
+	if mongodb.isDebug {
+		mongodb.logger.Debugf(format, v...)
+	}
+}
+
 func (mongodb *mongodbPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *mongodbConfig) error {
-	debugf("Init a MongoDB protocol parser")
+	mongodb.debugf("Init a MongoDB protocol parser")
 	mongodb.setFromConfig(config)
 
 	mongodb.requests = common.NewCache(
@@ -131,9 +143,9 @@ func (mongodb *mongodbPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	debugf("Parse method triggered")
+	mongodb.debugf("Parse method triggered")
 
-	conn := ensureMongodbConnection(private)
+	conn := ensureMongodbConnection(private, mongodb.logger)
 	conn = mongodb.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
@@ -141,18 +153,20 @@ func (mongodb *mongodbPlugin) Parse(
 	return conn
 }
 
-func ensureMongodbConnection(private protos.ProtocolData) *mongodbConnectionData {
+func ensureMongodbConnection(private protos.ProtocolData, logger *logp.Logger) *mongodbConnectionData {
 	if private == nil {
 		return &mongodbConnectionData{}
 	}
 
 	priv, ok := private.(*mongodbConnectionData)
 	if !ok {
-		logp.Warn("mongodb connection data type error, create new one")
+		logger.Warn("mongodb connection data type error, create new one")
 		return &mongodbConnectionData{}
 	}
 	if priv == nil {
-		debugf("Unexpected: mongodb connection data not set, create new one")
+		if logger.IsDebug() {
+			logger.Debug("Unexpected: mongodb connection data not set, create new one")
+		}
 		return &mongodbConnectionData{}
 	}
 
@@ -169,12 +183,12 @@ func (mongodb *mongodbPlugin) doParse(
 	if st == nil {
 		st = newStream(pkt, tcptuple)
 		conn.streams[dir] = st
-		debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+		mongodb.debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 	} else {
 		// concatenate bytes
 		st.data = append(st.data, pkt.Payload...)
 		if len(st.data) > tcp.TCPMaxDataInStream {
-			debugf("Stream data too large, dropping TCP stream")
+			mongodb.debugf("Stream data too large, dropping TCP stream")
 			conn.streams[dir] = nil
 			return conn
 		}
@@ -185,23 +199,23 @@ func (mongodb *mongodbPlugin) doParse(
 			st.message = &mongodbMessage{ts: pkt.Ts}
 		}
 
-		ok, complete := mongodbMessageParser(st)
+		ok, complete := mongodbMessageParser(st, mongodb.logger)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			conn.streams[dir] = nil
-			debugf("Ignore Mongodb message. Drop tcp stream. Try parsing with the next segment")
+			mongodb.debugf("Ignore Mongodb message. Drop tcp stream. Try parsing with the next segment")
 			return conn
 		}
 
 		if !complete {
 			// wait for more data
-			debugf("MongoDB wait for more data before parsing message")
+			mongodb.debugf("MongoDB wait for more data before parsing message")
 			break
 		}
 
 		// all ok, go to next level and reset stream for new message
-		debugf("MongoDB message complete")
+		mongodb.debugf("MongoDB message complete")
 		mongodb.handleMongodb(conn, st.message, tcptuple, dir)
 		st.PrepareForNewMessage()
 	}
@@ -229,10 +243,10 @@ func (mongodb *mongodbPlugin) handleMongodb(
 	m.cmdlineTuple = mongodb.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isResponse {
-		debugf("MongoDB response message")
+		mongodb.debugf("MongoDB response message")
 		mongodb.onResponse(conn, m)
 	} else {
-		debugf("MongoDB request message")
+		mongodb.debugf("MongoDB request message")
 		mongodb.onRequest(conn, m)
 	}
 }
@@ -251,7 +265,7 @@ func (mongodb *mongodbPlugin) onRequest(conn *mongodbConnectionData, msg *mongod
 	if v := mongodb.responses.Delete(key); v != nil {
 		resp, ok := v.(*mongodbMessage)
 		if !ok {
-			debugf("Unexpected type in responses cache for key %+v", key)
+			mongodb.debugf("Unexpected type in responses cache for key %+v", key)
 			return
 		}
 		mongodb.onTransComplete(msg, resp)
@@ -261,7 +275,7 @@ func (mongodb *mongodbPlugin) onRequest(conn *mongodbConnectionData, msg *mongod
 	// insert into cache for correlation
 	old := mongodb.requests.Put(key, msg)
 	if old != nil {
-		debugf("Two requests without a Response. Dropping old request")
+		mongodb.debugf("Two requests without a Response. Dropping old request")
 		unmatchedRequests.Add(1)
 	}
 }
@@ -274,7 +288,7 @@ func (mongodb *mongodbPlugin) onResponse(conn *mongodbConnectionData, msg *mongo
 	if v := mongodb.requests.Delete(key); v != nil {
 		requ, ok := v.(*mongodbMessage)
 		if !ok {
-			debugf("Unexpected type in requests cache for key %+v", key)
+			mongodb.debugf("Unexpected type in requests cache for key %+v", key)
 			return
 		}
 		mongodb.onTransComplete(requ, msg)
@@ -287,7 +301,7 @@ func (mongodb *mongodbPlugin) onResponse(conn *mongodbConnectionData, msg *mongo
 
 func (mongodb *mongodbPlugin) onTransComplete(requ, resp *mongodbMessage) {
 	trans := newTransaction(requ, resp)
-	debugf("Mongodb transaction completed: %s", trans.mongodb)
+	mongodb.debugf("Mongodb transaction completed: %s", trans.mongodb)
 	mongodb.publishTransaction(trans)
 }
 
@@ -315,9 +329,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 
 	// fill response
 	if resp != nil {
-		for k, v := range resp.event {
-			trans.event[k] = v
-		}
+		maps.Copy(trans.event, resp.event)
 
 		trans.error = resp.error
 		trans.documents = resp.documents
@@ -340,16 +352,10 @@ func (mongodb *mongodbPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	return private
 }
 
-func copyMapWithoutKey(d map[string]interface{}, keys ...string) map[string]interface{} {
-	res := map[string]interface{}{}
+func copyMapWithoutKey(d map[string]any, keys ...string) map[string]any {
+	res := map[string]any{}
 	for k, v := range d {
-		found := false
-		for _, excludeKey := range keys {
-			if k == excludeKey {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(keys, k)
 		if !found {
 			res[k] = v
 		}
@@ -357,9 +363,9 @@ func copyMapWithoutKey(d map[string]interface{}, keys ...string) map[string]inte
 	return res
 }
 
-func reconstructQuery(t *transaction, full bool) (query string) {
+func reconstructQuery(t *transaction, full bool, logger *logp.Logger) (query string) {
 	query = t.resource + "." + t.method + "("
-	var doc interface{}
+	var doc any
 
 	if len(t.params) > 0 {
 		if !full {
@@ -388,7 +394,7 @@ func reconstructQuery(t *transaction, full bool) (query string) {
 
 	queryString, err := doc2str(doc)
 	if err != nil {
-		debugf("Error marshaling query document: %v", err)
+		logger.Debugf("Error marshaling query document: %v", err)
 	} else {
 		query += queryString
 	}
@@ -408,7 +414,7 @@ func reconstructQuery(t *transaction, full bool) (query string) {
 
 func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 	if mongodb.results == nil {
-		debugf("Try to publish transaction with null results")
+		mongodb.debugf("Try to publish transaction with null results")
 		return
 	}
 
@@ -436,10 +442,10 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 	fields["mongodb"] = t.event
 	fields["method"] = t.method
 	fields["resource"] = t.resource
-	fields["query"] = reconstructQuery(t, false)
+	fields["query"] = reconstructQuery(t, false, mongodb.logger)
 
 	if mongodb.sendRequest {
-		fields["request"] = reconstructQuery(t, true)
+		fields["request"] = reconstructQuery(t, true, mongodb.logger)
 	}
 	if mongodb.sendResponse {
 		if len(t.documents) > 0 {
@@ -452,7 +458,7 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 				}
 				str, err := doc2str(doc)
 				if err != nil {
-					logp.Warn("Failed to JSON marshal document from Mongo: %v (error: %v)", doc, err)
+					mongodb.logger.Warnf("Failed to JSON marshal document from Mongo: %v (error: %v)", doc, err)
 				} else {
 					if mongodb.maxDocLength > 0 && len(str) > mongodb.maxDocLength {
 						str = str[:mongodb.maxDocLength] + " ..."

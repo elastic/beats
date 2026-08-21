@@ -12,7 +12,7 @@ applies_to:
 ::::{warning}
 The `log` input is deprecated in version 7.16 and disabled in version 9.0.
 
-Please use the the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input for sending log files to outputs. Follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log` inputs to `filestream` inputs.
+Use the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input for sending log files to outputs. Follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log` inputs to `filestream` inputs.
 
 After deprecation it’s possible to use this input type (e.g. for migration to `filestream`) only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
 ::::
@@ -237,6 +237,24 @@ The size in bytes of the buffer that each harvester uses when fetching a file. T
 #### `max_bytes` [_max_bytes_2]
 
 The maximum number of bytes that a single log message can have. All bytes after `max_bytes` are discarded and not sent. This setting is especially useful for multiline log messages, which can get large. The default is 10MB (10485760).
+
+
+#### `line_terminator` [filebeat-input-log-line-terminator]
+
+Specifies the characters used to separate lines in the input file. The default is `auto`.
+
+Valid values:
+
+* `auto`: Automatic detection of LF and CR+LF line endings (U+000A and U+000D U+000A).
+* `line_feed`: Line feed (LF, `\n`, U+000A).
+* `vertical_tab`: Vertical tab (VT, `\v`, U+000B).
+* `form_feed`: Form feed (FF, `\f`, U+000C).
+* `carriage_return`: Carriage return (CR, `\r`, U+000D).
+* `carriage_return_line_feed`: Carriage return followed by line feed (CR+LF, `\r\n`, U+000D U+000A).
+* `next_line`: Next line (NEL, U+0085).
+* `line_separator`: Line separator (LS, U+2028).
+* `paragraph_separator`: Paragraph separator (PS, U+2029).
+* `null_terminator`: Null character (`\u0000`, U+0000).
 
 
 #### `json` [filebeat-input-log-config-json]

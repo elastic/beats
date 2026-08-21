@@ -1,0 +1,93 @@
+[
+    {
+        "__ui": {
+            "is_tls_enabled": true
+        },
+        "check": {
+            "receive": "test"
+        },
+        "data_stream": {
+            "dataset": "tcp",
+            "elasticsearch": {
+                "privileges": {
+                    "indices": [
+                        "auto_configure",
+                        "create_doc",
+                        "read"
+                    ]
+                }
+            },
+            "namespace": "test",
+            "type": "synthetics"
+        },
+        "enabled": true,
+        "hosts": "example.com:80",
+        "id": "f9727584-2d86-4371-93a0-5b6f187db9ea",
+        "ipv4": true,
+        "ipv6": false,
+        "max_attempts": 2,
+        "mode": "all",
+        "name": "example.com:80",
+        "origin": "ui",
+        "processors": [
+            {
+                "add_fields": {
+                    "fields": {
+                        "config_id": "f9727584-2d86-4371-93a0-5b6f187db9ea",
+                        "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                        "meta": {
+                            "space_id": "default"
+                        },
+                        "monitor": {
+                            "fleet_managed": true,
+                            "interval": 180
+                        }
+                    },
+                    "target": ""
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f",
+                        "snapshot": false,
+                        "version": "8.13.1"
+                    },
+                    "target": "elastic_agent"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f"
+                    },
+                    "target": "agent"
+                }
+            }
+        ],
+        "proxy_use_local_resolver": false,
+        "run_from": {
+            "geo": {
+                "name": "test"
+            },
+            "id": "9ba26c7d-917b-465f-8461-b577fdd37a9f"
+        },
+        "schedule": "@every 3m",
+        "ssl": {
+            "certificate": "test",
+            "certificate_authorities": "test",
+            "key": "test",
+            "key_passphrase": "test",
+            "supported_protocols": [
+                "TLSv1.1",
+                "TLSv1.2"
+            ],
+            "verification_mode": "full"
+        },
+        "tags": [
+            "test"
+        ],
+        "timeout": "12s",
+        "type": "tcp"
+    }
+]

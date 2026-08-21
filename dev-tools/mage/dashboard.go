@@ -71,7 +71,7 @@ func ExportDashboard() error {
 // - KIBANA_INSECURE: Disable TLS verification.
 // - KIBANA_ALWAYS: Connect to Kibana without checking ES version. Default true.
 // - ES_URL: URL of Elasticsearch (only used with KIBANA_ALWAYS=false).
-func ImportDashboards(buildDep, dashboardDep interface{}) error {
+func ImportDashboards(buildDep, dashboardDep any) error {
 	mg.Deps(buildDep, dashboardDep)
 
 	setupDashboards := sh.RunCmd(CWD(BeatName+binaryExtension(GOOS)),

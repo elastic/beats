@@ -23,7 +23,8 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"net"
 	"net/http"
 	"net/url"
@@ -59,6 +60,7 @@ func newHTTPMonitorHostJob(
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
+	_ string,
 ) (jobs.Job, error) {
 
 	var reqFactory requestFactory = func() (*http.Request, error) { return buildRequest(addr, config, enc) }
@@ -92,6 +94,7 @@ func newHTTPMonitorIPsJob(
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
+	userAgent string,
 ) (jobs.Job, error) {
 
 	var reqFactory requestFactory = func() (*http.Request, error) { return buildRequest(addr, config, enc) }
@@ -101,7 +104,7 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	pingFactory := createPingFactory(config, port, tls, reqFactory, body, validator)
+	pingFactory := createPingFactory(config, port, tls, reqFactory, body, validator, userAgent)
 	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
@@ -114,6 +117,7 @@ func createPingFactory(
 	reqFactory requestFactory,
 	body []byte,
 	validator multiValidator,
+	userAgent string,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Transport.Timeout
 
@@ -311,7 +315,7 @@ func execPing(
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
 	req = req.WithContext(*ctx)
 	if len(body) > 0 {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		req.Body = io.NopCloser(bytes.NewBuffer(body))
 		req.ContentLength = int64(len(body))
 	}
 

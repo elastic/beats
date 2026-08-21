@@ -124,6 +124,7 @@ func enrichIndexMetadata(nodeIndexShards *NodeIndexShards, indexMetadata map[str
 	if metadata, found := indexMetadata[nodeIndexShards.Index]; found {
 		nodeIndexShards.Aliases = metadata.aliases
 		nodeIndexShards.Attributes = metadata.attributes
+		nodeIndexShards.DataStream = metadata.dataStream
 		nodeIndexShards.IndexType = &metadata.indexType
 		nodeIndexShards.IsHidden = &metadata.hidden
 		nodeIndexShards.IsOpen = &metadata.open

@@ -17,7 +17,7 @@ func TestActionFromMap(t *testing.T) {
 
 	tests := []struct {
 		Name string
-		Map  map[string]interface{}
+		Map  map[string]any
 		Err  error
 	}{
 		{
@@ -27,19 +27,19 @@ func TestActionFromMap(t *testing.T) {
 		},
 		{
 			Name: "empty",
-			Map:  map[string]interface{}{},
+			Map:  map[string]any{},
 			Err:  ErrActionRequest,
 		},
 		{
 			Name: "invalid id",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": 123,
 			},
 			Err: ErrActionRequest,
 		},
 		{
 			Name: "invalid data",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id":   "123456789",
 				"data": "foo",
 			},
@@ -47,9 +47,9 @@ func TestActionFromMap(t *testing.T) {
 		},
 		{
 			Name: "invalid query",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "123456789",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": 123221231,
 				},
 			},
@@ -57,28 +57,49 @@ func TestActionFromMap(t *testing.T) {
 		},
 		{
 			Name: "valid string for query",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "123456789",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from foo",
 				},
 			},
 		},
 		{
 			Name: "valid profile flag",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "123456789",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query":   "select * from foo",
 					"profile": true,
 				},
 			},
 		},
 		{
-			Name: "invalid profile flag type",
-			Map: map[string]interface{}{
+			Name: "valid platform",
+			Map: map[string]any{
 				"id": "123456789",
-				"data": map[string]interface{}{
+				"data": map[string]any{
+					"query":    "select * from foo",
+					"platform": " linux , windows ",
+				},
+			},
+		},
+		{
+			Name: "invalid platform type",
+			Map: map[string]any{
+				"id": "123456789",
+				"data": map[string]any{
+					"query":    "select * from foo",
+					"platform": []string{"linux"},
+				},
+			},
+			Err: ErrActionRequest,
+		},
+		{
+			Name: "invalid profile flag type",
+			Map: map[string]any{
+				"id": "123456789",
+				"data": map[string]any{
 					"query":   "select * from foo",
 					"profile": "true",
 				},
@@ -87,9 +108,9 @@ func TestActionFromMap(t *testing.T) {
 		},
 		{
 			Name: "empty id",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from foo",
 				},
 			},
@@ -97,9 +118,9 @@ func TestActionFromMap(t *testing.T) {
 		},
 		{
 			Name: "space empty id",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "    ",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from foo",
 				},
 			},
@@ -107,9 +128,9 @@ func TestActionFromMap(t *testing.T) {
 		},
 		{
 			Name: "empty query",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "123456789",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "",
 				},
 			},
@@ -117,9 +138,9 @@ func TestActionFromMap(t *testing.T) {
 		},
 		{
 			Name: "space empty query",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "123456789",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "   ",
 				},
 			},
@@ -142,9 +163,48 @@ func TestActionFromMap(t *testing.T) {
 			}
 
 			if tc.Name == "valid profile flag" {
-				if !a.Profile {
-					t.Errorf("expected Profile to be true, got false")
+				if a.Profile == nil || !*a.Profile {
+					t.Errorf("expected Profile to be true, got %v", a.Profile)
 				}
+			}
+			if tc.Name == "valid platform" {
+				if diff := cmp.Diff([]string{"linux", "windows"}, a.Platforms); diff != "" {
+					t.Errorf("unexpected platforms (-want +got):\n%s", diff)
+				}
+			}
+		})
+	}
+}
+
+func TestPlatformMatches(t *testing.T) {
+	tests := []struct {
+		name      string
+		goos      string
+		platforms []string
+		want      bool
+	}{
+		{name: "empty platform matches all", goos: "linux", want: true},
+		{name: "all platform matches", goos: "windows", platforms: []string{"all"}, want: true},
+		{name: "any platform matches", goos: "windows", platforms: []string{"any"}, want: true},
+		{name: "same platform matches", goos: "linux", platforms: []string{"linux"}, want: true},
+		{name: "comma separated platform matches", goos: "darwin", platforms: []string{"linux", "darwin"}, want: true},
+		{name: "different platform does not match", goos: "linux", platforms: []string{"windows"}, want: false},
+		{name: "empty list item is ignored", goos: "linux", platforms: []string{"windows", ""}, want: false},
+		{name: "ubuntu matches linux", goos: "linux", platforms: []string{"ubuntu"}, want: true},
+		{name: "centos matches linux", goos: "linux", platforms: []string{"centos"}, want: true},
+		{name: "ubuntu does not match windows", goos: "windows", platforms: []string{"ubuntu"}, want: false},
+		{name: "posix matches linux", goos: "linux", platforms: []string{"posix"}, want: true},
+		{name: "posix matches darwin", goos: "darwin", platforms: []string{"posix"}, want: true},
+		{name: "posix does not match windows", goos: "windows", platforms: []string{"posix"}, want: false},
+		{name: "macos matches darwin", goos: "darwin", platforms: []string{"macos"}, want: true},
+		{name: "case insensitive", goos: "linux", platforms: []string{"LINUX"}, want: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := platformMatches(tc.goos, tc.platforms)
+			if got != tc.want {
+				t.Fatalf("expected PlatformMatches(%q, %v) to be %v, got %v", tc.goos, tc.platforms, tc.want, got)
 			}
 		})
 	}
@@ -154,15 +214,15 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 
 	tests := []struct {
 		Name   string
-		Map    map[string]interface{}
+		Map    map[string]any
 		Action Action
 		Err    error
 	}{
 		{
 			Name: "valid",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
 				},
 			},
@@ -173,9 +233,9 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping nil",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query":       "select * from users limit 2",
 					"ecs_mapping": nil,
 				},
@@ -187,9 +247,9 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping empty string",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query":       "select * from users limit 2",
 					"ecs_mapping": "",
 				},
@@ -198,11 +258,11 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping empty",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query":       "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{},
+					"ecs_mapping": map[string]any{},
 				},
 			},
 			Action: Action{
@@ -213,11 +273,11 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping invalid",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
+					"ecs_mapping": map[string]any{
 						"foo": "bar",
 					},
 				},
@@ -226,12 +286,12 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping invalid, field spaces string",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
+					"ecs_mapping": map[string]any{
+						"user.custom.shoeSize": map[string]any{
 							"field": "      ",
 						},
 					},
@@ -241,12 +301,12 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping invalid, key empty",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"": map[string]interface{}{
+					"ecs_mapping": map[string]any{
+						"": map[string]any{
 							"field": "uid",
 						},
 					},
@@ -256,12 +316,12 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping invalid, key spaces",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"  ": map[string]interface{}{
+					"ecs_mapping": map[string]any{
+						"  ": map[string]any{
 							"field": "uid",
 						},
 					},
@@ -271,12 +331,12 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping invalid, field non-string",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
+					"ecs_mapping": map[string]any{
+						"user.custom.shoeSize": map[string]any{
 							"field": 123,
 						},
 					},
@@ -286,12 +346,12 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping invalid, both field and value defined",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
+					"ecs_mapping": map[string]any{
+						"user.custom.shoeSize": map[string]any{
 							"value": 48,
 							"field": "uid",
 						},
@@ -302,15 +362,15 @@ func TestActionFromMapWithECSMapping(t *testing.T) {
 		},
 		{
 			Name: "ECS mapping valid",
-			Map: map[string]interface{}{
+			Map: map[string]any{
 				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
+					"ecs_mapping": map[string]any{
+						"user.custom.shoeSize": map[string]any{
 							"value": 48,
 						},
-						"user.id": map[string]interface{}{
+						"user.id": map[string]any{
 							"field": "uid",
 						},
 					},

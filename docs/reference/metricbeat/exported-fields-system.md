@@ -934,10 +934,6 @@ Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be m
 
 ## network_summary [_network_summary]
 
-```{applies_to}
-stack: beta
-```
-
 Metrics relating to global network activity
 
 **`system.network_summary.ip.*`**
@@ -1855,7 +1851,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.stats.mapped_file.bytes`**
-:   Size of memory-mapped mapped files, including tmpfs (shmem), in bytes.
+:   Size of memory-mapped files, including tmpfs (shmem), in bytes.
 
     type: long
 
@@ -2298,10 +2294,6 @@ raid
 
 ## service [_service]
 
-```{applies_to}
-stack: beta
-```
-
 metrics for system services
 
 **`system.service.name`**
@@ -2655,10 +2647,6 @@ All UDP connections
 
 
 ## users [_users]
-
-```{applies_to}
-stack: beta
-```
 
 Logged-in user session data
 

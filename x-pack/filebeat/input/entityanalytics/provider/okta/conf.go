@@ -15,12 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 )
 
 // defaultConfig returns a default configuration.
@@ -167,14 +164,14 @@ func (o *oAuth2Config) Validate() error {
 		if o.OktaJWKJSON != nil {
 			// Validate JWK format by attempting to parse it
 			var jwkData struct {
-				N    interface{} `json:"n"`
-				E    interface{} `json:"e"`
-				D    interface{} `json:"d"`
-				P    interface{} `json:"p"`
-				Q    interface{} `json:"q"`
-				Dp   interface{} `json:"dp"`
-				Dq   interface{} `json:"dq"`
-				Qinv interface{} `json:"qi"`
+				N    any `json:"n"`
+				E    any `json:"e"`
+				D    any `json:"d"`
+				P    any `json:"p"`
+				Q    any `json:"q"`
+				Dp   any `json:"dp"`
+				Dq   any `json:"dq"`
+				Qinv any `json:"qi"`
 			}
 			if err := json.Unmarshal(o.OktaJWKJSON, &jwkData); err != nil {
 				return fmt.Errorf("oauth2 validation error: invalid JWK JSON format: %w", err)
@@ -323,13 +320,6 @@ func (c *conf) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
-	}
-	ok, err := httplog.IsPathInLogsFor(Name, c.Tracer.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, Name))
 	}
 	return nil
 }

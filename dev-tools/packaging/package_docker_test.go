@@ -32,8 +32,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/client"
 )
 
 // This file contains Docker archive parsing helpers used by the package tests.
@@ -65,7 +64,7 @@ func readDockerOCIFromDaemon(t *testing.T, dockerFile string) (*packageFile, *do
 	ctx, cancel := dockerTestContext(t)
 	defer cancel()
 
-	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	dockerClient, err := client.New(client.FromEnv)
 	if err != nil {
 		return nil, nil, "", fmt.Errorf("failed to get a Docker client: %w", err)
 	}
@@ -85,15 +84,15 @@ func readDockerOCIFromDaemon(t *testing.T, dockerFile string) (*packageFile, *do
 	info.Config.Labels = make(map[string]string, len(inspectResp.Config.Labels))
 	maps.Copy(info.Config.Labels, inspectResp.Config.Labels)
 
-	createResp, err := dockerClient.ContainerCreate(ctx, &container.Config{Image: imageRef}, nil, nil, nil, "")
+	createResp, err := dockerClient.ContainerCreate(ctx, client.ContainerCreateOptions{Image: imageRef})
 	if err != nil {
 		return nil, nil, "", fmt.Errorf("failed creating container from image %q: %w", imageRef, err)
 	}
 	defer func() {
-		_ = dockerClient.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+		_, _ = dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})
 	}()
 
-	exportedFilesystem, err := dockerClient.ContainerExport(ctx, createResp.ID)
+	exportedFilesystem, err := dockerClient.ContainerExport(ctx, createResp.ID, client.ContainerExportOptions{})
 	if err != nil {
 		return nil, nil, "", fmt.Errorf("failed exporting filesystem from image %q: %w", imageRef, err)
 	}

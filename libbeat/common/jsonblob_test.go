@@ -29,34 +29,34 @@ import (
 func TestConfigJSONBlob(t *testing.T) {
 	cases := []struct {
 		name        string
-		config      map[string]interface{}
+		config      map[string]any
 		expectedOut []byte
 		expectedErr string
 	}{
 		{
 			name: "successfully unpacks string",
-			config: map[string]interface{}{
+			config: map[string]any{
 				"jsonBlob": `{"key":"value"}`,
 			},
 			expectedOut: []byte(`{"key":"value"}`),
 		},
 		{
 			name: "successfully unpacks map[string]interface{}",
-			config: map[string]interface{}{
-				"jsonBlob": map[string]interface{}{"key": "value"},
+			config: map[string]any{
+				"jsonBlob": map[string]any{"key": "value"},
 			},
 			expectedOut: []byte(`{"key":"value"}`),
 		},
 		{
 			name: "successfully unpacks mapstr.M",
-			config: map[string]interface{}{
+			config: map[string]any{
 				"jsonBlob": mapstr.M{"key": "value"},
 			},
 			expectedOut: []byte(`{"key":"value"}`),
 		},
 		{
 			name: "fails if can't be converted to json",
-			config: map[string]interface{}{
+			config: map[string]any{
 				"jsonBlob": `invalid`,
 			},
 			expectedErr: "the field can't be converted to valid JSON accessing 'jsonBlob'",
@@ -64,7 +64,6 @@ func TestConfigJSONBlob(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(tc.config)
 			conf := struct {

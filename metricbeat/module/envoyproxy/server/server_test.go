@@ -18,9 +18,9 @@
 package server
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -35,7 +35,7 @@ import (
 const testFile = "../_meta/test/serverstats"
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile(testFile)
+	content, err := os.ReadFile(testFile)
 	assert.NoError(t, err)
 
 	event, err := eventMapping(content)
@@ -119,7 +119,7 @@ func TestFetchEventContent(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/test/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/serverstats")
+	response, err := os.ReadFile(absPath + "/serverstats")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -129,7 +129,7 @@ func TestFetchEventContent(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "envoyproxy",
 		"metricsets": []string{"server"},
 		"hosts":      []string{server.URL},
@@ -145,7 +145,7 @@ func TestFetchEventContent(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
+func testValue(t *testing.T, event mapstr.M, field string, value any) {
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)
@@ -155,7 +155,7 @@ func TestFetchTimeout(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/test/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/serverstats")
+	response, err := os.ReadFile(absPath + "/serverstats")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -166,7 +166,7 @@ func TestFetchTimeout(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "envoyproxy",
 		"metricsets": []string{"server"},
 		"hosts":      []string{server.URL},

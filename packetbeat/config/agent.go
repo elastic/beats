@@ -35,10 +35,10 @@ type datastream struct {
 }
 
 type agentInput struct {
-	Type       string                   `config:"type"`
-	Datastream datastream               `config:"data_stream"`
-	Processors []mapstr.M               `config:"processors"`
-	Streams    []map[string]interface{} `config:"streams"`
+	Type       string           `config:"type"`
+	Datastream datastream       `config:"data_stream"`
+	Processors []mapstr.M       `config:"processors"`
+	Streams    []map[string]any `config:"streams"`
 }
 
 func defaultDevice() string {
@@ -92,15 +92,9 @@ func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 }
 
 func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
-	maxProcReadFreq := one.MaxProcReadFreq
-	if two.MaxProcReadFreq > maxProcReadFreq {
-		maxProcReadFreq = two.MaxProcReadFreq
-	}
+	maxProcReadFreq := max(two.MaxProcReadFreq, one.MaxProcReadFreq)
 
-	refreshPidsFreq := one.RefreshPidsFreq
-	if two.RefreshPidsFreq < refreshPidsFreq {
-		refreshPidsFreq = two.RefreshPidsFreq
-	}
+	refreshPidsFreq := min(two.RefreshPidsFreq, one.RefreshPidsFreq)
 
 	return procs.ProcsConfig{
 		Enabled:         true,
@@ -112,8 +106,8 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 
 // NewAgentConfig allows the packetbeat configuration to understand
 // agent semantics
-func NewAgentConfig(cfg *conf.C) (Config, error) {
-	logp.Debug("agent", "Normalizing agent configuration")
+func NewAgentConfig(cfg *conf.C, logger *logp.Logger) (Config, error) {
+	logger.Debug("Normalizing agent configuration")
 	var (
 		input  agentInput
 		config Config
@@ -122,7 +116,7 @@ func NewAgentConfig(cfg *conf.C) (Config, error) {
 		return config, err
 	}
 
-	logp.Debug("agent", "Found %d inputs", len(input.Streams))
+	logger.Debugf("Found %d inputs", len(input.Streams))
 	for _, stream := range input.Streams {
 		if interfaceOverride, ok := stream["interface"]; ok {
 			cfg, err := conf.NewConfigFrom(interfaceOverride)
@@ -153,7 +147,7 @@ func NewAgentConfig(cfg *conf.C) (Config, error) {
 			if !ok {
 				return config, fmt.Errorf("invalid input type of: '%T'", rawStreamType)
 			}
-			logp.Debug("agent", "Found agent configuration for %v", streamType)
+			logger.Debugf("Found agent configuration for %v", streamType)
 			cfg, err := conf.NewConfigFrom(stream)
 			if err != nil {
 				return config, err

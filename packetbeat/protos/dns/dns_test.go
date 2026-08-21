@@ -60,8 +60,8 @@ type dnsTestMessage struct {
 	qType       string
 	qName       string
 	qEtld       string
-	qSubdomain  interface{}
-	qTLD        interface{}
+	qSubdomain  any
+	qTLD        any
 	answers     []string
 	authorities []string
 	additionals []string
@@ -107,14 +107,14 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 		callback = store.publish
 	}
 
-	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]any{
 		"ports":               []int{serverPort},
 		"include_authorities": true,
 		"include_additionals": true,
 		"send_request":        true,
 		"send_response":       true,
 	})
-	dns, err := New(false, callback, &procs.ProcessesWatcher{}, cfg)
+	dns, err := New(false, callback, &procs.ProcessesWatcher{}, cfg, logp.NewNopLogger())
 	if err != nil {
 		panic(err)
 	}
@@ -144,13 +144,13 @@ func expectResult(t testing.TB, e *eventStore) mapstr.M {
 }
 
 // Retrieves a map value. The key should be the full dotted path to the element.
-func mapValue(t testing.TB, m mapstr.M, key string) interface{} {
+func mapValue(t testing.TB, m mapstr.M, key string) any {
 	t.Helper()
 	return mapValueHelper(t, m, strings.Split(key, "."))
 }
 
 // Retrieves nested MapStr values.
-func mapValueHelper(t testing.TB, m mapstr.M, keys []string) interface{} {
+func mapValueHelper(t testing.TB, m mapstr.M, keys []string) any {
 	t.Helper()
 
 	key := keys[0]
@@ -170,7 +170,7 @@ func mapValueHelper(t testing.TB, m mapstr.M, keys []string) interface{} {
 		case mapstr.M:
 			return mapValueHelper(t, typ, keys[1:])
 		case []mapstr.M:
-			var values []interface{}
+			var values []any
 			for _, m := range typ {
 				values = append(values, mapValueHelper(t, m, keys[1:]))
 			}

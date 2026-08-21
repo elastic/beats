@@ -127,7 +127,7 @@ The `kubernetes` autodiscover provider has the following configuration settings:
 :   (Optional) Specify at what level autodiscover needs to be done at. `scope` can either take `node` or `cluster` as values. `node` scope allows discovery of resources in the specified node. `cluster` scope allows cluster wide discovery. Only `pod` and `node` resources can be discovered at node scope.
 
 `add_resource_metadata`
-:   (Optional) Specify filters and configration for the extra metadata, that will be added to the event. Configuration parameters:
+:   (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
 
     * `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output. Note: wildcards are not supported for those settings. The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
     * `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name isn’t added, this can be enabled by setting `deployment: true`.

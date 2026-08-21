@@ -87,10 +87,7 @@ loop:
 				switch errno {
 				case ERROR_INSUFFICIENT_BUFFER:
 					// Grow buffer.
-					newLen := 2 * len(cpBuffer)
-					if int(used) > newLen {
-						newLen = int(used)
-					}
+					newLen := max(int(used), 2*len(cpBuffer))
 					cpBuffer = make([]uint16, newLen)
 					continue
 				case ERROR_NO_MORE_ITEMS:
@@ -469,7 +466,7 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	switch runtime.GOARCH {
 	default:
 		return 0, fmt.Errorf("unhandled architecture: %s", runtime.GOARCH)
-	case "amd64":
+	case "amd64", "arm64":
 		err = binary.Read(reader, binary.LittleEndian, &dataPtr)
 		if err != nil {
 			return 0, err

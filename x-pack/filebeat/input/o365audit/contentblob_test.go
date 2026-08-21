@@ -30,7 +30,7 @@ func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 var errStopped = errors.New("stopped")
 
-func (s *contentStore) onEvent(b beat.Event, checkpointUpdate interface{}) error {
+func (s *contentStore) onEvent(b beat.Event, checkpointUpdate any) error {
 	b.Private = checkpointUpdate
 	s.events = append(s.events, b)
 	if s.stopped {

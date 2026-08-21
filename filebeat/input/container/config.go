@@ -19,6 +19,7 @@ package container
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -37,22 +38,13 @@ type config struct {
 
 // Validate validates the config.
 func (c *config) Validate() error {
-	if !stringInSlice(c.Stream, []string{"all", "stdout", "stderr"}) {
+	if !slices.Contains([]string{"all", "stdout", "stderr"}, c.Stream) {
 		return fmt.Errorf("invalid value for stream: %s, supported values are: all, stdout, stderr", c.Stream)
 	}
 
-	if !stringInSlice(strings.ToLower(c.Format), []string{"auto", "docker", "cri"}) {
+	if !slices.Contains([]string{"auto", "docker", "cri"}, strings.ToLower(c.Format)) {
 		return fmt.Errorf("invalid value for format: %s, supported values are: auto, docker, cri", c.Format)
 	}
 
 	return nil
-}
-
-func stringInSlice(str string, list []string) bool {
-	for _, v := range list {
-		if v == str {
-			return true
-		}
-	}
-	return false
 }

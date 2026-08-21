@@ -43,13 +43,13 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 				Dataset: "system.cpu",
 				Type:    "metrics",
 			},
-			Source: tests.RequireNewStruct(map[string]interface{}{
-				"metricsets": []interface{}{"cpu"},
+			Source: tests.RequireNewStruct(map[string]any{
+				"metricsets": []any{"cpu"},
 				"period":     "1s",
-				"processors": []interface{}{
-					map[string]interface{}{
-						"add_fields": map[string]interface{}{
-							"fields": map[string]interface{}{"testfield": true},
+				"processors": []any{
+					map[string]any{
+						"add_fields": map[string]any{
+							"fields": map[string]any{"testfield": true},
 							"target": "@metadata",
 						},
 					},
@@ -62,8 +62,8 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 				Dataset: "system.memory",
 				Type:    "metrics",
 			},
-			Source: tests.RequireNewStruct(map[string]interface{}{
-				"metricsets": []interface{}{"memory"},
+			Source: tests.RequireNewStruct(map[string]any{
+				"metricsets": []any{"memory"},
 				"period":     "1s",
 			}),
 		},
@@ -120,7 +120,7 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 	t.Logf("Got %d events", len(events))
 
 	// Look for processors
-	expectedCPUMetaValues := map[string]interface{}{
+	expectedCPUMetaValues := map[string]any{
 		// Processors created by
 		"@metadata.input_id":    "system/metrics-system-default-system",
 		"@metadata.stream_id":   "system/metrics-system.cpu-default-system",
@@ -133,14 +133,14 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 	}
 	tests.ValuesExist(t, expectedCPUMetaValues, events, tests.ONCE, "expectedCPUMetaValues")
 
-	expectedMemoryMetaValues := map[string]interface{}{
+	expectedMemoryMetaValues := map[string]any{
 		"@metadata.stream_id": "system/metrics-system.memory-default-system",
 		"data_stream.dataset": "system.memory",
 	}
 	tests.ValuesExist(t, expectedMemoryMetaValues, events, tests.ONCE, "expectedMemoryMetaValues")
 
 	// Look for proper CPU/memory config
-	expectedCPU := map[string]interface{}{
+	expectedCPU := map[string]any{
 		"system.cpu.cores":          nil,
 		"system.cpu.total":          nil,
 		"system.memory.actual.free": nil,

@@ -2,13 +2,14 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:deadcode,unused // This code will be used later.
 package cel
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -26,129 +27,136 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/icholy/digest"
+	"go.opentelemetry.io/otel/attribute"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
 
+var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
+
 var inputTests = []struct {
-	name          string
-	remote        bool
-	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
-	handler       http.HandlerFunc
-	config        map[string]interface{}
-	time          func() time.Time
-	persistCursor map[string]interface{}
-	want          []map[string]interface{}
-	wantCursor    []map[string]interface{}
-	wantErr       error
-	prepare       func() error
-	wantFile      string
-	wantNoFile    string
+	name                string
+	remote              bool
+	server              func(*testing.T, http.HandlerFunc, map[string]any)
+	handler             http.HandlerFunc
+	config              map[string]any
+	time                func() time.Time
+	persistCursor       map[string]any
+	want                []map[string]any
+	wantCursor          []map[string]any
+	wantErr             error
+	prepare             func() error
+	wantFile            string
+	wantNoFile          string
+	wantTraceNotContain []string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
 		name: "hello_world",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "Hello, World!"},
 		},
 	},
 	{
 		name: "hello_world_sprintf",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":sprintf("Hello, %s!", ["World"])}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "Hello, World!"},
 		},
 	},
 	{
 		name: "hello_world_time",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":{"Hello, World!": now}}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
 		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		want: []map[string]interface{}{{
-			"message": map[string]interface{}{
+		want: []map[string]any{{
+			"message": map[string]any{
 				"Hello, World!": "2010-02-08T00:00:00Z",
 			},
 		}},
 	},
 	{
 		name: "hello_world_sum",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":string(sum([1,2,3,4]))}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{{
+		want: []map[string]any{{
 			"message": "10",
 		}},
 	},
 	{
 		name: "hello_world_bytes",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":string(hex_decode("68656c6c6f20776f726c64"))}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{{
+		want: []map[string]any{{
 			"message": "hello world",
 		}},
 	},
 	{
 		name: "hello_world_front_and_tail_2",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":front([1,2,3,4,5],2)}, {"message":tail([1,2,3,4,5],2)}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": []any{1.0, 2.0}},
 			{"message": []any{3.0, 4.0, 5.0}},
 		},
 	},
 	{
 		name: "bad_events_type",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":["Hello, World!"]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
@@ -156,42 +164,42 @@ var inputTests = []struct {
 	},
 	{
 		name: "hello_world_non_nil_state",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}]}`,
-			"state":    map[string]interface{}{},
-			"resource": map[string]interface{}{
+			"state":    map[string]any{},
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "Hello, World!"},
 		},
 	},
 	{
 		name: "what_is_next",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}],"cursor":[{"todo":"What's next?"}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "Hello, World!"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"todo": "What's next?"},
 		},
 	},
 	{
 		name: "bad_cursor_type",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}],"cursor":["What's next?"]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
@@ -199,37 +207,37 @@ var inputTests = []struct {
 	},
 	{
 		name: "show_state",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[state]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"url": ""},
 		},
 	},
 	{
 		name: "show_provided_state",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[state]}`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"we":   "can",
 				"put":  []string{"a", "bunch"},
 				"of":   "stuff",
 				"here": "!",
 			},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"we":   "can",
-				"put":  []interface{}{"a", "bunch"}, // We lose typing.
+				"put":  []any{"a", "bunch"}, // We lose typing.
 				"of":   "stuff",
 				"here": "!",
 				"url":  "",
@@ -238,7 +246,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "iterative_state",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	{
@@ -251,20 +259,20 @@ var inputTests = []struct {
 		"data": state.data, // Make sure we have this for the next iteration.
 	}
 	`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"data":   []string{"first", "second", "third"},
 				"cursor": map[string]int{"next": 0},
 			},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "first"},
 			{"message": "second"},
 			{"message": "third"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			// The serialisation of numbers is to float when under 1<<53 (strings above).
 			// This is not visible within CEL, but presents in Go testing.
 			{"next": 1.0},
@@ -274,7 +282,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "iterative_state_implicit_initial_cursor",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
@@ -287,19 +295,19 @@ var inputTests = []struct {
 		"data": state.data, // Make sure we have this for the next iteration.
 	})
 	`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"data": []string{"first", "second", "third"},
 			},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "first"},
 			{"message": "second"},
 			{"message": "third"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			// The serialisation of numbers is to float when under 1<<53 (strings above).
 			// This is not visible within CEL, but presents in Go testing.
 			{"next": 1.0},
@@ -309,7 +317,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "iterative_state_provided_stored_cursor",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	{
@@ -322,22 +330,22 @@ var inputTests = []struct {
 		"data": state.data, // Make sure we have this for the next iteration.
 	}
 	`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"data":   []string{"first", "second", "third"},
 				"cursor": map[string]int{"next": 0},
 			},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		persistCursor: map[string]interface{}{
+		persistCursor: map[string]any{
 			"next": 1,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "second"},
 			{"message": "third"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			// The serialisation of numbers is to float when under 1<<53 (strings above).
 			// This is not visible within CEL, but presents in Go testing.
 			{"next": 2.0},
@@ -346,7 +354,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "iterative_state_implicit_initial_cursor_provided_stored_cursor",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
@@ -359,21 +367,21 @@ var inputTests = []struct {
 		"data": state.data, // Make sure we have this for the next iteration.
 	})
 	`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"data": []string{"first", "second", "third"},
 			},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		persistCursor: map[string]interface{}{
+		persistCursor: map[string]any{
 			"next": 1,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "second"},
 			{"message": "third"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			// The serialisation of numbers is to float when under 1<<53 (strings above).
 			// This is not visible within CEL, but presents in Go testing.
 			{"next": 2.0},
@@ -382,7 +390,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "strings_split",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	{
@@ -393,14 +401,14 @@ var inputTests = []struct {
 		)
 	}
 	`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"data": "first:second:third",
 			},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "first"},
 			{"message": "second"},
 			{"message": "third"},
@@ -408,7 +416,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "optional_types",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			// Program returns a compilation error if optional types are not enabled.
 			"program": `{"events":[
@@ -418,17 +426,17 @@ var inputTests = []struct {
 					{"message":"Hello, Void!"}
 			]}`,
 			"state": nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "Hello, Void!"},
 		},
 	},
 	{
 		name: "env_var_static",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"allowed_environment": []string{
 				"CELTESTENVVAR",
@@ -440,11 +448,11 @@ var inputTests = []struct {
 				{"message":env.?DISALLOWEDCELTESTENVVAR.orValue("not present")},
 			]}`,
 			"state": nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "TESTVALUE"},
 			{"message": "not present"},
 			{"message": "not present"},
@@ -452,7 +460,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "env_var_dynamic",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"allowed_environment": []string{
 				"CELTESTENVVAR",
@@ -462,11 +470,11 @@ var inputTests = []struct {
 				{"message":env[?k].orValue("not present")}
 			)}`,
 			"state": nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "TESTVALUE"},
 			{"message": "not present"},
 			{"message": "not present"},
@@ -475,7 +483,7 @@ var inputTests = []struct {
 	{
 		// This test exists purely to demonstrate that the lib is available.
 		name: "aws_signing_static",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `{"events": [{
 				"message": post_request("http://www.example.com/", "text/plain", "request data").sign_aws_from_static(
@@ -491,116 +499,321 @@ var inputTests = []struct {
 				).Header.Authorization[?0].orValue("nope")
 			}]}`,
 			"state": nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "AWS4-HMAC-SHA256 Credential=id/20091110/region/service/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=ad27046c0009e06c6626e6009ba2af96027f4893b7a190ab67aaec85becb25cd"},
 		},
 	},
 	{
 		// This test exists purely to demonstrate that the lib is available.
 		name: "optional_types_v2",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `{"events": [{
 				"message": optional.unwrap([optional.of(42), optional.none()]).encode_json(),
 			}]}`,
 			"state": nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": "[42]"},
 		},
 	},
 	{
 		// This test exists purely to demonstrate that the lib is available.
 		name: "two_var_comprehension_v2",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `{"events": [{
 				"message": {'hello': 'world'}.transformMap(k, v, v + '!').encode_json(),
 			}]}`,
 			"state": nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"message": `{"hello":"world!"}`},
 		},
 	},
 	{
 		name: "timestamp_round",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":timestamp("2009-11-10T23:00:00Z").round(duration("24h"))}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{{
+		want: []map[string]any{{
 			"message": "2009-11-11T00:00:00Z",
 		}},
 	},
 	{
 		name: "timestamp_truncate",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":timestamp("2009-11-10T23:00:00Z").truncate(duration("24h"))}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
-		want: []map[string]interface{}{{
+		want: []map[string]any{{
 			"message": "2009-11-10T00:00:00Z",
 		}},
+	},
+
+	// Emit tests.
+	{
+		name: "emit_no_cursor",
+		config: map[string]any{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello"},{"message":"world"}].emit(e, e)}`,
+			"state":    nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+	},
+	{
+		name: "emit_with_cursor",
+		config: map[string]any{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello","id":1},{"message":"world","id":2}].emit(e, {"message":e.message}, {"id":e.id})}`,
+			"state":    nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+		wantCursor: []map[string]any{
+			{"id": int64(1)},
+			{"id": int64(2)},
+		},
+	},
+
+	// Emit error-handling pattern (mirrors the documented example).
+	{
+		name: "emit_error_handling_success",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"},{"msg":"b"}].emit(e, e, {"id": e.msg}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"msg": "a"},
+			{"msg": "b"},
+			{"published": float64(2), "cursor": map[string]any{"id": "b"}},
+		},
+		wantCursor: []map[string]any{
+			{"id": "a"},
+			{"id": "b"},
+			{"id": "b"},
+		},
+	},
+	{
+		name: "emit_error_handling_failure",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"}, "bad"].emit(e, e, {"id": "x"}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"msg": "a"},
+			{"error": "emit: event must be a map, got string"},
+		},
+		wantCursor: []map[string]any{
+			{"id": "x"},
+		},
+	},
+
+	// Stream decode tests.
+	{
+		name: "decode_csv_stream_lazy_gzip",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  name,age,city
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA8tLzE3VSUxP1UnOLKnkcszJTE7VMTbQ8UstV4jML8rmcspP0jEy1fHJz0vJz+MCACmhrnIuAAAA"
+	).stream_gzip().decode_csv_stream_lazy().map(row,
+		row
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"name": "Alice", "age": "30", "city": "New York"},
+			{"name": "Bob", "age": "25", "city": "London"},
+		},
+	},
+	{
+		name: "decode_csv_stream_lazy_no_header_gzip",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA3PMyUxO1TE20PFLLVeIzC/K5nLKT9IxMtXxyc9Lyc/jAgAMH1FQIAAAAA=="
+	).stream_gzip().decode_csv_stream_lazy_no_header().map(row,
+		{"fields": row}
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"fields": []any{"Alice", "30", "New York"}},
+			{"fields": []any{"Bob", "25", "London"}},
+		},
+	},
+	{
+		name: "decode_lines_gzip",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().map(line,
+		{"line": line}
+	).as(lines,
+		{"events": lines}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
+	},
+	{
+		name: "emit_with_decode_lines_gzip",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().emit(line,
+		{"line": line}
+	).as(result,
+		{
+			"events": [],
+			"emit_result": result,
+		}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
 	},
 
 	// FS-based tests.
 	{
 		name: "ndjson_log_file_simple",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "testdata/log-1.ndjson",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"level": "info", "message": "something happened"},
 			{"level": "error", "message": "something bad happened"},
 		},
 	},
 	{
 		name: "ndjson_log_file_simple_file_scheme",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": fileSchemePath("testdata/log-1.ndjson"),
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"level": "info", "message": "something happened"},
 			{"level": "error", "message": "something bad happened"},
 		},
 	},
 	{
 		name: "ndjson_log_file_corrupted",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "testdata/corrupted-log-1.ndjson",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"level": "info", "message": "something happened"},
 			{"error.message": `unexpected end of JSON input: {"message":"Dave, stop. Stop, will you? Stop, Dave. Will you stop, Dave? Stop, Dave."`},
 			{"level": "error", "message": "something bad happened"},
@@ -608,14 +821,14 @@ var inputTests = []struct {
 	},
 	{
 		name: "missing_file",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "testdata/absent.ndjson",
 			},
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"file.error": "file: " + missingFileError("testdata/absent.ndjson")},
 		},
 	},
@@ -623,7 +836,7 @@ var inputTests = []struct {
 	// Decoder tests.
 	{
 		name: "decode_xml",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				const text = `<?xml version="1.0" encoding="UTF-8"?>
 <order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
@@ -652,7 +865,7 @@ var inputTests = []struct {
 			config["resource.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(get(state.url).Body).as(body, {
@@ -697,18 +910,18 @@ var inputTests = []struct {
 			},
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"order": map[string]interface{}{
-					"address": map[string]interface{}{
+				"order": map[string]any{
+					"address": map[string]any{
 						"address": "Beekplantsoen 594, 2 hoog, 6849 IG",
 						"city":    "Boekend",
 						"company": "Sydøstlige Gruppe",
 						"country": "Netherlands",
 						"name":    "Joord Lennart",
 					},
-					"item": []interface{}{
-						map[string]interface{}{
+					"item": []any{
+						map[string]any{
 							"cost":   99.95,
 							"name":   "Egil's Saga",
 							"note":   "Free Sample",
@@ -729,7 +942,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_request",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(get(state.url).Body).as(body, {
@@ -738,15 +951,15 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -758,7 +971,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_request_check_user_agent_default",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).Body.as(body, {
@@ -780,15 +993,15 @@ var inputTests = []struct {
 
 			w.Write([]byte(msg))
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -800,7 +1013,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_request_check_user_agent_user_defined",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get_request(state.url).with({
@@ -828,15 +1041,15 @@ var inputTests = []struct {
 
 			w.Write([]byte(msg))
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -848,7 +1061,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_headers",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":         1,
 			"resource.headers": http.Header{"foo": {"bar"}},
 			"program": `
@@ -861,7 +1074,7 @@ var inputTests = []struct {
 			enc := json.NewEncoder(w)
 			enc.Encode(map[string][]any{"events": {r.Header.Get("foo")}})
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"events": []any{"bar"},
 			},
@@ -870,7 +1083,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_max_body_size_ok",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":               1,
 			"resource.max_body_size": int64(6),
 			"program": `
@@ -882,7 +1095,7 @@ var inputTests = []struct {
 		handler: func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("hello"))
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"message": "hello",
 			},
@@ -891,7 +1104,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_max_body_size_too_big",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":               1,
 			"resource.max_body_size": int64(4),
 			"program": `
@@ -903,7 +1116,7 @@ var inputTests = []struct {
 		handler: func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("hello"))
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"error": map[string]any{
 					"message": `failed eval: ERROR: <input>:2:5: response body too big
@@ -916,7 +1129,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_request_check_user_agent_none",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get_request(state.url).with({
@@ -942,15 +1155,15 @@ var inputTests = []struct {
 
 			w.Write([]byte(msg))
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -962,7 +1175,7 @@ var inputTests = []struct {
 	{
 		name:   "GET_request_TLS",
 		server: newTestServer(httptest.NewTLSServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":                       1,
 			"resource.ssl.verification_mode": "none",
 			"program": `
@@ -972,15 +1185,15 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -992,7 +1205,7 @@ var inputTests = []struct {
 	{
 		name:   "retry_after_request",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).as(resp, {
@@ -1004,14 +1217,14 @@ var inputTests = []struct {
 	`,
 		},
 		handler: retryAfterHandler("1"),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"hello": "world"},
 		},
 	},
 	{
 		name:   "retry_after_request_time",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).as(resp, {
@@ -1023,14 +1236,14 @@ var inputTests = []struct {
 	`,
 		},
 		handler: retryAfterHandler(time.Now().Add(time.Second).UTC().Format(http.TimeFormat)),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"hello": "world"},
 		},
 	},
 	{
 		name:   "rate_limit_request_0",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).as(resp, {
@@ -1043,14 +1256,14 @@ var inputTests = []struct {
 	`,
 		},
 		handler: rateLimitHandler("0", 100*time.Millisecond),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"hello": "world"},
 		},
 	},
 	{
 		name:   "rate_limit_request_10",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).as(resp, {
@@ -1063,14 +1276,14 @@ var inputTests = []struct {
 	`,
 		},
 		handler: rateLimitHandler("10", 100*time.Millisecond),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"hello": "world"},
 		},
 	},
 	{
 		name:   "rate_limit_request_10_too_slow",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).as(resp, {
@@ -1083,12 +1296,12 @@ var inputTests = []struct {
 	`,
 		},
 		handler: rateLimitHandler("10", 10*time.Second),
-		want:    []map[string]interface{}{},
+		want:    []map[string]any{},
 	},
 	{
 		name:   "retry_failure",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).as(resp, {
@@ -1100,17 +1313,17 @@ var inputTests = []struct {
 	`,
 		},
 		handler: retryHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"hello": "world"},
 		},
 	},
 	{
 		name:   "retry_failure_no_success",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
-			"resource": map[string]interface{}{
-				"retry": map[string]interface{}{
+			"resource": map[string]any{
+				"retry": map[string]any{
 					"max_attempts": 2,
 				},
 			},
@@ -1130,7 +1343,7 @@ var inputTests = []struct {
 			//nolint:errcheck // No point checking errors in test server.
 			w.Write([]byte(`{"error":"we were too slow"}`))
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"error": "we were too slow"},
 			{"status": float64(504)}, // Float because of JSON.
 		},
@@ -1139,7 +1352,7 @@ var inputTests = []struct {
 	{
 		name:   "POST_request",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
@@ -1149,15 +1362,15 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1169,7 +1382,7 @@ var inputTests = []struct {
 	{
 		name:   "repeated_POST_request",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": "100ms",
 			"program": `
 	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
@@ -1179,15 +1392,15 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1195,13 +1408,13 @@ var inputTests = []struct {
 				},
 			},
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1213,7 +1426,7 @@ var inputTests = []struct {
 	{
 		name:   "split_events",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(get(state.url).Body).as(body, {
@@ -1222,13 +1435,13 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"world": "moon",
 			},
 			{
-				"space": []interface{}{
-					map[string]interface{}{
+				"space": []any{
+					map[string]any{
 						"cake": "pumpkin",
 					},
 				},
@@ -1238,7 +1451,7 @@ var inputTests = []struct {
 	{
 		name:   "split_events_keep_parent",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(get(state.url).Body).as(body, {
@@ -1250,16 +1463,16 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": map[string]interface{}{
+				"hello": map[string]any{
 					"world": "moon",
 				},
 			},
 			{
-				"hello": map[string]interface{}{
-					"space": []interface{}{
-						map[string]interface{}{
+				"hello": map[string]any{
+					"space": []any{
+						map[string]any{
 							"cake": "pumpkin",
 						},
 					},
@@ -1270,7 +1483,7 @@ var inputTests = []struct {
 	{
 		name:   "nested_split_events",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(get(state.url).Body).decode_json().as(e0, {
@@ -1285,12 +1498,12 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"world": "moon",
 			},
 			{
-				"space": map[string]interface{}{
+				"space": map[string]any{
 					"cake": "pumpkin",
 				},
 			},
@@ -1299,7 +1512,7 @@ var inputTests = []struct {
 	{
 		name:   "absent_split",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(get(state.url).Body).decode_json().as(e, {
@@ -1314,16 +1527,16 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want:    []map[string]interface{}(nil),
+		want:    []map[string]any(nil),
 	},
 
 	// Cursor/pagination tests.
 	{
 		name:   "date_cursor",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
 			"program": `
@@ -1348,12 +1561,12 @@ var inputTests = []struct {
 	`,
 		},
 		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"timestamp": "2002-10-02T15:00:00Z"},
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
@@ -1361,15 +1574,15 @@ var inputTests = []struct {
 	},
 	{
 		name: "tracer_filename_sanitization",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["resource.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":                 1,
 			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
 			"program": `
@@ -1394,12 +1607,12 @@ var inputTests = []struct {
 	`,
 		},
 		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"timestamp": "2002-10-02T15:00:00Z"},
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
@@ -1408,16 +1621,16 @@ var inputTests = []struct {
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["resource.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":                 1,
 			"resource.tracer.enabled":  true,
 			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
 			"program": `
@@ -1442,12 +1655,12 @@ var inputTests = []struct {
 	`,
 		},
 		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"timestamp": "2002-10-02T15:00:00Z"},
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
@@ -1456,16 +1669,16 @@ var inputTests = []struct {
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["resource.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
 			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
 			"program": `
@@ -1490,81 +1703,39 @@ var inputTests = []struct {
 	`,
 		},
 		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"timestamp": "2002-10-02T15:00:00Z"},
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
 		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
 	},
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
 	{
-		name: "tracer_escaping_logs",
-		config: map[string]interface{}{
-			"interval":                 1,
-			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  true,
-			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state":                    map[string]interface{}{},
-			"program":                  "{}",
-		},
-		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
-	},
-	{
-		name: "tracer_disabled_escaping_logs",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-			server := httptest.NewServer(h)
-			config["resource.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
-		config: map[string]interface{}{
+		name:   "tracer_disabled_escaping_logs",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]any{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state": map[string]interface{}{
-				"fake_now": "2002-10-02T15:00:00Z",
-			},
-			"program": `
-	// Use terse non-standard check for presence of timestamp. The standard
-	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
-	(!is_error(state.cursor.timestamp) ?
-		state.cursor.timestamp
-	:
-		timestamp(state.fake_now)-duration('10m')
-	).as(time_cursor,
-	string(state.url).parse_url().with_replace({
-		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
-	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
-		"events": [event],
-		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
-		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
-		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
-
-		// Just for testing, cycle this back into the next state.
-		"fake_now": state.fake_now
-	}))
-	`,
+			"program":                  `bytes(get(state.url).Body).as(body, {"events": [body.decode_json()]})`,
 		},
-		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
-			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
-		},
-		wantCursor: []map[string]interface{}{
-			{"timestamp": "2002-10-02T15:00:00Z"},
-			{"timestamp": "2002-10-02T15:00:01Z"},
-			{"timestamp": "2002-10-02T15:00:02Z"},
-		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name:   "pagination_cursor_object",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	(!is_error(state.cursor.page) ?
@@ -1581,11 +1752,11 @@ var inputTests = []struct {
 	`,
 		},
 		handler: paginationHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"foo": "a"},
 			{"foo": "b"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"page": "bar"},
 			{"page": ""},
 		},
@@ -1593,7 +1764,7 @@ var inputTests = []struct {
 	{
 		name:   "pagination_cursor_array",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	(!is_error(state.cursor.page) ?
@@ -1614,11 +1785,11 @@ var inputTests = []struct {
 	`,
 		},
 		handler: paginationHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"foo": "a"},
 			{"foo": "b"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"page": "bar"},
 			{"page": ""},
 		},
@@ -1630,7 +1801,7 @@ var inputTests = []struct {
 		// retaining identity in "first" doesn't follow a logic that I understand.
 		name:   "first_event_cursor",
 		server: newTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	(!is_error(state.cursor.page) ?
@@ -1652,13 +1823,13 @@ var inputTests = []struct {
 	`,
 		},
 		handler: paginationHandler(),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"first": "none", "foo": "a"},
 			{"first": "a", "foo": "b"},
 			{"first": "b", "foo": "c"},
 			{"first": "c", "foo": "d"},
 		},
-		wantCursor: []map[string]interface{}{
+		wantCursor: []map[string]any{
 			{"first": "a", "page": "bar"},
 			{"first": "b", "page": ""},
 			{"first": "c", "page": ""},
@@ -1669,12 +1840,12 @@ var inputTests = []struct {
 	// Authenticated access tests.
 	{
 		name: "basic_accept",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":            1,
 			"auth.basic.user":     "test_client",
 			"auth.basic.password": "secret_password",
@@ -1688,15 +1859,15 @@ var inputTests = []struct {
 			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1707,12 +1878,12 @@ var inputTests = []struct {
 	},
 	{
 		name: "basic_reject",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":            1,
 			"auth.basic.user":     "test_client",
 			"auth.basic.password": "pleeassssee",
@@ -1726,7 +1897,7 @@ var inputTests = []struct {
 			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"error": "not authorized",
 			},
@@ -1734,12 +1905,12 @@ var inputTests = []struct {
 	},
 	{
 		name: "token_accept",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":         1,
 			"auth.token.type":  "Token",
 			"auth.token.value": "sssh_super_secret_token",
@@ -1753,15 +1924,15 @@ var inputTests = []struct {
 			"Token sssh_super_secret_token",
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1772,12 +1943,12 @@ var inputTests = []struct {
 	},
 	{
 		name: "token_reject",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":         1,
 			"auth.token.type":  "Token",
 			"auth.token.value": "leaked_but_rolled_over_token_found_on_github",
@@ -1791,7 +1962,7 @@ var inputTests = []struct {
 			"Token sssh_super_secret_token",
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"error": "not authorized",
 			},
@@ -1799,7 +1970,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "file_auth_default_header",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			dir := t.TempDir()
 			secret := "file-secret"
 			path := filepath.Join(dir, "auth_token")
@@ -1811,7 +1982,7 @@ var inputTests = []struct {
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":                   1,
 			"auth.file.prefix":           "Bearer ",
 			"auth.file.refresh_interval": "100ms",
@@ -1825,15 +1996,15 @@ var inputTests = []struct {
 			"Bearer file-secret",
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1844,7 +2015,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "file_auth_custom_header",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			dir := t.TempDir()
 			tokenPath := filepath.Join(dir, "api_token")
 			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
@@ -1857,7 +2028,7 @@ var inputTests = []struct {
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	bytes(get(state.url).Body).as(body, {
@@ -1870,15 +2041,15 @@ var inputTests = []struct {
 			"X-API-Key",
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1889,12 +2060,12 @@ var inputTests = []struct {
 	},
 	{
 		name: "digest_accept",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":             1,
 			"auth.digest.user":     "test_client",
 			"auth.digest.password": "secret_password",
@@ -1911,15 +2082,15 @@ var inputTests = []struct {
 			"random_string",
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -1930,12 +2101,12 @@ var inputTests = []struct {
 	},
 	{
 		name: "digest_reject",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":             1,
 			"auth.digest.user":     "test_client",
 			"auth.digest.password": "wrong_secret_password",
@@ -1952,7 +2123,7 @@ var inputTests = []struct {
 			"random_string",
 			defaultHandler(http.MethodGet, ""),
 		),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"error": "not authorized",
 			},
@@ -1962,8 +2133,8 @@ var inputTests = []struct {
 		// Test case modelled on `curl --digest -u test_user:secret_password https://httpbin.org/digest-auth/auth/test_user/secret_password/md5`.
 		name:   "digest_remote",
 		remote: true,
-		server: func(_ *testing.T, _ http.HandlerFunc, _ map[string]interface{}) {},
-		config: map[string]interface{}{
+		server: func(_ *testing.T, _ http.HandlerFunc, _ map[string]any) {},
+		config: map[string]any{
 			"resource.url":         "https://httpbin.org/digest-auth/auth/test_user/secret_password/md5",
 			"interval":             1,
 			"auth.digest.user":     "test_user",
@@ -1974,7 +2145,7 @@ var inputTests = []struct {
 	})
 	`,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
 				"authenticated": true,
 				"user":          "test_user",
@@ -1983,17 +2154,17 @@ var inputTests = []struct {
 	},
 	{
 		name: "OAuth2",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			config["auth.oauth2.token_url"] = s.URL + "/token"
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":                  1,
 			"auth.oauth2.client.id":     "a_client_id",
 			"auth.oauth2.client.secret": "a_client_secret",
-			"auth.oauth2.endpoint_params": map[string]interface{}{
+			"auth.oauth2.endpoint_params": map[string]any{
 				"param1": "v1",
 			},
 			"auth.oauth2.scopes": []string{"scope1", "scope2"},
@@ -2003,20 +2174,27 @@ var inputTests = []struct {
 	})
 	`,
 		},
-		handler: oauth2Handler,
-		want: []map[string]interface{}{
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write(fmt.Appendf(nil, "unexpected UA: %s", r.UserAgent()))
+				return
+			}
+			oauth2Handler(w, r)
+		},
+		want: []map[string]any{
 			{"hello": "world"},
 		},
 	},
 
 	{
 		name: "Auth AWS V4 Signer",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			t.Cleanup(s.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":                   1,
 			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
 			"auth.aws.secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -2029,15 +2207,15 @@ var inputTests = []struct {
 	`,
 		},
 		handler: awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "")),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -2047,11 +2225,135 @@ var inputTests = []struct {
 		},
 	},
 
+	// Auth header sanitization in trace logs.
+	{
+		name: "trace_sanitize_basic_auth",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]any{
+			"interval":                 1,
+			"auth.basic.user":          "test_client",
+			"auth.basic.password":      "secret_password",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]any{
+			{
+				"hello": []any{
+					map[string]any{
+						"world": "moon",
+					},
+					map[string]any{
+						"space": []any{
+							map[string]any{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_basic_auth.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+	{
+		name: "trace_sanitize_token_auth",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]any{
+			"interval":                 1,
+			"auth.token.type":          "Token",
+			"auth.token.value":         "sssh_super_secret_token",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]any{
+			{
+				"hello": []any{
+					map[string]any{
+						"world": "moon",
+					},
+					map[string]any{
+						"space": []any{
+							map[string]any{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_token_auth.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+	{
+		name: "trace_sanitize_oauth2",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			config["auth.oauth2.token_url"] = s.URL + "/token"
+			t.Cleanup(s.Close)
+		},
+		config: map[string]any{
+			"interval":                  1,
+			"auth.oauth2.client.id":     "a_client_id",
+			"auth.oauth2.client.secret": "a_client_secret",
+			"auth.oauth2.endpoint_params": map[string]any{
+				"param1": "v1",
+			},
+			"auth.oauth2.scopes":       []string{"scope1", "scope2"},
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	post(state.url, '', '').Body.as(body, {
+		"events": body.decode_json()
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write(fmt.Appendf(nil, "unexpected UA: %s", r.UserAgent()))
+				return
+			}
+			oauth2Handler(w, r)
+		},
+		want: []map[string]any{
+			{"hello": "world"},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_oauth2.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+
 	// Multi-step requests.
 	{
 		name:   "simple_multistep_GET_request",
 		server: newChainTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	// Get the record IDs.
@@ -2063,15 +2365,15 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -2082,7 +2384,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "three_step_GET_request",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -2097,7 +2399,7 @@ var inputTests = []struct {
 			config["resource.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	// Get the record IDs.
@@ -2111,15 +2413,15 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"hello": []interface{}{
-					map[string]interface{}{
+				"hello": []any{
+					map[string]any{
 						"world": "moon",
 					},
-					map[string]interface{}{
-						"space": []interface{}{
-							map[string]interface{}{
+					map[string]any{
+						"space": []any{
+							map[string]any{
 								"cake": "pumpkin",
 							},
 						},
@@ -2133,7 +2435,7 @@ var inputTests = []struct {
 	{
 		name:   "type_error_message_compile_time",
 		server: newChainTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).Body.decode_json().records.map(r,
@@ -2151,7 +2453,7 @@ var inputTests = []struct {
 	{
 		name:   "type_error_message_run_time",
 		server: newChainTestServer(httptest.NewServer),
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `
 	get(state.url).Body.decode_json().records.map(r,
@@ -2162,9 +2464,9 @@ var inputTests = []struct {
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"message": `failed eval: ERROR: <input>:3:20: no such overload
  |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
  | ...................^`,
@@ -2175,79 +2477,79 @@ var inputTests = []struct {
 
 	{
 		name: "debug",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":{"value": 1+debug("partial sum", 2+3)}}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
 		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		want: []map[string]interface{}{{
-			"message": map[string]interface{}{
+		want: []map[string]any{{
+			"message": map[string]any{
 				"value": 6.0, // float64 due to json encoding.
 			},
 		}},
 	},
 	{
 		name: "debug_error",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
 		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		want: []map[string]interface{}{{
-			"message": map[string]interface{}{
+		want: []map[string]any{{
+			"message": map[string]any{
 				"value": "division by zero",
 			},
 		}},
 	},
 	{
 		name: "dump_no_error",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
-			"failure_dump": map[string]interface{}{
+			"failure_dump": map[string]any{
 				"enabled":  true,
 				"filename": "failure_dumps/dump.json",
 			},
 		},
 		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
-		want: []map[string]interface{}{{
-			"message": map[string]interface{}{
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		want: []map[string]any{{
+			"message": map[string]any{
 				"value": "division by zero",
 			},
 		}},
 	},
 	{
 		name: "dump_error",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
-			"failure_dump": map[string]interface{}{
+			"failure_dump": map[string]any{
 				"enabled":  true,
 				"filename": "failure_dumps/dump.json",
 			},
 		},
 		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
-		want: []map[string]interface{}{
+		wantFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]any{
 			{
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"message": `failed eval: ERROR: <input>:1:58: division by zero
  | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
  | .........................................................^`,
@@ -2257,14 +2559,14 @@ var inputTests = []struct {
 	},
 	{
 		name: "dump_error_delete",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
 			"state":    nil,
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
-			"failure_dump": map[string]interface{}{
+			"failure_dump": map[string]any{
 				"enabled":  false, // We have a name but are disabled, so delete.
 				"filename": "failure_dumps/dump.json",
 			},
@@ -2272,16 +2574,16 @@ var inputTests = []struct {
 		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
 		prepare: func() error {
 			// Make a file that the configuration should delete.
-			err := os.MkdirAll("failure_dumps", 0o700)
+			err := os.MkdirAll(filepath.Join("cel", "failure_dumps"), 0o700)
 			if err != nil {
 				return err
 			}
-			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+			return os.WriteFile(filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
 		},
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
-		want: []map[string]interface{}{
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]any{
 			{
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"message": `failed eval: ERROR: <input>:1:58: division by zero
  | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
  | .........................................................^`,
@@ -2292,7 +2594,7 @@ var inputTests = []struct {
 
 	{
 		name: "max_executions_with_remaining_executions",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval":       1,
 			"max_executions": 5,
 			"program": `debug("STATE", int(state.n).as(n, {
@@ -2301,12 +2603,12 @@ var inputTests = []struct {
 							"want_more":  remaining_executions != 0,
 						}))`,
 			"state": map[string]any{"n": 0},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
 		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{"n": float64(1), "remaining_executions": float64(4)},
 			{"n": float64(2), "remaining_executions": float64(3)},
 			{"n": float64(3), "remaining_executions": float64(2)},
@@ -2320,7 +2622,7 @@ var inputTests = []struct {
 	// Coverage
 	{
 		name: "coverage",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"interval": 1,
 			"program": `int(state.n).as(n, {
 							"events": [{"n": n+1}],
@@ -2337,7 +2639,7 @@ var inputTests = []struct {
 						})`,
 			"record_coverage": true,
 			"state":           map[string]any{"n": 0},
-			"resource": map[string]interface{}{
+			"resource": map[string]any{
 				"url": "",
 			},
 		},
@@ -2347,7 +2649,7 @@ var inputTests = []struct {
 		// the test construction that asks that we get at least as many
 		// results from the input as there are elements in the want slice
 		// and then stop.
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			// First periodic run.
 			{"n": float64(1)},
 			{"n": float64(2)},
@@ -2382,7 +2684,7 @@ func TestInput(t *testing.T) {
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
-	err := os.RemoveAll("failure_dumps")
+	err := os.RemoveAll(filepath.Join("cel", "failure_dumps"))
 	if err != nil {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
@@ -2451,11 +2753,16 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			id := "test_id:" + test.name
+			cwd, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("failed to get working directory: %v", err)
+			}
 			v2Ctx := v2.Context{
 				Logger:          logp.NewLogger("cel_test"),
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: userAgent},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
@@ -2465,7 +2772,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
-			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+			if !sameErrorOrContains(err, test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantFile != "" {
@@ -2480,6 +2787,17 @@ func TestInput(t *testing.T) {
 				}
 				if len(paths) != 0 {
 					t.Errorf("unexpected files found: %v", paths)
+				}
+			}
+			if len(test.wantTraceNotContain) > 0 && test.wantFile != "" {
+				traceData, err := os.ReadFile(filepath.Join(tempDir, test.wantFile))
+				if err != nil {
+					t.Fatalf("failed to read trace file for content check: %v", err)
+				}
+				for _, s := range test.wantTraceNotContain {
+					if bytes.Contains(traceData, []byte(s)) {
+						t.Errorf("trace log must not contain %q", s)
+					}
 				}
 			}
 			if test.wantErr != nil {
@@ -2524,14 +2842,14 @@ type publisher struct {
 	done      func()
 	mu        sync.Mutex
 	published []beat.Event
-	cursors   []map[string]interface{}
+	cursors   []map[string]any
 }
 
-func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+func (p *publisher) Publish(e beat.Event, cursor any) error {
 	p.mu.Lock()
 	p.published = append(p.published, e)
 	if cursor != nil {
-		c, ok := cursor.(map[string]interface{})
+		c, ok := cursor.(map[string]any)
 		if !ok {
 			return fmt.Errorf("invalid cursor type for testing: %T", cursor)
 		}
@@ -2560,16 +2878,16 @@ func missingFileError(path string) string {
 	return fmt.Sprint(err)
 }
 
-func newTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+func newTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, http.HandlerFunc, map[string]any) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 		server := serve(h)
 		config["resource.url"] = server.URL
 		t.Cleanup(server.Close)
 	}
 }
 
-func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, http.HandlerFunc, map[string]any) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/":
@@ -2582,15 +2900,6 @@ func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing
 		config["resource.url"] = server.URL
 		t.Cleanup(server.Close)
 	}
-}
-
-func newV2Context() (v2.Context, func()) {
-	ctx, cancel := context.WithCancel(context.Background())
-	return v2.Context{
-		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "test_id",
-		Cancelation: ctx,
-	}, cancel
 }
 
 //nolint:errcheck // No point checking errors in test server.
@@ -2857,26 +3166,6 @@ func paginationHandler() http.HandlerFunc {
 	}
 }
 
-//nolint:errcheck // No point checking errors in test server.
-func paginationArrayHandler() http.HandlerFunc {
-	var count int
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
-		switch count {
-		case 0:
-			w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
-		case 1:
-			if r.URL.Query().Get("page") != "bar" {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(`{"error":"wrong page token value"}`))
-				return
-			}
-			w.Write([]byte(`[{"foo":"bar"}]`))
-		}
-		count++
-	}
-}
-
 var redactorTests = []struct {
 	name  string
 	state mapstr.M
@@ -3070,5 +3359,67 @@ func TestRedactor(t *testing.T) {
 				t.Errorf("unexpected redaction:\n--- got\n--- want\n%s", cmp.Diff(got, test.wantRedact))
 			}
 		})
+	}
+}
+
+func TestGetResourceAttributesIncludesInputType(t *testing.T) {
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("input_type should be set from input name: got %q, want %q", got, want)
+	}
+}
+
+func TestGetResourceAttributesInputTypeCannotBeOverridden(t *testing.T) {
+	t.Setenv("OTEL_RESOURCE_ATTRIBUTES", "input_type=httpjson,deployment.environment=production")
+
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("built-in input_type should not be overridden from OTEL_RESOURCE_ATTRIBUTES: got %q, want %q", got, want)
+	}
+	if got, want := attrsMap["deployment.environment"], "production"; got != want {
+		t.Errorf("custom resource attributes from OTEL_RESOURCE_ATTRIBUTES should still be included: got %q, want %q", got, want)
+	}
+}
+
+func toResourceAttributeMap(attrs []attribute.KeyValue) map[string]string {
+	result := make(map[string]string, len(attrs))
+	for _, attr := range attrs {
+		result[string(attr.Key)] = attr.Value.AsString()
+	}
+	return result
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }

@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-07-28T06:18:04.600444Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "domain-trust-removed",

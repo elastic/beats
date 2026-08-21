@@ -11,7 +11,7 @@ This section is useful for the community Beats to migrate the Kibana 5.x dashboa
 
 In the Kibana 5.x, the saved dashboards consist of multiple JSON files, one for each dashboard, search, visualization and index-pattern. To import a dashboard in Kibana, you need to load not only the JSON file containing the dashboard, but also all its dependencies (searches, visualizations).
 
-Starting with Kibana 6.0, the dashboards are loaded by default via the Kibana API. In this case, the saved dashboard consist of a single JSON file that includes not only the dashboard content, but also all its dependencies.
+Starting with Kibana 6.0, the dashboards are loaded by default via the Kibana API. In this case, the saved dashboard consists of a single JSON file that includes not only the dashboard content, but also all its dependencies.
 
 As the format of the dashboards and index-pattern for Kibana 5.x is different than the ones for Kibana 6.x, they are placed in different directories. Depending on the Kibana version, the 5.x or 6.x dashboards are loaded.
 

@@ -23,22 +23,22 @@ import (
 )
 
 // MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.
-var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
-	"monitor": map[string]interface{}{
-		"timespan": map[string]interface{}{
+var MonitorTimespanValidator = lookslike.MustCompile(map[string]any{
+	"monitor": map[string]any{
+		"timespan": map[string]any{
 			"gte": IsTime,
 			"lt":  IsTime,
 		},
 	},
 })
 
-var MaybeHasEventType = lookslike.MustCompile(map[string]interface{}{
-	"event": map[string]interface{}{
+var MaybeHasEventType = lookslike.MustCompile(map[string]any{
+	"event": map[string]any{
 		"type": isdef.Optional(isdef.IsNonEmptyString),
 	},
 	"synthetics.type": isdef.Optional(isdef.IsNonEmptyString),
 })
 
-var MaybeHasDuration = lookslike.MustCompile(map[string]interface{}{
+var MaybeHasDuration = lookslike.MustCompile(map[string]any{
 	"monitor.duration.us": IsInt64,
 })

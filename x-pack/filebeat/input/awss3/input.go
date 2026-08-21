@@ -9,6 +9,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -45,6 +46,10 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
+	if features.AwsS3V2() {
+		return newInputV2(config, im.store, im.path, im.logger)
+	}
+
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig, im.logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
@@ -66,6 +71,3 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	return nil, fmt.Errorf("configuration has no SQS queue URL and no S3 bucket ARN")
 }
-
-// boolPtr returns a pointer to b.
-func boolPtr(b bool) *bool { return &b }

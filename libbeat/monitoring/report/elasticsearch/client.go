@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"time"
 
@@ -125,17 +126,13 @@ func (c *publishClient) Publish(ctx context.Context, batch publisher.Batch) erro
 
 		var params = map[string]string{}
 		// Copy params
-		for k, v := range c.params {
-			params[k] = v
-		}
+		maps.Copy(params, c.params)
 		// Extract potential additional params
 		p, err := event.Content.Meta.GetValue("params")
 		if err == nil {
 			p2, ok := p.(map[string]string)
 			if ok {
-				for k, v := range p2 {
-					params[k] = v
-				}
+				maps.Copy(params, p2)
 			}
 		}
 
@@ -204,7 +201,7 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		Timestamp: event.Content.Timestamp,
 		Fields:    fields,
 	}
-	bulk := [2]interface{}{action, document}
+	bulk := [2]any{action, document}
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
@@ -226,7 +223,7 @@ func getMonitoringIndexName() string {
 
 func logBulkFailures(log *logp.Logger, result eslegclient.BulkResponse, events []report.Event) {
 	var response struct {
-		Items []map[string]map[string]interface{} `json:"items"`
+		Items []map[string]map[string]any `json:"items"`
 	}
 
 	if err := json.Unmarshal(result, &response); err != nil {

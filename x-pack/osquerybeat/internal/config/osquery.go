@@ -6,13 +6,180 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
+	"time"
 )
+
+const (
+	// MaxSplay is the maximum allowed splay duration (aligns with daily-or-longer RRULE minimum).
+	MaxSplay = 12 * time.Hour
+	// DefaultSplay is the default splay duration (disabled)
+	DefaultSplay = 0
+)
+
+// RRuleScheduleConfig represents an RRULE-based schedule configuration
+// This provides an alternative to osquery's native interval-based scheduling
+type RRuleScheduleConfig struct {
+	// RRule is the RFC 5545 recurrence rule string
+	// Examples: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO,WE"
+	RRule string `config:"rrule" json:"rrule,omitempty"`
+
+	// StartDate is the required start date for the schedule (RFC3339 format)
+	// Queries will not run before this date
+	StartDate string `config:"start_date,omitempty" json:"start_date,omitempty"`
+
+	// EndDate is the optional end date for the schedule (RFC3339 format)
+	// Queries will not run after this date
+	EndDate string `config:"end_date,omitempty" json:"end_date,omitempty"`
+
+	// Splay is the maximum random delay before query execution.
+	// This helps spread out query execution times to avoid thundering herd effects.
+	// Accepts duration strings: "30s", "5m", "2h", etc.
+	// Range: 0s to 12h (see MaxSplay). Default: 0s (disabled).
+	Splay string `config:"splay,omitempty" json:"splay,omitempty"`
+
+	// Timeout is the query execution timeout in seconds
+	// Default is 60 seconds if not specified
+	Timeout int `config:"timeout,omitempty" json:"timeout,omitempty"`
+}
+
+// GetSplay parses and returns the splay duration, defaulting to 0s if not set
+func (c *RRuleScheduleConfig) GetSplay() (time.Duration, error) {
+	if c.Splay == "" {
+		return DefaultSplay, nil
+	}
+
+	d, err := time.ParseDuration(c.Splay)
+	if err != nil {
+		return 0, fmt.Errorf("invalid splay duration '%s': %w", c.Splay, err)
+	}
+
+	if d < 0 {
+		return 0, fmt.Errorf("splay cannot be negative: %s", c.Splay)
+	}
+
+	if d > MaxSplay {
+		return 0, fmt.Errorf("splay cannot exceed %v, got: %s", MaxSplay, c.Splay)
+	}
+
+	return d, nil
+}
+
+// ParseStartDate parses the start date string into a time.Time pointer
+func (c *RRuleScheduleConfig) ParseStartDate() (*time.Time, error) {
+	if c.StartDate == "" {
+		return nil, fmt.Errorf("start_date is required for rrule schedules")
+	}
+	t, err := time.Parse(time.RFC3339, c.StartDate)
+	if err != nil {
+		return nil, err
+	}
+	t = t.UTC()
+	return &t, nil
+}
+
+// ParseEndDate parses the end date string into a time.Time pointer
+func (c *RRuleScheduleConfig) ParseEndDate() (*time.Time, error) {
+	if c.EndDate == "" {
+		return nil, nil
+	}
+	t, err := time.Parse(time.RFC3339, c.EndDate)
+	if err != nil {
+		return nil, err
+	}
+	t = t.UTC()
+	return &t, nil
+}
+
+// IsEnabled returns true if an RRULE is configured
+func (c *RRuleScheduleConfig) IsEnabled() bool {
+	return c != nil && c.RRule != ""
+}
 
 // ElasticOptions contains Beat-specific options that are not part of
 // osquery's native config schema.
 type ElasticOptions struct {
-	Install             *InstallConfig             `config:"install" json:"-"`
-	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
+	Install *InstallConfig `config:"install" json:"-"`
+	// Profiling groups all query profiling settings (global publish default and local storage).
+	Profiling *ProfilingConfig `config:"profiling" json:"-"`
+	// Extensions configures loading of customer-managed osquery extensions.
+	Extensions *ExtensionsConfig `config:"extensions" json:"-"`
+}
+
+// ExtensionsConfig configures loading of customer-managed (third-party or
+// customer-built) osquery extensions. These extensions are NOT developed,
+// validated, or supported by Elastic; customers are fully responsible for
+// their security, maintenance, and stability.
+//
+// Paths lists absolute entries on the endpoint, where each entry may be:
+//   - a directory: every extension binary found directly in it is autoloaded
+//     (files ending in ".ext" on Unix or ".exe" on Windows);
+//   - a file: that specific extension binary is autoloaded;
+//   - a glob pattern (containing *, ? or [ ]): each match is resolved as a
+//     directory or file per the rules above.
+//
+// Symlinks are rejected (entries, glob matches, and directory contents) so the
+// binary that is validated is the one osqueryd executes.
+//
+// Entries are resolved when osqueryd is (re)started, which happens when the
+// extension configuration (or other osquery options) change. Adding or removing
+// binaries in a configured directory does NOT trigger a reload by itself.
+//
+// osquerybeat never copies these binaries and never writes into the Elastic
+// Agent install tree; it only appends the resolved paths to the osquery
+// extensions autoload file that lives in the runtime data directory. osqueryd
+// enforces safe file permissions on autoloaded extensions (owned by the running
+// user, not writable by group or others); unsafe, non-executable, or otherwise
+// invalid binaries are skipped and logged rather than aborting startup.
+type ExtensionsConfig struct {
+	// Paths lists absolute directories, files, or glob patterns to resolve into
+	// extension binaries.
+	Paths []string `config:"paths" json:"-"`
+	// Timeout optionally overrides osquery's extensions_timeout (seconds), the
+	// time osqueryd waits for autoloaded extensions to register.
+	Timeout int `config:"timeout" json:"-"`
+	// Require lists extension names osqueryd must wait for at startup
+	// (osquery's extensions_require); queries do not run until the named
+	// extensions have registered or extensions_timeout elapses. Use this to
+	// avoid "no such table" races against slow-registering extensions.
+	Require []string `config:"require" json:"-"`
+}
+
+// PathsOrEmpty returns the configured extension paths, or an empty slice when no
+// extensions are configured.
+func (c *ExtensionsConfig) PathsOrEmpty() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Paths
+}
+
+// ProfilingConfig groups all query profiling settings. When ProfilingAll is enabled (the default),
+// profiles are collected and published to the osquery_manager.query_profile data stream for all
+// queries that do not set their own profiling flag. It still requires the query_profile input stream
+// to be present for events to be published. Storage controls local retention of live profiles
+// for diagnostics, independent of publishing.
+type ProfilingConfig struct {
+	ProfilingAll *bool                      `config:"profiling_all" json:"-"`
+	Storage      *QueryProfileStorageConfig `config:"storage" json:"-"`
+}
+
+// ProfilingAllOrDefault returns the global profiling default, which is enabled unless
+// explicitly set to false.
+func (c ProfilingConfig) ProfilingAllOrDefault() bool {
+	if c.ProfilingAll == nil {
+		return true
+	}
+	return *c.ProfilingAll
+}
+
+// ResolveProfiling returns the effective profiling decision for a query: a per-query
+// override wins when set, otherwise the global default applies.
+func ResolveProfiling(globalDefault bool, override *bool) bool {
+	if override != nil {
+		return *override
+	}
+	return globalDefault
 }
 
 // QueryProfileStorageConfig controls local storage of live query profiles.
@@ -35,19 +202,29 @@ func (c QueryProfileStorageConfig) MaxProfilesOrDefault() int {
 	return c.MaxProfiles
 }
 
+type CommonScheduleConfig struct {
+	// SpaceID can match across queries in a pack; Fleet may set a pack-level default_space_id.
+	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
+	// ScheduleID is always per-query (policy schedule identity); it is not inherited from the pack.
+	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"`
+}
+
+// NativeSchedule holds interval and start_date for native (interval-based) schedules.
+// Used for Query (embedded with CommonScheduleConfig) and for Pack.DefaultNativeSchedule.
+type NativeSchedule struct {
+	Interval  int    `config:"interval" json:"interval,omitempty"`
+	StartDate string `config:"start_date,omitempty" json:"start_date,omitempty"` // RFC3339; for schedule_execution_count
+}
+
 type Query struct {
 	Query string `config:"query" json:"query"`
-	// Native schedule fields.
-	Interval int `config:"interval" json:"interval"`
-	// ScheduleID is the policy-defined schedule identifier for this scheduled query.
-	// Stored in the policy and used in result/response documents for correlation.
-	// If empty, the query name is used as the schedule_id when publishing.
-	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"`
-	// StartDate is the optional start date for native (interval-based) schedules (RFC3339).
-	// Used as the reference for schedule_execution_count.
-	StartDate string `config:"start_date,omitempty" json:"start_date,omitempty"`
-	// SpaceID is the optional policy space identifier for this scheduled query.
-	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
+
+	CommonScheduleConfig `config:",inline"`
+	NativeSchedule       `config:",inline"`
+	// RRuleSchedule provides RRULE-based scheduling as an alternative to interval.
+	// When set, queries are scheduled by osquerybeat instead of osqueryd's native scheduler.
+	// A query must not set both interval (native) and rrule_schedule; see ValidateQueryScheduleMode.
+	RRuleSchedule *RRuleScheduleConfig `config:"rrule_schedule,omitempty" json:"-"`
 
 	Platform    string `config:"platform" json:"platform,omitempty"`
 	Version     string `config:"version" json:"version,omitempty"`
@@ -55,7 +232,7 @@ type Query struct {
 	Description int    `config:"description" json:"description,omitempty"`
 
 	// Optional ECS mapping for the query, not rendered into osqueryd configuration
-	ECSMapping map[string]interface{} `config:"ecs_mapping" json:"-"`
+	ECSMapping map[string]any `config:"ecs_mapping" json:"-"`
 
 	// A boolean to set 'snapshot' mode, default true
 	// This is different from the default osquery behavior where the missing value defaults to false
@@ -65,20 +242,47 @@ type Query struct {
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
 
-	// Optional internal flag to emit per-query profiling for this scheduled query.
-	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
-	Profile bool `config:"profile" json:"-"`
+	// Optional per-query override to emit profiling for this scheduled query
+	// (native: osquery_schedule metrics; RRULE: process-level deltas like live queries).
+	// When nil the global elastic_options.profiling.profiling_all default applies (see ResolveProfiling).
+	// RRULE/live profiling uses the same serialized osquery client; native osqueryd schedules
+	// can still add process load outside that bracket. Not rendered into osqueryd configuration.
+	Profiling *bool `config:"profiling" json:"-"`
 }
 
 type Pack struct {
 	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
 	// If empty, the pack map key (pack name) is used when publishing.
-	PackID    string           `config:"pack_id,omitempty" json:"pack_id,omitempty"`
-	Discovery []string         `config:"discovery" json:"discovery,omitempty"`
-	Platform  string           `config:"platform" json:"platform,omitempty"`
-	Version   string           `config:"version" json:"version,omitempty"`
-	Shard     int              `config:"shard" json:"shard,omitempty"`
-	Queries   map[string]Query `config:"queries" json:"queries,omitempty"`
+	PackID string `config:"pack_id,omitempty" json:"pack_id,omitempty"`
+	// PackName is the policy-defined human-readable pack name; emitted as pack_name in
+	// result/response documents alongside pack_id. Optional and not sent to osqueryd.
+	PackName  string   `config:"pack_name,omitempty" json:"-"`
+	Discovery []string `config:"discovery" json:"discovery,omitempty"`
+	Platform  string   `config:"platform" json:"platform,omitempty"`
+	Version   string   `config:"version" json:"version,omitempty"`
+	Shard     int      `config:"shard" json:"shard,omitempty"`
+
+	// DefaultNativeSchedule provides interval and start_date defaults for queries in this pack
+	// that omit them. Omitted from JSON sent to osqueryd. Mutually exclusive at
+	// pack level with an enabled default_rrule_schedule (see ValidatePackScheduleDefaults). When set,
+	// every query in the pack must use native scheduling after merge (ValidatePackQueriesAfterMerge).
+	DefaultNativeSchedule NativeSchedule `config:"default_native_schedule" json:"-"`
+	// DefaultRRuleSchedule provides RRULE defaults for queries that do not define rrule_schedule.
+	// Config key default_rrule_schedule. Omitted from JSON sent to osqueryd.
+	// When enabled, every query in the pack must use rrule_schedule after merge.
+	DefaultRRuleSchedule *RRuleScheduleConfig `config:"default_rrule_schedule,omitempty" json:"-"`
+	// DefaultSpaceID is applied to queries that omit space_id (native and RRULE).
+	DefaultSpaceID string `config:"default_space_id,omitempty" json:"-"`
+	// DefaultPlatform is applied to queries that omit platform. Use this instead
+	// of the native pack platform when the policy expects per-query override semantics.
+	DefaultPlatform string `config:"default_platform,omitempty" json:"-"`
+	// DefaultVersion is applied to queries that omit version. Use this instead
+	// of the native pack version when the policy expects per-query override semantics.
+	DefaultVersion string `config:"default_version,omitempty" json:"-"`
+	// DefaultSnapshot is applied to queries that omit snapshot.
+	DefaultSnapshot *bool `config:"default_snapshot,omitempty" json:"-"`
+
+	Queries map[string]Query `config:"queries" json:"queries,omitempty"`
 }
 
 // > SELECT * FROM osquery_events where type = 'subscriber';
@@ -109,19 +313,61 @@ type Events struct {
 }
 
 type OsqueryConfig struct {
-	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
-	ElasticOptions        *ElasticOptions        `config:"elastic_options" json:"-"`
-	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
-	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
-	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
-	Views                 map[string]string      `config:"views" json:"views,omitempty"`
-	Events                *Events                `config:"events" json:"events,omitempty"`
-	Yara                  map[string]interface{} `config:"yara" json:"yara,omitempty"`
-	PrometheusTargets     map[string]interface{} `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
-	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
+	Options               map[string]any      `config:"options" json:"options,omitempty"`
+	ElasticOptions        *ElasticOptions     `config:"elastic_options" json:"-"`
+	Schedule              map[string]Query    `config:"schedule" json:"schedule,omitempty"`
+	Packs                 map[string]Pack     `config:"packs" json:"packs,omitempty"`
+	Filepaths             map[string][]string `config:"file_paths" json:"file_paths,omitempty"`
+	Views                 map[string]string   `config:"views" json:"views,omitempty"`
+	Events                *Events             `config:"events" json:"events,omitempty"`
+	Yara                  map[string]any      `config:"yara" json:"yara,omitempty"`
+	PrometheusTargets     map[string]any      `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
+	AutoTableConstruction map[string]any      `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
+}
+
+// forOsqueryd returns a copy of c without queries that osquerybeat runs via RRULE (they would
+// otherwise appear with interval 0 and are not meant for osqueryd's native scheduler).
+func (c OsqueryConfig) forOsqueryd() OsqueryConfig {
+	out := c
+	out.Schedule = nil
+	if len(c.Schedule) > 0 {
+		for name, q := range c.Schedule {
+			if q.RRuleSchedule.IsEnabled() {
+				continue
+			}
+			if out.Schedule == nil {
+				out.Schedule = make(map[string]Query)
+			}
+			out.Schedule[name] = q
+		}
+	}
+	out.Packs = nil
+	if len(c.Packs) > 0 {
+		for packName, pack := range c.Packs {
+			np := pack
+			np.Queries = nil
+			for qname, q := range pack.Queries {
+				if q.RRuleSchedule.IsEnabled() {
+					continue
+				}
+				if np.Queries == nil {
+					np.Queries = make(map[string]Query)
+				}
+				np.Queries[qname] = q
+			}
+			if len(np.Queries) == 0 {
+				continue
+			}
+			if out.Packs == nil {
+				out.Packs = make(map[string]Pack)
+			}
+			out.Packs[packName] = np
+		}
+	}
+	return out
 }
 
 // Render serializes the OsqueryConfig to JSON for osqueryd configuration.
 func (c OsqueryConfig) Render() ([]byte, error) {
-	return json.MarshalIndent(c, "", "    ")
+	return json.MarshalIndent(c.forOsqueryd(), "", "    ")
 }

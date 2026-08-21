@@ -37,7 +37,7 @@ type inputParsersConfig struct {
 func TestParsersExampleInline(t *testing.T) {
 	tests := map[string]struct {
 		lines            string
-		parsers          map[string]interface{}
+		parsers          map[string]any
 		expectedMessages []string
 	}{
 		"multiline docker logs parser": {
@@ -47,18 +47,18 @@ func TestParsersExampleInline(t *testing.T) {
 {"log":" lines","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 {"log":"[log] In total there should be 3 events\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 `,
-			parsers: map[string]interface{}{
+			parsers: map[string]any{
 				"max_bytes":       1024,
 				"line_terminator": "auto",
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"ndjson": map[string]interface{}{
+				"parsers": []map[string]any{
+					map[string]any{
+						"ndjson": map[string]any{
 							"keys_under_root": true,
 							"message_key":     "log",
 						},
 					},
-					map[string]interface{}{
-						"multiline": map[string]interface{}{
+					map[string]any{
+						"multiline": map[string]any{
 							"match":   "after",
 							"negate":  true,
 							"pattern": "^\\[log\\]",
@@ -82,12 +82,12 @@ func TestParsersExampleInline(t *testing.T) {
 	E
 	F</Data></Event>
 `,
-			parsers: map[string]interface{}{
+			parsers: map[string]any{
 				"max_bytes":       "4 KiB",
 				"line_terminator": "auto",
-				"parsers": []map[string]interface{}{
-					map[string]interface{}{
-						"multiline": map[string]interface{}{
+				"parsers": []map[string]any{
+					map[string]any{
+						"multiline": map[string]any{
 							"match":   "after",
 							"negate":  true,
 							"pattern": "^<Event",
@@ -103,7 +103,6 @@ func TestParsersExampleInline(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(test.parsers)
 			var c inputParsersConfig

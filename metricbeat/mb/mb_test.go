@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -52,18 +53,18 @@ func (m *testMetricSet) Fetch(reporter ReporterV2) {}
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
 		name string
-		in   interface{}
+		in   any
 		out  ModuleConfig
 		err  string
 	}{
 		{
 			name: "string value is not set on required field",
-			in:   map[string]interface{}{},
+			in:   map[string]any{},
 			err:  "string value is not set accessing 'module'",
 		},
 		{
 			name: "valid config",
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "example",
 				"metricsets": []string{"test"},
 			},
@@ -78,7 +79,7 @@ func TestModuleConfig(t *testing.T) {
 		},
 		{
 			name: "missing period",
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "example",
 				"metricsets": []string{"test"},
 				"period":     -1,
@@ -87,7 +88,7 @@ func TestModuleConfig(t *testing.T) {
 		},
 		{
 			name: "negative timeout",
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "example",
 				"metricsets": []string{"test"},
 				"timeout":    -1,
@@ -127,7 +128,7 @@ func TestModuleConfig(t *testing.T) {
 // Any changes to this test case are probably indicators of non-backwards
 // compatible changes affect all modules (including community modules).
 func TestModuleConfigDefaults(t *testing.T) {
-	c, err := conf.NewConfigFrom(map[string]interface{}{
+	c, err := conf.NewConfigFrom(map[string]any{
 		"module":     "mymodule",
 		"metricsets": []string{"mymetricset"},
 	})
@@ -152,12 +153,12 @@ func TestModuleConfigDefaults(t *testing.T) {
 func TestNewModuleRejectsNilPaths(t *testing.T) {
 	r := newTestRegistry(t)
 
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{metricSetName},
 	})
 
-	_, _, err := NewModule(c, r, nil, logptest.NewTestingLogger(t, ""))
+	_, _, err := NewModule(c, r, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	assert.ErrorIs(t, err, ErrPathsRequired)
 }
 
@@ -166,13 +167,13 @@ func TestNewModuleRejectsNilPaths(t *testing.T) {
 func TestNewModulesDuplicateHosts(t *testing.T) {
 	r := newTestRegistry(t)
 
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{metricSetName},
 		"hosts":      []string{"a", "b", "a"},
 	})
 
-	_, _, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, _, err := NewModule(c, r, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	assert.Error(t, err)
 }
 
@@ -181,11 +182,11 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 func TestNewModulesWithDefaultMetricSet(t *testing.T) {
 	r := newTestRegistry(t, DefaultMetricSet())
 
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module": moduleName,
 	})
 
-	_, metricSets, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricSets, err := NewModule(c, r, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -216,7 +217,7 @@ func TestNewModulesHostParser(t *testing.T) {
 	}
 
 	t.Run("MetricSet without HostParser", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]any{
 			"module":     moduleName,
 			"metricsets": []string{metricSetName},
 			"hosts":      []string{uri},
@@ -228,7 +229,7 @@ func TestNewModulesHostParser(t *testing.T) {
 	})
 
 	t.Run("MetricSet with HostParser", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]any{
 			"module":     moduleName,
 			"metricsets": []string{name},
 			"hosts":      []string{uri},
@@ -248,7 +249,7 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 
 	c := newConfig(t, moduleConf)
 
-	baseModule, err := newBaseModuleFromConfig(c, logptest.NewTestingLogger(t, ""))
+	baseModule, err := newBaseModuleFromConfig(c, logptest.NewTestingLogger(t, ""), paths.New())
 	assert.NoError(t, err)
 
 	assert.Equal(t, moduleName, baseModule.Name())
@@ -277,8 +278,8 @@ func newTestRegistry(t testing.TB, metricSetOptions ...MetricSetOption) *Registe
 	return r
 }
 
-func newTestMetricSet(t testing.TB, r *Register, config map[string]interface{}) MetricSet {
-	_, metricsets, err := NewModule(newConfig(t, config), r, paths.New(), logptest.NewTestingLogger(t, ""))
+func newTestMetricSet(t testing.TB, r *Register, config map[string]any) MetricSet {
+	_, metricsets, err := NewModule(newConfig(t, config), r, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -289,7 +290,7 @@ func newTestMetricSet(t testing.TB, r *Register, config map[string]interface{}) 
 	return metricsets[0]
 }
 
-func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
+func newConfig(t testing.TB, moduleConfig any) *conf.C {
 	config, err := conf.NewConfigFrom(moduleConfig)
 	if err != nil {
 		t.Fatal(err)
@@ -304,7 +305,7 @@ func TestModuleConfigQueryParams(t *testing.T) {
 		"floatKey":  11.5,
 		"boolKey":   true,
 		"nullKey":   nil,
-		"arKey":     []interface{}{1, 2},
+		"arKey":     []any{1, 2},
 	}
 
 	res := qp.String()
@@ -365,7 +366,7 @@ func TestBaseModuleWithConfig(t *testing.T) {
 				MetricSets: []string{"foo", "bar"},
 			}
 
-			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
+			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 			require.NoError(t, err)
 
 			bm, ok := m.(*BaseModule)

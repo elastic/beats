@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"maps"
 	"net"
 	"net/http"
@@ -51,7 +50,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
@@ -59,10 +57,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
@@ -78,10 +74,6 @@ const (
 	// exposed to the CEL program.
 	root = "state"
 )
-
-// The Filebeat user-agent is provided to the program as useragent. If a request
-// is not given a user-agent string, this user agent is added to the request.
-var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
@@ -164,15 +156,6 @@ func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
-// The request.tracer.filename may have ":" when a cel input has cursor config and
-// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
-}
-
 func (i input) run(env v2.Context, src *source, cursor map[string]any, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
@@ -197,17 +180,19 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	}
 	otelTracer := otelTracerProvider.Tracer(importPath)
 
-	if cfg.Resource.Tracer.enabled() {
-		id := sanitizeFileName(env.IDWithoutName)
-		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+	if cfg.Resource.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.Resource.Tracer.Filename)
 		if err != nil {
 			return err
 		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
-		}
 		cfg.Resource.Tracer.Filename = resolved
+	}
+	if cfg.FailureDump != nil {
+		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.FailureDump.Filename)
+		if err != nil {
+			return err
+		}
+		cfg.FailureDump.Filename = resolved
 	}
 
 	client, trace, otelMetrics, contextInjector, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
@@ -251,7 +236,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
-	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
+	// The emitter is created here but not yet bound to a session. The
+	// factory closure captures a pointer that is set after the runSession
+	// is constructed, because newProgram runs before the session exists.
+	var emitter *sessionEmitter
+	emitOpt := lib.Emit(func() lib.Emitter {
+		if emitter == nil {
+			return nil
+		}
+		return emitter
+	})
+	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, env.Agent.UserAgent, patterns, cfg.XSDs, log, trace, wantDump, doCov, emitOpt)
 	if err != nil {
 		return err
 	}
@@ -312,6 +307,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// In addition to this and the functions and globals available
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
+	emitter = &sessionEmitter{pub: pub}
 	s := &runSession{
 		cfg:      cfg,
 		prg:      prg,
@@ -326,7 +322,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		env: env,
 		now: i.now,
 
-		pub: pub,
+		pub:     pub,
+		emitter: emitter,
 
 		log:      log,
 		health:   health,
@@ -364,7 +361,8 @@ type runSession struct {
 	env v2.Context
 	now func() time.Time
 
-	pub inputcursor.Publisher
+	pub     inputcursor.Publisher
+	emitter *sessionEmitter
 
 	log      *logp.Logger
 	health   status.StatusReporter
@@ -376,6 +374,43 @@ type runSession struct {
 	cursor     map[string]any
 	goodCursor map[string]any
 	goodURL    string
+}
+
+var _ lib.Emitter = (*sessionEmitter)(nil)
+
+// sessionEmitter adapts inputcursor.Publisher to the lib.Emitter interface,
+// allowing the emit macro to publish events during CEL evaluation.
+type sessionEmitter struct {
+	pub inputcursor.Publisher
+
+	// count tracks events published during a single eval for metrics.
+	count int64
+	// hadCursor records whether any Emit call included a non-nil cursor.
+	hadCursor bool
+}
+
+func (e *sessionEmitter) Emit(value, cursor any) error {
+	event, ok := value.(map[string]any)
+	if !ok {
+		return fmt.Errorf("emit: event must be a map, got %T", value)
+	}
+	err := e.pub.Publish(beat.Event{
+		Timestamp: time.Now(),
+		Fields:    event,
+	}, cursor)
+	if err != nil {
+		return err
+	}
+	e.count++
+	if cursor != nil {
+		e.hadCursor = true
+	}
+	return nil
+}
+
+func (e *sessionEmitter) reset() {
+	e.count = 0
+	e.hadCursor = false
 }
 
 func (s *runSession) runCycle(ctx context.Context) error {
@@ -430,7 +465,8 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			return err
 		}
 		if result.action.retry() {
-			continue
+			// If we hit a 429, try again subject to budget limits.
+			goto nextTry
 		}
 
 		// Empty or nil events finish the execution without setting runSpan status.
@@ -442,6 +478,7 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			okSpans(runSpan)
 			return nil
 		}
+	nextTry:
 		budget--
 		if budget <= 0 {
 			msg := "reached maximum number of CEL executions"
@@ -561,6 +598,7 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	s.metrics.AddProgramExecution(execCtx)
 	start := s.now().In(time.UTC)
 
+	s.emitter.reset()
 	var err error
 	s.state, err = evalWith(execCtx, s.injector, s.prg, s.ast, s.state, start, s.wantDump, budget-1)
 	s.metrics.AddCELDuration(execCtx, time.Since(start))
@@ -574,7 +612,7 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 			errorSpans(err, execSpan)
 			return result, err
 		case errors.As(err, &dump):
-			path := strings.ReplaceAll(s.cfg.FailureDump.Filename, "*", sanitizeFileName(s.env.IDWithoutName))
+			path := strings.ReplaceAll(s.cfg.FailureDump.Filename, "*", httplog.SanitizeFileName(s.env.IDWithoutName))
 			dir := filepath.Dir(path)
 			base := filepath.Base(path)
 			ext := filepath.Ext(base)
@@ -610,6 +648,11 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", s.goodURL)
 	}
 
+	emitCount := s.emitter.count
+	if emitCount > 0 {
+		s.metrics.AddPublishedEvents(execCtx, uint(emitCount))
+	}
+
 	e, ok := s.state["events"]
 	if !ok {
 		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
@@ -617,6 +660,23 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		errorSpans(err, execSpan)
 		return result, err
 	}
+
+	if s.emitter.hadCursor {
+		var n int
+		switch ev := e.(type) {
+		case []any:
+			n = len(ev)
+		case map[string]any:
+			if ev != nil {
+				n = 1
+			}
+		}
+		if n != 1 {
+			execLog.Warnw("emit macro published events with cursors but state.events does not contain exactly one element; state.events should be a single-element array or object for cursor bookkeeping",
+				"emit_count", emitCount, "state_events_count", n)
+		}
+	}
+
 	var events []any
 	switch e := e.(type) {
 	case []any:
@@ -726,7 +786,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 			"limit", *s.cfg.MaxExecutions,
 			"next_eval_time", start.Add(s.cfg.Interval),
 		)
-		s.health.UpdateStatus(status.Degraded, msg)
 		execSpan.SetStatus(codes.Unset, msg)
 		return result, nil
 	}
@@ -1086,6 +1145,8 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]any, header http.Hea
 				}
 				limiter.SetLimitAt(waitUntil, next)
 				limiter.SetBurstAt(waitUntil, burst)
+			case nil:
+				log.Errorw("unexpected nil returned for rate limit reset", "rate_limit", mapstr.M(rateLimit))
 			default:
 				log.Errorw("unexpected type returned for rate limit reset", "type", reflect.TypeOf(w).String(), "rate_limit", mapstr.M(rateLimit))
 			}
@@ -1119,16 +1180,13 @@ func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit r
 			return limit, false
 		}
 		limit = rate.Inf
+	case nil:
+		log.Errorw("unexpected nil returned for rate limit "+which, "rate_limit", mapstr.M(rateLimit))
 	default:
 		log.Errorw("unexpected type returned for rate limit "+which, "type", reflect.TypeOf(r).String(), "rate_limit", mapstr.M(rateLimit))
 	}
 	return limit, true
 }
-
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context, tp *sdktrace.TracerProvider) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, *otel.ContextInjector, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
@@ -1180,47 +1238,17 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		traceLogger := zap.New(core)
 
 		maxBodyLen := cfg.Resource.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, log)
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 		c.Transport = trace
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err = os.Remove(cfg.Resource.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Resource.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Resource.Tracer.Filename, log)
 	}
 	if !cfg.FailureDump.enabled() && cfg.FailureDump != nil && cfg.FailureDump.Filename != "" {
 		// We have a fail-dump name, but we are not enabled,
 		// so remove all dumps we own.
-		err = os.Remove(cfg.FailureDump.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.FailureDump.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.FailureDump.Filename)
-		base := strings.TrimSuffix(cfg.FailureDump.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.FailureDump.Filename, log)
 	}
 
 	// inside the otel RoundTripper
@@ -1257,16 +1285,18 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}).StandardClient()
 	}
 
+	c.Transport = userAgentDecorator{
+		// The Filebeat user-agent is provided to the program as useragent. If a request
+		// is not given a user-agent string, this user agent is added to the request.
+		UserAgent: env.Agent.UserAgent,
+		Transport: c.Transport,
+	}
+
 	if cfg.Auth.OAuth2.isEnabled() {
 		c, err = cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-	}
-
-	c.Transport = userAgentDecorator{
-		UserAgent: userAgent,
-		Transport: c.Transport,
 	}
 
 	return c, trace, otelMetrics, contextInjector, nil
@@ -1290,6 +1320,7 @@ func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2
 func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 	attrs := []attribute.KeyValue{
 		semconv.ServiceInstanceID(env.IDWithoutName),
+		attribute.String("input_type", inputName),
 		attribute.String("package.name", cfg.GetPackageData("name")),
 		attribute.String("package.version", cfg.GetPackageData("version")),
 		attribute.String("package.data_stream", cfg.DataStream),
@@ -1307,8 +1338,8 @@ func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 		seen[attr.Key] = true
 	}
 
-	pairs := strings.Split(attributes, ",")
-	for _, pair := range pairs {
+	pairs := strings.SplitSeq(attributes, ",")
+	for pair := range pairs {
 		key, val, ok := strings.Cut(pair, "=")
 		if !ok || key == "" || seen[attribute.Key(key)] {
 			continue
@@ -1395,6 +1426,13 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
 		req.Header = prev.Header.Clone()
 
+		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
+			for _, k := range cfg.RedirectSensitiveHeaders {
+				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
+				req.Header.Del(k)
+			}
+		}
+
 		for _, k := range cfg.RedirectHeadersBanList {
 			log.Debugf("http client: ban header %v", k)
 			req.Header.Del(k)
@@ -1467,7 +1505,7 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 
 var (
 	// mimetypes holds supported MIME type mappings.
-	mimetypes = map[string]interface{}{
+	mimetypes = map[string]any{
 		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
 		"application/x-ndjson":     lib.NDJSON,
 		"application/zip":          lib.Zip,
@@ -1502,7 +1540,7 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, userAgent string, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool, emitOpt cel.EnvOption) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1523,6 +1561,9 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
+		lib.Stream(),
+		lib.CSV(),
+		lib.Lines(),
 		lib.HTTPWithContextOpts(ctx, client, httpOptions),
 		lib.LimitWithApply(limitPolicies, func(m map[string]any, h http.Header) map[string]any {
 			waitUntil := handleRateLimit(log, m, h, limit)
@@ -1531,11 +1572,12 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 			}
 			return m
 		}),
-		lib.Globals(map[string]interface{}{
+		lib.Globals(map[string]any{
 			"useragent":            userAgent,
 			"env":                  vars,
 			"remaining_executions": 0, // placeholder
 		}),
+		emitOpt,
 	}
 	if len(patterns) != 0 {
 		opts = append(opts, lib.Regexp(patterns))
@@ -1583,9 +1625,9 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]any, now time.Time, details bool, budget int) (map[string]any, error) {
 	contextInjector.SetContext(ctx)
-	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
+	out, det, err := prg.ContextEval(ctx, map[string]any{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
 		// which will persist over multiple evaluations. The lib.Time behaviour
@@ -1617,7 +1659,7 @@ func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg ce
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
+	v, err := out.ConvertToNative(reflect.TypeFor[*structpb.Struct]())
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
 		clearWantMore(state)
@@ -1669,14 +1711,14 @@ func (e dumpError) writeToFile(path string) (err error) {
 // It leaves state intact if there is no "want_more" element, and sets the element to false
 // if there is. This is necessary instead of just doing delete(state, "want_more") as
 // client CEL code may expect the want_more field to be present.
-func clearWantMore(state map[string]interface{}) {
+func clearWantMore(state map[string]any) {
 	if _, ok := state["want_more"]; ok {
 		state["want_more"] = false
 	}
 }
 
-func errorMessage(msg string) map[string]interface{} {
-	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
+func errorMessage(msg string) map[string]any {
+	return map[string]any{"error": map[string]any{"message": msg}}
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
@@ -1686,10 +1728,10 @@ func newRetryLog(log *logp.Logger) *retryLog {
 	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
 }
 
-func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
-func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
-func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
-func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+func (l *retryLog) Error(msg string, kv ...any) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...any)  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...any) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...any)  { l.log.Warnw(msg, kv...) }
 
 func test(url *url.URL) error {
 	port := func() string {
@@ -1748,8 +1790,8 @@ func cloneMap(dst, src mapstr.M) {
 			d := make(mapstr.M, len(v))
 			dst[k] = d
 			cloneMap(d, v)
-		case map[string]interface{}:
-			d := make(map[string]interface{}, len(v))
+		case map[string]any:
+			d := make(map[string]any, len(v))
 			dst[k] = d
 			cloneMap(d, v)
 		case []mapstr.M:
@@ -1760,10 +1802,10 @@ func cloneMap(dst, src mapstr.M) {
 				a = append(a, d)
 			}
 			dst[k] = a
-		case []map[string]interface{}:
-			a := make([]map[string]interface{}, 0, len(v))
+		case []map[string]any:
+			a := make([]map[string]any, 0, len(v))
 			for _, m := range v {
-				d := make(map[string]interface{}, len(m))
+				d := make(map[string]any, len(m))
 				cloneMap(d, m)
 				a = append(a, d)
 			}
@@ -1789,22 +1831,22 @@ func walkMap(m mapstr.M, path string, fn func(parent mapstr.M, key string)) {
 	switch v := v.(type) {
 	case mapstr.M:
 		walkMap(v, rest, fn)
-	case map[string]interface{}:
+	case map[string]any:
 		walkMap(v, rest, fn)
 	case []mapstr.M:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []map[string]interface{}:
+	case []map[string]any:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []interface{}:
+	case []any:
 		for _, v := range v {
 			switch m := v.(type) {
 			case mapstr.M:
 				walkMap(m, rest, fn)
-			case map[string]interface{}:
+			case map[string]any:
 				walkMap(m, rest, fn)
 			}
 		}
