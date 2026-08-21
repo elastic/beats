@@ -321,11 +321,13 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 
 	// Get query info for ECS mapping, pack/space, and schedule id fallback
 	var ecsMapping ecs.Mapping
-	var spaceID, packID string
+	var spaceID, packID, packName, queryName string
 	if qi, ok := h.configPlugin.LookupQueryInfo(name); ok {
 		ecsMapping = qi.ECSMapping
 		spaceID = qi.SpaceID
 		packID = qi.PackID
+		packName = qi.PackName
+		queryName = qi.QueryName
 	}
 
 	scheduleID := scheduledQuery.ScheduleID()
@@ -349,7 +351,7 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 		if action != "" {
 			meta["action"] = action
 		}
-		h.publisher.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, spaceID, packID, meta, rows, ecsMapping, nil)
+		h.publisher.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, spaceID, packID, packName, queryName, meta, rows, ecsMapping, nil)
 	}
 
 	if scheduledQuery.Snapshot() {
@@ -361,7 +363,7 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 	}
 
 	// Synthetic response document (no action) with execution count for correlation
-	h.publisher.PublishScheduledResponse(scheduleID, packID, spaceID, responseID, startedAt, completedAt, plannedScheduleTime, totalHits, int64(executionIndex))
+	h.publisher.PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID, startedAt, completedAt, plannedScheduleTime, totalHits, int64(executionIndex))
 
 	h.log.Debugf("RRULE-scheduled query '%s' completed with %d results", name, len(hits))
 	return nil
