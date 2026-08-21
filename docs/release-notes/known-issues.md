@@ -21,6 +21,20 @@ Known issues are significant defects or limitations that may impact your impleme
 
 % :::
 
+:::{dropdown} Disk queue filled metrics can underflow after blocked publishes
+**Applies to**: Beats version v8.15.0+.
+
+**Details**
+When a disk queue reaches its configured capacity, inputs can block until
+the output acknowledges events. The queue then accepts the blocked event without
+updating its metrics. When the event is later removed, the
+`queue.filled.events`, `queue.filled.bytes` and `queue.filled.pct`
+metrics might report incorrect values. Event delivery is unaffected.
+
+**Resolved**
+To apply the fix, upgrade to version v8.19.21, v9.5.3, v9.4.6, or any later release.
+:::
+
 :::{dropdown} Filebeat might crash (panic) on input errors or invalid processor configuration
 **Applies to**: Filebeat 9.2.3
 
