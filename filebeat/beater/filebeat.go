@@ -26,11 +26,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/backup"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/filestream/takeover"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
 	"github.com/elastic/beats/v7/filebeat/registrar"
@@ -48,6 +50,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -362,6 +365,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		})
 	}
 
+	if err = processLogInputTakeOver(fb.logger, stateStore, config, b.Info.Paths); err != nil {
+		fb.logger.Errorf("Failed to attempt filestream state take over: %+v", err)
+		return err
+	}
+
 	// Setup registrar to persist state
 	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout, fb.logger)
 	if err != nil {
@@ -599,17 +607,46 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 	return pipelineLoaderFactory
 }
 
+// processLogInputTakeOver migrates legacy log input state to filestream state
+// for filestream inputs configured with take_over: true.
+func processLogInputTakeOver(logger *logp.Logger, stateStore statestore.States, config *cfg.Config, beatPaths *paths.Path) error {
+	logger = logger.Named("filestream-takeover")
+	inputs, err := fetchInputConfiguration(config, logger, beatPaths)
+	if err != nil {
+		return fmt.Errorf("failed to fetch input configuration when attempting take over: %w", err)
+	}
+	if len(inputs) == 0 {
+		return nil
+	}
+
+	store, err := stateStore.StoreFor("")
+	if err != nil {
+		return fmt.Errorf("failed to access state when attempting take over: %w", err)
+	}
+	defer store.Close()
+
+	registryHome := beatPaths.Resolve(paths.Data, config.Registry.Path)
+	registryHome = filepath.Join(registryHome, "filebeat")
+
+	backuper := backup.NewRegistryBackuper(logger, registryHome)
+	return takeover.TakeOverLogInputStates(logger, store, backuper, inputs)
+}
+
 // fetches all the defined input configuration available at Filebeat startup including external files.
-func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []*conf.C, err error) {
-	if len(config.Inputs) == 0 {
-		inputs = []*conf.C{}
-	} else {
-		inputs = config.Inputs
+func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger, beatPaths *paths.Path) (inputs []*conf.C, err error) {
+	inputs = make([]*conf.C, 0, len(config.Inputs))
+	for _, input := range config.Inputs {
+		if input.Enabled() {
+			inputs = append(inputs, input)
+		}
 	}
 
 	// reading external input configuration if defined
 	var dynamicInputCfg cfgfile.DynamicConfig
 	if config.ConfigInput != nil {
+		if !config.ConfigInput.Enabled() {
+			return inputs, nil
+		}
 		err = config.ConfigInput.Unpack(&dynamicInputCfg)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unpack the dynamic input configuration: %w", err)
@@ -619,7 +656,12 @@ func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []
 		return inputs, nil
 	}
 
-	cfgPaths, err := filepath.Glob(dynamicInputCfg.Path)
+	path := dynamicInputCfg.Path
+	if !filepath.IsAbs(path) {
+		path = beatPaths.Resolve(paths.Config, path)
+	}
+
+	cfgPaths, err := filepath.Glob(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve external input configuration paths: %w", err)
 	}
@@ -628,16 +670,16 @@ func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []
 		return inputs, nil
 	}
 
-	// making a copy so we can safely extend the slice
-	inputs = make([]*conf.C, len(config.Inputs))
-	copy(inputs, config.Inputs)
-
 	for _, p := range cfgPaths {
 		externalInputs, err := cfgfile.LoadList(p, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load external input configuration: %w", err)
 		}
-		inputs = append(inputs, externalInputs...)
+		for _, input := range externalInputs {
+			if input.Enabled() {
+				inputs = append(inputs, input)
+			}
+		}
 	}
 
 	return inputs, nil
