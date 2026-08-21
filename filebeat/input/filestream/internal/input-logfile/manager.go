@@ -72,6 +72,7 @@ type InputManager struct {
 	storeMu sync.Mutex
 	entry   *logfileEntry
 	release func()
+	closed  bool
 	idsMux  sync.Mutex
 	ids     map[string]struct{}
 }
@@ -91,21 +92,51 @@ var errNoInputRunner = errors.New("no input runner available")
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
-// setup opens the shared store via the process-wide cache on the first call.
-// Caller holds cim.storeMu.
-func (cim *InputManager) setup() error {
+// ensureSetup opens the shared store on first call and returns a retained
+// reference to the logfileEntry. The caller must call entry.store.Release()
+// when done. ensureSetup must NOT be called with storeMu held: it releases
+// and re-acquires the lock around the blocking acquireStore call so that a
+// concurrent Close() can always proceed.
+func (cim *InputManager) ensureSetup() (*logfileEntry, error) {
+	cim.storeMu.Lock()
 	if cim.entry != nil {
-		return nil
+		cim.entry.store.Retain()
+		entry := cim.entry
+		cim.storeMu.Unlock()
+		return entry, nil
+	}
+	if cim.closed {
+		cim.storeMu.Unlock()
+		return nil, errors.New("input manager is closed")
 	}
 	log := cim.Logger.With("input_type", cim.Type)
-	entry, release, err := acquireStore(log, cim.StateStore, cim.Type)
+	cim.storeMu.Unlock()
+
+	// Acquire the store without holding storeMu so that a concurrent Close()
+	// or another Create() can proceed while this potentially-slow call runs.
+	newEntry, newRelease, err := acquireStore(log, cim.StateStore, cim.Type)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	cim.entry = entry
-	cim.release = release
-	cim.ids = map[string]struct{}{}
-	return nil
+
+	cim.storeMu.Lock()
+	if cim.closed {
+		cim.storeMu.Unlock()
+		newRelease()
+		return nil, errors.New("input manager is closed")
+	}
+	if cim.entry == nil {
+		cim.entry = newEntry
+		cim.release = newRelease
+		cim.ids = map[string]struct{}{}
+	} else {
+		// Another Create() won the race; release the redundant reference.
+		newRelease()
+	}
+	cim.entry.store.Retain()
+	entry := cim.entry
+	cim.storeMu.Unlock()
+	return entry, nil
 }
 
 // Close releases the manager's reference to the shared store. When the last
@@ -113,6 +144,7 @@ func (cim *InputManager) setup() error {
 // and the store is closed. Call after all inputs managed by cim have stopped.
 func (cim *InputManager) Close() {
 	cim.storeMu.Lock()
+	cim.closed = true
 	release := cim.release
 	cim.release = nil
 	cim.entry = nil
@@ -125,16 +157,7 @@ func (cim *InputManager) Close() {
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
-	// Capture entry and retain the store under the lock so that a concurrent
-	// Close() cannot nil-out cim.entry between setup() and the accesses below.
-	cim.storeMu.Lock()
-	err := cim.setup()
-	var entry *logfileEntry
-	if err == nil {
-		entry = cim.entry
-		entry.store.Retain()
-	}
-	cim.storeMu.Unlock()
+	entry, err := cim.ensureSetup()
 	if err != nil {
 		return nil, err
 	}
@@ -309,9 +332,14 @@ func (cim *InputManager) StopInput(id string) {
 	cim.idsMux.Unlock()
 }
 
-func (cim *InputManager) getRetainedStore() *store {
+func (cim *InputManager) getRetainedStore() (*store, error) {
+	cim.storeMu.Lock()
+	defer cim.storeMu.Unlock()
+	if cim.entry == nil {
+		return nil, errors.New("input manager is closed")
+	}
 	cim.entry.store.Retain()
-	return cim.entry.store
+	return cim.entry.store, nil
 }
 
 type SourceIdentifier struct {

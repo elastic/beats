@@ -67,11 +67,12 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-	// mu guards store and release. Both are set once on the first successful
-	// Create and cleared on Close.
+	// mu guards store, release, and closed. store and release are set once on
+	// the first successful Create and cleared on Close.
 	mu      sync.Mutex
 	store   *store
 	release func()
+	closed  bool
 }
 
 // Source describe a source the input can collect data from.
@@ -86,22 +87,28 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
-// setup opens the store via the process-wide cache on the first call, also
-// starting a shared background cleaner goroutine. Caller holds cim.mu.
-func (cim *InputManager) setup(inputID string) error {
+// ensureSetup opens the shared store on first call. It must NOT be called
+// with cim.mu held: it releases and re-acquires the lock around the blocking
+// globalCache.Acquire call so that a concurrent Close() can always proceed.
+func (cim *InputManager) ensureSetup(inputID string) error {
+	cim.mu.Lock()
 	if cim.store != nil {
+		cim.mu.Unlock()
 		return nil
+	}
+	if cim.closed {
+		cim.mu.Unlock()
+		return errors.New("input manager is closed")
 	}
 	if cim.DefaultCleanTimeout <= 0 {
 		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
-
 	log := cim.Logger.With("input_type", cim.Type)
 	// Use a null-byte delimiter to prevent collisions between backend keys or
 	// type names that themselves contain "::".
 	key := cim.StateStore.StoreKey() + "\x00" + cim.Type
-
 	interval := cim.StateStore.CleanupInterval()
+	cim.mu.Unlock()
 
 	// Only start the background cleaner when a positive cleanup interval is
 	// configured. Tests that use in-memory stores with no GCPeriod get a
@@ -113,6 +120,8 @@ func (cim *InputManager) setup(inputID string) error {
 		}
 	}
 
+	// Acquire the store without holding cim.mu so that a concurrent Close()
+	// or another Create() can proceed while this potentially-slow call runs.
 	s, release, err := globalCache.Acquire(
 		key,
 		func() (*store, error) {
@@ -125,8 +134,21 @@ func (cim *InputManager) setup(inputID string) error {
 	if err != nil {
 		return err
 	}
-	cim.store = s
-	cim.release = release
+
+	cim.mu.Lock()
+	if cim.closed {
+		cim.mu.Unlock()
+		release()
+		return errors.New("input manager is closed")
+	}
+	if cim.store == nil {
+		cim.store = s
+		cim.release = release
+	} else {
+		// Another Create() won the race; release the redundant reference.
+		release()
+	}
+	cim.mu.Unlock()
 	return nil
 }
 
@@ -136,6 +158,7 @@ func (cim *InputManager) setup(inputID string) error {
 // manager have stopped.
 func (cim *InputManager) Close() {
 	cim.mu.Lock()
+	cim.closed = true
 	release := cim.release
 	cim.release = nil
 	cim.store = nil
@@ -156,10 +179,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	cim.mu.Lock()
-	err := cim.setup(settings.ID)
-	cim.mu.Unlock()
-	if err != nil {
+	if err := cim.ensureSetup(settings.ID); err != nil {
 		return nil, err
 	}
 
@@ -186,7 +206,13 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 // lock locks a key for exclusive access and returns a resource that can be used to modify
 // the cursor state and unlock the key.
 func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
-	resource := cim.store.Get(key)
+	cim.mu.Lock()
+	store := cim.store
+	cim.mu.Unlock()
+	if store == nil {
+		return nil, errors.New("input manager is closed")
+	}
+	resource := store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {
 		resource.Release()

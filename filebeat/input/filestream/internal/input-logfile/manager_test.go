@@ -505,6 +505,11 @@ func TestInputManager_CreateOnlyAcquiresOneStoreReference(t *testing.T) {
 
 func initInputManager(t *testing.T, cim *InputManager) {
 	t.Helper()
+	if cim.StateStore.CleanupInterval() <= 0 {
+		if ts, ok := cim.StateStore.(testStateStore); ok {
+			cim.StateStore = ts.WithGCPeriod(time.Minute)
+		}
+	}
 	t.Cleanup(cim.Close)
 }
 

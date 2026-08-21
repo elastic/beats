@@ -39,18 +39,24 @@ type cacheState uint8
 const (
 	cacheInitializing cacheState = iota
 	cacheActive
+	cacheDraining
 )
 
 type cacheEntry[T any] struct {
 	state     cacheState
 	ready     chan struct{}
 	readyOnce sync.Once
-	initErr   error
-	value     T
-	users     int
-	cancel    context.CancelFunc
-	wg        sync.WaitGroup
-	key       string
+	// drained is closed after cancel()+wg.Wait()+closeFn() complete. It is
+	// only initialised when the entry transitions to cacheActive so that
+	// concurrent Acquires that observe cacheDraining know when the entry has
+	// been removed from the map and a fresh one can be opened.
+	drained chan struct{}
+	initErr error
+	value   T
+	users   int
+	cancel  context.CancelFunc
+	wg      sync.WaitGroup
+	key     string
 }
 
 // NewCache returns an empty Cache. closeFn is called once per key after all
@@ -75,8 +81,9 @@ func NewCache[T any](closeFn func(T)) *Cache[T] {
 // The returned release function must be called exactly once. When the last
 // caller releases, the background goroutine is cancelled, Acquire waits for
 // it to exit, and then calls closeFn (if set). A new Acquire for the same key
-// during drain (between the last release and closeFn completing) does NOT wait;
-// it immediately opens a fresh entry.
+// during drain (between the last release and closeFn completing) waits for the
+// drain to finish before opening a fresh entry, ensuring at most one writer is
+// active for a given backend key at any moment.
 func (c *Cache[T]) Acquire(
 	key string,
 	openFn func() (T, error),
@@ -118,6 +125,13 @@ func (c *Cache[T]) Acquire(
 				var zero T
 				return zero, nil, e.initErr
 			}
+		case cacheDraining:
+			// The entry is draining (cancel+wg.Wait+closeFn in progress).
+			// Wait until the drain completes — at that point the entry is
+			// removed from the map and a fresh one can be opened safely.
+			drained := e.drained
+			c.mu.Unlock()
+			<-drained
 		}
 	}
 }
@@ -138,6 +152,7 @@ func (c *Cache[T]) initialize(e *cacheEntry[T], openFn func() (T, error), runFn 
 	e.value = value
 	e.cancel = cancel
 	e.users = 1
+	e.drained = make(chan struct{})
 	e.state = cacheActive
 	c.mu.Unlock()
 
@@ -171,7 +186,10 @@ func (c *Cache[T]) newRelease(e *cacheEntry[T]) func() {
 				c.mu.Unlock()
 				return
 			}
-			delete(c.entries, e.key)
+			// Mark as draining while still in the map so that concurrent
+			// Acquires can wait for the drain to complete rather than racing
+			// to open a new store on top of an old one that is still flushing.
+			e.state = cacheDraining
 			cancel := e.cancel
 			value := e.value
 			c.mu.Unlock()
@@ -180,9 +198,15 @@ func (c *Cache[T]) newRelease(e *cacheEntry[T]) func() {
 				cancel()
 			}
 			e.wg.Wait()
+
+			c.mu.Lock()
+			delete(c.entries, e.key)
+			c.mu.Unlock()
+
 			if c.closeFn != nil {
 				c.closeFn(value)
 			}
+			close(e.drained)
 		})
 	}
 }

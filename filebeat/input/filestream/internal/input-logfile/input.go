@@ -64,7 +64,10 @@ func (inp *managedInput) Run(
 	// keep track of duplicated IDs
 	defer inp.manager.StopInput(inp.id)
 	ctx.UpdateStatus(status.Starting, "")
-	groupStore := inp.manager.getRetainedStore()
+	groupStore, err := inp.manager.getRetainedStore()
+	if err != nil {
+		return err
+	}
 	defer groupStore.Release()
 
 	// Setup cancellation using a custom cancel context. All harvesters will be
@@ -98,7 +101,10 @@ func (inp *managedInput) Run(
 	)
 	hg.start()
 
-	prospectorStore := inp.manager.getRetainedStore()
+	prospectorStore, err := inp.manager.getRetainedStore()
+	if err != nil {
+		return err
+	}
 	defer prospectorStore.Release()
 	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
 

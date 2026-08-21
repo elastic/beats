@@ -114,10 +114,6 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 	e.wg.Add(1)
 	go func() {
 		defer e.wg.Done()
-		defer func() {
-			//nolint:errcheck // It's a test, let it panic if the casting fails
-			e.getManager().(*loginp.InputManager).Close()
-		}()
 
 		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
@@ -139,6 +135,8 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 
 func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
+	//nolint:errcheck // It's a test, let it panic if the casting fails
+	e.getManager().(*loginp.InputManager).Close()
 }
 
 // mustWriteToFile writes data to file and returns the full path
