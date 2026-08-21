@@ -384,50 +384,39 @@ steps:
   - group: DRA publish
     key: dra
     steps:
-      - label: DRA Snapshot
+      - label: ":pipeline: Generate DRA Snapshot steps"
         ## Only for release branches and main
         if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
         key: dra-snapshot
-        env:
-          DRA_WORKFLOW: snapshot
         depends_on:
           - start-gate-snapshot
           - packaging-snapshot
           - dashboards-snapshot
-        command: |
-          buildkite-agent artifact download "build/**/*" .
-          .buildkite/scripts/packaging/prepare-release-manager.sh snapshot
-          .buildkite/scripts/dra.sh
+        command: ".buildkite/scripts/dra-generate.sh snapshot"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 10
         plugins:
           - *google_oidc_plugin
-          - *docker_elastic_login_plugin
 
-      - label: DRA Staging
+      - label: ":pipeline: Generate DRA Staging steps"
         # TODO remove OR clause below (see earlier comment)
         if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         key: dra-staging
-        env:
-          DRA_WORKFLOW: staging
         depends_on:
           - start-gate-staging
           - packaging-staging
           - dashboards-staging
-        command: |
-          source .buildkite/scripts/version_qualifier.sh
-          buildkite-agent artifact download "build/**" .
-          .buildkite/scripts/packaging/prepare-release-manager.sh staging
-          .buildkite/scripts/dra.sh
+        command: ".buildkite/scripts/dra-generate.sh staging"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 10
         plugins:
           - *google_oidc_plugin
-          - *docker_elastic_login_plugin
 
   - wait
 
