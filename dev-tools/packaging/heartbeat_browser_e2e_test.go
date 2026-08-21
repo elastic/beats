@@ -183,11 +183,9 @@ func checkHeartbeatBrowserE2E(t *testing.T, dockerArchives []string) {
 		}
 		diagnostics := fmt.Sprintf("stdout:\n%s\nstderr:\n%s\ninspect:\n%+v", stdout, stderr, inspectState)
 
-		if waitErr != nil {
-			t.Fatalf("waiting for Heartbeat browser E2E container failed: %v\n%s", waitErr, diagnostics)
+		if waitErr != nil || logsErr != nil || inspectErr != nil {
+			t.Fatalf("Heartbeat browser E2E container failed: waitErr=%v logsErr=%v inspectErr=%v\n%s", waitErr, logsErr, inspectErr, diagnostics)
 		}
-		require.NoError(t, logsErr, "reading Heartbeat browser E2E container logs should succeed")
-		require.NoError(t, inspectErr, "inspecting Heartbeat browser E2E container should succeed")
 
 		events, eventsErr := heartbeatBrowserE2EEvents(stdout)
 		diagnostics += "\nevents:\n" + events.String()
