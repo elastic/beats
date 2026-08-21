@@ -9,6 +9,7 @@ package azure
 import (
 	"reflect"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -220,13 +221,20 @@ func getVM(vmName string, vms []VmResource) (VmResource, bool) {
 	return VmResource{}, false
 }
 
-// Helper function to generate a string key for the dimensions
+// Helper function to generate a string key for the dimensions.
+// Both name and value are included so that metrics with the same dimension
+// names but different values (e.g. ResponseType=Success vs ResponseType=Error)
+// are placed in separate batch groups. Dimensions are sorted by name so the
+// key is stable regardless of the order they appear in the configuration.
 func getDimensionKey(dimensions []Dimension) string {
-	var dimensionKey string
-	for _, dimension := range dimensions {
-		dimensionKey += dimension.Name + ","
+	sorted := make([]Dimension, len(dimensions))
+	copy(sorted, dimensions)
+	sort.Slice(sorted, func(i, j int) bool { return sorted[i].Name < sorted[j].Name })
+	parts := make([]string, len(sorted))
+	for i, d := range sorted {
+		parts[i] = d.Name + "=" + d.Value
 	}
-	return dimensionKey
+	return strings.Join(parts, "|")
 }
 
 // Function to get the resource IDs from the batch of metrics
