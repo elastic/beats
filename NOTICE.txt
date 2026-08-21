@@ -19043,19 +19043,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/lib/pq
-<<<<<<< HEAD
-Version: v1.10.3
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/lib/pq@v1.10.3/LICENSE.md:
-=======
 Version: v1.12.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/lib/pq@v1.12.3/LICENSE:
->>>>>>> 810f67a7e (build(deps): bump github.com/lib/pq from 1.10.9 to 1.12.3 (#50538))
 
 MIT License
 
