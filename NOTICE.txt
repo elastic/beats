@@ -15754,11 +15754,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/godror/godror
-Version: v0.51.0
+Version: v0.51.4
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/godror/godror@v0.51.0/LICENSE.md:
+Contents of probable licence file $GOMODCACHE/github.com/godror/godror@v0.51.4/LICENSE.md:
 
 godror
 ========
