@@ -9,7 +9,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/go-concert/unison"
 )
 
 // Manager is used to create, manage, and coordinate inputs which use a key/value
@@ -31,11 +30,6 @@ type Manager struct {
 // managerConfig contains parameters needed to configure the Manager.
 type managerConfig struct {
 	ID string `config:"id" validate:"required"`
-}
-
-// Init initializes any required resources. It is currently a no-op.
-func (m *Manager) Init(grp unison.Group) error {
-	return nil
 }
 
 // Close is a no-op; this manager holds no resources to release.

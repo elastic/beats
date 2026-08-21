@@ -14,8 +14,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/go-concert/unison"
-
 	// For provider registration.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
@@ -48,16 +46,11 @@ type manager struct {
 	path     *paths.Path
 }
 
-// Init is not used for this input. It is called before Create and no provider
-// has been configured yet.
-func (m *manager) Init(grp unison.Group) error {
-	return nil
-}
-
 // Close releases resources held by the provider, if one was configured.
 func (m *manager) Close() {
 	if m.provider != nil {
 		m.provider.Close()
+		m.provider = nil
 	}
 }
 

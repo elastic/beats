@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -62,11 +61,6 @@ func Plugin(log *logp.Logger) v2.Plugin {
 // based on the configuration.
 type eventHubInputManager struct {
 	log *logp.Logger
-}
-
-// Init initializes the input manager.
-func (m *eventHubInputManager) Init(unison.Group) error {
-	return nil
 }
 
 // Close is a no-op; this manager holds no resources to release.

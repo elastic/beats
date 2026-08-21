@@ -39,21 +39,18 @@ type cacheState uint8
 const (
 	cacheInitializing cacheState = iota
 	cacheActive
-	cacheDraining
 )
 
 type cacheEntry[T any] struct {
-	state      cacheState
-	ready      chan struct{}
-	closed     chan struct{}
-	readyOnce  sync.Once
-	closedOnce sync.Once
-	initErr    error
-	value      T
-	users      int
-	cancel     context.CancelFunc
-	wg         sync.WaitGroup
-	key        string
+	state     cacheState
+	ready     chan struct{}
+	readyOnce sync.Once
+	initErr   error
+	value     T
+	users     int
+	cancel    context.CancelFunc
+	wg        sync.WaitGroup
+	key       string
 }
 
 // NewCache returns an empty Cache. closeFn is called once per key after all
@@ -72,26 +69,29 @@ func NewCache[T any](closeFn func(T)) *Cache[T] {
 // it is started in a background goroutine that must block until the supplied
 // context is cancelled. Subsequent callers with the same key reuse the value.
 // onWait, if non-nil, is called just before blocking for another goroutine's
-// initialization to complete — use it for logging or metrics.
+// initialization to complete. onHit, if non-nil, is called when an existing
+// active entry is reused. Both are suitable for logging or metrics.
 //
 // The returned release function must be called exactly once. When the last
 // caller releases, the background goroutine is cancelled, Acquire waits for
-// it to exit, and then calls closeFn (if set).
+// it to exit, and then calls closeFn (if set). A new Acquire for the same key
+// during drain (between the last release and closeFn completing) does NOT wait;
+// it immediately opens a fresh entry.
 func (c *Cache[T]) Acquire(
 	key string,
 	openFn func() (T, error),
 	runFn func(ctx context.Context, value T),
 	onWait func(),
+	onHit func(),
 ) (value T, release func(), err error) {
 	for {
 		c.mu.Lock()
 		e := c.entries[key]
 		if e == nil {
 			e = &cacheEntry[T]{
-				key:    key,
-				state:  cacheInitializing,
-				ready:  make(chan struct{}),
-				closed: make(chan struct{}),
+				key:   key,
+				state: cacheInitializing,
+				ready: make(chan struct{}),
 			}
 			c.entries[key] = e
 			c.mu.Unlock()
@@ -103,6 +103,9 @@ func (c *Cache[T]) Acquire(
 			v := e.value
 			rel := c.newRelease(e)
 			c.mu.Unlock()
+			if onHit != nil {
+				onHit()
+			}
 			return v, rel, nil
 		case cacheInitializing:
 			ready := e.ready
@@ -115,10 +118,6 @@ func (c *Cache[T]) Acquire(
 				var zero T
 				return zero, nil, e.initErr
 			}
-		case cacheDraining:
-			closed := e.closed
-			c.mu.Unlock()
-			<-closed
 		}
 	}
 }
@@ -172,7 +171,6 @@ func (c *Cache[T]) newRelease(e *cacheEntry[T]) func() {
 				c.mu.Unlock()
 				return
 			}
-			e.state = cacheDraining
 			delete(c.entries, e.key)
 			cancel := e.cancel
 			value := e.value
@@ -185,7 +183,6 @@ func (c *Cache[T]) newRelease(e *cacheEntry[T]) func() {
 			if c.closeFn != nil {
 				c.closeFn(value)
 			}
-			e.closedOnce.Do(func() { close(e.closed) })
 		})
 	}
 }

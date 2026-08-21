@@ -24,7 +24,6 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -45,10 +44,6 @@ func Plugin(log *logp.Logger) v2.Plugin {
 
 type netflowInputManager struct {
 	log *logp.Logger
-}
-
-func (im *netflowInputManager) Init(_ unison.Group) error {
-	return nil
 }
 
 func (im *netflowInputManager) Close() {}

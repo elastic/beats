@@ -125,12 +125,21 @@ func (cim *InputManager) Close() {
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
+	// Capture entry and retain the store under the lock so that a concurrent
+	// Close() cannot nil-out cim.entry between setup() and the accesses below.
 	cim.storeMu.Lock()
 	err := cim.setup()
+	var entry *logfileEntry
+	if err == nil {
+		entry = cim.entry
+		entry.store.Retain()
+	}
 	cim.storeMu.Unlock()
 	if err != nil {
 		return nil, err
 	}
+	pStore := entry.store
+	defer pStore.Release()
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
@@ -243,9 +252,6 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		}
 	}
 
-	pStore := cim.getRetainedStore()
-	defer pStore.Release()
-
 	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
 
 	// create a store with the deprecated global ID. This will be used to
@@ -263,7 +269,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	return &managedInput{
 		manager:                cim,
-		ackCH:                  cim.entry.ackCH,
+		ackCH:                  entry.ackCH,
 		id:                     settings.ID,
 		prospector:             prospector,
 		harvester:              harvester,

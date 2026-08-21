@@ -81,6 +81,7 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 		},
 		runFn,
 		func() { log.Debugw("waiting for filestream shared store initialization") },
+		func() { log.Debugw("filestream shared store cache hit") },
 	)
 	if err != nil {
 		return nil, nil, err

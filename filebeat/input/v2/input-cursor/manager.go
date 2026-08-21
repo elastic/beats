@@ -97,7 +97,9 @@ func (cim *InputManager) setup(inputID string) error {
 	}
 
 	log := cim.Logger.With("input_type", cim.Type)
-	key := cim.StateStore.StoreKey() + "::" + cim.Type
+	// Use a null-byte delimiter to prevent collisions between backend keys or
+	// type names that themselves contain "::".
+	key := cim.StateStore.StoreKey() + "\x00" + cim.Type
 
 	interval := cim.StateStore.CleanupInterval()
 
@@ -117,6 +119,7 @@ func (cim *InputManager) setup(inputID string) error {
 			return openStore(log, cim.StateStore, cim.Type, inputID, true)
 		},
 		runFn,
+		nil,
 		nil,
 	)
 	if err != nil {

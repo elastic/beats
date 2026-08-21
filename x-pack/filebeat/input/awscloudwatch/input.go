@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -46,10 +45,6 @@ func Plugin(logger *logp.Logger, store statestore.States) v2.Plugin {
 type cloudwatchInputManager struct {
 	store  statestore.States
 	logger *logp.Logger
-}
-
-func (im *cloudwatchInputManager) Init(grp unison.Group) error {
-	return nil
 }
 
 func (im *cloudwatchInputManager) Close() {}

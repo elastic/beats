@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/go-concert/unison"
-
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -74,11 +72,6 @@ func cursorConfigure(cfg *conf.C, _ *logp.Logger) ([]inputcursor.Source, inputcu
 type source struct{ cfg config }
 
 func (s *source) Name() string { return s.cfg.URL }
-
-// Init initializes both wrapped input managers.
-func (m InputManager) Init(grp unison.Group) error {
-	return m.cursor.Init(grp)
-}
 
 // Create creates a cursor input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {

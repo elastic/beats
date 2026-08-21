@@ -98,6 +98,62 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	_ = first // suppress unused variable
 }
 
+// TestStoreCache_NewAcquireOpensFreshEntryDuringDrain verifies the updated
+// drain semantics: when the last reference is released the cache entry is
+// removed from the map immediately, so a concurrent Acquire for the same key
+// does NOT wait for the drain to complete — it opens a brand-new entry right
+// away. This differs from the old behaviour, where a new caller would block on
+// the draining entry's closed channel until the store's ref-count reached zero.
+func TestStoreCache_NewAcquireOpensFreshEntryDuringDrain(t *testing.T) {
+	drainStarted := make(chan struct{})
+	allowDrain := make(chan struct{})
+	var onceBlock sync.Once
+
+	// Block the closeFn on the first (and only first) drain. We install the
+	// blocking logic in the cache itself so it fires before ackUpdater.Close()
+	// and store.Release(), keeping the test independent of closeStoreWith.
+	globalCache = statemanager.NewCache[*logfileEntry](func(e *logfileEntry) {
+		onceBlock.Do(func() {
+			close(drainStarted)
+			<-allowDrain
+		})
+		e.ackUpdater.Close()
+		e.store.Release()
+	})
+	t.Cleanup(func() {
+		require.Zero(t, globalCache.Len(), "all acquired store references must be released")
+	})
+
+	states := newCountingStateStore("drain-concurrent-backend")
+	logger := logp.NewNopLogger()
+
+	_, release1, err := acquireStore(logger, states, "filestream")
+	require.NoError(t, err)
+
+	// release1() triggers drain; closeFn blocks until allowDrain is closed.
+	drainDone := make(chan struct{})
+	go func() {
+		release1()
+		close(drainDone)
+	}()
+	<-drainStarted
+	// The entry is removed from the map as soon as the last user releases,
+	// even though closeFn has not yet returned.
+	require.Equal(t, 0, globalCache.Len(), "draining entry must not be in the active map")
+
+	// A new Acquire must not wait for the drain; it must open a fresh entry.
+	_, release2, err := acquireStore(logger, states, "filestream")
+	require.NoError(t, err)
+	require.Equal(t, 1, globalCache.Len(), "fresh entry must be in the active map")
+	require.Equal(t, int32(2), states.storeForCalls.Load(), "a new store must have been opened for the fresh entry")
+
+	// Unblock the drain, then release the second entry.
+	close(allowDrain)
+	<-drainDone
+	release2()
+	require.Equal(t, 0, globalCache.Len())
+}
+
 func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 	setupCacheForTest(t)
 

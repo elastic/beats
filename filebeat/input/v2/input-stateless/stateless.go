@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/elastic/go-concert/unison"
-
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -56,9 +54,6 @@ var _ v2.InputManager = InputManager{}
 func NewInputManager(configure func(*conf.C) (Input, error)) InputManager {
 	return InputManager{Configure: configure}
 }
-
-// Init does nothing. Init is required to fullfil the v2.InputManager interface.
-func (m InputManager) Init(_ unison.Group) error { return nil }
 
 // Close is a no-op; stateless inputs hold no resources to release.
 func (m InputManager) Close() {}
