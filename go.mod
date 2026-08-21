@@ -147,7 +147,11 @@ require (
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/compute v1.66.0
 	cloud.google.com/go/redis v1.25.0
+<<<<<<< HEAD
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.1
+=======
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.0
+>>>>>>> c50602671 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azcore from 1.22.0 to 1.23.0 (#52773))
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
