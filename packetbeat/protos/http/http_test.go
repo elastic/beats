@@ -743,6 +743,17 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	}
 }
 
+func TestParseBodyChunkedStartNegativeLength(t *testing.T) {
+	st := &stream{data: []byte("-1\r\n")}
+	msg := &message{}
+	parser := newParser(&testParserConfig)
+
+	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
+	if cont != false || ok != false || complete != false {
+		t.Errorf("parseBodyChunkedStart(negative chunk) = (%v, %v, %v); want (false, false, false)", cont, ok, complete)
+	}
+}
+
 func TestHttpParser_requestURIWithSpace(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
 

@@ -119,6 +119,7 @@ func TestMalformedBodyFiends(t *testing.T) {
 	}{
 		{msg: &message{body: []byte("\r\no="), contentType: []byte("application/sdp"), hasContentLength: true}},
 		{msg: &message{body: []byte("\r\no=\"00000000"), contentType: []byte("application/sdp"), hasContentLength: true}},
+		{msg: &message{body: []byte("o=\"\" 1 1 IN IP4 1.1.1.1\r\n"), contentType: []byte("application/sdp"), hasContentLength: true}},
 	}
 
 	// test is mostly that we don't crash
