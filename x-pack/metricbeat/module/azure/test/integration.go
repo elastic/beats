@@ -12,7 +12,7 @@ import (
 )
 
 // GetConfig function gets azure credentials for integration tests.
-func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
+func GetConfig(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
 
 	clientId, ok := os.LookupEnv("AZURE_CLIENT_ID")
@@ -31,7 +31,7 @@ func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	if !ok {
 		t.Fatal("Could not find var AZURE_SUBSCRIPTION_ID")
 	}
-	return map[string]interface{}{
+	return map[string]any{
 		"module":                "azure",
 		"period":                "300s",
 		"refresh_list_interval": "600s",
@@ -44,7 +44,7 @@ func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
 }
 
 // GetConfigForInsights function gets azure credentials for integration tests.
-func GetConfigForInsights(t *testing.T, metricSetName string) map[string]interface{} {
+func GetConfigForInsights(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
 	applicationId, ok := os.LookupEnv("AZURE_APPLICATION_ID")
 	if !ok {
@@ -54,7 +54,7 @@ func GetConfigForInsights(t *testing.T, metricSetName string) map[string]interfa
 	if !ok {
 		t.Fatal("Could not find var AZURE_API_KEY")
 	}
-	return map[string]interface{}{
+	return map[string]any{
 		"module":         "azure",
 		"period":         "300s",
 		"metricsets":     []string{metricSetName},

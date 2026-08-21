@@ -191,8 +191,8 @@ func baseMockEventMonitorValidator(id string, name string, status string) valida
 	} else {
 		idMatcher = isdef.IsEqual(id)
 	}
-	return lookslike.MustCompile(map[string]interface{}{
-		"monitor": map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
+		"monitor": map[string]any{
 			"id":          idMatcher,
 			"name":        name,
 			"type":        "test",
@@ -213,7 +213,7 @@ func mockEventMonitorValidator(id string, name string) validator.Validator {
 	))
 }
 
-func mockEventCustomFields() map[string]interface{} {
+func mockEventCustomFields() map[string]any {
 	return mapstr.M{"foo": "bar"}
 }
 
@@ -270,7 +270,7 @@ func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int64, closed *atomic
 }
 
 func mockPluginConf(t *testing.T, id string, name string, schedule string, url string) *config.C {
-	confMap := map[string]interface{}{
+	confMap := map[string]any{
 		"type":     "test",
 		"urls":     []string{url},
 		"schedule": schedule,
@@ -291,7 +291,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 // mockBadPluginConf returns a conf with an invalid plugin config.
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
 func mockBadPluginConf(t *testing.T, id string) *config.C {
-	confMap := map[string]interface{}{
+	confMap := map[string]any{
 		"type":        "test",
 		"notanoption": []string{"foo"},
 	}
@@ -307,7 +307,7 @@ func mockBadPluginConf(t *testing.T, id string) *config.C {
 }
 
 func mockInvalidPluginConf(t *testing.T) *config.C {
-	confMap := map[string]interface{}{
+	confMap := map[string]any{
 		"hoeutnheou": "oueanthoue",
 	}
 
@@ -318,7 +318,7 @@ func mockInvalidPluginConf(t *testing.T) *config.C {
 }
 
 func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *config.C {
-	confMap := map[string]interface{}{
+	confMap := map[string]any{
 		"type":     "test",
 		"id":       id,
 		"name":     name,
