@@ -205,7 +205,13 @@ func configYML() error {
 func Update() {
 	mg.SerialDeps(Fields, Dashboards, Config,
 		metricbeat.PrepareModulePackagingXPack,
-		devtools.GenerateModuleIncludeListGo)
+		generateModuleIncludeListGo)
+}
+
+func generateModuleIncludeListGo() error {
+	options := devtools.DefaultIncludeListOptions()
+	options.BuildTags = "\n//go:build !securityonly\n"
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

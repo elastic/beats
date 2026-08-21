@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.6
 
 require (
-	cloud.google.com/go/bigquery v1.79.1
+	cloud.google.com/go/bigquery v1.80.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -76,7 +76,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.2.2
-	github.com/godror/godror v0.49.4
+	github.com/godror/godror v0.51.0
 	github.com/gofrs/flock v0.13.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/gohugoio/hashstructure v0.5.0
@@ -95,7 +95,7 @@ require (
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v1.5.0
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.12.3
 	github.com/magefile/mage v1.17.2
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/miekg/dns v1.1.72
@@ -171,7 +171,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.9.1-0.20260727124511-05b78de333fd
 	github.com/elastic/elastic-agent-libs v0.46.3
-	github.com/elastic/elastic-agent-system-metrics v0.14.4
+	github.com/elastic/elastic-agent-system-metrics v0.14.5
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.6.0
@@ -300,7 +300,7 @@ require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.2 // indirect
-	cloud.google.com/go/auth v0.23.0 // indirect
+	cloud.google.com/go/auth v0.23.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.13.0 // indirect

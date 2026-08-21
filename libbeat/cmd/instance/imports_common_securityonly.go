@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !securityonly
+//go:build securityonly
 
 package instance
 
@@ -35,16 +35,13 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_xml"
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_xml_wineventlog"
 	_ "github.com/elastic/beats/v7/libbeat/processors/dissect"
-	_ "github.com/elastic/beats/v7/libbeat/processors/dns"
 	_ "github.com/elastic/beats/v7/libbeat/processors/extract_array"
 	_ "github.com/elastic/beats/v7/libbeat/processors/fingerprint"
 	_ "github.com/elastic/beats/v7/libbeat/processors/move_fields"
 	_ "github.com/elastic/beats/v7/libbeat/processors/now"
 	_ "github.com/elastic/beats/v7/libbeat/processors/ratelimit"
 	_ "github.com/elastic/beats/v7/libbeat/processors/registered_domain"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 	_ "github.com/elastic/beats/v7/libbeat/processors/syslog"
-	_ "github.com/elastic/beats/v7/libbeat/processors/translate_ldap_attribute"
 	_ "github.com/elastic/beats/v7/libbeat/processors/translate_sid"
 	_ "github.com/elastic/beats/v7/libbeat/processors/urldecode"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/includes" // Register publisher pipeline modules

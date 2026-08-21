@@ -15,11 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !(linux || darwin || windows) || agentbeat
+//go:build agentbeat && !securityonly
 
-package autodiscover
+package include
 
-// InitializeModule initializes this module.
+import (
+	m0 "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
+)
+
 func InitializeModule() {
-	// does nothing if kubernetes and docker are not supported
+	m0.InitializeModule()
 }
