@@ -383,7 +383,7 @@ func TestKafkaErrors(t *testing.T) {
 				"host":    "test-host-random-message-which-is-long-enough",
 				"message": id,
 			}),
-			"dropping message as it exceeds max_mesage_bytes",
+			"dropping message as it exceeds max_message_bytes",
 		},
 	}
 
