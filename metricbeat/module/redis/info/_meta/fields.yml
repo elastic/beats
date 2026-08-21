@@ -251,7 +251,7 @@
         - name: aof
           type: group
           description: >
-            Provides information about AOF persitence
+            Provides information about AOF persistence
           fields:
             - name: enabled
               type: boolean
@@ -285,7 +285,7 @@
             - name: bgrewrite.last_status
               type: keyword
               description: >
-                Status of the last AOF rewrite operatio
+                Status of the last AOF rewrite operation
 
             - name: write.last_status
               type: keyword
