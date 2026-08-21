@@ -82,7 +82,7 @@ func extractJa3Array(raw []byte, size int) []uint16 {
 		limit = actual
 	}
 	var array []uint16
-	for pos := size; pos <= limit; pos += size {
+	for pos := size; pos <= limit && pos+size <= actual; pos += size {
 		value := uint16(raw[pos])
 		if size == 2 {
 			value = value*256 + uint16(raw[pos+1])

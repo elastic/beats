@@ -203,12 +203,12 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-kvm,KVM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> beta[]  
 |<<metricbeat-metricset-kvm-status,status>> beta[]  
-|<<metricbeat-module-linux,Linux>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.7+| .7+|  |<<metricbeat-metricset-linux-conntrack,conntrack>> beta[]  
-|<<metricbeat-metricset-linux-iostat,iostat>> beta[]  
-|<<metricbeat-metricset-linux-ksm,ksm>> beta[]  
-|<<metricbeat-metricset-linux-memory,memory>> beta[]  
-|<<metricbeat-metricset-linux-pageinfo,pageinfo>> beta[]  
+|<<metricbeat-module-linux,Linux>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.7+| .7+|  |<<metricbeat-metricset-linux-conntrack,conntrack>>   
+|<<metricbeat-metricset-linux-iostat,iostat>>   
+|<<metricbeat-metricset-linux-ksm,ksm>>   
+|<<metricbeat-metricset-linux-memory,memory>>   
+|<<metricbeat-metricset-linux-pageinfo,pageinfo>>   
 |<<metricbeat-metricset-linux-pressure,pressure>> beta[]  
 |<<metricbeat-metricset-linux-rapl,rapl>> beta[]  
 |<<metricbeat-module-logstash,Logstash>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -305,15 +305,15 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-system-load,load>>   
 |<<metricbeat-metricset-system-memory,memory>>   
 |<<metricbeat-metricset-system-network,network>>   
-|<<metricbeat-metricset-system-network_summary,network_summary>> beta[]  
+|<<metricbeat-metricset-system-network_summary,network_summary>>   
 |<<metricbeat-metricset-system-process,process>>   
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
 |<<metricbeat-metricset-system-raid,raid>>   
-|<<metricbeat-metricset-system-service,service>> beta[]  
+|<<metricbeat-metricset-system-service,service>>   
 |<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-socket_summary,socket_summary>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
-|<<metricbeat-metricset-system-users,users>> beta[]  
+|<<metricbeat-metricset-system-users,users>>   
 |<<metricbeat-module-tomcat,Tomcat>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-tomcat-cache,cache>> beta[]  
 |<<metricbeat-metricset-tomcat-memory,memory>> beta[]  

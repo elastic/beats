@@ -3,12 +3,104 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.20 relnotes
+
+[[release-notes-8.19.20]]
+== Beats version 8.19.20
+
+https://github.com/elastic/beats/compare/v8.19.19\...v8.19.20[View commits]
+
+[discrete]
+=== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
+[[security-updates-8.19.20]]
+=== Security updates
+
+**All**
+
+* Upgrade Go to 1.26.5. https://github.com/elastic/beats/pull/52093[#52093] 
+
+**Osquerybeat**
+
+* Reject CPIO entries in macOS .pkg payloads whose paths escape the destination directory, preventing path traversal during extraction (CWE-22). https://github.com/elastic/beats/pull/52130[#52130] 
+
+[discrete]
+[[enhancements-8.19.20]]
+=== Enhancements
+
+**All**
+
+* Use native Go for Linux FIPS builds. https://github.com/elastic/beats/pull/51969[#51969] 
+
+**Auditbeat**
+
+* Update quark to 0.6.0. https://github.com/elastic/beats/pull/52063[#52063] 
+
+**Filebeat**
+
+* Aggregate SQS mode health status to reduce false Degraded/Healthy transitions. https://github.com/elastic/beats/pull/51997[#51997] https://github.com/elastic/beats/issues/51692[#51692]
+* Add configurable User-Agent header to the CrowdStrike streaming input. https://github.com/elastic/beats/pull/52025[#52025] 
+* Remove Authorization headers from CEL, Entity Analytics, HTTP Endpoint, and HTTP JSON input request trace logs. https://github.com/elastic/beats/pull/52239[#52239] 
+
+[discrete]
+[[bug-fixes-8.19.20]]
+=== Bug fixes
+
+**All**
+
+* Update `elastic-agent-libs` to v0.46.1. https://github.com/elastic/beats/pull/51921[#51921]
+
+**Elastic Agent**
+
+* Fix Beat receiver Shutdown hanging when Start fails before the beater is launched. https://github.com/elastic/beats/pull/52106[#52106] https://github.com/elastic/beats/issues/52009[#52009]
+
+**Filebeat**
+
+* Synchronize Filebeat Run and Shutdown functions. https://github.com/elastic/beats/pull/51800[#51800] 
+* Fix offset commits when using multiline in Journald and Kafka inputs. https://github.com/elastic/beats/pull/52345[#52345] https://github.com/elastic/beats/issues/51981[#51981]
+* Fix S3 polling input to exclude same-bucket backup objects from listing. https://github.com/elastic/beats/pull/52169[#52169] 
+* Honor `path_style` for non-AWS S3 buckets in the `aws-s3` input. https://github.com/elastic/beats/pull/52003[#52003] 
+* Use a stable status message for SQS receive errors to prevent update churn during sustained outages. https://github.com/elastic/beats/pull/52172[#52172] 
+* Do not mark the CEL input's health as degraded when the maximum number of executions is exceeded. https://github.com/elastic/beats/pull/52166[#52166] 
+* Fix the `aws-s3` input silently dropping events when a parser clears the message content. https://github.com/elastic/beats/pull/52077[#52077] 
+* Honor the configured language when rendering Windows events. https://github.com/elastic/beats/pull/52113[#52113] https://github.com/elastic/sdh-beats/issues/7332[#7332]
+* Fix `journald` input facility filters on `journalctl` older than 245. https://github.com/elastic/beats/pull/52250[#52250] 
+* The `journald` input now reports a Degraded status when `journalctl` repeatedly exits without delivering any data, instead of staying Healthy while collecting no events. https://github.com/elastic/beats/pull/52287[#52287] 
+
+**Heartbeat**
+
+* Fix panic with multiple Heartbeat receivers. https://github.com/elastic/beats/pull/52046[#52046] 
+* Bake Synthetics browser binaries into the Heartbeat Docker image. https://github.com/elastic/beats/pull/52445[#52445] https://github.com/elastic/beats/issues/52439[#52439]
+
+**Libbeat**
+
+* Prevent statestore startup failure when `meta.json` is left empty after an unclean shutdown. https://github.com/elastic/beats/pull/51897[#51897] 
+* Prevent stale autodiscover resources after Kubernetes leadership changes. https://github.com/elastic/beats/pull/52427[#52427]
+
+**Metricbeat**
+
+* Fix Azure module authentication on sovereign clouds (Government, China). https://github.com/elastic/beats/pull/52434[#52434] 
+
+// end 8.19.20 relnotes
+
 // begin 8.19.19 relnotes
 
 [[release-notes-8.19.19]]
 === Beats version 8.19.19
 
 https://github.com/elastic/beats/compare/v8.19.18\...v8.19.19[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[enhancements-8.19.19]]
@@ -74,6 +166,13 @@ https://github.com/elastic/beats/compare/v8.19.18\...v8.19.19[View commits]
 https://github.com/elastic/beats/compare/v8.19.17\...v8.19.18[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[enhancements-8.19.18]]
 ==== Enhancements
 
@@ -127,6 +226,13 @@ https://github.com/elastic/beats/compare/v8.19.17\...v8.19.18[View commits]
 === Beats version 8.19.17
 
 https://github.com/elastic/beats/compare/v8.19.16\...v8.19.17[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[security-updates-8.19.17]]
@@ -225,6 +331,13 @@ upgrade to 8.19.17.
 https://github.com/elastic/beats/compare/v8.19.15\...v8.19.16[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.16]]
 ==== Security updates
 
@@ -303,6 +416,13 @@ https://github.com/elastic/beats/compare/v8.19.15\...v8.19.16[View commits]
 https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.15]]
 ==== Security updates
 
@@ -361,6 +481,13 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 === Beats version 8.19.14
 
 https://github.com/elastic/beats/compare/v8.19.13\...v8.19.14[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.14]]
@@ -438,6 +565,13 @@ of values intended to be secret.
 === Beats version 8.19.13
 
 https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[security-updates-8.19.13]]
@@ -520,6 +654,13 @@ https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
 https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.12]]
 ==== Security updates
 
@@ -578,6 +719,13 @@ https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[bug-fixes-8.19.11]]
 ==== Bug fixes
 
@@ -607,6 +755,13 @@ https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
 === Beats version 8.19.10
 
 https://github.com/elastic/beats/compare/v8.19.9\...v8.19.10[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.10]]
@@ -646,6 +801,13 @@ The 8.19.10 release adds the following new and notable features.
 [[release-notes-8.19.9]]
 === Beats version 8.19.9
 https://github.com/elastic/beats/compare/v8.19.8\...v8.19.9[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.9]]
@@ -692,6 +854,13 @@ The 8.19.9 release adds the following new and notable features.
 https://github.com/elastic/beats/compare/v8.19.7\...v8.19.8[View commits]
 
 [discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[bug-fixes-8.19.8]]
 ==== Bug fixes
 
@@ -715,6 +884,13 @@ https://github.com/elastic/beats/compare/v8.19.7\...v8.19.8[View commits]
 [[release-notes-8.19.7]]
 === Beats version 8.19.7
 https://github.com/elastic/beats/compare/v8.19.6\...v8.19.7[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.7]]
@@ -745,6 +921,13 @@ The 8.19.7 release adds the following new and notable features.
 [[release-notes-8.19.6]]
 === Beats version 8.19.6
 https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
+
+[discrete]
+==== Known issues
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[enhancements-8.19.6]]
@@ -786,6 +969,12 @@ https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
 === Beats version 8.19.5
 https://github.com/elastic/beats/compare/v8.19.4\...v8.19.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
 ==== Breaking changes
 
 *Filebeat*
@@ -818,6 +1007,12 @@ https://github.com/elastic/beats/compare/v8.19.4\...v8.19.5[View commits]
 [[release-notes-8.19.4]]
 === Beats version 8.19.4
 https://github.com/elastic/beats/compare/v8.19.3\...v8.19.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 ==== Bugfixes
 
@@ -864,6 +1059,9 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 
 *Filebeat*
 
+// tag::known-issue-8.19-filestream-take-over[]
+- Filestream "take over" mode does not work in versions 8.19.0-8.19.20. A fix will ship in the 8.19.21 release.
+// end::known-issue-8.19-filestream-take-over[]
 // tag::known-issue-8.19-filestream-clean-inactive-1[]
 - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
 - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
@@ -1087,6 +1285,7 @@ https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
 
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
@@ -1100,6 +1299,7 @@ https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
@@ -1132,6 +1332,7 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]

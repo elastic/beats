@@ -22,7 +22,7 @@ package add_docker_metadata
 import (
 	"time"
 
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 )
 
 // Config for docker processor.
