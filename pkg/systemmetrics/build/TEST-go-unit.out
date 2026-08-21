@@ -1,0 +1,37 @@
+?   	github.com/elastic/beats/v7/pkg/systemmetrics/dev-tools/systemtests	[no test files]
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric	(cached)
+?   	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup	[no test files]
+?   	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/testhelpers	[no test files]
+?   	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cpu	[no test files]
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/memory	(cached)
+?   	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/diskio	[no test files]
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon	(cached)
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgv2	(cached)
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgv1	(cached)
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/cpu	(cached)
+?   	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/hwmon	[no test files]
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/host	(cached)
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/network	(cached)
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu	(cached)
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/filesystem	(cached)
+?   	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve	[no test files]
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/report	(cached)
+ok  	github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process	(cached)
+
+=== Skipped
+=== SKIP: pkg/systemmetrics/metric/memory TestMeminfoParse (0.00s)
+    memory_test.go:91: linux specific test
+
+=== SKIP: pkg/systemmetrics/metric/system/process TestGetInfoForPid_numThreads (0.00s)
+    process_linux_darwin_test.go:35: not supported for darwin/arm64. Supported patforms: [linux/amd64 darwin/amd64 windows/amd64]
+
+=== SKIP: pkg/systemmetrics/metric/system/process TestNetworkFetch (0.00s)
+    process_test.go:195: Network data only available on linux
+
+=== SKIP: pkg/systemmetrics/metric/system/process TestNetworkFilter (0.00s)
+    process_test.go:218: Network data only available on linux
+
+=== SKIP: pkg/systemmetrics/metric/system/process TestFilter (0.00s)
+    process_test.go:245: Run on Linux only
+
+DONE 78 tests, 5 skipped in 1.688s

@@ -46,7 +46,7 @@ type DockerTestRunner struct {
 	Runner *testing.T
 	// Privileged is equivalent to the `--privileged` flag passed to `docker run`. Sets elevated permissions.
 	Privileged bool
-	// Sets the filepath passed to `go test`
+	// Sets the filepath passed to `go test`, relative to the Go module root.
 	Basepath string
 	// Testname will run a given test if set
 	Testname string
@@ -210,6 +210,9 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *log
 	_, err = io.Copy(os.Stdout, reader)
 	require.NoError(tr.Runner, err, "error copying image")
 
+	// The main module root is mounted at /app so that `go test` inside the container
+	// can resolve the module. Basepath is therefore relative to the module root,
+	// which for this package is the Beats repository root, not pkg/systemmetrics.
 	wdCmd := exec.CommandContext(ctx, "go", "list", "-m", "-f", "{{.Dir}}")
 	wdPath, err := wdCmd.CombinedOutput()
 	require.NoError(tr.Runner, err, "error finding root path")

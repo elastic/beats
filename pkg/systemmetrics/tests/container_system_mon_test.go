@@ -38,6 +38,10 @@ import (
 
 // These tests are designed for the case of monitoring a host system from inside docker via a /hostfs
 
+// DockerTestRunner mounts the Go module root at /app, so Basepath values are
+// relative to the Beats repository root, not to pkg/systemmetrics.
+const pkgRoot = "./pkg/systemmetrics"
+
 func TestKernelProc(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("test is linux-only")
@@ -78,7 +82,7 @@ func TestKernelProc(t *testing.T) {
 	runner := systemtests.DockerTestRunner{
 		Runner:           t,
 		MonitorPID:       int(testPid),
-		Basepath:         "./metric/system/process",
+		Basepath:         pkgRoot + "/metric/system/process",
 		Privileged:       true,
 		Testname:         "TestSystemHostFromContainer",
 		FatalLogMessages: []string{"error", "Error"},
@@ -95,7 +99,7 @@ func TestProcessMetricsElevatedPerms(t *testing.T) {
 	// runs test cases where we do not expect any kind of permissions errors
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:            t,
-		Basepath:          "./metric/system/process",
+		Basepath:          pkgRoot + "/metric/system/process",
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
 		CreateHostProcess: longSleep(t.Context()),
@@ -110,7 +114,7 @@ func TestProcessAllSettings(t *testing.T) {
 	// runs test cases where we do not expect any kind of permissions errors
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:            t,
-		Basepath:          "./metric/system/process",
+		Basepath:          pkgRoot + "/metric/system/process",
 		Privileged:        true,
 		Testname:          "TestSystemHostFromContainer",
 		CreateHostProcess: longSleep(t.Context()),
@@ -127,7 +131,7 @@ func TestContainerProcess(t *testing.T) {
 	// Make sure that monitoring container procs from within the container still works
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:           t,
-		Basepath:         "./metric/system/process",
+		Basepath:         pkgRoot + "/metric/system/process",
 		Privileged:       true,
 		Testname:         "TestContainerMonitoringFromInsideContainer",
 		FatalLogMessages: []string{"error", "Error"},
@@ -144,7 +148,7 @@ func TestFilesystem(t *testing.T) {
 	// 'no such file or directory' or other messages
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:     t,
-		Basepath:   "./metric/system/filesystem",
+		Basepath:   pkgRoot + "/metric/system/filesystem",
 		Privileged: false,
 	}
 
@@ -164,7 +168,7 @@ func TestMemoryZswap(t *testing.T) {
 	// Tests zswap metrics from /proc/meminfo and optionally /sys/kernel/debug/zswap
 	baseRunner := systemtests.DockerTestRunner{
 		Runner:     t,
-		Basepath:   "./metric/memory",
+		Basepath:   pkgRoot + "/metric/memory",
 		Privileged: true, // Needed for debugfs access
 		Testname:   "TestMemoryFromContainer",
 	}

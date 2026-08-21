@@ -27,83 +27,87 @@ import (
 	"testing"
 )
 
-// allows us to use `defer` from TestMain, since the TestMain ideom is to use
-// os.Exit, which does not respect `defer`
+// MainTestWrapper unpacks the given zipped test fixtures before running the tests.
+// The extracted directories are left in place; they are gitignored, and keeping them
+// lets sibling packages share them instead of racing to delete each other's copies.
 func MainTestWrapper(m *testing.M, testFiles []string) int {
 	for _, testCase := range testFiles {
-		err := extractTestData(testCase)
-		defer generateTestdataCleanup(testCase)()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error extracting %s: %s", testCase, err)
+		if err := extractTestData(testCase); err != nil {
+			fmt.Fprintf(os.Stderr, "error extracting %s: %s\n", testCase, err)
 			return 1
 		}
 	}
 	return m.Run()
 }
 
-func generateTestdataCleanup(path string) func() {
-	return func() {
-		_ = os.RemoveAll(extractedPathNameFromZipName(path))
-	}
-}
-
-// extractedPathNameFromZipName turns the .zip name into the name of the extracted path.
-// used for cleanup.
-func extractedPathNameFromZipName(path string) string {
-	baseName := strings.Split(filepath.Base(path), ".")[0]
-	return filepath.Join("testdata", baseName)
-}
-
-// extractTestData from zip file and write it in the same dir as the zip file.
+// extractTestData unpacks a zip file next to itself, so testdata/docker.zip becomes
+// testdata/docker. Each archive holds a single top-level directory named after the
+// archive.
+//
+// Several packages under metric/system/cgroup share one testdata directory and `go test`
+// runs them as concurrent processes, so the tree is built in a temporary directory and
+// published with a single rename. Readers therefore only ever see a complete tree, and
+// a process that loses the race simply keeps the copy that was published first.
 func extractTestData(path string) error {
+	dest := filepath.Dir(path)
+	name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	target := filepath.Join(dest, name)
+
+	if found, err := exists(target); err != nil || found {
+		return err
+	}
+
 	r, err := zip.OpenReader(path)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
 
-	dest := filepath.Dir(path)
+	tmpDir, err := os.MkdirTemp(dest, ".extract-*")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpDir)
 
 	extractAndWriteFile := func(zipFile *zip.File) error {
+		path := filepath.Join(tmpDir, zipFile.Name) //nolint:gosec // test with controlled input
+
+		if zipFile.FileInfo().IsDir() {
+			return os.MkdirAll(path, 0o755)
+		}
+
 		rc, err := zipFile.Open()
 		if err != nil {
 			return err
 		}
 		defer rc.Close()
 
-		path := filepath.Join(dest, zipFile.Name) //nolint:gosec // test with controlled input
-		if found, err := exists(path); err != nil || found {
+		// Archives are not guaranteed to list a directory before its contents.
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 			return err
 		}
 
-		if zipFile.FileInfo().IsDir() {
-			err = os.MkdirAll(path, zipFile.Mode())
-			if err != nil {
-				return err
-			}
-		} else {
-			destFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0700))
-			if err != nil {
-				return err
-			}
-			defer destFile.Close()
-
-			_, err = io.Copy(destFile, rc) //nolint:gosec // test with controlled input
-			if err != nil {
-				return err
-			}
-
-			err = os.Chmod(path, zipFile.Mode())
-			if err != nil {
-				return err
-			}
+		destFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+		if err != nil {
+			return err
 		}
-		return nil
+		defer destFile.Close()
+
+		if _, err := io.Copy(destFile, rc); err != nil { //nolint:gosec // test with controlled input
+			return err
+		}
+
+		return os.Chmod(path, zipFile.Mode())
 	}
 
 	for _, f := range r.File {
-		err := extractAndWriteFile(f)
-		if err != nil {
+		if err := extractAndWriteFile(f); err != nil {
+			return err
+		}
+	}
+
+	if err := os.Rename(filepath.Join(tmpDir, name), target); err != nil {
+		if found, existsErr := exists(target); existsErr != nil || !found {
 			return err
 		}
 	}

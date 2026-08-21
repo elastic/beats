@@ -37,14 +37,13 @@ type zswapExpectation struct {
 }
 
 // ciExpectations maps BUILDKITE_STEP_KEY to expected zswap behavior.
-// Keys must match the `key` field in .buildkite/pipeline.yml
+// Keys must match the `key` field in .buildkite/libbeat/pipeline.libbeat.yml
 var ciExpectations = map[string]zswapExpectation{
-	"linux-container-test":       {zswapExists: true, debugExists: false},  // Ubuntu 22.04: modern kernel, zswap in meminfo, no debugfs
-	"linux-container-test-rhel9": {zswapExists: true, debugExists: false},  // RHEL 9: modern kernel, zswap in meminfo, no debugfs
-	"linux-container-test-u2004": {zswapExists: false, debugExists: true},  // Ubuntu 20.04: older kernel, no meminfo but debugfs accessible
-	"linux-test":                 {zswapExists: false, debugExists: false}, // Unit tests, unprivileged
+	// Both steps run on the Ubuntu 22.04 image: modern kernel, zswap in meminfo, no debugfs
+	"mandatory-systemmetrics-unit-test":       {zswapExists: true, debugExists: false},
+	"mandatory-systemmetrics-container-tests": {zswapExists: true, debugExists: false},
 	// Test locally with:
-	// go test -c ./metric/memory -o memory.test
+	// go test -c ./pkg/systemmetrics/metric/memory -o memory.test
 	// sudo BUILDKITE_STEP_KEY=manual PRIVILEGED=1 ./memory.test -test.run TestMemoryFromContainer
 	"manual": {zswapExists: true, debugExists: true},
 }
