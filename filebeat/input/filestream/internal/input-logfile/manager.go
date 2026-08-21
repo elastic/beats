@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -68,13 +67,13 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
-	initOnce  sync.Once
-	closeOnce sync.Once
-	initErr   error
-	store     *store
-	ackCH     *updateChan
-	idsMux    sync.Mutex
-	ids       map[string]struct{}
+	// storeMu guards entry and release. Both are set once on the first
+	// successful Create and cleared on Close.
+	storeMu sync.Mutex
+	entry   *logfileEntry
+	release func()
+	idsMux  sync.Mutex
+	ids     map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -92,43 +91,44 @@ var errNoInputRunner = errors.New("no input runner available")
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
-func (cim *InputManager) Init(group unison.Group) error {
-	cim.initOnce.Do(func() {
-		if group == nil {
-			cim.initErr = errors.New("input manager Init must be called before Create")
-			return
-		}
-
-		log := cim.Logger.With("input_type", cim.Type)
-
-		var store *store
-		store, cim.initErr = acquireStore(log, cim.StateStore, cim.Type)
-		if cim.initErr != nil {
-			return
-		}
-
-		cim.store = store
-		cim.ackCH = store.cacheEntry.ackCH
-		cim.ids = map[string]struct{}{}
-	})
-
-	return cim.initErr
+// setup opens the shared store via the process-wide cache on the first call.
+// Caller holds cim.storeMu.
+func (cim *InputManager) setup() error {
+	if cim.entry != nil {
+		return nil
+	}
+	log := cim.Logger.With("input_type", cim.Type)
+	entry, release, err := acquireStore(log, cim.StateStore, cim.Type)
+	if err != nil {
+		return err
+	}
+	cim.entry = entry
+	cim.release = release
+	cim.ids = map[string]struct{}{}
+	return nil
 }
 
-// Close releases the store acquired by Init. It must be called after all inputs
-// managed by cim have stopped.
+// Close releases the manager's reference to the shared store. When the last
+// manager sharing a backend key releases, the background cleaner is stopped
+// and the store is closed. Call after all inputs managed by cim have stopped.
 func (cim *InputManager) Close() {
-	cim.closeOnce.Do(func() {
-		if cim.store != nil {
-			releaseAcquiredStore(cim.Logger, cim.store)
-		}
-	})
+	cim.storeMu.Lock()
+	release := cim.release
+	cim.release = nil
+	cim.entry = nil
+	cim.storeMu.Unlock()
+	if release != nil {
+		release()
+	}
 }
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
-	if err := cim.Init(nil); err != nil {
+	cim.storeMu.Lock()
+	err := cim.setup()
+	cim.storeMu.Unlock()
+	if err != nil {
 		return nil, err
 	}
 
@@ -263,7 +263,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	return &managedInput{
 		manager:                cim,
-		ackCH:                  cim.ackCH,
+		ackCH:                  cim.entry.ackCH,
 		id:                     settings.ID,
 		prospector:             prospector,
 		harvester:              harvester,
@@ -304,9 +304,8 @@ func (cim *InputManager) StopInput(id string) {
 }
 
 func (cim *InputManager) getRetainedStore() *store {
-	store := cim.store
-	store.Retain()
-	return store
+	cim.entry.store.Retain()
+	return cim.entry.store
 }
 
 type SourceIdentifier struct {

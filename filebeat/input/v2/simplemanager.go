@@ -20,7 +20,6 @@ package v2
 import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 type configureFn func(*conf.C, *logp.Logger) (Input, error)
@@ -36,10 +35,6 @@ type simpleInputManager struct {
 func ConfigureWith(fn func(*conf.C, *logp.Logger) (Input, error), logger *logp.Logger) InputManager {
 	return &simpleInputManager{configure: fn, logger: logger}
 }
-
-// Init is required to fulfil the input.InputManager interface.
-// For the kafka input no special initialization is required.
-func (*simpleInputManager) Init(grp unison.Group) error { return nil }
 
 // Close is a no-op for simpleInputManager; it holds no resources to release.
 func (*simpleInputManager) Close() {}

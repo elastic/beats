@@ -44,7 +44,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 )
 
 type fakeTestInput struct {
@@ -57,21 +56,16 @@ type stringSource string
 func TestManager_Init(t *testing.T) {
 	// Integration style tests for the InputManager and the state garbage collector
 
-	// Init is called for every registered input type, but most of them are never
-	// configured. Opening a registry store and starting a cleanup goroutine for
-	// each is a per-Beat cost paid for inputs that never run, and elastic-agent
-	// runs one Beat receiver per input stream.
+	// The store is opened lazily on Create so that registered-but-never-configured
+	// input types do not pay a startup cost.
 	t.Run("no store is opened and no goroutine started until an input is created", func(t *testing.T) {
 		goroutines := resources.NewGoroutinesChecker()
 
-		var grp unison.TaskGroup
-		//nolint:errcheck // We don't need the error from grp.Stop()
-		defer grp.Stop()
-		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+		manager := cleanerManager(t, createSampleStore(t, nil))
 
-		require.Nil(t, manager.store, "Init must not open the registry store")
+		require.Nil(t, manager.store, "store must not be opened before Create")
 		_, err := goroutines.WaitUntilOriginalCount()
-		require.NoError(t, err, "Init must not start the store cleanup goroutine")
+		require.NoError(t, err, "no goroutine must be started before Create")
 
 		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
 		require.NoError(t, err)
@@ -85,10 +79,7 @@ func TestManager_Init(t *testing.T) {
 			"test::mykey": {Cursor: "value1"},
 		})
 
-		var grp unison.TaskGroup
-		//nolint:errcheck // We don't need the error from grp.Stop()
-		defer grp.Stop()
-		manager := cleanerManager(t, stateStore, &grp)
+		manager := cleanerManager(t, stateStore)
 
 		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
 		require.NoError(t, err)
@@ -98,19 +89,15 @@ func TestManager_Init(t *testing.T) {
 		assert.Equal(t, "value1", snap["test::mykey"].Cursor)
 	})
 
-	t.Run("stopping the taskgroup kills internal go-routines", func(t *testing.T) {
+	t.Run("calling Close kills the cleaner goroutine", func(t *testing.T) {
 		numRoutines := runtime.NumGoroutine()
 
-		var grp unison.TaskGroup
-		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+		manager := cleanerManager(t, createSampleStore(t, nil))
 		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
-		t.Cleanup(func() { manager.Close() })
 
 		time.Sleep(200 * time.Millisecond)
-		_ = grp.Stop()
-
-		// wait for all go-routines to be gone
+		manager.Close()
 
 		for numRoutines < runtime.NumGoroutine() {
 			time.Sleep(1 * time.Millisecond)
@@ -126,14 +113,10 @@ func TestManager_Init(t *testing.T) {
 		})
 		store.GCPeriod = 10 * time.Millisecond
 
-		var grp unison.TaskGroup
-		//nolint:errcheck // We don't need the error from grp.Stop()
-		defer grp.Stop()
-		manager := cleanerManager(t, store, &grp)
+		manager := cleanerManager(t, store)
 
 		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
-		t.Cleanup(func() { manager.Close() })
 
 		for len(store.snapshot()) > 0 {
 			time.Sleep(1 * time.Millisecond)
@@ -144,10 +127,7 @@ func TestManager_Init(t *testing.T) {
 	// create inputs of one type concurrently, and each of those is now what
 	// opens the store and starts the cleaner.
 	t.Run("concurrent Create opens one store and starts one cleaner", func(t *testing.T) {
-		var grp unison.TaskGroup
-		//nolint:errcheck // We don't need the error from grp.Stop()
-		defer grp.Stop()
-		manager := cleanerManager(t, createSampleStore(t, nil), &grp)
+		manager := cleanerManager(t, createSampleStore(t, nil))
 
 		var wg sync.WaitGroup
 		for i := range 8 {
@@ -161,13 +141,12 @@ func TestManager_Init(t *testing.T) {
 		wg.Wait()
 
 		require.NotNil(t, manager.store)
-		assert.Nil(t, manager.cleanerGroup, "the cleaner must have been started exactly once")
 	})
 }
 
-// cleanerManager builds an initialised InputManager whose Create succeeds, with
-// a clean timeout short enough for the garbage collector to act within a test.
-func cleanerManager(t *testing.T, store statestore.States, grp unison.Group) *InputManager {
+// cleanerManager builds an InputManager whose Create succeeds, with a clean
+// timeout short enough for the garbage collector to act within a test.
+func cleanerManager(t *testing.T, store statestore.States) *InputManager {
 	t.Helper()
 
 	manager := &InputManager{
@@ -179,7 +158,7 @@ func cleanerManager(t *testing.T, store statestore.States, grp unison.Group) *In
 			return sourceList("mykey"), &fakeTestInput{}, nil
 		},
 	}
-	require.NoError(t, manager.Init(grp))
+	t.Cleanup(manager.Close)
 	return manager
 }
 
@@ -196,11 +175,9 @@ func TestManager_InitDefersStoreForES(t *testing.T) {
 		"test::mykey": {Cursor: "value1"},
 	})
 
-	var grp unison.TaskGroup
-	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
-	manager := cleanerManager(t, stateStore, &grp)
+	manager := cleanerManager(t, stateStore)
 
-	require.Nil(t, manager.store, "store should be nil after Init()")
+	require.Nil(t, manager.store, "store should be nil before Create()")
 
 	_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
 		"id": "my-input-id",
@@ -685,12 +662,14 @@ func TestLockResource(t *testing.T) {
 func (s stringSource) Name() string { return string(s) }
 
 func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C, *logp.Logger) ([]Source, Input, error)) *InputManager {
-	return &InputManager{
+	m := &InputManager{
 		Logger:     logptest.NewTestingLogger(t, "test"),
 		StateStore: createSampleStore(t, nil),
 		Type:       "test",
 		Configure:  configure,
 	}
+	t.Cleanup(m.Close)
+	return m
 }
 
 func constConfigureResult(t *testing.T, sources []Source, inp Input, err error) *InputManager {

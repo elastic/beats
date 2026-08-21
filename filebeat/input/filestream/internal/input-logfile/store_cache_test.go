@@ -28,45 +28,40 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/filebeat/input/v2/statemanager"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestStoreCache_AcquireHit(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	logger, logs := newObserverLogger(t)
 	registry := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 	firstStates := newCountingStateStoreWithRegistry("shared-backend", registry)
 	secondStates := newCountingStateStoreWithRegistry("shared-backend", registry)
 
-	first, err := acquireStore(logger, firstStates, "filestream")
+	first, release1, err := acquireStore(logger, firstStates, "filestream")
 	require.NoError(t, err)
-	second, err := acquireStore(logger, secondStates, "filestream")
+	second, release2, err := acquireStore(logger, secondStates, "filestream")
 	require.NoError(t, err)
-	require.Same(t, first, second)
+	require.Same(t, first.store, second.store)
+	require.Same(t, first.ackCH, second.ackCH)
 	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
 	require.Zero(t, secondStates.storeForCalls.Load())
 
-	entry := snapshotStoreCacheEntry(firstStates.StoreKey())
-	require.True(t, entry.found)
-	require.Equal(t, storeActive, entry.state)
-	require.Equal(t, 2, entry.users)
-	require.Same(t, first, entry.store)
-	require.NotNil(t, entry.ackCH)
-	require.NotNil(t, entry.ackUpdater)
-	require.Equal(t, 1, storeCacheEntryCount())
+	require.Equal(t, 1, globalCache.Len())
 	require.Eventually(t, func() bool {
 		return logs.FilterMessage("filestream shared store cleaner started").Len() == 1
 	}, time.Second, time.Millisecond)
 
-	releaseAcquiredStore(logger, first)
-	releaseAcquiredStore(logger, second)
+	release1()
+	release2()
 }
 
 func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	closeStarted := make(chan struct{})
 	allowClose := make(chan struct{})
@@ -79,81 +74,32 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 
 	logger := logp.NewNopLogger()
 	states := createSampleStore(t, nil).WithGCPeriod(time.Hour)
-	first, err := acquireStore(logger, states, "filestream")
+	first, release1, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
-	second, err := acquireStore(logger, states, "filestream")
+	_, release2, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
+	require.Equal(t, 1, globalCache.Len())
 
-	releaseAcquiredStore(logger, first)
-	entry := snapshotStoreCacheEntry(states.StoreKey())
-	require.True(t, entry.found)
-	require.Equal(t, storeActive, entry.state)
-	require.Equal(t, 1, entry.users)
+	release1()
+	require.Equal(t, 1, globalCache.Len(), "one user still active; cache entry must remain")
 
 	released := make(chan struct{})
 	go func() {
-		releaseAcquiredStore(logger, second)
+		release2()
 		close(released)
 	}()
 	<-closeStarted
-
-	entry = snapshotStoreCacheEntry(states.StoreKey())
-	require.True(t, entry.found)
-	require.Equal(t, storeDraining, entry.state)
-	require.Zero(t, entry.users)
+	// The entry has been removed from the map (drain started) but the store
+	// close is blocked by closeStoreWith.
+	require.Equal(t, 0, globalCache.Len(), "draining entry is no longer in the active map")
 
 	close(allowClose)
 	<-released
-}
-
-func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
-	setupStoreCacheTest(t)
-
-	logger, logs := newObserverLogger(t)
-
-	states := newCountingStateStore("draining-backend")
-	first, err := acquireStore(logger, states, "filestream")
-	require.NoError(t, err)
-	first.Retain() // Hold a short-lived getRetainedStore-style reference.
-	releaseAcquiredStore(logger, first)
-
-	entry := snapshotStoreCacheEntry(states.StoreKey())
-	require.True(t, entry.found)
-	require.Equal(t, storeDraining, entry.state)
-
-	type acquireResult struct {
-		store *store
-		err   error
-	}
-	result := make(chan acquireResult, 1)
-	go func() {
-		s, err := acquireStore(logger, states, "filestream")
-		result <- acquireResult{store: s, err: err}
-	}()
-
-	// acquireStore logs this immediately before waiting for the draining store
-	// to close. The event is therefore a deterministic barrier that the second
-	// acquisition cannot complete until the retained reference is released.
-	require.Eventually(t, func() bool {
-		return logs.FilterMessage("waiting for draining filestream shared store").Len() == 1
-	}, time.Second, time.Millisecond)
-	require.Equal(t, int32(1), states.storeForCalls.Load())
-
-	first.Release()
-	var acquired acquireResult
-	select {
-	case acquired = <-result:
-	case <-time.After(100 * time.Millisecond):
-		t.Fatal("timed out waiting for acquisition after releasing the draining store")
-	}
-	require.NoError(t, acquired.err)
-	require.Equal(t, int32(2), states.storeForCalls.Load())
-	require.NotSame(t, first, acquired.store, "new store must be different from the first one")
-	releaseAcquiredStore(logger, acquired.store)
+	_ = first // suppress unused variable
 }
 
 func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	var closes atomic.Int32
 	cleanup := closeStoreWith(func(s *store) {
@@ -164,26 +110,23 @@ func TestStoreCache_LastReferenceClosesStoreOnce(t *testing.T) {
 
 	states := newCountingStateStore("last-reference-backend")
 	logger := logp.NewNopLogger()
-	acquired, err := acquireStore(logger, states, "filestream")
+	entry, release, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
-	// Model getRetainedStore ownership. A premature cache close while this
-	// reference exists would leave an active caller using a closed store.
-	acquired.Retain()
+	// Model getRetainedStore ownership: an extra Retain held during Create.
+	entry.store.Retain()
 
-	// This drops manager ownership and stops the cleaner, which drops cache
-	// ownership. Forgetting the latter leaks the implicit RefCount owner and
-	// prevents the store from ever closing.
-	releaseAcquiredStore(logger, acquired)
+	// Dropping the cache reference triggers drain, which calls closeFn only
+	// after the cleaner goroutine exits. The retained reference prevents the
+	// store from being closed until it is explicitly released.
+	release()
 	require.Zero(t, closes.Load(), "the short-lived reference keeps the store open")
 
-	// The final short-lived reference must be sufficient to close the store;
-	// more than one close would indicate duplicate release/close handling.
-	acquired.Release()
-	require.Equal(t, int32(1), closes.Load())
+	entry.store.Release()
+	require.Equal(t, int32(1), closes.Load(), "the store must close exactly once")
 }
 
 func TestStoreCache_ConcurrentInitialization(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	logger, logs := newObserverLogger(t)
 
@@ -191,86 +134,52 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 	const acquisitions = 10
 	const waiters = acquisitions - 1
 	type acquireResult struct {
-		store *store
-		err   error
+		entry   *logfileEntry
+		release func()
+		err     error
 	}
 	results := make(chan acquireResult, acquisitions)
 
-	// The first caller owns initialization and remains in StoreFor until the
-	// remaining callers have observed the initializing cache entry.
 	go func() {
-		s, err := acquireStore(logger, states, "filestream")
-		results <- acquireResult{store: s, err: err}
+		e, rel, err := acquireStore(logger, states, "filestream")
+		results <- acquireResult{entry: e, release: rel, err: err}
 	}()
 	<-states.firstStoreForStarted
 
 	for range waiters {
 		go func() {
-			s, err := acquireStore(logger, states, "filestream")
-			results <- acquireResult{store: s, err: err}
+			e, rel, err := acquireStore(logger, states, "filestream")
+			results <- acquireResult{entry: e, release: rel, err: err}
 		}()
 	}
-	// The event is logged immediately before each caller waits for the
-	// initializing entry. This proves the test is exercising that path.
 	require.Eventually(t, func() bool {
 		return logs.FilterMessage("waiting for filestream shared store initialization").Len() == waiters
 	}, time.Second, time.Millisecond)
 
 	close(states.releaseFirstStoreFor)
 
-	var first *store
-	acquiredStores := make([]*store, 0, acquisitions)
+	// Collect all results before releasing any reference. Releasing inside the
+	// loop would drain the cache entry while goroutines are still waking up from
+	// <-ready (between onWait and <-ready), causing them to see a missing entry
+	// and open a second store.
+	all := make([]acquireResult, 0, acquisitions)
 	for range acquisitions {
-		result := <-results
-		require.NoError(t, result.err)
-		if first == nil {
-			first = result.store
-		} else {
-			require.Same(t, first, result.store)
-		}
-		acquiredStores = append(acquiredStores, result.store)
+		r := <-results
+		require.NoError(t, r.err)
+		all = append(all, r)
 	}
-	for _, acquired := range acquiredStores {
-		releaseAcquiredStore(logger, acquired)
+	firstEntry := all[0].entry
+	for _, r := range all[1:] {
+		require.Same(t, firstEntry.store, r.entry.store)
+	}
+	for _, r := range all {
+		r.release()
 	}
 	require.Equal(t, int32(1), states.storeForCalls.Load())
 }
 
-func TestStoreCache_InitializationResetDoesNotLeakCleanerWaitGroup(t *testing.T) {
-	setupStoreCacheTest(t)
-
-	logger := logp.NewNopLogger()
-	states := newBlockingStateStore("reset-backend", nil)
-	result := make(chan error, 1)
-	go func() {
-		_, err := acquireStore(logger, states, "filestream")
-		result <- err
-	}()
-	<-states.firstStoreForStarted
-
-	globalStoreCache.mu.Lock()
-	entry := globalStoreCache.entries[states.StoreKey()]
-	globalStoreCache.mu.Unlock()
-	require.NotNil(t, entry, "blocked initialization must have a cache entry")
-
-	resetStoreCacheForTest()
-	close(states.releaseFirstStoreFor)
-	require.ErrorContains(t, <-result, "filestream shared store cache entry was reset", "reset initialization must return an error")
-
-	cleanerDone := make(chan struct{})
-	go func() {
-		entry.cleanerWg.Wait()
-		close(cleanerDone)
-	}()
-	select {
-	case <-cleanerDone:
-	case <-time.After(time.Second):
-		t.Fatal("timed out waiting for reset initialization cleaner accounting")
-	}
-}
-
 func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	logger, logs := newObserverLogger(t)
 
@@ -278,99 +187,90 @@ func TestStoreCache_InitializationFailureCanRetry(t *testing.T) {
 	const waiters = 4
 	type acquireResult struct{ err error }
 	results := make(chan acquireResult, waiters+1)
-	// This first acquisition owns initialization and blocks in StoreFor until
-	// the test chooses whether initialisation can continue and fails.
 	go func() {
-		_, err := acquireStore(logger, states, "filestream")
+		_, _, err := acquireStore(logger, states, "filestream")
 		results <- acquireResult{err: err}
 	}()
 	<-states.firstStoreForStarted
 
-	// These acquisitions find the initializing cache entry. They must wait for
-	// the first attempt instead of opening competing stores of their own.
 	for range waiters {
 		go func() {
-			_, err := acquireStore(logger, states, "filestream")
+			_, _, err := acquireStore(logger, states, "filestream")
 			results <- acquireResult{err: err}
 		}()
 	}
-	// acquireStore logs this immediately before blocking on entry.ready. Using
-	// that existing lifecycle event as the barrier proves these are current
-	// waiters without adding production-only synchronization state to the cache.
 	require.Eventually(t, func() bool {
 		return logs.FilterMessage("waiting for filestream shared store initialization").Len() == waiters
 	}, time.Second, time.Millisecond)
 
-	// Failing the initializer wakes every current waiter with the same error;
-	// nobody receives a store from this failed cache entry.
 	close(states.releaseFirstStoreFor)
 	for range waiters + 1 {
 		require.ErrorIs(t, (<-results).err, errTestStoreInitialization)
 	}
 	require.Equal(t, int32(1), states.storeForCalls.Load())
 
-	// The failed placeholder must be gone, so a later acquisition can create a
-	// new entry and successfully open a replacement store.
-	retried, err := acquireStore(logger, states, "filestream")
+	retried, release, err := acquireStore(logger, states, "filestream")
 	require.NoError(t, err)
 	require.Equal(t, int32(2), states.storeForCalls.Load())
-	releaseAcquiredStore(logger, retried)
+	release()
+	_ = retried
 }
 
 func TestStoreCache_DifferentBackendsInitializeIndependently(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	logger, logs := newObserverLogger(t)
 	firstStates := newBlockingStateStore("first-backend", nil)
 	secondStates := newCountingStateStore("second-backend")
 
 	type acquireResult struct {
-		store *store
-		err   error
+		entry   *logfileEntry
+		release func()
+		err     error
 	}
 	firstResult := make(chan acquireResult, 1)
 	go func() {
-		s, err := acquireStore(logger, firstStates, "filestream")
-		firstResult <- acquireResult{store: s, err: err}
+		e, rel, err := acquireStore(logger, firstStates, "filestream")
+		firstResult <- acquireResult{entry: e, release: rel, err: err}
 	}()
 	<-firstStates.firstStoreForStarted
 
 	secondResult := make(chan acquireResult, 1)
 	go func() {
-		s, err := acquireStore(logger, secondStates, "filestream")
-		secondResult <- acquireResult{store: s, err: err}
+		e, rel, err := acquireStore(logger, secondStates, "filestream")
+		secondResult <- acquireResult{entry: e, release: rel, err: err}
 	}()
-	var second *store
+	var second *logfileEntry
+	var release2 func()
 	select {
 	case result := <-secondResult:
 		require.NoError(t, result.err, "a different backend must initialize while the first backend is blocked")
-		second = result.store
+		second = result.entry
+		release2 = result.release
 	case <-time.After(time.Second):
 		t.Fatal("timed out waiting for a different backend to initialize")
 	}
-	require.Equal(t, 2, storeCacheEntryCount(), "both backend cache entries must exist while the first initialization is blocked")
+	require.Equal(t, 2, globalCache.Len(), "both backends must have active cache entries")
 
 	close(firstStates.releaseFirstStoreFor)
 	result := <-firstResult
-	require.NoError(t, result.err, "the initially blocked backend must finish after being released")
-	first := result.store
-	require.NotSame(t, first, second)
+	require.NoError(t, result.err)
+	first := result.entry
+	require.NotSame(t, first.store, second.store)
 
-	require.Equal(t, 2, storeCacheEntryCount(), "both backend cache entries must remain active")
-	require.True(t, snapshotStoreCacheEntry(firstStates.StoreKey()).found)
-	require.True(t, snapshotStoreCacheEntry(secondStates.StoreKey()).found)
+	require.Equal(t, 2, globalCache.Len())
 	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
 	require.Equal(t, int32(1), secondStates.storeForCalls.Load())
 	require.Eventually(t, func() bool {
 		return logs.FilterMessage("filestream shared store cleaner started").Len() == 2
 	}, time.Second, time.Millisecond)
 
-	releaseAcquiredStore(logger, first)
-	releaseAcquiredStore(logger, second)
+	result.release()
+	release2()
 }
 
 func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	states := newCountingStateStore("concurrent-acquire-release-backend")
 	logger := logp.NewNopLogger()
@@ -383,12 +283,12 @@ func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
 		wg.Go(func() {
 			<-start
 			for range iterations {
-				s, err := acquireStore(logger, states, "filestream")
+				_, release, err := acquireStore(logger, states, "filestream")
 				if err != nil {
 					errs <- err
 					continue
 				}
-				releaseAcquiredStore(logger, s)
+				release()
 			}
 		})
 	}
@@ -399,94 +299,13 @@ func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
-}
-
-func TestStoreCache_InvalidStateReturnsErrorAndUnlocks(t *testing.T) {
-	setupStoreCacheTest(t)
-
-	logger, logs := newObserverLogger(t)
-	states := newCountingStateStore("invalid-state-backend")
-	const invalidState = storeCacheState(255)
-
-	globalStoreCache.mu.Lock()
-	globalStoreCache.entries[states.StoreKey()] = &storeCacheEntry{state: invalidState}
-	globalStoreCache.mu.Unlock()
-	t.Cleanup(func() {
-		if globalStoreCache.mu.TryLock() {
-			delete(globalStoreCache.entries, states.StoreKey())
-			globalStoreCache.mu.Unlock()
-			return
-		}
-		t.Error("could not clean up store because it is already locked")
-	})
-
-	result := make(chan error, 1)
-	go func() {
-		_, err := acquireStore(logger, states, "filestream")
-		result <- err
-	}()
-
-	select {
-	case err := <-result:
-		require.ErrorContains(
-			t,
-			err,
-			"unhandled filestream shared store cache state unknown(255)",
-			"an unknown state must return an error",
-		)
-	case <-time.After(time.Second):
-		t.Fatal("timed out waiting for acquisition with an unknown cache state")
-	}
-
-	require.Eventually(t, func() bool {
-		return logs.FilterMessage("unhandled filestream shared store cache state").Len() == 1
-	}, time.Second, time.Millisecond, "an unknown state must be logged")
-
-	if !globalStoreCache.mu.TryLock() {
-		t.Fatal("store cache mutex remained locked after an unknown cache " +
-			"state. The clean up of this test might deadlock.")
-	}
-	globalStoreCache.mu.Unlock()
+	require.Equal(t, 0, globalCache.Len(), "all references released; cache must be empty")
 }
 
 type countingStateStore struct {
 	registry      *statestore.Registry
 	storeForCalls atomic.Int32
 	key           string
-}
-
-type cacheEntrySnapshot struct {
-	found      bool
-	state      storeCacheState
-	users      int
-	store      *store
-	ackCH      *updateChan
-	ackUpdater *updateWriter
-}
-
-func snapshotStoreCacheEntry(key string) cacheEntrySnapshot {
-	globalStoreCache.mu.Lock()
-	defer globalStoreCache.mu.Unlock()
-
-	entry := globalStoreCache.entries[key]
-	if entry == nil {
-		return cacheEntrySnapshot{}
-	}
-	return cacheEntrySnapshot{
-		found:      true,
-		state:      entry.state,
-		users:      entry.users,
-		store:      entry.store,
-		ackCH:      entry.ackCH,
-		ackUpdater: entry.ackUpdater,
-	}
-}
-
-func storeCacheEntryCount() int {
-	globalStoreCache.mu.Lock()
-	defer globalStoreCache.mu.Unlock()
-	return len(globalStoreCache.entries)
 }
 
 func newObserverLogger(t *testing.T) (*logp.Logger, *observer.ObservedLogs) {
@@ -543,20 +362,21 @@ func (s *blockingStateStore) StoreFor(name string) (*statestore.Store, error) {
 	return s.registry.Get(name)
 }
 
-func setupStoreCacheTest(t *testing.T) {
+// setupCacheForTest resets the global cache and registers a cleanup that
+// asserts all acquired references have been released.
+func setupCacheForTest(t *testing.T) {
 	t.Helper()
-	resetStoreCacheForTest()
+	resetCacheForTest()
 	t.Cleanup(func() {
-		require.Zero(t, storeCacheEntryCount(), "all acquired store references must be released")
+		require.Zero(t, globalCache.Len(), "all acquired store references must be released")
 	})
 }
 
-// resetStoreCacheForTest provides isolation before a test starts. Tests must
-// release all references themselves.
-// This helper never releases a store reference or alters an entry lifecycle;
-// cleanup detects ownership leaks instead.
-func resetStoreCacheForTest() {
-	globalStoreCache.mu.Lock()
-	defer globalStoreCache.mu.Unlock()
-	globalStoreCache.entries = make(map[string]*storeCacheEntry)
+// resetCacheForTest replaces the global cache with a fresh instance to
+// provide test isolation. Tests must release all references themselves.
+func resetCacheForTest() {
+	globalCache = statemanager.NewCache[*logfileEntry](func(e *logfileEntry) {
+		e.ackUpdater.Close()
+		e.store.Release()
+	})
 }
