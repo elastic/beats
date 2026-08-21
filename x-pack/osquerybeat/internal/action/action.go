@@ -29,6 +29,10 @@ type Action struct {
 	// Profile is the optional per-action profiling override. When nil the global
 	// elastic_options.profiling.profiling_all default applies (see config.ResolveProfiling).
 	Profile *bool
+	// SpaceID is the Kibana space the action was issued from. Kibana sets it at the
+	// top level of the action document; the result events have to carry it forward
+	// because the osquery read paths filter results by space_id.
+	SpaceID string
 }
 
 func FromMap(m map[string]any) (a Action, err error) {
@@ -37,12 +41,19 @@ func FromMap(m map[string]any) (a Action, err error) {
 	}
 
 	var (
-		id, query string
+		id, query, spaceID string
 	)
 
 	if v, ok := m["id"]; ok {
 		if id, ok = v.(string); !ok {
 			return a, fmt.Errorf("invalid id: %w", ErrActionRequest)
+		}
+	}
+
+	// Optional: only Kibana versions with space-aware osquery send this.
+	if v, ok := m["space_id"]; ok {
+		if spaceID, ok = v.(string); !ok {
+			return a, fmt.Errorf("invalid space_id: %w", ErrActionRequest)
 		}
 	}
 
@@ -105,6 +116,7 @@ func FromMap(m map[string]any) (a Action, err error) {
 		Platforms:  platforms,
 		ECSMapping: ecsm,
 		Profile:    profile,
+		SpaceID:    spaceID,
 	}
 
 	if v, ok := m["timeout"]; ok {

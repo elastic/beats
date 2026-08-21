@@ -190,7 +190,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", duration)
 
-	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", "", "", nil, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, "action_id", responseID, ac.SpaceID, "", "", "", nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }

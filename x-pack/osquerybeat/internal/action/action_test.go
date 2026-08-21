@@ -146,6 +146,17 @@ func TestActionFromMap(t *testing.T) {
 			},
 			Err: ErrActionRequest,
 		},
+		{
+			Name: "invalid space_id",
+			Map: map[string]any{
+				"id":       "123456789",
+				"space_id": 123,
+				"data": map[string]any{
+					"query": "select * from foo",
+				},
+			},
+			Err: ErrActionRequest,
+		},
 	}
 
 	for _, tc := range tests {
@@ -171,6 +182,49 @@ func TestActionFromMap(t *testing.T) {
 				if diff := cmp.Diff([]string{"linux", "windows"}, a.Platforms); diff != "" {
 					t.Errorf("unexpected platforms (-want +got):\n%s", diff)
 				}
+			}
+		})
+	}
+}
+
+func TestActionFromMapSpaceID(t *testing.T) {
+
+	tests := []struct {
+		Name    string
+		Map     map[string]any
+		SpaceID string
+	}{
+		{
+			Name: "space_id is parsed",
+			Map: map[string]any{
+				"id":       "123456789",
+				"space_id": "my-space",
+				"data": map[string]any{
+					"query": "select * from foo",
+				},
+			},
+			SpaceID: "my-space",
+		},
+		{
+			Name: "missing space_id leaves it empty",
+			Map: map[string]any{
+				"id": "123456789",
+				"data": map[string]any{
+					"query": "select * from foo",
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.Name, func(t *testing.T) {
+			a, err := FromMap(tc.Map)
+			if err != nil {
+				t.Fatalf("expected no error, got: %v", err)
+			}
+
+			if diff := cmp.Diff(tc.SpaceID, a.SpaceID); diff != "" {
+				t.Errorf("unexpected space id (-want +got):\n%s", diff)
 			}
 		})
 	}
