@@ -206,7 +206,7 @@ func appendStringField(m mapstr.M, field, value string) {
 		_, _ = m.Put(field, []string{t, value})
 	case []string:
 		_, _ = m.Put(field, append(t, value))
-	case []interface{}:
+	case []any:
 		_, _ = m.Put(field, append(t, value))
 	}
 }

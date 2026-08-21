@@ -162,6 +162,7 @@ func Update() {
 func includeList() error {
 	options := devtools.DefaultIncludeListOptions()
 	options.ImportDirs = []string{"input/*", "processors/*"}
+	options.BuildTags = "\n//go:build !securityonly\n"
 	return devtools.GenerateIncludeListGo(options)
 }
 

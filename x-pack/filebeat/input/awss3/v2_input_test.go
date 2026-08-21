@@ -90,16 +90,16 @@ func TestInputV2_resolveSQSRegion(t *testing.T) {
 }
 
 func TestFeatureFlag_routes_to_V2(t *testing.T) {
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"features": map[string]interface{}{
-			"aws_s3_v2": map[string]interface{}{"enabled": true},
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"features": map[string]any{
+			"aws_s3_v2": map[string]any{"enabled": true},
 		},
 	})
 	require.NoError(t, features.UpdateFromConfig(cfg))
 	t.Cleanup(func() {
-		off := conf.MustNewConfigFrom(map[string]interface{}{
-			"features": map[string]interface{}{
-				"aws_s3_v2": map[string]interface{}{"enabled": false},
+		off := conf.MustNewConfigFrom(map[string]any{
+			"features": map[string]any{
+				"aws_s3_v2": map[string]any{"enabled": false},
 			},
 		})
 		_ = features.UpdateFromConfig(off)
@@ -107,7 +107,7 @@ func TestFeatureFlag_routes_to_V2(t *testing.T) {
 
 	assert.True(t, features.AwsS3V2(), "V2 flag should be enabled")
 
-	inputCfg := conf.MustNewConfigFrom(map[string]interface{}{
+	inputCfg := conf.MustNewConfigFrom(map[string]any{
 		"queue_url": "https://sqs.us-east-1.amazonaws.com/123456789012/test-queue",
 	})
 	in, err := Plugin(logptest.NewTestingLogger(t, inputName), openTestStatestore(), nil).Manager.Create(inputCfg)

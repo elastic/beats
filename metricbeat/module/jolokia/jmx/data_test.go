@@ -18,7 +18,7 @@
 package jmx
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -34,7 +34,7 @@ func TestEventMapper(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response.json")
 
 	require.NoError(t, err)
 
@@ -71,20 +71,20 @@ func TestEventMapper(t *testing.T) {
 				"cms_collection_count": float64(1),
 			},
 			"memory": mapstr.M{
-				"heap_usage": map[string]interface{}{
+				"heap_usage": map[string]any{
 					"init":      float64(1073741824),
 					"committed": float64(1037959168),
 					"max":       float64(1037959168),
 					"used":      float64(227420472),
 				},
-				"non_heap_usage": map[string]interface{}{
+				"non_heap_usage": map[string]any{
 					"init":      float64(2555904),
 					"committed": float64(53477376),
 					"max":       float64(-1),
 					"used":      float64(50519768),
 				},
 			},
-			"metrics": map[string]interface{}{
+			"metrics": map[string]any{
 				"atomikos_nbTransactions": float64(0),
 				"classes":                 float64(18857),
 				"classes_loaded":          float64(19127),
@@ -105,7 +105,7 @@ func TestEventGroupingMapper(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response.json")
 
 	require.NoError(t, err)
 
@@ -137,7 +137,7 @@ func TestEventGroupingMapper(t *testing.T) {
 	expected := []mapstr.M{
 		{
 			"uptime": float64(47283),
-			"metrics": map[string]interface{}{
+			"metrics": map[string]any{
 				"atomikos_nbTransactions": float64(0),
 				"classes":                 float64(18857),
 				"classes_loaded":          float64(19127),
@@ -153,13 +153,13 @@ func TestEventGroupingMapper(t *testing.T) {
 		},
 		{
 			"memory": mapstr.M{
-				"heap_usage": map[string]interface{}{
+				"heap_usage": map[string]any{
 					"init":      float64(1073741824),
 					"committed": float64(1037959168),
 					"max":       float64(1037959168),
 					"used":      float64(227420472),
 				},
-				"non_heap_usage": map[string]interface{}{
+				"non_heap_usage": map[string]any{
 					"init":      float64(2555904),
 					"committed": float64(53477376),
 					"max":       float64(-1),
@@ -182,7 +182,7 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_get_response.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_get_response.json")
 
 	require.NoError(t, err)
 
@@ -204,13 +204,13 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 	expected := []mapstr.M{
 		{
 			"memory": mapstr.M{
-				"heap_usage": map[string]interface{}{
+				"heap_usage": map[string]any{
 					"init":      float64(1073741824),
 					"committed": float64(1037959168),
 					"max":       float64(1037959168),
 					"used":      float64(227420472),
 				},
-				"non_heap_usage": map[string]interface{}{
+				"non_heap_usage": map[string]any{
 					"init":      float64(2555904),
 					"committed": float64(53477376),
 					"max":       float64(-1),
@@ -231,7 +231,7 @@ func TestEventGroupingMapperGetRequestUptime(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_get_response_uptime.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_get_response_uptime.json")
 
 	require.NoError(t, err)
 
@@ -265,7 +265,7 @@ func TestEventMapperWithWildcard(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response_wildcard.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response_wildcard.json")
 
 	require.NoError(t, err)
 
@@ -306,7 +306,7 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response_wildcard.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response_wildcard.json")
 
 	require.NoError(t, err)
 

@@ -92,10 +92,10 @@ func TestResourcePoolMetricSetData(t *testing.T) {
 	assert.NoError(t, err, "failed to write events with reporter")
 }
 
-func getConfig(ts *simulator.Server) map[string]interface{} {
+func getConfig(ts *simulator.Server) map[string]any {
 	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "vsphere",
 		"metricsets": []string{"resourcepool"},
 		"hosts":      []string{urlSimulator},

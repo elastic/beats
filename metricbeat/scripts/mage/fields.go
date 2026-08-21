@@ -31,7 +31,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       []string{"module"},
 			ModulesToExclude: []string{"module/docker", "module/kubernetes"},
 			Outfile:          "include/list_common.go",
-			BuildTags:        "",
+			BuildTags:        "\n//go:build !securityonly\n",
 			Pkg:              "include",
 			SkipInitModule:   true,
 		})
@@ -45,7 +45,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       []string{"module/docker", "module/kubernetes"},
 			ModulesToExclude: nil,
 			Outfile:          "include/list_docker.go",
-			BuildTags:        "\n//go:build linux || darwin || windows\n",
+			BuildTags:        "\n//go:build (linux || darwin || windows) && !agentbeat\n",
 			Pkg:              "include",
 			SkipInitModule:   true,
 		})
@@ -59,6 +59,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       nil,
 			ModulesToExclude: nil,
 			Outfile:          "include/list_init.go",
+			BuildTags:        "\n//go:build !agentbeat\n",
 			Pkg:              "include",
 			SkipInitModule:   false,
 		})
