@@ -2,7 +2,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "format": "raw",
         "kernel": "3.10.0-1062.9.1.el7.x86_64",
         "node": "localhost.localdomain",
@@ -11,7 +11,7 @@
         "record_type": "DAEMON_START",
         "result": "success",
         "sequence": "4686",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "auditd_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -25,13 +25,13 @@
     "auditd": {
       "log": {
         "audit_backlog_limit": "8192",
-        "auid": "4294967295",
+        "auid": "unset",
         "node": "localhost.localdomain",
         "old": "64",
         "record_type": "CONFIG_CHANGE",
         "result": "success",
         "sequence": "4",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "unconfined_service_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -43,13 +43,13 @@
     "auditd": {
       "log": {
         "audit_failure": "1",
-        "auid": "4294967295",
+        "auid": "unset",
         "node": "localhost.localdomain",
         "old": "1",
         "record_type": "CONFIG_CHANGE",
         "result": "success",
         "sequence": "5",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "unconfined_service_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -60,7 +60,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd",
         "exe": "/usr/lib/systemd/systemd",
         "node": "localhost.localdomain",
@@ -68,7 +68,7 @@
         "record_type": "SERVICE_START",
         "result": "success",
         "sequence": "6",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -81,7 +81,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd-update-utmp",
         "exe": "/usr/lib/systemd/systemd-update-utmp",
         "node": "localhost.localdomain",
@@ -89,7 +89,7 @@
         "record_type": "SYSTEM_BOOT",
         "result": "success",
         "sequence": "7",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -101,7 +101,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd",
         "exe": "/usr/lib/systemd/systemd",
         "node": "localhost.localdomain",
@@ -109,7 +109,7 @@
         "record_type": "SERVICE_START",
         "result": "success",
         "sequence": "8",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -122,7 +122,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd",
         "exe": "/usr/lib/systemd/systemd",
         "node": "localhost.localdomain",
@@ -130,7 +130,7 @@
         "record_type": "SERVICE_START",
         "result": "success",
         "sequence": "9",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -143,7 +143,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd",
         "exe": "/usr/lib/systemd/systemd",
         "node": "localhost.localdomain",
@@ -151,7 +151,7 @@
         "record_type": "SERVICE_START",
         "result": "success",
         "sequence": "10",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -164,7 +164,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd",
         "exe": "/usr/lib/systemd/systemd",
         "node": "localhost.localdomain",
@@ -172,7 +172,7 @@
         "record_type": "SERVICE_START",
         "result": "success",
         "sequence": "11",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -185,7 +185,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd",
         "exe": "/usr/lib/systemd/systemd",
         "node": "localhost.localdomain",
@@ -193,7 +193,7 @@
         "record_type": "SERVICE_START",
         "result": "success",
         "sequence": "12",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
