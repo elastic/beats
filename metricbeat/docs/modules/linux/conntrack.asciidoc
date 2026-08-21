@@ -7,8 +7,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-linux-conntrack]]
 === Linux conntrack metricset
 
-beta[]
-
 include::../../../module/linux/conntrack/_meta/docs.asciidoc[]
 
 

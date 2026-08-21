@@ -7,8 +7,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-linux-iostat]]
 === Linux iostat metricset
 
-beta[]
-
 include::../../../module/linux/iostat/_meta/docs.asciidoc[]
 
 
