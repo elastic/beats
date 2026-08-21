@@ -391,7 +391,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Make sure all events that were published in
-	registrarChannel := newRegistrarLogger(registrar)
+	registrarChannel := newRegistrarLogger(registrar, fb.logger)
 
 	// setup event counting for startup and a global common ACKer, such that all events will be
 	// routed to the reigstrar after they've been ACKed.
@@ -469,13 +469,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// The current order is: registrar, publisher, spooler, crawler
 	// That means, crawler is stopped first.
 
-	// Start the registrar
-	err = registrar.Start()
-	if err != nil {
-		return fmt.Errorf("Could not start registrar: %w", err) //nolint:staticcheck //Keep old behavior
-	}
-
-	// Stopping registrar will write last state
+	// The registrar is started by the first log-family input to be created (see
+	// input.RunnerFactory.Create), because those inputs are the only source of
+	// the states it persists. When configured with none of them (eg. filestream),
+	// never starts it and never scans the registry for state that cannot arrive.
+	//
+	// Stopping registrar will write last state in cases where a registrar was actually
+	// started. When nothing is started this is a no-op.
 	defer registrar.Stop()
 
 	// Stopping publisher (might potentially drop items)
