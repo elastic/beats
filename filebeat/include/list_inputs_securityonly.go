@@ -15,11 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !(linux || darwin || windows) || agentbeat
+//go:build securityonly
 
-package autodiscover
+package include
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	// does nothing if kubernetes and docker are not supported
-}
+import (
+	_ "github.com/elastic/beats/v7/filebeat/input/syslog"
+)
+
+func InitializeModule() {}
