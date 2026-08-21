@@ -28,6 +28,8 @@ func resetTimeNow() {
 // can be applied to pointer(true) as the returned value is an addressable value.
 //
 // See: https://go.dev/ref/spec#Address_operators
+//
+//go:fix inline
 func pointer[T any](d T) *T {
-	return &d
+	return new(d)
 }

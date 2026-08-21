@@ -35,7 +35,7 @@ func TestHostParser(t *testing.T) {
 		{"unix:///var/lib/haproxy/stats", "unix:///var/lib/haproxy/stats"},
 	}
 
-	m := mbtest.NewTestModule(t, map[string]interface{}{})
+	m := mbtest.NewTestModule(t, map[string]any{})
 
 	for _, test := range tests {
 		hi, err := HostParser(m, test.host)

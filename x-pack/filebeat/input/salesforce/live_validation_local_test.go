@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build salesforce_live
-// +build salesforce_live
 
 // Local-only live Salesforce validation.
 //
@@ -146,7 +145,7 @@ func eventFieldValues(t *testing.T, events []string, field string) []string {
 
 	values := make([]string, 0, len(events))
 	for _, raw := range events {
-		var decoded map[string]interface{}
+		var decoded map[string]any
 		require.NoError(t, json.Unmarshal([]byte(raw), &decoded), "expected live event message to be valid JSON")
 		value, ok := decoded[field].(string)
 		if ok && value != "" {

@@ -76,8 +76,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(url string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(url string) map[string]any {
+	return map[string]any{
 		"module":     "rabbitmq",
 		"metricsets": []string{"exchange"},
 		"hosts":      []string{url},
