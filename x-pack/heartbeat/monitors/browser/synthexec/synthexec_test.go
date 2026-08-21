@@ -26,6 +26,7 @@ import (
 	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -138,7 +139,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 					Index:  0,
 					Status: "succeeded",
 				},
-				Payload: map[string]interface{}{
+				Payload: map[string]any{
 					"source":      "async ({page, params}) => {await page.goto('http://www.elastic.co')}",
 					"duration_ms": float64(3472),
 					"url":         "https://www.elastic.co/",
@@ -267,6 +268,29 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 		require.Len(t, stdoutEvents, 1)
 		require.Equal(t, "CMD_TIMEOUT", synthEvents[0].Error.Code)
 	})
+}
+
+func TestRunCmdStartFailure(t *testing.T) {
+	const deadline = 30*time.Second
+	ctx := context.WithValue(t.Context(), SynthexecTimeoutKey, 2*deadline)
+	cmd := exec.CommandContext(ctx, "/dev/null/no-such-binary")
+
+	goroutines := resources.NewGoroutinesChecker()
+
+	returned := make(chan error, 1)
+	go func() {
+		_, err := runCmd(ctx, &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+		returned <- err
+	}()
+
+	select {
+	case err := <-returned:
+		require.Error(t, err, "runCmd should report that the command could not be started")
+	case <-time.After(deadline):
+		require.Fail(t, "runCmd blocked instead of returning the start error")
+	}
+
+	goroutines.Check(t)
 }
 
 func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {

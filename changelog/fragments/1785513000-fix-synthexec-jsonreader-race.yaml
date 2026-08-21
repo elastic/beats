@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Prevent browser monitors from failing when the synthetics process exits during startup
+component: heartbeat
