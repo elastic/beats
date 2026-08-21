@@ -19,7 +19,7 @@ type MockClient struct {
 	err      error
 }
 
-func (m *MockClient) Op(req interface{}, vsys string, extras, ans interface{}) ([]byte, error) {
+func (m *MockClient) Op(req any, vsys string, extras, ans any) ([]byte, error) {
 	return m.response, m.err
 }
 

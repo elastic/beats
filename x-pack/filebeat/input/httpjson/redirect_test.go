@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -33,13 +34,13 @@ func TestRedirect_EndToEnd(t *testing.T) {
 	loader, err := v2.NewLoader(log, []v2.Plugin{httpjsonPlugin, celPlugin}, "type", "")
 	require.NoError(t, err)
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"type":        "httpjson",
 		"interval":    "60s",
 		"run_as_cel":  true,
 		"request.url": "https://api.example.com/events",
 		"cel.program": `{"events":[{"message":"Hello, World!"}]}`,
-		"cel.state":   map[string]interface{}{},
+		"cel.state":   map[string]any{},
 	})
 
 	input, err := loader.Configure(cfg)
@@ -61,7 +62,7 @@ func TestRedirect_NoRedirectWhenFlagAbsent(t *testing.T) {
 	loader, err := v2.NewLoader(log, []v2.Plugin{httpjsonPlugin}, "type", "")
 	require.NoError(t, err)
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"type":        "httpjson",
 		"interval":    "60s",
 		"request.url": "https://api.example.com/events",
@@ -85,7 +86,7 @@ func TestRedirect_ErrorWithoutProgram(t *testing.T) {
 	loader, err := v2.NewLoader(log, []v2.Plugin{httpjsonPlugin}, "type", "")
 	require.NoError(t, err)
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"type":        "httpjson",
 		"interval":    "60s",
 		"request.url": "https://api.example.com/events",
@@ -98,7 +99,7 @@ func TestRedirect_ErrorWithoutProgram(t *testing.T) {
 
 func TestConvertHttpjsonToCel(t *testing.T) {
 	t.Run("minimal", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"interval":    "60s",
 			"request.url": "https://api.example.com/events",
@@ -126,7 +127,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("passthrough_id", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"id":          "my-input",
 			"interval":    "60s",
@@ -143,7 +144,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("auth_block", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":                "httpjson",
 			"interval":            "60s",
 			"request.url":         "https://api.example.com/events",
@@ -165,7 +166,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("retry_block", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":                       "httpjson",
 			"interval":                   "60s",
 			"request.url":                "https://api.example.com/events",
@@ -191,7 +192,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("redirect_block", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":                             "httpjson",
 			"interval":                         "60s",
 			"request.url":                      "https://api.example.com/events",
@@ -216,7 +217,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("keep_alive_block", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"interval":    "60s",
 			"request.url": "https://api.example.com/events",
@@ -242,7 +243,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("tracer_block", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":                    "httpjson",
 			"interval":                "60s",
 			"request.url":             "https://api.example.com/events",
@@ -263,7 +264,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("transport_ssl", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":                          "httpjson",
 			"interval":                      "60s",
 			"request.url":                   "https://api.example.com/events",
@@ -284,7 +285,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("transport_timeout", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":            "httpjson",
 			"interval":        "60s",
 			"request.url":     "https://api.example.com/events",
@@ -301,7 +302,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("transport_proxy", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":                  "httpjson",
 			"interval":              "60s",
 			"request.url":           "https://api.example.com/events",
@@ -323,7 +324,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("cel_max_executions", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":               "httpjson",
 			"interval":           "60s",
 			"request.url":        "https://api.example.com/events",
@@ -340,12 +341,12 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("cel_state", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"interval":    "60s",
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.state":   map[string]interface{}{"cursor": map[string]interface{}{"ts": "2024-01-01T00:00:00Z"}},
+			"cel.state":   map[string]any{"cursor": map[string]any{"ts": "2024-01-01T00:00:00Z"}},
 		})
 
 		out, err := convertHttpjsonToCel(cfg)
@@ -361,12 +362,12 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("cel_regexp", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"interval":    "60s",
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.regexp":  map[string]interface{}{"link_next": `<([^>]+)>;\s*rel="next"`},
+			"cel.regexp":  map[string]any{"link_next": `<([^>]+)>;\s*rel="next"`},
 		})
 
 		out, err := convertHttpjsonToCel(cfg)
@@ -378,12 +379,12 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("cel_xsd", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"interval":    "60s",
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.xsd":     map[string]interface{}{"evt": "<xs:schema/>"},
+			"cel.xsd":     map[string]any{"evt": "<xs:schema/>"},
 		})
 
 		out, err := convertHttpjsonToCel(cfg)
@@ -395,12 +396,12 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("cel_redact", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"interval":    "60s",
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.redact":  map[string]interface{}{"fields": []string{"auth_token"}, "delete": true},
+			"cel.redact":  map[string]any{"fields": []string{"auth_token"}, "delete": true},
 		})
 
 		out, err := convertHttpjsonToCel(cfg)
@@ -416,7 +417,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("httpjson_only_fields_excluded", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":           "httpjson",
 			"interval":       "60s",
 			"request.url":    "https://api.example.com/events",
@@ -437,7 +438,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("realistic_full_config", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"id":          "okta-system-log",
 			"interval":    "120s",
@@ -473,9 +474,9 @@ state.url.with({
     })
 ))`,
 			"cel.max_executions": 100,
-			"cel.state":          map[string]interface{}{"cursor": map[string]interface{}{"after": ""}},
-			"cel.regexp":         map[string]interface{}{"link": `<([^>]+)>;\s*rel="next"`},
-			"cel.redact":         map[string]interface{}{"fields": []string{"auth.oauth2.client.secret"}},
+			"cel.state":          map[string]any{"cursor": map[string]any{"after": ""}},
+			"cel.regexp":         map[string]any{"link": `<([^>]+)>;\s*rel="next"`},
+			"cel.redact":         map[string]any{"fields": []string{"auth.oauth2.client.secret"}},
 		})
 
 		out, err := convertHttpjsonToCel(cfg)
@@ -574,23 +575,23 @@ func TestMigrateCursor(t *testing.T) {
 		store := newTestStore()
 		s, err := store.StoreFor("httpjson")
 		require.NoError(t, err)
-		err = s.Set("httpjson::my-input::https://api.example.com/events", map[string]interface{}{
+		err = s.Set("httpjson::my-input::https://api.example.com/events", map[string]any{
 			"ttl":     0,
 			"updated": time.Now(),
-			"cursor":  map[string]interface{}{"timestamp": "2025-06-15T10:30:00Z"},
+			"cursor":  map[string]any{"timestamp": "2025-06-15T10:30:00Z"},
 		})
 		require.NoError(t, err)
 		s.Close()
 
 		mgr := NewInputManager(logp.NewNopLogger(), store)
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"id":          "my-input",
 			"interval":    "60s",
 			"run_as_cel":  true,
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.state":   map[string]interface{}{"cursor": map[string]interface{}{"timestamp": ""}},
+			"cel.state":   map[string]any{"cursor": map[string]any{"timestamp": ""}},
 		})
 
 		_, newCfg, err := mgr.Redirect(cfg)
@@ -604,14 +605,14 @@ func TestMigrateCursor(t *testing.T) {
 	t.Run("no_entry", func(t *testing.T) {
 		store := newTestStore()
 		mgr := NewInputManager(logp.NewNopLogger(), store)
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"id":          "my-input",
 			"interval":    "60s",
 			"run_as_cel":  true,
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.state":   map[string]interface{}{"cursor": map[string]interface{}{"timestamp": "default"}},
+			"cel.state":   map[string]any{"cursor": map[string]any{"timestamp": "default"}},
 		})
 
 		_, newCfg, err := mgr.Redirect(cfg)
@@ -626,22 +627,22 @@ func TestMigrateCursor(t *testing.T) {
 		store := newTestStore()
 		s, err := store.StoreFor("httpjson")
 		require.NoError(t, err)
-		err = s.Set("httpjson::https://api.example.com/events", map[string]interface{}{
+		err = s.Set("httpjson::https://api.example.com/events", map[string]any{
 			"ttl":     0,
 			"updated": time.Now(),
-			"cursor":  map[string]interface{}{"page": "42"},
+			"cursor":  map[string]any{"page": "42"},
 		})
 		require.NoError(t, err)
 		s.Close()
 
 		mgr := NewInputManager(logp.NewNopLogger(), store)
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"interval":    "60s",
 			"run_as_cel":  true,
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.state":   map[string]interface{}{},
+			"cel.state":   map[string]any{},
 		})
 
 		_, newCfg, err := mgr.Redirect(cfg)
@@ -656,16 +657,16 @@ func TestMigrateCursor(t *testing.T) {
 		store := newTestStore()
 		s, err := store.StoreFor("httpjson")
 		require.NoError(t, err)
-		err = s.Set("httpjson::no-state::https://api.example.com/events", map[string]interface{}{
+		err = s.Set("httpjson::no-state::https://api.example.com/events", map[string]any{
 			"ttl":     0,
 			"updated": time.Now(),
-			"cursor":  map[string]interface{}{"offset": "100"},
+			"cursor":  map[string]any{"offset": "100"},
 		})
 		require.NoError(t, err)
 		s.Close()
 
 		mgr := NewInputManager(logp.NewNopLogger(), store)
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"id":          "no-state",
 			"interval":    "60s",
@@ -686,23 +687,23 @@ func TestMigrateCursor(t *testing.T) {
 		store := newTestStore()
 		s, err := store.StoreFor("httpjson")
 		require.NoError(t, err)
-		err = s.Set("httpjson::idem::https://api.example.com/events", map[string]interface{}{
+		err = s.Set("httpjson::idem::https://api.example.com/events", map[string]any{
 			"ttl":     0,
 			"updated": time.Now(),
-			"cursor":  map[string]interface{}{"seq": "99"},
+			"cursor":  map[string]any{"seq": "99"},
 		})
 		require.NoError(t, err)
 		s.Close()
 
 		mgr := NewInputManager(logp.NewNopLogger(), store)
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
 			"id":          "idem",
 			"interval":    "60s",
 			"run_as_cel":  true,
 			"request.url": "https://api.example.com/events",
 			"cel.program": `true`,
-			"cel.state":   map[string]interface{}{},
+			"cel.state":   map[string]any{},
 		})
 
 		_, first, err := mgr.Redirect(cfg)
@@ -739,4 +740,5 @@ func newTestStore() *testStore {
 
 func (s *testStore) Close()                                     { s.registry.Close() }
 func (s *testStore) StoreFor(string) (*statestore.Store, error) { return s.registry.Get("filebeat") }
+func (s *testStore) StoreKey() string                           { return fmt.Sprintf("test:%p", s.registry) }
 func (s *testStore) CleanupInterval() time.Duration             { return 0 }

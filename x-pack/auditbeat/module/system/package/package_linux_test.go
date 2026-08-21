@@ -32,7 +32,7 @@ func TestRPMParallel(t *testing.T) {
 	useUID := getUser(t)
 
 	t.Logf("Starting...")
-	for i := 0; i < count; i++ {
+	for i := range count {
 		inner := i
 		go func() {
 			defer waiter.Done()

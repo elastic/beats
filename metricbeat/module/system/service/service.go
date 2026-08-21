@@ -26,7 +26,6 @@ import (
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/go-viper/mapstructure/v2"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -58,8 +57,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	base.Logger().Warn(cfgwarn.Beta("The system service metricset is beta."))
-
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

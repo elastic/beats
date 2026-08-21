@@ -102,7 +102,7 @@ func New(
 }
 
 //go:inline
-func (plugin *tlsPlugin) debugf(format string, args ...interface{}) {
+func (plugin *tlsPlugin) debugf(format string, args ...any) {
 	if plugin.isDebug {
 		plugin.tlsLogger.Debugf(format, args...)
 	}

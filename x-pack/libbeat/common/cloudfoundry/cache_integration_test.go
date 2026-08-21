@@ -69,7 +69,7 @@ func TestGetApps(t *testing.T) {
 		})
 
 		t.Run("second call, in cache, faster, same response", func(t *testing.T) {
-			for i := 0; i < 10; i++ {
+			for range 10 {
 				startTime := time.Now()
 				testNotExists(t)
 				require.True(t, firstTimeDuration > time.Now().Sub(startTime))

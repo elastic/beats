@@ -45,10 +45,10 @@ func ifNotDone(ctx context.Context, f func()) func() {
 }
 
 func defaultTestConfig() *conf.C {
-	return conf.MustNewConfigFrom(map[string]interface{}{
+	return conf.MustNewConfigFrom(map[string]any{
 		"project_id": emulatorProjectID,
 		"topic":      emulatorTopic,
-		"subscription": map[string]interface{}{
+		"subscription": map[string]any{
 			"name":   emulatorSubscription,
 			"create": true,
 		},
@@ -147,10 +147,7 @@ func (o *stubOutleter) waitForEvents(numEvents int) ([]beat.Event, bool) {
 		o.cond.Wait()
 	}
 
-	size := numEvents
-	if size >= len(o.Events) {
-		size = len(o.Events)
-	}
+	size := min(numEvents, len(o.Events))
 
 	out := make([]beat.Event, size)
 	copy(out, o.Events)

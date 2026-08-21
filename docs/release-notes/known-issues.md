@@ -10,16 +10,46 @@ Known issues are significant defects or limitations that may impact your impleme
 % Use the following template to add entries to this page.
 
 % :::{dropdown} Title of known issue
-% **Details** 
+% **Details**
 % On [Month/Day/Year], a known issue was discovered that [description of known issue].
 
-% **Workaround** 
+% **Workaround**
 % Workaround description.
 
 % **Resolved**
 % On [Month/Day/Year], this issue was resolved.
 
 % :::
+
+:::{dropdown} Disk queue filled metrics can underflow after blocked publishes
+**Applies to**: Beats version v8.15.0+.
+
+**Details**
+When a disk queue reaches its configured capacity, inputs can block until
+the output acknowledges events. The queue then accepts the blocked event without
+updating its metrics. When the event is later removed, the
+`queue.filled.events`, `queue.filled.bytes` and `queue.filled.pct`
+metrics might report incorrect values. Event delivery is unaffected.
+
+**Resolved**
+To apply the fix, upgrade to version v8.19.21, v9.5.3, v9.4.6, or any later release.
+:::
+
+:::{dropdown} OTel runtime silently converts `map[string]string` values to `"unknown type: map[string]string"`
+**Applies to**: Beats 9.5.0+ (OTel runtime)
+
+**Details**
+When using the OTel runtime, fields containing `map[string]string` values (such as GCP `LogEntry.labels`) are silently converted to the scalar string `"unknown type: map[string]string"` instead of being represented as an OTel map. This can cause Elasticsearch to reject documents when the field is already mapped as an object type.
+
+**Workaround**
+Force the affected beat to use the process runtime instead of the OTel runtime by adding the following to the beat configuration:
+```yaml
+agent:
+  internal.runtime.filebeat.default: process
+```
+
+**Tracking**: [Issue #52460](https://github.com/elastic/beats/issues/52460)
+:::
 
 :::{dropdown} Filebeat might crash (panic) on input errors or invalid processor configuration
 **Applies to**: Filebeat 9.2.3
@@ -37,10 +67,10 @@ configuration solves the problem.
 :::
 
 :::{dropdown} Winlogbeat and Filebeat `winlog` input can crash the Event Log on Windows Server 2025.
-**Details** 
+**Details**
 On 04/16/2025, a known issue was discovered that can cause a crash of the Event Log service in Windows Server 2025 **when reading forwarded events in an Event Collector setup**. The issue appears for some combinations of filters where the OS handles non-null-terminated strings, leading to the crash.
 
-**Workaround** 
+**Workaround**
 As a workaround, and to prevent crashes, avoid custom `xml_query` filters when working with forwarded events on Windows Server 2025.
 
 **Resolved**
