@@ -241,7 +241,8 @@ func TestManager_InputsTest(t *testing.T) {
 	sources := sourceList("source1", "source2")
 
 	t.Run("test is run for each source", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sources, &fakeTestInput{
 			OnTest: func(source Source, _ input.TestContext) error {
@@ -263,7 +264,8 @@ func TestManager_InputsTest(t *testing.T) {
 	})
 
 	t.Run("cancel gets distributed to all source tests", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sources, &fakeTestInput{
 			OnTest: func(_ Source, ctx input.TestContext) error {
@@ -288,7 +290,8 @@ func TestManager_InputsTest(t *testing.T) {
 	})
 
 	t.Run("fail if test for one source fails", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		failing := Source(stringSource("source1"))
 		sources := []Source{failing, stringSource("source2")}
@@ -318,7 +321,8 @@ func TestManager_InputsTest(t *testing.T) {
 	})
 
 	t.Run("panic is captured", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sources, &fakeTestInput{
 			OnTest: func(source Source, _ input.TestContext) error {
@@ -344,7 +348,8 @@ func TestManager_InputsRun(t *testing.T) {
 	// Integration style tests for the InputManager and Input.Run
 
 	t.Run("input returned with error", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sourceList("test"), &fakeTestInput{
 			OnRun: func(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
@@ -373,7 +378,8 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("panic is captured", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sourceList("test"), &fakeTestInput{
 			OnRun: func(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
@@ -402,7 +408,8 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("shutdown on signal", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sourceList("test"), &fakeTestInput{
 			OnRun: func(ctx input.Context, _ Source, _ Cursor, _ Publisher) error {
@@ -514,7 +521,8 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("event ACK triggers execution of update operations", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		store := createSampleStore(t, nil)
 		var wgSend sync.WaitGroup
