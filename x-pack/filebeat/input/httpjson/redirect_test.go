@@ -5,12 +5,9 @@
 package httpjson
 
 import (
-<<<<<<< HEAD
-=======
 	"encoding/json"
 	"fmt"
 	"sync"
->>>>>>> eb40647a7 (x-pack/filebeat/input/httpjson: call SetID before cursor migration store read (#52759))
 	"testing"
 	"time"
 
