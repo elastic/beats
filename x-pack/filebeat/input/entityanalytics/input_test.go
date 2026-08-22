@@ -35,6 +35,8 @@ func (p *testProvider) Create(c *config.C) (v2.Input, error) {
 	return nil, nil
 }
 
+func (p *testProvider) Close() {}
+
 type testInput struct {
 	name   string
 	testFn func(testCtx v2.TestContext) error

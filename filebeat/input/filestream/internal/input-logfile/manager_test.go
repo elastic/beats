@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const testPluginName = "my_test_plugin"
@@ -438,7 +437,7 @@ paths:
 }
 
 func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
-	setupStoreCacheTest(t)
+	setupCacheForTest(t)
 
 	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
 	newManager := func() *InputManager {
@@ -446,105 +445,72 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 			Logger:     logp.NewNopLogger(),
 			StateStore: states,
 			Type:       "filestream",
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+				return nil, nil, errNoInputRunner
+			},
 		}
 	}
 	first, second := newManager(), newManager()
-	var firstGroup, secondGroup unison.TaskGroup
-	t.Cleanup(func() {
-		_ = firstGroup.Stop()
-		first.Close()
-	})
-	t.Cleanup(func() {
-		_ = secondGroup.Stop()
-		second.Close()
-	})
+	t.Cleanup(first.Close)
+	t.Cleanup(second.Close)
 
-	require.NoError(t, first.Init(&firstGroup))
-	require.NoError(t, second.Init(&secondGroup))
-	require.Same(t, first.store, second.store)
-	require.Same(t, first.ackCH, second.ackCH)
+	// Trigger setup on both managers by calling Create. setup() acquires the
+	// store before Configure is called, so entry is set even on Create error.
+	_, err := first.Create(config.MustNewConfigFrom(map[string]any{"id": "first-input"}))
+	require.ErrorIs(t, err, errNoInputRunner)
+	_, err = second.Create(config.MustNewConfigFrom(map[string]any{"id": "second-input"}))
+	require.ErrorIs(t, err, errNoInputRunner)
 
-	require.NoError(t, firstGroup.Stop())
+	require.Same(t, first.entry.store, second.entry.store)
+	require.Same(t, first.entry.ackCH, second.entry.ackCH)
+	require.Equal(t, 1, globalCache.Len(), "both managers must share one cache entry")
+
 	first.Close()
-	entry := snapshotStoreCacheEntry(states.StoreKey())
-	require.True(t, entry.found)
-	require.Equal(t, storeActive, entry.state)
-	require.Equal(t, 1, entry.users)
-	require.Same(t, second.store, entry.store)
+	require.Equal(t, 1, globalCache.Len(), "one manager closed; entry still in use by second")
+	require.NotNil(t, second.entry)
 
-	require.NoError(t, secondGroup.Stop())
 	second.Close()
 }
 
-func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
-	setupStoreCacheTest(t)
+func TestInputManager_CreateOnlyAcquiresOneStoreReference(t *testing.T) {
+	setupCacheForTest(t)
 
 	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
 	manager := &InputManager{
 		Logger:     logp.NewNopLogger(),
 		StateStore: states,
 		Type:       "filestream",
+		Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+			return nil, nil, errNoInputRunner
+		},
 	}
-	var group unison.TaskGroup
-	t.Cleanup(func() {
-		_ = group.Stop()
-		manager.Close()
-	})
+	t.Cleanup(manager.Close)
 
-	const initializers = 10
-	errs := make(chan error, initializers)
+	const workers = 10
 	var wg sync.WaitGroup
-	for range initializers {
+	for i := range workers {
 		wg.Go(func() {
-			errs <- manager.Init(&group)
+			_, _ = manager.Create(config.MustNewConfigFrom(map[string]any{
+				"id": fmt.Sprintf("input-%d", i),
+			}))
 		})
 	}
 	wg.Wait()
-	close(errs)
-	for err := range errs {
-		require.NoError(t, err)
-	}
 
-	entry := snapshotStoreCacheEntry(states.StoreKey())
-	require.True(t, entry.found)
-	require.Equal(t, 1, entry.users)
-	require.Same(t, manager.store, entry.store)
+	require.NotNil(t, manager.entry)
+	require.Equal(t, 1, globalCache.Len(), "concurrent Creates must share one cache entry")
 
-	require.NoError(t, group.Stop())
 	manager.Close()
-}
-
-func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
-	setupStoreCacheTest(t)
-
-	states := newCountingStateStore("create-before-init-backend")
-	manager := &InputManager{
-		Logger:     logp.NewNopLogger(),
-		StateStore: states,
-		Type:       "filestream",
-	}
-
-	_, err := manager.Create(config.MustNewConfigFrom(map[string]any{}))
-	require.EqualError(t, err, "input manager Init must be called before Create")
-	require.Zero(t, states.storeForCalls.Load())
-	require.Nil(t, manager.store)
-	require.Nil(t, manager.ackCH)
-
-	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
 }
 
 func initInputManager(t *testing.T, cim *InputManager) {
 	t.Helper()
-	if store, ok := cim.StateStore.(testStateStore); ok && store.GCPeriod <= 0 {
-		store.GCPeriod = time.Minute
-		cim.StateStore = store
+	if cim.StateStore.CleanupInterval() <= 0 {
+		if ts, ok := cim.StateStore.(testStateStore); ok {
+			cim.StateStore = ts.WithGCPeriod(time.Minute)
+		}
 	}
-	var group unison.TaskGroup
-	require.NoError(t, cim.Init(&group))
-	t.Cleanup(func() {
-		require.NoError(t, group.Stop())
-		cim.Close()
-	})
+	t.Cleanup(cim.Close)
 }
 
 // TestInputManager_Create_BackoffConfig asserts InputManager.Create wires the

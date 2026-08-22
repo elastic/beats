@@ -120,6 +120,10 @@ func (inp *managedInput) Run(
 	// stage.)
 	monitoring.NewString(ctx.MetricsRegistry, "input").Set(inputmon.InputNested)
 
+	inp.manager.mu.Lock()
+	store := inp.manager.store
+	inp.manager.mu.Unlock()
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		grp.Go(func() (err error) {
@@ -146,7 +150,7 @@ func (inp *managedInput) Run(
 			}
 			inpCtx = inpCtx.WithStatusReporter(ctx)
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
+			if err = inp.runSource(inpCtx, store, source, pc); err != nil {
 				cancel()
 			}
 			return err

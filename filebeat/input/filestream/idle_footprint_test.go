@@ -22,13 +22,16 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -46,14 +49,17 @@ import (
 //   - heap-B/file      : live heap bytes retained per open idle file
 //   - idle-heap-MiB    : total live heap retained by the idle fleet
 func BenchmarkIdleResourceFootprint(b *testing.B) {
-	for _, fileCount := range []int{2000, 10000} {
-		b.Run(fmt.Sprintf("%d_idle_files", fileCount), func(b *testing.B) {
-			benchmarkIdleFootprint(b, fileCount, 5)
+	for _, count := range []int{2000, 10000} {
+		b.Run(fmt.Sprintf("logfile/%d_idle_files", count), func(b *testing.B) {
+			benchmarkLogfileIdleFootprint(b, count, 5)
+		})
+		b.Run(fmt.Sprintf("cursor/%d_idle_sources", count), func(b *testing.B) {
+			benchmarkCursorIdleFootprint(b, count)
 		})
 	}
 }
 
-func benchmarkIdleFootprint(b *testing.B, fileCount, linesPerFile int) {
+func benchmarkLogfileIdleFootprint(b *testing.B, fileCount, linesPerFile int) {
 	logger := logp.NewNopLogger()
 
 	dir := b.TempDir()
@@ -79,7 +85,10 @@ paths:
 	var gPerFile, bytesPerFile, heapMiB float64
 	for i := 0; i < b.N; i++ {
 		// A fresh store each iteration so the fleet is re-read from offset 0.
-		input, err := Plugin(logger, createTestStore(b)).Manager.Create(c)
+		p := Plugin(logger, createTestStore(b))
+		//nolint:errcheck // Close is a cleanup function and never returns an error
+		b.Cleanup(p.Manager.(*loginp.InputManager).Close)
+		input, err := p.Manager.Create(c)
 		require.NoError(b, err)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -152,3 +161,99 @@ func (c *countingClient) PublishAll(es []beat.Event) {
 	atomic.AddInt64(c.count, int64(len(es)))
 }
 func (c *countingClient) Close() error { return nil }
+
+// benchmarkCursorIdleFootprint measures the steady-state goroutine count and
+// live heap of the cursor InputManager with sourceCount idle sources — sources
+// that have started but are blocking, waiting for more data. This is the
+// baseline cost of the traditional one-goroutine-per-source model: each source
+// holds a goroutine for the lifetime of the input run, even while idle.
+func benchmarkCursorIdleFootprint(b *testing.B, sourceCount int) {
+	b.Helper()
+	logger := logp.NewNopLogger()
+
+	sources := make([]cursor.Source, sourceCount)
+	for i := range sourceCount {
+		sources[i] = cursorBenchSource(fmt.Sprintf("source-%d", i))
+	}
+
+	var gPerSource, bytesPerSource, heapMiB float64
+	for range b.N {
+		var started sync.WaitGroup
+		started.Add(sourceCount)
+
+		manager := &cursor.InputManager{
+			Logger:              logger,
+			StateStore:          createTestStore(b),
+			Type:                "cursor-bench",
+			DefaultCleanTimeout: time.Minute,
+			Configure: func(_ *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+				return sources, &idleCursorInput{started: &started}, nil
+			},
+		}
+		b.Cleanup(manager.Close)
+
+		inp, err := manager.Create(conf.NewConfig())
+		require.NoError(b, err)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		v2ctx := v2.Context{
+			ID:              "cursor-footprint",
+			Name:            "cursor-bench",
+			Cancelation:     ctx,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          logger,
+		}
+
+		runtime.GC()
+		baseGoroutines := runtime.NumGoroutine()
+		var base runtime.MemStats
+		runtime.ReadMemStats(&base)
+
+		done := make(chan struct{})
+		go func() {
+			defer close(done)
+			_ = inp.Run(v2ctx, &countingPipeline{count: new(int64)})
+		}()
+
+		// Wait for all N source goroutines to start and settle.
+		started.Wait()
+		time.Sleep(500 * time.Millisecond)
+
+		runtime.GC()
+		runtime.GC()
+		idleGoroutines := runtime.NumGoroutine()
+		var idle runtime.MemStats
+		runtime.ReadMemStats(&idle)
+
+		gPerSource = float64(idleGoroutines-baseGoroutines) / float64(sourceCount)
+		bytesPerSource = float64(idle.HeapAlloc-base.HeapAlloc) / float64(sourceCount)
+		heapMiB = float64(idle.HeapAlloc-base.HeapAlloc) / (1 << 20)
+
+		cancel()
+		select {
+		case <-done:
+		case <-time.After(30 * time.Second):
+			b.Fatal("cursor input did not stop after cancellation")
+		}
+	}
+
+	b.ReportMetric(gPerSource, "goroutines/source")
+	b.ReportMetric(bytesPerSource, "heap-B/source")
+	b.ReportMetric(heapMiB, "idle-heap-MiB")
+}
+
+type cursorBenchSource string
+
+func (s cursorBenchSource) Name() string { return string(s) }
+
+type idleCursorInput struct{ started *sync.WaitGroup }
+
+func (i *idleCursorInput) Name() string { return "cursor-bench" }
+
+func (i *idleCursorInput) Test(_ cursor.Source, _ v2.TestContext) error { return nil }
+
+func (i *idleCursorInput) Run(ctx v2.Context, _ cursor.Source, _ cursor.Cursor, _ cursor.Publisher) error {
+	i.started.Done()
+	<-ctx.Cancelation.Done()
+	return nil
+}

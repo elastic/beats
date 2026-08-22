@@ -64,8 +64,21 @@ func (inp *managedInput) Run(
 	// keep track of duplicated IDs
 	defer inp.manager.StopInput(inp.id)
 	ctx.UpdateStatus(status.Starting, "")
-	groupStore := inp.manager.getRetainedStore()
+	// Retain both stores before starting any goroutines so that a failed
+	// second retain cannot leave already-running harvesters without a way to
+	// stop cleanly.
+	groupStore, err := inp.manager.getRetainedStore()
+	if err != nil {
+		return err
+	}
 	defer groupStore.Release()
+
+	prospectorStore, err := inp.manager.getRetainedStore()
+	if err != nil {
+		return err
+	}
+	defer prospectorStore.Release()
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
 
 	// Setup cancellation using a custom cancel context. All harvesters will be
 	// stopped if one failed badly by returning an error.
@@ -97,10 +110,6 @@ func (inp *managedInput) Run(
 		inp.stateCheckInterval,
 	)
 	hg.start()
-
-	prospectorStore := inp.manager.getRetainedStore()
-	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
 
 	if err := inp.prospector.TakeOver(sourceStore, inp.sourceIdentifier.ID); err != nil {
 		return fmt.Errorf("prospector failed to take over states: %w", err)
