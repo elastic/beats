@@ -21,7 +21,6 @@ var (
 	DataCacheDir   = filepath.Join(DataDir, "cache")
 )
 
-// Windows ARM URL: https://github.com/osquery/osquery/releases/download/{{osqueryVersion}}/osquery-{{osqueryVersion}}.windows_arm64.zip
 const (
 	osqueryDownloadBaseURL       = "https://pkg.osquery.io"
 	osqueryDownloadGithubBaseURL = "https://github.com/osquery/osquery/releases/download"
@@ -43,15 +42,15 @@ const (
 
 	osqueryLensesDir = "lenses"
 
-	osqueryVersion = "5.23.0"
+	osqueryVersion = "5.23.1"
 	osqueryPkgExt  = ".pkg"
 	osqueryZipExt  = ".zip"
 
-	osqueryDistroDarwinSHA256        = "2621179c334a6482fa822732f121409bbccc36784db18f576e2965dfc4f1845d"
-	osqueryDistroLinuxSHA256         = "0045739a68475760f7bc26ca493afda71cc02a8e4d29984717742d3e4c099296"
-	osqueryDistroLinuxARMSHA256      = "d9d4e5f6eeabda4949ae0ba6a8db424c789ec60ffef99269f479ff4b73f46e33"
-	osqueryDistroWindowsARMZipSHA256 = "92a820a39c12f7516040b62dc8e8546469c821f505eed0b7ff1eb7e43cc4b018"
-	osqueryDistroWindowsX86ZipSHA256 = "5ddb8e1c23fd870838ef4ff47c0d2e5a080f22a6944fc4870d726e7b20e962a4"
+	osqueryDistroDarwinSHA256        = "9f40cea0358759ab2ee871c577055657e3cc2c7cbe5c1247f764245941178aa6"
+	osqueryDistroLinuxSHA256         = "0f37a478a1dbda24b67c81551e32d734b392c5a2f5deb156bf1c41ca204cfa67"
+	osqueryDistroLinuxARMSHA256      = "9ae763820166f75f19970b5147b1930a308865a923ab127f4b8bbaea7b69962a"
+	osqueryDistroWindowsARMZipSHA256 = "0913d05cc3fc92dd9253c945caacde10a776408f267cc1cc853a05de24dba900"
+	osqueryDistroWindowsX86ZipSHA256 = "7bd411050ef6b5aae1b23956aec0dc5ce6e800c5656f0cd463ac70a6e1bdf30b"
 )
 
 type OSArch struct {
@@ -168,7 +167,7 @@ type Spec struct {
 
 func (s Spec) DistroFilename() string {
 	if s.PackSuffix == osqueryZipExt {
-		// Currently the only file whose source is a zip is the Windows ARM64 one
+		// The short suffix is used by the Windows ARM64 archive.
 		return osqueryName + "-" + osqueryVersion + ".windows_arm64" + s.PackSuffix
 	}
 	return osqueryName + "-" + osqueryVersion + s.PackSuffix
