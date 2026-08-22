@@ -111,10 +111,7 @@ func (e *inputTestingEnvironment) getManager() v2.InputManager {
 }
 
 func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp v2.Input) {
-	e.wg.Add(1)
-	go func() {
-		defer e.wg.Done()
-
+	e.wg.Go(func() {
 		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
 			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
@@ -130,7 +127,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Logger:          e.testLogger.Named("input.filestream"),
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
-	}()
+	})
 }
 
 func (e *inputTestingEnvironment) waitUntilInputStops() {

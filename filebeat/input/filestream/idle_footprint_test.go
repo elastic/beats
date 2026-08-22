@@ -86,7 +86,7 @@ paths:
 	for i := 0; i < b.N; i++ {
 		// A fresh store each iteration so the fleet is re-read from offset 0.
 		p := Plugin(logger, createTestStore(b))
-		//nolint:errcheck
+		//nolint:errcheck // Close is a cleanup function and never returns an error
 		b.Cleanup(p.Manager.(*loginp.InputManager).Close)
 		input, err := p.Manager.Create(c)
 		require.NoError(b, err)

@@ -146,7 +146,7 @@ func (c *Cache[T]) initialize(e *cacheEntry[T], openFn func() (T, error), runFn 
 		var zero T
 		return zero, nil, err
 	}
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background()) //nolint:gosec // cancel is stored in e.cancel and called from newRelease when the last user releases
 	e.value = value
 	e.cancel = cancel
 	e.users = 1
@@ -155,11 +155,7 @@ func (c *Cache[T]) initialize(e *cacheEntry[T], openFn func() (T, error), runFn 
 	c.mu.Unlock()
 
 	if runFn != nil {
-		e.wg.Add(1)
-		go func() {
-			defer e.wg.Done()
-			runFn(ctx, value)
-		}()
+		e.wg.Go(func() { runFn(ctx, value) })
 	}
 
 	e.readyOnce.Do(func() { close(e.ready) })
