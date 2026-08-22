@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix a slice bounds panic in the openmetrics label key prefix remover when the prefix is shorter than six characters
+component: metricbeat
+issue: https://github.com/elastic/beats/issues/51183
