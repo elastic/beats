@@ -19,6 +19,7 @@ package maintwin
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -27,6 +28,26 @@ import (
 
 var weekdayLookup = map[string]rrule.Weekday{
 	"MO": rrule.MO, "TU": rrule.TU, "WE": rrule.WE, "TH": rrule.TH, "FR": rrule.FR, "SA": rrule.SA, "SU": rrule.SU,
+}
+
+// parseByweekday parses RRule BYDAY tokens such as "MO", "+2TU", or "-1FR".
+func parseByweekday(wd string) (rrule.Weekday, error) {
+	wd = strings.ToUpper(strings.TrimSpace(wd))
+	if len(wd) < 2 {
+		return rrule.Weekday{}, fmt.Errorf("invalid byweekday: %q", wd)
+	}
+	day, ok := weekdayLookup[wd[len(wd)-2:]]
+	if !ok {
+		return rrule.Weekday{}, fmt.Errorf("invalid byweekday: %q", wd)
+	}
+	if len(wd) == 2 {
+		return day, nil
+	}
+	n, err := strconv.Atoi(wd[:len(wd)-2])
+	if err != nil {
+		return rrule.Weekday{}, fmt.Errorf("invalid byweekday: %q", wd)
+	}
+	return day.Nth(n), nil
 }
 
 type MaintWin struct {
@@ -70,12 +91,13 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 		)
 	}
 
-	// Convert the string weekdays to rrule.Weekday
-	weekdays := []rrule.Weekday{}
+	weekdays := make([]rrule.Weekday, 0, len(mw.Byweekday))
 	for _, wd := range mw.Byweekday {
-		if weekday, exists := weekdayLookup[wd]; exists {
-			weekdays = append(weekdays, weekday)
+		weekday, err := parseByweekday(wd)
+		if err != nil {
+			return nil, err
 		}
+		weekdays = append(weekdays, weekday)
 	}
 
 	dtstart = dtstart.UTC()
