@@ -95,7 +95,7 @@ steps:
           lifetime: 10800
           project-id: "elastic-observability-ci"
           project-number: "911195782929"
-      - elastic/dra-prep#v0.1.5:
+      - elastic/dra-prep#v0.1.6:
           product_id: "beats"
           stack_version: "${STACK_VERSION}"
           workflow: "${WORKFLOW}"
