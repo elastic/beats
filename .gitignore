@@ -11,6 +11,7 @@
 *beat/logs
 *beat/data
 **/ironbank/build/
+pkg/systemmetrics/build
 x-pack/otel/distributions/beats-otel-collector/_build
 
 # Files
