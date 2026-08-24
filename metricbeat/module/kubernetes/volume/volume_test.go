@@ -20,7 +20,8 @@
 package volume
 
 import (
-	"io/ioutil"
+	"io"
+
 	"os"
 	"testing"
 
@@ -39,7 +40,7 @@ func TestEventMapping(t *testing.T) {
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
 	events, err := eventMapping(body, logger)
@@ -47,7 +48,7 @@ func TestEventMapping(t *testing.T) {
 
 	assert.Len(t, events, 2, "got wrong number of events")
 
-	testCases := []map[string]interface{}{
+	testCases := []map[string]any{
 		// Test for ephemeral volume
 		{
 			"name":               "default-token-sg8x5",
@@ -74,7 +75,7 @@ func TestEventMapping(t *testing.T) {
 	}
 }
 
-func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
+func testValue(t *testing.T, event mapstr.M, field string, value any) {
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)

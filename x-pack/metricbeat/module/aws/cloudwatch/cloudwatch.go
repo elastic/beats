@@ -476,20 +476,20 @@ func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, dataGranu
 func constructLabel(metric aws.MetricWithID, statistic string) string {
 	// label = accountID + accountLabel + metricName + namespace + statistic + periodLabel + dimKeys + dimValues
 	label := strings.Join([]string{metric.AccountID, aws.LabelConst.AccountLabel, *metric.Metric.MetricName, *metric.Metric.Namespace, statistic, aws.LabelConst.PeriodLabel}, aws.LabelConst.LabelSeparator)
-	dimNames := ""
-	dimValues := ""
+	var dimNames strings.Builder
+	var dimValues strings.Builder
 	for i, dim := range metric.Metric.Dimensions {
-		dimNames += *dim.Name
-		dimValues += *dim.Value
+		dimNames.WriteString(*dim.Name)
+		dimValues.WriteString(*dim.Value)
 		if i != len(metric.Metric.Dimensions)-1 {
-			dimNames += dimensionSeparator
-			dimValues += dimensionSeparator
+			dimNames.WriteString(dimensionSeparator)
+			dimValues.WriteString(dimensionSeparator)
 		}
 	}
 
-	if dimNames != "" && dimValues != "" {
-		label += aws.LabelConst.LabelSeparator + dimNames
-		label += aws.LabelConst.LabelSeparator + dimValues
+	if dimNames.String() != "" && dimValues.String() != "" {
+		label += aws.LabelConst.LabelSeparator + dimNames.String()
+		label += aws.LabelConst.LabelSeparator + dimValues.String()
 	}
 	return label
 }
@@ -536,7 +536,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 
 	dimNames := strings.Split(labels[aws.LabelConst.IdentifierNameIdx], ",")
 	dimValues := strings.Split(labels[aws.LabelConst.IdentifierValueIdx], ",")
-	for i := 0; i < len(dimNames); i++ {
+	for i := range dimNames {
 		_, _ = event.RootFields.Put("aws.dimensions."+dimNames[i], dimValues[i])
 	}
 	return event
@@ -650,8 +650,8 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				// split the identifier and check for each sub-identifier.
 				// For example, identifier might be [storageType, s3BucketName].
 				// And tags are only store under s3BucketName in resourceTagMap.
-				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
-				for _, subIdentifier := range subIdentifiers {
+				subIdentifiers := strings.SplitSeq(identifierValue, dimensionSeparator)
+				for subIdentifier := range subIdentifiers {
 
 					if len(infoAPImap) > 0 { // If infoAPImap includes data
 						if valAPIName, ok := infoAPImap[subIdentifier]; ok {

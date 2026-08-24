@@ -4,12 +4,14 @@ updates:
   - package-ecosystem: gomod
     directory: /
     schedule:
-      interval: daily
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
     labels:
       - automation
       - dependabot
       - skip-changelog
-      - Team:Core
+      - Team:Elastic-Agent-Data-Plane
       - backport-active-all
     allow:
       # Team:Elastic-Agent-Data-Plane
@@ -61,7 +63,7 @@ updates:
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 10
 
   - package-ecosystem: gomod
     directory: /
