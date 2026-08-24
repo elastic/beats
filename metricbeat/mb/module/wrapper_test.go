@@ -275,7 +275,7 @@ func TestWrapperCompanionUnblocksStuckFetch(t *testing.T) {
 		"metricsets": []string{"BlockingFetcher"},
 		"hosts":      []string{"localhost"},
 	})
-	m, err := module.NewWrapper(c, r, &beat.Info{Logger: logptest.NewTestingLogger(t, "")}, beatmonitoring.NewMonitoring(), paths.New())
+	m, err := module.NewWrapper(c, r, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
