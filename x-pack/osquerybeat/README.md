@@ -92,7 +92,7 @@ JUMPLISTS_REFRESH_SOURCES=true mage generate
 
 ### Upgrade the bundled Osquery version
 
-The bundled release metadata is in `internal/distro/distro.go`. To upgrade it:
+The bundled release metadata is in `internal/distro/distro.json`. To upgrade it:
 
 ```bash
 mage updateOsquery

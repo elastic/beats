@@ -15,9 +15,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 )
 
 const githubReleasesAPI = "https://api.github.com/repos/osquery/osquery/releases"
@@ -34,17 +35,20 @@ type release struct {
 	Assets  []releaseAsset `json:"assets"`
 }
 
-var artifactConstants = map[string]string{
-	"osquery-%s.pkg":                    "osqueryDistroDarwinSHA256",
-	"osquery-%s_1.linux_x86_64.tar.gz":  "osqueryDistroLinuxSHA256",
-	"osquery-%s_1.linux_aarch64.tar.gz": "osqueryDistroLinuxARMSHA256",
-	"osquery-%s.windows_arm64.zip":      "osqueryDistroWindowsARMZipSHA256",
-	"osquery-%s.windows_x86_64.zip":     "osqueryDistroWindowsX86ZipSHA256",
+var artifactChecksumKeys = []struct {
+	pattern string
+	key     string
+}{
+	{"osquery-%s.pkg", "darwin"},
+	{"osquery-%s_1.linux_x86_64.tar.gz", "linux_amd64"},
+	{"osquery-%s_1.linux_aarch64.tar.gz", "linux_arm64"},
+	{"osquery-%s.windows_arm64.zip", "windows_arm64"},
+	{"osquery-%s.windows_x86_64.zip", "windows_amd64"},
 }
 
 func main() {
 	version := flag.String("version", "latest", "Osquery release version, or latest")
-	distroFile := flag.String("distro-file", "internal/distro/distro.go", "Path to distro.go")
+	distroFile := flag.String("distro-file", "internal/distro/distro.json", "Path to distro.json")
 	changelogDir := flag.String("changelog-dir", "../../changelog/fragments", "Path to changelog fragments")
 	flag.Parse()
 
@@ -109,14 +113,14 @@ func releaseHashes(client *http.Client, rel release, version string) (map[string
 	for _, asset := range rel.Assets {
 		assets[asset.Name] = asset
 	}
-	hashes := make(map[string]string, len(artifactConstants))
-	for pattern, constantName := range artifactConstants {
-		name := fmt.Sprintf(pattern, version)
+	hashes := make(map[string]string, len(artifactChecksumKeys))
+	for _, artifact := range artifactChecksumKeys {
+		name := fmt.Sprintf(artifact.pattern, version)
 		asset, ok := assets[name]
 		if !ok {
 			return nil, fmt.Errorf("release %s does not contain %s", version, name)
 		}
-		digest := strings.TrimPrefix(strings.TrimSpace(asset.Digest), "sha256:")
+		digest := strings.ToLower(strings.TrimPrefix(strings.TrimSpace(asset.Digest), "sha256:"))
 		if decoded, err := hex.DecodeString(digest); err != nil || len(decoded) != sha256.Size {
 			if sidecar, ok := assets[name+".sha256"]; ok {
 				var err error
@@ -132,7 +136,7 @@ func releaseHashes(client *http.Client, rel release, version string) (map[string
 				}
 			}
 		}
-		hashes[constantName] = digest
+		hashes[artifact.key] = strings.ToLower(digest)
 	}
 	return hashes, nil
 }
@@ -186,27 +190,19 @@ func downloadSHA256(client *http.Client, url string) (string, error) {
 }
 
 func updateDistroFile(path, version string, hashes map[string]string) (bool, error) {
-	b, err := os.ReadFile(path)
+	meta, err := distro.ReadMetadataFile(path)
 	if err != nil {
 		return false, err
 	}
-	updated := string(b)
-	values := make(map[string]string, len(hashes)+1)
-	values["osqueryVersion"] = version
-	for name, hash := range hashes {
-		values[name] = hash
+	meta.Version = version
+	meta.Checksums = distro.Checksums{
+		Darwin:       hashes["darwin"],
+		LinuxAMD64:   hashes["linux_amd64"],
+		LinuxARM64:   hashes["linux_arm64"],
+		WindowsARM64: hashes["windows_arm64"],
+		WindowsAMD64: hashes["windows_amd64"],
 	}
-	for name, value := range values {
-		re := regexp.MustCompile(`(?m)^(\s*` + regexp.QuoteMeta(name) + `\s*=\s*)"[^"]+"`)
-		if !re.MatchString(updated) {
-			return false, fmt.Errorf("constant %s not found in %s", name, path)
-		}
-		updated = re.ReplaceAllString(updated, `${1}"`+value+`"`)
-	}
-	if updated == string(b) {
-		return false, nil
-	}
-	return true, os.WriteFile(path, []byte(updated), 0o644)
+	return distro.WriteMetadataFile(path, meta)
 }
 
 func ensureChangelogFragment(dir, version string, now time.Time) error {

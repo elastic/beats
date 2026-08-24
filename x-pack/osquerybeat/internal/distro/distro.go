@@ -42,15 +42,8 @@ const (
 
 	osqueryLensesDir = "lenses"
 
-	osqueryVersion = "5.23.1"
-	osqueryPkgExt  = ".pkg"
-	osqueryZipExt  = ".zip"
-
-	osqueryDistroDarwinSHA256        = "9f40cea0358759ab2ee871c577055657e3cc2c7cbe5c1247f764245941178aa6"
-	osqueryDistroLinuxSHA256         = "0f37a478a1dbda24b67c81551e32d734b392c5a2f5deb156bf1c41ca204cfa67"
-	osqueryDistroLinuxARMSHA256      = "9ae763820166f75f19970b5147b1930a308865a923ab127f4b8bbaea7b69962a"
-	osqueryDistroWindowsARMZipSHA256 = "0913d05cc3fc92dd9253c945caacde10a776408f267cc1cc853a05de24dba900"
-	osqueryDistroWindowsX86ZipSHA256 = "7bd411050ef6b5aae1b23956aec0dc5ce6e800c5656f0cd463ac70a6e1bdf30b"
+	osqueryPkgExt = ".pkg"
+	osqueryZipExt = ".zip"
 )
 
 type OSArch struct {
@@ -196,15 +189,6 @@ func (s Spec) URL(osname string) string {
 		return osqueryDownloadGithubBaseURL + "/" + osqueryVersion + "/" + s.DistroFilename()
 	}
 	return osqueryDownloadBaseURL + "/" + osname + "/" + s.DistroFilename()
-}
-
-var specs = map[OSArch]Spec{
-	{"linux", "amd64"}:   {"_1.linux_x86_64.tar.gz", osqueryDistroLinuxSHA256, true},
-	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
-	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
-	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
-	{"windows", "amd64"}: {".windows_x86_64.zip", osqueryDistroWindowsX86ZipSHA256, true},
-	{"windows", "arm64"}: {osqueryZipExt, osqueryDistroWindowsARMZipSHA256, true},
 }
 
 func GetSpec(osarch OSArch) (spec Spec, err error) {
