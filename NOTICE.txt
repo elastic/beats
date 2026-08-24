@@ -15275,11 +15275,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/go-sql-driver/mysql
-Version: v1.9.3
+Version: v1.10.0
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/go-sql-driver/mysql@v1.9.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/go-sql-driver/mysql@v1.10.0/LICENSE:
 
 Mozilla Public License Version 2.0
 ==================================
@@ -39706,11 +39706,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : filippo.io/edwards25519
-Version: v1.1.1
+Version: v1.2.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/filippo.io/edwards25519@v1.1.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/filippo.io/edwards25519@v1.2.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
