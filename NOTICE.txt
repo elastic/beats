@@ -1283,19 +1283,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/redis@v1.25.0/
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/storage
-<<<<<<< HEAD
-Version: v1.62.3
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/storage@v1.62.3/LICENSE:
-=======
 Version: v1.65.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/cloud.google.com/go/storage@v1.65.0/LICENSE:
->>>>>>> e88ac7dcd (build(deps): bump the gcp-sdks group across 1 directory with 5 updates (#52801))
 
 
                                  Apache License
