@@ -203,15 +203,22 @@ func (w *WIITokenSource) fetchTokenWithRetry() ([]byte, time.Time, error) {
 
 // fetchToken performs a single POST /token exchange.
 func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
-	// Re-read the cert from disk on every fetch to pick up controller-driven rotation.
-	cert, err := tls.LoadX509KeyPair(w.certFile, w.keyFile)
-	if err != nil {
-		return nil, time.Time{}, fmt.Errorf("loading WII client cert from %s: %w", w.certFile, err)
-	}
-
 	tlsCfg := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		MinVersion:   tls.VersionTLS12,
+		// GetClientCertificate is used instead of Certificates so that the cert is
+		// always presented regardless of whether the server's acceptable-CA list
+		// contains the leaf's direct issuer (the per-tenant intermediate CA is not
+		// in ecp-internal-cas; only ecp-cluster-ca is). Go's static Certificates
+		// lookup matches on RawIssuer only, so it silently sends an empty Certificate
+		// when the intermediate is not advertised — GetClientCertificate bypasses that.
+		// Re-reading from disk on every fetch also picks up controller-driven rotation.
+		GetClientCertificate: func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
+			cert, err := tls.LoadX509KeyPair(w.certFile, w.keyFile)
+			if err != nil {
+				return nil, fmt.Errorf("loading WII client cert from %s: %w", w.certFile, err)
+			}
+			return &cert, nil
+		},
+		MinVersion: tls.VersionTLS12,
 	}
 
 	// WORKLOAD_IDENTITY_SSL_CA_FILE overrides the server CA trust — only used when the
