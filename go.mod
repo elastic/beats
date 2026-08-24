@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.6
 
 require (
-	cloud.google.com/go/bigquery v1.79.1
+	cloud.google.com/go/bigquery v1.80.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -30,7 +30,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.321.2
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.58.7
 	github.com/aws/aws-sdk-go-v2/service/iam v1.59.1
-	github.com/aws/aws-sdk-go-v2/service/organizations v1.53.8
+	github.com/aws/aws-sdk-go-v2/service/organizations v1.54.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.124.3
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.36.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.107.2
@@ -56,7 +56,7 @@ require (
 	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/elastic/elastic-agent-client/v7 v7.18.1
-	github.com/elastic/go-concert v0.3.0
+	github.com/elastic/go-concert v0.3.1
 	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v1.0.1
@@ -95,7 +95,7 @@ require (
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v1.5.0
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.12.3
 	github.com/magefile/mage v1.17.2
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/miekg/dns v1.1.72
@@ -130,15 +130,9 @@ require (
 	golang.org/x/time v0.15.0
 	golang.org/x/tools v0.48.0
 	google.golang.org/api v0.287.1
-<<<<<<< HEAD
-	google.golang.org/genproto v0.0.0-20260401024825-9d38bb4040a9 // indirect
-	google.golang.org/grpc v1.82.1
-	google.golang.org/protobuf v1.36.11
-=======
 	google.golang.org/genproto v0.0.0-20260519071638-aa98bba5eb94 // indirect
 	google.golang.org/grpc v1.83.0
 	google.golang.org/protobuf v1.36.12
->>>>>>> 02af38550 (chore(deps): update OTel Collector dependecies to `v0.159.0`/`1.65.0` (#52679))
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
@@ -153,8 +147,8 @@ require (
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/compute v1.66.0
 	cloud.google.com/go/redis v1.25.0
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.22.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
@@ -305,13 +299,8 @@ require (
 require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
-<<<<<<< HEAD
-	cel.dev/expr v0.25.1 // indirect
-	cloud.google.com/go/auth v0.23.0 // indirect
-=======
 	cel.dev/expr v0.25.2 // indirect
 	cloud.google.com/go/auth v0.23.1 // indirect
->>>>>>> 02af38550 (chore(deps): update OTel Collector dependecies to `v0.159.0`/`1.65.0` (#52679))
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.13.0 // indirect
@@ -332,15 +321,9 @@ require (
 	github.com/Azure/go-ntlmssp v0.1.1 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.2 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
-<<<<<<< HEAD
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.32.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.55.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.55.0 // indirect
-=======
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.35.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.57.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.57.0 // indirect
->>>>>>> 02af38550 (chore(deps): update OTel Collector dependecies to `v0.159.0`/`1.65.0` (#52679))
 	github.com/Velocidex/json v0.0.0-20220224052537-92f3c0326e5a // indirect
 	github.com/Velocidex/ordereddict v0.0.0-20230909174157-2aa49cc5d11d // indirect
 	github.com/Velocidex/yaml/v2 v2.2.8 // indirect
