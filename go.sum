@@ -6,12 +6,12 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.123.0 h1:2NAUJwPR47q+E35uaJeYoNhuNEM9kM8SjgRgdeOJUSE=
 cloud.google.com/go v0.123.0/go.mod h1:xBoMV08QcqUGuPW65Qfm1o9Y4zKZBpGS+7bImXLTAZU=
-cloud.google.com/go/auth v0.23.1 h1:1tPpBPG02lQHmoiAvs9egyCASqXP0xgobptjZzov/Jg=
-cloud.google.com/go/auth v0.23.1/go.mod h1:4DhBRcqvtljQN3dJ57qtqbib5ZGCYE5f2crfiiC2EM0=
+cloud.google.com/go/auth v0.23.2 h1:pxSCpfiji41hpzpPdMCftEUCezpgpqmmDdYiAjCKXxo=
+cloud.google.com/go/auth v0.23.2/go.mod h1:4DhBRcqvtljQN3dJ57qtqbib5ZGCYE5f2crfiiC2EM0=
 cloud.google.com/go/auth/oauth2adapt v0.2.8 h1:keo8NaayQZ6wimpNSmW5OPc283g65QNIiLpZnkHRbnc=
 cloud.google.com/go/auth/oauth2adapt v0.2.8/go.mod h1:XQ9y31RkqZCcwJWNSx2Xvric3RrU88hAYYbjDWYDL+c=
-cloud.google.com/go/bigquery v1.80.0 h1:BbDo+XURgr6uZaOEGnuDq2O2wwAMiHfzCbw3q0ApgzU=
-cloud.google.com/go/bigquery v1.80.0/go.mod h1:cc0XscySNQNuHBxuZSg5yyxFsg/ZHAfViAG49gJbWew=
+cloud.google.com/go/bigquery v1.81.0 h1:w0ygxA/AD6FDuewuIHPk0IrQXVJtZWTp5eazQ3KBtCw=
+cloud.google.com/go/bigquery v1.81.0/go.mod h1:cc0XscySNQNuHBxuZSg5yyxFsg/ZHAfViAG49gJbWew=
 cloud.google.com/go/compute v1.66.0 h1:v8pAJeA0xYPe/tJDMcyimdnHZ115LVrw3xCi9ZelTNQ=
 cloud.google.com/go/compute v1.66.0/go.mod h1:h1O3BCv0Zd0/8rZ6PGx8aRBhKBtDC0AuvURtWg1hLLE=
 cloud.google.com/go/compute/metadata v0.9.0 h1:pDUj4QMoPejqq20dK0Pg2N4yG9zIkYGdBtwLoEkH9Zs=
@@ -28,14 +28,19 @@ cloud.google.com/go/longrunning v1.2.0 h1:WjYH3YHBGCxGJP9M4dWGHBfXr/cFIjMkNgWcJj
 cloud.google.com/go/longrunning v1.2.0/go.mod h1:5KMQALFGOCtFoi2xSOA1u3H7WKlhmckgiyFw7+LGQp0=
 cloud.google.com/go/monitoring v1.30.0 h1:r/d+JUbyKmJ8b07iznuKfzVzrIXTWxHQ3lBRm3x2LlY=
 cloud.google.com/go/monitoring v1.30.0/go.mod h1:htlUR0QWVMrjFzZmN4LGnMAve9xB/eduwjmINxVZ8RM=
-cloud.google.com/go/pubsub v1.51.0 h1:XOaCejsqX7EEtUdQz+WPag66wWsUUGliyCOfGPKfo90=
-cloud.google.com/go/pubsub v1.51.0/go.mod h1:NERXf11sd82UV3VnflcUj8POIyQUXT/QwrKlxD8di/I=
-cloud.google.com/go/pubsub/v2 v2.6.1 h1:jX6gnC4n8BgYx6MOYICgbbaXZpr1vKeNOE3Bn17P5zg=
-cloud.google.com/go/pubsub/v2 v2.6.1/go.mod h1:1y2lZnKfUFPZz0PU4YmXyk4lA11+xmYA42zbC32RkxQ=
+cloud.google.com/go/pubsub v1.51.1 h1:R3G1wCOxBO7jRpL8x2pdZMv1GAJDF6ax/m2zPOtvTNE=
+cloud.google.com/go/pubsub v1.51.1/go.mod h1:y2T0IKtW1iWwVvazYaRpqOAFO4gy2+O7dTDt9TWY/5U=
+cloud.google.com/go/pubsub/v2 v2.6.2 h1:YPeEXnf4LZz9eVdpbXqBMRlxdwk4breCUsoIp7uDet4=
+cloud.google.com/go/pubsub/v2 v2.6.2/go.mod h1:JaFvWNVRk3Knoil/4M1ECeLOaI9D8drbmJWypQlK5aM=
 cloud.google.com/go/redis v1.25.0 h1:tRuy6PJgMyZanP+Jrs7NTMzA4lSoRlmRSvb5txGsE7k=
 cloud.google.com/go/redis v1.25.0/go.mod h1:ebtw9WLFKswecHO2ifNykuteNJNwoPqMCHz4UI11kF4=
+<<<<<<< HEAD
 cloud.google.com/go/storage v1.62.3 h1:SZq1t23NCI+e96dH77Dg3PEfsNNEjqO8zE5AnD8gVD0=
 cloud.google.com/go/storage v1.62.3/go.mod h1:cpYz/kRVZ+UQAF1uHeea10/9ewcRbxGoGNKsS9daSXA=
+=======
+cloud.google.com/go/storage v1.65.0 h1:McbFt5j+hTNx+dkFuzq7teakIKcpqGp/cJZRxMyfvAc=
+cloud.google.com/go/storage v1.65.0/go.mod h1:UsS9OgFg/XHOSYakQ8ZtLWWeyGkk1WnmD/GsGfN0BHM=
+>>>>>>> e88ac7dcd (build(deps): bump the gcp-sdks group across 1 directory with 5 updates (#52801))
 cloud.google.com/go/trace v1.16.0 h1:GmQovzFc5F0CNfl0VLgL64aoTtu7xsM0YajW2GlG9+E=
 cloud.google.com/go/trace v1.16.0/go.mod h1:r+bdAn16dKLSV1G2D5v3e58IlQlizfxWrUfjx7kM7X0=
 code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee h1:iAAPf9s7/+BIiGf+RjgcXLm3NoZaLIJsBXJuUa63Lx8=
