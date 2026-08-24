@@ -103,6 +103,14 @@ const beaterStopGracePeriod = 30 * time.Second
 // pipeline is force-disconnected.
 const beaterStopGraceMargin = time.Second
 
+// pipelineDrainTimeout is the default maximum time the publisher pipeline
+// waits for queued events to be acknowledged on shutdown. It applies when the
+// beater has not set a Beat.ShutdownTimeout. Beats that need a longer window
+// (e.g. one that reads a bounded input and exits as soon as it is exhausted)
+// should set ShutdownTimeout in their New() constructor; launch uses that
+// value as the Disconnect deadline instead.
+const pipelineDrainTimeout = time.Second
+
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
@@ -400,10 +408,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.MakeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
-		// Since now publisher is closed on Stop, we want to give some
-		// time to ack any pending events by default to avoid
-		// changing on stop behavior too much.
-		WaitClose:      time.Second,
+		WaitClose:      pipelineDrainTimeout,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -591,8 +596,20 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// acknowledge any outstanding events before we exit. Disconnect is
 	// idempotent, so a beater that already drained the pipeline itself with its
 	// own bounded timeout reaches this as a harmless no-op.
+	//
+	// Pass the beater's declared drain bound as the context deadline when one
+	// is set, so shutdown_timeout (or a beater-supplied default) controls how
+	// long we wait for the queue to flush. When no drain bound is declared,
+	// Disconnect falls back to the pipeline's own waitCloseTimeout
+	// (pipelineDrainTimeout = 1s).
 	if b.Publisher != nil {
-		if derr := b.Publisher.Disconnect(context.Background()); derr != nil {
+		ctx := context.Background()
+		if b.ShutdownTimeout > 0 {
+			var cancel context.CancelFunc
+			ctx, cancel = context.WithTimeout(context.Background(), b.ShutdownTimeout)
+			defer cancel()
+		}
+		if derr := b.Publisher.Disconnect(ctx); derr != nil {
 			logger.Errorf("error disconnecting publisher pipeline: %v", derr)
 		}
 	}
