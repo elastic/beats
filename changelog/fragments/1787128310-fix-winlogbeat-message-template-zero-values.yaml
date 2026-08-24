@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix rendering of event messages with zero values (e.g. "PID: 0") in place of non-string parameters when the event data does not match the publisher metadata
+summary: 'Fix event messages rendering zero values (e.g. "PID: 0") in place of non-string parameters'
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
