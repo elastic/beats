@@ -15133,19 +15133,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/go-sql-driver/mysql
-<<<<<<< HEAD
-Version: v1.6.0
-Licence type (autodetected): MPL-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/go-sql-driver/mysql@v1.6.0/LICENSE:
-=======
 Version: v1.10.0
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/go-sql-driver/mysql@v1.10.0/LICENSE:
->>>>>>> 66f06bdf3 (build(deps): bump github.com/go-sql-driver/mysql from 1.9.3 to 1.10.0 (#50950))
 
 Mozilla Public License Version 2.0
 ==================================
@@ -34928,8 +34920,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-<<<<<<< HEAD
-=======
 Dependency : filippo.io/edwards25519
 Version: v1.2.0
 Licence type (autodetected): BSD-3-Clause
@@ -34967,7 +34957,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
->>>>>>> 66f06bdf3 (build(deps): bump github.com/go-sql-driver/mysql from 1.9.3 to 1.10.0 (#50950))
 Dependency : github.com/AdaLogics/go-fuzz-headers
 Version: v0.0.0-20240806141605-e8a1dd7889d6
 Licence type (autodetected): Apache-2.0
