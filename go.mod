@@ -552,11 +552,7 @@ require (
 )
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/storage v1.62.3
-=======
 	cloud.google.com/go/storage v1.65.0
->>>>>>> e88ac7dcd (build(deps): bump the gcp-sdks group across 1 directory with 5 updates (#52801))
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
