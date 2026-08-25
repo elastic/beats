@@ -260,7 +260,7 @@ func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 			"process.args_count":                    len(qp.Cmdline),
 			"process.pid":                           uint32(os.Getpid()), //nolint:gosec // PID values fit in uint32
 			"process.executable":                    exe,
-			"process.parent.pid":                    uint32(os.Getppid()), //nolint:gosec // PID values fit in uint32
+			"process.parent.pid":                    uint32(os.Getppid()),                                         //nolint:gosec // PID values fit in uint32
 			"process.start":                         time.Unix(0, int64(quark.TimeToWallclock(qp.Proc.TimeBoot))), //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
