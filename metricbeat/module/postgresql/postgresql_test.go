@@ -93,7 +93,7 @@ func TestParseUrl(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mod := mbtest.NewTestModule(t, map[string]interface{}{
+		mod := mbtest.NewTestModule(t, map[string]any{
 			"username": test.Username,
 			"password": test.Password,
 		})

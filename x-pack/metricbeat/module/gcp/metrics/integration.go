@@ -11,19 +11,19 @@ import (
 
 // GetConfigForTest function gets aws credentials for integration tests.
 // GCP_REGION, GCP_PROJECT_ID and GCP_CREDENTIALS_FILE_PATH are required.
-func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{} {
+func GetConfigForTest(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
 	region, okRegion := os.LookupEnv("GCP_REGION")
 	projectID, okProjectID := os.LookupEnv("GCP_PROJECT_ID")
 	credentialsFilePath, okCredentialsFilePath := os.LookupEnv("GCP_CREDENTIALS_FILE_PATH")
 
-	config := map[string]interface{}{}
+	config := map[string]any{}
 	if !okProjectID || projectID == "" {
 		t.Fatal("$GCP_PROJECT_ID not set or set to empty")
 	} else if !okCredentialsFilePath || credentialsFilePath == "" {
 		t.Fatal("$GCP_CREDENTIALS_FILE_PATH not set or set to empty")
 	} else {
-		config = map[string]interface{}{
+		config = map[string]any{
 			"module":                "gcp",
 			"period":                "1m",
 			"metricsets":            []string{metricSetName},
