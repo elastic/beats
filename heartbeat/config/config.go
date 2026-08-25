@@ -65,12 +65,16 @@ type Scheduler struct {
 func DefaultConfig(logger *logp.Logger) *Config {
 	limits := map[string]*JobLimit{
 		"browser": {Limit: 2},
+		// API journeys spawn Node but no Chromium (~210MB vs ~460MB/run
+		// measured), so ~4 fit the same memory envelope as browser's 2.
+		// Override with SYNTHETICS_LIMIT_API.
+		"api": {Limit: 4},
 	}
 
 	// Read the env key SYNTHETICS_LIMIT_{TYPE} for each type of monitor to set scaling limits
 	// hard coded list of types to avoid cycles in current plugin system.
 	// TODO: refactor plugin system to DRY this up
-	for _, t := range []string{"http", "tcp", "icmp", "browser"} {
+	for _, t := range []string{"http", "tcp", "icmp", "browser", "api"} {
 		envKey := fmt.Sprintf("SYNTHETICS_LIMIT_%s", strings.ToUpper(t))
 		if limitStr := os.Getenv(envKey); limitStr != "" {
 			tLimitVal, err := strconv.ParseInt(limitStr, 10, 64)

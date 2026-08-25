@@ -22,8 +22,8 @@ func TestBuildPlan(t *testing.T) {
 	}{
 		{name: "linux tar", osarch: distro.OSArch{OS: "linux", Arch: "amd64"}, format: artifactformat.TarGz},
 		{name: "darwin pkg", osarch: distro.OSArch{OS: "darwin", Arch: "arm64"}, format: artifactformat.Pkg},
-		{name: "windows msi", osarch: distro.OSArch{OS: "windows", Arch: "amd64"}, format: artifactformat.Msi},
-		{name: "windows zip", osarch: distro.OSArch{OS: "windows", Arch: "arm64"}, format: artifactformat.Zip},
+		{name: "windows zip amd64", osarch: distro.OSArch{OS: "windows", Arch: "amd64"}, format: artifactformat.Zip},
+		{name: "windows zip arm64", osarch: distro.OSArch{OS: "windows", Arch: "arm64"}, format: artifactformat.Zip},
 		{name: "unsupported", osarch: distro.OSArch{OS: "linux", Arch: "amd64"}, format: artifactformat.Unknown, wantErr: true},
 	}
 

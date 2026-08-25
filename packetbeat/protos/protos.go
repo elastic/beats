@@ -20,7 +20,7 @@ package protos
 import (
 	"errors"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -40,7 +40,7 @@ const (
 // ProtocolData interface to represent an upper
 // protocol private data. Used with types like
 // HttpStream, MysqlStream, etc.
-type ProtocolData interface{}
+type ProtocolData any
 
 type Packet struct {
 	Ts      time.Time
@@ -298,7 +298,7 @@ func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	for proto := range s.all {
 		protos = append(protos, proto)
 	}
-	sort.Slice(protos, func(i, j int) bool { return protos[i] < protos[j] })
+	slices.Sort(protos)
 
 	var expressions []string
 	for _, proto := range protos {

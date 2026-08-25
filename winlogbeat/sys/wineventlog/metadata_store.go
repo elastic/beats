@@ -628,7 +628,7 @@ func (c *publisherMetadataCache) close() error {
 // --- Template Funcs
 
 // eventParam return an event data value inside a text/template.
-func eventParam(items []interface{}, paramNumber int) (interface{}, error) {
+func eventParam(items []any, paramNumber int) (any, error) {
 	// Windows parameter values start at %1 so adjust index value by -1.
 	index := paramNumber - 1
 	if index < len(items) {

@@ -251,12 +251,23 @@ type FileScanOptions struct {
 	IgnoreInactiveSince time.Time
 }
 
+// ScanResults is the outcome of a single FSScanner.GetFiles scan.
+type ScanResults struct {
+	// Files are the monitored files found by the scan, keyed by path. Each value
+	// is the descriptor holding all necessary information about the file.
+	Files map[string]FileDescriptor
+	// Metrics is this scan's metrics snapshot.
+	Metrics FileScanMetrics
+	// Unobservable is the list of "unobservable" path prefixes (a directory covers
+	// its subtree, a file covers itself) the scan could not observe because of a
+	// resource or permission error, as opposed to being gone.
+	Unobservable []string
+}
+
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
-	// GetFiles returns the list of monitored files.
-	// The keys of the map are the paths to the files and
-	// the values are the file descriptors that contain all necessary information about the file.
-	GetFiles(FileScanOptions) (map[string]FileDescriptor, FileScanMetrics)
+	// GetFiles scans the file system once and returns the result.
+	GetFiles(FileScanOptions) ScanResults
 }
 
 // FSWatcher returns file events of the monitored files.

@@ -122,6 +122,31 @@ func TestLoader_Init(t *testing.T) {
 	})
 }
 
+func TestLoader_Close(t *testing.T) {
+	var closed int
+	loader := loaderConfig{
+		Plugins: []Plugin{
+			{
+				Name:      "a",
+				Stability: feature.Stable,
+				Manager: &fakeInputManager{
+					OnClose: func() { closed++ },
+				},
+			},
+			{
+				Name:      "b",
+				Stability: feature.Stable,
+				Manager: &fakeInputManager{
+					OnClose: func() { closed++ },
+				},
+			},
+		},
+	}.MustNewLoader()
+
+	loader.Close()
+	require.Equal(t, 2, closed, "Close must call every closable input manager")
+}
+
 func TestLoader_Configure(t *testing.T) {
 	createManager := func(name string) InputManager {
 		return ConfigureWith(makeConfigFakeInput(fakeInput{Type: name}), logp.NewNopLogger())

@@ -73,7 +73,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	db := client.Database("admin")
 
-	result := map[string]interface{}{}
+	result := map[string]any{}
 	res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "serverStatus", Value: 1}})
 	if err = res.Err(); err != nil {
 		return fmt.Errorf("failed to retrieve data from 'serverStatus' command: %w", err)

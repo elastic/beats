@@ -37,6 +37,7 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 		FilesNoIngestTarget: metrics.FilesNoIngestTarget.Get(),
 		FilesIgnored:        metrics.FilesIgnored.Get(),
 		FilesEmpty:          metrics.FilesEmpty.Get(),
+		ScanErrors:          metrics.ScanErrors.Get(),
 	}
 
 	firstScan := FileScanMetrics{
@@ -45,6 +46,7 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 		FilesNoIngestTarget: 3,
 		FilesIgnored:        1,
 		FilesEmpty:          2,
+		ScanErrors:          4,
 	}
 	metrics.UpdateFileScanMetrics(firstScan)
 	assert.Equal(t, firstScan, metrics.lastFileScanMetrics, "file scan metrics after first update")
@@ -53,6 +55,7 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 	assert.Equal(t, baseline.FilesNoIngestTarget+3, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target")
 	assert.Equal(t, baseline.FilesIgnored+1, metrics.FilesIgnored.Get(), "files_ignored")
 	assert.Equal(t, baseline.FilesEmpty+2, metrics.FilesEmpty.Get(), "files_empty")
+	assert.Equal(t, baseline.ScanErrors+4, metrics.ScanErrors.Get(), "scan_errors")
 
 	secondScan := FileScanMetrics{
 		FilesMatched:        12,
@@ -60,6 +63,7 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 		FilesNoIngestTarget: 4,
 		FilesIgnored:        0,
 		FilesEmpty:          1,
+		ScanErrors:          0,
 	}
 	metrics.UpdateFileScanMetrics(secondScan)
 	assert.Equal(t, secondScan, metrics.lastFileScanMetrics, "file scan metrics after second update")
@@ -68,6 +72,7 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 	assert.Equal(t, baseline.FilesNoIngestTarget+4, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target after second update")
 	assert.Equal(t, baseline.FilesIgnored, metrics.FilesIgnored.Get(), "files_ignored after second update")
 	assert.Equal(t, baseline.FilesEmpty+1, metrics.FilesEmpty.Get(), "files_empty after second update")
+	assert.Equal(t, baseline.ScanErrors, metrics.ScanErrors.Get(), "scan_errors after second update")
 }
 
 func TestHarvesterMetricsUpdate(t *testing.T) {

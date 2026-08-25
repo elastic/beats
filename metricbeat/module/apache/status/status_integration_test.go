@@ -79,8 +79,8 @@ func TestFetchFleetMode(t *testing.T) {
 	assert.Equal(t, mapstr.ErrKeyNotFound, err, "apache.status.hostname shouldn't be present in the fleet mode")
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "apache",
 		"metricsets": []string{"status"},
 		"hosts":      []string{host},

@@ -79,16 +79,16 @@ func TestFilestreamDelete(t *testing.T) {
 		},
 		"Inactive": {
 			configTmpl:   "inactive.yml",
-			closeCondMsg: "'%s' is inactive",
+			closeCondMsg: "File is inactive. Closing. Path='%s'",
 		},
 		"Inactive and resource not finished": {
 			configTmpl:          "inactive.yml",
-			closeCondMsg:        "'%s' is inactive",
+			closeCondMsg:        "File is inactive. Closing. Path='%s'",
 			resourceNotFinished: true,
 		},
 		"Inactive resource not finished and data added during grace period": {
 			configTmpl:          "inactive.yml",
-			closeCondMsg:        "'%s' is inactive",
+			closeCondMsg:        "File is inactive. Closing. Path='%s'",
 			resourceNotFinished: true,
 			dataAdded:           true,
 			gracePeriod:         2 * time.Second,
@@ -287,7 +287,7 @@ func TestFilestreamDeleteEnabledOnExistingFiles(t *testing.T) {
 		},
 		"Inactive and grace period": {
 			configTmpl:  "restart-inactive.yml",
-			msg:         "'%s' is inactive",
+			msg:         "File is inactive. Closing. Path='%s'",
 			gracePeriod: 5 * time.Second,
 		},
 	}

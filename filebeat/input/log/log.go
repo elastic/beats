@@ -18,12 +18,13 @@
 package log
 
 import (
+	"errors"
 	"io"
-	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -37,6 +38,11 @@ type Log struct {
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
+
+	// deadline bounds how long Read waits for new data at EOF before returning
+	// reader.ErrReadDeadline. It is set and read only by the harvester read
+	// goroutine (via SetReadDeadline before Read), so it needs no synchronization.
+	reader.Deadline
 }
 
 // NewLog creates a new log instance to read log sources
@@ -48,7 +54,7 @@ func NewLog(
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
 		var err error
-		offset, err = seeker.Seek(0, os.SEEK_CUR)
+		offset, err = seeker.Seek(0, io.SeekCurrent)
 		if err != nil {
 			return nil, err
 		}
@@ -109,14 +115,16 @@ func (f *Log) Read(buf []byte) (int, error) {
 		}
 
 		f.logger.Debugf("End of file reached: %s; Backoff now.", f.fs.Name())
-		f.wait()
+		if !f.wait() {
+			return totalN, reader.ErrReadDeadline
+		}
 	}
 }
 
 // errorChecks determines the cause for EOF errors, and how the EOF event should be handled
 // based on the config options.
 func (f *Log) errorChecks(err error) error {
-	if err != io.EOF {
+	if !errors.Is(err, io.EOF) {
 		f.logger.Errorf("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
 		return err
 	}
@@ -193,15 +201,31 @@ func (f *Log) checkFileDisappearedErrors() error {
 	return nil
 }
 
-func (f *Log) wait() {
-	// Wait before trying to read file again. File reached EOF.
-	select {
-	case <-f.done:
-		return
-	case <-time.After(f.backoff):
+// wait blocks before retrying a read after EOF. It returns false if a read
+// deadline (set via SetReadDeadline) elapses first, telling Read to return
+// reader.ErrReadDeadline. Without a deadline it uses the normal exponential
+// backoff; with one it polls bounded by the remaining time so the deadline is
+// honored. The block is a cancellable sleep, so no goroutine is needed to bound it.
+func (f *Log) wait() bool {
+	if f.ReadDeadline().IsZero() {
+		select {
+		case <-f.done:
+			return true
+		case <-time.After(f.backoff):
+		}
+		f.incBackoff()
+		return true
 	}
 
-	// Increment backoff up to maxBackoff
+	completed, ok := f.WaitBackoff(f.done, f.backoff)
+	if completed {
+		f.incBackoff()
+	}
+	return ok
+}
+
+// incBackoff increases the backoff up to MaxBackoff.
+func (f *Log) incBackoff() {
 	if f.backoff < f.config.MaxBackoff {
 		f.backoff = min(f.backoff*time.Duration(f.config.BackoffFactor), f.config.MaxBackoff)
 	}

@@ -103,6 +103,13 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	logger := b.Info.Logger
 
+	timeout, err := config.GetShutDownTimeOut(rawConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	b.ShutdownTimeout = timeout
+
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err

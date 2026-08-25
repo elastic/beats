@@ -153,7 +153,7 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
 
-func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -182,7 +182,7 @@ func (p *Publisher) Close() {
 	}
 }
 
-func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[string]interface{}) {
+func (p *Publisher) PublishActionResult(req map[string]any, res map[string]any) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -210,7 +210,7 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 		return
 	}
 
-	fields := map[string]interface{}{
+	fields := map[string]any{
 		"schedule_id":              scheduleID,
 		"response_id":              responseID,
 		"action_input_type":        "osquery_scheduled",
@@ -218,8 +218,8 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 		"completed_at":             completedAt.Format(time.RFC3339Nano),
 		"planned_schedule_time":    plannedScheduleTime.Format(time.RFC3339Nano),
 		"schedule_execution_count": scheduleExecutionCount,
-		"action_response": map[string]interface{}{
-			"osquery": map[string]interface{}{
+		"action_response": map[string]any{
+			"osquery": map[string]any{
 				"count": resultCount,
 			},
 		},
@@ -241,7 +241,7 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 	p.publishActionResponseEvent(fields, completedAt)
 }
 
-func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, timestamp time.Time) {
+func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp time.Time) {
 	event := beat.Event{
 		Timestamp: timestamp,
 		Fields:    fields,
@@ -249,7 +249,7 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, ti
 	p.actionResponsesClient.Publish(event)
 }
 
-func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]any, reqData any) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -263,13 +263,13 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 
 	fields := mapstr.M{
 		"type": "osquery_profile",
-		"event": map[string]interface{}{
+		"event": map[string]any{
 			"module": eventModule,
 		},
 		"osquery_profile": profile,
 	}
 	if queryName != "" {
-		fields["query"] = map[string]interface{}{
+		fields["query"] = map[string]any{
 			"name": queryName,
 		}
 	}
@@ -296,10 +296,10 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 	p.queryProfileClient.Publish(event)
 }
 
-func actionResultToEvent(req, res map[string]interface{}) map[string]interface{} {
-	m := make(map[string]interface{}, 9)
+func actionResultToEvent(req, res map[string]any) map[string]any {
+	m := make(map[string]any, 9)
 
-	copyKey := func(key string, src, dst map[string]interface{}) {
+	copyKey := func(key string, src, dst map[string]any) {
 		if v, ok := src[key]; ok {
 			dst[key] = v
 		}
@@ -310,8 +310,8 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 	copyKey("error", res, m)
 
 	if v, ok := res["count"]; ok {
-		m["action_response"] = map[string]interface{}{
-			"osquery": map[string]interface{}{
+		m["action_response"] = map[string]any{
+			"osquery": map[string]any{
 				"count": v,
 			},
 		}
@@ -371,7 +371,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 	return procs, nil
 }
 
-func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
+func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta, hit map[string]any, ecsm ecs.Mapping, reqData any) beat.Event {
 	var fields mapstr.M
 
 	if len(ecsm) > 0 {
@@ -383,13 +383,13 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 
 	// Add event.module for ECS
 	// There could be already "event" properties set, preserve them and set the "event.module"
-	var evf map[string]interface{}
+	var evf map[string]any
 	ievf, ok := fields["event"]
 	if ok {
-		evf, ok = ievf.(map[string]interface{})
+		evf, ok = ievf.(map[string]any)
 	}
 	if !ok {
-		evf = make(map[string]interface{})
+		evf = make(map[string]any)
 	}
 	evf["module"] = eventModule
 	fields["event"] = evf

@@ -23,6 +23,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -38,12 +39,6 @@ var innerMsgRe = regexp.MustCompile(`\bmsg='([^']*)'`)
 // avcRe extracts the AVC action and first requested permission from an audit
 // log line such as: "avc: denied { getattr } for".
 var avcRe = regexp.MustCompile(`\bavc:\s+(\w+)\s+\{\s+(\w+)\s+\}\s+for\s+`)
-
-// auidSesRe extracts the raw numeric value of auid= and ses= fields from a
-// log line. auparse normalises auid=4294967295 and ses=4294967295 (the
-// kernel's sentinel for "not set") to the string "unset". Restoring the raw
-// numeric value preserves the original audit record value in auditd.log.*.
-var auidSesRe = regexp.MustCompile(`\b(auid|ses)=(\d+)\b`)
 
 // innerMsgKVRe extracts individual key=value pairs from inner msg content.
 // Unquoted values may span multiple words (e.g. op=adding group to /etc/group)
@@ -120,14 +115,6 @@ func (p *Parser) Next() (reader.Message, error) {
 	if nodeVal != "" {
 		logFields["node"] = nodeVal
 	}
-	// auparse normalises auid=4294967295 and ses=4294967295 to "unset".
-	// Restore the raw numeric value from the original audit record.
-	for _, m := range auidSesRe.FindAllStringSubmatch(auditMsg.RawData, -1) {
-		field, rawVal := m[1], m[2]
-		if v, ok := logFields[field]; ok && v == "unset" {
-			logFields[field] = rawVal
-		}
-	}
 
 	// auparse moves the audit rule key(s) from the data map to AuditMessage.Tags.
 	// Restore them as auditd.log.key so the parsed event keeps the rule key.
@@ -181,4 +168,9 @@ func stripNodePrefix(line string) (string, string) {
 		return line, ""
 	}
 	return line[i+1:], line[len(prefix):i]
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *Parser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
 }

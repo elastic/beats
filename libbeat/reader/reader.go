@@ -18,7 +18,9 @@
 package reader
 
 import (
+	"errors"
 	"io"
+	"time"
 )
 
 // Reader is the interface that wraps the basic Next method for
@@ -28,4 +30,27 @@ import (
 type Reader interface {
 	io.Closer
 	Next() (Message, error)
+}
+
+// ErrReadDeadline is returned by a read whose deadline (set via
+// DeadlineSetter.SetReadDeadline) elapsed before a line was available.
+var ErrReadDeadline = errors.New("read deadline exceeded")
+
+// DeadlineSetter is implemented by readers whose blocking wait for more data can
+// be bounded by a deadline, allowing a timeout to be enforced synchronously
+// without a background goroutine. Wrapping readers delegate to the reader they
+// wrap; the reader that actually blocks (e.g. the file reader) honors it.
+type DeadlineSetter interface {
+	// SetReadDeadline bounds how long the next blocking read may wait for data. A
+	// zero time clears the deadline. It returns true if the deadline is honored by
+	// this reader or one it wraps, so a caller can detect support and otherwise
+	// fall back. When the deadline elapses mid-wait, the read returns ErrReadDeadline.
+	SetReadDeadline(t time.Time) bool
+}
+
+// SetReadDeadline sets a read deadline on r if r (or a reader it wraps) supports
+// it, returning whether it was honored.
+func SetReadDeadline(r Reader, t time.Time) bool {
+	d, ok := r.(DeadlineSetter)
+	return ok && d.SetReadDeadline(t)
 }

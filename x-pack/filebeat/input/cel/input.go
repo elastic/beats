@@ -465,7 +465,8 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			return err
 		}
 		if result.action.retry() {
-			continue
+			// If we hit a 429, try again subject to budget limits.
+			goto nextTry
 		}
 
 		// Empty or nil events finish the execution without setting runSpan status.
@@ -477,6 +478,7 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			okSpans(runSpan)
 			return nil
 		}
+	nextTry:
 		budget--
 		if budget <= 0 {
 			msg := "reached maximum number of CEL executions"
@@ -1143,6 +1145,8 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]any, header http.Hea
 				}
 				limiter.SetLimitAt(waitUntil, next)
 				limiter.SetBurstAt(waitUntil, burst)
+			case nil:
+				log.Errorw("unexpected nil returned for rate limit reset", "rate_limit", mapstr.M(rateLimit))
 			default:
 				log.Errorw("unexpected type returned for rate limit reset", "type", reflect.TypeOf(w).String(), "rate_limit", mapstr.M(rateLimit))
 			}
@@ -1176,6 +1180,8 @@ func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit r
 			return limit, false
 		}
 		limit = rate.Inf
+	case nil:
+		log.Errorw("unexpected nil returned for rate limit "+which, "rate_limit", mapstr.M(rateLimit))
 	default:
 		log.Errorw("unexpected type returned for rate limit "+which, "type", reflect.TypeOf(r).String(), "rate_limit", mapstr.M(rateLimit))
 	}
@@ -1232,7 +1238,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		traceLogger := zap.New(core)
 
 		maxBodyLen := cfg.Resource.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, log)
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 		c.Transport = trace
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
@@ -1332,8 +1338,8 @@ func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 		seen[attr.Key] = true
 	}
 
-	pairs := strings.Split(attributes, ",")
-	for _, pair := range pairs {
+	pairs := strings.SplitSeq(attributes, ",")
+	for pair := range pairs {
 		key, val, ok := strings.Cut(pair, "=")
 		if !ok || key == "" || seen[attribute.Key(key)] {
 			continue
@@ -1499,7 +1505,7 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 
 var (
 	// mimetypes holds supported MIME type mappings.
-	mimetypes = map[string]interface{}{
+	mimetypes = map[string]any{
 		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
 		"application/x-ndjson":     lib.NDJSON,
 		"application/zip":          lib.Zip,
@@ -1566,7 +1572,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 			}
 			return m
 		}),
-		lib.Globals(map[string]interface{}{
+		lib.Globals(map[string]any{
 			"useragent":            userAgent,
 			"env":                  vars,
 			"remaining_executions": 0, // placeholder
@@ -1619,9 +1625,9 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]any, now time.Time, details bool, budget int) (map[string]any, error) {
 	contextInjector.SetContext(ctx)
-	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
+	out, det, err := prg.ContextEval(ctx, map[string]any{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
 		// which will persist over multiple evaluations. The lib.Time behaviour
@@ -1653,7 +1659,7 @@ func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg ce
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
+	v, err := out.ConvertToNative(reflect.TypeFor[*structpb.Struct]())
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
 		clearWantMore(state)
@@ -1705,14 +1711,14 @@ func (e dumpError) writeToFile(path string) (err error) {
 // It leaves state intact if there is no "want_more" element, and sets the element to false
 // if there is. This is necessary instead of just doing delete(state, "want_more") as
 // client CEL code may expect the want_more field to be present.
-func clearWantMore(state map[string]interface{}) {
+func clearWantMore(state map[string]any) {
 	if _, ok := state["want_more"]; ok {
 		state["want_more"] = false
 	}
 }
 
-func errorMessage(msg string) map[string]interface{} {
-	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
+func errorMessage(msg string) map[string]any {
+	return map[string]any{"error": map[string]any{"message": msg}}
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
@@ -1722,10 +1728,10 @@ func newRetryLog(log *logp.Logger) *retryLog {
 	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
 }
 
-func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
-func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
-func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
-func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+func (l *retryLog) Error(msg string, kv ...any) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...any)  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...any) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...any)  { l.log.Warnw(msg, kv...) }
 
 func test(url *url.URL) error {
 	port := func() string {
@@ -1784,8 +1790,8 @@ func cloneMap(dst, src mapstr.M) {
 			d := make(mapstr.M, len(v))
 			dst[k] = d
 			cloneMap(d, v)
-		case map[string]interface{}:
-			d := make(map[string]interface{}, len(v))
+		case map[string]any:
+			d := make(map[string]any, len(v))
 			dst[k] = d
 			cloneMap(d, v)
 		case []mapstr.M:
@@ -1796,10 +1802,10 @@ func cloneMap(dst, src mapstr.M) {
 				a = append(a, d)
 			}
 			dst[k] = a
-		case []map[string]interface{}:
-			a := make([]map[string]interface{}, 0, len(v))
+		case []map[string]any:
+			a := make([]map[string]any, 0, len(v))
 			for _, m := range v {
-				d := make(map[string]interface{}, len(m))
+				d := make(map[string]any, len(m))
 				cloneMap(d, m)
 				a = append(a, d)
 			}
@@ -1825,22 +1831,22 @@ func walkMap(m mapstr.M, path string, fn func(parent mapstr.M, key string)) {
 	switch v := v.(type) {
 	case mapstr.M:
 		walkMap(v, rest, fn)
-	case map[string]interface{}:
+	case map[string]any:
 		walkMap(v, rest, fn)
 	case []mapstr.M:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []map[string]interface{}:
+	case []map[string]any:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []interface{}:
+	case []any:
 		for _, v := range v {
 			switch m := v.(type) {
 			case mapstr.M:
 				walkMap(m, rest, fn)
-			case map[string]interface{}:
+			case map[string]any:
 				walkMap(m, rest, fn)
 			}
 		}
