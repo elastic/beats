@@ -1,0 +1,38 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: enhancement
+
+# Change summary; a 80ish characters long description of the change.
+summary: Let heartbeat receivers share a scheduler via the `scheduler_group` setting
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: |
+  A Heartbeat process has exactly one scheduler, so `heartbeat.scheduler.limit`,
+  `heartbeat.jobs.<type>.limit` and the `SYNTHETICS_LIMIT_<TYPE>` environment
+  variables bound the concurrency of every monitor it runs. A collector, on the
+  other hand, hosts one Heartbeat instance per heartbeat receiver, and each of
+  them builds its own scheduler, so those settings only bound a single receiver.
+
+  Heartbeat receivers now accept a `scheduler_group` setting. Receivers
+  configured with the same group share one scheduler, and therefore one set of
+  concurrency limits, which lets a set of receivers reproduce the limits of the
+  single Heartbeat process they were split out of. The setting defaults to the
+  receiver's own id, so behavior is unchanged unless a group is configured.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: heartbeat
+
+# PR URL: A link the PR that added the changeset.
+# pr: https://github.com/owner/repo/1234
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+issue: https://github.com/elastic/elastic-agent/issues/16283

@@ -159,12 +159,17 @@ func (s *Scheduler) Stop() {
 	s.cancelCtx()
 }
 
+// Stopped returns true once Stop has been invoked. A stopped scheduler cannot be
+// restarted and rejects new jobs.
+func (s *Scheduler) Stopped() bool {
+	return s.ctx.Err() != nil
+}
+
 // Wait until all tasks are done if run in runOnce mode. Will block forever
 // if this scheduler does not have the runOnce option set.
 // Adding new tasks after this method is invoked is not supported.
 func (s *Scheduler) WaitForRunOnce() {
 	s.runOnceWg.Wait()
-	s.Stop()
 }
 
 // ErrAlreadyStopped is returned when an Add operation is attempted after the scheduler
