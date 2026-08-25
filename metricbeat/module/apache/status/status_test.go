@@ -83,7 +83,7 @@ func TestFetchEventContents(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "apache",
 		"metricsets": []string{"status"},
 		"hosts":      []string{server.URL},
@@ -161,7 +161,7 @@ func TestFetchTimeout(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "apache",
 		"metricsets": []string{"status"},
 		"hosts":      []string{server.URL},
@@ -212,7 +212,7 @@ func TestMultipleFetches(t *testing.T) {
 	server.Start()
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "apache",
 		"metricsets": []string{"status"},
 		"hosts":      []string{server.URL},
@@ -220,7 +220,7 @@ func TestMultipleFetches(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		_, errs := mbtest.ReportingFetchV2Error(f)
 		if len(errs) > 0 {
 			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -250,7 +250,7 @@ func TestHostParser(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		hostData, err := hostParser(mbtest.NewTestModule(t, map[string]interface{}{}), test.host)
+		hostData, err := hostParser(mbtest.NewTestModule(t, map[string]any{}), test.host)
 		if err != nil && test.err != "" {
 			assert.Contains(t, err.Error(), test.err)
 		} else if assert.NoError(t, err, "unexpected error") {

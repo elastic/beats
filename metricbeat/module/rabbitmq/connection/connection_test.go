@@ -67,8 +67,8 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 60938, peer["port"])
 }
 
-func getConfig(url string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(url string) map[string]any {
+	return map[string]any{
 		"module":     "rabbitmq",
 		"metricsets": []string{"connection"},
 		"hosts":      []string{url},

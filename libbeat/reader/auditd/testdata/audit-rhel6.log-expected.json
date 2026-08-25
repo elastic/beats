@@ -81,14 +81,14 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "dst": "10.100.4.0",
         "dst_prefixlen": "22",
         "op": "SPD-add",
         "record_type": "MAC_IPSEC_EVENT",
         "result": "success",
         "sequence": "19600354",
-        "ses": "4294967295",
+        "ses": "unset",
         "src": "10.100.0.0",
         "src_prefixlen": "16"
       }
@@ -102,7 +102,7 @@
         "a2": "b8",
         "a3": "0",
         "arch": "x86_64",
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "charon",
         "egid": "0",
         "euid": "0",
@@ -117,7 +117,7 @@
         "record_type": "SYSCALL",
         "result": "success",
         "sequence": "19600354",
-        "ses": "4294967295",
+        "ses": "unset",
         "sgid": "0",
         "suid": "0",
         "syscall": "sendto",

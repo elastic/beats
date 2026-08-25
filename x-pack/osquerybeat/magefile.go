@@ -129,6 +129,20 @@ func FetchOsquerydForTesting() error {
 	return osquerybeat.FetchOsqueryDistros()
 }
 
+// UpdateOsquery updates the bundled osquery version and artifact checksums.
+// Set OSQUERY_VERSION to select a specific release; the latest stable release
+// is used by default.
+func UpdateOsquery() error {
+	args := []string{"run", "./scripts/update_osquery"}
+	if version := strings.TrimSpace(os.Getenv("OSQUERY_VERSION")); version != "" {
+		args = append(args, "-version", version)
+	}
+	cmd := exec.Command("go", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 // ensureExtensionInBinDir places osquery-extension in binDir, building it first if absent.
 func ensureExtensionInBinDir(binDir string) error {
 	extName := "osquery-extension.ext"
