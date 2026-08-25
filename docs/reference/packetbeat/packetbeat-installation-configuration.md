@@ -192,6 +192,9 @@ cloud.auth: "packetbeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/packetbeat/keystore.md).
+
+::::{include} /reference/_snippets/aws-privatelink-cloud-id.md
+::::
 ::::::
 
 ::::::{applies-item} self: ga
