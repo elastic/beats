@@ -286,9 +286,12 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, version uint8,
 	// permanently baking values like "(PID: 0)" into the cached message
 	// template. The provider metadata message is built with
 	// EvtFormatMessageId, which substitutes all placeholders verbatim.
+	//
+	// Assign both fields together: MsgStatic and MsgTemplate are mutually
+	// exclusive representations, and formatMessage prefers MsgStatic. Copying
+	// only one field would leave a stale event-handle message in place.
 	if defaultEM != nil && (defaultEM.MsgStatic != "" || defaultEM.MsgTemplate != nil) {
-		em.MsgStatic = defaultEM.MsgStatic
-		em.MsgTemplate = defaultEM.MsgTemplate
+		em.MsgStatic, em.MsgTemplate = defaultEM.MsgStatic, defaultEM.MsgTemplate
 	}
 
 	s.log.Debugw("Obtained unique event metadata from event handle. "+
