@@ -22434,11 +22434,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/testify
-Version: v1.12.0
+Version: v1.12.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.12.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.12.1/LICENSE:
 
 MIT License
 
@@ -22632,11 +22632,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/vmware/govmomi
-Version: v0.55.1
+Version: v0.56.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.55.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.56.0/LICENSE.txt:
 
 
                                  Apache License
