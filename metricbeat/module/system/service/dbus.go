@@ -37,12 +37,14 @@ type unitFetcher func(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitSt
 // instrospectForUnitMethods determines what methods are available via dbus for listing systemd units.
 // We have a number of functions, some better than others, for getting and filtering unit lists.
 // This will attempt to find the most optimal method, and move down to methods that require more work.
+// The temporary dbus connection used for introspection is always closed before returning.
 func instrospectForUnitMethods() (unitFetcher, error) {
 	//setup a dbus connection
 	conn, err := dbusRaw.SystemBusPrivate()
 	if err != nil {
 		return nil, fmt.Errorf("error getting connection to system bus: %w", err)
 	}
+	defer conn.Close()
 
 	auth := dbusRaw.AuthExternal(strconv.Itoa(os.Getuid()))
 	err = conn.Auth([]dbusRaw.Auth{auth})
