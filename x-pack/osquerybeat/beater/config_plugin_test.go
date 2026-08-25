@@ -635,6 +635,14 @@ func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
 	if diff := cmp.Diff(queryPeriod, qi.Interval); diff != "" {
 		t.Error(diff)
 	}
+	// query_name for a top-level scheduled query is the schedule config map key.
+	if diff := cmp.Diff(queryName, qi.QueryName); diff != "" {
+		t.Error(diff)
+	}
+	// Top-level schedule queries do not belong to a pack.
+	if diff := cmp.Diff("", qi.PackName); diff != "" {
+		t.Error(diff)
+	}
 }
 
 func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
@@ -644,6 +652,7 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	const (
 		packName    = "my-pack"
 		packID      = "pack-uuid-123"
+		packLabel   = "My Pack"
 		queryName   = "uptime_query"
 		querySQL    = "select * from uptime"
 		queryPeriod = 60
@@ -659,7 +668,8 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 			Osquery: &config.OsqueryConfig{
 				Packs: map[string]config.Pack{
 					packName: {
-						PackID: packID,
+						PackID:   packID,
+						PackName: packLabel,
 						Queries: map[string]config.Query{
 							queryName: {
 								Query: querySQL,
@@ -690,6 +700,13 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	}
 
 	if diff := cmp.Diff(packID, qi.PackID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(packLabel, qi.PackName); diff != "" {
+		t.Error(diff)
+	}
+	// query_name is taken from the pack's queries config map key.
+	if diff := cmp.Diff(queryName, qi.QueryName); diff != "" {
 		t.Error(diff)
 	}
 }
