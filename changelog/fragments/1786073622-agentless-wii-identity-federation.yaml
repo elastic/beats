@@ -7,7 +7,6 @@ description: >
   to the customer's AWS role via `sts:AssumeRoleWithWebIdentity`, replacing the
   legacy cloud-connector token-file flow. The new path activates when the
   `WORKLOAD_IDENTITY_ISSUER_URL` environment variable is set; the legacy IRSA and
-  OIDC paths are retained as fallbacks during rollout. Azure and GCP helpers for
-  the same exchange are exported from x-pack/libbeat/common/identityfederation
-  for downstream consumers.
+  OIDC paths are retained as fallbacks during rollout. AWS only — Azure and GCP
+  identity federation keep their existing flows.
 component: all

@@ -72,10 +72,9 @@ const (
 //	200 OK
 //	{"token": "<jwt>", "expires_at": <epoch-seconds>}
 //
-// The audience is opaque to the issuer and copied verbatim into the JWT aud claim:
-//   - AWS:   "sts.amazonaws.com"
-//   - GCP:   the WIF provider URL ("//iam.googleapis.com/projects/…/providers/…")
-//   - Azure: the Azure AD audience (e.g. "api://AzureADTokenExchange")
+// The audience is opaque to the issuer and copied verbatim into the JWT aud claim.
+// AWS is the only supported consumer today (audience "sts.amazonaws.com", presented
+// to STS via AssumeRoleWithWebIdentity); Azure/GCP consumers are follow-up work.
 //
 // Tokens are cached until expires_at minus a refresh margin; concurrent callers share
 // a single in-flight fetch. Failures are never cached. Transient failures (HTTP 429,
