@@ -73,7 +73,9 @@ func TestSchedulerGroup(t *testing.T) {
 		var groups []string
 		for _, entry := range logs.All() {
 			if group, ok := entry.ContextMap()["scheduler_group"]; ok {
-				groups = append(groups, group.(string))
+				if s, ok := group.(string); ok {
+					groups = append(groups, s)
+				}
 			}
 		}
 		require.NotEmpty(t, groups, "receiver logged no scheduler group")
