@@ -25,12 +25,12 @@ These settings can be also specified at the command line, like this:
 filebeat -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
 ```
 
+::::{include} /reference/_snippets/aws-privatelink-cloud-id.md
+::::
+
 ## `cloud.id` [_cloud_id]
 
 The Cloud ID, which can be found in the [{{ecloud}} console](https://cloud.elastic.co/?page=docs&placement=docs-body), is used by Filebeat to resolve the {{es}} and {{kib}} URLs. This setting overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings. For more on locating and configuring the Cloud ID, see [Find your Cloud ID](docs-content://deploy-manage/deploy/elastic-cloud/find-cloud-id.md).
-
-::::{include} /reference/_snippets/aws-privatelink-cloud-id.md
-::::
 
 ## `cloud.auth` [_cloud_auth]
 
