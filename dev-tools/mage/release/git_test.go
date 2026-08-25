@@ -461,7 +461,7 @@ func TestHasCommitsAheadOf(t *testing.T) {
 			name:     "missing base branch",
 			baseName: "does-not-exist",
 			setup:    func(t *testing.T, dir, baseBranch string) {},
-			want:    true,
+			want:     true,
 		},
 	}
 
