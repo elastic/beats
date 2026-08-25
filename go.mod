@@ -113,10 +113,10 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.1
 	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.51.0
-	go.elastic.co/ecszap v1.0.2
+	github.com/vmware/govmomi v0.56.0
+	go.elastic.co/ecszap v1.0.3
 	go.elastic.co/go-licence-detector v0.10.0
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/multierr v1.11.0
