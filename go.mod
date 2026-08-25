@@ -115,13 +115,8 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.12.1
 	github.com/ugorji/go/codec v1.1.8
-<<<<<<< HEAD
-	github.com/vmware/govmomi v0.51.0
-	go.elastic.co/ecszap v1.0.2
-=======
 	github.com/vmware/govmomi v0.56.0
 	go.elastic.co/ecszap v1.0.3
->>>>>>> cb6bd223c (build(deps): bump github.com/vmware/govmomi from 0.55.1 to 0.56.0 (#52804))
 	go.elastic.co/go-licence-detector v0.10.0
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/multierr v1.11.0
