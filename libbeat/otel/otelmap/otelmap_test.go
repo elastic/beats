@@ -462,6 +462,23 @@ func TestUnknownType(t *testing.T) {
 	assert.Equal(t, expected, inputMap)
 }
 
+func TestFromMapstr(t *testing.T) {
+	input := mapstr.M{
+		"str":    "hello",
+		"num":    int64(42),
+		"nested": mapstr.M{"key": "value"},
+	}
+	dst := pcommon.NewMap()
+	err := FromMapstr(dst, input)
+	assert.NoError(t, err)
+	assert.Equal(t, "hello", dst.AsRaw()["str"])
+	assert.Equal(t, int64(42), dst.AsRaw()["num"])
+	assert.Equal(t, map[string]any{"key": "value"}, dst.AsRaw()["nested"])
+
+	// Verify src is not mutated
+	assert.Equal(t, mapstr.M{"key": "value"}, input["nested"])
+}
+
 func TestIsFloatWholeNumber(t *testing.T) {
 	tests := []struct {
 		name string
