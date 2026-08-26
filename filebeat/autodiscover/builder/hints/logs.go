@@ -20,6 +20,7 @@ package hints
 import (
 	"fmt"
 	"regexp"
+	"slices"
 
 	"github.com/elastic/go-ucfg"
 
@@ -102,7 +103,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 		l.log.Debugf("Generated %d input configs from hint.", len(configs))
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, l.log, options...)
+		return l.applyConfigTemplate(event, configs, options...)
 	}
 
 	var configs []*conf.C //nolint:prealloc //breaks tests
@@ -199,7 +200,81 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		configs = append(configs, config)
 	}
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs, l.log, options...)
+	return l.applyConfigTemplate(event, configs, options...)
+}
+
+func (l *logHints) applyConfigTemplate(event bus.Event, configs []*conf.C, options ...ucfg.Option) []*conf.C {
+	configs = template.ApplyConfigTemplate(event, configs, l.log, options...)
+
+	if !l.config.InputAllowList.Enabled {
+		return configs
+	}
+
+	filtered := make([]*conf.C, 0, len(configs))
+	for _, config := range configs {
+		inputType, reason := l.validateInputConfig(config)
+		if reason != "" {
+			l.log.Warnw("Rejecting autodiscover hints configuration.",
+				"input.type", inputType,
+				"reason", reason,
+			)
+			continue
+		}
+
+		filtered = append(filtered, config)
+	}
+
+	return filtered
+}
+
+func (l *logHints) validateInputConfig(config *conf.C) (string, string) {
+	if config.HasField("module") {
+		return l.validateModuleInputConfigs(config)
+	}
+
+	return l.validateInputType(config)
+}
+
+func (l *logHints) validateModuleInputConfigs(config *conf.C) (string, string) {
+	filesetFound := false
+	for _, name := range config.GetFields() {
+		switch name {
+		case "module", "enabled", "path":
+			continue
+		}
+		filesetFound = true
+
+		filesetConfig, err := config.Child(name, -1)
+		if err != nil {
+			return "", "unreadable fileset config"
+		}
+		inputConfig, err := filesetConfig.Child("input", -1)
+		if err != nil {
+			return "", "missing fileset input type"
+		}
+		if inputType, reason := l.validateInputType(inputConfig); reason != "" {
+			return inputType, reason
+		}
+	}
+
+	if !filesetFound {
+		return "", "no fileset found in module configuration"
+	}
+
+	return "", ""
+}
+
+func (l *logHints) validateInputType(config *conf.C) (string, string) {
+	inputType, err := config.String("type", -1)
+	if err != nil || inputType == "" {
+		return "", "missing or unreadable input type"
+	}
+
+	if slices.Contains(l.config.InputAllowList.Types, inputType) {
+		return "", ""
+	}
+
+	return inputType, "disallowed input type"
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {
