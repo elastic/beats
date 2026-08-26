@@ -1645,9 +1645,9 @@ func TestInputAllowListFiltersAfterTemplateInterpolation(t *testing.T) {
 
 func TestInputAllowListEnforcesModuleFilesetTypes(t *testing.T) {
 	tests := []struct {
-		name       string
-		module     mapstr.M
-		wantConfig bool
+		name         string
+		module       mapstr.M
+		wantFilesets []string
 	}{
 		{
 			name: "allowed fileset input types",
@@ -1662,10 +1662,10 @@ func TestInputAllowListEnforcesModuleFilesetTypes(t *testing.T) {
 					"input":   mapstr.M{"type": "container"},
 				},
 			},
-			wantConfig: true,
+			wantFilesets: []string{"access", "error"},
 		},
 		{
-			name: "one disallowed fileset rejects whole module",
+			name: "disallowed fileset is removed",
 			module: mapstr.M{
 				"module": "apache",
 				"access": mapstr.M{
@@ -1677,9 +1677,10 @@ func TestInputAllowListEnforcesModuleFilesetTypes(t *testing.T) {
 					"input":   mapstr.M{"type": "httpjson"},
 				},
 			},
+			wantFilesets: []string{"access"},
 		},
 		{
-			name: "missing fileset input type rejects whole module",
+			name: "module is rejected when its only fileset has no input type",
 			module: mapstr.M{
 				"module": "apache",
 				"access": mapstr.M{
@@ -1689,12 +1690,26 @@ func TestInputAllowListEnforcesModuleFilesetTypes(t *testing.T) {
 			},
 		},
 		{
-			name: "unreadable fileset input type rejects whole module",
+			name: "module is rejected when its only fileset has an unreadable input type",
 			module: mapstr.M{
 				"module": "apache",
 				"access": mapstr.M{
 					"enabled": true,
 					"input":   mapstr.M{"type": mapstr.M{"invalid": true}},
+				},
+			},
+		},
+		{
+			name: "module is rejected when all filesets are disallowed",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "httpjson"},
+				},
+				"error": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "cel"},
 				},
 			},
 		},
@@ -1707,11 +1722,22 @@ func TestInputAllowListEnforcesModuleFilesetTypes(t *testing.T) {
 
 			configs := builder.applyConfigTemplate(bus.Event{}, []*conf.C{config})
 
-			if test.wantConfig {
-				assert.Len(t, configs, 1, "an allowed module configuration should be retained")
-			} else {
-				assert.Empty(t, configs, "an invalid module fileset input should reject the whole module")
+			if len(test.wantFilesets) == 0 {
+				assert.Empty(t, configs, "a module without allowed filesets should be rejected")
+				return
 			}
+
+			require.Len(t, configs, 1, "a module with allowed filesets should be retained")
+			var gotFilesets []string
+			for _, name := range configs[0].GetFields() {
+				switch name {
+				case "module", "enabled", "path":
+					continue
+				}
+				gotFilesets = append(gotFilesets, name)
+			}
+			assert.ElementsMatch(t, test.wantFilesets, gotFilesets,
+				"the retained module should contain only allowed filesets")
 		})
 	}
 }

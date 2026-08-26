@@ -198,7 +198,7 @@ allowed list can be overridden.
      to `filestream`, `container` and `log`.
 
 
-When filtering is enabled, Filebeat inspects the rendered input configuration after template interpolation. Direct input `type` values and nested module fileset `input.type` values are both checked. If any contained input type is missing, unreadable, or not allowed, Filebeat rejects the whole rendered configuration and logs the rejected input type at warning level.
+When filtering is enabled, Filebeat inspects the rendered input configuration after template interpolation. Direct input `type` values and nested module fileset `input.type` values are both checked. Any input or fileset with unreadable, or disallowed type is rejected. Each rejection is logged at warning level.
 
 This Kubernetes example enables the allow list with the defaults:
 

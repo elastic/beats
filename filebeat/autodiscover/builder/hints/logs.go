@@ -212,7 +212,14 @@ func (l *logHints) applyConfigTemplate(event bus.Event, configs []*conf.C, optio
 
 	filtered := make([]*conf.C, 0, len(configs))
 	for _, config := range configs {
-		inputType, reason := l.validateInputConfig(config)
+		if config.HasField("module") {
+			if l.filterModuleInputConfigs(config) {
+				filtered = append(filtered, config)
+			}
+			continue
+		}
+
+		inputType, reason := l.validateInputType(config)
 		if reason != "" {
 			l.log.Warnw("Rejecting autodiscover hints configuration.",
 				"input.type", inputType,
@@ -227,16 +234,10 @@ func (l *logHints) applyConfigTemplate(event bus.Event, configs []*conf.C, optio
 	return filtered
 }
 
-func (l *logHints) validateInputConfig(config *conf.C) (string, string) {
-	if config.HasField("module") {
-		return l.validateModuleInputConfigs(config)
-	}
-
-	return l.validateInputType(config)
-}
-
-func (l *logHints) validateModuleInputConfigs(config *conf.C) (string, string) {
+func (l *logHints) filterModuleInputConfigs(config *conf.C) bool {
+	module, _ := config.String("module", -1)
 	filesetFound := false
+	allowedFilesetFound := false
 	for _, name := range config.GetFields() {
 		switch name {
 		case "module", "enabled", "path":
@@ -246,22 +247,62 @@ func (l *logHints) validateModuleInputConfigs(config *conf.C) (string, string) {
 
 		filesetConfig, err := config.Child(name, -1)
 		if err != nil {
-			return "", "unreadable fileset config"
+			if !l.removeRejectedFileset(config, module, name, "", "unreadable fileset config") {
+				return false
+			}
+			continue
 		}
 		inputConfig, err := filesetConfig.Child("input", -1)
 		if err != nil {
-			return "", "missing fileset input type"
+			if !l.removeRejectedFileset(config, module, name, "", "missing fileset input type") {
+				return false
+			}
+			continue
 		}
 		if inputType, reason := l.validateInputType(inputConfig); reason != "" {
-			return inputType, reason
+			if !l.removeRejectedFileset(config, module, name, inputType, reason) {
+				return false
+			}
+			continue
 		}
+		allowedFilesetFound = true
 	}
 
 	if !filesetFound {
-		return "", "no fileset found in module configuration"
+		l.log.Warnw("Rejecting autodiscover hints configuration.",
+			"module", module,
+			"input.type", "",
+			"reason", "no fileset found in module configuration",
+		)
 	}
 
-	return "", ""
+	return filesetFound && allowedFilesetFound
+}
+
+func (l *logHints) removeRejectedFileset(
+	config *conf.C,
+	module string,
+	fileset string,
+	inputType string,
+	reason string,
+) bool {
+	l.log.Warnw("Rejecting autodiscover hints module fileset.",
+		"module", module,
+		"fileset", fileset,
+		"input.type", inputType,
+		"reason", reason,
+	)
+
+	if _, err := config.Remove(fileset, -1); err != nil {
+		l.log.Warnw("Failed to remove rejected autodiscover hints fileset.",
+			"module", module,
+			"fileset", fileset,
+			"error", err,
+		)
+		return false
+	}
+
+	return true
 }
 
 func (l *logHints) validateInputType(config *conf.C) (string, string) {
