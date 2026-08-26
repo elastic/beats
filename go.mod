@@ -195,15 +195,9 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.19.2
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-<<<<<<< HEAD
-	github.com/microsoft/go-mssqldb v1.9.5
-	github.com/microsoft/wmi v0.38.3
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.159.1-0.20260819055613-b7f4f425a7d9
-=======
 	github.com/microsoft/go-mssqldb v1.10.0
 	github.com/microsoft/wmi v0.44.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.159.1-0.20260825134713-7531790b5bc9
->>>>>>> 613ad1a (build(deps): bump github.com/microsoft/wmi from 0.42.0 to 0.44.0 in the windows group across 1 directory (#52803))
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.159.1-0.20260819055613-b7f4f425a7d9
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.159.0
 	github.com/pierrec/lz4/v4 v4.1.28
 	github.com/pkg/xattr v0.4.9
