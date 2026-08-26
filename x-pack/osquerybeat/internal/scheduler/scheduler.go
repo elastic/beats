@@ -274,10 +274,7 @@ func (s *Scheduler) runJob(ctx context.Context, job *scheduledJob) {
 
 		scheduledTime := nextRun.Add(splayDuration)
 
-		waitDuration := time.Until(scheduledTime)
-		if waitDuration < 0 {
-			waitDuration = 0
-		}
+		waitDuration := max(time.Until(scheduledTime), 0)
 
 		s.log.Debugf("Query '%s' scheduled for %v (splay: %v)", sq.Name, scheduledTime, splayDuration)
 

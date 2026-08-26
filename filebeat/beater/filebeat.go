@@ -52,11 +52,7 @@ import (
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
-
-	// include all filebeat specific autodiscover features
-	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
@@ -291,7 +287,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			gzipRegistry(b.Info.Logger, b.Info.Paths))
 	}
 
-	if !fb.moduleRegistry.Empty() {
+	if !fb.moduleRegistry.Empty() && beat.SetupPipelinesEnabled(b.BeatConfig) {
 		err = fb.loadModulesPipelines(b)
 		if err != nil {
 			return err
@@ -426,6 +422,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var inputTaskGroup unison.TaskGroup
 	defer func() {
 		_ = inputTaskGroup.Stop()
+		v2InputLoader.Close()
 	}()
 
 	// Store needs to be fully configured at this point
@@ -452,11 +449,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// the context.
 	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
 	defer cancelPipelineFactoryCtx()
-	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
-	} else {
-		if !b.Manager.Enabled() {
-			fb.logger.Warn(pipelinesWarning)
+	if beat.SetupPipelinesEnabled(b.BeatConfig) {
+		if b.Config.Output.Name() == "elasticsearch" {
+			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
+		} else {
+			if !b.Manager.Enabled() {
+				fb.logger.Warn(pipelinesWarning)
+			}
 		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)

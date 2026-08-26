@@ -120,7 +120,7 @@ func sBuf(t *testing.T, hexString string) *streambuf.Buffer {
 	return streambuf.New(bytes)
 }
 
-func mapGet(t *testing.T, m mapstr.M, key string) interface{} {
+func mapGet(t *testing.T, m mapstr.M, key string) any {
 	value, err := m.GetValue(key)
 	assert.NoError(t, err)
 	return value

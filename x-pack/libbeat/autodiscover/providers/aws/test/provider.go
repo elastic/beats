@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 )
 
 // TestEventAccumulator defined a list of events for testing
@@ -48,7 +48,7 @@ func (tea *TestEventAccumulator) Get() []bus.Event {
 func (tea *TestEventAccumulator) WaitForNumEvents(t *testing.T, targetLen int, timeout time.Duration) {
 	start := time.Now()
 
-	for time.Now().Sub(start) < timeout {
+	for time.Since(start) < timeout {
 		if tea.Len() >= targetLen {
 			return
 		}

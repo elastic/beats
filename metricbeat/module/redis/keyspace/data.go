@@ -72,7 +72,7 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]mapstr.M {
 		dbInfo := redis.ParseRedisLine(v, ",")
 
 		if len(dbInfo) >= 3 {
-			db := map[string]interface{}{}
+			db := map[string]any{}
 			for _, dbEntry := range dbInfo {
 				stats := redis.ParseRedisLine(dbEntry, "=")
 

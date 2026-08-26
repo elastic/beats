@@ -137,14 +137,14 @@ func newParser(config *parserConfig, httpLogger, httpDetailedLogger *logp.Logger
 }
 
 //go:inline
-func (parser *parser) debugf(format string, args ...interface{}) {
+func (parser *parser) debugf(format string, args ...any) {
 	if parser.httpLogger.IsDebug() {
 		parser.httpLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
-func (parser *parser) detailedf(format string, args ...interface{}) {
+func (parser *parser) detailedf(format string, args ...any) {
 	if parser.httpDetailedLogger.IsDebug() {
 		parser.httpDetailedLogger.Debugf(format, args...)
 	}
@@ -537,7 +537,7 @@ func (p *parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complet
 		return false, true, false
 	}
 	line := string(s.data[:i])
-	chunkLength, err := strconv.ParseInt(line, 16, 32)
+	chunkLength, err := strconv.ParseUint(line, 16, 32)
 	if err != nil {
 		p.httpLogger.Warn("Failed to understand chunked body start line")
 		return false, false, false

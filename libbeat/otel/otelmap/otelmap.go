@@ -118,6 +118,12 @@ func FromValue(dst pcommon.Value, value any) error {
 		return FromMapstr(dst.SetEmptyMap(), v)
 	case map[string]any:
 		return FromMapstr(dst.SetEmptyMap(), v)
+	case map[string]string:
+		fromStringMap(dst.SetEmptyMap(), v)
+		return nil
+	case map[string]int:
+		fromIntMap(dst.SetEmptyMap(), v)
+		return nil
 	case []mapstr.M:
 		return fromMapSlice(dst.SetEmptySlice(), v)
 	case []map[string]any:
@@ -225,6 +231,10 @@ func putIntoMap(key string, val any, dst pcommon.Map) error {
 		return FromMapstr(dst.PutEmptyMap(key), v)
 	case map[string]any:
 		return FromMapstr(dst.PutEmptyMap(key), v)
+	case map[string]string:
+		fromStringMap(dst.PutEmptyMap(key), v)
+	case map[string]int:
+		fromIntMap(dst.PutEmptyMap(key), v)
 	default:
 		return FromValue(dst.PutEmpty(key), val)
 	}
@@ -287,10 +297,16 @@ func (p PdataValuesMap) GetValue(key string) (any, error) {
 
 // GetAtPath retrieves the value at a dotted key path (e.g. "cloud.instance.id")
 // from m, traversing nested maps as needed.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.GetValue behaviour for keys stored flat), then falls back
+// to path navigation.
 func GetAtPath(key string, m pcommon.Map) (pcommon.Value, bool) {
-	before, after, ok0 := strings.Cut(key, ".")
-	if !ok0 {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
 		return m.Get(key)
+	}
+	if v, found := m.Get(key); found {
+		return v, true
 	}
 	parent, ok := m.Get(before)
 	if !ok || parent.Type() != pcommon.ValueTypeMap {
@@ -312,6 +328,48 @@ func PutAtPath(key string, val any, m pcommon.Map) error {
 		return PutAtPath(rest, val, existing.Map())
 	}
 	return PutAtPath(rest, val, m.PutEmptyMap(head))
+}
+
+// DeleteAtPath removes the value at a dotted key path (e.g. "cloud.instance.id")
+// from m, traversing nested maps as needed. Returns false if the path did not exist.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.Delete behaviour for keys stored flat), then falls back
+// to path navigation.
+func DeleteAtPath(key string, m pcommon.Map) bool {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
+		return m.Remove(key)
+	}
+	if m.Remove(key) {
+		return true
+	}
+	parent, ok := m.Get(before)
+	if !ok || parent.Type() != pcommon.ValueTypeMap {
+		return false
+	}
+	return DeleteAtPath(after, parent.Map())
+}
+
+// FlattenKeys returns all key paths in m as dotted strings (e.g. "cloud.instance.id"),
+// including intermediate map keys. This mirrors the behaviour of mapstr.M.FlattenKeys:
+// children are listed before their parent map key.
+func FlattenKeys(m pcommon.Map) []string {
+	out := make([]string, 0, m.Len())
+	flattenPdataKeys("", m, &out)
+	return out
+}
+
+func flattenPdataKeys(prefix string, m pcommon.Map, out *[]string) {
+	for k, v := range m.All() {
+		fullKey := k
+		if prefix != "" {
+			fullKey = prefix + "." + k
+		}
+		if v.Type() == pcommon.ValueTypeMap {
+			flattenPdataKeys(fullKey, v.Map(), out)
+		}
+		*out = append(*out, fullKey)
+	}
 }
 
 // FormatTimestamp renders t in the layout the elasticsearchexporter's
@@ -355,6 +413,12 @@ func fromReflective(dst pcommon.Value, value any) error {
 		return FromMapstr(dst.SetEmptyMap(), m)
 	case reflect.Slice, reflect.Array:
 		return fromReflectiveSlice(dst.SetEmptySlice(), ref)
+	case reflect.Map:
+		if ref.Type().Key().Kind() != reflect.String {
+			dst.SetStr(fmt.Sprintf("unknown type: %T", value))
+			return nil
+		}
+		return fromReflectiveMap(dst.SetEmptyMap(), ref)
 	case reflect.Pointer, reflect.Interface:
 		if ref.IsNil() {
 			return nil
@@ -371,6 +435,31 @@ func fromReflectiveSlice(dst pcommon.Slice, ref reflect.Value) error {
 	dst.EnsureCapacity(n)
 	for i := range n {
 		if err := FromValue(dst.AppendEmpty(), ref.Index(i).Interface()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func fromStringMap(dst pcommon.Map, src map[string]string) {
+	dst.EnsureCapacity(len(src))
+	for k, v := range src {
+		dst.PutStr(k, v)
+	}
+}
+
+func fromIntMap(dst pcommon.Map, src map[string]int) {
+	dst.EnsureCapacity(len(src))
+	for k, v := range src {
+		dst.PutInt(k, int64(v))
+	}
+}
+
+func fromReflectiveMap(dst pcommon.Map, ref reflect.Value) error {
+	dst.EnsureCapacity(ref.Len())
+	iter := ref.MapRange()
+	for iter.Next() {
+		if err := putIntoMap(iter.Key().String(), iter.Value().Interface(), dst); err != nil {
 			return err
 		}
 	}

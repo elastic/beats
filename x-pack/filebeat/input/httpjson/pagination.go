@@ -28,7 +28,7 @@ type pagination struct {
 	log            *logp.Logger
 }
 
-func newPagination(config config, client *httpClient, stat status.StatusReporter, log *logp.Logger) *pagination {
+func newPagination(config config, client *httpClient, stat status.StatusReporter, log *logp.Logger, userAgent string) *pagination {
 	pagination := &pagination{client: client, status: stat, log: log}
 	if config.Response == nil {
 		return pagination
@@ -69,12 +69,13 @@ func newPagination(config config, client *httpClient, stat status.StatusReporter
 		allowedOrigins,
 		stat,
 		log,
+		userAgent,
 	)
 	pagination.requestFactory = requestFactory
 	return pagination
 }
 
-func newPaginationRequestFactory(method, encodeAs string, u url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, allowedOrigins []*url.URL, stat status.StatusReporter, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method, encodeAs string, u url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, allowedOrigins []*url.URL, stat status.StatusReporter, log *logp.Logger, userAgent string) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
 		url:            u,
@@ -82,6 +83,7 @@ func newPaginationRequestFactory(method, encodeAs string, u url.URL, body *mapst
 		body:           body,
 		transforms:     ts,
 		log:            log,
+		userAgent:      userAgent,
 		encoder:        registeredEncoders[encodeAs],
 		originURL:      &u,
 		allowedOrigins: allowedOrigins,

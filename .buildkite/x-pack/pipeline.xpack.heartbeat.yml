@@ -3,21 +3,21 @@ name: "beats-xpack-heartbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1782878510"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1785316988"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_RHEL9_X86_64: "platform-ingest-beats-rhel-9-1782878510"
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1782878510"
+  IMAGE_RHEL9_X86_64: "platform-ingest-beats-rhel-9-1785316988"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1785316988"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
   IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
-  IMAGE_WIN_10_VERSION: "1.0.1782878510"
-  IMAGE_WIN_11_VERSION: "1.0.1782878510"
-  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1782878510"
-  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1782878510"
-  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1782878510"
+  IMAGE_WIN_10_VERSION: "1.0.1785316988"
+  IMAGE_WIN_11_VERSION: "1.0.1785316988"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1785316988"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1785316988"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1785316988"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -95,10 +95,15 @@ steps:
         key: "mandatory-linux-unit-test"
         command: |
           set -euo pipefail
-          echo "~~~ Installing @elastic/synthetics"
-          npm install -g @elastic/synthetics
-          echo "~~~ Running tests"
+          # apiJourney() ships only in unreleased @elastic/synthetics; mage installSyntheticsAgent
+          # clones, builds, and globally installs the pinned capable commit (elastic/synthetics#997)
+          # so the api monitor scenarios run the same way in CI and locally. Drop the goal and
+          # ELASTIC_SYNTHETICS_API_CAPABLE once apiJourney ships in a release.
           cd x-pack/heartbeat
+          echo "~~~ Installing apiJourney-capable @elastic/synthetics (pinned commit)"
+          mage installSyntheticsAgent
+          echo "~~~ Running tests"
+          export ELASTIC_SYNTHETICS_API_CAPABLE=true
           mage build unitTest
         retry:
           automatic:

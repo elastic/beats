@@ -72,7 +72,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 
 		var uri string
 		var err error
-		for i := uint(0); i < numCalls; i++ {
+		for range numCalls {
 			uri, err = getServicePath(*version.MustNew("8.0.0"))
 			if err != nil {
 				return false

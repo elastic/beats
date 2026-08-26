@@ -8,7 +8,7 @@ package azureblobstorage
 import (
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 )
 
@@ -36,6 +36,7 @@ const (
 	sharedKeyType        = "sharedKeyType"
 	connectionStringType = "connectionStringType"
 	oauth2Type           = "oauth2Type"
+	managedIdentityType  = "managedIdentityType"
 	jsonType             = "application/json"
 	octetType            = "application/octet-stream"
 	ndJsonType           = "application/x-ndjson"
@@ -44,12 +45,19 @@ const (
 	encodingGzip         = "gzip"
 )
 
-// currently only shared key & connection string types of credentials are supported
+// serviceCredentials holds the credential that the input uses for every request
+// to the storage account, and the client options that go with it.
 type serviceCredentials struct {
-	oauth2Creds        *azidentity.ClientSecretCredential
+	// tokenCreds is set for the oauth2 and managed identity types.
+	tokenCreds         azcore.TokenCredential
 	sharedKeyCreds     *azblob.SharedKeyCredential
 	connectionStrCreds string
-	cType              string
+
+	// cType names which of the credentials above is set.
+	cType string
+	// clientOpts are the resolved options for storage clients, including the retry
+	// policy. Blob clients reuse them.
+	clientOpts azcore.ClientOptions
 }
 
 type blobCredentials struct {

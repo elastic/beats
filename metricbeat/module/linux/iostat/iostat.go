@@ -22,7 +22,6 @@ package iostat
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
@@ -49,8 +48,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	base.Logger().Warn(cfgwarn.Beta("The linux iostat metricset is beta."))
-
 	config := struct {
 		IncludeDevices []string `config:"iostat.include_devices"`
 	}{IncludeDevices: []string{}}

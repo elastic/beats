@@ -22,89 +22,106 @@ package filestream
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // these tests are separated as one cannot delete/rename files
 // while another process is working with it on Windows
+
+// TestLogFileRenamed verifies that renaming an open file does not close its
+// logFile reader: logFile does not act on OnStateChange, so the reader keeps
+// reading its open descriptor and reports ErrWouldBlock at EOF even with
+// OnStateChange.Renamed configured. It closes (ErrClosed) only once its reader
+// context is cancelled.
 func TestLogFileRenamed(t *testing.T) {
 	f := createTestLogFile(t)
 	defer f.Close()
 
 	renamedFile := f.Name() + ".renamed"
 
-	reader, _, err := newFileReader(
-		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
-		context.TODO(),
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	reader, err := newFileReader(
+		logp.NewNopLogger(),
+		ctx,
 		f,
-		readerConfig{},
 		closerConfig{
 			OnStateChange: stateChangeCloserConfig{
 				CheckInterval: 1 * time.Second,
 				Renamed:       true,
 			},
 		},
-		false,
 	)
-	if err != nil {
-		t.Fatalf("error while creating logReader: %+v", err)
-	}
+	require.NoError(t, err, "error while creating logReader")
 
-	buf := make([]byte, 1024)
-	_, err = reader.Read(buf)
-	assert.NoError(t, err)
+	// Drain the initial content the file was created with.
+	require.NotEmpty(t, readAllAvailable(t, reader),
+		"expected to read the initial file content")
 
-	err = os.Rename(f.Name(), renamedFile)
-	if err != nil {
-		t.Fatalf("error while renaming file: %+v", err)
-	}
+	require.NoError(t, os.Rename(f.Name(), renamedFile),
+		"error while renaming file")
+	defer os.Remove(renamedFile)
 
-	err = readUntilError(reader)
-	os.Remove(renamedFile)
+	// The rename does not close the reader: logFile does not act on
+	// OnStateChange, so at EOF it just reports ErrWouldBlock.
+	_, err = readWithTimeout(t, reader, make([]byte, 1024), time.Second)
+	assert.ErrorIs(t, err, ErrWouldBlock,
+		"a renamed file must not close the reader; the open fd keeps reading")
 
-	assert.Equal(t, ErrClosed, err)
+	// Cancelling the reader context is what closes it.
+	cancel()
+	assert.Equal(t, ErrClosed, readUntilError(reader),
+		"a cancelled reader context must return ErrClosed")
 }
 
+// TestLogFileRemoved verifies that removing an open file does not close its
+// logFile reader. On a non-Windows system the open descriptor stays valid, so
+// the reader keeps reading and reports ErrWouldBlock at EOF even with
+// OnStateChange.Removed configured. It closes (ErrClosed) only once its reader
+// context is cancelled.
 func TestLogFileRemoved(t *testing.T) {
 	f := createTestLogFile(t)
 	defer f.Close()
 
-	reader, _, err := newFileReader(
-		logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests")).Logger,
-		context.TODO(),
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	reader, err := newFileReader(
+		logp.NewNopLogger(),
+		ctx,
 		f,
-		readerConfig{},
 		closerConfig{
 			OnStateChange: stateChangeCloserConfig{
 				CheckInterval: 1 * time.Second,
 				Removed:       true,
 			},
 		},
-		false,
 	)
-	if err != nil {
-		t.Fatalf("error while creating logReader: %+v", err)
-	}
+	require.NoError(t, err, "error while creating logReader")
 
-	buf := make([]byte, 1024)
-	_, err = reader.Read(buf)
-	assert.NoError(t, err)
+	// Drain the initial content the file was created with.
+	require.NotEmpty(t, readAllAvailable(t, reader),
+		"expected to read the initial file content")
 
-	err = os.Remove(f.Name())
-	if err != nil {
-		t.Fatalf("error while remove file: %+v", err)
-	}
+	require.NoError(t, os.Remove(f.Name()), "error while removing file")
 
-	err = readUntilError(reader)
+	// The removal does not close the reader: the open fd remains valid, so at
+	// EOF the reader reports ErrWouldBlock rather than closing.
+	_, err = readWithTimeout(t, reader, make([]byte, 1024), time.Second)
+	assert.ErrorIs(t, err, ErrWouldBlock,
+		"a removed file must not close the reader; the open fd keeps reading")
 
-	assert.Equal(t, ErrClosed, err)
+	// Cancelling the reader context is what closes it.
+	cancel()
+	assert.Equal(t, ErrClosed, readUntilError(reader),
+		"a cancelled reader context must return ErrClosed")
 }
 
 // createTestLogFile creates a temporary plain-text log file with a few lines of

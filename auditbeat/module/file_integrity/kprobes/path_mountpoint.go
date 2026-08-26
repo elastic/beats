@@ -160,7 +160,7 @@ func parseMountInfoLine(line string) (*mount, error) {
 	}
 	mnt.Subtree = unescapeString(fields[3])
 	mnt.Path = unescapeString(fields[4])
-	for _, opt := range strings.Split(fields[5], ",") {
+	for opt := range strings.SplitSeq(fields[5], ",") {
 		if opt == "ro" {
 			mnt.ReadOnly = true
 		}
