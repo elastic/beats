@@ -81,10 +81,6 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
 		e.plugin = Plugin(logptest.NewTestingLogger(e.t, ""), e.stateStore)
-		type closer interface{ Close() }
-		if c, ok := e.plugin.Manager.(closer); ok {
-			e.t.Cleanup(c.Close)
-		}
 	})
 	return e.plugin.Manager
 }
