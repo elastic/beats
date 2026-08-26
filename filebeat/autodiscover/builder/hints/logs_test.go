@@ -1536,11 +1536,10 @@ func TestInputAllowListDisabled(t *testing.T) {
 				`[{"type":"httpjson"}]`,
 			))
 
-			require.Len(t, configs, 1, "disabled filtering should retain every input type")
-			assert.Equal(
+			requireInputTypes(
 				t,
+				configs,
 				[]string{"httpjson"},
-				inputTypes(t, configs),
 				"disabled filtering should retain the disallowed input",
 			)
 		})
@@ -1575,11 +1574,10 @@ func TestInputAllowListDefaultTypes(t *testing.T) {
 				`[{"type":"log"},{"type":"filestream"},{"type":"container"}]`,
 			))
 
-			require.Len(t, configs, 3, "all default input types should be retained")
-			assert.Equal(
+			requireInputTypes(
 				t,
+				configs,
 				[]string{"log", "filestream", "container"},
-				inputTypes(t, configs),
 				"default input types should preserve their raw configuration order",
 			)
 		})
@@ -1599,11 +1597,10 @@ func TestInputAllowListCustomTypesReplaceDefaults(t *testing.T) {
 		`[{"type":"httpjson"},{"type":"filestream"}]`,
 	))
 
-	require.Len(t, configs, 1, "a custom allow list must be respected")
-	assert.Equal(
+	requireInputTypes(
 		t,
+		configs,
 		[]string{"httpjson"},
-		inputTypes(t, configs),
 		"a custom allowed direct input should be retained",
 	)
 }
@@ -1615,11 +1612,10 @@ func TestInputAllowListFiltersMixedRawConfigs(t *testing.T) {
 		`[{"type":"filestream"},{"type":"httpjson"},{"type":"container"}]`,
 	))
 
-	require.Len(t, configs, 2, "only allowed raw configurations should be retained")
-	assert.Equal(
+	requireInputTypes(
 		t,
+		configs,
 		[]string{"filestream", "container"},
-		inputTypes(t, configs),
 		"mixed raw configurations should retain only valid allowed entries",
 	)
 }
@@ -1639,11 +1635,10 @@ func TestInputAllowListFiltersAfterTemplateInterpolation(t *testing.T) {
 
 	configs := builder.CreateConfig(event)
 
-	require.Len(t, configs, 1, "an input allowed after interpolation should be retained")
-	assert.Equal(
+	requireInputTypes(
 		t,
+		configs,
 		[]string{"httpjson"},
-		inputTypes(t, configs),
 		"the rendered input type should be checked",
 	)
 }
@@ -1780,7 +1775,7 @@ func inputAllowListRawEvent(raw string) bus.Event {
 	}
 }
 
-func inputTypes(t *testing.T, configs []*conf.C) []string {
+func requireInputTypes(t *testing.T, configs []*conf.C, expected []string, message string) {
 	t.Helper()
 
 	types := make([]string, 0, len(configs))
@@ -1790,5 +1785,5 @@ func inputTypes(t *testing.T, configs []*conf.C) []string {
 		types = append(types, inputType)
 	}
 
-	return types
+	require.Equal(t, expected, types, message)
 }
