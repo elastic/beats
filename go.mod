@@ -194,15 +194,9 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.19.2
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-<<<<<<< HEAD
 	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.159.1-0.20260819055613-b7f4f425a7d9
-=======
-	github.com/microsoft/go-mssqldb v1.10.0
-	github.com/microsoft/wmi v0.42.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.159.1-0.20260825134713-7531790b5bc9
->>>>>>> 7b4059e (Bump elasticsearchexporter version to fix timeout=0 issue (#52843))
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.159.0
 	github.com/pierrec/lz4/v4 v4.1.29
 	github.com/pkg/xattr v0.4.9
@@ -519,17 +513,10 @@ require (
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.159.1-0.20260824174011-67fef8cb7049 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.159.1-0.20260824174011-67fef8cb7049 // indirect
 	go.opentelemetry.io/collector/extension/extensioncapabilities v0.159.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/extension/extensionmiddleware v0.159.0 // indirect
-	go.opentelemetry.io/collector/extension/xextension v0.159.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.65.0 // indirect
-	go.opentelemetry.io/collector/internal/componentalias v0.159.0 // indirect
-=======
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.159.1-0.20260824174011-67fef8cb7049 // indirect
-	go.opentelemetry.io/collector/extension/xextension v0.159.1-0.20260824174011-67fef8cb7049
+	go.opentelemetry.io/collector/extension/xextension v0.159.1-0.20260824174011-67fef8cb7049 // indirect
 	go.opentelemetry.io/collector/featuregate v1.65.1-0.20260824174011-67fef8cb7049 // indirect
 	go.opentelemetry.io/collector/internal/componentalias v0.159.1-0.20260824174011-67fef8cb7049 // indirect
->>>>>>> 7b4059e (Bump elasticsearchexporter version to fix timeout=0 issue (#52843))
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.159.0 // indirect
 	go.opentelemetry.io/collector/internal/telemetry v0.159.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.159.1-0.20260824174011-67fef8cb7049 // indirect
