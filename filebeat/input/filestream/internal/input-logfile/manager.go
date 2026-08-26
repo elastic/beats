@@ -70,7 +70,7 @@ type InputManager struct {
 	// storeMu guards entry and release. Both are set once on the first
 	// successful Create and cleared on Close.
 	storeMu sync.Mutex
-	entry   *logfileEntry
+	entry   *cacheEntry
 	release func()
 	closed  bool
 	idsMux  sync.Mutex
@@ -93,21 +93,21 @@ var errNoInputRunner = errors.New("no input runner available")
 const globalInputID = ".global"
 
 // ensureSetup opens the shared store on first call and returns a retained
-// reference to the logfileEntry. The caller must call entry.store.Release()
+// reference to the cacheEntry. The caller must call entry.store.Release()
 // when done. ensureSetup must NOT be called with storeMu held: it releases
 // and re-acquires the lock around the blocking acquireStore call so that a
 // concurrent Close() can always proceed.
-func (cim *InputManager) ensureSetup() (*logfileEntry, error) {
+func (cim *InputManager) ensureSetup() (*cacheEntry, error) {
 	cim.storeMu.Lock()
+	if cim.closed {
+		cim.storeMu.Unlock()
+		return nil, errors.New("input manager is closed")
+	}
 	if cim.entry != nil {
 		cim.entry.store.Retain()
 		entry := cim.entry
 		cim.storeMu.Unlock()
 		return entry, nil
-	}
-	if cim.closed {
-		cim.storeMu.Unlock()
-		return nil, errors.New("input manager is closed")
 	}
 	log := cim.Logger.With("input_type", cim.Type)
 	cim.storeMu.Unlock()

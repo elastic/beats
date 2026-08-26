@@ -130,6 +130,10 @@ func (c *Cache[T]) Acquire(
 			drained := e.drained
 			c.mu.Unlock()
 			<-drained
+		default:
+			// Unknown state; this should never happen. Release the lock and
+			// let the next iteration re-read the entry once its state settles.
+			c.mu.Unlock()
 		}
 	}
 }

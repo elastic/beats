@@ -107,7 +107,7 @@ func TestStoreCache_NewAcquireWaitsForDrain(t *testing.T) {
 	allowDrain := make(chan struct{})
 	var onceBlock sync.Once
 
-	globalCache = statemanager.NewCache[*logfileEntry](func(e *logfileEntry) {
+	globalCache = statemanager.NewCache[*cacheEntry](func(e *cacheEntry) {
 		onceBlock.Do(func() {
 			close(drainStarted)
 			<-allowDrain
@@ -197,7 +197,7 @@ func TestStoreCache_ConcurrentInitialization(t *testing.T) {
 	const acquisitions = 10
 	const waiters = acquisitions - 1
 	type acquireResult struct {
-		entry   *logfileEntry
+		entry   *cacheEntry
 		release func()
 		err     error
 	}
@@ -287,7 +287,7 @@ func TestStoreCache_DifferentBackendsInitializeIndependently(t *testing.T) {
 	secondStates := newCountingStateStore("second-backend")
 
 	type acquireResult struct {
-		entry   *logfileEntry
+		entry   *cacheEntry
 		release func()
 		err     error
 	}
@@ -303,7 +303,7 @@ func TestStoreCache_DifferentBackendsInitializeIndependently(t *testing.T) {
 		e, rel, err := acquireStore(logger, secondStates, "filestream")
 		secondResult <- acquireResult{entry: e, release: rel, err: err}
 	}()
-	var second *logfileEntry
+	var second *cacheEntry
 	var release2 func()
 	select {
 	case result := <-secondResult:
@@ -438,7 +438,7 @@ func setupCacheForTest(t *testing.T) {
 // resetCacheForTest replaces the global cache with a fresh instance to
 // provide test isolation. Tests must release all references themselves.
 func resetCacheForTest() {
-	globalCache = statemanager.NewCache[*logfileEntry](func(e *logfileEntry) {
+	globalCache = statemanager.NewCache[*cacheEntry](func(e *cacheEntry) {
 		e.ackUpdater.Close()
 		e.store.Release()
 	})

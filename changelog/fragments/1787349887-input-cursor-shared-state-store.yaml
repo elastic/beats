@@ -10,7 +10,7 @@
 kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
-summary: Fix memory bloat in cursor-based inputs when running as a Beat receiver
+summary: Reduce memory usage when running inputs with state (cel, httpjson, gcs, azureblobstorage, and others) as Beat receiver.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.

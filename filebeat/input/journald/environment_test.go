@@ -67,18 +67,24 @@ type inputTestingEnvironment struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	return &inputTestingEnvironment{
+	e := &inputTestingEnvironment{
 		t:              t,
 		workingDir:     t.TempDir(),
 		stateStore:     openTestStatestore(),
 		pipeline:       &mockPipelineConnector{},
 		statusReporter: &mockStatusReporter{},
 	}
+	t.Cleanup(e.stateStore.Close)
+	return e
 }
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
 		e.plugin = Plugin(logptest.NewTestingLogger(e.t, ""), e.stateStore)
+		type closer interface{ Close() }
+		if c, ok := e.plugin.Manager.(closer); ok {
+			e.t.Cleanup(c.Close)
+		}
 	})
 	return e.plugin.Manager
 }

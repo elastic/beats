@@ -140,6 +140,7 @@ func (cim *InputManager) ensureSetup(inputID string) error {
 		return errors.New("input manager is closed")
 	}
 	if cim.store == nil {
+		s.Retain() // InputManager holds its own reference to keep the store alive.
 		cim.store = s
 		cim.release = release
 	} else {
@@ -157,12 +158,16 @@ func (cim *InputManager) ensureSetup(inputID string) error {
 func (cim *InputManager) Close() {
 	cim.mu.Lock()
 	cim.closed = true
+	s := cim.store
 	release := cim.release
 	cim.release = nil
 	cim.store = nil
 	cim.mu.Unlock()
+	if s != nil {
+		s.Release() // Drop the InputManager's own reference.
+	}
 	if release != nil {
-		release()
+		release() // Drop the globalCache reference; closes the store when the last holder releases.
 	}
 }
 
@@ -203,17 +208,15 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 
 // lock locks a key for exclusive access and returns a resource that can be used to modify
 // the cursor state and unlock the key.
+// The store is guaranteed alive for the duration of this call because the InputManager holds
+// its own reference (acquired in ensureSetup, released in Close).
 func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
 	cim.mu.Lock()
 	store := cim.store
-	if store != nil {
-		store.Retain()
-	}
 	cim.mu.Unlock()
 	if store == nil {
 		return nil, errors.New("input manager is closed")
 	}
-	defer store.Release()
 	resource := store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {

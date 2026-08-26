@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// logfileEntry bundles all resources that are shared across InputManager
+// cacheEntry bundles all resources that are shared across InputManager
 // instances that map to the same backend key.
-type logfileEntry struct {
+type cacheEntry struct {
 	store      *store
 	ackCH      *updateChan
 	ackUpdater *updateWriter
@@ -40,15 +40,15 @@ type logfileEntry struct {
 // All InputManager instances that share a backend key use one entry and one
 // background cleaner goroutine. The entry is closed only after the last
 // manager releases its reference.
-var globalCache = statemanager.NewCache[*logfileEntry](func(e *logfileEntry) {
+var globalCache = statemanager.NewCache[*cacheEntry](func(e *cacheEntry) {
 	e.ackUpdater.Close()
 	e.store.Release()
 })
 
-// acquireStore returns the shared logfileEntry for a backend, opening it on
+// acquireStore returns the shared cacheEntry for a backend, opening it on
 // first access. The returned release function must be called exactly once when
 // the caller is done with the entry.
-func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*logfileEntry, func(), error) {
+func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*cacheEntry, func(), error) {
 	key := states.StoreKey()
 	log := logger.
 		Named("filestream.store_cache").
@@ -59,9 +59,9 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 		interval = 5 * time.Minute
 	}
 
-	var runFn func(context.Context, *logfileEntry)
+	var runFn func(context.Context, *cacheEntry)
 	if interval > 0 {
-		runFn = func(ctx context.Context, e *logfileEntry) {
+		runFn = func(ctx context.Context, e *cacheEntry) {
 			log.Debugw("filestream shared store cleaner started")
 			runCleaner(log, ctx, e.store, interval)
 			log.Debugw("filestream shared store cleaner stopped")
@@ -70,7 +70,7 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 
 	entry, release, err := globalCache.Acquire(
 		key,
-		func() (*logfileEntry, error) {
+		func() (*cacheEntry, error) {
 			log.Debugw("initializing filestream shared store cache entry")
 			s, err := openStore(log, states, prefix)
 			if err != nil {
@@ -78,7 +78,7 @@ func acquireStore(logger *logp.Logger, states statestore.States, prefix string) 
 			}
 			ackCH := newUpdateChan()
 			ackUpdater := newUpdateWriter(s, ackCH)
-			return &logfileEntry{store: s, ackCH: ackCH, ackUpdater: ackUpdater}, nil
+			return &cacheEntry{store: s, ackCH: ackCH, ackUpdater: ackUpdater}, nil
 		},
 		runFn,
 		func() { log.Debugw("waiting for filestream shared store initialization") },
