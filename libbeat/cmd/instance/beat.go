@@ -103,14 +103,6 @@ const beaterStopGracePeriod = 30 * time.Second
 // pipeline is force-disconnected.
 const beaterStopGraceMargin = time.Second
 
-// pipelineDrainTimeout is the default maximum time the publisher pipeline
-// waits for queued events to be acknowledged on shutdown. It applies when the
-// beater has not set a Beat.ShutdownTimeout. Beats that need a longer window
-// (e.g. one that reads a bounded input and exits as soon as it is exhausted)
-// should set ShutdownTimeout in their New() constructor; launch uses that
-// value as the Disconnect deadline instead.
-const pipelineDrainTimeout = time.Second
-
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
@@ -408,7 +400,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.MakeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
-		WaitClose:      pipelineDrainTimeout,
+		WaitClose:      beaterStopGraceMargin,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -601,7 +593,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// is set, so shutdown_timeout (or a beater-supplied default) controls how
 	// long we wait for the queue to flush. When no drain bound is declared,
 	// Disconnect falls back to the pipeline's own waitCloseTimeout
-	// (pipelineDrainTimeout = 1s).
+	// (beaterStopGraceMargin = 1s).
 	if b.Publisher != nil {
 		ctx := context.Background()
 		if b.ShutdownTimeout > 0 {
