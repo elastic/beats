@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) mb.Event {
+func (m *MetricSet) processBody(response *http.Response, jsonBody any) mb.Event {
 	var event mapstr.M
 
 	if m.deDotEnabled {

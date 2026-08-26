@@ -77,7 +77,7 @@ func newParser(config *parserConfig, logger *logp.Logger) *parser {
 }
 
 //go:inline
-func (p *parser) debugf(format string, args ...interface{}) {
+func (p *parser) debugf(format string, args ...any) {
 	if p.isDebug {
 		p.logger.Debugf(format, args...)
 	}

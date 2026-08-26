@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build salesforce_live
-// +build salesforce_live
 
 // Local-only Salesforce live-test helpers (build tag salesforce_live).
 //
@@ -338,12 +337,12 @@ func liveFilebeatOutputNDJSONSize(eventsOutDir string) (int64, error) {
 }
 
 // liveReadFilebeatOutputNDJSONRows reads all NDJSON event rows from date-rotated file output files.
-func liveReadFilebeatOutputNDJSONRows(eventsOutDir string) ([]map[string]interface{}, error) {
+func liveReadFilebeatOutputNDJSONRows(eventsOutDir string) ([]map[string]any, error) {
 	paths, err := liveGlobFilebeatNDJSONOutputFiles(eventsOutDir)
 	if err != nil {
 		return nil, err
 	}
-	var rows []map[string]interface{}
+	var rows []map[string]any
 	for _, p := range paths {
 		part, err := liveReadNDJSONFile(p)
 		if err != nil {
@@ -390,14 +389,14 @@ func liveRunFilebeatBounded(ctx context.Context, filebeatBinary, pathHome, confi
 	return out.Bytes(), err
 }
 
-func liveReadNDJSONFile(path string) ([]map[string]interface{}, error) {
+func liveReadNDJSONFile(path string) ([]map[string]any, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	var rows []map[string]interface{}
+	var rows []map[string]any
 	s := bufio.NewScanner(f)
 	// Override the default 64 KiB max token; large "message" fields exceed it.
 	s.Buffer(make([]byte, 0, 64*1024), liveFilebeatNDJSONMaxLineBytes)
@@ -406,7 +405,7 @@ func liveReadNDJSONFile(path string) ([]map[string]interface{}, error) {
 		if len(line) == 0 {
 			continue
 		}
-		var m map[string]interface{}
+		var m map[string]any
 		if err := json.Unmarshal(line, &m); err != nil {
 			return nil, fmt.Errorf("ndjson decode: %w", err)
 		}
@@ -418,11 +417,11 @@ func liveReadNDJSONFile(path string) ([]map[string]interface{}, error) {
 	return rows, nil
 }
 
-func liveEventDatasetFromMap(m map[string]interface{}) string {
+func liveEventDatasetFromMap(m map[string]any) string {
 	if v, ok := m["event.dataset"].(string); ok && v != "" {
 		return v
 	}
-	ev, ok := m["event"].(map[string]interface{})
+	ev, ok := m["event"].(map[string]any)
 	if !ok {
 		return ""
 	}
@@ -433,11 +432,11 @@ func liveEventDatasetFromMap(m map[string]interface{}) string {
 }
 
 // liveEventProviderFromMap returns event.provider when the Beat event is ECS-shaped (nested event map).
-func liveEventProviderFromMap(m map[string]interface{}) string {
+func liveEventProviderFromMap(m map[string]any) string {
 	if v, ok := m["event.provider"].(string); ok && v != "" {
 		return v
 	}
-	ev, ok := m["event"].(map[string]interface{})
+	ev, ok := m["event"].(map[string]any)
 	if !ok {
 		return ""
 	}
@@ -449,7 +448,7 @@ func liveEventProviderFromMap(m map[string]interface{}) string {
 
 // liveCountSalesforceModuleDatasetProvider counts rows from a fully wired Filebeat module run (e.g. output.file)
 // where nested event.dataset and event.provider match. provider "" means do not filter on provider.
-func liveCountSalesforceModuleDatasetProvider(rows []map[string]interface{}, dataset, provider string) int {
+func liveCountSalesforceModuleDatasetProvider(rows []map[string]any, dataset, provider string) int {
 	n := 0
 	for _, row := range rows {
 		if liveEventDatasetFromMap(row) != dataset {
@@ -463,7 +462,7 @@ func liveCountSalesforceModuleDatasetProvider(rows []map[string]interface{}, dat
 	return n
 }
 
-func liveCountDataset(rows []map[string]interface{}, dataset string) int {
+func liveCountDataset(rows []map[string]any, dataset string) int {
 	n := 0
 	for _, row := range rows {
 		if liveEventDatasetFromMap(row) == dataset {
@@ -474,7 +473,7 @@ func liveCountDataset(rows []map[string]interface{}, dataset string) int {
 }
 
 // liveMessageFromNDJSONRow returns the Beat "message" field (Salesforce JSON or ELF CSV line).
-func liveMessageFromNDJSONRow(m map[string]interface{}) string {
+func liveMessageFromNDJSONRow(m map[string]any) string {
 	if m == nil {
 		return ""
 	}
@@ -485,7 +484,7 @@ func liveMessageFromNDJSONRow(m map[string]interface{}) string {
 }
 
 // liveCountRowsWithMessageContaining counts NDJSON rows whose message contains sub.
-func liveCountRowsWithMessageContaining(rows []map[string]interface{}, sub string) int {
+func liveCountRowsWithMessageContaining(rows []map[string]any, sub string) int {
 	n := 0
 	for _, row := range rows {
 		if strings.Contains(liveMessageFromNDJSONRow(row), sub) {
@@ -497,7 +496,7 @@ func liveCountRowsWithMessageContaining(rows []map[string]interface{}, sub strin
 
 // liveCountLikelyLoginObjectMessages counts object API rows for LoginEvent (raw JSON in message).
 // Used for file-output smokes: Elasticsearch ingest pipelines (which set event.dataset) are not run.
-func liveCountLikelyLoginObjectMessages(rows []map[string]interface{}) int {
+func liveCountLikelyLoginObjectMessages(rows []map[string]any) int {
 	n := 0
 	for _, row := range rows {
 		msg := liveMessageFromNDJSONRow(row)
@@ -509,7 +508,7 @@ func liveCountLikelyLoginObjectMessages(rows []map[string]interface{}) int {
 }
 
 // liveCountLikelyApexELFMessages counts EventLogFile CSV rows for Apex event types shipped by the module.
-func liveCountLikelyApexELFMessages(rows []map[string]interface{}) int {
+func liveCountLikelyApexELFMessages(rows []map[string]any) int {
 	n := 0
 	for _, row := range rows {
 		// Prefer structured ECS fields when they exist.
@@ -536,7 +535,7 @@ func liveCountLikelyApexELFMessages(rows []map[string]interface{}) int {
 	return n
 }
 
-func liveCollectUniqueDatasets(rows []map[string]interface{}) []string {
+func liveCollectUniqueDatasets(rows []map[string]any) []string {
 	seen := make(map[string]struct{})
 	var out []string
 	for _, row := range rows {
@@ -583,14 +582,14 @@ func parseLiveSalesforceCredsContent(raw []byte) (liveSalesforceCreds, error) {
 		instanceFromLegacyLine string
 	)
 
-	for _, line := range strings.Split(strings.TrimSpace(string(raw)), "\n") {
+	for line := range strings.SplitSeq(strings.TrimSpace(string(raw)), "\n") {
 		line = strings.TrimSpace(strings.TrimSuffix(line, "\r"))
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 
-		if strings.HasPrefix(line, legacyPrefixInstanceURL) {
-			instanceFromLegacyLine = strings.TrimSpace(strings.TrimPrefix(line, legacyPrefixInstanceURL))
+		if after, ok := strings.CutPrefix(line, legacyPrefixInstanceURL); ok {
+			instanceFromLegacyLine = strings.TrimSpace(after)
 			continue
 		}
 

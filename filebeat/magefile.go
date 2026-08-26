@@ -147,6 +147,7 @@ func configYML() error {
 func GenerateModuleIncludeListGo() error {
 	options := devtools.DefaultIncludeListOptions()
 	options.ImportDirs = []string{"autodiscover", "autodiscover/**/*", "input", "input/*", "processor/*"}
+	options.BuildTags = "\n//go:build !agentbeat\n"
 	return devtools.GenerateIncludeListGo(options)
 }
 

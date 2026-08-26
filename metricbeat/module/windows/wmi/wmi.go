@@ -88,7 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // This function handles the skip conditions
-func (m *MetricSet) shouldSkipNilOrEmptyValue(propertyValue interface{}) bool {
+func (m *MetricSet) shouldSkipNilOrEmptyValue(propertyValue any) bool {
 	if propertyValue == nil {
 		if !m.config.IncludeNullProperties {
 			return true // Skip if it's nil and IncludeNullProperties is false

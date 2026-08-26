@@ -146,6 +146,11 @@ type ProcessingConfig struct {
 	// is applied to events. If nil the Beat's default behavior prevails.
 	EventNormalization *bool
 
+	// NormalizeInPlace lets event normalization reuse Event.Fields maps. Set it
+	// only if the producer exclusively owns every reachable map and never
+	// accesses them after Publish.
+	NormalizeInPlace bool
+
 	// Disables the addition of input.type
 	DisableType bool
 

@@ -70,7 +70,7 @@ type responseParameters struct {
 	// expected HTTP response configuration
 	Status      []uint16             `config:"status"`
 	RecvHeaders map[string]string    `config:"headers"`
-	RecvBody    interface{}          `config:"body"`
+	RecvBody    any                  `config:"body"`
 	RecvJSON    []*jsonResponseCheck `config:"json"`
 }
 
