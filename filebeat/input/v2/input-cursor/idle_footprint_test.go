@@ -156,9 +156,9 @@ func (p *benchPipeline) Disconnect(context.Context) error { return nil }
 
 type benchClient struct{ count *int64 }
 
-func (c *benchClient) Publish(beat.Event)              { atomic.AddInt64(c.count, 1) }
-func (c *benchClient) PublishAll(es []beat.Event)      { atomic.AddInt64(c.count, int64(len(es))) }
-func (c *benchClient) Close() error                    { return nil }
+func (c *benchClient) Publish(beat.Event)         { atomic.AddInt64(c.count, 1) }
+func (c *benchClient) PublishAll(es []beat.Event) { atomic.AddInt64(c.count, int64(len(es))) }
+func (c *benchClient) Close() error               { return nil }
 
 func makeBenchStateStore(b *testing.B) testStateStore {
 	b.Helper()

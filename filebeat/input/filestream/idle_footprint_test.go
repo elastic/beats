@@ -156,4 +156,3 @@ func (c *countingClient) PublishAll(es []beat.Event) {
 	atomic.AddInt64(c.count, int64(len(es)))
 }
 func (c *countingClient) Close() error { return nil }
-
