@@ -174,7 +174,11 @@ RUN HOME={{ $beatHome }} node "$(npm root -g)/@elastic/synthetics/node_modules/p
     test -d {{ $beatHome }}/.cache/ms-playwright
 {{- end }}
 
+<<<<<<< HEAD
 {{- if (and (eq .BeatName "heartbeat") (contains .from "ubuntu")) }}
+=======
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi") (contains .from "minimal")) }}
+>>>>>>> 7ba772a ([ci] Revert non-IronBank container images to using UBI9 (#52823))
 USER root
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
