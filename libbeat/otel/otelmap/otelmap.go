@@ -22,6 +22,7 @@ import (
 	"encoding"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"math"
 	"reflect"
 	"time"
@@ -47,9 +48,7 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 // does not mutate src.
 func FromMapstr[T mapstrOrMap](dst pcommon.Map, src T) error {
 	clone := make(map[string]any, len(src))
-	for k, v := range src {
-		clone[k] = v
-	}
+	maps.Copy(clone, src)
 	ConvertNonPrimitive(clone)
 	return dst.FromRaw(clone)
 }
