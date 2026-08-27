@@ -64,6 +64,8 @@ func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 		return nil, err
 	}
 
+	kafka.SetSaramaLogger(logger.Named("kafka"))
+
 	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing Sarama config: %w", err)

@@ -21,12 +21,12 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/sarama"
 )
 
 const (
@@ -44,7 +44,7 @@ func makeKafka(
 	cfg *config.C,
 ) (outputs.Group, error) {
 	log := beat.Logger.Named(logSelector)
-	sarama.Logger = kafkaLogger{log: log}
+	kafka.SetSaramaLogger(log)
 
 	log.Debug("initialize kafka output")
 
