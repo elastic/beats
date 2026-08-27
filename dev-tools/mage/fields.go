@@ -38,13 +38,13 @@ const (
 
 // IncludeListOptions stores the options for IncludeList generation
 type IncludeListOptions struct {
-	ImportDirs          []string
-	ModuleDirs          []string
-	ModulesToExclude    []string
-	Outfile             string
-	BuildTags           string
-	Pkg                 string
-	SkipInitModule      bool
+	ImportDirs            []string
+	ModuleDirs            []string
+	ModulesToExclude      []string
+	Outfile               string
+	BuildTags             string
+	Pkg                   string
+	SkipInitModule        bool
 	ForceInitializeModule bool
 }
 
