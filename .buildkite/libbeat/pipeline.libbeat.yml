@@ -153,8 +153,8 @@ steps:
         key: "mandatory-systemmetrics-unit-test"
         command: |
           set -euo pipefail
-          cd libbeat
-          mage -w ../pkg/systemmetrics goUnitTest
+          cd pkg/systemmetrics
+          mage goUnitTest
         retry:
           automatic:
             - limit: 1
@@ -203,14 +203,16 @@ steps:
           - github_commit_status:
               context: "libbeat: Go Integration Tests / Ubuntu x86_64"
 
-      # Invoked directly rather than via `mage goIntegTest`: libbeat's target
-      # generates libbeat fields and brings up its Elasticsearch compose stack,
-      # neither of which these tests use. They only need a Docker daemon.
+      # Uses pkg/systemmetrics' own mage target, which only runs the container
+      # tests under ./tests/... and does not bring up an Elasticsearch compose
+      # stack (these tests spin up their own Docker containers and only need a
+      # Docker daemon).
       - label: ":ubuntu: pkg/systemmetrics: Container-System Tests"
         key: "mandatory-systemmetrics-container-tests"
         command: |
           set -euo pipefail
-          go test -tags integration -timeout 20m -v ./pkg/systemmetrics/tests/...
+          cd pkg/systemmetrics
+          mage goIntegTest
         retry:
           automatic:
             - limit: 1
@@ -218,6 +220,15 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "pkg/systemmetrics/build/*.xml"
+          - "pkg/systemmetrics/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "pkg/systemmetrics/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "pkg/systemmetrics: Container-System Tests / Ubuntu x86_64"
