@@ -860,12 +860,18 @@ func (http *httpPlugin) extractParameters(m *message) (path string, params strin
 }
 
 func (http *httpPlugin) isSecretParameter(key string) bool {
+<<<<<<< HEAD
 	for _, keyword := range http.hideKeywords {
 		if strings.ToLower(key) == keyword {
 			return true
 		}
 	}
 	return false
+=======
+	return slices.ContainsFunc(http.hideKeywords, func(keyword string) bool {
+		return strings.EqualFold(keyword, key)
+	})
+>>>>>>> 3a55ba2 (packetbeat: make HTTP hide_keywords matching case-insensitive (#52650))
 }
 
 func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
