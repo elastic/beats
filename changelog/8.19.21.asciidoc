@@ -51,34 +51,34 @@ The 8.19.21 release adds the following new and notable features.
 
 **All**
 
-* Add support for index in inputs for beatreceivers. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+* Add support for index in inputs for beatreceivers. https://github.com/elastic/beats/pull/52662[#52662] 
 
 
 **Auditbeat**
 
-* Fix auditbeat system/package module to skip non-Ruby Homebrew formula paths. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+* Fix auditbeat system/package module to skip non-Ruby Homebrew formula paths. https://github.com/elastic/beats/pull/52685[#52685] 
 
 
 **Filebeat**
 
-* Restores Filestream take over feature. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
-* Fix httpjson cursor migration losing position when redirecting to CEL with a named input in Agentless deployments. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+* Restores Filestream take over feature. https://github.com/elastic/beats/pull/52630[#52630] 
+* Fix httpjson cursor migration losing position when redirecting to CEL with a named input in Agentless deployments. https://github.com/elastic/beats/pull/52759[#52759] 
 
 
 **Metricbeat**
 
-* Recreate Kubernetes metadata watchers after their final metricset owner stops. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] https://github.com/elastic/beats/issues/51833[#51833]
+* Recreate Kubernetes metadata watchers after their final metricset owner stops. https://github.com/elastic/beats/pull/52028[#52028] https://github.com/elastic/beats/issues/51833[#51833]
 * Unblock a metricset whose first Fetch() call is stuck when the wrapper shuts down. https://github.com/elastic/beats/pull/52619[#52619] https://github.com/elastic/beats/issues/15666[#15666]
-* Close dbus connections in system service/users metricsets to stop FD leaks. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] https://github.com/elastic/beats/issues/52418[#52418]
+* Close dbus connections in system service/users metricsets to stop FD leaks. https://github.com/elastic/beats/pull/52674[#52674] https://github.com/elastic/beats/issues/52418[#52418]
 
 
 **Packetbeat**
 
-* Fix panics in packetbeat SIP, TLS JA3, MySQL execute, and HTTP chunked parsers on malformed or truncated network input. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+* Fix panics in packetbeat SIP, TLS JA3, MySQL execute, and HTTP chunked parsers on malformed or truncated network input. https://github.com/elastic/beats/pull/52686[#52686] 
 
 
 **Winlogbeat**
 
-* Fix event messages rendering zero values (e.g. &#34;PID: 0&#34;) in place of non-string parameters. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+* Fix event messages rendering zero values (e.g. &#34;PID: 0&#34;) in place of non-string parameters. https://github.com/elastic/beats/pull/52810[#52810] 
 
 // end 8.19.21 relnotes
