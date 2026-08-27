@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/teambition/rrule-go"
 )
@@ -53,6 +54,8 @@ func parseByweekday(wd string) (rrule.Weekday, error) {
 type MaintWin struct {
 	Freq       string        `config:"freq" validate:"required"`
 	Dtstart    string        `config:"dtstart" validate:"required"`
+	Tzid       string        `config:"tzid"`
+	Until      string        `config:"until"`
 	Interval   int           `config:"interval"`
 	Duration   time.Duration `config:"duration" validate:"required"`
 	Wkst       rrule.Weekday `config:"wkst"`
@@ -100,12 +103,30 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 		weekdays = append(weekdays, weekday)
 	}
 
-	dtstart = dtstart.UTC()
+	loc := time.UTC
+	if mw.Tzid != "" {
+		loc, err = time.LoadLocation(mw.Tzid)
+		if err != nil {
+			return nil, fmt.Errorf("invalid tzid: %q", mw.Tzid)
+		}
+	}
+	// Kibana stores dtstart as a UTC instant and tzid as the calendar for later occurrences.
+	dtstart = dtstart.In(loc)
+
+	var until time.Time
+	if mw.Until != "" {
+		until, err = time.Parse(time.RFC3339, mw.Until)
+		if err != nil {
+			return nil, fmt.Errorf("invalid until: %q", mw.Until)
+		}
+		until = until.In(loc)
+	}
 
 	r, err = rrule.NewRRule(rrule.ROption{
 		Freq:       freq,
 		Count:      mw.Count,
 		Dtstart:    dtstart,
+		Until:      until,
 		Interval:   mw.Interval,
 		Byweekday:  weekdays,
 		Byhour:     mw.Byhour,

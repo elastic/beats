@@ -199,6 +199,50 @@ func TestMaintWin(t *testing.T) {
 			positiveMatches: []string{"2025-02-08T08:30:00Z"},
 			negativeMatches: []string{"2025-02-07T09:30:00Z"},
 		},
+
+		{
+			name: "Daily 09:00 Europe/Berlin keeps local time across DST",
+			mw: MaintWin{
+				Freq:     "daily",
+				Dtstart:  "2025-03-28T08:00:00Z", // 09:00 CET
+				Tzid:     "Europe/Berlin",
+				Duration: mustParseDuration("1h"),
+			},
+			positiveMatches: []string{
+				"2025-03-28T08:30:00Z", // 09:30 CET
+				"2025-03-31T07:30:00Z", // 09:30 CEST after spring-forward
+			},
+			negativeMatches: []string{
+				"2025-03-31T08:30:00Z", // 10:30 CEST; UTC-only recurrence would still match
+			},
+		},
+
+		{
+			name: "Weekly Monday evening America/Los_Angeles via byweekday",
+			mw: MaintWin{
+				Freq:      "weekly",
+				Dtstart:   "2025-02-04T01:00:00Z", // Monday 17:00 PST
+				Tzid:      "America/Los_Angeles",
+				Duration:  mustParseDuration("2h"),
+				Byweekday: []string{"MO"},
+			},
+			positiveMatches: []string{"2025-02-11T01:30:00Z"}, // next Monday 17:30 PST
+			negativeMatches: []string{
+				"2025-02-10T01:30:00Z", // Monday 01:30 UTC = Sunday evening PST
+			},
+		},
+
+		{
+			name: "Until stops recurrence after the bound",
+			mw: MaintWin{
+				Freq:     "daily",
+				Dtstart:  "2025-02-01T10:00:00Z",
+				Until:    "2025-02-03T00:00:00Z",
+				Duration: mustParseDuration("2h"),
+			},
+			positiveMatches: []string{"2025-02-01T10:30:00Z", "2025-02-02T10:30:00Z"},
+			negativeMatches: []string{"2025-02-03T10:30:00Z", "2025-02-04T10:30:00Z"},
+		},
 	}
 
 	for _, c := range cases {
@@ -275,4 +319,24 @@ func TestParseInvalidByweekday(t *testing.T) {
 	_, err := mw.Parse(false)
 	require.Error(t, err, "Parse should reject invalid byweekday tokens")
 	assert.Contains(t, err.Error(), "invalid byweekday", "error should mention invalid byweekday")
+}
+
+func TestParseInvalidTzidAndUntil(t *testing.T) {
+	_, err := (&MaintWin{
+		Freq:     "daily",
+		Dtstart:  "2025-02-01T10:00:00Z",
+		Tzid:     "Not/AZone",
+		Duration: mustParseDuration("1h"),
+	}).Parse(false)
+	require.Error(t, err, "Parse should reject unknown tzid")
+	assert.Contains(t, err.Error(), "invalid tzid", "error should mention invalid tzid")
+
+	_, err = (&MaintWin{
+		Freq:     "daily",
+		Dtstart:  "2025-02-01T10:00:00Z",
+		Until:    "not-a-date",
+		Duration: mustParseDuration("1h"),
+	}).Parse(false)
+	require.Error(t, err, "Parse should reject invalid until")
+	assert.Contains(t, err.Error(), "invalid until", "error should mention invalid until")
 }
