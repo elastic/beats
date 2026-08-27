@@ -26,7 +26,7 @@ const (
 	logSelector = "kafka"
 )
 
-// sets the sarama.Logger to a kafkaLogger that will log to the given logp.Logger
+// sets the sarama.Logger to the given logp.Logger
 func SetSaramaLogger(log *logp.Logger) {
 	sarama.Logger = newKafkaLogger(log)
 }
