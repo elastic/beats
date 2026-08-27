@@ -38,13 +38,14 @@ const (
 
 // IncludeListOptions stores the options for IncludeList generation
 type IncludeListOptions struct {
-	ImportDirs       []string
-	ModuleDirs       []string
-	ModulesToExclude []string
-	Outfile          string
-	BuildTags        string
-	Pkg              string
-	SkipInitModule   bool
+	ImportDirs          []string
+	ModuleDirs          []string
+	ModulesToExclude    []string
+	Outfile             string
+	BuildTags           string
+	Pkg                 string
+	SkipInitModule      bool
+	ForceInitializeModule bool
 }
 
 // DefaultIncludeListOptions initializes IncludeListOptions struct with default values
@@ -198,6 +199,9 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 	}
 	if options.SkipInitModule {
 		cmd = append(cmd, "-skip-init-module")
+	}
+	if options.ForceInitializeModule {
+		cmd = append(cmd, "-force-init-module")
 	}
 
 	includeListCmd := sh.RunCmd("go", cmd...)

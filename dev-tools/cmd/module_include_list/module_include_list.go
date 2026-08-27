@@ -55,6 +55,7 @@ var (
 	moduleExcludeDirs stringSliceFlag
 	importDirs        stringSliceFlag
 	skipInitModule    bool
+	forceInitModule   bool
 )
 
 func init() {
@@ -66,6 +67,7 @@ func init() {
 	flag.Var(&moduleExcludeDirs, "moduleExcludeDirs", "Directory to exclude from the list")
 	flag.Var(&importDirs, "import", "Directory to include")
 	flag.BoolVar(&skipInitModule, "skip-init-module", false, "Skip finding and importing modules with InitializeModule")
+	flag.BoolVar(&forceInitModule, "force-init-module", false, "Emit an empty InitializeModule() stub even when no modules define it")
 	flag.Usage = usageFlag
 }
 
@@ -76,10 +78,6 @@ func main() {
 	license, err := licenses.Find(license)
 	if err != nil {
 		log.Fatalf("Invalid license specifier: %v", err)
-	}
-
-	if len(moduleDirs) == 0 && len(importDirs) == 0 {
-		log.Fatal("At least one -import or -moduleDir must be specified.")
 	}
 
 	dirs, err := findModuleAndDatasets()
@@ -147,11 +145,12 @@ func main() {
 	// Populate the template.
 	var buf bytes.Buffer
 	err = Template.Execute(&buf, Data{
-		License:   license,
-		Package:   pkg,
-		BuildTags: buildTags,
-		Imports:   imports,
-		Modules:   modules,
+		License:         license,
+		Package:         pkg,
+		BuildTags:       buildTags,
+		Imports:         imports,
+		Modules:         modules,
+		ForceInitModule: forceInitModule,
 	})
 	if err != nil {
 		log.Fatalf("Failed executing template: %v", err)
@@ -182,6 +181,7 @@ var Template = template.Must(template.New("normalizations").Funcs(map[string]any
 {{ .BuildTags }}
 package {{ .Package }}
 
+{{- if or .Modules .Imports }}
 import (
 {{- if .Modules }}
 	// Import packages to perform 'func InitializeModule()' when in-use.
@@ -194,6 +194,7 @@ import (
 	_ "{{ $import }}"
 {{- end }}
 )
+{{- end }}
 {{- if .Modules }}
 
 // InitializeModules initialize all of the modules.
@@ -202,15 +203,19 @@ func InitializeModule() {
 	m{{ $i }}.InitializeModule()
 {{- end }}
 }
+{{- else if .ForceInitModule }}
+
+func InitializeModule() {}
 {{- end }}
 `[1:]))
 
 type Data struct {
-	License   string
-	Package   string
-	BuildTags string
-	Imports   []string
-	Modules   []string
+	License         string
+	Package         string
+	BuildTags       string
+	Imports         []string
+	Modules         []string
+	ForceInitModule bool
 }
 
 // stringSliceFlag is a flag type that allows more than one value to be specified.
