@@ -13,18 +13,7 @@ Review important information about the  8.19.21 release.
 
 
 
-[discrete]
-[[new-features-8.19.21]]
-=== New features
 
-The 8.19.21 release adds the following new and notable features.
-
-
-
-
-**Filebeat**
-
-* Update github.com/apache/thrift to v0.24.0. https://github.com/elastic/beats/pull/52330[#52330] 
 
 
 [discrete]
@@ -37,6 +26,11 @@ The 8.19.21 release adds the following new and notable features.
 **All**
 
 * Update Go to 1.26.7. https://github.com/elastic/beats/pull/52750[#52750] 
+
+
+**Filebeat**
+
+* Update github.com/apache/thrift to v0.24.0. https://github.com/elastic/beats/pull/52330[#52330] 
 
 
 

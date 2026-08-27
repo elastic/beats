@@ -14,7 +14,7 @@ entries:
       file:
         name: 1784239873-fix-kubernetes-shared-watcher-lifecycle.yaml
         checksum: f16537d7029051ec3be3540c078472f88ef5927e
-    - kind: feature
+    - kind: enhancement
       summary: update github.com/apache/thrift to v0.24.0
       description: ""
       component: filebeat
