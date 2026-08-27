@@ -1,0 +1,84 @@
+// begin 8.19.21 relnotes
+
+[[release-notes-8.19.21]]
+==  8.19.21
+
+Review important information about the  8.19.21 release.
+
+
+
+
+
+
+
+
+
+[discrete]
+[[new-features-8.19.21]]
+=== New features
+
+The 8.19.21 release adds the following new and notable features.
+
+
+
+
+**Filebeat**
+
+* Update github.com/apache/thrift to v0.24.0. https://github.com/elastic/beats/pull/52330[#52330] 
+
+
+[discrete]
+[[enhancements-8.19.21]]
+=== Enhancements
+
+
+
+
+**All**
+
+* Update Go to 1.26.6. https://github.com/elastic/beats/pull/52642[#52642] 
+* Update Go to 1.26.7. https://github.com/elastic/beats/pull/52750[#52750] 
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.21]]
+=== Bug fixes
+
+
+
+
+**All**
+
+* Add support for index in inputs for beatreceivers. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+
+
+**Auditbeat**
+
+* Fix auditbeat system/package module to skip non-Ruby Homebrew formula paths. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+
+
+**Filebeat**
+
+* Restores Filestream take over feature. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+* Fix httpjson cursor migration losing position when redirecting to CEL with a named input in Agentless deployments. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+
+
+**Metricbeat**
+
+* Recreate Kubernetes metadata watchers after their final metricset owner stops. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] https://github.com/elastic/beats/issues/51833[#51833]
+* Unblock a metricset whose first Fetch() call is stuck when the wrapper shuts down. https://github.com/elastic/beats/pull/52619[#52619] https://github.com/elastic/beats/issues/15666[#15666]
+* Close dbus connections in system service/users metricsets to stop FD leaks. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] https://github.com/elastic/beats/issues/52418[#52418]
+
+
+**Packetbeat**
+
+* Fix panics in packetbeat SIP, TLS JA3, MySQL execute, and HTTP chunked parsers on malformed or truncated network input. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+
+
+**Winlogbeat**
+
+* Fix event messages rendering zero values (e.g. &#34;PID: 0&#34;) in place of non-string parameters. https://github.com/elastic/beats/pull/52803[#52803] https://github.com/elastic/beats/pull/52823[#52823] https://github.com/elastic/beats/pull/52650[#52650] https://github.com/elastic/beats/pull/52885[#52885] 
+
+// end 8.19.21 relnotes
