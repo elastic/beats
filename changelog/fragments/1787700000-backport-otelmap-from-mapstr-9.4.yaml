@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Add FromMapstr to libbeat/otel/otelmap to allow encoding mapstr.M directly into pcommon.Map
-component: libbeat
