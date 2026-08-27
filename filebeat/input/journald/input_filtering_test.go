@@ -260,7 +260,7 @@ func TestInputSeek(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to open store: %v", err)
 				}
-				defer store.Close() //nolint:errcheck
+				defer store.Close()
 				tmp := map[string]any{}
 				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
 					t.Fatal(err)
