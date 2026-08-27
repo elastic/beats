@@ -333,7 +333,12 @@ func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient
 	prg, ast, err := newProgram(ctx, `
 		state.response.decode_json().as(body, {
 			"events": [body],
-			?"cursor": body.?metadata.optMap(m, {"offset": m.offset}),
+			?"cursor": has(body.metadata) ?
+				optional.of(state.?cursor.orValue({}).with({
+					?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+				}))
+			:
+				state.?cursor,
 		})
 	`, root, nil, "", log)
 	if err != nil {

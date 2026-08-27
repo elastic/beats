@@ -15,7 +15,7 @@ This functionality is in technical preview and may be changed or removed in a fu
 
 
 
-The `streaming` input reads messages from a streaming data source, for example a websocket server. This input uses the `CEL engine` and the `mito` library internally to parse and process the messages. Having support for `CEL` allows you to parse and process the messages in a more flexible way. It has many similarities with the `cel` input as to how the `CEL` programs are written but differs in the way the messages are read and processed. Currently websocket server or API endpoints, and the Crowdstrike Falcon streaming API are supported.
+The `streaming` input reads messages from a streaming data source, for example a websocket server. This input uses the `CEL engine` and the `mito` library internally to parse and process the messages. Having support for `CEL` allows you to parse and process the messages in a more flexible way. It has many similarities with the `cel` input as to how the `CEL` programs are written but differs in the way the messages are read and processed. Currently websocket server or API endpoints, and the CrowdStrike Falcon streaming API are supported.
 
 The websocket streaming input supports:
 
@@ -32,15 +32,15 @@ The `streaming` input websocket handler does not currently support XML messages.
 ::::
 
 
-The Crowdstrike streaming input requires OAuth2.0 as described in the Crowdstrike documentation for the API. When using the Crowdstrike streaming type, the `crowdstrike_app_id` configuration field must be set. This field specifies the `appId` parameter sent to the Crowdstrike API. See the Crowdstrike documentation for details.
+The CrowdStrike streaming input requires OAuth2.0 as described in the CrowdStrike documentation for the API. When using the CrowdStrike streaming type, the `crowdstrike_app_id` configuration field must be set. This field specifies the `appId` parameter sent to the CrowdStrike API. See the CrowdStrike documentation for details.
 
-The feed and refresh URLs returned by the Crowdstrike discover endpoint are validated against the configured URL's origin before any request is made. By default, both URLs must share the same registrable domain (e.g. `crowdstrike.com`) as the configured `url`. If the discover response returns URLs on a different domain, you can allowlist additional origins with the `resource_origins` option.
+The feed and refresh URLs returned by the CrowdStrike discover endpoint are validated against the configured URL's origin before any request is made. By default, both URLs must share the same registrable domain (e.g. `crowdstrike.com`) as the configured `url`. If the discover response returns URLs on a different domain, you can allowlist additional origins with the `resource_origins` option.
 
-The `stream_type` configuration field specifies which type of streaming input to use, "websocket" or "crowdstrike". If it is not set, the input defaults to websocket streaming  .
+The `stream_type` configuration field specifies which type of streaming input to use, `websocket` or `crowdstrike`. If it is not set, the input defaults to websocket streaming.
 
 ## Execution [_execution_3]
 
-The execution environment provided for the input includes includes the functions, macros, and global variables provided by the mito library. A single JSON object is provided as an input accessible through a `state` variable. `state` contains a `response` map field and may contain arbitrary other fields configured via the input’s `state` configuration. If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
+The execution environment provided for the input includes the functions, macros, and global variables provided by the mito library. A single JSON object is provided as an input accessible through a `state` variable. `state` contains a `response` map field and may contain arbitrary other fields configured via the input’s `state` configuration. If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
 
 On start the `state` will be something like this:
 
@@ -52,9 +52,11 @@ On start the `state` will be something like this:
 }
 ```
 
-The `streaming` input websocket handler creates a `response` field in the state map and attaches the websocket message to this field. All `CEL` programs written should act on this `response` field. Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent. Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
+The websocket and CrowdStrike handlers attach each received message to the `response` field in the state map. All `CEL` programs should act on this field. For CrowdStrike, `state.feed` contains the original `dataFeedURL` of the resource that produced the message. Additional fields may be present at the root of the object and, if the program tolerates it, the cursor value may be absent. Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
 
 If the cursor is present the program should process or filter out responses based on its value. If cursor is not present all responses should be processed as per the program’s logic.
+
+The CrowdStrike discover endpoint can return multiple feed resources. A CrowdStrike cursor must therefore be a single object keyed by `state.feed`, with each value storing that feed's offset. When producing a new cursor, merge the current feed's offset into `state.cursor` so that offsets for the other feeds are retained. A flat cursor such as `{"offset": 123}` cannot track more than one feed.
 
 After completion of a program’s execution it should return a single object with a structure looking like this:
 
@@ -72,7 +74,7 @@ After completion of a program’s execution it should return a single object wit
 ```
 
 1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field could be an array or a single object that will be treated as an array with a single element. This depends completely on the streaming data source. The `events` field is the array of events to be published to the output. Each event must be a JSON object.
-2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array. Note that the Crowdstrike streaming input does not support array cursors.
+2. If `cursor` is present it must be either a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array. The CrowdStrike streaming input requires the per-feed single-object cursor described above and does not support array cursors.
 
 
 Example configurations:
@@ -92,7 +94,7 @@ filebeat.inputs:
 
 ```yaml
 filebeat.inputs:
-# Read and process events from the Crowdstrike Falcon Hose API
+# Read and process events from the CrowdStrike Falcon Event Streams API
 - type: streaming
   stream_type: crowdstrike
   url: https://api.crowdstrike.com/sensors/entities/datafeed/v2
@@ -102,19 +104,21 @@ filebeat.inputs:
     token_url: https://api.crowdstrike.com/oauth2/token
   crowdstrike_app_id: my_app_id
   program: |
-    state.response.decode_json().as(body,{
+    state.response.decode_json().as(body, {
       "events": [body],
-      ?"cursor": has(body.?metadata.offset) ?
-        optional.of({"offset": body.metadata.offset})
+      ?"cursor": has(body.metadata) ?
+        optional.of(state.?cursor.orValue({}).with({
+          ?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+        }))
       :
-        optional.none(),
+        state.?cursor,
     })
 ```
 
 
 ## Debug state logging [_debug_state_logging_2]
 
-The Websocket input will log the complete state when logging at the DEBUG level before and after CEL evaluation. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See [`redact`](#streaming-state-redact) configuration parameters for settings to exclude sensitive fields from DEBUG logs.
+The streaming input will log the complete state when logging at the DEBUG level before and after CEL evaluation. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See [`redact`](#streaming-state-redact) configuration parameters for settings to exclude sensitive fields from DEBUG logs.
 
 
 ## Authentication [_authentication]
@@ -155,7 +159,7 @@ filebeat.inputs:
   url: wss://localhost:443/_stream
 ```
 
-The crowdstrike streaming input requires OAuth2.0 authentication using a client ID, client secret and a token URL. These values are not exposed to the `state` object. OAuth2.0 scopes and endpoint parameters are available via the `auth.scopes` and `auth.endpoint_params` config parameters.
+The CrowdStrike streaming input requires OAuth2.0 authentication using a client ID, client secret and a token URL. These values are not exposed to the `state` object. OAuth2.0 scopes and endpoint parameters are available via the `auth.scopes` and `auth.endpoint_params` config parameters.
 
 ```yaml
 filebeat.inputs:

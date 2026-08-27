@@ -85,11 +85,14 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 		Type: "crowdstrike",
 		URL:  &urlConfig{u},
 		Program: `
-				state.response.decode_json().as(body,{
+				state.response.decode_json().as(body, {
 					"events": [body],
-					"cursor": state.cursor.with({
-						?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
-					}),
+					?"cursor": has(body.metadata) ?
+						optional.of(state.?cursor.orValue({}).with({
+							?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+						}))
+					:
+						state.?cursor,
 				})`,
 		Auth: authConfig{
 			OAuth2: oAuth2Config{
