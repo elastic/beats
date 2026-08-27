@@ -138,7 +138,10 @@ func TestHintsKubernetesInputAllowList(t *testing.T) {
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
-	const rejectionMessage = "Rejecting autodiscover hints configuration."
+	const (
+		rejectionLogPrefix = "Rejecting autodiscover hints configuration."
+		rejectionMessage   = `Rejecting autodiscover hints configuration. input.type: "httpjson", reason: disallowed input type`
+	)
 	filestreamStart := fmt.Sprintf(
 		`"message":"Input 'filestream' starting","service.name":"filebeat","id":"container-logs-%s"`,
 		filestreamContainerID,
@@ -147,19 +150,18 @@ func TestHintsKubernetesInputAllowList(t *testing.T) {
 	// The other pods in the K8s cluster will start Filestream inputs because
 	// this is the default config, so we ensure they start and httpjson is rejected.
 	filebeat.WaitLogsContainsAnyOrder(
-		[]string{filestreamStart, rejectionMessage},
+		[]string{filestreamStart, rejectionLogPrefix},
 		30*time.Second,
 		"default filestream input did not start or httpjson raw hints configuration was not rejected",
 	)
 
-	warningLine := filebeat.GetLogLine(rejectionMessage)
+	warningLine := filebeat.GetLogLine(rejectionLogPrefix)
 	require.NotEmpty(t, warningLine, "rejection warning log line should be available from the beginning of the logs")
 
 	var warning map[string]any
 	require.NoError(t, json.Unmarshal([]byte(warningLine), &warning), "log entries must be valid JSON")
 	assert.Equal(t, "warn", warning["log.level"], "rejection should be logged at warning level")
-	assert.Equal(t, "httpjson", warning["input.type"], "rejection warning should identify the disallowed input type")
-	assert.Equal(t, "disallowed input type", warning["reason"], "rejection warning should identify the allow-list failure")
+	assert.Equal(t, rejectionMessage, warning["message"], "rejection warning should describe the rejected input")
 
 	// Stop Filebeat after the rejection has been observed so all logs produced
 	// while processing the annotated pod can be checked deterministically.

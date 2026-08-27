@@ -221,9 +221,9 @@ func (l *logHints) applyConfigTemplate(event bus.Event, configs []*conf.C, optio
 
 		inputType, reason := l.validateInputType(config)
 		if reason != "" {
-			l.log.Warnw("Rejecting autodiscover hints configuration.",
-				"input.type", inputType,
-				"reason", reason,
+			l.log.Warnf("Rejecting autodiscover hints configuration. input.type: %s, reason: %s",
+				inputType,
+				reason,
 			)
 			continue
 		}
@@ -269,10 +269,9 @@ func (l *logHints) filterModuleInputConfigs(config *conf.C) bool {
 	}
 
 	if !filesetFound {
-		l.log.Warnw("Rejecting autodiscover hints configuration.",
-			"module", module,
-			"input.type", "",
-			"reason", "no fileset found in module configuration",
+		l.log.Warnf("Rejecting autodiscover hints configuration. module: %s, reason: %s",
+			module,
+			"no fileset found in module configuration",
 		)
 	}
 
@@ -286,18 +285,19 @@ func (l *logHints) removeRejectedFileset(
 	inputType string,
 	reason string,
 ) bool {
-	l.log.Warnw("Rejecting autodiscover hints module fileset.",
-		"module", module,
-		"fileset", fileset,
-		"input.type", inputType,
-		"reason", reason,
+	l.log.Warnf("Rejecting autodiscover hints configuration. module: %s, fileset: %s, input.type: %s, reason: %s",
+		module,
+		fileset,
+		inputType,
+		reason,
 	)
 
 	if _, err := config.Remove(fileset, -1); err != nil {
-		l.log.Warnw("Failed to remove rejected autodiscover hints fileset.",
-			"module", module,
-			"fileset", fileset,
-			"error", err,
+		l.log.Warnf(
+			"Failed to remove rejected autodiscover hints fileset. module: %s, fileset: %s, error: %s",
+			module,
+			fileset,
+			err,
 		)
 		return false
 	}
