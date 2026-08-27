@@ -67,19 +67,6 @@ entries:
       file:
         name: 1786640366-restore-filestream-takeover.yaml
         checksum: ee8a9df875c65f3482b364328154d901b8293004
-    - kind: enhancement
-      summary: Update Go to 1.26.6
-      description: ""
-      component: all
-      pr:
-        - https://github.com/elastic/beats/pull/52642
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1786744713
-      file:
-        name: 1786744713-updatecli_main_bump-golang-version.yaml
-        checksum: f2eee2fc4175168b0f34782ae918f8102bbb498c
     - kind: bug-fix
       summary: Close dbus connections in system service/users metricsets to stop FD leaks
       description: ""
@@ -134,7 +121,7 @@ entries:
         name: 1787107546-fix-packetbeat-parser-panics.yaml
         checksum: 219a8d82034a604ee375c59a085db2583faf8a97
     - kind: bug-fix
-      summary: 'Fix event messages rendering zero values (e.g. "PID: 0") in place of non-string parameters'
+      summary: 'Fix event messages rendering zero values (e.g. `PID: 0`) in place of non-string parameters'
       description: ""
       component: winlogbeat
       pr:

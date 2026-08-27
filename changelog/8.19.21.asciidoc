@@ -36,7 +36,6 @@ The 8.19.21 release adds the following new and notable features.
 
 **All**
 
-* Update Go to 1.26.6. https://github.com/elastic/beats/pull/52642[#52642] 
 * Update Go to 1.26.7. https://github.com/elastic/beats/pull/52750[#52750] 
 
 
@@ -79,6 +78,6 @@ The 8.19.21 release adds the following new and notable features.
 
 **Winlogbeat**
 
-* Fix event messages rendering zero values (e.g. &#34;PID: 0&#34;) in place of non-string parameters. https://github.com/elastic/beats/pull/52810[#52810] 
+* Fix event messages rendering zero values (e.g. `PID: 0`) in place of non-string parameters. https://github.com/elastic/beats/pull/52810[#52810] 
 
 // end 8.19.21 relnotes
