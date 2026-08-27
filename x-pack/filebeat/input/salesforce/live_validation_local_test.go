@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build salesforce_live
-// +build salesforce_live
 
 // Local-only live Salesforce validation.
 //
@@ -128,7 +127,7 @@ func liveConfigWithMethod(creds liveSalesforceCreds, method eventMonitoringMetho
 	cfg.Auth = &authConfig{
 		OAuth2: &OAuth2{
 			UserPasswordFlow: &UserPasswordFlow{
-				Enabled:      pointer(true),
+				Enabled:      new(true),
 				ClientID:     creds.ClientID,
 				ClientSecret: creds.ClientSecret,
 				TokenURL:     strings.TrimSuffix(creds.TokenURL, "/services/oauth2/token"),
@@ -146,7 +145,7 @@ func eventFieldValues(t *testing.T, events []string, field string) []string {
 
 	values := make([]string, 0, len(events))
 	for _, raw := range events {
-		var decoded map[string]interface{}
+		var decoded map[string]any
 		require.NoError(t, json.Unmarshal([]byte(raw), &decoded), "expected live event message to be valid JSON")
 		value, ok := decoded[field].(string)
 		if ok && value != "" {
@@ -217,13 +216,13 @@ func TestLiveSalesforceValidation(t *testing.T) {
 
 		cfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 			Object: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: 5 * time.Minute,
 				Batch: &batchConfig{
-					Enabled:          pointer(true),
+					Enabled:          new(true),
 					InitialInterval:  24 * time.Hour,
 					Window:           12 * time.Hour,
-					MaxWindowsPerRun: pointer(2),
+					MaxWindowsPerRun: new(2),
 				},
 				Query: &QueryConfig{
 					Default: getValueTpl("SELECT FIELDS(STANDARD) FROM LoginEvent ORDER BY EventDate DESC"),
@@ -267,13 +266,13 @@ func TestLiveSalesforceValidation(t *testing.T) {
 
 		cfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 			Object: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: 5 * time.Minute,
 				Batch: &batchConfig{
-					Enabled:          pointer(true),
+					Enabled:          new(true),
 					InitialInterval:  24 * time.Hour,
 					Window:           12 * time.Hour,
-					MaxWindowsPerRun: pointer(2),
+					MaxWindowsPerRun: new(2),
 				},
 				Query: &QueryConfig{
 					Default: getValueTpl("SELECT FIELDS(STANDARD) FROM LogoutEvent ORDER BY EventDate DESC"),
@@ -326,7 +325,7 @@ func TestLiveSalesforceValidation(t *testing.T) {
 	t.Run("setup audit trail object", func(t *testing.T) {
 		cfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 			Object: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: 5 * time.Minute,
 				Query: &QueryConfig{
 					Default: getValueTpl(`SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] ORDER BY CreatedDate ASC NULLS FIRST, Id ASC`),
@@ -367,7 +366,7 @@ func TestLiveSalesforceValidation(t *testing.T) {
 	t.Run("login event log file", func(t *testing.T) {
 		cfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Hour,
 				Query: &QueryConfig{
 					Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
@@ -412,7 +411,7 @@ func TestLiveSalesforceValidation(t *testing.T) {
 	t.Run("logout event log file", func(t *testing.T) {
 		cfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Hour,
 				Query: &QueryConfig{
 					Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND EventType = 'Logout' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
@@ -456,7 +455,7 @@ func TestLiveSalesforceValidation(t *testing.T) {
 	t.Run("apex event log file", func(t *testing.T) {
 		cfg := liveConfigWithMethod(creds, eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Hour,
 				Query: &QueryConfig{
 					Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),

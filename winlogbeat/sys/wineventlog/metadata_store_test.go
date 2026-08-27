@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -61,5 +62,40 @@ func TestPublisherMetadataStore(t *testing.T) {
 		assert.Empty(t, em.MsgStatic)
 		assert.NotNil(t, em.MsgTemplate)
 		assert.NotEmpty(t, em.EventData)
+	})
+
+	t.Run("publisher_message_is_preferred_on_event_data_mismatch", func(t *testing.T) {
+		log := openLog(t, security4752File)
+		defer log.Close()
+
+		h := mustNextHandle(t, log)
+		defer h.Close()
+
+		defaultEM := s.EventsNewest[4752]
+		require.NotNil(t, defaultEM, "expected event 4752 in the publisher metadata")
+		require.NotNil(t, defaultEM.MsgTemplate, "expected a message template for event 4752")
+
+		// Simulate an event whose data does not match the parameters declared
+		// in the publisher metadata (e.g. Schannel events whose XML
+		// representation does not include the __binLength/binaryData template
+		// parameters) by adding an extra parameter to the metadata.
+		originalParams := defaultEM.EventData.Params
+		defaultEM.EventData.Params = append(originalParams[:len(originalParams):len(originalParams)], EventData{Name: "__binLength"})
+		t.Cleanup(func() { defaultEM.EventData.Params = originalParams })
+
+		em := s.getEventMetadata(4752, 0, 12345, h)
+		require.NotNil(t, em, "expected event metadata for the mismatched event")
+		require.NotSame(t, defaultEM, em, "expected unique event metadata built from the event handle")
+
+		// The message template must come from the publisher metadata, not
+		// from formatting the event handle with the template inserts. The
+		// latter (EvtFormatMessageEvent) only substitutes the inserts for
+		// string parameters and bakes zero values for all other types into
+		// the cached template (e.g. "(PID: 0)"). Both representations must
+		// be replaced together so a stale event-handle MsgStatic cannot win
+		// over the publisher MsgTemplate in formatMessage.
+		assert.Same(t, defaultEM.MsgTemplate, em.MsgTemplate, "expected the message template from the publisher metadata to be used")
+		assert.Equal(t, defaultEM.MsgStatic, em.MsgStatic, "expected the static message from the publisher metadata to be used")
+		assert.Empty(t, em.MsgStatic, "publisher MsgTemplate must clear any event-handle MsgStatic")
 	})
 }

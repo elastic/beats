@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/assert"
@@ -148,23 +147,23 @@ func TestGetMetricValues(t *testing.T) {
 			mock.Anything,
 		).Return(
 			[]armmonitor.Metric{{
-				ID: to.Ptr("test"),
+				ID: new("test"),
 				Name: &armmonitor.LocalizableString{
-					Value:          to.Ptr("ActiveConnections"),
-					LocalizedValue: to.Ptr("ActiveConnections"),
+					Value:          new("ActiveConnections"),
+					LocalizedValue: new("ActiveConnections"),
 				},
 				Timeseries: []*armmonitor.TimeSeriesElement{{
 					Data: []*armmonitor.MetricValue{{
-						Average:   to.Ptr(1.0),
-						Maximum:   to.Ptr(2.0),
-						Minimum:   to.Ptr(3.0),
-						TimeStamp: to.Ptr(time.Now()),
+						Average:   new(1.0),
+						Maximum:   new(2.0),
+						Minimum:   new(3.0),
+						TimeStamp: new(time.Now()),
 					}},
 				}},
-				Type:               to.Ptr("Microsoft.Insights/metrics"),
+				Type:               new("Microsoft.Insights/metrics"),
 				Unit:               &countUnit,
-				DisplayDescription: to.Ptr("Total Active Connections for Microsoft.EventHub."),
-				ErrorCode:          to.Ptr("Success"),
+				DisplayDescription: new("Total Active Connections for Microsoft.EventHub."),
+				ErrorCode:          new("Success"),
 			}},
 			"PT1M",
 			nil,
@@ -218,9 +217,9 @@ func TestGetMetricValues(t *testing.T) {
 			aggregation string
 			data        []*armmonitor.MetricValue
 		}{
-			{aggregation: "Maximum", data: []*armmonitor.MetricValue{{Maximum: to.Ptr(3.0), TimeStamp: to.Ptr(timestamp)}}},
-			{aggregation: "Minimum", data: []*armmonitor.MetricValue{{Minimum: to.Ptr(1.0), TimeStamp: to.Ptr(timestamp)}}},
-			{aggregation: "Average", data: []*armmonitor.MetricValue{{Average: to.Ptr(2.0), TimeStamp: to.Ptr(timestamp)}}},
+			{aggregation: "Maximum", data: []*armmonitor.MetricValue{{Maximum: new(3.0), TimeStamp: new(timestamp)}}},
+			{aggregation: "Minimum", data: []*armmonitor.MetricValue{{Minimum: new(1.0), TimeStamp: new(timestamp)}}},
+			{aggregation: "Average", data: []*armmonitor.MetricValue{{Average: new(2.0), TimeStamp: new(timestamp)}}},
 		}
 
 		for _, v := range x {
@@ -235,18 +234,18 @@ func TestGetMetricValues(t *testing.T) {
 				mock.Anything,
 			).Return(
 				[]armmonitor.Metric{{
-					ID: to.Ptr("test"),
+					ID: new("test"),
 					Name: &armmonitor.LocalizableString{
-						Value:          to.Ptr("ActiveConnections"),
-						LocalizedValue: to.Ptr("ActiveConnections"),
+						Value:          new("ActiveConnections"),
+						LocalizedValue: new("ActiveConnections"),
 					},
 					Timeseries: []*armmonitor.TimeSeriesElement{{
 						Data: v.data,
 					}},
-					Type:               to.Ptr("Microsoft.Insights/metrics"),
+					Type:               new("Microsoft.Insights/metrics"),
 					Unit:               &countUnit,
-					DisplayDescription: to.Ptr("Total Active Connections for Microsoft.EventHub."),
-					ErrorCode:          to.Ptr("Success"),
+					DisplayDescription: new("Total Active Connections for Microsoft.EventHub."),
+					ErrorCode:          new("Success"),
 				}},
 				"PT1M",
 				nil,

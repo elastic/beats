@@ -1,0 +1,5 @@
+kind: enhancement
+
+summary: Reduce the allocations Filebeat makes per file when scanning with fingerprint file identity.
+
+component: filebeat

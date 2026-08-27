@@ -18,6 +18,8 @@
 package beat
 
 import (
+	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,6 +28,27 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+var hostnameOverride atomic.Pointer[string]
+
+// SetHostnameOverride sets the process-wide hostname override.
+// The value is trimmed; casing is preserved. Pass "" to clear.
+func SetHostnameOverride(h string) {
+	h = strings.TrimSpace(h)
+	if h == "" {
+		hostnameOverride.Store(nil)
+		return
+	}
+	hostnameOverride.Store(&h)
+}
+
+// GetHostnameOverride returns the active hostname override, or "" if none is set.
+func GetHostnameOverride() string {
+	if h := hostnameOverride.Load(); h != nil {
+		return *h
+	}
+	return ""
+}
 
 // Info stores a beats instance meta data.
 type Info struct {
