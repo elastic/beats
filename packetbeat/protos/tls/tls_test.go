@@ -666,6 +666,15 @@ func TestSupportedVersionsEmptyExtension(t *testing.T) {
 		private = p.Parse(&protos.Packet{Payload: reqData}, tcpTuple, 0, private)
 	})
 	assert.NotEmpty(t, results.events)
+	for key, expected := range map[string]string{
+		"tls.version":          "1.2",
+		"tls.version_protocol": "tls",
+		"tls.detailed.version": "TLS 1.2",
+	} {
+		version, err := results.events[0].Fields.GetValue(key)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, version)
+	}
 }
 
 func TestLegacyVersionNegotiation(t *testing.T) {
