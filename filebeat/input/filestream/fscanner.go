@@ -123,8 +123,6 @@ type fileScanner struct {
 	paths            []string
 	cfg              fileScannerConfig
 	log              *logp.Logger
-	hasher           hash.Hash
-	readBuffer       []byte
 	compression      string
 	// completedFingerprints holds paths already complete on the previous watch scan
 	// (growing mode), so attachBridgingRaw can skip re-encoding their bridging header.
@@ -144,6 +142,12 @@ type fileScanner struct {
 	pathIndex       map[string]int
 	pathsCanOverlap bool
 
+	// Everything below exists only to avoid per-file allocations
+
+	hasher       hash.Hash
+	readBuffer   []byte
+	sumBuffer    [sha256.Size]byte
+	rawHexBuffer []byte
 	// lastCount is the number of unique files the previous scan produced.
 	lastCount int
 }
@@ -170,6 +174,9 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d, growing %t",
 			s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length, s.cfg.Fingerprint.Growing)
 		s.readBuffer = make([]byte, s.cfg.Fingerprint.Length)
+		if s.cfg.Fingerprint.Growing {
+			s.rawHexBuffer = make([]byte, hex.EncodedLen(int(s.cfg.Fingerprint.Length)))
+		}
 	}
 
 	err := s.resolveRecursiveGlobs(config)
@@ -866,86 +873,23 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	length := s.cfg.Fingerprint.Length
 	threshold := offset + length
 
-	// opener is used to open the file only once
-	opener := struct {
-		Open func() (*os.File, error)
-		f    *os.File
-	}{}
-	opener.Open = func() (*os.File, error) {
-		if opener.f != nil {
-			return opener.f, nil
-		}
-
-		opener.f, err = os.Open(it.originalFilename)
-		if err != nil {
-			return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-		return opener.f, err
+	var osFile *os.File
+	osFile, fd.GZIP, err = s.openFingerprintSource(it)
+	if osFile != nil {
+		defer osFile.Close()
+	}
+	if err != nil {
+		return fd, err
 	}
 
-	defer func() {
-		if opener.f != nil {
-			opener.f.Close()
-		}
-	}()
-
-	switch s.compression {
-	case CompressionNone:
-		// fd.GZIP stays false
-	case CompressionGZIP:
-		fd.GZIP = true
-	case CompressionAuto:
-		osFile, err := opener.Open()
-		if err != nil {
-			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-
-		fd.GZIP, err = IsGZIP(osFile)
-		if err != nil {
-			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
-				it.originalFilename, err)
-		}
-	}
-
-	// Fast path for non-GZIP files we know the size from lstat and can
-	// reject too-small files in static mode without opening the file. This
-	// preserves the no-open guarantee for static fingerprint on
-	// unreadable/permission-denied small files.
-	if !fd.GZIP {
-		// size <= offset we cannot read anything from the offset, regardless of mode.
-		if it.info.Size() <= offset {
-			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes, less than fingerprint offset %d: %w",
-				fd.Filename, it.info.Size(), offset, errFileTooSmall)
-		}
-		if !s.cfg.Fingerprint.Growing && it.info.Size() < threshold {
-			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
-				fd.Filename, it.info.Size(), threshold, errFileTooSmall)
-		}
-	}
-
-	// Wrap the open file (plain or GZIP) so subsequent reads/seeks operate
-	// on the decompressed stream when applicable.
-	var file File
+	var file io.ReadSeeker = osFile
 	if fd.GZIP {
-		osFile, err := opener.Open()
-		if err != nil {
-			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-
-		// Check if there is enough *decompressed* data for fingerprint
-		file, err = newGzipSeekerReader(osFile, int(threshold))
+		gzFile, err := newGzipSeekerReader(osFile, int(threshold))
 		if err != nil {
 			return fd, fmt.Errorf("failed to create gzip seeker: %w", err)
 		}
-		defer file.Close()
-	} else {
-		osFile, err := opener.Open()
-		if err != nil {
-			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-		file = newPlainFile(osFile)
+		defer gzFile.Close()
+		file = gzFile
 	}
 
 	// Seek to offset (for both growing and static paths).
@@ -984,7 +928,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		// Growing mode small file: hex of bytes[offset:offset+n].
-		fd.Fingerprint = loginp.FingerprintID{Raw: hex.EncodeToString(s.readBuffer[:n])}
+		fd.Fingerprint = loginp.FingerprintID{Raw: s.rawHex(s.readBuffer[:n])}
 
 		return fd, nil
 	}
@@ -992,11 +936,80 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// File at or above threshold: compute SHA-256 of bytes[offset:offset+length].
 	s.hasher.Reset()
 	s.hasher.Write(s.readBuffer[:length])
-	fd.Fingerprint = loginp.FingerprintID{
-		Sum: hex.EncodeToString(s.hasher.Sum(nil)),
-	}
+	// hexBuffer is allocated on the stack. sumBuffer can't because Sum() is an
+	// interface call
+	var hexBuffer [2 * sha256.Size]byte
+	hex.Encode(hexBuffer[:], s.hasher.Sum(s.sumBuffer[:0]))
+	fd.Fingerprint = loginp.FingerprintID{Sum: string(hexBuffer[:])}
 
 	return fd, nil
+}
+
+// rawHex returns hex(b) with the reusable buffer
+func (s *fileScanner) rawHex(b []byte) string {
+	n := hex.Encode(s.rawHexBuffer, b)
+	return string(s.rawHexBuffer[:n])
+}
+
+// openFingerprintSource opens the file the fingerprint is read from and reports
+// whether that file is GZIP. Callers must close a non-nil *os.File.
+func (s *fileScanner) openFingerprintSource(it *ingestTarget) (osFile *os.File, isGZIP bool, err error) {
+	switch s.compression {
+	case CompressionNone:
+		if err = s.checkFingerprintSize(it); err != nil {
+			return nil, false, err
+		}
+
+	case CompressionGZIP:
+		isGZIP = true
+
+	case CompressionAuto:
+		// Open the file to check its magic bytes
+		osFile, err = openIngestTarget(it)
+		if err != nil {
+			return osFile, false, err
+		}
+		isGZIP, err = IsGZIP(osFile)
+		if err != nil {
+			return osFile, false, fmt.Errorf("failed to check if %q is gzip: %w",
+				it.originalFilename, err)
+		}
+		if !isGZIP {
+			err = s.checkFingerprintSize(it)
+		}
+		return osFile, isGZIP, err
+	}
+
+	osFile, err = openIngestTarget(it)
+	return osFile, isGZIP, err
+}
+
+func openIngestTarget(it *ingestTarget) (*os.File, error) {
+	osFile, err := os.Open(it.originalFilename)
+	if err != nil {
+		return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+	}
+	return osFile, nil
+}
+
+// checkFingerprintSize reports errFileTooSmall when the stat size cannot yield
+// a fingerprint. Not applicable to GZIP files.
+func (s *fileScanner) checkFingerprintSize(it *ingestTarget) error {
+	offset := s.cfg.Fingerprint.Offset
+	threshold := offset + s.cfg.Fingerprint.Length
+
+	// At or below the offset nothing is readable from it, regardless of mode.
+	if it.info.Size() <= offset {
+		return fmt.Errorf(
+			"filesize of %q is %d bytes, less than fingerprint offset %d: %w",
+			it.filename, it.info.Size(), offset, errFileTooSmall)
+	}
+	if !s.cfg.Fingerprint.Growing && it.info.Size() < threshold {
+		return fmt.Errorf(
+			"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
+			it.filename, it.info.Size(), threshold, errFileTooSmall)
+	}
+	return nil
 }
 
 // attachBridgingRaw sets a complete descriptor's raw header.
@@ -1007,7 +1020,7 @@ func (s *fileScanner) attachBridgingRaw(fd *loginp.FileDescriptor) {
 	if _, done := s.completedFingerprints[fd.Filename]; done {
 		return
 	}
-	fd.Fingerprint.Raw = hex.EncodeToString(s.readBuffer[:s.cfg.Fingerprint.Length])
+	fd.Fingerprint.Raw = s.rawHex(s.readBuffer[:s.cfg.Fingerprint.Length])
 }
 
 func (s *fileScanner) isFileExcluded(file string) bool {

@@ -30,6 +30,7 @@ import (
 type fakeInputManager struct {
 	OnInit      func() error
 	OnConfigure func(*conf.C) (Input, error)
+	OnClose     func()
 }
 
 type fakeInput struct {
@@ -57,6 +58,12 @@ func (m *fakeInputManager) Create(cfg *conf.C) (Input, error) {
 		return m.OnConfigure(cfg)
 	}
 	return nil, errors.New("oops")
+}
+
+func (m *fakeInputManager) Close() {
+	if m.OnClose != nil {
+		m.OnClose()
+	}
 }
 
 func (f *fakeInput) Name() string { return f.Type }

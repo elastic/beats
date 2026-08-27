@@ -18,7 +18,7 @@ func TestExecMultiplexer(t *testing.T) {
 	// Generate three fake journeys with three fake steps
 	testEvents := make([]*SynthEvent, 0, 3)
 	time := float64(0)
-	for jIdx := 0; jIdx < 3; jIdx++ {
+	for jIdx := range 3 {
 		time++ // fake time to make events seem spaced out
 		journey := &Journey{
 			Name: fmt.Sprintf("J%d", jIdx),
@@ -30,7 +30,7 @@ func TestExecMultiplexer(t *testing.T) {
 			TimestampEpochMicros: time,
 		})
 
-		for sIdx := 0; sIdx < 3; sIdx++ {
+		for sIdx := range 3 {
 			step := &Step{
 				Name:   fmt.Sprintf("S%d", sIdx),
 				Index:  sIdx,
