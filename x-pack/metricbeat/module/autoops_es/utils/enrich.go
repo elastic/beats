@@ -15,9 +15,6 @@ type EnrichedType[T any] struct {
 	// If set, the calculated value is clamped to min(calculated, MaxValueMillis(cache)).
 	// Used to ensure latency cannot exceed the sampling interval.
 	MaxValueMillis func(cache EnrichedCache[T]) float64
-	// WriteZeroOnDecrease writes 0 when the value decreased instead of omitting the field.
-	// Use for gauge-backed rates so a decrease is distinguishable from missing data.
-	WriteZeroOnDecrease bool
 }
 
 type EnrichedCache[T any] struct {
@@ -89,8 +86,6 @@ func EnrichObject[T any](obj *T, prevObj *T, cache EnrichedCache[T]) {
 			}
 
 			enricher.WriteValue(obj, calculated)
-		} else if newTime >= prevTime && enricher.WriteZeroOnDecrease {
-			enricher.WriteValue(obj, 0)
 		}
 	}
 }

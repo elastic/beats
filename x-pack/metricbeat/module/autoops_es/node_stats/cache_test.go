@@ -300,7 +300,7 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 	}
 }
 
-func TestEnrichNodeStatsGaugeDecreaseWritesZeroIngestRate(t *testing.T) {
+func TestEnrichNodeStatsGaugeDecreaseWritesNilIngestRate(t *testing.T) {
 	initCache(getNodeStats(), 10)
 
 	nodeStatsMap := getNodeStats()
@@ -314,9 +314,9 @@ func TestEnrichNodeStatsGaugeDecreaseWritesZeroIngestRate(t *testing.T) {
 
 	for key, nodeStats := range nodeStatsMap {
 		enrichNodeStats(key, &nodeStats, 10_000)
-		// gauge-backed rates write 0 on decrease, not nil
-		require.EqualValues(t, 0, nodeStats["ingest_docs_per_second"])
-		require.EqualValues(t, 0, nodeStats["ingest_bytes_per_second"])
+		// gauge-backed rates are nil on decrease (not written)
+		require.Nil(t, nodeStats["ingest_docs_per_second"])
+		require.Nil(t, nodeStats["ingest_bytes_per_second"])
 		// counter-backed rates still report correctly
 		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
 		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])

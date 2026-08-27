@@ -17,8 +17,8 @@ var (
 			createRate("index_rate_per_second", "indices.indexing.index_total"),
 			createRate("merge_rate_per_second", "indices.merges.total"),
 			createRate("search_rate_per_second", "indices.search.query_total"),
-			createGaugeRate("ingest_docs_per_second", "indices.docs.count"),
-			createGaugeRate("ingest_bytes_per_second", "indices.store.size_in_bytes"),
+			createRate("ingest_docs_per_second", "indices.docs.count"),
+			createRate("ingest_bytes_per_second", "indices.store.size_in_bytes"),
 			createRate("bulk_bytes_per_second", "indices.bulk.total_size_in_bytes"),
 			createRate("bulk_operations_per_second", "indices.bulk.total_operations"),
 			// LATENCIES:
@@ -73,12 +73,6 @@ func createRate(rateKey string, key string) utils.EnrichedType[mapstr.M] {
 		IsUsable:       func(obj *mapstr.M) bool { return hasKey(obj, key) },
 		WriteValue:     func(obj *mapstr.M, value float64) { setValue(obj, rateKey, value) },
 	}
-}
-
-func createGaugeRate(rateKey string, key string) utils.EnrichedType[mapstr.M] {
-	e := createRate(rateKey, key)
-	e.WriteZeroOnDecrease = true
-	return e
 }
 
 func enrichNodeStats(id string, nodeStats *mapstr.M, timestampDiff int64) {

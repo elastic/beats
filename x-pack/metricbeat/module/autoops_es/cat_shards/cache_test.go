@@ -949,13 +949,13 @@ func TestEnrichNodeIndexShardsIngestAndBulkRatesWithNewNode(t *testing.T) {
 	}
 }
 
-func TestEnrichNodeIndexShardsGaugeDecreaseWritesZeroIngestRate(t *testing.T) {
+func TestEnrichNodeIndexShardsGaugeDecreaseWritesNilIngestRate(t *testing.T) {
 	initCache(getNodeIndexShardsWithIngestBulk(), 10)
 
 	nodeIndexShardsMap := getNodeIndexShardsWithIngestBulk()
 	for key, nodeIndexShards := range nodeIndexShardsMap {
-		*nodeIndexShards.DocsCount -= 5              // gauge decrease → must write 0, not nil
-		*nodeIndexShards.SizeInBytes -= 3            // gauge decrease → must write 0, not nil
+		*nodeIndexShards.DocsCount -= 5              // gauge decrease → not written (nil)
+		*nodeIndexShards.SizeInBytes -= 3            // gauge decrease → not written (nil)
 		*nodeIndexShards.BulkTotalSizeInBytes += 100 // counter → still reports rate
 		*nodeIndexShards.BulkTotalOperations += 50   // counter → still reports rate
 		nodeIndexShardsMap[key] = nodeIndexShards
@@ -964,11 +964,9 @@ func TestEnrichNodeIndexShardsGaugeDecreaseWritesZeroIngestRate(t *testing.T) {
 	nodeIndexShardsList := enrichNodeIndexShards(nodeIndexShardsMap, map[string]IndexMetadata{})
 
 	for _, nodeIndexShards := range nodeIndexShardsList {
-		// gauge-backed rates write 0 on decrease, not nil
-		require.NotNil(t, nodeIndexShards.IngestDocsPerSecond)
-		require.EqualValues(t, 0, *nodeIndexShards.IngestDocsPerSecond)
-		require.NotNil(t, nodeIndexShards.IngestBytesPerSecond)
-		require.EqualValues(t, 0, *nodeIndexShards.IngestBytesPerSecond)
+		// gauge-backed rates are nil on decrease (not written)
+		require.Nil(t, nodeIndexShards.IngestDocsPerSecond)
+		require.Nil(t, nodeIndexShards.IngestBytesPerSecond)
 		// counter-backed rates still report correctly
 		require.EqualValues(t, 10, *nodeIndexShards.BulkBytesPerSecond)
 		require.EqualValues(t, 5, *nodeIndexShards.BulkOperationsPerSecond)
