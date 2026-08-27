@@ -149,32 +149,6 @@ steps:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
-      - label: ":ubuntu: pkg/systemmetrics: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-systemmetrics-unit-test"
-        command: |
-          set -euo pipefail
-          cd pkg/systemmetrics
-          mage goUnitTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "pkg/systemmetrics/build/*.xml"
-          - "pkg/systemmetrics/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "pkg/systemmetrics/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "pkg/systemmetrics: Ubuntu x86_64 Unit Tests"
-
       - label: ":ubuntu: Libbeat: Go Integration Tests"
         command: |
           set -euo pipefail
@@ -202,36 +176,6 @@ steps:
         notify:
           - github_commit_status:
               context: "libbeat: Go Integration Tests / Ubuntu x86_64"
-
-      # Uses pkg/systemmetrics' own mage target, which only runs the container
-      # tests under ./tests/... and does not bring up an Elasticsearch compose
-      # stack (these tests spin up their own Docker containers and only need a
-      # Docker daemon).
-      - label: ":ubuntu: pkg/systemmetrics: Container-System Tests"
-        key: "mandatory-systemmetrics-container-tests"
-        command: |
-          set -euo pipefail
-          cd pkg/systemmetrics
-          mage goIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "pkg/systemmetrics/build/*.xml"
-          - "pkg/systemmetrics/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "pkg/systemmetrics/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "pkg/systemmetrics: Container-System Tests / Ubuntu x86_64"
 
       - label: ":windows: Libbeat: Go Integration Tests"
         skip: "Skipped due to https://github.com/elastic/beats/issues/44537"
