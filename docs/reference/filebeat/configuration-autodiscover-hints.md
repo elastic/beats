@@ -184,9 +184,9 @@ In this example first the condition `docker.container.labels.type: "pipeline"` i
 
 ## Restrict hints-generated input types [hints-input-allow-list]
 
-Hints can render any Filebeat input type, `hints.input_allow_list` restricts which input types a hints-generated configuration may start.
+Hints can render any Filebeat input type, `hints.input_allow_list` restricts which input types a hints-generated configuration can start.
 
-The option is disabled by default, when enabled, Filebeat defaults to allowing
+The option is off by default, when enabled, Filebeat defaults to allowing
 inputs that read log files (`filestream`, `container` and `log`). The
 allowed list can be overridden.
 
@@ -220,7 +220,7 @@ filebeat.autodiscover:
           - /var/log/containers/*-${data.container.id}.log
 ```
 
-To replace the defaults, set `hints.input_allow_list.types` to the input types Filebeat may start from hints:
+To replace the defaults, set `hints.input_allow_list.types` to the input types Filebeat can start from hints:
 
 ```yaml
 filebeat.autodiscover:

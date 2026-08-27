@@ -66,6 +66,7 @@ func TestBuilderRegistry(t *testing.T) {
 	builder, err := reg.BuildBuilder(logger, cfg, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, builder)
+	//nolint:errcheck // it's a test assertion, we don't need the returned value
 	assert.Same(t, logger, builder.(*fakeBuilder).logger, "BuildBuilder should pass the explicit logger to the constructor")
 
 	// Try to create a config with fake builder and assert length
