@@ -44,8 +44,7 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 }
 
 // FromMapstr encodes src directly into dst as the inverse of [ToMapstr].
-// Unlike [ConvertNonPrimitive], this function writes directly into dst and
-// does not mutate src.
+// Note: nested map values in src may be mutated in place by [ConvertNonPrimitive].
 func FromMapstr[T mapstrOrMap](dst pcommon.Map, src T) error {
 	clone := make(map[string]any, len(src))
 	maps.Copy(clone, src)
