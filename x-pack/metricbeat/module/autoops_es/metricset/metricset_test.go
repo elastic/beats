@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package metricset
 
@@ -23,7 +22,7 @@ import (
 )
 
 type testObjectType struct {
-	Values []map[string]interface{} `json:"items"`
+	Values []map[string]any `json:"items"`
 }
 
 const (

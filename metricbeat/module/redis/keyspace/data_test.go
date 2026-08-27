@@ -24,7 +24,7 @@ import (
 )
 
 // getInt64 attempts to normalize various numeric types (and numeric strings) to int64 for assertions.
-func getInt64(t *testing.T, v interface{}) int64 {
+func getInt64(t *testing.T, v any) int64 {
 	switch n := v.(type) {
 	case int:
 		return int64(n)

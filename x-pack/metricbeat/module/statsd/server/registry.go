@@ -18,7 +18,7 @@ type metric struct {
 	name     string
 	tags     map[string]string
 	lastSeen time.Time
-	metric   interface{}
+	metric   any
 }
 
 type registry struct {
@@ -183,8 +183,8 @@ type metricsGroup struct {
 	metrics mapstr.M
 }
 
-func (r *registry) getMetric(metric interface{}) map[string]interface{} {
-	values := map[string]interface{}{}
+func (r *registry) getMetric(metric any) map[string]any {
+	values := map[string]any{}
 	switch m := metric.(type) {
 	case metrics.Counter:
 		values["count"] = m.Count()
@@ -280,7 +280,7 @@ func (r *registry) Delete(name string, tags map[string]string) {
 	}
 }
 
-func (r *registry) getOrNew(name string, tags map[string]string, new func() interface{}) interface{} {
+func (r *registry) getOrNew(name string, tags map[string]string, new func() any) any {
 	tagsKey := r.metricHash(tags)
 	tc, ok := r.metrics[tagsKey]
 	if !ok {
@@ -320,7 +320,7 @@ func (r *registry) clearTypeChanged(name string, tags map[string]string) {
 }
 
 func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.Counter {
-	maybeCounter := r.getOrNew(name, tags, func() interface{} { return metrics.NewCounter() })
+	maybeCounter := r.getOrNew(name, tags, func() any { return metrics.NewCounter() })
 	counter, ok := maybeCounter.(metrics.Counter)
 	if ok {
 		return counter
@@ -331,7 +331,7 @@ func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.
 }
 
 func (r *registry) GetOrNewTimer(name string, tags map[string]string) *samplingTimer {
-	timer, ok := r.getOrNew(name, tags, func() interface{} { return newSamplingTimer() }).(*samplingTimer)
+	timer, ok := r.getOrNew(name, tags, func() any { return newSamplingTimer() }).(*samplingTimer)
 	if ok {
 		return timer
 	}
@@ -341,7 +341,7 @@ func (r *registry) GetOrNewTimer(name string, tags map[string]string) *samplingT
 }
 
 func (r *registry) GetOrNewGauge64(name string, tags map[string]string) *deltaGaugeMetric {
-	gauge, ok := r.getOrNew(name, tags, func() interface{} { return &deltaGaugeMetric{} }).(*deltaGaugeMetric)
+	gauge, ok := r.getOrNew(name, tags, func() any { return &deltaGaugeMetric{} }).(*deltaGaugeMetric)
 	if ok {
 		return gauge
 	}
@@ -351,7 +351,7 @@ func (r *registry) GetOrNewGauge64(name string, tags map[string]string) *deltaGa
 }
 
 func (r *registry) GetOrNewHistogram(name string, tags map[string]string) metrics.Histogram {
-	histogram, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewHistogram(metrics.NewExpDecaySample(1028, 0.015)) }).(metrics.Histogram)
+	histogram, ok := r.getOrNew(name, tags, func() any { return metrics.NewHistogram(metrics.NewExpDecaySample(1028, 0.015)) }).(metrics.Histogram)
 	if ok {
 		return histogram
 	}
@@ -361,7 +361,7 @@ func (r *registry) GetOrNewHistogram(name string, tags map[string]string) metric
 }
 
 func (r *registry) GetOrNewSet(name string, tags map[string]string) *setMetric {
-	setmetric, ok := r.getOrNew(name, tags, func() interface{} { return newSetMetric() }).(*setMetric)
+	setmetric, ok := r.getOrNew(name, tags, func() any { return newSetMetric() }).(*setMetric)
 	if ok {
 		return setmetric
 	}

@@ -22,12 +22,17 @@ package service
 import (
 	"fmt"
 	"path/filepath"
+	"syscall"
 
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/go-viper/mapstructure/v2"
+	dbusRaw "github.com/godbus/dbus/v5"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+// Ensure MetricSet implements mb.Closer so dbus connections are released on stop/reload.
+var _ mb.Closer = (*MetricSet)(nil)
 
 // Config stores the config object
 type Config struct {
@@ -69,6 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	unitFunction, err := instrospectForUnitMethods()
 	if err != nil {
+		conn.Close()
 		return nil, fmt.Errorf("error finding ListUnits Method: %w", err)
 	}
 
@@ -78,6 +84,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		cfg:           config,
 		unitList:      unitFunction,
 	}, nil
+}
+
+// Close closes the dbus connection to systemd.
+func (m *MetricSet) Close() error {
+	if m.conn != nil {
+		m.conn.Close()
+		m.conn = nil
+	}
+	return nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -133,9 +148,27 @@ func getProps(conn *dbus.Conn, unit string) (Properties, error) {
 	if err != nil {
 		return Properties{}, fmt.Errorf("error getting list of running units: %w", err)
 	}
+	// GetAll may include unix file descriptors; close them so they do not leak
+	// across collection cycles. Properties we report do not need those FDs.
+	defer closePropertyFDs(rawProps)
+
 	parsed := Properties{}
 	if err := mapstructure.Decode(rawProps, &parsed); err != nil {
 		return parsed, fmt.Errorf("error decoding properties: %w", err)
 	}
 	return parsed, nil
+}
+
+// closePropertyFDs closes any unix file descriptors returned in a dbus property map.
+func closePropertyFDs(props map[string]any) {
+	for _, v := range props {
+		switch fd := v.(type) {
+		case dbusRaw.UnixFD:
+			_ = syscall.Close(int(fd))
+		case []dbusRaw.UnixFD:
+			for _, f := range fd {
+				_ = syscall.Close(int(f))
+			}
+		}
+	}
 }
