@@ -120,6 +120,8 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 			return nil, fmt.Errorf("invalid until: %q", mw.Until)
 		}
 		until = until.In(loc)
+		// Kibana @kbn/rrule skips occurrences at or after until (current >= until).
+		until = until.Add(-time.Nanosecond)
 	}
 
 	r, err = rrule.NewRRule(rrule.ROption{

@@ -233,15 +233,15 @@ func TestMaintWin(t *testing.T) {
 		},
 
 		{
-			name: "Until stops recurrence after the bound",
+			name: "Until is exclusive of the bound like Kibana",
 			mw: MaintWin{
 				Freq:     "daily",
 				Dtstart:  "2025-02-01T10:00:00Z",
-				Until:    "2025-02-03T00:00:00Z",
-				Duration: mustParseDuration("2h"),
+				Until:    "2025-02-03T10:00:00Z",
+				Duration: mustParseDuration("1h"),
 			},
 			positiveMatches: []string{"2025-02-01T10:30:00Z", "2025-02-02T10:30:00Z"},
-			negativeMatches: []string{"2025-02-03T10:30:00Z", "2025-02-04T10:30:00Z"},
+			negativeMatches: []string{"2025-02-03T10:00:00Z", "2025-02-03T10:30:00Z"},
 		},
 	}
 
