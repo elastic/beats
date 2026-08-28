@@ -182,6 +182,7 @@ var Template = template.Must(template.New("normalizations").Funcs(map[string]any
 package {{ .Package }}
 
 {{- if or .Modules .Imports }}
+
 import (
 {{- if .Modules }}
 	// Import packages to perform 'func InitializeModule()' when in-use.

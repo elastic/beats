@@ -23,6 +23,7 @@ package include
 
 import (
 	// Import packages that perform 'func init()'.
+	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/conntrack"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/iostat"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/ksm"
@@ -30,6 +31,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pageinfo"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pressure"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/rapl"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/core"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/cpu"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/diskio"
@@ -49,6 +51,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/socket_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/uptime"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/users"
+	_ "github.com/elastic/beats/v7/metricbeat/module/windows"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/service"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/wmi"
