@@ -184,21 +184,21 @@ In this example first the condition `docker.container.labels.type: "pipeline"` i
 
 ## Restrict hints-generated input types [hints-input-allow-list]
 
-Hints can render any Filebeat input type, `hints.input_allow_list` restricts which input types a hints-generated configuration can start.
+Hints can render any Filebeat input type. `hints.input_allow_list` restricts which input types a hints-generated configuration can start.
 
-The option is off by default, when enabled, Filebeat defaults to allowing
+The option is off by default. When enabled, Filebeat defaults to allowing
 inputs that read log files (`filestream`, `container` and `log`). The
 allowed list can be overridden.
 
 `hints.input_allow_list.enabled`
-:   Defaults to `false`. When enabled Filebeat does filter hints-generated input types.
+:   Defaults to `false`. When enabled, Filebeat filters hints-generated input types.
 
 `hints.input_allow_list.types`
 :   List of allowed input type names. If empty or missing, it defaults
      to `filestream`, `container` and `log`.
 
 
-When filtering is enabled, Filebeat inspects the rendered input configuration after template interpolation. Direct input `type` values and nested module fileset `input.type` values are both checked. Any input or fileset with unreadable, or disallowed type is rejected. Each rejection is logged at warning level.
+When filtering is enabled, Filebeat inspects the rendered input configuration after template interpolation. Direct input `type` values and nested module fileset `input.type` values are both checked. Any input or fileset with unreadable or disallowed type is rejected. Each rejection is logged at warning level.
 
 This Kubernetes example enables the allow list with the defaults:
 
@@ -220,7 +220,7 @@ filebeat.autodiscover:
           - /var/log/containers/*-${data.container.id}.log
 ```
 
-To replace the defaults, set `hints.input_allow_list.types` to the input types Filebeat can start from hints:
+To replace the defaults, set `hints.input_allow_list.types` to the input types Filebeat can start from hints. For example, to only allow the `filestream` input type, set:
 
 ```yaml
 filebeat.autodiscover:
