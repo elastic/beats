@@ -184,6 +184,10 @@ In this example first the condition `docker.container.labels.type: "pipeline"` i
 
 ## Restrict hints-generated input types [hints-input-allow-list]
 
+```{applies_to}
+stack: ga 9.4.5+
+```
+
 Hints can render any Filebeat input type, `hints.input_allow_list` restricts which input types a hints-generated configuration can start.
 
 The option is off by default, when enabled, Filebeat defaults to allowing
