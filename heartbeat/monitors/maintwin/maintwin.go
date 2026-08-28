@@ -72,26 +72,19 @@ type MaintWin struct {
 	Byeaster   []int         `config:"byeaster"`
 }
 
-func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
+// Parse converts a Kibana-shaped maintenance window into an rrule.
+// dtstart may be arbitrarily old: Kibana keeps the original start on recurring windows.
+func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 
-	// validate the frequency, we don't support less than daily
+	// Kibana MW request schema allows yearly (0) through hourly (4).
 	freq, err := rrule.StrToFreq(strings.ToUpper(mw.Freq))
-	if err != nil || freq > rrule.DAILY {
-		return nil, fmt.Errorf("invalid frequency %s: only yearly, monthly, weekly, and daily are supported", mw.Freq)
+	if err != nil || freq > rrule.HOURLY {
+		return nil, fmt.Errorf("invalid frequency %s: only yearly, monthly, weekly, daily, and hourly are supported", mw.Freq)
 	}
 
 	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
 	if err != nil {
 		return nil, err
-	}
-
-	// validate DTSTART and make sure it's not older than 2 years
-	if dtstart.Before(time.Now().AddDate(-2, 0, 0)) && validateDtStart {
-		return nil, fmt.Errorf(
-			"invalid dtstart: %s is more than 2 years in the past; "+
-				"to prevent excessive iterations, please use a more recent date",
-			dtstart.Format(time.RFC3339),
-		)
 	}
 
 	weekdays := make([]rrule.Weekday, 0, len(mw.Byweekday))
@@ -154,11 +147,13 @@ type ParsedMaintWin struct {
 	Duration time.Duration
 }
 
+// IsActive reports whether tOrig falls in [occurrence, occurrence+duration].
+// The end is inclusive to match Kibana alerting (`eventTimeMs <= event.lteMs`).
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 	if pmw.Rule == nil {
 		return false
 	}
 	tOrig = tOrig.UTC()
 	window := pmw.Rule.Before(tOrig, true)
-	return !window.IsZero() && tOrig.Before(window.Add(pmw.Duration))
+	return !window.IsZero() && !tOrig.After(window.Add(pmw.Duration))
 }

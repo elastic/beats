@@ -55,8 +55,9 @@ func TestMaintWin(t *testing.T) {
 				Dtstart:  "2025-02-06T21:00:00Z",
 				Duration: mustParseDuration("2h"),
 			},
-			positiveMatches: []string{"2025-02-06T21:30:00Z", "2025-02-06T22:45:00Z"},
-			negativeMatches: []string{"2025-02-06T23:01:00Z", "2025-02-07T00:00:00Z"},
+			// Kibana alerting uses inclusive lte (start+duration).
+			positiveMatches: []string{"2025-02-06T21:30:00Z", "2025-02-06T22:45:00Z", "2025-02-06T23:00:00Z"},
+			negativeMatches: []string{"2025-02-06T23:00:01Z", "2025-02-07T00:00:00Z"},
 		},
 
 		{
@@ -243,11 +244,37 @@ func TestMaintWin(t *testing.T) {
 			positiveMatches: []string{"2025-02-01T10:30:00Z", "2025-02-02T10:30:00Z"},
 			negativeMatches: []string{"2025-02-03T10:00:00Z", "2025-02-03T10:30:00Z"},
 		},
+
+		{
+			name: "Hourly interval 1 as Kibana MW UI convertToRRule emits",
+			mw: MaintWin{
+				Freq:     "hourly",
+				Dtstart:  "2025-02-01T10:00:00Z",
+				Tzid:     "UTC",
+				Interval: 1,
+				Duration: mustParseDuration("30m"),
+			},
+			positiveMatches: []string{"2025-02-01T10:00:00Z", "2025-02-01T10:15:00Z", "2025-02-01T10:30:00Z", "2025-02-01T11:00:00Z"},
+			negativeMatches: []string{"2025-02-01T10:30:01Z", "2025-02-01T11:30:01Z"},
+		},
+
+		{
+			name: "Hourly interval 3 as Kibana custom hourly schedule",
+			mw: MaintWin{
+				Freq:     "hourly",
+				Dtstart:  "2025-02-01T10:00:00Z",
+				Tzid:     "UTC",
+				Interval: 3,
+				Duration: mustParseDuration("1h"),
+			},
+			positiveMatches: []string{"2025-02-01T10:30:00Z", "2025-02-01T11:00:00Z", "2025-02-01T13:00:00Z"},
+			negativeMatches: []string{"2025-02-01T11:00:01Z", "2025-02-01T11:30:00Z", "2025-02-01T12:30:00Z"},
+		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			r, err := c.mw.Parse(false)
+			r, err := c.mw.Parse()
 			require.NoError(t, err)
 			pmw := ParsedMaintWin{Rule: r, Duration: c.mw.Duration}
 			for _, m := range c.positiveMatches {
@@ -316,7 +343,7 @@ func TestParseInvalidByweekday(t *testing.T) {
 		Duration:  mustParseDuration("1h"),
 		Byweekday: []string{"+2TU", "NOTADAY"},
 	}
-	_, err := mw.Parse(false)
+	_, err := mw.Parse()
 	require.Error(t, err, "Parse should reject invalid byweekday tokens")
 	assert.Contains(t, err.Error(), "invalid byweekday", "error should mention invalid byweekday")
 }
@@ -327,7 +354,7 @@ func TestParseInvalidTzidAndUntil(t *testing.T) {
 		Dtstart:  "2025-02-01T10:00:00Z",
 		Tzid:     "Not/AZone",
 		Duration: mustParseDuration("1h"),
-	}).Parse(false)
+	}).Parse()
 	require.Error(t, err, "Parse should reject unknown tzid")
 	assert.Contains(t, err.Error(), "invalid tzid", "error should mention invalid tzid")
 
@@ -336,7 +363,28 @@ func TestParseInvalidTzidAndUntil(t *testing.T) {
 		Dtstart:  "2025-02-01T10:00:00Z",
 		Until:    "not-a-date",
 		Duration: mustParseDuration("1h"),
-	}).Parse(false)
+	}).Parse()
 	require.Error(t, err, "Parse should reject invalid until")
 	assert.Contains(t, err.Error(), "invalid until", "error should mention invalid until")
+}
+
+func TestParseRejectsMinutely(t *testing.T) {
+	_, err := (&MaintWin{
+		Freq:     "minutely",
+		Dtstart:  "2025-02-01T10:00:00Z",
+		Duration: mustParseDuration("1m"),
+	}).Parse()
+	require.Error(t, err, "Parse should reject minutely; Kibana MW schema only allows yearly through hourly")
+	assert.Contains(t, err.Error(), "invalid frequency", "error should mention invalid frequency")
+}
+
+func TestParseAcceptsKibanaDtstartOlderThanTwoYears(t *testing.T) {
+	_, err := (&MaintWin{
+		Freq:      "weekly",
+		Dtstart:   "2023-03-22T00:00:00Z",
+		Tzid:      "UTC",
+		Duration:  mustParseDuration("1h"),
+		Byweekday: []string{"WE"},
+	}).Parse()
+	require.NoError(t, err, "Kibana keeps the original dtstart on recurring windows; Parse must not reject dates older than 2 years")
 }

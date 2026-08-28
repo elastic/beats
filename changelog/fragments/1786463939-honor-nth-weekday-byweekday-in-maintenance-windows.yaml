@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Honor Kibana maintenance-window byweekday nth-weekday tokens, tzid, and until.
+summary: Match Kibana maintenance windows for nth-weekday, tzid, until, hourly, inclusive duration, and old dtstart.
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.

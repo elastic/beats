@@ -112,7 +112,7 @@ func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 	}
 
 	for _, mw := range sFields.MaintenanceWindows {
-		parsed, err := mw.Parse(true)
+		parsed, err := mw.Parse()
 		if err != nil {
 			return StdMonitorFields{}, fmt.Errorf("could not parse maintenance window for monitor (id:%s name:%s): %w", sFields.ID, sFields.Name, err)
 		}

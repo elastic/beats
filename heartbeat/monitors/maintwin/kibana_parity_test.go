@@ -343,11 +343,187 @@ func TestKibanaRRuleParity(t *testing.T) {
 				"2023-04-12T00:00:00Z",
 			},
 		},
+		{
+			name: "hourly interval 1 from Kibana @kbn/rrule",
+			mw: MaintWin{
+				Freq:     "hourly",
+				Dtstart:  "2019-01-01T00:00:00.000Z",
+				Tzid:     "UTC",
+				Interval: 1,
+				Duration: time.Hour,
+				Count:    10,
+			},
+			wantISO: []string{
+				"2019-01-01T00:00:00Z",
+				"2019-01-01T01:00:00Z",
+				"2019-01-01T02:00:00Z",
+				"2019-01-01T03:00:00Z",
+				"2019-01-01T04:00:00Z",
+				"2019-01-01T05:00:00Z",
+				"2019-01-01T06:00:00Z",
+				"2019-01-01T07:00:00Z",
+				"2019-01-01T08:00:00Z",
+				"2019-01-01T09:00:00Z",
+			},
+		},
+		{
+			name: "Kibana UI monthly default +4WE from convertToRRule",
+			mw: MaintWin{
+				Freq:      "monthly",
+				Dtstart:   "2023-03-22T00:00:00.000Z",
+				Tzid:      "UTC",
+				Interval:  1,
+				Duration:  time.Hour,
+				Byweekday: []string{"+4WE"},
+				Count:     4,
+			},
+			wantISO: []string{
+				"2023-03-22T00:00:00Z",
+				"2023-04-26T00:00:00Z",
+				"2023-05-24T00:00:00Z",
+				"2023-06-28T00:00:00Z",
+			},
+		},
+		{
+			name: "Kibana UI yearly default bymonth+bymonthday",
+			mw: MaintWin{
+				Freq:       "yearly",
+				Dtstart:    "2023-03-22T00:00:00.000Z",
+				Tzid:       "UTC",
+				Interval:   1,
+				Duration:   time.Hour,
+				Bymonth:    []int{3},
+				Bymonthday: []int{22},
+				Count:      3,
+			},
+			wantISO: []string{
+				"2023-03-22T00:00:00Z",
+				"2024-03-22T00:00:00Z",
+				"2025-03-22T00:00:00Z",
+			},
+		},
+		{
+			name: "Kibana UI custom weekly WE+TH",
+			mw: MaintWin{
+				Freq:      "weekly",
+				Dtstart:   "2023-03-22T00:00:00.000Z",
+				Tzid:      "UTC",
+				Interval:  1,
+				Duration:  time.Hour,
+				Byweekday: []string{"WE", "TH"},
+				Count:     6,
+			},
+			wantISO: []string{
+				"2023-03-22T00:00:00Z",
+				"2023-03-23T00:00:00Z",
+				"2023-03-29T00:00:00Z",
+				"2023-03-30T00:00:00Z",
+				"2023-04-05T00:00:00Z",
+				"2023-04-06T00:00:00Z",
+			},
+		},
+		{
+			name: "Kibana UI custom monthly by day 22",
+			mw: MaintWin{
+				Freq:       "monthly",
+				Dtstart:    "2023-03-22T00:00:00.000Z",
+				Tzid:       "UTC",
+				Interval:   1,
+				Duration:   time.Hour,
+				Bymonthday: []int{22},
+				Count:      4,
+			},
+			wantISO: []string{
+				"2023-03-22T00:00:00Z",
+				"2023-04-22T00:00:00Z",
+				"2023-05-22T00:00:00Z",
+				"2023-06-22T00:00:00Z",
+			},
+		},
+		{
+			name: "Kibana UI daily WE count 3 (ends after x)",
+			mw: MaintWin{
+				Freq:      "daily",
+				Dtstart:   "2023-03-22T00:00:00.000Z",
+				Tzid:      "UTC",
+				Interval:  1,
+				Duration:  time.Hour,
+				Byweekday: []string{"WE"},
+				Count:     3,
+			},
+			wantISO: []string{
+				"2023-03-22T00:00:00Z",
+				"2023-03-29T00:00:00Z",
+				"2023-04-05T00:00:00Z",
+			},
+		},
+		{
+			name: "monthly bymonthday 31 skips short months like Kibana",
+			mw: MaintWin{
+				Freq:       "monthly",
+				Dtstart:    "2025-01-31T00:00:00.000Z",
+				Tzid:       "UTC",
+				Interval:   1,
+				Duration:   time.Hour,
+				Bymonthday: []int{31},
+				Count:      4,
+			},
+			wantISO: []string{
+				"2025-01-31T00:00:00Z",
+				"2025-03-31T00:00:00Z",
+				"2025-05-31T00:00:00Z",
+				"2025-07-31T00:00:00Z",
+			},
+		},
+		{
+			name: "weekly Saturday Europe/Madrid keeps local midnight across DST",
+			mw: MaintWin{
+				Freq:      "weekly",
+				Dtstart:   "2023-01-06T23:00:00Z",
+				Tzid:      "Europe/Madrid",
+				Interval:  1,
+				Duration:  time.Hour,
+				Byweekday: []string{"SA"},
+				Count:     13,
+			},
+			wantISO: []string{
+				"2023-01-06T23:00:00Z",
+				"2023-01-13T23:00:00Z",
+				"2023-01-20T23:00:00Z",
+				"2023-01-27T23:00:00Z",
+				"2023-02-03T23:00:00Z",
+				"2023-02-10T23:00:00Z",
+				"2023-02-17T23:00:00Z",
+				"2023-02-24T23:00:00Z",
+				"2023-03-03T23:00:00Z",
+				"2023-03-10T23:00:00Z",
+				"2023-03-17T23:00:00Z",
+				"2023-03-24T23:00:00Z",
+				"2023-03-31T22:00:00Z",
+			},
+		},
+		{
+			name: "weekly Saturday Europe/Madrid keeps local midnight across fall-back",
+			mw: MaintWin{
+				Freq:      "weekly",
+				Dtstart:   "2023-10-20T22:00:00Z",
+				Tzid:      "Europe/Madrid",
+				Interval:  1,
+				Duration:  time.Hour,
+				Byweekday: []string{"SA"},
+				Count:     3,
+			},
+			wantISO: []string{
+				"2023-10-20T22:00:00Z",
+				"2023-10-27T22:00:00Z",
+				"2023-11-03T23:00:00Z",
+			},
+		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			r, err := c.mw.Parse(false)
+			r, err := c.mw.Parse()
 			require.NoError(t, err, "Parse should succeed for Kibana-shaped rule")
 			got := r.All()
 			require.Equal(t, len(c.wantISO), len(got), "occurrence count: got %v", isoTimes(got))
@@ -365,13 +541,36 @@ func TestKibanaIsActiveMatchesOccurrences(t *testing.T) {
 		Duration:  time.Hour,
 		Byweekday: []string{"SA"},
 	}
-	r, err := mw.Parse(false)
+	r, err := mw.Parse()
 	require.NoError(t, err)
 	pmw := ParsedMaintWin{Rule: r, Duration: mw.Duration}
 
+	assert.True(t, pmw.IsActive(mustTime("2023-01-06T23:00:00Z")), "window start should be active")
 	assert.True(t, pmw.IsActive(mustTime("2023-01-06T23:30:00Z")), "first Saturday local occurrence should be active")
+	assert.True(t, pmw.IsActive(mustTime("2023-01-07T00:00:00Z")), "Kibana lte includes exact window end")
+	assert.False(t, pmw.IsActive(mustTime("2023-01-07T00:00:01Z")), "after window end should be inactive")
 	assert.False(t, pmw.IsActive(mustTime("2023-01-07T23:30:00Z")), "Saturday UTC (Sunday Madrid) should not be active")
 	assert.True(t, pmw.IsActive(mustTime("2023-01-13T23:30:00Z")), "next Saturday Madrid should be active")
+	assert.True(t, pmw.IsActive(mustTime("2023-03-31T22:30:00Z")), "Saturday midnight CEST after DST should be active")
+	assert.False(t, pmw.IsActive(mustTime("2023-03-31T23:00:01Z")), "after CEST Saturday window should be inactive")
+}
+
+func TestKibanaOneShotIsActiveOnlyForDuration(t *testing.T) {
+	mw := MaintWin{
+		Freq:     "yearly",
+		Dtstart:  "2025-06-10T11:40:29Z",
+		Tzid:     "Europe/Berlin",
+		Count:    1,
+		Duration: 30 * time.Minute,
+	}
+	r, err := mw.Parse()
+	require.NoError(t, err, "Parse should succeed for Kibana one-shot yearly count 1")
+	pmw := ParsedMaintWin{Rule: r, Duration: mw.Duration}
+
+	assert.True(t, pmw.IsActive(mustTime("2025-06-10T11:40:29Z")), "one-shot start should be active")
+	assert.True(t, pmw.IsActive(mustTime("2025-06-10T12:10:29Z")), "Kibana lte includes exact one-shot end")
+	assert.False(t, pmw.IsActive(mustTime("2025-06-10T12:10:30Z")), "after one-shot duration should be inactive")
+	assert.False(t, pmw.IsActive(mustTime("2026-06-10T11:40:29Z")), "count 1 must not recur the next year")
 }
 
 func isoTimes(ts []time.Time) []string {
