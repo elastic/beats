@@ -39,7 +39,7 @@
     - name: request.dry_run
       type: keyword
       description: >
-        Wether the request uses dry run
+        Whether the request uses dry run
     - name: request.kind
       type: keyword
       description: >
