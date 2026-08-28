@@ -10291,11 +10291,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/ebpfevents
-Version: v0.9.1-0.20260727124511-05b78de333fd
+Version: v0.10.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/ebpfevents@v0.9.1-0.20260727124511-05b78de333fd/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/ebpfevents@v0.10.0/LICENSE.txt:
 
 The https://github.com/elastic/ebpfevents repository contains source code under
 various licenses:
