@@ -81,20 +81,24 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		return nil, nil, fmt.Errorf("error reading directory names: %w", err)
 	}
 
+	return procStats.fetchPidsFromNames(names)
+}
+
+func (procStats *Stats) fetchPidsFromNames(names []string) (ProcsMap, []ProcState, error) {
 	procMap := make(ProcsMap, len(names))
 	plist := make([]ProcState, 0, len(names))
 	var wrappedErr error
 
-	// Iterate over the directory, fetch just enough info so we can filter based on user input.
 	for _, name := range names {
-
 		if !dirIsPid(name) {
 			continue
 		}
-		// Will this actually fail?
 		pid, err := strconv.Atoi(name)
 		if err != nil {
 			procStats.Logger.Debugf("Error converting PID name %s", name)
+			continue
+		}
+		if _, seen := procMap[pid]; seen {
 			continue
 		}
 		procMap, plist, err = procStats.pidIter(pid, procMap, plist)
