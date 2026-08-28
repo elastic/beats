@@ -40,10 +40,11 @@ import (
 )
 
 const (
-	heartbeatBrowserE2EMonitorID = "generated-image-browser-e2e"
-	heartbeatBrowserE2EConfig    = "testdata/heartbeat-browser-e2e.yml"
-	heartbeatConfigPath          = "/usr/share/heartbeat/heartbeat.yml"
-	heartbeatBrowserE2ETimeout   = 90 * time.Second
+	heartbeatBrowserE2EMonitorID         = "generated-image-browser-e2e"
+	heartbeatBrowserE2EConfig            = "testdata/heartbeat-browser-e2e.yml"
+	heartbeatConfigPath                  = "/usr/share/heartbeat/heartbeat.yml"
+	heartbeatBrowserE2ETimeout           = 90 * time.Second
+	heartbeatRequireBrowserE2EArchiveEnv = "HEARTBEAT_REQUIRE_BROWSER_E2E_ARCHIVE"
 )
 
 var heartbeatBrowserE2EArchivePattern = regexp.MustCompile(`^heartbeat-\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)*-linux-amd64\.docker\.tar\.gz$`)
@@ -52,20 +53,23 @@ func TestHeartbeatBrowserE2EArchive(t *testing.T) {
 	for _, test := range []struct {
 		name     string
 		archives []string
+		required bool
 		want     string
 		wantErr  bool
 	}{
-		{name: "standard archive", archives: []string{"heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"}, want: "heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"},
+		{name: "standard archive", archives: []string{"heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"}, required: true, want: "heartbeat-9.5.0-SNAPSHOT-linux-amd64.docker.tar.gz"},
 		{name: "no Heartbeat archive", archives: []string{"filebeat-9.5.0-linux-amd64.docker.tar.gz"}},
+		{name: "required archive missing", archives: []string{"filebeat-9.5.0-linux-amd64.docker.tar.gz"}, required: true, wantErr: true},
 		{name: "only Wolfi archive", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}},
+		{name: "required archive has only Wolfi variant", archives: []string{"heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz"}, required: true, wantErr: true},
 		{name: "unexpected variant", archives: []string{"heartbeat-custom-9.5.0-linux-amd64.docker.tar.gz"}},
 		{name: "excluded variants", archives: []string{"heartbeat-oss-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-ubi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-wolfi-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-fips-9.5.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-arm64.docker.tar.gz"}},
 		{name: "ambiguous archives", archives: []string{"heartbeat-9.4.0-linux-amd64.docker.tar.gz", "heartbeat-9.5.0-linux-amd64.docker.tar.gz"}, wantErr: true},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := heartbeatBrowserE2EArchive(test.archives)
+			got, err := heartbeatBrowserE2EArchive(test.archives, test.required)
 			if test.wantErr {
-				require.Error(t, err, "selecting an ambiguous archive should fail")
+				require.Error(t, err, "selecting archive should fail")
 				return
 			}
 			require.NoError(t, err, "selecting archive should not fail")
@@ -118,7 +122,8 @@ func checkHeartbeatBrowserE2E(t *testing.T, dockerArchives []string) {
 	t.Helper()
 
 	t.Run("heartbeat browser journey", func(t *testing.T) {
-		archive, err := heartbeatBrowserE2EArchive(dockerArchives)
+		requireArchive := os.Getenv(heartbeatRequireBrowserE2EArchiveEnv) == "true"
+		archive, err := heartbeatBrowserE2EArchive(dockerArchives, requireArchive)
 		require.NoError(t, err, "selecting Heartbeat browser E2E archive should succeed")
 		if archive == "" {
 			t.Skip("Heartbeat Docker archive was not generated")
@@ -196,7 +201,7 @@ func checkHeartbeatBrowserE2E(t *testing.T, dockerArchives []string) {
 	})
 }
 
-func heartbeatBrowserE2EArchive(archives []string) (string, error) {
+func heartbeatBrowserE2EArchive(archives []string, required bool) (string, error) {
 	var matches []string
 	for _, archive := range archives {
 		if isHeartbeatBrowserE2EArchive(filepath.Base(archive)) {
@@ -206,6 +211,9 @@ func heartbeatBrowserE2EArchive(archives []string) (string, error) {
 
 	switch len(matches) {
 	case 0:
+		if required {
+			return "", fmt.Errorf("expected one standard Linux AMD64 Heartbeat Docker archive, found 0")
+		}
 		return "", nil
 	case 1:
 		return matches[0], nil
