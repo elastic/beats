@@ -216,8 +216,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 func (cim *InputManager) acquireLease() (*store, func(), bool) {
 	cim.mu.Lock()
 	key := cim.cacheKey
+	closed := cim.closed
 	cim.mu.Unlock()
-	if key == "" {
+	if key == "" || closed {
 		return nil, func() {}, false
 	}
 	return globalCache.Lease(key)
