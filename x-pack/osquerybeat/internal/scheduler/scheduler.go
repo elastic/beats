@@ -85,7 +85,7 @@ type scheduledJob struct {
 // New creates a new recurrence scheduler
 func New(log *logp.Logger, queryFunc QueryFunc) *Scheduler {
 	return &Scheduler{
-		log:       log.With("component", "recurrence-scheduler"),
+		log:       log.With("log.logger", "recurrence-scheduler"),
 		queries:   make(map[string]*scheduledJob),
 		queryFunc: queryFunc,
 	}
