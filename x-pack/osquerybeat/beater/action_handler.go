@@ -34,7 +34,11 @@ type scheduledResponsePublisher interface {
 }
 
 type queryProfilePublisher interface {
+<<<<<<< HEAD
 	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
+=======
+	PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any)
+>>>>>>> 75c1543 (x-pack/osquerybeat: stamp space_id on live query result and profile documents (#52915))
 }
 
 type liveProfileRecorder interface {
@@ -172,7 +176,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 				a.profiles.RecordLiveProfile(ac.Query, profile)
 			}
 			if publishProfile {
-				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
+				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, ac.SpaceID, profile, req["data"])
 			}
 		}
 	} else if shouldCollect && !beforeReady {
@@ -190,7 +194,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", duration)
 
-	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", "", "", nil, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, "action_id", responseID, ac.SpaceID, "", "", "", nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }
