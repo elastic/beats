@@ -627,8 +627,8 @@ func getStoreKey(stateID string) string {
 // that is missing from the input's bucket listing, so loading another input's
 // states here would delete them from the shared store (and each input would
 // also hold every other input's states in memory).
-// An empty bucket matches states from any bucket; the pollers always pass
-// their bucket name.
+// Passing an empty bucket argument disables the bucket filter; the pollers
+// always pass their bucket name.
 func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, bucket string, prefix string, lexicographicalOrdering bool) (map[string]*state, error) {
 	stateTable := map[string]*state{}
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
