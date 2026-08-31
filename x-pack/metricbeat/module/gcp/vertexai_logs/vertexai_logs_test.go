@@ -79,9 +79,9 @@ func TestCreateEvent(t *testing.T) {
 		"model":             "gemini-2.5-pro",
 		"model_version":     "1.0",
 		"api_method":        "generateContent",
-		"full_request":      map[string]interface{}{"inputs": []interface{}{"test"}},
-		"full_response":     map[string]interface{}{"outputs": []interface{}{"result"}},
-		"metadata":          map[string]interface{}{"user_id": "user123"},
+		"full_request":      map[string]any{"inputs": []any{"test"}},
+		"full_response":     map[string]any{"outputs": []any{"result"}},
+		"metadata":          map[string]any{"user_id": "user123"},
 	}
 	assert.Equal(expectedFields, event.MetricSetFields)
 	// Check RootFields

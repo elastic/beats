@@ -75,7 +75,13 @@ func (inp *managedInput) Run(
 
 	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
 
+	// The harvester scheduler is shared by every filestream input in the process.
+	engine, releaseEngine := acquireEngine(inp.manager.Logger)
+	defer releaseEngine()
+
 	hg := newHarvesterRunner(
+		engine,
+		releaseEngine,
 		ctx,
 		inp.harvesterLimit,
 		pipeline,

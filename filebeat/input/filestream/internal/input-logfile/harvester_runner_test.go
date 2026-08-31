@@ -591,13 +591,15 @@ func TestHarvesterRunner_ParkPollGrowsBackoff(t *testing.T) {
 
 // TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers asserts a
 // slow Poll on one source (e.g. a stat() stuck on an unresponsive network
-// filesystem) does not delay another due source's Poll beyond pollGracePeriod.
-// Before this fix, the waker polled due sources sequentially with no bound, so
-// one slow Poll starved every other file indefinitely.
+// filesystem) does not hold up another due source's Poll: unbounded sequential
+// polling would let one slow Poll starve every other file indefinitely.
 func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T) {
 	var callCount atomic.Int32
 	blockFirst := make(chan struct{})
 	secondDone := make(chan struct{})
+	// The unblocked source parks and is polled again, so this is reached more
+	// than once.
+	reportSecond := sync.OnceFunc(func() { close(secondDone) })
 	start := time.Now()
 
 	h := &fakeHarvester{
@@ -606,7 +608,7 @@ func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T
 			if callCount.Add(1) == 1 {
 				<-blockFirst // simulate a stat() stuck on a slow/unresponsive filesystem
 			} else {
-				close(secondDone)
+				reportSecond()
 			}
 			return PollPark
 		},
@@ -627,10 +629,11 @@ func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T
 
 	select {
 	case <-secondDone:
-		// The waker only moves on once it gives up waiting on the first
-		// (blocked) source, so this must take at least one grace period —
-		// otherwise the test isn't actually exercising the timeout path.
-		assert.GreaterOrEqual(t, time.Since(start), pollGracePeriod)
+		// The blocked source costs the other nothing when they come due in one
+		// batch, and at most the batch's grace period when they do not. Anything
+		// beyond that is the blocked Poll being waited on.
+		assert.Less(t, time.Since(start), 2*pollGracePeriod,
+			"a source must not wait on another source's stuck Poll")
 	case <-time.After(eventuallyTimeout):
 		t.Fatal("a slow Poll on one source must not block another source's Poll")
 	}
@@ -638,8 +641,8 @@ func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T
 
 // TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait asserts a Poll that
 // returns quickly (the common case, e.g. a healthy local filesystem) is not
-// delayed by the grace period: the waker moves on as soon as it completes,
-// well under pollGracePeriod, rather than always waiting out the full window.
+// delayed by the grace period: the chain moves to the next source as soon as it
+// completes, rather than always waiting out the full window.
 func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
 	session := &fakeSession{pollFn: func(_ int) PollResult { return PollPark }}
@@ -656,13 +659,11 @@ func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	assert.Equal(t, 1, session.pollCount())
 }
 
-// TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed asserts
-// pollWithGracePeriod does not wait out the grace period when the runner is
-// already closed: spawn silently declines to run the closure in that case, so
-// without this check the waker would wait a full pollGracePeriod per due
-// source collected just before shutdown instead of returning immediately —
-// with enough due sources this can exceed the stuck grace and skip
-// finishRemaining's cleanup entirely.
+// TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed asserts a
+// closed runner runs no poll and does not wait: spawn silently declines to run
+// the closure, so without the check the chain would wait out the grace period
+// for a poll that is never going to happen, delaying shutdown past the stuck
+// grace and skipping finishRemaining's cleanup.
 func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing.T) {
 	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
 	state.session = &fakeSession{pollFn: func(_ int) PollResult {
@@ -678,7 +679,7 @@ func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing
 	start := time.Now()
 	g.pollWithGracePeriod(state)
 	assert.Less(t, time.Since(start), pollGracePeriod,
-		"pollWithGracePeriod must return immediately, not wait out the grace period, when closed")
+		"a closed runner must not wait out the grace period for a poll it never started")
 }
 
 // TestHarvesterRunner_ParkCapsDueAtStateCheckInterval asserts park schedules the
@@ -1360,11 +1361,38 @@ func testHarvesterRunner(t *testing.T, h Harvester, limit uint64) *harvesterRunn
 func testHarvesterRunnerEOF(t *testing.T, h Harvester, limit uint64, eof ReadUntilEOFConfig) *harvesterRunner {
 	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
+
+	// A private engine per test rather than the process-global one, so tests
+	// never share a scheduler or leak sources into each other's waker. Passing
+	// stop as the release func confines the waker to this runner's lifetime,
+	// which the goroutine-leak assertions in these tests depend on; Cleanup
+	// covers tests that never stop the runner, and stop is idempotent.
+	engine := newEngine(logger)
+	t.Cleanup(engine.stop)
+
+	return newHarvesterRunnerOn(t, engine, engine.stop, h, limit, eof)
+}
+
+// newHarvesterRunnerOn builds a runner on a caller-supplied engine, so a test
+// can put more than one runner on one scheduler. See engine_cotenancy_test.go.
+func newHarvesterRunnerOn(
+	t *testing.T,
+	engine *engine,
+	release func(),
+	h Harvester,
+	limit uint64,
+	eof ReadUntilEOFConfig,
+) *harvesterRunner {
+	t.Helper()
+	logger := logptest.NewTestingLogger(t, "")
 	ident, err := NewSourceIdentifier("filestream", "")
 	require.NoError(t, err)
 
 	runnerCtx := v2.Context{Logger: logger, Cancelation: context.Background()}
+
 	return newHarvesterRunner(
+		engine,
+		release,
 		runnerCtx,
 		limit,
 		&MockPipeline{},
@@ -1565,7 +1593,7 @@ func (g *harvesterRunner) statusOf(id string) (sourceStatus, bool) {
 func (g *harvesterRunner) parkedLen() int {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	return g.parked.Len()
+	return g.engine.parked.Len()
 }
 
 func (g *harvesterRunner) counts() (active, parked int) {
@@ -1593,7 +1621,7 @@ func (g *harvesterRunner) popDueNow() *sourceState {
 	defer g.mu.Unlock()
 	// Far enough in the future that any real backoff config is due, regardless
 	// of how the runner under test was configured.
-	due := g.popDue(time.Now().Add(24 * time.Hour))
+	due := g.engine.popDue(time.Now().Add(24 * time.Hour))
 	if len(due) == 0 {
 		return nil
 	}

@@ -37,19 +37,19 @@ func TestOsqueryConfig_Render_OmitsRRULEQueries(t *testing.T) {
 	}
 	out, err := cfg.Render()
 	require.NoError(t, err)
-	var decoded map[string]interface{}
+	var decoded map[string]any
 	require.NoError(t, json.Unmarshal(out, &decoded))
-	sched, ok := decoded["schedule"].(map[string]interface{})
+	sched, ok := decoded["schedule"].(map[string]any)
 	require.True(t, ok, "schedule present")
 	_, hasRRule := sched["rrule"]
 	assert.False(t, hasRRule, "RRULE-only top-level query must not appear in osqueryd config")
 	_, hasNative := sched["native"]
 	assert.True(t, hasNative)
-	packs, ok := decoded["packs"].(map[string]interface{})
+	packs, ok := decoded["packs"].(map[string]any)
 	require.True(t, ok)
-	mixed, ok := packs["mixed"].(map[string]interface{})
+	mixed, ok := packs["mixed"].(map[string]any)
 	require.True(t, ok)
-	mq, ok := mixed["queries"].(map[string]interface{})
+	mq, ok := mixed["queries"].(map[string]any)
 	require.True(t, ok)
 	_, hasB := mq["b"]
 	assert.False(t, hasB, "RRULE pack query must be omitted")
@@ -63,16 +63,16 @@ func TestOsqueryConfig_Render_Options(t *testing.T) {
 	// Native osquery options (e.g. schedule_splay_percent, schedule_max_drift) are
 	// passed through in Options; defaults are applied when building config for osqueryd (beater).
 	rendered, err := OsqueryConfig{
-		Options: map[string]interface{}{
+		Options: map[string]any{
 			"schedule_splay_percent": 10,
 			"schedule_max_drift":     60,
 		},
 	}.Render()
 	require.NoError(t, err)
-	var result map[string]interface{}
+	var result map[string]any
 	err = json.Unmarshal(rendered, &result)
 	require.NoError(t, err)
-	options, ok := result["options"].(map[string]interface{})
+	options, ok := result["options"].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, float64(10), options["schedule_splay_percent"])
 	assert.Equal(t, float64(60), options["schedule_max_drift"])
@@ -226,8 +226,4 @@ func TestRRuleScheduleConfig_ParseDates(t *testing.T) {
 		require.NoError(t, err)
 		assert.Nil(t, parsed)
 	})
-}
-
-func intPtr(i int) *int {
-	return &i
 }

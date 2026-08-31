@@ -143,7 +143,7 @@ func createTestDeviceMapping(count int) (map[string]string, []string) {
 	deviceMap := make(map[string]string)
 	deviceList := make([]string, 0, count)
 
-	for i := 0; i < count; i++ {
+	for i := range count {
 		device := fmt.Sprintf("\\Device\\HarddiskVolume%d", i)
 		drive := fmt.Sprintf("%c:", 'A'+i%26)
 		deviceMap[device] = drive

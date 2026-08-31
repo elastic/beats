@@ -21,7 +21,7 @@ type mappedField struct {
 	// Translate should not mutate the input and should
 	// return an error if the input data cannot be correctly
 	// mapped to ECS-formatted data for the target field.
-	Translate func(in *cef.Field) (interface{}, error)
+	Translate func(in *cef.Field) (any, error)
 }
 
 var ecsExtensionMapping = map[string]mappedField{
@@ -62,13 +62,13 @@ var ecsExtensionMapping = map[string]mappedField{
 	"deviceAction":                 {Target: "event.action"},
 	"deviceAddress": {
 		Target: "observer.ip",
-		Translate: func(in *cef.Field) (interface{}, error) {
+		Translate: func(in *cef.Field) (any, error) {
 			return []string{in.String}, nil
 		},
 	},
 	"deviceDirection": {
 		Target: "network.direction",
-		Translate: func(in *cef.Field) (interface{}, error) {
+		Translate: func(in *cef.Field) (any, error) {
 			switch in.String {
 			case "0":
 				return "inbound", nil
@@ -105,7 +105,7 @@ var ecsExtensionMapping = map[string]mappedField{
 	"requestClientApplication": {Target: "user_agent.original"},
 	"requestContext": {
 		Target: "http.request.referrer",
-		Translate: func(in *cef.Field) (interface{}, error) {
+		Translate: func(in *cef.Field) (any, error) {
 			// Does the string look like URL?
 			if strings.HasPrefix(in.String, "http") {
 				return in.String, nil
@@ -136,13 +136,13 @@ var ecsExtensionMapping = map[string]mappedField{
 	"startTime":               {Target: "event.start"},
 	"transportProtocol": {
 		Target: "network.transport",
-		Translate: func(in *cef.Field) (interface{}, error) {
+		Translate: func(in *cef.Field) (any, error) {
 			return strings.ToLower(in.String), nil
 		},
 	},
 	"type": {Target: "event.kind"},
 }
 
-func ecsMAC(in *cef.Field) (interface{}, error) {
+func ecsMAC(in *cef.Field) (any, error) {
 	return strings.ToUpper(strings.ReplaceAll(in.String, ":", "-")), nil
 }

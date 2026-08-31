@@ -217,7 +217,7 @@ func TestOCSPStatus(t *testing.T) {
 
 	for i, test := range []struct {
 		msg  string
-		want interface{}
+		want any
 	}{
 		// Packets from https://github.com/elastic/beats/issues/29962#issue-1112502582
 		//
@@ -629,6 +629,47 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 		"tls.version":          "1.3",
 		"tls.version_protocol": "tls",
 		"tls.detailed.version": "TLS 1.3",
+	} {
+		version, err := results.events[0].Fields.GetValue(key)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, version)
+	}
+}
+
+func TestSupportedVersionsEmptyExtension(t *testing.T) {
+	results, p := testInit()
+	tcpTuple := testTCPTuple()
+	var private protos.ProtocolData
+
+	// Client Hello.
+	reqData, err := hex.DecodeString(rawClientHello)
+	require.NoError(t, err)
+	private = p.Parse(&protos.Packet{Payload: reqData}, tcpTuple, 0, private)
+
+	// ServerHello with supported_versions extension (0x002b) set to length 0,
+	// followed by a server-side ChangeCipherSpec.
+	reqData, err = hex.DecodeString("" +
+		"1603030078020000740303225084578024a693566bc71ba223826eeffc875b20" +
+		"27eec7337bf5fdf0eb1de720944f9b7806d887e27500dc6a05cfed8becf3d65a" +
+		"9a75ab618828f1b9e418d168130100002c00330024001d002070b27700b360aa" +
+		"3941a22da86901c00e174dc3d83e13cf4159b34b3de6809372" +
+		"002b0000" +
+		"140303000101",
+	)
+	require.NoError(t, err)
+	private = p.Parse(&protos.Packet{Payload: reqData}, tcpTuple, 1, private)
+
+	// Client ChangeCipherSpec triggers event construction — previously panicked.
+	reqData, err = hex.DecodeString(rawChangeCipherSpec)
+	require.NoError(t, err)
+	require.NotPanics(t, func() {
+		private = p.Parse(&protos.Packet{Payload: reqData}, tcpTuple, 0, private)
+	})
+	assert.NotEmpty(t, results.events)
+	for key, expected := range map[string]string{
+		"tls.version":          "1.2",
+		"tls.version_protocol": "tls",
+		"tls.detailed.version": "TLS 1.2",
 	} {
 		version, err := results.events[0].Fields.GetValue(key)
 		assert.NoError(t, err)
