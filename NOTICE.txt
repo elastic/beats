@@ -19451,11 +19451,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/microsoft/go-mssqldb
-Version: v1.10.0
+Version: v1.11.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/microsoft/go-mssqldb@v1.10.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/microsoft/go-mssqldb@v1.11.0/LICENSE.txt:
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) Microsoft Corporation.
@@ -40229,11 +40229,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azkeys
-Version: v1.4.0
+Version: v1.5.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/security/keyvault/azkeys@v1.4.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/security/keyvault/azkeys@v1.5.0/LICENSE.txt:
 
     MIT License
 
