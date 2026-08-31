@@ -30,8 +30,8 @@ import (
 // uses to decide whether a maintenance window is running.
 func TestKibanaRRuleParity(t *testing.T) {
 	cases := []struct {
-		name     string
-		mw       MaintWin
+		name    string
+		mw      MaintWin
 		wantISO []string
 	}{
 		{
@@ -526,7 +526,7 @@ func TestKibanaRRuleParity(t *testing.T) {
 			r, err := c.mw.Parse()
 			require.NoError(t, err, "Parse should succeed for Kibana-shaped rule")
 			got := r.All()
-			require.Equal(t, len(c.wantISO), len(got), "occurrence count: got %v", isoTimes(got))
+			require.Len(t, got, len(c.wantISO), "occurrence count: got %v", isoTimes(got))
 			assert.Equal(t, c.wantISO, isoTimes(got), "occurrences should match Kibana @kbn/rrule")
 		})
 	}
