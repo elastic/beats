@@ -44,7 +44,7 @@ func TestLocalSourceValidate(t *testing.T) {
 	}
 }
 
-func dummyLocal(conf map[string]interface{}) (*LocalSource, error) {
+func dummyLocal(conf map[string]any) (*LocalSource, error) {
 	zus := &LocalSource{}
 	y, _ := yaml.Marshal(conf)
 	c, err := config.NewConfigWithYAML(y, string(y))

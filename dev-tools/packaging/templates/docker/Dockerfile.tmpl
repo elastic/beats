@@ -163,7 +163,7 @@ RUN HOME={{ $beatHome }} node "$(npm root -g)/@elastic/synthetics/node_modules/p
     test -d {{ $beatHome }}/.cache/ms-playwright
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi10-minimal")) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi") (contains .from "minimal")) }}
 USER root
 
 # Install the deps as needed by the exact version of playwright elastic synthetics uses

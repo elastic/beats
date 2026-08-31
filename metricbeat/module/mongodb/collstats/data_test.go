@@ -125,7 +125,7 @@ func TestEventMappingPreservesCollectionWithDots(t *testing.T) {
 }
 
 func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
-	shard1 := map[string]interface{}{
+	shard1 := map[string]any{
 		"count":       int64(10),
 		"size":        float64(1000),
 		"storageSize": float64(2000),
@@ -133,7 +133,7 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 		"shard":       "shard1",
 		"host":        "host1",
 	}
-	shard2 := map[string]interface{}{
+	shard2 := map[string]any{
 		"count":       int64(20),
 		"size":        float64(3000),
 		"storageSize": float64(4000),
@@ -141,7 +141,7 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 		"shard":       "shard2",
 		"host":        "host2",
 	}
-	merged, err := mergeShardedCollStats([]map[string]interface{}{shard1, shard2})
+	merged, err := mergeShardedCollStats([]map[string]any{shard1, shard2})
 	assert.NoError(t, err)
 	// Summed fields
 	assert.Equal(t, int64(30), merged["count"].(int64))           //nolint:errcheck // safe
@@ -158,8 +158,8 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 }
 
 func TestFlattenAggregationResult(t *testing.T) {
-	input := map[string]interface{}{
-		"storageStats": map[string]interface{}{
+	input := map[string]any{
+		"storageStats": map[string]any{
 			"size":           1000,
 			"count":          5,
 			"avgObjSize":     200,

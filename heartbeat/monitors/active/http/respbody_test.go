@@ -21,7 +21,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -131,7 +131,7 @@ func Test_handleRespBody(t *testing.T) {
 				t.Errorf("invalid mime type - got: '%v' - want: '%v'", mimeType, tt.args.mimeType)
 			}
 
-			bodyMatch := map[string]interface{}{
+			bodyMatch := map[string]any{
 				"hash":  "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
 				"bytes": 5,
 			}
@@ -233,7 +233,7 @@ func Test_readPrefixAndHash(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rc := ioutil.NopCloser(strings.NewReader(tt.body))
+			rc := io.NopCloser(strings.NewReader(tt.body))
 			gotRespSize, gotPrefix, gotHashStr, err := readPrefixAndHash(rc, tt.len)
 
 			if tt.err {
@@ -256,5 +256,5 @@ func Test_readPrefixAndHash(t *testing.T) {
 }
 
 func simpleHTTPResponse() *http.Response {
-	return &http.Response{Body: ioutil.NopCloser(strings.NewReader("hello"))}
+	return &http.Response{Body: io.NopCloser(strings.NewReader("hello"))}
 }

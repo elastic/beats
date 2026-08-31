@@ -40,7 +40,7 @@ func SetSqlValue(logger *logp.Logger, output mapstr.M, targetFieldName string, v
 
 type SqlValue interface {
 	isValid() bool
-	Value() interface{}
+	Value() any
 }
 
 type Float64Value struct {
@@ -51,7 +51,7 @@ func (i *Float64Value) isValid() bool {
 	return i.Valid
 }
 
-func (i *Float64Value) Value() interface{} {
+func (i *Float64Value) Value() any {
 	return i.Float64
 }
 
@@ -63,7 +63,7 @@ func (i *Int64Value) isValid() bool {
 	return i.Valid
 }
 
-func (i *Int64Value) Value() interface{} {
+func (i *Int64Value) Value() any {
 	return i.Int64
 }
 
@@ -75,6 +75,6 @@ func (s *StringValue) isValid() bool {
 	return s.Valid
 }
 
-func (s *StringValue) Value() interface{} {
+func (s *StringValue) Value() any {
 	return s.String
 }

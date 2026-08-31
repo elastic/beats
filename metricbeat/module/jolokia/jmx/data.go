@@ -33,10 +33,10 @@ const (
 
 type Entry struct {
 	Request struct {
-		Mbean     string      `json:"mbean"`
-		Attribute interface{} `json:"attribute"`
+		Mbean     string `json:"mbean"`
+		Attribute any    `json:"attribute"`
 	}
-	Value interface{}
+	Value any
 }
 
 // Map responseBody to mapstr.M
@@ -134,11 +134,11 @@ func eventMapping(entries []Entry, mapping AttributeMapping, logger *logp.Logger
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case map[string]interface{}:
+			case map[string]any:
 				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
 			}
-		case []interface{}:
-			entryValues, ok := v.Value.(map[string]interface{})
+		case []any:
+			entryValues, ok := v.Value.(map[string]any)
 			if ok {
 				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
 			}
@@ -153,7 +153,7 @@ func eventMapping(entries []Entry, mapping AttributeMapping, logger *logp.Logger
 	return events, errors.Join(errs...)
 }
 
-func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs []error, logger *logp.Logger) []error {
+func constructEvents(entryValues map[string]any, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs []error, logger *logp.Logger) []error {
 	hasWildcard := strings.Contains(v.Request.Mbean, "*")
 	for attribute, value := range entryValues {
 		if !hasWildcard {
@@ -167,7 +167,7 @@ func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents ma
 		// If there was a wildcard, we are going to have an additional
 		// nesting level in response values, and attribute here is going
 		// to be actually the matching mbean name
-		values, ok := value.(map[string]interface{})
+		values, ok := value.(map[string]any)
 		if !ok {
 			errs = append(errs, fmt.Errorf("expected map of values for %s", v.Request.Mbean))
 			continue
@@ -200,7 +200,7 @@ func parseResponseEntry(
 	requestMbeanName string,
 	responseMbeanName string,
 	attributeName string,
-	attributeValue interface{},
+	attributeValue any,
 	events map[eventKey]mapstr.M,
 	mapping AttributeMapping,
 	logger *logp.Logger,
@@ -223,8 +223,8 @@ func parseResponseEntry(
 	// In case the attributeValue is a map the keys are dedotted
 	data := attributeValue
 	switch aValue := attributeValue.(type) {
-	case map[string]interface{}:
-		newData := map[string]interface{}{}
+	case map[string]any:
+		newData := map[string]any{}
 		for k, v := range aValue {
 			newData[common.DeDot(k)] = v
 		}

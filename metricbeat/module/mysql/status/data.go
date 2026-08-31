@@ -162,7 +162,7 @@ var (
 // Map data to MapStr of server stats variables: http://dev.mysql.com/doc/refman/5.7/en/server-status-variables.html
 // This is only a subset of the available values
 func eventMapping(status map[string]string) mapstr.M {
-	source := map[string]interface{}{}
+	source := map[string]any{}
 	for key, val := range status {
 		source[key] = val
 	}
