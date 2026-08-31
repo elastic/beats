@@ -98,10 +98,25 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 
 	return procs.ProcsConfig{
 		Enabled:         true,
+		Backend:         mergeProcsBackend(one.Backend, two.Backend),
 		MaxProcReadFreq: maxProcReadFreq,
 		RefreshPidsFreq: refreshPidsFreq,
 		Monitored:       append(one.Monitored, two.Monitored...),
 	}
+}
+
+// mergeProcsBackend returns the strongest backend requested by any
+// stream: kernel_tracing wins over auto, which wins over procfs.
+func mergeProcsBackend(one, two string) string {
+	for _, backend := range []string{procs.BackendKernelTracing, procs.BackendAuto} {
+		if one == backend || two == backend {
+			return backend
+		}
+	}
+	if one != "" {
+		return one
+	}
+	return two
 }
 
 // NewAgentConfig allows the packetbeat configuration to understand
