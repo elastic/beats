@@ -34,6 +34,7 @@ type rruleRuntimeProfileState struct {
 	queryName            string
 	ns                   string
 	responseID           string
+	spaceID              string
 	sql                  string
 	shouldPublishProfile bool
 	shouldCollectProfile bool
@@ -247,10 +248,15 @@ func (h *recurrenceQueryHandler) retainDiffState(queries []*scheduler.ScheduledQ
 // initRRuleRuntimeProfiling collects a pre-query process snapshot when profiling is enabled
 // for this query (publish flag and/or local profile store).
 func (h *recurrenceQueryHandler) initRRuleRuntimeProfiling(ctx context.Context, name, ns, responseID, sql string) rruleRuntimeProfileState {
+	var spaceID string
+	if qi, ok := h.configPlugin.LookupQueryInfo(name); ok {
+		spaceID = qi.SpaceID
+	}
 	st := rruleRuntimeProfileState{
 		queryName:            name,
 		ns:                   ns,
 		responseID:           responseID,
+		spaceID:              spaceID,
 		sql:                  sql,
 		shouldPublishProfile: h.configPlugin.LookupQueryProfile(name),
 	}
@@ -292,7 +298,7 @@ func (h *recurrenceQueryHandler) completeRRuleRuntimeProfiling(ctx context.Conte
 		h.profiles.RecordLiveProfile(st.sql, prof)
 	}
 	if st.shouldPublishProfile {
-		h.publisher.PublishQueryProfile(config.QueryProfileDatastream(st.ns), st.queryName, "", st.responseID, prof, nil)
+		h.publisher.PublishQueryProfile(config.QueryProfileDatastream(st.ns), st.queryName, "", st.responseID, st.spaceID, prof, nil)
 	}
 }
 
