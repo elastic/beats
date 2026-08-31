@@ -650,7 +650,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		if err != nil {
 			bt.log.Debugf("failed to collect scheduled query profile for %s: %v", res.Name, err)
 		} else {
-			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, profile, nil)
+			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, qi.SpaceID, profile, nil)
 		}
 	}
 
