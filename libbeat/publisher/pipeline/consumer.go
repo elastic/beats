@@ -105,11 +105,9 @@ func newEventConsumer(
 	// safe ordering: wg drains first (which closes queueReader.req), then
 	// queueReaderWg ensures the goroutine has fully exited before close()
 	// returns — preventing goroutine log calls after the caller has torn down.
-	c.queueReaderWg.Add(1)
-	go func() {
-		defer c.queueReaderWg.Done()
+	c.queueReaderWg.Go(func() {
 		c.queueReader.run(c.logger)
-	}()
+	})
 
 	return c
 }
