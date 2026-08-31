@@ -8,13 +8,19 @@
 ##  build, so filenames distinguish them: snapshot files contain "-SNAPSHOT-"
 ##  (or end in "-SNAPSHOT.csv"); staging files do not.
 ##
+##  Runs in dra-prep.pipeline.yml, a separate pipeline from the one that
+##  packaged the artifacts, so the download is scoped to the parent build
+##  via BUILDKITE_TRIGGERED_FROM_BUILD_ID (auto-propagated by Buildkite to
+##  any build started by a trigger step).
+##
 
 set -euo pipefail
 
 WORKFLOW="${DRA_WORKFLOW:?DRA_WORKFLOW is required}"
+PARENT_BUILD_ID="${BUILDKITE_TRIGGERED_FROM_BUILD_ID:?BUILDKITE_TRIGGERED_FROM_BUILD_ID is required}"
 
-echo "--- Restoring artifacts"
-buildkite-agent artifact download "build/**/*" .
+echo "--- Restoring artifacts from parent build ${PARENT_BUILD_ID}"
+buildkite-agent artifact download "build/**/*" . --build "${PARENT_BUILD_ID}"
 
 echo "--- Normalizing filenames (${WORKFLOW})"
 .buildkite/scripts/packaging/prepare-dra-artifacts.sh "${WORKFLOW}"

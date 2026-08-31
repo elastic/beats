@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 ##
-##  Downloads the DRA manifest from the dra-prep-${WORKFLOW} step,
-##  extracts build_id and version, and annotates the build with a link to
-##  the workflow's summary at dra-prep plugin's temp upload path.
+##  Downloads the DRA manifest from the dra-prep step, extracts build_id
+##  and version, and annotates the build with a link to the workflow's
+##  summary at dra-prep plugin's temp upload path.
 ##
 ##  Link the temp path so the annotation is live the moment dra-prep plugin finishes.
 ##
-##  Invoked from the generated DRA sub-pipeline. Kept as a standalone script
-##  because Buildkite interpolates inline command:'s ${VAR} references at
-##  job pickup, which would eat local variables set inside the command block.
+##  Invoked from dra-prep.pipeline.yml. Kept as a standalone script because
+##  Buildkite interpolates inline command:'s ${VAR} references at job
+##  pickup, which would eat local variables set inside the command block.
 ##
 
 set -euo pipefail
 
 WORKFLOW="${1:?workflow required}"
 
-buildkite-agent artifact download "artifacts/dra/beats/*/manifest-*.json" . --step "dra-prep-${WORKFLOW}"
+buildkite-agent artifact download "artifacts/dra/beats/*/manifest-*.json" . --step "dra-prep"
 manifest=$(find artifacts/dra/beats -name "manifest-*.json" | head -1)
 build_id=$(jq -r '.build_id' "${manifest}")
 version=$(jq -r '.version' "${manifest}")
