@@ -115,31 +115,6 @@ metricbeat.modules:
 
 Note that by default prometheus pushes data with the interval of 60s (in remote write). In case that prometheus push rate is changed, the `period` parameter needs to be configured accordingly.
 
-When both `use_types` and `histogram_assembly.enabled` are enabled, Metricbeat buffers histogram buckets that arrive in separate remote write requests. Buckets with the same metric name, labels (excluding `le`), and sample timestamp are published as one Elasticsearch histogram. `histogram_assembly.enabled` defaults to `false`; when disabled, Metricbeat converts histogram buckets independently within each remote write request. The other `histogram_assembly` settings apply only when `histogram_assembly.enabled` is `true`:
-
-```yaml
-metricbeat.modules:
-- module: prometheus
-  metricsets: ["remote_write"]
-  host: "localhost"
-  port: "9201"
-  use_types: true
-  histogram_assembly:
-    enabled: true
-    quiet_period: 5s
-    hard_timeout: 30s
-    max_pending_histograms: 10000
-    max_pending_buckets: 100000
-```
-
-`quiet_period` (default: `5s`) is the time Metricbeat waits without receiving an update after the `+Inf` bucket arrives. When this period expires, Metricbeat publishes the assembled histogram.
-
-`hard_timeout` (default: `30s`) is the maximum time Metricbeat buffers a histogram after receiving its first bucket. When this timeout expires, Metricbeat publishes the available buckets as a partial histogram. After publishing, Metricbeat remembers the histogram identity for the same duration and drops late buckets so they cannot reopen it and produce a duplicate event. This value must be greater than or equal to `quiet_period`.
-
-`max_pending_histograms` (default: `10000`) limits the number of histograms buffered in memory. `max_pending_buckets` (default: `100000`) limits the total number of distinct buffered buckets. If accepting a remote write request would exceed either limit, Metricbeat rejects the request with HTTP status `503 Service Unavailable`, allowing the sender to retry it.
-
-Only histogram bucket samples are buffered. Histogram `_sum` and `_count` samples, counters, and gauges are published immediately.
-
 When `use_types` and `rate_counters` are enabled, metrics are stored like this:
 
 ```json
@@ -167,6 +142,41 @@ When `use_types` and `rate_counters` are enabled, metrics are stored like this:
 }
 ```
 
+
+### Histogram assembly [_histogram_assembly]
+
+```{applies_to}
+stack: beta 9.4+
+```
+
+Prometheus can send classic histogram buckets in more than one remote write request. By default, Metricbeat converts the buckets in each request independently, which can produce incomplete histograms and duplicate documents.
+
+`histogram_assembly` buffers those buckets and publishes them as one Elasticsearch histogram. It requires `use_types: true`. `histogram_assembly.enabled` defaults to `false`.
+
+When you set `histogram_assembly.enabled` to `true`, Metricbeat groups buckets that share the same metric name, labels (excluding `le`), and sample timestamp. The other `histogram_assembly` settings apply only when assembly is enabled:
+
+```yaml
+metricbeat.modules:
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+  use_types: true
+  histogram_assembly:
+    enabled: true
+    quiet_period: 5s
+    hard_timeout: 30s
+    max_pending_histograms: 10000
+    max_pending_buckets: 100000
+```
+
+`quiet_period` (default: `5s`) is the time Metricbeat waits without receiving an update after the `+Inf` bucket arrives. When this period expires, Metricbeat publishes the assembled histogram.
+
+`hard_timeout` (default: `30s`) is the maximum time Metricbeat buffers a histogram after receiving its first bucket. When this timeout expires, Metricbeat publishes the available buckets as a partial histogram. After publishing, Metricbeat remembers the histogram identity for the same duration and drops late buckets so they cannot reopen it and produce a duplicate event. This value must be greater than or equal to `quiet_period`.
+
+`max_pending_histograms` (default: `10000`) limits the number of histograms buffered in memory. `max_pending_buckets` (default: `100000`) limits the total number of distinct buffered buckets. If accepting a remote write request would exceed either limit, Metricbeat rejects the request with HTTP status `503 Service Unavailable`, allowing the sender to retry it.
+
+Only histogram bucket samples are buffered. Histogram `_sum` and `_count` samples, counters, and gauges are published immediately.
 
 ### Types' patterns [_types_patterns]
 
