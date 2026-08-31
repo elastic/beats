@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -295,6 +296,123 @@ func TestFollowSession_UserAgent(t *testing.T) {
 	}
 }
 
+func TestFollowSessionProcessesAllDiscoveredResources(t *testing.T) {
+	// Hold the first feed open after one event so a sequential follower
+	// would starve the second resource. Concurrent following should
+	// still publish both events within a bounded time.
+	release := make(chan struct{})
+
+	feed1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			t.Error("ResponseWriter does not implement http.Flusher")
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(w, `{"metadata":{"eventType":"Test","offset":1},"event":{"feed":"one"}}`)
+		flusher.Flush()
+		<-release
+	}))
+	t.Cleanup(func() {
+		close(release)
+		feed1.Close()
+	})
+
+	feed2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(w, `{"metadata":{"eventType":"Test","offset":2},"event":{"feed":"two"}}`)
+	}))
+	defer feed2.Close()
+
+	refreshSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer refreshSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		resp := map[string]any{
+			"resources": []map[string]any{
+				{
+					"dataFeedURL": feed1.URL + "/firehose",
+					"sessionToken": map[string]any{
+						"token":      "test-token",
+						"expiration": "2099-01-01T00:00:00Z",
+					},
+					"refreshActiveSessionURL":      refreshSrv.URL + "/refresh",
+					"refreshActiveSessionInterval": 1800,
+				},
+				{
+					"dataFeedURL": feed2.URL + "/firehose",
+					"sessionToken": map[string]any{
+						"token":      "test-token",
+						"expiration": "2099-01-01T00:00:00Z",
+					},
+					"refreshActiveSessionURL":      refreshSrv.URL + "/refresh",
+					"refreshActiveSessionInterval": 1800,
+				},
+			},
+			"meta": map[string]any{},
+		}
+		b, err := json.Marshal(resp)
+		if err != nil {
+			t.Errorf("failed to marshal discover response: %v", err)
+			return
+		}
+		_, _ = w.Write(b)
+	}))
+	defer discoverSrv.Close()
+
+	pub := new(recordingPublisher)
+	s := newTestStreamWithPublisher(t, discoverSrv.URL, http.DefaultClient, pub)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	done := make(chan error, 1)
+	go func() {
+		_, err := s.followSession(ctx, discoverSrv.Client(), map[string]any{})
+		done <- err
+	}()
+
+	deadline := time.After(3 * time.Second)
+	for {
+		if pub.published() >= 2 {
+			break
+		}
+		select {
+		case <-deadline:
+			t.Fatalf("expected events from both feeds within 3s, got %d", pub.published())
+		case err := <-done:
+			if pub.published() < 2 {
+				t.Fatalf("followSession returned before both feeds published: err=%v published=%d", err, pub.published())
+			}
+		case <-time.After(10 * time.Millisecond):
+		}
+	}
+
+	got := map[string]bool{}
+	for _, e := range pub.snapshot() {
+		ev, _ := e.Fields["event"].(map[string]any)
+		if ev == nil {
+			continue
+		}
+		if name, ok := ev["feed"].(string); ok {
+			got[name] = true
+		}
+	}
+	if !got["one"] || !got["two"] {
+		t.Errorf("expected events from feeds one and two, got %v", got)
+	}
+
+	cancel()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("followSession did not return after context cancel")
+	}
+}
+
 func discoverResponse(t *testing.T, feedURL, refreshURL string) string {
 	t.Helper()
 	resp := map[string]any{
@@ -362,13 +480,41 @@ func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient
 	}
 }
 
-type countingPublisher int
+type countingPublisher struct {
+	n atomic.Int64
+}
 
 func (p *countingPublisher) Publish(beat.Event, any) error {
-	*p++
+	p.n.Add(1)
 	return nil
 }
 
 func (p *countingPublisher) published() int {
-	return int(*p)
+	return int(p.n.Load())
+}
+
+type recordingPublisher struct {
+	mu     sync.Mutex
+	events []beat.Event
+}
+
+func (p *recordingPublisher) Publish(e beat.Event, _ any) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.events = append(p.events, e)
+	return nil
+}
+
+func (p *recordingPublisher) published() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return len(p.events)
+}
+
+func (p *recordingPublisher) snapshot() []beat.Event {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	out := make([]beat.Event, len(p.events))
+	copy(out, p.events)
+	return out
 }

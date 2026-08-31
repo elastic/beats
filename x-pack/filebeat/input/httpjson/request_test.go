@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
@@ -560,6 +561,78 @@ func TestChainStepOriginValidation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestChainPaginationFailureDoesNotAdvanceCursor(t *testing.T) {
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/":
+			fmt.Fprintf(w, `{"records":[{"id":"1"}],"page":"p1","nextLink":"%s/page2"}`, serverURL)
+		case "/page2":
+			fmt.Fprintln(w, `{"records":[{"id":"2"}],"page":"p2"}`)
+		case "/1":
+			fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+		case "/2":
+			w.WriteHeader(http.StatusBadGateway)
+			fmt.Fprintln(w, `{"error":"transient chain failure"}`)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	t.Cleanup(server.Close)
+	serverURL = server.URL
+
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"interval":       1,
+		"request.method": "GET",
+		"request.url":    server.URL,
+		"response.pagination": []any{
+			map[string]any{
+				"set": map[string]any{
+					"target":                 "url.value",
+					"value":                  "[[.last_response.body.nextLink]]",
+					"fail_on_template_error": true,
+				},
+			},
+		},
+		"chain": []any{
+			map[string]any{
+				"step": map[string]any{
+					"request.method": "GET",
+					"request.url":    server.URL + "/$.records[:].id",
+					"replace":        "$.records[:].id",
+				},
+			},
+		},
+		"cursor": map[string]any{
+			"page": map[string]any{
+				"value": "[[ .last_event.page ]]",
+			},
+		},
+	})
+
+	config := defaultConfig()
+	require.NoError(t, cfg.Unpack(&config), "unpacking test config should succeed")
+
+	log := logptest.NewTestingLogger(t, "")
+	ctx := context.Background()
+	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
+	require.NoError(t, err, "creating http client should succeed")
+
+	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "")
+	require.NoError(t, err, "creating request factory should succeed")
+	pagination := newPagination(config, client, noopReporter{}, log, "")
+	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
+	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
+
+	trCtx := emptyTransformContext()
+	trCtx.cursor = newCursor(config.Cursor, noopReporter{}, log)
+
+	err = requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}})
+	require.Error(t, err, "interval should fail when a paginated chain request fails")
+	assert.Contains(t, err.Error(), "502", "error should surface the transient chain HTTP failure")
+	assert.Equal(t, "p1", trCtx.cursorMap()["page"], "cursor should remain on the last successfully chained page")
 }
 
 func TestPaginationRequestFactorySetsUserAgent(t *testing.T) {

@@ -36,6 +36,8 @@ The CrowdStrike streaming input requires OAuth2.0 as described in the CrowdStrik
 
 The feed and refresh URLs returned by the CrowdStrike discover endpoint are validated against the configured URL's origin before any request is made. By default, both URLs must share the same registrable domain (e.g. `crowdstrike.com`) as the configured `url`. If the discover response returns URLs on a different domain, you can allowlist additional origins with the `resource_origins` option.
 
+The CrowdStrike discover endpoint can return multiple feed resources. Each resource is followed concurrently so a long-lived feed cannot starve the others.
+
 The `stream_type` configuration field specifies which type of streaming input to use, `websocket` or `crowdstrike`. If it is not set, the input defaults to websocket streaming.
 
 ## Execution [_execution_3]
