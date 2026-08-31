@@ -479,12 +479,12 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	for _, f := range feeds {
 		wg.Add(1)
-		go func() {
+		go func(f preparedFeed) {
 			defer wg.Done()
 			feedState := cloneState(state)
 			feedState["feed"] = f.feedName
 			fail(s.consumeFeed(sessionCtx, cli, f.resource, f.feedName, f.offset, feedState, merged))
-		}()
+		}(f)
 	}
 	wg.Wait()
 	delete(state, "feed")

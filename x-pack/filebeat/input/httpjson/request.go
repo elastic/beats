@@ -724,11 +724,11 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	// for each pagination response, we repeat all the chain steps / blocks
 	n, err := p.req.processChainPaginationEvents(ctx, p.trCtx, p.pub, &response, p.idx, p.req.log)
 	if err != nil {
-		p.trCtx.cursor.restore(savedCursor)
 		if errors.Is(err, notLogged{}) {
 			p.req.log.Debugf("ignored error processing chain event: %v", err)
 			return
 		}
+		p.trCtx.cursor.restore(savedCursor)
 		p.setErr(err)
 		p.req.log.Errorf("error processing chain event: %v", err)
 		return
@@ -741,6 +741,7 @@ func (p *chainProcessor) handleError(err error) {
 		p.req.log.Debugf("ignored error processing response: %v", err)
 		return
 	}
+	p.setErr(err)
 	p.status.UpdateStatus(status.Degraded, "error processing response: "+err.Error())
 	p.req.log.Errorf("error processing response: %v", err)
 }
