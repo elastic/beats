@@ -1194,7 +1194,7 @@ spec:
       description: Runs elastic/dra-prep
     spec:
       repository: elastic/beats
-      pipeline_file: ".buildkite/dra-prep.pipeline.yml"
+      pipeline_file: ".buildkite/dra-prep-pipeline.yml"
       branch_configuration: "main 8.19 9.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
