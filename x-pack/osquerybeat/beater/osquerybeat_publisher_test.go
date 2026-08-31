@@ -30,11 +30,7 @@ func (m *mockBeatPublisher) PublishActionResult(req map[string]interface{}, res 
 func (m *mockBeatPublisher) PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 }
 
-<<<<<<< HEAD
-func (m *mockBeatPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
-=======
 func (m *mockBeatPublisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
->>>>>>> 75c1543 (x-pack/osquerybeat: stamp space_id on live query result and profile documents (#52915))
 }
 
 func (m *mockBeatPublisher) Configure(inputs []config.InputConfig) error {

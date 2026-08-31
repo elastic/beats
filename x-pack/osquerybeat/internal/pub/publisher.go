@@ -249,11 +249,7 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, ti
 	p.actionResponsesClient.Publish(event)
 }
 
-<<<<<<< HEAD
-func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
-=======
 func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
->>>>>>> 75c1543 (x-pack/osquerybeat: stamp space_id on live query result and profile documents (#52915))
 	p.mx.Lock()
 	defer p.mx.Unlock()
 

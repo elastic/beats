@@ -32,21 +32,6 @@ func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) 
 }
 
 type mockPublisher struct {
-<<<<<<< HEAD
-	index      string
-	idValue    string
-	idFieldKey string
-	responseID string
-	spaceID    string
-	packID     string
-	packName   string
-	queryName  string
-	meta       map[string]interface{}
-	hits       []map[string]interface{}
-	ecsm       ecs.Mapping
-	reqData    interface{}
-	profile    map[string]interface{}
-=======
 	index          string
 	idValue        string
 	idFieldKey     string
@@ -61,7 +46,6 @@ type mockPublisher struct {
 	reqData        any
 	profile        map[string]any
 	profileSpaceID string
->>>>>>> 75c1543 (x-pack/osquerybeat: stamp space_id on live query result and profile documents (#52915))
 }
 
 func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
@@ -79,11 +63,7 @@ func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID,
 	p.reqData = reqData
 }
 
-<<<<<<< HEAD
-func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
-=======
 func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
->>>>>>> 75c1543 (x-pack/osquerybeat: stamp space_id on live query result and profile documents (#52915))
 	p.profile = profile
 	p.profileSpaceID = spaceID
 }
