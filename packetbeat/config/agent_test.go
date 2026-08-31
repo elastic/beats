@@ -22,6 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -64,6 +65,7 @@ streams:
       buffer_size_mb: 100
     procs:
       enabled: true
+      backend: auto
       monitored:
         - process: postgresql
           cmdline_grep: postgresql
@@ -100,4 +102,23 @@ streams:
 	require.Equal(t, "en1", config.Interfaces[1].Device)
 	require.Equal(t, "en2", config.Interfaces[2].Device)
 	require.Len(t, config.Procs.Monitored, 3)
+	require.Equal(t, procs.BackendAuto, config.Procs.Backend)
+}
+
+func TestMergeProcsBackend(t *testing.T) {
+	for _, tc := range []struct {
+		one, two, want string
+	}{
+		{"", "", ""},
+		{procs.BackendProcfs, "", procs.BackendProcfs},
+		{"", procs.BackendProcfs, procs.BackendProcfs},
+		{procs.BackendProcfs, procs.BackendAuto, procs.BackendAuto},
+		{procs.BackendAuto, procs.BackendProcfs, procs.BackendAuto},
+		{procs.BackendAuto, procs.BackendKernelTracing, procs.BackendKernelTracing},
+		{procs.BackendKernelTracing, "", procs.BackendKernelTracing},
+		{procs.BackendProcfs, procs.BackendProcfs, procs.BackendProcfs},
+	} {
+		require.Equal(t, tc.want, mergeProcsBackend(tc.one, tc.two),
+			"mergeProcsBackend(%q, %q)", tc.one, tc.two)
+	}
 }
