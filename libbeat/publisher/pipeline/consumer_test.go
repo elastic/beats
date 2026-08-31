@@ -188,3 +188,84 @@ func TestEventConsumerCloseReleasesHeldBatches(t *testing.T) {
 		"all slots must return to the pool after consumer close (got %d/%d)",
 		pool.Available(), capacity)
 }
+
+// blockingGetQueue wraps a queue.Queue so that Get() blocks until unblock is
+// closed, signalling via entered when a caller first lands inside Get(). This
+// gives tests precise control over the moment queueReader holds a fetched batch
+// so they can race the consumer shutdown against the batch delivery.
+type blockingGetQueue struct {
+	queue.Queue[publisher.Event]
+	entered chan struct{}
+	unblock chan struct{}
+}
+
+func (q *blockingGetQueue) Get(n int) (queue.Batch[publisher.Event], error) {
+	select {
+	case <-q.entered:
+	default:
+		close(q.entered)
+	}
+	<-q.unblock
+	return q.Queue.Get(n)
+}
+
+// TestEventConsumerCloseReleasesQueueReaderBatch verifies that when a consumer
+// shuts down while queueReader has data inflight, the batch is released.
+func TestEventConsumerCloseReleasesQueueReaderBatch(t *testing.T) {
+	const capacity = 8
+	pool := slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: capacity}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	for i := range capacity {
+		_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: i}})
+		require.True(t, ok)
+	}
+	require.Equal(t, 0, pool.Available(), "pool should be full before test")
+
+	bq := &blockingGetQueue{
+		Queue:   q,
+		entered: make(chan struct{}),
+		unblock: make(chan struct{}),
+	}
+
+	c := newEventConsumer(logp.NewNopLogger(), nilObserver)
+	out := make(chan publisher.Batch)
+	c.setTarget(consumerTarget{queue: bq, ch: out, batchSize: capacity, timeToLive: 3})
+
+	// Wait until queueReader is inside Get() so we know it will receive a
+	// batch the moment we unblock it.
+	select {
+	case <-bq.entered:
+	case <-time.After(2 * time.Second):
+		t.Fatal("queueReader never entered Get()")
+	}
+
+	// trigger a shutdown
+	closeDone := make(chan struct{})
+	go func() {
+		defer close(closeDone)
+		c.close()
+	}()
+
+	// c.wg.Wait() returns only after run() has exited, which means
+	// close(c.queueReader.req) has already been called. qr.req is now closed.
+	c.wg.Wait()
+
+	// Unblock queueReader. It calls the real Get() (returns immediately —
+	// the pool is full), then enters its select. Because qr.req is already
+	// closed, case <-qr.req fires: the batch is Released and queueReader exits.
+	close(bq.unblock)
+
+	select {
+	case <-closeDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("consumer.close() hung after unblocking queueReader")
+	}
+
+	require.Equal(t, capacity, pool.Available(),
+		"batch held by queueReader must be Released on shutdown (got %d/%d)",
+		pool.Available(), capacity)
+}
