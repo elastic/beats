@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"regexp"
 	"slices"
+	"strings"
 
 	"github.com/elastic/go-ucfg"
 
@@ -305,6 +306,8 @@ func (l *logHints) removeRejectedFileset(
 	return true
 }
 
+// validateInputType returns the inputType and the reason for rejection
+// if the input is not allowed/valid.
 func (l *logHints) validateInputType(config *conf.C) (string, string) {
 	inputType, err := config.String("type", -1)
 	if err != nil || inputType == "" {
@@ -315,7 +318,11 @@ func (l *logHints) validateInputType(config *conf.C) (string, string) {
 		return "", ""
 	}
 
-	return inputType, "disallowed input type"
+	msg := fmt.Sprintf(
+		"disallowed input type, valid inputs are: %s",
+		strings.Join(l.config.InputAllowList.Types, " "))
+
+	return inputType, msg
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {
