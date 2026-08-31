@@ -8,7 +8,7 @@
 ##  build, so filenames distinguish them: snapshot files contain "-SNAPSHOT-"
 ##  (or end in "-SNAPSHOT.csv"); staging files do not.
 ##
-##  Runs in dra-prep.pipeline.yml, a separate pipeline from the one that
+##  Runs in dra-prep-pipeline.yml, a separate pipeline from the one that
 ##  packaged the artifacts, so the download is scoped to the parent build
 ##  via BUILDKITE_TRIGGERED_FROM_BUILD_ID (auto-propagated by Buildkite to
 ##  any build started by a trigger step).

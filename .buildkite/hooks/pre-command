@@ -49,7 +49,7 @@ if [[ "${BUILDKITE_PIPELINE_SLUG:-}" == "beats-dra-prep-pipeline" ]]; then
   # DRY_RUN env-var contract: when set to "true" from the Buildkite UI (or
   # forwarded from the triggering packaging.pipeline.yml build), the plugin
   # runs but does not upload to GCS, and the annotate + processing-trigger
-  # steps are skipped (see dra-prep.pipeline.yml's `if:` conditions).
+  # steps are skipped (see dra-prep-pipeline.yml's `if:` conditions).
   export DRA_UPLOAD="true"
   if [[ "${DRY_RUN:-}" == "true" ]]; then
     export DRA_UPLOAD="false"

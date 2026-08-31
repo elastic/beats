@@ -6,7 +6,7 @@
 ##
 ##  Link the temp path so the annotation is live the moment dra-prep plugin finishes.
 ##
-##  Invoked from dra-prep.pipeline.yml. Kept as a standalone script because
+##  Invoked from dra-prep-pipeline.yml. Kept as a standalone script because
 ##  Buildkite interpolates inline command:'s ${VAR} references at job
 ##  pickup, which would eat local variables set inside the command block.
 ##
