@@ -379,6 +379,7 @@ steps:
         key: "packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
+          HEARTBEAT_REQUIRE_BROWSER_E2E_ARCHIVE: "true"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
