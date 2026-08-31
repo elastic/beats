@@ -331,10 +331,6 @@ func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-func toMap(t *testing.T, s string) map[string]interface{} {
-	var m map[string]interface{}
-=======
 func TestQueryProfileToEvent_SpaceID(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -364,9 +360,8 @@ func TestQueryProfileToEvent_SpaceID(t *testing.T) {
 	}
 }
 
-func toMap(t *testing.T, s string) map[string]any {
-	var m map[string]any
->>>>>>> 75c1543 (x-pack/osquerybeat: stamp space_id on live query result and profile documents (#52915))
+func toMap(t *testing.T, s string) map[string]interface{} {
+	var m map[string]interface{}
 	err := json.Unmarshal([]byte(s), &m)
 	if err != nil {
 		t.Fatal(err)
