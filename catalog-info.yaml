@@ -1201,8 +1201,7 @@ spec:
       maximum_timeout_in_minutes: 90
       provider_settings:
         # Only ever run via the trigger step in packaging.pipeline.yml, or
-        # manually from the Buildkite UI for testing (see teams below) --
-        # matches unified-release-dra-processing's config for the same shape.
+        # manually from the Buildkite UI for testing
         build_pull_requests: false
         trigger_mode: none
       env:
