@@ -120,9 +120,14 @@ func (inp *managedInput) Run(
 	// stage.)
 	monitoring.NewString(ctx.MetricsRegistry, "input").Set(inputmon.InputNested)
 
-	inp.manager.mu.Lock()
-	store := inp.manager.store
-	inp.manager.mu.Unlock()
+	// Acquire a lease on the shared store. This increments the cache user
+	// count so the store cannot be drained by a concurrent Close() call
+	// until all source goroutines have finished and leaseRelease is called.
+	store, leaseRelease, ok := inp.manager.acquireLease()
+	if !ok {
+		return errors.New("input manager store is not available")
+	}
+	defer leaseRelease()
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {

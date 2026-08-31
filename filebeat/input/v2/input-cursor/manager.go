@@ -67,12 +67,14 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-	// mu guards store, release, and closed. store and release are set once on
-	// the first successful Create and cleared on Close.
-	mu      sync.Mutex
-	store   *store
-	release func()
-	closed  bool
+	// mu guards store, release, cacheKey, and closed. store, release, and
+	// cacheKey are set once on the first successful Create and store/release
+	// are cleared on Close.
+	mu       sync.Mutex
+	store    *store
+	release  func()
+	cacheKey string
+	closed   bool
 }
 
 // Source describe a source the input can collect data from.
@@ -105,6 +107,7 @@ func (cim *InputManager) ensureSetup(inputID string) error {
 	}
 	log := cim.Logger.With("input_type", cim.Type)
 	key := cim.StateStore.StoreKey() + "::" + cim.Type
+	cim.cacheKey = key
 	interval := cim.StateStore.CleanupInterval()
 	if interval <= 0 {
 		interval = 5 * time.Minute
@@ -204,6 +207,20 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		input:        inp,
 		cleanTimeout: settings.CleanInactive,
 	}, nil
+}
+
+// acquireLease increments the globalCache user count for this manager's key,
+// preventing the cache from draining the store while the caller is active.
+// Returns ok=false if the cache entry is not active (manager not yet set up or
+// already closed). The returned release function must be called exactly once.
+func (cim *InputManager) acquireLease() (*store, func(), bool) {
+	cim.mu.Lock()
+	key := cim.cacheKey
+	cim.mu.Unlock()
+	if key == "" {
+		return nil, func() {}, false
+	}
+	return globalCache.Lease(key)
 }
 
 // lock locks a key for exclusive access and returns a resource that can be used to modify

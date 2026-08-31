@@ -606,6 +606,101 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 }
 
+func TestManager_RunHoldsLeaseUntilDone(t *testing.T) {
+	// Verify that calling InputManager.Close() while inp.Run() is still
+	// executing does not prematurely drain the shared store. Without the lease
+	// acquired in Run(), the cache user count would drop to zero on Close(),
+	// triggering the closeFn while source goroutines still hold store references
+	// and have cursor updates pending in the ACK pipeline.
+
+	store := createSampleStore(t, nil)
+
+	inputRunning := make(chan struct{})
+	inputProceed := make(chan struct{})
+
+	var capturedAcker beat.EventListener
+	ackSet := make(chan struct{})
+	var ackOnce sync.Once
+
+	manager := &InputManager{
+		Logger:              logptest.NewTestingLogger(t, "test"),
+		StateStore:          store,
+		Type:                "test",
+		DefaultCleanTimeout: time.Minute,
+		Configure: func(_ *conf.C, _ *logp.Logger) ([]Source, Input, error) {
+			return sourceList("key"), &fakeTestInput{
+				OnRun: func(_ input.Context, _ Source, _ Cursor, pub Publisher) error {
+					// Publish before signalling so the test knows AddEvent
+					// has already been called when it proceeds.
+					_ = pub.Publish(beat.Event{Fields: mapstr.M{"hello": "world"}}, "cursor-while-closing")
+					close(inputRunning)
+					<-inputProceed
+					return nil
+				},
+			}, nil
+		},
+	}
+
+	pipeline := &pubtest.FakeConnector{
+		ConnectFunc: func(cfg beat.ClientConfig) (beat.Client, error) {
+			ackOnce.Do(func() {
+				capturedAcker = cfg.EventListener
+				close(ackSet)
+			})
+			return &pubtest.FakeClient{
+				PublishFunc: func(event beat.Event) {
+					capturedAcker.AddEvent(event, true)
+				},
+			}, nil
+		},
+	}
+
+	inp, err := manager.Create(conf.NewConfig())
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	var runErr error
+	var runWg sync.WaitGroup
+	runWg.Add(1)
+	go func() {
+		defer runWg.Done()
+		id := uuid.Must(uuid.NewV4()).String()
+		inpCtx := input.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     ctx,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          manager.Logger,
+		}
+		runErr = inp.Run(inpCtx, pipeline)
+	}()
+
+	// Wait for the input goroutine to be running and the ACK handler to be wired.
+	<-inputRunning
+	<-ackSet
+
+	// Close manager while the input goroutine is still executing. Without the
+	// lease, this would drop e.users to 0, trigger cache drain, and close the
+	// persistent store before the ACK handler runs.
+	manager.Close()
+
+	// ACK the event. The cursor updateOp writes to the store; with the lease
+	// fix the store is still alive here because leaseRelease() has not been
+	// called yet (the goroutine is still blocked on inputProceed).
+	capturedAcker.ACKEvents(1)
+
+	// The cursor state must have been written successfully.
+	require.Equal(t, "cursor-while-closing", store.snapshot()["test::key"].Cursor)
+
+	// Let the goroutine finish, which releases the lease and allows the drain.
+	close(inputProceed)
+	runWg.Wait()
+	require.NoError(t, runErr)
+}
+
 func TestLockResource(t *testing.T) {
 	t.Run("can lock unused resource", func(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))

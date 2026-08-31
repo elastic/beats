@@ -166,6 +166,21 @@ func (c *Cache[T]) initialize(e *cacheEntry[T], openFn func() (T, error), runFn 
 	return value, c.newRelease(e), nil
 }
 
+// Lease returns the active value for key and a release function, incrementing
+// the user count without calling openFn or runFn. Returns ok=false if no active
+// entry exists for key. Use Lease to hold a reference to a value already opened
+// by Acquire, preventing a drain from firing while the caller is still using it.
+func (c *Cache[T]) Lease(key string) (value T, release func(), ok bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	e := c.entries[key]
+	if e == nil || e.state != cacheActive {
+		return *new(T), func() {}, false
+	}
+	e.users++
+	return e.value, c.newRelease(e), true
+}
+
 // Len returns the number of active cache entries.
 func (c *Cache[T]) Len() int {
 	c.mu.Lock()
