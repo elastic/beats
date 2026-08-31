@@ -1178,7 +1178,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: beats-dra-prep-pipeline
-  description: Buildkite pipeline for DRA prep + publishing, triggered by beats-packaging-pipeline
+  description: Buildkite pipeline for DRA prep
   links:
     - title: Pipeline
       url: https://buildkite.com/elastic/beats-dra-prep-pipeline
@@ -1191,7 +1191,7 @@ spec:
     kind: Pipeline
     metadata:
       name: beats-dra-prep-pipeline
-      description: Runs elastic/dra-prep + annotation for beats, triggered by beats-packaging-pipeline
+      description: Runs elastic/dra-prep
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/dra-prep.pipeline.yml"
@@ -1212,7 +1212,7 @@ spec:
       teams:
         streams:
           access_level: MANAGE_BUILD_AND_READ
-        release-eng:
+        artifact-management:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
