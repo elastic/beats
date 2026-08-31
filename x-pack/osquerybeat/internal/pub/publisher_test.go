@@ -331,6 +331,35 @@ func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
 	}
 }
 
+func TestQueryProfileToEvent_SpaceID(t *testing.T) {
+	tests := []struct {
+		name    string
+		spaceID string
+		present bool
+	}{
+		{name: "present", spaceID: "production", present: true},
+		{name: "absent", spaceID: "", present: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fields := queryProfileToEvent("", "", "", tc.spaceID, map[string]any{"key": "val"}, nil)
+			got, ok := fields["space_id"]
+			if tc.present {
+				if !ok {
+					t.Errorf("expected space_id %q, field not present", tc.spaceID)
+				} else if got != tc.spaceID {
+					t.Errorf("space_id mismatch: got=%q want=%q", got, tc.spaceID)
+				}
+			} else {
+				if ok {
+					t.Errorf("expected no space_id field, got %v", got)
+				}
+			}
+		})
+	}
+}
+
 func toMap(t *testing.T, s string) map[string]interface{} {
 	var m map[string]interface{}
 	err := json.Unmarshal([]byte(s), &m)
