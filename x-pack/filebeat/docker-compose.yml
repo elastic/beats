@@ -51,11 +51,11 @@ services:
     command: bash -c "/start.sh"
     
   googlepubsub:
-    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-467.0.0-0}-1
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-582.0.0-0}-1
     build:
       context: ${ES_BEATS}/testing/environments/docker/googlepubsub
       args:
-        SDK_VERSION: ${SDK_VERSION:-467.0.0-0}
+        SDK_VERSION: ${SDK_VERSION:-582.0.0-0}
     hostname: googlepubsub
     ports:
       - 8432:8432
