@@ -658,25 +658,20 @@ func TestManager_RunHoldsLeaseUntilDone(t *testing.T) {
 	inp, err := manager.Create(conf.NewConfig())
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	var runErr error
 	var runWg sync.WaitGroup
-	runWg.Add(1)
-	go func() {
-		defer runWg.Done()
+	runWg.Go(func() {
 		id := uuid.Must(uuid.NewV4()).String()
 		inpCtx := input.Context{
 			ID:              id,
 			IDWithoutName:   id,
 			Name:            inp.Name(),
-			Cancelation:     ctx,
+			Cancelation:     t.Context(),
 			MetricsRegistry: monitoring.NewRegistry(),
 			Logger:          manager.Logger,
 		}
 		runErr = inp.Run(inpCtx, pipeline)
-	}()
+	})
 
 	// Wait for the input goroutine to be running and the ACK handler to be wired.
 	<-inputRunning
