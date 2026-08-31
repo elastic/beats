@@ -357,7 +357,7 @@ func newTestMetricSetBase(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBy
 // to ensure proper initialization (including logger)
 func newTestMetricSet(t *testing.T, maxCompressedBodyBytes, maxDecodedBodyBytes int64) *MetricSet {
 	m := newTestMetricSetBase(t, maxCompressedBodyBytes, maxDecodedBodyBytes)
-	startOwnerLoop(t, m, newTestPushReporter(nil))
+	startOwnerLoop(t, m, newTestPushReporter(context.Background()))
 	return m
 }
 
