@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/docker/go-units"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -51,6 +52,7 @@ type responseConfig struct {
 	IncludeBody         string `config:"include_body"`
 	IncludeBodyMaxBytes int    `config:"include_body_max_bytes"`
 	IncludeHeaders      bool   `config:"include_headers"`
+	CheckBodyMaxBytes   int    `config:"check_body_max_bytes"`
 }
 
 type checkConfig struct {
@@ -99,6 +101,9 @@ func defaultConfig() Config {
 			IncludeBody:         "on_error",
 			IncludeBodyMaxBytes: 2048,
 			IncludeHeaders:      true,
+			// CheckBodyMaxBytes sets a hard limit on how much we're willing to buffer for body validators internally.
+			// This values gets overriden when IncludeBodyMaxBytes is larger.
+			CheckBodyMaxBytes: 4 * units.MiB,
 		},
 		Mode: monitors.DefaultIPSettings,
 		Check: checkConfig{
@@ -130,6 +135,10 @@ func (r *responseConfig) Validate() error {
 
 	if r.IncludeBodyMaxBytes <= 0 {
 		return fmt.Errorf("include_body_max_bytes must be a positive integer, got %d", r.IncludeBodyMaxBytes)
+	}
+
+	if r.CheckBodyMaxBytes <= 0 {
+		return fmt.Errorf("check_body_max_bytes must be a positive integer, got %d", r.CheckBodyMaxBytes)
 	}
 
 	return nil
