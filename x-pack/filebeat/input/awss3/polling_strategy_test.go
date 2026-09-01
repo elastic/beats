@@ -12,10 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNewPollingStrategy(t *testing.T) {
-	log := logp.NewLogger("new_polling_strategy_test")
+	log := logptest.NewTestingLogger(t, "new_polling_strategy_test")
 
 	t.Run("returns normalPollingStrategy when lexicographical ordering is false", func(t *testing.T) {
 		strategy := newPollingStrategy(false, log)
@@ -31,7 +32,7 @@ func TestNewPollingStrategy(t *testing.T) {
 }
 
 func TestNormalPollingStrategy(t *testing.T) {
-	log := logp.NewLogger("normal_polling_strategy_test")
+	log := logptest.NewTestingLogger(t, "normal_polling_strategy_test")
 	strategy := newNormalPollingStrategy(log)
 
 	t.Run("GetStartAfterKey returns empty string", func(t *testing.T) {
@@ -67,7 +68,7 @@ func TestNormalPollingStrategy(t *testing.T) {
 }
 
 func TestLexicographicalPollingStrategy(t *testing.T) {
-	log := logp.NewLogger("lexicographical_polling_strategy_test")
+	log := logptest.NewTestingLogger(t, "lexicographical_polling_strategy_test")
 	strategy := newLexicographicalPollingStrategy(log)
 
 	t.Run("GetStartAfterKey returns lexicographically smallest key", func(t *testing.T) {
@@ -120,7 +121,7 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 }
 
 func TestPollingStrategyBehaviorDifferences(t *testing.T) {
-	log := logp.NewLogger("polling_strategy_behavior_differences_test")
+	log := logptest.NewTestingLogger(t, "polling_strategy_behavior_differences_test")
 	normalStrategy := newNormalPollingStrategy(log)
 	lexicoStrategy := newLexicographicalPollingStrategy(log)
 

@@ -136,9 +136,9 @@ func TestContract_EventFieldPaths(t *testing.T) {
 	v, _ = event.Fields.GetValue("cloud.region")
 	assert.Equal(t, "eu-west-1", v)
 
-	// aws.s3.metadata (stored as map[string]interface{}, which is the underlying type of mapstr.M)
+	// aws.s3.metadata (stored as map[string]any, which is the underlying type of mapstr.M)
 	v, _ = event.Fields.GetValue("aws.s3.metadata")
-	assert.Equal(t, map[string]interface{}{"x-amz-server-side-encryption": "AES256"}, v)
+	assert.Equal(t, map[string]any{"x-amz-server-side-encryption": "AES256"}, v)
 
 	// @metadata._id
 	expectedID := objectID(obj.S3.Object.LastModified, s3ObjectHash(obj), 42)
@@ -454,19 +454,19 @@ func TestContract_ExpandEventListFromField_EmptyArray(t *testing.T) {
 func TestContract_ConfigValidation_MutualExclusion(t *testing.T) {
 	cases := []struct {
 		name string
-		cfg  map[string]interface{}
+		cfg  map[string]any
 	}{
 		{
 			name: "queue_url_and_bucket_arn",
-			cfg:  map[string]interface{}{"queue_url": "https://sqs.us-east-1.amazonaws.com/1234/queue", "bucket_arn": "arn:aws:s3:::b"},
+			cfg:  map[string]any{"queue_url": "https://sqs.us-east-1.amazonaws.com/1234/queue", "bucket_arn": "arn:aws:s3:::b"},
 		},
 		{
 			name: "bucket_arn_and_non_aws_bucket_name",
-			cfg:  map[string]interface{}{"bucket_arn": "arn:aws:s3:::b", "non_aws_bucket_name": "nb", "region": "us-east-1"},
+			cfg:  map[string]any{"bucket_arn": "arn:aws:s3:::b", "non_aws_bucket_name": "nb", "region": "us-east-1"},
 		},
 		{
 			name: "none_set",
-			cfg:  map[string]interface{}{},
+			cfg:  map[string]any{},
 		},
 	}
 
@@ -587,7 +587,7 @@ func runExpandTest(t *testing.T, input, field string) []string {
 	return events
 }
 
-func makeConfig(overrides map[string]interface{}) config {
+func makeConfig(overrides map[string]any) config {
 	c := defaultConfig()
 	if v, ok := overrides["queue_url"]; ok {
 		c.QueueURL = v.(string) //nolint:errcheck // Statically known to be a string.

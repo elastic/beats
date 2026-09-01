@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
@@ -398,7 +397,7 @@ func TestLexicographicalStateRegistry_TailTracking(t *testing.T) {
 }
 
 func TestLexicographicalStateRegistry_CleanUp(t *testing.T) {
-	logger := logp.NewLogger("lexicographical-registry-test")
+	logger := logptest.NewTestingLogger(t, "lexicographical-registry-test")
 
 	t.Run("CleanUp preserves newest state", func(t *testing.T) {
 		store := openTestStatestore()
@@ -456,12 +455,12 @@ func TestLexicographicalStateRegistry_CleanUp(t *testing.T) {
 		require.True(t, registry.IsProcessed(stateA.IDWithLexicographicalOrdering()))
 		require.False(t, registry.IsProcessed(stateB.IDWithLexicographicalOrdering()))
 		require.False(t, registry.IsProcessed(stateC.IDWithLexicographicalOrdering()))
-		require.Equal(t, 1, len(lexicoRegistry.states))
+		require.Len(t, lexicoRegistry.states, 1)
 	})
 }
 
 func TestLexicographicalStateRegistry_TrimsOnLoad(t *testing.T) {
-	logger := logp.NewLogger("lexicographical-registry-test")
+	logger := logptest.NewTestingLogger(t, "lexicographical-registry-test")
 	store := openTestStatestore()
 
 	registry1, err := newStateRegistry(logger, store, "", "", false, 0)
@@ -496,7 +495,7 @@ func TestLexicographicalStateRegistry_TrimsOnLoad(t *testing.T) {
 	lexicoRegistry2 := registry2.(*lexicographicalStateRegistry) //nolint:errcheck // type assertion is safe in test
 
 	// Should only have the 2 newest (lexicographically greatest) states: c and d
-	require.Equal(t, capacity, len(lexicoRegistry2.states))
+	require.Len(t, lexicoRegistry2.states, capacity)
 	require.False(t, registry2.IsProcessed(stateA.IDWithLexicographicalOrdering()))
 	require.False(t, registry2.IsProcessed(stateB.IDWithLexicographicalOrdering()))
 	require.True(t, registry2.IsProcessed(stateC.IDWithLexicographicalOrdering()))
@@ -512,7 +511,7 @@ func TestLexicographicalStateRegistry_TrimsOnLoad(t *testing.T) {
 }
 
 func TestLexicographicalStateRegistry_HeapOrder(t *testing.T) {
-	logger := logp.NewLogger("lexicographical-registry-test")
+	logger := logptest.NewTestingLogger(t, "lexicographical-registry-test")
 	store := openTestStatestore()
 	registry, err := newStateRegistry(logger, store, "", "", true, 10)
 	require.NoError(t, err)
@@ -568,7 +567,7 @@ func TestNewStateRegistry(t *testing.T) {
 // ============================================================================
 
 func TestStateRegistryBehaviorDifferences(t *testing.T) {
-	logger := logp.NewLogger("state-registry-diff-test")
+	logger := logptest.NewTestingLogger(t, "state-registry-diff-test")
 
 	t.Run("ID format differs between implementations", func(t *testing.T) {
 		normalStore := openTestStatestore()
@@ -655,7 +654,7 @@ func TestStateRegistryBehaviorDifferences(t *testing.T) {
 }
 
 func TestStatesStoreForRouting(t *testing.T) {
-	logger := logp.NewLogger("states-store-routing-test")
+	logger := logptest.NewTestingLogger(t, "states-store-routing-test")
 
 	t.Run("lexicographical ordering passes aws-s3 to StoreFor", func(t *testing.T) {
 		store := &trackingInputStore{
@@ -680,7 +679,7 @@ func TestStatesStoreForRouting(t *testing.T) {
 		_, err := newStateRegistry(logger, store, "", "", false, 0)
 		require.NoError(t, err)
 
-		require.Equal(t, "", store.lastStoreForType, "StoreFor should be called with empty string when lexicographical ordering is disabled")
+		require.Empty(t, store.lastStoreForType, "StoreFor should be called with empty string when lexicographical ordering is disabled")
 	})
 }
 
