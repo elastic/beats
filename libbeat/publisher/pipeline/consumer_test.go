@@ -200,11 +200,7 @@ type blockingGetQueue struct {
 }
 
 func (q *blockingGetQueue) Get(n int) (queue.Batch[publisher.Event], error) {
-	select {
-	case <-q.entered:
-	default:
-		close(q.entered)
-	}
+	close(q.entered)
 	<-q.unblock
 	return q.Queue.Get(n)
 }
@@ -251,7 +247,7 @@ func TestEventConsumerCloseReleasesQueueReaderBatch(t *testing.T) {
 	}()
 
 	// c.wg.Wait() returns only after run() has exited, which means
-	// close(c.queueReader.req) has already been called. qr.req is now closed.
+	// close(c.queueReader.req) has already been called. c.queueReader.req is now closed.
 	c.wg.Wait()
 
 	// Unblock queueReader. It calls the real Get() (returns immediately —
