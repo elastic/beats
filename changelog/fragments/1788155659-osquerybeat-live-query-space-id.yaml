@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Stamp space_id on Osquerybeat live query result and profile documents so results are visible in non-default Kibana spaces.
+component: osquerybeat
