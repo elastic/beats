@@ -631,8 +631,7 @@ func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r 
 			if errors.Is(err, context.Canceled) || errors.Is(ctx.Err(), context.Canceled) {
 				return ctx.Err()
 			}
-			//nolint:errorlint // will not be a wrapped error here.
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				s.log.Infow("feed stream ended", "url", feedName)
 				return nil
 			}

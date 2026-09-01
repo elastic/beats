@@ -376,10 +376,7 @@ func TestFollowSessionProcessesAllDiscoveredResources(t *testing.T) {
 	}()
 
 	deadline := time.After(3 * time.Second)
-	for {
-		if pub.published() >= 2 {
-			break
-		}
+	for pub.published() < 2 {
 		select {
 		case <-deadline:
 			t.Fatalf("expected events from both feeds within 3s, got %d", pub.published())
