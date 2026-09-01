@@ -11009,11 +11009,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-s
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/entcollect
-Version: v0.0.0-20260720203654-e61fb8788d9a
+Version: v0.0.0-20260901073829-6510b053b36d
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/entcollect@v0.0.0-20260720203654-e61fb8788d9a/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/entcollect@v0.0.0-20260901073829-6510b053b36d/LICENSE.txt:
 
 Elastic License 2.0
 
