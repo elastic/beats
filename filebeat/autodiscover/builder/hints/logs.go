@@ -319,7 +319,7 @@ func (l *logHints) validateInputType(config *conf.C) (string, string) {
 	}
 
 	msg := fmt.Sprintf(
-		"disallowed input type, valid inputs are: %s",
+		"disallowed input type, allowed inputs are: %s",
 		strings.Join(l.config.InputAllowList.Types, " "))
 
 	return inputType, msg
