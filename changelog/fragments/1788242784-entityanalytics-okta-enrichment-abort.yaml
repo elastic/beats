@@ -1,0 +1,17 @@
+kind: bug-fix
+
+summary: A deleted Okta user or custom role no longer aborts the entire entity analytics minimal-state sync; the affected entity is published without the failed enrichment and the sync continues.
+
+description: |
+  With the minimal-state sync implementation, a failure in any
+  per-user enrichment call (groups, factors, roles, role permissions,
+  devices) aborted the entire sync, so a single user or custom role
+  deleted between the bulk fetch and its enrichment call (an API 404)
+  discarded the whole run and nothing was ingested. Update entcollect
+  so that such failures log a warning and the sync continues,
+  matching the behaviour of the legacy sync implementation. A sync
+  whose input is shut down or reconfigured still aborts promptly.
+
+component: filebeat
+
+issue: https://github.com/elastic/entcollect/issues/18
