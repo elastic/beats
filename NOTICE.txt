@@ -10586,12 +10586,12 @@ SOFTWARE
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.46.3
+Dependency : github.com/orestisfl/elastic-agent-libs
+Version: v0.0.0-20260901124045-5af8d15cb723
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.46.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/orestisfl/elastic-agent-libs@v0.0.0-20260901124045-5af8d15cb723/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
