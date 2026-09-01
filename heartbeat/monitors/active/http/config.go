@@ -24,7 +24,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/go-units"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -102,8 +101,8 @@ func defaultConfig() Config {
 			IncludeBodyMaxBytes: 2048,
 			IncludeHeaders:      true,
 			// CheckBodyMaxBytes sets a hard limit on how much we're willing to buffer for body validators internally.
-			// This values gets overriden when IncludeBodyMaxBytes is larger.
-			CheckBodyMaxBytes: 4 * units.MiB,
+			// This values gets overridden when IncludeBodyMaxBytes is larger.
+			CheckBodyMaxBytes: 4 << 20,
 		},
 		Mode: monitors.DefaultIPSettings,
 		Check: checkConfig{
