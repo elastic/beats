@@ -17,7 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	)
+)
 
 // getResultsAsMaps calls getResults and converts each Result to map[string]string for tests that assert on row["column"].
 func getResultsAsMaps(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]map[string]string, error) {

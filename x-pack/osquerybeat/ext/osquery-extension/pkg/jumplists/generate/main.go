@@ -13,8 +13,8 @@ import (
 )
 
 type generatorOptions struct {
-	workingDir      string
-	refreshSources  bool
+	workingDir     string
+	refreshSources bool
 }
 
 func main() {
