@@ -18,6 +18,9 @@
 package kafka
 
 import (
+	"sync"
+	"sync/atomic"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/sarama"
 )
@@ -26,32 +29,43 @@ const (
 	logSelector = "kafka"
 )
 
-// sets the sarama.Logger to the given logp.Logger
-func SetSaramaLogger(log *logp.Logger) {
-	sarama.Logger = newKafkaLogger(log)
-}
+var (
+	saramaAdapter     kafkaLogger
+	saramaAdapterOnce sync.Once
+)
 
-func newKafkaLogger(log *logp.Logger) kafkaLogger {
-	return kafkaLogger{log: log}
+// SetSaramaLogger installs a process-wide adapter on sarama.Logger.
+//
+// Sarama exposes a single global logger, so the adapter is installed once and
+// later calls only swap the inner logp logger. That avoids races when the
+// Kafka input and output both configure it.
+func SetSaramaLogger(log *logp.Logger) {
+	if log == nil {
+		log = logp.NewLogger(logSelector)
+	}
+	saramaAdapter.log.Store(log)
+	saramaAdapterOnce.Do(func() {
+		sarama.Logger = &saramaAdapter
+	})
 }
 
 type kafkaLogger struct {
-	log *logp.Logger
+	log atomic.Pointer[logp.Logger]
 }
 
-func (kl kafkaLogger) Print(v ...any) {
+func (kl *kafkaLogger) Print(v ...any) {
 	kl.Log("kafka message: %v", v...)
 }
 
-func (kl kafkaLogger) Printf(format string, v ...any) {
+func (kl *kafkaLogger) Printf(format string, v ...any) {
 	kl.Log(format, v...)
 }
 
-func (kl kafkaLogger) Println(v ...any) {
+func (kl *kafkaLogger) Println(v ...any) {
 	kl.Log("kafka message: %v", v...)
 }
 
-func (kl kafkaLogger) Log(format string, v ...any) {
+func (kl *kafkaLogger) Log(format string, v ...any) {
 	warn := false
 	for _, val := range v {
 		if err, ok := val.(sarama.KError); ok {
@@ -61,12 +75,14 @@ func (kl kafkaLogger) Log(format string, v ...any) {
 			}
 		}
 	}
-	if kl.log == nil {
-		kl.log = logp.NewLogger(logSelector)
+	log := kl.log.Load()
+	if log == nil {
+		log = logp.NewLogger(logSelector)
+		kl.log.Store(log)
 	}
 	if warn {
-		kl.log.Warnf(format, v...)
+		log.Warnf(format, v...)
 	} else {
-		kl.log.Infof(format, v...)
+		log.Infof(format, v...)
 	}
 }
