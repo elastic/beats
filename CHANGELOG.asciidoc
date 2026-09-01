@@ -3,6 +3,58 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.21 relnotes
+
+[[release-notes-8.19.21]]
+== Beats version 8.19.21
+
+https://github.com/elastic/beats/compare/v8.19.20\...v8.19.21[View commits]
+
+[discrete]
+[[enhancements-8.19.21]]
+=== Enhancements
+
+**All**
+
+* Update Go to 1.26.7. https://github.com/elastic/beats/pull/52750[#52750] 
+
+**Filebeat**
+
+* Update `github.com/apache/thrift` to v0.24.0. https://github.com/elastic/beats/pull/52330[#52330]
+
+[discrete]
+[[bug-fixes-8.19.21]]
+=== Bug fixes
+
+**All**
+
+* Add support for index in inputs for Beat receivers. https://github.com/elastic/beats/pull/52662[#52662]
+
+**Auditbeat**
+
+* Fix the Auditbeat `system/package` module to skip non-Ruby Homebrew formula paths. https://github.com/elastic/beats/pull/52685[#52685]
+
+**Filebeat**
+
+* Restores the Filestream take over feature. https://github.com/elastic/beats/pull/52630[#52630]
+* Fix `httpjson` cursor migration losing position when redirecting to CEL with a named input in Managed integration deployments. https://github.com/elastic/beats/pull/52759[#52759]
+
+**Metricbeat**
+
+* Recreate Kubernetes metadata watchers after their final metricset owner stops. https://github.com/elastic/beats/pull/52028[#52028] https://github.com/elastic/beats/issues/51833[#51833]
+* Unblock a metricset whose first `fetch()` call is stuck when the wrapper shuts down. https://github.com/elastic/beats/pull/52619[#52619] https://github.com/elastic/beats/issues/15666[#15666]
+* Close `dbus` connections in the `system/service` and `system/users` metricsets to stop FD leaks. https://github.com/elastic/beats/pull/52674[#52674] https://github.com/elastic/beats/issues/52418[#52418]
+
+**Packetbeat**
+
+* Fix panics in Packetbeat SIP, TLS JA3, MySQL execute, and HTTP chunked parsers on malformed or truncated network input. https://github.com/elastic/beats/pull/52686[#52686]
+
+**Winlogbeat**
+
+* Fix event messages rendering zero values (for example, `PID: 0`) in place of non-string parameters. https://github.com/elastic/beats/pull/52810[#52810]
+
+// end 8.19.21 relnotes
+
 // begin 8.19.20 relnotes
 
 [[release-notes-8.19.20]]
