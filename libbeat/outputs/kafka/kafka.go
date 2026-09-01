@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"go.uber.org/zap"
 )
 
 const (
@@ -44,7 +45,7 @@ func makeKafka(
 	cfg *config.C,
 ) (outputs.Group, error) {
 	log := beat.Logger.Named(logSelector)
-	kafka.SetSaramaLogger(log)
+	kafka.SetSaramaLogger(log.WithOptions(zap.AddCallerSkip(1)))
 
 	log.Debug("initialize kafka output")
 

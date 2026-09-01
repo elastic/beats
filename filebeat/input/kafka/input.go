@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"go.uber.org/zap"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -64,7 +65,7 @@ func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 		return nil, err
 	}
 
-	kafka.SetSaramaLogger(logger.Named("kafka"))
+	kafka.SetSaramaLogger(logger.Named("kafka").WithOptions(zap.AddCallerSkip(1)))
 
 	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
