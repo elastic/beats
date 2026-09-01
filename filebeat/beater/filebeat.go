@@ -84,6 +84,8 @@ type Filebeat struct {
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 	runReady                 *closeOnce
+	ctx                      context.Context
+	cancelCtx                context.CancelFunc
 }
 
 type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
@@ -173,6 +175,8 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, fmt.Errorf("stdin requires to be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
 	}
 
+	ctx, cn := context.WithCancel(context.Background())
+
 	fb := &Filebeat{
 		done:           make(chan struct{}),
 		runReady:       &closeOnce{ch: make(chan struct{})},
@@ -180,6 +184,8 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		moduleRegistry: moduleRegistry,
 		pluginFactory:  plugins,
 		logger:         b.Info.Logger,
+		ctx:            ctx,
+		cancelCtx:      cn,
 	}
 
 	err = fb.setupPipelineLoaderCallback(b)
@@ -339,14 +345,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Use context, like normal people do, hooking up to the beat.done channel
-	ctx, cn := context.WithCancel(context.Background())
-	go func() {
-		<-fb.done
-		cn()
-	}()
-
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+	stateStore, err := openStateStore(fb.ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
@@ -620,7 +619,10 @@ func (fb *Filebeat) StopWithContext(ctx context.Context) {
 		fb.logger.Warn("Timed out waiting for Run to reach ready state; stopping anyway")
 	}
 
-	fb.stopOnce.Do(func() { close(fb.done) })
+	fb.stopOnce.Do(func() {
+		close(fb.done)
+		fb.cancelCtx()
+	})
 }
 
 // Create a new pipeline loader (es client) factory
