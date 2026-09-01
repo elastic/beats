@@ -42,9 +42,51 @@ The `add_session_metadata` processor operates using various backend options.
 * `procfs` collects process information with the proc filesystem. This is compatible with older systems that may not support ebpf. To gather complete process info, auditbeat requires permissions to read all process data in procfs; for example, run as a superuser or have the `SYS_PTRACE` capability.
 
 
+### Required privileges [add-session-metadata-privileges]
+
+The required privileges depend on the backend in use.
+
+| Backend | Linux capabilities | Root required | Kernel version | Extra requirements |
+|---|---|---|---|---|
+| `procfs` | `CAP_SYS_PTRACE` (or root) | No (capability sufficient) | Any | Host PID namespace |
+| `kernel_tracing` (kprobes) | `CAP_SYS_ADMIN` (or root) | No (capability sufficient) | 3.10.0+ | Host PID namespace; `/sys/kernel/debug` accessible |
+| `kernel_tracing` (eBPF) | `CAP_SYS_ADMIN` + `CAP_BPF` (or root) | No (capabilities sufficient) | 5.10.16+ with eBPF ring buffer | Host PID namespace; `/sys/kernel/debug` and `/sys/fs/bpf` accessible |
+| `auto` | Highest of the above that is available | No | Depends on selected sub-backend | Same as the selected sub-backend |
+
+**Minimum recommended setup (bare metal / VM)**
+
+```sh
+# grant capabilities without running as root
+setcap ‘cap_sys_admin,cap_bpf+ep’ /usr/share/auditbeat/auditbeat
+```
+
+**Docker**
+
+All backends require `--pid=host`. The `kernel_tracing` backends also require mounted host directories:
+
+```sh
+docker run \
+  --pid=host \
+  --cap-add=SYS_ADMIN \
+  --cap-add=BPF \
+  -v /sys/kernel/debug:/sys/kernel/debug \
+  -v /sys/fs/bpf:/sys/fs/bpf \
+  ...
+```
+
+For the `procfs` backend only:
+
+```sh
+docker run \
+  --pid=host \
+  --cap-add=SYS_PTRACE \
+  ...
+```
+
+
 ### Containers [add-session-metadata-containers]
 
-If you are running {{auditbeat}} in a container, the container must run in the host’s PID namespace. With the `auto` or `kernel_tracing` backend, these host directories must also be mounted to the same path within the container: `/sys/kernel/debug`, `/sys/fs/bpf`.
+If you are running {{auditbeat}} in a container, the container must run in the host’s PID namespace (`--pid=host`). With the `auto` or `kernel_tracing` backend, these host directories must also be mounted to the same path within the container: `/sys/kernel/debug`, `/sys/fs/bpf`. See [Required privileges](#add-session-metadata-privileges) for the full `docker run` examples.
 
 
 

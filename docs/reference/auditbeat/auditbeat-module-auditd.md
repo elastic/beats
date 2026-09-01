@@ -15,6 +15,29 @@ The `auditd` module receives audit events from the Linux Audit Framework that is
 This module is available only for Linux.
 
 
+## Required privileges [_required_privileges_auditd]
+
+The `auditd` module has different privilege requirements depending on the socket type used.
+
+**Multicast (default)**
+:   Requires the `CAP_AUDIT_READ` Linux capability. The process does not need to be root, but must hold this capability. If `CAP_AUDIT_CONTROL` is also present, the module will attempt to enable auditing in the kernel; otherwise, you must ensure the kernel audit subsystem is already enabled before starting Auditbeat.
+
+**Unicast**
+:   Requires `CAP_AUDIT_CONTROL` and the process must run in the **initial PID namespace** (not inside a user or PID namespace). This is typically achieved by running as root on the host or by using `--pid=host` in Docker.
+
+**Docker summary**
+
+| Requirement | Multicast | Unicast |
+|---|---|---|
+| `CAP_AUDIT_READ` | Required | Required |
+| `CAP_AUDIT_CONTROL` | Optional (recommended) | Required |
+| Initial PID namespace (`--pid=host`) | Not required | Required |
+
+::::{note}
+On Docker, add `--cap-add=AUDIT_READ` for multicast, or `--cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --pid=host` for unicast. See [Run Auditbeat on Docker](/reference/auditbeat/running-on-docker.md) for full examples.
+::::
+
+
 ## How it works [_how_it_works]
 
 This module establishes a subscription to the kernel to receive the events as they occur. So unlike most other modules, the `period` configuration option is unused because it is not implemented using polling.
