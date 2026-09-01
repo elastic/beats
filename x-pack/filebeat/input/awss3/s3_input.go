@@ -141,12 +141,10 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	workChan := make(chan state)
 
 	// Start the worker goroutines to listen on the work channel
-	for i := 0; i < in.config.NumberOfWorkers; i++ {
-		workerWg.Add(1)
-		go func() {
-			defer workerWg.Done()
+	for range in.config.NumberOfWorkers {
+		workerWg.Go(func() {
 			in.workerLoop(ctx, workChan)
-		}()
+		})
 	}
 
 	// Start reading data and wait for its processing to be done
