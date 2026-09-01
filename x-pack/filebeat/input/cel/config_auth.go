@@ -190,6 +190,7 @@ type oAuth2Provider string
 const (
 	oAuth2ProviderDefault oAuth2Provider = ""       // oAuth2ProviderDefault means no specific provider is set.
 	oAuth2ProviderAzure   oAuth2Provider = "azure"  // oAuth2ProviderAzure AzureAD.
+	oAuth2ProviderBox     oAuth2Provider = "box"    // oAuth2ProviderBox Box.
 	oAuth2ProviderGoogle  oAuth2Provider = "google" // oAuth2ProviderGoogle Google.
 	oAuth2ProviderOkta    oAuth2Provider = "okta"   // oAuth2ProviderOkta Okta.
 )
@@ -232,6 +233,16 @@ type oAuth2Config struct {
 	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
 	OktaJWKPEM  string          `config:"okta.jwk_pem"`
 	DPoPKeyPEM  string          `config:"okta.dpop_key_pem"`
+
+	// box specific
+	BoxConfigFile   string          `config:"box.config_file"`
+	BoxConfigJSON   common.JSONBlob `config:"box.config_json"`
+	BoxEnterpriseID string          `config:"box.enterprise_id"`
+	BoxPublicKeyID  string          `config:"box.public_key_id"`
+	BoxPrivateKey   string          `config:"box.private_key"`
+	BoxPassphrase   string          `config:"box.passphrase"`
+	BoxSubjectType  string          `config:"box.subject_type"`
+	BoxSubjectID    string          `config:"box.subject_id"`
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
@@ -277,6 +288,8 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 		}
 	case oAuth2ProviderAzure:
 		return o.clientCredentialsGrant(ctx, client), nil
+	case oAuth2ProviderBox:
+		return o.fetchBoxOauthClient(ctx)
 	case oAuth2ProviderGoogle:
 		if len(o.GoogleJWTJSON) != 0 {
 			cfg, err := google.JWTConfigFromJSON(o.GoogleJWTJSON, o.Scopes...)
@@ -323,6 +336,10 @@ func (o *oAuth2Config) getTokenURL() string {
 		if o.TokenURL == "" {
 			return endpoints.AzureAD(o.AzureTenantID).TokenURL
 		}
+	case oAuth2ProviderBox:
+		if o.TokenURL == "" {
+			return boxTokenURL
+		}
 	}
 
 	return o.TokenURL
@@ -357,6 +374,8 @@ func (o *oAuth2Config) Validate() error {
 	switch o.getProvider() {
 	case oAuth2ProviderAzure:
 		return o.validateAzureProvider()
+	case oAuth2ProviderBox:
+		return o.validateBoxProvider()
 	case oAuth2ProviderGoogle:
 		return o.validateGoogleProvider()
 	case oAuth2ProviderOkta:
