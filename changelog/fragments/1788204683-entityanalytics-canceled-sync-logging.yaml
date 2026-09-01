@@ -1,0 +1,19 @@
+kind: bug-fix
+
+summary: Log entity analytics sync interruption by input shutdown or reconfiguration at info level instead of error, and no longer mark the input degraded for it.
+
+description: |
+  When an entity analytics sync was interrupted because the input's
+  context was cancelled — agent shutdown, restart, or a policy change
+  re-rendering the input mid-sync — the failure was logged as an error
+  such as "Error running full sync: ... context canceled" and the
+  input was marked Degraded. This routine lifecycle event is now
+  logged at info level as a sync interruption and no longer degrades
+  the input's status. All entity analytics providers
+  (activedirectory, azuread, jamf, okta) and the minimal-state runner
+  are covered. Other errors, including context deadline expiry, keep
+  the previous error treatment.
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/52945

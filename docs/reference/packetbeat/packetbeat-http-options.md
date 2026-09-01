@@ -28,7 +28,7 @@ Also see [Common protocol options](/reference/packetbeat/common-protocol-options
 
 ### `hide_keywords` [_hide_keywords]
 
-A list of query parameters that Packetbeat will automatically censor in the transactions that it saves. The values associated with these parameters are replaced by `'xxxxx'`. By default, no changes are made to the HTTP messages.
+A list of query parameters that Packetbeat will automatically censor in the transactions that it saves. The values associated with these parameters are replaced by `'xxxxx'`. Parameter names are not case-sensitive. By default, Packetbeat doesn't modify HTTP messages.
 
 Packetbeat has this option because, unlike SQL traffic, which typically only contains the hashes of the passwords, HTTP traffic may contain sensitive data. To reduce security risks, you can configure this option to avoid sending the contents of certain HTTP POST parameters.
 
