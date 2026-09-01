@@ -36,7 +36,7 @@ func TestNormalPollingStrategy(t *testing.T) {
 
 	t.Run("GetStartAfterKey returns empty string", func(t *testing.T) {
 		store := openTestStatestore()
-		registry, err := newStateRegistry(nil, store, "", false, 0)
+		registry, err := newStateRegistry(nil, store, "", "", false, 0)
 		require.NoError(t, err)
 
 		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now()}
@@ -72,7 +72,7 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 
 	t.Run("GetStartAfterKey returns lexicographically smallest key", func(t *testing.T) {
 		store := openTestStatestore()
-		registry, err := newStateRegistry(log, store, "", true, 100)
+		registry, err := newStateRegistry(log, store, "", "", true, 100)
 		require.NoError(t, err)
 
 		st1 := state{Bucket: "bucket", Key: "aaa-first", Etag: "etag1", LastModified: time.Now()}
@@ -96,7 +96,7 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 
 	t.Run("GetStartAfterKey returns empty string when no states", func(t *testing.T) {
 		store := openTestStatestore()
-		registry, err := newStateRegistry(log, store, "", true, 100)
+		registry, err := newStateRegistry(log, store, "", "", true, 100)
 		require.NoError(t, err)
 
 		startKey := registry.GetStartAfterKey()
@@ -128,10 +128,10 @@ func TestPollingStrategyBehaviorDifferences(t *testing.T) {
 		normalStore := openTestStatestore()
 		lexicoStore := openTestStatestore()
 
-		normalRegistry, err := newStateRegistry(log, normalStore, "", false, 0)
+		normalRegistry, err := newStateRegistry(log, normalStore, "", "", false, 0)
 		require.NoError(t, err)
 
-		lexicoRegistry, err := newStateRegistry(log, lexicoStore, "", true, 100)
+		lexicoRegistry, err := newStateRegistry(log, lexicoStore, "", "", true, 100)
 		require.NoError(t, err)
 
 		st1 := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now()}
