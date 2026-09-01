@@ -89,9 +89,11 @@ func run() error {
 		return err
 	}
 
-	if err := paths.InitPaths(&config.Path); err != nil {
+	beatPaths := paths.New()
+	if err := beatPaths.InitPaths(&config.Path); err != nil {
 		return err
 	}
+	info.Paths = beatPaths
 
 	common.PrintConfigDebugf(cfg, "input config:")
 
