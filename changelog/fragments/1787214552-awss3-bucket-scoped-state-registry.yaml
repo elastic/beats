@@ -1,3 +1,4 @@
+# REQUIRED
 # Kind can be one of:
 # - breaking-change: a change to previously-documented behavior
 # - deprecation: functionality that is being removed in a later release
@@ -8,25 +9,45 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: feature
+kind: bug-fix
 
+# REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: update github.com/apache/thrift to v0.24.0
+summary: Scope the aws-s3 polling state registry to the input's bucket.
 
+# REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# NOTE: This field will be rendered only for breaking-change and known-issue kinds at the moment.
-#description:
+description: |
+  All aws-s3 inputs of a process share one persistent state registry. Each
+  polling input loaded every input's states into memory, and its periodic
+  registry cleanup then deleted from the shared store all entries missing
+  from its own bucket listing, including the other inputs' states. After a
+  restart the affected inputs found no persisted state and re-ingested
+  their buckets. Loading is now scoped to the input's bucket and key
+  prefix. This also removes the duplicated memory usage of the registry
+  when several polling inputs run in one process.
 
-# Affected component; a word indicating the component this changeset affects.
+# REQUIRED for breaking-change, deprecation, known-issue
+# impact:
+
+# REQUIRED for breaking-change, deprecation, known-issue
+# action:
+
+# REQUIRED for all kinds
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: filebeat
 
-# PR URL; optional; the PR number that added the changeset.
+# AUTOMATED
+# OPTIONAL to manually add other PR URLs
+# PR URL: A link the PR that added the changeset.
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/52330
+pr: https://github.com/elastic/beats/pull/52728
 
+# AUTOMATED
+# OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-#issue: https://github.com/owner/repo/1234
+issue: https://github.com/elastic/beats/issues/52721

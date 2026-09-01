@@ -249,7 +249,7 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, ti
 	p.actionResponsesClient.Publish(event)
 }
 
-func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -261,6 +261,23 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 		return
 	}
 
+	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData)
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    fields,
+	}
+	if index != "" {
+		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
+	}
+
+	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
+
+	p.queryProfileClient.Publish(event)
+}
+
+// queryProfileToEvent builds the field set for a query profile document.
+func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) mapstr.M {
 	fields := mapstr.M{
 		"type": "osquery_profile",
 		"event": map[string]interface{}{
@@ -279,25 +296,17 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 	if responseID != "" {
 		fields["response_id"] = responseID
 	}
+	if spaceID != "" {
+		fields["space_id"] = spaceID
+	}
 	if reqData != nil {
 		fields["action_data"] = reqData
 	}
-
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields:    fields,
-	}
-	if index != "" {
-		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
-	}
-
-	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
-
-	p.queryProfileClient.Publish(event)
+	return fields
 }
 
 func actionResultToEvent(req, res map[string]interface{}) map[string]interface{} {
-	m := make(map[string]interface{}, 8)
+	m := make(map[string]interface{}, 9)
 
 	copyKey := func(key string, src, dst map[string]interface{}) {
 		if v, ok := src[key]; ok {
@@ -328,6 +337,8 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 	if v, ok := req["data"]; ok {
 		m["action_data"] = v
 	}
+
+	copyKey("space_id", req, m)
 
 	return m
 }

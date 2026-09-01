@@ -186,6 +186,40 @@ func TestActionResultToEvent(t *testing.T) {
 				}
 			  }`),
 		},
+		{
+			name: "successful with space id",
+			req: toMap(t, `{
+				"data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"input_type": "osquery",
+				"space_id": "production",
+				"type": "INPUT_ACTION"
+			}`),
+			res: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"count": 1,
+				"started_at": "2024-04-18T19:39:39.532125Z"
+			} `),
+			want: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"action_response": {
+					"osquery": {
+						"count": 1
+					}
+				},
+				"action_id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"started_at": "2024-04-18T19:39:39.532125Z",
+				"action_input_type": "osquery",
+				"action_data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"space_id": "production"
+			}`),
+		},
 	}
 
 	for _, tc := range tests {
@@ -294,6 +328,35 @@ func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
 	}
 	if _, ok := ev.Fields["query_name"]; ok {
 		t.Error(`expected no "query_name" field when queryName is empty`)
+	}
+}
+
+func TestQueryProfileToEvent_SpaceID(t *testing.T) {
+	tests := []struct {
+		name    string
+		spaceID string
+		present bool
+	}{
+		{name: "present", spaceID: "production", present: true},
+		{name: "absent", spaceID: "", present: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fields := queryProfileToEvent("", "", "", tc.spaceID, map[string]any{"key": "val"}, nil)
+			got, ok := fields["space_id"]
+			if tc.present {
+				if !ok {
+					t.Errorf("expected space_id %q, field not present", tc.spaceID)
+				} else if got != tc.spaceID {
+					t.Errorf("space_id mismatch: got=%q want=%q", got, tc.spaceID)
+				}
+			} else {
+				if ok {
+					t.Errorf("expected no space_id field, got %v", got)
+				}
+			}
+		})
 	}
 }
 
