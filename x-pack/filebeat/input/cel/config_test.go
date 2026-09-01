@@ -913,10 +913,11 @@ LNV/bIgMHOMoxiGrwyjAhg==
 		name: "box_successful_discrete_validation",
 		input: map[string]any{
 			"auth.oauth2": map[string]any{
-				"provider":        "box",
-				"client.id":       "x",
-				"client.secret":   "y",
-				"box.private_key": testBoxPEMForConfig,
+				"provider":          "box",
+				"client.id":         "x",
+				"client.secret":     "y",
+				"box.private_key":   testBoxPEMForConfig,
+				"box.enterprise_id": "eid123",
 			},
 		},
 	},

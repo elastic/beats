@@ -5,12 +5,9 @@
 package cel
 
 import (
-	"bytes"
 	"context"
 	"crypto"
-	"crypto/x509"
 	"encoding/json"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"maps"
@@ -20,7 +17,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/youmark/pkcs8"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
@@ -123,7 +119,7 @@ func (o *oAuth2Config) resolveBoxCredentials() (boxCredentials, error) {
 			c.subjectID = o.BoxSubjectID
 		}
 
-		key, err := pemPrivateKey([]byte(app.BoxAppSettings.AppAuth.PrivateKey), app.BoxAppSettings.AppAuth.Passphrase)
+		key, err := pemPKCS8PrivateKey([]byte(app.BoxAppSettings.AppAuth.PrivateKey), app.BoxAppSettings.AppAuth.Passphrase)
 		if err != nil {
 			return c, fmt.Errorf("box.config_json private key: %w", err)
 		}
@@ -148,7 +144,7 @@ func (o *oAuth2Config) resolveBoxCredentials() (boxCredentials, error) {
 			c.subjectID = o.BoxSubjectID
 		}
 
-		key, err := pemPrivateKey([]byte(o.BoxPrivateKey), o.BoxPassphrase)
+		key, err := pemPKCS8PrivateKey([]byte(o.BoxPrivateKey), o.BoxPassphrase)
 		if err != nil {
 			return c, fmt.Errorf("box.private_key: %w", err)
 		}
@@ -172,41 +168,6 @@ type boxAppConfig struct {
 		} `json:"appAuth"`
 	} `json:"boxAppSettings"`
 	EnterpriseID string `json:"enterpriseID"`
-}
-
-// pemPrivateKey decodes a PEM block and parses it as a PKCS#8 private key.
-// If pass is non-empty and the block type is "ENCRYPTED PRIVATE KEY" the block
-// is decrypted with the passphrase before parsing.
-func pemPrivateKey(pemdata []byte, pass string) (crypto.Signer, error) {
-	blk, rest := pem.Decode(pemdata)
-	if blk == nil {
-		return nil, errors.New("no PEM data")
-	}
-	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
-	}
-
-	var (
-		key any
-		err error
-	)
-	if blk.Type == "ENCRYPTED PRIVATE KEY" {
-		key, err = pkcs8.ParsePKCS8PrivateKey(blk.Bytes, []byte(pass))
-		if err != nil {
-			return nil, fmt.Errorf("decrypting private key: %w", err)
-		}
-	} else {
-		key, err = x509.ParsePKCS8PrivateKey(blk.Bytes)
-		if err != nil {
-			return nil, fmt.Errorf("parsing private key: %w", err)
-		}
-	}
-
-	signer, ok := key.(crypto.Signer)
-	if !ok {
-		return nil, fmt.Errorf("key is not a signer: %T", key)
-	}
-	return signer, nil
 }
 
 // exchangeBoxAssertion signs a JWT assertion and exchanges it for an access
@@ -265,7 +226,7 @@ func signBoxAssertion(c boxCredentials, now time.Time) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    c.clientID,
 			Subject:   c.subjectID,
-			Audience:  []string{c.tokenURL},
+			Audience:  []string{boxTokenURL}, // aud is pinned to the api.box.com token endpoint.
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(now.Add(45 * time.Second)),
 			ID:        dpop.RandomJTI(),
@@ -329,6 +290,11 @@ func (o *oAuth2Config) validateBoxProvider() error {
 	if subType != "" && subType != "enterprise" && subType != "user" {
 		return fmt.Errorf("box validation error: box.subject_type must be enterprise or user, got %q", subType)
 	}
+	// Normalise to match the behaviour of resolveBoxCredentials so the checks
+	// below are consistent regardless of whether subType was set explicitly.
+	if subType == "" {
+		subType = "enterprise"
+	}
 	if subType == "user" && o.BoxSubjectID == "" {
 		return errors.New("box validation error: box.subject_id must be provided when box.subject_type is user")
 	}
@@ -344,8 +310,13 @@ func (o *oAuth2Config) validateBoxProvider() error {
 	}
 
 	// Eager key parse so a bad private key or wrong passphrase surfaces at startup.
-	if _, err := o.resolveBoxCredentials(); err != nil {
+	// Also validates that the enterprise subject ID is non-empty after resolution.
+	creds, err := o.resolveBoxCredentials()
+	if err != nil {
 		return fmt.Errorf("box validation error: %w", err)
+	}
+	if creds.subjectType == "enterprise" && creds.subjectID == "" {
+		return errors.New("box validation error: enterprise_id must be provided when box.subject_type is enterprise")
 	}
 
 	return nil

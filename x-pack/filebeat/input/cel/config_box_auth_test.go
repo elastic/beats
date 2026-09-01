@@ -376,7 +376,6 @@ func TestBoxTokenSource_Token(t *testing.T) {
 	}
 
 	// Second call with a valid token should reuse it without hitting the server.
-	ts.token = tok
 	_, err = ts.Token()
 	if err != nil {
 		t.Fatalf("second Token(): %v", err)
@@ -437,7 +436,7 @@ func TestExchangeBoxAssertion_ClockSkewRetry(t *testing.T) {
 	}
 }
 
-func TestPemPrivateKey(t *testing.T) {
+func TestPemPKCS8PrivateKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		pem     string
@@ -452,7 +451,7 @@ func TestPemPrivateKey(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := pemPrivateKey([]byte(test.pem), test.pass)
+			_, err := pemPKCS8PrivateKey([]byte(test.pem), test.pass)
 			if test.wantErr != "" {
 				if err == nil {
 					t.Fatalf("got nil error; want error containing %q", test.wantErr)

@@ -865,7 +865,7 @@ stack: ga 9.6.0
 Path to the `config.json` file downloaded from the Box Developer Console. The file contains all credentials needed to authenticate: client ID, client secret, RSA private key, passphrase, public key ID, and enterprise ID.
 
 ::::{note}
-Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information see [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
+Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information, refer to [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
 ::::
 
 
@@ -878,7 +878,7 @@ stack: ga 9.6.0
 The Box Developer Console `config.json` content as a raw JSON blob. Use this when the credentials are injected as an environment variable or a secret rather than stored on disk.
 
 ::::{note}
-Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information see [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
+Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information, refer to [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
 ::::
 
 
