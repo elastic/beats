@@ -5,11 +5,14 @@
 package beater
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
 	"syscall"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIsRecoverableOsqueryError(t *testing.T) {
@@ -54,9 +57,24 @@ func TestIsRecoverableOsqueryError(t *testing.T) {
 			want: true,
 		},
 		{
+			name: "connection reset op error",
+			err:  &net.OpError{Op: "read", Err: syscall.ECONNRESET},
+			want: true,
+		},
+		{
 			name: "net timeout",
 			err:  &net.DNSError{Err: "i/o timeout", IsTimeout: true},
 			want: true,
+		},
+		{
+			name: "context canceled",
+			err:  context.Canceled,
+			want: false,
+		},
+		{
+			name: "context deadline exceeded",
+			err:  context.DeadlineExceeded,
+			want: false,
 		},
 		{
 			name: "unrelated error is not recoverable",
@@ -72,9 +90,7 @@ func TestIsRecoverableOsqueryError(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := isRecoverableOsqueryError(tc.err); got != tc.want {
-				t.Errorf("isRecoverableOsqueryError(%v) = %v, want %v", tc.err, got, tc.want)
-			}
+			assert.Equal(t, tc.want, isRecoverableOsqueryError(tc.err), "unexpected recoverability for %v", tc.err)
 		})
 	}
 }

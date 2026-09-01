@@ -5,23 +5,25 @@
 package beater
 
 import (
+	"context"
 	"errors"
 	"net"
 	"strings"
 	"syscall"
 )
 
-// extensionPingFailed is the prefix osquery-go uses when the extension manager
-// watchdog fails to ping osqueryd. See osquery-go server.go.
-const extensionPingFailed = "extension ping failed"
-
-// isBrokenPipeOrEOFError checks for broken pipe, diconnect or EOF errors from osquery
-// This is to workaround the known and possibly future defects with osquery implementation, allowing us to gracefully recover, restart osquery and rerun failed queries
+// isBrokenPipeOrEOFError checks for broken pipe, disconnect, or EOF errors from osquery.
+// Recovering from these errors lets osquerybeat restart osqueryd and rerun failed queries.
 func isBrokenPipeOrEOFError(err error) bool {
 	var netErr *net.OpError
 	return (errors.As(err, &netErr) && (errors.Is(netErr.Err, syscall.EPIPE) || errors.Is(netErr.Err, syscall.ECONNRESET))) ||
 		strings.HasSuffix(err.Error(), " broken pipe") || strings.HasSuffix(err.Error(), " EOF")
 }
+
+// extensionPingFailed is the prefix osquery-go adds when the extension manager
+// watchdog loses communication with osqueryd.
+// https://github.com/osquery/osquery-go/blob/0cc22f415e57/server.go#L274
+const extensionPingFailed = "extension ping failed"
 
 // isRecoverableOsqueryError reports whether an osquery run failure should restart osqueryd
 // rather than terminate the beat.
@@ -31,7 +33,7 @@ func isBrokenPipeOrEOFError(err error) bool {
 // PermanentError, and nothing restarts a receiver. The osquery_manager unit then stays
 // FAILED until the whole agent is restarted.
 func isRecoverableOsqueryError(err error) bool {
-	if err == nil {
+	if err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return false
 	}
 	if isBrokenPipeOrEOFError(err) {
