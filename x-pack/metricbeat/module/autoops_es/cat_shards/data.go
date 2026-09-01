@@ -61,6 +61,11 @@ type JSONShard struct {
 	SearchQueryTime  json.Number `json:"sqti"`
 	SearchQueryTotal json.Number `json:"sqto"`
 
+	BulkTotalSizeInBytes    json.Number `json:"btsi"`
+	BulkTotalOperations     json.Number `json:"bto"`
+	TotalDataSetSizeInBytes json.Number `json:"dataset"`
+	DenseVectorCount        json.Number `json:"dvc"`
+
 	// only used for unassigned state
 	UnassignedReason  *string `json:"ur"`
 	UnassignedDetails *string `json:"ud"`
