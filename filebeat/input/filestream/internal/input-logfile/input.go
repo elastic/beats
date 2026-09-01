@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -59,6 +60,13 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
+
+	// Acquire a lease on the shared cache entry.
+	leaseRelease, ok := inp.manager.acquireLease()
+	if !ok {
+		return errors.New("input manager store is not available")
+	}
+	defer leaseRelease()
 
 	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs

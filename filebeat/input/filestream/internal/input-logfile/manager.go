@@ -332,6 +332,21 @@ func (cim *InputManager) StopInput(id string) {
 	cim.idsMux.Unlock()
 }
 
+// acquireLease increments the globalCache user count for this manager's key,
+// preventing the cache from draining the entry (and closing the ackUpdater)
+// while the caller is active. Returns ok=false if the manager is closed.
+// The returned release function must be called exactly once.
+func (cim *InputManager) acquireLease() (func(), bool) {
+	cim.storeMu.Lock()
+	closed := cim.closed
+	cim.storeMu.Unlock()
+	if closed {
+		return func() {}, false
+	}
+	_, release, ok := globalCache.Lease(cim.StateStore.StoreKey())
+	return release, ok
+}
+
 func (cim *InputManager) getRetainedStore() (*store, error) {
 	cim.storeMu.Lock()
 	defer cim.storeMu.Unlock()
