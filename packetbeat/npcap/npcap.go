@@ -23,9 +23,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/google/gopacket/pcap"
 	"golang.org/x/mod/semver"
@@ -84,6 +87,7 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 	cmd.Stdout = &outBuf
 	cmd.Stderr = &errBuf
 
+	before := time.Now()
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("npcap: failed to start Npcap installer: %w", err)
@@ -95,10 +99,42 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 	}
 	if err != nil {
 		log.Error(&errBuf)
+		logInstallDiagnostics(log, dst, before)
 		return fmt.Errorf("npcap: failed to install Npcap: %w", err)
 	}
 
 	return loadWinPCAP()
+}
+
+// logInstallDiagnostics reads the Npcap installer log files and logs their
+// contents. The installer writes diagnostics to files in the install directory
+// rather than to stdout or stderr.
+// See https://npcap.com/guide/npcap-users-guide.html#npcap-qa.
+func logInstallDiagnostics(log *logp.Logger, dst string, since time.Time) {
+	if dst == "" {
+		dst = `C:\Program Files\Npcap`
+	}
+	// install.log records general installation activity.
+	// NPFInstall.log records driver installation commands via NPFInstall.exe.
+	for _, name := range []string{"install.log", "NPFInstall.log"} {
+		path := filepath.Join(dst, name)
+		fi, err := os.Stat(path)
+		if err != nil {
+			if !errors.Is(err, os.ErrNotExist) {
+				log.Warnf("npcap: could not stat %s: %v", path, err)
+			}
+			continue
+		}
+		if fi.ModTime().Before(since) {
+			continue
+		}
+		b, err := os.ReadFile(path)
+		if err != nil {
+			log.Warnf("npcap: could not read %s: %v", path, err)
+			continue
+		}
+		log.Errorf("npcap %s:\n%s", name, b)
+	}
 }
 
 // Version returns the installed version of pcap or the empty string if no
