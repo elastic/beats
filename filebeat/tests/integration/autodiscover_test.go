@@ -141,7 +141,7 @@ func TestHintsKubernetesInputAllowList(t *testing.T) {
 	const (
 		rejectionLogPrefix = "Rejecting autodiscover hints configuration."
 		rejectionMessage   = `Rejecting autodiscover hints configuration. ` +
-			`input.type: httpjson, reason: disallowed input type, valid ` +
+			`input.type: httpjson, reason: disallowed input type, allowed ` +
 			`inputs are: log filestream container`
 	)
 	filestreamStart := fmt.Sprintf(
