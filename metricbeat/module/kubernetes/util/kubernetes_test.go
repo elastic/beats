@@ -45,7 +45,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -55,7 +55,7 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	k8smetafake "k8s.io/client-go/metadata/fake"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 )
 
 const (
@@ -124,7 +124,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, 1)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
@@ -145,7 +145,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, 1)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
@@ -165,7 +165,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 2, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, 2)
 	require.NotNil(t, resourceWatchers.metaWatchersMap[DeploymentResource])
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	resourceWatchers.lock.Unlock()
@@ -239,15 +239,15 @@ func TestWatcherContainerMetrics(t *testing.T) {
 	containerStore := metricsRepo.GetNodeStore(pod.Spec.NodeName).GetPodStore(podId).GetContainerStore(containerName)
 	metrics := containerStore.GetContainerMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.1, metrics.CoresLimit.Value)
-	assert.Equal(t, 100*1024*1024.0, metrics.MemoryLimit.Value)
+	assert.Equal(t, 0.1, metrics.CoresLimit.Value)              //nolint:testifylint // exact float comparison
+	assert.Equal(t, 100*1024*1024.0, metrics.MemoryLimit.Value) //nolint:testifylint // exact float comparison
 
 	// modify the limit and verify the new value is present
 	pod.Spec.Containers[0].Resources.Limits[v1.ResourceCPU] = resource.MustParse("200m")
 	watcher.handler.OnUpdate(pod)
 	metrics = containerStore.GetContainerMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.2, metrics.CoresLimit.Value)
+	assert.Equal(t, 0.2, metrics.CoresLimit.Value) //nolint:testifylint // exact float comparison
 
 	// delete the pod and verify no metrics are present
 	watcher.handler.OnDelete(pod)
@@ -300,15 +300,15 @@ func TestWatcherNodeMetrics(t *testing.T) {
 	nodeStore := metricsRepo.GetNodeStore(node.Name)
 	metrics := nodeStore.GetNodeMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.1, metrics.CoresAllocatable.Value)
-	assert.Equal(t, 100*1024*1024.0, metrics.MemoryAllocatable.Value)
+	assert.Equal(t, 0.1, metrics.CoresAllocatable.Value)              //nolint:testifylint // exact float comparison
+	assert.Equal(t, 100*1024*1024.0, metrics.MemoryAllocatable.Value) //nolint:testifylint // exact float comparison
 
 	// modify the limit and verify the new value is present
 	node.Status.Allocatable[v1.ResourceCPU] = resource.MustParse("200m")
 	watcher.handler.OnUpdate(node)
 	metrics = nodeStore.GetNodeMetrics()
 	require.NotNil(t, metrics)
-	assert.Equal(t, 0.2, metrics.CoresAllocatable.Value)
+	assert.Equal(t, 0.2, metrics.CoresAllocatable.Value) //nolint:testifylint // exact float comparison
 
 	// delete the node and verify no metrics are present
 	watcher.handler.OnDelete(node)
@@ -348,7 +348,7 @@ func TestCreateAllWatchers(t *testing.T) {
 		metricsRepo)
 	require.Error(t, err)
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 0, len(resourceWatchers.metaWatchersMap))
+	require.Empty(t, resourceWatchers.metaWatchersMap)
 	resourceWatchers.lock.Unlock()
 
 	// Start watcher for a resource that requires other resources, should start all the watchers
@@ -368,7 +368,7 @@ func TestCreateAllWatchers(t *testing.T) {
 	// Check that all the required watchers are in the map
 	resourceWatchers.lock.Lock()
 	// we add 1 to the expected result to represent the resource itself
-	require.Equal(t, len(extras)+1, len(resourceWatchers.metaWatchersMap))
+	require.Len(t, resourceWatchers.metaWatchersMap, len(extras)+1)
 	for _, extra := range extras {
 		require.NotNil(t, resourceWatchers.metaWatchersMap[extra])
 	}
@@ -429,7 +429,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 
 	log := logptest.NewTestingLogger(t, "test")
 
-	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{
 		"enabled": true,
 	})
 	require.NoError(t, err)
@@ -680,8 +680,8 @@ func TestNewResourceMetadataEnricherRollbackDoesNotUpgradeNodeScopedOwner(t *tes
 
 	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
 	resourceWatchers.lock.RLock()
-	require.Nil(t, metaWatcher.restartWatcher, "rolling back the last cluster-scoped registration must discard its pending replacement")
-	require.Nil(t, metaWatcher.restartWatcherFactory, "rollback must discard the replacement factory")
+	require.Nil(t, metaWatcher.replacementWatcher, "rolling back the last cluster-scoped registration must discard its pending replacement")
+	require.Nil(t, metaWatcher.replacementWatcherFactory, "rollback must discard the replacement factory")
 	require.True(t, metaWatcher.nodeScope, "rollback must preserve the active node-scoped watcher's scope")
 	resourceWatchers.lock.RUnlock()
 
@@ -697,13 +697,13 @@ func TestPendingScopeUpgradeRetainedForCommittedClusterScopedOwner(t *testing.T)
 	active := newMockWatcher()
 	pending := newMockWatcher()
 	metaWatcher := &metaWatcher{
-		watcher:        active,
-		started:        true,
-		users:          make(map[*enricher]watcherRegistration),
-		enrichers:      make(map[*enricher]struct{}),
-		nodeScope:      true,
-		restartWatcher: pending,
-		restartWatcherFactory: func() (kubernetes.Watcher, error) {
+		watcher:            active,
+		started:            true,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		nodeScope:          true,
+		replacementWatcher: pending,
+		replacementWatcherFactory: func() (kubernetes.Watcher, error) {
 			return newMockWatcher(), nil
 		},
 	}
@@ -718,14 +718,14 @@ func TestPendingScopeUpgradeRetainedForCommittedClusterScopedOwner(t *testing.T)
 
 	firstClusterScoped.Stop(resourceWatchers)
 	resourceWatchers.lock.RLock()
-	require.Same(t, pending, metaWatcher.restartWatcher, "another committed cluster-scoped owner must retain the pending replacement")
-	require.NotNil(t, metaWatcher.restartWatcherFactory, "another committed cluster-scoped owner must retain the replacement factory")
+	require.Same(t, pending, metaWatcher.replacementWatcher, "another committed cluster-scoped owner must retain the pending replacement")
+	require.NotNil(t, metaWatcher.replacementWatcherFactory, "another committed cluster-scoped owner must retain the replacement factory")
 	resourceWatchers.lock.RUnlock()
 
 	secondClusterScoped.Stop(resourceWatchers)
 	resourceWatchers.lock.RLock()
-	require.Nil(t, metaWatcher.restartWatcher, "the last cluster-scoped owner must discard the pending replacement")
-	require.Nil(t, metaWatcher.restartWatcherFactory, "the last cluster-scoped owner must discard the replacement factory")
+	require.Nil(t, metaWatcher.replacementWatcher, "the last cluster-scoped owner must discard the pending replacement")
+	require.Nil(t, metaWatcher.replacementWatcherFactory, "the last cluster-scoped owner must discard the replacement factory")
 	require.True(t, metaWatcher.nodeScope, "discarding a pending replacement must preserve the active watcher scope")
 	resourceWatchers.lock.RUnlock()
 
@@ -752,7 +752,7 @@ func TestConcurrentNodeScopedStartDoesNotApplyProvisionalScopeUpgrade(t *testing
 	provisional := newMetadataEnricher("state_pod", PodResource, config, log)
 
 	resourceWatchers.lock.Lock()
-	metaWatcher.restartWatcher = pending
+	metaWatcher.replacementWatcher = pending
 	registerWatcherUser(PodResource, metaWatcher, provisional, true, false)
 	started := make(chan struct{})
 	go func() {
@@ -764,7 +764,7 @@ func TestConcurrentNodeScopedStartDoesNotApplyProvisionalScopeUpgrade(t *testing
 
 	require.Equal(t, 0, pending.startCalls, "Start must not apply a scope change required only by a provisional owner")
 	require.Equal(t, 0, active.stopCalls, "Start must leave the active watcher uninterrupted")
-	require.Same(t, pending, metaWatcher.restartWatcher, "the provisional owner's replacement must remain available during construction")
+	require.Same(t, pending, metaWatcher.replacementWatcher, "the provisional owner's replacement must remain available during construction")
 
 	releaseWatcherOwnership(provisional, resourceWatchers)
 	nodeScoped.Stop(resourceWatchers)
@@ -781,13 +781,13 @@ func TestFailedScopeUpgradeLeavesActiveWatcherRunning(t *testing.T) {
 	replacements := []kubernetes.Watcher{secondFailed, replacement}
 	factoryCalls := 0
 	metaWatcher := &metaWatcher{
-		watcher:        active,
-		started:        true,
-		users:          make(map[*enricher]watcherRegistration),
-		enrichers:      make(map[*enricher]struct{}),
-		nodeScope:      true,
-		restartWatcher: firstFailed,
-		restartWatcherFactory: func() (kubernetes.Watcher, error) {
+		watcher:            active,
+		started:            true,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		nodeScope:          true,
+		replacementWatcher: firstFailed,
+		replacementWatcherFactory: func() (kubernetes.Watcher, error) {
 			watcher := replacements[factoryCalls]
 			factoryCalls++
 			return watcher, nil
@@ -806,7 +806,7 @@ func TestFailedScopeUpgradeLeavesActiveWatcherRunning(t *testing.T) {
 	require.Equal(t, 1, firstFailed.stopCalls, "failed replacement must be stopped")
 	require.Equal(t, 0, active.stopCalls, "failed replacement must not stop the active watcher")
 	require.Same(t, active, metaWatcher.watcher, "failed replacement must not replace the active watcher")
-	require.Nil(t, metaWatcher.restartWatcher, "failed replacement must be discarded")
+	require.Nil(t, metaWatcher.replacementWatcher, "failed replacement must be discarded")
 	require.True(t, metaWatcher.nodeScope, "failed replacement must preserve the active watcher scope")
 	require.True(t, metaWatcher.started, "failed replacement must preserve active watcher state")
 
@@ -821,25 +821,25 @@ func TestFailedScopeUpgradeLeavesActiveWatcherRunning(t *testing.T) {
 	require.Equal(t, 1, replacement.startCalls, "fresh replacement must be started")
 	require.Equal(t, 1, active.stopCalls, "active watcher must stop only after its replacement starts")
 	require.Same(t, replacement, metaWatcher.watcher, "successful replacement must become active")
-	require.Nil(t, metaWatcher.restartWatcher, "successful scope upgrade must clear the pending replacement")
-	require.Nil(t, metaWatcher.restartWatcherFactory, "successful scope upgrade must clear the replacement factory")
+	require.Nil(t, metaWatcher.replacementWatcher, "successful scope upgrade must clear the pending replacement")
+	require.Nil(t, metaWatcher.replacementWatcherFactory, "successful scope upgrade must clear the replacement factory")
 	require.False(t, metaWatcher.nodeScope, "successful replacement must restore cluster-scoped coverage")
 
 	clusterScoped.Stop(resourceWatchers)
 	nodeScoped.Stop(resourceWatchers)
 }
 
-func TestNodeScopeRestartWatcherLifecycle(t *testing.T) {
+func TestNodeScopeReplacementWatcherLifecycle(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	active := newMockWatcher()
 	replacement := newMockWatcher()
 	metaWatcher := &metaWatcher{
-		watcher:        active,
-		started:        true,
-		users:          make(map[*enricher]watcherRegistration),
-		enrichers:      make(map[*enricher]struct{}),
-		nodeScope:      true,
-		restartWatcher: replacement,
+		watcher:            active,
+		started:            true,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		nodeScope:          true,
+		replacementWatcher: replacement,
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 
@@ -853,7 +853,7 @@ func TestNodeScopeRestartWatcherLifecycle(t *testing.T) {
 	require.Equal(t, 1, active.stopCalls, "scope upgrade must stop the old active watcher")
 	require.Equal(t, 1, replacement.startCalls, "scope upgrade must start the pending cluster-scoped watcher")
 	require.Same(t, replacement, metaWatcher.watcher, "replacement must become the active watcher")
-	require.Nil(t, metaWatcher.restartWatcher, "successful scope upgrade must clear the pending watcher")
+	require.Nil(t, metaWatcher.replacementWatcher, "successful scope upgrade must clear the pending watcher")
 
 	clusterScoped.Stop(resourceWatchers)
 	require.Equal(t, 0, replacement.stopCalls, "node-scoped owner must retain the replacement watcher")
@@ -864,17 +864,17 @@ func TestNodeScopeRestartWatcherLifecycle(t *testing.T) {
 	resourceWatchers.lock.RUnlock()
 }
 
-func TestFinalOwnerEvictionDiscardsPendingRestartWatcher(t *testing.T) {
+func TestFinalOwnerEvictionDiscardsPendingReplacementWatcher(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	active := newMockWatcher()
 	pending := newMockWatcher()
 	metaWatcher := &metaWatcher{
-		watcher:        active,
-		started:        true,
-		users:          make(map[*enricher]watcherRegistration),
-		enrichers:      make(map[*enricher]struct{}),
-		nodeScope:      true,
-		restartWatcher: pending,
+		watcher:            active,
+		started:            true,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		nodeScope:          true,
+		replacementWatcher: pending,
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 
@@ -1074,12 +1074,12 @@ func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
 	require.NoError(t, replacement.Store().Add(replacementResource), "replacement watcher store must contain the resource")
 
 	metaWatcher := &metaWatcher{
-		watcher:        active,
-		started:        true,
-		users:          make(map[*enricher]watcherRegistration),
-		enrichers:      make(map[*enricher]struct{}),
-		nodeScope:      true,
-		restartWatcher: replacement,
+		watcher:            active,
+		started:            true,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		nodeScope:          true,
+		replacementWatcher: replacement,
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 	e := newWatcherLookupTestEnricher(t, resourceWatchers, metaWatcher)
@@ -1728,7 +1728,7 @@ func (f *mockFuncs) update(obj kubernetes.Resource) map[string]mapstr.M {
 			},
 		},
 	}
-	logger := logp.NewLogger("kubernetes")
+	logger := logp.NewLogger("kubernetes") //nolint:forbidigo // test helper
 	for k, v := range accessor.GetLabels() {
 		kubernetes2.ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, logger)
 	}
@@ -1745,7 +1745,7 @@ func (f *mockFuncs) delete(obj kubernetes.Resource) []string {
 
 func (f *mockFuncs) index(m mapstr.M) string {
 	f.indexed = m
-	return m["name"].(string)
+	return m["name"].(string) //nolint:errcheck // test mock
 }
 
 type mockWatcher struct {
@@ -1758,7 +1758,7 @@ type mockWatcher struct {
 
 func newMockWatcher() *mockWatcher {
 	return &mockWatcher{
-		store: cache.NewStore(func(obj interface{}) (string, error) {
+		store: cache.NewStore(func(obj any) (string, error) {
 			objName, err := cache.ObjectToName(obj)
 			if err != nil {
 				return "", err

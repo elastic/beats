@@ -1,0 +1,167 @@
+version: 8.19.21
+entries:
+    - kind: bug-fix
+      summary: Recreate Kubernetes metadata watchers after their final metricset owner stops
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52028
+      issue:
+        - https://github.com/elastic/beats/issues/51833
+      impact: ""
+      action: ""
+      timestamp: 1784239873
+      file:
+        name: 1784239873-fix-kubernetes-shared-watcher-lifecycle.yaml
+        checksum: f16537d7029051ec3be3540c078472f88ef5927e
+    - kind: enhancement
+      summary: update github.com/apache/thrift to v0.24.0
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52330
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1785413015
+      file:
+        name: 1785413015-update-github.com-apache-thrift-to-v0.24.0.yaml
+        checksum: 3e3db9edd931244d871267e11f2d3960cd7e7dd3
+    - kind: other
+      summary: Bump Node.js to 22.23.2 and npm to 12.0.2 in the Heartbeat Docker image.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52488
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786035917
+      file:
+        name: 1786035917-bump-heartbeat-nodejs-22.23.2-npm-10.0.2.yaml
+        checksum: 751cb84747d6d65a01603f2abfc5c8dca51161d9
+    - kind: bug-fix
+      summary: Unblock a metricset whose first Fetch() call is stuck when the wrapper shuts down
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52619
+      issue:
+        - https://github.com/elastic/beats/issues/15666
+      impact: ""
+      action: ""
+      timestamp: 1786624957
+      file:
+        name: 1786624957-drosiek-15666-wrapper-companion-goroutine.yaml
+        checksum: 6248fcffa577e860bac24baf418bed61bb4fac78
+    - kind: bug-fix
+      summary: Restores Filestream take over feature
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52630
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786640366
+      file:
+        name: 1786640366-restore-filestream-takeover.yaml
+        checksum: ee8a9df875c65f3482b364328154d901b8293004
+    - kind: bug-fix
+      summary: Close dbus connections in system service/users metricsets to stop FD leaks
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52674
+      issue:
+        - https://github.com/elastic/beats/issues/52418
+      impact: ""
+      action: ""
+      timestamp: 1786974327
+      file:
+        name: 1786974327-fix-system-service-dbus-fd-leak.yaml
+        checksum: 46fe12911b7e01d67e76334cdf43d92b6ea76afc
+    - kind: bug-fix
+      summary: add support for index in inputs for beatreceivers
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/52662
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786994745
+      file:
+        name: 1786994745-otelconsumer-propogate-raw_index.yaml
+        checksum: 235fe354dc8a31279befc8389bdd9958e29a5882
+    - kind: bug-fix
+      summary: Fix auditbeat system/package module to skip non-Ruby Homebrew formula paths.
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52685
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787104949
+      file:
+        name: 1787104949-fix-homebrew-jws-formula-scanner.yaml
+        checksum: d58ebca2c9dd4598dcab6751e626fc981c706c6b
+    - kind: bug-fix
+      summary: Fix panics in packetbeat SIP, TLS JA3, MySQL execute, and HTTP chunked parsers on malformed or truncated network input.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52686
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787107546
+      file:
+        name: 1787107546-fix-packetbeat-parser-panics.yaml
+        checksum: 219a8d82034a604ee375c59a085db2583faf8a97
+    - kind: bug-fix
+      summary: 'Fix event messages rendering zero values (e.g. `PID: 0`) in place of non-string parameters'
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52810
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787128310
+      file:
+        name: 1787128310-fix-winlogbeat-message-template-zero-values.yaml
+        checksum: 90088b7d2d86d04d913ab451f352d21528619cc9
+    - kind: bug-fix
+      summary: Fix httpjson cursor migration losing position when redirecting to CEL with a named input in Agentless deployments.
+      description: |
+        When an httpjson input with an id field uses run_as_cel: true to redirect to
+        the CEL input, the cursor migration path was not calling SetID on the state
+        store before reading the stored cursor. In Agentless deployments backed by the
+        Elasticsearch state store, SetID selects the per-input index, so omitting the
+        call caused the migration to read from the wrong index and silently fall back
+        to the default cursor state.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52759
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787267404
+      file:
+        name: 1787267404-fix-httpjson-cel-cursor-migration-set-id.yaml
+        checksum: 219c6f11bc18db2d081b367da6222fa70d9ae46d
+    - kind: enhancement
+      summary: Update Go to 1.26.7
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/52750
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787328794
+      file:
+        name: 1787328794-update-go-to-1.26.7.yaml
+        checksum: 4f69e7c044ff634129706c229644d1eb8d0a277c

@@ -3,12 +3,77 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.21 relnotes
+
+[[release-notes-8.19.21]]
+== Beats version 8.19.21
+
+https://github.com/elastic/beats/compare/v8.19.20\...v8.19.21[View commits]
+
+[discrete]
+[[enhancements-8.19.21]]
+=== Enhancements
+
+**All**
+
+* Update Go to 1.26.7. https://github.com/elastic/beats/pull/52750[#52750] 
+
+**Filebeat**
+
+* Update `github.com/apache/thrift` to v0.24.0. https://github.com/elastic/beats/pull/52330[#52330]
+
+[discrete]
+[[bug-fixes-8.19.21]]
+=== Bug fixes
+
+**All**
+
+* Add support for index in inputs for Beat receivers. https://github.com/elastic/beats/pull/52662[#52662]
+
+**Auditbeat**
+
+* Fix the Auditbeat `system/package` module to skip non-Ruby Homebrew formula paths. https://github.com/elastic/beats/pull/52685[#52685]
+
+**Filebeat**
+
+* Restores the Filestream take over feature. https://github.com/elastic/beats/pull/52630[#52630]
+* Fix `httpjson` cursor migration losing position when redirecting to CEL with a named input in Managed integration deployments. https://github.com/elastic/beats/pull/52759[#52759]
+
+**Metricbeat**
+
+* Recreate Kubernetes metadata watchers after their final metricset owner stops. https://github.com/elastic/beats/pull/52028[#52028] https://github.com/elastic/beats/issues/51833[#51833]
+* Unblock a metricset whose first `fetch()` call is stuck when the wrapper shuts down. https://github.com/elastic/beats/pull/52619[#52619] https://github.com/elastic/beats/issues/15666[#15666]
+* Close `dbus` connections in the `system/service` and `system/users` metricsets to stop FD leaks. https://github.com/elastic/beats/pull/52674[#52674] https://github.com/elastic/beats/issues/52418[#52418]
+
+**Packetbeat**
+
+* Fix panics in Packetbeat SIP, TLS JA3, MySQL execute, and HTTP chunked parsers on malformed or truncated network input. https://github.com/elastic/beats/pull/52686[#52686]
+
+**Winlogbeat**
+
+* Fix event messages rendering zero values (for example, `PID: 0`) in place of non-string parameters. https://github.com/elastic/beats/pull/52810[#52810]
+
+// end 8.19.21 relnotes
+
 // begin 8.19.20 relnotes
 
 [[release-notes-8.19.20]]
 == Beats version 8.19.20
 
 https://github.com/elastic/beats/compare/v8.19.19\...v8.19.20[View commits]
+
+[discrete]
+=== Known issues
+
+**All**
+
+// tag::known-issue-8.19-disk-queue-filled-metrics[]
+* Disk queue filled metrics can underflow after blocked publishes. When a disk queue reaches its configured capacity, inputs can block until the output acknowledges events. The queue then accepts the blocked event without updating its metrics. When the event is later removed, the `queue.filled.events`, `queue.filled.bytes`, and `queue.filled.pct` metrics might report incorrect values. Event delivery is unaffected. Upgrade to 8.19.21 or later to apply the fix.
+// end::known-issue-8.19-disk-queue-filled-metrics[]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[security-updates-8.19.20]]
@@ -89,6 +154,17 @@ https://github.com/elastic/beats/compare/v8.19.19\...v8.19.20[View commits]
 https://github.com/elastic/beats/compare/v8.19.18\...v8.19.19[View commits]
 
 [discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[enhancements-8.19.19]]
 ==== Enhancements
 
@@ -152,6 +228,17 @@ https://github.com/elastic/beats/compare/v8.19.18\...v8.19.19[View commits]
 https://github.com/elastic/beats/compare/v8.19.17\...v8.19.18[View commits]
 
 [discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[enhancements-8.19.18]]
 ==== Enhancements
 
@@ -205,6 +292,17 @@ https://github.com/elastic/beats/compare/v8.19.17\...v8.19.18[View commits]
 === Beats version 8.19.17
 
 https://github.com/elastic/beats/compare/v8.19.16\...v8.19.17[View commits]
+
+[discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[security-updates-8.19.17]]
@@ -303,6 +401,17 @@ upgrade to 8.19.17.
 https://github.com/elastic/beats/compare/v8.19.15\...v8.19.16[View commits]
 
 [discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.16]]
 ==== Security updates
 
@@ -381,6 +490,17 @@ https://github.com/elastic/beats/compare/v8.19.15\...v8.19.16[View commits]
 https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.15]]
 ==== Security updates
 
@@ -439,6 +559,17 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 === Beats version 8.19.14
 
 https://github.com/elastic/beats/compare/v8.19.13\...v8.19.14[View commits]
+
+[discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.14]]
@@ -516,6 +647,17 @@ of values intended to be secret.
 === Beats version 8.19.13
 
 https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
+
+[discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[security-updates-8.19.13]]
@@ -598,6 +740,17 @@ https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
 https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 
 [discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[security-updates-8.19.12]]
 ==== Security updates
 
@@ -656,6 +809,17 @@ https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
 https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
 
 [discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[bug-fixes-8.19.11]]
 ==== Bug fixes
 
@@ -685,6 +849,17 @@ https://github.com/elastic/beats/compare/v8.19.10\...v8.19.11[View commits]
 === Beats version 8.19.10
 
 https://github.com/elastic/beats/compare/v8.19.9\...v8.19.10[View commits]
+
+[discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.10]]
@@ -724,6 +899,17 @@ The 8.19.10 release adds the following new and notable features.
 [[release-notes-8.19.9]]
 === Beats version 8.19.9
 https://github.com/elastic/beats/compare/v8.19.8\...v8.19.9[View commits]
+
+[discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.9]]
@@ -770,6 +956,17 @@ The 8.19.9 release adds the following new and notable features.
 https://github.com/elastic/beats/compare/v8.19.7\...v8.19.8[View commits]
 
 [discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
+[discrete]
 [[bug-fixes-8.19.8]]
 ==== Bug fixes
 
@@ -793,6 +990,17 @@ https://github.com/elastic/beats/compare/v8.19.7\...v8.19.8[View commits]
 [[release-notes-8.19.7]]
 === Beats version 8.19.7
 https://github.com/elastic/beats/compare/v8.19.6\...v8.19.7[View commits]
+
+[discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.7]]
@@ -823,6 +1031,17 @@ The 8.19.7 release adds the following new and notable features.
 [[release-notes-8.19.6]]
 === Beats version 8.19.6
 https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
+
+[discrete]
+==== Known issues
+
+**All**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+**Filebeat**
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[enhancements-8.19.6]]
@@ -864,6 +1083,16 @@ https://github.com/elastic/beats/compare/v8.19.5\...v8.19.6[View commits]
 === Beats version 8.19.5
 https://github.com/elastic/beats/compare/v8.19.4\...v8.19.5[View commits]
 
+==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
+
 ==== Breaking changes
 
 *Filebeat*
@@ -896,6 +1125,16 @@ https://github.com/elastic/beats/compare/v8.19.4\...v8.19.5[View commits]
 [[release-notes-8.19.4]]
 === Beats version 8.19.4
 https://github.com/elastic/beats/compare/v8.19.3\...v8.19.4[View commits]
+
+==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 ==== Bugfixes
 
@@ -940,8 +1179,15 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
+// tag::known-issue-8.19-filestream-take-over[]
+- Filestream "take over" mode does not work in versions 8.19.0-8.19.20. A fix will ship in the 8.19.21 release.
+// end::known-issue-8.19-filestream-take-over[]
 // tag::known-issue-8.19-filestream-clean-inactive-1[]
 - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
 - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
@@ -1163,8 +1409,13 @@ https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
 
 ==== Known issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
@@ -1176,8 +1427,13 @@ https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
@@ -1208,8 +1464,13 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
@@ -1296,6 +1557,10 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -1326,6 +1591,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -1374,6 +1643,10 @@ https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
 https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -1431,6 +1704,10 @@ https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -1477,6 +1754,10 @@ https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -1504,6 +1785,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.17.4\...v8.18.0[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -1612,6 +1897,10 @@ https://github.com/elastic/beats/compare/v8.17.9\...v8.17.10[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 
 ==== Bugfixes
@@ -1639,6 +1928,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -1680,6 +1973,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -1729,6 +2026,10 @@ https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -1763,6 +2064,10 @@ https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -1787,6 +2092,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -1834,6 +2143,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -1887,6 +2200,10 @@ https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -1937,6 +2254,10 @@ https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -1981,6 +2302,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -2045,6 +2370,10 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 - Standalone Beats docker image will not start if `-e` option is not added {issue}42038[42038].
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -2135,6 +2464,10 @@ https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -2171,6 +2504,10 @@ https://github.com/elastic/beats/compare/v8.16.3\...v8.16.4[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -2199,6 +2536,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.16.2\...v8.16.3[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -2251,6 +2592,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -2313,6 +2658,10 @@ https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
@@ -2335,6 +2684,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 https://github.com/elastic/beats/compare/v8.15.4\...v8.16.0[View commits]
 
 ==== Known issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -2448,6 +2801,10 @@ https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 // tag::known-issue-8.19-filestream-clean-inactive-long-value[]
@@ -2477,6 +2834,10 @@ https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
 
 ==== Known Issues
+
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 *Filebeat*
 
@@ -2531,6 +2892,10 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 ==== Known Issues
 
+*Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 *Filebeat*
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
@@ -2581,6 +2946,8 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 
 *Affecting all Beats*
 
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
+
 - Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
 
 *Filebeat*
@@ -2605,6 +2972,8 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 ==== Known issues
 
 *Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 - Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
 
@@ -2662,6 +3031,8 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 ==== Known issues
 
 *Affecting all Beats*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-disk-queue-filled-metrics]
 
 - Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
 

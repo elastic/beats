@@ -35,8 +35,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	k8sresource "k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -111,9 +111,9 @@ type metaWatcher struct {
 	enrichers   map[*enricher]struct{}            // enrichers that use this watcher as their primary source
 	metricsRepo *MetricsRepo                      // used to update container metrics derived from metadata, like resource limits
 
-	nodeScope             bool                               // whether the active watcher watches resources in the current node or the whole cluster
-	restartWatcher        kubernetes.Watcher                 // whether this watcher needs a restart. Only relevant in leader nodes due to metricsets with different nodescope(pod, state_pod)
-	restartWatcherFactory func() (kubernetes.Watcher, error) // creates a fresh replacement after a failed one-shot watcher start
+	nodeScope                 bool                               // whether the active watcher watches resources in the current node or the whole cluster
+	replacementWatcher        kubernetes.Watcher                 // pending cluster-scoped watcher that replaces the active node-scoped watcher
+	replacementWatcherFactory func() (kubernetes.Watcher, error) // creates a fresh replacement after a failed one-shot watcher start
 }
 
 // getActiveWatcherByKey keeps the active watcher alive while its store is read.
@@ -384,7 +384,9 @@ func hasCommittedClusterScopedUser(metaWatcher *metaWatcher) bool {
 	return false
 }
 
-// registerWatcherUser records ownership of one exact watched resource.
+// registerWatcherUser reserves one exact watched resource while the enricher is
+// initialized. This keeps a concurrently stopping owner from removing the
+// watcher while metadata generators are being created.
 // The resource watcher registry must be locked by the caller.
 func registerWatcherUser(resourceName string, metaWatcher *metaWatcher, e *enricher, primary, nodeScope bool) {
 	if addWatcherUser(metaWatcher, e, nodeScope) {
@@ -395,8 +397,10 @@ func registerWatcherUser(resourceName string, metaWatcher *metaWatcher, e *enric
 	}
 }
 
-// commitWatcherOwnership publishes a fully initialized enricher to Start and
-// watcher event handlers.
+// commitWatcherOwnership makes an enricher visible to Start and watcher event
+// handlers after its callbacks and indexes have been initialized. Registrations
+// are made earlier to reserve the shared watchers and rolled back if setup
+// fails.
 func commitWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
@@ -439,10 +443,7 @@ func createWatcher(
 ) (bool, error) {
 
 	// We need to check the node scope to decide on whether a watcher should be updated or not.
-	nodeScope := false
-	if options.Node != "" {
-		nodeScope = true
-	}
+	nodeScope := options.Node != ""
 	// The nodescope for extra watchers node, namespace, replicaset and job should be always false.
 	if extraWatcher {
 		nodeScope = false
@@ -457,18 +458,18 @@ func createWatcher(
 
 	// If the watcher exists, exit
 	if ok {
-		if resourceMetaWatcher.nodeScope && !nodeScope && resourceMetaWatcher.restartWatcher == nil {
+		if resourceMetaWatcher.nodeScope && !nodeScope && resourceMetaWatcher.replacementWatcher == nil {
 			// It might happen that the watcher already exists, but is only being used to monitor the resources
 			// of a single node(e.g. created by pod metricset). In that case, we need to check if we are trying to create a new watcher that will track
 			// the resources of whole cluster(e.g. in case of state_pod metricset).
 			// If it is the case, then we need to update the watcher by changing its watch options (removing options.Node)
 			// A running watcher cannot be updated directly. Instead, we must create a new one with the correct watch options.
-			// The new restartWatcher must be identical to the old watcher, including the same handler function, with the only difference being the watch options.
+			// The replacement watcher must be identical to the old watcher, including the same handler function, with the only difference being the watch options.
 
 			if isNamespaced(resourceName) {
 				options.Namespace = namespace
 			}
-			restartWatcherFactory := func() (kubernetes.Watcher, error) {
+			replacementWatcherFactory := func() (kubernetes.Watcher, error) {
 				restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
 				if err != nil {
 					return nil, err
@@ -476,12 +477,12 @@ func createWatcher(
 				restartWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
 				return restartWatcher, nil
 			}
-			restartWatcher, err := restartWatcherFactory()
+			replacementWatcher, err := replacementWatcherFactory()
 			if err != nil {
 				return false, err
 			}
-			resourceMetaWatcher.restartWatcherFactory = restartWatcherFactory
-			resourceMetaWatcher.restartWatcher = restartWatcher
+			resourceMetaWatcher.replacementWatcherFactory = replacementWatcherFactory
+			resourceMetaWatcher.replacementWatcher = replacementWatcher
 		}
 		registerWatcherUser(resourceName, resourceMetaWatcher, e, !extraWatcher, nodeScope)
 		return false, nil
@@ -517,13 +518,13 @@ func createWatcher(
 	}
 
 	resourceMetaWatcher = &metaWatcher{
-		watcher:        watcher,
-		started:        false, // not started yet
-		users:          make(map[*enricher]watcherRegistration),
-		enrichers:      make(map[*enricher]struct{}),
-		metricsRepo:    metricsRepo,
-		restartWatcher: nil,
-		nodeScope:      nodeScope,
+		watcher:            watcher,
+		started:            false, // not started yet
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		metricsRepo:        metricsRepo,
+		replacementWatcher: nil,
+		nodeScope:          nodeScope,
 	}
 	resourceWatchers.metaWatchersMap[resourceName] = resourceMetaWatcher
 	registerWatcherUser(resourceName, resourceMetaWatcher, e, !extraWatcher, nodeScope)
@@ -612,7 +613,7 @@ func addEventHandlersToWatcher(
 	}
 
 	metaWatcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
+		AddFunc: func(obj any) {
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
 				containerMetricsUpdateFunc(res)
@@ -620,7 +621,7 @@ func addEventHandlersToWatcher(
 				nodeMetricsUpdateFunc(res)
 			}
 		},
-		UpdateFunc: func(obj interface{}) {
+		UpdateFunc: func(obj any) {
 			clearMetadataCacheFunc(obj)
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
@@ -629,7 +630,7 @@ func addEventHandlersToWatcher(
 				nodeMetricsUpdateFunc(res)
 			}
 		},
-		DeleteFunc: func(obj interface{}) {
+		DeleteFunc: func(obj any) {
 			clearMetadataCacheFunc(obj)
 			switch res := obj.(type) {
 			case *kubernetes.Pod:
@@ -739,13 +740,14 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 	mainWatcher := (*resourceMetaWatcher).watcher
 	if e != nil {
 		if registration, owned := resourceMetaWatcher.users[e]; owned &&
-			!registration.nodeScope && resourceMetaWatcher.nodeScope && resourceMetaWatcher.restartWatcher != nil {
-			mainWatcher = resourceMetaWatcher.restartWatcher
+			!registration.nodeScope && resourceMetaWatcher.nodeScope && resourceMetaWatcher.replacementWatcher != nil {
+			mainWatcher = resourceMetaWatcher.replacementWatcher
 		}
 	}
 
 	var metaGen metadata.MetaGen
-	if resourceName == PodResource {
+	switch resourceName {
+	case PodResource:
 		var nodeWatcher kubernetes.Watcher
 		if nodeMetaWatcher := resourceWatchers.metaWatchersMap[NodeResource]; nodeMetaWatcher != nil {
 			nodeWatcher = (*nodeMetaWatcher).watcher
@@ -767,7 +769,7 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		metaGen = metadata.GetPodMetaGen(commonConfig, mainWatcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
 			jobWatcher, addResourceMetadata)
 		return metaGen, nil
-	} else if resourceName == ServiceResource {
+	case ServiceResource:
 		namespaceMetaWatcher := resourceWatchers.metaWatchersMap[NamespaceResource]
 		if namespaceMetaWatcher == nil {
 			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
@@ -1009,7 +1011,7 @@ func NewContainerMetadataEnricher(
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-			id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
+			id := join(pod.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 			ids = append(ids, id)
 		}
 
@@ -1133,27 +1135,27 @@ func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
 	// stopping the active watcher so a failed replacement does not interrupt
 	// metadata collection.
 	if resourceMetaWatcher.nodeScope && hasCommittedClusterScopedUser(resourceMetaWatcher) &&
-		resourceMetaWatcher.restartWatcher == nil && resourceMetaWatcher.restartWatcherFactory != nil {
-		restartWatcher, err := resourceMetaWatcher.restartWatcherFactory()
+		resourceMetaWatcher.replacementWatcher == nil && resourceMetaWatcher.replacementWatcherFactory != nil {
+		replacementWatcher, err := resourceMetaWatcher.replacementWatcherFactory()
 		if err != nil {
 			e.log.Warnf("Error recreating %s watcher: %s", e.resourceName, err)
 		} else {
-			resourceMetaWatcher.restartWatcher = restartWatcher
+			resourceMetaWatcher.replacementWatcher = replacementWatcher
 		}
 	}
-	if resourceMetaWatcher.restartWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
-		if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
+	if resourceMetaWatcher.replacementWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
+		if err := resourceMetaWatcher.replacementWatcher.Start(); err != nil {
 			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
-			watcherToStop = resourceMetaWatcher.restartWatcher
-			resourceMetaWatcher.restartWatcher = nil
+			watcherToStop = resourceMetaWatcher.replacementWatcher
+			resourceMetaWatcher.replacementWatcher = nil
 		} else {
 			if resourceMetaWatcher.started {
-				watcherToStop = resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
+				watcherToStop = resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.replacementWatcher)
 			} else {
-				resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
+				resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.replacementWatcher)
 			}
-			resourceMetaWatcher.restartWatcher = nil
-			resourceMetaWatcher.restartWatcherFactory = nil
+			resourceMetaWatcher.replacementWatcher = nil
+			resourceMetaWatcher.replacementWatcherFactory = nil
 			resourceMetaWatcher.nodeScope = false
 			resourceMetaWatcher.started = true
 		}
@@ -1192,8 +1194,8 @@ func releaseWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 				watchersToStop = append(watchersToStop, activeWatcher)
 			}
 		} else if !hasClusterScopedUser(metaWatcher) {
-			metaWatcher.restartWatcher = nil
-			metaWatcher.restartWatcherFactory = nil
+			metaWatcher.replacementWatcher = nil
+			metaWatcher.replacementWatcherFactory = nil
 		}
 	}
 	e.watchedResources = nil
@@ -1360,7 +1362,7 @@ func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 // transformReplicaSetMetadata ensures that the PartialObjectMetadata resources we get from a metadata watcher
 // can be correctly interpreted by the update function returned by getEventMetadataFunc.
 // This really just involves adding missing type information.
-func transformReplicaSetMetadata(obj interface{}) (interface{}, error) {
+func transformReplicaSetMetadata(obj any) (any, error) {
 	old, ok := obj.(*metav1.PartialObjectMetadata)
 	if !ok {
 		return nil, fmt.Errorf("obj of type %T neither a ReplicaSet nor a PartialObjectMetadata", obj)

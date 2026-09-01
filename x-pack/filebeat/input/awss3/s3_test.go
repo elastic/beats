@@ -132,7 +132,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, "", listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
 		cfg := config{
@@ -248,7 +248,7 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, "", listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
 		poller := &s3PollerInput{
@@ -364,7 +364,7 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		states, err := newStates(nil, store, "")
+		states, err := newStates(nil, store, "", "")
 		require.NoError(t, err, "states creation must succeed")
 
 		poller := &s3PollerInput{
@@ -501,7 +501,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, "", listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
 		cfg := config{
@@ -757,7 +757,7 @@ func Test_S3StateHandling(t *testing.T) {
 			mockS3ObjectHandler.EXPECT().FinalizeS3Object().AnyTimes().Return(nil)
 
 			store := openTestStatestore()
-			s3States, err := newStates(logger, store, "")
+			s3States, err := newStates(logger, store, "", "")
 			require.NoError(t, err, "States creation must succeed")
 
 			// Note - add init states as if we are deriving them from registry

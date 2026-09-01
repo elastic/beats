@@ -21,9 +21,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/moby/moby/api/types/container"
@@ -84,7 +83,7 @@ func (c Client) imagePull(img string) (err error) {
 			defer respBody.Close()
 
 			// Read all the response, to be sure that the pull has finished before returning.
-			_, err = io.Copy(ioutil.Discard, respBody)
+			_, err = io.Copy(io.Discard, respBody)
 			if err != nil {
 				return fmt.Errorf("reading response for image %s: %w", img, err)
 			}
