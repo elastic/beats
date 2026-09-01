@@ -458,13 +458,13 @@ func TestTest(t *testing.T) {
 		"group_id": "filebeat",
 	})
 
-	inp, err := Plugin(logptest.NewTestingLogger(t, "")).Manager.Create(config)
+	inp, err := Plugin(logp.NewNopLogger()).Manager.Create(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	err = inp.Test(v2.TestContext{
-		Logger: logptest.NewTestingLogger(t, "kafka_test"),
+		Logger: logp.NewNopLogger(),
 	})
 	if err != nil {
 		t.Fatal(err)
