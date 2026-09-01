@@ -337,13 +337,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
 				store := openTestStatestore()
 
-<<<<<<< HEAD
-				states, err := newStates(nil, store, "")
+				states, err := newStates(nil, store, "", "")
 				assert.NoError(t, err, "states creation should succeed")
-=======
-				registry, err := newStateRegistry(nil, store, "", "", false, 0)
-				assert.NoError(t, err, "registry creation should succeed")
->>>>>>> d5abb60 ([aws-s3]  Scope polling state registry to the input's bucket (#52728))
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
 				s3Poller := &s3PollerInput{
