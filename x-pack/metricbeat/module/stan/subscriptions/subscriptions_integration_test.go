@@ -35,8 +35,8 @@ func TestFetch(t *testing.T) {
 	assert.NotEmpty(t, events)
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "stan",
 		"metricsets": []string{"subscriptions"},
 		"hosts":      []string{host},

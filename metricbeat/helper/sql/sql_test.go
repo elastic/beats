@@ -36,7 +36,7 @@ import (
 
 type kv struct {
 	k string
-	v interface{}
+	v any
 }
 
 type mockVariableMode struct {
@@ -44,11 +44,11 @@ type mockVariableMode struct {
 	results []kv
 }
 
-func (m *mockVariableMode) Scan(dest ...interface{}) error {
+func (m *mockVariableMode) Scan(dest ...any) error {
 	d1 := dest[0].(*string) //nolint:errcheck // false positive
 	*d1 = m.results[m.index].k
 
-	d2 := dest[1].(*interface{}) //nolint:errcheck // false positive
+	d2 := dest[1].(*any) //nolint:errcheck // false positive
 	*d2 = m.results[m.index].v
 
 	m.index++
@@ -73,9 +73,9 @@ type mockTableMode struct {
 	totalResults int
 }
 
-func (m *mockTableMode) Scan(dest ...interface{}) error {
+func (m *mockTableMode) Scan(dest ...any) error {
 	for i, d := range dest {
-		d1 := d.(*interface{}) //nolint:errcheck // false positive
+		d1 := d.(*any) //nolint:errcheck // false positive
 		*d1 = m.results[i].v
 	}
 
@@ -111,7 +111,7 @@ var results = []kv{
 	{k: "float32", v: float32(13.2)},
 	{k: "null", v: nil},
 	{k: "boolean", v: true},
-	{k: "array", v: []interface{}{0, 1, 2}},
+	{k: "array", v: []any{0, 1, 2}},
 	{k: "byte_array", v: []byte("byte_array")},
 	{k: "time", v: time.Now()},
 }
@@ -157,8 +157,8 @@ func checkValue(t *testing.T, res kv, ms mapstr.M) {
 		if actual != nil {
 			t.Errorf("key %q: expected nil, got %v (%T)", res.k, actual, actual)
 		}
-	case []interface{}:
-		actualSlice := actual.([]interface{}) //nolint:errcheck // slice expected
+	case []any:
+		actualSlice := actual.([]any) //nolint:errcheck // slice expected
 		if len(v) != len(actualSlice) {
 			t.Errorf("key %q: slice length mismatch: expected %d, got %d", res.k, len(v), len(actualSlice))
 			return

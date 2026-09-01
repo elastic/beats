@@ -57,7 +57,6 @@ func TestStringToInt(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			got := stringToInt(tc.in)
@@ -131,7 +130,6 @@ var removeBytesCases = map[string]struct {
 
 func TestRemoveBytes(t *testing.T) {
 	for name, tc := range removeBytesCases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -144,7 +142,6 @@ func TestRemoveBytes(t *testing.T) {
 
 func BenchmarkRemoveBytes(b *testing.B) {
 	for name, bc := range removeBytesCases {
-		bc := bc
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
@@ -186,7 +183,6 @@ func TestMapIndexToString(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -235,18 +231,17 @@ func TestAppendStringField(t *testing.T) {
 		},
 		"interface-slice": {
 			inMap: mapstr.M{
-				"error": []interface{}{"foo", "bar"},
+				"error": []any{"foo", "bar"},
 			},
 			inField: "error",
 			inValue: "some value",
 			want: mapstr.M{
-				"error": []interface{}{"foo", "bar", "some value"},
+				"error": []any{"foo", "bar", "some value"},
 			},
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			appendStringField(tc.inMap, tc.inField, tc.inValue)
@@ -290,7 +285,6 @@ func TestJoinStr(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

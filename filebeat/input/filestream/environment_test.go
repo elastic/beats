@@ -125,7 +125,11 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
-		defer func() { _ = grp.Stop() }()
+		defer func() {
+			_ = grp.Stop()
+			//nolint:errcheck // It's a test, let it panic if the casting fails
+			e.getManager().(*loginp.InputManager).Close()
+		}()
 
 		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
@@ -396,7 +400,7 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
 	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		events := e.pipeline.GetAllEvents()
-		require.Equal(t, count, len(events), "unexpected number of events")
+		require.Len(t, events, count, "unexpected number of events")
 	}, 2*time.Minute, 10*time.Millisecond)
 }
 
@@ -567,6 +571,10 @@ func (s *testInputStore) Close() {
 
 func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testInputStore) CleanupInterval() time.Duration {
