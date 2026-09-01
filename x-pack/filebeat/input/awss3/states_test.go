@@ -11,7 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -84,7 +84,6 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			store := openTestStatestore()
 			states, err := newStates(nil, store, "", "")
@@ -175,7 +174,7 @@ func TestStatesCleanUp(t *testing.T) {
 }
 
 func TestStatesPrefixHandling(t *testing.T) {
-	logger := logp.NewLogger("state-prefix-testing")
+	logger := logptest.NewTestingLogger(t, "state-prefix-testing")
 
 	t.Run("if prefix was set, accept only states with prefix", func(t *testing.T) {
 		// given
