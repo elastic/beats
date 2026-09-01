@@ -60,7 +60,7 @@ type recurrenceQueryHandler struct {
 // (same backing store as live queries), and policy-driven publish still follows LookupQueryProfile.
 func newRecurrenceQueryHandler(log *logp.Logger, cli *osqdcli.Client, configPlugin *ConfigPlugin, pub scheduledQueryPublisher, profiles liveProfileRecorder, osqueryVersion string) *recurrenceQueryHandler {
 	h := &recurrenceQueryHandler{
-		log:             log.With("component", "rrule-query-handler"),
+		log:             log.With("log.logger", "rrule-query-handler"),
 		cli:             cli,
 		configPlugin:    configPlugin,
 		publisher:       pub,
