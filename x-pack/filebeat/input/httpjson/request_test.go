@@ -576,8 +576,8 @@ func TestChainPaginationIgnoredFailureAdvancesCursor(t *testing.T) {
 	requester, trCtx, publisher := newChainPaginationTestRequester(t, []any{
 		map[string]any{
 			"set": map[string]any{
-				"target": "header.X-Test",
-				"value":  `[[if eq .parent_last_response.body.page "p1"]]ok[[else]][[.parent_last_response.body.missing]][[end]]`,
+				"target":                 "header.X-Test",
+				"value":                  `[[if eq .parent_last_response.body.page "p1"]]ok[[else]][[.parent_last_response.body.missing]][[end]]`,
 				"fail_on_template_error": true,
 				"do_not_log_failure":     true,
 			},
