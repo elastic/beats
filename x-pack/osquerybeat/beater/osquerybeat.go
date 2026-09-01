@@ -219,6 +219,19 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer bt.close()
 
+	// Start checking in with Elastic Agent before validating osqueryd, but do not
+	// apply configuration until startup has completed successfully.
+	if err := b.Manager.PreInit(); err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to pre-initialize manager: "+err.Error())
+		return err
+	}
+	managerEarlyStop := b.Manager.Stop
+	defer func() {
+		if managerEarlyStop != nil {
+			managerEarlyStop()
+		}
+	}()
+
 	// Watch input configuration updates
 	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
@@ -353,10 +366,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
-	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
-		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
-		return err
-	}
+	b.Manager.PostInit()
+	managerEarlyStop = nil
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
@@ -728,42 +739,44 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
-// nativeScheduleExecutionCount returns the 1-based execution count for a native (interval) schedule,
-// computed from start_date and interval so it is deterministic across agents.
-// Returns 0 if startDate is empty, interval <= 0, or runTime is before startDate.
-func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+// nativeScheduleTiming returns deterministic timing metadata for a native
+// interval schedule. A run reported before a valid start date is clamped to the
+// first execution and its planned start date so clock skew cannot produce an
+// execution count of zero or a pre-schedule planned time.
+func nativeScheduleTiming(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) (executionCount int64, plannedScheduleTime time.Time, clockSkewClamped bool) {
+	runTime := time.Unix(runTimeUnix, 0).UTC()
 	if startDateRFC3339 == "" || intervalSecs <= 0 {
-		return 0
+		return 0, runTime, false
 	}
+
 	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
 	if err != nil {
-		return 0
+		return 0, runTime, false
+	}
+	startTime = startTime.UTC()
+
+	if runTime.Before(startTime) {
+		return 1, startTime, true
 	}
 
-	startUnix := startTime.Unix()
-	if runTimeUnix < startUnix {
-		return 0
-	}
+	elapsedSeconds := runTimeUnix - startTime.Unix()
+	executionCount = 1 + (elapsedSeconds / int64(intervalSecs))
+	plannedScheduleTime = startTime.Add(time.Duration(executionCount-1) * time.Duration(intervalSecs) * time.Second)
+	return executionCount, plannedScheduleTime, false
+}
 
-	elapsedSeconds := runTimeUnix - startUnix
-	return 1 + (elapsedSeconds / int64(intervalSecs))
+// nativeScheduleExecutionCount returns the 1-based execution count for a native
+// interval schedule. It returns 0 for missing or invalid schedule metadata.
+func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+	executionCount, _, _ := nativeScheduleTiming(startDateRFC3339, intervalSecs, runTimeUnix)
+	return executionCount
 }
 
 // nativePlannedScheduleTime returns the intended schedule slot for a native interval schedule.
 // Falls back to runTimeUnix when schedule metadata is missing or invalid.
 func nativePlannedScheduleTime(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) time.Time {
-	runTime := time.Unix(runTimeUnix, 0).UTC()
-	executionCount := nativeScheduleExecutionCount(startDateRFC3339, intervalSecs, runTimeUnix)
-	if executionCount <= 0 {
-		return runTime
-	}
-
-	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
-	if err != nil {
-		return runTime
-	}
-
-	return startTime.UTC().Add(time.Duration(executionCount-1) * time.Duration(intervalSecs) * time.Second)
+	_, plannedScheduleTime, _ := nativeScheduleTiming(startDateRFC3339, intervalSecs, runTimeUnix)
+	return plannedScheduleTime
 }
 
 func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
@@ -786,14 +799,19 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	if scheduleID == "" {
 		scheduleID = res.Name
 	}
-	// Schedule execution count from start_date + interval (same across agents)
-	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
-
 	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	runTime := time.Unix(res.UnixTime, 0)
-	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
+	runTime := time.Unix(res.UnixTime, 0).UTC()
+	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
+	if clockSkewClamped {
+		bt.log.Warnf(
+			"Native scheduled query %q reported run time %s before start_date %s; possible clock skew, clamping to execution 1",
+			res.Name,
+			runTime.Format(time.RFC3339Nano),
+			plannedScheduleTime.Format(time.RFC3339Nano),
+		)
+	}
 	publishResolved := func(resultType, action string, hits []map[string]any) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)

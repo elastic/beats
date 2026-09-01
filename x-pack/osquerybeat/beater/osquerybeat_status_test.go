@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -30,11 +31,15 @@ import (
 // Mock osqueryd implementation for testing
 type mockOsqueryd struct {
 	checkErr error
+	checkFn  func(context.Context) error
 	runErr   error
 	runDelay time.Duration
 }
 
 func (m *mockOsqueryd) Check(ctx context.Context) error {
+	if m.checkFn != nil {
+		return m.checkFn(ctx)
+	}
 	return m.checkErr
 }
 
@@ -65,12 +70,15 @@ type statusEvent struct {
 }
 
 type testManager struct {
-	events   []statusEvent
-	started  bool
-	stopped  bool
-	startErr error
-	diagHook map[string]management.DiagnosticHook
-	mx       sync.Mutex
+	events          []statusEvent
+	started         bool
+	preInitialized  bool
+	postInitialized bool
+	stopped         bool
+	startErr        error
+	preInitErr      error
+	diagHook        map[string]management.DiagnosticHook
+	mx              sync.Mutex
 }
 
 type diagnosticsQueryExecutor struct {
@@ -88,12 +96,27 @@ func (m *testManager) UpdateStatus(s status.Status, msg string) {
 	m.events = append(m.events, statusEvent{Status: s, Message: msg})
 }
 func (m *testManager) Start() error {
+	m.mx.Lock()
+	defer m.mx.Unlock()
 	m.started = true
 	return m.startErr
 }
-func (m *testManager) PreInit() error                      { return nil }
-func (m *testManager) PostInit()                           {}
-func (m *testManager) Stop()                               { m.stopped = true }
+func (m *testManager) PreInit() error {
+	m.mx.Lock()
+	defer m.mx.Unlock()
+	m.preInitialized = true
+	return m.preInitErr
+}
+func (m *testManager) PostInit() {
+	m.mx.Lock()
+	defer m.mx.Unlock()
+	m.postInitialized = true
+}
+func (m *testManager) Stop() {
+	m.mx.Lock()
+	defer m.mx.Unlock()
+	m.stopped = true
+}
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
@@ -130,6 +153,100 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 		override(ob)
 	}
 	return ob, b, mgr
+}
+
+func TestOsquerybeatManagerInitializationWaitsForCheck(t *testing.T) {
+	checkStarted := make(chan struct{})
+	checkReleased := make(chan struct{})
+
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{
+				checkFn: func(ctx context.Context) error {
+					close(checkStarted)
+					select {
+					case <-checkReleased:
+						return nil
+					case <-ctx.Done():
+						return ctx.Err()
+					}
+				},
+				runErr: context.Canceled,
+			}, nil
+		}
+	})
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+
+	select {
+	case <-checkStarted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("osqueryd check did not start")
+	}
+
+	mgr.mx.Lock()
+	assert.True(t, mgr.preInitialized, "manager PreInit should run before the osqueryd check")
+	assert.False(t, mgr.postInitialized, "manager PostInit should wait for the osqueryd check")
+	assert.False(t, mgr.started, "deprecated manager Start should not be called")
+	mgr.mx.Unlock()
+
+	close(checkReleased)
+	require.Eventually(t, func() bool {
+		mgr.mx.Lock()
+		defer mgr.mx.Unlock()
+		return mgr.postInitialized
+	}, 5*time.Second, 10*time.Millisecond, "manager PostInit should run after the osqueryd check succeeds")
+
+	ob.Stop()
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop")
+	}
+}
+
+func TestOsquerybeatEarlyShutdownDuringCheck(t *testing.T) {
+	checkStarted := make(chan struct{})
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{
+				checkFn: func(ctx context.Context) error {
+					close(checkStarted)
+					<-ctx.Done()
+					return ctx.Err()
+				},
+			}, nil
+		}
+	})
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+
+	select {
+	case <-checkStarted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("osqueryd check did not start")
+	}
+	ob.Stop()
+
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, context.Canceled, "Run should preserve cancellation from the osqueryd check")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop after cancellation")
+	}
+
+	mgr.mx.Lock()
+	defer mgr.mx.Unlock()
+	assert.True(t, mgr.preInitialized, "manager PreInit should run before the osqueryd check")
+	assert.False(t, mgr.postInitialized, "manager PostInit should not run after early shutdown")
+	assert.True(t, mgr.stopped, "an early-initialized manager should be stopped")
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
@@ -254,43 +371,46 @@ func newTestBeatPaths(t *testing.T) *paths.Path {
 	return p
 }
 
-// TestOsquerybeatStatusReporting_CheckFailure tests status reporting when osqueryd check fails.
+// TestOsquerybeatStatusReporting_CheckFailure tests status reporting when osqueryd
+// fails or times out during its startup check.
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
-	mgr := &testManager{}
-	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
-		Manager:    mgr,
-		Registry:   reload.NewRegistry(),
-		Monitoring: beatmonitoring.NewMonitoring(),
-	}
-	b.Info.Paths = newTestBeatPaths(t)
-
-	cfg := agentconfig.NewConfig()
-	beater, err := New(b, cfg)
-	require.NoError(t, err)
-
-	// Inject mock osqueryd that fails the check
-	ob, ok := beater.(*osquerybeat)
-	require.True(t, ok)
-	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
-		return &mockOsqueryd{
-			checkErr: assert.AnError, // Check fails
-		}, nil
+	tests := []struct {
+		name     string
+		checkErr error
+	}{
+		{
+			name:     "ordinary failure",
+			checkErr: assert.AnError,
+		},
+		{
+			name:     "timeout",
+			checkErr: errors.New("osqueryd check timed out after 15s: context deadline exceeded"),
+		},
 	}
 
-	err = beater.Run(b)
-	require.Error(t, err)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+				ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+					return &mockOsqueryd{checkErr: tc.checkErr}, nil
+				}
+			})
 
-	// Should have Failed status
-	mgr.mx.Lock()
-	defer mgr.mx.Unlock()
+			err := ob.Run(b)
+			require.ErrorIs(t, err, tc.checkErr, "Run should return the osqueryd check error")
 
-	require.GreaterOrEqual(t, len(mgr.events), 1, "should have at least one status event")
-
-	// Last event should be Failed
-	lastEvent := mgr.events[len(mgr.events)-1]
-	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on check failure")
-	assert.Contains(t, lastEvent.Message, "Failed to check osqueryd")
+			mgr.mx.Lock()
+			defer mgr.mx.Unlock()
+			require.NotEmpty(t, mgr.events, "should report at least one status event")
+			lastEvent := mgr.events[len(mgr.events)-1]
+			assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on check failure")
+			assert.Contains(t, lastEvent.Message, "Failed to check osqueryd", "status should identify the failed check")
+			assert.Contains(t, lastEvent.Message, tc.checkErr.Error(), "status should include the check error")
+			assert.True(t, mgr.preInitialized, "manager PreInit should run before the osqueryd check")
+			assert.False(t, mgr.postInitialized, "manager PostInit should not run after a failed check")
+			assert.True(t, mgr.stopped, "manager should stop after an early startup failure")
+		})
+	}
 }
 
 // TestOsquerybeatStatusReporting_CreateOsquerydFailure tests status reporting when osqueryd creation fails.
@@ -330,10 +450,11 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	assert.Contains(t, lastEvent.Message, "Failed to create osqueryd")
 }
 
-// TestOsquerybeatStatusReporting_ManagerStartFailure tests status reporting when manager start fails.
-func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
+// TestOsquerybeatStatusReporting_ManagerPreInitFailure tests status reporting
+// when manager pre-initialization fails.
+func TestOsquerybeatStatusReporting_ManagerPreInitFailure(t *testing.T) {
 	mgr := &testManager{
-		startErr: assert.AnError, // Manager.Start() will fail
+		preInitErr: assert.AnError,
 	}
 	b := &beat.Beat{
 		Info:       beat.Info{Logger: logp.NewLogger("test")},
@@ -347,15 +468,6 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	beater, err := New(b, cfg)
 	require.NoError(t, err)
 
-	// Inject mock osqueryd that works fine
-	ob, ok := beater.(*osquerybeat)
-	require.True(t, ok)
-	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
-		return &mockOsqueryd{
-			checkErr: nil,
-		}, nil
-	}
-
 	err = beater.Run(b)
 	require.Error(t, err)
 
@@ -367,8 +479,9 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 
 	// Last event should be Failed
 	lastEvent := mgr.events[len(mgr.events)-1]
-	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager start failure")
-	assert.Contains(t, lastEvent.Message, "Failed to start manager")
+	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager PreInit failure")
+	assert.Contains(t, lastEvent.Message, "Failed to pre-initialize manager")
+	assert.False(t, mgr.stopped, "manager should not be stopped when PreInit itself fails")
 }
 
 func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {

@@ -123,7 +123,9 @@ osquerybeat:
 #            # space_id: "kibana-space-id"
 #            # For native schedules: start_date (RFC3339) is optional. When set, it enables
 #            # consistent schedule_execution_count in scheduled results/responses across agents
-#            # (computed as 1 + (run_time - start_date) / interval).
+#            # (computed as 1 + (run_time - start_date) / interval). If clock skew makes
+#            # run_time earlier than start_date, timing metadata is clamped to execution 1
+#            # and the start_date planned slot.
 #            # start_date: "2024-01-01T00:00:00Z"
 #            rrule_schedule:
 #              # RFC 5545 recurrence rule string

@@ -34,11 +34,11 @@ func TestNativeScheduleExecutionCount(t *testing.T) {
 			expected:  3,
 		},
 		{
-			name:      "returns zero when before start",
+			name:      "clamps to first execution when before start",
 			startDate: "2024-01-01T05:00:00Z",
 			interval:  3600,
 			runTime:   time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC),
-			expected:  0,
+			expected:  1,
 		},
 		{
 			name:      "returns zero when start date is empty",
@@ -101,11 +101,11 @@ func TestNativePlannedScheduleTime(t *testing.T) {
 			expected:  time.Date(2024, 1, 1, 3, 0, 0, 0, time.UTC),
 		},
 		{
-			name:      "returns runtime when before start",
+			name:      "returns first schedule slot when before start",
 			startDate: "2024-01-01T05:00:00Z",
 			interval:  3600,
 			runTime:   time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC),
-			expected:  time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC),
+			expected:  time.Date(2024, 1, 1, 5, 0, 0, 0, time.UTC),
 		},
 		{
 			name:      "returns runtime when start date is empty",
@@ -143,6 +143,17 @@ func TestNativePlannedScheduleTime(t *testing.T) {
 			assert.Equal(t, tt.expected, got)
 		})
 	}
+}
+
+func TestNativeScheduleTimingClockSkew(t *testing.T) {
+	startDate := "2024-01-01T05:00:00Z"
+	runTime := time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC)
+
+	executionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(startDate, 3600, runTime.Unix())
+
+	assert.Equal(t, int64(1), executionCount, "a pre-start run should be assigned to the first execution")
+	assert.Equal(t, time.Date(2024, 1, 1, 5, 0, 0, 0, time.UTC), plannedScheduleTime, "a pre-start run should use start_date as its planned slot")
+	assert.True(t, clockSkewClamped, "a pre-start run should report that clock skew was clamped")
 }
 
 func TestQueryResultMeta_PlannedScheduleTime(t *testing.T) {
