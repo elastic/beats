@@ -342,7 +342,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
 				store := openTestStatestore()
 
-				registry, err := newStateRegistry(nil, store, "", false, 0)
+				registry, err := newStateRegistry(nil, store, "", "", false, 0)
 				assert.NoError(t, err, "registry creation should succeed")
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
