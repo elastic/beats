@@ -233,7 +233,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.22.0
 	github.com/coder/websocket v1.8.14
-	github.com/elastic/entcollect v0.0.0-20260720203654-e61fb8788d9a
+	github.com/elastic/entcollect v0.0.0-20260901073829-6510b053b36d
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
 	github.com/jimlambrt/gldap v0.1.14
