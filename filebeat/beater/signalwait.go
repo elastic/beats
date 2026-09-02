@@ -42,6 +42,9 @@ func (s *signalWait) Wait() {
 
 	select {
 	case <-s.ch:
+		// A closed channel stays readable. Drop it so later Wait
+		// calls still block until another registered signal fires.
+		s.ch = nil
 	case <-s.signals:
 	}
 	s.count--
