@@ -42,10 +42,11 @@ type coalescingParser struct {
 	reasm  *libaudit.Reassembler
 	logger *logp.Logger
 
-	pending     []pendingEvent
-	deferredErr error
-	node        string // most recently seen node= value
-	bytesRead   int    // bytes consumed from inner since last distribution
+	pending      []pendingEvent
+	deferredErr  error
+	node         string              // most recently seen node= value
+	bytesRead    int                 // bytes not yet distributed to any pending event
+	inFlightSeqs map[uint32]struct{} // sequence numbers pushed to the reassembler but not yet completed
 }
 
 type pendingEvent struct {
@@ -60,9 +61,10 @@ var (
 
 func newCoalescingParser(r reader.Reader, cfg Config, logger *logp.Logger) *coalescingParser {
 	p := &coalescingParser{
-		cfg:    cfg,
-		inner:  r,
-		logger: logger.Named("reader_auditd_coalesce"),
+		cfg:          cfg,
+		inner:        r,
+		logger:       logger.Named("reader_auditd_coalesce"),
+		inFlightSeqs: make(map[uint32]struct{}),
 	}
 	reasm, err := libaudit.NewReassembler(reassemblerMaxInFlight, reassemblerTimeout, p)
 	if err != nil {
@@ -85,6 +87,9 @@ const (
 // Reassembler when a group of records sharing the same sequence number
 // is complete.
 func (p *coalescingParser) ReassemblyComplete(msgs []*auparse.AuditMessage) {
+	if len(msgs) > 0 {
+		delete(p.inFlightSeqs, msgs[0].Sequence)
+	}
 	evt, err := aucoalesce.CoalesceMessages(msgs)
 	if err != nil {
 		if p.cfg.LogErrors {
@@ -166,27 +171,37 @@ func (p *coalescingParser) Next() (reader.Message, error) {
 			}
 			continue
 		}
+		p.inFlightSeqs[auditMsg.Sequence] = struct{}{}
 		p.reasm.PushMessage(auditMsg)
 	}
 }
 
-// distributeBytesRead spreads accumulated bytesRead evenly across all pending
-// events so that each has a non-zero Bytes value. The remainder goes to the
-// first event (the one about to be returned).
+// distributeBytesRead spreads accumulated bytesRead across pending events and
+// reserves a proportional share for each in-flight group still in the
+// reassembler. The remainder goes to the first pending event.
+//
+// Consumers of Bytes care only about the cumulative sum (offset tracking,
+// metrics) and a non-zero value (the filestream IsEmpty gate). Individual
+// per-event precision is not required, so even distribution is sufficient as
+// long as the sum is conserved and no event receives zero.
+//
+// By reserving inflight groups' share in bytesRead, those groups will have
+// non-zero bytes when they complete and are drained.
 func (p *coalescingParser) distributeBytesRead() {
-	// The distribution does not need to be precise per-event. The only
-	// consumers of Bytes are offset tracking (cumulative sum), metrics
-	// (cumulative sum), and the IsEmpty gate (non-zero check). None
-	// observe individual event values, so even distribution is sufficient
-	// as long as the sum is conserved and no event gets zero.
 	n := len(p.pending)
-	perEvent := p.bytesRead / n
-	remainder := p.bytesRead % n
+	inflight := len(p.inFlightSeqs)
+	total := n + inflight
+	if total == 0 {
+		p.bytesRead = 0
+		return
+	}
+	perGroup := p.bytesRead / total
+	remainder := p.bytesRead % total
 	for i := range p.pending {
-		p.pending[i].bytes += perEvent
+		p.pending[i].bytes += perGroup
 	}
 	p.pending[0].bytes += remainder
-	p.bytesRead = 0
+	p.bytesRead = perGroup * inflight
 }
 
 // eventToMessage converts a coalesced aucoalesce.Event into a reader.Message

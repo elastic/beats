@@ -194,6 +194,57 @@ func TestCoalescingInterleavedBytesAccounting(t *testing.T) {
 	}
 }
 
+// TestCoalescingStaggeredBytesAccounting covers the case where one group
+// completes (via EOE) while another group's lines are already in the byte
+// accumulator. Without inflight-aware distribution, the first group drains all
+// of bytesRead and the second group later flushes with Bytes=0, which the
+// filestream session treats as empty and drops.
+func TestCoalescingStaggeredBytesAccounting(t *testing.T) {
+	// seq 1000 completes with EOE; seq 1001's SYSCALL line has already been
+	// read and is in bytesRead. seq 1001 has no EOE so it flushes at EOF.
+	lines := [][]byte{
+		[]byte(`type=SYSCALL msg=audit(1626700000.000:1000): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=100 pid=1001 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="a" exe="/a" key=(null)`),
+		[]byte(`type=SYSCALL msg=audit(1626700000.001:1001): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=100 pid=1002 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="b" exe="/b" key=(null)`),
+		[]byte(`type=EOE msg=audit(1626700000.000:1000):`),
+	}
+
+	var totalInput int
+	for _, l := range lines {
+		totalInput += len(l)
+	}
+
+	r := &testReader{messages: lines}
+	p := NewParser(r, coalesceConfig(), logptest.NewTestingLogger(t, t.Name()))
+
+	var (
+		totalOutput int
+		count       int
+	)
+	for {
+		msg, err := p.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			t.Fatalf("Next() returned unexpected error: %v", err)
+		}
+		if !msg.IsEmpty() {
+			count++
+		}
+		if msg.Bytes == 0 {
+			t.Errorf("event %d has Bytes=0 (would be dropped as empty)", count)
+		}
+		totalOutput += msg.Bytes
+	}
+
+	if count != 2 {
+		t.Errorf("got %d events; want 2", count)
+	}
+	if totalOutput != totalInput {
+		t.Errorf("sum(output.Bytes) = %d; want %d (sum of input bytes)", totalOutput, totalInput)
+	}
+}
+
 func TestCoalescingEOFFlush(t *testing.T) {
 	lines := [][]byte{
 		[]byte(`type=SYSCALL msg=audit(1626700000.000:400): arch=c000003e syscall=1 success=yes exit=10 a0=1 a1=2 a2=3 a3=4 items=0 ppid=100 pid=401 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="echo" exe="/usr/bin/echo" key=(null)`),
