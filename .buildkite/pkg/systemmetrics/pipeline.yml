@@ -96,12 +96,14 @@ steps:
           - github_commit_status:
               context: "pkg/systemmetrics: Win 2022 Unit Tests"
 
-      # Uses pkg/systemmetrics' own mage target, which only runs the container
-      # tests under ./tests/... and does not bring up an Elasticsearch compose
-      # stack (these tests spin up their own Docker containers and only need a
-      # Docker daemon).
-      - label: ":ubuntu: pkg/systemmetrics: Ubuntu 22.04 Container-System Tests"
-        key: "mandatory-systemmetrics-container-tests-ubuntu-2204"
+      # Container-System tests spin up their own Docker containers under
+      # ./tests/... via `mage goIntegTest` and only need a Docker daemon (no
+      # Elasticsearch compose stack). Run across images to keep coverage of:
+      #   - RHEL 9
+      #   - Ubuntu 20.04 (cgroup v1 host exercising metric/system/cgroup/cgv1)
+      #   - Ubuntu 22.04 (cgroup v2)
+      - label: ":linux: pkg/systemmetrics: Container-System Tests -- {{matrix.image}}"
+        key: "mandatory-systemmetrics-container-tests"
         command: |
           set -euo pipefail
           cd pkg/systemmetrics
@@ -111,7 +113,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "{{matrix.image}}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "pkg/systemmetrics/build/*.xml"
@@ -124,58 +126,10 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "pkg/systemmetrics: Container-System Tests / Ubuntu 22.04"
-
-      - label: ":redhat: pkg/systemmetrics: RHEL 9 Container-System Tests"
-        key: "mandatory-systemmetrics-container-tests-rhel-9"
-        command: |
-          set -euo pipefail
-          cd pkg/systemmetrics
-          mage goIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_RHEL9_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "pkg/systemmetrics/build/*.xml"
-          - "pkg/systemmetrics/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "pkg/systemmetrics/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "pkg/systemmetrics: Container-System Tests / RHEL 9"
-
-      # Ubuntu 20.04 is the cgroup v1 host that exercises
-      # metric/system/cgroup/cgv1.
-      - label: ":ubuntu: pkg/systemmetrics: Ubuntu 20.04 Container-System Tests"
-        key: "mandatory-systemmetrics-container-tests-ubuntu-2004"
-        command: |
-          set -euo pipefail
-          cd pkg/systemmetrics
-          mage goIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_2004_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "pkg/systemmetrics/build/*.xml"
-          - "pkg/systemmetrics/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "pkg/systemmetrics/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "pkg/systemmetrics: Container-System Tests / Ubuntu 20.04"
+              context: "pkg/systemmetrics: Container-System Tests"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_X86_64}"
+              - "${IMAGE_RHEL9_X86_64}"
+              - "${IMAGE_UBUNTU_2004_X86_64}"
