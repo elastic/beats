@@ -338,8 +338,6 @@ steps:
         - .buildkite/scripts/**
         - .buildkite/hooks/**
     trigger: "beats-pkg-systemmetrics"
-    # TODO: remove once the beats-pkg-systemmetrics pipeline is created in Buildkite
-    soft_fail: true
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
