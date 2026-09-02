@@ -1,0 +1,21 @@
+kind: bug-fix
+
+summary: Fix Kubernetes metadata watcher deadlock that blocked metricset shutdown
+
+description: >
+  The Kubernetes metadata enricher held the shared watcher registry lock while
+  waiting for an informer cache to synchronize. When the Kubernetes API was
+  unreachable or RBAC denied the initial LIST, that wait never completed and
+  Stop() could not acquire the same lock to cancel it, hanging the metricset and
+  blocking shutdown. Watcher startup now runs outside the registry lock as a
+  shared attempt, and each metricset can cancel its own wait independently of
+  other owners of the same watcher. Metricsets that successfully registered all
+  their required metadata watchers now wait for those watchers to be ready before
+  publishing. When add_metadata is disabled or client creation fails, the enricher
+  is a no-op and publishing continues unenriched as before. A metricset whose
+  extra metadata watcher (such as namespace enrichment) failed to register or
+  synchronize does not collect.
+
+component: metricbeat
+
+# pr and issue are filled in automatically by the tooling.
