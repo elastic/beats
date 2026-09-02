@@ -11,10 +11,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net"
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 	"time"
 
 	"golang.org/x/net/publicsuffix"
@@ -401,17 +403,8 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 
 	dec := json.NewDecoder(resp.Body)
 
-	type resource struct {
-		FeedURL string `json:"dataFeedURL"`
-		Session struct {
-			Token   string    `json:"token"`
-			Expires time.Time `json:"expiration"`
-		} `json:"sessionToken"`
-		RefreshURL   string `json:"refreshActiveSessionURL"`
-		RefreshAfter int    `json:"refreshActiveSessionInterval"`
-	}
 	var body struct {
-		Resources []resource     `json:"resources"`
+		Resources []hoseResource `json:"resources"`
 		Meta      map[string]any `json:"meta"`
 	}
 	err = dec.Decode(&body)
@@ -433,10 +426,13 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		return state, fmt.Errorf("failed to parse discover url for origin check: %w", err)
 	}
 
+	type preparedFeed struct {
+		resource hoseResource
+		feedName string
+		offset   int
+	}
 	cursors, _ := state["cursor"].(map[string]any)
-	// Clean up state feed annotation. This unfortunate code placement
-	// is in order to avoid allocating defers in a loop.
-	defer delete(state, "feed")
+	feeds := make([]preparedFeed, 0, len(body.Resources))
 	for _, r := range body.Resources {
 		feedURL, err := url.Parse(r.FeedURL)
 		if err != nil {
@@ -463,109 +459,200 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 				offset = int(off)
 			}
 		}
-		refreshAfter := time.Duration(r.RefreshAfter) * time.Second
-		go func() {
-			runRefreshLoopWithAfter(sessionCtx, refreshSessionWait(refreshAfter), time.After, func() error {
-				s.log.Debugw("session refresh", "url", r.RefreshURL)
-				req, err := http.NewRequestWithContext(sessionCtx, http.MethodPost, r.RefreshURL, nil)
-				if err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
-					s.log.Errorw("failed to prepare refresh stream request", "error", err)
-					return err
-				}
-				req.Header.Set("Content-Type", "application/json")
-				resp, err := cli.Do(req)
-				if err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
-					s.log.Errorw("failed to refresh stream connection", "error", err)
-					return err
-				}
-				err = resp.Body.Close()
-				if err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
-					s.log.Warnw("failed to close refresh response body", "error", err)
-				}
-				return nil
-			})
-		}()
+		feeds = append(feeds, preparedFeed{resource: r, feedName: feedName, offset: offset})
+	}
 
-		if offset > 0 {
-			feedQuery, err := url.ParseQuery(feedURL.RawQuery)
-			if err != nil {
-				return state, fmt.Errorf("failed to parse feed query: %w", err)
-			}
-			feedQuery.Set("offset", strconv.Itoa(offset))
-			feedURL.RawQuery = feedQuery.Encode()
-			r.FeedURL = feedURL.String()
+	merged := &feedCursors{cursor: cloneStringMap(cursors)}
+	var (
+		wg       sync.WaitGroup
+		errOnce  sync.Once
+		firstErr error
+	)
+	fail := func(err error) {
+		if err == nil {
+			return
 		}
-
-		s.log.Debugw("stream request", "url", r.FeedURL)
-		req, err := http.NewRequestWithContext(sessionCtx, "GET", r.FeedURL, nil)
-		if err != nil {
-			return state, fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)
+		errOnce.Do(func() {
+			firstErr = err
+			sessionCancel()
+		})
+	}
+	for _, f := range feeds {
+		wg.Add(1)
+		go func(f preparedFeed) {
+			defer wg.Done()
+			feedState := cloneState(state)
+			feedState["feed"] = f.feedName
+			fail(s.consumeFeed(sessionCtx, cli, f.resource, f.feedName, f.offset, feedState, merged))
+		}(f)
+	}
+	wg.Wait()
+	delete(state, "feed")
+	if merged.cursor != nil {
+		state["cursor"] = merged.cursor
+	}
+	if firstErr != nil {
+		if errors.Is(firstErr, hardError{}) {
+			return nil, firstErr
 		}
-		req.Header = make(http.Header)
-		req.Header.Add("Accept", "application/json")
-		req.Header.Add("Authorization", "Token "+r.Session.Token)
-
-		resp, err := s.plainClient.Do(req)
-		if err != nil {
-			return state, fmt.Errorf("failed to get firehose from %s: %w", r.FeedURL, err)
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			var buf bytes.Buffer
-			_, _ = io.Copy(&buf, resp.Body)
-			s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
-			return state, fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
-		}
-
-		// Prepare state to understand which feed is being processed.
-		// This is cleared by the deferred delete above the loop.
-		state["feed"] = feedName
-		dec := json.NewDecoder(resp.Body)
-		for {
-			var msg json.RawMessage
-			err := dec.Decode(&msg)
-			if err != nil {
-				s.metrics.errorsTotal.Inc()
-				//nolint:errorlint // will not be a wrapped error here.
-				if err == io.EOF {
-					s.log.Info("stream ended, restarting")
-					return state, nil
-				}
-				return state, fmt.Errorf("error decoding event: %w", err)
-			}
-			s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
-			if len(msg) == 0 || msg[0] != '{' {
-				s.metrics.errorsTotal.Inc()
-				s.log.Warnw("skipping non-object message from firehose", logp.Namespace(s.ns), "msg", debugMsg(msg))
-				continue
-			}
-			state["response"] = []byte(msg)
-			s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
-			currentCursor, ok := state["cursor"].(map[string]any)
-			if !ok {
-				currentCursor = s.cursor
-			}
-			newCursor, err := s.process(ctx, state, currentCursor, s.now().In(time.UTC))
-			if newCursor != nil {
-				state["cursor"] = newCursor
-			}
-			if err != nil {
-				s.log.Errorw("failed to process and publish data", "error", err)
-				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
-				// Fail the input so that we do not attempt to progress
-				// while dropping data on the floor.
-				return nil, hardError{err}
-			}
-		}
+		return state, firstErr
 	}
 	return state, nil
+}
+
+type hoseResource struct {
+	FeedURL string `json:"dataFeedURL"`
+	Session struct {
+		Token   string    `json:"token"`
+		Expires time.Time `json:"expiration"`
+	} `json:"sessionToken"`
+	RefreshURL   string `json:"refreshActiveSessionURL"`
+	RefreshAfter int    `json:"refreshActiveSessionInterval"`
+}
+
+// feedCursors serializes CEL evaluation and publication across concurrent
+// feeds and keeps a merged per-feed cursor so each worker sees offsets
+// from the others.
+type feedCursors struct {
+	mu     sync.Mutex
+	cursor map[string]any
+}
+
+func (c *feedCursors) evalAndPublish(s *falconHoseStream, ctx context.Context, state map[string]any) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.cursor != nil {
+		state["cursor"] = maps.Clone(c.cursor)
+	}
+	current, ok := state["cursor"].(map[string]any)
+	if !ok {
+		current = s.cursor
+	}
+	newCursor, err := s.process(ctx, state, current, s.now().In(time.UTC))
+	if newCursor != nil {
+		c.cursor = newCursor
+		state["cursor"] = newCursor
+	}
+	return err
+}
+
+func cloneState(state map[string]any) map[string]any {
+	out := maps.Clone(state)
+	if out == nil {
+		out = make(map[string]any)
+	}
+	if c, ok := state["cursor"].(map[string]any); ok {
+		out["cursor"] = maps.Clone(c)
+	}
+	return out
+}
+
+func cloneStringMap(in map[string]any) map[string]any {
+	if in == nil {
+		return nil
+	}
+	return maps.Clone(in)
+}
+
+// consumeFeed follows a single discovered FalconHose resource until the
+// stream ends, the context is cancelled, or an error occurs.
+func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r hoseResource, feedName string, offset int, state map[string]any, cursors *feedCursors) error {
+	refreshAfter := time.Duration(r.RefreshAfter) * time.Second
+	go func() {
+		runRefreshLoopWithAfter(ctx, refreshSessionWait(refreshAfter), time.After, func() error {
+			s.log.Debugw("session refresh", "url", r.RefreshURL)
+			req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.RefreshURL, nil)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
+				s.log.Errorw("failed to prepare refresh stream request", "error", err)
+				return err
+			}
+			req.Header.Set("Content-Type", "application/json")
+			resp, err := cli.Do(req)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
+				s.log.Errorw("failed to refresh stream connection", "error", err)
+				return err
+			}
+			err = resp.Body.Close()
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
+				s.log.Warnw("failed to close refresh response body", "error", err)
+			}
+			return nil
+		})
+	}()
+
+	feedURL, err := url.Parse(r.FeedURL)
+	if err != nil {
+		return fmt.Errorf("failed to parse feed url: %w", err)
+	}
+	if offset > 0 {
+		feedQuery, err := url.ParseQuery(feedURL.RawQuery)
+		if err != nil {
+			return fmt.Errorf("failed to parse feed query: %w", err)
+		}
+		feedQuery.Set("offset", strconv.Itoa(offset))
+		feedURL.RawQuery = feedQuery.Encode()
+		r.FeedURL = feedURL.String()
+	}
+
+	s.log.Debugw("stream request", "url", r.FeedURL)
+	req, err := http.NewRequestWithContext(ctx, "GET", r.FeedURL, nil)
+	if err != nil {
+		return fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)
+	}
+	req.Header = make(http.Header)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Authorization", "Token "+r.Session.Token)
+
+	resp, err := s.plainClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to get firehose from %s: %w", r.FeedURL, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		var buf bytes.Buffer
+		_, _ = io.Copy(&buf, resp.Body)
+		s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
+		return fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
+	}
+
+	dec := json.NewDecoder(resp.Body)
+	for {
+		var msg json.RawMessage
+		err := dec.Decode(&msg)
+		if err != nil {
+			s.metrics.errorsTotal.Inc()
+			if errors.Is(err, context.Canceled) || errors.Is(ctx.Err(), context.Canceled) {
+				return ctx.Err()
+			}
+			if errors.Is(err, io.EOF) {
+				s.log.Infow("feed stream ended", "url", feedName)
+				return nil
+			}
+			return fmt.Errorf("error decoding event: %w", err)
+		}
+		s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
+		if len(msg) == 0 || msg[0] != '{' {
+			s.metrics.errorsTotal.Inc()
+			s.log.Warnw("skipping non-object message from firehose", logp.Namespace(s.ns), "msg", debugMsg(msg))
+			continue
+		}
+		state["response"] = []byte(msg)
+		s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
+		if err := cursors.evalAndPublish(s, ctx, state); err != nil {
+			s.log.Errorw("failed to process and publish data", "error", err)
+			s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
+			// Fail the input so that we do not attempt to progress
+			// while dropping data on the floor.
+			return hardError{err}
+		}
+	}
 }
 
 // rateLimitError carries a retry-after duration from a 429 response so

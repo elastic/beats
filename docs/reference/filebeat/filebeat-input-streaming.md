@@ -52,9 +52,11 @@ On start the `state` will be something like this:
 }
 ```
 
-The `streaming` input websocket handler creates a `response` field in the state map and attaches the websocket message to this field. All `CEL` programs written should act on this `response` field. Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent. Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
+The `streaming` input websocket handler creates a `response` field in the state map and attaches the websocket message to this field. All `CEL` programs written should act on this `response` field. For the CrowdStrike handler, `state.feed` contains the original `dataFeedURL` of the resource that produced the message. Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent. Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
 
 If the cursor is present the program should process or filter out responses based on its value. If cursor is not present all responses should be processed as per the program’s logic.
+
+The CrowdStrike discover endpoint can return multiple feed resources. Each resource is followed concurrently, so a long-lived feed cannot starve the others. A CrowdStrike cursor must therefore be a single object keyed by `state.feed`, with each value storing that feed's offset. When producing a new cursor, merge the current feed's offset into `state.cursor` so that offsets for the other feeds are retained. A flat cursor such as `{"offset": 123}` cannot track more than one feed.
 
 After completion of a program’s execution it should return a single object with a structure looking like this:
 
@@ -72,7 +74,7 @@ After completion of a program’s execution it should return a single object wit
 ```
 
 1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field could be an array or a single object that will be treated as an array with a single element. This depends completely on the streaming data source. The `events` field is the array of events to be published to the output. Each event must be a JSON object.
-2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array. Note that the Crowdstrike streaming input does not support array cursors.
+2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array. Note that the CrowdStrike streaming input does not support array cursors and requires the per-feed single-object cursor described earlier on this page.
 
 
 Example configurations:
@@ -105,9 +107,11 @@ filebeat.inputs:
     state.response.decode_json().as(body,{
       "events": [body],
       ?"cursor": has(body.?metadata.offset) ?
-        optional.of({"offset": body.metadata.offset})
+        optional.of(state.?cursor.orValue({}).with({
+          ?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+        }))
       :
-        optional.none(),
+        state.?cursor,
     })
 ```
 
