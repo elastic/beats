@@ -38,8 +38,15 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/go-ucfg"
 )
 
 func TestNewReceiver(t *testing.T) {
@@ -110,6 +117,83 @@ func TestNewReceiver(t *testing.T) {
 			}, "failed to check metrics logging")
 		},
 	})
+}
+
+type mockBuilder struct{}
+
+func (mockBuilder) CreateConfig(_ bus.Event, _ ...ucfg.Option) []*conf.C {
+	return nil
+}
+
+type mockProvider struct{}
+
+func (mockProvider) Start() {}
+
+func (mockProvider) Stop() {}
+
+func (mockProvider) String() string {
+	return "mock provider"
+}
+
+func TestReceiverRecreatesAutodiscoverBuilders(t *testing.T) {
+	id, err := uuid.NewV4()
+	require.NoError(t, err, "failed to generate mock autodiscover UUID")
+	builderType := "mock-builder-" + id.String()
+	providerType := "mock-provider-" + id.String()
+
+	var builderCalls atomic.Int32
+	builder := func(_ *conf.C, _ *logp.Logger, _ *paths.Path) (autodiscover.Builder, error) {
+		builderCalls.Add(1)
+		return mockBuilder{}, nil
+	}
+	provider := func(_ string, _ bus.Bus, _ uuid.UUID, c *conf.C, _ keystore.Keystore, logger *logp.Logger, path *paths.Path) (autodiscover.Provider, error) {
+		var config struct {
+			Builders []*conf.C `config:"builders"`
+		}
+		if err := c.Unpack(&config); err != nil {
+			return nil, fmt.Errorf("unpack mock provider config: %w", err)
+		}
+		if _, err := autodiscover.NewBuilders(logger, config.Builders, nil, nil, path); err != nil {
+			return nil, fmt.Errorf("create mock builders: %w", err)
+		}
+		return mockProvider{}, nil
+	}
+	require.NoError(t, autodiscover.Registry.AddBuilder(builderType, builder), "failed to register mock builder")
+	require.NoError(t, autodiscover.Registry.AddProvider(providerType, provider), "failed to register mock provider")
+
+	tmpDir := t.TempDir()
+	factory := NewFactory()
+	config := &Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"autodiscover": map[string]any{
+					"providers": []any{
+						map[string]any{
+							"type": providerType,
+							"builders": []any{
+								map[string]any{
+									"type": builderType,
+								},
+							},
+						},
+					},
+				},
+			},
+			"path.home": tmpDir,
+		},
+	}
+	settings := receiver.Settings{ID: component.NewID(factory.Type())}
+	settings.Logger = zap.NewNop()
+
+	for attempt := range 2 {
+		receiver, err := factory.CreateLogs(t.Context(), settings, config, nil)
+		require.NoErrorf(t, err, "failed to create receiver on attempt %d", attempt+1)
+		require.NoErrorf(t, receiver.Start(t.Context(), componenttest.NewNopHost()), "failed to start receiver on attempt %d", attempt+1)
+		require.Eventuallyf(t, func() bool {
+			return builderCalls.Load() == int32(attempt+1)
+		}, 5*time.Second, 10*time.Millisecond, "expected Registry.BuildBuilder to invoke the registered builder on attempt %d", attempt+1)
+		require.NoErrorf(t, receiver.Shutdown(t.Context()), "failed to shut down receiver on attempt %d", attempt+1)
+	}
 }
 
 func BenchmarkFactory(b *testing.B) {
