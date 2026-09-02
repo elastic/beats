@@ -1,4 +1,24 @@
-######################## Filebeat Configuration ############################
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-reference-yml.html
+applies_to:
+  stack: ga
+  serverless: ga
+---
+
+# filebeat.reference.yml [filebeat-reference-yml]
+
+The following reference file is available with your Filebeat installation. It shows all non-deprecated Filebeat options. You can copy from this file and paste configurations into the `filebeat.yml` file to customize it.
+
+::::{tip}
+The reference file is located in the same directory as the `filebeat.yml` file. To locate the file, see [Directory layout](/reference/filebeat/directory-layout.md).
+::::
+
+
+The contents of the file are included here for your convenience.
+
+```yaml
+## Filebeat Configuration ############################
 
 # This file is a full configuration example documenting all non-deprecated
 # options in comments. For a shorter configuration example, that contains only
@@ -43,24 +63,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------------- ActiveMQ Module -------------------------------
-- module: activemq
-  # Audit logs
-  audit:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Application logs
-  log:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
 #-------------------------------- Apache Module --------------------------------
 #- module: apache
   # Access logs
@@ -100,696 +102,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- AWS Module ---------------------------------
-- module: aws
-  cloudtrail:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # AWS S3 bucket arn
-    #var.bucket_arn: 'arn:aws:s3:::mybucket'
-
-    # AWS S3 list prefix
-    #var.bucket_list_prefix: 'prefix'
-
-    # Bucket list interval on S3 bucket
-    #var.bucket_list_interval: 300s
-
-    # Number of workers on S3 bucket or SQS queue
-    #var.number_of_workers: 5
-
-    # Process CloudTrail logs
-    # default is true, set to false to skip Cloudtrail logs
-    # var.process_cloudtrail_logs: false
-
-    # Process CloudTrail Digest logs
-    # default true, set to false to skip CloudTrail Digest logs
-    # var.process_digest_logs: false
-
-    # Process CloudTrail Insight logs
-    # default true, set to false to skip CloudTrail Insight logs
-    # var.process_insight_logs: false
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # Default region to query if no other region is set
-    #var.default_region: us-east-1
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
-    #var.fips_enabled: false
-
-    # URL to proxy AWS API calls
-    #var.proxy_url: http://proxy:3128
-
-    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
-    #var.ssl:
-
-  cloudwatch:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # AWS S3 bucket arn
-    #var.bucket_arn: 'arn:aws:s3:::mybucket'
-
-    # AWS S3 list prefix
-    #var.bucket_list_prefix: 'prefix'
-
-    # Bucket list interval on S3 bucket
-    #var.bucket_list_interval: 300s
-
-    # Number of workers on S3 bucket or SQS queue
-    #var.number_of_workers: 5
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # Default region to query if no other region is set
-    #var.default_region: us-east-1
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
-    #var.fips_enabled: false
-
-    # URL to proxy AWS API calls
-    #var.proxy_url: http://proxy:3128
-
-    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
-    #var.ssl:
-
-  ec2:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # AWS S3 bucket arn
-    #var.bucket_arn: 'arn:aws:s3:::mybucket'
-
-    # AWS S3 list prefix
-    #var.bucket_list_prefix: 'prefix'
-
-    # Bucket list interval on S3 bucket
-    #var.bucket_list_interval: 300s
-
-    # Number of workers on S3 bucket or SQS queue
-    #var.number_of_workers: 5
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # Default region to query if no other region is set
-    #var.default_region: us-east-1
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
-    #var.fips_enabled: false
-
-    # URL to proxy AWS API calls
-    #var.proxy_url: http://proxy:3128
-
-    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
-    #var.ssl:
-
-  elb:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # AWS S3 bucket arn
-    #var.bucket_arn: 'arn:aws:s3:::mybucket'
-
-    # AWS S3 list prefix
-    #var.bucket_list_prefix: 'prefix'
-
-    # Bucket list interval on S3 bucket
-    #var.bucket_list_interval: 300s
-
-    # Number of workers on S3 bucket or SQS queue
-    #var.number_of_workers: 5
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # Default region to query if no other region is set
-    #var.default_region: us-east-1
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
-    #var.fips_enabled: false
-
-    # URL to proxy AWS API calls
-    #var.proxy_url: http://proxy:3128
-
-    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
-    #var.ssl:
-
-  s3access:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # AWS S3 bucket arn
-    #var.bucket_arn: 'arn:aws:s3:::mybucket'
-
-    # AWS S3 list prefix
-    #var.bucket_list_prefix: 'prefix'
-
-    # Bucket list interval on S3 bucket
-    #var.bucket_list_interval: 300s
-
-    # Number of workers on S3 bucket or SQS queue
-    #var.number_of_workers: 5
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # Default region to query if no other region is set
-    #var.default_region: us-east-1
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
-    #var.fips_enabled: false
-
-    # URL to proxy AWS API calls
-    #var.proxy_url: http://proxy:3128
-
-    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
-    #var.ssl:
-
-  vpcflow:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # AWS S3 bucket arn
-    #var.bucket_arn: 'arn:aws:s3:::mybucket'
-
-    # AWS S3 list prefix
-    #var.bucket_list_prefix: 'prefix'
-
-    # Bucket list interval on S3 bucket
-    #var.bucket_list_interval: 300s
-
-    # Number of workers on S3 bucket or SQS queue
-    #var.number_of_workers: 5
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # Default region to query if no other region is set
-    #var.default_region: us-east-1
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
-    #var.fips_enabled: false
-
-    # URL to proxy AWS API calls
-    #var.proxy_url: http://proxy:3128
-
-    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
-    #var.ssl:
-
-    # Specify a custom VPC flow log format.
-    #var.format:
-
-#----------------------------- AWS Fargate Module -----------------------------
-- module: awsfargate
-  log:
-    enabled: false
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # ARN of the log group to collect logs from
-    #var.log_group_arn: arn:aws:logs:us-east-1:123456789012:log-group:test:*
-
-    # Name of the log group to collect logs from
-    #var.log_group_name: /ecs/test-log-group
-
-    # Region that the specified log group belongs to
-    #var.region_name: us-east-1
-
-    # A list of strings of log streams names that Filebeat collect log events from
-    #var.log_streams: ["/ecs/test-log-group/test-log-stream"]
-
-    # A string to filter the results to include only log events from log streams that have names starting with this prefix
-    #var.log_stream_prefix: /ecs/test-log-group/
-
-    # Specify if Filebeat should read log files from the beginning or from the end
-    # Default start_position is beginning
-    #var.start_position: beginning
-
-    # How often Filebeat checks for new log events from the specified log group
-    # Default scan_frequency is 1 minute
-    #var.scan_frequency: 1m
-
-    # Time used to sleep between AWS FilterLogEvents API calls inside the same collection period
-    # Default api_sleep is 200 ms
-    #var.api_sleep: 200ms
-
-    # URL to proxy AWS API calls
-    #var.proxy_url: http://proxy:3128
-
-    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
-    #var.ssl:
-
-#-------------------------------- Azure Module --------------------------------
-- module: azure
-  # All logs
-  activitylogs:
-    enabled: false
-    var:
-      # eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
-      eventhub: "insights-operational-logs"
-      # consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
-      consumer_group: "$Default"
-      # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
-      connection_string: ""
-      # the name of the storage account the state/offsets will be stored and updated
-      storage_account: ""
-      # the name of the storage account container you would like to store the offset information in.
-      storage_account_container: ""
-      # the storage account key, this key will be used to authorize access to data in your storage account
-      storage_account_key: ""
-
-  platformlogs:
-    enabled: false
-  #  var:
-  #    eventhub: ""
-  #    consumer_group: "$Default"
-  #    connection_string: ""
-  #    storage_account: ""
-  #    storage_account_key: ""
-
-
-  auditlogs:
-    enabled: false
- #   var:
- #     eventhub: "insights-logs-auditlogs"
- #     consumer_group: "$Default"
- #     connection_string: ""
- #     storage_account: ""
- #     storage_account_key: ""
-  signinlogs:
-    enabled: false
- #   var:
- #     eventhub: "insights-logs-signinlogs"
- #     consumer_group: "$Default"
- #     connection_string: ""
- #     storage_account: ""
- #     storage_account_key: ""
-
-#--------------------------------- CEF Module ---------------------------------
-- module: cef
-  log:
-    enabled: false
-    var:
-      syslog_host: localhost
-      syslog_port: 9003
-
-      # Set internal security zones. used to override parsed network.direction
-      # based on zone egress and ingress
-      #var.internal_zones: [ "Internal" ]
-
-      # Set external security zones. used to override parsed network.direction
-      # based on zone egress and ingress
-      #var.external_zones: [ "External" ]
-
-#------------------------------ Checkpoint Module ------------------------------
-- module: checkpoint
-  firewall:
-    enabled: false
-
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
-
-    # The interface to listen to UDP based syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The UDP port to listen for syslog traffic. Defaults to 9001.
-    #var.syslog_port: 9001
-
-    # Set internal security zones. used to override parsed network.direction
-    # based on zone egress and ingress
-    #var.internal_zones: [ "Internal" ]
-
-    # Set external security zones. used to override parsed network.direction
-    # based on zone egress and ingress
-    #var.external_zones: [ "External" ]
-
-    # IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
-    # timestamps without a time zone.
-    #var.timezone_offset: UTC
-
-#-------------------------------- Cisco Module --------------------------------
-- module: cisco
-  asa:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    #var.input: udp
-
-    # The interface to listen to udp or tcp syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The port to listen for udp or tcp syslog traffic. Defaults to 9001.
-    #var.syslog_port: 9001
-
-    # With tcp input, set the optional tls configuration:
-    #var.ssl:
-    #  enabled: true
-    #  certificate: /path/to/cert.pem
-    #  key: /path/to/privatekey.pem
-    #  key_passphrase: 'password for my key'
-
-    # Set the log level from 1 (alerts only) to 7 (include all messages).
-    # Messages with a log level higher than the specified will be dropped.
-    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
-    #var.log_level: 7
-
-    # Set internal security zones. used to override parsed network.direction
-    # based on zone egress and ingress
-    #var.internal_zones: [ "Internal" ]
-
-    # Set external security zones. used to override parsed network.direction
-    # based on zone egress and ingress
-    #var.external_zones: [ "External" ]
-
-    # IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
-    # timestamps without a time zone.
-    #var.timezone_offset: UTC
-
-  ftd:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    #var.input: udp
-
-    # The interface to listen to tcp or udp syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The UDP port to listen for tcp or udp syslog traffic. Defaults to 9003.
-    #var.syslog_port: 9003
-
-    # With tcp input, set the optional tls configuration:
-    #var.ssl:
-    #  enabled: true
-    #  certificate: /path/to/cert.pem
-    #  key: /path/to/privatekey.pem
-    #  key_passphrase: 'password for my key'
-
-    # Set the log level from 1 (alerts only) to 7 (include all messages).
-    # Messages with a log level higher than the specified will be dropped.
-    # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
-    #var.log_level: 7
-
-    # Set internal security zones. used to override parsed network.direction
-    # based on zone egress and ingress
-    #var.internal_zones: [ "Internal" ]
-
-    # Set external security zones. used to override parsed network.direction
-    # based on zone egress and ingress
-    #var.external_zones: [ "External" ]
-
-    # IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
-    # timestamps without a time zone.
-    #var.timezone_offset: UTC
-
-  ios:
-    enabled: false
-
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
-
-    # The interface to listen to syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The port to listen on for syslog traffic. Defaults to 9002.
-    #var.syslog_port: 9002
-
-    # Set which protocol to use between udp (default) or tcp.
-    #var.syslog_protocol: udp
-
-    # Set custom paths for the log files when using file input. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  umbrella:
-    enabled: false
-
-    #var.input: aws-s3
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
-    # Access ID to authenticate with the S3 input
-    #var.access_key_id: 123456
-    # Access key to authenticate with the S3 input
-    #var.secret_access_key: PASSWORD
-    # The duration that the received messages are hidden from ReceiveMessage request
-    #var.visibility_timeout: 300s
-    # Maximum duration before AWS API request will be interrupted
-    #var.api_timeout: 120s
-
-  amp:
-    enabled: false
-
-    # Set which input to use between httpjson (default) or file.
-    #var.input: httpjson
-
-    # The API URL
-    #var.url: https://api.amp.cisco.com/v1/events
-    # The client ID used as a username for the API requests.
-    #var.client_id:
-    # The API key related to the client ID.
-    #var.api_key:
-    # How far to look back the first time the module is started. Expects an amount of hours.
-    #var.first_interval: 24h
-    # Overriding the default request timeout, optional.
-    #var.request_timeout: 60s
-
-#------------------------------- Coredns Module -------------------------------
-- module: coredns
-  # Fileset for native deployment
-  log: 
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#----------------------------- Crowdstrike Module -----------------------------
-- module: crowdstrike
-  
-  falcon:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#----------------------------- CyberArk PAS Module -----------------------------
-- module: cyberarkpas
-  audit:
-    enabled: false
-
-    # Set which input to use between tcp (default), udp, or file.
-    #
-    # var.input: tcp
-
-    # var.syslog_host: localhost
-    # var.syslog_port: 9301
-
-    # With tcp input, set the optional tls configuration:
-    #var.ssl:
-    #  enabled: true
-    #  certificate: /path/to/cert.pem
-    #  key: /path/to/privatekey.pem
-    #  key_passphrase: 'password for my key'
-
-    # Uncoment to keep the original syslog event under event.original.
-    # var.preserve_original_event: true
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-
 #---------------------------- Elasticsearch Module ----------------------------
 - module: elasticsearch
   # Server log
@@ -824,174 +136,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------ Envoyproxy Module ------------------------------
-- module: envoyproxy
-  # Fileset for native deployment
-  log: 
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#------------------------------- Fortinet Module -------------------------------
-- module: fortinet
-  firewall:
-    enabled: false
-
-    # Set which input to use between tcp, udp (default) or file.
-    #var.input: udp
-
-    # The interface to listen to syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The port to listen for syslog traffic. Defaults to 9004.
-    #var.syslog_port: 9004
-
-    # Set internal interfaces. used to override parsed network.direction
-    # based on a tagged interface. Both internal and external interfaces must be
-    # set to leverage this functionality.
-    #var.internal_interfaces: [ "LAN" ]
-
-    # Set external interfaces. used to override parsed network.direction
-    # based on a tagged interface. Both internal and external interfaces must be
-    # set to leverage this functionality.
-    #var.external_interfaces: [ "WAN" ]
-
-    # List of internal networks. Supports IPv4 and IPv6 addresses and ranges in CIDR notation.
-    # Also supports the named ranges listed
-    # [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/network-direction-processor.html#supported-named-network-ranges).
-    # This can't be used in combination with internal_interfaces and external_interfaces.
-    #var.internal_networks: [ "private" ]
-
-#--------------------- Google Cloud Platform (GCP) Module ---------------------
-- module: gcp
-  vpcflow:
-    enabled: false
-
-    # Google Cloud project ID.
-    var.project_id: my-gcp-project-id
-
-    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
-    # configured to use this topic as a sink for VPC flow logs.
-    var.topic: gcp-vpc-flowlogs
-
-    # Google Pub/Sub subscription for the topic. Filebeat will create this
-    # subscription if it does not exist.
-    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
-
-    # Credentials file for the service account with authorization to read from
-    # the subscription.
-    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
-
-    # Set internal networks. This is used to classify network.direction based
-    # off of what networks are considered "internal" either base off of a CIDR
-    # block or named network conditions. If this is not specified, then traffic
-    # direction is determined by whether it is between source and destination
-    # instance information rather than IP.
-    #
-    # For a full list of network conditions see:
-    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
-    #var.internal_networks: [ "private" ]
-
-  firewall:
-    enabled: false
-
-    # Google Cloud project ID.
-    var.project_id: my-gcp-project-id
-
-    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
-    # configured to use this topic as a sink for firewall logs.
-    var.topic: gcp-vpc-firewall
-
-    # Google Pub/Sub subscription for the topic. Filebeat will create this
-    # subscription if it does not exist.
-    var.subscription_name: filebeat-gcp-firewall-sub
-
-    # Credentials file for the service account with authorization to read from
-    # the subscription.
-    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
-
-    # Set internal networks. This is used to classify network.direction based
-    # off of what networks are considered "internal" either base off of a CIDR
-    # block or named network conditions. If this is not specified, then traffic
-    # is taken from the direction data in the rule_details event payload.
-    #
-    # For a full list of network conditions see:
-    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
-    #var.internal_networks: [ "private" ]
-
-  audit:
-    enabled: false
-
-    # Google Cloud project ID.
-    var.project_id: my-gcp-project-id
-
-    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
-    # configured to use this topic as a sink for firewall logs.
-    var.topic: gcp-vpc-audit
-
-    # Google Pub/Sub subscription for the topic. Filebeat will create this
-    # subscription if it does not exist.
-    var.subscription_name: filebeat-gcp-audit
-
-    # Credentials file for the service account with authorization to read from
-    # the subscription.
-    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
-
-#--------------------------- Google_workspace Module ---------------------------
-- module: google_workspace
-  saml:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  user_accounts:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  login:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  admin:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  drive:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  groups:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-
-
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   # All logs
@@ -1000,16 +144,6 @@ filebeat.modules:
 
     # Set which input to use between syslog (default) or file.
     #var.input:
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#-------------------------------- Ibmmq Module --------------------------------
-- module: ibmmq
-  # All logs
-  errorlog:
-    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1079,33 +213,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------------- Iptables Module -------------------------------
-- module: iptables
-  log:
-    enabled: false
-
-    # Set which input to use between syslog (default) or file.
-    #var.input:
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#---------------------------- Juniper JUNOS Module ----------------------------
-- module: juniper
-  srx:
-    enabled: false
-
-    # Set which input to use between tcp, udp (default) or file.
-    #var.input: udp
-
-    # The interface to listen to syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The port to listen for syslog traffic. Defaults to 9006.
-    #var.syslog_port: 9006
-
 #-------------------------------- Kafka Module --------------------------------
 - module: kafka
   # All logs
@@ -1156,58 +263,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------ Microsoft Module ------------------------------
-- module: microsoft
-  # ATP configuration
-  defender_atp:
-    enabled: false
-    # How often the API should be polled
-    #var.interval: 5m
-
-    # Oauth Client ID
-    #var.oauth2.client.id: ""
-
-    # Oauth Client Secret
-    #var.oauth2.client.secret: ""
-
-    # Oauth Token URL, should include the tenant ID
-    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
-  m365_defender:
-    enabled: false
-    # How often the API should be polled
-    #var.interval: 5m
-
-    # Oauth Client ID
-    #var.oauth2.client.id: ""
-
-    # Oauth Client Secret
-    #var.oauth2.client.secret: ""
-
-    # Oauth Token URL, should include the tenant ID
-    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
-
-    # Related scopes, default should be included
-    #var.oauth2.scopes:
-    #  - "https://api.security.microsoft.com/.default"
-
-#--------------------------------- MISP Module ---------------------------------
-# Deprecated in 7.14.0: Recommended to migrate to the Threat Intel module.
-
-- module: misp
-  threat:
-    enabled: false
-    # API key to access MISP
-    #var.api_key
-
-    # Array object in MISP response
-    #var.http_request_body.limit: 1000
-
-    # URL of the MISP REST API
-    #var.url
-
-    # You can also pass SSL options. For example:
-    #var.ssl.verification_mode: none
-
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
   # Logs
@@ -1221,16 +276,6 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-
-#-------------------------------- Mssql Module --------------------------------
-- module: mssql
-  # Fileset for native deployment
-  log:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths: ['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']
 
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
@@ -1258,19 +303,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------- MySQL Enterprise Module ---------------------------
-- module: mysqlenterprise
-  audit:
-    enabled: false
-
-    # Sets the input type. Currently only supports file
-    #var.input: file
-
-    # Set paths for the log files when file input is used.
-    # Should only be used together with file input
-    # var.paths:
-    #  - /home/user/mysqlauditlogs/audit.*.log
-
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
   # All logs
@@ -1280,19 +312,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-#------------------------------- NetFlow Module -------------------------------
-- module: netflow
-  log:
-    enabled: false
-    var:
-      netflow_host: localhost
-      netflow_port: 2055
-      # internal_networks specifies which networks are considered internal or private
-      # you can specify either a CIDR block or any of the special named ranges listed
-      # at: https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
-      internal_networks:
-        - private
 
 #-------------------------------- Nginx Module --------------------------------
 #- module: nginx
@@ -1328,74 +347,6 @@ filebeat.modules:
   #  # Filebeat will choose the paths depending on your OS.
   #  #var.paths:
 
-#------------------------------ Office 365 Module ------------------------------
-- module: o365
-  audit:
-    enabled: false
-
-    # Set the application_id (also known as client ID):
-    var.application_id: "<MyApplicationID>"
-
-    # Configure the tenants to monitor:
-    # Use the tenant ID (also known as directory ID) and the domain name.
-    # var.tenants:
-    #  - id: "tenant_id_1"
-    #    name: "mydomain.onmicrosoft.com"
-    #  - id: "tenant_id_2"
-    #    name: "mycompany.com"
-    var.tenants:
-     - id: "<MyTenantID>"
-       name: "mytenant.onmicrosoft.com"
-
-    # List of content-types to fetch. By default all known content-types
-    # are retrieved:
-    # var.content_type:
-    #  - "Audit.AzureActiveDirectory"
-    #  - "Audit.Exchange"
-    #  - "Audit.SharePoint"
-    #  - "Audit.General"
-    #  - "DLP.All"
-
-    # Use the following settings to enable certificate-based authentication:
-    # var.certificate: "/path/to/certificate.pem"
-    # var.key: "/path/to/private_key.pem"
-    # var.key_passphrase: "myPrivateKeyPassword"
-
-    # Client-secret based authentication:
-    # Comment the following line if using certificate authentication.
-    var.client_secret: "<YourClientSecretHere>"
-
-    # Advanced settings, use with care:
-    # var.api:
-    #   # Settings for custom endpoints:
-    #   authentication_endpoint: "https://login.microsoftonline.us/"
-    #   resource: "https://manage.office365.us"
-    #
-    #   max_retention: 168h
-    #   max_requests_per_minute: 2000
-    #   poll_interval: 3m
-
-#--------------------------------- Okta Module ---------------------------------
-- module: okta
-  system:
-    enabled: false
-    # You must configure the URL with your Okta domain and provide an
-    # API token to access the logs API.
-    #var.url: https://yourOktaDomain/api/v1/logs
-    #var.api_key: 'yourApiTokenHere'
-
-#-------------------------------- Oracle Module --------------------------------
-- module: oracle
-  database_audit:
-    enabled: false
-
-    # Set which input to use between syslog or file (default).
-    #var.input: file
-
-    # Set paths for the log files when file input is used.
-    # Should only be used together with file input
-    #var.paths: ["/home/user/oracleauditlogs/*.aud"]
-
 #------------------------------- Osquery Module -------------------------------
 #- module: osquery
   #result:
@@ -1409,27 +360,6 @@ filebeat.modules:
     # `osquery.result`. Set to false to copy the fields in the root
     # of the document. The default is true.
     #var.use_namespace: true
-
-#--------------------------------- Panw Module ---------------------------------
-- module: panw
-  panos:
-    enabled: false
-
-    # Set which input to use between syslog (default) or file.
-    #var.input:
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-    # Set internal security zones. used to determine network.direction
-    # default "trust"
-    #var.internal_zones:
-
-    # Set external security zones. used to determine network.direction
-    # default "untrust"
-    #var.external_zones:
-
 
 #------------------------------- Pensando Module -------------------------------
 - module: pensando
@@ -1457,16 +387,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------------- RabbitMQ Module -------------------------------
-- module: rabbitmq
-  # All logs
-  log:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths: ["/var/log/rabbitmq/rabbit@localhost.log*"]
-
 #-------------------------------- Redis Module --------------------------------
 #- module: redis
   # Main logs
@@ -1487,475 +407,13 @@ filebeat.modules:
     # Optional, the password to use when connecting to Redis.
     #var.password:
 
-#------------------------------ Salesforce Module ------------------------------
-# Configuration file for Salesforce module in Filebeat
-
-# Common Configurations:
-# - enabled: Set to true to enable ingestion of Salesforce module fileset
-# - initial_interval: Initial interval for log collection. This setting determines the time period for which the logs will be initially collected when the ingestion process starts, i.e. 1d/h/m/s
-# - api_version: API version for Salesforce, version should be greater than 46.0
-# - url: URL for Salesforce instance
-
-# Authentication Configurations:
-# User-Password Authentication:
-# - enabled: Set to true to enable user-password authentication
-# - client.id: Client ID for user-password authentication
-# - client.secret: Client secret for user-password authentication
-# - token_url: Token URL for user-password authentication
-# - username: Username for user-password authentication
-# - password: Password for user-password authentication
-
-# JWT Authentication:
-# - enabled: Set to true to enable JWT authentication
-# - client.id: Client ID for JWT authentication
-# - client.username: Username for JWT authentication
-# - client.key_path: Path to client key for JWT authentication
-# - url: Audience URL for JWT authentication
-# - token_url: Token URL for JWT authentication
-
-# Event Monitoring:
-# - real_time: Set to true to enable real-time logging using object type data collection
-# - real_time_interval: Interval for real-time logging
-
-# Event Log File:
-# - event_log_file: Set to true to enable event log file type data collection
-# - elf_interval: Interval for event log file
-# - log_file_interval: Interval type for log file collection, either Hourly or Daily
-
-- module: salesforce
-
-  apex:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
-
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "<YourClientSecretHere>"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
-        # token_url: "<YourTokenURLHere>"
-
-    var.url: "https://instance_id.my.salesforce.com"
-
-    var.event_log_file: true
-    var.elf_interval: 1h
-    var.log_file_interval: "Hourly"
-
-  login:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
-
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "client-secret"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
-        # token_url: "<YourTokenURLHere>"
-
-    var.url: "https://instance_id.my.salesforce.com"
-
-    var.event_log_file: true
-    var.elf_interval: 1h
-    var.log_file_interval: "Hourly"
-
-    var.real_time: true
-    var.real_time_interval: 5m
-
-  logout:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
-
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "client-secret"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
-        # token_url: "<YourTokenURLHere>"
-
-    var.url: "https://instance_id.my.salesforce.com"
-
-    var.event_log_file: true
-    var.elf_interval: 1h
-    var.log_file_interval: "Hourly"
-
-    var.real_time: true
-    var.real_time_interval: 5m
-
-  setupaudittrail:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
-
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "client-secret"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
-        # token_url: "<YourTokenURLHere>"
-
-    var.url: "https://instance_id.my.salesforce.com"
-
-    var.real_time: true
-    var.real_time_interval: 5m
-
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
     enabled: false
     # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
+    # Filebeat will choose the default path.
     #var.paths:
-
-#--------------------------------- Snyk Module ---------------------------------
-- module: snyk
-  audit:
-    enabled: false
-    # Set which input to use between httpjson (default) or file.
-    #var.input: httpjson
-    #
-    # What audit type to collect, can be either "group" or "organization".
-    #var.audit_type: organization
-    #
-    # The ID related to the audit_type. If audit type is group, then this value should be
-    # the group ID and if it is organization it should be the organization ID to collect from.
-    #var.audit_id: 1235432-asdfdf-2341234-asdgjhg
-    # How often the API should be polled, defaults to 1 hour.
-    #var.interval: 1h
-    # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
-    #var.first_interval: 24h
-    # The API token that is created for a specific user, found in the Snyk management dashboard.
-    #var.api_token:
-    # Event filtering.
-    # All configuration items below is OPTIONAL and the default options will be overwritten
-    # for each entry that is not commented out.
-    # Will return only logs for this specific project.
-    #var.project_id: ""
-    # User public ID. Will fetch only audit logs originated from this user's actions.
-    #var.user_id: ""
-    # Will return only logs for this specific event.
-    #var.event: ""
-    # User email address. Will fetch only audit logs originated from this user's actions.
-    #var.email_address: ""
-
-  vulnerabilities:
-    enabled: false
-    # Set which input to use between httpjson (default) or file.
-    #var.input: httpjson
-    # How often the API should be polled. Data from the Snyk API is automatically updated
-    # once per day, so the default interval is 24 hours.
-    #var.interval: 24h
-    # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
-    #var.first_interval: 24h
-    # The API token that is created for a specific user, found in the Snyk management dashboard.
-    #var.api_token:
-    # The list of org IDs to filter the results by.
-    # One organization ID per line, starting with a - sign
-    #var.orgs:
-    #  - 12354-asdfdf-123543-asdsdfg
-    #  - 76554-jhggfd-654342-hgrfasd
-    # Event filtering.
-    # All configuration items below is OPTIONAL and the default options will be overwritten
-    # for each entry that is not commented out.
-    # The severity levels of issues to filter the results by.
-    #var.included_severity:
-    #  - critical
-    #  - high
-    #  - medium
-    #  - low
-    #
-    # The exploit maturity levels of issues to filter the results by.
-    #var.exploit_maturity:
-    #  - mature
-    #  - proof-of-concept
-    #  - no-known-exploit
-    #  - no-data
-    #
-    # The type of issues to filter the results by.
-    #var.types:
-    #  - vuln
-    #  - license
-    #  - configuration
-    #
-    # The type of languages to filter the results by.
-    #var.languages:
-    #  - javascript
-    #  - ruby
-    #  - java
-    #  - scala
-    #  - python
-    #  - golang
-    #  - php
-    #  - dotnet
-    #  - swift-objective-c
-    #  - elixir
-    #  - docker
-    #  - terraform
-    #  - kubernetes
-    #  - helm
-    #  - cloudformation
-    #
-    # Search term to filter issue name by, or an exact CVE or CWE.
-    #var.identifier:
-    #  - ""
-    #
-    # If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
-    #var.ignored: false
-    #var.patched: false
-    #var.fixable: false
-    #var.is_fixed: false
-    #var.is_patchable: false
-    #var.is_pinnable: false
-    #
-    # The priority score ranging between 0-1000
-    #var.min_priority_score: 0
-    #var.max_priority_score: 1000
-
-#-------------------------------- Sophos Module --------------------------------
-- module: sophos
-  xg:
-    enabled: false
-
-    # Set which input to use between tcp, udp (default) or file.
-    #var.input: udp
-
-    # The interface to listen to syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The port to listen for syslog traffic. Defaults to 9004.
-    #var.syslog_port: 9005
-
-    # firewall default hostname
-    #var.default_host_name: firewall.localgroup.local
-
-    # known firewalls
-    #var.known_devices:
-      #- serial_number: "1234567890123457"
-      #  hostname: "a.host.local"
-      #- serial_number: "1234234590678557"
-      #  hostname: "b.host.local"
-
-
-#------------------------------- Suricata Module -------------------------------
-- module: suricata
-  # All logs
-  eve:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#----------------------------- Threatintel Module -----------------------------
-- module: threatintel
-  abuseurl:
-    enabled: false
-
-    # Input used for ingesting threat intel data.
-    var.input: httpjson
-
-    # The URL used for Threat Intel API calls.
-    var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
-
-    # The interval to poll the API for updates.
-    var.interval: 10m
-
-  abusemalware:
-    enabled: false
-
-    # Input used for ingesting threat intel data.
-    var.input: httpjson
-
-    # The URL used for Threat Intel API calls.
-    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
-
-    # The interval to poll the API for updates.
-    var.interval: 10m
-
-  malwarebazaar:
-    enabled: false
-
-    # Input used for ingesting threat intel data.
-    var.input: httpjson
-
-    # The URL used for Threat Intel API calls.
-    var.url: https://mb-api.abuse.ch/api/v1/
-
-    # The interval to poll the API for updates.
-    var.interval: 10m
-
-  misp:
-    enabled: false
-
-    # Input used for ingesting threat intel data, defaults to JSON.
-    var.input: httpjson
-
-    # The URL of the MISP instance, should end with "/events/restSearch".
-    var.url: https://SERVER/events/restSearch
-
-    # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
-    var.api_token: API_KEY
-
-    # Configures the type of SSL verification done, if MISP is running on self signed certificates
-    # then the certificate would either need to be trusted, or verification_mode set to none.
-    #var.ssl.verification_mode: none
-
-    # Optional filters that can be applied to the API for filtering out results. This should support the majority of fields in a MISP context.
-    # For examples please reference the filebeat module documentation.
-    #var.filters:
-    #  - threat_level: [4, 5]
-    #  - to_ids: true
-
-    # How far back to look once the beat starts up for the first time, the value has to be in hours. Each request afterwards will filter on any event newer
-    # than the last event that was already ingested.
-    var.first_interval: 300h
-
-    # The interval to poll the API for updates.
-    var.interval: 5m
-
-  otx:
-    enabled: false
-
-    # Input used for ingesting threat intel data
-    var.input: httpjson
-
-    # The URL used for OTX Threat Intel API calls.
-    var.url: https://otx.alienvault.com/api/v1/indicators/export
-
-    # The authentication token used to contact the OTX API, can be found on the OTX UI.
-    var.api_token: API_KEY
-
-    # Optional filters that can be applied to retrieve only specific indicators.
-    #var.types: "domain,IPv4,hostname,url,FileHash-SHA256"
-
-    # The timeout of the HTTP client connecting to the OTX API
-    #var.http_client_timeout: 120s
-
-    # How many hours to look back for each request, should be close to the configured interval. Deduplication of events is handled by the module.
-    var.lookback_range: 1h
-
-    # How far back to look once the beat starts up for the first time, the value has to be in hours.
-    var.first_interval: 400h
-
-    # The interval to poll the API for updates
-    var.interval: 5m
-
-  anomali:
-    enabled: false
-
-    # Input used for ingesting threat intel data
-    var.input: httpjson
-
-    # The URL used for Threat Intel API calls. Limo has multiple different possibilities for URL's depending
-    # on the type of threat intel source that is needed.
-    var.url: https://limo.anomali.com/api/v1/taxii2/feeds/collections/41/objects
-
-    # The Username used by anomali Limo, defaults to guest.
-    #var.username: guest
-
-    # The password used by anomali Limo, defaults to guest.
-    #var.password: guest
-
-    # How far back to look once the beat starts up for the first time, the value has to be in hours.
-    var.first_interval: 400h
-
-    # The interval to poll the API for updates
-    var.interval: 5m
-
-  anomalithreatstream:
-    enabled: false
-
-    # Input used for ingesting threat intel data
-    var.input: http_endpoint
-
-    # Address to bind to in order to receive HTTP requests
-    # from the Integrator SDK. Use 0.0.0.0 to bind to all
-    # existing interfaces.
-    var.listen_address: localhost
-
-    # Port to use to receive HTTP requests from the
-    # Integrator SDK.
-    var.listen_port: 8080
-
-    # Secret key to authenticate requests from the SDK.
-    var.secret: "<Add your secret here>"
-
-    # Uncomment the following and set the absolute paths
-    # to the server SSL certificate and private key to
-    # enable HTTPS secure connections.
-    #
-    # var.ssl_certificate: path/to/server_ssl_cert.pem
-    # var.ssl_key: path/to/ssl_key.pem
-
-  threatq:
-    enabled: false
-
-    # Input used for ingesting threat intel data
-    var.input: httpjson
-
-    # The URL used for ThreatQ ThreatLibrary API calls.
-    # Remember to put a slash at the end of the host URL
-    var.host: https://www.threatq.com/
-
-    # Oauth 2.0 Access Token URL
-    var.token_url: https://www.threatq.com/api/token
-
-    # Oauth 2.0 Client ID
-    var.client_id: "INSERT_CLIENT_ID"
-
-    # Oauth 2.0 Client Secret
-    var.client_secret: "INSERT_CLIENT_SECRET"
-
-    # The interval to poll the API for updates
-    var.interval: 1m
-
-    # The ID for the ThreatQ smart data collection
-    var.data_collection_id: "INSERT_THREATQ_DATA_COLLECTION_ID"
-
-    # The URL of the proxy if used
-    #var.proxy_url: http://proxy:8000
-
-    # Customize the HTTP timeout configured for the API requests
-    #var.http_client_timeout: 30s
 
 #------------------------------- Traefik Module -------------------------------
 #- module: traefik
@@ -1970,135 +428,6 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-
-#--------------------------------- Zeek Module ---------------------------------
-- module: zeek
-  capture_loss:
-    enabled: false
-  connection:
-    enabled: false
-  dce_rpc:
-    enabled: false
-  dhcp:
-    enabled: false
-  dnp3:
-    enabled: false
-  dns:
-    enabled: false
-  dpd:
-    enabled: false
-  files:
-    enabled: false
-  ftp:
-    enabled: false
-  http:
-    enabled: false
-  intel:
-    enabled: false
-  irc:
-    enabled: false
-  kerberos:
-    enabled: false
-  modbus:
-    enabled: false
-  mysql:
-    enabled: false
-  notice:
-    enabled: false
-  ntp:
-    enabled: false
-  ntlm:
-    enabled: false
-  ocsp:
-    enabled: false
-  pe:
-    enabled: false
-  radius:
-    enabled: false
-  rdp:
-    enabled: false
-  rfb:
-    enabled: false
-  signature:
-    enabled: false
-  sip:
-    enabled: false
-  smb_cmd:
-    enabled: false
-  smb_files:
-    enabled: false
-  smb_mapping:
-    enabled: false
-  smtp:
-    enabled: false
-  snmp:
-    enabled: false
-  socks:
-    enabled: false
-  ssh:
-    enabled: false
-  ssl:
-    enabled: false
-  stats:
-    enabled: false
-  syslog:
-    enabled: false
-  traceroute:
-    enabled: false
-  tunnel:
-    enabled: false
-  weird:
-    enabled: false
-  x509:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#------------------------------ ZooKeeper Module ------------------------------
-- module: zookeeper
-  # All logs
-  audit:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-  # All logs
-  log:
-    enabled: false
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#--------------------------------- Zoom Module ---------------------------------
-- module: zoom
-  webhook:
-    enabled: false
-
-    # The type of input to use
-    #var.input: http_endpoint
-
-    # The interface to listen for incoming HTTP requests. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.listen_address: localhost
-
-    # The port to bind to
-    #var.listen_port: 80
-
-    # The header Zoom uses to send its secret token, defaults to "Authorization"
-    #secret.header: Authorization
-
-    # The custom secret token value created when configuring the Zoom webhook
-    #secret.value: my-custom-value
-
-    # Enable the CRC webhook validation
-    #crc.enabled: false
-
-    # The secret token value provided by Zoom for CRC validation
-    #crc.secret: ZOOMSECRETTOKEN
 
 
 
@@ -2247,7 +576,7 @@ filebeat.inputs:
 
   # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
   #multiline.match: after
 
   # The maximum number of lines that are combined into one event.
@@ -2355,7 +684,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -2404,17 +733,17 @@ filebeat.inputs:
   # original for harvesting but will report the symlink name as the source.
   #prospector.scanner.symlinks: false
 
-  # If enabled, instead of relying on the device ID and inode values when comparing files,
-  # compare hashes of the given byte ranges in files. A file becomes an ingest target
-  # when its size grows larger than offset+length (see below). Until then it's ignored.
-  #prospector.scanner.fingerprint.enabled: false
+  # Deprecated and ignored. Scanner fingerprinting identifies files by hashing
+  # configured byte ranges instead of relying on device IDs and inode values. It
+  # is enabled if and only if the fingerprint file identity (the default) is used.
+  #prospector.scanner.fingerprint.enabled: true
 
-  # If fingerprint mode is enabled, sets the offset from the beginning of the file
-  # for the byte range used for computing the fingerprint value.
+  # Sets the offset from the beginning of the file for the byte range used for
+  # computing the fingerprint value.
   #prospector.scanner.fingerprint.offset: 0
 
-  # If fingerprint mode is enabled, sets the length of the byte range used for
-  # computing the fingerprint value. Cannot be less than 64 bytes.
+  # Sets the length of the byte range used for computing the fingerprint value.
+  # Cannot be less than 64 bytes.
   #prospector.scanner.fingerprint.length: 1024
 
   ### Parsers configuration
@@ -2450,7 +779,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -2542,8 +871,9 @@ filebeat.inputs:
   #clean_removed: true
 
   # Method to determine if two files are the same or not. By default
-  # the Beat considers two files the same if their inode and device id are the same.
-  #file_identity.native: ~
+  # a fingerprint is generated using the first 1024 bytes of the file,
+  # if the fingerprints match, then the files are considered equal.
+  #file_identity.fingerprint: ~
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -2640,7 +970,7 @@ filebeat.inputs:
 #- type: redis
   #enabled: false
 
-  # List of hosts to pool to retrieve the slow log information.
+  # List of hosts to poll to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
   # How often the input checks for redis slow log.
@@ -2753,6 +1083,19 @@ filebeat.inputs:
 
   # How long to wait before retrying a failed read.
   #consume_backoff: 2s
+
+  # Network timeout for the connection to the brokers (dial, read and write).
+  #timeout: 30s
+
+  # Keep-alive period for active network connections (0 disables it).
+  #keep_alive: 0s
+
+  # Consumer group session timeout. Increase for higher-latency consumers to
+  # avoid spurious rebalances.
+  #session_timeout: 10s
+
+  # How often the consumer sends heartbeats. Must be lower than session_timeout.
+  #heartbeat_interval: 3s
 
   # How long to wait for the minimum number of input bytes while reading.
   #max_wait_time: 250ms
@@ -2913,18 +1256,10 @@ filebeat.inputs:
     #- 2
 
   # You may wish to have separate inputs for each service. You can use
-  # include_matches.match to define a list of filters, each event needs
-  # to match all filters defined.
+  # include_matches.or to specify a list of filter expressions that are
+  # applied as a logical OR.
   #include_matches.match:
     #- _SYSTEMD_UNIT=foo.service
-
-  # To create a disjunction (logical OR) use the `+` character between
-  # the filters
-  #include_matches:
-    #match:
-      #- "systemd.transport=kernel"
-      #- "+"
-      #- "journald.process.name=systemd"
 
   # Uses the original hostname of the entry instead of the one
   # from the host running jounrald
@@ -2938,252 +1273,6 @@ filebeat.inputs:
   #- multiline:
     #type: count
     #count_lines: 3
-
-#------------------------------ NetFlow input --------------------------------
-# Experimental: Config options for the Netflow/IPFIX collector over UDP input
-#- type: netflow
-  #enabled: false
-
-  # Address where the NetFlow Collector will bind
-  #host: ":2055"
-
-  # Maximum size of the message received over UDP
-  #max_message_size: 10KiB
-
-  # List of enabled protocols.
-  # Valid values are 'v1', 'v5', 'v6', 'v7', 'v8', 'v9' and 'ipfix'
-  #protocols: [ v5, v9, ipfix ]
-
-  # Expiration timeout
-  # This is the time before an idle session or unused template is expired.
-  # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
-  #expiration_timeout: 30m
-
-  # Share Templates
-  # This option allows v9 and ipfix templates to be shared within a session without
-  # reference to the origin of the template.
-  #
-  # Setting this to true is not recommended as it can result in the wrong template
-  # being applied under certain conditions, but it may be required for some systems.
-  #share_templates: false
-
-  # Queue size limits the number of netflow packets that are queued awaiting
-  # processing.
-  #queue_size: 8192
-
-  # Custom field definitions for NetFlow V9 / IPFIX.
-  # List of files with YAML fields definition.
-  #custom_definitions:
-  #- path/to/ipfix.yaml
-  #- path/to/netflow.yaml
-
-#---------------------------- Google Cloud Pub/Sub Input -----------------------
-# Input for reading messages from a Google Cloud Pub/Sub topic subscription.
-- type: gcp-pubsub
-  enabled: false
-
-  # Google Cloud project ID. Required.
-  project_id: my-gcp-project-id
-
-  # Google Cloud Pub/Sub topic name. Required.
-  topic: my-gcp-pubsub-topic-name
-
-  # Google Cloud Pub/Sub topic subscription name. Required.
-  subscription.name: my-gcp-pubsub-subscription-name
-
-  # Create subscription if it does not exist.
-  #subscription.create: true
-
-  # Number of goroutines to create to read from the subscription.
-  #subscription.num_goroutines: 1
-
-  # Maximum number of unprocessed messages to allow at any time.
-  # This must be at least queue.mem.flush.min_events to prevent input blockage.
-  #subscription.max_outstanding_messages: 1600
-
-  # Path to a JSON file containing the credentials and key used to subscribe.
-  credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
-
-#------------------------------ AWS S3 input --------------------------------
-# Beta: Config options for AWS S3 input
-#- type: aws-s3
-  #enabled: false
-
-  # AWS Credentials
-  # If access_key_id and secret_access_key are configured, then use them to make api calls.
-  # If not, aws-s3 input will load default AWS config or load with given profile name.
-  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  #session_token: '${AWS_SESSION_TOKEN:"”}'
-  #credential_profile_name: test-aws-s3-input
-
-  # SQS queue URL to receive messages from (required).
-  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
-
-  # Number of workers on S3 bucket or SQS queue
-  #number_of_workers: 5
-
-  # Maximum duration of an AWS API call (excluding S3 GetObject calls).
-  #api_timeout: 120s
-
-  # Duration that received SQS messages are hidden from subsequent
-  # requests after being retrieved by a ReceiveMessage request.
-  #visibility_timeout: 300s
-
-  # List of S3 object metadata keys to include in events.
-  #include_s3_metadata: []
-
-  # The max number of times an SQS message should be received (retried) before deleting it.
-  #sqs.max_receive_count: 5
-
-  # Maximum duration for which the SQS ReceiveMessage call waits for a message
-  # to arrive in the queue before returning.
-  #sqs.wait_time: 20s
-
-  # Bucket ARN used for polling AWS S3 buckets
-  #bucket_arn: arn:aws:s3:::test-s3-bucket
-
-  # Access Point ARN used for polling AWS S3 buckets
-  #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
-
-  # Bucket Name used for polling non-AWS S3 buckets
-  # Note: `region` is required when non_aws_bucket_name is given.
-  #non_aws_bucket_name: test-s3-bucket
-
-  # Configures the AWS S3 API to use path style instead of virtual host style (default)
-  #path_style: false
-
-  # Overrides the `cloud.provider` field for non-AWS S3 buckets. See docs for auto recognized providers.
-  #provider: minio
-
-  # Configures backing up processed files to another (or the same) bucket
-  #backup_to_bucket_arn: 'arn:aws:s3:::mybucket'
-  #non_aws_backup_to_bucket_name: 'mybucket'
-
-  # Sets a prefix to prepend to object keys when backing up
-  #backup_to_bucket_prefix: 'backup/'
-
-  # Controls deletion of objects after backing them up
-  #delete_after_backup: false
-
-  # Ignore bucket entries older than the given timespan.
-  # Timespan is calculated from current time to processing object's last modified timestamp.
-  # This is disabled by default(value 0) and can be configured to a time duration like "48h" or "2h30m".
-  #ignore_older: 0
-
-  # Accept bucket entries with last modified timestamp newer than the given timestamp.
-  # Accepts a timestamp in YYYY-MM-DDTHH:MM:SSZ format and default is empty.
-  # For example, "2024-11-20T20:00:00Z" (UTC) or "2024-11-20T22:30:00+02:30" (with zone offset).
-  #start_timestamp:
-
-#------------------------------ AWS CloudWatch input --------------------------------
-# Beta: Config options for AWS CloudWatch input
-#- type: aws-cloudwatch
-  #enabled: false
-
-  # AWS Credentials
-  # If access_key_id and secret_access_key are configured, then use them to make api calls.
-  # If not, aws-cloudwatch input will load default AWS config or load with given profile name.
-  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  #session_token: '${AWS_SESSION_TOKEN:"”}'
-  #credential_profile_name: test-aws-s3-input
-
-  # ARN of the log group to collect logs from
-  # This ARN could refer to a log group from a linked source account
-  # Note: This property precedes over `log_group_name` & `log_group_name_prefix`
-  #log_group_arn: "arn:aws:logs:us-east-1:428152502467:log-group:test:*"
-
-  # Name of the log group to collect logs from.
-  # Note: region_name is required when log_group_name is given.
-  #log_group_name: test
-
-  # The prefix for a group of log group names.
-  # You can include linked source accounts by using the property `include_linked_accounts_for_prefix_mode`.
-  # Note: `region_name` is required when `log_group_name_prefix` is given.
-  # `log_group_name` and `log_group_name_prefix` cannot be given at the same time.
-  #log_group_name_prefix: /aws/
-
-  # State whether to include linked source accounts when obtaining log groups matching the prefix provided through `log_group_name_prefix`
-  # This property works together with `log_group_name_prefix` and default value (if unset) is false
-  #include_linked_accounts_for_prefix_mode: true
-
-  # Region that the specified log group or log group prefix belongs to.
-  #region_name: us-east-1
-
-  # A list of strings of log streams names that Filebeat collect log events from.
-  #log_streams:
-  # - log_stream_name
-
-  # A string to filter the results to include only log events from log streams
-  # that have names starting with this prefix.
-  #log_stream_prefix: test
-
-  # `start_position` allows user to specify if this input should read log files
-  # from the `beginning` or from the `end`.
-  # `beginning`: reads from the beginning of the log group (default).
-  # `end`: read only new messages from current time minus `scan_frequency` going forward.
-  #start_position: beginning
-
-  # This config parameter sets how often Filebeat checks for new log events from the
-  # specified log group. Default `scan_frequency` is 1 minute, which means Filebeat
-  # will sleep for 1 minute before querying for new logs again.
-  #scan_frequency: 1m
-
-  # The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
-  # will be interrupted.
-  # The default AWS API timeout for a message is 120 seconds.
-  # The minimum is 0 seconds.
-  #api_timeout: 120s
-
-  # This is used to sleep between AWS `FilterLogEvents` API calls inside the same
-  # collection period.
-  #api_sleep: 200ms
-
-  # This is used to shift collection start time and end time back in order to
-  # collect logs when there is a delay in CloudWatch.
-  #latency: 1m
-
-#------------------------------ ETW input --------------------------------
-# Beta: Config options for ETW (Event Trace for Windows) input (Only available for Windows)
-#- type: etw
-  #enabled: false
-  #id: etw-dnsserver
-
-  # Path to an .etl file to read from.
-  #file: "C:\Windows\System32\Winevt\Logs\Logfile.etl"
-
-  # GUID of an ETW provider.
-  # Run 'logman query providers' to list the available providers.
-  #provider.guid: {EB79061A-A566-4698-9119-3ED2807060E7}
-
-  # Name of an ETW provider.
-  # Run 'logman query providers' to list the available providers.
-  #provider.name: Microsoft-Windows-DNSServer
-
-  # Tag to identify created sessions.
-  # If missing, its default value is the provider ID prefixed by 'Elastic-'.
-  #session_name: DNSServer-Analytical-Trace
-
-  # Filter collected events with a level value that is less than or equal to this level.
-  # Allowed values are critical, error, warning, informational, and verbose.
-  #trace_level: verbose
-
-  # 8-byte bitmask that enables the filtering of events from specific provider subcomponents.
-  # The provider will write a particular event if the event's keyword bits match any of the bits
-  # in this bitmask.
-  # Run 'logman query providers "<provider.name>"' to list available keywords.
-  #match_any_keyword: 0x8000000000000000
-
-  # 8-byte bitmask that enables the filtering of events from
-  # specific provider subcomponents. The provider will write a particular
-  # event if the event's keyword bits match all of the bits in this bitmask.
-  # Run 'logman query providers "<provider.name>"' to list available keywords.
-  #match_all_keyword: 0
-
-  # An existing session to read from.
-  # Run 'logman query -ets' to list existing sessions.
-  #session: UAL_Usermode_Provider
 
 # =========================== Filebeat autodiscover ============================
 
@@ -3259,6 +1348,39 @@ filebeat.inputs:
 # filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
 # point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
+
+# The storage backend for the registry. Supported values are "memlog" and
+# "otel_file_storage". The default is "memlog", which uses an in-memory log
+# with periodic disk flushing. The "otel_file_storage" backend stores state
+# using the same on-disk layout as the OpenTelemetry Collector file_storage
+# extension (under registry.path).
+# NOTE: The "otel_file_storage" backend is in technical preview (available
+# since 9.5) and may be changed or removed in a future release.
+#filebeat.registry.backend: memlog
+
+# ----------------------- OTel file_storage backend settings -------------------
+# NOTE: This configuration section is in technical preview (available since 9.5)
+# and may be changed or removed in a future release.
+# These settings apply only when filebeat.registry.backend is set to
+# "otel_file_storage". Registry data files live under filebeat.registry.path;
+# optional fields below map to the OpenTelemetry file_storage extension config.
+# The running beat name (for example "filebeat") is used as the OpenTelemetry
+# receiver identity for storage client file naming; no separate setting is used.
+#
+#filebeat.registry.otel_file_storage.timeout: 1s
+#filebeat.registry.otel_file_storage.fsync: false
+# Filebeat defaults create_directory to true when no otel_file_storage
+# section is provided. When otel_file_storage is configured explicitly,
+# the upstream default (false) applies unless overridden here.
+#filebeat.registry.otel_file_storage.create_directory: true
+# directory_permissions defaults to "0700" when create_directory is true
+# and directory_permissions is not set explicitly.
+#filebeat.registry.otel_file_storage.directory_permissions: "0700"
+#filebeat.registry.otel_file_storage.recreate: false
+#
+# See the OpenTelemetry Collector file_storage extension documentation for
+# compaction and other nested options:
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -3444,7 +1566,7 @@ filebeat.inputs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -4102,7 +2224,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -4295,7 +2417,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-  
+
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 
@@ -4472,7 +2594,7 @@ setup.template.settings:
 
 # ======================== Data Stream Lifecycle (DSL) =========================
 
-# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch.
 # These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
 
 # Enable DSL support. Valid values are true, or false.
@@ -4480,7 +2602,7 @@ setup.template.settings:
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
 # The default data stream pattern is filebeat-%{[agent.version]}"
-# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The template string `%{[agent.version]}` will resolve to the current stack version.
 # The other possible template value is `%{[beat.name]}`.
 #setup.dsl.data_stream_pattern: "filebeat-%{[agent.version]}"
 
@@ -4645,7 +2767,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
@@ -4661,7 +2783,7 @@ logging.files:
 # sensitive information) together with other log messages, a different
 # log file, only for log entries containing raw events, is used. It will
 # use the same level, selectors and all other configurations from the
-# default logger, but it will have it's own file configuration.
+# default logger, but it will have its own file configuration.
 #
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.
@@ -4693,7 +2815,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
@@ -4961,4 +3083,5 @@ logging.files:
 #features:
 #  fqdn:
 #    enabled: true
+```
 

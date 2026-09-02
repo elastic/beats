@@ -44,3 +44,90 @@ func TestUnpackCopiesDefault(t *testing.T) {
 
 	assert.NotEqual(t, cfg1.DefaultConfig, cfg2.DefaultConfig)
 }
+<<<<<<< HEAD
+=======
+
+func TestDefaultConfigContainsCloseRemovedFalse(t *testing.T) {
+	cfg := defaultConfig()
+	closeRemoved, err := cfg.DefaultConfig.Bool("close.on_state_change.removed", -1)
+	if err != nil {
+		t.Fatalf("cannot get 'close.on_state_change.removed': %s", err)
+	}
+
+	// 'close.on_state_change.removed' to prevent missing log lines at the
+	// end of files when using autodiscover, this is specially common on
+	// Kubernetes.
+	if closeRemoved {
+		t.Fatalf("'close.on_state_change.removed' must be false")
+	}
+}
+
+func TestInputAllowListConfig(t *testing.T) {
+	tests := []struct {
+		name        string
+		userConfig  mapstr.M
+		wantEnabled bool
+		wantTypes   []string
+	}{
+		{
+			name:       "empty",
+			userConfig: mapstr.M{},
+		},
+		{
+			name: "disabled",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": false,
+					"types":   []string{"httpjson"},
+				},
+			},
+			wantTypes: []string{"httpjson"},
+		},
+		{
+			name: "enabled with omitted types",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": true,
+				},
+			},
+			wantEnabled: true,
+			wantTypes:   []string{"log", "filestream", "container"},
+		},
+		{
+			name: "enabled with empty types",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": true,
+					"types":   []string{},
+				},
+			},
+			wantEnabled: true,
+			wantTypes:   []string{"log", "filestream", "container"},
+		},
+		{
+			name: "enabled with custom types",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": true,
+					"types":   []string{"httpjson", "cel"},
+				},
+			},
+			wantEnabled: true,
+			wantTypes:   []string{"httpjson", "cel"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := defaultConfig()
+			userConfig := conf.MustNewConfigFrom(test.userConfig)
+
+			assert.NoError(t, userConfig.Unpack(&cfg), "input allow list config should unpack")
+			assert.Equal(t, test.wantEnabled, cfg.InputAllowList.Enabled,
+				"input allow list enabled state should match")
+			assert.Equal(t, test.wantTypes, cfg.InputAllowList.Types,
+				"input allow list types should match")
+		})
+	}
+}
+>>>>>>> 9137b72 ([Filebeat] restrict hints-based autodiscover input types (#52869))
