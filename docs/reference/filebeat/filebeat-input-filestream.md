@@ -1017,12 +1017,12 @@ This example shows you how to include messages that start with the string ERR or
 stack: ga 9.5.0
 ```
 
-Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under `auditd.log.*`.
+Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under a namespace that depends on the configured `mode` (see below).
 
 The parser sets the event timestamp from the audit record header, so `@timestamp` reflects when the audit event occurred rather than when Filebeat read it.
 
 :::{note}
-This parser is only supported on Linux. On other platforms, configuring it returns an error.
+This parser is only fully supported on Linux. On other platforms it acts as a pass-through: lines are forwarded unchanged and no audit fields are added.
 :::
 
 The supported configuration options are:
