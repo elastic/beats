@@ -144,19 +144,17 @@ func (iter *pageIterator) next() (*response, bool, error) {
 	}
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
-	var execErr template.ExecError
-	switch {
-	case err == nil:
-		// OK
-	case errors.Is(err, errNewURLValueNotSet),
-		errors.Is(err, errEmptyTemplateResult),
-		errors.Is(err, errExecutingTemplate),
-		errors.As(err, &execErr):
+	if err != nil {
 		// If this error happens here it means a transform
 		// did not find any new value and we can stop paginating without error.
-		iter.done = true
-		return nil, false, nil
-	default:
+		var execErr template.ExecError
+		if errors.Is(err, errNewURLValueNotSet) ||
+			errors.Is(err, errEmptyTemplateResult) ||
+			errors.Is(err, errExecutingTemplate) ||
+			errors.As(err, &execErr) {
+			iter.done = true
+			return nil, false, nil
+		}
 		return nil, false, err
 	}
 
