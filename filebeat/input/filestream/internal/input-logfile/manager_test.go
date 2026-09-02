@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-concert/unison"
 )
 
 const testPluginName = "my_test_plugin"
@@ -204,6 +206,7 @@ func TestInputManager_Create(t *testing.T) {
 				}}
 			cfg, err := config.NewConfigFrom("id: my-id")
 			require.NoError(t, err)
+			initInputManager(t, cim)
 
 			_, err = cim.Create(cfg)
 			require.ErrorIs(t, err, errNoInputRunner)
@@ -264,6 +267,7 @@ id: %s
 paths:
   - /var/log/bar
 `, tc.id))
+				initInputManager(t, cim)
 
 				_, err = cim.Create(cfg1)
 				require.NoError(t, err, "1st input should have been created")
@@ -328,6 +332,7 @@ id: t-wing
 paths:
   - /var/log/bar
 `)
+		initInputManager(t, cim)
 
 		// Happy path, if an input fails to start, it's ID is removed from cim.ids list and
 		// can be re-used.
@@ -415,6 +420,7 @@ allow_deprecated_id_duplication: true
 paths:
   - /var/log/bar
 `)
+		initInputManager(t, cim)
 		_, err = cim.Create(cfg1)
 		require.NoError(t, err, "1st input should have been created")
 		// Create an input with a duplicated ID
@@ -428,6 +434,120 @@ paths:
 				"will lead to data duplication, please use a different ID. Metrics "+
 				"collection has been disabled on this input.",
 			"did not find the expected message about the duplicated input ID")
+	})
+}
+
+func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
+	setupStoreCacheTest(t)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	newManager := func() *InputManager {
+		return &InputManager{
+			Logger:     logp.NewNopLogger(),
+			StateStore: states,
+			Type:       "filestream",
+		}
+	}
+	first, second := newManager(), newManager()
+	var firstGroup, secondGroup unison.TaskGroup
+	t.Cleanup(func() {
+		_ = firstGroup.Stop()
+		first.Close()
+	})
+	t.Cleanup(func() {
+		_ = secondGroup.Stop()
+		second.Close()
+	})
+
+	require.NoError(t, first.Init(&firstGroup))
+	require.NoError(t, second.Init(&secondGroup))
+	require.Same(t, first.store, second.store)
+	require.Same(t, first.ackCH, second.ackCH)
+
+	require.NoError(t, firstGroup.Stop())
+	first.Close()
+	entry := snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
+	require.Equal(t, storeActive, entry.state)
+	require.Equal(t, 1, entry.users)
+	require.Same(t, second.store, entry.store)
+
+	require.NoError(t, secondGroup.Stop())
+	second.Close()
+}
+
+func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
+	setupStoreCacheTest(t)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	manager := &InputManager{
+		Logger:     logp.NewNopLogger(),
+		StateStore: states,
+		Type:       "filestream",
+	}
+	var group unison.TaskGroup
+	t.Cleanup(func() {
+		_ = group.Stop()
+		manager.Close()
+	})
+
+	const initializers = 10
+	errs := make(chan error, initializers)
+	var wg sync.WaitGroup
+	for range initializers {
+		wg.Go(func() {
+			errs <- manager.Init(&group)
+		})
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		require.NoError(t, err)
+	}
+
+	entry := snapshotStoreCacheEntry(states.StoreKey())
+	require.True(t, entry.found)
+	require.Equal(t, 1, entry.users)
+	require.Same(t, manager.store, entry.store)
+
+	require.NoError(t, group.Stop())
+	manager.Close()
+}
+
+func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
+	setupStoreCacheTest(t)
+
+	states := newCountingStateStore("create-before-init-backend")
+	manager := &InputManager{
+		Logger:     logp.NewNopLogger(),
+		StateStore: states,
+		Type:       "filestream",
+	}
+
+	_, err := manager.Create(config.MustNewConfigFrom(map[string]any{}))
+	require.EqualError(t, err, "input manager Init must be called before Create")
+	require.Zero(t, states.storeForCalls.Load())
+	require.Nil(t, manager.store)
+	require.Nil(t, manager.ackCH)
+
+	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
+}
+
+func initInputManager(t *testing.T, cim *InputManager) {
+	t.Helper()
+	if store, ok := cim.StateStore.(testStateStore); ok && store.GCPeriod <= 0 {
+		store.GCPeriod = time.Minute
+		cim.StateStore = store
+	}
+	var group unison.TaskGroup
+	logger := cim.Logger
+	cim.Logger = logp.NewNopLogger()
+	err := cim.Init(&group)
+	cim.Logger = logger
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, group.Stop())
+		cim.Close()
 	})
 }
 

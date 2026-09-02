@@ -12,10 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNewPollingStrategy(t *testing.T) {
-	log := logp.NewLogger("new_polling_strategy_test")
+	log := logptest.NewTestingLogger(t, "new_polling_strategy_test")
 
 	t.Run("returns normalPollingStrategy when lexicographical ordering is false", func(t *testing.T) {
 		strategy := newPollingStrategy(false, log)
@@ -31,12 +32,12 @@ func TestNewPollingStrategy(t *testing.T) {
 }
 
 func TestNormalPollingStrategy(t *testing.T) {
-	log := logp.NewLogger("normal_polling_strategy_test")
+	log := logptest.NewTestingLogger(t, "normal_polling_strategy_test")
 	strategy := newNormalPollingStrategy(log)
 
 	t.Run("GetStartAfterKey returns empty string", func(t *testing.T) {
 		store := openTestStatestore()
-		registry, err := newStateRegistry(nil, store, "", false, 0)
+		registry, err := newStateRegistry(nil, store, "", "", false, 0)
 		require.NoError(t, err)
 
 		st := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now()}
@@ -67,12 +68,12 @@ func TestNormalPollingStrategy(t *testing.T) {
 }
 
 func TestLexicographicalPollingStrategy(t *testing.T) {
-	log := logp.NewLogger("lexicographical_polling_strategy_test")
+	log := logptest.NewTestingLogger(t, "lexicographical_polling_strategy_test")
 	strategy := newLexicographicalPollingStrategy(log)
 
 	t.Run("GetStartAfterKey returns lexicographically smallest key", func(t *testing.T) {
 		store := openTestStatestore()
-		registry, err := newStateRegistry(log, store, "", true, 100)
+		registry, err := newStateRegistry(log, store, "", "", true, 100)
 		require.NoError(t, err)
 
 		st1 := state{Bucket: "bucket", Key: "aaa-first", Etag: "etag1", LastModified: time.Now()}
@@ -96,7 +97,7 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 
 	t.Run("GetStartAfterKey returns empty string when no states", func(t *testing.T) {
 		store := openTestStatestore()
-		registry, err := newStateRegistry(log, store, "", true, 100)
+		registry, err := newStateRegistry(log, store, "", "", true, 100)
 		require.NoError(t, err)
 
 		startKey := registry.GetStartAfterKey()
@@ -120,7 +121,7 @@ func TestLexicographicalPollingStrategy(t *testing.T) {
 }
 
 func TestPollingStrategyBehaviorDifferences(t *testing.T) {
-	log := logp.NewLogger("polling_strategy_behavior_differences_test")
+	log := logptest.NewTestingLogger(t, "polling_strategy_behavior_differences_test")
 	normalStrategy := newNormalPollingStrategy(log)
 	lexicoStrategy := newLexicographicalPollingStrategy(log)
 
@@ -128,10 +129,10 @@ func TestPollingStrategyBehaviorDifferences(t *testing.T) {
 		normalStore := openTestStatestore()
 		lexicoStore := openTestStatestore()
 
-		normalRegistry, err := newStateRegistry(log, normalStore, "", false, 0)
+		normalRegistry, err := newStateRegistry(log, normalStore, "", "", false, 0)
 		require.NoError(t, err)
 
-		lexicoRegistry, err := newStateRegistry(log, lexicoStore, "", true, 100)
+		lexicoRegistry, err := newStateRegistry(log, lexicoStore, "", "", true, 100)
 		require.NoError(t, err)
 
 		st1 := state{Bucket: "bucket", Key: "key1", Etag: "etag1", LastModified: time.Now()}
