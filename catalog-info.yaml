@@ -339,12 +339,6 @@ spec:
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
-        build_pull_request_forks: false
-        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
-        build_tags: true
-        filter_enabled: true
-        filter_condition: >-
-          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
       cancel_intermediate_builds_branch_filter: "!main !8.19 !9.*"
