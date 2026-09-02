@@ -13,7 +13,7 @@ entries:
         those results correctly.
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/51781
       issue: []
       impact: ""
       action: ""
@@ -27,7 +27,7 @@ entries:
         Filebeat now shares Filestream registry state between Filebeat receiver instances that use the same persistent registry. This avoids keeping a separate in-memory copy of the same state for each receiver, reducing memory use in workloads with a large number of inputs, like Kubernetes.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52326
       issue: []
       impact: ""
       action: ""
@@ -40,7 +40,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52614
       issue: []
       impact: ""
       action: ""
@@ -53,7 +53,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52650
       issue: []
       impact: ""
       action: ""
@@ -66,7 +66,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52667
       issue: []
       impact: ""
       action: ""
@@ -79,7 +79,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52684
       issue: []
       impact: ""
       action: ""
@@ -127,7 +127,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52870
       issue: []
       impact: ""
       action: ""
@@ -140,7 +140,7 @@ entries:
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52912
       issue:
         - https://github.com/elastic/beats/issues/52888
       impact: ""
@@ -154,7 +154,7 @@ entries:
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52915
       issue: []
       impact: ""
       action: ""
@@ -196,7 +196,7 @@ entries:
         the previous error treatment.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/52973
+        - https://github.com/elastic/beats/pull/52950
       issue:
         - https://github.com/elastic/beats/issues/52945
       impact: ""
