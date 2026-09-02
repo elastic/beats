@@ -53,20 +53,6 @@ func TestResource_CopyInto(t *testing.T) {
 }
 
 func TestStore_OpenClose(t *testing.T) {
-	t.Run("notifies after close hook", func(t *testing.T) {
-		var events []string
-		cleanup := closeStoreWith(func(*store) {
-			events = append(events, "close")
-		})
-		defer cleanup()
-
-		store := testOpenStore(t, "test", nil)
-		store.onClose = func() { events = append(events, "notify") }
-		store.Release()
-
-		require.Equal(t, []string{"close", "notify"}, events)
-	})
-
 	t.Run("acquiring and releasing store closes", func(t *testing.T) {
 		var closed bool
 		cleanup := closeStoreWith(func(s *store) {
@@ -77,9 +63,9 @@ func TestStore_OpenClose(t *testing.T) {
 
 		logger := logptest.NewTestingLogger(t, "")
 		states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
-		store, err := acquireStore(logger, states, "test")
+		_, release, err := acquireStore(logger, states, "test")
 		require.NoError(t, err)
-		releaseAcquiredStore(logger, store)
+		release()
 
 		require.True(t, closed)
 	})

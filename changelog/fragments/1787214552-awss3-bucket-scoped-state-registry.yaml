@@ -13,17 +13,20 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add configurable usage lookback and forecast windows to the Azure billing metricset
+summary: Scope the aws-s3 polling state registry to the input's bucket.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  Adds `billing_usage_lookback` and `billing_forecast_window` duration config options to the
-  Azure billing metricset. `billing_usage_lookback` (default `24h`) allows re-querying multiple
-  previous days of usage data so that Azure's documented up-to-72h cost corrections are captured.
-  `billing_forecast_window` (default `720h`) controls the length of the forecast period. Defaults
-  preserve the existing behaviour.
+  All aws-s3 inputs of a process share one persistent state registry. Each
+  polling input loaded every input's states into memory, and its periodic
+  registry cleanup then deleted from the shared store all entries missing
+  from its own bucket listing, including the other inputs' states. After a
+  restart the affected inputs found no persisted state and re-ingested
+  their buckets. Loading is now scoped to the input's bucket and key
+  prefix. This also removes the duplicated memory usage of the registry
+  when several polling inputs run in one process.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -33,7 +36,7 @@ description: |
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: metricbeat
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -41,10 +44,10 @@ component: metricbeat
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-# pr: https://github.com/owner/repo/1234
+pr: https://github.com/elastic/beats/pull/52728
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-# issue: https://github.com/owner/repo/1234
+issue: https://github.com/elastic/beats/issues/52721

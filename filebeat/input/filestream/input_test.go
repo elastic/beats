@@ -51,7 +51,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -668,13 +667,8 @@ func createFilestreamTestRunner(tb testing.TB, logger *logp.Logger, testID strin
 	require.NoError(tb, err)
 
 	p := Plugin(logger, createTestStore(tb))
-	var group unison.TaskGroup
-	require.NoError(tb, p.Manager.Init(&group))
-	tb.Cleanup(func() {
-		require.NoError(tb, group.Stop())
-		//nolint:errcheck // It's a test, let it panic if the casting fails
-		p.Manager.(*loginp.InputManager).Close()
-	})
+	//nolint:errcheck // It's a test, let it panic if the casting fails
+	tb.Cleanup(p.Manager.(*loginp.InputManager).Close)
 	input, err := p.Manager.Create(c)
 	require.NoError(tb, err)
 

@@ -63,7 +63,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 
 	errCh := make(chan error, 1)
 
-	// lastKnownInputs is used for recovery after "broken pipe" error
+	// lastKnownInputs is used for recovery after a recoverable osquery error
 	var lastKnownInputs []config.InputConfig
 
 	logLevel := zapcore.LevelOf(r.log.Core())
@@ -131,8 +131,8 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				r.log.Info("Osquery exited: ", err)
 			} else {
 				r.log.Error("Failed to run osquery:", err)
-				if isBrokenPipeOrEOFError(err) {
-					r.log.Infof("Recover osquery after broken pipe error")
+				if isRecoverableOsqueryError(err) {
+					r.log.Infof("Recover osquery after recoverable error: %v", err)
 					if lastKnownInputs != nil {
 						select {
 						case r.inputCh <- lastKnownInputs:
