@@ -31,8 +31,8 @@ env:
   BEAT_PATH: "x-pack/metricbeat"
 
   # Platforms to be used for FIPS packaging nodes
-  PLATFORMS_AMD64_FIPS: "+all linux/amd64"
-  PLATFORMS_ARM64_FIPS: "+all linux/arm64"
+  PLATFORMS_AMD64_FIPS: "+all linux/amd64 windows/amd64"
+  PLATFORMS_ARM64_FIPS: "+all linux/arm64 windows/arm64"
 
 # This section is used to define the plugins that will be used in the pipeline.
 # See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
