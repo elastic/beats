@@ -142,7 +142,6 @@ When `use_types` and `rate_counters` are enabled, metrics are stored like this:
 }
 ```
 
-
 ### Histogram assembly [_histogram_assembly]
 
 ```{applies_to}
