@@ -21,6 +21,7 @@ package memory
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,16 +37,41 @@ type zswapExpectation struct {
 	debugExists bool // Whether /sys/kernel/debug/zswap is accessible
 }
 
-// ciExpectations maps BUILDKITE_STEP_KEY to expected zswap behavior.
-// Keys must match the `key` field in .buildkite/libbeat/pipeline.libbeat.yml
+// ciExpectations maps a CI step to expected zswap behavior.
+//
+// Keys are either a bare BUILDKITE_STEP_KEY, or "<BUILDKITE_STEP_KEY>/<image family>"
+// for matrix steps where the same step key runs on several host images. Step keys
+// must match the `key` field and image names the `matrix` values in
+// .buildkite/pkg/systemmetrics/pipeline.yml.
 var ciExpectations = map[string]zswapExpectation{
-	// Both steps run on the Ubuntu 22.04 image: modern kernel, zswap in meminfo, no debugfs
-	"mandatory-systemmetrics-unit-test":       {zswapExists: true, debugExists: false},
-	"mandatory-systemmetrics-container-tests": {zswapExists: true, debugExists: false},
+	// Ubuntu 22.04 host: kernel >= 5.19 reports Zswap in /proc/meminfo, debugfs not readable
+	"mandatory-systemmetrics-unit-test":                   {zswapExists: true, debugExists: false},
+	"mandatory-systemmetrics-container-tests/ubuntu-2204": {zswapExists: true, debugExists: false},
+	// RHEL 9 host: zswap backported into /proc/meminfo, debugfs not readable
+	"mandatory-systemmetrics-container-tests/rhel-9": {zswapExists: true, debugExists: false},
+	// Ubuntu 20.04 host: kernel < 5.19 has no Zswap fields in /proc/meminfo,
+	// but /sys/kernel/debug/zswap is readable from a privileged container
+	"mandatory-systemmetrics-container-tests/ubuntu-2004": {zswapExists: false, debugExists: true},
 	// Test locally with:
 	// go test -c ./pkg/systemmetrics/metric/memory -o memory.test
 	// sudo BUILDKITE_STEP_KEY=manual PRIVILEGED=1 ./memory.test -test.run TestMemoryFromContainer
 	"manual": {zswapExists: true, debugExists: true},
+}
+
+// ciImageFamilies are substrings that identify the host image family in the
+// SYSTEMMETRICS_CI_IMAGE value (e.g. "platform-ingest-beats-ubuntu-2004-1782878510").
+// The numeric suffix rotates with every image bump, so match on the family only.
+var ciImageFamilies = []string{"ubuntu-2004", "ubuntu-2204", "rhel-9"}
+
+// ciExpectationKey builds the ciExpectations lookup key. When the image family is
+// known the step-specific "<step>/<family>" key is used, otherwise the bare step key.
+func ciExpectationKey(stepKey, image string) string {
+	for _, family := range ciImageFamilies {
+		if strings.Contains(image, family) {
+			return stepKey + "/" + family
+		}
+	}
+	return stepKey
 }
 
 // TestMemoryFromContainer tests memory metric collection from inside a container
@@ -69,7 +95,9 @@ func TestMemoryFromContainer(t *testing.T) {
 	debugExists := !mem.Zswap.Debug.IsZero()
 
 	stepKey := os.Getenv("BUILDKITE_STEP_KEY")
-	t.Logf("Zswap exists: %v, Debug exists: %v (BUILDKITE_STEP_KEY=%q)", zswapExists, debugExists, stepKey)
+	image := os.Getenv("SYSTEMMETRICS_CI_IMAGE")
+	t.Logf("Zswap exists: %v, Debug exists: %v (BUILDKITE_STEP_KEY=%q, SYSTEMMETRICS_CI_IMAGE=%q)",
+		zswapExists, debugExists, stepKey, image)
 
 	logZswapStatus(t, mem, zswapExists, debugExists)
 	if stepKey == "" {
@@ -77,15 +105,17 @@ func TestMemoryFromContainer(t *testing.T) {
 		return
 	}
 
-	expected, ok := ciExpectations[stepKey]
-	require.Truef(t, ok, `BUILDKITE_STEP_KEY=%q not found in ciExpectations map.
+	key := ciExpectationKey(stepKey, image)
+	expected, ok := ciExpectations[key]
+	require.Truef(t, ok, `BUILDKITE_STEP_KEY=%q, SYSTEMMETRICS_CI_IMAGE=%q (key %q) not found in ciExpectations map.
 
 To fix this test:
 1. Check the debug output above for "Zswap exists" and "Debug exists" values
-2. Look at the CI print_debug_info() output for kernel config and zswap status
+2. If the image is a new family, add it to ciImageFamilies in memory_integration_test.go
 3. Add an entry to ciExpectations in memory_integration_test.go:
-   %q: {zswapExists: <true|false>, debugExists: <true|false>}`,
-		stepKey, stepKey,
+   %q: {zswapExists: <true|false>, debugExists: <true|false>}
+   Step keys and matrix images are defined in .buildkite/pkg/systemmetrics/pipeline.yml`,
+		stepKey, image, key, key,
 	)
 
 	// Enforce expectations
@@ -101,6 +131,51 @@ To fix this test:
 		assert.NotEmpty(t, os.Getenv("PRIVILEGED"), "debugfs access requires PRIVILEGED")
 	} else {
 		assert.False(t, debugExists, "expected NO debug metrics accessible for step %q", stepKey)
+	}
+}
+
+func TestCIExpectationKey(t *testing.T) {
+	cases := []struct {
+		name    string
+		stepKey string
+		image   string
+		want    string
+	}{
+		{
+			name:    "matrix image ubuntu 20.04",
+			stepKey: "mandatory-systemmetrics-container-tests",
+			image:   "platform-ingest-beats-ubuntu-2004-1782878510",
+			want:    "mandatory-systemmetrics-container-tests/ubuntu-2004",
+		},
+		{
+			name:    "matrix image rhel 9",
+			stepKey: "mandatory-systemmetrics-container-tests",
+			image:   "platform-ingest-beats-rhel-9-1782878510",
+			want:    "mandatory-systemmetrics-container-tests/rhel-9",
+		},
+		{
+			name:    "no image falls back to step key",
+			stepKey: "mandatory-systemmetrics-unit-test",
+			image:   "",
+			want:    "mandatory-systemmetrics-unit-test",
+		},
+		{
+			name:    "unknown image family falls back to step key",
+			stepKey: "manual",
+			image:   "some-other-image",
+			want:    "manual",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := ciExpectationKey(tc.stepKey, tc.image)
+			assert.Equal(t, tc.want, got, "unexpected ciExpectations key")
+			if tc.image != "" && tc.want != tc.stepKey {
+				_, ok := ciExpectations[got]
+				assert.True(t, ok, "every matrix image family must have a ciExpectations entry")
+			}
+		})
 	}
 }
 

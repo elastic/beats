@@ -104,6 +104,11 @@ steps:
       #   - Ubuntu 22.04 (cgroup v2)
       - label: ":linux: pkg/systemmetrics: Container-System Tests -- {{matrix.image}}"
         key: "mandatory-systemmetrics-container-tests"
+        # Matrix values are not exposed in the environment; the memory
+        # integration test needs the host image to pick the right zswap
+        # expectations (see ciExpectations in metric/memory).
+        env:
+          SYSTEMMETRICS_CI_IMAGE: "{{matrix.image}}"
         command: |
           set -euo pipefail
           cd pkg/systemmetrics
