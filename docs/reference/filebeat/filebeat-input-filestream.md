@@ -1027,7 +1027,7 @@ This parser is only fully supported on Linux. On other platforms it acts as a pa
 
 The supported configuration options are:
 
-**`mode`** {applies_to}`stack: ga 9.5.4+`
+**`mode`** {applies_to}`stack: ga 9.6.0+`
 :   (Optional) Controls the parser behavior. Valid values:
 
     - `parse` (default): Each audit log line is parsed individually. Fields are added under `auditd.log.*`. This preserves one output event per input line.
