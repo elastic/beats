@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix rendering of TLS serial numbers to match OpenSSL byte-for-byte output.
+component: packetbeat
