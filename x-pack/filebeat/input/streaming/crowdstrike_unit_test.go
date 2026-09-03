@@ -366,7 +366,7 @@ func TestFollowSessionProcessesAllDiscoveredResources(t *testing.T) {
 	pub := new(recordingPublisher)
 	s := newTestStreamWithPublisher(t, discoverSrv.URL, http.DefaultClient, pub)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
 	done := make(chan error, 1)
@@ -497,8 +497,8 @@ type recordingPublisher struct {
 
 func (p *recordingPublisher) Publish(e beat.Event, _ any) error {
 	p.mu.Lock()
-	defer p.mu.Unlock()
 	p.events = append(p.events, e)
+	p.mu.Unlock()
 	return nil
 }
 

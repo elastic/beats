@@ -404,7 +404,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	dec := json.NewDecoder(resp.Body)
 
 	var body struct {
-		Resources []hoseResource `json:"resources"`
+		Resources []resource     `json:"resources"`
 		Meta      map[string]any `json:"meta"`
 	}
 	err = dec.Decode(&body)
@@ -427,7 +427,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 
 	type preparedFeed struct {
-		resource hoseResource
+		resource resource
 		feedName string
 		offset   int
 	}
@@ -462,28 +462,19 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		feeds = append(feeds, preparedFeed{resource: r, feedName: feedName, offset: offset})
 	}
 
-	merged := &feedCursors{cursor: cloneStringMap(cursors)}
-	var (
-		wg       sync.WaitGroup
-		errOnce  sync.Once
-		firstErr error
-	)
-	fail := func(err error) {
-		if err == nil {
-			return
-		}
-		errOnce.Do(func() {
-			firstErr = err
-			sessionCancel()
-		})
-	}
+	merged := &feedCursors{cursor: maps.Clone(cursors)}
+	var wg sync.WaitGroup
+	feedCtx, cancel := context.WithCancelCause(sessionCtx)
 	for _, f := range feeds {
 		wg.Add(1)
 		go func(f preparedFeed) {
 			defer wg.Done()
 			feedState := cloneState(state)
 			feedState["feed"] = f.feedName
-			fail(s.consumeFeed(sessionCtx, cli, f.resource, f.feedName, f.offset, feedState, merged))
+			err := s.consumeFeed(feedCtx, cli, f.resource, f.feedName, f.offset, feedState, merged)
+			if err != nil {
+				cancel(err)
+			}
 		}(f)
 	}
 	wg.Wait()
@@ -491,16 +482,16 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	if merged.cursor != nil {
 		state["cursor"] = merged.cursor
 	}
-	if firstErr != nil {
-		if errors.Is(firstErr, hardError{}) {
-			return nil, firstErr
+	if err := context.Cause(feedCtx); err != nil {
+		if errors.Is(err, hardError{}) {
+			return nil, err
 		}
-		return state, firstErr
+		return state, err
 	}
 	return state, nil
 }
 
-type hoseResource struct {
+type resource struct {
 	FeedURL string `json:"dataFeedURL"`
 	Session struct {
 		Token   string    `json:"token"`
@@ -547,16 +538,9 @@ func cloneState(state map[string]any) map[string]any {
 	return out
 }
 
-func cloneStringMap(in map[string]any) map[string]any {
-	if in == nil {
-		return nil
-	}
-	return maps.Clone(in)
-}
-
 // consumeFeed follows a single discovered FalconHose resource until the
 // stream ends, the context is cancelled, or an error occurs.
-func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r hoseResource, feedName string, offset int, state map[string]any, cursors *feedCursors) error {
+func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r resource, feedName string, offset int, state map[string]any, cursors *feedCursors) error {
 	refreshAfter := time.Duration(r.RefreshAfter) * time.Second
 	go func() {
 		runRefreshLoopWithAfter(ctx, refreshSessionWait(refreshAfter), time.After, func() error {
