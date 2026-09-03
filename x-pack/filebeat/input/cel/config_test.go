@@ -23,6 +23,42 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
+// testBoxPEMForConfig is the plain testBoxPlainKey reformatted for use in
+// oAuth2ValidationTests table entries, where it appears as a raw string.
+const testBoxPEMForConfig = `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzy2cU1+L8Tpht
+Lg9q9nCNqy3pXQQAiuWhGRtBS9pmRo/xl+tlVUeJxN8AVdBjJGjra6pZZ6g8x+NW
+tUfuOXNgRa8NUVQIRNkspSQVlb00DD8LQetehnSRQV6I0CY2g4xmobw9246HFIlO
+64/KhBF0BxnYx45rJ7CHEuo61p97dzGbvq0yf3aUMKo/NkqxgSLi5dKeOBuolHJb
+k/fbRGaXG0YDqpz0EjxnSRZ8PNw35JSNjEpiRhxcLEJo002V+x/SrS/w7peGjdFN
+axe47SoKSF2SErtLYxciGEY5Cn3E1A/8DGFXVsIQx987+nzfZJU2Yos/2iHwA/+N
+O+u2zGYlAgMBAAECggEACK1pdTUSLHEypBpT/iqUthGr7pZhqhEKEiNfEGCz0rnX
+GqblYoeiI0EQLjj2DMLmGW6h0xzQntZa34VySkoVinDyiOcC8j84aBI0UqJedlOc
++1McI/zDRXttL5c0MO9aaF2n8yhUkappEhkGYJTNLtdk5PSEqCFLQMml6l8PZWr/
+j8tbbIuNudzpBR8H4/agc0UFZwLK1YpCF9vD9oRZ+HZSum5sM7Hg4UV4UqZUmyaE
+Fqdy82P1bw9W2mJ171yYsTP7UzQo6eJ7H0Mdo5AYmReNXLIgE0rPtc1S3KIxWvVl
+0k6kp1P0ria11qzjpIuzYZkzE1cLZfuuaVinoznWoQKBgQDRPazPohVCdbc3frT1
+a9hBotAAAKg0Mc7eRIb9JqPPj2p5eUanpZgWaQ1To+I/uN+i7EWiCHAAeZhzj8wm
+O8H+QEo3jUntIam7TNdEW/TC5Uex4GKshA2EaNekoFudzAcmgrzi3CLsF3e9Ks3a
+iOE/1io3NwcAvYb/z+m9tvJrPQKBgQDb+SY+Xwu6wzVPTK6TRPhoBFEDasyzElKt
+5i1Jg6K8W0YHe1L9y5jwPVXGPBhN3loRqrO1zJxVwK8CbR13VNagvPw4UEKkkCjh
+fuYlNx0ifukAK8fKWqWJm/NyFy5uPqsEh8KrPbkONzKC6oJRxYd3lmZoOYnSr+6u
+jwU2BY81CQKBgC7xRkbi1yAs5qjlnVV+F2tKSp3lh9cF4aJN/3bl51RWmY2dHrPX
+29ITSXEdUFH5ePrFRS3/9Ji2rvQmK6fcOj5/T+c8pHw11C14JMdqVfQvmjEW5SxN
+B/dPyild7I/vSR9jr1q6Bn+vGCbxZnODx/0ZYCk5CDIrUxErJQZx99sFAoGBALGW
+co6WExUjNa2gnavdWaI4IeNdXIcROtiT5GneMQpZsa6mnHiy3vTMv6u7pm9vHE34
+/v69glUkquWNi+VkA6ZfDEy2VyceDzMFTO4skYPg62Cs963hApWW5rJsDpsIUu7k
+X3/546WbYFca1j0H+HbOYDyyfxct28bnRfC4CkZpAoGAeEZ4ZPh2ufpMzKgwWK/U
+5lXA5QVH167KYRJR5ptH3GjNjBc6jmsHqb24Dnx9y+7jmVDGSWhRvjhbpj9mT19m
+yzbNC9wNkT3IGwoEu1C3SbsstDnPmDILXZXoGODn5jYWYKXwUPRmakkkFpqdkQ4f
+A7JN9GvuuK/jTvNqCQDmIb0=
+-----END PRIVATE KEY-----
+`
+
+// boxTestKeyOneLiner is testBoxPEMForConfig with newlines escaped as \n so
+// the key can be embedded directly in a JSON string literal.
+var boxTestKeyOneLiner = strings.ReplaceAll(strings.TrimSpace(testBoxPEMForConfig), "\n", `\n`)
+
 func TestProviderCanonical(t *testing.T) {
 	const (
 		a oAuth2Provider = "gOoGle"
@@ -797,6 +833,91 @@ ExRhcDP1hFM6CdmSkIYEgBKvN9N0O4Lx1ba34gk74Hm65KXxokjJHOC0plO7c7ok
 LNV/bIgMHOMoxiGrwyjAhg==
 -----END PRIVATE KEY-----
 `,
+			},
+		},
+	},
+
+	{
+		name:    "box_must_have_key_material",
+		wantErr: errors.New("box validation error: one of box.config_file, box.config_json or discrete credentials (box.private_key) must be provided accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider": "box",
+			},
+		},
+	},
+	{
+		name:    "box_scopes_rejected",
+		wantErr: errors.New("box validation error: scopes must not be set for the Box JWT grant accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":        "box",
+				"box.config_json": `{"boxAppSettings":{"clientID":"x","clientSecret":"y","appAuth":{"publicKeyID":"k","privateKey":"` + boxTestKeyOneLiner + `","passphrase":""}},"enterpriseID":"e"}`,
+				"scopes":          []string{"foo"},
+			},
+		},
+	},
+	{
+		name:    "box_config_json_and_private_key_mutually_exclusive",
+		wantErr: errors.New("box validation error: box.config_file/box.config_json and discrete fields are mutually exclusive accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":        "box",
+				"box.config_json": `{"boxAppSettings":{"clientID":"x","clientSecret":"y","appAuth":{"publicKeyID":"k","privateKey":"` + boxTestKeyOneLiner + `","passphrase":""}},"enterpriseID":"e"}`,
+				"box.private_key": testBoxPEMForConfig,
+			},
+		},
+	},
+	{
+		name:    "box_discrete_requires_client_id_and_secret",
+		wantErr: errors.New("box validation error: client.id and client.secret must be provided when using discrete credentials accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":        "box",
+				"box.private_key": testBoxPEMForConfig,
+			},
+		},
+	},
+	{
+		name:    "box_invalid_subject_type",
+		wantErr: errors.New(`box validation error: box.subject_type must be enterprise or user, got "invalid" accessing 'auth.oauth2'`),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":         "box",
+				"box.config_json":  `{"boxAppSettings":{"clientID":"x","clientSecret":"y","appAuth":{"publicKeyID":"k","privateKey":"` + boxTestKeyOneLiner + `","passphrase":""}},"enterpriseID":"e"}`,
+				"box.subject_type": "invalid",
+			},
+		},
+	},
+	{
+		name:    "box_user_subject_requires_subject_id",
+		wantErr: errors.New("box validation error: box.subject_id must be provided when box.subject_type is user accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":         "box",
+				"box.config_json":  `{"boxAppSettings":{"clientID":"x","clientSecret":"y","appAuth":{"publicKeyID":"k","privateKey":"` + boxTestKeyOneLiner + `","passphrase":""}},"enterpriseID":"e"}`,
+				"box.subject_type": "user",
+			},
+		},
+	},
+	{
+		name: "box_successful_config_json_validation",
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":        "box",
+				"box.config_json": `{"boxAppSettings":{"clientID":"x","clientSecret":"y","appAuth":{"publicKeyID":"k","privateKey":"` + boxTestKeyOneLiner + `","passphrase":""}},"enterpriseID":"e"}`,
+			},
+		},
+	},
+	{
+		name: "box_successful_discrete_validation",
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":          "box",
+				"client.id":         "x",
+				"client.secret":     "y",
+				"box.private_key":   testBoxPEMForConfig,
+				"box.enterprise_id": "eid123",
 			},
 		},
 	},

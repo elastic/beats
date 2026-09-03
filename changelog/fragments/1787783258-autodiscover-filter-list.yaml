@@ -1,0 +1,4 @@
+kind: enhancement
+summary: Add hints.input_allow_list to restrict Filebeat hints-generated input types
+component: filebeat
+issue: https://github.com/elastic/beats/issues/52624
