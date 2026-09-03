@@ -566,7 +566,7 @@ func TestChainStepOriginValidation(t *testing.T) {
 func TestChainPaginationFailureDoesNotAdvanceCursor(t *testing.T) {
 	requester, trCtx, publisher := newChainPaginationTestRequester(t, nil)
 
-	err := requester.doRequest(context.Background(), trCtx, publisher)
+	err := requester.doRequest(t.Context(), trCtx, publisher)
 	require.Error(t, err, "interval should fail when a paginated chain request fails")
 	assert.Contains(t, err.Error(), "502", "error should surface the transient chain HTTP failure")
 	assert.Equal(t, "p1", trCtx.cursorMap()["page"], "cursor should remain on the last successfully chained page")
@@ -584,7 +584,7 @@ func TestChainPaginationIgnoredFailureAdvancesCursor(t *testing.T) {
 		},
 	})
 
-	err := requester.doRequest(context.Background(), trCtx, publisher)
+	err := requester.doRequest(t.Context(), trCtx, publisher)
 	require.NoError(t, err, "an intentionally ignored chain error should not fail the interval")
 	assert.Equal(t, "p2", trCtx.cursorMap()["page"], "ignored chain error should retain the advanced page cursor")
 }
@@ -660,11 +660,10 @@ func newChainPaginationTestRequester(t *testing.T, chainTransforms []any) (*requ
 	require.NoError(t, cfg.Unpack(&config), "unpacking test config should succeed")
 
 	log := logptest.NewTestingLogger(t, "")
-	ctx := context.Background()
-	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
+	client, err := newHTTPClient(t.Context(), config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	require.NoError(t, err, "creating http client should succeed")
 
-	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "")
+	requestFactory, err := newRequestFactory(t.Context(), config, noopReporter{}, log, nil, nil, "")
 	require.NoError(t, err, "creating request factory should succeed")
 	pagination := newPagination(config, client, noopReporter{}, log, "")
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
