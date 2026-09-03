@@ -20,21 +20,35 @@
 package auditd
 
 import (
+<<<<<<< HEAD
 	"errors"
+=======
+	"time"
+>>>>>>> f449761 (libbeat/reader/auditd: add multi-record coalescing mode (#52648))
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Stub for non-Linux builds
-type Parser struct{}
-
-func (p *Parser) Close() error { return nil }
-
-func (p *Parser) Next() (reader.Message, error) {
-	return reader.Message{}, errors.New("auditd parser is not supported on this platform")
+// Parser wraps the internal auditd parsing implementation. On non-Linux
+// platforms it acts as a pass-through.
+type Parser struct {
+	r reader.Reader
 }
 
-func NewParser(_ reader.Reader, _ Config, _ *logp.Logger) *Parser {
-	return &Parser{}
+// NewParser is a pass-through on non-Linux platforms. The auditd parser
+// requires go-libaudit which is Linux-only.
+func NewParser(r reader.Reader, _ Config, _ *logp.Logger) *Parser {
+	return &Parser{r: r}
 }
+<<<<<<< HEAD
+=======
+
+func (p *Parser) Next() (reader.Message, error) { return p.r.Next() }
+
+func (p *Parser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.r, t)
+}
+
+func (p *Parser) Close() error { return p.r.Close() }
+>>>>>>> f449761 (libbeat/reader/auditd: add multi-record coalescing mode (#52648))
