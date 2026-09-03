@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -860,12 +861,9 @@ func (http *httpPlugin) extractParameters(m *message) (path string, params strin
 }
 
 func (http *httpPlugin) isSecretParameter(key string) bool {
-	for _, keyword := range http.hideKeywords {
-		if strings.ToLower(key) == keyword {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(http.hideKeywords, func(keyword string) bool {
+		return strings.EqualFold(keyword, key)
+	})
 }
 
 func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
