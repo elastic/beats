@@ -28,7 +28,7 @@ summary: Update Go to 1.26.8
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component:
+component: all
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
