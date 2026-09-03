@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Log Npcap installer diagnostic files on installation failure.
-component: packetbeat
