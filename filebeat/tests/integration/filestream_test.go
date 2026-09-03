@@ -73,6 +73,7 @@ logging:
   selectors:
     - "input"
     - "input.filestream"
+    - "input.filestream.store_cache"
     - "input.filestream.file_watcher"
     - "input.filestream.prospector"
     - "input.filestream.scanner"
@@ -168,6 +169,7 @@ logging:
   selectors:
     - "input"
     - "input.filestream"
+    - "input.filestream.store_cache"
     - "input.filestream.file_watcher"
     - "input.filestream.prospector"
     - "input.filestream.scanner"
@@ -496,6 +498,7 @@ logging:
   selectors:
     - input
     - input.filestream
+    - input.filestream.store_cache
     - input.filestream.prospector
   metrics:
     enabled: false
@@ -640,6 +643,7 @@ logging:
   selectors:
     - input
     - input.filestream
+    - input.filestream.store_cache
     - input.filestream.prospector
   metrics:
     enabled: false
