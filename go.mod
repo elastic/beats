@@ -254,6 +254,7 @@ require (
 	go.opentelemetry.io/collector/service v0.159.0
 	go.opentelemetry.io/otel/sdk/metric v1.45.0
 	go.uber.org/goleak v1.3.0
+	sigs.k8s.io/kind v0.29.0
 )
 
 require (
@@ -291,7 +292,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.45.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.45.0 // indirect
 	go.opentelemetry.io/otel/trace v1.45.0 // indirect
-	sigs.k8s.io/kind v0.29.0 // indirect
 )
 
 require (
