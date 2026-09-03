@@ -108,7 +108,7 @@ steps:
         # integration test needs the host image to pick the right zswap
         # expectations (see ciExpectations in metric/memory).
         env:
-          SYSTEMMETRICS_CI_IMAGE: "{{matrix.image}}"
+          HOST_OS_IMAGE: "{{matrix.image}}"
         command: |
           set -euo pipefail
           cd pkg/systemmetrics

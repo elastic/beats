@@ -58,17 +58,17 @@ var ciExpectations = map[string]zswapExpectation{
 	"manual": {zswapExists: true, debugExists: true},
 }
 
-// ciImageFamilies are substrings that identify the host image family in the
-// SYSTEMMETRICS_CI_IMAGE value (e.g. "platform-ingest-beats-ubuntu-2004-1782878510").
+// hostOsImageFamilies are substrings that identify the host image family in the
+// HOST_OS_IMAGE value (e.g. "platform-ingest-beats-ubuntu-2004-1782878510").
 // The numeric suffix rotates with every image bump, so match on the family only.
-var ciImageFamilies = []string{"ubuntu-2004", "ubuntu-2204", "rhel-9"}
+var hostOsImageFamilies = []string{"ubuntu-2004", "ubuntu-2204", "rhel-9"}
 
 // ciExpectationKey builds the ciExpectations lookup key. When the image family is
 // known the step-specific "<step>/<family>" key is used, otherwise the bare step key.
 func ciExpectationKey(stepKey, image string) string {
-	for _, family := range ciImageFamilies {
-		if strings.Contains(image, family) {
-			return stepKey + "/" + family
+	for _, imageFamily := range hostOsImageFamilies {
+		if strings.Contains(image, imageFamily) {
+			return stepKey + "/" + imageFamily
 		}
 	}
 	return stepKey
@@ -95,8 +95,8 @@ func TestMemoryFromContainer(t *testing.T) {
 	debugExists := !mem.Zswap.Debug.IsZero()
 
 	stepKey := os.Getenv("BUILDKITE_STEP_KEY")
-	image := os.Getenv("SYSTEMMETRICS_CI_IMAGE")
-	t.Logf("Zswap exists: %v, Debug exists: %v (BUILDKITE_STEP_KEY=%q, SYSTEMMETRICS_CI_IMAGE=%q)",
+	image := os.Getenv("HOST_OS_IMAGE")
+	t.Logf("Zswap exists: %v, Debug exists: %v (BUILDKITE_STEP_KEY=%q, HOST_OS_IMAGE=%q)",
 		zswapExists, debugExists, stepKey, image)
 
 	logZswapStatus(t, mem, zswapExists, debugExists)
@@ -107,11 +107,11 @@ func TestMemoryFromContainer(t *testing.T) {
 
 	key := ciExpectationKey(stepKey, image)
 	expected, ok := ciExpectations[key]
-	require.Truef(t, ok, `BUILDKITE_STEP_KEY=%q, SYSTEMMETRICS_CI_IMAGE=%q (key %q) not found in ciExpectations map.
+	require.Truef(t, ok, `BUILDKITE_STEP_KEY=%q, HOST_OS_IMAGE=%q (key %q) not found in ciExpectations map.
 
 To fix this test:
 1. Check the debug output above for "Zswap exists" and "Debug exists" values
-2. If the image is a new family, add it to ciImageFamilies in memory_integration_test.go
+2. If the image is a new family, add it to hostOsFamilies in memory_integration_test.go
 3. Add an entry to ciExpectations in memory_integration_test.go:
    %q: {zswapExists: <true|false>, debugExists: <true|false>}
    Step keys and matrix images are defined in .buildkite/pkg/systemmetrics/pipeline.yml`,

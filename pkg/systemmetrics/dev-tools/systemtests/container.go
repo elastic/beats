@@ -243,7 +243,7 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *log
 	// Propagate BUILDKITE_STEP_KEY and the matrix image for CI test expectations
 	containerEnv = append(containerEnv,
 		fmt.Sprintf("BUILDKITE_STEP_KEY=%s", os.Getenv("BUILDKITE_STEP_KEY")),
-		fmt.Sprintf("SYSTEMMETRICS_CI_IMAGE=%s", os.Getenv("SYSTEMMETRICS_CI_IMAGE")),
+		fmt.Sprintf("HOST_OS_IMAGE=%s", os.Getenv("HOST_OS_IMAGE")),
 	)
 
 	gomodcacheCmd := exec.CommandContext(ctx, "go", "env", "GOMODCACHE")
