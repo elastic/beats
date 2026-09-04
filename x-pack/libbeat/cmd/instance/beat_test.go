@@ -7,6 +7,7 @@ package instance
 import (
 	"maps"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -83,8 +84,6 @@ type: "log"`)
 		assert.False(t, log.AllowDeprecatedUse(cfg))
 	})
 }
-<<<<<<< HEAD
-=======
 
 func TestReceiverHostnameConfigField(t *testing.T) {
 	t.Cleanup(func() { beat.SetHostnameOverride("") })
@@ -182,4 +181,3 @@ func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
 		assert.Equal(t, time.Duration(0), metricCfg.Period)
 	})
 }
->>>>>>> 85c5f57 (Add hostname overrides for Beat events (#52126))

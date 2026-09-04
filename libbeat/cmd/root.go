@@ -90,13 +90,10 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("strict.perms"))
-<<<<<<< HEAD
 	if f := flag.CommandLine.Lookup("plugin"); f != nil {
 		rootCmd.PersistentFlags().AddGoFlag(f)
 	}
-=======
 	rootCmd.PersistentFlags().StringVar(&instance.HostnameFlag, "hostname", "", "Override the detected hostname")
->>>>>>> 85c5f57 (Add hostname overrides for Beat events (#52126))
 
 	// Inherit root flags from run command
 	// TODO deprecate when root command no longer executes run (7.0)
