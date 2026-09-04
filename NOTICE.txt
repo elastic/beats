@@ -12629,11 +12629,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-quark
-Version: v0.6.0
+Version: v0.8.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-quark@v0.6.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-quark@v0.8.0/LICENSE.txt:
 
 
                                  Apache License
