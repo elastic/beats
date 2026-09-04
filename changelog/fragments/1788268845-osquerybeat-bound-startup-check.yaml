@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Bound the osqueryd startup check and report startup failures through Elastic Agent.
+component: osquerybeat

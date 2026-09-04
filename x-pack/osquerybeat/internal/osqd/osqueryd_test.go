@@ -5,6 +5,7 @@
 package osqd
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -12,12 +13,56 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestRunCheckWithTimeout(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		err := runCheckWithTimeout(t.Context(), time.Second, func(context.Context) error {
+			return nil
+		})
+		require.NoError(t, err, "successful check should not return an error")
+	})
+
+	t.Run("ordinary failure", func(t *testing.T) {
+		wantErr := errors.New("check failed")
+		err := runCheckWithTimeout(t.Context(), time.Second, func(context.Context) error {
+			return wantErr
+		})
+		require.ErrorIs(t, err, wantErr, "ordinary check failure should be preserved")
+	})
+
+	t.Run("timeout", func(t *testing.T) {
+		timeout := 20 * time.Millisecond
+		startedAt := time.Now()
+		err := runCheckWithTimeout(t.Context(), timeout, func(ctx context.Context) error {
+			<-ctx.Done()
+			return ctx.Err()
+		})
+		require.ErrorIs(t, err, context.DeadlineExceeded, "check timeout should wrap context deadline exceeded")
+		assert.Contains(t, err.Error(), "osqueryd check timed out after 20ms", "timeout error should identify the check and duration")
+		assert.Less(t, time.Since(startedAt), time.Second, "test check should be terminated promptly")
+	})
+
+	t.Run("parent cancellation", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(t.Context())
+		cancel()
+
+		err := runCheckWithTimeout(ctx, time.Second, func(checkCtx context.Context) error {
+			<-checkCtx.Done()
+			return checkCtx.Err()
+		})
+		require.ErrorIs(t, err, context.Canceled, "parent cancellation should be preserved")
+		assert.NotContains(t, err.Error(), "timed out", "parent cancellation should not be reported as a check timeout")
+	})
+}
 
 func TestNew(t *testing.T) {
 
