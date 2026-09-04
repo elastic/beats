@@ -19,6 +19,11 @@ This is the `host` dataset of the system module.
 
 It is implemented for Linux, macOS (Darwin), and Windows.
 
+
+## Required privileges [_required_privileges_host]
+
+The `host` dataset reads general system information (uptime, IP addresses, OS details) from standard operating system interfaces. No special Linux capabilities or elevated privileges are required. It can run as a non-root user.
+
 ### Example dashboard [_example_dashboard_2]
 
 This dataset comes with a sample dashboard:

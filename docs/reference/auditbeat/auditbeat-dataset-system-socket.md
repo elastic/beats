@@ -36,6 +36,32 @@ The dataset uses [KProbe-based event tracing](https://www.kernel.org/doc/Documen
 By not relying on periodic polling, this approach enables the dataset to perform near real-time monitoring of the system without the risk of missing short lived connections or processes.
 
 
+## Required privileges [_required_privileges_socket]
+
+The `socket` dataset uses KProbes to intercept kernel TCP/IP stack functions. It requires:
+
+* **`CAP_SYS_ADMIN`**: To install kernel probes via tracefs or debugfs.
+* **`CAP_NET_ADMIN`**: To monitor network traffic.
+
+The process does not need to run as root if these two capabilities are granted explicitly. However, root is the simplest way to satisfy both requirements.
+
+**Docker**: The container must have both capabilities and the host `/sys` directory must be bind-mounted so that tracefs or debugfs is accessible inside the container:
+
+```sh
+docker run \
+  --cap-add=SYS_ADMIN \
+  --cap-add=NET_ADMIN \
+  -v /sys:/sys \
+  ...
+```
+
+Alternatively, run as a `--privileged` container, which grants all capabilities automatically.
+
+::::{important}
+Bind-mounting `/sys` (or at least `/sys/kernel/debug` and `/sys/kernel/tracing`) is required for the dataset to function inside a container. Without it, Auditbeat cannot access tracefs and the dataset will fail to start.
+::::
+
+
 ## Requirements [_requirements]
 
 Features used by the `socket` dataset require a minimum Linux kernel version of 3.12 (vanilla). However, some distributions have backported those features to older kernels. The following (non-exhaustive) lists the different distributions under which the dataset is known to work:
@@ -58,7 +84,7 @@ Features used by the `socket` dataset require a minimum Linux kernel version of 
 
 ^1^ $$$footnote-1$$$ These systems lack [PERF_EVENT_IOC_ID ioctl.](https://lore.kernel.org/patchwork/patch/399251/) Support might be added in a future release.
 
-The dataset needs CAP_SYS_ADMIN and CAP_NET_ADMIN in order to work.
+The dataset needs `CAP_SYS_ADMIN` and `CAP_NET_ADMIN` in order to work. See [Required privileges](#_required_privileges_socket) above.
 
 
 ### Kernel configuration [_kernel_configuration]
@@ -77,9 +103,9 @@ The following configuration settings can prevent the dataset from starting:
 * `/proc/sys/net/ipv6/conf/lo/disable_ipv6` (IPv6 enabled in loopback device) is required when running with IPv6 enabled.
 
 
-### Running on docker [_running_on_docker]
+### Running on Docker [_running_on_docker]
 
-The dataset can monitor the Docker host when running inside a container. However it needs to run on a `privileged` container with `CAP_NET_ADMIN`. The docker container running Auditbeat needs access to the host’s tracefs or debugfs directory. This is achieved by bind-mounting `/sys`.
+The dataset can monitor the Docker host when running inside a container. The container needs `CAP_SYS_ADMIN` and `CAP_NET_ADMIN`, and the host’s tracefs or debugfs directory must be accessible inside the container. Achieve this by bind-mounting `/sys` from the host. See [Required privileges](#_required_privileges_socket) for the full `docker run` example.
 
 
 ## Configuration [_configuration_2]

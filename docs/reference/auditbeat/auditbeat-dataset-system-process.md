@@ -20,6 +20,25 @@ This is the `process` dataset of the system module. It generates an event when a
 It is implemented for Linux, macOS (Darwin), and Windows.
 
 
+## Required privileges [_required_privileges_process]
+
+The `process` dataset reads process information from `/proc` (Linux), `sysctl` (macOS), or the Windows API.
+
+**Minimum**: Auditbeat can run as a non-root user, but will log a warning that it may not report all processes. Without elevated privileges, it cannot read per-process details (such as open file descriptors, environment variables, or network namespaces) for processes owned by other users.
+
+**Recommended**: Run as root or grant `CAP_SYS_PTRACE` for complete visibility across all running processes.
+
+**Docker**: The container must run in the **host PID namespace** (`--pid=host`) so that Auditbeat can see all host processes rather than only those inside the container.
+
+```sh
+docker run --pid=host --user=root ...
+```
+
+::::{note}
+Without `--pid=host`, the `process` dataset only reports processes running inside the container, not on the host.
+::::
+
+
 ## Configuration options [_configuration_options_20]
 
 **`process.state.period`**
