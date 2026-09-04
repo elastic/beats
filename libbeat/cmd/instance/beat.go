@@ -852,10 +852,10 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Monitoring = beatmonitoring.NewGlobalMonitoring()
 
-	if err := InitPaths(cfg); err != nil {
+	b.Info.Paths, err = InitPaths(cfg)
+	if err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths //nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -885,7 +885,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, b.Info.Paths, logp.TypeKey, logp.EventType)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
@@ -1536,7 +1536,7 @@ func isElasticsearchOutput(name string) bool {
 	return name == "elasticsearch"
 }
 
-func InitPaths(cfg *config.C) error {
+func InitPaths(cfg *config.C) (*paths.Path, error) {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference
@@ -1546,14 +1546,14 @@ func InitPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %w", err)
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
 
-	//nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
-	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %w", err)
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error setting default paths: %w", err)
 	}
-	return nil
+	return p, nil
 }
 
 // every IP address received from `Info()` has a netmask suffix
