@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+//nolint:misspell // the fixtures below are verbatim Spanish locale event data, "comando" is Spanish for "command"
 const (
 	allXML = `
 <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
@@ -78,7 +79,7 @@ const (
 </Event>
 `
 
-	mensajeEnEspañol = `
+	mensajeEnEspanol = `
 <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
   <System>
     <Provider Name="Microsoft-Windows-PowerShell" Guid="{b51b54b5-04a1-4c65-8760-04f9e2335cd5}" EventSourceName="Service Control Manager"/>
@@ -159,6 +160,7 @@ Datos de usuario:</Message>
 `
 )
 
+//nolint:misspell // the expectations below are verbatim Spanish locale event data, "comando" is Spanish for "command"
 func TestXML(t *testing.T) {
 	allXMLTimeCreated, _ := time.Parse(time.RFC3339Nano, "2016-01-28T20:33:27.990735300Z")
 
@@ -215,7 +217,7 @@ func TestXML(t *testing.T) {
 			},
 		},
 		{
-			xml: mensajeEnEspañol,
+			xml: mensajeEnEspanol,
 			event: Event{
 				Provider: Provider{
 					Name:            "Microsoft-Windows-PowerShell",
@@ -392,7 +394,7 @@ func TestXML(t *testing.T) {
 func TestInvalidXML(t *testing.T) {
 	evXML := strings.ReplaceAll(allXML, "%1", "\t&#xD;\n\x1b")
 	ev, err := UnmarshalXML([]byte(evXML))
-	assert.Equal(t, nil, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "Creating WSMan shell on server with ResourceUri: \t\r\n\\u001b", ev.Message)
 }
 

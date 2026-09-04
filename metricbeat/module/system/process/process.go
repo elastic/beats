@@ -27,9 +27,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 func init() {
