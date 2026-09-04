@@ -465,6 +465,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	merged := &feedCursors{cursor: maps.Clone(cursors)}
 	var wg sync.WaitGroup
 	feedCtx, cancel := context.WithCancelCause(sessionCtx)
+	defer cancel(context.Canceled)
 	for _, f := range feeds {
 		wg.Add(1)
 		go func(f preparedFeed) {

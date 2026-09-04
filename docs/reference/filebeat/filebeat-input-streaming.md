@@ -56,7 +56,7 @@ The `streaming` input websocket handler creates a `response` field in the state 
 
 If the cursor is present the program should process or filter out responses based on its value. If cursor is not present all responses should be processed as per the program’s logic.
 
-The CrowdStrike discover endpoint can return multiple feed resources. Each resource is followed concurrently, so a long-lived feed cannot starve the others. A CrowdStrike cursor must therefore be a single object keyed by `state.feed`, with each value storing that feed's offset. When producing a new cursor, merge the current feed's offset into `state.cursor` so that offsets for the other feeds are retained. A flat cursor such as `{"offset": 123}` cannot track more than one feed.
+{applies_to}`stack: ga 9.4+` The CrowdStrike discover endpoint can return multiple feed resources. Each resource is followed concurrently, so a long-lived feed cannot starve the others. A CrowdStrike cursor must therefore be a single object keyed by `state.feed`, with each value storing that feed's offset. When producing a new cursor, merge the current feed's offset into `state.cursor` so that offsets for the other feeds are retained. A flat cursor such as `{"offset": 123}` cannot track more than one feed.
 
 After completion of a program’s execution it should return a single object with a structure looking like this:
 
