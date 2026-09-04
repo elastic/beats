@@ -5,10 +5,7 @@
 package httpjson
 
 import (
-	"errors"
-
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -40,14 +37,6 @@ func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	}
 }
 
-// Init initializes both wrapped input managers.
-func (m InputManager) Init(grp unison.Group) error {
-	return errors.Join(
-		m.stateless.Init(grp),
-		m.cursor.Init(grp),
-	)
-}
-
 // Create creates a cursor input manager if the config has a date cursor set up,
 // otherwise it creates a stateless input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
@@ -59,4 +48,10 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return m.stateless.Create(cfg)
 	}
 	return m.cursor.Create(cfg)
+}
+
+// Close releases resources held by the underlying cursor input manager.
+func (m InputManager) Close() {
+	m.stateless.Close()
+	m.cursor.Close()
 }
