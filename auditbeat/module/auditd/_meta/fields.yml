@@ -332,7 +332,7 @@
         description: syscall exit code
       - name: fp
         type: keyword
-        description: crypto key finger print
+        description: crypto key fingerprint
       - name: laddr
         type: keyword
         description: local network address
