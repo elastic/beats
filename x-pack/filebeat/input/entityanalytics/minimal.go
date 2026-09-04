@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/entcollect"
@@ -88,7 +89,11 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 
 		case <-syncTimer.C:
 			if err := syncer.runSync(runCtx, n.provider, client, slogger, true); err != nil {
-				log.Errorw("Error running full sync", "error", err)
+				if provider.SyncInterrupted(runCtx, err) {
+					log.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					log.Errorw("Error running full sync", "error", err)
+				}
 			}
 			syncTimer.Reset(n.fullSyncInterval)
 			log.Debugf("Next full sync expected at: %v", time.Now().Add(n.fullSyncInterval))
@@ -103,7 +108,11 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 
 		case <-incrTimer.C:
 			if err := syncer.runSync(runCtx, n.provider, client, slogger, false); err != nil {
-				log.Errorw("Error running incremental sync", "error", err)
+				if provider.SyncInterrupted(runCtx, err) {
+					log.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					log.Errorw("Error running incremental sync", "error", err)
+				}
 			}
 			incrTimer.Reset(n.incrSyncInterval)
 			log.Debugf("Next incremental sync expected at: %v", time.Now().Add(n.incrSyncInterval))
