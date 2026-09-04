@@ -956,3 +956,9 @@ Redis command statistics
     type: long
 
 
+**`redis.keyspace.keys_with_volatile_items`**
+:   Number of keys with volatile items (0 when not reported).
+
+    type: long
+
+
