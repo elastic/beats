@@ -37,6 +37,32 @@ func TestUnmarshal(t *testing.T) {
 		assert.Contains(t, cfg.Beatconfig, "heartbeat")
 	})
 
+	t.Run("scheduler_group is a receiver setting, not beat config", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"scheduler_group": "synthetics/synthetics-browser-default",
+			"heartbeat":       map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+
+		assert.Equal(t, "synthetics/synthetics-browser-default", cfg.SchedulerGroup)
+		assert.NotContains(t, cfg.Beatconfig, "scheduler_group",
+			"scheduler_group must not be passed down to heartbeat as beat config")
+	})
+
+	t.Run("scheduler_group defaults to empty", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"heartbeat": map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+		assert.Empty(t, cfg.SchedulerGroup)
+	})
+
 	t.Run("no defaults does not error", func(t *testing.T) {
 		cfg := &Config{}
 
