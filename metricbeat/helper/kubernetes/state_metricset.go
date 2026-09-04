@@ -101,7 +101,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		resourceName = "state_namespace"
 	}
 
-	m.enricher.Start(m.mod.GetResourceWatchers())
+	if !m.enricher.Start(m.mod.GetResourceWatchers()) {
+		return
+	}
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheusClient)
 	if err != nil {
