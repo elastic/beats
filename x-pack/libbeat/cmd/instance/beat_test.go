@@ -7,17 +7,15 @@ package instance
 import (
 	"maps"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/beat"
->>>>>>> 85c5f57 (Add hostname overrides for Beat events (#52126))
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 )
@@ -70,14 +68,6 @@ func TestManager(t *testing.T) {
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, &management.FallbackManager{}, beat.Manager)
 		assert.False(t, management.UnderAgent())
-<<<<<<< HEAD
-=======
-
-		// test if log input is disabled
-		cfg, err := conf.NewConfigFrom(`
-type: "log"`)
-		require.NoError(t, err)
-		assert.False(t, log.AllowDeprecatedUse(cfg))
 	})
 }
 
@@ -175,6 +165,5 @@ func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
 		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
 		assert.True(t, metricCfg.Enabled)
 		assert.Equal(t, time.Duration(0), metricCfg.Period)
->>>>>>> 85c5f57 (Add hostname overrides for Beat events (#52126))
 	})
 }
