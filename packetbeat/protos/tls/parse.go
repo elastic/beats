@@ -23,6 +23,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/asn1"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -636,10 +637,17 @@ func getKeySize(key any) int {
 
 // certToMap takes an x509 cert and converts it into a map.
 func certToMap(cert *x509.Certificate) mapstr.M {
+	serial, err := rawSerialBytes(cert.Raw)
+	if err != nil {
+		// Best effort to get the serial. If the DER parsing
+		// fails, try to get as much as we can from the cert
+		// directly.
+		serial = cert.SerialNumber.Bytes()
+	}
 	certMap := mapstr.M{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		"serial_number":        strings.ToUpper(cert.SerialNumber.Text(16)),
+		"serial_number":        strings.ToUpper(hex.EncodeToString(serial)),
 		"issuer":               toMap(&cert.Issuer),
 		"subject":              toMap(&cert.Subject),
 		"not_before":           cert.NotBefore,
@@ -658,6 +666,29 @@ func certToMap(cert *x509.Certificate) mapstr.M {
 		certMap["alternative_names"] = san
 	}
 	return certMap
+}
+
+// rawSerialBytes returns the content octets of the serialNumber INTEGER from
+// the certificate's DER encoding. This matches the byte-for-byte representation
+// used by OpenSSL's i2a_ASN1_INTEGER (crypto/asn1/f_int.c), preserving any
+// leading zero bytes and the sign byte that big.Int.Bytes discards.
+func rawSerialBytes(certDER []byte) ([]byte, error) {
+	var cert struct {
+		TBSCert asn1.RawValue
+	}
+	_, err := asn1.Unmarshal(certDER, &cert)
+	if err != nil {
+		return nil, err
+	}
+	var tbs struct {
+		Version asn1.RawValue `asn1:"optional,explicit,tag:0"`
+		Serial  asn1.RawValue
+	}
+	_, err = asn1.Unmarshal(cert.TBSCert.FullBytes, &tbs)
+	if err != nil {
+		return nil, err
+	}
+	return tbs.Serial.Bytes, nil
 }
 
 func toMap(name *pkix.Name) mapstr.M {
