@@ -8,8 +8,9 @@ import (
 	"net/url"
 	"time"
 
-	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 	"golang.org/x/net/publicsuffix"
+
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 func newResult(parser string, profile *profile, timestamp int64) elasticbrowserhistory.Result {
