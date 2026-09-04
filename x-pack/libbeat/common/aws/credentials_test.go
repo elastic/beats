@@ -105,11 +105,12 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 
 					switch receivedCalls {
 
+					// Step 1: AssumeRoleWithWebIdentity → Elastic Global Role
 					case 1:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRoleWithWebIdentity", q.Get("Action"))
-						assert.Equal(t, "1200", q.Get("DurationSeconds"))
+						assert.Equal(t, "1200", q.Get("DurationSeconds")) // defaultIntermediateDuration
 						assert.Equal(t, globalRoleARN, q.Get("RoleArn"))
 						assert.Equal(t, tokenFileContent, q.Get("WebIdentityToken"))
 						return middleware.FinalizeOutput{
@@ -123,11 +124,12 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 							},
 						}, middleware.Metadata{}, nil
 
+					// Step 2: AssumeRole → customer remote role
 					case 2:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
-						assert.Equal(t, "2700", q.Get("DurationSeconds"))
+						assert.Equal(t, "2700", q.Get("DurationSeconds")) // 45 * time.Minute
 						assert.Equal(t, cloudResourceID+"-"+config.ExternalID, q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
 						return middleware.FinalizeOutput{
@@ -161,6 +163,8 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 	require.Equal(t, 2, receivedCalls)
 }
 
+// TestApplyIdentityFederationChainIRSA exercises the IRSA two-step STS chain:
+// IRSA pod creds → AssumeRole(GlobalRole) → AssumeRole(customer role).
 func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 	config := ConfigAWS{
 		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
@@ -171,8 +175,9 @@ func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 	globalRoleARN := "arn:aws:iam::999999999999:role/elastic-global-role"
 	cloudResourceID := "abcd1234"
 
-	t.Setenv(identityfederation.AWSIRSATokenFileEnvVar, "/var/run/secrets/irsa-token")
+	t.Setenv(identityfederation.AWSIRSATokenFileEnvVar, "/var/run/secrets/irsa-token") // trigger IRSA path
 	t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, globalRoleARN)
+	// AWSIDTokenFileEnvVar intentionally NOT set — IRSA path must not require it
 	t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, cloudResourceID)
 
 	baseConfig := &aws.Config{
@@ -196,11 +201,12 @@ func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 
 					switch receivedCalls {
 
+					// Step 1: AssumeRole → Elastic Global Role (IRSA path, no WebIdentity)
 					case 1:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
-						assert.Equal(t, "1200", q.Get("DurationSeconds"))
+						assert.Equal(t, "1200", q.Get("DurationSeconds")) // defaultIntermediateDuration
 						assert.Equal(t, globalRoleARN, q.Get("RoleArn"))
 						assert.Empty(t, q.Get("WebIdentityToken"), "IRSA step must not use WebIdentity")
 						return middleware.FinalizeOutput{
@@ -214,11 +220,12 @@ func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 							},
 						}, middleware.Metadata{}, nil
 
+					// Step 2: AssumeRole → customer remote role
 					case 2:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
-						assert.Equal(t, "2700", q.Get("DurationSeconds"))
+						assert.Equal(t, "2700", q.Get("DurationSeconds")) // 45 * time.Minute
 						assert.Equal(t, cloudResourceID+"-"+config.ExternalID, q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
 						return middleware.FinalizeOutput{
@@ -288,6 +295,7 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 		t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
 		// IDTokenFileEnvVar intentionally not set — should not be required in IRSA mode
 
+		// We only check that the error is not about "id token"; the chain itself will fail later when STS is called, but config validation should pass.
 		err := applyIdentityFederationChain(ConfigAWS{RoleArn: validRoleARN}, &aws.Config{Region: "us-east-1"}, logger)
 		if err != nil {
 			require.NotContains(t, err.Error(), "id token")

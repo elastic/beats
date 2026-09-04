@@ -184,8 +184,24 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 	})
 }
 
+// defaultIntermediateDuration is the session duration for the intermediate Elastic Global Role.
+// It is intentionally short because it is only used as a stepping stone to the customer's remote role.
 const defaultIntermediateDuration = 20 * time.Minute
 
+// applyIdentityFederationChain configures awsConfig with Identity Federation role-chaining
+// credentials. It reads the required env vars set by the agentless controller and builds the
+// STS credential chain. Three paths are supported:
+//
+// WII path (WORKLOAD_IDENTITY_ISSUER_URL is set):
+//   - AssumeRoleWithWebIdentity using a JWT from the workload-identity-issuer directly to the customer's role.
+//
+// IRSA path (AWS_WEB_IDENTITY_TOKEN_FILE is set — EKS pod with IRSA):
+//  1. AssumeRole → Elastic Global Role (using IRSA pod credentials from LoadDefaultConfig)
+//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
+//
+// OIDC path (default — agentless controller with JWT token file):
+//  1. AssumeRoleWithWebIdentity → Elastic Global Role (using OIDC JWT from IDTokenFileEnvVar)
+//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
 func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, logger *logp.Logger) error {
 	logger = logger.Named("applyIdentityFederationChain")
 
@@ -234,6 +250,7 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	if globalRoleARN == "" {
 		errs = append(errs, errors.New("elastic global role arn is not configured"))
 	}
+	// idTokenPath is only required for the OIDC path; IRSA uses pod credentials instead.
 	if idTokenPath == "" && irsaTokenFile == "" {
 		errs = append(errs, errors.New("no id token source configured (set WORKLOAD_IDENTITY_ISSUER_URL, CLOUD_CONNECTORS_ID_TOKEN_FILE, or AWS_WEB_IDENTITY_TOKEN_FILE)"))
 	}
@@ -243,6 +260,8 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	if config.RoleArn == "" {
 		errs = append(errs, errors.New("role_arn is not configured"))
 	}
+	// AWS enforces a hard 1-hour maximum on DurationSeconds when AssumeRole is
+	// called using credentials from another assumed role (role chaining).
 	if config.AssumeRoleDuration > time.Hour {
 		errs = append(errs, errors.New("assume role duration cannot exceed 1h for identity federation role chaining"))
 	}
@@ -254,6 +273,8 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 
 	switch {
 	case irsaTokenFile != "":
+		// IRSA flow: LoadDefaultConfig already loaded IRSA pod credentials via
+		// AWS_WEB_IDENTITY_TOKEN_FILE/AWS_ROLE_ARN. Use AssumeRole directly.
 		logger.Debug("Switching credentials provider to Identity Federation (IRSA)")
 		step1 = &identityfederation.AWSAssumeRoleStep{
 			RoleARN: globalRoleARN,
@@ -263,6 +284,8 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		}
 
 	default:
+		// OIDC flow: assume the Elastic Global Role with web identity using the ID token
+		// provided by the agentless OIDC issuer.
 		logger.Debug("Switching credentials provider to Identity Federation (OIDC)")
 		step1 = &identityfederation.AWSWebIdentityRoleStep{
 			RoleARN:              globalRoleARN,
@@ -275,6 +298,8 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 
 	chain := []identityfederation.AWSRoleChainingStep{
 		step1,
+		// Step 2: Assume the remote role (the user's configured role), using the
+		// previously assumed Elastic Global Role credentials.
 		&identityfederation.AWSAssumeRoleStep{
 			RoleARN: config.RoleArn,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
