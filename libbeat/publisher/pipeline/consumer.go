@@ -50,9 +50,14 @@ type eventConsumer struct {
 	// separate goroutine so we don't block on the control path.
 	queueReader queueReader
 
-	// This waitgroup is released when this eventConsumer's worker
-	// goroutines return.
+	// wg is released when the main eventConsumer worker goroutine returns.
 	wg sync.WaitGroup
+
+	// queueReaderWg is released when the queueReader goroutine returns.
+	// It is kept separate from wg because queueReader can only exit after
+	// eventConsumer.run() closes queueReader.req — which happens after wg
+	// is done — so combining them into one WaitGroup would deadlock.
+	queueReaderWg sync.WaitGroup
 }
 
 // consumerTarget specifies the queue to read from, the parameters needed
@@ -89,15 +94,12 @@ func newEventConsumer(
 		c.run()
 	})
 
-	// Even though we start a goroutine here, we don't include it in the
-	// waitGroup used for shutdown: if the queue itself is not closed yet,
-	// then the queueReader may be blocked in a read call to the queue,
-	// and waiting on it would deadlock. (This scenario is common; the
-	// queue is rarely closed properly on shutdown.) The queueReader itself
-	// has no independent state to clean up, and can safely shut down
-	// after the eventConsumer is already gone, so nothing is lost by
-	// letting it happen asynchronously.
-	go c.queueReader.run(c.logger)
+	// Use two WaitGroups for safe ordering: wg drains first
+	// (which closes queueReader.req), then queueReaderWg ensures the
+	// goroutine has fully exited before close() returns.
+	c.queueReaderWg.Go(func() {
+		c.queueReader.run(c.logger)
+	})
 
 	return c
 }
@@ -237,4 +239,5 @@ func (c *eventConsumer) retry(batch *ttlBatch, decreaseTTL bool) {
 func (c *eventConsumer) close() {
 	close(c.done)
 	c.wg.Wait()
+	c.queueReaderWg.Wait()
 }
