@@ -60,7 +60,7 @@ func TestConfigDefault(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -107,7 +107,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -314,7 +314,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -394,7 +394,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
