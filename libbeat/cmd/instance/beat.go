@@ -191,7 +191,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
-				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
+				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.", //nolint:forbidigo // no logger in scope inside recover()
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
@@ -797,7 +797,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths
+	b.Info.Paths = paths.Paths //nolint:forbidigo // global paths instance is the only option here
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -1492,7 +1492,7 @@ func InitPaths(cfg *config.C) error {
 		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
-	if err := paths.InitPaths(&partialConfig.Path); err != nil {
+	if err := paths.InitPaths(&partialConfig.Path); err != nil { //nolint:forbidigo // global paths instance is the only option here
 		return fmt.Errorf("error setting default paths: %w", err)
 	}
 	return nil

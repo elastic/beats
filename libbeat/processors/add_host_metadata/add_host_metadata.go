@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
@@ -57,16 +58,24 @@ type metrics struct {
 	FQDNLookupFailed *monitoring.Int
 }
 
+type hostInfo interface {
+	Info() types.HostInfo
+	FQDNWithContext(context.Context) (string, error)
+}
+
+type hostInfoFactory func() (hostInfo, error)
+
 type addHostMetadata struct {
 	lastUpdate struct {
 		time.Time
 		sync.Mutex
 	}
-	data    mapstr.Pointer
-	geoData mapstr.M
-	config  Config
-	logger  *logp.Logger
-	metrics metrics
+	data            mapstr.Pointer
+	geoData         mapstr.M
+	config          Config
+	logger          *logp.Logger
+	metrics         metrics
+	hostInfoFactory hostInfoFactory
 }
 
 // New constructs a new add_host_metadata processor.
@@ -83,6 +92,7 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		metrics: metrics{
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
+		hostInfoFactory: func() (hostInfo, error) { return sysinfo.Host() },
 	}
 	if err := p.loadData(true, features.FQDN()); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
@@ -172,7 +182,7 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 		return nil
 	}
 
-	h, err := sysinfo.Host()
+	h, err := p.hostInfoFactory()
 	if err != nil {
 		return fmt.Errorf("error collecting host info: %w", err)
 	}

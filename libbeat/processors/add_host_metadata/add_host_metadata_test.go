@@ -18,11 +18,13 @@
 package add_host_metadata
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -32,8 +34,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/foxcpp/go-mockdns"
@@ -57,7 +61,7 @@ func TestConfigDefault(t *testing.T) {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -104,7 +108,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -311,7 +315,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -371,10 +375,12 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			hostMap, ok := v.(mapstr.M)
+			require.True(t, ok)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(hostMap) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(hostMap) == 1)
 			if c.expectedHostFieldLength != -1 {
-				assert.Len(t, v.(mapstr.M), c.expectedHostFieldLength) //nolint:errcheck // already checked
+				assert.Len(t, hostMap, c.expectedHostFieldLength)
 			}
 		})
 	}
@@ -391,7 +397,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -447,8 +453,10 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			hostMap, ok := v.(mapstr.M)
+			require.True(t, ok)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(hostMap) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(hostMap) == 1)
 		})
 	}
 }
@@ -688,4 +696,52 @@ func fqdnFeatureFlagConfig(fqdnEnabled bool) *conf.C {
 	return conf.MustNewConfigFrom(map[string]any{
 		"features.fqdn.enabled": fqdnEnabled,
 	})
+}
+
+type mockHostInfo struct {
+	FQDN                 string
+	Hostname             string
+	FQDNErr              error
+	FQDNRequestCount     atomic.Int64
+	HostInfoRequestCount atomic.Int64
+}
+
+var _ hostInfo = &mockHostInfo{}
+
+func (m *mockHostInfo) Info() types.HostInfo {
+	m.HostInfoRequestCount.Add(1)
+	return types.HostInfo{
+		Hostname: m.Hostname,
+		OS:       &types.OSInfo{},
+	}
+}
+
+func (m *mockHostInfo) FQDNWithContext(_ context.Context) (string, error) {
+	m.FQDNRequestCount.Add(1)
+	if m.FQDNErr != nil {
+		return "", m.FQDNErr
+	}
+	return m.FQDN, nil
+}
+
+func newWithHostInfoFactory(cfg *conf.C, log *logp.Logger, factory hostInfoFactory) (beat.Processor, error) {
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
+	}
+
+	p := &addHostMetadata{
+		config: c,
+		data:   mapstr.NewPointer(nil),
+		logger: log.Named(logName),
+		metrics: metrics{
+			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
+		},
+		hostInfoFactory: factory,
+	}
+	if err := p.loadData(false, features.FQDN()); err != nil {
+		return nil, fmt.Errorf("failed to load data: %w", err)
+	}
+
+	return p, nil
 }
