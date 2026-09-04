@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -78,10 +79,13 @@ func (m *preinitFailManager) RegisterDiagnosticHook(_, _, _, _ string, _ managem
 // This guards against a race where the OTel collector calls Shutdown before
 // the beat's Run goroutine has initialised its shutdown-signal machinery.
 func TestStopWaitsForRunReady(t *testing.T) {
+	ctx, cn := context.WithCancel(t.Context())
 	fb := &Filebeat{
-		done:     make(chan struct{}),
-		runReady: &closeOnce{ch: make(chan struct{})},
-		logger:   logp.NewNopLogger(),
+		done:      make(chan struct{}),
+		runReady:  &closeOnce{ch: make(chan struct{})},
+		logger:    logp.NewNopLogger(),
+		ctx:       ctx,
+		cancelCtx: cn,
 	}
 
 	stopDone := make(chan struct{})
