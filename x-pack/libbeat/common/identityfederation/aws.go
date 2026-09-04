@@ -257,10 +257,6 @@ func AWSNewOIDCChain(ctx context.Context, cfg AWSOIDCChainConfig) (*awssdk.Confi
 	return AWSConfigRoleChaining(baseCfg, chain), nil
 }
 
-// AWSWIIWebIdentityStep uses a WIITokenSource as the identity token retriever
-// for sts:AssumeRoleWithWebIdentity. In the WII flow this is the only step: the
-// JWT is presented directly to the customer's role, with no intermediate Elastic
-// role and no ExternalID.
 type AWSWIIWebIdentityStep struct {
 	RoleARN     string
 	TokenSource *WIITokenSource
@@ -270,7 +266,6 @@ type AWSWIIWebIdentityStep struct {
 	CacheOptions func(*awssdk.CredentialsCacheOptions)
 }
 
-// BuildCredentialsCache implements AWSRoleChainingStep.
 func (s *AWSWIIWebIdentityStep) BuildCredentialsCache(client *sts.Client) *awssdk.CredentialsCache {
 	provider := stscreds.NewWebIdentityRoleProvider(
 		client,

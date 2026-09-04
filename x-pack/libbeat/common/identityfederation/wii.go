@@ -24,26 +24,12 @@ import (
 )
 
 const (
-	// WIIIssuerURLEnvVar is the env var set by the agentless controller for the
-	// workload-identity-issuer URL. Its presence acts as a feature gate: when set,
-	// beats uses WII mTLS token exchange instead of the legacy
-	// CLOUD_CONNECTORS_ID_TOKEN_FILE OIDC path. This mirrors Elasticsearch, where
-	// the workload-identity module activates on a non-blank
-	// workload_identity.issuer.url setting.
-	WIIIssuerURLEnvVar = "WORKLOAD_IDENTITY_ISSUER_URL"
-	// WIISSLCertFileEnvVar is the env var pointing to the WII client certificate file.
+	WIIIssuerURLEnvVar   = "WORKLOAD_IDENTITY_ISSUER_URL"
 	WIISSLCertFileEnvVar = "WORKLOAD_IDENTITY_SSL_CERT_FILE"
-	// WIISSLKeyFileEnvVar is the env var pointing to the WII client private key file.
-	WIISSLKeyFileEnvVar = "WORKLOAD_IDENTITY_SSL_KEY_FILE"
-	// WIISSLCAFileEnvVar is the optional env var pointing to a CA bundle used to verify
-	// the WII server's TLS certificate. When not set, the system root CAs are used —
-	// the production issuer endpoint presents a publicly trusted certificate, so this
-	// is only needed for dev/test setups with private server CAs.
-	WIISSLCAFileEnvVar = "WORKLOAD_IDENTITY_SSL_CA_FILE"
+	WIISSLKeyFileEnvVar  = "WORKLOAD_IDENTITY_SSL_KEY_FILE"
+	WIISSLCAFileEnvVar   = "WORKLOAD_IDENTITY_SSL_CA_FILE"
 )
 
-// Transport and retry tuning, matching the defaults of Elasticsearch's
-// workload-identity module (WorkloadIdentityHttpSettings / WorkloadIdentityIssuerSettings).
 const (
 	wiiConnectTimeout      = 5 * time.Second
 	wiiRequestTimeout      = 10 * time.Second
@@ -52,52 +38,24 @@ const (
 	wiiRetryMaxDelay       = 5 * time.Second
 	wiiRetryMaxAttempts    = 3
 	wiiRefreshBeforeExpiry = time.Minute
-	// wiiMaxTokenLifetime is a sanity ceiling on expires_at, guarding against
-	// response-encoding bugs (e.g. epoch millis read as epoch seconds). Not a policy
-	// bound on issuer lifetime.
-	wiiMaxTokenLifetime = 365 * 24 * time.Hour
+	wiiMaxTokenLifetime    = 365 * 24 * time.Hour // epoch-millis guard
 )
 
-// WIITokenSource obtains short-lived JWTs from the workload-identity-issuer
-// POST /token endpoint over mTLS, using the client certificate provisioned by the
-// agentless controller. It implements stscreds.IdentityTokenRetriever and is the Go
-// equivalent of Elasticsearch's HttpsWorkloadIdentityIssuerClient.
+// WIITokenSource fetches JWTs from the workload-identity-issuer over mTLS.
 //
-// Wire contract (same as Elasticsearch):
-//
-//	POST <issuer-url>/token
-//	Content-Type: application/json
-//	{"aud": "<audience>"}
-//
-//	200 OK
-//	{"token": "<jwt>", "expires_at": <epoch-seconds>}
-//
-// The audience is opaque to the issuer and copied verbatim into the JWT aud claim.
-// AWS is the only supported consumer today (audience "sts.amazonaws.com", presented
-// to STS via AssumeRoleWithWebIdentity); Azure/GCP consumers are follow-up work.
-//
-// Tokens are cached until expires_at minus a refresh margin; concurrent callers share
-// a single in-flight fetch. Failures are never cached. Transient failures (HTTP 429,
-// 5xx, network errors) are retried with jittered exponential backoff; other HTTP
-// errors are not. The client certificate is re-read from disk on every fetch so
-// rotation by the controller is picked up without a restart.
+//	POST <issuer-url>/token  {"aud": "<audience>"}
+//	200 OK                   {"token": "<jwt>", "expires_at": <epoch-seconds>}
 type WIITokenSource struct {
 	tokenEndpoint string
 	certFile      string
 	keyFile       string
 	audience      string
 
-	// mu serializes fetches: the holder performs the HTTP exchange while
-	// concurrent callers block and then serve from the refreshed cache.
 	mu           sync.Mutex
 	cachedToken  []byte
 	cachedExpiry time.Time
 }
 
-// NewWIITokenSource creates a WIITokenSource for the given audience. The issuer URL
-// must be https, include a host, and carry no query string or fragment (the same
-// validation Elasticsearch applies at node startup, surfaced here at configuration
-// time rather than at the first token request).
 func NewWIITokenSource(issuerURL, certFile, keyFile, audience string) (*WIITokenSource, error) {
 	endpoint, err := resolveWIITokenEndpoint(issuerURL)
 	if err != nil {
@@ -111,7 +69,6 @@ func NewWIITokenSource(issuerURL, certFile, keyFile, audience string) (*WIIToken
 	}, nil
 }
 
-// resolveWIITokenEndpoint validates the issuer base URL and appends the /token path.
 func resolveWIITokenEndpoint(issuerURL string) (string, error) {
 	if issuerURL == "" {
 		return "", errors.New("workload-identity issuer URL must be configured")
@@ -132,9 +89,6 @@ func resolveWIITokenEndpoint(issuerURL string) (string, error) {
 	return strings.TrimRight(issuerURL, "/") + "/token", nil
 }
 
-// GetIdentityToken implements stscreds.IdentityTokenRetriever. It returns the cached
-// JWT when it is still fresh (expires_at minus the refresh margin), otherwise fetches
-// a new one from the issuer.
 func (w *WIITokenSource) GetIdentityToken() ([]byte, error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -152,22 +106,14 @@ func (w *WIITokenSource) GetIdentityToken() ([]byte, error) {
 	return token, nil
 }
 
-// wiiHTTPError carries the issuer's HTTP status so the retry policy can
-// distinguish transient statuses from configuration/credential errors.
 type wiiHTTPError struct {
 	status int
 }
 
 func (e *wiiHTTPError) Error() string {
-	// The response body is deliberately kept out of the error (it is not under our
-	// control and may end up in logs); only the status is surfaced.
 	return fmt.Sprintf("workload-identity issuer returned HTTP %d", e.status)
 }
 
-// isRetryableWIIError reports whether a subsequent attempt could plausibly succeed:
-// transport-level errors and the issuer-reported transient statuses (429 plus any
-// 5xx). Other HTTP statuses and response parse/validation failures are not retried.
-// Same policy as Elasticsearch's HttpsWorkloadIdentityIssuerClient.isRetryable.
 func isRetryableWIIError(err error) bool {
 	var httpErr *wiiHTTPError
 	if errors.As(err, &httpErr) {
@@ -177,9 +123,6 @@ func isRetryableWIIError(err error) bool {
 	return errors.As(err, &urlErr)
 }
 
-// fetchTokenWithRetry runs fetchToken with up to wiiRetryMaxAttempts attempts,
-// sleeping a jittered exponential backoff (initial wiiRetryInitialDelay, capped at
-// wiiRetryMaxDelay) between retryable failures.
 func (w *WIITokenSource) fetchTokenWithRetry() ([]byte, time.Time, error) {
 	var errs []error
 	delayBound := wiiRetryInitialDelay
@@ -194,22 +137,13 @@ func (w *WIITokenSource) fetchTokenWithRetry() ([]byte, time.Time, error) {
 				"fetching workload-identity token from %s (%d attempts): %w",
 				w.tokenEndpoint, attempt, errors.Join(errs...))
 		}
-		// Uniform jitter within the current bound, then double the bound.
 		time.Sleep(rand.N(delayBound) + 1)
 		delayBound = min(delayBound*2, wiiRetryMaxDelay)
 	}
 }
 
-// fetchToken performs a single POST /token exchange.
 func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
 	tlsCfg := &tls.Config{
-		// GetClientCertificate is used instead of Certificates so that the cert is
-		// always presented regardless of whether the server's acceptable-CA list
-		// contains the leaf's direct issuer (the per-tenant intermediate CA is not
-		// in ecp-internal-cas; only ecp-cluster-ca is). Go's static Certificates
-		// lookup matches on RawIssuer only, so it silently sends an empty Certificate
-		// when the intermediate is not advertised — GetClientCertificate bypasses that.
-		// Re-reading from disk on every fetch also picks up controller-driven rotation.
 		GetClientCertificate: func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
 			cert, err := tls.LoadX509KeyPair(w.certFile, w.keyFile)
 			if err != nil {
@@ -220,8 +154,6 @@ func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
 		MinVersion: tls.VersionTLS12,
 	}
 
-	// WORKLOAD_IDENTITY_SSL_CA_FILE overrides the server CA trust — only used when the
-	// issuer endpoint presents a cert from a private CA (dev/test setups).
 	if caFile := os.Getenv(WIISSLCAFileEnvVar); caFile != "" {
 		caBytes, caErr := os.ReadFile(caFile) //nolint:gosec // G703: the path is operator-provided configuration, not untrusted input
 		if caErr != nil {
@@ -273,9 +205,6 @@ func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
 	return parseWIITokenResponse(responseBody)
 }
 
-// parseWIITokenResponse parses the issuer's JSON response. Both fields are required
-// (Elasticsearch's parser rejects responses missing either); unknown fields are
-// tolerated so the issuer can add fields without breaking clients.
 func parseWIITokenResponse(body []byte) ([]byte, time.Time, error) {
 	var envelope struct {
 		Token     string `json:"token"`

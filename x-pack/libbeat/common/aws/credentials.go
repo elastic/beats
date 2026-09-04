@@ -184,25 +184,8 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 	})
 }
 
-// defaultIntermediateDuration is the session duration for the intermediate Elastic Global Role
-// in the legacy IRSA and OIDC paths.
 const defaultIntermediateDuration = 20 * time.Minute
 
-// applyIdentityFederationChain configures awsConfig with Identity Federation credentials.
-// Three paths are supported, checked in priority order:
-//
-// WII path (WORKLOAD_IDENTITY_ISSUER_URL is set — new default for agentless deployments):
-//   - AssumeRoleWithWebIdentity via WII POST /token (mTLS, controller-provisioned cert)
-//     directly to customer's RoleArn. No intermediate Elastic role. No ExternalID.
-//     Customer's IAM trust policy trusts the WII issuer OIDC endpoint directly.
-//
-// IRSA path (AWS_WEB_IDENTITY_TOKEN_FILE is set — EKS pod with IRSA):
-//  1. AssumeRole → Elastic Global Role (using IRSA pod credentials from LoadDefaultConfig)
-//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
-//
-// OIDC path (fallback — legacy agentless controller with JWT token file):
-//  1. AssumeRoleWithWebIdentity → Elastic Global Role (using OIDC JWT from IDTokenFileEnvVar)
-//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
 func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, logger *logp.Logger) error {
 	logger = logger.Named("applyIdentityFederationChain")
 
@@ -211,17 +194,13 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	wiiKeyFile := os.Getenv(identityfederation.WIISSLKeyFileEnvVar)
 
 	if wiiIssuerURL != "" {
-		// WII path: direct trust — customer IAM trust policy trusts WII issuer OIDC endpoint.
-		// Beat gets JWT from WII → directly calls AssumeRoleWithWebIdentity for customer's role.
-		// No intermediate Elastic global role. No ExternalID.
-		logger.Debug("Switching credentials provider to Identity Federation (WII mTLS direct trust)")
+		logger.Debug("Switching credentials provider to Identity Federation (WII)")
 		if wiiCertFile == "" || wiiKeyFile == "" {
 			return fmt.Errorf("WORKLOAD_IDENTITY_SSL_CERT_FILE and WORKLOAD_IDENTITY_SSL_KEY_FILE must be set when WORKLOAD_IDENTITY_ISSUER_URL is configured")
 		}
 		if config.RoleArn == "" {
 			return fmt.Errorf("role_arn is required for WII identity federation")
 		}
-		// AWS STS always requires audience "sts.amazonaws.com" for AssumeRoleWithWebIdentity.
 		tokenSource, err := identityfederation.NewWIITokenSource(wiiIssuerURL, wiiCertFile, wiiKeyFile, "sts.amazonaws.com")
 		if err != nil {
 			return fmt.Errorf("configuring WII token source: %w", err)
@@ -246,7 +225,6 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		return nil
 	}
 
-	// Legacy paths (IRSA and OIDC) require a global Elastic role and cloud resource ID.
 	globalRoleARN := os.Getenv(identityfederation.AWSGlobalRoleARNEnvVar)
 	idTokenPath := os.Getenv(identityfederation.AWSIDTokenFileEnvVar)
 	cloudResourceID := os.Getenv(identityfederation.AWSCloudResourceIDEnvVar)
@@ -276,7 +254,6 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 
 	switch {
 	case irsaTokenFile != "":
-		// IRSA flow: LoadDefaultConfig already loaded IRSA pod credentials.
 		logger.Debug("Switching credentials provider to Identity Federation (IRSA)")
 		step1 = &identityfederation.AWSAssumeRoleStep{
 			RoleARN: globalRoleARN,
@@ -286,7 +263,6 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		}
 
 	default:
-		// OIDC flow: legacy path using JWT file from CLOUD_CONNECTORS_ID_TOKEN_FILE.
 		logger.Debug("Switching credentials provider to Identity Federation (OIDC)")
 		step1 = &identityfederation.AWSWebIdentityRoleStep{
 			RoleARN:              globalRoleARN,

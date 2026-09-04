@@ -105,12 +105,11 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 
 					switch receivedCalls {
 
-					// Step 1: AssumeRoleWithWebIdentity → Elastic Global Role
 					case 1:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRoleWithWebIdentity", q.Get("Action"))
-						assert.Equal(t, "1200", q.Get("DurationSeconds")) // defaultIntermediateDuration
+						assert.Equal(t, "1200", q.Get("DurationSeconds"))
 						assert.Equal(t, globalRoleARN, q.Get("RoleArn"))
 						assert.Equal(t, tokenFileContent, q.Get("WebIdentityToken"))
 						return middleware.FinalizeOutput{
@@ -124,12 +123,11 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 							},
 						}, middleware.Metadata{}, nil
 
-					// Step 2: AssumeRole → customer remote role
 					case 2:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
-						assert.Equal(t, "2700", q.Get("DurationSeconds")) // 45 * time.Minute
+						assert.Equal(t, "2700", q.Get("DurationSeconds"))
 						assert.Equal(t, cloudResourceID+"-"+config.ExternalID, q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
 						return middleware.FinalizeOutput{
@@ -163,8 +161,6 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 	require.Equal(t, 2, receivedCalls)
 }
 
-// TestApplyIdentityFederationChainIRSA exercises the IRSA two-step STS chain:
-// IRSA pod creds → AssumeRole(GlobalRole) → AssumeRole(customer role).
 func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 	config := ConfigAWS{
 		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
@@ -175,9 +171,8 @@ func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 	globalRoleARN := "arn:aws:iam::999999999999:role/elastic-global-role"
 	cloudResourceID := "abcd1234"
 
-	t.Setenv(identityfederation.AWSIRSATokenFileEnvVar, "/var/run/secrets/irsa-token") // trigger IRSA path
+	t.Setenv(identityfederation.AWSIRSATokenFileEnvVar, "/var/run/secrets/irsa-token")
 	t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, globalRoleARN)
-	// AWSIDTokenFileEnvVar intentionally NOT set — IRSA path must not require it
 	t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, cloudResourceID)
 
 	baseConfig := &aws.Config{
@@ -201,12 +196,11 @@ func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 
 					switch receivedCalls {
 
-					// Step 1: AssumeRole → Elastic Global Role (IRSA path, no WebIdentity)
 					case 1:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
-						assert.Equal(t, "1200", q.Get("DurationSeconds")) // defaultIntermediateDuration
+						assert.Equal(t, "1200", q.Get("DurationSeconds"))
 						assert.Equal(t, globalRoleARN, q.Get("RoleArn"))
 						assert.Empty(t, q.Get("WebIdentityToken"), "IRSA step must not use WebIdentity")
 						return middleware.FinalizeOutput{
@@ -220,12 +214,11 @@ func TestApplyIdentityFederationChainIRSA(t *testing.T) {
 							},
 						}, middleware.Metadata{}, nil
 
-					// Step 2: AssumeRole → customer remote role
 					case 2:
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
-						assert.Equal(t, "2700", q.Get("DurationSeconds")) // 45 * time.Minute
+						assert.Equal(t, "2700", q.Get("DurationSeconds"))
 						assert.Equal(t, cloudResourceID+"-"+config.ExternalID, q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
 						return middleware.FinalizeOutput{
@@ -295,8 +288,6 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 		t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
 		// IDTokenFileEnvVar intentionally not set — should not be required in IRSA mode
 
-		// We only check that the error is not about "id token"; the chain itself will
-		// fail later when STS is called, but config validation should pass.
 		err := applyIdentityFederationChain(ConfigAWS{RoleArn: validRoleARN}, &aws.Config{Region: "us-east-1"}, logger)
 		if err != nil {
 			require.NotContains(t, err.Error(), "id token")
@@ -305,8 +296,6 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 
 	t.Run("wii: cert and key files are required and there is no silent legacy fallback", func(t *testing.T) {
 		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "https://wii.example.com")
-		// Legacy env vars are fully configured: the WII path must still be selected
-		// (and fail on the missing cert), never silently fall back to the legacy chain.
 		t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
 		t.Setenv(identityfederation.AWSIDTokenFileEnvVar, "/path/token")
 		t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
@@ -396,16 +385,9 @@ func TestDefaultRegion(t *testing.T) {
 	}
 }
 
-// TestApplyIdentityFederationChainWII exercises the WII direct-trust path: the JWT
-// fetched from the workload-identity issuer is presented straight to the customer's
-// role via a single AssumeRoleWithWebIdentity call — no intermediate Elastic global
-// role, no ExternalID.
 func TestApplyIdentityFederationChainWII(t *testing.T) {
 	const wiiToken = "eyJhbGciOiJSUzI1NiJ9.wii-test.sig" //nolint:gosec // G101: not a credential, an inert JWT-shaped test fixture
 
-	// A self-signed client keypair: the WII test server does not verify it, but the
-	// token source requires the files to exist (mTLS presentation is covered by the
-	// identityfederation package tests).
 	certPEM, keyPEM, err := genSelfSignedClientCert()
 	require.NoError(t, err)
 	tmpDir := t.TempDir()
@@ -425,7 +407,6 @@ func TestApplyIdentityFederationChainWII(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	// Trust the httptest server's self-signed certificate.
 	serverCertPath := path.Join(tmpDir, "wii-server-ca.crt")
 	require.NoError(t, os.WriteFile(serverCertPath, pem.EncodeToMemory(
 		&pem.Block{Type: "CERTIFICATE", Bytes: srv.Certificate().Raw}), 0o600))
@@ -437,7 +418,7 @@ func TestApplyIdentityFederationChainWII(t *testing.T) {
 
 	config := ConfigAWS{
 		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
-		ExternalID:         "external-id-456", // must NOT be sent on the WII path
+		ExternalID:         "external-id-456",
 		AssumeRoleDuration: 45 * time.Minute,
 	}
 
@@ -464,7 +445,7 @@ func TestApplyIdentityFederationChainWII(t *testing.T) {
 					assert.Equal(t, "AssumeRoleWithWebIdentity", q.Get("Action"))
 					assert.Equal(t, config.RoleArn, q.Get("RoleArn"), "the customer role must be assumed directly")
 					assert.Equal(t, wiiToken, q.Get("WebIdentityToken"))
-					assert.Equal(t, "2700", q.Get("DurationSeconds")) // 45 * time.Minute
+					assert.Equal(t, "2700", q.Get("DurationSeconds"))
 					assert.Empty(t, q.Get("ExternalId"), "ExternalID must not be sent on the WII path")
 					return middleware.FinalizeOutput{
 						Result: &sts.AssumeRoleWithWebIdentityOutput{
@@ -492,8 +473,6 @@ func TestApplyIdentityFederationChainWII(t *testing.T) {
 	require.Equal(t, 1, wiiCalls)
 }
 
-// genSelfSignedClientCert returns a PEM-encoded self-signed certificate and key
-// suitable for tls.LoadX509KeyPair in tests.
 func genSelfSignedClientCert() (certPEM, keyPEM []byte, err error) {
 	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {

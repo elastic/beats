@@ -117,7 +117,6 @@ func TestParseWIITokenResponse(t *testing.T) {
 		},
 		{
 			name: "epoch-millis encoding bug is caught by the lifetime ceiling",
-			// epoch millis parsed as epoch seconds lands ~56000 years in the future
 			body:        fmt.Sprintf(`{"token":"eyJx.y.z","expires_at":%d}`, time.Now().UnixMilli()),
 			expectedErr: "exceeds the maximum acceptable lifetime",
 		},
@@ -137,9 +136,6 @@ func TestParseWIITokenResponse(t *testing.T) {
 	}
 }
 
-// wiiTestPKI generates a self-signed CA plus a CA-signed leaf key pair, writes the
-// client cert/key and the CA bundle to disk, and returns everything needed to run
-// an mTLS test server.
 type wiiTestPKI struct {
 	caPEMPath  string
 	certPath   string
@@ -214,8 +210,6 @@ func newWIITestPKI(t *testing.T) wiiTestPKI {
 	}
 }
 
-// newWIITestServer starts an mTLS test server that requires a client certificate
-// signed by the test CA and serves the given handler on /token.
 func newWIITestServer(t *testing.T, pki wiiTestPKI, handler http.HandlerFunc) *httptest.Server {
 	t.Helper()
 	srv := httptest.NewUnstartedServer(handler)
@@ -263,7 +257,6 @@ func TestWIITokenSourceMTLSExchange(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []byte("eyJtest.jwt.value"), token)
 
-	// Second call must be served from the cache — no additional HTTP exchange.
 	token, err = source.GetIdentityToken()
 	require.NoError(t, err)
 	require.Equal(t, []byte("eyJtest.jwt.value"), token)
@@ -277,8 +270,6 @@ func TestWIITokenSourceRefreshesNearExpiry(t *testing.T) {
 	var requests atomic.Int32
 	srv := newWIITestServer(t, pki, func(w http.ResponseWriter, _ *http.Request) {
 		n := requests.Add(1)
-		// Expiry within the refresh margin: the token is valid but must not be cached
-		// beyond the next call.
 		_, _ = w.Write(tokenResponse(fmt.Sprintf("eyJtoken-%d", n), time.Now().Add(wiiRefreshBeforeExpiry/2)))
 	})
 
@@ -333,7 +324,6 @@ func TestWIITokenSourceDoesNotRetryClientErrors(t *testing.T) {
 	require.ErrorContains(t, err, "HTTP 401")
 	require.Equal(t, int32(1), requests.Load(), "4xx responses must not be retried")
 
-	// Failures must not be cached: the next call reaches the server again.
 	_, err = source.GetIdentityToken()
 	require.Error(t, err)
 	require.Equal(t, int32(2), requests.Load())
