@@ -116,7 +116,7 @@ func TestParseWIITokenResponse(t *testing.T) {
 			expectedErr: "is in the past",
 		},
 		{
-			name: "epoch-millis encoding bug is caught by the lifetime ceiling",
+			name:        "epoch-millis encoding bug is caught by the lifetime ceiling",
 			body:        fmt.Sprintf(`{"token":"eyJx.y.z","expires_at":%d}`, time.Now().UnixMilli()),
 			expectedErr: "exceeds the maximum acceptable lifetime",
 		},
