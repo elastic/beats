@@ -63,20 +63,15 @@ List of names the `providers` setting supports:
 
 ## Azure credentials for AKS metadata lookup [_azure_credentials_for_aks_metadata_lookup]
 
-```{applies_to}
-stack: ga 9.1.7+
-serverless: ga
-```
-
 After Azure VM metadata is detected, `add_cloud_metadata` automatically attempts a best-effort lookup through Azure Resource Manager (ARM), even when the VM is not an AKS node. The resulting AKS cluster name and ID fields (`orchestrator.cluster.name` and `orchestrator.cluster.id`) are optional.
 
 If all three of `TENANT_ID`, `CLIENT_ID`, and `CLIENT_SECRET` are set, Beats uses an explicit client secret credential for the ARM lookup. Otherwise, it uses the Azure SDK for Go `DefaultAzureCredential`.
 
-On Windows, development-focused credentials in the bundled default chain may start Azure CLI, Azure Developer CLI, or, when present, Azure PowerShell. `AzurePowerShellCredential`, when included, starts PowerShell with an encoded command.
+On Windows, development-focused credentials in the bundled default chain may start Azure CLI, Azure Developer CLI, or Azure PowerShell. `AzurePowerShellCredential` is in the chain in Beats 9.1.8 and later 9.1 releases, 9.2.2 and later 9.2 releases, and all 9.3 and later releases; when included, it starts PowerShell with an encoded command.
 
-To exclude development credentials, set `AZURE_TOKEN_CREDENTIALS=prod` in the Beat or Elastic Agent process environment and restart the process. This retains `EnvironmentCredential`, `WorkloadIdentityCredential`, and `ManagedIdentityCredential` while excluding developer credentials. For details, see Microsoft's guidance on [excluding a credential type category](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/credential-chains#exclude-a-credential-type-category). For Elastic Agent environment variable locations, see [Where to set proxy environment variables](https://www.elastic.co/docs/reference/fleet/host-proxy-env-vars#where-to-set-proxy-env-vars).
+{applies_to}`stack: ga 9.1.3+` {applies_to}`serverless: ga` To exclude development credentials, set `AZURE_TOKEN_CREDENTIALS=prod` in the Beat or Elastic Agent process environment and restart the process. This retains `EnvironmentCredential`, `WorkloadIdentityCredential`, and `ManagedIdentityCredential` while excluding developer credentials. For details, see Microsoft's guidance on [excluding a credential type category](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/credential-chains#exclude-a-credential-type-category). For Elastic Agent environment variable locations, see [Where to set proxy environment variables](https://www.elastic.co/docs/reference/fleet/host-proxy-env-vars#where-to-set-proxy-env-vars).
 
-`AZURE_TOKEN_CREDENTIALS` applies process-wide to all uses of `DefaultAzureCredential`. It does not disable Azure metadata detection or the AKS lookup, and any retained credential can still call ARM. To prevent the lookup, exclude `azure` with the `providers` option; this also removes basic Azure VM metadata.
+{applies_to}`stack: ga 9.1.3+` {applies_to}`serverless: ga` `AZURE_TOKEN_CREDENTIALS` applies process-wide to all uses of `DefaultAzureCredential`. It does not disable Azure metadata detection or the AKS lookup, and any retained credential can still call ARM. To prevent the lookup, exclude `azure` with the `providers` option; this also removes basic Azure VM metadata.
 
 For example, configuration below only utilize `aws` metadata retrieval mechanism,
 
