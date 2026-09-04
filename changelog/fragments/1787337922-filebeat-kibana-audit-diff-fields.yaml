@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add index mappings for the `kibana.diff` fields emitted by Kibana saved object audit events, leaving variable-shape `ops.value`/`ops.oldValue` unmapped (`dynamic: false`) so mixed JSON types cannot cause mapping conflicts.
+component: filebeat
