@@ -217,7 +217,7 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		if config.RoleArn == "" {
 			return fmt.Errorf("role_arn is required for WII identity federation")
 		}
-		tokenSource, err := identityfederation.NewWIITokenSource(wiiIssuerURL, wiiCertFile, wiiKeyFile, "sts.amazonaws.com")
+		tokenSource, err := identityfederation.NewWIITokenSource(wiiIssuerURL, wiiCertFile, wiiKeyFile, "sts.amazonaws.com", logger)
 		if err != nil {
 			return fmt.Errorf("configuring WII token source: %w", err)
 		}

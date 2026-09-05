@@ -21,6 +21,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -50,13 +52,14 @@ type WIITokenSource struct {
 	certFile      string
 	keyFile       string
 	audience      string
+	logger        *logp.Logger
 
 	mu           sync.Mutex
 	cachedToken  []byte
 	cachedExpiry time.Time
 }
 
-func NewWIITokenSource(issuerURL, certFile, keyFile, audience string) (*WIITokenSource, error) {
+func NewWIITokenSource(issuerURL, certFile, keyFile, audience string, logger *logp.Logger) (*WIITokenSource, error) {
 	endpoint, err := resolveWIITokenEndpoint(issuerURL)
 	if err != nil {
 		return nil, err
@@ -66,6 +69,7 @@ func NewWIITokenSource(issuerURL, certFile, keyFile, audience string) (*WIIToken
 		certFile:      certFile,
 		keyFile:       keyFile,
 		audience:      audience,
+		logger:        logger.Named("wii"),
 	}, nil
 }
 
@@ -86,6 +90,9 @@ func resolveWIITokenEndpoint(issuerURL string) (string, error) {
 	if parsed.RawQuery != "" || parsed.Fragment != "" {
 		return "", fmt.Errorf("workload-identity issuer URL %q must not include a query string or fragment", issuerURL)
 	}
+	if strings.HasSuffix(strings.TrimRight(parsed.Path, "/"), "/token") {
+		return "", fmt.Errorf("workload-identity issuer URL %q must be the base URL; omit the /token path suffix", issuerURL)
+	}
 	return strings.TrimRight(issuerURL, "/") + "/token", nil
 }
 
@@ -99,6 +106,13 @@ func (w *WIITokenSource) GetIdentityToken() ([]byte, error) {
 
 	token, expiresAt, err := w.fetchTokenWithRetry()
 	if err != nil {
+		// Fall back to the cached token if it has not yet hard-expired. The refresh
+		// will be retried on the next call.
+		if w.cachedToken != nil && time.Now().Before(w.cachedExpiry) {
+			w.logger.Warnf("workload-identity token refresh failed; using cached token until %s: %v",
+				w.cachedExpiry.UTC().Format(time.RFC3339), err)
+			return w.cachedToken, nil
+		}
 		return nil, err
 	}
 	w.cachedToken = token

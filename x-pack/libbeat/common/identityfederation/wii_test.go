@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestResolveWIITokenEndpoint(t *testing.T) {
@@ -63,6 +65,21 @@ func TestResolveWIITokenEndpoint(t *testing.T) {
 			name:        "query string is rejected",
 			issuerURL:   "https://issuer.example.com?region=eu",
 			expectedErr: "must not include a query string or fragment",
+		},
+		{
+			name:        "URL ending in /token is rejected",
+			issuerURL:   "https://issuer.example.com/token",
+			expectedErr: "omit the /token path suffix",
+		},
+		{
+			name:        "URL ending in /token/ is rejected",
+			issuerURL:   "https://issuer.example.com/token/",
+			expectedErr: "omit the /token path suffix",
+		},
+		{
+			name:      "subpath without /token is accepted",
+			issuerURL: "https://proxy.example.com/wii",
+			expected:  "https://proxy.example.com/wii/token",
 		},
 	}
 
@@ -250,7 +267,7 @@ func TestWIITokenSourceMTLSExchange(t *testing.T) {
 		_, _ = w.Write(tokenResponse("eyJtest.jwt.value", time.Now().Add(time.Hour)))
 	})
 
-	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com")
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	token, err := source.GetIdentityToken()
@@ -273,7 +290,7 @@ func TestWIITokenSourceRefreshesNearExpiry(t *testing.T) {
 		_, _ = w.Write(tokenResponse(fmt.Sprintf("eyJtoken-%d", n), time.Now().Add(wiiRefreshBeforeExpiry/2)))
 	})
 
-	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com")
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	token, err := source.GetIdentityToken()
@@ -298,7 +315,7 @@ func TestWIITokenSourceRetriesTransientErrors(t *testing.T) {
 		_, _ = w.Write(tokenResponse("eyJrecovered", time.Now().Add(time.Hour)))
 	})
 
-	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com")
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	token, err := source.GetIdentityToken()
@@ -317,7 +334,7 @@ func TestWIITokenSourceDoesNotRetryClientErrors(t *testing.T) {
 		w.WriteHeader(http.StatusUnauthorized)
 	})
 
-	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com")
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	_, err = source.GetIdentityToken()
@@ -327,6 +344,33 @@ func TestWIITokenSourceDoesNotRetryClientErrors(t *testing.T) {
 	_, err = source.GetIdentityToken()
 	require.Error(t, err)
 	require.Equal(t, int32(2), requests.Load())
+}
+
+func TestWIITokenSourceServesCachedTokenOnRefreshFailure(t *testing.T) {
+	pki := newWIITestPKI(t)
+	t.Setenv(WIISSLCAFileEnvVar, pki.caPEMPath)
+
+	var requests atomic.Int32
+	srv := newWIITestServer(t, pki, func(w http.ResponseWriter, _ *http.Request) {
+		n := requests.Add(1)
+		if n == 1 {
+			_, _ = w.Write(tokenResponse("eyJcached-token", time.Now().Add(wiiRefreshBeforeExpiry/2)))
+			return
+		}
+		w.WriteHeader(http.StatusServiceUnavailable)
+	})
+
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	token, err := source.GetIdentityToken()
+	require.NoError(t, err)
+	require.Equal(t, []byte("eyJcached-token"), token)
+
+	// Refresh attempt fails (503), but cached token has not hard-expired yet — must not error.
+	token, err = source.GetIdentityToken()
+	require.NoError(t, err)
+	require.Equal(t, []byte("eyJcached-token"), token, "cached token must be returned when refresh fails but token is still valid")
 }
 
 func TestWIITokenSourcePicksUpRotatedCert(t *testing.T) {
@@ -339,7 +383,7 @@ func TestWIITokenSourcePicksUpRotatedCert(t *testing.T) {
 		_, _ = w.Write(tokenResponse(fmt.Sprintf("eyJtoken-%d", n), time.Now().Add(wiiRefreshBeforeExpiry/2)))
 	})
 
-	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com")
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	_, err = source.GetIdentityToken()
@@ -356,6 +400,9 @@ func TestWIITokenSourcePicksUpRotatedCert(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(pki.certPath, certPEM, 0o600)) //nolint:gosec // G703: test-owned temp file
 	require.NoError(t, os.WriteFile(pki.keyPath, keyPEM, 0o600))   //nolint:gosec // G703: test-owned temp file
+
+	// Expire the cache so the stale-token fallback does not mask the TLS error.
+	source.cachedExpiry = time.Now().Add(-time.Second)
 
 	_, err = source.GetIdentityToken()
 	require.Error(t, err, "a rotated (untrusted) cert must be presented on the next fetch")
