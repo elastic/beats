@@ -210,7 +210,7 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	wiiKeyFile := os.Getenv(identityfederation.WIISSLKeyFileEnvVar)
 
 	if wiiIssuerURL != "" {
-		logger.Debug("Switching credentials provider to Identity Federation (WII)")
+		logger.Info("Switching credentials provider to Identity Federation (WII)")
 		if wiiCertFile == "" || wiiKeyFile == "" {
 			return fmt.Errorf("WORKLOAD_IDENTITY_SSL_CERT_FILE and WORKLOAD_IDENTITY_SSL_KEY_FILE must be set when WORKLOAD_IDENTITY_ISSUER_URL is configured")
 		}
@@ -275,7 +275,7 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	case irsaTokenFile != "":
 		// IRSA flow: LoadDefaultConfig already loaded IRSA pod credentials via
 		// AWS_WEB_IDENTITY_TOKEN_FILE/AWS_ROLE_ARN. Use AssumeRole directly.
-		logger.Debug("Switching credentials provider to Identity Federation (IRSA)")
+		logger.Info("Switching credentials provider to Identity Federation (IRSA)")
 		step1 = &identityfederation.AWSAssumeRoleStep{
 			RoleARN: globalRoleARN,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
@@ -286,7 +286,7 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	default:
 		// OIDC flow: assume the Elastic Global Role with web identity using the ID token
 		// provided by the agentless OIDC issuer.
-		logger.Debug("Switching credentials provider to Identity Federation (OIDC)")
+		logger.Info("Switching credentials provider to Identity Federation (OIDC)")
 		step1 = &identityfederation.AWSWebIdentityRoleStep{
 			RoleARN:              globalRoleARN,
 			WebIdentityTokenFile: idTokenPath,
