@@ -177,7 +177,9 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 		return fmt.Errorf("error collecting host info: %w", err)
 	}
 
-	hostname := h.Info().Hostname
+	hInfo := h.Info()
+	hostname := hInfo.Hostname
+
 	if useFQDN {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
@@ -198,7 +200,14 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 		}
 	}
 
-	data := host.MapHostInfo(h.Info(), hostname)
+	data := host.MapHostInfo(hInfo, hostname)
+
+	if override := beat.GetHostnameOverride(); override != "" {
+		if _, err := data.Put("host.name", override); err != nil {
+			return fmt.Errorf("could not set host.name override: %w", err)
+		}
+	}
+
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
