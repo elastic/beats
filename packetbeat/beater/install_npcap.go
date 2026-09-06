@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/packetbeat/npcap"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -119,7 +120,7 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C, log *logp.Logger) (bool, erro
 	}
 
 	// Agent managed case.
-	if b.Manager.Enabled() {
+	if management.UnderAgent() {
 		var cfg struct {
 			Streams []npcapInstallCfg `config:"streams"`
 		}
