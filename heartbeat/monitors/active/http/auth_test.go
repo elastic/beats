@@ -56,6 +56,10 @@ func TestConfigAuthMutualExclusivity(t *testing.T) {
 			cfg:     Config{Hosts: []string{"http://x"}, Username: "u", Password: "p", NTLM: &NTLMConfig{Enabled: &enabled, Username: `D\u`, Password: "p"}},
 			wantErr: true,
 		},
+		"password-only basic + kerberos": {
+			cfg:     Config{Hosts: []string{"http://x"}, Password: "p", Kerberos: kerberosTestConfig()},
+			wantErr: true,
+		},
 		"kerberos + ntlm": {
 			cfg:     Config{Hosts: []string{"http://x"}, Kerberos: kerberosTestConfig(), NTLM: &NTLMConfig{Enabled: &enabled, Username: `D\u`, Password: "p"}},
 			wantErr: true,
