@@ -145,6 +145,15 @@ func TestNativePlannedScheduleTime(t *testing.T) {
 	}
 }
 
+func TestShouldLogClockSkewWarnOncePerSchedule(t *testing.T) {
+	bt := &osquerybeat{}
+
+	assert.True(t, bt.shouldLogClockSkewWarn("pack_query_a"), "the first clamp for a schedule should be logged")
+	assert.False(t, bt.shouldLogClockSkewWarn("pack_query_a"), "repeat clamps for the same schedule should be suppressed")
+	assert.True(t, bt.shouldLogClockSkewWarn("pack_query_b"), "the first clamp for a different schedule should still be logged")
+	assert.False(t, bt.shouldLogClockSkewWarn("pack_query_b"), "repeat clamps for the second schedule should be suppressed")
+}
+
 func TestNativeScheduleTimingClockSkew(t *testing.T) {
 	startDate := "2024-01-01T05:00:00Z"
 	runTime := time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC)

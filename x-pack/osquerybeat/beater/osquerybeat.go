@@ -91,6 +91,11 @@ type osquerybeat struct {
 	cancel context.CancelFunc
 	mx     sync.Mutex
 
+	// clockSkewWarnLogged latches the pre-start clamp warning to once per
+	// schedule name. handleQueryResult runs per result document, so without
+	// this a persistently skewed agent would warn on every snapshot/diff hit.
+	clockSkewWarnLogged map[string]struct{}
+
 	diagMx          sync.RWMutex
 	diagQueryExec   queryExecutor
 	diagExtensions  config.ExtensionsConfig
@@ -779,6 +784,22 @@ func nativePlannedScheduleTime(startDateRFC3339 string, intervalSecs int, runTim
 	return plannedScheduleTime
 }
 
+// shouldLogClockSkewWarn reports whether a clock-skew clamp warning should be
+// emitted for scheduleName. The first call for a name returns true; later
+// calls for the same name return false.
+func (bt *osquerybeat) shouldLogClockSkewWarn(scheduleName string) bool {
+	bt.mx.Lock()
+	defer bt.mx.Unlock()
+	if bt.clockSkewWarnLogged == nil {
+		bt.clockSkewWarnLogged = make(map[string]struct{})
+	}
+	if _, logged := bt.clockSkewWarnLogged[scheduleName]; logged {
+		return false
+	}
+	bt.clockSkewWarnLogged[scheduleName] = struct{}{}
+	return true
+}
+
 func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
 	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
@@ -804,7 +825,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	responseID := uuid.Must(uuid.NewV4()).String()
 	runTime := time.Unix(res.UnixTime, 0).UTC()
 	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
-	if clockSkewClamped {
+	if clockSkewClamped && bt.shouldLogClockSkewWarn(res.Name) {
 		bt.log.Warnf(
 			"Native scheduled query %q reported run time %s before start_date %s; possible clock skew, clamping to execution 1",
 			res.Name,
