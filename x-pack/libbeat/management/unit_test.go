@@ -276,6 +276,49 @@ func TestUnitUpdatePayloadStreamsSerializable(t *testing.T) {
 	assert.NoError(t, err, "forwarded payload must be serializable by structpb.NewStruct")
 }
 
+func TestStreamUpdateRetainsInputPayload(t *testing.T) {
+	mock := &mockClientUnit{
+		expected: client.Expected{
+			Config: &proto.UnitExpectedConfig{
+				Id: "input-with-stream",
+				Streams: []*proto.Stream{
+					{Id: "stream-1"},
+				},
+			},
+		},
+	}
+	unit := newAgentUnit(mock, nil)
+	scheduler := map[string]any{"jobs": 3}
+	payload := map[string]any{
+		"heartbeat": map[string]any{
+			"scheduler": scheduler,
+		},
+	}
+
+	err := unit.UpdateState(status.Running, "Healthy", payload)
+	assert.NoError(t, err, "input-level UpdateState should succeed")
+
+	scheduler["jobs"] = 999
+	unit.updateStateForStream("stream-1", status.Running, "Healthy")
+
+	assert.Equal(t, 2, mock.updateCalls, "stream update should forward a second payload")
+	heartbeat, ok := mock.reportedPayload["heartbeat"].(map[string]any)
+	assert.True(t, ok, "heartbeat telemetry should remain map[string]any")
+	reportedScheduler, ok := heartbeat["scheduler"].(map[string]any)
+	assert.True(t, ok, "scheduler telemetry should remain map[string]any")
+	assert.Equal(t, 3, reportedScheduler["jobs"], "stream update should retain the snapshotted scheduler value")
+
+	streams, ok := mock.reportedPayload["streams"].(map[string]any)
+	assert.True(t, ok, "stream update should include streams")
+	assert.Equal(t, map[string]any{
+		"status": client.UnitStateHealthy.String(),
+		"error":  "Healthy",
+	}, streams["stream-1"], "stream update should include the latest stream state")
+
+	_, err = structpb.NewStruct(mock.reportedPayload)
+	assert.NoError(t, err, "merged stream payload must be serializable by structpb.NewStruct")
+}
+
 type mockClientUnit struct {
 	expected        client.Expected
 	reportedState   client.UnitState

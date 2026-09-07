@@ -270,7 +270,7 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 
 	state, msg = u.calcState()
 
-	forwardPayload := payload
+	forwardPayload := clonePayload(payload)
 	if u.clientUnit.Type() != client.UnitTypeOutput && len(u.streamStates) > 0 {
 		streamsPayload := make(map[string]any, len(u.streamStates))
 
@@ -283,12 +283,6 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 
 		if forwardPayload == nil {
 			forwardPayload = make(map[string]any)
-		} else {
-			shallow := make(map[string]any, len(forwardPayload)+1)
-			for k, v := range forwardPayload {
-				shallow[k] = v
-			}
-			forwardPayload = shallow
 		}
 
 		forwardPayload["streams"] = streamsPayload
@@ -298,11 +292,7 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 		return err
 	}
 
-	if payload == nil {
-		u.inputLevelPayload = nil
-	} else {
-		u.inputLevelPayload = map[string]any(mapstr.M(payload).Clone())
-	}
+	u.inputLevelPayload = clonePayload(payload)
 
 	return nil
 }
@@ -315,7 +305,36 @@ func inputPayloadsEqual(stored, incoming map[string]any) bool {
 		return false
 	}
 
-	return reflect.DeepEqual(stored, map[string]any(mapstr.M(incoming).Clone()))
+	return reflect.DeepEqual(stored, clonePayload(incoming))
+}
+
+func clonePayload(payload map[string]any) map[string]any {
+	if payload == nil {
+		return nil
+	}
+
+	cloned := make(map[string]any, len(payload))
+	for key, value := range payload {
+		cloned[key] = clonePayloadValue(value)
+	}
+	return cloned
+}
+
+func clonePayloadValue(value any) any {
+	switch value := value.(type) {
+	case mapstr.M:
+		return clonePayload(map[string]any(value))
+	case map[string]any:
+		return clonePayload(value)
+	case []any:
+		cloned := make([]any, len(value))
+		for i, item := range value {
+			cloned[i] = clonePayloadValue(item)
+		}
+		return cloned
+	default:
+		return value
+	}
 }
 
 // updateStateForStream updates the state for a specific stream in the agent unit.
@@ -351,9 +370,11 @@ func (u *agentUnit) updateStateForStream(streamID string, state status.Status, m
 		}
 	}
 
-	payload := map[string]any{
-		"streams": streamsPayload,
+	payload := clonePayload(u.inputLevelPayload)
+	if payload == nil {
+		payload = make(map[string]any)
 	}
+	payload["streams"] = streamsPayload
 
 	if err := u.clientUnit.UpdateState(getUnitState(state), msg, payload); err != nil {
 		u.logger.Warnf("failed to update state for input %s: %v", u.ID(), err)
