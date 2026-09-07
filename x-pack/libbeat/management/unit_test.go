@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 )
@@ -181,19 +182,86 @@ func TestUnitUpdate(t *testing.T) {
 	}
 }
 
+func TestUnitUpdatePayload(t *testing.T) {
+	mock := &mockClientUnit{
+		expected: client.Expected{
+			Config: &proto.UnitExpectedConfig{
+				Id: "input-1",
+			},
+		},
+	}
+	unit := newAgentUnit(mock, nil)
+
+	payloadA := map[string]any{
+		"telemetry": map[string]any{"jobs": 1},
+	}
+	payloadB := map[string]any{
+		"telemetry": map[string]any{"jobs": 2},
+	}
+
+	err := unit.UpdateState(status.Running, "Healthy", payloadA)
+	assert.NoError(t, err, "first UpdateState should succeed")
+
+	err = unit.UpdateState(status.Running, "Healthy", payloadB)
+	assert.NoError(t, err, "second UpdateState with different payload should succeed")
+
+	assert.Equal(t, 2, mock.updateCalls, "different payload with same status should forward a second update")
+	assert.Equal(t, payloadB, mock.reportedPayload, "client should receive the latest payload")
+
+	payloadBEqual := map[string]any{
+		"telemetry": map[string]any{"jobs": 2},
+	}
+	err = unit.UpdateState(status.Running, "Healthy", payloadBEqual)
+	assert.NoError(t, err, "third UpdateState with equal payload should succeed")
+
+	assert.Equal(t, 2, mock.updateCalls, "equal payload with same status should be suppressed")
+
+	nested := map[string]any{"jobs": 1}
+	payloadWithNested := map[string]any{"telemetry": nested}
+	mockMutation := &mockClientUnit{
+		expected: client.Expected{
+			Config: &proto.UnitExpectedConfig{
+				Id: "input-mutation",
+			},
+		},
+	}
+	mutationUnit := newAgentUnit(mockMutation, nil)
+
+	err = mutationUnit.UpdateState(status.Running, "Healthy", payloadWithNested)
+	assert.NoError(t, err, "initial UpdateState should succeed")
+
+	nested["jobs"] = 999
+
+	payloadUnchanged := map[string]any{
+		"telemetry": map[string]any{"jobs": 1},
+	}
+	err = mutationUnit.UpdateState(status.Running, "Healthy", payloadUnchanged)
+	assert.NoError(t, err, "UpdateState with original payload values should succeed")
+
+	assert.Equal(t, 1, mockMutation.updateCalls, "mutating caller map must not alter stored comparison snapshot")
+}
+
 type mockClientUnit struct {
-	expected      client.Expected
-	reportedState client.UnitState
-	reportedMsg   string
+	expected        client.Expected
+	reportedState   client.UnitState
+	reportedMsg     string
+	reportedPayload map[string]any
+	updateCalls     int
 }
 
 func (u *mockClientUnit) Expected() client.Expected {
 	return u.expected
 }
 
-func (u *mockClientUnit) UpdateState(state client.UnitState, msg string, _ map[string]any) error {
+func (u *mockClientUnit) UpdateState(
+	state client.UnitState,
+	msg string,
+	payload map[string]any,
+) error {
 	u.reportedState = state
 	u.reportedMsg = msg
+	u.reportedPayload = payload
+	u.updateCalls++
 	return nil
 }
 

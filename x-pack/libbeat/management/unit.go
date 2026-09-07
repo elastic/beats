@@ -6,11 +6,13 @@ package management
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // unitState is the current state of a unit
@@ -33,13 +35,14 @@ type clientUnit interface {
 // for the input as well as a unitState for each stream of
 // the input in when this a client.UnitTypeInput.
 type agentUnit struct {
-	softDeleted     bool
-	mtx             sync.Mutex
-	logger          *logp.Logger
-	clientUnit      clientUnit
-	inputLevelState unitState
-	streamIDs       []string
-	streamStates    map[string]unitState
+	softDeleted       bool
+	mtx               sync.Mutex
+	logger            *logp.Logger
+	clientUnit        clientUnit
+	inputLevelState   unitState
+	inputLevelPayload map[string]any
+	streamIDs         []string
+	streamStates      map[string]unitState
 }
 
 // getUnitState converts status.Status to client.UnitState
@@ -256,7 +259,7 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 		return nil
 	}
 
-	if u.inputLevelState.state == state && u.inputLevelState.msg == msg {
+	if u.inputLevelState.state == state && u.inputLevelState.msg == msg && inputPayloadsEqual(u.inputLevelPayload, payload) {
 		return nil
 	}
 
@@ -267,26 +270,48 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 
 	state, msg = u.calcState()
 
-	if u.clientUnit.Type() == client.UnitTypeOutput || len(u.streamStates) == 0 {
-		return u.clientUnit.UpdateState(getUnitState(state), msg, payload)
+	forwardPayload := payload
+	if u.clientUnit.Type() != client.UnitTypeOutput && len(u.streamStates) > 0 {
+		streamsPayload := make(map[string]any, len(u.streamStates))
+
+		for streamID, streamState := range u.streamStates {
+			streamsPayload[streamID] = map[string]any{
+				"status": getUnitState(streamState.state).String(),
+				"error":  streamState.msg,
+			}
+		}
+
+		if forwardPayload == nil {
+			forwardPayload = make(map[string]any)
+		} else {
+			forwardPayload = mapstr.M(forwardPayload).Clone()
+		}
+
+		forwardPayload["streams"] = streamsPayload
 	}
 
-	streamsPayload := make(map[string]any, len(u.streamStates))
-
-	for streamID, streamState := range u.streamStates {
-		streamsPayload[streamID] = map[string]any{
-			"status": getUnitState(streamState.state).String(),
-			"error":  streamState.msg,
-		}
+	if err := u.clientUnit.UpdateState(getUnitState(state), msg, forwardPayload); err != nil {
+		return err
 	}
 
 	if payload == nil {
-		payload = make(map[string]any)
+		u.inputLevelPayload = nil
+	} else {
+		u.inputLevelPayload = map[string]any(mapstr.M(payload).Clone())
 	}
 
-	payload["streams"] = streamsPayload
+	return nil
+}
 
-	return u.clientUnit.UpdateState(getUnitState(state), msg, payload)
+func inputPayloadsEqual(stored, incoming map[string]any) bool {
+	if stored == nil && incoming == nil {
+		return true
+	}
+	if stored == nil || incoming == nil {
+		return false
+	}
+
+	return reflect.DeepEqual(stored, map[string]any(mapstr.M(incoming).Clone()))
 }
 
 // updateStateForStream updates the state for a specific stream in the agent unit.
