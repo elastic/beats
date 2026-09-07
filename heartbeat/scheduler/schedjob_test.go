@@ -83,7 +83,7 @@ func TestSchedJobRun(t *testing.T) {
 
 			beforeStart := time.Now()
 			sj := newSchedJob(testCase.jobCtx, s, "myid", "atype", tf, logptest.NewTestingLogger(t, ""))
-			startedAt := sj.run()
+			startedAt, taskStarted := sj.run()
 
 			// This will panic in the case where we don't check s.limitSem.Acquire
 			// for an error value and released an unacquired resource in scheduler.go.
@@ -94,6 +94,8 @@ func TestSchedJobRun(t *testing.T) {
 			}
 
 			require.Equal(t, testCase.shouldRunTask, executed.Load())
+			require.Equal(t, testCase.shouldRunTask, taskStarted,
+				"task-start signal should match task body execution")
 			require.True(t, startedAt.Equal(beforeStart) || startedAt.After(beforeStart))
 		})
 	}

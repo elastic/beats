@@ -257,8 +257,9 @@ func TestCanceledJobDoesNotRecordScheduleDelay(t *testing.T) {
 		require.FailNow(t, "first job should start before scheduling the canceled job")
 	}
 
+	secondExecuted := make(chan struct{}, 1)
 	removeSecond, err := s.Add(testSchedule{delay: time.Hour}, nil, "second", func(context.Context) []TaskFunc {
-		require.Fail(t, "canceled job should not execute")
+		secondExecuted <- struct{}{}
 		return nil
 	}, jobType)
 	require.NoError(t, err, "second job should be added")
@@ -279,8 +280,44 @@ func TestCanceledJobDoesNotRecordScheduleDelay(t *testing.T) {
 		require.FailNow(t, "first job should finish after release")
 	}
 
+	select {
+	case <-secondExecuted:
+		assert.Fail(t, "canceled job should not execute")
+	default:
+	}
 	assert.Equal(t, uint64(0), s.Status().Jobs[jobType].ScheduleDelay.Count,
 		"canceled job should not record schedule delay")
+}
+
+func TestStartedCanceledJobRecordsScheduleDelay(t *testing.T) {
+	const jobType = "browser"
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false, logptest.NewTestingLogger(t, ""))
+	defer s.Stop()
+
+	taskEntered := make(chan struct{})
+	releaseTask := make(chan struct{})
+	scheduledAt := time.Now().Add(50 * time.Millisecond)
+	remove, err := s.Add(&scheduledOnce{runAt: scheduledAt}, nil, "started", func(context.Context) []TaskFunc {
+		close(taskEntered)
+		<-releaseTask
+		return nil
+	}, jobType)
+	require.NoError(t, err, "job should be added")
+
+	select {
+	case <-taskEntered:
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "scheduled job should enter its task body")
+	}
+	remove()
+	close(releaseTask)
+	require.Eventually(t, func() bool {
+		return s.stats.activeJobs.Get() == 0
+	}, 5*time.Second, 10*time.Millisecond,
+		"started job should finish after release")
+
+	assert.Equal(t, uint64(1), s.Status().Jobs[jobType].ScheduleDelay.Count,
+		"job canceled after its task body starts should record schedule delay")
 }
 
 func TestMaintenanceWindowSkipDoesNotRecordScheduleDelay(t *testing.T) {

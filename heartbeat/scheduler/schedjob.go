@@ -40,9 +40,6 @@ type schedJob struct {
 	logger       *logp.Logger
 }
 
-// runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
-// Subtasks are run in separate goroutines.
-// returns the time execution began on its first task
 func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, task TaskFunc, logger *logp.Logger) *schedJob {
 	return &schedJob{
 		id:           id,
@@ -56,18 +53,16 @@ func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, t
 	}
 }
 
-// runRecursiveTask runs an individual task and its continuations until none are left with as much parallelism as possible.
-// Since task funcs can emit continuations recursively we need a function to execute
-// recursively.
-// The wait group passed into this function expects to already have its count incremented by one.
-func (sj *schedJob) run() (startedAt time.Time) {
+// run blocks until the entrypoint and all continuations complete.
+// taskStarted reports whether the entrypoint body ran.
+func (sj *schedJob) run() (startedAt time.Time, taskStarted bool) {
 	if sj.jobLimitSem != nil {
 		sj.jobTypeStats.waiting.Add(1)
 		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
 		sj.jobTypeStats.waiting.Add(-1)
 		if err != nil {
 			sj.logger.Errorf("could not acquire semaphore: %v", err)
-			return time.Now()
+			return time.Now(), false
 		}
 		defer sj.jobLimitSem.Release(1)
 	}
@@ -77,16 +72,16 @@ func (sj *schedJob) run() (startedAt time.Time) {
 
 	sj.wg.Add(1)
 	sj.activeTasks.Add(1)
-	startedAt = sj.runTask(sj.entrypoint, true)
+	startedAt, taskStarted = sj.runTask(sj.entrypoint, true)
 	sj.wg.Wait()
-	return startedAt
+	return startedAt, taskStarted
 }
 
 // runRecursiveTask runs an individual task and its continuations until none are left with as much parallelism as possible.
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
-func (sj *schedJob) runTask(task TaskFunc, countRun bool) time.Time {
+func (sj *schedJob) runTask(task TaskFunc, countRun bool) (time.Time, bool) {
 	defer sj.wg.Done()
 	defer sj.activeTasks.Add(-1)
 
@@ -111,7 +106,7 @@ func (sj *schedJob) runTask(task TaskFunc, countRun bool) time.Time {
 	// Check if the scheduler has been shut down. If so, exit early
 	select {
 	case <-sj.ctx.Done():
-		return startedAt
+		return startedAt, false
 	default:
 		sj.scheduler.stats.activeTasks.Inc()
 
@@ -131,5 +126,5 @@ func (sj *schedJob) runTask(task TaskFunc, countRun bool) time.Time {
 		}
 	}
 
-	return startedAt
+	return startedAt, true
 }

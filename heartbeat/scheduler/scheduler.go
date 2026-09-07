@@ -215,8 +215,8 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 
 		var lastRanAt time.Time
 		if activeMainWin == nil {
-			startedAt := sj.run()
-			if jobCtx.Err() == nil {
+			startedAt, taskStarted := sj.run()
+			if taskStarted {
 				sj.jobTypeStats.recordDelay(startedAt.Sub(scheduledAt))
 			}
 			lastRanAt = startedAt
