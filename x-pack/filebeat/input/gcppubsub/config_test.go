@@ -11,8 +11,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 //nolint:gosec // false positive
@@ -38,12 +39,12 @@ func TestConfigValidateGoogleAppDefaultCreds(t *testing.T) {
 }
 
 func TestConfigAPIEndpoint(t *testing.T) {
-	cfg, err := conf.NewConfigFrom(map[string]interface{}{
+	cfg, err := conf.NewConfigFrom(map[string]any{
 		"project_id":       "test-project",
 		"topic":            "test-topic",
-		"subscription":     map[string]interface{}{"name": "test-sub"},
+		"subscription":     map[string]any{"name": "test-sub"},
 		"api_endpoint":     "custom-endpoint.googleapis.com:443",
-		"credentials_file": filepath.Clean("testdata/fake.json"),
+		"credentials_file": "testdata/fake.json",
 	})
 	assert.NoError(t, err, "failed to create config from map")
 

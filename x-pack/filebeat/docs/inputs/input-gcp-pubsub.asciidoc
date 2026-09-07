@@ -110,6 +110,22 @@ filebeat.inputs:
   proxy_url: http://proxy.example:8080
 ----
 
+[float]
+==== `api_endpoint`
+
+Optional Google Cloud Pub/Sub API endpoint to connect to. When specified, Filebeat
+connects to this endpoint instead of the default `pubsub.googleapis.com:443`.
+This is useful for connecting through Private Service Connect (PSC), custom
+Universe Domains, or reverse proxies.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: gcp-pubsub
+  . . .
+  api_endpoint: custom-pubsub-endpoint.googleapis.com:443
+----
+
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
