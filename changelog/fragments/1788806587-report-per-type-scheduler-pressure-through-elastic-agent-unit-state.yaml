@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Report per-type scheduler pressure through Elastic Agent unit state
+component: heartbeat
