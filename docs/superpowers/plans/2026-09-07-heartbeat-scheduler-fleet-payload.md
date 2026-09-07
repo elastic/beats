@@ -395,14 +395,28 @@ Test a pure payload builder against:
 ```go
 map[string]any{
 	"heartbeat": map[string]any{
-		"scheduler": scheduler.Status{
-			Jobs: map[string]scheduler.JobTypeStatus{
-				"browser": {Limit: 2},
+		"scheduler": map[string]any{
+			"jobs": map[string]any{
+				"browser": map[string]any{
+					"limit":   int64(2),
+					"running": int64(0),
+					"waiting": int64(0),
+					"runs":    uint64(0),
+					"schedule_delay": map[string]any{
+						"count":    uint64(0),
+						"total_ms": uint64(0),
+						"max_ms":   uint64(0),
+					},
+				},
 			},
 		},
 	},
 }
 ```
+
+Build plain JSON-compatible maps rather than placing `scheduler.Status` structs
+in the payload because `structpb.NewStruct` does not accept arbitrary Go
+structs.
 
 - [ ] **Step 2: Run and verify RED**
 
