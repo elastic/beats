@@ -38,14 +38,11 @@ type Config struct {
 
 	Mode monitors.IPSettings `config:",inline"`
 
-	// authentication
+	// Basic authentication
 	Username string `config:"username"`
 	Password string `config:"password"`
 
-	// Kerberos/SPNEGO (Negotiate) authentication. Reuses the shared Beats
-	// Kerberos client configuration so it matches the Elasticsearch/Kafka
-	// outputs. Only usable from on-prem/Private Location agents that can reach
-	// the KDC.
+	// Kerberos/SPNEGO (Negotiate) authentication.
 	Kerberos *kerberos.Config `config:"kerberos"`
 
 	// NTLM (Integrated Windows Authentication) authentication.
@@ -223,7 +220,7 @@ func (c *Config) Validate() error {
 	// Only a single authentication scheme can be active at once: basic
 	// (username/password), Kerberos, or NTLM.
 	authMethods := 0
-	if c.Username != "" {
+	if c.Username != "" || c.Password != "" {
 		authMethods++
 	}
 	if c.Kerberos.IsEnabled() {
