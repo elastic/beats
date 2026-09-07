@@ -816,7 +816,7 @@ logging.level: debug
 	require.NoError(t, err, "could not write gzip file to disk")
 
 	// wait filebeat to pick up the file and see it's the same as the plain file.
-	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\" [e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3==e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3]. Skipping",
+	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\". Skipping",
 		logPathGZ, logPathPlain)
 	filebeat.WaitLogsContainsFromBeginning(
 		wantLine,

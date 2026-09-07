@@ -1912,7 +1912,7 @@ func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
 		"expected errFileTooSmall, it probably tried to open the file")
 }
 
-// TestToFileDescriptor_GrowingLifecycle tests the Enhanced Fingerprint
+// TestToFileDescriptor_GrowingLifecycle tests the growing fingerprint
 // lifecycle through the scanner:
 //
 //  1. small file (below offset+length) under growing mode → raw-hex

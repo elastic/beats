@@ -50,7 +50,11 @@ type stateRegistry interface {
 }
 
 // newStateRegistry creates the appropriate state registry based on configuration.
-func newStateRegistry(log *logp.Logger, stateStore statestore.States, keyPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (stateRegistry, error) {
+// bucket is the name of the bucket the input polls, used to scope the loaded
+// states to this input. The persistent store is shared by all aws-s3 inputs of
+// the process, so without this scoping an input would load (and later clean up)
+// states belonging to other inputs. An empty bucket disables the scoping.
+func newStateRegistry(log *logp.Logger, stateStore statestore.States, bucket string, keyPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (stateRegistry, error) {
 	// When lexicographical ordering is enabled, pass the input type to allow
 	// ES state store routing for agentless deployments
 	storeKey := ""
@@ -63,9 +67,9 @@ func newStateRegistry(log *logp.Logger, stateStore statestore.States, keyPrefix 
 	}
 
 	if lexicographicalOrdering {
-		return newLexicographicalStateRegistry(log, store, keyPrefix, lexicographicalLookbackKeys)
+		return newLexicographicalStateRegistry(log, store, bucket, keyPrefix, lexicographicalLookbackKeys)
 	}
-	return newNormalStateRegistry(log, store, keyPrefix)
+	return newNormalStateRegistry(log, store, bucket, keyPrefix)
 }
 
 // baseStateRegistry contains shared functionality between registry implementations.
@@ -127,8 +131,8 @@ type normalStateRegistry struct {
 }
 
 // newNormalStateRegistry creates a new normal state registry.
-func newNormalStateRegistry(log *logp.Logger, store *statestore.Store, keyPrefix string) (*normalStateRegistry, error) {
-	stateTable, err := loadS3StatesFromRegistry(log, store, keyPrefix, false)
+func newNormalStateRegistry(log *logp.Logger, store *statestore.Store, bucket string, keyPrefix string) (*normalStateRegistry, error) {
+	stateTable, err := loadS3StatesFromRegistry(log, store, bucket, keyPrefix, false)
 	if err != nil {
 		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
@@ -232,8 +236,8 @@ type lexicographicalStateRegistry struct {
 }
 
 // newLexicographicalStateRegistry creates a new lexicographical state registry.
-func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, keyPrefix string, capacity int) (*lexicographicalStateRegistry, error) {
-	stateTable, err := loadS3StatesFromRegistry(log, store, keyPrefix, true)
+func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, bucket string, keyPrefix string, capacity int) (*lexicographicalStateRegistry, error) {
+	stateTable, err := loadS3StatesFromRegistry(log, store, bucket, keyPrefix, true)
 	if err != nil {
 		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
@@ -617,8 +621,15 @@ func getStoreKey(stateID string) string {
 }
 
 // loadS3StatesFromRegistry loads a copy of the registry states.
-// If prefix is set, entries will match the provided prefix(including empty prefix)
-func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string, lexicographicalOrdering bool) (map[string]*state, error) {
+// Only entries belonging to the given bucket and matching the given key prefix
+// are loaded. The store is shared by all aws-s3 inputs of the process, and an
+// input must only ever see its own states: CleanUp removes every store entry
+// that is missing from the input's bucket listing, so loading another input's
+// states here would delete them from the shared store (and each input would
+// also hold every other input's states in memory).
+// Passing an empty bucket argument disables the bucket filter; the pollers
+// always pass their bucket name.
+func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, bucket string, prefix string, lexicographicalOrdering bool) (map[string]*state, error) {
 	stateTable := map[string]*state{}
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
@@ -639,6 +650,11 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix 
 			// registry even if the object wasn't processed, or if it encountered
 			// ephemeral download errors. We don't add these to the in-memory cache,
 			// so if we see them during a bucket scan we will still retry them.
+			return true, nil
+		}
+
+		// skip entries that belong to another input's bucket
+		if bucket != "" && st.Bucket != bucket {
 			return true, nil
 		}
 

@@ -431,6 +431,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var inputTaskGroup unison.TaskGroup
 	defer func() {
 		_ = inputTaskGroup.Stop()
+		v2InputLoader.Close()
 	}()
 
 	// Store needs to be fully configured at this point

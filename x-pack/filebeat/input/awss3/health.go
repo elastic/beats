@@ -108,7 +108,10 @@ func (h *sqsHealth) UpdateStatus(s status.Status, msg string) {
 	case status.Degraded:
 		h.consecutiveRecvFails++
 		if h.consecutiveRecvFails >= h.recvFailThreshold {
-			h.conditions[condReceive] = healthCondition{msg: msg, at: time.Now()}
+			h.conditions[condReceive] = healthCondition{
+				msg: "The input cannot reach SQS: messages are not being collected. Check network connectivity, AWS credentials, and queue permissions.",
+				at:  time.Now(),
+			}
 		}
 		h.update()
 	}

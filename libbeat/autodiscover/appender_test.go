@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -40,7 +40,7 @@ func newFakeAppender(_ *conf.C, _ *logp.Logger) (Appender, error) {
 func TestAppenderRegistry(t *testing.T) {
 	// Add a new builder
 	reg := NewRegistry()
-	reg.AddAppender("fake", newFakeAppender)
+	reg.AddAppender("fake", newFakeAppender) //nolint:errcheck // test registration
 
 	// Check if that appender is available in registry
 	b := reg.GetAppender("fake")
@@ -60,7 +60,7 @@ func TestAppenderRegistry(t *testing.T) {
 	assert.NotNil(t, appender)
 
 	// Attempt to build using an array of configs
-	Registry.AddAppender("fake", newFakeAppender)
+	Registry.AddAppender("fake", newFakeAppender) //nolint:errcheck // test registration
 	cfgs := []*conf.C{cfg}
 	appenders, err := NewAppenders(cfgs)
 	assert.NoError(t, err)

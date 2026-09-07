@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix data races in the add_session_metadata kernel_tracing provider backoff accounting
-component: auditbeat

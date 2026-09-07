@@ -2,21 +2,19 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:errcheck // test file; error returns from w.Write are intentionally unchecked
 package okta
 
 import (
 	"context"
 	"encoding/json"
 	"log/slog"
-	"net/http"
-	"net/http/httptest"
 	"sort"
 	"strings"
 	"testing"
 	"time"
 
 	legacyokta "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/testokta"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 	ecokta "github.com/elastic/entcollect/provider/okta"
@@ -36,7 +34,7 @@ import (
 //   - Supervises on incremental sync is computed from the current batch
 //     only (minimal-state), vs globally from all stored users (legacy).
 func TestEquivalence_UserTypes(t *testing.T) {
-	fixture := equivUserFixtureJSON()
+	fixture := testokta.UsersJSON()
 
 	// Parse through legacy types.
 	var legacyUsers []legacyokta.User
@@ -66,7 +64,7 @@ func TestEquivalence_UserTypes(t *testing.T) {
 
 // TestEquivalence_DeviceTypes verifies the same JSON round-trip for devices.
 func TestEquivalence_DeviceTypes(t *testing.T) {
-	fixture := equivDeviceFixtureJSON()
+	fixture := testokta.DevicesJSON()
 
 	var legacyDevices []legacyokta.Device
 	if err := json.Unmarshal(fixture, &legacyDevices); err != nil {
@@ -96,7 +94,7 @@ func TestEquivalence_DeviceTypes(t *testing.T) {
 // an httptest mock and verifies it produces the expected user and device
 // documents with correct group enrichment.
 func TestEquivalence_FullSync(t *testing.T) {
-	srv := startEquivOktaServer(t)
+	srv := testokta.StartServer(t)
 
 	cfg := ecokta.DefaultConfig()
 	cfg.Domain = strings.TrimPrefix(srv.URL, "https://")
@@ -178,99 +176,6 @@ func TestEquivalence_FullSync(t *testing.T) {
 	}
 }
 
-func startEquivOktaServer(t *testing.T) *httptest.Server {
-	t.Helper()
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/api/v1/users", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(equivUserFixtureJSON())
-	})
-
-	mux.HandleFunc("/api/v1/groups", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(equivGroupFixtureJSON())
-	})
-
-	mux.HandleFunc("/api/v1/groups/g1/users", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`[{"id":"u1"},{"id":"u2"}]`))
-	})
-
-	mux.HandleFunc("/api/v1/groups/g2/users", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`[{"id":"u1"}]`))
-	})
-
-	mux.HandleFunc("/api/v1/devices", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(equivDeviceFixtureJSON())
-	})
-
-	mux.HandleFunc("/api/v1/devices/d1/users", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`[{"created":"2026-01-01T12:00:00.000Z","managementStatus":"NOT_MANAGED","screenLockType":"NONE","user":{"id":"u1","status":"ACTIVE","created":"2026-01-01T12:00:00.000Z","lastUpdated":"2026-01-02T12:00:00.000Z","profile":{"login":"alice@example.com","email":"alice@example.com","firstName":"Alice","lastName":"Smith"}}}]`))
-	})
-
-	srv := httptest.NewTLSServer(mux)
-	t.Cleanup(srv.Close)
-	return srv
-}
-
-func equivUserFixtureJSON() []byte {
-	now := time.Date(2026, 1, 2, 12, 0, 0, 0, time.UTC)
-	return []byte(`[
-		{
-			"id": "u1",
-			"status": "ACTIVE",
-			"created": "2026-01-01T12:00:00.000Z",
-			"activated": "2026-01-01T12:00:00.000Z",
-			"lastUpdated": "` + now.Format(ecokta.ISO8601) + `",
-			"profile": {"login": "alice@example.com", "email": "alice@example.com", "firstName": "Alice", "lastName": "Smith", "managerId": "u2"}
-		},
-		{
-			"id": "u2",
-			"status": "ACTIVE",
-			"created": "2026-01-01T12:00:00.000Z",
-			"activated": "2026-01-01T12:00:00.000Z",
-			"lastUpdated": "` + now.Format(ecokta.ISO8601) + `",
-			"profile": {"login": "bob@example.com", "email": "bob@example.com", "firstName": "Bob", "lastName": "Jones"}
-		},
-		{
-			"id": "u3",
-			"status": "DEPROVISIONED",
-			"created": "2026-01-01T12:00:00.000Z",
-			"activated": "2026-01-01T12:00:00.000Z",
-			"lastUpdated": "` + now.Format(ecokta.ISO8601) + `",
-			"profile": {"login": "charlie@example.com", "email": "charlie@example.com", "firstName": "Charlie", "lastName": "Brown"}
-		}
-	]`)
-}
-
-func equivGroupFixtureJSON() []byte {
-	return []byte(`[
-		{"id": "g1", "profile": {"name": "Staff", "description": "All staff"}},
-		{"id": "g2", "profile": {"name": "Engineering", "description": "Engineering team"}}
-	]`)
-}
-
-func equivDeviceFixtureJSON() []byte {
-	return []byte(`[
-		{
-			"id": "d1",
-			"created": "2026-01-01T12:00:00.000Z",
-			"lastUpdated": "2026-01-02T12:00:00.000Z",
-			"status": "ACTIVE",
-			"profile": {"displayName": "Alice Laptop"},
-			"resourceAlternateID": "",
-			"resourceDisplayName": {"sensitive": false, "value": "Alice Laptop"},
-			"resourceID": "d1",
-			"resourceType": "UDDevice"
-		}
-	]`)
-}
-
 func filterDocsByKind(docs []entcollect.Document, kind entcollect.EntityKind) []entcollect.Document {
 	var out []entcollect.Document
 	for _, d := range docs {
@@ -320,7 +225,6 @@ func (m *equivMemStore) Delete(key string) error {
 
 func (m *equivMemStore) Each(fn func(string, func(any) error) (bool, error)) error {
 	for k, v := range m.data {
-		v := v
 		cont, err := fn(k, func(dst any) error { return json.Unmarshal(v, dst) })
 		if err != nil {
 			return err

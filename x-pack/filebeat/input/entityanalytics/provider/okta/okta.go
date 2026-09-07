@@ -143,9 +143,13 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				msg := "Error running full sync"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running full sync"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.syncError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful full sync")
@@ -167,9 +171,13 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				msg := "Error running incremental update"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running incremental update"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.updateError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
@@ -241,7 +249,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	traceLogger := zap.New(core)
 
 	maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
+	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 	return cli
 }
 

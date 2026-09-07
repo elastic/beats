@@ -75,7 +75,7 @@ var supportedMonitorMetricsets = []string{"monitor", "container_registry", "cont
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	metricsetName := base.Name()
-	config := createDefaultConfig()
+	var config Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)

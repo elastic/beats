@@ -107,6 +107,8 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 175109606, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.search.query_total"))
 		require.EqualValues(t, 3464297906, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.search.query_time_in_millis"))
 		require.EqualValues(t, 5358, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.segments.count"))
+		require.EqualValues(t, 277737431206550, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_size_in_bytes"))
+		require.EqualValues(t, 17452535488, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_operations"))
 		require.EqualValues(t, 32, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.threads"))
 		require.EqualValues(t, 24175874622, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
 		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
@@ -120,6 +122,8 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.Equal(t, false, node1MetricSet["is_elected_master"])
 		require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "master", "remote_cluster_client", "transform"}, node1MetricSet["roles"])
 		require.EqualValues(t, 2902603, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.docs.count"))
+		require.EqualValues(t, 593809157, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_size_in_bytes"))
+		require.EqualValues(t, 646725, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_operations"))
 		require.EqualValues(t, 2818360, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.count"))
 		require.EqualValues(t, 4510292000, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.off_heap.total_size_bytes"))
 	}
@@ -139,6 +143,10 @@ func expectValidParsedDetailedWithNoCache(t *testing.T, data metricset.FetcherDa
 	require.Nil(t, node1MetricSet["index_rate_per_second"])
 	require.Nil(t, node1MetricSet["merge_rate_per_second"])
 	require.Nil(t, node1MetricSet["search_rate_per_second"])
+	require.Nil(t, node1MetricSet["ingest_docs_per_second"])
+	require.Nil(t, node1MetricSet["ingest_bytes_per_second"])
+	require.Nil(t, node1MetricSet["bulk_bytes_per_second"])
+	require.Nil(t, node1MetricSet["bulk_operations_per_second"])
 	require.Nil(t, node1MetricSet["index_latency_in_millis"])
 	require.Nil(t, node1MetricSet["merge_latency_in_millis"])
 	require.Nil(t, node1MetricSet["search_latency_in_millis"])
@@ -159,6 +167,18 @@ func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData
 	require.NotNil(t, node1MetricSet["index_latency_in_millis"])
 	require.NotNil(t, node1MetricSet["merge_latency_in_millis"])
 	require.NotNil(t, node1MetricSet["search_latency_in_millis"])
+
+	// ingest rates use docs/store which are present on all ES versions
+	require.NotNil(t, node1MetricSet["ingest_docs_per_second"])
+	require.NotNil(t, node1MetricSet["ingest_bytes_per_second"])
+	// bulk rates require indices.bulk which is only present on ES 8+
+	if data.Version == "7.17.0" {
+		require.Nil(t, node1MetricSet["bulk_bytes_per_second"])
+		require.Nil(t, node1MetricSet["bulk_operations_per_second"])
+	} else {
+		require.NotNil(t, node1MetricSet["bulk_bytes_per_second"])
+		require.NotNil(t, node1MetricSet["bulk_operations_per_second"])
+	}
 }
 
 // Expect a valid response from Elasticsearch to create N events

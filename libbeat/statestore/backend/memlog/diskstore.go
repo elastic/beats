@@ -439,7 +439,7 @@ func updateActiveMarker(log *logp.Logger, homePath, checkpointFilePath string) e
 		log.Errorf("Failed to remove old temporary active.dat.tmp file: %v", err)
 		return err
 	}
-	if err := os.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
+	if err := os.WriteFile(tmpLink, []byte(checkpointFilePath), 0o600); err != nil {
 		log.Errorf("Failed to write temporary pointer file: %v", err)
 		return err
 	}
@@ -672,7 +672,6 @@ func writeMetaFile(home string, mode os.FileMode) error {
 		return fmt.Errorf("error rotating meta file into place: %w", err)
 	}
 
-	trySyncPath(home)
 	return nil
 }
 

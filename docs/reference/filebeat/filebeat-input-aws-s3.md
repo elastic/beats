@@ -548,7 +548,7 @@ Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
 ### `backup_to_bucket_prefix` [_backup_to_bucket_prefix]
 
-This prefix will be prepended to the object key when backing it up to another (or the same) bucket.
+This prefix is prepended to the object key using string concatenation when backing it up to another (or the same) bucket. For example, with `backup_to_bucket_prefix: processed/` and an object key `logs/data.json`, the backup key is `processed/logs/data.json`. No path separator is inserted automatically. Include a trailing `/` in the prefix if you want the backup to appear in a subdirectory.
 
 
 ### `non_aws_backup_to_bucket_name` [_non_aws_backup_to_bucket_name]

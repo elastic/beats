@@ -4,7 +4,7 @@ COLLECTOR_LOG ?= $(TEMP_DIR)/collector.log
 
 # This version is used to build the OpenTelemetry Collector distribution.
 # It should be updated when the OTel Collector version is updated in the beats-otel-collector module.
-OCB_VERSION ?= v0.156.0
+OCB_VERSION ?= v0.159.0
 
 include $(ES_BEATS)/dev-tools/make/mage.mk
 
@@ -14,7 +14,7 @@ install-builder:
 	mv $$(go env GOPATH)/bin/builder $$(go env GOPATH)/bin/ocb
 
 .PHONY: build-otel-distro-ci
-build-otel-distro-ci: install-builder
+build-otel-distro-ci: install-builder mage
 	PATH="$$(go env GOPATH)/bin:$$PATH" RACE=1 mage buildOtelDistro
 	go version -m ./distributions/beats-otel-collector/_build/beats-otel-collector | grep -q 'race=true'
 	echo "--- Collector output (errors below are expected if external services are unavailable)"

@@ -421,6 +421,7 @@ func (dq *diskQueue) maybeUnblockProducers() {
 		}
 		// Add the frame to pendingFrames and report success.
 		dq.enqueueWriteFrame(request.frame)
+		dq.observer.AddEvent(int(request.frame.sizeOnDisk())) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 		request.responseChan <- true
 		unblockedCount++
 	}

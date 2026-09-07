@@ -420,6 +420,10 @@ func TestIndexShardsToNodeIndexShardsGreenIndex(t *testing.T) {
 	indexingFailed := []int64{60, 61, 62, 63}
 	indexingTotals := []int64{70, 71, 72, 73}
 	indexingTimes := []int64{74, 75, 76, 77}
+	bulkSizes := []int64{200, 201, 202, 203}
+	bulkOps := []int64{300, 301, 302, 303}
+	datasetSizes := []int64{20, 21, 22, 23}
+	dvcCounts := []int64{0, 0, 5, 0}
 
 	shards := []Shard{
 		{shard: 0, primary: true, node_id: "node1", node_name: "name1"},
@@ -442,6 +446,10 @@ func TestIndexShardsToNodeIndexShardsGreenIndex(t *testing.T) {
 		shard.indexing_index_failed = &indexingFailed[i]
 		shard.indexing_index_total = &indexingTotals[i]
 		shard.indexing_index_time = &indexingTimes[i]
+		shard.bulk_total_size_in_bytes = &bulkSizes[i]
+		shard.bulk_total_operations = &bulkOps[i]
+		shard.total_data_set_size_in_bytes = &datasetSizes[i]
+		shard.dense_vector_count = &dvcCounts[i]
 
 		shards[i] = shard
 	}
@@ -484,6 +492,10 @@ func TestIndexShardsToNodeIndexShardsGreenIndex(t *testing.T) {
 	require.Equal(t, searchQueryTimes[0], *nodeIndex.SearchQueryTime)
 	require.Equal(t, mergeTotals[0], *nodeIndex.TotalMergesTotal)
 	require.Equal(t, mergeTimes[0], *nodeIndex.TotalMergesTotalTime)
+	require.Equal(t, bulkSizes[0], *nodeIndex.BulkTotalSizeInBytes)
+	require.Equal(t, bulkOps[0], *nodeIndex.BulkTotalOperations)
+	require.Equal(t, datasetSizes[0], *nodeIndex.TotalDataSetSizeInBytes)
+	require.Equal(t, dvcCounts[0], *nodeIndex.DenseVectorCount)
 	require.Equal(t, 1, len(nodeIndex.AssignShards))
 	require.Equal(t, 0, len(nodeIndex.InitializingShards))
 	require.EqualValues(t, 0, nodeIndex.Initializing)
@@ -535,6 +547,11 @@ func TestIndexShardsToNodeIndexShardsGreenIndex(t *testing.T) {
 	require.Equal(t, searchQueryTimes[1]+searchQueryTimes[2], *nodeIndex.SearchQueryTime)
 	require.Equal(t, mergeTotals[1]+mergeTotals[2], *nodeIndex.TotalMergesTotal)
 	require.Equal(t, mergeTimes[1]+mergeTimes[2], *nodeIndex.TotalMergesTotalTime)
+	// primary-only bulk/dataset/dvc fields: only shard[2] (index 2) is primary for node2
+	require.Equal(t, bulkSizes[2], *nodeIndex.BulkTotalSizeInBytes)
+	require.Equal(t, bulkOps[2], *nodeIndex.BulkTotalOperations)
+	require.Equal(t, datasetSizes[2], *nodeIndex.TotalDataSetSizeInBytes)
+	require.Equal(t, dvcCounts[2], *nodeIndex.DenseVectorCount)
 	require.Equal(t, 2, len(nodeIndex.AssignShards))
 	require.Equal(t, 0, len(nodeIndex.InitializingShards))
 	require.EqualValues(t, 0, nodeIndex.Initializing)
@@ -589,6 +606,11 @@ func TestIndexShardsToNodeIndexShardsGreenIndex(t *testing.T) {
 	require.Nil(t, nodeIndex.IndexingIndexTotalTime)
 	require.Nil(t, nodeIndex.MergesTotal)
 	require.Nil(t, nodeIndex.MergesTotalTime)
+	// replica-only node: no primary-only snapshot fields
+	require.Nil(t, nodeIndex.BulkTotalSizeInBytes)
+	require.Nil(t, nodeIndex.BulkTotalOperations)
+	require.Nil(t, nodeIndex.TotalDataSetSizeInBytes)
+	require.Nil(t, nodeIndex.DenseVectorCount)
 	require.Equal(t, getMissingTotals[3], *nodeIndex.GetMissingDocTotal)
 	require.Equal(t, getMissingTimes[3], *nodeIndex.GetMissingDocTotalTime)
 	require.Equal(t, searchQueryTotals[3], *nodeIndex.SearchQueryTotal)

@@ -465,7 +465,8 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			return err
 		}
 		if result.action.retry() {
-			continue
+			// If we hit a 429, try again subject to budget limits.
+			goto nextTry
 		}
 
 		// Empty or nil events finish the execution without setting runSpan status.
@@ -477,6 +478,7 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			okSpans(runSpan)
 			return nil
 		}
+	nextTry:
 		budget--
 		if budget <= 0 {
 			msg := "reached maximum number of CEL executions"
@@ -784,7 +786,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 			"limit", *s.cfg.MaxExecutions,
 			"next_eval_time", start.Add(s.cfg.Interval),
 		)
-		s.health.UpdateStatus(status.Degraded, msg)
 		execSpan.SetStatus(codes.Unset, msg)
 		return result, nil
 	}
@@ -1144,6 +1145,8 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]any, header http.Hea
 				}
 				limiter.SetLimitAt(waitUntil, next)
 				limiter.SetBurstAt(waitUntil, burst)
+			case nil:
+				log.Errorw("unexpected nil returned for rate limit reset", "rate_limit", mapstr.M(rateLimit))
 			default:
 				log.Errorw("unexpected type returned for rate limit reset", "type", reflect.TypeOf(w).String(), "rate_limit", mapstr.M(rateLimit))
 			}
@@ -1177,6 +1180,8 @@ func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit r
 			return limit, false
 		}
 		limit = rate.Inf
+	case nil:
+		log.Errorw("unexpected nil returned for rate limit "+which, "rate_limit", mapstr.M(rateLimit))
 	default:
 		log.Errorw("unexpected type returned for rate limit "+which, "type", reflect.TypeOf(r).String(), "rate_limit", mapstr.M(rateLimit))
 	}
@@ -1233,7 +1238,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		traceLogger := zap.New(core)
 
 		maxBodyLen := cfg.Resource.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, log)
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 		c.Transport = trace
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,

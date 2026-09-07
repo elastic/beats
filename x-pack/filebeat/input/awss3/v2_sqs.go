@@ -18,7 +18,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -34,7 +33,7 @@ type sqsDiscoveryV2 struct {
 	processor         *objectProcessorV2
 	metrics           *inputMetrics
 	log               *logp.Logger
-	status            status.StatusReporter
+	health            *sqsHealth
 	warnOnce          sync.Once
 }
 
@@ -49,7 +48,7 @@ type sqsDiscoveryV2Config struct {
 	Processor         *objectProcessorV2
 	Metrics           *inputMetrics
 	Log               *logp.Logger
-	Status            status.StatusReporter
+	Health            *sqsHealth
 }
 
 func newSQSDiscoveryV2(cfg sqsDiscoveryV2Config) *sqsDiscoveryV2 {
@@ -63,7 +62,7 @@ func newSQSDiscoveryV2(cfg sqsDiscoveryV2Config) *sqsDiscoveryV2 {
 		processor:         cfg.Processor,
 		metrics:           cfg.Metrics,
 		log:               cfg.Log,
-		status:            cfg.Status,
+		health:            cfg.Health,
 	}
 }
 
@@ -130,15 +129,21 @@ func (r sqsResultV2) Done() {
 	if r.err == nil {
 		if err := d.sqs.DeleteMessage(context.Background(), r.msg); err != nil {
 			d.log.Errorf("failed deleting SQS message (may be reprocessed): %v", err)
-			d.status.UpdateStatus(status.Degraded, fmt.Sprintf("SQS delete failed: %s", err))
+			d.health.SetDeleteFailed(err)
 			return
 		}
 		d.metrics.sqsMessagesDeletedTotal.Inc()
+		var finErr error
 		for _, fin := range r.finalizers {
 			if err := fin(); err != nil {
 				d.log.Errorf("S3 finalization failed (manual cleanup required): %v", err)
-				d.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 finalization failed: %s", err))
+				finErr = err
 			}
+		}
+		if finErr != nil {
+			d.health.SetFinalizeFailed(finErr)
+		} else {
+			d.health.ClearDisposition()
 		}
 		return
 	}
@@ -153,17 +158,17 @@ func (r sqsResultV2) Done() {
 	if errors.Is(procErr, &nonRetryableError{}) {
 		if err := d.sqs.DeleteMessage(context.Background(), r.msg); err != nil {
 			d.log.Errorf("failed deleting non-retryable SQS message: %v", err)
-			d.status.UpdateStatus(status.Degraded, fmt.Sprintf("SQS delete failed for non-retryable message: %s", err))
+			d.health.SetDeleteFailed(err)
 			return
 		}
 		d.metrics.sqsMessagesDeletedTotal.Inc()
 		d.log.Warnf("deleted non-retryable SQS message: %v", procErr)
+		d.health.RecordPoisonPill(procErr)
 		return
 	}
 
 	d.metrics.sqsMessagesReturnedTotal.Inc()
 	d.log.Warnf("SQS message will return after visibility timeout: %v", procErr)
-	d.status.UpdateStatus(status.Degraded, fmt.Sprintf("SQS processing failed (will retry): %s", procErr))
 }
 
 // keepalive extends the SQS message visibility timeout periodically.
@@ -203,10 +208,11 @@ func (d *sqsDiscoveryV2) processNotifications(ctx context.Context, log *logp.Log
 	for i, evt := range s3Events {
 		n, procErr := d.processor.ProcessObject(ctx, log, evt, pub)
 		if procErr != nil {
-			errs = append(errs, fmt.Errorf(
+			procErr = fmt.Errorf(
 				"failed processing S3 object %q in bucket %q (record %d of %d): %w",
-				evt.S3.Object.Key, evt.S3.Bucket.Name, i+1, len(s3Events), procErr))
-			d.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 processing failure: %s", procErr))
+				evt.S3.Object.Key, evt.S3.Bucket.Name, i+1, len(s3Events), procErr)
+			d.health.SetProcessingError(procErr)
+			errs = append(errs, procErr)
 			continue
 		}
 		if n > 0 {
@@ -285,7 +291,7 @@ func (d *sqsDiscoveryV2) filterRecords(records []s3EventV2) ([]s3EventV2, error)
 // processing and finalizing the message.
 func (d *sqsDiscoveryV2) ReceiveLoop(ctx context.Context, maxMessages int, handle func(context.Context, types.Message)) {
 	for ctx.Err() == nil {
-		msgs := readSQSMessages(ctx, d.log, d.status, d.sqs, d.metrics, maxMessages, d.queueURL)
+		msgs := readSQSMessages(ctx, d.log, d.health, d.sqs, d.metrics, maxMessages, d.queueURL)
 		for _, msg := range msgs {
 			if ctx.Err() != nil {
 				return

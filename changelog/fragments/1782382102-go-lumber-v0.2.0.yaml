@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Upgrade github.com/elastic/go-lumber to v0.2.0.
-component: filebeat

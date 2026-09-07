@@ -19,10 +19,13 @@ package logv2
 
 import (
 	_ "embed"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -48,6 +51,15 @@ func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 
 	store := openTestStatestore()
 	p := filestream.Plugin(logp.NewNopLogger(), store)
+	var group unison.TaskGroup
+	if err := p.Manager.Init(&group); err != nil {
+		t.Fatalf("could not initialize filestream input manager: %s", err)
+	}
+	t.Cleanup(func() {
+		if err := group.Stop(); err != nil {
+			t.Errorf("could not stop filestream input manager: %s", err)
+		}
+	})
 	if _, err := p.Manager.Create(newCfg); err != nil {
 		t.Fatalf("Filestream input cannot be created from converted config: %s", err)
 	}
@@ -571,6 +583,10 @@ func (s *testInputStore) Close() {
 
 func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testInputStore) CleanupInterval() time.Duration {

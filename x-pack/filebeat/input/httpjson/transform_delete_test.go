@@ -119,7 +119,7 @@ func TestNewDelete(t *testing.T) {
 			gotDelete, gotErr := tc.constructor(cfg, noopReporter{}, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.expectedTarget, (gotDelete.(*delete)).targetInfo)
+				assert.Equal(t, tc.expectedTarget, (gotDelete.(*deleteTransform)).targetInfo)
 			} else {
 				assert.EqualError(t, gotErr, tc.expectedErr)
 			}

@@ -74,6 +74,14 @@ func (f fileSource) Name() string {
 	return f.fileID
 }
 
+// LogPath returns the path used in logs.
+func (f fileSource) LogPath() string {
+	if f.newPath != "" {
+		return f.newPath
+	}
+	return f.oldPath
+}
+
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {

@@ -27,7 +27,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -245,11 +244,10 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
-	state := initState(log, cursor, fs)
+	state := initState(ctx.Logger, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
-		log.Infof("GZIP file already read to EOF, not reading it again, file name '%s'",
+		ctx.Logger.Infof("GZIP file already read to EOF, not reading it again, file name '%s'",
 			fs.newPath)
 		return nil
 	}
@@ -258,9 +256,9 @@ func (inp *filestream) Run(
 	// (upstream behavior). When read_until_eof is enabled, it "resets" the
 	// reader via startReadUntilEOF by swapping in a fresh, read_until_eof-scoped
 	// context so the drain read can proceed past ctx.Cancelation.
-	r, startReadUntilEOF, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
+	r, startReadUntilEOF, truncated, err := inp.open(ctx.Logger, ctx.Cancelation, fs, state.Offset)
 	if err != nil {
-		log.Errorf("File could not be opened for reading: %v", err)
+		ctx.Logger.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
 
@@ -287,16 +285,16 @@ func (inp *filestream) Run(
 	}
 
 	defer func() {
-		log.Debug("Closing reader of filestream")
+		ctx.Logger.Debug("Closing reader of filestream")
 		if err := r.Close(); err != nil {
-			log.Errorf("Error stopping filestream reader: %v", err)
+			ctx.Logger.Errorf("Error stopping filestream reader: %v", err)
 		}
 	}()
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
 	err = inp.readFromSource(
-		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metricsOffset, metrics,
+		ctx, ctx.Logger, r, fs.newPath, state, publisher, fs.desc.GZIP, metricsOffset, metrics,
 		startReadUntilEOF)
 	if err != nil {
 		// First handle actual errors
@@ -305,7 +303,7 @@ func (inp *filestream) Run(
 		}
 
 		if inp.deleterConfig.Enabled {
-			if err := inp.deleteFile(ctx, log, cursor, fs.newPath); err != nil {
+			if err := inp.deleteFile(ctx, ctx.Logger, cursor, fs.newPath); err != nil {
 				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
 			}
 		}

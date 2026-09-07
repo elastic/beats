@@ -203,7 +203,10 @@ type Query struct {
 type Pack struct {
 	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
 	// If empty, the pack map key (pack name) is used when publishing.
-	PackID    string   `config:"pack_id,omitempty" json:"pack_id,omitempty"`
+	PackID string `config:"pack_id,omitempty" json:"pack_id,omitempty"`
+	// PackName is the policy-defined human-readable pack name; emitted as pack_name in
+	// result/response documents alongside pack_id. Optional and not sent to osqueryd.
+	PackName  string   `config:"pack_name,omitempty" json:"-"`
 	Discovery []string `config:"discovery" json:"discovery,omitempty"`
 	Platform  string   `config:"platform" json:"platform,omitempty"`
 	Version   string   `config:"version" json:"version,omitempty"`

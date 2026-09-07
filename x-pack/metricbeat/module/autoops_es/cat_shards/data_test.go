@@ -246,6 +246,11 @@ func expectValidParsedDetailedShardsWithCache(t *testing.T, data metricset.Fetch
 	require.Nil(t, myIndexNode2.MergeRatePerSecond)
 	require.Nil(t, myIndexNode2.IndexLatencyInMillis)
 	require.Nil(t, myIndexNode2.MergeLatencyInMillis)
+	// Replica-only node: primary-only fields are nil, so ingest/bulk rates are nil
+	require.Nil(t, myIndexNode2.IngestDocsPerSecond)
+	require.Nil(t, myIndexNode2.IngestBytesPerSecond)
+	require.Nil(t, myIndexNode2.BulkBytesPerSecond)
+	require.Nil(t, myIndexNode2.BulkOperationsPerSecond)
 }
 
 // Expect a valid response from Elasticsearch to create N events

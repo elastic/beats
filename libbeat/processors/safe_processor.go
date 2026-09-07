@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"sync"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -34,6 +36,8 @@ var (
 	ErrPathsAlreadySet  = errors.New("attempt to set paths twice")
 	ErrSetPathsOnClosed = errors.New("attempt to set paths on closed processor")
 )
+
+var _ PdataProcessor = (*safePdataProcessorWithClose)(nil)
 
 type state = int
 
@@ -60,6 +64,14 @@ type safeProcessorWithClose struct {
 	SafeProcessor
 }
 
+// safePdataProcessorWithClose extends safeProcessorWithClose with a pdata fast
+// path. It is only created by SafeWrap when the inner processor implements both
+// Closer and PdataProcessor.
+type safePdataProcessorWithClose struct {
+	safeProcessorWithClose
+	pdataProc PdataProcessor
+}
+
 // Run delegates to the underlying processor. Returns ErrClosed if the processor
 // has been closed, or ErrPathsNotSet if the processor implements PathSetter but
 // SetPaths has not been called.
@@ -76,6 +88,24 @@ func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	default: // proceed
 	}
 	return p.Processor.Run(event)
+}
+
+// RunPdata delegates to the inner processor's RunPdata. The inner is guaranteed
+// to implement PdataProcessor because SafeWrap only creates this type when the
+// inner satisfies both Closer and PdataProcessor.
+func (p *safePdataProcessorWithClose) RunPdata(body pcommon.Map) (bool, error) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	switch p.state {
+	case stateClosed:
+		return false, ErrClosed
+	case stateInit:
+		if _, ok := p.Processor.(PathSetter); ok {
+			return false, ErrPathsNotSet
+		}
+	default: // proceed
+	}
+	return p.pdataProc.RunPdata(body)
 }
 
 // Close makes sure the underlying `Close` function is called only once.
@@ -130,21 +160,36 @@ func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 //
 // Without SafeWrap, processors must handle these cases manually using sync.Once
 // or similar mechanisms. SafeWrap is automatically applied by RegisterPlugin.
+//
+// When the inner processor implements both Closer and PdataProcessor, SafeWrap
+// returns a safePdataProcessorWithClose so that the pdata fast path in
+// buildPdataProcs can detect the capability without a fallback round-trip.
 func SafeWrap(constructor Constructor) Constructor {
 	return func(config *config.C, log *logp.Logger) (beat.Processor, error) {
 		processor, err := constructor(config, log)
 		if err != nil {
 			return nil, err
 		}
+		_, isCloser := processor.(Closer)
+		pdataProc, isPdata := processor.(PdataProcessor)
+
 		// if the processor does not implement `Closer` it does not need a wrap
-		if _, ok := processor.(Closer); !ok {
+		if !isCloser {
 			// if SetPaths is implemented, ensure single call of SetPaths
-			if _, ok = processor.(PathSetter); ok {
+			if _, ok := processor.(PathSetter); ok {
 				return &SafeProcessor{Processor: processor}, nil
 			}
 			return processor, nil
 		}
 
+		if isPdata {
+			return &safePdataProcessorWithClose{
+				safeProcessorWithClose: safeProcessorWithClose{
+					SafeProcessor: SafeProcessor{Processor: processor},
+				},
+				pdataProc: pdataProc,
+			}, nil
+		}
 		return &safeProcessorWithClose{
 			SafeProcessor: SafeProcessor{Processor: processor},
 		}, nil

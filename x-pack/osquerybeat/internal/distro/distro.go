@@ -44,16 +44,16 @@ const (
 
 	osqueryLensesDir = "lenses"
 
-	osqueryVersion = "5.23.0"
+	osqueryVersion = "5.23.1"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
 	osqueryZipExt  = ".zip"
 
-	osqueryDistroDarwinSHA256     = "2621179c334a6482fa822732f121409bbccc36784db18f576e2965dfc4f1845d"
-	osqueryDistroLinuxSHA256      = "0045739a68475760f7bc26ca493afda71cc02a8e4d29984717742d3e4c099296"
-	osqueryDistroLinuxARMSHA256   = "d9d4e5f6eeabda4949ae0ba6a8db424c789ec60ffef99269f479ff4b73f46e33"
-	osqueryDistroWindowsSHA256    = "5060c7cc21bc00258b5d7822a769cb619ff432c02ba89f6c1b6cbfa127d59b40"
-	osqueryDistroWindowsZipSHA256 = "92a820a39c12f7516040b62dc8e8546469c821f505eed0b7ff1eb7e43cc4b018"
+	osqueryDistroDarwinSHA256     = "9f40cea0358759ab2ee871c577055657e3cc2c7cbe5c1247f764245941178aa6"
+	osqueryDistroLinuxSHA256      = "0f37a478a1dbda24b67c81551e32d734b392c5a2f5deb156bf1c41ca204cfa67"
+	osqueryDistroLinuxARMSHA256   = "9ae763820166f75f19970b5147b1930a308865a923ab127f4b8bbaea7b69962a"
+	osqueryDistroWindowsSHA256    = "bb3adc9f32f257147855404d24bceebcd8baf6e65f4d4ca43e186f4a85fa6ed3"
+	osqueryDistroWindowsZipSHA256 = "0913d05cc3fc92dd9253c945caacde10a776408f267cc1cc853a05de24dba900"
 )
 
 type OSArch struct {

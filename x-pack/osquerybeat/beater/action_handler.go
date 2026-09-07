@@ -26,15 +26,15 @@ type actionResultPublisher interface {
 }
 
 type queryResultPublisher interface {
-	Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
 }
 
 type scheduledResponsePublisher interface {
-	PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
+	PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
 }
 
 type queryProfilePublisher interface {
-	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
+	PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any)
 }
 
 type liveProfileRecorder interface {
@@ -172,7 +172,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 				a.profiles.RecordLiveProfile(ac.Query, profile)
 			}
 			if publishProfile {
-				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
+				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, ac.SpaceID, profile, req["data"])
 			}
 		}
 	} else if shouldCollect && !beforeReady {
@@ -190,7 +190,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", duration)
 
-	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", nil, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, "action_id", responseID, ac.SpaceID, "", "", "", nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }
