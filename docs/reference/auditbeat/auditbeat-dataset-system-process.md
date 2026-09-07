@@ -24,7 +24,7 @@ It is implemented for Linux, macOS (Darwin), and Windows.
 
 The `process` dataset reads process information from `/proc` (Linux), `sysctl` (macOS), or the Windows API.
 
-**Minimum**: Auditbeat can run as a non-root user, but will log a warning that it may not report all processes. Without elevated privileges, it cannot read per-process details (such as open file descriptors, environment variables, or network namespaces) for processes owned by other users.
+**Minimum**: Auditbeat can run as a non-root user, but logs a warning that it might not report all processes. Without elevated privileges, it cannot read per-process details (such as open file descriptors, environment variables, or network namespaces) for processes owned by other users.
 
 **Recommended**: Run as root or grant `CAP_SYS_PTRACE` for complete visibility across all running processes.
 

@@ -154,7 +154,7 @@ COPY auditbeat.yml /usr/share/auditbeat/auditbeat.yml
 
 ## Special requirements [_special_requirements]
 
-Auditbeat modules and datasets have different privilege requirements. The table below shows the minimum flags needed for each component when running on Docker. Grant only the capabilities your configuration actually uses.
+Auditbeat modules and datasets have different privilege requirements. The following table shows the minimum flags needed for each component when running on Docker. Grant only the capabilities your configuration actually uses.
 
 | Component | `--cap-add` flags | `--pid=host` | Volume mounts |
 |---|---|---|---|
@@ -175,7 +175,7 @@ Auditbeat modules and datasets have different privilege requirements. The table 
 | **add_session_metadata** (kernel_tracing/kprobes) | `SYS_ADMIN` | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug` |
 | **add_session_metadata** (kernel_tracing/eBPF) | `SYS_ADMIN`, `BPF` | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/bpf:/sys/fs/bpf` |
 
-For more detail on what each component requires and why, see the individual module and dataset pages:
+For more details on what each component requires and why, refer to the individual module and dataset pages:
 
 * [Auditd module](/reference/auditbeat/auditbeat-module-auditd.md)
 * [File Integrity module](/reference/auditbeat/auditbeat-module-file_integrity.md)
@@ -184,7 +184,7 @@ For more detail on what each component requires and why, see the individual modu
 
 **Typical full-featured setup**
 
-The volume-mounted configuration example earlier in this page uses `--cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --pid=host` — the minimum needed for the `auditd` module in unicast mode. If you also enable the `system/socket` dataset or `add_session_metadata` with kernel tracing, add the additional flags from the table above.
+The volume-mounted configuration example earlier in this page uses `--cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --pid=host` — the minimum needed for the `auditd` module in unicast mode. If you also enable the `system/socket` dataset or `add_session_metadata` with kernel tracing, add the additional flags from the preceding table.
 
 ```sh subs=true
 docker run --cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --user=root --pid=host docker.elastic.co/beats/auditbeat:{{version.stack}}

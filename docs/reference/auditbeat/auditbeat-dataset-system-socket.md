@@ -40,12 +40,12 @@ By not relying on periodic polling, this approach enables the dataset to perform
 
 The `socket` dataset uses KProbes to intercept kernel TCP/IP stack functions. It requires:
 
-* **`CAP_SYS_ADMIN`**: To install kernel probes via tracefs or debugfs.
+* **`CAP_SYS_ADMIN`**: To install kernel probes through tracefs or debugfs.
 * **`CAP_NET_ADMIN`**: To monitor network traffic.
 
 The process does not need to run as root if these two capabilities are granted explicitly. However, root is the simplest way to satisfy both requirements.
 
-**Docker**: The container must have both capabilities and the host `/sys` directory must be bind-mounted so that tracefs or debugfs is accessible inside the container:
+**Docker**: The container must have both capabilities, and the host `/sys` directory must be bind-mounted so that tracefs or debugfs is accessible inside the container:
 
 ```sh
 docker run \
@@ -58,7 +58,7 @@ docker run \
 Alternatively, run as a `--privileged` container, which grants all capabilities automatically.
 
 ::::{important}
-Bind-mounting `/sys` (or at least `/sys/kernel/debug` and `/sys/kernel/tracing`) is required for the dataset to function inside a container. Without it, Auditbeat cannot access tracefs and the dataset will fail to start.
+Bind-mounting `/sys` (or at least `/sys/kernel/debug` and `/sys/kernel/tracing`) is required for the dataset to function inside a container. Without it, Auditbeat cannot access tracefs and the dataset fails to start.
 ::::
 
 
@@ -84,7 +84,7 @@ Features used by the `socket` dataset require a minimum Linux kernel version of 
 
 ^1^ $$$footnote-1$$$ These systems lack [PERF_EVENT_IOC_ID ioctl.](https://lore.kernel.org/patchwork/patch/399251/) Support might be added in a future release.
 
-The dataset needs `CAP_SYS_ADMIN` and `CAP_NET_ADMIN` in order to work. See [Required privileges](#_required_privileges_socket) above.
+The dataset needs `CAP_SYS_ADMIN` and `CAP_NET_ADMIN` in order to work. Refer to [Required privileges](#_required_privileges_socket).
 
 
 ### Kernel configuration [_kernel_configuration]
@@ -105,7 +105,7 @@ The following configuration settings can prevent the dataset from starting:
 
 ### Running on Docker [_running_on_docker]
 
-The dataset can monitor the Docker host when running inside a container. The container needs `CAP_SYS_ADMIN` and `CAP_NET_ADMIN`, and the host’s tracefs or debugfs directory must be accessible inside the container. Achieve this by bind-mounting `/sys` from the host. See [Required privileges](#_required_privileges_socket) for the full `docker run` example.
+The dataset can monitor the Docker host when running inside a container. The container needs `CAP_SYS_ADMIN` and `CAP_NET_ADMIN`, and the host’s tracefs or debugfs directory must be accessible inside the container. Achieve this by bind-mounting `/sys` from the host. Refer to [Required privileges](#_required_privileges_socket) for the full `docker run` example.
 
 
 ## Configuration [_configuration_2]

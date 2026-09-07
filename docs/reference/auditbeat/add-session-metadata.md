@@ -51,13 +51,13 @@ The required privileges depend on the backend in use.
 | `procfs` | `CAP_SYS_PTRACE` (or root) | No (capability sufficient) | Any | Host PID namespace |
 | `kernel_tracing` (kprobes) | `CAP_SYS_ADMIN` (or root) | No (capability sufficient) | 3.10.0+ | Host PID namespace; `/sys/kernel/debug` accessible |
 | `kernel_tracing` (eBPF) | `CAP_SYS_ADMIN` + `CAP_BPF` (or root) | No (capabilities sufficient) | 5.10.16+ with eBPF ring buffer | Host PID namespace; `/sys/kernel/debug` and `/sys/fs/bpf` accessible |
-| `auto` | Highest of the above that is available | No | Depends on selected sub-backend | Same as the selected sub-backend |
+| `auto` | Whichever of the preceding backends is available | No | Depends on the selected backend | Same as the selected backend |
 
 **Minimum recommended setup (bare metal / VM)**
 
 ```sh
 # grant capabilities without running as root
-setcap ‘cap_sys_admin,cap_bpf+ep’ /usr/share/auditbeat/auditbeat
+setcap 'cap_sys_admin,cap_bpf+ep' /usr/share/auditbeat/auditbeat
 ```
 
 **Docker**
@@ -86,7 +86,7 @@ docker run \
 
 ### Containers [add-session-metadata-containers]
 
-If you are running {{auditbeat}} in a container, the container must run in the host’s PID namespace (`--pid=host`). With the `auto` or `kernel_tracing` backend, these host directories must also be mounted to the same path within the container: `/sys/kernel/debug`, `/sys/fs/bpf`. See [Required privileges](#add-session-metadata-privileges) for the full `docker run` examples.
+If you are running {{auditbeat}} in a container, the container must run in the host’s PID namespace (`--pid=host`). With the `auto` or `kernel_tracing` backend, these host directories must also be mounted to the same path within the container: `/sys/kernel/debug`, `/sys/fs/bpf`. Refer to [Required privileges](#add-session-metadata-privileges) for the full `docker run` examples.
 
 
 

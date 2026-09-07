@@ -24,7 +24,7 @@ It is implemented for Linux only.
 
 The `user` dataset reads `/etc/passwd` and `/etc/group`, which are world-readable on all standard Linux distributions. No elevated privileges are required for basic operation.
 
-When `user.detect_password_changes: true` is set, the dataset also reads `/etc/shadow` to detect password hash changes. The shadow file is readable only by root (or the `shadow` group on some distributions).
+When `user.detect_password_changes: true` is set, the dataset also reads `/etc/shadow` to detect password hash changes. The shadow file is readable only by root, or by the `shadow` group on some distributions.
 
 | Configuration | Minimum privilege |
 |---|---|

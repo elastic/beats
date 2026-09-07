@@ -20,10 +20,10 @@ This module is available only for Linux.
 The `auditd` module has different privilege requirements depending on the socket type used.
 
 **Multicast (default)**
-:   Requires the `CAP_AUDIT_READ` Linux capability. The process does not need to be root, but must hold this capability. If `CAP_AUDIT_CONTROL` is also present, the module will attempt to enable auditing in the kernel; otherwise, you must ensure the kernel audit subsystem is already enabled before starting Auditbeat.
+:   Requires the `CAP_AUDIT_READ` Linux capability. The process does not need to be root, but must hold this capability. If `CAP_AUDIT_CONTROL` is also present, the module attempts to enable auditing in the kernel. If it is not present, you must make sure the kernel audit subsystem is already enabled before you start Auditbeat.
 
 **Unicast**
-:   Requires `CAP_AUDIT_CONTROL` and the process must run in the **initial PID namespace** (not inside a user or PID namespace). This is typically achieved by running as root on the host or by using `--pid=host` in Docker.
+:   Requires `CAP_AUDIT_CONTROL` and the process must run in the **initial PID namespace** (not inside a user or PID namespace). To achieve this, run as root on the host or use `--pid=host` in Docker.
 
 **Docker summary**
 
@@ -34,7 +34,7 @@ The `auditd` module has different privilege requirements depending on the socket
 | Initial PID namespace (`--pid=host`) | Not required | Required |
 
 ::::{note}
-On Docker, add `--cap-add=AUDIT_READ` for multicast, or `--cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --pid=host` for unicast. See [Run Auditbeat on Docker](/reference/auditbeat/running-on-docker.md) for full examples.
+On Docker, add `--cap-add=AUDIT_READ` for multicast, or `--cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --pid=host` for unicast. Refer to [Run Auditbeat on Docker](/reference/auditbeat/running-on-docker.md) for full examples.
 ::::
 
 

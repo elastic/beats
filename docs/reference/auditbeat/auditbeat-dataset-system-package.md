@@ -23,7 +23,7 @@ Privilege requirements depend on the package manager in use.
 :   No elevated privileges are required. The dpkg database at `/var/lib/dpkg` is world-readable.
 
 **RPM (RHEL/CentOS/SUSE)**
-:   The RPM library may attempt to write lock files to the RPM database, which typically requires root. To avoid this, configure `package.rpm_drop_to_uid` with a non-root UID. Auditbeat will use `setreuid` to switch to that UID before querying the RPM database, preventing unintended writes.
+:   The RPM library might attempt to write lock files to the RPM database, which typically requires root. To avoid this, configure `package.rpm_drop_to_uid` with a non-root UID. Auditbeat uses `setreuid` to switch to that UID before it queries the RPM database, which prevents unintended writes.
 
     ```yaml
     - module: system

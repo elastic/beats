@@ -23,7 +23,7 @@ Privilege requirements vary by backend.
 :   No special Linux capabilities are needed. Auditbeat only needs read access to the paths it monitors. It can run as a non-root user as long as file permissions allow it to read the monitored files or directories.
 
 **kprobes**
-:   Requires `CAP_SYS_ADMIN` to install kernel probes via tracefs. The tracefs or debugfs filesystem must be accessible at `/sys/kernel/tracing` or `/sys/kernel/debug/tracing`.
+:   Requires `CAP_SYS_ADMIN` to install kernel probes through tracefs. The tracefs or debugfs filesystem must be accessible at `/sys/kernel/tracing` or `/sys/kernel/debug/tracing`.
 
     In Docker containers, bind-mount `/sys` from the host so that tracefs is available inside the container. The mount must be writable because Auditbeat must write probe definitions to tracefs:
 
@@ -32,7 +32,7 @@ Privilege requirements vary by backend.
     ```
 
 **ebpf**
-:   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), a kernel version of 5.10.16 or later, and access to `/sys/fs/bpf` for the BPF filesystem. eBPF programs must be permitted by the kernel's BPF policy.
+:   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), a kernel version of 5.10.16 or later, and access to `/sys/fs/bpf` for the BPF filesystem. The kernel BPF policy must permit eBPF programs.
 
     In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF` and mount `/sys` from the host.
 
@@ -40,7 +40,7 @@ Privilege requirements vary by backend.
 :   Requires Administrator privileges.
 
 ::::{note}
-When using the `kprobes` or `ebpf` backend in a Docker container, bind-mount the host `/sys` directory and add the required capabilities. See [Run Auditbeat on Docker](/reference/auditbeat/running-on-docker.md).
+When using the `kprobes` or `ebpf` backend in a Docker container, bind-mount the host `/sys` directory and add the required capabilities. Refer to [Run Auditbeat on Docker](/reference/auditbeat/running-on-docker.md).
 ::::
 
 
