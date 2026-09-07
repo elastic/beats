@@ -176,6 +176,8 @@ var ErrAlreadyStopped = errors.New("attempted to add job to already stopped sche
 
 type AddTask func(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error)
 
+type scheduledTaskFn func(scheduledAt, triggeredAt time.Time)
+
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
 func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
@@ -189,9 +191,9 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 	// The initial value is runAt.Now() because we use it to get the next runAt a job is scheduled to run
 	lastRanAt := time.Now().In(s.location)
 
-	var taskFn timerqueue.TimerTaskFn
+	var taskFn scheduledTaskFn
 
-	taskFn = func(now time.Time) {
+	taskFn = func(scheduledAt, now time.Time) {
 		select {
 		case <-jobCtx.Done():
 			debugf("Job '%v' canceled", id)
@@ -213,7 +215,11 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 
 		var lastRanAt time.Time
 		if activeMainWin == nil {
-			lastRanAt = sj.run()
+			startedAt := sj.run()
+			if jobCtx.Err() == nil {
+				sj.jobTypeStats.recordDelay(startedAt.Sub(scheduledAt))
+			}
+			lastRanAt = startedAt
 		} else {
 			s.logger.Infof("Job '%s' is in maintenance window '%s' , skipping", id, activeMainWin.Rule)
 			lastRanAt = now
@@ -250,7 +256,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 // runTaskOnce runs the given task exactly once at the given time. Set deadlineCheck
 // to false if this is the first invocation of this, otherwise the deadline checker
 // will complain about a missed task
-func (s *Scheduler) runTaskOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn, deadlineCheck bool) {
+func (s *Scheduler) runTaskOnce(runAt time.Time, taskFn scheduledTaskFn, deadlineCheck bool) {
 	now := time.Now().In(s.location)
 	// Check if the task is more than 1 second late
 	if deadlineCheck && runAt.Sub(now) < time.Second {
@@ -259,6 +265,6 @@ func (s *Scheduler) runTaskOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn, 
 
 	// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
 	// blocks the timer thread.
-	asyncTask := func(now time.Time) { go taskFn(now) }
+	asyncTask := func(now time.Time) { go taskFn(runAt, now) }
 	s.timerQueue.Push(runAt, asyncTask)
 }

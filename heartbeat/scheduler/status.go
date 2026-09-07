@@ -19,6 +19,7 @@ package scheduler
 
 import (
 	"sync/atomic"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 )
@@ -52,6 +53,21 @@ type jobTypeStats struct {
 	delayCount   atomic.Uint64
 	delayTotalMS atomic.Uint64
 	delayMaxMS   atomic.Uint64
+}
+
+func (s *jobTypeStats) recordDelay(delay time.Duration) {
+	if delay < 0 {
+		delay = 0
+	}
+	delayMS := uint64(delay.Milliseconds())
+
+	s.delayCount.Add(1)
+	s.delayTotalMS.Add(delayMS)
+	for currentMax := s.delayMaxMS.Load(); delayMS > currentMax; currentMax = s.delayMaxMS.Load() {
+		if s.delayMaxMS.CompareAndSwap(currentMax, delayMS) {
+			break
+		}
+	}
 }
 
 func newJobTypeStats(jobLimitByType map[string]*config.JobLimit) map[string]*jobTypeStats {

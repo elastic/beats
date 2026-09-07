@@ -65,6 +65,22 @@ func (t testSchedule) Next(now time.Time) time.Time {
 	return now.Add(t.delay)
 }
 
+type scheduledOnce struct {
+	runAt time.Time
+	calls atomic.Uint32
+}
+
+func (scheduledOnce) RunOnInit() bool {
+	return false
+}
+
+func (s *scheduledOnce) Next(time.Time) time.Time {
+	if s.calls.Add(1) == 1 {
+		return s.runAt
+	}
+	return s.runAt.Add(time.Hour)
+}
+
 // Test task that will only actually invoke the fn the given number of times
 // this lets us test around timing / scheduling weirdness more accurately, since
 // we can in tests expect an exact number of invocations
@@ -157,6 +173,146 @@ func TestSchedulerRun(t *testing.T) {
 	assert.Equal(t, int(removedEvents), int(counts["removed"]))
 	assert.Equal(t, int(postRemoveEvents), int(counts["postRemove"]))
 	assert.Equal(t, int(postRemoveEvents), int(counts["postRemoveCont"]))
+}
+
+func TestScheduleDelayIncludesTypeLimitWait(t *testing.T) {
+	const jobType = "browser"
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
+		jobType: {Limit: 1},
+	}, false, logptest.NewTestingLogger(t, ""))
+	defer s.Stop()
+
+	firstStarted := make(chan struct{})
+	releaseFirst := make(chan struct{})
+	firstDone := make(chan struct{})
+	go func() {
+		newSchedJob(context.Background(), s, "first", jobType, func(context.Context) []TaskFunc {
+			close(firstStarted)
+			<-releaseFirst
+			return nil
+		}, logptest.NewTestingLogger(t, "")).run()
+		close(firstDone)
+	}()
+	select {
+	case <-firstStarted:
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "first job should start before scheduling the second")
+	}
+
+	scheduledAt := time.Now().Add(50 * time.Millisecond)
+	secondStarted := make(chan struct{})
+	_, err := s.Add(&scheduledOnce{runAt: scheduledAt}, nil, "second", func(context.Context) []TaskFunc {
+		close(secondStarted)
+		return nil
+	}, jobType)
+	require.NoError(t, err, "second job should be added")
+
+	releaseAt := scheduledAt.Add(150 * time.Millisecond)
+	releaseTimer := time.NewTimer(time.Until(releaseAt))
+	defer releaseTimer.Stop()
+	<-releaseTimer.C
+	close(releaseFirst)
+
+	select {
+	case <-secondStarted:
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "second job should start after the first releases its type slot")
+	}
+	select {
+	case <-firstDone:
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "first job should finish after release")
+	}
+
+	require.Eventually(t, func() bool {
+		return s.Status().Jobs[jobType].ScheduleDelay.Count == 1
+	}, 5*time.Second, 10*time.Millisecond,
+		"started scheduled job should record schedule delay")
+	delay := s.Status().Jobs[jobType].ScheduleDelay
+	assert.GreaterOrEqual(t, delay.MaxMS, uint64(100),
+		"second job delay should include time waiting for the type slot")
+}
+
+func TestCanceledJobDoesNotRecordScheduleDelay(t *testing.T) {
+	const jobType = "browser"
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
+		jobType: {Limit: 1},
+	}, false, logptest.NewTestingLogger(t, ""))
+	defer s.Stop()
+
+	firstStarted := make(chan struct{})
+	releaseFirst := make(chan struct{})
+	firstDone := make(chan struct{})
+	go func() {
+		newSchedJob(context.Background(), s, "first", jobType, func(context.Context) []TaskFunc {
+			close(firstStarted)
+			<-releaseFirst
+			return nil
+		}, logptest.NewTestingLogger(t, "")).run()
+		close(firstDone)
+	}()
+	select {
+	case <-firstStarted:
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "first job should start before scheduling the canceled job")
+	}
+
+	removeSecond, err := s.Add(testSchedule{delay: time.Hour}, nil, "second", func(context.Context) []TaskFunc {
+		require.Fail(t, "canceled job should not execute")
+		return nil
+	}, jobType)
+	require.NoError(t, err, "second job should be added")
+	require.Eventually(t, func() bool {
+		return s.Status().Jobs[jobType].Waiting == 1
+	}, 5*time.Second, 10*time.Millisecond,
+		"second job should wait for the type slot")
+
+	removeSecond()
+	require.Eventually(t, func() bool {
+		return s.Status().Jobs[jobType].Waiting == 0 && s.stats.activeJobs.Get() == 0
+	}, 5*time.Second, 10*time.Millisecond,
+		"canceled job should stop waiting for the type slot")
+	close(releaseFirst)
+	select {
+	case <-firstDone:
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "first job should finish after release")
+	}
+
+	assert.Equal(t, uint64(0), s.Status().Jobs[jobType].ScheduleDelay.Count,
+		"canceled job should not record schedule delay")
+}
+
+func TestMaintenanceWindowSkipDoesNotRecordScheduleDelay(t *testing.T) {
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, true, logptest.NewTestingLogger(t, ""))
+	defer s.Stop()
+
+	window := maintwin.MaintWin{
+		Freq:     "daily",
+		Dtstart:  time.Now().Add(-time.Hour).UTC().Format(time.RFC3339),
+		Duration: 2 * time.Hour,
+	}
+	rule, err := window.Parse()
+	require.NoError(t, err, "maintenance window should parse")
+
+	executed := make(chan struct{}, 1)
+	_, err = s.Add(testSchedule{}, []maintwin.ParsedMaintWin{{
+		Rule:     rule,
+		Duration: window.Duration,
+	}}, "skipped", func(context.Context) []TaskFunc {
+		executed <- struct{}{}
+		return nil
+	}, "http")
+	require.NoError(t, err, "maintenance-window job should be added")
+	s.WaitForRunOnce()
+
+	select {
+	case <-executed:
+		require.Fail(t, "maintenance-window job should not execute")
+	default:
+	}
+	assert.Equal(t, uint64(0), s.Status().Jobs["http"].ScheduleDelay.Count,
+		"maintenance-window skip should not record schedule delay")
 }
 
 func TestScheduler_WaitForRunOnce(t *testing.T) {

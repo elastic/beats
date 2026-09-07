@@ -19,6 +19,7 @@ package scheduler
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -59,4 +60,23 @@ func TestSchedulerStatusNilJobLimit(t *testing.T) {
 	status := scheduler.Status()
 	assert.Equal(t, int64(0), status.Jobs["browser"].Limit,
 		"nil job limits should be reported as unlimited")
+}
+
+func TestJobTypeScheduleDelay(t *testing.T) {
+	stats := &jobTypeStats{}
+	stats.recordDelay(100 * time.Millisecond)
+	stats.recordDelay(900 * time.Millisecond)
+	stats.recordDelay(-time.Second)
+
+	delay := ScheduleDelayStatus{
+		Count:   stats.delayCount.Load(),
+		TotalMS: stats.delayTotalMS.Load(),
+		MaxMS:   stats.delayMaxMS.Load(),
+	}
+	assert.Equal(t, uint64(3), delay.Count,
+		"all started jobs should contribute a delay sample")
+	assert.Equal(t, uint64(1000), delay.TotalMS,
+		"negative delay should be clamped to zero")
+	assert.Equal(t, uint64(900), delay.MaxMS,
+		"maximum delay should retain the largest sample")
 }
