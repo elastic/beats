@@ -79,7 +79,7 @@ type Schedule interface {
 func getJobLimitSem(jobLimitByType map[string]*config.JobLimit, logger *logp.Logger) map[string]*semaphore.Weighted {
 	jobLimitSem := map[string]*semaphore.Weighted{}
 	for jobType, jobLimit := range jobLimitByType {
-		if jobLimit.Limit > 0 {
+		if jobLimit != nil && jobLimit.Limit > 0 {
 			logger.Infof("limiting to %d concurrent jobs for '%s' type", jobLimit.Limit, jobType)
 			jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
 		}

@@ -30,6 +30,7 @@ import (
 func TestSchedulerStatus(t *testing.T) {
 	scheduler := Create(10, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
 		"browser": {Limit: 2},
+		"icmp":    {Limit: -1},
 	}, false, logptest.NewTestingLogger(t, ""))
 	defer scheduler.Stop()
 
@@ -40,9 +41,22 @@ func TestSchedulerStatus(t *testing.T) {
 		"new scheduler should report no running browser jobs")
 	assert.Equal(t, int64(0), status.Jobs["browser"].Waiting,
 		"new scheduler should report no waiting browser jobs")
+	assert.Equal(t, int64(0), status.Jobs["icmp"].Limit,
+		"negative job limits should be reported as unlimited")
 
 	scheduler.getJobTypeStats("http")
 	status = scheduler.Status()
 	assert.Equal(t, int64(0), status.Jobs["http"].Limit,
 		"unknown job types should be reported as unlimited")
+}
+
+func TestSchedulerStatusNilJobLimit(t *testing.T) {
+	scheduler := Create(10, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
+		"browser": nil,
+	}, false, logptest.NewTestingLogger(t, ""))
+	defer scheduler.Stop()
+
+	status := scheduler.Status()
+	assert.Equal(t, int64(0), status.Jobs["browser"].Limit,
+		"nil job limits should be reported as unlimited")
 }

@@ -57,7 +57,11 @@ type jobTypeStats struct {
 func newJobTypeStats(jobLimitByType map[string]*config.JobLimit) map[string]*jobTypeStats {
 	stats := make(map[string]*jobTypeStats, len(jobLimitByType))
 	for jobType, jobLimit := range jobLimitByType {
-		stats[jobType] = &jobTypeStats{limit: jobLimit.Limit}
+		var limit int64
+		if jobLimit != nil && jobLimit.Limit > 0 {
+			limit = jobLimit.Limit
+		}
+		stats[jobType] = &jobTypeStats{limit: limit}
 	}
 	return stats
 }
