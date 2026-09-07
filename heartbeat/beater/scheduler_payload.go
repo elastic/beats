@@ -27,6 +27,14 @@ import (
 
 const schedulerPayloadInterval = 30 * time.Second
 
+var schedulerPayloadJobTypes = map[string]struct{}{
+	"http":    {},
+	"tcp":     {},
+	"icmp":    {},
+	"browser": {},
+	"api":     {},
+}
+
 type payloadSetter interface {
 	SetPayload(map[string]any)
 }
@@ -37,16 +45,19 @@ type schedulerStatusProvider interface {
 
 func schedulerPayload(status scheduler.Status) map[string]any {
 	jobs := make(map[string]any, len(status.Jobs))
-	for jobType, status := range status.Jobs {
+	for jobType, jobStatus := range status.Jobs {
+		if _, supported := schedulerPayloadJobTypes[jobType]; !supported {
+			continue
+		}
 		jobs[jobType] = map[string]any{
-			"limit":   status.Limit,
-			"running": status.Running,
-			"waiting": status.Waiting,
-			"runs":    status.Runs,
+			"limit":   jobStatus.Limit,
+			"running": jobStatus.Running,
+			"waiting": jobStatus.Waiting,
+			"runs":    jobStatus.Runs,
 			"schedule_delay": map[string]any{
-				"count":    status.ScheduleDelay.Count,
-				"total_ms": status.ScheduleDelay.TotalMS,
-				"max_ms":   status.ScheduleDelay.MaxMS,
+				"count":    jobStatus.ScheduleDelay.Count,
+				"total_ms": jobStatus.ScheduleDelay.TotalMS,
+				"max_ms":   jobStatus.ScheduleDelay.MaxMS,
 			},
 		}
 	}

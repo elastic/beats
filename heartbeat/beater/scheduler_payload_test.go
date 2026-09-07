@@ -71,6 +71,35 @@ func TestSchedulerPayload(t *testing.T) {
 	assert.NoError(t, err, "scheduler payload should be protobuf-serializable")
 }
 
+func TestSchedulerPayloadFiltersUnsupportedJobTypes(t *testing.T) {
+	status := scheduler.Status{
+		Jobs: map[string]scheduler.JobTypeStatus{
+			"http":         {Limit: 10, Running: 1},
+			"operator-key": {Limit: 99, Running: 98},
+		},
+	}
+
+	got := schedulerPayload(status)
+	jobs := got["heartbeat"].(map[string]any)["scheduler"].(map[string]any)["jobs"].(map[string]any)
+
+	assert.Equal(t, map[string]any{
+		"http": map[string]any{
+			"limit":   int64(10),
+			"running": int64(1),
+			"waiting": int64(0),
+			"runs":    uint64(0),
+			"schedule_delay": map[string]any{
+				"count":    uint64(0),
+				"total_ms": uint64(0),
+				"max_ms":   uint64(0),
+			},
+		},
+	}, jobs, "scheduler payload should contain only supported monitor types")
+
+	_, err := structpb.NewStruct(got)
+	assert.NoError(t, err, "filtered scheduler payload should be protobuf-serializable")
+}
+
 type recordingPayloadSetter struct {
 	payloads chan map[string]any
 }
