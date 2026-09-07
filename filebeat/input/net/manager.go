@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 )
 
 // Input is the interface for net inputs
@@ -103,8 +102,8 @@ func NewManager(fn func(*conf.C) (Input, error)) v2.InputManager {
 	return &manager{configure: fn}
 }
 
-// Init Noop, it is required to fulfil the v2.InputManager interface.
-func (*manager) Init(grp unison.Group) error { return nil }
+// Close is a no-op; net managers hold no resources to release.
+func (*manager) Close() {}
 
 // Create creates a new Input instance from the given configuration
 // by calling the manager's configure callback, or returns

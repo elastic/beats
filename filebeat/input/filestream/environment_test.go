@@ -46,7 +46,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
@@ -61,8 +60,7 @@ type inputTestingEnvironment struct {
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
 
-	wg  sync.WaitGroup
-	grp unison.TaskGroup
+	wg sync.WaitGroup
 }
 
 type registryEntry struct {
@@ -90,9 +88,7 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 
 func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Input {
 	e.t.Helper()
-	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	_ = manager.Init(&e.grp)
 	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
@@ -102,16 +98,9 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Inpu
 }
 
 func (e *inputTestingEnvironment) createInput(config map[string]any) (v2.Input, error) {
-	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	_ = manager.Init(&e.grp)
 	c := conf.MustNewConfigFrom(config)
-	inp, err := manager.Create(c)
-	if err != nil {
-		return nil, err
-	}
-
-	return inp, nil
+	return manager.Create(c)
 }
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
@@ -122,15 +111,7 @@ func (e *inputTestingEnvironment) getManager() v2.InputManager {
 }
 
 func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp v2.Input) {
-	e.wg.Add(1)
-	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
-		defer wg.Done()
-		defer func() {
-			_ = grp.Stop()
-			//nolint:errcheck // It's a test, let it panic if the casting fails
-			e.getManager().(*loginp.InputManager).Close()
-		}()
-
+	e.wg.Go(func() {
 		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
 			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
@@ -146,11 +127,13 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			Logger:          e.testLogger.Named("input.filestream"),
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
-	}(&e.wg, &e.grp)
+	})
 }
 
 func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
+	//nolint:errcheck // It's a test, let it panic if the casting fails
+	e.getManager().(*loginp.InputManager).Close()
 }
 
 // mustWriteToFile writes data to file and returns the full path
@@ -214,6 +197,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 
 func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 	inputStore, _ := e.stateStore.StoreFor("")
+	defer inputStore.Close()
 
 	actual := 0
 	err := inputStore.Each(func(_ string, _ statestore.ValueDecoder) (bool, error) {
@@ -344,6 +328,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 	}
 
 	inputStore, _ := e.stateStore.StoreFor("")
+	defer inputStore.Close()
 	id := getIDFromPath(filepath, inputID, fi)
 
 	var entry registryEntry
@@ -365,6 +350,7 @@ func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expect
 
 func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, error) {
 	inputStore, _ := e.stateStore.StoreFor("")
+	defer inputStore.Close()
 
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)

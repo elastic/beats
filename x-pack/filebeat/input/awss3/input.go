@@ -15,7 +15,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/go-concert/unison"
 )
 
 const inputName = "aws-s3"
@@ -36,9 +35,7 @@ type s3InputManager struct {
 	path   *paths.Path
 }
 
-func (im *s3InputManager) Init(grp unison.Group) error {
-	return nil
-}
+func (im *s3InputManager) Close() {}
 
 func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()

@@ -62,8 +62,6 @@ type store struct {
 	refCount        concert.RefCount
 	persistentStore *statestore.Store
 	ephemeralStore  *states
-	onClose         func()
-	cacheEntry      *storeCacheEntry
 }
 
 // states stores resource states in memory. When a cursor for an input is updated,
@@ -643,9 +641,6 @@ func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
 		closeStore(s)
-		if s.onClose != nil {
-			s.onClose()
-		}
 	}
 }
 
