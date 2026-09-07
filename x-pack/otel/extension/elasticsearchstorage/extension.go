@@ -118,9 +118,3 @@ func (s *lockedStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) 
 	defer s.mu.Unlock()
 	return s.inner.Each(fn)
 }
-
-func (s *lockedStore) SetID(id string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.inner.SetID(id)
-}

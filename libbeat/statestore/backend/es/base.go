@@ -181,17 +181,6 @@ func (b *baseStore) Close() error {
 	return nil
 }
 
-func (b *baseStore) SetID(id string) {
-	if b == nil {
-		return
-	}
-
-	if id == "" {
-		return
-	}
-	b.index = renderIndexName(id)
-}
-
 type queryResult struct {
 	Found  bool `json:"found"`
 	Source struct {

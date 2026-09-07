@@ -285,10 +285,6 @@ func (m *memstore) Remove(key string) bool {
 	return true
 }
 
-func (s *store) SetID(_ string) {
-	// NOOP
-}
-
 func (e entry) Decode(to any) error {
 	return typeconv.Convert(to, e.value)
 }

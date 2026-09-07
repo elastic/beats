@@ -256,7 +256,7 @@ func TestInputSeek(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			if testCase.cursor != "" {
-				store, err := env.stateStore.StoreFor("")
+				store, err := env.stateStore.StoreFor("", "")
 				if err != nil {
 					t.Fatalf("failed to open store: %v", err)
 				}

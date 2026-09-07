@@ -343,7 +343,7 @@ func (cim *InputManager) acquireLease() (func(), bool) {
 	if closed {
 		return func() {}, false
 	}
-	_, release, ok := globalCache.Lease(cim.StateStore.StoreKey())
+	_, release, ok := globalCache.Lease(cim.StateStore.StoreKey("", ""))
 	return release, ok
 }
 
