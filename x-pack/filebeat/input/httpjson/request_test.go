@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -562,8 +563,6 @@ func TestChainStepOriginValidation(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-=======
 func TestChainPaginationFailureDoesNotAdvanceCursor(t *testing.T) {
 	requester, trCtx, publisher := newChainPaginationTestRequester(t, nil)
 
@@ -664,9 +663,9 @@ func newChainPaginationTestRequester(t *testing.T, chainTransforms []any) (*requ
 	client, err := newHTTPClient(t.Context(), config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	require.NoError(t, err, "creating http client should succeed")
 
-	requestFactory, err := newRequestFactory(t.Context(), config, noopReporter{}, log, nil, nil, "")
+	requestFactory, err := newRequestFactory(t.Context(), config, noopReporter{}, log, nil, nil)
 	require.NoError(t, err, "creating request factory should succeed")
-	pagination := newPagination(config, client, noopReporter{}, log, "")
+	pagination := newPagination(config, client, noopReporter{}, log)
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
 	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
 
@@ -676,17 +675,6 @@ func newChainPaginationTestRequester(t *testing.T, chainTransforms []any) (*requ
 	return requester, trCtx, statelessPublisher{&beattest.FakeClient{}}
 }
 
-func TestPaginationRequestFactorySetsUserAgent(t *testing.T) {
-	const wantUA = "Elastic-Filebeat/9.5.0 (linux; amd64)"
-	u, _ := url.Parse("https://api.example.com/v1/events")
-	rf := newPaginationRequestFactory("GET", "", *u, &mapstr.M{}, nil, nil, nil, noopReporter{}, logptest.NewTestingLogger(t, t.Name()), wantUA)
-
-	req, err := rf.newRequest(emptyTransformContext())
-	require.NoError(t, err)
-	assert.Equal(t, wantUA, req.header().Get("User-Agent"))
-}
-
->>>>>>> 9eb57e8 (filebeat: keep httpjson chain pagination cursor on failure (#52996))
 func defaultChainConfig() config {
 	chaincfg := defaultConfig()
 	chaincfg.Chain = []chainConfig{
