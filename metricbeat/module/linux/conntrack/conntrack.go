@@ -23,7 +23,6 @@ import (
 
 	"github.com/prometheus/procfs"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -49,8 +48,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	base.Logger().Warn(cfgwarn.Beta("The linux conntrack metricset is beta."))
-
 	sys, ok := base.Module().(resolve.Resolver)
 	if !ok {
 		return nil, fmt.Errorf("unexpected module type: %T", base.Module())

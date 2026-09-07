@@ -7,8 +7,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-linux-ksm]]
 === Linux ksm metricset
 
-beta[]
-
 include::../../../module/linux/ksm/_meta/docs.asciidoc[]
 
 

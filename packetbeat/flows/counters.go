@@ -17,7 +17,11 @@
 
 package flows
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
 type Var interface{}
 
@@ -47,6 +51,7 @@ type counterReg struct {
 	ints   counterTypeReg
 	uints  counterTypeReg
 	floats counterTypeReg
+	logger *logp.Logger
 }
 
 type counterTypeReg struct {
@@ -148,8 +153,6 @@ func (c *counterReg) newFloat(name string) (*Float, error) {
 //   - error on index > int max
 //   - error if already in use
 func (reg *counterTypeReg) reg(name string) (int, error) {
-	debugf("register flow counter: %v", name)
-
 	i := len(reg.names)
 	reg.names = append(reg.names, name)
 	return i, nil

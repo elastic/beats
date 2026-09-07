@@ -132,7 +132,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, "", listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
 		cfg := config{
@@ -248,7 +248,7 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, "", listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
 		poller := &s3PollerInput{
@@ -269,6 +269,119 @@ func TestS3Poller(t *testing.T) {
 		// Finalization happens asynchronously after ACK; wait until it completes.
 		waitForChannel(t, backupDone, 3*testTimeout)
 		waitForChannel(t, deleteDone, 3*testTimeout)
+	})
+
+	t.Run("Same-bucket backup objects are excluded from listing", func(t *testing.T) {
+		store := openTestStatestore()
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
+		pipeline := newFakePipeline()
+
+		backupDone := make(chan struct{})
+
+		mockAPI.EXPECT().
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("")).
+			Times(1).
+			DoAndReturn(func(_, _ string) s3Pager {
+				return mockPager
+			})
+
+		hasMoreCalls := 0
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(2).
+			DoAndReturn(func() bool {
+				hasMoreCalls++
+				return hasMoreCalls == 1
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("input.log"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag2"),
+							Key:          aws.String("processed/input.log"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag3"),
+							Key:          aws.String("processed/processed/input.log"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		// Only the source object should be fetched.
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("input.log")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string) (*s3.GetObjectOutput, error) {
+				return &s3.GetObjectOutput{
+					Body: io.NopCloser(strings.NewReader("hello\n")),
+				}, nil
+			})
+
+		// Finalization copies the source object to the backup prefix.
+		mockAPI.EXPECT().
+			CopyObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq(bucket), gomock.Eq("input.log"), gomock.Eq("processed/input.log")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string, _ string, _ string) (*s3.CopyObjectOutput, error) {
+				close(backupDone)
+				return &s3.CopyObjectOutput{}, nil
+			})
+
+		// The backup-prefixed keys must NOT trigger GetObject. gomock will
+		// fail the test if an unexpected GetObject call is made.
+
+		backupCfg := backupConfig{
+			BackupToBucketArn:    bucket,
+			BackupToBucketPrefix: "processed/",
+		}
+
+		cfg := config{
+			NumberOfWorkers:    numberOfWorkers,
+			BucketListInterval: pollInterval,
+			BucketARN:          bucket,
+			BucketListPrefix:   "",
+			BackupConfig:       backupCfg,
+		}
+		log := logptest.NewTestingLogger(t, inputName)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
+		states, err := newStates(nil, store, "", "")
+		require.NoError(t, err, "states creation must succeed")
+
+		poller := &s3PollerInput{
+			log:             log,
+			config:          cfg,
+			s3:              mockAPI,
+			pipeline:        pipeline,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
+		}
+
+		poller.runPoll(ctx)
+		waitForChannel(t, backupDone, 3*testTimeout)
 	})
 
 	t.Run("restart bucket scan after paging errors", func(t *testing.T) {
@@ -388,7 +501,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
-		states, err := newStates(nil, store, listPrefix)
+		states, err := newStates(nil, store, "", listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
 		cfg := config{
@@ -644,7 +757,7 @@ func Test_S3StateHandling(t *testing.T) {
 			mockS3ObjectHandler.EXPECT().FinalizeS3Object().AnyTimes().Return(nil)
 
 			store := openTestStatestore()
-			s3States, err := newStates(logger, store, "")
+			s3States, err := newStates(logger, store, "", "")
 			require.NoError(t, err, "States creation must succeed")
 
 			// Note - add init states as if we are deriving them from registry

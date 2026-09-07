@@ -26,6 +26,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewPublisherMetadataUsesLocale(t *testing.T) {
+	const expectedLocale = uint32(0x0409)
+
+	var actualLocale uint32
+	metadata, err := newPublisherMetadata(
+		func(_ EvtHandle, _, _ *uint16, locale, _ uint32) (EvtHandle, error) {
+			actualLocale = locale
+			return EvtHandle(1), nil
+		},
+		NilHandle,
+		"Microsoft-Windows-PowerShell",
+		expectedLocale,
+	)
+	if !assert.NoError(t, err, "NewPublisherMetadata should succeed") {
+		return
+	}
+
+	assert.Equal(t, expectedLocale, actualLocale, "configured locale should be passed to EvtOpenPublisherMetadata")
+	assert.Equal(t, "Microsoft-Windows-PowerShell", metadata.Name, "publisher name should be preserved")
+}
+
 func TestPublisherMetadata(t *testing.T) {
 	// Modern Application
 	testPublisherMetadata(t, "Microsoft-Windows-PowerShell")

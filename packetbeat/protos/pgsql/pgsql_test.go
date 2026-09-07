@@ -53,6 +53,10 @@ func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
 	}
 
 	var pgsql pgsqlPlugin
+	logger := logp.NewNopLogger()
+	pgsql.log = logger
+	pgsql.debug = logger.Named("pgsql")
+	pgsql.detail = logger.Named("pgsqldetailed")
 	config := defaultConfig
 	pgsql.init(callback, &procs.ProcessesWatcher{}, &config)
 	return &pgsql

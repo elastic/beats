@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -52,7 +52,10 @@ const (
 // initCgroupPaths initializes a new cgroup reader. This enables
 // unit testing by allowing us to stub the OS interface.
 var initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
-	return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	return cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		RootfsMountpoint:  rootfsMountpoint,
+		IgnoreRootCgroups: ignoreRootCgroups,
+	})
 }
 
 func init() {
@@ -278,7 +281,12 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 		if cgroups := d.cgroups.Load(); cgroups != nil {
 			if cid := cgroups.Get(pid); cid != nil {
 				d.log.Debugf("Using cached cgroups for pid=%v", pid)
-				return cid.(string), nil
+				cidStr, ok := cid.(string)
+				if !ok {
+					d.log.Debugf("cached cgroup value for pid=%v is not a string (type=%T)", pid, cid)
+					continue
+				}
+				return cidStr, nil
 			}
 		}
 

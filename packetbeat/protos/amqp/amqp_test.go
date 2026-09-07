@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -47,11 +48,12 @@ func (e *eventStore) publish(event beat.Event) {
 }
 
 func amqpModForTests() (*eventStore, *amqpPlugin, error) {
-	var amqp amqpPlugin
 	results := &eventStore{}
-	config := defaultConfig
-	err := amqp.init(results.publish, &procs.ProcessesWatcher{}, &config)
-	return results, &amqp, err
+	plugin, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil, logp.L())
+	if err != nil {
+		return nil, nil, err
+	}
+	return results, plugin.(*amqpPlugin), nil
 }
 
 func testTCPTuple() *common.TCPTuple {
@@ -1248,7 +1250,7 @@ func TestAmqp_BasicReturnMethod_ParsesOffsets(t *testing.T) {
 		0x02, 'r', 'k', // routing-key
 	}
 
-	ok, complete := basicReturnMethod(m, args)
+	ok, complete := basicReturnMethod(m, args, logptest.NewTestingLogger(t, ""))
 	assert.True(t, ok)
 	assert.False(t, complete)
 	assert.Equal(t, "basic.return", m.method)
@@ -1268,7 +1270,7 @@ func TestAmqp_BasicGetOkMethod_ParsesOffsets(t *testing.T) {
 		0x00, 0x00, 0x00, 0x05, // message-count = 5
 	}
 
-	ok, complete := basicGetOkMethod(m, args)
+	ok, complete := basicGetOkMethod(m, args, logptest.NewTestingLogger(t, ""))
 	assert.True(t, ok)
 	assert.False(t, complete)
 	assert.Equal(t, "basic.get-ok", m.method)
@@ -1285,7 +1287,7 @@ func TestAmqp_GetTable_EmptyTableAtEndOfData(t *testing.T) {
 		0x00, 0x00, 0x00, 0x00, // table length = 0
 	}
 
-	next, err, exists := getTable(fields, data, 1)
+	next, err, exists := getTable(fields, data, 1, logptest.NewTestingLogger(t, ""))
 	assert.False(t, err)
 	assert.False(t, exists)
 	assert.Equal(t, uint32(5), next)
@@ -1298,7 +1300,7 @@ func TestAmqp_OverflowValidation_GetLVStringUint32OffsetWrap(t *testing.T) {
 	data := []byte{0, 0, 0, 1, 'x'}
 	var err bool
 	assert.NotPanics(t, func() {
-		_, _, err = getLVString[uint32](data, math.MaxUint32-1)
+		_, _, err = getLVString[uint32](data, math.MaxUint32-1, logptest.NewTestingLogger(t, ""))
 	})
 	assert.True(t, err)
 }
@@ -1313,7 +1315,7 @@ func TestAmqp_OverflowValidation_GetTableOffsetWrap(t *testing.T) {
 		exists bool
 	)
 	assert.NotPanics(t, func() {
-		next, err, exists = getTable(fields, data, math.MaxUint32-1)
+		next, err, exists = getTable(fields, data, math.MaxUint32-1, logptest.NewTestingLogger(t, ""))
 	})
 	assert.True(t, err)
 	assert.False(t, exists)
@@ -1330,7 +1332,7 @@ func TestAmqp_OverflowValidation_GetArrayOffsetWrap(t *testing.T) {
 		exists bool
 	)
 	assert.NotPanics(t, func() {
-		next, err, exists = getArray(fields, data, math.MaxUint32-1)
+		next, err, exists = getArray(fields, data, math.MaxUint32-1, logptest.NewTestingLogger(t, ""))
 	})
 	assert.True(t, err)
 	assert.False(t, exists)

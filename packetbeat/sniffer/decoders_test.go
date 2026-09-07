@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/dns"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestDecoderAndProtocolCleanupStopsAllGoroutines(t *testing.T) {
@@ -41,7 +42,7 @@ func TestDecoderAndProtocolCleanupStopsAllGoroutines(t *testing.T) {
 			"type":    "dns",
 			"enabled": true,
 		}),
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	cfg := config.Config{
@@ -52,7 +53,7 @@ func TestDecoderAndProtocolCleanupStopsAllGoroutines(t *testing.T) {
 		},
 	}
 
-	makeDecoders := DecodersFor("test", nil, protocols, nil, nil, cfg)
+	makeDecoders := DecodersFor("test", nil, protocols, nil, nil, cfg, logptest.NewTestingLogger(t, ""))
 	_, cleanup, err := makeDecoders(layers.LinkTypeEthernet, "lo", 0)
 	require.NoError(t, err)
 	require.NotNil(t, cleanup)

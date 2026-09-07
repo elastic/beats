@@ -18,10 +18,10 @@
 package seccomp
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
-
-	"errors"
+	"slices"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -41,25 +41,49 @@ var (
 	registeredPolicy *seccomp.Policy
 )
 
-// MustRegisterPolicy registers a seccomp policy to use instead of the default
-// policy. This can be used to register an application specific seccomp policy
-// that is tailored to the specific system calls that the application requires.
-// It panics if a policy has already been registered or if the given policy
+// MustRegisterPolicy registers an application-specific seccomp policy in place
+// of the default one. Re-registering an identical policy is a no-op, so it is
+// safe to call more than once (e.g. when a component is re-initialized in the
+// same process). It panics if a different policy is already registered or if p
 // is invalid.
 func MustRegisterPolicy(p *seccomp.Policy) {
+	registerPolicy(&registeredPolicy, p)
+}
+
+// registerPolicy validates p and stores it in *dst. It panics if p is nil,
+// invalid, or would install a different filter than the policy already in *dst.
+func registerPolicy(dst **seccomp.Policy, p *seccomp.Policy) {
 	if p == nil {
 		panic(errors.New("seccomp policy cannot be nil"))
-	}
-
-	if registeredPolicy != nil {
-		panic(errors.New("a seccomp policy is already registered"))
 	}
 
 	// Ensure that the policy is valid and usable.
 	if _, err := p.Assemble(); err != nil {
 		panic(fmt.Errorf("failed to register seccomp policy: %w", err))
 	}
-	registeredPolicy = p
+
+	if *dst != nil && !policiesEqual(*dst, p) {
+		panic(errors.New("a different seccomp policy is already registered"))
+	}
+
+	*dst = p
+}
+
+// policiesEqual reports whether a and b would install the same seccomp filter.
+func policiesEqual(a, b *seccomp.Policy) bool {
+	if a.DefaultAction != b.DefaultAction {
+		return false
+	}
+	return slices.EqualFunc(a.Syscalls, b.Syscalls, func(x, y seccomp.SyscallGroup) bool {
+		return x.Action == y.Action &&
+			slices.Equal(x.Names, y.Names) &&
+			slices.EqualFunc(x.NamesWithCondtions, y.NamesWithCondtions, nameWithConditionsEqual)
+	})
+}
+
+// nameWithConditionsEqual reports whether two conditional syscall matches are equal.
+func nameWithConditionsEqual(a, b seccomp.NameWithConditions) bool {
+	return a.Name == b.Name && slices.Equal(a.Conditions, b.Conditions)
 }
 
 // LoadFilter loads a seccomp system call filter into the kernel for this

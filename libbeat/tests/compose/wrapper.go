@@ -23,6 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"os/exec"
@@ -37,7 +38,7 @@ import (
 	"github.com/moby/moby/api/types/container"
 	dockerclient "github.com/moby/moby/client"
 
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -106,6 +107,7 @@ func (c *wrapperContainer) Old() bool {
 // running from the hoist network if the docker daemon runs natively.
 func (c *wrapperContainer) privateHost(port int) string {
 	var ip string
+	var shortPort uint16
 	for _, net := range c.info.NetworkSettings.Networks {
 		if net.IPAddress.IsValid() {
 			ip = net.IPAddress.String()
@@ -116,8 +118,13 @@ func (c *wrapperContainer) privateHost(port int) string {
 		return ""
 	}
 
+	if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort(ip, strconv.Itoa(int(info.PrivatePort)))
 		}
 	}
@@ -127,8 +134,15 @@ func (c *wrapperContainer) privateHost(port int) string {
 // exposedHost returns the exposed address in the host, can be used when the
 // test is run from the host network. Recommended when using docker machines.
 func (c *wrapperContainer) exposedHost(port int) string {
+	var shortPort uint16
+
+	if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort("localhost", strconv.Itoa(int(info.PublicPort)))
 		}
 	}

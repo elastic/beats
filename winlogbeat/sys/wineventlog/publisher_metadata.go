@@ -35,6 +35,14 @@ type PublisherMetadata struct {
 	Handle EvtHandle // Handle to the publisher metadata from EvtOpenPublisherMetadata.
 }
 
+type openPublisherMetadataFunc func(
+	session EvtHandle,
+	publisherIdentity *uint16,
+	logFilePath *uint16,
+	locale uint32,
+	flags uint32,
+) (EvtHandle, error)
+
 // Close releases the publisher metadata handle.
 func (m *PublisherMetadata) Close() error {
 	return m.Handle.Close()
@@ -43,6 +51,15 @@ func (m *PublisherMetadata) Close() error {
 // NewPublisherMetadata opens the publisher's metadata. Close must be called on
 // the returned PublisherMetadata to release its handle.
 func NewPublisherMetadata(session EvtHandle, name string, locale uint32) (*PublisherMetadata, error) {
+	return newPublisherMetadata(_EvtOpenPublisherMetadata, session, name, locale)
+}
+
+func newPublisherMetadata(
+	openPublisherMetadata openPublisherMetadataFunc,
+	session EvtHandle,
+	name string,
+	locale uint32,
+) (*PublisherMetadata, error) {
 	var publisherName, logFile *uint16
 	if info, err := os.Stat(name); err == nil && info.Mode().IsRegular() {
 		logFile, err = syscall.UTF16PtrFromString(name)
@@ -56,7 +73,7 @@ func NewPublisherMetadata(session EvtHandle, name string, locale uint32) (*Publi
 		}
 	}
 
-	handle, err := _EvtOpenPublisherMetadata(session, publisherName, logFile, 0, 0)
+	handle, err := openPublisherMetadata(session, publisherName, logFile, locale, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtOpenPublisherMetadata: %w", err)
 	}

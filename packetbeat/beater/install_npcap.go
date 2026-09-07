@@ -48,7 +48,7 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	}
 
 	defer func() {
-		log := logp.NewLogger("npcap")
+		log := b.Info.Logger.Named("npcap")
 		npcapVersion := npcap.Version()
 		if npcapVersion == "" {
 			log.Warn("no version available for npcap")
@@ -61,7 +61,7 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 		return nil
 	}
 
-	log := logp.NewLogger("npcap_install")
+	log := b.Info.Logger.Named("npcap_install")
 	// Only check whether we have been requested to never_install if there
 	// is already an Npcap installation present. This should not be necessary,
 	// but the start-up logic of packetbeat is tightly coupled to the presence

@@ -47,11 +47,7 @@ func DefineModules() {
 	}
 
 	var modulePattern = fmt.Sprintf("^%s\\/module\\/([^\\/]+)\\/.*", beatPath)
-
-	moduleRegex, err := regexp.Compile(modulePattern)
-	if err != nil {
-		log.Fatal("failed to compile regex: " + err.Error())
-	}
+	moduleRegex := regexp.MustCompile(modulePattern)
 
 	modules := map[string]struct{}{}
 	for _, line := range getDiff() {
@@ -73,8 +69,7 @@ func DefineModules() {
 	moduleVar := strings.Join(keys, ",")
 
 	if moduleVar != "" {
-		err = os.Setenv("MODULE", moduleVar)
-		if err != nil {
+		if err := os.Setenv("MODULE", moduleVar); err != nil {
 			return
 		}
 
@@ -91,6 +86,12 @@ func shouldIgnore(file string) bool {
 			return true
 		}
 	}
+
+	// if the file has been removed, we should ignore it
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		return true
+	}
+
 	return false
 }
 

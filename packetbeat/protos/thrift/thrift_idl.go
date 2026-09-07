@@ -60,14 +60,14 @@ func fieldsToArrayByID(fields []*parser.Field) []*string {
 	return output
 }
 
-func buildMethodsMap(thriftFiles map[string]parser.Thrift) map[string]*thriftIdlMethod {
+func buildMethodsMap(thriftFiles map[string]parser.Thrift, logger *logp.Logger) map[string]*thriftIdlMethod {
 	output := make(map[string]*thriftIdlMethod)
 
 	for _, thrift := range thriftFiles {
 		for _, service := range thrift.Services {
 			for _, method := range service.Methods {
 				if _, exists := output[method.Name]; exists {
-					logp.Warn("Thrift IDL: Method %s is defined in more services: %s and %s",
+					logger.Warnf("Thrift IDL: Method %s is defined in more services: %s and %s",
 						method.Name, output[method.Name].service.Name, service.Name)
 				}
 				output[method.Name] = &thriftIdlMethod{
@@ -106,7 +106,7 @@ func (thriftidl *thriftIdl) findMethod(name string) *thriftIdlMethod {
 	return thriftidl.methodsByName[name]
 }
 
-func newThriftIdl(idlFiles []string) (*thriftIdl, error) {
+func newThriftIdl(idlFiles []string, logger *logp.Logger) (*thriftIdl, error) {
 	if len(idlFiles) == 0 {
 		return nil, nil
 	}
@@ -116,6 +116,6 @@ func newThriftIdl(idlFiles []string) (*thriftIdl, error) {
 	}
 
 	return &thriftIdl{
-		methodsByName: buildMethodsMap(thriftFiles),
+		methodsByName: buildMethodsMap(thriftFiles, logger),
 	}, nil
 }

@@ -23,12 +23,13 @@ import (
 )
 
 var quarkMetrics = struct {
-	insertions      *monitoring.Uint
-	removals        *monitoring.Uint
-	aggregations    *monitoring.Uint
-	nonAggregations *monitoring.Uint
-	lost            *monitoring.Uint
-	backend         *monitoring.String
+	insertions         *monitoring.Uint
+	removals           *monitoring.Uint
+	aggregations       *monitoring.Uint
+	nonAggregations    *monitoring.Uint
+	garbageCollections *monitoring.Uint
+	lost               *monitoring.Uint
+	backend            *monitoring.String
 }{}
 
 func init() {
@@ -37,6 +38,7 @@ func init() {
 	quarkMetrics.removals = monitoring.NewUint(reg, "removals")
 	quarkMetrics.aggregations = monitoring.NewUint(reg, "aggregations")
 	quarkMetrics.nonAggregations = monitoring.NewUint(reg, "non_aggregations")
+	quarkMetrics.garbageCollections = monitoring.NewUint(reg, "garbage_collections")
 	quarkMetrics.lost = monitoring.NewUint(reg, "lost")
 	quarkMetrics.backend = monitoring.NewString(reg, "backend", monitoring.Report)
 }
@@ -48,7 +50,7 @@ func init() {
 type QuarkMetricSet struct {
 	MetricSet
 	queue        *quark.Queue // Quark runtime state
-	selfMntNsIno uint64       // Mnt inode from current process
+	selfMntNsIno uint32       // Mnt inode from current process
 	cachedHasher *hasher.CachedHasher
 }
 
@@ -65,7 +67,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch self mount inode: %w", err)
 	}
-	qm.selfMntNsIno = ino64
+	qm.selfMntNsIno = uint32(ino64) //nolint:gosec // mount namespace inodes fit in uint32
 	qm.cachedHasher, err = hasher.NewFileHasherWithCache(qm.config.HasherConfig, 4096)
 	if err != nil {
 		return nil, fmt.Errorf("can't create hash cache: %w", err)
@@ -76,7 +78,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 		attr.Flags &= ^quark.QQ_ALL_BACKENDS
 		attr.Flags |= quark.QQ_KPROBE
 	}
-	qm.queue, err = quark.OpenQueue(attr, 1)
+	qm.queue, err = quark.OpenQueue(attr)
 	if err != nil {
 		qm.cachedHasher.Close()
 		return nil, fmt.Errorf("can't open quark queue: %w", err)
@@ -104,6 +106,14 @@ func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
 
 	metricsStamp := time.Now()
 
+	for _, proc := range ms.queue.Snapshot() {
+		var snapshotEvent quark.Event
+		snapshotEvent.Process = proc
+		if event, ok := ms.toEvent(snapshotEvent, true); ok {
+			r.Event(event)
+		}
+	}
+
 MainLoop:
 	for {
 		// Poll for done
@@ -116,29 +126,20 @@ MainLoop:
 		ms.maybeUpdateMetrics(&metricsStamp)
 
 		x := time.Now()
-		quarkEvents, err := ms.queue.GetEvents()
-		if len(quarkEvents) == 1 {
-			ms.log.Debugf("getevents took %v", time.Since(x))
-		}
-		if err != nil {
-			ms.log.Error("quark GetEvents, unrecoverable error", err)
-			break MainLoop
-		}
-		if len(quarkEvents) == 0 {
-			err = ms.queue.Block()
-			if err != nil {
+		quarkEvent, ok := ms.queue.GetEvent()
+		if !ok {
+			if err := ms.queue.Block(); err != nil {
 				ms.log.Error("quark Block, unrecoverable error", err)
 				break MainLoop
 			}
 			continue
 		}
-		for _, quarkEvent := range quarkEvents {
-			if !wantedEvent(quarkEvent) {
-				continue
-			}
-			if event, ok := ms.toEvent(quarkEvent); ok {
-				r.Event(event)
-			}
+		ms.log.Debugf("getevent took %v", time.Since(x))
+		if !wantedEvent(quarkEvent) {
+			continue
+		}
+		if event, ok := ms.toEvent(quarkEvent, false); ok {
+			r.Event(event)
 		}
 	}
 
@@ -151,8 +152,8 @@ MainLoop:
 
 // toEvent converts a quark.Event to a mb.Event, returns true if we
 // were able to make an event.
-func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
-	action, evtype := actionAndTypeOfEvent(quarkEvent)
+func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event, snap bool) (mb.Event, bool) {
+	action, evtype := actionAndTypeOfEvent(quarkEvent, snap)
 	process := quarkEvent.Process
 	event := mb.Event{RootFields: mapstr.M{}}
 
@@ -175,11 +176,17 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 	event.RootFields.Put("event.kind", "event")
 	// Fill out process.*
 	event.RootFields.Put("process.name", process.Comm)
-	event.RootFields.Put("process.args", process.Cmdline)
-	event.RootFields.Put("process.args_count", len(process.Cmdline))
+	if len(process.Cmdline) > 0 {
+		event.RootFields.Put("process.args", process.Cmdline)
+		event.RootFields.Put("process.args_count", len(process.Cmdline))
+	}
 	event.RootFields.Put("process.pid", process.Pid)
-	event.RootFields.Put("process.working_directory", process.Cwd)
-	event.RootFields.Put("process.executable", process.Filename)
+	if len(process.Cwd) > 0 {
+		event.RootFields.Put("process.working_directory", process.Cwd)
+	}
+	if len(process.Exe) > 0 {
+		event.RootFields.Put("process.executable", process.Exe)
+	}
 	if process.Exit.Valid {
 		event.RootFields.Put("process.exit_code", process.Exit.ExitCode)
 	}
@@ -193,7 +200,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 
 	// Ids
 	event.RootFields.Put("process.parent.pid", process.Proc.Ppid)
-	startTime := time.Unix(0, int64(process.Proc.TimeBoot)) //nolint:gosec // 292 billion years is enough
+	startTime := time.Unix(0, int64(process.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 	if ms.HostID() != "" {
 		// TODO unify with sessionview and guarantee loss of precision
 		event.RootFields.Put("process.entity_id",
@@ -236,11 +243,11 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 	// the file. When quark is running on kprobes, there are
 	// limitations concerning the full path of the filename, in
 	// those cases, the path won't start with a slash.
-	if uint64(process.Proc.MntInonum) == ms.selfMntNsIno && len(process.Filename) > 0 && process.Filename[0] == '/' {
-		hashes, err := ms.cachedHasher.HashFile(process.Filename)
+	if process.Proc.MntInonum == ms.selfMntNsIno && len(process.Exe) > 0 && process.Exe[0] == '/' {
+		hashes, err := ms.cachedHasher.HashFile(process.Exe)
 		if err != nil {
 			processErr = fmt.Errorf("failed to hash executable %v for PID %v: %w",
-				process.Filename, process.Pid, err)
+				process.Exe, process.Pid, err)
 			ms.log.Warn(processErr.Error())
 		} else {
 			for hashType, digest := range hashes {
@@ -249,7 +256,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 			}
 		}
 	} else {
-		ms.log.Debugf("skipping hash %s (inonum %d vs %d)", process.Filename, process.Proc.MntInonum, ms.selfMntNsIno)
+		ms.log.Debugf("skipping hash %s (inonum %d vs %d)", process.Exe, process.Proc.MntInonum, ms.selfMntNsIno)
 	}
 
 	return event, true
@@ -259,8 +266,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 func wantedEvent(quarkEvent quark.Event) bool {
 	const wanted uint64 = quark.QUARK_EV_FORK |
 		quark.QUARK_EV_EXEC |
-		quark.QUARK_EV_EXIT |
-		quark.QUARK_EV_SNAPSHOT
+		quark.QUARK_EV_EXIT
 	if quarkEvent.Events&wanted == 0 ||
 		quarkEvent.Process.Pid == 2 ||
 		quarkEvent.Process.Proc.Ppid == 2 { // skip kthreads
@@ -272,8 +278,7 @@ func wantedEvent(quarkEvent quark.Event) bool {
 }
 
 // actionAndTypeOfEvent computes eventAction and event.type out of a quark.Event.
-func actionAndTypeOfEvent(quarkEvent quark.Event) (eventAction, []string) {
-	snap := quarkEvent.Events&quark.QUARK_EV_SNAPSHOT != 0
+func actionAndTypeOfEvent(quarkEvent quark.Event, snap bool) (eventAction, []string) {
 	fork := quarkEvent.Events&quark.QUARK_EV_FORK != 0
 	exec := quarkEvent.Events&quark.QUARK_EV_EXEC != 0
 	exit := quarkEvent.Events&quark.QUARK_EV_EXIT != 0
@@ -325,6 +330,7 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 	quarkMetrics.removals.Set(stats.Removals)
 	quarkMetrics.aggregations.Set(stats.Aggregations)
 	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
+	quarkMetrics.garbageCollections.Set(stats.GarbageCollections)
 	quarkMetrics.lost.Set(stats.Lost)
 	switch stats.Backend {
 	case quark.QQ_EBPF:

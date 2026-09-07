@@ -28,12 +28,15 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -61,7 +64,7 @@ func TestEventWithNonStringData(t *testing.T) {
 				KillFunc: func() error { return nil },
 			}
 			r := Reader{
-				logger: logp.L(),
+				logger: logptest.NewTestingLogger(t, ""),
 				jctl:   &mock,
 			}
 
@@ -197,6 +200,98 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 }
 
+type statusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+type mockStatusReporter struct {
+	mu      sync.Mutex
+	updates []statusUpdate
+}
+
+func (m *mockStatusReporter) UpdateStatus(s status.Status, msg string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.updates = append(m.updates, statusUpdate{s, msg})
+}
+
+func (m *mockStatusReporter) getUpdates() []statusUpdate {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return slices.Clone(m.updates)
+}
+
+func TestReaderReportsDegradedOnRestartLoop(t *testing.T) {
+	versionMock := JctlMock{
+		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+			return []byte("systemd 259 (259.3-1-arch)\n+PAM +AUDIT"), nil
+		},
+		KillFunc: func() error { return nil },
+	}
+
+	dataCalls := atomic.Uint32{}
+	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+		if slices.Contains(args, "--version") {
+			return &versionMock, nil
+		}
+
+		id := dataCalls.Add(1)
+		return &JctlMock{
+			NextFunc: func(canceler input.Canceler) ([]byte, error) {
+				// The first two journalctl instances exit without delivering
+				// any data, the third one succeeds.
+				if id < 3 {
+					return nil, fmt.Errorf("journalctl %d exited with code 1", id)
+				}
+				return jdEvent, nil
+			},
+			KillFunc: func() error { return nil },
+		}, nil
+	}
+
+	reader, err := New(
+		logp.NewNopLogger(),
+		t.Context(),
+		nil,
+		nil,
+		nil,
+		journalfield.IncludeMatches{},
+		nil,
+		SeekHead,
+		"",
+		0,
+		"",
+		factory)
+	if err != nil {
+		t.Fatalf("cannot instantiate journalctl reader: %s", err)
+	}
+
+	reporter := &mockStatusReporter{}
+	reader.SetStatusReporter(reporter)
+
+	// Next must block through both failed journalctl instances and only
+	// return once the third instance delivers an entry.
+	entry, err := reader.Next(t.Context())
+	if err != nil {
+		t.Fatalf("expecting no error, got: %s", err)
+	}
+	if len(entry.Fields) == 0 {
+		t.Fatal("expected a valid entry after journalctl recovered")
+	}
+
+	updates := reporter.getUpdates()
+	if len(updates) != 2 {
+		t.Fatalf("expecting exactly 2 status updates (Degraded, Running), got %d: %v", len(updates), updates)
+	}
+	if updates[0].status != status.Degraded {
+		t.Errorf("first status update must be Degraded, got %v (%q)", updates[0].status, updates[0].msg)
+	}
+	if updates[1].status != status.Running {
+		t.Errorf("second status update must be Running, got %v (%q)", updates[1].status, updates[1].msg)
+	}
+}
+
 // fakeJournalctl writes a tiny shell script that prints a fake journalctl
 // version line and returns the path to that script.
 func fakeJournalctl(t *testing.T, version int) string {
@@ -236,6 +331,52 @@ func TestJournalctlSupportsBootAll(t *testing.T) {
 			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
 			if got != tc.wantBootAll {
 				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
+			}
+		})
+	}
+}
+
+func TestFacilityArgs(t *testing.T) {
+	// Facilities are always passed as SYSLOG_FACILITY matches regardless of
+	// the journalctl version: `--facility` only exists on journalctl >= 245
+	// and is implemented as exactly these matches.
+	for _, version := range []int{239, 250} {
+		t.Run(fmt.Sprintf("version %d", version), func(t *testing.T) {
+			f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
+				return &JctlMock{
+					NextFunc: func(canceler input.Canceler) ([]byte, error) {
+						ret := fmt.Sprintf("systemd %d (%d-test)\n+PAM +AUDIT", version, version)
+						return []byte(ret), nil
+					},
+					KillFunc: func() error { return nil },
+				}, nil
+			}
+
+			r, err := New(
+				logptest.NewTestingLogger(t, ""),
+				t.Context(),
+				nil,
+				nil,
+				nil,
+				journalfield.IncludeMatches{},
+				[]int{4, 10},
+				SeekHead,
+				"",
+				0,
+				"",
+				f)
+			if err != nil {
+				t.Fatalf("did not expect an error when calling New: %s", err)
+			}
+
+			argsStr := strings.Join(r.args, " ")
+			for _, want := range []string{"SYSLOG_FACILITY=4", "SYSLOG_FACILITY=10"} {
+				if !strings.Contains(argsStr, want) {
+					t.Errorf("expected %q in args %q", want, argsStr)
+				}
+			}
+			if strings.Contains(argsStr, "--facility") {
+				t.Errorf("did not expect \"--facility\" in args %q", argsStr)
 			}
 		})
 	}

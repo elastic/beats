@@ -63,7 +63,7 @@ type entry struct {
 func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, checkpoint CheckpointPredicate) (*store, error) {
 	fi, err := os.Stat(home)
 	if os.IsNotExist(err) {
-		err = os.MkdirAll(home, os.ModeDir|0770)
+		err = os.MkdirAll(home, os.ModeDir|0o770)
 		if err != nil {
 			return nil, err
 		}
@@ -75,7 +75,16 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 	} else if !fi.Mode().IsDir() {
 		return nil, fmt.Errorf("'%v' is not a directory", home)
 	} else {
-		if err := pathEnsurePermissions(filepath.Join(home, metaFileName), mode); err != nil {
+		metaPath := filepath.Join(home, metaFileName)
+		if _, err := os.Stat(metaPath); os.IsNotExist(err) {
+			// Directory exists but meta.json is absent — the process likely crashed
+			// after MkdirAll but before writeMetaFile completed on a prior run.
+			if err := writeMetaFile(home, mode); err != nil {
+				return nil, err
+			}
+		} else if err != nil {
+			return nil, fmt.Errorf("failed to stat meta file: %w", err)
+		} else if err := pathEnsurePermissions(metaPath, mode); err != nil {
 			return nil, fmt.Errorf("failed to update meta file permissions: %w", err)
 		}
 	}

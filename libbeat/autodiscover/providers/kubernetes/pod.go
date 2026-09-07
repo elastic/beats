@@ -29,10 +29,10 @@ import (
 	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -215,7 +215,7 @@ func (p *pod) OnAdd(obj any) {
 	defer p.crossUpdate.RUnlock()
 
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
-	p.emit(obj.(*kubernetes.Pod), "start")
+	p.emit(obj.(*kubernetes.Pod), "start") //nolint:errcheck // informer object type is validated
 }
 
 // OnUpdate handles events for pods that have been updated.
@@ -228,8 +228,8 @@ func (p *pod) OnUpdate(obj any) {
 
 func (p *pod) unlockedUpdate(obj any) {
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
-	p.emit(obj.(*kubernetes.Pod), "stop")
-	p.emit(obj.(*kubernetes.Pod), "start")
+	p.emit(obj.(*kubernetes.Pod), "stop")  //nolint:errcheck // informer object type is validated
+	p.emit(obj.(*kubernetes.Pod), "start") //nolint:errcheck // informer object type is validated
 }
 
 // OnDelete stops pod objects that are deleted.
@@ -238,7 +238,7 @@ func (p *pod) OnDelete(obj any) {
 	defer p.crossUpdate.RUnlock()
 
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
-	p.emit(obj.(*kubernetes.Pod), "stop")
+	p.emit(obj.(*kubernetes.Pod), "stop") //nolint:errcheck // informer object type is validated
 }
 
 // GenerateHints creates hints needed for hints builder.

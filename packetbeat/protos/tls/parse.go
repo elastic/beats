@@ -106,6 +106,7 @@ type parser struct {
 
 	// If a key-exchange message has been sent. Used to detect session resumption
 	keyExchanged bool
+	logger       *logp.Logger
 }
 
 // https://www.rfc-editor.org/rfc/rfc6960#section-4.2.1
@@ -160,6 +161,7 @@ type helloMessage struct {
 		compression compressionMethod
 	}
 	extensions Extensions
+	logger     *logp.Logger
 }
 
 func readRecordHeader(buf *streambuf.Buffer) (*recordHeader, error) {
@@ -247,13 +249,19 @@ func (hello *helloMessage) supportedCiphers() []string {
 	return ciphers
 }
 
+func (parser *parser) debugf(format string, args ...interface{}) {
+	if parser.logger != nil && parser.logger.IsDebug() {
+		parser.logger.Debugf(format, args...)
+	}
+}
+
 func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 	for buf.Avail(recordHeaderSize) {
 
 		header, err := readRecordHeader(buf)
 		if err != nil || !header.isValid() {
 			if err != nil {
-				logp.Warn("internal buffer error: %v", err)
+				parser.logger.Warnf("internal buffer error: %v", err)
 			}
 			return resultFailed
 		}
@@ -266,38 +274,30 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 
 		switch header.recordType {
 		case recordTypeChangeCipherSpec: // single message of size 1 (byte 1)
-			if isDebug {
-				debugf("handshake completed")
-			}
+			parser.debugf("handshake completed")
 			// discard remaining data for this stream (encrypted)
 			_ = buf.Advance(buf.Len())
 			return resultEncrypted
 
 		case recordTypeHandshake:
-			if isDebug {
-				debugf("got handshake record of size %d", header.length)
-			}
+			parser.debugf("got handshake record of size %d", header.length)
 			if err = parser.bufferHandshake(buf, int(header.length)); err != nil {
-				logp.Warn("Error parsing handshake message: %v", err)
+				parser.logger.Warnf("Error parsing handshake message: %v", err)
 				return resultFailed
 			}
 
 		case recordTypeAlert:
 			if err = parser.parseAlert(newBufferView(buf, recordHeaderSize, int(header.length))); err != nil {
-				logp.Warn("Error parsing alert message: %v", err)
+				parser.logger.Warnf("Error parsing alert message: %v", err)
 				return resultFailed
 			}
 
 		case recordTypeApplicationData:
 			// TODO: Request / Response analytics
-			if isDebug {
-				debugf("ignoring application data length %d", header.length)
-			}
+			parser.debugf("ignoring application data length %d", header.length)
 
 		default:
-			if isDebug {
-				debugf("ignoring record type %d length %d", header.recordType, header.length)
-			}
+			parser.debugf("ignoring record type %d length %d", header.recordType, header.length)
 		}
 
 		_ = buf.Advance(limit)
@@ -313,7 +313,7 @@ func (parser *parser) bufferHandshake(buf *streambuf.Buffer, length int) (err er
 	// TODO: parse in-place if message in received buffer is complete
 	err = parser.handshakeBuf.Append(buf.Bytes()[recordHeaderSize : recordHeaderSize+length])
 	if err != nil {
-		logp.Warn("failed appending to buffer: %v", err)
+		parser.logger.Warnf("failed appending to buffer: %v", err)
 		// Discard buffer
 		parser.handshakeBuf.Init(nil, false)
 		return err
@@ -335,7 +335,7 @@ func (parser *parser) bufferHandshake(buf *streambuf.Buffer, length int) (err er
 		// type
 		header, err := readHandshakeHeader(&parser.handshakeBuf)
 		if err != nil {
-			logp.Warn("read failed: %v", err)
+			parser.logger.Warnf("read failed: %v", err)
 			parser.handshakeBuf.Init(nil, false)
 			return err
 		}
@@ -363,30 +363,28 @@ func (parser *parser) bufferHandshake(buf *streambuf.Buffer, length int) (err er
 
 func (parser *parser) setDirection(dir direction) {
 	if parser.direction != dir && parser.direction != dirUnknown {
-		logp.Warn("client/server identification mismatch")
+		parser.logger.Warn("client/server identification mismatch")
 	}
 	parser.direction = dir
 }
 
 func (parser *parser) parseHandshake(handshakeType handshakeType, buffer bufferView) bool {
-	if isDebug {
-		debugf("got handshake message %v [%d]", handshakeType, buffer.length())
-	}
+	parser.debugf("got handshake message %v [%d]", handshakeType, buffer.length())
 	switch handshakeType {
 	case helloRequest:
 		parser.setDirection(dirServer)
-		return parseHelloRequest(buffer)
+		return parseHelloRequest(buffer, parser.logger)
 
 	case clientHello:
 		parser.setDirection(dirClient)
-		if parser.hello = parseClientHello(buffer); parser.hello == nil {
+		if parser.hello = parseClientHello(buffer, parser.logger); parser.hello == nil {
 			return false
 		}
 		return true
 
 	case serverHello:
 		parser.setDirection(dirServer)
-		if parser.hello = parseServerHello(buffer); parser.hello == nil {
+		if parser.hello = parseServerHello(buffer, parser.logger); parser.hello == nil {
 			return false
 		}
 		return true
@@ -413,9 +411,9 @@ func (parser *parser) parseHandshake(handshakeType handshakeType, buffer bufferV
 	return true
 }
 
-func parseHelloRequest(buffer bufferView) bool {
+func parseHelloRequest(buffer bufferView, logger *logp.Logger) bool {
 	if buffer.length() != 0 {
-		logp.Warn("non-empty hello request")
+		logger.Warn("non-empty hello request")
 	}
 	return true
 }
@@ -428,23 +426,23 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 		!buffer.read32Net(2, &dest.timestamp) ||
 		// ignore 28 random bytes
 		!buffer.read8(6+randomDataLength, &sessionIDLength) {
-		logp.Warn("failed reading hello message")
+		dest.logger.Warn("failed reading hello message")
 		return 0, false
 	}
 
 	if dest.version.major != 3 {
-		logp.Warn("Not a TLS hello (reported version %d.%d)",
+		dest.logger.Warnf("Not a TLS hello (reported version %d.%d)",
 			dest.version.major, dest.version.minor)
 		return 0, false
 	}
 	if sessionIDLength > 32 {
-		logp.Warn("Not a TLS hello (session id length %d out of bounds)", sessionIDLength)
+		dest.logger.Warnf("Not a TLS hello (session id length %d out of bounds)", sessionIDLength)
 		return 0, false
 	}
 
 	bytes := buffer.readBytes(7+randomDataLength, int(sessionIDLength))
 	if len(bytes) != int(sessionIDLength) {
-		logp.Warn("Not a TLS hello (failed reading session ID)")
+		dest.logger.Warn("Not a TLS hello (failed reading session ID)")
 		return 0, false
 	}
 	dest.sessionID = hex.EncodeToString(bytes)
@@ -454,19 +452,20 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 }
 
 func (hello *helloMessage) parseExtensions(buffer bufferView) {
-	hello.extensions = ParseExtensions(buffer)
+	hello.extensions = ParseExtensions(buffer, hello.logger)
 	if ticket, err := hello.extensions.Parsed.GetValue("session_ticket"); err == nil {
 		if value, ok := ticket.(string); ok {
 			hello.ticket.present = true
 			hello.ticket.value = value
 		} else {
-			logp.Err("tls ticket data type error")
+			hello.logger.Error("tls ticket data type error")
 		}
 	}
 }
 
-func parseClientHello(buffer bufferView) *helloMessage {
+func parseClientHello(buffer bufferView, logger *logp.Logger) *helloMessage {
 	var result helloMessage
+	result.logger = logger
 	pos, ok := parseCommonHello(buffer, &result)
 	if !ok {
 		return nil
@@ -474,14 +473,14 @@ func parseClientHello(buffer bufferView) *helloMessage {
 
 	var cipherSuitesLength uint16
 	if !buffer.read16Net(pos, &cipherSuitesLength) {
-		logp.Warn("failed parsing client hello cipher suite length")
+		logger.Warn("failed parsing client hello cipher suite length")
 		return nil
 	}
 
 	for base := pos + 2; base < pos+2+int(cipherSuitesLength); base += 2 {
 		var cipher uint16
 		if !buffer.read16Net(base, &cipher) {
-			logp.Warn("failed parsing client hello cipher suite")
+			logger.Warn("failed parsing client hello cipher suite")
 			return nil
 		}
 		if !isGreaseValue(cipher) {
@@ -492,14 +491,14 @@ func parseClientHello(buffer bufferView) *helloMessage {
 	pos += 2 + int(cipherSuitesLength)
 	var compMethodsLength uint8
 	if !buffer.read8(pos, &compMethodsLength) {
-		logp.Warn("failed parsing client hello compression methods length")
+		logger.Warn("failed parsing client hello compression methods length")
 		return nil
 	}
 	limit := pos + 1 + int(compMethodsLength)
 	for base := pos + 1; base < limit; base++ {
 		var method uint8
 		if !buffer.read8(base, &method) {
-			logp.Warn("failed parsing client hello compression methods")
+			logger.Warn("failed parsing client hello compression methods")
 			return nil
 		}
 		result.supported.compression = append(result.supported.compression, compressionMethod(method))
@@ -509,8 +508,9 @@ func parseClientHello(buffer bufferView) *helloMessage {
 	return &result
 }
 
-func parseServerHello(buffer bufferView) *helloMessage {
+func parseServerHello(buffer bufferView, logger *logp.Logger) *helloMessage {
 	var result helloMessage
+	result.logger = logger
 	pos, ok := parseCommonHello(buffer, &result)
 	if !ok {
 		return nil

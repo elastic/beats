@@ -83,7 +83,7 @@ func formatDeviceNames(devices []pcap.Interface, withDescription, withIP bool) [
 	return names
 }
 
-func resolveDeviceName(name string) (string, error) {
+func resolveDeviceName(name string, logger *logp.Logger) (string, error) {
 	if name == "" {
 		if runtime.GOOS == "linux" {
 			return "any", nil
@@ -148,7 +148,7 @@ func resolveDeviceName(name string) (string, error) {
 		return "", fmt.Errorf("invalid device index %d: %w", index, err)
 	}
 
-	logp.L().Named("sniffer").Info("Resolved device index %d to device: %s", index, name)
+	logger.Infof("Resolved device index %d to device: %s", index, name)
 	return name, nil
 }
 

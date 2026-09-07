@@ -29,7 +29,6 @@ import (
 
 var (
 	ErrFrameTooBig = errors.New("frame length is bigger than the maximum allowed")
-	debugf         = logp.MakeDebug("cassandra")
 )
 
 type frameHeader struct {
@@ -76,11 +75,14 @@ type Framer struct {
 	r *streambuf.Buffer
 
 	decoder Decoder
+
+	logger *logp.Logger
 }
 
-func NewFramer(r *streambuf.Buffer, compressor Compressor) *Framer {
+func NewFramer(r *streambuf.Buffer, compressor Compressor, logger *logp.Logger) *Framer {
 	f := framerPool.Get().(*Framer)
 	f.compres = compressor
+	f.logger = logger
 	f.r = r
 
 	return f
@@ -152,14 +154,14 @@ func (f *Framer) ReadHeader() (head *frameHeader, err error) {
 		return nil, fmt.Errorf("frame body length can not be less than 0: %d", head.BodyLength)
 	} else if head.BodyLength > maxFrameSize {
 		// need to free up the connection to be used again
-		logp.Err("head length is too large")
+		f.logger.Errorf("head length is too large")
 		return nil, ErrFrameTooBig
 	}
 
 	headSize := f.r.BufferConsumed()
 	head.HeadLength = headSize
 
-	debugf("header: %v", head)
+	f.logger.Debugf("header: %v", head)
 
 	f.Header = head
 	return head, nil
@@ -195,7 +197,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	// the frame body. The rest of the body will then be the usual body
 	// corresponding to the response opcode.
 	if f.Header.Flags&flagTracing == flagTracing && (f.Header.Op&opQuery == opQuery || f.Header.Op&opExecute == opExecute || f.Header.Op&opPrepare == opPrepare) {
-		debugf("tracing enabled")
+		f.logger.Debugf("tracing enabled")
 
 		// seems no UUID to read, protocol incorrect?
 		// uid := decoder.ReadUUID()
@@ -203,7 +205,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	}
 
 	if f.Header.Flags&flagWarning == flagWarning {
-		debugf("hit warning flags")
+		f.logger.Debugf("hit warning flags")
 
 		warnings := decoder.ReadStringList()
 		// dealing with warnings
@@ -211,7 +213,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	}
 
 	if f.Header.Flags&flagCustomPayload == flagCustomPayload {
-		debugf("hit custom payload flags")
+		f.logger.Debugf("hit custom payload flags")
 
 		f.Header.CustomPayload = decoder.ReadBytesMap()
 	}
@@ -219,7 +221,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	if f.Header.Flags&flagCompress == flagCompress {
 		// decompress data and switch to use bytearray decoder
 		if f.compres == nil {
-			logp.Err("hit compress flag, but compressor was not set")
+			f.logger.Errorf("hit compress flag, but compressor was not set")
 			panic(errors.New("hit compress flag, but compressor was not set"))
 		}
 
@@ -234,7 +236,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		decoder.Data = &dec
 		f.decoder = decoder
 
-		debugf("hit compress flags")
+		f.logger.Debugf("hit compress flags")
 	}
 
 	// assumes that the frame body has been read into rbuf
@@ -266,7 +268,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 	default:
 		// ignore
-		debugf("unknow ops, not processed, %v", f.Header)
+		f.logger.Debugf("unknow ops, not processed, %v", f.Header)
 
 	}
 
@@ -356,7 +358,7 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		errProtocol, errServer, errSyntax, errTruncate, errUnauthorized:
 		// ignored
 	default:
-		logp.Err("unknown error code: 0x%x", code)
+		f.logger.Errorf("unknown error code: 0x%x", code)
 	}
 
 	if len(detail) > 0 {
@@ -456,7 +458,7 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 
 	uuid, err := UUIDFromBytes((f.decoder).ReadShortBytes())
 	if err != nil {
-		logp.Err("Error in parsing UUID")
+		f.logger.Errorf("Error in parsing UUID")
 	}
 
 	result["prepared_id"] = uuid.String()
@@ -504,7 +506,7 @@ func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
 			data["args"] = decoder.ReadStringList()
 
 		default:
-			logp.Warn("unknown SCHEMA_CHANGE target: %q change: %q", target, change)
+			f.logger.Warnf("unknown SCHEMA_CHANGE target: %q change: %q", target, change)
 		}
 	}
 	return data
@@ -551,7 +553,7 @@ func (f *Framer) parseEventFrame() (data map[string]interface{}) {
 		// this should work for all versions
 		data["schema_change"] = f.parseResultSchemaChange()
 	default:
-		logp.Err("unknown event type: %q", eventType)
+		f.logger.Errorf("unknown event type: %q", eventType)
 	}
 
 	return data

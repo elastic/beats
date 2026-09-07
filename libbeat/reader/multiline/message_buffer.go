@@ -32,6 +32,7 @@ type messageBuffer struct {
 	truncated      int
 	err            error // last seen error
 	message        reader.Message
+	privates       []any
 }
 
 func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool) *messageBuffer {
@@ -67,6 +68,7 @@ func (b *messageBuffer) clear() {
 	b.processedLines = 0
 	b.truncated = 0
 	b.err = nil
+	b.privates = nil
 }
 
 // addLine adds the read content to the message
@@ -115,6 +117,9 @@ func (b *messageBuffer) addLine(m reader.Message) {
 	b.last = m.Content
 	b.message.Bytes += m.Bytes
 	b.message.AddFields(m.Fields)
+	if m.Private != nil {
+		b.privates = append(b.privates, m.Private)
+	}
 }
 
 // finalize writes the existing content into the returned message and resets all reader variables.
@@ -125,6 +130,15 @@ func (b *messageBuffer) finalize() reader.Message {
 
 	if b.numLines > 1 {
 		b.message.AddFlagsWithKey("log.flags", "multiline") //nolint:errcheck // It is safe to ignore the error.
+	}
+
+	if len(b.privates) > 0 {
+		// Preserve the message.Private if multiline contains a single source message
+		if b.processedLines == 1 {
+			b.message.Private = b.privates[0]
+		} else {
+			b.message.Private = append([]any(nil), b.privates...)
+		}
 	}
 
 	// Copy message from existing content

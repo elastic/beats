@@ -56,10 +56,26 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 	}
 
 	var mysql mysqlPlugin
+	logger := logp.NewNopLogger()
+	mysql.logger = logger
+	mysql.mysqlLogger = logger.Named("mysql")
+	mysql.mysqlDetLogger = logger.Named("mysql.detail")
 	config := defaultConfig
 	config.Ports = []int{serverPort}
 	mysql.init(callback, &procs.ProcessesWatcher{}, &config)
 	return &mysql
+}
+
+func newTestMySQLStream(data []byte, isClient bool) *mysqlStream {
+	logger := logp.NewNopLogger()
+	return &mysqlStream{
+		data:           data,
+		message:        new(mysqlMessage),
+		isClient:       isClient,
+		logger:         logger,
+		mysqlLogger:    logger.Named("mysql"),
+		mysqlDetLogger: logger.Named("mysql.detail"),
+	}
 }
 
 func Test_parseStateNames(t *testing.T) {
@@ -85,7 +101,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage), isClient: true}
+	stream := newTestMySQLStream(message, true)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -116,7 +132,7 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -152,7 +168,7 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -197,7 +213,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -250,7 +266,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -286,7 +302,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := newTestMySQLStream(message, false)
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -571,7 +587,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 			"66726f6d20746573")
 	assert.NoError(t, err)
 
-	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
+	stream := newTestMySQLStream(reqData, true)
 	ok, complete := mysqlMessageParser(stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
@@ -680,4 +696,23 @@ func Test_PreparedStatement(t *testing.T) {
 	send(tcp.TCPDirectionOriginal, "33000000170b00000000010000000001fd000c000c000841313232343633380be107071c000000000000000be1070a1c173b3b00000000")
 	send(tcp.TCPDirectionReverse, "01000001011e0000020364656600000008636f6c5f305f305f000c3f001500000008810000000005000003fe000001200a00000400000b0000000000000005000005fe00000120")
 	assert.Len(t, results.events, 2)
+}
+
+// TestParseMysqlExecuteStatementTruncated confirms that parseMysqlExecuteStatement
+// does not panic when the parameter data is absent (truncated payload).
+func TestParseMysqlExecuteStatementTruncated(t *testing.T) {
+	mysql := mysqlModForTests(nil)
+
+	// data is exactly 16 bytes (the minimum for the header path to advance past
+	// the null-bitmap), with stmtBound=0 so the saved nparamType is used.
+	// paramOffset ends up at 16 == dataLen, so data[paramOffset] would panic
+	// without the bounds check added for FIELD_TYPE_TINY.
+	data := make([]byte, 16)
+	// stmtBound byte (index 15) is already 0; nparamType is supplied via stmtdata.
+	stmt := &mysqlStmtData{numOfParameters: 1, nparamType: []uint8{0x01}}
+
+	got := mysql.parseMysqlExecuteStatement(data, stmt)
+	if got != nil {
+		t.Errorf("parseMysqlExecuteStatement(truncated) = %v; want nil", got)
+	}
 }

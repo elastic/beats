@@ -7,8 +7,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-system-service]]
 === System service metricset
 
-beta[]
-
 include::../../../module/system/service/_meta/docs.asciidoc[]
 
 

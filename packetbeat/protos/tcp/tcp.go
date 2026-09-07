@@ -57,15 +57,12 @@ type TCP struct {
 	expiredConns expirationQueue
 
 	metrics *inputMetrics
+	logger  *logp.Logger
+	isDebug bool
 }
 
 // Creates and returns a new Tcp.
-func NewTCP(p protos.Protocols, id, device string, idx int, loggers ...*logp.Logger) (*TCP, error) {
-	isDebug = logp.IsDebug("tcp")
-	var logger *logp.Logger
-	if len(loggers) > 0 {
-		logger = loggers[0]
-	}
+func NewTCP(p protos.Protocols, id, device string, idx int, logger *logp.Logger) (*TCP, error) {
 
 	portMap, err := buildPortsMap(p.GetAllTCP())
 	if err != nil {
@@ -76,6 +73,8 @@ func NewTCP(p protos.Protocols, id, device string, idx int, loggers ...*logp.Log
 		protocols: p,
 		portMap:   portMap,
 		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap, logger),
+		logger:    logger.Named("tcp"),
+		isDebug:   logger.IsDebug(),
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -83,11 +82,15 @@ func NewTCP(p protos.Protocols, id, device string, idx int, loggers ...*logp.Log
 		tcp.removalListener)
 
 	tcp.streams.StartJanitor(protos.DefaultTransactionExpiration)
-	if isDebug {
-		logp.Debug("tcp", "Port map: %v", portMap)
-	}
-
+	tcp.debugf("Port map: %v", portMap)
 	return tcp, nil
+}
+
+//go:inline
+func (tcp *TCP) debugf(format string, args ...interface{}) {
+	if tcp.isDebug {
+		tcp.logger.Debugf(format, args...)
+	}
 }
 
 func (tcp *TCP) removalListener(_ common.Key, value common.Value) {
@@ -119,9 +122,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 		id.AddConnectionID(uint64(conn.id))
 	}
 
-	if isDebug {
-		logp.Debug("tcp", "tcp flow id: %p", id)
-	}
+	tcp.debugf("tcp flow id: %p", id)
 
 	if len(pkt.Payload) == 0 && !tcphdr.FIN {
 		// return early if packet is not interesting. Still need to find/create
@@ -132,25 +133,22 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	tcpStartSeq := tcphdr.Seq
 	payloadLen := uint64(len(pkt.Payload))
 	if payloadLen > uint64(^uint32(0)) {
-		logp.Warn("TCP payload length (%d) overflows uint32; dropping packet", len(pkt.Payload))
+		tcp.logger.Warnf("TCP payload length (%d) overflows uint32; dropping packet", len(pkt.Payload))
 		return
 	}
 	tcpSeq := tcpStartSeq + uint32(payloadLen)
 	lastSeq := conn.lastSeq[stream.dir]
-	if isDebug {
-		logp.Debug("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
-			tcpStartSeq, tcpSeq, lastSeq, len(pkt.Payload))
-	}
+	tcp.debugf("pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
+		tcpStartSeq, tcpSeq, lastSeq, len(pkt.Payload))
 
 	if len(pkt.Payload) != 0 {
 		tcp.metrics.log(pkt)
 	}
 	if len(pkt.Payload) > 0 && lastSeq != 0 {
 		if tcpSeqBeforeEq(tcpSeq, lastSeq) {
-			if isDebug {
-				logp.Debug("tcp", "Ignoring retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
-					tcphdr.Seq, len(pkt.Payload), lastSeq)
-			}
+			tcp.debugf("Ignoring retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
+				tcphdr.Seq, len(pkt.Payload), lastSeq)
+
 			return
 		}
 
@@ -161,12 +159,12 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			}
 
 			gap := int(tcpStartSeq - lastSeq)
-			logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
+			tcp.debugf("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
 			drop := stream.gapInStream(gap)
 			if drop {
-				if isDebug {
-					logp.Debug("tcp", "Dropping connection state because of gap")
-				}
+
+				tcp.debugf("Dropping connection state because of gap")
+
 				tcp.metrics.logDrop()
 
 				// drop application layer connection state and
@@ -179,10 +177,8 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			// lastSeq > tcpStartSeq => overlapping TCP segment detected. shrink packet
 			delta := lastSeq - tcpStartSeq
 
-			if isDebug {
-				logp.Debug("tcp", "Overlapping tcp segment. last_seq %d, seq: %d, delta: %d",
-					lastSeq, tcpStartSeq, delta)
-			}
+			tcp.debugf("Overlapping tcp segment. last_seq %d, seq: %d, delta: %d",
+				lastSeq, tcpStartSeq, delta)
 
 			pkt.Payload = pkt.Payload[delta:]
 			tcphdr.Seq += delta
@@ -196,11 +192,11 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 
 func (tcp *TCP) getStream(pkt *protos.Packet) (stream TCPStream, created bool) {
 	if conn := tcp.findStream(pkt.Tuple.Hashable()); conn != nil {
-		return TCPStream{conn: conn, dir: TCPDirectionOriginal}, false
+		return TCPStream{conn: conn, dir: TCPDirectionOriginal, logger: tcp.logger}, false
 	}
 
 	if conn := tcp.findStream(pkt.Tuple.RevHashable()); conn != nil {
-		return TCPStream{conn: conn, dir: TCPDirectionReverse}, false
+		return TCPStream{conn: conn, dir: TCPDirectionReverse, logger: tcp.logger}, false
 	}
 
 	protocol := tcp.decideProtocol(&pkt.Tuple)
@@ -215,9 +211,9 @@ func (tcp *TCP) getStream(pkt *protos.Packet) (stream TCPStream, created bool) {
 		timeout = mod.ConnectionTimeout()
 	}
 
-	if isDebug {
+	if tcp.logger.IsDebug() {
 		t := pkt.Tuple
-		logp.Debug("tcp", "Connection src[%s:%d] dst[%s:%d] doesn't exist, creating new",
+		tcp.debugf("Connection src[%s:%d] dst[%s:%d] doesn't exist, creating new",
 			t.SrcIP.String(), t.SrcPort,
 			t.DstIP.String(), t.DstPort)
 	}
@@ -230,7 +226,7 @@ func (tcp *TCP) getStream(pkt *protos.Packet) (stream TCPStream, created bool) {
 	}
 	conn.tcptuple = common.TCPTupleFromIPPort(conn.tuple, conn.id)
 	tcp.streams.PutWithTimeout(pkt.Tuple.Hashable(), conn, timeout)
-	return TCPStream{conn: conn, dir: TCPDirectionOriginal}, true
+	return TCPStream{conn: conn, dir: TCPDirectionOriginal, logger: tcp.logger}, true
 }
 
 func tcpSeqCompare(seq1, seq2 uint32) seqCompare {
@@ -252,8 +248,6 @@ const (
 	seqEq seqCompare = 0
 	seqGT seqCompare = 1
 )
-
-var isDebug = false
 
 func (tcp *TCP) getID() uint32 {
 	tcp.id++
@@ -311,17 +305,18 @@ func (conn *TCPConnection) String() string {
 }
 
 type TCPStream struct {
-	conn *TCPConnection
-	dir  uint8
+	conn   *TCPConnection
+	dir    uint8
+	logger *logp.Logger
 }
 
 func (stream *TCPStream) addPacket(pkt *protos.Packet, tcphdr *layers.TCP) {
 	conn := stream.conn
 	mod := conn.tcp.protocols.GetTCP(conn.protocol)
 	if mod == nil {
-		if isDebug {
+		if stream.logger.IsDebug() {
 			protocol := conn.protocol
-			logp.Debug("tcp", "Ignoring protocol for which we have no module loaded: %s",
+			stream.logger.Debugf("Ignoring protocol for which we have no module loaded: %s",
 				protocol)
 		}
 		return
@@ -460,12 +455,10 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol, logger
 		processingTime: metrics.NewUniformSample(1024),
 	}
 
-	if logger != nil {
-		_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
-			Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-		_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
-			Register("histogram", metrics.NewHistogram(out.processingTime))
-	}
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)
 
