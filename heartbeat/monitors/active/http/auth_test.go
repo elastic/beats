@@ -18,23 +18,25 @@
 package http
 
 import (
+	"encoding/base64"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // kerberosTestConfig returns a non-nil Kerberos config so the block is treated
 // as "enabled". These tests never contact a KDC, so the auth_type/keytab fields
 // (normally validated during config unpacking) are irrelevant here.
-func kerberosTestConfig() *kerberos.Config {
-	return &kerberos.Config{
+func kerberosTestConfig() *kerberosSettings {
+	return &kerberosSettings{Config: &kerberos.Config{
 		Realm:      "CORP.LOCAL",
 		ConfigPath: "/etc/krb5.conf",
 		Username:   "svc",
-	}
+	}}
 }
 
 func TestConfigAuthMutualExclusivity(t *testing.T) {
@@ -152,5 +154,54 @@ func TestBuildRequestAuthSchemes(t *testing.T) {
 		_, _, ok := req.BasicAuth()
 		assert.False(t, ok, "kerberos must not set a Basic auth header; SPNEGO sets it during the handshake")
 		assert.Empty(t, req.Header.Get("Authorization"), "no Authorization header before the handshake")
+	})
+}
+
+func TestAuthUnpackNestedAndBase64(t *testing.T) {
+	ntlmYAML := "enabled: true\nusername: svc\npassword: secret\ndomain: CORP\n"
+	kerberosYAML := "enabled: true\nauth_type: password\nrealm: CORP.LOCAL\nconfig_path: /etc/krb5.conf\nusername: svc\npassword: secret\n"
+
+	unpack := func(t *testing.T, yaml string) Config {
+		t.Helper()
+		cfg, err := conf.NewConfigWithYAML([]byte(yaml), "test")
+		require.NoError(t, err)
+		c := defaultConfig()
+		require.NoError(t, cfg.Unpack(&c))
+		return c
+	}
+
+	t.Run("ntlm nested object", func(t *testing.T) {
+		c := unpack(t, "urls: [http://x]\nntlm:\n  enabled: true\n  username: svc\n  password: secret\n  domain: CORP\n")
+		require.True(t, c.NTLM.IsEnabled())
+		assert.Equal(t, "svc", c.NTLM.Username)
+		assert.Equal(t, "secret", c.NTLM.Password)
+		assert.Equal(t, "CORP", c.NTLM.Domain)
+	})
+
+	t.Run("ntlm base64 string", func(t *testing.T) {
+		c := unpack(t, "urls: [http://x]\nntlm: "+base64.StdEncoding.EncodeToString([]byte(ntlmYAML))+"\n")
+		require.True(t, c.NTLM.IsEnabled())
+		assert.Equal(t, "svc", c.NTLM.Username)
+		assert.Equal(t, "CORP", c.NTLM.Domain)
+	})
+
+	t.Run("kerberos nested object", func(t *testing.T) {
+		c := unpack(t, "urls: [http://x]\nkerberos:\n  enabled: true\n  auth_type: password\n  realm: CORP.LOCAL\n  config_path: /etc/krb5.conf\n  username: svc\n  password: secret\n")
+		require.True(t, c.Kerberos.IsEnabled())
+		assert.Equal(t, "CORP.LOCAL", c.Kerberos.Realm)
+		assert.Equal(t, "svc", c.Kerberos.Username)
+	})
+
+	t.Run("kerberos base64 string", func(t *testing.T) {
+		c := unpack(t, "urls: [http://x]\nkerberos: "+base64.StdEncoding.EncodeToString([]byte(kerberosYAML))+"\n")
+		require.True(t, c.Kerberos.IsEnabled())
+		assert.Equal(t, "CORP.LOCAL", c.Kerberos.Realm)
+		assert.Equal(t, "svc", c.Kerberos.Username)
+	})
+
+	t.Run("kerberos base64 json", func(t *testing.T) {
+		c := unpack(t, "urls: [http://x]\nkerberos: "+base64.StdEncoding.EncodeToString([]byte(`{"enabled":true,"auth_type":"password","realm":"CORP.LOCAL","config_path":"/etc/krb5.conf","username":"svc","password":"secret"}`))+"\n")
+		require.True(t, c.Kerberos.IsEnabled())
+		assert.Equal(t, "CORP.LOCAL", c.Kerberos.Realm)
 	})
 }

@@ -85,7 +85,7 @@ func newHTTPMonitorHostJob(
 		// SPNEGO 401 challenge. NTLM is handled at the transport level instead.
 		var doer httpDoer = client
 		if config.Kerberos.IsEnabled() {
-			krbClient, err := kerberos.NewClient(config.Kerberos, client)
+			krbClient, err := kerberos.NewClient(config.Kerberos.Config, client)
 			if err != nil {
 				return fmt.Errorf("could not create kerberos client: %w", err)
 			}
