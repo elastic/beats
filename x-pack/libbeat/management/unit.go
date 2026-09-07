@@ -284,7 +284,11 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 		if forwardPayload == nil {
 			forwardPayload = make(map[string]any)
 		} else {
-			forwardPayload = mapstr.M(forwardPayload).Clone()
+			shallow := make(map[string]any, len(forwardPayload)+1)
+			for k, v := range forwardPayload {
+				shallow[k] = v
+			}
+			forwardPayload = shallow
 		}
 
 		forwardPayload["streams"] = streamsPayload

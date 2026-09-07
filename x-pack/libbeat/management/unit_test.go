@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 )
@@ -239,6 +240,40 @@ func TestUnitUpdatePayload(t *testing.T) {
 	assert.NoError(t, err, "UpdateState with original payload values should succeed")
 
 	assert.Equal(t, 1, mockMutation.updateCalls, "mutating caller map must not alter stored comparison snapshot")
+}
+
+func TestUnitUpdatePayloadStreamsSerializable(t *testing.T) {
+	mock := &mockClientUnit{
+		expected: client.Expected{
+			Config: &proto.UnitExpectedConfig{
+				Id: "input-with-streams",
+				Streams: []*proto.Stream{
+					{Id: "stream-1"},
+				},
+			},
+		},
+	}
+	unit := newAgentUnit(mock, nil)
+
+	payload := map[string]any{
+		"telemetry": map[string]any{"jobs": 3},
+	}
+
+	err := unit.UpdateState(status.Running, "Healthy", payload)
+	assert.NoError(t, err, "UpdateState with streams should succeed")
+
+	assert.Equal(t, 1, mock.updateCalls, "first UpdateState should forward to client")
+
+	reportedTelemetry, ok := mock.reportedPayload["telemetry"].(map[string]any)
+	assert.True(t, ok, "telemetry should be forwarded as map[string]any")
+	assert.Equal(t, 3, reportedTelemetry["jobs"], "telemetry values should be preserved")
+
+	streams, ok := mock.reportedPayload["streams"].(map[string]any)
+	assert.True(t, ok, "streams should be present in forwarded payload")
+	assert.Contains(t, streams, "stream-1", "stream state should be included")
+
+	_, err = structpb.NewStruct(mock.reportedPayload)
+	assert.NoError(t, err, "forwarded payload must be serializable by structpb.NewStruct")
 }
 
 type mockClientUnit struct {
