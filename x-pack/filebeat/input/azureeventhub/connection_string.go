@@ -81,9 +81,9 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 
 	csp := ConnectionStringProperties{}
 
-	splits := strings.Split(connStr, ";")
+	splits := strings.SplitSeq(connStr, ";")
 
-	for _, split := range splits {
+	for split := range splits {
 		if split == "" {
 			continue
 		}

@@ -36,8 +36,8 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "stan",
 		"metricsets": []string{"stats"},
 		"hosts":      []string{host},

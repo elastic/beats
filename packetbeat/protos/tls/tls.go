@@ -403,11 +403,10 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		var ok bool
 		var raw []byte
 		const supportedVersionsExt = 43
-		if raw, ok = serverHello.extensions.Raw[supportedVersionsExt]; ok {
+		if raw, ok = serverHello.extensions.Raw[supportedVersionsExt]; ok && len(raw) >= 2 {
 			version.major = raw[0]
 			version.minor = raw[1]
-		}
-		if !ok {
+		} else {
 			version = serverHello.version
 		}
 	} else if !clientHello.version.IsZero() {

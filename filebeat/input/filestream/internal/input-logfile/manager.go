@@ -18,7 +18,6 @@
 package input_logfile
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -26,7 +25,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -69,13 +67,14 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
-	initOnce   sync.Once
-	initErr    error
-	store      *store
-	ackUpdater *updateWriter
-	ackCH      *updateChan
-	idsMux     sync.Mutex
-	ids        map[string]struct{}
+	// storeMu guards entry and release. Both are set once on the first
+	// successful Create and cleared on Close.
+	storeMu sync.Mutex
+	entry   *cacheEntry
+	release func()
+	closed  bool
+	idsMux  sync.Mutex
+	ids     map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -93,75 +92,77 @@ var errNoInputRunner = errors.New("no input runner available")
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
-func (cim *InputManager) init() error {
-	cim.initOnce.Do(func() {
-
-		log := cim.Logger.With("input_type", cim.Type)
-
-		var store *store
-		store, cim.initErr = openStore(log, cim.StateStore, cim.Type)
-		if cim.initErr != nil {
-			return
-		}
-
-		cim.store = store
-		cim.ackCH = newUpdateChan()
-		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
-		cim.ids = map[string]struct{}{}
-	})
-
-	return cim.initErr
-}
-
-// Init starts background processes for deleting old entries from the
-// persistent store if mode is ModeRun.
-func (cim *InputManager) Init(group unison.Group) error {
-	if err := cim.init(); err != nil {
-		return err
+// ensureSetup opens the shared store on first call and returns a retained
+// reference to the cacheEntry. The caller must call entry.store.Release()
+// when done. ensureSetup must NOT be called with storeMu held: it releases
+// and re-acquires the lock around the blocking acquireStore call so that a
+// concurrent Close() can always proceed.
+func (cim *InputManager) ensureSetup() (*cacheEntry, error) {
+	cim.storeMu.Lock()
+	if cim.closed {
+		cim.storeMu.Unlock()
+		return nil, errors.New("input manager is closed")
 	}
-
+	if cim.entry != nil {
+		cim.entry.store.Retain()
+		entry := cim.entry
+		cim.storeMu.Unlock()
+		return entry, nil
+	}
 	log := cim.Logger.With("input_type", cim.Type)
+	cim.storeMu.Unlock()
 
-	store := cim.getRetainedStore()
-	cleaner := &cleaner{log: log}
-	// TL;DR: If Filebeat shuts down too quickly, the function passed to
-	// `group.Go` will never run, therefore this instance of store will
-	// never be released, locking Filebeat's shutdown process.
-	//
-	// To circumvent that, we wait for `group.Go` to start our function.
-	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
-	waitRunning := make(chan struct{})
-	err := group.Go(func(canceler context.Context) error {
-		waitRunning <- struct{}{}
-		defer cim.shutdown()
-		defer store.Release()
-		interval := cim.StateStore.CleanupInterval()
-		if interval <= 0 {
-			interval = 5 * time.Minute
-		}
-		cleaner.run(canceler, store, interval)
-		return nil
-	})
+	// Acquire the store without holding storeMu so that a concurrent Close()
+	// or another Create() can proceed while this potentially-slow call runs.
+	newEntry, newRelease, err := acquireStore(log, cim.StateStore, cim.Type)
 	if err != nil {
-		store.Release()
-		cim.shutdown()
-		return fmt.Errorf("can not start registry cleanup process: %w", err)
+		return nil, err
 	}
-	<-waitRunning
-	return nil
+
+	cim.storeMu.Lock()
+	if cim.closed {
+		cim.storeMu.Unlock()
+		newRelease()
+		return nil, errors.New("input manager is closed")
+	}
+	if cim.entry == nil {
+		cim.entry = newEntry
+		cim.release = newRelease
+		cim.ids = map[string]struct{}{}
+	} else {
+		// Another Create() won the race; release the redundant reference.
+		newRelease()
+	}
+	cim.entry.store.Retain()
+	entry := cim.entry
+	cim.storeMu.Unlock()
+	return entry, nil
 }
 
-func (cim *InputManager) shutdown() {
-	cim.ackUpdater.Close()
-	cim.store.Release()
+// Close releases the manager's reference to the shared store. When the last
+// manager sharing a backend key releases, the background cleaner is stopped
+// and the store is closed. Call after all inputs managed by cim have stopped.
+func (cim *InputManager) Close() {
+	cim.storeMu.Lock()
+	cim.closed = true
+	release := cim.release
+	cim.release = nil
+	cim.entry = nil
+	cim.storeMu.Unlock()
+	if release != nil {
+		release()
+	}
 }
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
-	if err := cim.init(); err != nil {
+	entry, err := cim.ensureSetup()
+	if err != nil {
 		return nil, err
 	}
+	pStore := entry.store
+	defer pStore.Release()
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
@@ -274,9 +275,6 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		}
 	}
 
-	pStore := cim.getRetainedStore()
-	defer pStore.Release()
-
 	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
 
 	// create a store with the deprecated global ID. This will be used to
@@ -294,7 +292,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	return &managedInput{
 		manager:                cim,
-		ackCH:                  cim.ackCH,
+		ackCH:                  entry.ackCH,
 		id:                     settings.ID,
 		prospector:             prospector,
 		harvester:              harvester,
@@ -334,10 +332,29 @@ func (cim *InputManager) StopInput(id string) {
 	cim.idsMux.Unlock()
 }
 
-func (cim *InputManager) getRetainedStore() *store {
-	store := cim.store
-	store.Retain()
-	return store
+// acquireLease increments the globalCache user count for this manager's key,
+// preventing the cache from draining the entry (and closing the ackUpdater)
+// while the caller is active. Returns ok=false if the manager is closed.
+// The returned release function must be called exactly once.
+func (cim *InputManager) acquireLease() (func(), bool) {
+	cim.storeMu.Lock()
+	closed := cim.closed
+	cim.storeMu.Unlock()
+	if closed {
+		return func() {}, false
+	}
+	_, release, ok := globalCache.Lease(cim.StateStore.StoreKey())
+	return release, ok
+}
+
+func (cim *InputManager) getRetainedStore() (*store, error) {
+	cim.storeMu.Lock()
+	defer cim.storeMu.Unlock()
+	if cim.entry == nil {
+		return nil, errors.New("input manager is closed")
+	}
+	cim.entry.store.Retain()
+	return cim.entry.store, nil
 }
 
 type SourceIdentifier struct {

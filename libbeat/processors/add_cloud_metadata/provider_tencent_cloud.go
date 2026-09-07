@@ -35,7 +35,7 @@ var qcloudMetadataFetcher = provider{
 		qcloudMetadataRegionURI := "/meta-data/placement/region"
 		qcloudMetadataZoneURI := "/meta-data/placement/zone"
 
-		qcloudSchema := func(m map[string]interface{}) mapstr.M {
+		qcloudSchema := func(m map[string]any) mapstr.M {
 			m["service"] = mapstr.M{
 				"name": "CVM",
 			}

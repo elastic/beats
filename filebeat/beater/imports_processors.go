@@ -15,45 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kafka
+//go:build !securityonly
+
+package beater
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/sarama"
+	// Add filebeat level processors
+	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 )
-
-type kafkaLogger struct {
-	log *logp.Logger
-}
-
-func (kl kafkaLogger) Print(v ...any) {
-	kl.Log("kafka message: %v", v...)
-}
-
-func (kl kafkaLogger) Printf(format string, v ...any) {
-	kl.Log(format, v...)
-}
-
-func (kl kafkaLogger) Println(v ...any) {
-	kl.Log("kafka message: %v", v...)
-}
-
-func (kl kafkaLogger) Log(format string, v ...any) {
-	warn := false
-	for _, val := range v {
-		if err, ok := val.(sarama.KError); ok {
-			if err != sarama.ErrNoError {
-				warn = true
-				break
-			}
-		}
-	}
-	if kl.log == nil {
-		kl.log = logp.NewLogger(logSelector)
-	}
-	if warn {
-		kl.log.Warnf(format, v...)
-	} else {
-		kl.log.Infof(format, v...)
-	}
-}

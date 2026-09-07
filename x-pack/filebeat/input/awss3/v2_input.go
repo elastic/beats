@@ -253,6 +253,7 @@ func (in *inputV2) runPolling(ctx context.Context, log *logp.Logger, st status.S
 	registry, err := newStateRegistryV2(stateRegistryV2Config{
 		Log:       log,
 		Store:     in.store,
+		Bucket:    getBucketNameFromARN(in.config.getBucketARN()),
 		KeyPrefix: in.config.BucketListPrefix,
 		Capacity:  capacity,
 	})

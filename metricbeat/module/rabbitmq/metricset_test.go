@@ -59,7 +59,7 @@ func TestManagementPathPrefix(t *testing.T) {
 	})
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":      "rabbitmq",
 		"metricsets":  []string{"test"},
 		"hosts":       []string{server.URL},

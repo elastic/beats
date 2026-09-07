@@ -51,7 +51,7 @@ Let’s look at these files one by one.
 
 ### module.yml [_module_yml]
 
-This file contains list of all the dashboards available for the module and used by `export_dashboards.go` script for exporting dashboards. Each dashboard is defined by an id and the name of json file where the dashboard is saved locally. At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset. Please ensure that this settings are correct.
+This file contains a list of all the dashboards available for the module and is used by the `export_dashboards.go` script to export dashboards. Each dashboard is defined by an ID and the name of the JSON file where the dashboard is saved locally. When a new fileset is generated, this file is automatically updated with "default" dashboard settings for the new fileset. Please ensure that these settings are correct.
 
 
 ### _meta/docs.md [_metadocs_md]

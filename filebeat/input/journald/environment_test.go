@@ -46,8 +46,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
@@ -63,41 +63,43 @@ type inputTestingEnvironment struct {
 	inputLogger *logp.Logger
 	logBuffer   *bytes.Buffer
 
-	wg  sync.WaitGroup
-	grp unison.TaskGroup
+	wg sync.WaitGroup
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	return &inputTestingEnvironment{
+	e := &inputTestingEnvironment{
 		t:              t,
 		workingDir:     t.TempDir(),
 		stateStore:     openTestStatestore(),
 		pipeline:       &mockPipelineConnector{},
 		statusReporter: &mockStatusReporter{},
 	}
+	t.Cleanup(e.stateStore.Close)
+	return e
 }
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-		e.plugin = Plugin(logp.L(), e.stateStore)
+		e.plugin = Plugin(logptest.NewTestingLogger(e.t, ""), e.stateStore)
+		type closer interface{ Close() }
+		if c, ok := e.plugin.Manager.(closer); ok {
+			e.t.Cleanup(func() {
+				e.wg.Wait() // wait for input goroutines to exit before closing the manager
+				c.Close()
+			})
+		}
 	})
 	return e.plugin.Manager
 }
 
 func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Input {
 	e.t.Helper()
-	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	if err := manager.Init(&e.grp); err != nil {
-		e.t.Fatalf("failed to initialise manager: %+v", err)
-	}
-
 	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
 		e.t.Fatalf("failed to create input using manager: %+v", err)
 	}
-
 	return inp
 }
 
@@ -134,13 +136,8 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 		}
 	})
 
-	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
-		defer wg.Done()
-		defer func() {
-			if err := grp.Stop(); err != nil {
-				e.t.Errorf("could not stop input: %s", err)
-			}
-		}()
+	go func() {
+		defer e.wg.Done()
 
 		id := uuid.Must(uuid.NewV4()).String()
 		inputCtx := v2.Context{
@@ -155,7 +152,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 		if err := inp.Run(inputCtx, e.pipeline); err != nil {
 			e.t.Errorf("input 'Run' method returned an error: %s", err)
 		}
-	}(&e.wg, &e.grp)
+	}()
 }
 
 // waitUntilEventCount waits until total count events arrive to the client.
@@ -235,6 +232,10 @@ func (s *testInputStore) Close() {
 
 func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testInputStore) CleanupInterval() time.Duration {
@@ -320,6 +321,7 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
+	//nolint:gosec // cancel is passed to the mockClient
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &mockClient{
 		canceler:   cancel,

@@ -364,6 +364,7 @@ output.elasticsearch:
   index: %s
 setup.template.enabled: false
 queue.mem.flush.timeout: 0s
+shutdown_timeout: 30s
 `, pbIndex)
 
 	pb := integration.NewBeat(t, "packetbeat", "../../packetbeat.test")

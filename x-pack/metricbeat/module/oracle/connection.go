@@ -19,9 +19,9 @@ import (
 // ConnectionDetails contains all possible data that can be used to create a connection with
 // an Oracle db
 type ConnectionDetails struct {
-	Username string        `config:"username"`
-	Password string        `config:"password"`
-	Patterns []interface{} `config:"patterns"`
+	Username string `config:"username"`
+	Password string `config:"password"`
+	Patterns []any  `config:"patterns"`
 }
 
 // HostParser parses host and extracts connection information and returns it to HostData

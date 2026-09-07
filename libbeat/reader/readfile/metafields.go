@@ -97,8 +97,7 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 	}
 
 	// Copy cached fields into a fresh map for this event.
-	fileMap := make(mapstr.M, len(r.cachedMeta))
-	maps.Copy(fileMap, r.cachedMeta)
+	fileMap := maps.Clone(r.cachedMeta)
 	// Direct assignment replaces any existing "log" key rather than merging.
 	// This is intentional and safe: FileMetaReader is always the first component
 	// in the pipeline to write log.* fields. Downstream readers (parsers,

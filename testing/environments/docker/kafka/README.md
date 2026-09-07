@@ -1,6 +1,8 @@
 # Kafka test container
 
-This Docker container provides an environment for testing with Kafka. It exposes two ports to the host system, `9092` for `PLAINTEXT` and `9093` for `SASL/SSL` with username `beats` and password `KafkaTest`.
+This Docker container provides an environment for testing with Kafka. It exposes two ports to the host system, `9092` for `PLAINTEXT` and `9093` for `SASL/SSL`.
+
+On `9093`, the broker accepts `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`, and `OAUTHBEARER`. Username/password mechanisms use user `beats` and password `KafkaTest`. `OAUTHBEARER` uses Kafka's built-in unsecured JWT validator (test-only): tokens must include a `sub` claim.
 
 ## Certificates
 

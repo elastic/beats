@@ -495,7 +495,7 @@ func TestReverseFlows(t *testing.T) {
 		t.Fatal()
 	}
 	for _, key := range reverseFlowsTestKeys {
-		var keys [2]interface{}
+		var keys [2]any
 		for i := range keys {
 			var err error
 			if keys[i], err = evs[i].Fields.GetValue(key); err != nil {

@@ -667,6 +667,8 @@ func createFilestreamTestRunner(tb testing.TB, logger *logp.Logger, testID strin
 	require.NoError(tb, err)
 
 	p := Plugin(logger, createTestStore(tb))
+	//nolint:errcheck // It's a test, let it panic if the casting fails
+	tb.Cleanup(p.Manager.(*loginp.InputManager).Close)
 	input, err := p.Manager.Create(c)
 	require.NoError(tb, err)
 
@@ -730,6 +732,10 @@ func (s *testStore) Close() {
 
 func (s *testStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
+}
+
+func (s *testStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testStore) CleanupInterval() time.Duration {

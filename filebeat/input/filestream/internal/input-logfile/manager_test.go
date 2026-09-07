@@ -205,6 +205,7 @@ func TestInputManager_Create(t *testing.T) {
 				}}
 			cfg, err := config.NewConfigFrom("id: my-id")
 			require.NoError(t, err)
+			initInputManager(t, cim)
 
 			_, err = cim.Create(cfg)
 			require.ErrorIs(t, err, errNoInputRunner)
@@ -265,6 +266,7 @@ id: %s
 paths:
   - /var/log/bar
 `, tc.id))
+				initInputManager(t, cim)
 
 				_, err = cim.Create(cfg1)
 				require.NoError(t, err, "1st input should have been created")
@@ -329,6 +331,7 @@ id: t-wing
 paths:
   - /var/log/bar
 `)
+		initInputManager(t, cim)
 
 		// Happy path, if an input fails to start, it's ID is removed from cim.ids list and
 		// can be re-used.
@@ -416,6 +419,7 @@ allow_deprecated_id_duplication: true
 paths:
   - /var/log/bar
 `)
+		initInputManager(t, cim)
 		_, err = cim.Create(cfg1)
 		require.NoError(t, err, "1st input should have been created")
 		// Create an input with a duplicated ID
@@ -432,6 +436,83 @@ paths:
 	})
 }
 
+func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
+	setupCacheForTest(t)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	newManager := func() *InputManager {
+		return &InputManager{
+			Logger:     logp.NewNopLogger(),
+			StateStore: states,
+			Type:       "filestream",
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+				return nil, nil, errNoInputRunner
+			},
+		}
+	}
+	first, second := newManager(), newManager()
+	t.Cleanup(first.Close)
+	t.Cleanup(second.Close)
+
+	// Trigger setup on both managers by calling Create. setup() acquires the
+	// store before Configure is called, so entry is set even on Create error.
+	_, err := first.Create(config.MustNewConfigFrom(map[string]any{"id": "first-input"}))
+	require.ErrorIs(t, err, errNoInputRunner)
+	_, err = second.Create(config.MustNewConfigFrom(map[string]any{"id": "second-input"}))
+	require.ErrorIs(t, err, errNoInputRunner)
+
+	require.Same(t, first.entry.store, second.entry.store)
+	require.Same(t, first.entry.ackCH, second.entry.ackCH)
+	require.Equal(t, 1, globalCache.Len(), "both managers must share one cache entry")
+
+	first.Close()
+	require.Equal(t, 1, globalCache.Len(), "one manager closed; entry still in use by second")
+	require.NotNil(t, second.entry)
+
+	second.Close()
+}
+
+func TestInputManager_CreateOnlyAcquiresOneStoreReference(t *testing.T) {
+	setupCacheForTest(t)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	manager := &InputManager{
+		Logger:     logp.NewNopLogger(),
+		StateStore: states,
+		Type:       "filestream",
+		Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+			return nil, nil, errNoInputRunner
+		},
+	}
+	t.Cleanup(manager.Close)
+
+	const workers = 10
+	var wg sync.WaitGroup
+	for i := range workers {
+		wg.Go(func() {
+			_, _ = manager.Create(config.MustNewConfigFrom(map[string]any{
+				"id": fmt.Sprintf("input-%d", i),
+			}))
+		})
+	}
+	wg.Wait()
+
+	require.NotNil(t, manager.entry)
+	require.Equal(t, 1, globalCache.Len(), "concurrent Creates must share one cache entry")
+
+	manager.Close()
+}
+
+func initInputManager(t *testing.T, cim *InputManager) {
+	t.Helper()
+	if cim.StateStore.CleanupInterval() <= 0 {
+		if ts, ok := cim.StateStore.(testStateStore); ok {
+			cim.StateStore = ts.WithGCPeriod(time.Minute)
+		}
+	}
+	t.Cleanup(cim.Close)
+}
+
 // TestInputManager_Create_BackoffConfig asserts InputManager.Create wires the
 // filestream input's backoff config (independently parsed here, like
 // read_until_eof and harvester_limit) into the harvesterRunner it builds:
@@ -443,7 +524,7 @@ func TestInputManager_Create_BackoffConfig(t *testing.T) {
 		testStore, err := storeReg.Get("test")
 		require.NoError(t, err)
 		log, _ := newBufferLogger()
-		return &InputManager{
+		manager := &InputManager{
 			Logger:     log,
 			StateStore: testStateStore{Store: testStore},
 			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
@@ -451,6 +532,8 @@ func TestInputManager_Create_BackoffConfig(t *testing.T) {
 				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
 			},
 		}
+		initInputManager(t, manager)
+		return manager
 	}
 
 	t.Run("defaulted when absent from config", func(t *testing.T) {
@@ -500,7 +583,7 @@ func TestInputManager_Create_StateCheckInterval(t *testing.T) {
 		testStore, err := storeReg.Get("test")
 		require.NoError(t, err)
 		log, _ := newBufferLogger()
-		return &InputManager{
+		manager := &InputManager{
 			Logger:     log,
 			StateStore: testStateStore{Store: testStore},
 			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
@@ -508,6 +591,8 @@ func TestInputManager_Create_StateCheckInterval(t *testing.T) {
 				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
 			},
 		}
+		initInputManager(t, manager)
+		return manager
 	}
 
 	t.Run("defaulted when absent from config", func(t *testing.T) {
@@ -548,7 +633,7 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	buf := &bytes.Buffer{}
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	writeSyncer := zapcore.AddSync(buf)
+	writeSyncer := zapcore.Lock(zapcore.AddSync(buf))
 	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core { //nolint:forbidigo // test helper builds a buffer-backed logger to assert on emitted logs
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))

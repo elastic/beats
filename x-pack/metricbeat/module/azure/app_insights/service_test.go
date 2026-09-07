@@ -88,7 +88,7 @@ func TestMetricsClient_GetMultiple(t *testing.T) {
 
 		body, err := io.ReadAll(r.Body)
 		require.NoError(t, err, "reading request body should not fail")
-		var sent []map[string]interface{}
+		var sent []map[string]any
 		require.NoError(t, json.Unmarshal(body, &sent), "request body must be a JSON array")
 		require.Len(t, sent, 1, "test sends one metric in the batch")
 		require.Contains(t, sent[0], "parameters", "each batch entry must carry parameters")

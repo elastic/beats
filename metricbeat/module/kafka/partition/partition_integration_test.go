@@ -166,13 +166,13 @@ func generateKafkaData(t *testing.T, host string, topic string) {
 	}
 }
 
-func getConfig(host string, topic string) map[string]interface{} {
+func getConfig(host string, topic string) map[string]any {
 	var topics []string
 	if topic != "" {
 		topics = []string{topic}
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
 		"hosts":      []string{host},

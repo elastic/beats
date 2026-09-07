@@ -127,14 +127,16 @@ Here is a list of acronyms used in defining the cipher suites:
 
 ### `curve_types` [curve-types]
 
-The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
+The list of supported TLS key-exchange groups. Available values include classical elliptic-curve groups and hybrid post-quantum groups:
 
-The following elliptic curve types are available:
 
 * P-256
 * P-384
 * P-521
 * X25519
+* X25519MLKEM768
+* SecP256r1MLKEM768
+* SecP384r1MLKEM1024
 
 
 ### `ca_sha256` [ca-sha256]

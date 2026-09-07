@@ -41,14 +41,13 @@ const (
 
 func TestNetFlowIntegration(t *testing.T) {
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	// make sure there is an ES instance running
 	integration.EnsureESIsRunning(t)
 	esConnectionDetails := integration.GetESURL(t, "http")
 	outputHost := fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())
-	outputHosts := []interface{}{outputHost}
+	outputHosts := []any{outputHost}
 
 	kibanaURL, kibanaUser := integration.GetKibana(t)
 	kibanaUsername := kibanaUser.Username()
@@ -83,7 +82,7 @@ func TestNetFlowIntegration(t *testing.T) {
 				Id:   "default",
 				Type: "elasticsearch",
 				Name: "elasticsearch",
-				Source: integration.RequireNewStruct(t, map[string]interface{}{
+				Source: integration.RequireNewStruct(t, map[string]any{
 					"type":                  "elasticsearch",
 					"hosts":                 outputHosts,
 					"username":              outputUsername,
@@ -113,7 +112,7 @@ func TestNetFlowIntegration(t *testing.T) {
 				Id:   "netflow-netflow-1e8b33de-d54a-45cd-90da-23ed71c482e5",
 				Type: "netflow",
 				Name: "netflow-1",
-				Source: integration.RequireNewStruct(t, map[string]interface{}{
+				Source: integration.RequireNewStruct(t, map[string]any{
 					"use_output": "default",
 					"revision":   0,
 				}),
@@ -132,7 +131,7 @@ func TestNetFlowIntegration(t *testing.T) {
 						DataStream: &proto.DataStream{
 							Dataset: "netflow.log",
 						},
-						Source: integration.RequireNewStruct(t, map[string]interface{}{
+						Source: integration.RequireNewStruct(t, map[string]any{
 							"id":                    "netflow_integration_test",
 							"host":                  "localhost:6006",
 							"expiration_timeout":    "30m",
@@ -153,7 +152,7 @@ func TestNetFlowIntegration(t *testing.T) {
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
 			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
 			if unitState == proto.State_HEALTHY {
-				if payload.streamStatusEquals("netflow-netflow.netflow-1e8b33de-d54a-45cd-90da-23ed71c482e2", map[string]interface{}{
+				if payload.streamStatusEquals("netflow-netflow.netflow-1e8b33de-d54a-45cd-90da-23ed71c482e2", map[string]any{
 					"status": "HEALTHY",
 					"error":  "",
 				}) {
@@ -267,19 +266,19 @@ func TestNetFlowIntegration(t *testing.T) {
 	}, waitFor, tick, fmt.Sprintf("expected netflow data stream to have %d events", expectedEventsNumbers))
 }
 
-type unitPayload map[string]interface{}
+type unitPayload map[string]any
 
-func (u unitPayload) streamStatusEquals(streamID string, expected map[string]interface{}) bool {
+func (u unitPayload) streamStatusEquals(streamID string, expected map[string]any) bool {
 	if u == nil {
 		return false
 	}
 
-	streams, ok := u["streams"].(map[string]interface{})
+	streams, ok := u["streams"].(map[string]any)
 	if !ok || streams == nil {
 		return false
 	}
 
-	streamMap, ok := streams[streamID].(map[string]interface{})
+	streamMap, ok := streams[streamID].(map[string]any)
 	if !ok || streamMap == nil {
 		return false
 	}
@@ -304,7 +303,7 @@ type DataStream struct {
 
 type DataStreamResult struct {
 	DataStreams []DataStream `json:"data_streams"`
-	Error       interface{}  `json:"error"`
+	Error       any          `json:"error"`
 }
 
 func HasDataStream(ctx context.Context, username string, password string, url string, name string) error {

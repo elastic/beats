@@ -43,7 +43,7 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 
 	host := strings.TrimPrefix(server.URL, "http://")
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":        "prometheus",
 		"metricsets":    []string{"collector"},
 		"hosts":         []string{server.URL},

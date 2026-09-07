@@ -54,7 +54,7 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 
-func getConfig(host string) map[string]interface{} {
+func getConfig(host string) map[string]any {
 	config := mtest.GetIntegrationConfig(host)
 	config["metricsets"] = []string{"node"}
 	return config

@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"strconv"
 	"strings"
 
@@ -53,7 +54,7 @@ type CollStatsOptions struct {
 type CollectionInfo struct {
 	Database   string
 	Collection string
-	TopInfo    map[string]interface{} // Optional info from top command (mongod only)
+	TopInfo    map[string]any // Optional info from top command (mongod only)
 }
 
 // Metricset type defines all fields of the Metricset
@@ -128,7 +129,6 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	collStatsErrGroup.SetLimit(10) // limit number of goroutines running at the same time
 
 	for _, collInfo := range collections {
-		collInfo := collInfo // make sure it works properly on older Go versions
 
 		collStatsErrGroup.Go(func() error {
 			database, collection := collInfo.Database, collInfo.Collection
@@ -146,7 +146,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			}
 
 			// Create infoMap structure similar to what top command provides
-			infoMap := map[string]interface{}{
+			infoMap := map[string]any{
 				"stats": collStats,
 			}
 
@@ -211,7 +211,7 @@ func (m *Metricset) cacheMongoVersion(client *mongo.Client) {
 }
 
 // fetchCollStatsWithVersion selects the appropriate method based on MongoDB version
-func (m *Metricset) fetchCollStatsWithVersion(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+func (m *Metricset) fetchCollStatsWithVersion(client *mongo.Client, dbName, collectionName string) (map[string]any, error) {
 	// For MongoDB 6.2+, try aggregation first with fallback to command
 	if isVersionAtLeast(m.mongoVersion, "6.2.0") {
 		m.Logger().Debugf("collstats: using $collStats aggregation for %s.%s (scale=%d)", dbName, collectionName, m.options.Scale)
@@ -232,7 +232,7 @@ func (m *Metricset) fetchCollStatsWithVersion(client *mongo.Client, dbName, coll
 }
 
 // fetchCollStatsAggregation uses the $collStats aggregation stage (MongoDB 6.2+)
-func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, collectionName string) (map[string]any, error) {
 	collection := client.Database(dbName).Collection(collectionName)
 	ctx := context.Background()
 
@@ -258,7 +258,7 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 	}
 	defer cursor.Close(ctx)
 
-	var results []map[string]interface{}
+	var results []map[string]any
 	if err := cursor.All(ctx, &results); err != nil {
 		return nil, fmt.Errorf("could not decode aggregation results: %w", err)
 	}
@@ -289,7 +289,7 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 }
 
 // fetchCollStatsCommand uses the legacy collStats command (pre-6.2 and fallback)
-func (m *Metricset) fetchCollStatsCommand(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+func (m *Metricset) fetchCollStatsCommand(client *mongo.Client, dbName, collectionName string) (map[string]any, error) {
 	db := client.Database(dbName)
 
 	// Build command with options.
@@ -311,7 +311,7 @@ func (m *Metricset) fetchCollStatsCommand(client *mongo.Client, dbName, collecti
 	if err := collStats.Err(); err != nil {
 		return nil, fmt.Errorf("collStats command failed: %w", err)
 	}
-	var statsRes map[string]interface{}
+	var statsRes map[string]any
 	if err := collStats.Decode(&statsRes); err != nil {
 		return nil, fmt.Errorf("could not decode mongo response for database=%s, collection=%s: %w", dbName, collectionName, err)
 	}
@@ -320,7 +320,7 @@ func (m *Metricset) fetchCollStatsCommand(client *mongo.Client, dbName, collecti
 }
 
 // applyOptionsToStats applies post-processing options to collected statistics
-func (m *Metricset) applyOptionsToStats(stats map[string]interface{}) (map[string]interface{}, error) {
+func (m *Metricset) applyOptionsToStats(stats map[string]any) (map[string]any, error) {
 	if stats == nil {
 		return stats, nil
 	}
@@ -340,16 +340,14 @@ func (m *Metricset) applyOptionsToStats(stats map[string]interface{}) (map[strin
 }
 
 // mergeShardedCollStats merges collection statistics from multiple shards
-func mergeShardedCollStats(shardResults []map[string]interface{}) (map[string]interface{}, error) {
+func mergeShardedCollStats(shardResults []map[string]any) (map[string]any, error) {
 	if len(shardResults) == 0 {
 		return nil, fmt.Errorf("no shard results to merge")
 	}
 
 	// Start with the first shard's result as the base
-	merged := make(map[string]interface{})
-	for key, value := range shardResults[0] {
-		merged[key] = value
-	}
+	merged := make(map[string]any)
+	maps.Copy(merged, shardResults[0])
 
 	// Fields that should be summed across shards
 	sumFields := []string{
@@ -479,7 +477,7 @@ func mergeShardedCollStats(shardResults []map[string]interface{}) (map[string]in
 // includes it (the hostname of the serving node), even on a standalone mongod or
 // a replica set. Treating "host" as shard metadata would force every standalone
 // result through the sharded-merge path and emit a spurious shardCount=1.
-func hasShardMetadata(result map[string]interface{}) bool {
+func hasShardMetadata(result map[string]any) bool {
 	if result == nil {
 		return false
 	}
@@ -488,7 +486,7 @@ func hasShardMetadata(result map[string]interface{}) bool {
 }
 
 // convertToFloat64 safely converts various numeric types to float64
-func convertToFloat64(value interface{}) (float64, bool) {
+func convertToFloat64(value any) (float64, bool) {
 	switch v := value.(type) {
 	case float64:
 		return v, true
@@ -521,7 +519,7 @@ func convertToFloat64(value interface{}) (float64, bool) {
 
 // flattenAggregationResult flattens the $collStats aggregation output (storageStats sub-document)
 // to resemble the legacy collStats command result expected by existing mapping logic.
-func flattenAggregationResult(result map[string]interface{}) map[string]interface{} {
+func flattenAggregationResult(result map[string]any) map[string]any {
 	if result == nil {
 		return result
 	}
@@ -531,7 +529,7 @@ func flattenAggregationResult(result map[string]interface{}) map[string]interfac
 		return result // already flat (legacy or unexpected format)
 	}
 
-	storageStats, ok := storageStatsRaw.(map[string]interface{})
+	storageStats, ok := storageStatsRaw.(map[string]any)
 	if !ok {
 		return result
 	}
@@ -581,7 +579,7 @@ func getMongoDBVersion(client *mongo.Client) (string, error) {
 		return "", fmt.Errorf("buildInfo command failed: %w", err)
 	}
 
-	var buildInfo map[string]interface{}
+	var buildInfo map[string]any
 	if err := result.Decode(&buildInfo); err != nil {
 		return "", fmt.Errorf("could not decode buildInfo: %w", err)
 	}
@@ -672,7 +670,7 @@ func (m *Metricset) getCollectionsFromTop(client *mongo.Client) ([]CollectionInf
 		return nil, fmt.Errorf("'top' command failed: %w", err)
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := res.Decode(&result); err != nil {
 		return nil, fmt.Errorf("could not decode mongo response: %w", err)
 	}
@@ -681,7 +679,7 @@ func (m *Metricset) getCollectionsFromTop(client *mongo.Client) ([]CollectionInf
 		return nil, errors.New("collection 'totals' key not found in mongodb response")
 	}
 
-	totals, ok := result["totals"].(map[string]interface{})
+	totals, ok := result["totals"].(map[string]any)
 	if !ok {
 		return nil, errors.New("collection 'totals' is not a map")
 	}
@@ -693,7 +691,7 @@ func (m *Metricset) getCollectionsFromTop(client *mongo.Client) ([]CollectionInf
 			continue
 		}
 
-		infoMap, ok := info.(map[string]interface{})
+		infoMap, ok := info.(map[string]any)
 		if !ok {
 			m.Logger().Debugf("unexpected data returned by mongodb for group %s", group)
 			continue

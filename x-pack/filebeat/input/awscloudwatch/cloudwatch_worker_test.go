@@ -67,7 +67,7 @@ func TestAckTracker(t *testing.T) {
 
 	t.Run("increments should not get blocked even if wait is not called", func(t *testing.T) {
 		tracker := newACKTracker()
-		done := make(chan interface{})
+		done := make(chan any)
 
 		go func() {
 			tracker.increaseAck(1)

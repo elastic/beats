@@ -62,13 +62,13 @@ var (
 
 // Connections stores connections related information
 type Connections struct {
-	Now         time.Time                `json:"now"`
-	ServerID    string                   `json:"server_id"`
-	Connections []map[string]interface{} `json:"connections,omitempty"`
+	Now         time.Time        `json:"now"`
+	ServerID    string           `json:"server_id"`
+	Connections []map[string]any `json:"connections,omitempty"`
 }
 
 // eventMapping maps a connection to a Metricbeat event using connectionsSchema
-func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Event, error) {
+func eventMapping(content map[string]any, fieldsSchema s.Schema) (mb.Event, error) {
 	fields, err := fieldsSchema.Apply(content)
 	if err != nil {
 		return mb.Event{}, fmt.Errorf("error applying connection schema: %w", err)

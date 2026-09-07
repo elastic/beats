@@ -19,6 +19,7 @@ package logv2
 
 import (
 	_ "embed"
+	"fmt"
 	"testing"
 	"time"
 
@@ -48,6 +49,7 @@ func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 
 	store := openTestStatestore()
 	p := filestream.Plugin(logp.NewNopLogger(), store)
+	t.Cleanup(p.Manager.Close)
 	if _, err := p.Manager.Create(newCfg); err != nil {
 		t.Fatalf("Filestream input cannot be created from converted config: %s", err)
 	}
@@ -506,6 +508,10 @@ func (s *testInputStore) Close() {
 
 func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testInputStore) CleanupInterval() time.Duration {

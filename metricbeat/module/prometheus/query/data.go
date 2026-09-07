@@ -44,7 +44,7 @@ type ArrayResponse struct {
 	Data   arrayData `json:"data"`
 }
 type arrayData struct {
-	Results []interface{} `json:"result"`
+	Results []any `json:"result"`
 }
 
 // InstantVectorResponse is for "vector" type from Prometheus Query API Request
@@ -67,7 +67,7 @@ type instantVectorData struct {
 }
 type instantVectorResult struct {
 	Metric map[string]string `json:"metric"`
-	Vector []interface{}     `json:"value"`
+	Vector []any             `json:"value"`
 }
 
 // RangeVectorResponse is for "vector" type from Prometheus Query API Request
@@ -90,7 +90,7 @@ type rangeVectorData struct {
 }
 type rangeVectorResult struct {
 	Metric  map[string]string `json:"metric"`
-	Vectors [][]interface{}   `json:"values"`
+	Vectors [][]any           `json:"values"`
 }
 
 func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
@@ -241,7 +241,7 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 	return mb.Event{}, fmt.Errorf("could not parse results")
 }
 
-func getTimestampFromVector(vector []interface{}) (float64, error) {
+func getTimestampFromVector(vector []any) (float64, error) {
 	// Example input: [ <unix_time>, "<sample_value>" ]
 	if len(vector) != 2 {
 		return 0, fmt.Errorf("could not parse results")
@@ -253,7 +253,7 @@ func getTimestampFromVector(vector []interface{}) (float64, error) {
 	return timestamp, nil
 }
 
-func getValueFromVector(vector []interface{}) (float64, error) {
+func getValueFromVector(vector []any) (float64, error) {
 	// Example input: [ <unix_time>, "<sample_value>" ]
 	if len(vector) != 2 {
 		return 0, errors.New("could not parse results")

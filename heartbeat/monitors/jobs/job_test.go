@@ -64,7 +64,7 @@ func TestWrapAll(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         args
-		resultFields []map[string]interface{}
+		resultFields []map[string]any
 	}{
 		{
 			"simple",
@@ -72,7 +72,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{basicJob},
 				[]JobWrapper{addFoo},
 			},
-			[]map[string]interface{}{{"basic": "job", "foo": "bar"}},
+			[]map[string]any{{"basic": "job", "foo": "bar"}},
 		},
 		{
 			"multijob",
@@ -80,7 +80,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{basicJob, basicJob},
 				[]JobWrapper{addFoo},
 			},
-			[]map[string]interface{}{
+			[]map[string]any{
 				{"basic": "job", "foo": "bar"},
 				{"basic": "job", "foo": "bar"},
 			},
@@ -91,7 +91,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{contJob},
 				[]JobWrapper{addFoo},
 			},
-			[]map[string]interface{}{
+			[]map[string]any{
 				{"cont": "job", "foo": "bar"},
 				{"basic": "job", "foo": "bar"},
 			},
@@ -102,7 +102,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{contJob},
 				[]JobWrapper{addFoo, addBaz},
 			},
-			[]map[string]interface{}{
+			[]map[string]any{
 				{"cont": "job", "foo": "bar", "baz": "bot"},
 				{"basic": "job", "foo": "bar", "baz": "bot"},
 			},

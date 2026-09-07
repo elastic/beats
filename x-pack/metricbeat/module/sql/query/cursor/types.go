@@ -85,7 +85,7 @@ func InferTypeFromDefaultValue(raw string) (string, error) {
 }
 
 // InferTypeFromDatabaseValue infers a cursor type from a database row value.
-func InferTypeFromDatabaseValue(dbVal interface{}) (string, error) {
+func InferTypeFromDatabaseValue(dbVal any) (string, error) {
 	if dbVal == nil {
 		return "", errors.New("column value is NULL")
 	}
@@ -178,7 +178,7 @@ func isDateOnlyString(s string) bool {
 
 // FromDatabaseValue creates a Value from a database result.
 // This handles the various types that SQL drivers may return.
-func FromDatabaseValue(dbVal interface{}, valueType string) (*Value, error) {
+func FromDatabaseValue(dbVal any, valueType string) (*Value, error) {
 	if dbVal == nil {
 		return nil, errors.New("column value is NULL")
 	}
@@ -201,7 +201,7 @@ func FromDatabaseValue(dbVal interface{}, valueType string) (*Value, error) {
 
 // ToDriverArg converts the Value to a type suitable for database/sql Query.
 // The returned value can be passed directly to db.QueryContext().
-func (v *Value) ToDriverArg() interface{} {
+func (v *Value) ToDriverArg() any {
 	switch v.Type {
 	case CursorTypeInteger:
 		i, _ := strconv.ParseInt(v.Raw, 10, 64)
@@ -288,7 +288,7 @@ func compareFloat64(a, b float64) int {
 
 // --- Integer parsing ---
 
-func parseIntegerFromDB(dbVal interface{}) (*Value, error) {
+func parseIntegerFromDB(dbVal any) (*Value, error) {
 	var intVal int64
 
 	switch v := dbVal.(type) {
@@ -351,7 +351,7 @@ func parseIntegerFromDB(dbVal interface{}) (*Value, error) {
 
 // --- Float parsing ---
 
-func parseFloatFromDB(dbVal interface{}) (*Value, error) {
+func parseFloatFromDB(dbVal any) (*Value, error) {
 	var floatVal float64
 
 	switch v := dbVal.(type) {
@@ -396,7 +396,7 @@ func parseFloatFromDB(dbVal interface{}) (*Value, error) {
 
 // --- Decimal parsing ---
 
-func parseDecimalFromDB(dbVal interface{}) (*Value, error) {
+func parseDecimalFromDB(dbVal any) (*Value, error) {
 	var d decimal.Decimal
 
 	switch v := dbVal.(type) {
@@ -460,7 +460,7 @@ func parseTimestampString(s string) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("cannot parse timestamp: %s", s)
 }
 
-func parseTimestampFromDB(dbVal interface{}) (*Value, error) {
+func parseTimestampFromDB(dbVal any) (*Value, error) {
 	var t time.Time
 
 	switch v := dbVal.(type) {
@@ -509,7 +509,7 @@ func parseDateString(s string) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("cannot parse date: %s", s)
 }
 
-func parseDateFromDB(dbVal interface{}) (*Value, error) {
+func parseDateFromDB(dbVal any) (*Value, error) {
 	var d time.Time
 
 	switch v := dbVal.(type) {

@@ -223,13 +223,6 @@ func (c lookupCache) Lookup(q string, qt queryType) (*result, error) {
 	return r, nil
 }
 
-func max(a, b uint32) uint32 {
-	if a >= b {
-		return a
-	}
-	return b
-}
-
 // safeUint32 converts a float64 to a uint32, protecting against out-of-bounds
 // values. It takes the absolute value to prevent negative numbers and caps the
 // result at math.MaxUint32 to avoid integer overflows.
