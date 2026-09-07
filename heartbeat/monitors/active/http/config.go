@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -42,10 +41,12 @@ type Config struct {
 	Username string `config:"username"`
 	Password string `config:"password"`
 
-	// Kerberos/SPNEGO (Negotiate) authentication.
-	Kerberos *kerberos.Config `config:"kerberos"`
+	// Kerberos/SPNEGO (Negotiate) authentication. Accepts a nested object or a
+	// base64-encoded YAML/JSON string of that object (Fleet / synthetics).
+	Kerberos *kerberosSettings `config:"kerberos"`
 
-	// NTLM (Integrated Windows Authentication) authentication.
+	// NTLM (Integrated Windows Authentication) authentication. Accepts a nested
+	// object or a base64-encoded YAML/JSON string of that object.
 	NTLM *NTLMConfig `config:"ntlm"`
 
 	// http(s) ping validation

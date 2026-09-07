@@ -193,7 +193,9 @@ heartbeat.monitors:
 
   # Kerberos/SPNEGO (Negotiate) authentication. Mutually exclusive with basic
   # auth (username/password) and ntlm. Only usable from on-prem/Private Location
-  # agents that can reach the KDC. Not available in FIPS builds.
+  # agents that can reach the KDC. Not available in FIPS builds. The synthetics
+  # integration may pass this as a base64-encoded YAML/JSON string of the same
+  # object; Heartbeat decodes it.
   #kerberos:
     #enabled: true
     # Authentication type: 'password' or 'keytab'.
