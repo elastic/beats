@@ -111,9 +111,10 @@ func (bt *Heartbeat) startManagedSchedulerPayloadReporter(
 }
 
 // startSchedulerPayloadReporterWithTicks publishes a snapshot immediately and
-// then on every tick. Snapshots are unconditionally handed to the manager,
-// which drops values identical to the last one it forwarded; a scheduler under
-// no pressure therefore produces no periodic Fleet state writes.
+// then on every tick. Snapshots are always handed to the manager, which
+// suppresses a snapshot identical to what a unit already carries: an idle
+// scheduler stops generating state writes, while a change in the live
+// running/waiting gauges or in the delayed-start counters still propagates.
 func startSchedulerPayloadReporterWithTicks(
 	setter payloadSetter,
 	statusProvider schedulerStatusProvider,

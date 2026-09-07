@@ -101,5 +101,5 @@ func TestJobTypeScheduleDelayIgnoresHealthyStarts(t *testing.T) {
 
 func TestJobTypeScheduleDelayThresholdIsOneSecond(t *testing.T) {
 	assert.Equal(t, time.Second, scheduleDelayThreshold,
-		"the reporting threshold keeps healthy execution from writing Fleet state")
+		"the reporting threshold keeps idle snapshots unchanged so they can be suppressed")
 }

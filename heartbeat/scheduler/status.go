@@ -26,8 +26,10 @@ import (
 
 // scheduleDelayThreshold is the smallest first-task start delay worth
 // reporting. Healthy execution jitter is far below a second, so ignoring
-// smaller delays keeps consecutive status snapshots byte-identical and stops
-// routine execution from causing periodic Fleet state writes.
+// smaller delays lets an idle scheduler produce byte-identical snapshots that
+// the management layer suppresses, instead of nudging a counter on every check.
+// Live running/waiting gauges and delays at or above the threshold still
+// publish news as they happen.
 const scheduleDelayThreshold = time.Second
 
 // ScheduleDelayStatus counts first-task starts that began at least

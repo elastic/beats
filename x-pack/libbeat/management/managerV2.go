@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"reflect"
 	"sync"
 	"time"
 
@@ -426,19 +425,19 @@ func (cm *BeatV2Manager) SetPayload(payload map[string]any) {
 
 // SetOutputPayload attaches Beat-wide telemetry to output units only, so
 // consumers read it once from the unit whose type is `output` instead of from
-// every input unit. Identical payloads are dropped, which keeps a Beat that
-// reports unchanged telemetry from generating Fleet state writes.
+// every input unit.
+//
+// The payload is always retained and offered to the output units; dedup is left
+// to agentUnit.UpdateState, which is the authoritative view of what each unit
+// last delivered. Short circuiting here on an unchanged value would make a unit
+// that lost its payload unable to recover.
 func (cm *BeatV2Manager) SetOutputPayload(payload map[string]any) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
-	// Clone so a caller mutating its map afterwards cannot invalidate the
-	// comparison snapshot or the value forwarded to Elastic Agent.
-	payload = clonePayload(payload)
-	if reflect.DeepEqual(cm.outputPayload, payload) {
-		return
-	}
-	cm.outputPayload = payload
+	// Clone so a caller mutating its map afterwards cannot change what we
+	// report to Elastic Agent.
+	cm.outputPayload = clonePayload(payload)
 
 	for _, unit := range cm.units {
 		if unit.Type() != client.UnitTypeOutput {
@@ -469,15 +468,17 @@ func (cm *BeatV2Manager) updateUnitStatus(unit *agentUnit) {
 		return
 	}
 
-	if err := unit.UpdateState(cm.status, cm.message, cm.payloadFor(unit.Type())); err != nil {
+	if err := unit.UpdateState(cm.status, cm.message, cm.lockedPayloadFor(unit.Type())); err != nil {
 		cm.logger.Errorf("Failed to update unit %s status: %s", unit.ID(), err)
 	}
 }
 
-// payloadFor returns the payload to report on a unit of the given type. Output
-// units see the global payload merged with the output payload, output keys
-// winning. Neither source map is mutated.
-func (cm *BeatV2Manager) payloadFor(unitType client.UnitType) map[string]any {
+// lockedPayloadFor returns the payload to report on a unit of the given type.
+// Output units see the global payload merged with the output payload, output
+// keys winning. Neither source map is mutated.
+//
+// Callers must hold cm.mx; use payloadSnapshotFor from unlocked code.
+func (cm *BeatV2Manager) lockedPayloadFor(unitType client.UnitType) map[string]any {
 	if unitType != client.UnitTypeOutput || len(cm.outputPayload) == 0 {
 		return cm.payload
 	}
@@ -494,6 +495,17 @@ func (cm *BeatV2Manager) payloadFor(unitType client.UnitType) map[string]any {
 	}
 
 	return merged
+}
+
+// payloadSnapshotFor is the lock-safe counterpart of lockedPayloadFor: it takes
+// cm.mx itself and returns a copy that is safe to hand to a unit afterwards.
+// The reload paths deliberately run without the manager lock, and they must
+// reuse the retained payload rather than clearing it off the units.
+func (cm *BeatV2Manager) payloadSnapshotFor(unitType client.UnitType) map[string]any {
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	return clonePayload(cm.lockedPayloadFor(unitType))
 }
 
 // ================================
@@ -516,7 +528,7 @@ func (cm *BeatV2Manager) upsertUnit(unit *client.Unit) {
 	// update specific unit to starting; keep the payload attached because an
 	// unchanged snapshot published later is suppressed and would never
 	// re-attach it
-	_ = aUnit.UpdateState(status.Starting, "Starting", cm.payloadFor(aUnit.Type()))
+	_ = aUnit.UpdateState(status.Starting, "Starting", cm.lockedPayloadFor(aUnit.Type()))
 
 	// register the already registered actions (only on input units)
 	for _, action := range cm.actions {
@@ -543,7 +555,7 @@ func (cm *BeatV2Manager) updateUnit(unit *client.Unit) {
 
 	aUnit.update(unit)
 
-	payload := cm.payloadFor(aUnit.Type())
+	payload := cm.lockedPayloadFor(aUnit.Type())
 	expected := unit.Expected()
 	if expected.State == client.UnitStateStopped {
 		// expected to be stopped; needs to stop this unit
@@ -690,7 +702,8 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		for _, unit := range units {
 			errs := unitErrors[unit.ID()]
 			if len(errs) != 0 {
-				_ = unit.UpdateState(status.Failed, errors.Join(errs...).Error(), nil)
+				_ = unit.UpdateState(status.Failed, errors.Join(errs...).Error(),
+					cm.payloadSnapshotFor(unit.Type()))
 			}
 		}
 	}()
@@ -762,7 +775,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 
 		msg := fmt.Sprintf("could not start output: %s", err)
 		if outputUnit != nil {
-			if err := outputUnit.UpdateState(status.Failed, msg, nil); err != nil {
+			if err := outputUnit.UpdateState(status.Failed, msg, cm.payloadSnapshotFor(client.UnitTypeOutput)); err != nil {
 				cm.logger.Errorw("setting output state", "error", err)
 			}
 		}
@@ -771,7 +784,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	}
 
 	if outputUnit != nil {
-		if err := outputUnit.UpdateState(status.Running, "Healthy", nil); err != nil {
+		if err := outputUnit.UpdateState(status.Running, "Healthy", cm.payloadSnapshotFor(client.UnitTypeOutput)); err != nil {
 			cm.logger.Errorw("setting output state", "error", err)
 		}
 	}
@@ -849,12 +862,13 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 
 	// report the stopping units as stopped
 	for _, unit := range stoppingUnits {
-		_ = unit.UpdateState(status.Stopped, "Stopped", nil)
+		_ = unit.UpdateState(status.Stopped, "Stopped", cm.payloadSnapshotFor(unit.Type()))
 	}
 
 	// now update the statuses of all units that contain only healthy
 	// inputs. If there isn't an error with the inputs, we set the unit as
 	// healthy because there is no way to know more information about its inputs.
+	inputPayload := cm.payloadSnapshotFor(client.UnitTypeInput)
 	for _, unit := range healthyInputs {
 		expected := unit.Expected()
 		if expected.State == client.UnitStateStopped {
@@ -863,7 +877,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 			continue
 		}
 
-		err := unit.UpdateState(status.Running, "Healthy", nil)
+		err := unit.UpdateState(status.Running, "Healthy", inputPayload)
 		if err != nil {
 			cm.logger.Errorf("Failed to update unit %s status: %s", unit.ID(), err)
 		}
@@ -910,7 +924,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
-		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
+		_ = unit.UpdateState(status.Stopping, "Restarting", cm.payloadSnapshotFor(unit.Type()))
 		cm.stop()
 		return true, nil
 	}
