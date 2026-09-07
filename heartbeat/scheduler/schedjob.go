@@ -29,14 +29,15 @@ import (
 )
 
 type schedJob struct {
-	id          string
-	ctx         context.Context
-	scheduler   *Scheduler
-	wg          *sync.WaitGroup
-	entrypoint  TaskFunc
-	jobLimitSem *semaphore.Weighted
-	activeTasks atomic.Int64
-	logger      *logp.Logger
+	id           string
+	ctx          context.Context
+	scheduler    *Scheduler
+	wg           *sync.WaitGroup
+	entrypoint   TaskFunc
+	jobLimitSem  *semaphore.Weighted
+	jobTypeStats *jobTypeStats
+	activeTasks  atomic.Int64
+	logger       *logp.Logger
 }
 
 // runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
@@ -44,13 +45,14 @@ type schedJob struct {
 // returns the time execution began on its first task
 func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, task TaskFunc, logger *logp.Logger) *schedJob {
 	return &schedJob{
-		id:          id,
-		ctx:         ctx,
-		scheduler:   s,
-		jobLimitSem: s.jobLimitSem[jobType],
-		entrypoint:  task,
-		wg:          &sync.WaitGroup{},
-		logger:      logger,
+		id:           id,
+		ctx:          ctx,
+		scheduler:    s,
+		jobLimitSem:  s.jobLimitSem[jobType],
+		jobTypeStats: s.getJobTypeStats(jobType),
+		entrypoint:   task,
+		wg:           &sync.WaitGroup{},
+		logger:       logger,
 	}
 }
 
@@ -59,20 +61,23 @@ func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, t
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
 func (sj *schedJob) run() (startedAt time.Time) {
-	sj.wg.Add(1)
-	sj.activeTasks.Add(1)
 	if sj.jobLimitSem != nil {
+		sj.jobTypeStats.waiting.Add(1)
 		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
-		// Defer release only if acquired
-		if err == nil {
-			defer sj.jobLimitSem.Release(1)
-		} else {
+		sj.jobTypeStats.waiting.Add(-1)
+		if err != nil {
 			sj.logger.Errorf("could not acquire semaphore: %v", err)
+			return time.Now()
 		}
+		defer sj.jobLimitSem.Release(1)
 	}
 
-	startedAt = sj.runTask(sj.entrypoint)
+	sj.jobTypeStats.running.Add(1)
+	defer sj.jobTypeStats.running.Add(-1)
 
+	sj.wg.Add(1)
+	sj.activeTasks.Add(1)
+	startedAt = sj.runTask(sj.entrypoint, true)
 	sj.wg.Wait()
 	return startedAt
 }
@@ -81,7 +86,7 @@ func (sj *schedJob) run() (startedAt time.Time) {
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
-func (sj *schedJob) runTask(task TaskFunc) time.Time {
+func (sj *schedJob) runTask(task TaskFunc, countRun bool) time.Time {
 	defer sj.wg.Done()
 	defer sj.activeTasks.Add(-1)
 
@@ -110,6 +115,9 @@ func (sj *schedJob) runTask(task TaskFunc) time.Time {
 	default:
 		sj.scheduler.stats.activeTasks.Inc()
 
+		if countRun {
+			sj.jobTypeStats.runs.Add(1)
+		}
 		continuations := task(sj.ctx)
 		sj.scheduler.stats.activeTasks.Dec()
 
@@ -119,7 +127,7 @@ func (sj *schedJob) runTask(task TaskFunc) time.Time {
 			// Run continuations in parallel, note that these each will acquire their own slots
 			// We can discard the started at times for continuations as those are
 			// irrelevant
-			go sj.runTask(cont)
+			go sj.runTask(cont, false)
 		}
 	}
 

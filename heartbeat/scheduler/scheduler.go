@@ -41,17 +41,19 @@ var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
 // Scheduler represents our async timer based scheduler.
 type Scheduler struct {
-	limit       int64
-	limitSem    *semaphore.Weighted
-	location    *time.Location
-	timerQueue  *timerqueue.TimerQueue
-	ctx         context.Context
-	cancelCtx   context.CancelFunc
-	stats       schedulerStats
-	jobLimitSem map[string]*semaphore.Weighted
-	runOnce     bool
-	runOnceWg   *sync.WaitGroup
-	logger      *logp.Logger
+	limit          int64
+	limitSem       *semaphore.Weighted
+	location       *time.Location
+	timerQueue     *timerqueue.TimerQueue
+	ctx            context.Context
+	cancelCtx      context.CancelFunc
+	stats          schedulerStats
+	jobLimitSem    map[string]*semaphore.Weighted
+	jobTypeStatsMu sync.Mutex
+	jobTypeStats   map[string]*jobTypeStats
+	runOnce        bool
+	runOnceWg      *sync.WaitGroup
+	logger         *logp.Logger
 }
 
 type schedulerStats struct {
@@ -106,15 +108,16 @@ func Create(
 	waitingTasksGauge := monitoring.NewUint(registry, "tasks.waiting")
 
 	sched := &Scheduler{
-		limit:       limit,
-		location:    location,
-		ctx:         ctx,
-		cancelCtx:   cancelCtx,
-		limitSem:    semaphore.NewWeighted(limit),
-		jobLimitSem: getJobLimitSem(jobLimitByType, logger),
-		timerQueue:  timerqueue.NewTimerQueue(ctx),
-		runOnce:     runOnce,
-		runOnceWg:   &sync.WaitGroup{},
+		limit:        limit,
+		location:     location,
+		ctx:          ctx,
+		cancelCtx:    cancelCtx,
+		limitSem:     semaphore.NewWeighted(limit),
+		jobLimitSem:  getJobLimitSem(jobLimitByType, logger),
+		jobTypeStats: newJobTypeStats(jobLimitByType),
+		timerQueue:   timerqueue.NewTimerQueue(ctx),
+		runOnce:      runOnce,
+		runOnceWg:    &sync.WaitGroup{},
 
 		stats: schedulerStats{
 			activeJobs:         activeJobsGauge,
