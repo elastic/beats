@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"text/template"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/mito/lib/xml"
@@ -143,17 +144,17 @@ func (iter *pageIterator) next() (*response, bool, error) {
 	}
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
-	switch {
-	case err == nil:
-		// OK
-	case errors.Is(err, errNewURLValueNotSet),
-		errors.Is(err, errEmptyTemplateResult),
-		errors.Is(err, errExecutingTemplate):
-		// If this error happens here it means a transform
-		// did not find any new value and we can stop paginating without error.
-		iter.done = true
-		return nil, false, nil
-	default:
+	if err != nil {
+		var execErr template.ExecError
+		if errors.Is(err, errNewURLValueNotSet) ||
+			errors.Is(err, errEmptyTemplateResult) ||
+			errors.Is(err, errExecutingTemplate) ||
+			errors.As(err, &execErr) {
+			// If this error happens here it means a transform
+			// did not find any new value and we can stop paginating without error.
+			iter.done = true
+			return nil, false, nil
+		}
 		return nil, false, err
 	}
 
