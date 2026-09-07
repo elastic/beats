@@ -22,38 +22,41 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 )
 
 const schedulerPayloadInterval = 30 * time.Second
 
-var schedulerPayloadJobTypes = map[string]struct{}{
-	"http":    {},
-	"tcp":     {},
-	"icmp":    {},
-	"browser": {},
-	"api":     {},
-}
-
+// payloadSetter attaches scheduler telemetry to the Elastic Agent output unit.
 type payloadSetter interface {
-	SetPayload(map[string]any)
+	SetOutputPayload(map[string]any)
 }
 
 type schedulerStatusProvider interface {
 	Status() scheduler.Status
 }
 
+// schedulerPayload renders the snapshot consumers read from the single Elastic
+// Agent output unit (`unit.type == "output"`). Per monitor type it exposes
+// exactly `limit`, `running`, `waiting` and
+// `schedule_delay.{count,total_ms,max_ms}`.
+//
+// `waiting` counts jobs blocked on the per-type semaphore, so types without a
+// per-type limit report 0; their global scheduler pressure shows up as
+// schedule-delay events instead. `max_ms` is a process-lifetime maximum, so
+// sustained pressure must be derived from deltas of `count` and `total_ms`
+// combined with the current `waiting`, not from `max_ms` alone.
 func schedulerPayload(status scheduler.Status) map[string]any {
 	jobs := make(map[string]any, len(status.Jobs))
 	for jobType, jobStatus := range status.Jobs {
-		if _, supported := schedulerPayloadJobTypes[jobType]; !supported {
+		if !config.IsSupportedJobType(jobType) {
 			continue
 		}
 		jobs[jobType] = map[string]any{
 			"limit":   jobStatus.Limit,
 			"running": jobStatus.Running,
 			"waiting": jobStatus.Waiting,
-			"runs":    jobStatus.Runs,
 			"schedule_delay": map[string]any{
 				"count":    jobStatus.ScheduleDelay.Count,
 				"total_ms": jobStatus.ScheduleDelay.TotalMS,
@@ -107,12 +110,16 @@ func (bt *Heartbeat) startManagedSchedulerPayloadReporter(
 	return stop
 }
 
+// startSchedulerPayloadReporterWithTicks publishes a snapshot immediately and
+// then on every tick. Snapshots are unconditionally handed to the manager,
+// which drops values identical to the last one it forwarded; a scheduler under
+// no pressure therefore produces no periodic Fleet state writes.
 func startSchedulerPayloadReporterWithTicks(
 	setter payloadSetter,
 	statusProvider schedulerStatusProvider,
 	ticks <-chan time.Time,
 ) func() {
-	setter.SetPayload(schedulerPayload(statusProvider.Status()))
+	setter.SetOutputPayload(schedulerPayload(statusProvider.Status()))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
@@ -123,7 +130,7 @@ func startSchedulerPayloadReporterWithTicks(
 			case <-ctx.Done():
 				return
 			case <-ticks:
-				setter.SetPayload(schedulerPayload(statusProvider.Status()))
+				setter.SetOutputPayload(schedulerPayload(statusProvider.Status()))
 			}
 		}
 	}()

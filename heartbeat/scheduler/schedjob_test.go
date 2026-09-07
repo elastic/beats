@@ -153,7 +153,7 @@ func TestJobTypePressure(t *testing.T) {
 			first.run()
 			close(firstDone)
 		}()
-		<-firstStarted
+		requireClosed(t, firstStarted, "first browser job should start")
 
 		go func() {
 			second.run()
@@ -174,17 +174,15 @@ func TestJobTypePressure(t *testing.T) {
 			"the second browser job should wait for the type semaphore")
 
 		close(releaseFirst)
-		<-firstDone
-		<-secondStarted
-		<-secondDone
+		requireClosed(t, firstDone, "first browser job should finish after release")
+		requireClosed(t, secondStarted, "second browser job should start once the type slot frees")
+		requireClosed(t, secondDone, "second browser job should finish")
 
 		status = s.Status()
 		assert.Equal(t, int64(0), status.Jobs["browser"].Running,
 			"completed browser jobs should not be reported as running")
 		assert.Equal(t, int64(0), status.Jobs["browser"].Waiting,
 			"completed browser jobs should not be reported as waiting")
-		assert.Equal(t, uint64(2), status.Jobs["browser"].Runs,
-			"both browser tasks should be counted as runs")
 	})
 
 	t.Run("does not count canceled jobs", func(t *testing.T) {
@@ -213,7 +211,22 @@ func TestJobTypePressure(t *testing.T) {
 			"a canceled browser job should not be reported as running")
 		assert.Equal(t, int64(0), status.Jobs["browser"].Waiting,
 			"a canceled browser job should not remain waiting")
-		assert.Equal(t, uint64(0), status.Jobs["browser"].Runs,
-			"a canceled browser job should not be counted as a run")
+		assert.Equal(t, uint64(0), status.Jobs["browser"].ScheduleDelay.Count,
+			"a canceled browser job should not record a schedule delay")
 	})
+}
+
+// testTimeout bounds channel waits in scheduler tests.
+const testTimeout = 10 * time.Second
+
+// requireClosed waits for ch with a bound so a regression fails the test
+// instead of hanging the package.
+func requireClosed(t *testing.T, ch <-chan struct{}, msg string) {
+	t.Helper()
+
+	select {
+	case <-ch:
+	case <-time.After(testTimeout):
+		require.FailNow(t, msg)
+	}
 }

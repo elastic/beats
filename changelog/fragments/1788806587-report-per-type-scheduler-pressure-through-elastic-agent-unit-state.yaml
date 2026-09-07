@@ -1,3 +1,19 @@
 kind: enhancement
 summary: Report per-type scheduler pressure through Elastic Agent unit state
+description: >
+  When Heartbeat runs under Elastic Agent it now publishes aggregate scheduler
+  pressure under `heartbeat.scheduler.jobs` in the check-in payload of the
+  single `output` unit, so the telemetry is reported once instead of on every
+  monitor input unit. Per monitor type (http, tcp, icmp, browser, api) the
+  payload exposes `limit`, `running`, `waiting` and
+  `schedule_delay.{count,total_ms,max_ms}`. `waiting` counts jobs blocked on
+  the per-type concurrency semaphore, so types configured without a per-type
+  limit report 0; their contention with the global scheduler limit shows up as
+  schedule-delay events instead. Only first-task starts that were at least one
+  second late update the delay counters, which keeps a healthy scheduler from
+  writing Fleet state every 30 seconds. `max_ms` is a process-lifetime
+  maximum, so consumers looking for sustained pressure should use deltas of
+  `count` and `total_ms` together with the current `waiting` rather than
+  `max_ms` alone.
 component: heartbeat
+issue: https://github.com/elastic/beats/issues/53074

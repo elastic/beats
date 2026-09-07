@@ -24,19 +24,37 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/config"
 )
 
-// ScheduleDelayStatus reports job scheduling delay measurements.
+// scheduleDelayThreshold is the smallest first-task start delay worth
+// reporting. Healthy execution jitter is far below a second, so ignoring
+// smaller delays keeps consecutive status snapshots byte-identical and stops
+// routine execution from causing periodic Fleet state writes.
+const scheduleDelayThreshold = time.Second
+
+// ScheduleDelayStatus counts first-task starts that began at least
+// scheduleDelayThreshold after their scheduled time. Starts that were on time
+// leave every counter untouched.
 type ScheduleDelayStatus struct {
 	Count   uint64 `json:"count"`
 	TotalMS uint64 `json:"total_ms"`
-	MaxMS   uint64 `json:"max_ms"`
+	// MaxMS is the largest delay seen over the whole process lifetime and is
+	// never reset. Consumers looking for sustained pressure must compare
+	// deltas of Count and TotalMS together with the current Waiting value,
+	// because a single historical spike keeps MaxMS high forever.
+	MaxMS uint64 `json:"max_ms"`
 }
 
 // JobTypeStatus reports scheduler pressure for a monitor type.
 type JobTypeStatus struct {
-	Limit         int64               `json:"limit"`
-	Running       int64               `json:"running"`
-	Waiting       int64               `json:"waiting"`
-	Runs          uint64              `json:"runs"`
+	// Limit is the per-type concurrency limit, 0 meaning unlimited.
+	Limit int64 `json:"limit"`
+	// Running counts jobs holding the per-type semaphore.
+	Running int64 `json:"running"`
+	// Waiting counts jobs blocked on the per-type semaphore only.
+	// Types without a per-type limit (http, tcp and icmp by default) therefore
+	// always report 0 even under load; their contention with the global
+	// scheduler limit surfaces through ScheduleDelay instead.
+	Waiting int64 `json:"waiting"`
+	// ScheduleDelay aggregates late first-task starts for this type.
 	ScheduleDelay ScheduleDelayStatus `json:"schedule_delay"`
 }
 
@@ -49,15 +67,17 @@ type jobTypeStats struct {
 	limit        int64
 	running      atomic.Int64
 	waiting      atomic.Int64
-	runs         atomic.Uint64
 	delayCount   atomic.Uint64
 	delayTotalMS atomic.Uint64
 	delayMaxMS   atomic.Uint64
 }
 
+// recordDelay samples how late a first task actually started. Delays shorter
+// than scheduleDelayThreshold are dropped, including negative ones from clock
+// adjustments, so a healthy scheduler never mutates these counters.
 func (s *jobTypeStats) recordDelay(delay time.Duration) {
-	if delay < 0 {
-		delay = 0
+	if delay < scheduleDelayThreshold {
+		return
 	}
 	delayMS := uint64(delay.Milliseconds())
 
@@ -105,7 +125,6 @@ func (s *Scheduler) Status() Status {
 			Limit:   stats.limit,
 			Running: stats.running.Load(),
 			Waiting: stats.waiting.Load(),
-			Runs:    stats.runs.Load(),
 			ScheduleDelay: ScheduleDelayStatus{
 				Count:   stats.delayCount.Load(),
 				TotalMS: stats.delayTotalMS.Load(),

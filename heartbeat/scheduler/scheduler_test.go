@@ -70,7 +70,7 @@ type scheduledOnce struct {
 	calls atomic.Uint32
 }
 
-func (scheduledOnce) RunOnInit() bool {
+func (*scheduledOnce) RunOnInit() bool {
 	return false
 }
 
@@ -193,44 +193,100 @@ func TestScheduleDelayIncludesTypeLimitWait(t *testing.T) {
 		}, logptest.NewTestingLogger(t, "")).run()
 		close(firstDone)
 	}()
-	select {
-	case <-firstStarted:
-	case <-time.After(5 * time.Second):
-		require.FailNow(t, "first job should start before scheduling the second")
-	}
+	requireClosed(t, firstStarted, "first job should start before scheduling the second")
 
-	scheduledAt := time.Now().Add(50 * time.Millisecond)
 	secondStarted := make(chan struct{})
-	_, err := s.Add(&scheduledOnce{runAt: scheduledAt}, nil, "second", func(context.Context) []TaskFunc {
+	_, err := s.Add(&scheduledOnce{runAt: time.Now()}, nil, "second", func(context.Context) []TaskFunc {
 		close(secondStarted)
 		return nil
 	}, jobType)
 	require.NoError(t, err, "second job should be added")
 
-	releaseAt := scheduledAt.Add(150 * time.Millisecond)
-	releaseTimer := time.NewTimer(time.Until(releaseAt))
-	defer releaseTimer.Stop()
-	<-releaseTimer.C
+	require.Eventually(t, func() bool {
+		return s.Status().Jobs[jobType].Waiting == 1
+	}, testTimeout, 10*time.Millisecond,
+		"second job should block on the type semaphore")
+
+	// Hold the only type slot past the reporting threshold so the recorded
+	// delay is deterministically at or above it.
+	holdFor := scheduleDelayThreshold + 200*time.Millisecond
+	<-time.After(holdFor)
 	close(releaseFirst)
 
-	select {
-	case <-secondStarted:
-	case <-time.After(5 * time.Second):
-		require.FailNow(t, "second job should start after the first releases its type slot")
-	}
-	select {
-	case <-firstDone:
-	case <-time.After(5 * time.Second):
-		require.FailNow(t, "first job should finish after release")
-	}
+	requireClosed(t, secondStarted, "second job should start after the first releases its type slot")
+	requireClosed(t, firstDone, "first job should finish after release")
 
 	require.Eventually(t, func() bool {
 		return s.Status().Jobs[jobType].ScheduleDelay.Count == 1
-	}, 5*time.Second, 10*time.Millisecond,
-		"started scheduled job should record schedule delay")
+	}, testTimeout, 10*time.Millisecond,
+		"a start delayed past the threshold should be recorded once")
 	delay := s.Status().Jobs[jobType].ScheduleDelay
-	assert.GreaterOrEqual(t, delay.MaxMS, uint64(100),
+	assert.GreaterOrEqual(t, delay.MaxMS, uint64(scheduleDelayThreshold.Milliseconds()),
 		"second job delay should include time waiting for the type slot")
+	assert.GreaterOrEqual(t, delay.TotalMS, uint64(scheduleDelayThreshold.Milliseconds()),
+		"total delay should include time waiting for the type slot")
+}
+
+// TestUnlimitedJobTypeReportsPressureAsScheduleDelay pins the intentional
+// asymmetry of the telemetry: `waiting` only tracks the per-type semaphore, so
+// types without a per-type limit report 0 even while blocked on the global
+// scheduler limit. Their pressure surfaces as a schedule-delay event instead.
+func TestUnlimitedJobTypeReportsPressureAsScheduleDelay(t *testing.T) {
+	const jobType = "http"
+	s := Create(1, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
+		jobType: {Limit: 0},
+	}, false, logptest.NewTestingLogger(t, ""))
+	defer s.Stop()
+
+	require.NoError(t, s.limitSem.Acquire(context.Background(), 1),
+		"the only global scheduler slot should be free")
+
+	started := make(chan struct{})
+	_, err := s.Add(&scheduledOnce{runAt: time.Now().Add(-2 * scheduleDelayThreshold)}, nil, "blocked",
+		func(context.Context) []TaskFunc {
+			close(started)
+			return nil
+		}, jobType)
+	require.NoError(t, err, "job should be added")
+
+	require.Eventually(t, func() bool {
+		return s.stats.waitingTasks.Get() == 1
+	}, testTimeout, 10*time.Millisecond,
+		"the job should block on the global scheduler limit")
+	assert.Equal(t, int64(0), s.Status().Jobs[jobType].Waiting,
+		"types without a per-type limit must report no waiting jobs")
+
+	s.limitSem.Release(1)
+	requireClosed(t, started, "job should run once a global slot frees")
+
+	require.Eventually(t, func() bool {
+		return s.Status().Jobs[jobType].ScheduleDelay.Count == 1
+	}, testTimeout, 10*time.Millisecond,
+		"global scheduler pressure should surface as a per-type schedule-delay event")
+}
+
+func TestOnTimeStartDoesNotRecordScheduleDelay(t *testing.T) {
+	const jobType = "http"
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, true, logptest.NewTestingLogger(t, ""))
+	defer s.Stop()
+
+	executed := make(chan struct{}, 1)
+	_, err := s.Add(testSchedule{}, nil, "ontime", func(context.Context) []TaskFunc {
+		executed <- struct{}{}
+		return nil
+	}, jobType)
+	require.NoError(t, err, "job should be added")
+	s.WaitForRunOnce()
+
+	select {
+	case <-executed:
+	case <-time.After(testTimeout):
+		require.FailNow(t, "job should execute")
+	}
+
+	delay := s.Status().Jobs[jobType].ScheduleDelay
+	assert.Equal(t, ScheduleDelayStatus{}, delay,
+		"a start that was not late by at least the threshold must leave the counters untouched")
 }
 
 func TestCanceledJobDoesNotRecordScheduleDelay(t *testing.T) {
@@ -251,11 +307,7 @@ func TestCanceledJobDoesNotRecordScheduleDelay(t *testing.T) {
 		}, logptest.NewTestingLogger(t, "")).run()
 		close(firstDone)
 	}()
-	select {
-	case <-firstStarted:
-	case <-time.After(5 * time.Second):
-		require.FailNow(t, "first job should start before scheduling the canceled job")
-	}
+	requireClosed(t, firstStarted, "first job should start before scheduling the canceled job")
 
 	secondExecuted := make(chan struct{}, 1)
 	removeSecond, err := s.Add(testSchedule{delay: time.Hour}, nil, "second", func(context.Context) []TaskFunc {
@@ -265,20 +317,16 @@ func TestCanceledJobDoesNotRecordScheduleDelay(t *testing.T) {
 	require.NoError(t, err, "second job should be added")
 	require.Eventually(t, func() bool {
 		return s.Status().Jobs[jobType].Waiting == 1
-	}, 5*time.Second, 10*time.Millisecond,
+	}, testTimeout, 10*time.Millisecond,
 		"second job should wait for the type slot")
 
 	removeSecond()
 	require.Eventually(t, func() bool {
 		return s.Status().Jobs[jobType].Waiting == 0 && s.stats.activeJobs.Get() == 0
-	}, 5*time.Second, 10*time.Millisecond,
+	}, testTimeout, 10*time.Millisecond,
 		"canceled job should stop waiting for the type slot")
 	close(releaseFirst)
-	select {
-	case <-firstDone:
-	case <-time.After(5 * time.Second):
-		require.FailNow(t, "first job should finish after release")
-	}
+	requireClosed(t, firstDone, "first job should finish after release")
 
 	select {
 	case <-secondExecuted:
@@ -296,7 +344,9 @@ func TestStartedCanceledJobRecordsScheduleDelay(t *testing.T) {
 
 	taskEntered := make(chan struct{})
 	releaseTask := make(chan struct{})
-	scheduledAt := time.Now().Add(50 * time.Millisecond)
+	// Schedule in the past so the recorded delay clears the reporting
+	// threshold without depending on wall-clock timing during the test.
+	scheduledAt := time.Now().Add(-2 * scheduleDelayThreshold)
 	remove, err := s.Add(&scheduledOnce{runAt: scheduledAt}, nil, "started", func(context.Context) []TaskFunc {
 		close(taskEntered)
 		<-releaseTask
@@ -304,20 +354,19 @@ func TestStartedCanceledJobRecordsScheduleDelay(t *testing.T) {
 	}, jobType)
 	require.NoError(t, err, "job should be added")
 
-	select {
-	case <-taskEntered:
-	case <-time.After(5 * time.Second):
-		require.FailNow(t, "scheduled job should enter its task body")
-	}
+	requireClosed(t, taskEntered, "scheduled job should enter its task body")
 	remove()
 	close(releaseTask)
 	require.Eventually(t, func() bool {
 		return s.stats.activeJobs.Get() == 0
-	}, 5*time.Second, 10*time.Millisecond,
+	}, testTimeout, 10*time.Millisecond,
 		"started job should finish after release")
 
-	assert.Equal(t, uint64(1), s.Status().Jobs[jobType].ScheduleDelay.Count,
+	delay := s.Status().Jobs[jobType].ScheduleDelay
+	assert.Equal(t, uint64(1), delay.Count,
 		"job canceled after its task body starts should record schedule delay")
+	assert.GreaterOrEqual(t, delay.MaxMS, uint64(2*scheduleDelayThreshold.Milliseconds()),
+		"recorded delay should reflect how late the start actually was")
 }
 
 func TestMaintenanceWindowSkipDoesNotRecordScheduleDelay(t *testing.T) {

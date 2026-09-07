@@ -320,7 +320,10 @@ func TestStreamUpdateRetainsInputPayload(t *testing.T) {
 }
 
 type mockClientUnit struct {
-	expected        client.Expected
+	id       string
+	unitType client.UnitType
+	expected client.Expected
+
 	reportedState   client.UnitState
 	reportedMsg     string
 	reportedPayload map[string]any
@@ -344,11 +347,15 @@ func (u *mockClientUnit) UpdateState(
 }
 
 func (u *mockClientUnit) ID() string {
+	if u.id != "" {
+		return u.id
+	}
+
 	return "inputLevelState-1"
 }
 
 func (u *mockClientUnit) Type() client.UnitType {
-	return client.UnitTypeInput
+	return u.unitType
 }
 
 func (u *mockClientUnit) RegisterAction(_ client.Action) {

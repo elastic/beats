@@ -72,7 +72,7 @@ func (sj *schedJob) run() (startedAt time.Time, taskStarted bool) {
 
 	sj.wg.Add(1)
 	sj.activeTasks.Add(1)
-	startedAt, taskStarted = sj.runTask(sj.entrypoint, true)
+	startedAt, taskStarted = sj.runTask(sj.entrypoint)
 	sj.wg.Wait()
 	return startedAt, taskStarted
 }
@@ -81,7 +81,7 @@ func (sj *schedJob) run() (startedAt time.Time, taskStarted bool) {
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
-func (sj *schedJob) runTask(task TaskFunc, countRun bool) (time.Time, bool) {
+func (sj *schedJob) runTask(task TaskFunc) (time.Time, bool) {
 	defer sj.wg.Done()
 	defer sj.activeTasks.Add(-1)
 
@@ -110,9 +110,6 @@ func (sj *schedJob) runTask(task TaskFunc, countRun bool) (time.Time, bool) {
 	default:
 		sj.scheduler.stats.activeTasks.Inc()
 
-		if countRun {
-			sj.jobTypeStats.runs.Add(1)
-		}
 		continuations := task(sj.ctx)
 		sj.scheduler.stats.activeTasks.Dec()
 
@@ -122,7 +119,7 @@ func (sj *schedJob) runTask(task TaskFunc, countRun bool) (time.Time, bool) {
 			// Run continuations in parallel, note that these each will acquire their own slots
 			// We can discard the started at times for continuations as those are
 			// irrelevant
-			go sj.runTask(cont, false)
+			go sj.runTask(cont)
 		}
 	}
 

@@ -18,27 +18,32 @@
 package beater
 
 import (
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 )
+
+// testTimeout bounds every channel wait so a regression fails the test instead
+// of hanging the package.
+const testTimeout = 10 * time.Second
 
 func TestSchedulerPayload(t *testing.T) {
 	status := scheduler.Status{
 		Jobs: map[string]scheduler.JobTypeStatus{
 			"browser": {
 				Limit:   2,
-				Running: 0,
-				Waiting: 0,
-				Runs:    0,
+				Running: 1,
+				Waiting: 3,
 				ScheduleDelay: scheduler.ScheduleDelayStatus{
-					Count:   0,
-					TotalMS: 0,
-					MaxMS:   0,
+					Count:   2,
+					TotalMS: 4500,
+					MaxMS:   3000,
 				},
 			},
 		},
@@ -52,13 +57,12 @@ func TestSchedulerPayload(t *testing.T) {
 				"jobs": map[string]any{
 					"browser": map[string]any{
 						"limit":   int64(2),
-						"running": int64(0),
-						"waiting": int64(0),
-						"runs":    uint64(0),
+						"running": int64(1),
+						"waiting": int64(3),
 						"schedule_delay": map[string]any{
-							"count":    uint64(0),
-							"total_ms": uint64(0),
-							"max_ms":   uint64(0),
+							"count":    uint64(2),
+							"total_ms": uint64(4500),
+							"max_ms":   uint64(3000),
 						},
 					},
 				},
@@ -69,6 +73,28 @@ func TestSchedulerPayload(t *testing.T) {
 
 	_, err := structpb.NewStruct(got)
 	assert.NoError(t, err, "scheduler payload should be protobuf-serializable")
+}
+
+func TestSchedulerPayloadHasExactlyTheContractKeys(t *testing.T) {
+	got := schedulerPayload(scheduler.Status{
+		Jobs: map[string]scheduler.JobTypeStatus{"http": {}},
+	})
+
+	jobs := got["heartbeat"].(map[string]any)["scheduler"].(map[string]any)["jobs"].(map[string]any)
+	http := jobs["http"].(map[string]any)
+
+	assert.ElementsMatch(t, []string{"limit", "running", "waiting", "schedule_delay"}, keysOf(http),
+		"per-type payload must expose exactly the documented gauges")
+	assert.ElementsMatch(t, []string{"count", "total_ms", "max_ms"}, keysOf(http["schedule_delay"].(map[string]any)),
+		"schedule_delay must expose exactly the documented delayed-start counters")
+}
+
+func keysOf(m map[string]any) []string {
+	keys := make([]string, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	return keys
 }
 
 func TestSchedulerPayloadFiltersUnsupportedJobTypes(t *testing.T) {
@@ -87,7 +113,6 @@ func TestSchedulerPayloadFiltersUnsupportedJobTypes(t *testing.T) {
 			"limit":   int64(10),
 			"running": int64(1),
 			"waiting": int64(0),
-			"runs":    uint64(0),
 			"schedule_delay": map[string]any{
 				"count":    uint64(0),
 				"total_ms": uint64(0),
@@ -101,70 +126,128 @@ func TestSchedulerPayloadFiltersUnsupportedJobTypes(t *testing.T) {
 }
 
 type recordingPayloadSetter struct {
+	t        *testing.T
 	payloads chan map[string]any
 }
 
-func (s *recordingPayloadSetter) SetPayload(payload map[string]any) {
-	s.payloads <- payload
+func newRecordingPayloadSetter(t *testing.T) *recordingPayloadSetter {
+	return &recordingPayloadSetter{t: t, payloads: make(chan map[string]any, 8)}
+}
+
+// SetOutputPayload records the snapshot without blocking the reporter: a full
+// buffer means the reporter published more snapshots than the test expects.
+func (s *recordingPayloadSetter) SetOutputPayload(payload map[string]any) {
+	select {
+	case s.payloads <- payload:
+	default:
+		assert.Fail(s.t, "reporter published more payloads than expected")
+	}
+}
+
+func (s *recordingPayloadSetter) next() (map[string]any, bool) {
+	select {
+	case payload := <-s.payloads:
+		return payload, true
+	case <-time.After(testTimeout):
+		return nil, false
+	}
+}
+
+func (s *recordingPayloadSetter) requireNext(t *testing.T, msg string) map[string]any {
+	t.Helper()
+
+	payload, ok := s.next()
+	require.True(t, ok, msg)
+	return payload
 }
 
 type mutableSchedulerStatus struct {
+	mu     sync.Mutex
 	status scheduler.Status
 }
 
-func (s *mutableSchedulerStatus) Status() scheduler.Status {
+func (s *mutableSchedulerStatus) set(status scheduler.Status) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.status = status
+}
+
+func (s *mutableSchedulerStatus) get() scheduler.Status {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return s.status
 }
 
-func TestSchedulerPayloadReporterSendsImmediatelyAndOnEachTick(t *testing.T) {
-	setter := &recordingPayloadSetter{payloads: make(chan map[string]any, 3)}
-	source := &mutableSchedulerStatus{
-		status: scheduler.Status{
-			Jobs: map[string]scheduler.JobTypeStatus{
-				"http": {Limit: 10, Running: 1},
-			},
-		},
+func (s *mutableSchedulerStatus) Status() scheduler.Status {
+	return s.get()
+}
+
+func requireTick(t *testing.T, ticks chan time.Time) {
+	t.Helper()
+
+	select {
+	case ticks <- time.Time{}:
+	case <-time.After(testTimeout):
+		require.FailNow(t, "reporter should consume scheduler payload ticks")
 	}
+}
+
+func TestSchedulerPayloadReporterSendsImmediatelyAndOnEachTick(t *testing.T) {
+	setter := newRecordingPayloadSetter(t)
+	source := &mutableSchedulerStatus{}
+	source.set(scheduler.Status{
+		Jobs: map[string]scheduler.JobTypeStatus{
+			"http": {Limit: 10, Running: 1},
+		},
+	})
 	ticks := make(chan time.Time)
 
 	stop := startSchedulerPayloadReporterWithTicks(setter, source, ticks)
 	defer stop()
 
-	assert.Equal(t, schedulerPayload(source.status), <-setter.payloads, "reporter should send an immediate snapshot")
+	assert.Equal(t, schedulerPayload(source.get()),
+		setter.requireNext(t, "reporter should send an immediate snapshot"),
+		"immediate snapshot should match the scheduler status")
 
-	source.status = scheduler.Status{
+	source.set(scheduler.Status{
 		Jobs: map[string]scheduler.JobTypeStatus{
 			"http": {Limit: 10, Running: 2, Waiting: 1},
 		},
-	}
-	ticks <- time.Time{}
-	assert.Equal(t, schedulerPayload(source.status), <-setter.payloads, "reporter should send the first tick snapshot")
+	})
+	requireTick(t, ticks)
+	assert.Equal(t, schedulerPayload(source.get()),
+		setter.requireNext(t, "reporter should send the first tick snapshot"),
+		"first tick snapshot should match the scheduler status")
 
-	source.status = scheduler.Status{
+	source.set(scheduler.Status{
 		Jobs: map[string]scheduler.JobTypeStatus{
-			"http": {Limit: 10, Running: 3, Runs: 4},
+			"http": {Limit: 10, Running: 3, ScheduleDelay: scheduler.ScheduleDelayStatus{Count: 1, TotalMS: 1200, MaxMS: 1200}},
 		},
-	}
-	ticks <- time.Time{}
-	assert.Equal(t, schedulerPayload(source.status), <-setter.payloads, "reporter should send the second tick snapshot")
+	})
+	requireTick(t, ticks)
+	assert.Equal(t, schedulerPayload(source.get()),
+		setter.requireNext(t, "reporter should send the second tick snapshot"),
+		"second tick snapshot should match the scheduler status")
 }
 
 func TestSchedulerPayloadReporterStopsOnCancellation(t *testing.T) {
-	setter := &recordingPayloadSetter{payloads: make(chan map[string]any, 2)}
-	source := &mutableSchedulerStatus{status: scheduler.Status{Jobs: map[string]scheduler.JobTypeStatus{}}}
+	setter := newRecordingPayloadSetter(t)
+	source := &mutableSchedulerStatus{}
+	source.set(scheduler.Status{Jobs: map[string]scheduler.JobTypeStatus{}})
 	ticks := make(chan time.Time, 1)
 
 	stop := startSchedulerPayloadReporterWithTicks(setter, source, ticks)
-	<-setter.payloads
+	setter.requireNext(t, "reporter should send an immediate snapshot")
 	stop()
 
-	ticks <- time.Time{}
+	requireTick(t, ticks)
 	assert.Empty(t, setter.payloads, "reporter should not send snapshots after it stops")
 }
 
 func TestSchedulerPayloadReporterDoesNotStartWhenManagementDisabled(t *testing.T) {
-	setter := &recordingPayloadSetter{payloads: make(chan map[string]any, 1)}
-	source := &mutableSchedulerStatus{status: scheduler.Status{Jobs: map[string]scheduler.JobTypeStatus{}}}
+	setter := newRecordingPayloadSetter(t)
+	source := &mutableSchedulerStatus{}
+	source.set(scheduler.Status{Jobs: map[string]scheduler.JobTypeStatus{}})
 
 	stop := startManagedSchedulerPayloadReporter(false, setter, source)
 	defer stop()
@@ -197,8 +280,9 @@ func TestSchedulerPayloadReporterStopsBeforeHeartbeatShutdown(t *testing.T) {
 func TestSchedulerPayloadReporterDoesNotStartAfterHeartbeatStops(t *testing.T) {
 	heartbeat := &Heartbeat{done: make(chan struct{})}
 	heartbeat.Stop()
-	setter := &recordingPayloadSetter{payloads: make(chan map[string]any, 1)}
-	source := &mutableSchedulerStatus{status: scheduler.Status{Jobs: map[string]scheduler.JobTypeStatus{}}}
+	setter := newRecordingPayloadSetter(t)
+	source := &mutableSchedulerStatus{}
+	source.set(scheduler.Status{Jobs: map[string]scheduler.JobTypeStatus{}})
 
 	stop := heartbeat.startManagedSchedulerPayloadReporter(true, setter, source)
 	defer stop()

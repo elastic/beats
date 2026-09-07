@@ -64,19 +64,42 @@ func TestSchedulerStatusNilJobLimit(t *testing.T) {
 
 func TestJobTypeScheduleDelay(t *testing.T) {
 	stats := &jobTypeStats{}
-	stats.recordDelay(100 * time.Millisecond)
-	stats.recordDelay(900 * time.Millisecond)
-	stats.recordDelay(-time.Second)
+	stats.recordDelay(time.Second)
+	stats.recordDelay(2500 * time.Millisecond)
 
 	delay := ScheduleDelayStatus{
 		Count:   stats.delayCount.Load(),
 		TotalMS: stats.delayTotalMS.Load(),
 		MaxMS:   stats.delayMaxMS.Load(),
 	}
-	assert.Equal(t, uint64(3), delay.Count,
-		"all started jobs should contribute a delay sample")
-	assert.Equal(t, uint64(1000), delay.TotalMS,
-		"negative delay should be clamped to zero")
-	assert.Equal(t, uint64(900), delay.MaxMS,
+	assert.Equal(t, uint64(2), delay.Count,
+		"starts delayed by at least the threshold should contribute a delay sample")
+	assert.Equal(t, uint64(3500), delay.TotalMS,
+		"total delay should sum all recorded samples")
+	assert.Equal(t, uint64(2500), delay.MaxMS,
 		"maximum delay should retain the largest sample")
+}
+
+func TestJobTypeScheduleDelayIgnoresHealthyStarts(t *testing.T) {
+	stats := &jobTypeStats{}
+	for _, delay := range []time.Duration{
+		-time.Second,
+		0,
+		time.Millisecond,
+		999 * time.Millisecond,
+	} {
+		stats.recordDelay(delay)
+	}
+
+	assert.Equal(t, uint64(0), stats.delayCount.Load(),
+		"starts delayed by less than a second should not be counted")
+	assert.Equal(t, uint64(0), stats.delayTotalMS.Load(),
+		"starts delayed by less than a second should not add to the total")
+	assert.Equal(t, uint64(0), stats.delayMaxMS.Load(),
+		"starts delayed by less than a second should not raise the maximum")
+}
+
+func TestJobTypeScheduleDelayThresholdIsOneSecond(t *testing.T) {
+	assert.Equal(t, time.Second, scheduleDelayThreshold,
+		"the reporting threshold keeps healthy execution from writing Fleet state")
 }

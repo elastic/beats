@@ -106,6 +106,11 @@ func (n *OtelManager) UnregisterAction(action management.Action) {
 	}
 }
 func (n *OtelManager) SetPayload(map[string]any) {}
+
+// SetOutputPayload is a no-op: unit state for OTel receivers is owned by the
+// collector, so Beat telemetry has no output unit to attach to here.
+func (n *OtelManager) SetOutputPayload(map[string]any) {}
+
 func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook management.DiagnosticHook) {
 	if n.ext != nil {
 		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)
