@@ -17,6 +17,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -73,6 +74,7 @@ type etwInput struct {
 	etwSession *etw.Session
 	publisher  stateless.Publisher
 	operator   sessionOperator
+	health     *eventHealth
 }
 
 func Plugin() input.Plugin {
@@ -106,9 +108,16 @@ func (e *etwInput) Test(_ input.TestContext) error {
 func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	var err error
 
+	// Lifecycle states are reported straight to the context; the agent
+	// drops repeats of the state it already has. Per-event health goes
+	// through e.health, which is the hot path and needs the counting logic.
+	ctx.UpdateStatus(status.Starting, "")
+	e.health = &eventHealth{reporter: ctx, threshold: e.config.FailureThreshold}
+
 	// Initialize a new ETW session with the provided configuration
 	e.etwSession, err = e.operator.newSession(e.config)
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, "failed to initialize ETW session: "+errDetail(err))
 		return fmt.Errorf("error initializing ETW session: %w", err)
 	}
 	e.etwSession.Callback = e.consumeEvent
@@ -122,6 +131,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 	// Handle realtime session creation or attachment
 	if e.etwSession.Realtime {
+		ctx.UpdateStatus(status.Configuring, "")
 		switch e.etwSession.NewSession {
 		case true:
 			// Create a new realtime session
@@ -132,6 +142,8 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 				break
 			}
 			if !errors.Is(createErr, etw.ERROR_ALREADY_EXISTS) {
+				ctx.UpdateStatus(status.Failed, fmt.Sprintf("failed to create realtime session %q for provider %s: %s",
+					e.etwSession.Name, e.config.provider(), errDetail(createErr)))
 				return fmt.Errorf("realtime session could not be created: %w", createErr)
 			}
 			e.log.Debug("session already exists, trying to attach to it")
@@ -139,6 +151,8 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		case false:
 			// Attach to an existing session
 			if err := e.operator.attachToExistingSession(e.etwSession); err != nil {
+				ctx.UpdateStatus(status.Failed, fmt.Sprintf("failed to attach to session %q: %s",
+					e.etwSession.Name, errDetail(err)))
 				return fmt.Errorf("unable to retrieve handler: %w", err)
 			}
 			e.log.Debug("attached to existing session")
@@ -159,14 +173,76 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	g.Go(func() error {
 		e.log.Debug("starting ETW consumer")
 		defer e.log.Debug("stopped ETW consumer")
+		// startConsumer opens the trace and then blocks inside ProcessTrace
+		// for the life of the session, so there is no point after it returns
+		// where we could report Running. Report it up front; if opening the
+		// trace fails we immediately move to Failed below.
+		ctx.UpdateStatus(status.Running, "")
 		if err = e.operator.startConsumer(e.etwSession); err != nil {
 			e.metrics.errors.Inc()
+			ctx.UpdateStatus(status.Failed, fmt.Sprintf("ETW consumer for session %q failed: %s",
+				e.etwSession.Name, errDetail(err)))
 			return fmt.Errorf("failed running ETW consumer: %w", err)
 		}
 		return nil
 	})
 
 	return g.Wait()
+}
+
+// eventHealth turns the per-event success/failure stream from consumeEvent
+// into Degraded/Running reports. It follows the awss3 input: N consecutive
+// failures mark the input Degraded. Unlike awss3 it also needs N consecutive
+// successes to recover, because a provider that alternates bursts of good and
+// unreadable events would otherwise flap on every burst. A single threshold
+// is used for both directions; there is no known reason to tune them apart.
+type eventHealth struct {
+	reporter  status.StatusReporter
+	threshold uint // 0 means never report Degraded.
+
+	// ETW delivers callbacks on a single thread today, so mu is rarely
+	// contended; it is cheap insurance against that changing.
+	mu       sync.Mutex
+	bad      uint // Consecutive failures, reset by a success.
+	good     uint // Consecutive successes, reset by a failure.
+	degraded bool
+}
+
+// failure records an event that could not be read. err is only formatted
+// when the threshold is reached, since most calls never report anything.
+func (h *eventHealth) failure(err error) {
+	if h.threshold == 0 {
+		return
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.good = 0
+	h.bad++
+	if h.degraded || h.bad < h.threshold {
+		return
+	}
+	h.degraded = true
+	h.reporter.UpdateStatus(status.Degraded,
+		fmt.Sprintf("%d consecutive events could not be read; last error: %s", h.bad, errDetail(err)))
+}
+
+// success records an event that was read and published.
+func (h *eventHealth) success() {
+	if h.threshold == 0 {
+		return
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.bad = 0
+	if !h.degraded {
+		return
+	}
+	h.good++
+	if h.good < h.threshold {
+		return
+	}
+	h.degraded = false
+	h.reporter.UpdateStatus(status.Running, "")
 }
 
 var (
@@ -312,10 +388,14 @@ func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.S
 	}
 }
 
+// errNullRecord is reported to eventHealth when ETW hands us a nil record.
+var errNullRecord = errors.New("received null event record from ETW session")
+
 func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 	if record == nil {
 		e.log.Error("received null event record")
 		e.metrics.errors.Inc()
+		e.health.failure(errNullRecord)
 		return 1
 	}
 
@@ -327,10 +407,13 @@ func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 
 	etwEvent, err := e.etwSession.RenderEvent(record)
 	if err != nil {
+		// Unprocessable events are expected noise from some providers and
+		// are dropped quietly; anything else means we are losing data.
 		if !errors.Is(err, etw.ErrUnprocessableEvent) {
 			e.log.Errorw("failed to read event properties", "error", err)
 			e.metrics.errors.Inc()
 			e.metrics.dropped.Inc()
+			e.health.failure(err)
 		}
 		return 1
 	}
@@ -338,6 +421,7 @@ func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 	evt := buildEvent(etwEvent, record.EventHeader, e.etwSession, e.config)
 	e.publisher.Publish(evt)
 
+	e.health.success()
 	e.metrics.events.Inc()
 	e.metrics.sourceLag.Update(start.Sub(evt.Timestamp).Nanoseconds())
 	if !e.metrics.lastCallback.IsZero() {
@@ -346,6 +430,22 @@ func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 	e.metrics.lastCallback = start
 
 	return 0
+}
+
+// errDetail formats err for a status message. When a Windows error is wrapped
+// it appends the raw code, since the text alone ("Access is denied.") is often
+// not enough to search for, and for access denied it spells out what
+// privileges ETW needs.
+func errDetail(err error) string {
+	var errno windows.Errno
+	if !errors.As(err, &errno) {
+		return err.Error()
+	}
+	msg := fmt.Sprintf("%v (windows error %d)", err, uint32(errno))
+	if errno == etw.ERROR_ACCESS_DENIED {
+		msg += "; ETW sessions require running as Administrator or membership in the Performance Log Users group"
+	}
+	return msg
 }
 
 // Close stops the ETW session and logs the outcome.

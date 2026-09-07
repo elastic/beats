@@ -57,6 +57,11 @@ type config struct {
 	BufferSize     uint32      `config:"buffer_size"`
 	MinimumBuffers uint32      `config:"minimum_buffers"`
 	MaximumBuffers uint32      `config:"maximum_buffers"`
+	// FailureThreshold is the number of consecutive events that must fail to
+	// render before the input reports Degraded, and the number of consecutive
+	// good events needed afterwards to report Running again. 0 disables
+	// Degraded reporting for render failures.
+	FailureThreshold uint `config:"failure_threshold"`
 }
 
 type EventFilter struct {
@@ -90,13 +95,28 @@ func convertConfig(cfg config) etw.Config {
 	}
 }
 
+// provider returns whichever provider identifier the user configured, for
+// use in log and status messages. Validate guarantees at most one is set.
+func (c *config) provider() string {
+	if c.ProviderName != "" {
+		return c.ProviderName
+	}
+	return c.ProviderGUID
+}
+
 func defaultConfig() config {
 	return config{
-		TraceLevel:      "verbose",
-		MatchAnyKeyword: 0xffffffffffffffff,
-		BufferSize:      64,
+		TraceLevel:       "verbose",
+		MatchAnyKeyword:  0xffffffffffffffff,
+		BufferSize:       64,
+		FailureThreshold: defaultFailureThreshold,
 	}
 }
+
+// defaultFailureThreshold is deliberately higher than the 3 used by other
+// inputs: ETW providers can emit thousands of events a second, so a short
+// burst of unreadable events should not flip the input to Degraded.
+const defaultFailureThreshold = 10
 
 func (c *config) Validate() error {
 	if c.ProviderName == "" && c.ProviderGUID == "" && c.Logfile == "" && c.Session == "" {

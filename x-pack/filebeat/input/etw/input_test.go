@@ -8,8 +8,11 @@ package etw
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"slices"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
@@ -17,8 +20,8 @@ import (
 	"golang.org/x/sys/windows"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -68,6 +71,45 @@ func (m *mockSessionOperator) stopSession(session *etw.Session) error {
 	return nil
 }
 
+// statusUpdate is one UpdateStatus call as seen by recordingReporter.
+type statusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+// recordingReporter captures every status update so tests can check the
+// exact sequence the input reported.
+type recordingReporter struct {
+	mu      sync.Mutex
+	updates []statusUpdate
+}
+
+func (r *recordingReporter) UpdateStatus(s status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.updates = append(r.updates, statusUpdate{status: s, msg: msg})
+}
+
+func (r *recordingReporter) statuses() []status.Status {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := make([]status.Status, len(r.updates))
+	for i, u := range r.updates {
+		out[i] = u.status
+	}
+	return out
+}
+
+// lastMsg returns the message of the most recent update, or "" if none.
+func (r *recordingReporter) lastMsg() string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if len(r.updates) == 0 {
+		return ""
+	}
+	return r.updates[len(r.updates)-1].msg
+}
+
 func Test_RunEtwInput_NewSessionError(t *testing.T) {
 	// Mocks
 	mockOperator := &mockSessionOperator{}
@@ -78,11 +120,12 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 	}
 
 	// Setup input
+	reporter := &recordingReporter{}
 	inputCtx := input.Context{
 		Cancelation:     nil,
-		Logger:          logp.NewLogger("test"),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
-	}
+	}.WithStatusReporter(reporter)
 
 	etwInput := &etwInput{
 		config: config{
@@ -100,6 +143,10 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 	// Run test
 	err := etwInput.Run(inputCtx, nil)
 	assert.EqualError(t, err, "error initializing ETW session: failed creating session 'MySession'")
+	assert.Equal(t, []status.Status{status.Starting, status.Failed}, reporter.statuses(),
+		"input should report Starting then Failed when the session cannot be initialized")
+	assert.Equal(t, "failed to initialize ETW session: failed creating session 'MySession'", reporter.lastMsg(),
+		"Failed message should carry the underlying error")
 }
 
 func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
@@ -115,17 +162,19 @@ func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
 		}
 		return mockSession, nil
 	}
-	// Setup the mock behavior for AttachToExistingSession
+	// Setup the mock behavior for AttachToExistingSession. Wrap a real
+	// Windows error so we can check the code is surfaced in the status.
 	mockOperator.attachToExistingSessionFunc = func(session *etw.Session) error {
-		return fmt.Errorf("mock error")
+		return fmt.Errorf("session is not running: %w", etw.ERROR_WMI_INSTANCE_NOT_FOUND)
 	}
 
 	// Setup input
+	reporter := &recordingReporter{}
 	inputCtx := input.Context{
 		Cancelation:     nil,
-		Logger:          logp.NewLogger("test"),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
-	}
+	}.WithStatusReporter(reporter)
 
 	etwInput := &etwInput{
 		config: config{
@@ -140,7 +189,13 @@ func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
 
 	// Run test
 	err := etwInput.Run(inputCtx, nil)
-	assert.EqualError(t, err, "unable to retrieve handler: mock error")
+	assert.ErrorContains(t, err, "unable to retrieve handler: session is not running")
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Failed}, reporter.statuses(),
+		"input should fail while configuring when attach fails")
+	assert.Contains(t, reporter.lastMsg(), `failed to attach to session "MySession"`,
+		"Failed message should name the session")
+	assert.Contains(t, reporter.lastMsg(), fmt.Sprintf("(windows error %d)", uint32(etw.ERROR_WMI_INSTANCE_NOT_FOUND)),
+		"Failed message should include the Windows error code")
 }
 
 func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
@@ -166,11 +221,12 @@ func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
 	}
 
 	// Setup input
+	reporter := &recordingReporter{}
 	inputCtx := input.Context{
 		Cancelation:     nil,
-		Logger:          logp.NewLogger("test"),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
-	}
+	}.WithStatusReporter(reporter)
 
 	etwInput := &etwInput{
 		config: config{
@@ -186,6 +242,51 @@ func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
 	// Run test
 	err := etwInput.Run(inputCtx, nil)
 	assert.EqualError(t, err, "realtime session could not be created: mock error")
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Failed}, reporter.statuses(),
+		"input should fail while configuring when session creation fails")
+	assert.Equal(t, `failed to create realtime session "MySession" for provider Microsoft-Windows-Provider: mock error`,
+		reporter.lastMsg(), "Failed message should name the session and provider")
+}
+
+func Test_RunEtwInput_CreateRealtimeSessionAlreadyExists(t *testing.T) {
+	// When the session already exists we fall back to attaching. That is a
+	// normal path and must not show up as Degraded or Failed.
+	mockOperator := &mockSessionOperator{}
+	mockOperator.newSessionFunc = func(config config) (*etw.Session, error) {
+		return &etw.Session{Name: "MySession", Realtime: true, NewSession: true}, nil
+	}
+	mockOperator.createRealtimeSessionFunc = func(session *etw.Session) error {
+		return fmt.Errorf("session already exists: %w", etw.ERROR_ALREADY_EXISTS)
+	}
+	attached := false
+	mockOperator.attachToExistingSessionFunc = func(session *etw.Session) error {
+		attached = true
+		return nil
+	}
+	blockConsumerUntilStopped(mockOperator)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	reporter := &recordingReporter{}
+	inputCtx := input.Context{
+		Cancelation:     ctx,
+		Logger:          logptest.NewTestingLogger(t, ""),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}.WithStatusReporter(reporter)
+
+	etwInput := &etwInput{
+		config:   config{ProviderName: "Microsoft-Windows-Provider", SessionName: "MySession"},
+		operator: mockOperator,
+	}
+
+	done := make(chan error, 1)
+	go func() { done <- etwInput.Run(inputCtx, nil) }()
+	waitForStatus(t, reporter, status.Running)
+	cancel()
+	assert.NoError(t, <-done, "Run should exit cleanly on cancellation")
+	assert.True(t, attached, "input should attach when the session already exists")
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Running}, reporter.statuses(),
+		"falling back to attach should still end up Running")
 }
 
 func Test_RunEtwInput_StartConsumerError(t *testing.T) {
@@ -209,9 +310,10 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 	mockOperator.createRealtimeSessionFunc = func(session *etw.Session) error {
 		return nil
 	}
-	// Setup the mock behavior for StartConsumer
+	// Setup the mock behavior for StartConsumer. Access denied is the most
+	// common real failure here, so use it to check the privilege hint.
 	mockOperator.startConsumerFunc = func(session *etw.Session) error {
-		return fmt.Errorf("mock error")
+		return fmt.Errorf("access denied when opening trace: %w", etw.ERROR_ACCESS_DENIED)
 	}
 	// Setup the mock behavior for StopSession
 	mockOperator.stopSessionFunc = func(session *etw.Session) error {
@@ -222,11 +324,12 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 	ctx := t.Context()
 
 	// Setup input
+	reporter := &recordingReporter{}
 	inputCtx := input.Context{
 		Cancelation:     ctx,
-		Logger:          logp.NewLogger("test"),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
-	}
+	}.WithStatusReporter(reporter)
 
 	etwInput := &etwInput{
 		config: config{
@@ -241,7 +344,13 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 
 	// Run test
 	err := etwInput.Run(inputCtx, nil)
-	assert.EqualError(t, err, "failed running ETW consumer: mock error")
+	assert.ErrorContains(t, err, "failed running ETW consumer: access denied when opening trace")
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Running, status.Failed}, reporter.statuses(),
+		"consumer failure should move from Running to Failed")
+	assert.Contains(t, reporter.lastMsg(), `ETW consumer for session "MySession" failed`,
+		"Failed message should name the session")
+	assert.Contains(t, reporter.lastMsg(), "Performance Log Users",
+		"access denied should explain which privileges ETW needs")
 }
 
 func Test_RunEtwInput_Success(t *testing.T) {
@@ -265,25 +374,20 @@ func Test_RunEtwInput_Success(t *testing.T) {
 	mockOperator.createRealtimeSessionFunc = func(session *etw.Session) error {
 		return nil
 	}
-	// Setup the mock behavior for StartConsumer
-	mockOperator.startConsumerFunc = func(session *etw.Session) error {
-		return nil
-	}
-	// Setup the mock behavior for StopSession
-	mockOperator.stopSessionFunc = func(session *etw.Session) error {
-		return nil
-	}
+	// Setup the mock behavior for StartConsumer and StopSession
+	blockConsumerUntilStopped(mockOperator)
 
 	// Setup cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 
 	// Setup input
+	reporter := &recordingReporter{}
 	inputCtx := input.Context{
 		Cancelation:     ctx,
-		Logger:          logp.NewLogger("test"),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
-	}
+	}.WithStatusReporter(reporter)
 
 	etwInput := &etwInput{
 		config: config{
@@ -297,16 +401,150 @@ func Test_RunEtwInput_Success(t *testing.T) {
 	}
 
 	// Run test
-	go func() {
-		err := etwInput.Run(inputCtx, nil)
-		if err != nil {
-			t.Errorf("Run() error = %v, wantErr %v", err, false)
-		}
-	}()
+	done := make(chan error, 1)
+	go func() { done <- etwInput.Run(inputCtx, nil) }()
 
-	// Simulate waiting for a condition
-	time.Sleep(time.Millisecond * 100)
-	cancelFunc() // Trigger cancellation to test cleanup and goroutine exit
+	// Wait until the consumer is up, then cancel to test cleanup and exit.
+	waitForStatus(t, reporter, status.Running)
+	cancelFunc()
+	assert.NoError(t, <-done, "Run should exit cleanly on cancellation")
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Running}, reporter.statuses(),
+		"a healthy start should report Starting, Configuring, Running exactly once each")
+}
+
+// blockConsumerUntilStopped makes the mock consumer behave like the real
+// one: startConsumer blocks until stopSession is called, so tests can
+// exercise the cancellation path rather than having Run return at once.
+func blockConsumerUntilStopped(op *mockSessionOperator) {
+	stopped := make(chan struct{})
+	op.startConsumerFunc = func(*etw.Session) error {
+		<-stopped
+		return nil
+	}
+	op.stopSessionFunc = func(*etw.Session) error {
+		close(stopped)
+		return nil
+	}
+}
+
+// waitForStatus blocks until reporter has seen want, failing the test if it
+// does not show up in time.
+func waitForStatus(t *testing.T, reporter *recordingReporter, want status.Status) {
+	t.Helper()
+	assert.Eventually(t, func() bool {
+		return slices.Contains(reporter.statuses(), want)
+	}, 5*time.Second, 10*time.Millisecond, "input never reported %s", want)
+}
+
+func Test_eventHealth(t *testing.T) {
+	// Each test feeds a string of events to eventHealth: 'b' is a failure,
+	// 'g' is a success. Spaces are ignored and are only there to make the
+	// runs readable.
+	tests := []struct {
+		name      string
+		threshold uint
+		events    string
+		want      []statusUpdate
+	}{
+		{
+			name:      "below threshold never degrades",
+			threshold: 3,
+			events:    "bb g bb g bb",
+			want:      nil,
+		},
+		{
+			name:      "degrades at threshold, once",
+			threshold: 3,
+			events:    "bbb bbbbb",
+			want: []statusUpdate{
+				{status.Degraded, "3 consecutive events could not be read; last error: bad"},
+			},
+		},
+		{
+			name:      "one good event is not enough to recover",
+			threshold: 3,
+			events:    "bbb g bbb g",
+			want: []statusUpdate{
+				{status.Degraded, "3 consecutive events could not be read; last error: bad"},
+			},
+		},
+		{
+			name:      "recovers after threshold good events",
+			threshold: 3,
+			events:    "bbb gg b ggg",
+			want: []statusUpdate{
+				{status.Degraded, "3 consecutive events could not be read; last error: bad"},
+				{status.Running, ""},
+			},
+		},
+		{
+			name:      "can degrade again after recovering",
+			threshold: 2,
+			events:    "bb gg bb",
+			want: []statusUpdate{
+				{status.Degraded, "2 consecutive events could not be read; last error: bad"},
+				{status.Running, ""},
+				{status.Degraded, "2 consecutive events could not be read; last error: bad"},
+			},
+		},
+		{
+			name:      "good events while healthy report nothing",
+			threshold: 2,
+			events:    "gggggg",
+			want:      nil,
+		},
+		{
+			name:      "zero threshold disables reporting",
+			threshold: 0,
+			events:    "bbbbbbbbbb gggg",
+			want:      nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reporter := &recordingReporter{}
+			h := &eventHealth{reporter: reporter, threshold: tt.threshold}
+			for _, ev := range tt.events {
+				switch ev {
+				case 'b':
+					h.failure(errors.New("bad"))
+				case 'g':
+					h.success()
+				}
+			}
+			assert.Equal(t, tt.want, reporter.updates, "events %q with threshold %d", tt.events, tt.threshold)
+		})
+	}
+}
+
+func Test_errDetail(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{
+			name: "plain error",
+			err:  errors.New("boom"),
+			want: "boom",
+		},
+		{
+			name: "wrapped windows error gets its code",
+			err:  fmt.Errorf("session is not running: %w", etw.ERROR_WMI_INSTANCE_NOT_FOUND),
+			want: fmt.Sprintf("session is not running: %v (windows error 4201)", etw.ERROR_WMI_INSTANCE_NOT_FOUND),
+		},
+		{
+			name: "access denied explains required privileges",
+			err:  fmt.Errorf("access denied when opening trace: %w", etw.ERROR_ACCESS_DENIED),
+			want: fmt.Sprintf("access denied when opening trace: %v (windows error 5); ETW sessions require running as Administrator or membership in the Performance Log Users group",
+				etw.ERROR_ACCESS_DENIED),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, errDetail(tt.err), "errDetail(%v)", tt.err)
+		})
+	}
 }
 
 func Test_buildEvent(t *testing.T) {

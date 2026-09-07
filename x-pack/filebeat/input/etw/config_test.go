@@ -138,3 +138,45 @@ func Test_validateConfig(t *testing.T) {
 		})
 	}
 }
+
+func Test_failureThreshold(t *testing.T) {
+	tests := []struct {
+		name      string
+		raw       map[string]any
+		want      uint
+		wantError bool
+	}{
+		{
+			name: "default",
+			raw:  map[string]any{"provider.name": "P"},
+			want: defaultFailureThreshold,
+		},
+		{
+			name: "custom",
+			raw:  map[string]any{"provider.name": "P", "failure_threshold": 25},
+			want: 25,
+		},
+		{
+			name: "zero disables",
+			raw:  map[string]any{"provider.name": "P", "failure_threshold": 0},
+			want: 0,
+		},
+		{
+			name:      "negative rejected",
+			raw:       map[string]any{"provider.name": "P", "failure_threshold": -1},
+			wantError: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := defaultConfig()
+			err := confpkg.MustNewConfigFrom(tt.raw).Unpack(&cfg)
+			if tt.wantError {
+				assert.Error(t, err, "unpack should reject %v", tt.raw["failure_threshold"])
+				return
+			}
+			assert.NoError(t, err, "unpack should accept %v", tt.raw)
+			assert.Equal(t, tt.want, cfg.FailureThreshold, "failure_threshold value")
+		})
+	}
+}
