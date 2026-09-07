@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add frozen_cache_stats metricset to autoops_es module to collect node-level searchable snapshot shared cache statistics
+component: metricbeat
