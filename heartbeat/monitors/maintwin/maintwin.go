@@ -78,13 +78,8 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 
 	// Kibana MW request schema allows yearly (0) through hourly (4).
 	freq, err := rrule.StrToFreq(strings.ToUpper(mw.Freq))
-<<<<<<< HEAD
-	if err != nil || freq > rrule.DAILY {
-		return nil, fmt.Errorf("invalid frequency %s: only yearly, monthly, weekly, and daily are supported", mw.Freq)
-=======
 	if err != nil || freq > rrule.HOURLY {
 		return nil, fmt.Errorf("invalid frequency %s: only yearly, monthly, weekly, daily, and hourly are supported", mw.Freq)
->>>>>>> 0dd9eb0 (Fix Heartbeat maintenance windows for Kibana byweekday, tzid, and until (#52572))
 	}
 
 	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
@@ -92,15 +87,6 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	// validate DTSTART and make sure it's not older than 2 years
-	if dtstart.Before(time.Now().AddDate(-2, 0, 0)) && validateDtStart {
-		return nil, fmt.Errorf(
-			"invalid dtstart: %s is more than 2 years in the past. "+
-				"To prevent excessive iterations, please use a more recent date",
-			dtstart.Format(time.RFC3339),
-		)
-=======
 	weekdays := make([]rrule.Weekday, 0, len(mw.Byweekday))
 	for _, wd := range mw.Byweekday {
 		weekday, err := parseByweekday(wd)
@@ -108,7 +94,6 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 			return nil, err
 		}
 		weekdays = append(weekdays, weekday)
->>>>>>> 0dd9eb0 (Fix Heartbeat maintenance windows for Kibana byweekday, tzid, and until (#52572))
 	}
 
 	loc := time.UTC
