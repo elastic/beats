@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.7
 
 require (
-	cloud.google.com/go/bigquery v1.82.0
+	cloud.google.com/go/bigquery v1.83.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -562,7 +562,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.66.0
+	cloud.google.com/go/storage v1.67.0
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
