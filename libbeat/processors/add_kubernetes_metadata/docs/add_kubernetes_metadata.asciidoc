@@ -6,10 +6,7 @@
 ++++
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
-metadata based on which Kubernetes pod the event originated from. By default,
-this processor only adds metadata to events that do not already have a
-`kubernetes` field. Set `append_fields: true` to merge metadata into events
-that already carry a `kubernetes` field without overwriting existing keys.
+metadata based on which Kubernetes pod the event originated from. This processor only adds metadata to the events that do not have it yet present.
 
 At startup, it detects an `in_cluster` environment and caches the
 Kubernetes-related metadata. Events are only annotated if a valid configuration
@@ -174,8 +171,3 @@ running configuration for a container. This is `60s` by default.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.
 `labels.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
 `annotations.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
-`append_fields`:: (Optional) Default false. When set to true, the processor
-will enrich events that already have a `kubernetes` field by merging the
-cached metadata into the existing object. Existing keys are preserved; only
-fields that are absent from the event are added. Has no effect when the event
-does not have a `kubernetes` field.
