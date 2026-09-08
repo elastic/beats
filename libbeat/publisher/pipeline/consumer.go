@@ -49,7 +49,6 @@ type eventConsumer struct {
 
 	// queueReader is a helper routine that fetches queue batches in a
 	// separate goroutine so we don't block on the control path.
-	// It is only started for queues that do not implement UnblockingQueue.
 	queueReader queueReader
 
 	// This waitgroup is released when this eventConsumer's worker
@@ -95,13 +94,9 @@ func newEventConsumer(
 }
 
 func (c *eventConsumer) run() {
-	log := c.logger
-	log.Debug("start pipeline event consumer")
-
 	// The queue type is fixed for the life of a pipeline, but the first
 	// setTarget is often an empty pause (nil queue). Wait for a real queue
-	// before choosing a loop so we do not start queueReader for slabqueue
-	// or miss ReadyChan for memqueue.
+	// before choosing a loop.
 	var target consumerTarget
 	for target.queue == nil {
 		select {
@@ -110,6 +105,9 @@ func (c *eventConsumer) run() {
 			return
 		}
 	}
+
+	
+	c.logger.Debug("start pipeline event consumer")
 
 	if uq, ok := target.queue.(queue.UnblockingQueue[publisher.Event]); ok {
 		c.runUnblocking(log, target, uq)
