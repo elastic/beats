@@ -10,7 +10,7 @@ The module is fully implemented for Linux on x86. Currently, the `socket` module
 
 ## Required privileges [_required_privileges_system]
 
-Each dataset has its own privilege requirements. The following table summarizes the minimum setup for a least-privilege deployment on Linux. "Root / CAP" means the process must either run as root or hold the listed capability.
+Each dataset has its own privilege requirements. The following table summarizes the minimum setup for a least-privilege deployment on Linux. "Root or capability required" means the process must either run as root or hold the listed capability.
 
 | Dataset | Root or capability required | Host PID namespace | Notes |
 |---|---|---|---|
