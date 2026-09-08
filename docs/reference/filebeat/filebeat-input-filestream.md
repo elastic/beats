@@ -389,6 +389,20 @@ take_over:
   from_ids: ["foo", "bar"]
 ```
 
+When the source input IDs share a common pattern — for example when IDs are generated dynamically —
+use `take_over.from_id_patterns` instead of (or in addition to) `from_ids`.
+Each entry is a [Go regular expression](https://pkg.go.dev/regexp/syntax) matched against the
+input ID segment of registry keys. Invalid patterns are rejected at startup.
+
+```yaml
+take_over:
+  enabled: true
+  from_id_patterns: ["old-input-.*", "legacy-[0-9]+"]
+```
+
+`from_ids` and `from_id_patterns` can be combined; both are matched.
+When either is set, files are not taken over from `log` inputs.
+
 This take over mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.

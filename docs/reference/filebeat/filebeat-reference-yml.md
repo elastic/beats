@@ -899,10 +899,18 @@ filebeat.inputs:
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
 
-  # If `take_over` is set to `true`, this `filestream` will take over all files
-  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # When enabled, this `filestream` input takes over states from `log` inputs
+  # or other `filestream` inputs. Only files actively matched by `paths` are migrated.
   # This functionality is still in beta.
-  #take_over: false
+  #take_over:
+  #  enabled: true
+  #  # Take over from specific filestream inputs by exact ID.
+  #  # When set, files are not taken over from `log` inputs.
+  #  #from_ids: ["foo", "bar"]
+  #  # Take over from filestream inputs whose ID matches any of these Go regexes.
+  #  # Invalid patterns are rejected at startup. Can be combined with from_ids.
+  #  # When set, files are not taken over from `log` inputs.
+  #  #from_id_patterns: ["old-input-.*", "legacy-[0-9]+"]
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
