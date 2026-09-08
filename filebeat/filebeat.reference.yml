@@ -1271,6 +1271,13 @@ filebeat.inputs:
 #      - type: kubernetes
 #        node: ${NODE_NAME}
 #        hints.enabled: true
+#        # Restrict hints-generated input types. Disabled by default.
+#        # When enabled with an empty types list, defaults to log, filestream, and container.
+#        hints.input_allow_list.enabled: false
+#        #hints.input_allow_list.types:
+#        #  - log
+#        #  - filestream
+#        #  - container
 #        # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
 #        use_kubeadm: true
 #        hints.default_config:

@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix bounds-check panics in Packetbeat TLS and Cassandra protocol parsers.
+component: packetbeat

@@ -1,4 +1,6 @@
 ES_BEATS ?= ../..
+TEMP_DIR ?= $(or $(TMPDIR),$(TEMP),$(TMP),/tmp)
+COLLECTOR_LOG ?= $(TEMP_DIR)/collector.log
 
 # This version is used to build the OpenTelemetry Collector distribution.
 # It should be updated when the OTel Collector version is updated in the beats-otel-collector module.
