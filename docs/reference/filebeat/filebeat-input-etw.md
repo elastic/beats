@@ -247,9 +247,7 @@ filebeat.inputs:
 stack: ga 9.4.7+
 ```
 
-Available in 9.4.7 and later, 9.5.4 and later, and 9.6.0 and later.
-
-Controls when the input reports itself as degraded to {{agent}} because of events it cannot read. After this many consecutive events fail to be read, the input reports a `DEGRADED` status. It returns to `HEALTHY` only after the same number of consecutive events are read successfully, so short bursts of bad events do not cause the status to flap. Default is `10`. Set to `0` to never report `DEGRADED` for unreadable events; failures are still counted in the input metrics and logged.
+The number of consecutive events that must fail to be read before the input reports a `DEGRADED` status to {{agent}}. Default is `3`. Set to `0` to never report `DEGRADED` for unreadable events. Failures are still counted in the input metrics and logged.
 
 Fatal errors such as a missing provider, a session that cannot be created or attached to, or insufficient privileges always report a `FAILED` status and are not affected by this setting.
 
@@ -258,7 +256,24 @@ Example:
 ```yaml
 filebeat.inputs:
 - type: etw
-  failure_threshold: 25
+  failure_threshold: 5
+```
+
+
+### `recovery_threshold` [_recovery_threshold]
+
+```{applies_to}
+stack: ga 9.4.7+
+```
+
+The number of consecutive events that must be read successfully, after the input has reported `DEGRADED`, before it reports `HEALTHY` again. Default is `1`. Must be at least `1`. Raise this value if a provider alternates between bursts of readable and unreadable events and you want the status to settle before it recovers.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  recovery_threshold: 5
 ```
 
 

@@ -23,8 +23,9 @@ description: |
   states to Elastic Agent. Failure messages include the session name, the
   configured provider and the raw Windows error code, and access-denied errors
   spell out the privileges ETW sessions need. The input reports Degraded after
-  `failure_threshold` consecutive unreadable events (default 10) and recovers
-  after the same number of consecutive good events; set it to 0 to disable.
+  `failure_threshold` consecutive unreadable events (default 3) and recovers
+  after `recovery_threshold` consecutive good events (default 1). Set
+  `failure_threshold` to 0 to disable Degraded reporting for unreadable events.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:

@@ -112,7 +112,11 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	// drops repeats of the state it already has. Per-event health goes
 	// through e.health, which is the hot path and needs the counting logic.
 	ctx.UpdateStatus(status.Starting, "")
-	e.health = &eventHealth{reporter: ctx, threshold: e.config.FailureThreshold}
+	e.health = &eventHealth{
+		reporter:          ctx,
+		failureThreshold:  e.config.FailureThreshold,
+		recoveryThreshold: e.config.RecoveryThreshold,
+	}
 
 	// Initialize a new ETW session with the provided configuration
 	e.etwSession, err = e.operator.newSession(e.config)
@@ -191,14 +195,15 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 }
 
 // eventHealth turns the per-event success/failure stream from consumeEvent
-// into Degraded/Running reports. It follows the awss3 input: N consecutive
-// failures mark the input Degraded. Unlike awss3 it also needs N consecutive
-// successes to recover, because a provider that alternates bursts of good and
-// unreadable events would otherwise flap on every burst. A single threshold
-// is used for both directions; there is no known reason to tune them apart.
+// into Degraded/Running reports using the consecutive-count model of
+// Kubernetes probes and the awss3 input: failureThreshold failures in a row
+// mark the input Degraded, recoveryThreshold successes in a row clear it.
+// The two are separate knobs because there is no reason to expect the run
+// lengths of good and bad events to match in a failing provider.
 type eventHealth struct {
-	reporter  status.StatusReporter
-	threshold uint // 0 means never report Degraded.
+	reporter          status.StatusReporter
+	failureThreshold  uint // 0 means never report Degraded.
+	recoveryThreshold uint // Validated to be at least 1.
 
 	// ETW delivers callbacks on a single thread today, so mu is rarely
 	// contended; it is cheap insurance against that changing.
@@ -211,14 +216,14 @@ type eventHealth struct {
 // failure records an event that could not be read. err is only formatted
 // when the threshold is reached, since most calls never report anything.
 func (h *eventHealth) failure(err error) {
-	if h.threshold == 0 {
+	if h.failureThreshold == 0 {
 		return
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.good = 0
 	h.bad++
-	if h.degraded || h.bad < h.threshold {
+	if h.degraded || h.bad < h.failureThreshold {
 		return
 	}
 	h.degraded = true
@@ -228,7 +233,7 @@ func (h *eventHealth) failure(err error) {
 
 // success records an event that was read and published.
 func (h *eventHealth) success() {
-	if h.threshold == 0 {
+	if h.failureThreshold == 0 {
 		return
 	}
 	h.mu.Lock()
@@ -238,7 +243,7 @@ func (h *eventHealth) success() {
 		return
 	}
 	h.good++
-	if h.good < h.threshold {
+	if h.good < h.recoveryThreshold {
 		return
 	}
 	h.degraded = false

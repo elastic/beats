@@ -86,17 +86,17 @@ type recordingReporter struct {
 
 func (r *recordingReporter) UpdateStatus(s status.Status, msg string) {
 	r.mu.Lock()
-	defer r.mu.Unlock()
 	r.updates = append(r.updates, statusUpdate{status: s, msg: msg})
+	r.mu.Unlock()
 }
 
 func (r *recordingReporter) statuses() []status.Status {
 	r.mu.Lock()
-	defer r.mu.Unlock()
 	out := make([]status.Status, len(r.updates))
 	for i, u := range r.updates {
 		out[i] = u.status
 	}
+	r.mu.Unlock()
 	return out
 }
 
@@ -265,7 +265,7 @@ func Test_RunEtwInput_CreateRealtimeSessionAlreadyExists(t *testing.T) {
 	}
 	blockConsumerUntilStopped(mockOperator)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	reporter := &recordingReporter{}
 	inputCtx := input.Context{
@@ -378,7 +378,7 @@ func Test_RunEtwInput_Success(t *testing.T) {
 	blockConsumerUntilStopped(mockOperator)
 
 	// Setup cancellation
-	ctx, cancelFunc := context.WithCancel(context.Background())
+	ctx, cancelFunc := context.WithCancel(t.Context())
 	defer cancelFunc()
 
 	// Setup input
@@ -440,71 +440,84 @@ func Test_eventHealth(t *testing.T) {
 	// Each test feeds a string of events to eventHealth: 'b' is a failure,
 	// 'g' is a success. Spaces are ignored and are only there to make the
 	// runs readable.
+	degraded := func(n int) statusUpdate {
+		return statusUpdate{status.Degraded, fmt.Sprintf("%d consecutive events could not be read; last error: bad", n)}
+	}
+	running := statusUpdate{status.Running, ""}
+
 	tests := []struct {
-		name      string
-		threshold uint
-		events    string
-		want      []statusUpdate
+		name     string
+		failure  uint
+		recovery uint
+		events   string
+		want     []statusUpdate
 	}{
 		{
-			name:      "below threshold never degrades",
-			threshold: 3,
-			events:    "bb g bb g bb",
-			want:      nil,
+			name:     "defaults: below failure threshold never degrades",
+			failure:  3,
+			recovery: 1,
+			events:   "bb g bb g bb",
+			want:     nil,
 		},
 		{
-			name:      "degrades at threshold, once",
-			threshold: 3,
-			events:    "bbb bbbbb",
-			want: []statusUpdate{
-				{status.Degraded, "3 consecutive events could not be read; last error: bad"},
-			},
+			name:     "defaults: degrades at threshold, once",
+			failure:  3,
+			recovery: 1,
+			events:   "bbb bbbbb",
+			want:     []statusUpdate{degraded(3)},
 		},
 		{
-			name:      "one good event is not enough to recover",
-			threshold: 3,
-			events:    "bbb g bbb g",
-			want: []statusUpdate{
-				{status.Degraded, "3 consecutive events could not be read; last error: bad"},
-			},
+			name:     "defaults: one good event recovers",
+			failure:  3,
+			recovery: 1,
+			events:   "bbb g",
+			want:     []statusUpdate{degraded(3), running},
 		},
 		{
-			name:      "recovers after threshold good events",
-			threshold: 3,
-			events:    "bbb gg b ggg",
-			want: []statusUpdate{
-				{status.Degraded, "3 consecutive events could not be read; last error: bad"},
-				{status.Running, ""},
-			},
+			name:     "defaults: alternating runs flap",
+			failure:  3,
+			recovery: 1,
+			events:   "bbb g bbb g",
+			want:     []statusUpdate{degraded(3), running, degraded(3), running},
 		},
 		{
-			name:      "can degrade again after recovering",
-			threshold: 2,
-			events:    "bb gg bb",
-			want: []statusUpdate{
-				{status.Degraded, "2 consecutive events could not be read; last error: bad"},
-				{status.Running, ""},
-				{status.Degraded, "2 consecutive events could not be read; last error: bad"},
-			},
+			name:     "higher recovery threshold: one good event is not enough",
+			failure:  3,
+			recovery: 3,
+			events:   "bbb g bbb g",
+			want:     []statusUpdate{degraded(3)},
 		},
 		{
-			name:      "good events while healthy report nothing",
-			threshold: 2,
-			events:    "gggggg",
-			want:      nil,
+			name:     "higher recovery threshold: a failure resets the good run",
+			failure:  3,
+			recovery: 3,
+			events:   "bbb gg b ggg",
+			want:     []statusUpdate{degraded(3), running},
 		},
 		{
-			name:      "zero threshold disables reporting",
-			threshold: 0,
-			events:    "bbbbbbbbbb gggg",
-			want:      nil,
+			name:     "good events while healthy report nothing",
+			failure:  2,
+			recovery: 1,
+			events:   "gggggg",
+			want:     nil,
+		},
+		{
+			name:     "zero failure threshold disables reporting",
+			failure:  0,
+			recovery: 1,
+			events:   "bbbbbbbbbb gggg",
+			want:     nil,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			reporter := &recordingReporter{}
-			h := &eventHealth{reporter: reporter, threshold: tt.threshold}
-			for _, ev := range tt.events {
+			h := &eventHealth{
+				reporter:          reporter,
+				failureThreshold:  test.failure,
+				recoveryThreshold: test.recovery,
+			}
+			for _, ev := range test.events {
 				switch ev {
 				case 'b':
 					h.failure(errors.New("bad"))
@@ -512,7 +525,8 @@ func Test_eventHealth(t *testing.T) {
 					h.success()
 				}
 			}
-			assert.Equal(t, tt.want, reporter.updates, "events %q with threshold %d", tt.events, tt.threshold)
+			assert.Equal(t, test.want, reporter.updates,
+				"events %q with failure=%d recovery=%d", test.events, test.failure, test.recovery)
 		})
 	}
 }
@@ -540,9 +554,9 @@ func Test_errDetail(t *testing.T) {
 				etw.ERROR_ACCESS_DENIED),
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, errDetail(tt.err), "errDetail(%v)", tt.err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, errDetail(test.err), "errDetail(%v)", test.err)
 		})
 	}
 }
