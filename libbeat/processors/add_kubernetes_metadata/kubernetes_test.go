@@ -795,7 +795,9 @@ func TestAnnotatorAppendFields(t *testing.T) {
 		require.True(t, ok)
 
 		// Conflicting keys must keep the pre-existing value.
-		assert.Equal(t, "existing-pod", k8s["pod"].(mapstr.M)["name"], "pod.name must not be overwritten")
+		podMap, ok := k8s["pod"].(mapstr.M)
+		require.True(t, ok, "kubernetes.pod must be a mapstr.M")
+		assert.Equal(t, "existing-pod", podMap["name"], "pod.name must not be overwritten")
 		assert.Equal(t, "existing-ns", k8s["namespace"], "namespace must not be overwritten")
 		// Keys absent from the event must be appended from the cache.
 		assert.Equal(t, mapstr.M{"app": "myapp"}, k8s["labels"], "labels should be appended from cache metadata")
