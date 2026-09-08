@@ -420,13 +420,7 @@ func (r *RegexInputMatcher) MatchesInput(key string) bool {
 		return false
 	}
 	rest := key[len(r.pluginPrefix):]
-	idx := strings.Index(rest, "::")
-	var inputID string
-	if idx < 0 {
-		inputID = rest
-	} else {
-		inputID = rest[:idx]
-	}
+	inputID, _, _ := strings.Cut(rest, "::")
 	return r.pattern.MatchString(inputID)
 }
 
