@@ -7,7 +7,9 @@
 package node_stats
 
 import (
+	"math"
 	"testing"
+	"testing/quick"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -297,6 +299,167 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 		require.EqualValues(t, 1, nodeStats["merge_latency_in_millis"])
 		require.EqualValues(t, 2, nodeStats["search_latency_in_millis"])
 	}
+}
+
+func makeCgroupNodeStats(usageNanos, periods, quotaMicros int64) mapstr.M {
+	return mapstr.M{
+		"os": mapstr.M{
+			"cgroup": mapstr.M{
+				"cpuacct": mapstr.M{
+					"usage_nanos": usageNanos,
+				},
+				"cpu": mapstr.M{
+					"cfs_quota_micros": quotaMicros,
+					"stat": mapstr.M{
+						"number_of_elapsed_periods": periods,
+					},
+				},
+			},
+		},
+	}
+}
+
+// makeCgroupWithout returns a cgroup mapstr.M with the given key path deleted.
+func makeCgroupWithout(usageNanos, periods, quotaMicros int64, deletePath string) mapstr.M {
+	m := makeCgroupNodeStats(usageNanos, periods, quotaMicros)
+	_ = m.Delete(deletePath)
+	return m
+}
+
+func TestEnrichNodeStatsCgroupCpuUsagePercent(t *testing.T) {
+	tests := map[string]struct {
+		prev          mapstr.M // if nil, cache is cleared (first sample)
+		curr          mapstr.M
+		expectPresent bool
+		expected      float64
+	}{
+		"happy path 50%": {
+			// Δusage=500_000_000 ns, Δperiods=10, quota=100_000 µs → 50%
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      50.0,
+		},
+		"burst above quota emits >100%": {
+			// Δusage=3_000_000_000 ns, Δperiods=10, quota=100_000 µs → 300%
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(4_000_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      300.0,
+		},
+		"zero usage delta emits 0%": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_000_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      0.0,
+		},
+		"quota changed uses current quota": {
+			// Even if prev had a different quota, current sample's quota is authoritative.
+			// Δusage=500_000_000, Δperiods=10, current quota=200_000 → 25%
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 200_000),
+			expectPresent: true,
+			expected:      25.0,
+		},
+		"unlimited quota (-1)": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, -1),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, -1),
+			expectPresent: false,
+		},
+		"zero quota": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 0),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 0),
+			expectPresent: false,
+		},
+		"first sample no previous": {
+			prev:          nil,
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"zero periods delta": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 100, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"usage counter reset (negative delta)": {
+			prev:          makeCgroupNodeStats(2_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"periods counter reset (negative delta)": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 100, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 50, 100_000),
+			expectPresent: false,
+		},
+		"missing usage_nanos on previous": {
+			prev:          makeCgroupWithout(1_000_000_000, 90, 100_000, "os.cgroup.cpuacct.usage_nanos"),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"missing usage_nanos on current": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupWithout(1_500_000_000, 100, 100_000, "os.cgroup.cpuacct.usage_nanos"),
+			expectPresent: false,
+		},
+		"missing periods on previous": {
+			prev:          makeCgroupWithout(1_000_000_000, 90, 100_000, "os.cgroup.cpu.stat.number_of_elapsed_periods"),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"missing periods on current": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupWithout(1_500_000_000, 100, 100_000, "os.cgroup.cpu.stat.number_of_elapsed_periods"),
+			expectPresent: false,
+		},
+		"missing cfs_quota_micros on current": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupWithout(1_500_000_000, 100, 100_000, "os.cgroup.cpu.cfs_quota_micros"),
+			expectPresent: false,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			if tt.prev != nil {
+				initCache(map[string]mapstr.M{"n1": tt.prev}, 10)
+			} else {
+				clearCache()
+			}
+			curr := tt.curr
+
+			enrichNodeStats("n1", &curr, 10_000)
+
+			if tt.expectPresent {
+				require.InDelta(t, tt.expected, curr[cgroupCpuPercentField], 0.001)
+			} else {
+				require.Nil(t, curr[cgroupCpuPercentField])
+			}
+		})
+	}
+}
+
+// TestEnrichNodeStatsCgroupCpuUsagePercentQuickCheck fuzzes the enricher with
+// randomly-generated positive counter deltas and quota. For any valid input
+// the emitted percent must be finite and non-negative.
+func TestEnrichNodeStatsCgroupCpuUsagePercentQuickCheck(t *testing.T) {
+	property := func(prevUsage uint32, usageDelta uint32, prevPeriods uint16, periodsDelta uint16, quotaMicros uint32) bool {
+		// Guarantee the two counter deltas and quota are strictly positive so
+		// the enricher can compute a value. Otherwise we assert only the skip.
+		periodsDelta = (periodsDelta % 1000) + 1 // 1..1000
+		quotaMicros = (quotaMicros % 500_000) + 1
+		prev := makeCgroupNodeStats(int64(prevUsage), int64(prevPeriods), int64(quotaMicros))
+		curr := makeCgroupNodeStats(int64(prevUsage)+int64(usageDelta), int64(prevPeriods)+int64(periodsDelta), int64(quotaMicros))
+		initCache(map[string]mapstr.M{"n1": prev}, 10)
+
+		enrichNodeStats("n1", &curr, 10_000)
+
+		v, ok := curr[cgroupCpuPercentField].(float64)
+		if !ok {
+			return false
+		}
+		return v >= 0 && !math.IsNaN(v) && !math.IsInf(v, 0)
+	}
+	require.NoError(t, quick.Check(property, nil))
 }
 
 func TestEnrichNodeStatsGaugeDecreaseWritesNilIngestRate(t *testing.T) {
