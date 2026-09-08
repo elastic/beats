@@ -55,9 +55,8 @@ func TestHTTPMonitorKerberosHandshake(t *testing.T) {
 	user := envOr("HB_KRB5_USER", "testuser")
 	pass := envOr("HB_KRB5_PASS", "testpass")
 
-	if _, err := os.Stat(krb5Conf); err != nil {
-		t.Skipf("krb5 config %q not found; start the heartbeat_kerberos fixture first: %v", krb5Conf, err)
-	}
+	_, err := os.Stat(krb5Conf)
+	require.NoError(t, err, "krb5 config %q must exist (committed testdata/krb5.conf, or set HB_KRB5_CONF)", krb5Conf)
 	requireReachable(t, target)
 
 	cfgSrc := map[string]any{

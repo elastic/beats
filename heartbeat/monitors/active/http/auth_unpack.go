@@ -37,7 +37,7 @@ func (k *kerberosSettings) IsEnabled() bool {
 	return k != nil && k.Config.IsEnabled()
 }
 
-func (k *kerberosSettings) Unpack(v interface{}) error {
+func (k *kerberosSettings) Unpack(v any) error {
 	if s, ok := v.(string); ok && strings.TrimSpace(s) == "" {
 		k.Config = nil
 		return nil
@@ -54,7 +54,7 @@ func (k *kerberosSettings) Unpack(v interface{}) error {
 // without recursing into NTLMConfig.Unpack.
 type ntlmPlain NTLMConfig
 
-func (n *NTLMConfig) Unpack(v interface{}) error {
+func (n *NTLMConfig) Unpack(v any) error {
 	if s, ok := v.(string); ok && strings.TrimSpace(s) == "" {
 		disabled := false
 		n.Enabled = &disabled
@@ -68,7 +68,7 @@ func (n *NTLMConfig) Unpack(v interface{}) error {
 	return nil
 }
 
-func unpackYAMLOrBase64(v interface{}, dest any, name string) error {
+func unpackYAMLOrBase64(v any, dest any, name string) error {
 	switch val := v.(type) {
 	case string:
 		raw, err := base64.StdEncoding.DecodeString(strings.TrimSpace(val))
@@ -80,7 +80,7 @@ func unpackYAMLOrBase64(v interface{}, dest any, name string) error {
 			return fmt.Errorf("%s: invalid yaml: %w", name, err)
 		}
 		return cfg.Unpack(dest)
-	case map[string]interface{}:
+	case map[string]any:
 		cfg, err := conf.NewConfigFrom(val)
 		if err != nil {
 			return fmt.Errorf("%s: %w", name, err)
