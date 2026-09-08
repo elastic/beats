@@ -768,6 +768,7 @@ func TestAnnotatorAppendFields(t *testing.T) {
 
 		event := baseEvent("abc000")
 		event.Fields["kubernetes"] = existingKubernetes.Clone()
+		inputFields := event.Fields.Clone()
 
 		result, err := processor.Run(event)
 		require.NoError(t, err)
@@ -776,7 +777,7 @@ func TestAnnotatorAppendFields(t *testing.T) {
 		assert.Equal(t, existingKubernetes, k8sRaw, "kubernetes field must be unchanged when append_fields is false")
 
 		// RunPdata path: assert Run == RunPdata.
-		assertRunPdataEquivalent(t, processor, event.Fields, result.Fields)
+		assertRunPdataEquivalent(t, processor, inputFields, result.Fields)
 	})
 
 	t.Run("append_fields merges without overwriting existing keys", func(t *testing.T) {
@@ -785,6 +786,7 @@ func TestAnnotatorAppendFields(t *testing.T) {
 
 		event := baseEvent("abc001")
 		event.Fields["kubernetes"] = existingKubernetes.Clone()
+		inputFields := event.Fields.Clone()
 
 		result, err := processor.Run(event)
 		require.NoError(t, err)
@@ -803,6 +805,6 @@ func TestAnnotatorAppendFields(t *testing.T) {
 		assert.Equal(t, mapstr.M{"app": "myapp"}, k8s["labels"], "labels should be appended from cache metadata")
 
 		// RunPdata path: assert Run == RunPdata.
-		assertRunPdataEquivalent(t, processor, event.Fields, result.Fields)
+		assertRunPdataEquivalent(t, processor, inputFields, result.Fields)
 	})
 }
