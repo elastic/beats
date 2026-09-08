@@ -1,6 +1,2 @@
-# Versions must be valid x.x.x semver because Python tests compare them
-# against the older Apache status field structure.
-# 2.4.12 was dropped: the official httpd image is based on Debian releases
-# whose apt repositories no longer work in CI.
 variants:
   - APACHE_VERSION: "2.4.68"
