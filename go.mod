@@ -3,11 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.7
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/bigquery v1.81.0
-=======
 	cloud.google.com/go/bigquery v1.83.0
->>>>>>> 316ed9e (build(deps): bump the gcp-sdks group with 2 updates (#53056))
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -561,11 +557,7 @@ require (
 )
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/storage v1.65.0
-=======
 	cloud.google.com/go/storage v1.67.0
->>>>>>> 316ed9e (build(deps): bump the gcp-sdks group with 2 updates (#53056))
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
