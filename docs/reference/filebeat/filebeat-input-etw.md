@@ -266,7 +266,7 @@ filebeat.inputs:
 stack: ga 9.4.7+
 ```
 
-The number of consecutive events that must be read successfully, after the input has reported `DEGRADED`, before it reports `HEALTHY` again. Default is `1`. Must be at least `1`. Raise this value if a provider alternates between bursts of readable and unreadable events and you want the status to settle before it recovers.
+The number of consecutive events that must be read successfully, after the input has reported `DEGRADED`, before it reports `HEALTHY` again. Default is `1`. Must be at least `1` unless `failure_threshold` is `0`. Raise this value if a provider alternates between bursts of readable and unreadable events and you want the status to settle before it recovers.
 
 Example:
 

@@ -63,7 +63,7 @@ type config struct {
 	FailureThreshold uint `config:"failure_threshold"`
 	// RecoveryThreshold is the number of consecutive events that must render
 	// successfully, after the input has reported Degraded, before it reports
-	// Running again. Must be at least 1.
+	// Running again. Must be at least 1 when FailureThreshold is non-zero.
 	RecoveryThreshold uint `config:"recovery_threshold"`
 }
 
@@ -160,8 +160,8 @@ func (c *config) Validate() error {
 		}
 	}
 
-	if c.RecoveryThreshold == 0 {
-		return fmt.Errorf("recovery_threshold must be at least 1")
+	if c.FailureThreshold > 0 && c.RecoveryThreshold == 0 {
+		return fmt.Errorf("recovery_threshold must be at least 1 if failure_threshold is set")
 	}
 
 	return nil

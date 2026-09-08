@@ -43,13 +43,22 @@ func Test_validateConfig(t *testing.T) {
 		{
 			// A zero-valued struct field is serialised by ucfg and overrides
 			// the default, so this exercises the recovery_threshold check.
-			name: "zero recovery threshold",
+			name: "zero recovery threshold with thresholding enabled",
+			config: config{
+				ProviderName:     "Microsoft-Windows-DNSServer",
+				TraceLevel:       "verbose",
+				MatchAnyKeyword:  0xffffffffffffffff,
+				FailureThreshold: 3,
+			},
+			wantError: "recovery_threshold must be at least 1 if failure_threshold is set",
+		},
+		{
+			name: "zero recovery threshold with thresholding disabled",
 			config: config{
 				ProviderName:    "Microsoft-Windows-DNSServer",
 				TraceLevel:      "verbose",
 				MatchAnyKeyword: 0xffffffffffffffff,
 			},
-			wantError: "recovery_threshold must be at least 1",
 		},
 		{
 			name: "missing source config",
@@ -179,9 +188,15 @@ func Test_healthThresholds(t *testing.T) {
 			wantRecovery: defaultRecoveryThreshold,
 		},
 		{
-			name:      "zero recovery threshold rejected",
+			name:      "zero recovery threshold rejected when thresholding enabled",
 			raw:       map[string]any{"provider.name": "P", "recovery_threshold": 0},
-			wantError: "recovery_threshold must be at least 1",
+			wantError: "recovery_threshold must be at least 1 if failure_threshold is set",
+		},
+		{
+			name:         "zero recovery threshold allowed when thresholding disabled",
+			raw:          map[string]any{"provider.name": "P", "failure_threshold": 0, "recovery_threshold": 0},
+			wantFailure:  0,
+			wantRecovery: 0,
 		},
 		{
 			name:      "negative failure threshold rejected",

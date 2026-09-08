@@ -203,7 +203,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 type eventHealth struct {
 	reporter          status.StatusReporter
 	failureThreshold  uint // 0 means never report Degraded.
-	recoveryThreshold uint // Validated to be at least 1.
+	recoveryThreshold uint // Validated to be at least 1 if thresholding is being used.
 
 	// ETW delivers callbacks on a single thread today, so mu is rarely
 	// contended; it is cheap insurance against that changing.
