@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"sync"
 	"time"
@@ -487,12 +488,8 @@ func (cm *BeatV2Manager) lockedPayloadFor(unitType client.UnitType) map[string]a
 	}
 
 	merged := make(map[string]any, len(cm.payload)+len(cm.outputPayload))
-	for key, value := range cm.payload {
-		merged[key] = value
-	}
-	for key, value := range cm.outputPayload {
-		merged[key] = value
-	}
+	maps.Copy(merged, cm.payload)
+	maps.Copy(merged, cm.outputPayload)
 
 	return merged
 }

@@ -81,7 +81,7 @@ func (s *jobTypeStats) recordDelay(delay time.Duration) {
 	if delay < scheduleDelayThreshold {
 		return
 	}
-	delayMS := uint64(delay.Milliseconds())
+	delayMS := durationMillis(delay)
 
 	s.delayCount.Add(1)
 	s.delayTotalMS.Add(delayMS)
@@ -135,4 +135,14 @@ func (s *Scheduler) Status() Status {
 		}
 	}
 	return Status{Jobs: jobs}
+}
+
+// durationMillis converts a non-negative duration to milliseconds. Negative
+// values, including clock-adjustment artifacts, are reported as 0 so the
+// conversion to uint64 cannot overflow.
+func durationMillis(d time.Duration) uint64 {
+	if d <= 0 {
+		return 0
+	}
+	return uint64(d / time.Millisecond)
 }

@@ -6,16 +6,17 @@ package management
 
 import (
 	"errors"
+	"maps"
 	"testing"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -117,9 +118,7 @@ func newManagerPayloadFixture(
 	require.Equal(t, 1, output.updateCalls, "output unit should reach the steady state")
 
 	units := make(map[unitKey]*agentUnit, len(manager.units))
-	for key, unit := range manager.units {
-		units[key] = unit
-	}
+	maps.Copy(units, manager.units)
 
 	return outputPayloadFixture{manager: manager, input: input, output: output, units: units}
 }

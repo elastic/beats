@@ -80,12 +80,11 @@ func TestSchedulerPayloadHasExactlyTheContractKeys(t *testing.T) {
 		Jobs: map[string]scheduler.JobTypeStatus{"http": {}},
 	})
 
-	jobs := got["heartbeat"].(map[string]any)["scheduler"].(map[string]any)["jobs"].(map[string]any)
-	http := jobs["http"].(map[string]any)
+	http := payloadJob(t, got, "http")
 
 	assert.ElementsMatch(t, []string{"limit", "running", "waiting", "schedule_delay"}, keysOf(http),
 		"per-type payload must expose exactly the documented gauges")
-	assert.ElementsMatch(t, []string{"count", "total_ms", "max_ms"}, keysOf(http["schedule_delay"].(map[string]any)),
+	assert.ElementsMatch(t, []string{"count", "total_ms", "max_ms"}, keysOf(asMap(t, http["schedule_delay"], "schedule_delay")),
 		"schedule_delay must expose exactly the documented delayed-start counters")
 }
 
@@ -97,6 +96,25 @@ func keysOf(m map[string]any) []string {
 	return keys
 }
 
+func asMap(t *testing.T, value any, name string) map[string]any {
+	t.Helper()
+	m, ok := value.(map[string]any)
+	require.True(t, ok, "%s should be a map", name)
+	return m
+}
+
+func payloadJobs(t *testing.T, payload map[string]any) map[string]any {
+	t.Helper()
+	heartbeat := asMap(t, payload["heartbeat"], "heartbeat")
+	sched := asMap(t, heartbeat["scheduler"], "scheduler")
+	return asMap(t, sched["jobs"], "jobs")
+}
+
+func payloadJob(t *testing.T, payload map[string]any, jobType string) map[string]any {
+	t.Helper()
+	return asMap(t, payloadJobs(t, payload)[jobType], jobType)
+}
+
 func TestSchedulerPayloadFiltersUnsupportedJobTypes(t *testing.T) {
 	status := scheduler.Status{
 		Jobs: map[string]scheduler.JobTypeStatus{
@@ -106,7 +124,7 @@ func TestSchedulerPayloadFiltersUnsupportedJobTypes(t *testing.T) {
 	}
 
 	got := schedulerPayload(status)
-	jobs := got["heartbeat"].(map[string]any)["scheduler"].(map[string]any)["jobs"].(map[string]any)
+	jobs := payloadJobs(t, got)
 
 	assert.Equal(t, map[string]any{
 		"http": map[string]any{

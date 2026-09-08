@@ -221,9 +221,9 @@ func TestScheduleDelayIncludesTypeLimitWait(t *testing.T) {
 	}, testTimeout, 10*time.Millisecond,
 		"a start delayed past the threshold should be recorded once")
 	delay := s.Status().Jobs[jobType].ScheduleDelay
-	assert.GreaterOrEqual(t, delay.MaxMS, uint64(scheduleDelayThreshold.Milliseconds()),
+	assert.GreaterOrEqual(t, delay.MaxMS, durationMillis(scheduleDelayThreshold),
 		"second job delay should include time waiting for the type slot")
-	assert.GreaterOrEqual(t, delay.TotalMS, uint64(scheduleDelayThreshold.Milliseconds()),
+	assert.GreaterOrEqual(t, delay.TotalMS, durationMillis(scheduleDelayThreshold),
 		"total delay should include time waiting for the type slot")
 }
 
@@ -365,7 +365,7 @@ func TestStartedCanceledJobRecordsScheduleDelay(t *testing.T) {
 	delay := s.Status().Jobs[jobType].ScheduleDelay
 	assert.Equal(t, uint64(1), delay.Count,
 		"job canceled after its task body starts should record schedule delay")
-	assert.GreaterOrEqual(t, delay.MaxMS, uint64(2*scheduleDelayThreshold.Milliseconds()),
+	assert.GreaterOrEqual(t, delay.MaxMS, durationMillis(2*scheduleDelayThreshold),
 		"recorded delay should reflect how late the start actually was")
 }
 

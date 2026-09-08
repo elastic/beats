@@ -7,12 +7,12 @@ package management
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
 func TestUnitUpdate(t *testing.T) {
