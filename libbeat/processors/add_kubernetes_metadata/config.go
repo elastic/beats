@@ -46,7 +46,7 @@ type kubeAnnotatorConfig struct {
 	WaitMetadata            bool                                `config:"wait_for_metadata"`
 	WaitMetadataTimeout     time.Duration                       `config:"wait_for_metadata_timeout"`
 	WaitMetadataRetryPeriod time.Duration                       `config:"wait_for_metadata_retry_period"`
-	AppendFields bool `config:"append_fields"`
+	AppendFields            bool                                `config:"append_fields"`
 }
 
 type Enabled struct {

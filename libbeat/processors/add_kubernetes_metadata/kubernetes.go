@@ -61,12 +61,12 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
-	log              *logp.Logger
-	state            atomic.Pointer[initializedState]
-	cache            *cache
-	initOnce         sync.Once
-	wg               sync.WaitGroup
-	cancelCtx        context.CancelFunc
+	log          *logp.Logger
+	state        atomic.Pointer[initializedState]
+	cache        *cache
+	initOnce     sync.Once
+	wg           sync.WaitGroup
+	cancelCtx    context.CancelFunc
 	appendFields bool
 }
 
@@ -146,9 +146,9 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	ctx, cancelCtx := context.WithCancel(context.Background())
 	processor := &kubernetesAnnotator{
-		log:              log,
-		cache:            newCache(config.CleanupTimeout),
-		cancelCtx:        cancelCtx,
+		log:          log,
+		cache:        newCache(config.CleanupTimeout),
+		cancelCtx:    cancelCtx,
 		appendFields: config.AppendFields,
 	}
 
