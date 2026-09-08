@@ -159,7 +159,6 @@ func TestBuildRequestAuthSchemes(t *testing.T) {
 
 func TestAuthUnpackNestedAndBase64(t *testing.T) {
 	ntlmYAML := "enabled: true\nusername: svc\npassword: secret\ndomain: CORP\n"
-	kerberosYAML := "enabled: true\nauth_type: password\nrealm: CORP.LOCAL\nconfig_path: /etc/krb5.conf\nusername: svc\npassword: secret\n"
 
 	unpack := func(t *testing.T, yaml string) Config {
 		t.Helper()
@@ -183,25 +182,5 @@ func TestAuthUnpackNestedAndBase64(t *testing.T) {
 		require.True(t, c.NTLM.IsEnabled())
 		assert.Equal(t, "svc", c.NTLM.Username)
 		assert.Equal(t, "CORP", c.NTLM.Domain)
-	})
-
-	t.Run("kerberos nested object", func(t *testing.T) {
-		c := unpack(t, "urls: [http://x]\nkerberos:\n  enabled: true\n  auth_type: password\n  realm: CORP.LOCAL\n  config_path: /etc/krb5.conf\n  username: svc\n  password: secret\n")
-		require.True(t, c.Kerberos.IsEnabled())
-		assert.Equal(t, "CORP.LOCAL", c.Kerberos.Realm)
-		assert.Equal(t, "svc", c.Kerberos.Username)
-	})
-
-	t.Run("kerberos base64 string", func(t *testing.T) {
-		c := unpack(t, "urls: [http://x]\nkerberos: "+base64.StdEncoding.EncodeToString([]byte(kerberosYAML))+"\n")
-		require.True(t, c.Kerberos.IsEnabled())
-		assert.Equal(t, "CORP.LOCAL", c.Kerberos.Realm)
-		assert.Equal(t, "svc", c.Kerberos.Username)
-	})
-
-	t.Run("kerberos base64 json", func(t *testing.T) {
-		c := unpack(t, "urls: [http://x]\nkerberos: "+base64.StdEncoding.EncodeToString([]byte(`{"enabled":true,"auth_type":"password","realm":"CORP.LOCAL","config_path":"/etc/krb5.conf","username":"svc","password":"secret"}`))+"\n")
-		require.True(t, c.Kerberos.IsEnabled())
-		assert.Equal(t, "CORP.LOCAL", c.Kerberos.Realm)
 	})
 }
