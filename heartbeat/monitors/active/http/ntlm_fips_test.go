@@ -48,3 +48,22 @@ func TestNTLMRejectedInFIPS(t *testing.T) {
 	require.Error(t, err, "ntlm monitor must not be creatable in fips mode")
 	assert.Contains(t, err.Error(), "fips", "error should explain that ntlm is unavailable in fips mode")
 }
+
+func TestKerberosRejectedInFIPS(t *testing.T) {
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"hosts": "http://localhost:9200",
+		"kerberos": map[string]any{
+			"enabled":     true,
+			"auth_type":   "password",
+			"realm":       "CORP.LOCAL",
+			"config_path": "/etc/krb5.conf",
+			"username":    "svc",
+			"password":    "secret",
+		},
+	})
+	require.NoError(t, err)
+
+	_, err = create("kerberos", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
+	require.Error(t, err, "kerberos monitor must not be creatable in fips mode")
+	assert.Contains(t, err.Error(), "fips", "error should explain that kerberos is unavailable in fips mode")
+}
