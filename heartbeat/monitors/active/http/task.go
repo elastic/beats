@@ -408,11 +408,15 @@ func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http
 	}
 
 	return func(r *http.Request, via []*http.Request) error {
+		n := len(via)
 		if redirects != nil {
 			*redirects = append(*redirects, r.URL.String())
+			// Count our list, not via. The Kerberos SPNEGO client intercepts
+			// each hop and starts a new Do(), which resets via.
+			n = len(*redirects)
 		}
 
-		if max == len(via) {
+		if max == n {
 			return http.ErrUseLastResponse
 		}
 		return nil
