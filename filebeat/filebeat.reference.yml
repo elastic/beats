@@ -923,6 +923,12 @@ filebeat.inputs:
   #  from `filestream` inputs that were assigned these IDs.
   #  Taking over from `log` inputs is disabled when `from_ids` is set.
   #  from_ids: ["foo", "bar"]
+  #  If `from_id_patterns` is set, files are taken over from any `filestream`
+  #  input whose ID matches one of the provided Go regular expressions.
+  #  Patterns are matched only against the input ID segment of registry keys.
+  #  Invalid patterns are rejected at startup. Can be combined with `from_ids`.
+  #  Taking over from `log` inputs is disabled when `from_id_patterns` is set.
+  #  from_id_patterns: ["old-input-.*", "legacy-[0-9]+"]
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
