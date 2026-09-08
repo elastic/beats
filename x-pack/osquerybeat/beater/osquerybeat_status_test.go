@@ -484,6 +484,65 @@ func TestOsquerybeatStatusReporting_ManagerPreInitFailure(t *testing.T) {
 	assert.False(t, mgr.stopped, "manager should not be stopped when PreInit itself fails")
 }
 
+func TestNewCheckTimeout(t *testing.T) {
+	newBeat := func(t *testing.T) *beat.Beat {
+		t.Helper()
+		b := &beat.Beat{
+			Info:       beat.Info{Logger: logp.NewLogger("test")},
+			Registry:   reload.NewRegistry(),
+			Monitoring: beatmonitoring.NewMonitoring(),
+		}
+		b.Info.Paths = newTestBeatPaths(t)
+		return b
+	}
+
+	t.Run("defaults to 15s", func(t *testing.T) {
+		beater, err := New(newBeat(t), agentconfig.NewConfig())
+		require.NoError(t, err, "New should succeed with empty config")
+		ob, ok := beater.(*osquerybeat)
+		require.True(t, ok, "New should return *osquerybeat")
+		assert.Equal(t, 15*time.Second, ob.checkTimeout, "unset check_timeout should default to 15s")
+	})
+
+	t.Run("reads elastic_options.check_timeout", func(t *testing.T) {
+		cfg, err := agentconfig.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"check_timeout": "30s",
+						},
+					},
+				},
+			},
+		})
+		require.NoError(t, err, "test config should build")
+		beater, err := New(newBeat(t), cfg)
+		require.NoError(t, err, "New should accept a valid check_timeout")
+		ob, ok := beater.(*osquerybeat)
+		require.True(t, ok, "New should return *osquerybeat")
+		assert.Equal(t, 30*time.Second, ob.checkTimeout, "checkTimeout should match elastic_options.check_timeout")
+	})
+
+	t.Run("rejects invalid check_timeout", func(t *testing.T) {
+		cfg, err := agentconfig.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"check_timeout": "nope",
+						},
+					},
+				},
+			},
+		})
+		require.NoError(t, err, "test config should build")
+		_, err = New(newBeat(t), cfg)
+		require.Error(t, err, "New should reject an invalid check_timeout")
+		assert.Contains(t, err.Error(), "check_timeout", "error should identify check_timeout")
+	})
+}
+
 func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{Manager: mgr}

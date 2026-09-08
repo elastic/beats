@@ -79,6 +79,7 @@ type OSQueryD struct {
 
 	extensionsTimeout     int
 	configRefreshInterval int
+	checkTimeout          time.Duration
 
 	// baseExtensionsTimeout is the effective extensions_timeout after construction
 	// options are applied; SetExtensions reverts to it when the configuration no
@@ -101,6 +102,16 @@ type Option func(*OSQueryD)
 func WithExtensionsTimeout(to int) Option {
 	return func(q *OSQueryD) {
 		q.extensionsTimeout = to
+	}
+}
+
+// WithCheckTimeout sets the osqueryd --version startup check deadline.
+// Values <= 0 leave the default (15s) in place.
+func WithCheckTimeout(to time.Duration) Option {
+	return func(q *OSQueryD) {
+		if to > 0 {
+			q.checkTimeout = to
+		}
 	}
 }
 
@@ -163,6 +174,7 @@ func newOsqueryD(socketPath string, opts ...Option) (*OSQueryD, error) {
 		socketPath:            socketPath,
 		extensionsTimeout:     defaultExtensionsTimeout,
 		configRefreshInterval: defaultConfigRefreshInterval,
+		checkTimeout:          defaultCheckTimeout,
 	}
 
 	for _, opt := range opts {
@@ -259,7 +271,7 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 		return fmt.Errorf("failed to prepare bin path, %w", err)
 	}
 
-	return runCheckWithTimeout(ctx, defaultCheckTimeout, func(checkCtx context.Context) error {
+	return runCheckWithTimeout(ctx, q.checkTimeout, func(checkCtx context.Context) error {
 		//nolint:gosec // The executable path is selected from the validated runtime.
 		cmd := exec.CommandContext(
 			checkCtx,

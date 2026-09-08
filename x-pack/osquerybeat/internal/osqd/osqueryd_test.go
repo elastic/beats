@@ -79,6 +79,7 @@ func TestNew(t *testing.T) {
 		WithConfigRefresh(configurationRefreshIntervalSecs),
 		WithConfigPlugin(configPluginName),
 		WithLoggerPlugin(loggerPluginName),
+		WithCheckTimeout(30*time.Second),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -102,6 +103,17 @@ func TestNew(t *testing.T) {
 	if diff != "" {
 		t.Error(diff)
 	}
+
+	diff = cmp.Diff(30*time.Second, osq.checkTimeout)
+	if diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestWithCheckTimeoutIgnoredWhenNonPositive(t *testing.T) {
+	osq, err := newOsqueryD("/var/run/foobar", WithCheckTimeout(0))
+	require.NoError(t, err, "newOsqueryD should succeed")
+	assert.Equal(t, defaultCheckTimeout, osq.checkTimeout, "non-positive WithCheckTimeout should keep the default")
 }
 
 func TestVerifyAutoloadFileMissing(t *testing.T) {

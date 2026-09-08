@@ -77,6 +77,9 @@ type osquerybeat struct {
 	config config.Config
 	// osquery install settings are sourced from inputs[0].osquery.elastic_options.install.
 	osqueryInstallConfig config.InstallConfig
+	// checkTimeout is the osqueryd --version startup check deadline, from
+	// elastic_options.check_timeout (default 15s).
+	checkTimeout time.Duration
 	// runtime-selected osquery metadata.
 	osqueryVersion string
 	osquerySource  string
@@ -142,11 +145,16 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
 	}
+	checkTimeout, err := config.GetOsqueryCheckTimeout(c.Inputs)
+	if err != nil {
+		return nil, err
+	}
 
 	bt := &osquerybeat{
 		b:                    b,
 		config:               c,
 		osqueryInstallConfig: installCfg,
+		checkTimeout:         checkTimeout,
 		log:                  log,
 		pub:                  pub.New(b, log),
 		qp:                   newQueryProfiler(log),
@@ -315,6 +323,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
 		osqd.WithDataPath(bt.osqueryDataPath),
+		osqd.WithCheckTimeout(bt.checkTimeout),
 	}
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
