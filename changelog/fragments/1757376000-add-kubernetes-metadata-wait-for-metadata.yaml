@@ -2,10 +2,6 @@ kind: bug-fix
 
 summary: "add_kubernetes_metadata: wait_for_metadata now prevents unenriched events at startup"
 
-# description:
-# watcher.Start() now drains the initial work queue synchronously before returning,
-# so the processor's metadata cache is fully populated when wait_for_metadata is set.
-
 component: libbeat
 
 issue: https://github.com/elastic/beats/issues/53090
