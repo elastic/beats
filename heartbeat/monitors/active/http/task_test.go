@@ -148,7 +148,7 @@ func TestNonZeroRedirect(t *testing.T) {
 	// Test requests within the limit
 	for range limit {
 		req := makeTestHTTPRequest(t)
-		assert.Nil(t, checker(req, via))
+		assert.NoError(t, checker(req, via))
 		via = append(via, req)
 	}
 
@@ -166,11 +166,11 @@ func TestRedirectLimitIndependentOfVia(t *testing.T) {
 	via := []*http.Request{makeTestHTTPRequest(t)}
 	for range limit - 1 {
 		req := makeTestHTTPRequest(t)
-		assert.Nil(t, checker(req, via), "redirects within the limit should be allowed")
+		assert.NoError(t, checker(req, via), "redirects within the limit should be allowed")
 	}
 
 	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via), "limit must apply even when via does not grow")
-	assert.Equal(t, limit, len(redirects), "every hop should still be recorded")
+	assert.Len(t, redirects, limit, "every hop should still be recorded")
 }
 
 func TestRequestBuildingWithCustomHost(t *testing.T) {
