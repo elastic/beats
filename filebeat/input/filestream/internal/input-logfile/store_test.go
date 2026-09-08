@@ -431,7 +431,7 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	defer s.Release()
 	store := &sourceStore{
 		identifier:            &SourceIdentifier{"filestream::current-id::"},
-		identifiersToTakeOver: []*SourceIdentifier{{"filestream::previous-id::"}},
+		identifiersToTakeOver: []InputMatcher{&SourceIdentifier{"filestream::previous-id::"}},
 		store:                 s,
 	}
 

@@ -1,0 +1,7 @@
+kind: enhancement
+
+summary: filestream take_over now supports regex patterns via from_id_patterns
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/53097

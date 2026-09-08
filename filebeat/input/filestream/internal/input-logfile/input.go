@@ -37,7 +37,7 @@ type managedInput struct {
 	manager                *InputManager
 	ackCH                  *updateChan
 	sourceIdentifier       *SourceIdentifier
-	previousSrcIdentifiers []*SourceIdentifier
+	previousSrcIdentifiers []InputMatcher
 	prospector             Prospector
 	harvester              Harvester
 	cleanTimeout           time.Duration

@@ -716,6 +716,36 @@ take_over:
 			cfgYAML:   "take_over: 42",
 			expectErr: true,
 		},
+		"new mode with id patterns": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_id_patterns: ["foo-.*", "bar-[0-9]+"]`,
+			expected: TakeOverConfig{
+				Enabled:        true,
+				FromIDPatterns: []string{"foo-.*", "bar-[0-9]+"},
+			},
+		},
+		"new mode with ids and id patterns": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_ids: ["exact-id"]
+  from_id_patterns: ["prefix-.*"]`,
+			expected: TakeOverConfig{
+				Enabled:        true,
+				FromIDs:        []string{"exact-id"},
+				FromIDPatterns: []string{"prefix-.*"},
+			},
+		},
+		"invalid from_id_patterns regex": {
+			cfgYAML:   `take_over.from_id_patterns: ["[invalid"]`,
+			expectErr: true,
+		},
+		"invalid from_id_patterns element type": {
+			cfgYAML:   `take_over.from_id_patterns: ["foo", 42]`,
+			expectErr: true,
+		},
 	}
 
 	for name, tc := range testCases {
@@ -732,6 +762,60 @@ take_over:
 			}
 
 			assert.Equal(t, tc.expected, outer.TakeOver, "TakeOverConfig was not parsed correctly")
+		})
+	}
+}
+
+func TestRegexInputMatcher(t *testing.T) {
+	testCases := []struct {
+		name    string
+		pattern string
+		key     string
+		want    bool
+	}{
+		{
+			name:    "matches input ID",
+			pattern: `foo-.*`,
+			key:     "filestream::foo-bar::native::123",
+			want:    true,
+		},
+		{
+			name:    "no match on different ID",
+			pattern: `foo-.*`,
+			key:     "filestream::baz::native::123",
+			want:    false,
+		},
+		{
+			name:    "no match on different plugin",
+			pattern: `foo-.*`,
+			key:     "logfile::foo-bar::native::123",
+			want:    false,
+		},
+		{
+			name:    "pattern anchored to full ID segment",
+			pattern: `foo`,
+			key:     "filestream::foo-bar::native::123",
+			want:    true, // regexp.MatchString is a substring match
+		},
+		{
+			name:    "anchored pattern no match",
+			pattern: `^foo$`,
+			key:     "filestream::foo-bar::native::123",
+			want:    false,
+		},
+		{
+			name:    "exact match with anchors",
+			pattern: `^foo-bar$`,
+			key:     "filestream::foo-bar::native::123",
+			want:    true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			m, err := newRegexInputMatcher("filestream", tc.pattern)
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, m.MatchesInput(tc.key))
 		})
 	}
 }
