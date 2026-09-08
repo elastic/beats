@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.7
 
 require (
-	cloud.google.com/go/bigquery v1.81.0
+	cloud.google.com/go/bigquery v1.83.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
