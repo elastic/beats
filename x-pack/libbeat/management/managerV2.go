@@ -74,6 +74,10 @@ type BeatV2Manager struct {
 	status  status.Status
 	message string
 	payload map[string]any
+	// outputConfigHandler receives raw expected output-unit config after a
+	// successful output reload. It is used for Beat-specific settings that do
+	// not belong on monitor input streams.
+	outputConfigHandler lbmanagement.OutputConfigHandler
 
 	// stop callback must be registered by libbeat, as with the V1 callback
 	stopFunc    func()
@@ -254,6 +258,22 @@ func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
 		ManagedMode:  lbmanagement.AgentManagedMode(info.ManagedMode),
 		Unprivileged: info.Unprivileged,
 	}
+}
+
+// SetOutputConfigHandler registers a handler for successful Elastic Agent
+// output-unit configuration changes.
+func (cm *BeatV2Manager) SetOutputConfigHandler(handler lbmanagement.OutputConfigHandler) {
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	cm.outputConfigHandler = handler
+}
+
+func (cm *BeatV2Manager) outputConfigHandlerSnapshot() lbmanagement.OutputConfigHandler {
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	return cm.outputConfigHandler
 }
 
 // RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
@@ -874,6 +894,19 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		return false, fmt.Errorf("failed to reload output: %w", err)
+	}
+	if handler := cm.outputConfigHandlerSnapshot(); handler != nil {
+		source := expected.Config.GetSource()
+		if source == nil {
+			cm.logger.Warn("output expected config has no source for registered handler")
+			return false, nil
+		}
+		outputConfig, err := conf.NewConfigFrom(source.AsMap())
+		if err != nil {
+			cm.logger.Errorf("could not create output config for handler: %v", err)
+			return false, nil
+		}
+		handler(outputConfig)
 	}
 	return false, nil
 }

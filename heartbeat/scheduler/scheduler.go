@@ -41,17 +41,19 @@ var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
 // Scheduler represents our async timer based scheduler.
 type Scheduler struct {
-	limit       int64
-	limitSem    *semaphore.Weighted
-	location    *time.Location
-	timerQueue  *timerqueue.TimerQueue
-	ctx         context.Context
-	cancelCtx   context.CancelFunc
-	stats       schedulerStats
-	jobLimitSem map[string]*semaphore.Weighted
-	runOnce     bool
-	runOnceWg   *sync.WaitGroup
-	logger      *logp.Logger
+	limit             int64
+	limitSem          *semaphore.Weighted
+	location          *time.Location
+	timerQueue        *timerqueue.TimerQueue
+	ctx               context.Context
+	cancelCtx         context.CancelFunc
+	stats             schedulerStats
+	jobLimitMu        sync.Mutex
+	jobLimitSem       map[string]*jobLimitSemaphore
+	fallbackJobLimits map[string]*config.JobLimit
+	runOnce           bool
+	runOnceWg         *sync.WaitGroup
+	logger            *logp.Logger
 }
 
 type schedulerStats struct {
@@ -74,17 +76,6 @@ type Schedule interface {
 	RunOnInit() bool
 }
 
-func getJobLimitSem(jobLimitByType map[string]*config.JobLimit, logger *logp.Logger) map[string]*semaphore.Weighted {
-	jobLimitSem := map[string]*semaphore.Weighted{}
-	for jobType, jobLimit := range jobLimitByType {
-		if jobLimit.Limit > 0 {
-			logger.Infof("limiting to %d concurrent jobs for '%s' type", jobLimit.Limit, jobType)
-			jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
-		}
-	}
-	return jobLimitSem
-}
-
 // NewWithLocation creates a new Scheduler using the given runAt zone.
 func Create(
 	limit int64,
@@ -104,17 +95,19 @@ func Create(
 	activeJobsGauge := monitoring.NewUint(registry, "jobs.active")
 	activeTasksGauge := monitoring.NewUint(registry, "tasks.active")
 	waitingTasksGauge := monitoring.NewUint(registry, "tasks.waiting")
+	fallbackJobLimits := cloneJobLimits(jobLimitByType)
 
 	sched := &Scheduler{
-		limit:       limit,
-		location:    location,
-		ctx:         ctx,
-		cancelCtx:   cancelCtx,
-		limitSem:    semaphore.NewWeighted(limit),
-		jobLimitSem: getJobLimitSem(jobLimitByType, logger),
-		timerQueue:  timerqueue.NewTimerQueue(ctx),
-		runOnce:     runOnce,
-		runOnceWg:   &sync.WaitGroup{},
+		limit:             limit,
+		location:          location,
+		ctx:               ctx,
+		cancelCtx:         cancelCtx,
+		limitSem:          semaphore.NewWeighted(limit),
+		jobLimitSem:       newJobLimitSem(fallbackJobLimits, logger),
+		fallbackJobLimits: fallbackJobLimits,
+		timerQueue:        timerqueue.NewTimerQueue(ctx),
+		runOnce:           runOnce,
+		runOnceWg:         &sync.WaitGroup{},
 
 		stats: schedulerStats{
 			activeJobs:         activeJobsGauge,
@@ -129,6 +122,89 @@ func Create(
 	go sched.missedDeadlineReporter()
 
 	return sched
+}
+
+// ApplyJobLimits overlays Fleet output-unit limits on the limits supplied by
+// heartbeat.yml and SYNTHETICS_LIMIT_* at startup. Omitted types return to
+// their original fallback instead of retaining an older Fleet value.
+func (s *Scheduler) ApplyJobLimits(overrides map[string]*config.JobLimit) error {
+	effective := cloneJobLimits(s.fallbackJobLimits)
+	for jobType, jobLimit := range overrides {
+		if !config.IsSupportedJobType(jobType) {
+			continue
+		}
+		if jobLimit == nil {
+			return fmt.Errorf("job limit for %q is nil", jobType)
+		}
+		if jobLimit.Limit < 0 {
+			return fmt.Errorf("job limit for %q must not be negative", jobType)
+		}
+		effective[jobType] = &config.JobLimit{Limit: jobLimit.Limit}
+	}
+
+	s.jobLimitMu.Lock()
+	defer s.jobLimitMu.Unlock()
+
+	for _, jobType := range config.SupportedJobTypes() {
+		limit := jobLimitValue(effective[jobType])
+		jobLimitSem, exists := s.jobLimitSem[jobType]
+		if !exists {
+			jobLimitSem = newJobLimitSemaphore(limit)
+			s.jobLimitSem[jobType] = jobLimitSem
+			continue
+		}
+		if !jobLimitSem.setLimit(limit) {
+			continue
+		}
+		if limit == 0 {
+			s.logger.Infof("removing concurrent job limit for '%s' type", jobType)
+		} else {
+			s.logger.Infof("limiting to %d concurrent jobs for '%s' type", limit, jobType)
+		}
+	}
+
+	return nil
+}
+
+func (s *Scheduler) getJobLimitSem(jobType string) *jobLimitSemaphore {
+	s.jobLimitMu.Lock()
+	defer s.jobLimitMu.Unlock()
+
+	jobLimitSem, exists := s.jobLimitSem[jobType]
+	if !exists {
+		jobLimitSem = newJobLimitSemaphore(jobLimitValue(s.fallbackJobLimits[jobType]))
+		s.jobLimitSem[jobType] = jobLimitSem
+	}
+	return jobLimitSem
+}
+
+func newJobLimitSem(jobLimits map[string]*config.JobLimit, logger interface{ Infof(string, ...any) }) map[string]*jobLimitSemaphore {
+	jobLimitSem := make(map[string]*jobLimitSemaphore, len(jobLimits))
+	for jobType, jobLimit := range jobLimits {
+		limit := jobLimitValue(jobLimit)
+		jobLimitSem[jobType] = newJobLimitSemaphore(limit)
+		if limit > 0 {
+			logger.Infof("limiting to %d concurrent jobs for '%s' type", limit, jobType)
+		}
+	}
+	return jobLimitSem
+}
+
+func cloneJobLimits(jobLimits map[string]*config.JobLimit) map[string]*config.JobLimit {
+	cloned := make(map[string]*config.JobLimit, len(jobLimits))
+	for jobType, jobLimit := range jobLimits {
+		if jobLimit != nil {
+			cloned[jobType] = &config.JobLimit{Limit: jobLimit.Limit}
+		}
+	}
+	return cloned
+}
+
+func jobLimitValue(jobLimit *config.JobLimit) int64 {
+	if jobLimit == nil || jobLimit.Limit < 1 {
+		return 0
+	}
+	return jobLimit.Limit
 }
 
 func (s *Scheduler) missedDeadlineReporter() {

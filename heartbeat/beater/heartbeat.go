@@ -143,6 +143,9 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		trace:  trace,
 		logger: logger,
 	}
+	if manager, ok := b.Manager.(management.OutputConfigHandlerRegistrar); ok {
+		manager.SetOutputConfigHandler(bt.applyOutputJobLimits)
+	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
 		runFromID = parsedConfig.RunFrom.ID
