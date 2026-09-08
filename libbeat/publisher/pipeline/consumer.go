@@ -106,8 +106,8 @@ func (c *eventConsumer) run() {
 		}
 	}
 
-	
-	c.logger.Debug("start pipeline event consumer")
+	log := c.logger
+	log.Debug("start pipeline event consumer")
 
 	if uq, ok := target.queue.(queue.UnblockingQueue[publisher.Event]); ok {
 		c.runUnblocking(log, target, uq)
