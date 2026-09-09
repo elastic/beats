@@ -166,7 +166,7 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 :   Time to wait before retrying the metadata request. The retry period must not be greater than `wait_for_metadata_timeout` unless retrying indefinitely. Defaults to `3s`.
 
 `append_fields`
-:   (Optional) When `true`, the processor enriches events that already have a `kubernetes` field by merging the cached metadata into the existing object. Existing keys are preserved; only absent fields are added. Defaults to `false`.
+:   (Optional) When `true`, the processor enriches events that already have a `kubernetes` field by merging the cached metadata into the existing object. Existing keys are preserved. Only absent fields are added. Defaults to `false`.
 
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 
