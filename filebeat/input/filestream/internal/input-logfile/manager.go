@@ -299,7 +299,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		backoff:                settings.Backoff,
 		stateCheckInterval:     settings.Close.OnStateChange.CheckInterval,
 		sourceIdentifier:       srcIdentifier,
-		previousSrcIdentifiers: previousMatchers,
+		previousMatchers: previousMatchers,
 		takeOverAnyID:          settings.TakeOver.FromAnyID,
 		cleanTimeout:           settings.CleanInactive,
 		harvesterLimit:         settings.HarvesterLimit,
