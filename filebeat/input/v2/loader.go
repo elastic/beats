@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 // Loader can be used to create Inputs from configurations.
@@ -63,23 +62,10 @@ func NewLoader(log *logp.Logger, plugins []Plugin, typeField, defaultType string
 	}, nil
 }
 
-// Init runs Init on all InputManagers for all plugins known to the loader.
-func (l *Loader) Init(group unison.Group) error {
-	for _, p := range l.registry {
-		if err := p.Manager.Init(group); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// Close releases resources owned by input managers that support explicit shutdown.
-// Call Close after stopping the task group passed to Init.
+// Close releases resources owned by all input managers.
 func (l *Loader) Close() {
 	for _, p := range l.registry {
-		if manager, ok := p.Manager.(interface{ Close() }); ok {
-			manager.Close()
-		}
+		p.Manager.Close()
 	}
 }
 
