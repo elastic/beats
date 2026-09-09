@@ -75,9 +75,36 @@ func createRate(rateKey string, key string) utils.EnrichedType[mapstr.M] {
 	}
 }
 
+const (
+	cgroupUsageNanosKey   = "os.cgroup.cpuacct.usage_nanos"
+	cgroupPeriodsKey      = "os.cgroup.cpu.stat.number_of_elapsed_periods"
+	cgroupQuotaMicrosKey  = "os.cgroup.cpu.cfs_quota_micros"
+	cgroupCpuPercentField = "cgroup_cpu_usage_percent"
+)
+
+func enrichCgroupCpuUsagePercent(node *mapstr.M, prevNode *mapstr.M) {
+	if !hasKey(node, cgroupUsageNanosKey) || !hasKey(prevNode, cgroupUsageNanosKey) ||
+		!hasKey(node, cgroupPeriodsKey) || !hasKey(prevNode, cgroupPeriodsKey) ||
+		!hasKey(node, cgroupQuotaMicrosKey) {
+		return
+	}
+	quotaMicros := getValue(node, cgroupQuotaMicrosKey)
+	if quotaMicros <= 0 {
+		return
+	}
+	usageDelta := getValue(node, cgroupUsageNanosKey) - getValue(prevNode, cgroupUsageNanosKey)
+	periodsDelta := getValue(node, cgroupPeriodsKey) - getValue(prevNode, cgroupPeriodsKey)
+	if usageDelta < 0 || periodsDelta <= 0 {
+		return
+	}
+	percent := float64(usageDelta) / (float64(periodsDelta) * float64(quotaMicros) * 1000) * 100
+	setValue(node, cgroupCpuPercentField, percent)
+}
+
 func enrichNodeStats(id string, nodeStats *mapstr.M, timestampDiff int64) {
 	if prevNodeStats, exists := cache.PreviousCache[id]; exists {
 		utils.EnrichObject(nodeStats, &prevNodeStats, cache)
+		enrichCgroupCpuUsagePercent(nodeStats, &prevNodeStats)
 
 		setValue(nodeStats, "timestampDiff", timestampDiff)
 	}

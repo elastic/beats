@@ -1,0 +1,23 @@
+kind: bug-fix
+
+summary: Restart osqueryd instead of terminating osquerybeat when the extension manager ping times out.
+
+description: |
+  The osquery-go extension manager watchdog shares a single thrift socket, and a
+  single 200ms lock, with extension registration and deregistration. Losing that
+  lock race surfaces as "extension ping failed: timeout after 200ms", which is
+  indistinguishable from osqueryd actually being gone.
+
+  That error was not in osquerybeat's recoverable set, so it propagated out of
+  Run. As a supervised process the agent restarted the component and suppressed
+  the failed state, making this self-healing and effectively invisible. Running
+  as a beat receiver there is no such restart: the error is reported as
+  status.Failed, maps to an OTel PermanentError, and the osquery_manager unit
+  stays FAILED until the whole agent is restarted.
+
+  Extension ping failures and network timeouts are now treated as recoverable,
+  so the runner replays the last known inputs and restarts osqueryd.
+
+component: osquerybeat
+
+# pr: https://github.com/elastic/beats/pull/xxxx

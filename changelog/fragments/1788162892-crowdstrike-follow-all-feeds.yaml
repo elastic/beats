@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Follow every CrowdStrike discover resource instead of only the first feed.
+description: |
+  FalconHose followSession iterated discovered resources but blocked in the
+  first feed's decode loop and returned on EOF, so additional feeds in the same
+  discover response were never read. Each resource is now followed
+  concurrently with a merged per-feed cursor.
+component: filebeat
