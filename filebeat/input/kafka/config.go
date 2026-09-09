@@ -232,19 +232,30 @@ func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Conf
 	// configure client ID
 	k.ClientID = config.ClientID
 
+	if err := k.Validate(); err != nil {
+		return nil, err
+	}
+	return k, nil
+}
+
+// attachSaramaMetrics registers Sarama's go-metrics on parent instead of
+// monitoring.Default. parent should be the input's MetricsRegistry so each
+// Kafka input (and each filebeatreceiver) has its own tree. Sharing Default
+// panics with "name bytes_read already used" when several inputs open brokers
+// at once. A nil parent gets a private registry so CheckConfig/tests stay off
+// the process global.
+func attachSaramaMetrics(k *sarama.Config, parent *monitoring.Registry, logger *logp.Logger) {
+	if parent == nil {
+		parent = monitoring.NewRegistry()
+	}
 	k.MetricRegistry = adapter.GetGoMetrics(
-		monitoring.Default,
-		"filebeat.inputs.kafka",
+		parent,
+		"kafka",
 		logger,
 		adapter.Rename("incoming-byte-rate", "bytes_read"),
 		adapter.Rename("outgoing-byte-rate", "bytes_write"),
 		adapter.GoMetricsNilify,
 	)
-
-	if err := k.Validate(); err != nil {
-		return nil, err
-	}
-	return k, nil
 }
 
 // asSaramaOffset converts an initialOffset enum to the corresponding

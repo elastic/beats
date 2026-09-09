@@ -19,13 +19,16 @@ package kafka
 
 import (
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	metrics "github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // TestNewSaramaConfigDefaults verifies that the default input config maps the
@@ -33,7 +36,11 @@ import (
 // existing configurations are unaffected by these options being added.
 func TestNewSaramaConfigDefaults(t *testing.T) {
 	saramaConfig, err := newSaramaConfig(defaultConfig(), logp.NewNopLogger())
-	require.NoError(t, err)
+	require.NoError(t, err, "default config should produce a valid sarama config")
+	assert.Nil(t, monitoring.Default.Get("filebeat.inputs.kafka"),
+		"config construction must not register Sarama metrics on monitoring.Default")
+	assert.Nil(t, monitoring.Default.Get("kafka"),
+		"config construction must not register Sarama metrics on monitoring.Default")
 
 	assert.Equal(t, 10*time.Second, saramaConfig.Consumer.Group.Session.Timeout)
 	assert.Equal(t, 3*time.Second, saramaConfig.Consumer.Group.Heartbeat.Interval)
@@ -118,4 +125,60 @@ func TestNewSaramaConfigGroupInstanceIDInvalid(t *testing.T) {
 				"invalid group_instance_id %q must be rejected", id)
 		})
 	}
+}
+
+func TestAttachSaramaMetricsUsesParentRegistry(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	cfg, err := newSaramaConfig(defaultConfig(), logp.NewNopLogger())
+	require.NoError(t, err, "default config should produce a valid sarama config")
+
+	attachSaramaMetrics(cfg, parent, logp.NewNopLogger())
+	require.NotNil(t, cfg.MetricRegistry, "Sarama should have a metric registry after attach")
+
+	metrics.GetOrRegisterMeter("incoming-byte-rate", cfg.MetricRegistry)
+	assert.NotNil(t, parent.Get("kafka.bytes_read"),
+		"incoming-byte-rate should be renamed to bytes_read on the provided parent")
+	assert.Nil(t, monitoring.Default.Get("filebeat.inputs.kafka.bytes_read"),
+		"must not register Kafka input metrics on the process-global registry")
+	assert.Nil(t, monitoring.Default.Get("kafka.bytes_read"),
+		"must not register Kafka input metrics on the process-global registry")
+}
+
+func TestAttachSaramaMetricsNilParentDoesNotUseDefault(t *testing.T) {
+	cfg, err := newSaramaConfig(defaultConfig(), logp.NewNopLogger())
+	require.NoError(t, err, "default config should produce a valid sarama config")
+
+	attachSaramaMetrics(cfg, nil, logp.NewNopLogger())
+	require.NotNil(t, cfg.MetricRegistry, "nil parent should still get a private registry")
+
+	metrics.GetOrRegisterMeter("incoming-byte-rate", cfg.MetricRegistry)
+	assert.Nil(t, monitoring.Default.Get("filebeat.inputs.kafka.bytes_read"),
+		"nil parent must not fall back to monitoring.Default")
+	assert.Nil(t, monitoring.Default.Get("kafka.bytes_read"),
+		"nil parent must not fall back to monitoring.Default")
+}
+
+func TestAttachSaramaMetricsIsolatedPerParent(t *testing.T) {
+	const n = 32
+	var wg sync.WaitGroup
+	wg.Add(n)
+	for i := 0; i < n; i++ {
+		go func() {
+			defer wg.Done()
+			parent := monitoring.NewRegistry()
+			cfg, err := newSaramaConfig(defaultConfig(), logp.NewNopLogger())
+			assert.NoError(t, err, "default config should produce a valid sarama config")
+			if err != nil {
+				return
+			}
+			attachSaramaMetrics(cfg, parent, logp.NewNopLogger())
+			metrics.GetOrRegisterMeter("incoming-byte-rate", cfg.MetricRegistry)
+			metrics.GetOrRegisterMeter("outgoing-byte-rate", cfg.MetricRegistry)
+			assert.NotNil(t, parent.Get("kafka.bytes_read"),
+				"each parent should own its own bytes_read metric")
+			assert.NotNil(t, parent.Get("kafka.bytes_write"),
+				"each parent should own its own bytes_write metric")
+		}()
+	}
+	wg.Wait()
 }
