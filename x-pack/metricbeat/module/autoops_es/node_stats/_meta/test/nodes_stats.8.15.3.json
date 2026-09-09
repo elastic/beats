@@ -904,6 +904,9 @@
             "host": "172.22.233.43",
             "ip": "172.22.233.43:19261",
             "roles": ["master", "remote_cluster_client"],
+            "attributes": {
+                "logical_availability_zone": "zone-2"
+            },
             "indices": {
                 "docs": {
                     "count": 0,
@@ -1359,6 +1362,10 @@
                 "remote_cluster_client",
                 "transform"
             ],
+            "attributes": {
+                "logical_availability_zone": "zone-0",
+                "instance_configuration": "aws.es.datahot.i3"
+            },
             "indices": {
                 "docs": {
                     "count": 3836668558,
