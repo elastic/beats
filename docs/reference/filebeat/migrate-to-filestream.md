@@ -115,7 +115,7 @@ Every `filestream` input **must** have a unique identifier as `id`. Using meanin
 Never change the ID of an input, or you will end up with duplicate events.
 If you do need to rename an input ID, use [`take_over.from_ids`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-take-over)
 to migrate the existing registry state to the new ID without re-ingesting data.
-To migrate from multiple inputs whose IDs share a pattern, use `take_over.from_id_patterns` instead.
+To migrate from many inputs without knowing their IDs in advance, use `take_over.from_any_id: true` instead.
 ::::
 
 Let's start the migration process with this simple set of `filestream` inputs without any additional parameters for now:

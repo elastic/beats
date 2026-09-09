@@ -716,34 +716,36 @@ take_over:
 			cfgYAML:   "take_over: 42",
 			expectErr: true,
 		},
-		"new mode with id patterns": {
+		"from_any_id enabled": {
 			cfgYAML: `
 take_over:
   enabled: true
-  from_id_patterns: ["foo-.*", "bar-[0-9]+"]`,
+  from_any_id: true`,
 			expected: TakeOverConfig{
-				Enabled:        true,
-				FromIDPatterns: []string{"foo-.*", "bar-[0-9]+"},
+				Enabled:   true,
+				FromAnyID: true,
 			},
 		},
-		"new mode with ids and id patterns": {
+		"from_any_id disabled": {
 			cfgYAML: `
 take_over:
   enabled: true
-  from_ids: ["exact-id"]
-  from_id_patterns: ["prefix-.*"]`,
+  from_any_id: false`,
 			expected: TakeOverConfig{
-				Enabled:        true,
-				FromIDs:        []string{"exact-id"},
-				FromIDPatterns: []string{"prefix-.*"},
+				Enabled:   true,
+				FromAnyID: false,
 			},
 		},
-		"invalid from_id_patterns regex": {
-			cfgYAML:   `take_over.from_id_patterns: ["[invalid"]`,
+		"from_any_id invalid type": {
+			cfgYAML:   `take_over.from_any_id: "yes"`,
 			expectErr: true,
 		},
-		"invalid from_id_patterns element type": {
-			cfgYAML:   `take_over.from_id_patterns: ["foo", 42]`,
+		"from_any_id and from_ids are mutually exclusive": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: true
+  from_ids: ["foo"]`,
 			expectErr: true,
 		},
 	}
@@ -762,60 +764,6 @@ take_over:
 			}
 
 			assert.Equal(t, tc.expected, outer.TakeOver, "TakeOverConfig was not parsed correctly")
-		})
-	}
-}
-
-func TestRegexInputMatcher(t *testing.T) {
-	testCases := []struct {
-		name    string
-		pattern string
-		key     string
-		want    bool
-	}{
-		{
-			name:    "matches input ID",
-			pattern: `foo-.*`,
-			key:     "filestream::foo-bar::native::123",
-			want:    true,
-		},
-		{
-			name:    "no match on different ID",
-			pattern: `foo-.*`,
-			key:     "filestream::baz::native::123",
-			want:    false,
-		},
-		{
-			name:    "no match on different plugin",
-			pattern: `foo-.*`,
-			key:     "logfile::foo-bar::native::123",
-			want:    false,
-		},
-		{
-			name:    "pattern anchored to full ID segment",
-			pattern: `foo`,
-			key:     "filestream::foo-bar::native::123",
-			want:    true, // regexp.MatchString is a substring match
-		},
-		{
-			name:    "anchored pattern no match",
-			pattern: `^foo$`,
-			key:     "filestream::foo-bar::native::123",
-			want:    false,
-		},
-		{
-			name:    "exact match with anchors",
-			pattern: `^foo-bar$`,
-			key:     "filestream::foo-bar::native::123",
-			want:    true,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			m, err := newRegexInputMatcher("filestream", tc.pattern)
-			require.NoError(t, err)
-			assert.Equal(t, tc.want, m.MatchesInput(tc.key))
 		})
 	}
 }

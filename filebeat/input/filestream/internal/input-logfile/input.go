@@ -38,6 +38,7 @@ type managedInput struct {
 	ackCH                  *updateChan
 	sourceIdentifier       *SourceIdentifier
 	previousSrcIdentifiers []InputMatcher
+	takeOverAnyID          bool
 	prospector             Prospector
 	harvester              Harvester
 	cleanTimeout           time.Duration
@@ -86,7 +87,7 @@ func (inp *managedInput) Run(
 		return err
 	}
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers, inp.takeOverAnyID)
 
 	// Setup cancellation using a custom cancel context. All harvesters will be
 	// stopped if one failed badly by returning an error.

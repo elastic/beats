@@ -20,7 +20,6 @@ package input_logfile
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -273,19 +272,9 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 			}
 			previousMatchers = append(previousMatchers, si)
 		}
-		for _, pattern := range settings.TakeOver.FromIDPatterns {
-			rm, err := newRegexInputMatcher(cim.Type, pattern)
-			if err != nil {
-				return nil,
-					fmt.Errorf(
-						"[ID: %q] error while creating regex matcher for pattern %q: %w",
-						settings.ID, pattern, err)
-			}
-			previousMatchers = append(previousMatchers, rm)
-		}
 	}
 
-	prospectorStore := newSourceStore(pStore, srcIdentifier, previousMatchers)
+	prospectorStore := newSourceStore(pStore, srcIdentifier, previousMatchers, settings.TakeOver.FromAnyID)
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
@@ -293,7 +282,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
-	globalStore := newSourceStore(pStore, globalIdentifier, nil)
+	globalStore := newSourceStore(pStore, globalIdentifier, nil, false)
 
 	err = prospector.Init(prospectorStore, globalStore, srcIdentifier.ID)
 	if err != nil {
@@ -311,6 +300,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		stateCheckInterval:     settings.Close.OnStateChange.CheckInterval,
 		sourceIdentifier:       srcIdentifier,
 		previousSrcIdentifiers: previousMatchers,
+		takeOverAnyID:          settings.TakeOver.FromAnyID,
 		cleanTimeout:           settings.CleanInactive,
 		harvesterLimit:         settings.HarvesterLimit,
 	}, nil
@@ -398,32 +388,6 @@ type InputMatcher interface {
 	MatchesInput(key string) bool
 }
 
-// RegexInputMatcher matches registry keys whose input ID segment matches a compiled regexp.
-type RegexInputMatcher struct {
-	pluginPrefix string
-	pattern      *regexp.Regexp
-}
-
-func newRegexInputMatcher(pluginName, pattern string) (*RegexInputMatcher, error) {
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		return nil, fmt.Errorf("invalid from_id_patterns entry %q: %w", pattern, err)
-	}
-	return &RegexInputMatcher{
-		pluginPrefix: pluginName + "::",
-		pattern:      re,
-	}, nil
-}
-
-func (r *RegexInputMatcher) MatchesInput(key string) bool {
-	if !strings.HasPrefix(key, r.pluginPrefix) {
-		return false
-	}
-	rest := key[len(r.pluginPrefix):]
-	inputID, _, _ := strings.Cut(rest, "::")
-	return r.pattern.MatchString(inputID)
-}
-
 // TakeOverConfig is the configuration for the take over mode.
 // It allows the Filestream input to take over states from the log
 // input or other Filestream inputs
@@ -431,9 +395,9 @@ type TakeOverConfig struct {
 	Enabled bool `config:"enabled"`
 	// Filestream IDs to take over states (exact match).
 	FromIDs []string `config:"from_ids"`
-	// Go regular expressions matched against the input ID segment of registry
-	// keys. Compiled at parse time; an invalid pattern is a config error.
-	FromIDPatterns []string `config:"from_id_patterns"`
+	// FromAnyID, when true, takes over states from any previous filestream
+	// input ID, regardless of what that ID was. Mutually exclusive with FromIDs.
+	FromAnyID bool `config:"from_any_id"`
 	// Stream from the container input to take over from.
 	// Valid values: stderr, stdout or it can be empty. An empty stream means
 	// all streams.
@@ -477,22 +441,17 @@ func (t *TakeOverConfig) Unpack(value any) error {
 			}
 		}
 
-		rawFromIDPatterns, exists := v["from_id_patterns"]
+		rawFromAnyID, exists := v["from_any_id"]
 		if exists {
-			fromIDPatterns, ok := rawFromIDPatterns.([]any)
+			fromAnyID, ok := rawFromAnyID.(bool)
 			if !ok {
-				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDPatterns)
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawFromAnyID)
 			}
-			for _, el := range fromIDPatterns {
-				strEl, ok := el.(string)
-				if !ok {
-					return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
-				}
-				if _, err := regexp.Compile(strEl); err != nil {
-					return fmt.Errorf("invalid from_id_patterns entry %q: %w", strEl, err)
-				}
-				t.FromIDPatterns = append(t.FromIDPatterns, strEl)
-			}
+			t.FromAnyID = fromAnyID
+		}
+
+		if t.FromAnyID && len(t.FromIDs) > 0 {
+			return fmt.Errorf("'from_any_id' and 'from_ids' are mutually exclusive")
 		}
 
 	default:
@@ -509,7 +468,7 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 }
 
 func (t *TakeOverConfig) FromFilestream() bool {
-	return len(t.FromIDs) != 0 || len(t.FromIDPatterns) != 0
+	return len(t.FromIDs) != 0 || t.FromAnyID
 }
 
 // ReadUntilEOFConfig configures the behaviour to keep reading the current

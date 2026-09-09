@@ -47,6 +47,9 @@ type sourceStore struct {
 	// identifiersToTakeOver are matchers for previous input instances whose
 	// states this sourceStore will take over.
 	identifiersToTakeOver []InputMatcher
+	// takeOverAnyID, when true, takes over states from any previous filestream
+	// input ID rather than only those in identifiersToTakeOver.
+	takeOverAnyID bool
 	// store is the underlying store that encapsulates
 	// the in-memory and persistent store.
 	store *store
@@ -184,12 +187,14 @@ func newSourceStore(
 	s *store,
 	identifier *SourceIdentifier,
 	identifiersToTakeOver []InputMatcher,
+	takeOverAnyID bool,
 ) *sourceStore {
 
 	return &sourceStore{
 		store:                 s,
 		identifier:            identifier,
 		identifiersToTakeOver: identifiersToTakeOver,
+		takeOverAnyID:         takeOverAnyID,
 	}
 }
 
@@ -430,12 +435,15 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	defer s.store.ephemeralStore.mu.Unlock()
 
 	matchPreviousFilestreamIDs := func(key string) bool {
+		if s.takeOverAnyID {
+			// Match any filestream key that isn't from the current input.
+			return strings.HasPrefix(key, "filestream::") && !s.identifier.MatchesInput(key)
+		}
 		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {
 				return true
 			}
 		}
-
 		return false
 	}
 
@@ -460,9 +468,9 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	// Iterate through the whole store, no matter input type or input ID.
 	// That's the only way to access the log input states.
 	// We only iterate through the whole store if we're not migrating from
-	// a Filestream input
+	// a Filestream input.
 	fromLogInput := map[string]TakeOverState{}
-	if len(s.identifiersToTakeOver) == 0 {
+	if len(s.identifiersToTakeOver) == 0 && !s.takeOverAnyID {
 		_ = s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
 			if strings.HasPrefix(key, "filebeat::logs::") {
 				logSt := inpFile.State{}
