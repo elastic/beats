@@ -30215,11 +30215,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googlea
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/grpc
-Version: v1.83.0
+Version: v1.83.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.83.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.83.1/LICENSE:
 
 
                                  Apache License
