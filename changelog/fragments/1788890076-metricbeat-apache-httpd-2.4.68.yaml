@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Update Apache module test image to httpd 2.4.68 (Debian Trixie) to fix CI failures caused by expired Debian Bullseye security repository
+component: metricbeat
