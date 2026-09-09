@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: "add_kubernetes_metadata: wait_for_metadata now prevents unenriched events at startup"
+
+component: libbeat
+
+issue: https://github.com/elastic/beats/issues/53090
