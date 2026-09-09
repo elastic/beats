@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.7
 
 require (
-	cloud.google.com/go/bigquery v1.82.0
+	cloud.google.com/go/bigquery v1.83.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -22,20 +22,20 @@ require (
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-sdk-go-v2 v1.45.1
-	github.com/aws/aws-sdk-go-v2/config v1.33.1
-	github.com/aws/aws-sdk-go-v2/credentials v1.20.1
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.69.1
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.84.1
-	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.69.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.325.1
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.60.1
-	github.com/aws/aws-sdk-go-v2/service/iam v1.61.1
-	github.com/aws/aws-sdk-go-v2/service/organizations v1.56.1
-	github.com/aws/aws-sdk-go-v2/service/rds v1.126.1
-	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.38.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.109.1
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.48.1
-	github.com/aws/aws-sdk-go-v2/service/sts v1.47.1
+	github.com/aws/aws-sdk-go-v2/config v1.33.2
+	github.com/aws/aws-sdk-go-v2/credentials v1.20.2
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.70.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.85.0
+	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.70.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.328.0
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.61.1
+	github.com/aws/aws-sdk-go-v2/service/iam v1.62.0
+	github.com/aws/aws-sdk-go-v2/service/organizations v1.58.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.127.0
+	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.39.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.110.0
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.50.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.48.0
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 	github.com/cavaliergopher/rpm v1.2.0
 	github.com/cespare/xxhash/v2 v2.3.0
@@ -120,7 +120,7 @@ require (
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.28.0
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 	golang.org/x/mod v0.39.0
 	golang.org/x/net v0.58.0
 	golang.org/x/oauth2 v0.36.0
@@ -160,10 +160,10 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.19.1
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.1
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.44.1
-	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.39.1
-	github.com/aws/aws-sdk-go-v2/service/health v1.42.1
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.2
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.45.0
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.40.0
+	github.com/aws/aws-sdk-go-v2/service/health v1.43.0
 	github.com/aws/smithy-go v1.28.1
 	github.com/beevik/ntp v1.4.3
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
@@ -342,9 +342,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/signin v1.7.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.35.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.40.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.36.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.41.0 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
@@ -566,7 +566,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.66.0
+	cloud.google.com/go/storage v1.67.0
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
