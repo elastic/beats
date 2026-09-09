@@ -290,19 +290,19 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	return &managedInput{
-		manager:                cim,
-		ackCH:                  entry.ackCH,
-		id:                     settings.ID,
-		prospector:             prospector,
-		harvester:              harvester,
-		readUntilEOF:           settings.ReadUntilEOF,
-		backoff:                settings.Backoff,
-		stateCheckInterval:     settings.Close.OnStateChange.CheckInterval,
-		sourceIdentifier:       srcIdentifier,
-		previousMatchers: previousMatchers,
-		takeOverAnyID:          settings.TakeOver.FromAnyID,
-		cleanTimeout:           settings.CleanInactive,
-		harvesterLimit:         settings.HarvesterLimit,
+		manager:            cim,
+		ackCH:              entry.ackCH,
+		id:                 settings.ID,
+		prospector:         prospector,
+		harvester:          harvester,
+		readUntilEOF:       settings.ReadUntilEOF,
+		backoff:            settings.Backoff,
+		stateCheckInterval: settings.Close.OnStateChange.CheckInterval,
+		sourceIdentifier:   srcIdentifier,
+		previousMatchers:   previousMatchers,
+		takeOverAnyID:      settings.TakeOver.FromAnyID,
+		cleanTimeout:       settings.CleanInactive,
+		harvesterLimit:     settings.HarvesterLimit,
 	}, nil
 }
 

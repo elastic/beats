@@ -33,19 +33,19 @@ import (
 type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
-	id                     string
-	manager                *InputManager
-	ackCH                  *updateChan
-	sourceIdentifier       *SourceIdentifier
-	previousMatchers []InputMatcher
-	takeOverAnyID          bool
-	prospector             Prospector
-	harvester              Harvester
-	cleanTimeout           time.Duration
-	harvesterLimit         uint64
-	readUntilEOF           ReadUntilEOFConfig
-	backoff                BackoffConfig
-	stateCheckInterval     time.Duration
+	id                 string
+	manager            *InputManager
+	ackCH              *updateChan
+	sourceIdentifier   *SourceIdentifier
+	previousMatchers   []InputMatcher
+	takeOverAnyID      bool
+	prospector         Prospector
+	harvester          Harvester
+	cleanTimeout       time.Duration
+	harvesterLimit     uint64
+	readUntilEOF       ReadUntilEOFConfig
+	backoff            BackoffConfig
+	stateCheckInterval time.Duration
 }
 
 // Name is required to implement the v2.Input interface
