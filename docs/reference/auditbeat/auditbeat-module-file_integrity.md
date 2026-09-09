@@ -32,7 +32,7 @@ Privilege requirements vary by backend.
     ```
 
 **ebpf**
-:   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), a kernel version of 5.10.16 or later, and access to `/sys/fs/bpf` for the BPF filesystem. The kernel BPF policy must permit eBPF programs.
+:   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), and a kernel version of 5.10.16 or later. The kernel BPF policy must permit eBPF programs.
 
     In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF` and mount `/sys` from the host.
 

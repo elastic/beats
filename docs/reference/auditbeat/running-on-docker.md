@@ -154,9 +154,9 @@ COPY auditbeat.yml /usr/share/auditbeat/auditbeat.yml
 
 ## Special requirements [_special_requirements]
 
-Auditbeat modules and datasets have different privilege requirements. The following table shows the minimum flags needed for each component when running on Docker. Grant only the capabilities your configuration actually uses.
+Auditbeat modules and datasets have different privilege requirements. The following table shows the minimum privileges needed for each component when running on Docker. Capabilities are given as the name you pass to `--cap-add`. Grant only the privileges your configuration actually uses.
 
-| Component | `--cap-add` flags | `--pid=host` | Volume mounts |
+| Component | Required privileges | `--pid=host` | Volume mounts |
 |---|---|---|---|
 | **auditd** (multicast, default) | `AUDIT_READ` | No | — |
 | **auditd** (unicast) | `AUDIT_CONTROL`, `AUDIT_READ` | **Yes** | — |
@@ -168,12 +168,12 @@ Auditbeat modules and datasets have different privilege requirements. The follow
 | **system/package** (dpkg) | None | No | `-v /var/lib/dpkg:/var/lib/dpkg:ro` |
 | **system/package** (RPM) | None (or root for RPM DB) | No | `-v /var/lib/rpm:/var/lib/rpm:ro` |
 | **system/process** | `SYS_PTRACE` (recommended) | **Yes** | — |
-| **system/socket** | `SYS_ADMIN`, `NET_ADMIN` | No | `-v /sys:/sys` |
+| **system/socket** | `SYS_ADMIN`, `NET_RAW` | No | `-v /sys:/sys` |
 | **system/user** (default) | None | No | — |
 | **system/user** (`detect_password_changes: true`) | None (shadow group) | No | `-v /etc/shadow:/etc/shadow:ro` |
-| **add_session_metadata** (procfs) | `SYS_PTRACE` | **Yes** | — |
-| **add_session_metadata** (kernel_tracing/kprobes) | `SYS_ADMIN` | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug` |
-| **add_session_metadata** (kernel_tracing/eBPF) | `SYS_ADMIN`, `BPF` | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/bpf:/sys/fs/bpf` |
+| **add_session_metadata** (procfs) | `SYS_PTRACE` (or root) | **Yes** | — |
+| **add_session_metadata** (kernel_tracing/kprobes) | Root (`--user=root`) | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug` |
+| **add_session_metadata** (kernel_tracing/eBPF) | Root (`--user=root`) | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/bpf:/sys/fs/bpf` |
 
 For more details on what each component requires and why, refer to the individual module and dataset pages:
 

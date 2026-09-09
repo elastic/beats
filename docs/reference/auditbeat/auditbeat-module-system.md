@@ -30,7 +30,7 @@ Each dataset has its own privilege requirements. The following table summarizes 
 | `login` | `utmp` group membership | No | Reads `/var/log/wtmp` and `/var/log/btmp`; those files are group-readable by `utmp` on most distributions |
 | `package` | None (dpkg/Homebrew); root for RPM | No | RPM queries might need root to read the RPM DB; use `package.rpm_drop_to_uid` to drop privileges afterwards |
 | `process` | Recommended: root or `CAP_SYS_PTRACE` | Yes (Docker: `--pid=host`) | Without elevated privileges, some per-process details (for example, open file descriptors, env vars) are unavailable |
-| `socket` | `CAP_SYS_ADMIN` + `CAP_NET_ADMIN` | No | Also requires tracefs/debugfs access (`/sys` bind-mount in Docker); refer to [System socket dataset](/reference/auditbeat/auditbeat-dataset-system-socket.md) |
+| `socket` | `CAP_SYS_ADMIN` + `CAP_NET_RAW` | No | Also requires tracefs/debugfs access (`/sys` bind-mount in Docker); refer to [System socket dataset](/reference/auditbeat/auditbeat-dataset-system-socket.md) |
 | `user` | `shadow` group or root (when `detect_password_changes: true`) | No | `/etc/passwd` and `/etc/group` are world-readable; `/etc/shadow` requires elevated access |
 
 Refer to the individual dataset pages for full details.

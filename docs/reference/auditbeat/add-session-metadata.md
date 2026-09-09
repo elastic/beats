@@ -46,29 +46,29 @@ The `add_session_metadata` processor operates using various backend options.
 
 The required privileges depend on the backend in use.
 
-| Backend | Linux capabilities | Root required | Kernel version | Extra requirements |
-|---|---|---|---|---|
-| `procfs` | `CAP_SYS_PTRACE` (or root) | No (capability sufficient) | Any | Host PID namespace |
-| `kernel_tracing` (kprobes) | `CAP_SYS_ADMIN` (or root) | No (capability sufficient) | 3.10.0+ | Host PID namespace; `/sys/kernel/debug` accessible |
-| `kernel_tracing` (eBPF) | `CAP_SYS_ADMIN` + `CAP_BPF` (or root) | No (capabilities sufficient) | 5.10.16+ with eBPF ring buffer | Host PID namespace; `/sys/kernel/debug` and `/sys/fs/bpf` accessible |
-| `auto` | Whichever of the preceding backends is available | No | Depends on the selected backend | Same as the selected backend |
+| Backend | Privileges | Kernel requirements | Extra requirements |
+|---|---|---|---|
+| `procfs` | Root, or `CAP_SYS_PTRACE` | Any | Host PID namespace |
+| `kernel_tracing` (kprobes) | Root | 3.10.0 or later | Host PID namespace; `/sys/kernel/debug` accessible |
+| `kernel_tracing` (eBPF) | Root | eBPF enabled, with eBPF ring buffer support | Host PID namespace; `/sys/kernel/debug` and `/sys/fs/bpf` accessible |
+| `auto` | Root, because `kernel_tracing` is tried first | Falls back to `procfs` when `kernel_tracing` is unavailable | Same as the selected backend |
 
-**Minimum recommended setup (bare metal / VM)**
+**Running without root**
+
+Only the `procfs` backend can run without root. Grant it `CAP_SYS_PTRACE` so that it can read process data for every process in procfs:
 
 ```sh
-# grant capabilities without running as root
-setcap 'cap_sys_admin,cap_bpf+ep' /usr/share/auditbeat/auditbeat
+setcap 'cap_sys_ptrace+ep' /usr/share/auditbeat/auditbeat
 ```
 
 **Docker**
 
-All backends require `--pid=host`. The `kernel_tracing` backends also require mounted host directories:
+All backends require `--pid=host`. The `kernel_tracing` backends also run as root and need mounted host directories:
 
 ```sh
 docker run \
   --pid=host \
-  --cap-add=SYS_ADMIN \
-  --cap-add=BPF \
+  --user=root \
   -v /sys/kernel/debug:/sys/kernel/debug \
   -v /sys/fs/bpf:/sys/fs/bpf \
   ...
