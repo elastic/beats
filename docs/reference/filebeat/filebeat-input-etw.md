@@ -18,6 +18,16 @@ This input currently supports manifest-based, MOF (classic) and TraceLogging pro
 
 It has been tested in the Windows versions supported by Filebeat, starting from Windows 10 and Windows Server 2016. In addition, administrative privileges are required to control event tracing sessions.
 
+## Session reconnection [filebeat-input-etw-reconnection]
+
+```{applies_to}
+stack: ga 9.4.7+
+```
+
+When reading from a real-time session (`provider.name`, `provider.guid` or `session`), the input keeps running if the session is stopped by another controller, for example when an administrator restarts it with `logman`. The input reports a `DEGRADED` status while the session is unavailable, retries with a backoff that grows to 30 seconds, and reports `HEALTHY` again once it has reconnected to the session. If the input created the session itself, it creates it again; if it attached to an existing session, it waits for the session to be started again. Events produced while the session is stopped, or before the input reconnects, are not recovered.
+
+Failures during the first connection, such as a session that does not exist or insufficient privileges, still report `FAILED` and stop the input. Reading from a `file` is not affected: the input stops when it reaches the end of the file.
+
 Example configurations:
 
 Read from a provider by name:
@@ -370,6 +380,7 @@ You must assign a unique `id` to the input to expose metrics.
 | `received_events_total` | Total number of events received. |
 | `discarded_events_total` | Total number of discarded events. |
 | `errors_total` | Total number of errors. |
+| `reconnects_total` | Total number of attempts to reconnect after the ETW session stopped unexpectedly. |
 | `source_lag_time` | Histogram of the difference between timestamped event’s creation and reading. |
 | `arrival_period` | Histogram of the elapsed time between event notification callbacks. |
 | `processing_time` | Histogram of the elapsed time between event notification callback and publication to the internal queue. |

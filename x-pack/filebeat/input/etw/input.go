@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
@@ -24,14 +26,21 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/go-concert/ctxtool"
 
 	"github.com/rcrowley/go-metrics"
-	"golang.org/x/sync/errgroup"
 	"golang.org/x/sys/windows"
 )
 
 const (
 	inputName = "etw"
+
+	// Reconnect backoff bounds. A realtime session that is restarted by its
+	// owner usually comes back within seconds, and events produced while no
+	// consumer is attached are lost, so the first retries are quick. The cap
+	// keeps a session that never returns from being polled too eagerly.
+	reconnectInitialBackoff = time.Second
+	reconnectMaxBackoff     = 30 * time.Second
 )
 
 // It abstracts the underlying operations needed to work with ETW, allowing for easier
@@ -42,6 +51,7 @@ type sessionOperator interface {
 	createRealtimeSession(session *etw.Session) error
 	startConsumer(session *etw.Session) error
 	stopSession(session *etw.Session) error
+	resetSession(session *etw.Session)
 }
 
 type realSessionOperator struct{}
@@ -66,6 +76,10 @@ func (op *realSessionOperator) stopSession(session *etw.Session) error {
 	return session.StopSession()
 }
 
+func (op *realSessionOperator) resetSession(session *etw.Session) {
+	session.Reset()
+}
+
 // etwInput struct holds the configuration and state for the ETW input
 type etwInput struct {
 	log        *logp.Logger
@@ -75,6 +89,9 @@ type etwInput struct {
 	publisher  stateless.Publisher
 	operator   sessionOperator
 	health     *eventHealth
+	// backoff paces reconnection attempts. Nil means use the package
+	// defaults; tests set a short one.
+	backoff backoff.Backoff
 }
 
 func Plugin() input.Plugin {
@@ -105,6 +122,14 @@ func (e *etwInput) Test(_ input.TestContext) error {
 }
 
 // Run starts the ETW session and processes incoming events.
+//
+// For realtime sessions Run does not return when the session ends. Windows
+// makes ProcessTrace return ERROR_SUCCESS when another controller stops the
+// session (for example `logman stop <session> -ets`), which used to look like
+// a clean exit and left the input stopped until Filebeat was restarted. Run
+// now treats that as a lost session: it reports Degraded and keeps trying to
+// create or attach to the session again, with backoff, until it is consuming
+// events or the input is cancelled.
 func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	var err error
 
@@ -124,6 +149,10 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		ctx.UpdateStatus(status.Failed, "failed to initialize ETW session: "+errDetail(err))
 		return fmt.Errorf("error initializing ETW session: %w", err)
 	}
+	// The same session object, and so the same Callback value, is reused for
+	// every reconnect. StartConsumer hands Callback to syscall.NewCallback,
+	// which dedupes on the function value but never frees registrations and
+	// caps them process-wide, so a fresh closure per attempt would leak.
 	e.etwSession.Callback = e.consumeEvent
 	e.publisher = publisher
 	e.metrics = newInputMetrics(e.etwSession.Name, ctx.MetricsRegistry, ctx.Logger)
@@ -133,65 +162,156 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	e.log.Info("Starting " + inputName + " input")
 	defer e.log.Info(inputName + " input stopped")
 
-	// Handle realtime session creation or attachment
+	b := e.backoff
+	if b == nil {
+		b = backoff.NewEqualJitterBackoff(reconnectInitialBackoff, reconnectMaxBackoff)
+	}
+	cancelCtx := ctxtool.FromCanceller(ctx.Cancelation)
+
+	// The first pass fails fast so that a bad configuration or missing
+	// privileges surface as Failed with the runner's error log. Once the
+	// session has worked, losing it is treated as transient: it is most
+	// likely being restarted by whoever owns it, so we stay Degraded and
+	// keep trying to get it back for as long as the input runs.
+	for attempt := 0; ; attempt++ {
+		err = e.runSession(ctx, cancelCtx, attempt == 0)
+		switch {
+		case cancelCtx.Err() != nil:
+			// Shutting down. The consumer was stopped by us, so whatever it
+			// returned is not a failure.
+			return nil
+		case !e.etwSession.Realtime:
+			// Reading an .etl file: ProcessTrace returning means the file
+			// has been read to the end. There is nothing to reconnect to.
+			if err != nil {
+				ctx.UpdateStatus(status.Failed, statusMessage(err))
+			}
+			return err
+		case attempt == 0 && err != nil:
+			ctx.UpdateStatus(status.Failed, statusMessage(err))
+			return err
+		}
+
+		if err != nil {
+			e.log.Warnw("reconnecting to ETW session failed, will retry", "attempt", attempt, "error", err)
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s; reconnecting (attempt %d)", statusMessage(err), attempt+1))
+		} else {
+			// The session was consuming and then ended without us asking:
+			// another controller stopped it. Start the backoff over, since
+			// the previous schedule was for a different outage.
+			e.log.Warn("ETW session stopped by another controller, reconnecting")
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("ETW session %q stopped; reconnecting (attempt %d)",
+				e.etwSession.Name, attempt+1))
+			b.Reset()
+		}
+		if !b.Wait(cancelCtx) {
+			return nil
+		}
+		// Counted after the wait so that it only covers attempts that are
+		// made, not one that shutdown interrupted.
+		e.metrics.reconnects.Inc()
+		e.operator.resetSession(e.etwSession)
+	}
+}
+
+// runSession connects to the session and consumes it until ProcessTrace
+// returns, then stops the session so its handles are released before any
+// reconnect. cancelCtx is ctx.Cancelation as a context.Context. first selects
+// the lifecycle statuses: only the first pass reports Configuring, so a
+// reconnect stays Degraded until it is consuming again.
+func (e *etwInput) runSession(ctx input.Context, cancelCtx context.Context, first bool) error {
 	if e.etwSession.Realtime {
-		ctx.UpdateStatus(status.Configuring, "")
-		switch e.etwSession.NewSession {
-		case true:
-			// Create a new realtime session
-			// If it fails with ERROR_ALREADY_EXISTS we try to attach to it
-			createErr := e.operator.createRealtimeSession(e.etwSession)
-			if createErr == nil {
-				e.log.Debug("created new session")
-				break
-			}
-			if !errors.Is(createErr, etw.ERROR_ALREADY_EXISTS) {
-				ctx.UpdateStatus(status.Failed, fmt.Sprintf("failed to create realtime session %q for provider %s: %s",
-					e.etwSession.Name, e.config.provider(), errDetail(createErr)))
-				return fmt.Errorf("realtime session could not be created: %w", createErr)
-			}
-			e.log.Debug("session already exists, trying to attach to it")
-			fallthrough
-		case false:
-			// Attach to an existing session
-			if err := e.operator.attachToExistingSession(e.etwSession); err != nil {
-				ctx.UpdateStatus(status.Failed, fmt.Sprintf("failed to attach to session %q: %s",
-					e.etwSession.Name, errDetail(err)))
-				return fmt.Errorf("unable to retrieve handler: %w", err)
-			}
-			e.log.Debug("attached to existing session")
+		if first {
+			ctx.UpdateStatus(status.Configuring, "")
+		}
+		if err := e.connect(); err != nil {
+			return err
 		}
 	}
 
-	stopConsumer := sync.OnceFunc(e.Close)
-	defer stopConsumer()
-
-	// Stop the consumer upon input cancellation (shutdown).
-	go func() {
-		<-ctx.Cancelation.Done()
-		stopConsumer()
+	// Stop the session on cancellation so that ProcessTrace returns. The
+	// same stop runs when the consumer returns for any other reason, to
+	// close the trace handle; OnceFunc makes the two paths safe together.
+	stop := sync.OnceFunc(e.Close)
+	unregister := context.AfterFunc(cancelCtx, stop)
+	defer func() {
+		unregister()
+		stop()
 	}()
 
-	// Start a goroutine to consume ETW events
-	g := new(errgroup.Group)
-	g.Go(func() error {
-		e.log.Debug("starting ETW consumer")
-		defer e.log.Debug("stopped ETW consumer")
-		// startConsumer opens the trace and then blocks inside ProcessTrace
-		// for the life of the session, so there is no point after it returns
-		// where we could report Running. Report it up front; if opening the
-		// trace fails we immediately move to Failed below.
-		ctx.UpdateStatus(status.Running, "")
-		if err = e.operator.startConsumer(e.etwSession); err != nil {
-			e.metrics.errors.Inc()
-			ctx.UpdateStatus(status.Failed, fmt.Sprintf("ETW consumer for session %q failed: %s",
-				e.etwSession.Name, errDetail(err)))
-			return fmt.Errorf("failed running ETW consumer: %w", err)
+	e.log.Debug("starting ETW consumer")
+	defer e.log.Debug("stopped ETW consumer")
+	// startConsumer opens the trace and then blocks inside ProcessTrace for
+	// the life of the session, so there is no point after it returns where
+	// we could report Running. Report it up front; if opening the trace
+	// fails the caller moves to Failed or Degraded right after.
+	ctx.UpdateStatus(status.Running, "")
+	// A Degraded that eventHealth reported for the previous session has just
+	// been overwritten by Running; its counters must agree or it would never
+	// report Degraded again.
+	e.health.reset()
+	if err := e.operator.startConsumer(e.etwSession); err != nil {
+		e.metrics.errors.Inc()
+		return &sessionError{
+			status: fmt.Sprintf("ETW consumer for session %q failed: %s", e.etwSession.Name, errDetail(err)),
+			err:    fmt.Errorf("failed running ETW consumer: %w", err),
 		}
-		return nil
-	})
+	}
+	return nil
+}
 
-	return g.Wait()
+// connect creates the realtime session or attaches to an existing one. When
+// creating fails with ERROR_ALREADY_EXISTS the input attaches instead, which
+// is also how it picks a session back up after a reconnect races the owner.
+func (e *etwInput) connect() error {
+	switch e.etwSession.NewSession {
+	case true:
+		createErr := e.operator.createRealtimeSession(e.etwSession)
+		if createErr == nil {
+			e.log.Debug("created new session")
+			return nil
+		}
+		if !errors.Is(createErr, etw.ERROR_ALREADY_EXISTS) {
+			return &sessionError{
+				status: fmt.Sprintf("failed to create realtime session %q for provider %s: %s",
+					e.etwSession.Name, e.config.provider(), errDetail(createErr)),
+				err: fmt.Errorf("realtime session could not be created: %w", createErr),
+			}
+		}
+		e.log.Debug("session already exists, trying to attach to it")
+		fallthrough
+	case false:
+		if err := e.operator.attachToExistingSession(e.etwSession); err != nil {
+			return &sessionError{
+				status: fmt.Sprintf("failed to attach to session %q: %s", e.etwSession.Name, errDetail(err)),
+				err:    fmt.Errorf("unable to retrieve handler: %w", err),
+			}
+		}
+		e.log.Debug("attached to existing session")
+	}
+	return nil
+}
+
+// sessionError is returned by runSession. It carries the message for the
+// status reporter separately from the error returned to the runner: the status
+// message names the session and provider and spells out Windows error codes,
+// while the returned error keeps the shorter form that ends up in the runner's
+// log line. Run decides whether it means Failed or Degraded.
+type sessionError struct {
+	status string
+	err    error
+}
+
+func (e *sessionError) Error() string { return e.err.Error() }
+func (e *sessionError) Unwrap() error { return e.err }
+
+// statusMessage returns the text to report for err.
+func statusMessage(err error) string {
+	var se *sessionError
+	if errors.As(err, &se) {
+		return se.status
+	}
+	return errDetail(err)
 }
 
 // eventHealth turns the per-event success/failure stream from consumeEvent
@@ -248,6 +368,15 @@ func (h *eventHealth) success() {
 	}
 	h.degraded = false
 	h.reporter.UpdateStatus(status.Running, "")
+}
+
+// reset forgets the run counts and any Degraded that was reported. It is for
+// when the input has reported a lifecycle status itself, such as Running
+// after a reconnect, so that the two views of the input's health agree.
+func (h *eventHealth) reset() {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.bad, h.good, h.degraded = 0, 0, false
 }
 
 var (
@@ -453,14 +582,16 @@ func errDetail(err error) string {
 	return msg
 }
 
-// Close stops the ETW session and logs the outcome.
+// Close stops the ETW session and logs the outcome. It runs both at shutdown
+// and after a session ends on its own, to release the trace handle before the
+// session is reused.
 func (e *etwInput) Close() {
 	if err := e.operator.stopSession(e.etwSession); err != nil {
-		e.log.Error("failed to shutdown ETW session")
+		e.log.Errorw("failed to stop ETW session", "error", err)
 		e.metrics.errors.Inc()
 		return
 	}
-	e.log.Info("successfully shutdown")
+	e.log.Info("ETW session stopped")
 }
 
 // inputMetrics handles event log metric reporting.
@@ -471,6 +602,7 @@ type inputMetrics struct {
 	events         *monitoring.Uint   // total number of events received
 	dropped        *monitoring.Uint   // total number of discarded events
 	errors         *monitoring.Uint   // total number of errors
+	reconnects     *monitoring.Uint   // total number of attempts to reconnect after the session ended
 	sourceLag      metrics.Sample     // histogram of the difference between timestamped event's creation and reading
 	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between callbacks.
 	processingTime metrics.Sample     // histogram of the elapsed time between event callback receipt and publication.
@@ -484,6 +616,7 @@ func newInputMetrics(session string, reg *monitoring.Registry, logger *logp.Logg
 		events:         monitoring.NewUint(reg, "received_events_total"),
 		dropped:        monitoring.NewUint(reg, "discarded_events_total"),
 		errors:         monitoring.NewUint(reg, "errors_total"),
+		reconnects:     monitoring.NewUint(reg, "reconnects_total"),
 		sourceLag:      metrics.NewUniformSample(1024),
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
