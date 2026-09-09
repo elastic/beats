@@ -24,9 +24,9 @@ It has been tested in the Windows versions supported by Filebeat, starting from 
 stack: ga 9.4.7+
 ```
 
-When reading from a real-time session (`provider.name`, `provider.guid` or `session`), the input keeps running if the session is stopped by another controller, for example when an administrator restarts it with `logman`. The input reports a `DEGRADED` status while the session is unavailable, retries with a backoff that grows to 30 seconds, and reports `HEALTHY` again once it has reconnected to the session. If the input created the session itself, it creates it again; if it attached to an existing session, it waits for the session to be started again. Events produced while the session is stopped, or before the input reconnects, are not recovered.
+When reading from a real-time session (`provider.name`, `provider.guid` or `session`), the input keeps running if the session is stopped by another controller, for example when an administrator restarts it with `logman`. The input reports a `DEGRADED` status while the session is unavailable, retries with a backoff that grows to 30 seconds, and reports `HEALTHY` again once it has reconnected to the session. If the input created the session itself, it creates it again. If it attached to an existing session, it waits for the session to be started again. Events produced while the session is stopped, or before the input reconnects, are not recovered.
 
-Failures during the first connection, such as a session that does not exist or insufficient privileges, still report `FAILED` and stop the input. Reading from a `file` is not affected: the input stops when it reaches the end of the file.
+Only a session that is not running is treated as a temporary condition. If a reconnection attempt fails for a reason that waiting cannot fix, such as insufficient privileges or a provider that cannot be enabled, the input reports `FAILED` and stops, as it does when the same error happens during the first connection. Reading from a `file` is not affected: the input stops when it reaches the end of the file.
 
 Example configurations:
 

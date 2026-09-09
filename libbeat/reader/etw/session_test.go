@@ -329,25 +329,6 @@ func TestStartConsumer_Success(t *testing.T) {
 	assert.Equal(t, uint64(12345), session.traceHandler, "traceHandler should be set to the mock value")
 }
 
-// stoppableSession returns a realtime session whose mocks record closed trace
-// handles in *closed and run processTrace, so tests can drive the ordering of
-// StartConsumer against StopSession.
-func stoppableSession(closed *[]uint64, processTrace func(*uint64, uint32, *FileTime, *FileTime) error) *Session {
-	return &Session{
-		Name:       "TestSession",
-		Realtime:   true,
-		Callback:   func(*EventRecord) uintptr { return 1 },
-		properties: &EventTraceProperties{},
-		openTrace:  func(*EventTraceLogfile) (uint64, error) { return 12345, nil },
-		closeTrace: func(h uint64) error {
-			*closed = append(*closed, h)
-			return nil
-		},
-		controlTrace: func(uintptr, *uint16, *EventTraceProperties, uint32) error { return nil },
-		processTrace: processTrace,
-	}
-}
-
 func TestStartConsumer_StopBeforeOpen(t *testing.T) {
 	// StopSession ran before StartConsumer had a trace handle, so it had
 	// nothing to close. StartConsumer must notice the stop once the trace is
@@ -456,4 +437,24 @@ func TestStartConsumer_ConcurrentStop(t *testing.T) {
 		t.Fatal("StartConsumer did not return; the stop was lost")
 	}
 	assert.Equal(t, []uint64{12345}, closed, "the trace handle should be closed exactly once")
+}
+
+// stoppableSession is the fixture for the tests above that drive the ordering
+// of StartConsumer against StopSession. It returns a realtime session whose
+// mocks open trace handle 12345, record every handle passed to closeTrace in
+// *closed, and run processTrace in place of ProcessTrace.
+func stoppableSession(closed *[]uint64, processTrace func(*uint64, uint32, *FileTime, *FileTime) error) *Session {
+	return &Session{
+		Name:       "TestSession",
+		Realtime:   true,
+		Callback:   func(*EventRecord) uintptr { return 1 },
+		properties: &EventTraceProperties{},
+		openTrace:  func(*EventTraceLogfile) (uint64, error) { return 12345, nil },
+		closeTrace: func(h uint64) error {
+			*closed = append(*closed, h)
+			return nil
+		},
+		controlTrace: func(uintptr, *uint16, *EventTraceProperties, uint32) error { return nil },
+		processTrace: processTrace,
+	}
 }

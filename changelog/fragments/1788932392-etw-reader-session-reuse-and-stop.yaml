@@ -27,7 +27,10 @@ description: |
     attached to again without re-registering its event callback. This is what
     lets the etw input reconnect after its session is stopped and restarted.
   - `StopSession` no longer reports an error when the session it was asked to
-    stop has already been stopped by another controller.
+    stop has already been stopped by another controller. It is a no-op when no
+    session was created or attached to, so it can be used to clean up after a
+    failed connection, and it only waits for flushed events to be processed
+    when the flush succeeded and a consumer is running.
   - A stop issued before the trace was open is no longer lost: `StartConsumer`
     closes the trace itself instead of blocking in `ProcessTrace` on a session
     that nobody will end, which could hang shutdown. The trace handle is now

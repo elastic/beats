@@ -24,8 +24,12 @@ description: |
   input exited silently, staying down until Filebeat was restarted. The input
   now treats this as a lost session: it reports Degraded, retries creating or
   attaching to the session with a backoff of up to 30 seconds, and reports
-  Running again once it has reconnected. Reading from an .etl file is not
-  affected. A new `reconnects_total` metric counts the reconnection attempts.
+  Running again once it has reconnected. Only a session that is not running
+  is retried; an attempt that fails for a reason waiting cannot fix, such as
+  insufficient privileges, reports Failed. A session that was created but
+  could not be fully configured is now stopped rather than left running.
+  Reading from an .etl file is not affected. A new `reconnects_total` metric
+  counts the reconnection attempts.
   The changes to the shared ETW reader that make a session safe to reuse are
   listed under libbeat.
 

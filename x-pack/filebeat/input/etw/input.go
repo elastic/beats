@@ -129,7 +129,8 @@ func (e *etwInput) Test(_ input.TestContext) error {
 // a clean exit and left the input stopped until Filebeat was restarted. Run
 // now treats that as a lost session: it reports Degraded and keeps trying to
 // create or attach to the session again, with backoff, until it is consuming
-// events or the input is cancelled.
+// events, the input is cancelled, or an attempt fails with an error that
+// waiting will not fix, which reports Failed.
 func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	var err error
 
@@ -172,7 +173,8 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	// privileges surface as Failed with the runner's error log. Once the
 	// session has worked, losing it is treated as transient: it is most
 	// likely being restarted by whoever owns it, so we stay Degraded and
-	// keep trying to get it back for as long as the input runs.
+	// keep trying to get it back for as long as the input runs. Only
+	// failures that waiting can fix are retried, though; see isTransient.
 	for attempt := 0; ; attempt++ {
 		err = e.runSession(ctx, cancelCtx, attempt == 0)
 		switch {
@@ -187,7 +189,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 				ctx.UpdateStatus(status.Failed, statusMessage(err))
 			}
 			return err
-		case attempt == 0 && err != nil:
+		case err != nil && (attempt == 0 || !isTransient(err)):
 			ctx.UpdateStatus(status.Failed, statusMessage(err))
 			return err
 		}
@@ -214,6 +216,17 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 }
 
+// isTransient reports whether a reconnect failure is one that waiting can
+// fix. Only "session is not running" qualifies: the owner has stopped the
+// session and has not started it again yet, which is exactly what the
+// reconnect loop exists to wait out. Anything else, such as access denied or
+// a provider that cannot be enabled, is the same class of error that fails
+// the first pass and does not clear by retrying, so the input reports Failed
+// rather than sitting Degraded forever.
+func isTransient(err error) bool {
+	return errors.Is(err, etw.ERROR_WMI_INSTANCE_NOT_FOUND)
+}
+
 // runSession connects to the session and consumes it until ProcessTrace
 // returns, then stops the session so its handles are released before any
 // reconnect. cancelCtx is ctx.Cancelation as a context.Context. first selects
@@ -225,6 +238,12 @@ func (e *etwInput) runSession(ctx input.Context, cancelCtx context.Context, firs
 			ctx.UpdateStatus(status.Configuring, "")
 		}
 		if err := e.connect(); err != nil {
+			// connect can fail part way: StartTrace succeeds and enabling a
+			// provider does not. That leaves a session running with no
+			// providers, and the next attempt would hit ERROR_ALREADY_EXISTS,
+			// attach to it and collect nothing. Tear down whatever connect
+			// built; StopSession is a no-op if it built nothing.
+			e.Close()
 			return err
 		}
 	}
@@ -375,8 +394,8 @@ func (h *eventHealth) success() {
 // after a reconnect, so that the two views of the input's health agree.
 func (h *eventHealth) reset() {
 	h.mu.Lock()
-	defer h.mu.Unlock()
 	h.bad, h.good, h.degraded = 0, 0, false
+	h.mu.Unlock()
 }
 
 var (

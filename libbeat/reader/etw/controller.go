@@ -142,6 +142,11 @@ func (s *Session) CreateRealtimeSession() error {
 // It is safe to call while StartConsumer is running on another goroutine; that
 // is how a blocked ProcessTrace is made to return. A stop that arrives before
 // the trace is open is honoured by StartConsumer once it is.
+//
+// StopSession is also safe to call when CreateRealtimeSession or
+// AttachToExistingSession failed, so that a session that was created but not
+// fully configured is not left running. After StopSession the session stays
+// stopped until Reset is called: StartConsumer returns without consuming.
 func (s *Session) StopSession() error {
 	if !s.Realtime {
 		return nil
@@ -154,16 +159,29 @@ func (s *Session) StopSession() error {
 	traceHandler := s.traceHandler
 	s.mu.Unlock()
 
-	// try to flush all buffer before stopping the session
-	_ = s.controlTrace(
-		s.handler,
-		nil,
-		s.properties,
-		EVENT_TRACE_CONTROL_FLUSH,
-	)
+	// handler is set by StartTrace or by the QUERY in
+	// AttachToExistingSession. Without it there is no session to flush or
+	// stop, which is the case when connecting failed before either succeeded.
+	hasSession := s.handler != 0
 
-	// give time to process any flushed events
-	time.Sleep(time.Second)
+	if hasSession {
+		// Flush so that buffered events reach the consumer before the trace
+		// is closed. Waiting for them to be processed only makes sense when
+		// the flush went through and a consumer is processing them: a
+		// session that another controller has already stopped fails the
+		// flush, and a consumer that never opened its trace has nothing to
+		// deliver to. Skipping the wait in those cases keeps a reconnect
+		// from paying a second for nothing.
+		flushErr := s.controlTrace(
+			s.handler,
+			nil,
+			s.properties,
+			EVENT_TRACE_CONTROL_FLUSH,
+		)
+		if flushErr == nil && isValidHandler(traceHandler) {
+			time.Sleep(time.Second)
+		}
+	}
 
 	if isValidHandler(traceHandler) {
 		// Attempt to close the trace and handle potential errors.
@@ -172,7 +190,7 @@ func (s *Session) StopSession() error {
 		}
 	}
 
-	if s.NewSession {
+	if s.NewSession && hasSession {
 		// If we created the session, send a control command to stop it.
 		err := s.controlTrace(
 			s.handler,

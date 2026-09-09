@@ -532,6 +532,129 @@ func Test_RunEtwInput_RecreateOwnSessionAfterItStops(t *testing.T) {
 	assert.Equal(t, int32(1), mockOperator.resets.Load(), "the session should be reset once per reconnect")
 }
 
+func Test_RunEtwInput_ReconnectPermanentErrorFails(t *testing.T) {
+	// The session was lost and the reconnect attempt fails with an error that
+	// waiting will not fix. Staying Degraded forever would hide a problem that
+	// needs a person, so the input reports Failed and returns, exactly as it
+	// would had the same error happened on the first pass.
+	mockOperator := &mockSessionOperator{}
+	mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+		return &etw.Session{Name: "MySession", Realtime: true, NewSession: false}, nil
+	}
+	var attaches atomic.Int32
+	mockOperator.attachToExistingSessionFunc = func(*etw.Session) error {
+		if attaches.Add(1) == 1 {
+			return nil
+		}
+		return fmt.Errorf("failed to get handler: %w", etw.ERROR_ACCESS_DENIED)
+	}
+	mockOperator.startConsumerFunc = func(*etw.Session) error { return nil } // Session lost at once.
+
+	reporter := &recordingReporter{}
+	inputCtx := input.Context{
+		Cancelation:     t.Context(),
+		Logger:          logptest.NewTestingLogger(t, ""),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}.WithStatusReporter(reporter)
+
+	etwInput := &etwInput{
+		config:   config{Session: "MySession"},
+		operator: mockOperator,
+		backoff:  testBackoff(),
+	}
+
+	done := make(chan error, 1)
+	go func() { done <- etwInput.Run(inputCtx, nil) }()
+	select {
+	case err := <-done:
+		assert.ErrorContains(t, err, "unable to retrieve handler", "the permanent error should be returned to the runner")
+		assert.ErrorIs(t, err, etw.ERROR_ACCESS_DENIED, "the underlying Windows error should be preserved")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run kept retrying a permanent error instead of failing")
+	}
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Running, status.Degraded, status.Failed}, reporter.statuses(),
+		"a permanent reconnect failure should end in Failed, not stay Degraded")
+	assert.Contains(t, reporter.lastMsg(), "Performance Log Users",
+		"the Failed message should carry the same detail a first-pass failure would")
+	assert.Equal(t, int32(2), attaches.Load(), "there should be exactly one reconnect attempt")
+}
+
+func Test_RunEtwInput_ConnectFailureStopsSession(t *testing.T) {
+	// Creating a session can fail after StartTrace has succeeded, for example
+	// when a provider cannot be enabled. Without a stop, that half-configured
+	// session stays running; the next attempt would then get
+	// ERROR_ALREADY_EXISTS, attach to it, and never see an event.
+	tests := []struct {
+		name string
+		// failOnCreate is the create call that fails: 1 is the first pass,
+		// 2 is the first reconnect attempt.
+		failOnCreate int32
+		wantStatus   []status.Status
+		wantStops    int32
+	}{
+		{
+			name:         "first pass",
+			failOnCreate: 1,
+			wantStatus:   []status.Status{status.Starting, status.Configuring, status.Failed},
+			wantStops:    1, // Teardown after the failed create.
+		},
+		{
+			name:         "reconnect",
+			failOnCreate: 2,
+			wantStatus:   []status.Status{status.Starting, status.Configuring, status.Running, status.Degraded, status.Failed},
+			wantStops:    2, // Cleanup after the loss, then teardown after the failed create.
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockOperator := &mockSessionOperator{}
+			mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+				return &etw.Session{Name: "MySession", Realtime: true, NewSession: true}, nil
+			}
+			var creates, stops atomic.Int32
+			mockOperator.createRealtimeSessionFunc = func(*etw.Session) error {
+				if creates.Add(1) == test.failOnCreate {
+					return fmt.Errorf("failed to enable trace: %w", etw.ERROR_INVALID_PARAMETER)
+				}
+				return nil
+			}
+			mockOperator.attachToExistingSessionFunc = func(*etw.Session) error {
+				t.Error("a create failure other than ERROR_ALREADY_EXISTS must not fall back to attach")
+				return nil
+			}
+			mockOperator.startConsumerFunc = func(*etw.Session) error { return nil } // Session lost at once.
+			mockOperator.stopSessionFunc = func(*etw.Session) error {
+				stops.Add(1)
+				return nil
+			}
+
+			reporter := &recordingReporter{}
+			inputCtx := input.Context{
+				Cancelation:     t.Context(),
+				Logger:          logptest.NewTestingLogger(t, ""),
+				MetricsRegistry: monitoring.NewRegistry(),
+			}.WithStatusReporter(reporter)
+
+			etwInput := &etwInput{
+				config:   config{ProviderName: "Microsoft-Windows-Provider", SessionName: "MySession"},
+				operator: mockOperator,
+				backoff:  testBackoff(),
+			}
+
+			done := make(chan error, 1)
+			go func() { done <- etwInput.Run(inputCtx, nil) }()
+			select {
+			case err := <-done:
+				assert.ErrorContains(t, err, "realtime session could not be created", "the create error should be returned")
+			case <-time.After(5 * time.Second):
+				t.Fatal("Run did not return after the create failure")
+			}
+			assert.Equal(t, test.wantStatus, reporter.statuses(), "create failure should end in Failed")
+			assert.Equal(t, test.wantStops, stops.Load(), "the session must be stopped after a failed create so nothing is left running")
+		})
+	}
+}
+
 func Test_RunEtwInput_LogfileDoesNotReconnect(t *testing.T) {
 	// For an .etl file ProcessTrace returning means end of file. That is
 	// the input finishing its job, not a lost session.

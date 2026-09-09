@@ -80,7 +80,9 @@ type Session struct {
 	// stopping records that StopSession has been called. StartConsumer checks
 	// it once the trace is open: a stop that arrived before then found no
 	// handle to close, and without this check ProcessTrace would block on a
-	// session that nobody is going to end.
+	// session that nobody is going to end. Only Reset clears it, so a
+	// session that has been stopped cannot be consumed again until it has
+	// been reset.
 	stopping bool
 
 	// Pointers to functions that make calls to the Windows API.
@@ -209,12 +211,14 @@ func NewSession(conf Config) (*Session, error) {
 
 // Reset prepares the session to be created or attached to again after its
 // consumer has returned, which for a realtime session happens when another
-// controller stops it. StopSession should be called first to release the
-// trace handle. The handles from the previous run and the pending stop are
-// discarded and the session properties are rebuilt, because StartTrace and
-// ControlTrace write into the properties buffer (session GUID, handle, live
-// buffer counts) and feeding the previous session's output back in as input
-// is not safe.
+// controller stops it. Callers must call StopSession first, to release the
+// trace handle, and then Reset before starting the session again: Reset is
+// the only thing that clears the stop recorded by StopSession, and until it
+// runs StartConsumer returns without consuming. The handles from the previous
+// run and the pending stop are discarded and the session properties are
+// rebuilt, because StartTrace and ControlTrace write into the properties
+// buffer (session GUID, handle, live buffer counts) and feeding the previous
+// session's output back in as input is not safe.
 //
 // Callback is kept as is on purpose: StartConsumer registers it with
 // syscall.NewCallback, which dedupes on the function value and never frees
@@ -235,7 +239,8 @@ func (s *Session) Reset() {
 // blocks until the trace ends. If StopSession was called before the trace was
 // open, StartConsumer closes the trace itself and returns nil without
 // processing events, the same outcome as a stop that arrives while
-// ProcessTrace is running.
+// ProcessTrace is running. This includes a StopSession from a previous run:
+// a stopped session must be Reset before it is started again.
 func (s *Session) StartConsumer() error {
 	var elf EventTraceLogfile
 
