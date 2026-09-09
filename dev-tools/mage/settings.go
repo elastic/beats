@@ -41,7 +41,7 @@ import (
 )
 
 const (
-	fpmVersion = "1.13.1"
+	fpmVersion = "1.18.0"
 
 	// Docker images. See https://github.com/elastic/golang-crossbuild.
 	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
