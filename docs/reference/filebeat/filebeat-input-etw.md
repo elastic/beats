@@ -241,6 +241,42 @@ filebeat.inputs:
 ```
 
 
+### `failure_threshold` [_failure_threshold]
+
+```{applies_to}
+stack: ga 9.4.7+
+```
+
+The number of consecutive events that must fail to be read before the input reports a `DEGRADED` status to {{agent}}. Default is `3`. Set to `0` to never report `DEGRADED` for unreadable events. Failures are still counted in the input metrics and logged.
+
+Fatal errors such as a missing provider, a session that cannot be created or attached to, or insufficient privileges always report a `FAILED` status and are not affected by this setting.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  failure_threshold: 5
+```
+
+
+### `recovery_threshold` [_recovery_threshold]
+
+```{applies_to}
+stack: ga 9.4.7+
+```
+
+The number of consecutive events that must be read successfully, after the input has reported `DEGRADED`, before it reports `HEALTHY` again. Default is `1`. Must be at least `1` unless `failure_threshold` is `0`. Raise this value if a provider alternates between bursts of readable and unreadable events and you want the status to settle before it recovers.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  recovery_threshold: 5
+```
+
+
 ## Common options [filebeat-input-etw-common-options]
 
 The following configuration options are supported by all inputs.
