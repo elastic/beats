@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Add cgroup_cpu_usage_percent field to autoops_es node_stats
-component: metricbeat
