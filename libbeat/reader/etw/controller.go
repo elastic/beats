@@ -139,10 +139,20 @@ func (s *Session) CreateRealtimeSession() error {
 }
 
 // StopSession closes the ETW session and associated handles if they were created.
+// It is safe to call while StartConsumer is running on another goroutine; that
+// is how a blocked ProcessTrace is made to return. A stop that arrives before
+// the trace is open is honoured by StartConsumer once it is.
 func (s *Session) StopSession() error {
 	if !s.Realtime {
 		return nil
 	}
+
+	// Record the stop and take the trace handle in one step; see
+	// StartConsumer for why the two must not be observed separately.
+	s.mu.Lock()
+	s.stopping = true
+	traceHandler := s.traceHandler
+	s.mu.Unlock()
 
 	// try to flush all buffer before stopping the session
 	_ = s.controlTrace(
@@ -155,21 +165,28 @@ func (s *Session) StopSession() error {
 	// give time to process any flushed events
 	time.Sleep(time.Second)
 
-	if isValidHandler(s.traceHandler) {
+	if isValidHandler(traceHandler) {
 		// Attempt to close the trace and handle potential errors.
-		if err := s.closeTrace(s.traceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
+		if err := s.closeTrace(traceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
 			return fmt.Errorf("failed to close trace: %w", err)
 		}
 	}
 
 	if s.NewSession {
 		// If we created the session, send a control command to stop it.
-		return s.controlTrace(
+		err := s.controlTrace(
 			s.handler,
 			nil,
 			s.properties,
 			EVENT_TRACE_CONTROL_STOP,
 		)
+		// Another controller may already have stopped the session; that is
+		// what brings a realtime consumer here when it reconnects, and the
+		// outcome is the one we wanted.
+		if errors.Is(err, ERROR_WMI_INSTANCE_NOT_FOUND) {
+			return nil
+		}
+		return err
 	}
 
 	return nil

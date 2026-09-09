@@ -209,3 +209,42 @@ func TestStopSession_Success(t *testing.T) {
 	err := session.StopSession()
 	assert.NoError(t, err)
 }
+
+func TestStopSession_AlreadyStopped(t *testing.T) {
+	// When another controller has already stopped the session, the STOP
+	// control fails with ERROR_WMI_INSTANCE_NOT_FOUND. The session is in the
+	// state we asked for, so that is not an error; anything else still is.
+	tests := []struct {
+		name    string
+		stopErr error
+		wantErr error
+	}{
+		{name: "session already gone", stopErr: ERROR_WMI_INSTANCE_NOT_FOUND, wantErr: nil},
+		{name: "other stop failures are reported", stopErr: ERROR_ACCESS_DENIED, wantErr: ERROR_ACCESS_DENIED},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			closed := false
+			session := &Session{
+				Realtime:     true,
+				NewSession:   true,
+				traceHandler: 12345,
+				properties:   &EventTraceProperties{},
+				closeTrace: func(uint64) error {
+					closed = true
+					return nil
+				},
+				controlTrace: func(_ uintptr, _ *uint16, _ *EventTraceProperties, controlCode uint32) error {
+					if controlCode == EVENT_TRACE_CONTROL_STOP {
+						return test.stopErr
+					}
+					return nil
+				},
+			}
+
+			err := session.StopSession()
+			assert.ErrorIs(t, err, test.wantErr, "StopSession with STOP failing with %v", test.stopErr)
+			assert.True(t, closed, "trace handle should be closed before the session is stopped")
+		})
+	}
+}
