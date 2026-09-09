@@ -238,12 +238,6 @@ func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Conf
 	return k, nil
 }
 
-// attachSaramaMetrics registers Sarama's go-metrics on parent instead of
-// monitoring.Default. parent should be the input's MetricsRegistry so each
-// Kafka input (and each filebeatreceiver) has its own tree. Sharing Default
-// panics with "name bytes_read already used" when several inputs open brokers
-// at once. A nil parent gets a private registry so CheckConfig/tests stay off
-// the process global.
 func attachSaramaMetrics(k *sarama.Config, parent *monitoring.Registry, logger *logp.Logger) {
 	if parent == nil {
 		parent = monitoring.NewRegistry()

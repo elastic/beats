@@ -11,18 +11,11 @@
 kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
-summary: Register Filebeat Kafka input Sarama metrics on the per-input registry
+summary: Fix race condition in Kafka input when multiple inputs are configured.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: >
-  The Kafka input registered Sarama go-metrics on the process-global
-  monitoring.Default under filebeat.inputs.kafka. Multiple inputs (or
-  per-stream filebeatreceivers) opening brokers at once raced on
-  Registry.Add("bytes_read") and panicked with "name bytes_read already used".
-  Metrics now attach at Run on the input's MetricsRegistry, matching other
-  Filebeat inputs. bytes_read and bytes_write are reported per input under
-  the dataset namespace instead of as process-global stats.
 
 component: filebeat
 
