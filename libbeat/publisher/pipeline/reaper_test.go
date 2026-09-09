@@ -227,13 +227,11 @@ func TestReaperConcurrentAcquireRelease(t *testing.T) {
 	const N = 200
 	var wg sync.WaitGroup
 	for range N {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			p := new(Pipeline)
 			r.acquire(p)
 			r.release(p)
-		}()
+		})
 	}
 	wg.Wait()
 }

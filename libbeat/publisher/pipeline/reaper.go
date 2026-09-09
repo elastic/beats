@@ -62,11 +62,7 @@ func (r *clientReaper) acquire(p *Pipeline) {
 		wg := &sync.WaitGroup{}
 		r.runWG = wg
 		done := r.done // capture once; see invariant 1
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			r.run(done)
-		}()
+		wg.Go(func() { r.run(done) })
 	}
 	r.refs++
 }
@@ -93,7 +89,7 @@ func (r *clientReaper) release(p *Pipeline) {
 	// After delete(r.pending, p) above, future sweeps cannot reach p's
 	// clients. Acquiring sweepMu ensures the current sweep — if any — has
 	// completed before we return. See invariant 3.
-	r.sweepMu.Lock()
+	r.sweepMu.Lock() //nolint:staticcheck // SA2001: intentional barrier — ensures any in-flight sweep completes
 	r.sweepMu.Unlock()
 
 	if wg != nil {
