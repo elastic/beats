@@ -35,10 +35,7 @@ import (
 // Tests must use this rather than sharedReaper to avoid cross-test
 // interference and satisfy the goroutine-leak checker.
 func newTestReaper() *clientReaper {
-	return &clientReaper{
-		pending: make(map[*Pipeline]map[*client]struct{}),
-		notify:  make(chan struct{}, 1),
-	}
+	return newClientReaper()
 }
 
 // newDrainedClient returns a client whose events are already acknowledged

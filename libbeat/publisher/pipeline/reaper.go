@@ -31,20 +31,48 @@ const reaperInterval = 50 * time.Millisecond
 // sharedReaper is the process-wide client reaper, shared across all pipelines.
 // It is started on the first pipeline connect and stopped when the last
 // pipeline disconnects. It must not be used during package init.
-var sharedReaper = &clientReaper{
-	pending: make(map[*Pipeline]map[*client]struct{}),
-	notify:  make(chan struct{}, 1),
+var sharedReaper = newClientReaper()
+
+func newClientReaper() *clientReaper {
+	r := &clientReaper{
+		pending: make(map[*Pipeline]map[*client]struct{}),
+		notify:  make(chan struct{}, 1),
+	}
+	r.noSweep = sync.NewCond(&r.mu)
+	return r
 }
 
 // clientReaper finalizes Closed-but-not-yet-drained clients across all
 // pipelines in a single goroutine rather than one per pipeline. Pending
 // clients are grouped by pipeline so release can drop all of a disconnecting
 // pipeline's entries atomically.
+//
+// Three design invariants, each addressing a specific correctness hazard:
+//
+//  1. done is captured once into a local variable inside the goroutine
+//     closure (not re-read from r.done inside run). This prevents a data
+//     race with a concurrent acquire() that overwrites r.done.
+//
+//  2. Each goroutine generation owns its own *sync.WaitGroup (runWG), created
+//     fresh in acquire() before the goroutine starts. release() captures runWG
+//     before releasing r.mu and waits on that specific WaitGroup — not a
+//     shared r.wg field. This prevents concurrent Add/Wait violations when a
+//     new acquire() races with a release() that is still in wg.Wait().
+//
+//  3. sweeping is set to true (under mu) before any c.disconnect() call
+//     begins, and cleared to false (under mu, with a Broadcast on noSweep)
+//     once all calls in the batch finish. release() waits on noSweep until
+//     sweeping is false after deleting p from pending. Because both the
+//     sweeping=true assignment and delete(r.pending, p) are serialised by mu,
+//     a client from p can only be present in the current sweep's ready list
+//     if sweeping was set to true before release() acquired mu — in which
+//     case the Wait loop will block until Broadcast signals completion.
 type clientReaper struct {
-	mu      sync.Mutex
-	sweepMu sync.Mutex // held during c.disconnect() calls; see invariant 3
-	pending map[*Pipeline]map[*client]struct{}
-	notify  chan struct{}
+	mu       sync.Mutex
+	noSweep  *sync.Cond // broadcast when sweeping → false; uses mu as its lock
+	sweeping bool       // true while c.disconnect() calls are in progress
+	pending  map[*Pipeline]map[*client]struct{}
+	notify   chan struct{}
 
 	refs  int
 	done  chan struct{}
@@ -83,14 +111,12 @@ func (r *clientReaper) release(p *Pipeline) {
 		close(r.done)
 		wg = r.runWG
 	}
-	r.mu.Unlock()
-
 	// Wait for any in-flight sweep to finish its c.disconnect() calls.
-	// After delete(r.pending, p) above, future sweeps cannot reach p's
-	// clients. Acquiring sweepMu ensures the current sweep — if any — has
-	// completed before we return. See invariant 3.
-	r.sweepMu.Lock() //nolint:staticcheck // SA2001: intentional barrier — ensures any in-flight sweep completes
-	r.sweepMu.Unlock()
+	// See invariant 3.
+	for r.sweeping {
+		r.noSweep.Wait()
+	}
+	r.mu.Unlock()
 
 	if wg != nil {
 		wg.Wait()
@@ -121,15 +147,6 @@ func (r *clientReaper) add(p *Pipeline, c *client) {
 // from r.done to avoid a data race with acquire() — see invariant 1.
 func (r *clientReaper) run(done <-chan struct{}) {
 	for {
-		// Hold sweepMu for the entire sweep so release() cannot slip between
-		// the moment the client is removed from r.pending (under r.mu) and
-		// the moment c.disconnect() is called. Without this, release() could
-		// observe an empty pending set, acquire-and-release sweepMu before
-		// the reaper reaches it, and return — leaving c.disconnect() called
-		// after the test/pipeline that owns the client logger has finished.
-		// Lock ordering: sweepMu → r.mu (release() takes r.mu then sweepMu,
-		// never both simultaneously, so no deadlock is possible).
-		r.sweepMu.Lock()
 		r.mu.Lock()
 		var ready []*client
 		total := 0
@@ -144,12 +161,21 @@ func (r *clientReaper) run(done <-chan struct{}) {
 				}
 			}
 		}
+		if len(ready) > 0 {
+			r.sweeping = true
+		}
 		r.mu.Unlock()
 
 		for _, c := range ready {
 			c.disconnect()
 		}
-		r.sweepMu.Unlock()
+
+		if len(ready) > 0 {
+			r.mu.Lock()
+			r.sweeping = false
+			r.noSweep.Broadcast()
+			r.mu.Unlock()
+		}
 
 		if total == 0 {
 			select {
