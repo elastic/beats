@@ -33,6 +33,7 @@ import (
 type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
+<<<<<<< HEAD
 	id                     string
 	manager                *InputManager
 	ackCH                  *updateChan
@@ -43,6 +44,21 @@ type managedInput struct {
 	cleanTimeout           time.Duration
 	harvesterLimit         uint64
 	readUntilEOF           ReadUntilEOFConfig
+=======
+	id                 string
+	manager            *InputManager
+	ackCH              *updateChan
+	sourceIdentifier   *SourceIdentifier
+	previousMatchers   []InputMatcher
+	takeOverAnyID      bool
+	prospector         Prospector
+	harvester          Harvester
+	cleanTimeout       time.Duration
+	harvesterLimit     uint64
+	readUntilEOF       ReadUntilEOFConfig
+	backoff            BackoffConfig
+	stateCheckInterval time.Duration
+>>>>>>> e3e6669 (filestream: add take_over.from_any_id for ID-agnostic state takeover (#53122))
 }
 
 // Name is required to implement the v2.Input interface
@@ -66,7 +82,18 @@ func (inp *managedInput) Run(
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
+<<<<<<< HEAD
 	// Setup cancellation using a custom cancel context. All workers will be
+=======
+	prospectorStore, err := inp.manager.getRetainedStore()
+	if err != nil {
+		return err
+	}
+	defer prospectorStore.Release()
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousMatchers, inp.takeOverAnyID)
+
+	// Setup cancellation using a custom cancel context. All harvesters will be
+>>>>>>> e3e6669 (filestream: add take_over.from_any_id for ID-agnostic state takeover (#53122))
 	// stopped if one failed badly by returning an error.
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
