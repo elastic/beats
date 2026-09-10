@@ -454,7 +454,7 @@ func Test_RunEtwInput_ReconnectAfterAttachedSessionStops(t *testing.T) {
 	etwInput := &etwInput{
 		config:   config{Session: "MySession"},
 		operator: mockOperator,
-		backoff:  testBackoff(),
+		backoff:  testBackoff(ctx.Done()),
 	}
 
 	done := make(chan error, 1)
@@ -515,7 +515,7 @@ func Test_RunEtwInput_RecreateOwnSessionAfterItStops(t *testing.T) {
 	etwInput := &etwInput{
 		config:   config{ProviderName: "Microsoft-Windows-Provider", SessionName: "MySession"},
 		operator: mockOperator,
-		backoff:  testBackoff(),
+		backoff:  testBackoff(ctx.Done()),
 	}
 
 	done := make(chan error, 1)
@@ -561,7 +561,7 @@ func Test_RunEtwInput_ReconnectPermanentErrorFails(t *testing.T) {
 	etwInput := &etwInput{
 		config:   config{Session: "MySession"},
 		operator: mockOperator,
-		backoff:  testBackoff(),
+		backoff:  testBackoff(t.Context().Done()),
 	}
 
 	done := make(chan error, 1)
@@ -639,7 +639,7 @@ func Test_RunEtwInput_ConnectFailureStopsSession(t *testing.T) {
 			etwInput := &etwInput{
 				config:   config{ProviderName: "Microsoft-Windows-Provider", SessionName: "MySession"},
 				operator: mockOperator,
-				backoff:  testBackoff(),
+				backoff:  testBackoff(t.Context().Done()),
 			}
 
 			done := make(chan error, 1)
@@ -703,7 +703,7 @@ func Test_RunEtwInput_LogfileDoesNotReconnect(t *testing.T) {
 			etwInput := &etwInput{
 				config:   config{Logfile: `C:\logs\trace.etl`},
 				operator: mockOperator,
-				backoff:  testBackoff(),
+				backoff:  testBackoff(t.Context().Done()),
 			}
 
 			done := make(chan error, 1)
@@ -749,7 +749,7 @@ func Test_RunEtwInput_CancelWhileWaitingToReconnect(t *testing.T) {
 		operator: mockOperator,
 		// Long enough that the test can only pass if cancellation
 		// interrupts the wait.
-		backoff: backoff.NewEqualJitterBackoff(time.Hour, time.Hour),
+		backoff: backoff.NewEqualJitterBackoff(ctx.Done(), time.Hour, time.Hour),
 	}
 
 	done := make(chan error, 1)
@@ -798,9 +798,10 @@ func lostSessionConsumer(op *mockSessionOperator, ctx context.Context) *atomic.I
 }
 
 // testBackoff returns a backoff short enough that reconnect tests run in
-// milliseconds rather than the seconds production waits.
-func testBackoff() backoff.Backoff {
-	return backoff.NewEqualJitterBackoff(time.Millisecond, 5*time.Millisecond)
+// milliseconds rather than the seconds production waits. done should be the
+// test's cancellation, so that a wait in progress ends with the test.
+func testBackoff(done <-chan struct{}) backoff.Backoff {
+	return backoff.NewEqualJitterBackoff(done, time.Millisecond, 5*time.Millisecond)
 }
 
 // waitForUpdateCount blocks until reporter has recorded at least n status

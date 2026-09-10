@@ -90,7 +90,8 @@ type etwInput struct {
 	operator   sessionOperator
 	health     *eventHealth
 	// backoff paces reconnection attempts. Nil means use the package
-	// defaults; tests set a short one.
+	// defaults, bound to the input's cancellation; tests set a short one
+	// bound to their own context.
 	backoff backoff.Backoff
 }
 
@@ -163,11 +164,11 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	e.log.Info("Starting " + inputName + " input")
 	defer e.log.Info(inputName + " input stopped")
 
+	cancelCtx := ctxtool.FromCanceller(ctx.Cancelation)
 	b := e.backoff
 	if b == nil {
-		b = backoff.NewEqualJitterBackoff(reconnectInitialBackoff, reconnectMaxBackoff)
+		b = backoff.NewEqualJitterBackoff(cancelCtx.Done(), reconnectInitialBackoff, reconnectMaxBackoff)
 	}
-	cancelCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	// The first pass fails fast so that a bad configuration or missing
 	// privileges surface as Failed with the runner's error log. Once the
@@ -206,7 +207,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 				e.etwSession.Name, attempt+1))
 			b.Reset()
 		}
-		if !b.Wait(cancelCtx) {
+		if !b.Wait() {
 			return nil
 		}
 		// Counted after the wait so that it only covers attempts that are
