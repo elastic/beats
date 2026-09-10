@@ -13,6 +13,7 @@ import (
 	"slices"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -34,6 +36,13 @@ type mockSessionOperator struct {
 	createRealtimeSessionFunc   func(session *etw.Session) error
 	startConsumerFunc           func(session *etw.Session) error
 	stopSessionFunc             func(session *etw.Session) error
+
+	// resets counts resetSession calls, one per reconnect attempt.
+	resets atomic.Int32
+}
+
+func (m *mockSessionOperator) resetSession(*etw.Session) {
+	m.resets.Add(1)
 }
 
 func (m *mockSessionOperator) newSession(config config) (*etw.Session, error) {
@@ -122,7 +131,7 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 	// Setup input
 	reporter := &recordingReporter{}
 	inputCtx := input.Context{
-		Cancelation:     nil,
+		Cancelation:     t.Context(),
 		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}.WithStatusReporter(reporter)
@@ -171,7 +180,7 @@ func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
 	// Setup input
 	reporter := &recordingReporter{}
 	inputCtx := input.Context{
-		Cancelation:     nil,
+		Cancelation:     t.Context(),
 		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}.WithStatusReporter(reporter)
@@ -223,7 +232,7 @@ func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
 	// Setup input
 	reporter := &recordingReporter{}
 	inputCtx := input.Context{
-		Cancelation:     nil,
+		Cancelation:     t.Context(),
 		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}.WithStatusReporter(reporter)
@@ -413,6 +422,397 @@ func Test_RunEtwInput_Success(t *testing.T) {
 		"a healthy start should report Starting, Configuring, Running exactly once each")
 }
 
+func Test_RunEtwInput_ReconnectAfterAttachedSessionStops(t *testing.T) {
+	// The input is attached to a session owned by someone else, who stops it
+	// and restarts it a little later. ProcessTrace returns success when the
+	// session stops, so the first startConsumer returns nil unprompted.
+	// Attaching then fails until the owner has restarted the session.
+	mockOperator := &mockSessionOperator{}
+	mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+		return &etw.Session{Name: "MySession", Realtime: true, NewSession: false}, nil
+	}
+	var attaches atomic.Int32
+	mockOperator.attachToExistingSessionFunc = func(*etw.Session) error {
+		// 1: initial attach. 2, 3: session still gone. 4: it is back.
+		switch attaches.Add(1) {
+		case 2, 3:
+			return fmt.Errorf("session is not running: %w", etw.ERROR_WMI_INSTANCE_NOT_FOUND)
+		}
+		return nil
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	consumes := lostSessionConsumer(mockOperator, ctx)
+	reporter := &recordingReporter{}
+	inputCtx := input.Context{
+		Cancelation:     ctx,
+		Logger:          logptest.NewTestingLogger(t, ""),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}.WithStatusReporter(reporter)
+
+	etwInput := &etwInput{
+		config:   config{Session: "MySession"},
+		operator: mockOperator,
+		backoff:  testBackoff(ctx.Done()),
+	}
+
+	done := make(chan error, 1)
+	go func() { done <- etwInput.Run(inputCtx, nil) }()
+
+	want := []status.Status{
+		status.Starting, status.Configuring, status.Running, // First connection.
+		status.Degraded, // Session stopped by its owner.
+		status.Degraded, // Reconnect attempt 2 could not attach.
+		status.Degraded, // Reconnect attempt 3 could not attach.
+		status.Running,  // Reattached.
+	}
+	waitForUpdateCount(t, reporter, len(want))
+	cancel()
+	assert.NoError(t, <-done, "Run should exit cleanly on cancellation after reconnecting")
+
+	assert.Equal(t, want, reporter.statuses(), "input should stay Degraded while the session is gone and recover to Running")
+	updates := reporter.updates
+	assert.Equal(t, `ETW session "MySession" stopped; reconnecting (attempt 1)`, updates[3].msg,
+		"losing the session should say so and count the attempt")
+	assert.Equal(t, fmt.Sprintf(`failed to attach to session "MySession": session is not running: %v (windows error %d); reconnecting (attempt 2)`,
+		etw.ERROR_WMI_INSTANCE_NOT_FOUND, uint32(etw.ERROR_WMI_INSTANCE_NOT_FOUND)), updates[4].msg,
+		"a failed reconnect should carry the attach error and the next attempt number")
+	assert.Equal(t, int32(4), attaches.Load(), "one initial attach plus one per reconnect attempt")
+	assert.Equal(t, int32(2), consumes.Load(), "the consumer should only start once the session is back")
+	assert.Equal(t, int32(3), mockOperator.resets.Load(), "the session should be reset before every reconnect attempt")
+	assert.Equal(t, uint64(3), etwInput.metrics.reconnects.Get(), "reconnects_total should count every attempt")
+}
+
+func Test_RunEtwInput_RecreateOwnSessionAfterItStops(t *testing.T) {
+	// The input created the session itself and someone stops it from
+	// outside. Recreating it does not depend on anyone else, so the first
+	// reconnect attempt succeeds.
+	mockOperator := &mockSessionOperator{}
+	mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+		return &etw.Session{Name: "MySession", Realtime: true, NewSession: true}, nil
+	}
+	var creates, attaches atomic.Int32
+	mockOperator.createRealtimeSessionFunc = func(*etw.Session) error {
+		creates.Add(1)
+		return nil
+	}
+	mockOperator.attachToExistingSessionFunc = func(*etw.Session) error {
+		attaches.Add(1)
+		return nil
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	consumes := lostSessionConsumer(mockOperator, ctx)
+	reporter := &recordingReporter{}
+	inputCtx := input.Context{
+		Cancelation:     ctx,
+		Logger:          logptest.NewTestingLogger(t, ""),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}.WithStatusReporter(reporter)
+
+	etwInput := &etwInput{
+		config:   config{ProviderName: "Microsoft-Windows-Provider", SessionName: "MySession"},
+		operator: mockOperator,
+		backoff:  testBackoff(ctx.Done()),
+	}
+
+	done := make(chan error, 1)
+	go func() { done <- etwInput.Run(inputCtx, nil) }()
+
+	want := []status.Status{status.Starting, status.Configuring, status.Running, status.Degraded, status.Running}
+	waitForUpdateCount(t, reporter, len(want))
+	cancel()
+	assert.NoError(t, <-done, "Run should exit cleanly on cancellation after reconnecting")
+
+	assert.Equal(t, want, reporter.statuses(), "a recreated session should go Degraded then straight back to Running")
+	assert.Equal(t, int32(2), creates.Load(), "the session should be created again after it was stopped")
+	assert.Equal(t, int32(0), attaches.Load(), "creating succeeded, so there should be no attach fallback")
+	assert.Equal(t, int32(2), consumes.Load(), "the consumer should be started for each session")
+	assert.Equal(t, int32(1), mockOperator.resets.Load(), "the session should be reset once per reconnect")
+}
+
+func Test_RunEtwInput_ReconnectPermanentErrorFails(t *testing.T) {
+	// The session was lost and the reconnect attempt fails with an error that
+	// waiting will not fix. Staying Degraded forever would hide a problem that
+	// needs a person, so the input reports Failed and returns, exactly as it
+	// would had the same error happened on the first pass.
+	mockOperator := &mockSessionOperator{}
+	mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+		return &etw.Session{Name: "MySession", Realtime: true, NewSession: false}, nil
+	}
+	var attaches atomic.Int32
+	mockOperator.attachToExistingSessionFunc = func(*etw.Session) error {
+		if attaches.Add(1) == 1 {
+			return nil
+		}
+		return fmt.Errorf("failed to get handler: %w", etw.ERROR_ACCESS_DENIED)
+	}
+	mockOperator.startConsumerFunc = func(*etw.Session) error { return nil } // Session lost at once.
+
+	reporter := &recordingReporter{}
+	inputCtx := input.Context{
+		Cancelation:     t.Context(),
+		Logger:          logptest.NewTestingLogger(t, ""),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}.WithStatusReporter(reporter)
+
+	etwInput := &etwInput{
+		config:   config{Session: "MySession"},
+		operator: mockOperator,
+		backoff:  testBackoff(t.Context().Done()),
+	}
+
+	done := make(chan error, 1)
+	go func() { done <- etwInput.Run(inputCtx, nil) }()
+	select {
+	case err := <-done:
+		assert.ErrorContains(t, err, "unable to retrieve handler", "the permanent error should be returned to the runner")
+		assert.ErrorIs(t, err, etw.ERROR_ACCESS_DENIED, "the underlying Windows error should be preserved")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run kept retrying a permanent error instead of failing")
+	}
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Running, status.Degraded, status.Failed}, reporter.statuses(),
+		"a permanent reconnect failure should end in Failed, not stay Degraded")
+	assert.Contains(t, reporter.lastMsg(), "Performance Log Users",
+		"the Failed message should carry the same detail a first-pass failure would")
+	assert.Equal(t, int32(2), attaches.Load(), "there should be exactly one reconnect attempt")
+}
+
+func Test_RunEtwInput_ConnectFailureStopsSession(t *testing.T) {
+	// Creating a session can fail after StartTrace has succeeded, for example
+	// when a provider cannot be enabled. Without a stop, that half-configured
+	// session stays running; the next attempt would then get
+	// ERROR_ALREADY_EXISTS, attach to it, and never see an event.
+	tests := []struct {
+		name string
+		// failOnCreate is the create call that fails: 1 is the first pass,
+		// 2 is the first reconnect attempt.
+		failOnCreate int32
+		wantStatus   []status.Status
+		wantStops    int32
+	}{
+		{
+			name:         "first pass",
+			failOnCreate: 1,
+			wantStatus:   []status.Status{status.Starting, status.Configuring, status.Failed},
+			wantStops:    1, // Teardown after the failed create.
+		},
+		{
+			name:         "reconnect",
+			failOnCreate: 2,
+			wantStatus:   []status.Status{status.Starting, status.Configuring, status.Running, status.Degraded, status.Failed},
+			wantStops:    2, // Cleanup after the loss, then teardown after the failed create.
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockOperator := &mockSessionOperator{}
+			mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+				return &etw.Session{Name: "MySession", Realtime: true, NewSession: true}, nil
+			}
+			var creates, stops atomic.Int32
+			mockOperator.createRealtimeSessionFunc = func(*etw.Session) error {
+				if creates.Add(1) == test.failOnCreate {
+					return fmt.Errorf("failed to enable trace: %w", etw.ERROR_INVALID_PARAMETER)
+				}
+				return nil
+			}
+			mockOperator.attachToExistingSessionFunc = func(*etw.Session) error {
+				t.Error("a create failure other than ERROR_ALREADY_EXISTS must not fall back to attach")
+				return nil
+			}
+			mockOperator.startConsumerFunc = func(*etw.Session) error { return nil } // Session lost at once.
+			mockOperator.stopSessionFunc = func(*etw.Session) error {
+				stops.Add(1)
+				return nil
+			}
+
+			reporter := &recordingReporter{}
+			inputCtx := input.Context{
+				Cancelation:     t.Context(),
+				Logger:          logptest.NewTestingLogger(t, ""),
+				MetricsRegistry: monitoring.NewRegistry(),
+			}.WithStatusReporter(reporter)
+
+			etwInput := &etwInput{
+				config:   config{ProviderName: "Microsoft-Windows-Provider", SessionName: "MySession"},
+				operator: mockOperator,
+				backoff:  testBackoff(t.Context().Done()),
+			}
+
+			done := make(chan error, 1)
+			go func() { done <- etwInput.Run(inputCtx, nil) }()
+			select {
+			case err := <-done:
+				assert.ErrorContains(t, err, "realtime session could not be created", "the create error should be returned")
+			case <-time.After(5 * time.Second):
+				t.Fatal("Run did not return after the create failure")
+			}
+			assert.Equal(t, test.wantStatus, reporter.statuses(), "create failure should end in Failed")
+			assert.Equal(t, test.wantStops, stops.Load(), "the session must be stopped after a failed create so nothing is left running")
+		})
+	}
+}
+
+func Test_RunEtwInput_LogfileDoesNotReconnect(t *testing.T) {
+	// For an .etl file ProcessTrace returning means end of file. That is
+	// the input finishing its job, not a lost session.
+	tests := []struct {
+		name        string
+		consumerErr error
+		wantErr     string
+		wantStatus  []status.Status
+	}{
+		{
+			name:       "end of file",
+			wantStatus: []status.Status{status.Starting, status.Running},
+		},
+		{
+			name:        "unreadable file",
+			consumerErr: fmt.Errorf("invalid log source when opening trace: %w", etw.ERROR_BAD_PATHNAME),
+			wantErr:     "failed running ETW consumer: invalid log source when opening trace",
+			wantStatus:  []status.Status{status.Starting, status.Running, status.Failed},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockOperator := &mockSessionOperator{}
+			mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+				return &etw.Session{Name: `C:\logs\trace.etl`, Realtime: false}, nil
+			}
+			var connects atomic.Int32
+			mockOperator.createRealtimeSessionFunc = func(*etw.Session) error {
+				connects.Add(1)
+				return nil
+			}
+			mockOperator.attachToExistingSessionFunc = func(*etw.Session) error {
+				connects.Add(1)
+				return nil
+			}
+			mockOperator.startConsumerFunc = func(*etw.Session) error { return test.consumerErr }
+
+			reporter := &recordingReporter{}
+			inputCtx := input.Context{
+				Cancelation:     t.Context(),
+				Logger:          logptest.NewTestingLogger(t, ""),
+				MetricsRegistry: monitoring.NewRegistry(),
+			}.WithStatusReporter(reporter)
+
+			etwInput := &etwInput{
+				config:   config{Logfile: `C:\logs\trace.etl`},
+				operator: mockOperator,
+				backoff:  testBackoff(t.Context().Done()),
+			}
+
+			done := make(chan error, 1)
+			go func() { done <- etwInput.Run(inputCtx, nil) }()
+			select {
+			case err := <-done:
+				if test.wantErr == "" {
+					assert.NoError(t, err, "reaching the end of the file is a clean exit")
+				} else {
+					assert.ErrorContains(t, err, test.wantErr, "a consumer error on a file is fatal")
+				}
+			case <-time.After(5 * time.Second):
+				t.Fatal("Run did not return after the file was consumed; it must not try to reconnect")
+			}
+			assert.Equal(t, test.wantStatus, reporter.statuses(), "file input should not report Configuring or Degraded")
+			assert.Equal(t, int32(0), connects.Load(), "file input should neither create nor attach to a session")
+			assert.Equal(t, int32(0), mockOperator.resets.Load(), "file input should never reset the session")
+			assert.Equal(t, uint64(0), etwInput.metrics.reconnects.Get(), "file input should never count a reconnect")
+		})
+	}
+}
+
+func Test_RunEtwInput_CancelWhileWaitingToReconnect(t *testing.T) {
+	// Shutdown during the backoff between reconnect attempts must return
+	// promptly and cleanly, not report Failed and not wait out the backoff.
+	mockOperator := &mockSessionOperator{}
+	mockOperator.newSessionFunc = func(config) (*etw.Session, error) {
+		return &etw.Session{Name: "MySession", Realtime: true, NewSession: false}, nil
+	}
+	mockOperator.startConsumerFunc = func(*etw.Session) error { return nil } // Session lost at once.
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	reporter := &recordingReporter{}
+	inputCtx := input.Context{
+		Cancelation:     ctx,
+		Logger:          logptest.NewTestingLogger(t, ""),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}.WithStatusReporter(reporter)
+
+	etwInput := &etwInput{
+		config:   config{Session: "MySession"},
+		operator: mockOperator,
+		// Long enough that the test can only pass if cancellation
+		// interrupts the wait.
+		backoff: backoff.NewEqualJitterBackoff(ctx.Done(), time.Hour, time.Hour),
+	}
+
+	done := make(chan error, 1)
+	go func() { done <- etwInput.Run(inputCtx, nil) }()
+	waitForStatus(t, reporter, status.Degraded)
+	cancel()
+	select {
+	case err := <-done:
+		assert.NoError(t, err, "cancellation while waiting to reconnect is a clean exit")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not return after cancellation while waiting to reconnect")
+	}
+	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Running, status.Degraded}, reporter.statuses(),
+		"shutdown while Degraded must not report Failed")
+	assert.Equal(t, int32(0), mockOperator.resets.Load(), "cancelled before the reconnect attempt, so no reset")
+	assert.Equal(t, uint64(0), etwInput.metrics.reconnects.Get(), "an attempt that shutdown interrupted must not be counted")
+}
+
+// lostSessionConsumer configures op so that startConsumer returns nil at once
+// on its first call, as ProcessTrace does when another controller stops the
+// session, and on later calls blocks until the input is cancelled and stops
+// the session. It returns the count of startConsumer calls.
+//
+// The release is keyed on cancellation rather than on which stopSession call
+// this is: the input's own cleanup stop after the loss must not release the
+// consumer, and cancellation may land before or after the second
+// startConsumer call, since Running is reported just ahead of it.
+func lostSessionConsumer(op *mockSessionOperator, ctx context.Context) *atomic.Int32 {
+	consumes := new(atomic.Int32)
+	stopped := make(chan struct{})
+	var closeStopped sync.Once
+	op.startConsumerFunc = func(*etw.Session) error {
+		if consumes.Add(1) == 1 {
+			return nil
+		}
+		<-stopped
+		return nil
+	}
+	op.stopSessionFunc = func(*etw.Session) error {
+		if ctx.Err() != nil {
+			closeStopped.Do(func() { close(stopped) })
+		}
+		return nil
+	}
+	return consumes
+}
+
+// testBackoff returns a backoff short enough that reconnect tests run in
+// milliseconds rather than the seconds production waits. done should be the
+// test's cancellation, so that a wait in progress ends with the test.
+func testBackoff(done <-chan struct{}) backoff.Backoff {
+	return backoff.NewEqualJitterBackoff(done, time.Millisecond, 5*time.Millisecond)
+}
+
+// waitForUpdateCount blocks until reporter has recorded at least n status
+// updates, failing the test if they do not show up in time.
+func waitForUpdateCount(t *testing.T, reporter *recordingReporter, n int) {
+	t.Helper()
+	assert.Eventually(t, func() bool {
+		return len(reporter.statuses()) >= n
+	}, 5*time.Second, 10*time.Millisecond, "input never reported %d status updates, got %v", n, reporter.statuses())
+}
+
 // blockConsumerUntilStopped makes the mock consumer behave like the real
 // one: startConsumer blocks until stopSession is called, so tests can
 // exercise the cancellation path rather than having Run return at once.
@@ -439,8 +839,8 @@ func waitForStatus(t *testing.T, reporter *recordingReporter, want status.Status
 
 func Test_eventHealth(t *testing.T) {
 	// Each test feeds a string of events to eventHealth: 'b' is a failure,
-	// 'g' is a success. Spaces are ignored and are only there to make the
-	// runs readable.
+	// 'g' is a success and 'r' is a reset, as done on reconnect. Spaces are
+	// ignored and are only there to make the runs readable.
 	degraded := func(n int) statusUpdate {
 		return statusUpdate{status.Degraded, fmt.Sprintf("%d consecutive events could not be read; last error: bad", n)}
 	}
@@ -509,6 +909,29 @@ func Test_eventHealth(t *testing.T) {
 			events:   "bbbbbbbbbb gggg",
 			want:     nil,
 		},
+		{
+			// Run reports Running itself after a reconnect. Without the
+			// reset the stale degraded flag would swallow the second run.
+			name:     "reset after Degraded lets the next failure run report again",
+			failure:  3,
+			recovery: 1,
+			events:   "bbb r bbb",
+			want:     []statusUpdate{degraded(3), degraded(3)},
+		},
+		{
+			name:     "reset clears a partial failure run",
+			failure:  3,
+			recovery: 1,
+			events:   "bb r bb",
+			want:     nil,
+		},
+		{
+			name:     "reset while healthy reports nothing",
+			failure:  3,
+			recovery: 1,
+			events:   "gg r gg",
+			want:     nil,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -524,6 +947,8 @@ func Test_eventHealth(t *testing.T) {
 					h.failure(errors.New("bad"))
 				case 'g':
 					h.success()
+				case 'r':
+					h.reset()
 				}
 			}
 			assert.Equal(t, test.want, reporter.updates,
@@ -560,6 +985,40 @@ func Test_errDetail(t *testing.T) {
 			assert.Equal(t, test.want, errDetail(test.err), "errDetail(%v)", test.err)
 		})
 	}
+}
+
+func Test_statusMessage(t *testing.T) {
+	se := &sessionError{
+		status: `failed to attach to session "MySession": boom (windows error 5)`,
+		err:    errors.New("unable to retrieve handler: boom"),
+	}
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{
+			name: "session error reports its status text",
+			err:  se,
+			want: se.status,
+		},
+		{
+			name: "wrapped session error is still found",
+			err:  fmt.Errorf("outer: %w", se),
+			want: se.status,
+		},
+		{
+			name: "other errors fall back to errDetail",
+			err:  fmt.Errorf("stopped: %w", etw.ERROR_WMI_INSTANCE_NOT_FOUND),
+			want: errDetail(fmt.Errorf("stopped: %w", etw.ERROR_WMI_INSTANCE_NOT_FOUND)),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, statusMessage(test.err), "statusMessage(%v)", test.err)
+		})
+	}
+	assert.EqualError(t, se, "unable to retrieve handler: boom", "the runner should see the short error, not the status text")
 }
 
 func Test_buildEvent(t *testing.T) {
