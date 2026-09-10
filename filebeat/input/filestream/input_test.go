@@ -449,7 +449,7 @@ paths:
   - /var/log/foo
 %s
 `, extra))
-		_, harvester, err := configure(cfg, logger, srcIdentifier)
+		_, harvester, err := configure(cfg, logger, srcIdentifier, osDirReader{})
 		require.NoError(t, err)
 		fs, ok := harvester.(*filestream)
 		require.True(t, ok)
@@ -668,7 +668,7 @@ func createFilestreamTestRunner(tb testing.TB, logger *logp.Logger, testID strin
 
 	p := Plugin(logger, createTestStore(tb))
 	//nolint:errcheck // It's a test, let it panic if the casting fails
-	tb.Cleanup(p.Manager.(*loginp.InputManager).Close)
+	tb.Cleanup(p.Manager.(*filestreamInputManager).Close)
 	input, err := p.Manager.Create(c)
 	require.NoError(tb, err)
 

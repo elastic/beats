@@ -89,9 +89,25 @@ func newFileWatcher(
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
+	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, osDirReader{})
+}
+
+// newFileWatcherWithDirReader is like newFileWatcher but accepts an explicit
+// dirReader. Pass sharedDirReader in the production path so all inputs sharing
+// a base directory make only one readdir syscall per TTL window.
+func newFileWatcherWithDirReader(
+	logger *logp.Logger,
+	paths []string,
+	config fileWatcherConfig,
+	compression string,
+	sendNotChanged bool,
+	fi fileIdentifier,
+	srci *loginp.SourceIdentifier,
+	dr dirReader,
+) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(logger, paths, config.Scanner, compression)
+	scanner, err := newFileScannerWithReader(logger, paths, config.Scanner, compression, dr)
 	if err != nil {
 		return nil, err
 	}

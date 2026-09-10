@@ -142,6 +142,11 @@ type fileScanner struct {
 	pathIndex       map[string]int
 	pathsCanOverlap bool
 
+	// dirReader is the directory reader used by walk. It defaults to
+	// sharedDirReader so that all scanners in the process share a single cached
+	// readdir result per directory per TTL window.
+	dirReader dirReader
+
 	// Everything below exists only to avoid per-file allocations
 
 	hasher       hash.Hash
@@ -153,12 +158,20 @@ type fileScanner struct {
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
+	return newFileScannerWithReader(logger, paths, config, compression, osDirReader{})
+}
+
+// newFileScannerWithReader is like newFileScanner but accepts an explicit
+// dirReader. Pass sharedDirReader in the production path to share cached
+// directory reads across inputs watching the same base directory.
+func newFileScannerWithReader(logger *logp.Logger, paths []string, config fileScannerConfig, compression string, dr dirReader) (*fileScanner, error) {
 	s := fileScanner{
 		paths:       paths,
 		cfg:         config,
 		log:         logger.Named("scanner"),
 		hasher:      sha256.New(),
 		compression: compression,
+		dirReader:   dr,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -570,7 +583,7 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 		// With nothing deeper to descend into, entry types are irrelevant: read
 		// only the names, avoiding os.ReadDir's per-entry os.DirEntry allocation.
 		if len(deeper) == 0 {
-			names, err := readDirNames(dir)
+			names, err := s.dirReader.readDirNames(dir)
 			if err != nil {
 				onReadError(err)
 				return
@@ -581,7 +594,7 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			return
 		}
 
-		entries, err := os.ReadDir(dir)
+		entries, err := s.dirReader.readDir(dir)
 		if err != nil {
 			onReadError(err)
 			return
