@@ -98,8 +98,15 @@ func acquireSharedDirReader() (dirReader, func()) {
 // cachedDirReader caches directory listings for a configurable TTL. A single
 // instance shared across all fileScanner instances reduces readdir syscalls when
 // many inputs watch the same base directory.
+//
+// Locking discipline:
+//   - mu (RWMutex) guards cache and pathCounts. Readers hold RLock; writers hold Lock.
+//   - dirMus holds one *sync.Mutex per directory path. A goroutine acquires the
+//     per-dir lock before calling os.ReadDir, so concurrent reads for the same
+//     directory are serialised into one syscall while reads for distinct directories
+//     proceed in parallel.
 type cachedDirReader struct {
-	mu         sync.Mutex
+	mu         sync.RWMutex
 	defaultTTL time.Duration
 	// pathCounts tracks how many callers have registered each (dir, interval) pair.
 	// The effective TTL for a dir is the minimum interval with a positive count.
@@ -107,6 +114,7 @@ type cachedDirReader struct {
 	// entry is removed and the TTL for that dir may rise.
 	pathCounts map[string]map[time.Duration]int
 	cache      map[string]dirListing
+	dirMus     sync.Map // map[string]*sync.Mutex — per-directory fetch locks
 	stopCh     chan struct{}
 }
 
@@ -154,7 +162,7 @@ func (c *cachedDirReader) registerPath(dir string, interval time.Duration) func(
 	}
 }
 
-// ttlForDir returns the effective TTL for dir. Must be called with c.mu held.
+// ttlForDir returns the effective TTL for dir. Must be called with c.mu held (read or write).
 func (c *cachedDirReader) ttlForDir(dir string) time.Duration {
 	counts, ok := c.pathCounts[dir]
 	if !ok || len(counts) == 0 {
@@ -195,15 +203,37 @@ func (c *cachedDirReader) stop() {
 	close(c.stopCh)
 }
 
-// readDir returns the cached listing for dir, refreshing it from the OS if
-// the entry is absent or older than the effective TTL for that dir. The lock
-// is held during the underlying os.ReadDir call so that concurrent callers for
-// the same directory wait for a single syscall rather than each issuing their own.
+// readDir returns the cached listing for dir, refreshing it from the OS if the
+// entry is absent or older than the effective TTL for that dir.
+//
+// Reads for distinct directories proceed concurrently. Reads for the same
+// directory are serialised by a per-directory mutex so that at most one
+// os.ReadDir syscall runs for any given dir at a time; subsequent waiters
+// receive the result from the cache rather than issuing their own syscall.
 func (c *cachedDirReader) readDir(dir string) (dirListing, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	// Fast path: serve from cache under a read lock.
+	c.mu.RLock()
+	e, ok := c.cache[dir]
+	ttl := c.ttlForDir(dir)
+	c.mu.RUnlock()
+	if ok && time.Since(e.fetched) < ttl {
+		return e, nil
+	}
 
-	if e, ok := c.cache[dir]; ok && time.Since(e.fetched) < c.ttlForDir(dir) {
+	// Slow path: acquire the per-directory lock so only one goroutine calls
+	// os.ReadDir for this dir at a time while others block here.
+	muVal, _ := c.dirMus.LoadOrStore(dir, new(sync.Mutex))
+	dirMu := muVal.(*sync.Mutex) //nolint:errcheck
+	dirMu.Lock()
+	defer dirMu.Unlock()
+
+	// Re-check now that we hold the per-dir lock; another goroutine may have
+	// already fetched and populated the cache while we were waiting.
+	c.mu.RLock()
+	e, ok = c.cache[dir]
+	ttl = c.ttlForDir(dir)
+	c.mu.RUnlock()
+	if ok && time.Since(e.fetched) < ttl {
 		return e, nil
 	}
 
@@ -212,14 +242,16 @@ func (c *cachedDirReader) readDir(dir string) (dirListing, error) {
 	if err != nil {
 		return dirListing{}, err
 	}
-
 	names := make([]string, len(entries))
 	for i, entry := range entries {
 		names[i] = entry.Name()
 	}
-
 	listing := dirListing{entries: entries, names: names, fetched: time.Now()}
+
+	c.mu.Lock()
 	c.cache[dir] = listing
+	c.mu.Unlock()
+
 	return listing, nil
 }
 
