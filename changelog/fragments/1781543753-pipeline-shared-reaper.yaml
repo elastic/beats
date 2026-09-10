@@ -1,7 +1,0 @@
-kind: enhancement
-
-summary: "Replace per-pipeline reapClosedClients goroutine with a single process-wide shared reaper, reducing goroutine count for idle filestream receivers"
-
-component: libbeat
-
-issue: https://github.com/elastic/beats/issues/52357
