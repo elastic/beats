@@ -24,9 +24,11 @@ It has been tested in the Windows versions supported by Filebeat, starting from 
 stack: ga 9.4.7+
 ```
 
-When reading from a real-time session (`provider.name`, `provider.guid` or `session`), the input keeps running if the session is stopped by another controller, for example when an administrator restarts it with `logman`. The input reports a `DEGRADED` status while the session is unavailable, retries with a backoff that grows to 30 seconds, and reports `HEALTHY` again once it has reconnected to the session. If the input created the session itself, it creates it again. If it attached to an existing session, it waits for the session to be started again. Events produced while the session is stopped, or before the input reconnects, are not recovered.
+When the input reads from a real-time session (`provider.name`, `provider.guid`, or `session`), it stays running if another process stops the session, for example, when an administrator restarts it with `logman`. While the session is unavailable, the input reports a `DEGRADED` status and retries with a backoff that grows to 30 seconds. After it reconnects, it reports `HEALTHY` again.
 
-Only a session that is not running is treated as a temporary condition. If a reconnection attempt fails for a reason that waiting cannot fix, such as insufficient privileges or a provider that cannot be enabled, the input reports `FAILED` and stops, as it does when the same error happens during the first connection. Reading from a `file` is not affected: the input stops when it reaches the end of the file.
+If you configured `provider.name` or `provider.guid`, the input recreates the session. If you configured `session`, the input waits for that session to start again. Events that occur while the session is stopped, or before the input reconnects, are not recovered.
+
+The input retries only when the session is not running. If a reconnection attempt fails for a reason that retrying cannot resolve, such as insufficient privileges or a provider that cannot be enabled, the input reports `FAILED` and stops. The same errors fail the input on the first connection. Reading from a `file` is unchanged: the input stops when it reaches the end of the file.
 
 Example configurations:
 
@@ -380,7 +382,7 @@ You must assign a unique `id` to the input to expose metrics.
 | `received_events_total` | Total number of events received. |
 | `discarded_events_total` | Total number of discarded events. |
 | `errors_total` | Total number of errors. |
-| `reconnects_total` | Total number of attempts to reconnect after the ETW session stopped unexpectedly. |
+| `reconnects_total` {applies_to}`stack: ga 9.4.7+` | Total number of attempts to reconnect after the ETW session stopped unexpectedly. |
 | `source_lag_time` | Histogram of the difference between timestamped event’s creation and reading. |
 | `arrival_period` | Histogram of the elapsed time between event notification callbacks. |
 | `processing_time` | Histogram of the elapsed time between event notification callback and publication to the internal queue. |
