@@ -449,7 +449,7 @@ paths:
   - /var/log/foo
 %s
 `, extra))
-		_, harvester, err := configure(cfg, logger, srcIdentifier, osDirReader{})
+		_, harvester, err := configure(cfg, logger, srcIdentifier, osDirReader{}, nil)
 		require.NoError(t, err)
 		fs, ok := harvester.(*filestream)
 		require.True(t, ok)

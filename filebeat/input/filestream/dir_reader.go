@@ -18,7 +18,10 @@
 package filestream
 
 import (
+	"math"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
@@ -96,34 +99,88 @@ func acquireSharedDirReader() (dirReader, func()) {
 // instance shared across all fileScanner instances reduces readdir syscalls when
 // many inputs watch the same base directory.
 type cachedDirReader struct {
-	mu     sync.Mutex
-	ttl    time.Duration
-	cache  map[string]dirListing
-	stopCh chan struct{}
+	mu         sync.Mutex
+	defaultTTL time.Duration
+	// pathCounts tracks how many callers have registered each (dir, interval) pair.
+	// The effective TTL for a dir is the minimum interval with a positive count.
+	// When a caller deregisters, its count is decremented; if it reaches zero the
+	// entry is removed and the TTL for that dir may rise.
+	pathCounts map[string]map[time.Duration]int
+	cache      map[string]dirListing
+	stopCh     chan struct{}
 }
 
-func newCachedDirReader(ttl time.Duration) *cachedDirReader {
+func newCachedDirReader(defaultTTL time.Duration) *cachedDirReader {
 	c := &cachedDirReader{
-		ttl:    ttl,
-		cache:  make(map[string]dirListing),
-		stopCh: make(chan struct{}),
+		defaultTTL: defaultTTL,
+		pathCounts: make(map[string]map[time.Duration]int),
+		cache:      make(map[string]dirListing),
+		stopCh:     make(chan struct{}),
 	}
 	go c.sweepLoop()
 	return c
 }
 
-// sweepLoop removes expired cache entries every TTL. Run in a goroutine.
+// registerPath records that an input with the given check interval is watching
+// dir. It returns a deregister function the caller must invoke when the input
+// stops. While at least one caller is registered for a dir the effective TTL
+// for that dir equals the minimum registered interval; when all callers
+// deregister it reverts to defaultTTL.
+func (c *cachedDirReader) registerPath(dir string, interval time.Duration) func() {
+	c.mu.Lock()
+	if c.pathCounts[dir] == nil {
+		c.pathCounts[dir] = make(map[time.Duration]int)
+	}
+	c.pathCounts[dir][interval]++
+	c.mu.Unlock()
+
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			c.mu.Lock()
+			if counts, ok := c.pathCounts[dir]; ok {
+				counts[interval]--
+				if counts[interval] == 0 {
+					delete(counts, interval)
+				}
+				if len(counts) == 0 {
+					delete(c.pathCounts, dir)
+				}
+				// Invalidate the cached entry so the next fetch uses the new TTL.
+				delete(c.cache, dir)
+			}
+			c.mu.Unlock()
+		})
+	}
+}
+
+// ttlForDir returns the effective TTL for dir. Must be called with c.mu held.
+func (c *cachedDirReader) ttlForDir(dir string) time.Duration {
+	counts, ok := c.pathCounts[dir]
+	if !ok || len(counts) == 0 {
+		return c.defaultTTL
+	}
+	min := time.Duration(math.MaxInt64)
+	for d := range counts {
+		if d < min {
+			min = d
+		}
+	}
+	return min
+}
+
+// sweepLoop removes expired cache entries every defaultTTL. Run in a goroutine.
 func (c *cachedDirReader) sweepLoop() {
-	ticker := time.NewTicker(c.ttl)
+	ticker := time.NewTicker(c.defaultTTL)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
 			c.mu.Lock()
 			now := time.Now()
-			for k, v := range c.cache {
-				if now.Sub(v.fetched) >= c.ttl {
-					delete(c.cache, k)
+			for dir, listing := range c.cache {
+				if now.Sub(listing.fetched) >= c.ttlForDir(dir) {
+					delete(c.cache, dir)
 				}
 			}
 			c.mu.Unlock()
@@ -138,26 +195,15 @@ func (c *cachedDirReader) stop() {
 	close(c.stopCh)
 }
 
-// lowerTTL shrinks the cache TTL if d is smaller than the current one.
-// Called when an input is configured with a check_interval shorter than the
-// current TTL so the cache does not serve listings stale beyond that interval.
-func (c *cachedDirReader) lowerTTL(d time.Duration) {
-	c.mu.Lock()
-	if d < c.ttl {
-		c.ttl = d
-	}
-	c.mu.Unlock()
-}
-
 // readDir returns the cached listing for dir, refreshing it from the OS if
-// the entry is absent or older than the TTL. The lock is held during the
-// underlying os.ReadDir call so that concurrent callers for the same directory
-// wait for a single syscall rather than each issuing their own.
+// the entry is absent or older than the effective TTL for that dir. The lock
+// is held during the underlying os.ReadDir call so that concurrent callers for
+// the same directory wait for a single syscall rather than each issuing their own.
 func (c *cachedDirReader) readDir(dir string) (dirListing, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if e, ok := c.cache[dir]; ok && time.Since(e.fetched) < c.ttl {
+	if e, ok := c.cache[dir]; ok && time.Since(e.fetched) < c.ttlForDir(dir) {
 		return e, nil
 	}
 
@@ -175,4 +221,14 @@ func (c *cachedDirReader) readDir(dir string) (dirListing, error) {
 	listing := dirListing{entries: entries, names: names, fetched: time.Now()}
 	c.cache[dir] = listing
 	return listing, nil
+}
+
+// globBase returns the base directory for a glob pattern: the longest path
+// prefix that contains no wildcard metacharacters.
+func globBase(pattern string) string {
+	i := strings.IndexAny(pattern, "*?[")
+	if i < 0 {
+		return filepath.Dir(pattern)
+	}
+	return filepath.Dir(pattern[:i])
 }

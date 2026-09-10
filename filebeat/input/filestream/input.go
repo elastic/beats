@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -99,9 +100,23 @@ type filestream struct {
 type filestreamInputManager struct {
 	*loginp.InputManager
 	releaseDirReader func()
+
+	deregMu    sync.Mutex
+	deregPaths []func() // per-path TTL deregister funcs, one per registered (dir, interval) pair
+}
+
+func (m *filestreamInputManager) trackDeregister(fn func()) {
+	m.deregMu.Lock()
+	m.deregPaths = append(m.deregPaths, fn)
+	m.deregMu.Unlock()
 }
 
 func (m *filestreamInputManager) Close() {
+	m.deregMu.Lock()
+	for _, fn := range m.deregPaths {
+		fn()
+	}
+	m.deregMu.Unlock()
 	m.InputManager.Close()
 	m.releaseDirReader()
 }
@@ -109,30 +124,29 @@ func (m *filestreamInputManager) Close() {
 // Plugin creates a new filestream input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	dr, releaseDR := acquireSharedDirReader()
+	mgr := &filestreamInputManager{releaseDirReader: releaseDR}
+	mgr.InputManager = &loginp.InputManager{
+		Logger:              log,
+		StateStore:          store,
+		Type:                pluginName,
+		Configure:           makeConfigureFunc(dr, mgr),
+		DefaultCleanTimeout: -1,
+	}
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
-		Manager: &filestreamInputManager{
-			InputManager: &loginp.InputManager{
-				Logger:              log,
-				StateStore:          store,
-				Type:                pluginName,
-				Configure:           makeConfigureFunc(dr),
-				DefaultCleanTimeout: -1,
-			},
-			releaseDirReader: releaseDR,
-		},
+		Manager:    mgr,
 	}
 }
 
-// makeConfigureFunc returns a configure function that closes over dr so the
-// shared dir reader flows into every prospector created by this plugin instance.
-func makeConfigureFunc(dr dirReader) func(*conf.C, *logp.Logger, *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+// makeConfigureFunc returns a configure function that closes over dr and mgr so
+// the shared dir reader and per-path TTL tracking flow into every prospector.
+func makeConfigureFunc(dr dirReader, mgr *filestreamInputManager) func(*conf.C, *logp.Logger, *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
 	return func(cfg *conf.C, log *logp.Logger, src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
-		return configure(cfg, log, src, dr)
+		return configure(cfg, log, src, dr, mgr.trackDeregister)
 	}
 }
 
@@ -140,7 +154,8 @@ func configure(
 	cfg *conf.C,
 	log *logp.Logger,
 	src *loginp.SourceIdentifier,
-	dr dirReader) (loginp.Prospector, loginp.Harvester, error) {
+	dr dirReader,
+	trackFn func(func())) (loginp.Prospector, loginp.Harvester, error) {
 
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
@@ -151,11 +166,14 @@ func configure(
 		return nil, nil, err
 	}
 
-	// Lower the cache TTL if this input's check_interval is shorter, so the
-	// cache never serves listings stale beyond the fastest configured interval.
-	type ttlLowerer interface{ lowerTTL(time.Duration) }
-	if tl, ok := dr.(ttlLowerer); ok {
-		tl.lowerTTL(c.FileWatcher.Interval)
+	// Register each watched base directory with the shared cache so the
+	// per-path TTL reflects this input's check_interval. The deregister func
+	// is called on receiver shutdown so the TTL rises back when no fast
+	// watchers remain for a given directory.
+	if rd, ok := dr.(*cachedDirReader); ok && trackFn != nil {
+		for _, pattern := range c.Paths {
+			trackFn(rd.registerPath(globBase(pattern), c.FileWatcher.Interval))
+		}
 	}
 
 	// zero must also disable clean_inactive, see:
