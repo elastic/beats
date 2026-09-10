@@ -635,8 +635,6 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 	rec(g.root, 0, patterns)
 }
 
-
-
 // hasGlobMeta reports whether path contains any glob metacharacter, mirroring the
 // unexported path/filepath.hasMeta.
 func hasGlobMeta(path string) bool {
