@@ -58,10 +58,11 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
-	log      *logp.Logger
-	state    atomic.Pointer[initializedState]
-	cache    *cache
-	initOnce sync.Once
+	log          *logp.Logger
+	state        atomic.Pointer[initializedState]
+	cache        *cache
+	initOnce     sync.Once
+	appendFields bool
 }
 
 func init() {
@@ -118,8 +119,9 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
-		log:   log,
-		cache: newCache(config.CleanupTimeout),
+		log:          log,
+		cache:        newCache(config.CleanupTimeout),
+		appendFields: config.AppendFields,
 	}
 
 	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
@@ -341,7 +343,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if state == nil {
 		return event, nil
 	}
-	if kubernetesMetadataExist(event) {
+	if kubernetesMetadataExist(event) && !k.appendFields {
 		return event, nil
 	}
 
@@ -371,7 +373,11 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 				_ = ociContainer.Delete("image")
 				ociContainer["image"] = mapstr.M{"name": img}
 			}
-			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+			if k.appendFields {
+				event.Fields.DeepUpdateNoOverwrite(mapstr.M{"container": ociContainer})
+			} else {
+				event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+			}
 		}
 	}
 
@@ -381,7 +387,11 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
-	event.Fields.DeepUpdate(kubeMeta)
+	if k.appendFields {
+		event.Fields.DeepUpdateNoOverwrite(kubeMeta)
+	} else {
+		event.Fields.DeepUpdate(kubeMeta)
+	}
 
 	return event, nil
 }

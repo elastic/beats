@@ -160,6 +160,9 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 :   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
 
 
+`append_fields` {applies_to}`stack: ga 9.4`
+:   (Optional) When `true`, the processor enriches events that already have a `kubernetes` field by merging the cached metadata into the existing object. Existing keys are preserved. Only absent fields are added. Defaults to `false`.
+
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 
 ## Indexers [_indexers]
