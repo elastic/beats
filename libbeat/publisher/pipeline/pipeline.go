@@ -84,7 +84,6 @@ type Pipeline struct {
 	// disconnected. Guarded by clientsMu.
 	clientsMu sync.Mutex
 	clients   map[*client]struct{}
-
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
