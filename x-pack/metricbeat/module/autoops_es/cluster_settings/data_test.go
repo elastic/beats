@@ -83,6 +83,9 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]a
 		// `hosts` is a list and `hosts.resolve_timeout` a literal dotted sibling key: both are reported
 		require.Equal(t, []any{}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "discovery.zen.ping.unicast.hosts"))
 		require.Equal(t, "5s", auto_ops_testing.GetObjectValue(event.MetricSetFields, "discovery.zen.ping.unicast.hosts_resolve_timeout"))
+
+		// this cluster has no archived settings, so no empty key is added to the event
+		require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "archived"))
 	} else if data.Version == "8.15.3" {
 		require.Equal(t, ".ent-search-*-logs-*,-.ent-search-*,+*", auto_ops_testing.GetObjectValue(event.MetricSetFields, "action.auto_create_index"))
 
@@ -92,6 +95,16 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]a
 		// likewise the pre-8.0 gateway settings
 		require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "gateway.expected_nodes"))
 		require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "gateway.recover_after_nodes"))
+
+		// archived setting names are reported with the `archived.` prefix stripped, unioned across
+		// persistent and transient rather than one scope overriding the other, and sorted. The
+		// fixture nests most keys but leaves `disk.include_relocations` as a literal dotted key,
+		// because Elasticsearch emits both shapes.
+		require.Equal(t, []string{
+			"cluster.routing.allocation.disk.include_relocations",
+			"search.remote.connect",
+			"xpack.monitoring.exporters.cloud_monitoring.type",
+		}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "archived"))
 	}
 
 	// schema is expected to drop this field if it appears (it does in one file)
@@ -101,4 +114,107 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]a
 // Expect a valid response from Elasticsearch to create a single event
 func TestProperlyHandlesResponse(t *testing.T) {
 	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/cluster_settings.*.json", ClusterSettingsMetricSet, eventsMapping, expectValidParsedData)
+}
+
+func TestCollectArchivedSettings(t *testing.T) {
+	tests := map[string]struct {
+		settings map[string]any
+		expected []string
+	}{
+		"no archived settings": {
+			settings: map[string]any{
+				"persistent": map[string]any{"cluster": map[string]any{"max_shards_per_node": "4000"}},
+				"transient":  map[string]any{},
+			},
+			expected: nil,
+		},
+		"an empty archived object contributes no names": {
+			settings: map[string]any{
+				"persistent": map[string]any{"archived": map[string]any{}},
+			},
+			expected: nil,
+		},
+		"nested and literal dotted keys flatten to the same shape": {
+			settings: map[string]any{
+				"persistent": map[string]any{
+					"archived": map[string]any{
+						"search": map[string]any{"remote": map[string]any{"connect": "false"}},
+						"cluster": map[string]any{
+							"routing": map[string]any{"allocation.disk.include_relocations": "false"},
+						},
+					},
+				},
+			},
+			expected: []string{
+				"cluster.routing.allocation.disk.include_relocations",
+				"search.remote.connect",
+			},
+		},
+		"persistent and transient are unioned, not overridden": {
+			settings: map[string]any{
+				"persistent": map[string]any{
+					"archived": map[string]any{"xpack": map[string]any{"monitoring": map[string]any{"enabled": "true"}}},
+				},
+				"transient": map[string]any{
+					"archived": map[string]any{"search": map[string]any{"remote": map[string]any{"connect": "false"}}},
+				},
+			},
+			expected: []string{"search.remote.connect", "xpack.monitoring.enabled"},
+		},
+		"a name archived in both scopes is reported once": {
+			settings: map[string]any{
+				"persistent": map[string]any{
+					"archived": map[string]any{"search": map[string]any{"remote": map[string]any{"connect": "false"}}},
+				},
+				"transient": map[string]any{
+					"archived": map[string]any{"search": map[string]any{"remote": map[string]any{"connect": "true"}}},
+				},
+			},
+			expected: []string{"search.remote.connect"},
+		},
+		"list values are reported by name only": {
+			settings: map[string]any{
+				"persistent": map[string]any{
+					"archived": map[string]any{"discovery": map[string]any{"zen": map[string]any{"hosts_provider": []any{"file"}}}},
+				},
+			},
+			expected: []string{"discovery.zen.hosts_provider"},
+		},
+		"defaults are ignored: archived settings only exist in cluster state": {
+			settings: map[string]any{
+				"defaults": map[string]any{
+					"archived": map[string]any{"search": map[string]any{"remote": map[string]any{"connect": "false"}}},
+				},
+			},
+			expected: nil,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			require.Equal(t, test.expected, collectArchivedSettings(test.settings))
+		})
+	}
+}
+
+// Go randomises map iteration order, so the same response must still produce an identical list.
+func TestCollectArchivedSettingsIsDeterministic(t *testing.T) {
+	settings := map[string]any{
+		"persistent": map[string]any{
+			"archived": map[string]any{
+				"xpack":   map[string]any{"monitoring": map[string]any{"enabled": "true"}},
+				"search":  map[string]any{"remote": map[string]any{"connect": "false"}},
+				"cluster": map[string]any{"routing": map[string]any{"allocation.disk.include_relocations": "false"}},
+			},
+		},
+		"transient": map[string]any{
+			"archived": map[string]any{"node": map[string]any{"max_local_storage_nodes": "1"}},
+		},
+	}
+
+	first := collectArchivedSettings(settings)
+
+	for range 50 {
+		require.Equal(t, first, collectArchivedSettings(settings))
+	}
 }
