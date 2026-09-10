@@ -419,11 +419,8 @@ func BenchmarkGetFilesIdentityCollision(b *testing.B) {
 	}
 }
 
-// BenchmarkGetFilesSharedDir models the Kubernetes pod-log case: N filestream
-// inputs each watching the same base directory with a different leaf glob.
-// With the shared cachedDirReader, N inputs make 1 readdir call total; without
-// it they make N calls. The benchmark uses the cached reader (the production
-// default) so it measures cache-hit throughput for cross-input sharing.
+// BenchmarkGetFilesSharedDir models N filestream inputs each watching the same
+// base directory with a different leaf glob.
 func BenchmarkGetFilesSharedDir(b *testing.B) {
 	for _, inputs := range []int{10, 100, 400} {
 		b.Run(fmt.Sprintf("inputs%d", inputs), func(b *testing.B) {
@@ -449,8 +446,7 @@ func BenchmarkGetFilesSharedDir(b *testing.B) {
 			}
 
 			b.ReportAllocs()
-			b.ResetTimer()
-			for range b.N {
+			for b.Loop() {
 				for _, s := range scanners {
 					s.GetFiles(loginp.FileScanOptions{})
 				}

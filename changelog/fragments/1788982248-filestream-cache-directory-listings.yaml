@@ -13,18 +13,6 @@ kind: enhancement
 # Change summary; a 80ish characters long description of the change.
 summary: Cache directory listings across filestream inputs sharing the same base directory
 
-# Long description; in case the summary is not enough to describe the change
-# this field accommodate a description without length limits.
-description: >
-  When many filestream inputs watch the same base directory (for example, the
-  Kubernetes integration running 1,600 inputs all watching
-  /var/log/containers), each input previously called readdir on that directory
-  independently on every check_interval tick. A node with 1,600 container-log
-  inputs and 500 files in the directory generated 1,600 readdir syscalls and
-  800,000 os.DirEntry allocations per tick. The scanner now uses a
-  process-wide cached directory reader with a 1 s TTL: N inputs watching the
-  same base directory make a single readdir call per TTL window instead of N
-  calls, eliminating nearly all redundant syscalls and allocations.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: filebeat

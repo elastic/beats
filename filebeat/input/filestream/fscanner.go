@@ -142,9 +142,7 @@ type fileScanner struct {
 	pathIndex       map[string]int
 	pathsCanOverlap bool
 
-	// dirReader is the directory reader used by walk. It defaults to
-	// sharedDirReader so that all scanners in the process share a single cached
-	// readdir result per directory per TTL window.
+	// dirReader is the directory reader used by walk
 	dirReader dirReader
 
 	// Everything below exists only to avoid per-file allocations
@@ -162,8 +160,7 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 }
 
 // newFileScannerWithReader is like newFileScanner but accepts an explicit
-// dirReader. Pass sharedDirReader in the production path to share cached
-// directory reads across inputs watching the same base directory.
+// dirReader.
 func newFileScannerWithReader(logger *logp.Logger, paths []string, config fileScannerConfig, compression string, dr dirReader) (*fileScanner, error) {
 	s := fileScanner{
 		paths:       paths,

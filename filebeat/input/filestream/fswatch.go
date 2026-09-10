@@ -93,8 +93,7 @@ func newFileWatcher(
 }
 
 // newFileWatcherWithDirReader is like newFileWatcher but accepts an explicit
-// dirReader. Pass sharedDirReader in the production path so all inputs sharing
-// a base directory make only one readdir syscall per TTL window.
+// dirReader.
 func newFileWatcherWithDirReader(
 	logger *logp.Logger,
 	paths []string,
