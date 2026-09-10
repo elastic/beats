@@ -97,7 +97,7 @@ func newEventConsumer(
 	// has no independent state to clean up, and can safely shut down
 	// after the eventConsumer is already gone, so nothing is lost by
 	// letting it happen asynchronously.
-	go c.queueReader.run()
+	go c.queueReader.run(log)
 
 	return c
 }

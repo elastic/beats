@@ -20,6 +20,7 @@ package pipeline
 import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // queueReader is a standalone stateless helper goroutine to dispatch
@@ -44,7 +45,9 @@ func makeQueueReader() queueReader {
 	return qr
 }
 
-func (qr *queueReader) run() {
+func (qr *queueReader) run(logger *logp.Logger) {
+	logger.Debug("pipeline event consumer queue reader: start")
+	defer logger.Debug("pipeline event consumer queue reader: stop")
 	for {
 		req, ok := <-qr.req
 		if !ok {

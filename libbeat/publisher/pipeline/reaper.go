@@ -128,8 +128,8 @@ func (r *clientReaper) release(p *Pipeline) {
 // pipeline's disconnectClients will handle the client instead.
 func (r *clientReaper) add(p *Pipeline, c *client) {
 	r.mu.Lock()
-	if set, ok := r.pending[p]; ok {
-		set[c] = struct{}{}
+	if clientSet, ok := r.pending[p]; ok {
+		clientSet[c] = struct{}{}
 	}
 	r.mu.Unlock()
 	select {
@@ -150,12 +150,12 @@ func (r *clientReaper) run(done <-chan struct{}) {
 		r.mu.Lock()
 		var ready []*client
 		total := 0
-		for _, set := range r.pending {
-			for c := range set {
+		for _, clientSet := range r.pending {
+			for c := range clientSet {
 				select {
 				case <-c.producer.ACKWaitChan():
 					ready = append(ready, c)
-					delete(set, c)
+					delete(clientSet, c)
 				default:
 					total++
 				}

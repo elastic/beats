@@ -46,8 +46,9 @@ import (
 
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
 	t.Helper()
-	logger := logptest.NewTestingLogger(t, "")
-	p, err := New(beat.Info{Logger: logger},
+	// Use a nop logger so the async queueReader goroutine (which is intentionally
+	// not tracked in the shutdown WaitGroup) cannot race with *testing.T cleanup.
+	p, err := New(beat.Info{Logger: logp.NewNopLogger()},
 		Monitors{},
 		conf.Namespace{},
 		outputs.Group{},
