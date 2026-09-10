@@ -222,9 +222,13 @@ func TestAcquireSharedDirReaderSingleton(t *testing.T) {
 	dr1, release1 := acquireSharedDirReader()
 	dr2, release2 := acquireSharedDirReader()
 
+	rd1, ok1 := dr1.(*cachedDirReader)
+	rd2, ok2 := dr2.(*cachedDirReader)
+	require.True(t, ok1 && ok2, "acquireSharedDirReader must return *cachedDirReader")
+
 	dirReaderMu.Lock()
 	assert.Equal(t, 2, dirReaderRefs, "two acquires should give ref count 2")
-	assert.Same(t, dr1.(*cachedDirReader), dr2.(*cachedDirReader), "both acquires should return the same instance")
+	assert.Same(t, rd1, rd2, "both acquires should return the same instance")
 	dirReaderMu.Unlock()
 
 	release1()
