@@ -576,25 +576,20 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 		}
 
-		// With nothing deeper to descend into, entry types are irrelevant: read
-		// only the names, avoiding os.ReadDir's per-entry os.DirEntry allocation.
+		listing, err := s.dirReader.readDir(dir)
+		if err != nil {
+			onReadError(err)
+			return
+		}
+
 		if len(deeper) == 0 {
-			names, err := s.dirReader.readDirNames(dir)
-			if err != nil {
-				onReadError(err)
-				return
-			}
-			for _, name := range names {
+			for _, name := range listing.names {
 				matchLeaf(name)
 			}
 			return
 		}
 
-		entries, err := s.dirReader.readDir(dir)
-		if err != nil {
-			onReadError(err)
-			return
-		}
+		entries := listing.entries
 
 		for _, e := range entries {
 			matchLeaf(e.Name())
@@ -640,22 +635,7 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 	rec(g.root, 0, patterns)
 }
 
-// readDirNames returns the sorted entry names of dir, reading names only to avoid
-// os.ReadDir's per-entry os.DirEntry allocation. Used for leaf directories, where
-// entry types are not needed. Sorted to keep traversal order stable.
-func readDirNames(dir string) ([]string, error) {
-	f, err := os.Open(dir)
-	if err != nil {
-		return nil, err
-	}
-	names, err := f.Readdirnames(-1)
-	_ = f.Close()
-	if err != nil {
-		return nil, err
-	}
-	slices.Sort(names)
-	return names, nil
-}
+
 
 // hasGlobMeta reports whether path contains any glob metacharacter, mirroring the
 // unexported path/filepath.hasMeta.

@@ -23,22 +23,36 @@ import (
 	"time"
 )
 
+// dirListing holds the entries and sorted names for a single directory.
+type dirListing struct {
+	entries []os.DirEntry
+	names   []string
+	fetched time.Time
+}
+
 // dirReader abstracts reading a directory's entries. The abstraction allows a
 // caching implementation to be shared across fileScanner instances so that many
 // inputs watching the same base directory make only one readdir syscall per TTL
 // window instead of one per input.
 type dirReader interface {
-	// readDirNames returns the sorted entry names of dir.
-	readDirNames(dir string) ([]string, error)
-	// readDir returns the sorted DirEntry slice for dir.
-	readDir(dir string) ([]os.DirEntry, error)
+	// readDir returns the sorted entries and names for dir.
+	readDir(dir string) (dirListing, error)
 }
 
 // osDirReader reads directories directly from the OS without caching.
 type osDirReader struct{}
 
-func (osDirReader) readDirNames(dir string) ([]string, error) { return readDirNames(dir) }
-func (osDirReader) readDir(dir string) ([]os.DirEntry, error) { return os.ReadDir(dir) }
+func (osDirReader) readDir(dir string) (dirListing, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return dirListing{}, err
+	}
+	names := make([]string, len(entries))
+	for i, e := range entries {
+		names[i] = e.Name()
+	}
+	return dirListing{entries: entries, names: names}, nil
+}
 
 // Process-wide singleton dir reader shared across all filestream Plugin()
 // instances. acquireSharedDirReader / releaseSharedDirReader follow the same
@@ -78,27 +92,20 @@ func acquireSharedDirReader() (dirReader, func()) {
 	}
 }
 
-// cachedDirListing holds a cached directory listing.
-type cachedDirListing struct {
-	entries []os.DirEntry
-	names   []string
-	fetched time.Time
-}
-
 // cachedDirReader caches directory listings for a configurable TTL. A single
 // instance shared across all fileScanner instances reduces readdir syscalls when
 // many inputs watch the same base directory.
 type cachedDirReader struct {
 	mu     sync.Mutex
 	ttl    time.Duration
-	cache  map[string]cachedDirListing
+	cache  map[string]dirListing
 	stopCh chan struct{}
 }
 
 func newCachedDirReader(ttl time.Duration) *cachedDirReader {
 	c := &cachedDirReader{
 		ttl:    ttl,
-		cache:  make(map[string]cachedDirListing),
+		cache:  make(map[string]dirListing),
 		stopCh: make(chan struct{}),
 	}
 	go c.sweepLoop()
@@ -131,11 +138,11 @@ func (c *cachedDirReader) stop() {
 	close(c.stopCh)
 }
 
-// getOrFetch returns the cached listing for dir, refreshing it from the OS if
+// readDir returns the cached listing for dir, refreshing it from the OS if
 // the entry is absent or older than the TTL. The lock is held during the
 // underlying os.ReadDir call so that concurrent callers for the same directory
 // wait for a single syscall rather than each issuing their own.
-func (c *cachedDirReader) getOrFetch(dir string) (cachedDirListing, error) {
+func (c *cachedDirReader) readDir(dir string) (dirListing, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -146,7 +153,7 @@ func (c *cachedDirReader) getOrFetch(dir string) (cachedDirListing, error) {
 	// os.ReadDir returns entries sorted by filename.
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return cachedDirListing{}, err
+		return dirListing{}, err
 	}
 
 	names := make([]string, len(entries))
@@ -154,23 +161,7 @@ func (c *cachedDirReader) getOrFetch(dir string) (cachedDirListing, error) {
 		names[i] = entry.Name()
 	}
 
-	listing := cachedDirListing{entries: entries, names: names, fetched: time.Now()}
+	listing := dirListing{entries: entries, names: names, fetched: time.Now()}
 	c.cache[dir] = listing
 	return listing, nil
-}
-
-func (c *cachedDirReader) readDirNames(dir string) ([]string, error) {
-	listing, err := c.getOrFetch(dir)
-	if err != nil {
-		return nil, err
-	}
-	return listing.names, nil
-}
-
-func (c *cachedDirReader) readDir(dir string) ([]os.DirEntry, error) {
-	listing, err := c.getOrFetch(dir)
-	if err != nil {
-		return nil, err
-	}
-	return listing.entries, nil
 }
