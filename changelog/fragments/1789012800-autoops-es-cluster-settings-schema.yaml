@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Persist additional cluster settings in the autoops_es cluster_settings metricset
+component: metricbeat

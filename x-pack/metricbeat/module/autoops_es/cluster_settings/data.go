@@ -17,7 +17,49 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
+// allocationFilterSchema builds the schema for one of the interchangeable
+// `cluster.routing.allocation.{exclude,include,require}` shard filter groups,
+// which all accept the same attributes.
+func allocationFilterSchema(key string) c.ConvMap {
+	return c.Dict(key, s.Schema{
+		"_ip":   c.Str("_ip", s.IgnoreAllErrors),
+		"_host": c.Str("_host", s.IgnoreAllErrors),
+		"_name": c.Str("_name", s.IgnoreAllErrors),
+		"_tier": c.Str("_tier", s.IgnoreAllErrors),
+	}, c.DictOptional)
+}
+
 var (
+	// `discovery.zen.*` is a 7.x-only namespace, removed in 8.0, so every key is optional.
+	discoverySchema = c.Dict("discovery", s.Schema{
+		"zen": c.Dict("zen", s.Schema{
+			"minimum_master_nodes": c.Str("minimum_master_nodes", s.IgnoreAllErrors),
+			"ping_timeout":         c.Str("ping_timeout", s.IgnoreAllErrors),
+			"join_timeout":         c.Str("join_timeout", s.IgnoreAllErrors),
+			"publish_timeout":      c.Str("publish_timeout", s.IgnoreAllErrors),
+			"hosts_provider":       c.Ifc("hosts_provider", s.Optional),
+			"fd": c.Dict("fd", s.Schema{
+				"ping_timeout": c.Str("ping_timeout", s.IgnoreAllErrors),
+			}, c.DictOptional),
+			"master_election": c.Dict("master_election", s.Schema{
+				"wait_for_joins_timeout": c.Str("wait_for_joins_timeout", s.IgnoreAllErrors),
+			}, c.DictOptional),
+			"ping": c.Dict("ping", s.Schema{
+				"unicast": c.Dict("unicast", s.Schema{
+					"hosts": c.Ifc("hosts", s.Optional),
+					// `hosts` is a list and `hosts.resolve_timeout` a literal dotted sibling key,
+					// so the two cannot share the `hosts` name in the event
+					"hosts_resolve_timeout": c.Str("hosts.resolve_timeout", s.IgnoreAllErrors),
+				}, c.DictOptional),
+			}, c.DictOptional),
+		}, c.DictOptional),
+	}, c.DictOptional)
+
+	actionSchema = c.Dict("action", s.Schema{
+		"destructive_requires_name": c.Str("destructive_requires_name", s.IgnoreAllErrors),
+		"auto_create_index":         c.Str("auto_create_index", s.IgnoreAllErrors),
+	}, c.DictOptional)
+
 	clusterSchema = c.Dict("cluster", s.Schema{
 		"metadata": c.Dict("metadata", s.Schema{
 			"display_name": c.Str("display_name", s.IgnoreAllErrors),
@@ -28,6 +70,7 @@ var (
 		"routing": c.Dict("routing", s.Schema{
 			"allocation": c.Dict("allocation", s.Schema{
 				"disk": c.Dict("disk", s.Schema{
+					"threshold_enabled": c.Str("threshold_enabled", s.IgnoreAllErrors),
 					"watermark": c.Dict("watermark", s.Schema{
 						"low":                c.Str("low", s.IgnoreAllErrors),
 						"high":               c.Str("high", s.IgnoreAllErrors),
@@ -35,20 +78,22 @@ var (
 						"flood_stage_frozen": c.Str("flood_stage.frozen", s.IgnoreAllErrors),
 					}, c.DictOptional),
 				}, c.DictOptional),
+				"enable":                              c.Str("enable", s.IgnoreAllErrors),
 				"node_concurrent_outgoing_recoveries": c.Str("node_concurrent_outgoing_recoveries", s.IgnoreAllErrors),
 				"cluster_concurrent_rebalance":        c.Str("cluster_concurrent_rebalance", s.IgnoreAllErrors),
 				"node_concurrent_recoveries":          c.Str("node_concurrent_recoveries", s.IgnoreAllErrors),
+				"node_initial_primaries_recoveries":   c.Str("node_initial_primaries_recoveries", s.IgnoreAllErrors),
 				"total_shards_per_node":               c.Str("total_shards_per_node", s.IgnoreAllErrors),
-				"exclude": c.Dict("exclude", s.Schema{
-					"_ip":   c.Str("_ip", s.IgnoreAllErrors),
-					"_host": c.Str("_host", s.IgnoreAllErrors),
-					"_name": c.Str("_name", s.IgnoreAllErrors),
+				"awareness": c.Dict("awareness", s.Schema{
+					// a list setting: ES returns an array, or a comma-separated string when set that way
+					"attributes": c.Ifc("attributes", s.Optional),
 				}, c.DictOptional),
-				"include": c.Dict("include", s.Schema{
-					"_ip":   c.Str("_ip", s.IgnoreAllErrors),
-					"_host": c.Str("_host", s.IgnoreAllErrors),
-					"_name": c.Str("_name", s.IgnoreAllErrors),
-				}, c.DictOptional),
+				"exclude": allocationFilterSchema("exclude"),
+				"include": allocationFilterSchema("include"),
+				"require": allocationFilterSchema("require"),
+			}, c.DictOptional),
+			"rebalance": c.Dict("rebalance", s.Schema{
+				"enable": c.Str("enable", s.IgnoreAllErrors),
 			}, c.DictOptional),
 		}, c.DictOptional),
 		"blocks": c.Dict("blocks", s.Schema{
@@ -70,13 +115,20 @@ var (
 					"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
 				}, c.DictOptional),
 			}, c.DictOptional),
-			"discovery": c.Dict("discovery", s.Schema{
-				"zen": c.Dict("zen", s.Schema{
-					"minimum_master_nodes": c.Str("minimum_master_nodes", s.IgnoreAllErrors),
-				}, c.DictOptional),
-			}, c.DictOptional),
+			"discovery":  discoverySchema,
 			"processors": c.Str("processors", s.IgnoreAllErrors),
 			"cluster":    clusterSchema,
+			// `gateway.*` is static, node-scoped configuration: it can never be set as a persistent
+			// or transient cluster setting, so it is only mapped under `defaults`. Both generations
+			// are collected — `expected_nodes` and `recover_after_nodes` were removed in 8.0 in
+			// favour of the `*_data_nodes` variants — so every key is optional.
+			"gateway": c.Dict("gateway", s.Schema{
+				"expected_nodes":           c.Str("expected_nodes", s.IgnoreAllErrors),
+				"expected_data_nodes":      c.Str("expected_data_nodes", s.IgnoreAllErrors),
+				"recover_after_nodes":      c.Str("recover_after_nodes", s.IgnoreAllErrors),
+				"recover_after_data_nodes": c.Str("recover_after_data_nodes", s.IgnoreAllErrors),
+				"recover_after_time":       c.Str("recover_after_time", s.IgnoreAllErrors),
+			}, c.DictOptional),
 			"repositories": c.Dict("repositories", s.Schema{
 				"fs": c.Dict("fs", s.Schema{
 					"compress":   c.Str("compress", s.IgnoreAllErrors),
@@ -115,9 +167,7 @@ var (
 					}, c.DictOptional),
 				}, c.DictOptional),
 			}, c.DictOptional),
-			"action": c.Dict("action", s.Schema{
-				"destructive_requires_name": c.Str("destructive_requires_name", s.IgnoreAllErrors),
-			}, c.DictOptional),
+			"action": actionSchema,
 		}, c.DictRequired),
 		"persistent": c.Dict("persistent", s.Schema{
 			"serverless": c.Dict("serverless", s.Schema{
@@ -127,11 +177,7 @@ var (
 					"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
 				}, c.DictOptional),
 			}, c.DictOptional),
-			"discovery": c.Dict("discovery", s.Schema{
-				"zen": c.Dict("zen", s.Schema{
-					"minimum_master_nodes": c.Str("minimum_master_nodes", s.IgnoreAllErrors),
-				}, c.DictOptional),
-			}, c.DictOptional),
+			"discovery":  discoverySchema,
 			"processors": c.Str("processors", s.IgnoreAllErrors),
 			"cluster":    clusterSchema,
 			"bootstrap": c.Dict("bootstrap", s.Schema{
@@ -162,9 +208,7 @@ var (
 					}, c.DictOptional),
 				}, c.DictOptional),
 			}, c.DictOptional),
-			"action": c.Dict("action", s.Schema{
-				"destructive_requires_name": c.Str("destructive_requires_name", s.IgnoreAllErrors),
-			}, c.DictOptional),
+			"action": actionSchema,
 		}, c.DictOptional),
 		"transient": c.Dict("transient", s.Schema{
 			"serverless": c.Dict("serverless", s.Schema{
@@ -174,11 +218,7 @@ var (
 					"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
 				}, c.DictOptional),
 			}, c.DictOptional),
-			"discovery": c.Dict("discovery", s.Schema{
-				"zen": c.Dict("zen", s.Schema{
-					"minimum_master_nodes": c.Str("minimum_master_nodes", s.IgnoreAllErrors),
-				}, c.DictOptional),
-			}, c.DictOptional),
+			"discovery":  discoverySchema,
 			"processors": c.Str("processors", s.IgnoreAllErrors),
 			"cluster":    clusterSchema,
 			"bootstrap": c.Dict("bootstrap", s.Schema{
@@ -209,9 +249,7 @@ var (
 					}, c.DictOptional),
 				}, c.DictOptional),
 			}, c.DictOptional),
-			"action": c.Dict("action", s.Schema{
-				"destructive_requires_name": c.Str("destructive_requires_name", s.IgnoreAllErrors),
-			}, c.DictOptional),
+			"action": actionSchema,
 		}, c.DictOptional),
 	}
 )
