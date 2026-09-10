@@ -109,7 +109,11 @@ func enrichCgroupCpuUsagePercent(node *mapstr.M, prevNode *mapstr.M) {
 	if usageDelta < 0 || periodsDelta <= 0 {
 		return
 	}
-	percent := float64(usageDelta) / (float64(periodsDelta) * float64(quotaMicros) * 1000) * 100
+	// Truncate to a whole-number percentage: process.cpu.percent is already an integer
+	// (the ES node stats API returns 0–100 as int), and the account index mapping for
+	// this field is `long`. Emitting an integer keeps the stored value identical to
+	// what the agent sends rather than relying on ES coercion to truncate a float.
+	percent := int64(float64(usageDelta) / (float64(periodsDelta) * float64(quotaMicros) * 1000) * 100)
 
 	// `setValue` writes a literal flat key; use `Put` so the value lands inside the
 	// nested `os.cgroup.cpu` object that the schema already produces.

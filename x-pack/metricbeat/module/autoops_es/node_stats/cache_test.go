@@ -7,7 +7,6 @@
 package node_stats
 
 import (
-	"math"
 	"testing"
 	"testing/quick"
 	"time"
@@ -346,27 +345,27 @@ func TestEnrichNodeStatsCgroupCpuUsagePercent(t *testing.T) {
 		prev          mapstr.M // if nil, cache is cleared (first sample)
 		curr          mapstr.M
 		expectPresent bool
-		expected      float64
+		expected      int64
 	}{
 		"happy path 50%": {
 			// Δusage=500_000_000 ns, Δperiods=10, quota=100_000 µs → 50%
 			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
 			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
 			expectPresent: true,
-			expected:      50.0,
+			expected:      50,
 		},
 		"burst above quota emits >100%": {
 			// Δusage=3_000_000_000 ns, Δperiods=10, quota=100_000 µs → 300%
 			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
 			curr:          makeCgroupNodeStats(4_000_000_000, 100, 100_000),
 			expectPresent: true,
-			expected:      300.0,
+			expected:      300,
 		},
 		"zero usage delta emits 0%": {
 			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
 			curr:          makeCgroupNodeStats(1_000_000_000, 100, 100_000),
 			expectPresent: true,
-			expected:      0.0,
+			expected:      0,
 		},
 		"quota changed uses current quota": {
 			// Even if prev had a different quota, current sample's quota is authoritative.
@@ -374,7 +373,7 @@ func TestEnrichNodeStatsCgroupCpuUsagePercent(t *testing.T) {
 			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
 			curr:          makeCgroupNodeStats(1_500_000_000, 100, 200_000),
 			expectPresent: true,
-			expected:      25.0,
+			expected:      25,
 		},
 		"unlimited quota (-1)": {
 			prev:          makeCgroupNodeStats(1_000_000_000, 90, -1),
@@ -447,7 +446,7 @@ func TestEnrichNodeStatsCgroupCpuUsagePercent(t *testing.T) {
 			if tt.expectPresent {
 				v, err := curr.GetValue(cgroupCpuPercentKey)
 				require.NoError(t, err, "expected %s to be set", cgroupCpuPercentKey)
-				require.InDelta(t, tt.expected, v.(float64), 0.001)
+				require.Equal(t, tt.expected, v.(int64))
 			} else {
 				ok, _ := curr.HasKey(cgroupCpuPercentKey)
 				require.False(t, ok, "expected %s to be absent", cgroupCpuPercentKey)
@@ -475,11 +474,11 @@ func TestEnrichNodeStatsCgroupCpuUsagePercentQuickCheck(t *testing.T) {
 		if err != nil {
 			return false
 		}
-		v, ok := raw.(float64)
+		v, ok := raw.(int64)
 		if !ok {
 			return false
 		}
-		return v >= 0 && !math.IsNaN(v) && !math.IsInf(v, 0)
+		return v >= 0
 	}
 	require.NoError(t, quick.Check(property, nil))
 }

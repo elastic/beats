@@ -205,7 +205,7 @@ func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData
 	// fixture value and the enricher always emits a positive percentage.
 	cgroupCpuPct := auto_ops_testing.GetObjectValue(node1MetricSet, "os.cgroup.cpu.usage_percent")
 	require.NotNil(t, cgroupCpuPct, "expected os.cgroup.cpu.usage_percent to be set")
-	require.Greater(t, cgroupCpuPct.(float64), 0.0)
+	require.Greater(t, cgroupCpuPct.(int64), int64(0))
 }
 
 // Expect a valid response from Elasticsearch to create N events
