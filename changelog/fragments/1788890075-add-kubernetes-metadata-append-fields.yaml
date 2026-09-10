@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add `append_fields` option to `add_kubernetes_metadata` processor to merge metadata into events that already have a `kubernetes` field without overwriting existing keys
+component: libbeat
