@@ -169,6 +169,8 @@ func expectValidParsedDetailedWithNoCache(t *testing.T, data metricset.FetcherDa
 	require.Nil(t, node1MetricSet["index_latency_in_millis"])
 	require.Nil(t, node1MetricSet["merge_latency_in_millis"])
 	require.Nil(t, node1MetricSet["search_latency_in_millis"])
+	// no previous sample → cgroup CPU percent must be absent
+	require.Nil(t, auto_ops_testing.GetObjectValue(node1MetricSet, "os.cgroup.cpu.usage_percent"))
 }
 
 func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData[NodesStats]) {
@@ -198,6 +200,12 @@ func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData
 		require.NotNil(t, node1MetricSet["bulk_bytes_per_second"])
 		require.NotNil(t, node1MetricSet["bulk_operations_per_second"])
 	}
+	// all three fixture versions carry cgroup counters with a positive quota; the cache
+	// is seeded with zero prev-counters (getNodeStatsForNode), so the delta equals the
+	// fixture value and the enricher always emits a positive percentage.
+	cgroupCpuPct := auto_ops_testing.GetObjectValue(node1MetricSet, "os.cgroup.cpu.usage_percent")
+	require.NotNil(t, cgroupCpuPct, "expected os.cgroup.cpu.usage_percent to be set")
+	require.Greater(t, cgroupCpuPct.(float64), 0.0)
 }
 
 // Expect a valid response from Elasticsearch to create N events
