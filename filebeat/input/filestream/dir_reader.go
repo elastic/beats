@@ -38,7 +38,7 @@ type dirReader interface {
 type osDirReader struct{}
 
 func (osDirReader) readDirNames(dir string) ([]string, error) { return readDirNames(dir) }
-func (osDirReader) readDir(dir string) ([]os.DirEntry, error)  { return os.ReadDir(dir) }
+func (osDirReader) readDir(dir string) ([]os.DirEntry, error) { return os.ReadDir(dir) }
 
 // Process-wide singleton dir reader shared across all filestream Plugin()
 // instances. acquireSharedDirReader / releaseSharedDirReader follow the same
@@ -90,10 +90,10 @@ type cachedDirListing struct {
 // instance shared across all fileScanner instances reduces readdir syscalls when
 // many inputs watch the same base directory.
 type cachedDirReader struct {
-	mu       sync.Mutex
-	ttl      time.Duration
-	cache    map[string]cachedDirListing
-	stopCh   chan struct{}
+	mu     sync.Mutex
+	ttl    time.Duration
+	cache  map[string]cachedDirListing
+	stopCh chan struct{}
 }
 
 func newCachedDirReader(ttl time.Duration) *cachedDirReader {
