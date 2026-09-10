@@ -151,6 +151,13 @@ func configure(
 		return nil, nil, err
 	}
 
+	// Lower the cache TTL if this input's check_interval is shorter, so the
+	// cache never serves listings stale beyond the fastest configured interval.
+	type ttlLowerer interface{ lowerTTL(time.Duration) }
+	if tl, ok := dr.(ttlLowerer); ok {
+		tl.lowerTTL(c.FileWatcher.Interval)
+	}
+
 	// zero must also disable clean_inactive, see:
 	// https://github.com/elastic/beats/issues/45601
 	// for more details. At the same time we need to allow

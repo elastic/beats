@@ -138,6 +138,17 @@ func (c *cachedDirReader) stop() {
 	close(c.stopCh)
 }
 
+// lowerTTL shrinks the cache TTL if d is smaller than the current one.
+// Called when an input is configured with a check_interval shorter than the
+// current TTL so the cache does not serve listings stale beyond that interval.
+func (c *cachedDirReader) lowerTTL(d time.Duration) {
+	c.mu.Lock()
+	if d < c.ttl {
+		c.ttl = d
+	}
+	c.mu.Unlock()
+}
+
 // readDir returns the cached listing for dir, refreshing it from the OS if
 // the entry is absent or older than the TTL. The lock is held during the
 // underlying os.ReadDir call so that concurrent callers for the same directory
