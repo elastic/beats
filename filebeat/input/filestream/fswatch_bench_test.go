@@ -438,6 +438,7 @@ func BenchmarkGetFilesSharedDir(b *testing.B) {
 			}
 			scanners := make([]*fileScanner, inputs)
 			dr := newCachedDirReader(time.Second)
+			b.Cleanup(dr.stop)
 			for i := range inputs {
 				glob := filepath.Join(base, fmt.Sprintf("pod-%04d-container-*.log", i%total))
 				var err error
@@ -446,6 +447,7 @@ func BenchmarkGetFilesSharedDir(b *testing.B) {
 			}
 
 			b.ReportAllocs()
+			b.ResetTimer()
 			for b.Loop() {
 				for _, s := range scanners {
 					s.GetFiles(loginp.FileScanOptions{})

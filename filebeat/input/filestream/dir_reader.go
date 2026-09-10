@@ -60,7 +60,6 @@ func acquireSharedDirReader() (dirReader, func()) {
 
 	if dirReaderInst == nil {
 		dirReaderInst = newCachedDirReader(time.Second)
-		go dirReaderInst.sweepLoop()
 	}
 	dirReaderRefs++
 
@@ -97,11 +96,13 @@ type cachedDirReader struct {
 }
 
 func newCachedDirReader(ttl time.Duration) *cachedDirReader {
-	return &cachedDirReader{
+	c := &cachedDirReader{
 		ttl:    ttl,
 		cache:  make(map[string]cachedDirListing),
 		stopCh: make(chan struct{}),
 	}
+	go c.sweepLoop()
+	return c
 }
 
 // sweepLoop removes expired cache entries every TTL. Run in a goroutine.

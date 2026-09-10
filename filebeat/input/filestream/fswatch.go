@@ -92,8 +92,7 @@ func newFileWatcher(
 	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, osDirReader{})
 }
 
-// newFileWatcherWithDirReader is like newFileWatcher but accepts an explicit
-// dirReader.
+// newFileWatcherWithDirReader is like newFileWatcher but accepts an explicit dirReader.
 func newFileWatcherWithDirReader(
 	logger *logp.Logger,
 	paths []string,

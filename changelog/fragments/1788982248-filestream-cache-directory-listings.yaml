@@ -13,7 +13,8 @@ kind: enhancement
 # Change summary; a 80ish characters long description of the change.
 summary: Cache directory listings across filestream inputs sharing the same base directory
 
-
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: filebeat
 
