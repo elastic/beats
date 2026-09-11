@@ -103,14 +103,10 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			}
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom, logger))
-			logger.Info("=============== Using ES state loader")
 		}
 	} else if b.Manager.Enabled() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second, logger)
-		logger.Info("=============== Using Nil state loader")
 	}
-
-	logger.Infof("=============== Output: %q, isManaged %T", b.Config.Output.Name(), b.Manager.Enabled())
 
 	limit := parsedConfig.Scheduler.Limit
 	schedLocationName := parsedConfig.Scheduler.Location
@@ -331,6 +327,13 @@ func (bt *Heartbeat) Stop() {
 
 func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 	bt.otelStatusFactoryWrapper = wrapper
+}
+
+// WithElasticsearchStateLoader atomically installs a monitor state loader that reads
+// prior monitor state from Elasticsearch using requester. Callers such as the OTel
+// Heartbeat receiver invoke this before Run so monitors use the injected client.
+func (bt *Heartbeat) WithElasticsearchStateLoader(requester monitorstate.ElasticsearchRequester) {
+	bt.replaceStateLoader(monitorstate.MakeESLoader(requester, monitorstate.DefaultDataStreams, bt.config.RunFrom, bt.logger))
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
