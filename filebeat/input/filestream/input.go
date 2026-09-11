@@ -524,7 +524,7 @@ func (inp *filestream) openFile(
 	f, err := inp.newFile(rawFile)
 	if err != nil {
 		return nil, nil, false,
-			fmt.Errorf("failed to create a File from a os.File: %w", err)
+			fmt.Errorf("failed to create a File from an os.File: %w", err)
 	}
 
 	ok := false
