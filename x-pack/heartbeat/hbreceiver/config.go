@@ -12,10 +12,11 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 )
 
-// Config is config settings for heartbeat receiver.  The structure of
-// which is the same as the heartbeat.yml configuration file.
+// Config contains explicit receiver-only settings and the remaining Heartbeat
+// Beat configuration.
 type Config struct {
-	Beatconfig map[string]any `mapstructure:",remain"`
+	ElasticsearchClient string         `mapstructure:"elasticsearch_client"`
+	Beatconfig          map[string]any `mapstructure:",remain"`
 }
 
 // Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.

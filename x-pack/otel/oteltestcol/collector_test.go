@@ -11,9 +11,21 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+func TestElasticsearchClientExtensionRegistered(t *testing.T) {
+	factories, err := getComponent()
+	require.NoError(t, err, "test Collector factories should build")
+	require.Contains(
+		t,
+		factories.Extensions,
+		component.MustNewType("elasticsearchclient"),
+		"test Collector should register the elasticsearchclient extension",
+	)
+}
 
 func TestFilebeatReceiver(t *testing.T) {
 	cfg := `receivers:
