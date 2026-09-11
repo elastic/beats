@@ -514,9 +514,6 @@ type walkPattern struct {
 	orderIndex int
 }
 
-// readNames returns sorted entry names for dir.
-// When shared is true and s.dirCache is non-nil the result is served from (or
-// stored into) the shared cache; otherwise the OS is read directly.
 func (s *fileScanner) readNames(dir string, shared bool) ([]string, error) {
 	if s.dirCache != nil {
 		return s.dirCache.readDirNames(dir, s.dirCacheMaxAge, shared)
@@ -524,9 +521,6 @@ func (s *fileScanner) readNames(dir string, shared bool) ([]string, error) {
 	return osDirNames(dir)
 }
 
-// readEntries returns sorted DirEntries for dir.
-// When shared is true and s.dirCache is non-nil the result is served from (or
-// stored into) the shared cache; otherwise the OS is read directly.
 func (s *fileScanner) readEntries(dir string, shared bool) ([]os.DirEntry, error) {
 	if s.dirCache != nil {
 		return s.dirCache.readDirEntries(dir, s.dirCacheMaxAge, shared)
@@ -601,11 +595,10 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 		}
 
-		// Only cache the walk root (depth 0); sub-directories are read directly.
-		shared := depth == 0
+		shared := depth == 0 // only cache the walk root
 
 		if len(deeper) == 0 {
-			// Leaf directory: only names needed; use the fast Readdirnames path.
+			// Leaf: names only; Readdirnames avoids DirEntry allocation.
 			names, err := s.readNames(dir, shared)
 			if err != nil {
 				onReadError(err)

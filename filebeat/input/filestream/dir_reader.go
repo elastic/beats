@@ -25,13 +25,11 @@ import (
 	"time"
 )
 
-// maxDirCacheAge caps how long a directory listing may be served from cache.
 const maxDirCacheAge = time.Second
 
-// dirCacheEntry holds a cached directory listing protected by its own mutex.
-// The per-entry mutex allows concurrent reads of distinct directories while
-// serialising concurrent reads of the same directory so at most one OS call
-// runs per directory at a time.
+// dirCacheEntry holds a cached directory listing. The per-entry mutex
+// serialises concurrent reads of the same directory without blocking reads
+// of distinct directories.
 type dirCacheEntry struct {
 	mu      sync.Mutex
 	fetched atomic.Int64 // Unix nanoseconds; zero means no valid entry
@@ -47,8 +45,7 @@ func (e *dirCacheEntry) age() time.Duration {
 	return time.Since(time.Unix(0, f))
 }
 
-// set stores names/entries and timestamps the entry. Passing nil for both
-// clears the entry so the next caller retries (used when an OS read fails).
+// set timestamps the entry. Passing nil for both clears it so the next caller retries.
 func (e *dirCacheEntry) set(names []string, entries []os.DirEntry) {
 	e.names = names
 	e.entries = entries
@@ -59,15 +56,9 @@ func (e *dirCacheEntry) set(names []string, entries []os.DirEntry) {
 	}
 }
 
-// dirCache is a process-wide cache of directory listings. A single instance is
-// shared across all filestream Plugin() invocations via acquireSharedDirReader.
-//
-// Locking discipline:
-//   - mu guards the entries map (held only while looking up / inserting entries).
-//   - Each dirCacheEntry has its own mutex that serialises concurrent reads of
-//     the same directory; reads for distinct directories proceed fully in parallel.
-//   - Sweep runs inline on every miss path (under defer, after e.mu is released).
-//     A swept timestamp throttles actual work to at most once per maxDirCacheAge.
+// dirCache is a process-wide singleton cache of directory listings shared across
+// all filestream inputs via acquireSharedDirReader. mu guards the entries map
+// only; per-entry locking is handled by dirCacheEntry.mu.
 type dirCache struct {
 	mu      sync.Mutex
 	entries map[string]*dirCacheEntry
@@ -78,8 +69,7 @@ func newDirCache() *dirCache {
 	return &dirCache{entries: make(map[string]*dirCacheEntry)}
 }
 
-// reset clears all cached entries. Called when the last receiver releases the
-// singleton so the GC can reclaim any pinned slices.
+// reset clears all cached entries on last release so the GC can reclaim them.
 func (c *dirCache) reset() {
 	c.mu.Lock()
 	c.entries = make(map[string]*dirCacheEntry)
@@ -87,7 +77,6 @@ func (c *dirCache) reset() {
 	c.mu.Unlock()
 }
 
-// entry returns the cache entry for dir, creating it if absent.
 func (c *dirCache) entry(dir string) *dirCacheEntry {
 	c.mu.Lock()
 	e := c.entries[dir]
@@ -99,9 +88,8 @@ func (c *dirCache) entry(dir string) *dirCacheEntry {
 	return e
 }
 
-// readDirNames returns sorted file names for dir from the cache (when fresh
-// and shared=true) or from the OS. shared=false bypasses the cache so
-// sub-directories are always read directly; only the walk root is cached.
+// readDirNames returns sorted names for dir. shared=false bypasses the cache;
+// only the walk root passes shared=true so sub-directories are never cached.
 func (c *dirCache) readDirNames(dir string, maxAge time.Duration, shared bool) ([]string, error) {
 	if !shared {
 		return osDirNames(dir)
@@ -128,8 +116,7 @@ func (c *dirCache) readDirNames(dir string, maxAge time.Duration, shared bool) (
 	return names, nil
 }
 
-// readDirEntries returns sorted DirEntries for dir from the cache (when fresh
-// and shared=true) or from the OS. shared=false bypasses the cache.
+// readDirEntries returns sorted DirEntries for dir. shared=false bypasses the cache.
 func (c *dirCache) readDirEntries(dir string, maxAge time.Duration, shared bool) ([]os.DirEntry, error) {
 	if !shared {
 		return os.ReadDir(dir)
@@ -150,10 +137,8 @@ func (c *dirCache) readDirEntries(dir string, maxAge time.Duration, shared bool)
 	return entries, nil
 }
 
-// sweep removes entries older than maxDirCacheAge from the map. It is throttled
-// by the swept timestamp so at most one sweep runs per maxDirCacheAge even if
-// many misses occur concurrently. Sweep is called via defer after each OS read,
-// so it executes after e.mu has been released — it only needs c.mu.
+// sweep removes stale entries. Throttled to at most once per maxDirCacheAge;
+// called via defer after each OS read so it runs after e.mu is released.
 func (c *dirCache) sweep() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -169,9 +154,8 @@ func (c *dirCache) sweep() {
 	}
 }
 
-// osDirNames reads sorted entry names from dir directly from the OS.
-// Using Readdirnames + sort avoids allocating DirEntry objects, which is
-// significantly faster for leaf directories that only need names.
+// osDirNames reads sorted entry names directly from the OS using
+// Readdirnames, which avoids DirEntry allocation for leaf directories.
 func osDirNames(dir string) ([]string, error) {
 	f, err := os.Open(dir)
 	if err != nil {
@@ -186,7 +170,6 @@ func osDirNames(dir string) ([]string, error) {
 	return names, nil
 }
 
-// entryNames extracts sorted names from a slice of DirEntry values.
 func entryNames(entries []os.DirEntry) []string {
 	names := make([]string, len(entries))
 	for i, e := range entries {
@@ -195,20 +178,14 @@ func entryNames(entries []os.DirEntry) []string {
 	return names
 }
 
-// Process-wide singleton dir cache shared across all filestream Plugin()
-// invocations. acquireSharedDirReader / release follow the same ref-counted
-// acquire/release pattern as oteltelemetry.AcquireSystemBridge.
 var (
 	dirReaderMu   sync.Mutex
 	dirReaderInst *dirCache
 	dirReaderRefs int
 )
 
-// acquireSharedDirReader returns the process-wide dirCache and a release
-// function the caller must invoke on shutdown. On first call the singleton is
-// created. Subsequent calls increment the reference count. When the last caller
-// releases, the cache is cleared and the singleton is discarded — no background
-// goroutine is involved, so cleanup is immediate and complete.
+// acquireSharedDirReader returns the process-wide dirCache and a release func.
+// When the last caller releases, the cache is cleared and the singleton is nil'd.
 func acquireSharedDirReader() (*dirCache, func()) {
 	dirReaderMu.Lock()
 	defer dirReaderMu.Unlock()
