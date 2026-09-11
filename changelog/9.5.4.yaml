@@ -5,9 +5,7 @@ entries:
       description: 'The hostname can be overridden with the --hostname flag or the top-level hostname config field. The flag wins when both are set. The config field also works for beats running as OTel receivers, which never see CLI flags. The add_host_metadata and add_observer_metadata processors honor the override: host.name reflects the override value, and observer.hostname does too when add_observer_metadata is in the pipeline. The override value is trimmed of whitespace; casing is preserved as supplied.'
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53029
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -21,9 +19,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/52914
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -37,9 +33,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/52957
       issue:
         - https://github.com/elastic/beats/issues/52571
       impact: ""
@@ -67,9 +61,7 @@ entries:
         so the runner replays the last known inputs and restarts osqueryd.
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/52993
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -83,9 +75,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53006
       issue:
         - https://github.com/elastic/beats/issues/52624
       impact: ""
@@ -99,9 +89,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/52980
       issue:
         - https://github.com/elastic/beats/issues/51305
       impact: ""
@@ -120,9 +108,7 @@ entries:
         last successfully chained page so the next run retries it.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53063
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -140,9 +126,7 @@ entries:
         concurrently with a merged per-feed cursor.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53060
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -157,9 +141,7 @@ entries:
         The Kubernetes metadata enricher held the shared watcher registry lock while waiting for an informer cache to synchronize. When the Kubernetes API was unreachable or RBAC denied the initial LIST, that wait never completed and Stop() could not acquire the same lock to cancel it, hanging the metricset and blocking shutdown. Watcher startup now runs outside the registry lock as a shared attempt, and each metricset can cancel its own wait independently of other owners of the same watcher. Metricsets that successfully registered all their required metadata watchers now wait for those watchers to be ready before publishing. When add_metadata is disabled or client creation fails, the enricher is a no-op and publishing continues unenriched as before. A metricset whose extra metadata watcher (such as namespace enrichment) failed to register or synchronize does not collect.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53040
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -173,9 +155,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/52971
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -189,9 +169,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53119
       issue:
         - https://github.com/elastic/beats/issues/48923
       impact: ""
@@ -212,9 +190,7 @@ entries:
         `failure_threshold` to 0 to disable Degraded reporting for unreadable events.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53089
       issue:
         - https://github.com/elastic/beats/issues/44271
       impact: ""
@@ -228,9 +204,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53091
-        - https://github.com/elastic/beats/pull/53172
-        - https://github.com/elastic/beats/pull/53080
+        - https://github.com/elastic/beats/pull/53114
       issue:
         - https://github.com/elastic/beats/issues/52341
       impact: ""
