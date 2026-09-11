@@ -9,21 +9,22 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix network flow collection under the Elastic Agent OTel runtime.
+summary: Add hostname overrides for Beat events
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: |
-  Under the Elastic Agent OTel runtime, the flows stream is delivered in the
-  protocols list, where Packetbeat dropped it as an unknown protocol plugin,
-  collecting no flow events. Flow entries in the protocols list are now routed
-  to the flows configuration, and unknown protocol entries mark Packetbeat as
-  degraded instead of being silently ignored.
+description: >-
+  The hostname can be overridden with the --hostname flag or the top-level hostname config field.
+  The flag wins when both are set. The config field also works for beats running as OTel receivers,
+  which never see CLI flags. The add_host_metadata and add_observer_metadata processors honor the
+  override: host.name reflects the override value, and observer.hostname does too when
+  add_observer_metadata is in the pipeline. The override value is trimmed of whitespace;
+  casing is preserved as supplied.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -33,7 +34,7 @@ description: |
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: packetbeat
+component: all
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -41,10 +42,10 @@ component: packetbeat
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/52932
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-issue: https://github.com/elastic/beats/issues/52931
+# issue: https://github.com/owner/repo/1234

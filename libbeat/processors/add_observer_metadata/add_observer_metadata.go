@@ -121,15 +121,21 @@ func (p *observerMetadata) loadData() error {
 		return nil
 	}
 
-	h, err := sysinfo.Host()
-	if err != nil {
-		return err
+	// Avoid querying sysinfo when the hostname was supplied explicitly.
+	hostname := beat.GetHostnameOverride()
+	if hostname != "" {
+		p.logger.Debugf("using hostname override %q for observer.hostname", hostname)
+	} else {
+		h, err := sysinfo.Host()
+		if err != nil {
+			return err
+		}
+		hostname = h.Info().Hostname
 	}
 
-	hostInfo := h.Info()
 	data := mapstr.M{
 		"observer": mapstr.M{
-			"hostname": hostInfo.Hostname,
+			"hostname": hostname,
 		},
 	}
 	if p.config.NetInfoEnabled {
