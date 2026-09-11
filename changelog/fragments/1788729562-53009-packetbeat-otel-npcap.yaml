@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix npcap.never_install policy opt-out being silently ignored when packetbeat runs as an OTel receiver
+component: packetbeat
+issue: https://github.com/elastic/beats/issues/53009

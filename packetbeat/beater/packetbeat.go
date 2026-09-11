@@ -97,7 +97,7 @@ type packetbeat struct {
 // New returns a new Packetbeat beat.Beater.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	configurator := config.NewAgentConfig
-	if !b.Manager.Enabled() {
+	if !management.UnderAgent() {
 		configurator = initialConfig().FromStatic
 	}
 
