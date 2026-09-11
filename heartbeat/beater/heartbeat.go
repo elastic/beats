@@ -103,10 +103,14 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			}
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom, logger))
+			logger.Info("=============== Using ES state loader")
 		}
 	} else if b.Manager.Enabled() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second, logger)
+		logger.Info("=============== Using Nil state loader")
 	}
+
+	logger.Infof("=============== Output: %q, isManaged %T", b.Config.Output.Name(), b.Manager.Enabled())
 
 	limit := parsedConfig.Scheduler.Limit
 	schedLocationName := parsedConfig.Scheduler.Location
