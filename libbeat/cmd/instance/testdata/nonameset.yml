@@ -1,0 +1,7 @@
+############################# Mockbeat ######################################
+mockbeat:
+
+# No "name:" set — agent.name defaults to the OS hostname.
+
+output.elasticsearch:
+    hosts: ["localhost:9200"]
