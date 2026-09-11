@@ -360,6 +360,90 @@ func TestCoalescingBytesAccounting(t *testing.T) {
 	}
 }
 
+// TestCoalescingResolveIDs verifies that UID→name resolution is performed when
+// ResolveIDs is true. uid=0 is root on all Linux systems, so user.name="root"
+// is a safe assertion without knowing the CI host's user database.
+func TestCoalescingResolveIDs(t *testing.T) {
+	lines := [][]byte{
+		[]byte(`type=SYSCALL msg=audit(1626700000.000:100): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=1 pid=100 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="id" exe="/usr/bin/id" key=(null)`),
+		[]byte(`type=EOE msg=audit(1626700000.000:100):`),
+	}
+	cfg := coalesceConfig()
+	cfg.ResolveIDs = true
+	r := &testReader{messages: lines}
+	p := NewParser(r, cfg, logptest.NewTestingLogger(t, t.Name()))
+
+	msg, err := p.Next()
+	if err != nil {
+		t.Fatalf("Next() returned error: %v", err)
+	}
+
+	// uid=0 is root on all Linux systems.
+	checkField(t, msg.Fields, "user.name", "root")
+	checkField(t, msg.Fields, "user.audit.name", "root")
+}
+
+// TestCoalescingResolveIDsDisabled verifies that no name resolution occurs when
+// ResolveIDs is false, leaving user.name unset even for uid=0.
+func TestCoalescingResolveIDsDisabled(t *testing.T) {
+	lines := [][]byte{
+		[]byte(`type=SYSCALL msg=audit(1626700000.000:101): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=1 pid=101 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="id" exe="/usr/bin/id" key=(null)`),
+		[]byte(`type=EOE msg=audit(1626700000.000:101):`),
+	}
+	cfg := coalesceConfig()
+	cfg.ResolveIDs = false
+	r := &testReader{messages: lines}
+	p := NewParser(r, cfg, logptest.NewTestingLogger(t, t.Name()))
+
+	msg, err := p.Next()
+	if err != nil {
+		t.Fatalf("Next() returned error: %v", err)
+	}
+
+	got, err := msg.Fields.GetValue("user.name")
+	if err == nil && got != "" {
+		t.Errorf("user.name = %v; want absent (ResolveIDs=false)", got)
+	}
+}
+
+// TestCoalescingUserKeyMapping verifies that all kernel identity keys are
+// placed at the correct ECS user.* sub-path. Uses distinct numeric values so
+// each field can be checked independently without relying on name resolution.
+func TestCoalescingUserKeyMapping(t *testing.T) {
+	// uid=1, gid=2, euid=3, egid=4, suid=5, sgid=6, fsuid=7, fsgid=8, auid=9.
+	lines := [][]byte{
+		[]byte(`type=SYSCALL msg=audit(1626700000.000:102): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=1 pid=102 auid=9 uid=1 gid=2 euid=3 egid=4 suid=5 sgid=6 fsuid=7 fsgid=8 tty=pts0 ses=1 comm="id" exe="/usr/bin/id" key=(null)`),
+		[]byte(`type=EOE msg=audit(1626700000.000:102):`),
+	}
+	cfg := coalesceConfig()
+	cfg.ResolveIDs = false
+	r := &testReader{messages: lines}
+	p := NewParser(r, cfg, logptest.NewTestingLogger(t, t.Name()))
+
+	msg, err := p.Next()
+	if err != nil {
+		t.Fatalf("Next() returned error: %v", err)
+	}
+
+	checkField(t, msg.Fields, "user.id", "1")
+	checkField(t, msg.Fields, "user.group.id", "2")
+	checkField(t, msg.Fields, "user.effective.id", "3")
+	checkField(t, msg.Fields, "user.effective.group.id", "4")
+	checkField(t, msg.Fields, "user.saved.id", "5")
+	checkField(t, msg.Fields, "user.saved.group.id", "6")
+	checkField(t, msg.Fields, "user.filesystem.id", "7")
+	checkField(t, msg.Fields, "user.filesystem.group.id", "8")
+	checkField(t, msg.Fields, "user.audit.id", "9")
+
+	// The old raw maps must not be present.
+	if _, err := msg.Fields.GetValue("auditd.user.ids"); err == nil {
+		t.Error("auditd.user.ids still present; want absent")
+	}
+	if _, err := msg.Fields.GetValue("auditd.user.names"); err == nil {
+		t.Error("auditd.user.names still present; want absent")
+	}
+}
+
 // checkField verifies that fields.GetValue(key) equals want. It handles
 // []string specially since reflect.DeepEqual is needed for slice comparison.
 func checkField(t *testing.T, fields mapstr.M, key string, want any) {

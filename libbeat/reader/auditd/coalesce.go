@@ -97,6 +97,9 @@ func (p *coalescingParser) ReassemblyComplete(msgs []*auparse.AuditMessage) {
 		}
 		return
 	}
+	if p.cfg.ResolveIDs {
+		aucoalesce.ResolveIDs(evt)
+	}
 	p.pending = append(p.pending, pendingEvent{evt: evt})
 }
 
@@ -316,20 +319,11 @@ func addSummaryFields(dst mapstr.M, evt *aucoalesce.Event) {
 }
 
 func addUserFields(dst mapstr.M, u aucoalesce.User) {
-	if len(u.IDs) != 0 {
-		ids := make(mapstr.M, len(u.IDs))
-		for k, v := range u.IDs {
-			if v != uidUnset {
-				ids[k] = v
-			}
-		}
-		if len(ids) != 0 {
-			_, _ = dst.Put("user.ids", ids)
-		}
-	}
-	if len(u.Names) != 0 {
-		_, _ = dst.Put("user.names", u.Names)
-	}
+	// user.selinux appears in two places in the final document: here under the
+	// auditd sub-document (auditd.user.selinux), and at the ECS root
+	// (user.selinux) written by addECSUser. Both are intentional; the auditd
+	// sub-document copy mirrors auditd_manager's field layout; the ECS root
+	// copy follows ECS convention.
 	if len(u.SELinux) != 0 {
 		_, _ = dst.Put("user.selinux", u.SELinux)
 	}
@@ -440,6 +434,11 @@ func addECSUser(dst mapstr.M, evt *aucoalesce.Event) {
 	u := evt.User
 	user := mapstr.M{}
 
+	// Map kernel identity keys to the ECS user.* sub-paths that auditd_manager
+	// and auditbeat use. The coalesced.yml ingest pipeline renames these into
+	// the auditd.user.* namespace, matching auditd_manager's output shape.
+	// Unknown keys (ouid, obj_uid, inode_uid, …) land at user.<key>.id/name
+	// to preserve them rather than silently discard them.
 	for id, value := range u.IDs {
 		if value == uidUnset {
 			continue
@@ -453,8 +452,18 @@ func addECSUser(dst mapstr.M, evt *aucoalesce.Event) {
 			_, _ = user.Put("effective.id", value)
 		case "egid":
 			_, _ = user.Put("effective.group.id", value)
+		case "suid":
+			_, _ = user.Put("saved.id", value)
+		case "sgid":
+			_, _ = user.Put("saved.group.id", value)
+		case "fsuid":
+			_, _ = user.Put("filesystem.id", value)
+		case "fsgid":
+			_, _ = user.Put("filesystem.group.id", value)
 		case "auid":
 			_, _ = user.Put("audit.id", value)
+		default:
+			_, _ = user.Put(id+".id", value)
 		}
 	}
 	for id, value := range u.Names {
@@ -467,8 +476,18 @@ func addECSUser(dst mapstr.M, evt *aucoalesce.Event) {
 			_, _ = user.Put("effective.name", value)
 		case "egid":
 			_, _ = user.Put("effective.group.name", value)
+		case "suid":
+			_, _ = user.Put("saved.name", value)
+		case "sgid":
+			_, _ = user.Put("saved.group.name", value)
+		case "fsuid":
+			_, _ = user.Put("filesystem.name", value)
+		case "fsgid":
+			_, _ = user.Put("filesystem.group.name", value)
 		case "auid":
 			_, _ = user.Put("audit.name", value)
+		default:
+			_, _ = user.Put(id+".name", value)
 		}
 	}
 	if len(u.SELinux) != 0 {

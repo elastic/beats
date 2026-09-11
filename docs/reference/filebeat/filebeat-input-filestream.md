@@ -1064,6 +1064,9 @@ The supported configuration options are:
 **`add_error_key`**
 :   (Optional) If `true`, a parse error is added to the event under `error.message`. Defaults to `true`.
 
+**`resolve_ids`** {applies_to}`stack: ga 9.6.0+`
+:   (Optional) If `true`, UIDs and GIDs in coalesced events are resolved to names using the reading host's `/etc/passwd` and `/etc/group`. Only meaningful in `coalesce` mode. Defaults to `true`. Set to `false` when reading forwarded logs from a different host, where the local name database does not apply.
+
 Example configuration (per-line parsing, the default):
 
 ```yaml
