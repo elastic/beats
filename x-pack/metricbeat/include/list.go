@@ -18,6 +18,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/cluster_health"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/cluster_settings"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/component_template"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/frozen_cache_stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/index_template"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/license"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/node_stats"
