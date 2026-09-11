@@ -2,7 +2,7 @@
 
 This metricset connects to kube-state-metrics endpoint to retrieve and report Storage Class metrics.
 
-Interestingly enough kube-state-metrics does not repport annotations, we are unable to inform which storage class is default. We can consider enriching adding that info, or contributing back to kube-state-metrics to add annotations.
+Interestingly enough kube-state-metrics does not report annotations, we are unable to inform which storage class is default. We can consider enriching adding that info, or contributing back to kube-state-metrics to add annotations.
 
 ## Version history
 
