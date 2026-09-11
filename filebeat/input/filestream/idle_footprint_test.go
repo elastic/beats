@@ -28,7 +28,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -82,7 +81,7 @@ paths:
 		// A fresh store each iteration so the fleet is re-read from offset 0.
 		p := Plugin(logger, createTestStore(b))
 		//nolint:errcheck // Close is a cleanup function and never returns an error
-		b.Cleanup(p.Manager.(*loginp.InputManager).Close)
+		b.Cleanup(p.Manager.(*filestreamInputManager).Close)
 		input, err := p.Manager.Create(c)
 		require.NoError(b, err)
 
