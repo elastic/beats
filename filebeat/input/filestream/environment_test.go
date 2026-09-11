@@ -133,7 +133,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 	//nolint:errcheck // It's a test, let it panic if the casting fails
-	e.getManager().(*loginp.InputManager).Close()
+	e.getManager().(*filestreamInputManager).Close()
 }
 
 // mustWriteToFile writes data to file and returns the full path
