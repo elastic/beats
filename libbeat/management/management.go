@@ -88,6 +88,14 @@ type Manager interface {
 	// SetPayload Allows to add additional metadata to future requests made by the manager.
 	SetPayload(map[string]any)
 
+	// SetOutputPayload adds additional metadata to the output unit only,
+	// leaving input units untouched. Use it for Beat-wide telemetry that would
+	// otherwise be duplicated onto every input unit; consumers read it from
+	// the single unit whose type is `output`. Values must be
+	// structpb-compatible. Keys set here take precedence over SetPayload keys
+	// on the output unit.
+	SetOutputPayload(map[string]any)
+
 	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
 	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook DiagnosticHook)
 }
@@ -182,5 +190,6 @@ func (n *FallbackManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *FallbackManager) RegisterAction(action Action)       {}
 func (n *FallbackManager) UnregisterAction(action Action)     {}
 func (n *FallbackManager) SetPayload(map[string]any)          {}
+func (n *FallbackManager) SetOutputPayload(map[string]any)    {}
 func (n *FallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ DiagnosticHook) {
 }

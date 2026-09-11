@@ -50,6 +50,7 @@ func (tm testManager) CheckRawConfig(_ *config.C) error     { return nil }
 func (tm testManager) RegisterAction(_ management.Action)   {}
 func (tm testManager) UnregisterAction(_ management.Action) {}
 func (tm testManager) SetPayload(_ map[string]any)          {}
+func (tm testManager) SetOutputPayload(_ map[string]any)    {}
 func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ management.DiagnosticHook) {
 }
 
