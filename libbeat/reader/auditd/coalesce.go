@@ -319,11 +319,11 @@ func addSummaryFields(dst mapstr.M, evt *aucoalesce.Event) {
 }
 
 func addUserFields(dst mapstr.M, u aucoalesce.User) {
-	// Write auditd.user.selinux into the auditd.* sub-document. The ECS-root
-	// user.* fields (including user.selinux) are written by addECSUser; both
-	// locations are kept intentionally — the coalesced.yml pipeline renames
-	// user.selinux → auditd.user.selinux, but that destination is already
-	// populated here, so the rename is a no-op and ignore_failure absorbs it.
+	// user.selinux appears in two places in the final document: here under the
+	// auditd sub-document (auditd.user.selinux), and at the ECS root
+	// (user.selinux) written by addECSUser. Both are intentional; the auditd
+	// sub-document copy mirrors auditd_manager's field layout; the ECS root
+	// copy follows ECS convention.
 	if len(u.SELinux) != 0 {
 		_, _ = dst.Put("user.selinux", u.SELinux)
 	}
