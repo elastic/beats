@@ -243,7 +243,7 @@ func execPing(
 
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
-	start, resp, errReason := execRequest(client, req)
+	start, resp, errReason := execRequest(client, req) //nolint:bodyclose // the body is closed by readBody, reached through processBody below
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways

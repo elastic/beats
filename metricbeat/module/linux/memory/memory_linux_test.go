@@ -24,8 +24,8 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestPercents(t *testing.T) {
@@ -34,9 +34,9 @@ func TestPercents(t *testing.T) {
 	err := FetchLinuxMemStats(data, res)
 	assert.NoError(t, err, "FetchLinuxMemStats")
 
-	assert.Equal(t, float64(1), data["page_stats"].(mapstr.M)["kswapd_efficiency"].(mapstr.M)["pct"].(float64))
-	assert.Equal(t, float64(0.7143), data["page_stats"].(mapstr.M)["direct_efficiency"].(mapstr.M)["pct"].(float64))
-	assert.Equal(t, float64(0), data["swap"].(mapstr.M)["used"].(mapstr.M)["pct"].(float64))
+	assertValue(t, data, "page_stats.kswapd_efficiency.pct", float64(1))
+	assertValue(t, data, "page_stats.direct_efficiency.pct", float64(0.7143))
+	assertValue(t, data, "swap.used.pct", float64(0))
 }
 
 func TestPagesFields(t *testing.T) {
@@ -45,9 +45,17 @@ func TestPagesFields(t *testing.T) {
 	err := FetchLinuxMemStats(data, res)
 	assert.NoError(t, err, "FetchLinuxMemStats")
 
-	assert.Equal(t, uint64(2077939388), data["page_stats"].(mapstr.M)["pgfree"].(mapstr.M)["pages"].(uint64))
-	assert.Equal(t, uint64(7), data["page_stats"].(mapstr.M)["pgscan_direct"].(mapstr.M)["pages"].(uint64))
-	assert.Equal(t, uint64(5), data["page_stats"].(mapstr.M)["pgsteal_direct"].(mapstr.M)["pages"].(uint64))
+	assertValue(t, data, "page_stats.pgfree.pages", uint64(2077939388))
+	assertValue(t, data, "page_stats.pgscan_direct.pages", uint64(7))
+	assertValue(t, data, "page_stats.pgsteal_direct.pages", uint64(5))
+}
+
+func assertValue(t *testing.T, data mapstr.M, key string, expected any) {
+	t.Helper()
+	actual, err := data.GetValue(key)
+	if assert.NoError(t, err, "get %s", key) {
+		assert.Equal(t, expected, actual, "value of %s", key)
+	}
 }
 
 func TestFetch(t *testing.T) {

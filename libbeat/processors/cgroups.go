@@ -20,8 +20,8 @@ package processors
 import (
 	"io/fs"
 
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 // InitCgroupHandler is a type for creating stubs for the cgroup resolver. Used primarily for testing.

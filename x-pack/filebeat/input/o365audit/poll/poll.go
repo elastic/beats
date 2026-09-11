@@ -105,7 +105,7 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 	if err != nil {
 		return fmt.Errorf("failed preparing request: %w", err)
 	}
-	response, err := autorest.Send(request,
+	response, err := autorest.Send(request, //nolint:bodyclose // on success the body is closed by the readJSONBody call in item.OnResponse
 		autorest.DoCloseIfError())
 	if err != nil {
 		r.log.Warnf("-- error sending request: %v", err)
@@ -125,8 +125,8 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 }
 
 // Logger returns the logger used.
-func (p *Poller) Logger() *logp.Logger {
-	return p.log
+func (r *Poller) Logger() *logp.Logger {
+	return r.log
 }
 
 // PollerOption is the type for additional configuration options for a Poller.

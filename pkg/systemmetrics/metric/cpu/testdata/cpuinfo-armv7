@@ -1,0 +1,17 @@
+Processor	: ARMv7 Processor rev 4 (v7l)
+processor	: 0
+BogoMIPS	: 1694.10
+
+processor	: 1
+BogoMIPS	: 1694.10
+
+Features	: swp half thumb fastmult vfp edsp thumbee neon vfpv3 tls vfpv4 idiva idivt 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xc0f
+CPU revision	: 4
+
+Hardware	: SAMSUNG EXYNOS5 (Flattened Device Tree)
+Revision	: 0000
+Serial		: 0000000000000000

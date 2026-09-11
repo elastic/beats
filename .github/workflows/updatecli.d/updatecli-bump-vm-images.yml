@@ -65,6 +65,7 @@ targets:
         - .buildkite/libbeat/pipeline.libbeat.yml
         - .buildkite/metricbeat/pipeline.yml
         - .buildkite/packetbeat/pipeline.packetbeat.yml
+        - .buildkite/pkg/systemmetrics/pipeline.yml
         - .buildkite/winlogbeat/pipeline.winlogbeat.yml
         - .buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml
         - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
