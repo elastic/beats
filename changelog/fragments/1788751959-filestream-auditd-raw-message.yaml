@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Populate auditd.messages and message field in filestream auditd coalescing parser so preserve_original_event works.
+component: libbeat

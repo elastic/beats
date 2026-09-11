@@ -56,6 +56,11 @@ type Config struct {
 	// Default is true. Set to false when reading forwarded logs from a
 	// different host, where the local name database does not apply.
 	ResolveIDs bool `config:"resolve_ids"`
+	// IncludeRawMessage, if true, captures the reassembled raw audit records as
+	// a list of "type=X msg=..." strings in auditd.messages, and sets the
+	// message field to their newline-joined form. Only meaningful in coalesce
+	// mode. Default is false, matching auditbeat's include_raw_message option.
+	IncludeRawMessage bool `config:"include_raw_message"`
 }
 
 // DefaultConfig returns a Config populated with default values. The default
@@ -64,9 +69,10 @@ type Config struct {
 // so its mere presence implies that parsing is desired.
 func DefaultConfig() Config {
 	return Config{
-		Mode:        ModeParse,
-		LogErrors:   false,
-		AddErrorKey: true,
-		ResolveIDs:  true,
+		Mode:              ModeParse,
+		LogErrors:         false,
+		AddErrorKey:       true,
+		ResolveIDs:        true,
+		IncludeRawMessage: false,
 	}
 }
