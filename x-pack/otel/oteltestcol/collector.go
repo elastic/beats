@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchclient"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 	"github.com/elastic/beats/v7/x-pack/packetbeat/pbreceiver"
@@ -236,6 +237,7 @@ func getComponent() (otelcol.Factories, error) {
 
 	extensions, err := otelcol.MakeFactoryMap(
 		beatsauthextension.NewFactory(),
+		elasticsearchclient.NewFactory(),
 		elasticsearchstorage.NewFactory(),
 	)
 	if err != nil {
