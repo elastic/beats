@@ -93,7 +93,7 @@ func newProspector(
 	config config,
 	log *logp.Logger,
 	srci *loginp.SourceIdentifier,
-	dr dirReader) (loginp.Prospector, error) {
+	dc *dirCache) (loginp.Prospector, error) {
 
 	logger := log.Named("filestream").With("id", config.ID)
 
@@ -114,7 +114,8 @@ func newProspector(
 		config.Delete.Enabled,
 		identifier,
 		srci,
-		dr,
+		dc,
+		min(config.FileWatcher.Interval, maxDirCacheAge),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)

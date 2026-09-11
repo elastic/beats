@@ -89,10 +89,11 @@ func newFileWatcher(
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
-	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, osDirReader{})
+	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, nil, 0)
 }
 
-// newFileWatcherWithDirReader is like newFileWatcher but accepts an explicit dirReader.
+// newFileWatcherWithDirReader is like newFileWatcher but accepts a shared dirCache
+// and the per-call maxAge for the directory listing cache. dc=nil disables caching.
 func newFileWatcherWithDirReader(
 	logger *logp.Logger,
 	paths []string,
@@ -101,11 +102,12 @@ func newFileWatcherWithDirReader(
 	sendNotChanged bool,
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
-	dr dirReader,
+	dc *dirCache,
+	maxAge time.Duration,
 ) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScannerWithReader(logger, paths, config.Scanner, compression, dr)
+	scanner, err := newFileScannerWithCache(logger, paths, config.Scanner, compression, dc, maxAge)
 	if err != nil {
 		return nil, err
 	}

@@ -47,7 +47,7 @@ func TestCreateProspector(t *testing.T) {
 			t.Run(name, func(t *testing.T) {
 				c := defaultConfig()
 				c.IgnoreInactive = ignoreInactiveSettings[test.ignore_inactive_since]
-				p, err := newProspector(c, logptest.NewTestingLogger(t, ""), mustSourceIdentifier("foo-id"), osDirReader{})
+				p, err := newProspector(c, logptest.NewTestingLogger(t, ""), mustSourceIdentifier("foo-id"), nil)
 				require.NoError(t, err)
 				fileProspector := p.(*fileProspector) //nolint:errcheck // we know the type
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
@@ -109,7 +109,7 @@ prospector.scanner.fingerprint.enabled: false
 				require.NoError(t, err)
 				require.NoError(t, normalizeConfig(c, &cfg, logger))
 
-				_, err = newProspector(cfg, logger, mustSourceIdentifier("foo-id"), osDirReader{})
+				_, err = newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil)
 				require.NoError(t, err)
 			})
 		}
@@ -150,7 +150,7 @@ rotation.external.strategy.copytruncate:
 				require.NoError(t, c.Unpack(&cfg), "test config must unpack into filestream config")
 				require.NoError(t, normalizeConfig(c, &cfg, logger), "normalizeConfig must succeed")
 
-				p, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"), osDirReader{})
+				p, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil)
 				require.NoError(t, err, "creating the prospector must succeed")
 
 				if tc.wantCopyTruncate {

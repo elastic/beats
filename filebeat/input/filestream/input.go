@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sync"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -96,40 +95,26 @@ type filestream struct {
 }
 
 // filestreamInputManager wraps loginp.InputManager and releases the shared
-// directory reader when all inputs have stopped (on Close).
+// directory cache when all inputs have stopped (on Close).
 type filestreamInputManager struct {
 	*loginp.InputManager
 	releaseDirReader func()
-
-	deregMu    sync.Mutex
-	deregPaths []func() // per-path TTL deregister funcs, one per registered (dir, interval) pair
-}
-
-func (m *filestreamInputManager) trackDeregister(fn func()) {
-	m.deregMu.Lock()
-	m.deregPaths = append(m.deregPaths, fn)
-	m.deregMu.Unlock()
 }
 
 func (m *filestreamInputManager) Close() {
-	m.deregMu.Lock()
-	for _, fn := range m.deregPaths {
-		fn()
-	}
-	m.deregMu.Unlock()
 	m.InputManager.Close()
 	m.releaseDirReader()
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
-	dr, releaseDR := acquireSharedDirReader()
+	dc, releaseDR := acquireSharedDirReader()
 	mgr := &filestreamInputManager{releaseDirReader: releaseDR}
 	mgr.InputManager = &loginp.InputManager{
 		Logger:              log,
 		StateStore:          store,
 		Type:                pluginName,
-		Configure:           makeConfigureFunc(dr, mgr),
+		Configure:           makeConfigureFunc(dc),
 		DefaultCleanTimeout: -1,
 	}
 	return input.Plugin{
@@ -142,11 +127,11 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-// makeConfigureFunc returns a configure function that closes over dr and mgr so
-// the shared dir reader and per-path TTL tracking flow into every prospector.
-func makeConfigureFunc(dr dirReader, mgr *filestreamInputManager) func(*conf.C, *logp.Logger, *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+// makeConfigureFunc returns a configure function that closes over dc so the
+// shared dir cache flows into every prospector created by this plugin instance.
+func makeConfigureFunc(dc *dirCache) func(*conf.C, *logp.Logger, *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
 	return func(cfg *conf.C, log *logp.Logger, src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
-		return configure(cfg, log, src, dr, mgr.trackDeregister)
+		return configure(cfg, log, src, dc)
 	}
 }
 
@@ -154,8 +139,7 @@ func configure(
 	cfg *conf.C,
 	log *logp.Logger,
 	src *loginp.SourceIdentifier,
-	dr dirReader,
-	trackFn func(func())) (loginp.Prospector, loginp.Harvester, error) {
+	dc *dirCache) (loginp.Prospector, loginp.Harvester, error) {
 
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
@@ -164,16 +148,6 @@ func configure(
 
 	if err := normalizeConfig(cfg, &c, log); err != nil {
 		return nil, nil, err
-	}
-
-	// Register each watched base directory with the shared cache so the
-	// per-path TTL reflects this input's check_interval. The deregister func
-	// is called on receiver shutdown so the TTL rises back when no fast
-	// watchers remain for a given directory.
-	if rd, ok := dr.(*cachedDirReader); ok && trackFn != nil {
-		for _, pattern := range c.Paths {
-			trackFn(rd.registerPath(globBase(pattern), c.FileWatcher.Interval))
-		}
 	}
 
 	// zero must also disable clean_inactive, see:
@@ -189,7 +163,7 @@ func configure(
 
 	c.TakeOver.LogWarnings(log)
 
-	prospector, err := newProspector(c, log, src, dr)
+	prospector, err := newProspector(c, log, src, dc)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}

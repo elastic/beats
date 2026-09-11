@@ -2070,7 +2070,7 @@ func TestWalk(t *testing.T) {
 		require.NoError(t, os.WriteFile(path, []byte("data"), 0o660))
 	}
 	collect := func(g *walkGroup) []string {
-		s := &fileScanner{log: logger, dirReader: osDirReader{}}
+		s := &fileScanner{log: logger}
 		var got []string
 		s.walk(g, func(f string, _ int) { got = append(got, f) }, func(string) {})
 		return got
@@ -2154,7 +2154,7 @@ func TestWalk(t *testing.T) {
 		mkfile(t, filepath.Join(base, "appx", "f2.log"))
 
 		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
-		sc := &fileScanner{log: inMemoryLog, dirReader: osDirReader{}}
+		sc := &fileScanner{log: inMemoryLog}
 		var got []string
 		// "app[" is a malformed pattern (unclosed character class) that
 		// buildWalkGroups cannot detect upfront: matching it against "" fails on

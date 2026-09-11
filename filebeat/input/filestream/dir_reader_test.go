@@ -20,6 +20,7 @@ package filestream
 import (
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -27,185 +28,104 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// ---- globBase ---------------------------------------------------------------
-
-func TestGlobBase(t *testing.T) {
-	tests := []struct {
-		pattern string
-		want    string
-	}{
-		// glob patterns
-		{"/var/log/containers/*.log", "/var/log/containers"},
-		{"/var/log/**/*.log", "/var/log"},
-		{"/var/log/*/containers.log", "/var/log"},
-		{"*.log", "."},
-		// literal file paths (no glob chars)
-		{"/var/log/containers/pod.log", "/var/log/containers"},
-		{"/var/log/containers/a/b.log", "/var/log/containers/a"},
-	}
-	for _, tc := range tests {
-		t.Run(tc.pattern, func(t *testing.T) {
-			assert.Equal(t, filepath.FromSlash(tc.want), globBase(filepath.FromSlash(tc.pattern)))
-		})
-	}
-}
-
-// ---- per-path TTL ref counting ----------------------------------------------
-
-func TestPerPathTTLSingleRegistration(t *testing.T) {
-	dr := newCachedDirReader(time.Second)
-	defer dr.stop()
-
-	deregFn := dr.registerPath("/var/log/containers", 200*time.Millisecond)
-	defer deregFn()
-
-	dr.mu.Lock()
-	assert.Equal(t, 200*time.Millisecond, dr.ttlForDir("/var/log/containers"))
-	dr.mu.Unlock()
-}
-
-func TestPerPathTTLMinOfMultipleRegistrations(t *testing.T) {
-	dr := newCachedDirReader(time.Second)
-	defer dr.stop()
-
-	deregA := dr.registerPath("/var/log/containers", time.Second)
-	deregB := dr.registerPath("/var/log/containers", 200*time.Millisecond)
-	defer deregA()
-	defer deregB()
-
-	dr.mu.Lock()
-	assert.Equal(t, 200*time.Millisecond, dr.ttlForDir("/var/log/containers"))
-	dr.mu.Unlock()
-}
-
-func TestPerPathTTLRisesWhenFastWatcherDeregisters(t *testing.T) {
-	dr := newCachedDirReader(time.Second)
-	defer dr.stop()
-
-	deregA := dr.registerPath("/var/log/containers", time.Second)
-	deregB := dr.registerPath("/var/log/containers", 200*time.Millisecond)
-	defer deregA()
-
-	// B (fast) stops first: TTL rises back to A's interval
-	deregB()
-
-	dr.mu.Lock()
-	assert.Equal(t, time.Second, dr.ttlForDir("/var/log/containers"))
-	dr.mu.Unlock()
-}
-
-func TestPerPathTTLRevertsToDefaultWhenAllDeregister(t *testing.T) {
-	const defaultTTL = time.Second
-	dr := newCachedDirReader(defaultTTL)
-	defer dr.stop()
-
-	deregA := dr.registerPath("/var/log/containers", time.Second)
-	deregB := dr.registerPath("/var/log/containers", 200*time.Millisecond)
-
-	deregA()
-	deregB()
-
-	dr.mu.Lock()
-	assert.Equal(t, defaultTTL, dr.ttlForDir("/var/log/containers"))
-	dr.mu.Unlock()
-}
-
-func TestPerPathTTLDeregisterIdempotent(t *testing.T) {
-	dr := newCachedDirReader(time.Second)
-	defer dr.stop()
-
-	deregFn := dr.registerPath("/var/log/containers", 200*time.Millisecond)
-	deregFn()
-	deregFn() // second call must be a no-op
-
-	dr.mu.Lock()
-	assert.Equal(t, time.Second, dr.ttlForDir("/var/log/containers"), "double deregister must not undercount")
-	dr.mu.Unlock()
-}
-
-func TestPerPathTTLIndependentPaths(t *testing.T) {
-	dr := newCachedDirReader(time.Second)
-	defer dr.stop()
-
-	deregA := dr.registerPath("/var/log/containers", 200*time.Millisecond)
-	deregB := dr.registerPath("/var/log/pods", time.Second)
-	defer deregA()
-	defer deregB()
-
-	dr.mu.Lock()
-	assert.Equal(t, 200*time.Millisecond, dr.ttlForDir("/var/log/containers"))
-	assert.Equal(t, time.Second, dr.ttlForDir("/var/log/pods"))
-	dr.mu.Unlock()
-}
-
 // ---- cache hit / miss -------------------------------------------------------
 
-func TestCachedDirReaderCacheHit(t *testing.T) {
+func TestDirCacheCacheHit(t *testing.T) {
 	dir := t.TempDir()
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "a.log"), nil, 0o600))
 
-	// defaultTTL long enough that the per-path registration drives the TTL.
-	dr := newCachedDirReader(time.Second)
-	defer dr.stop()
-	deregFn := dr.registerPath(dir, 50*time.Millisecond)
-	defer deregFn()
+	c := newDirCache()
+	maxAge := 100 * time.Millisecond
 
 	// Warm the cache.
-	listing, err := dr.readDir(dir)
+	names, err := c.readDirNames(dir, maxAge, true)
 	require.NoError(t, err)
-	assert.Equal(t, []string{"a.log"}, listing.names)
+	assert.Equal(t, []string{"a.log"}, names)
 
 	// Add a file while the cache is warm.
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "b.log"), nil, 0o600))
 
 	// Second read within TTL: still sees only a.log.
-	listing, err = dr.readDir(dir)
+	names, err = c.readDirNames(dir, maxAge, true)
 	require.NoError(t, err)
-	assert.Equal(t, []string{"a.log"}, listing.names)
+	assert.Equal(t, []string{"a.log"}, names)
 }
 
-func TestCachedDirReaderCacheMissAfterTTL(t *testing.T) {
+func TestDirCacheCacheMissAfterTTL(t *testing.T) {
 	dir := t.TempDir()
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "a.log"), nil, 0o600))
 
-	dr := newCachedDirReader(time.Second)
-	defer dr.stop()
-	deregFn := dr.registerPath(dir, 50*time.Millisecond)
-	defer deregFn()
+	c := newDirCache()
+	maxAge := 50 * time.Millisecond
 
 	// Warm the cache then add a file.
-	_, err := dr.readDir(dir)
+	_, err := c.readDirNames(dir, maxAge, true)
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "b.log"), nil, 0o600))
 
-	// Wait past the 50 ms per-path TTL.
+	// Wait past the TTL.
 	time.Sleep(100 * time.Millisecond)
 
-	listing, err := dr.readDir(dir)
+	names, err := c.readDirNames(dir, maxAge, true)
 	require.NoError(t, err)
-	assert.Equal(t, []string{"a.log", "b.log"}, listing.names)
+	assert.Equal(t, []string{"a.log", "b.log"}, names)
 }
 
-func TestCachedDirReaderDeregisterInvalidatesCache(t *testing.T) {
+func TestDirCacheSharedFalseBypassesCache(t *testing.T) {
 	dir := t.TempDir()
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "a.log"), nil, 0o600))
 
-	// Use a very long TTL so the cache would not expire on its own.
-	dr := newCachedDirReader(time.Hour)
-	defer dr.stop()
-	deregFn := dr.registerPath(dir, time.Hour)
+	c := newDirCache()
+	maxAge := time.Hour
 
-	// Warm the cache then add a file.
-	_, err := dr.readDir(dir)
+	// Warm the cache.
+	_, err := c.readDirNames(dir, maxAge, true)
 	require.NoError(t, err)
+
+	// Add a file then read with shared=false — must see new file despite cache.
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "b.log"), nil, 0o600))
-
-	// Deregister: must invalidate the cached entry.
-	deregFn()
-
-	listing, err := dr.readDir(dir)
+	names, err := c.readDirNames(dir, maxAge, false)
 	require.NoError(t, err)
-	assert.Equal(t, []string{"a.log", "b.log"}, listing.names)
+	assert.Equal(t, []string{"a.log", "b.log"}, names)
+}
+
+func TestDirCacheErrorNotCached(t *testing.T) {
+	c := newDirCache()
+	// Read a non-existent directory.
+	_, err := c.readDirNames("/nonexistent/path/that/does/not/exist", time.Hour, true)
+	require.Error(t, err)
+
+	// Entry should be cleared so the next read retries the OS.
+	e := c.entry("/nonexistent/path/that/does/not/exist")
+	assert.Equal(t, int64(0), e.fetched.Load(), "error should clear the entry's fetched timestamp")
+}
+
+// ---- concurrent readers for the same directory ------------------------------
+
+func TestDirCacheConcurrentReaders(t *testing.T) {
+	dir := t.TempDir()
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "a.log"), nil, 0o600))
+
+	c := newDirCache()
+	maxAge := time.Second
+
+	const goroutines = 50
+	var wg sync.WaitGroup
+	wg.Add(goroutines)
+	results := make([][]string, goroutines)
+	errs := make([]error, goroutines)
+	for i := range goroutines {
+		go func(i int) {
+			defer wg.Done()
+			results[i], errs[i] = c.readDirNames(dir, maxAge, true)
+		}(i)
+	}
+	wg.Wait()
+
+	for i := range goroutines {
+		require.NoError(t, errs[i])
+		assert.Equal(t, []string{"a.log"}, results[i])
+	}
 }
 
 // ---- singleton lifecycle ----------------------------------------------------
@@ -219,16 +139,12 @@ func TestAcquireSharedDirReaderSingleton(t *testing.T) {
 	}
 	dirReaderMu.Unlock()
 
-	dr1, release1 := acquireSharedDirReader()
-	dr2, release2 := acquireSharedDirReader()
-
-	rd1, ok1 := dr1.(*cachedDirReader)
-	rd2, ok2 := dr2.(*cachedDirReader)
-	require.True(t, ok1 && ok2, "acquireSharedDirReader must return *cachedDirReader")
+	dc1, release1 := acquireSharedDirReader()
+	dc2, release2 := acquireSharedDirReader()
 
 	dirReaderMu.Lock()
 	assert.Equal(t, 2, dirReaderRefs, "two acquires should give ref count 2")
-	assert.Same(t, rd1, rd2, "both acquires should return the same instance")
+	assert.Same(t, dc1, dc2, "both acquires should return the same instance")
 	dirReaderMu.Unlock()
 
 	release1()
@@ -260,4 +176,35 @@ func TestAcquireSharedDirReaderReleaseIdempotent(t *testing.T) {
 	assert.Equal(t, 0, dirReaderRefs)
 	assert.Nil(t, dirReaderInst)
 	dirReaderMu.Unlock()
+}
+
+func TestAcquireSharedDirReaderResetOnLastRelease(t *testing.T) {
+	dirReaderMu.Lock()
+	if dirReaderInst != nil {
+		dirReaderMu.Unlock()
+		t.Skip("singleton already held by another test")
+	}
+	dirReaderMu.Unlock()
+
+	dir := t.TempDir()
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "a.log"), nil, 0o600))
+
+	dc, release := acquireSharedDirReader()
+
+	// Warm the cache.
+	_, err := dc.readDirNames(dir, time.Hour, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, dc.entries)
+
+	// On last release, reset() clears the entries map — no leak.
+	release()
+
+	dirReaderMu.Lock()
+	assert.Nil(t, dirReaderInst, "singleton should be nil after last release")
+	dirReaderMu.Unlock()
+
+	// The old dc pointer's entries were cleared by reset().
+	dc.mu.Lock()
+	assert.Empty(t, dc.entries, "reset should clear all cached entries")
+	dc.mu.Unlock()
 }

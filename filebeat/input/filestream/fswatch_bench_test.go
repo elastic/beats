@@ -25,7 +25,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -437,12 +436,12 @@ func BenchmarkGetFilesSharedDir(b *testing.B) {
 				Fingerprint:   fingerprintConfig{Enabled: false},
 			}
 			scanners := make([]*fileScanner, inputs)
-			dr := newCachedDirReader(time.Second)
-			b.Cleanup(dr.stop)
+			dc := newDirCache()
+			b.Cleanup(func() { dc.reset() })
 			for i := range inputs {
 				glob := filepath.Join(base, fmt.Sprintf("pod-%04d-container-*.log", i%total))
 				var err error
-				scanners[i], err = newFileScannerWithReader(logp.NewNopLogger(), []string{glob}, cfg, CompressionNone, dr)
+				scanners[i], err = newFileScannerWithCache(logp.NewNopLogger(), []string{glob}, cfg, CompressionNone, dc, maxDirCacheAge)
 				require.NoError(b, err)
 			}
 
