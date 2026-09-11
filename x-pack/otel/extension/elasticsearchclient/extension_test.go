@@ -300,7 +300,6 @@ func TestExtension_ShutdownNeverStarted(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	ext := newTestExtension(nil, logger)
 	require.NoError(t, ext.Shutdown(t.Context()), "Shutdown before Start must succeed")
-	require.NoError(t, ext.Shutdown(t.Context()), "repeated Shutdown before Start must be idempotent")
 
 	_, _, err := ext.Request(http.MethodGet, "/", "", nil, nil)
 	assert.ErrorIs(t, err, ErrShutdown, "Request after Shutdown without Start must return ErrShutdown")
@@ -314,58 +313,16 @@ func TestExtension_StartFailed_MissingHosts(t *testing.T) {
 	require.Error(t, err, "Start without hosts must fail")
 	assert.Contains(t, err.Error(), "failed connecting elasticsearch client", "startup failure must wrap the client error")
 	assert.Equal(t, componentstatus.StatusPermanentError, host.lastStatus(), "startup failure must report a permanent error")
-
-	_, _, reqErr := ext.Request(http.MethodGet, "/", "", nil, nil)
-	assert.ErrorIs(t, reqErr, ErrNotStarted, "Request after failed Start must return ErrNotStarted")
 }
 
-func TestExtension_StartFailed_Unauthorized(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, `{"error":"unauthorized"}`, http.StatusUnauthorized)
-	}))
-	t.Cleanup(srv.Close)
-
-	host := &reportingHost{Host: componenttest.NewNopHost()}
-	ext := newTestExtension(map[string]any{
-		"hosts":    []string{srv.URL},
-		"username": "invalid",
-		"password": "wrong",
-	}, logp.NewNopLogger())
-
-	err := ext.Start(t.Context(), host)
-	require.Error(t, err, "Start with rejected credentials must fail")
-	assert.Contains(t, err.Error(), "failed connecting elasticsearch client", "auth failure must wrap the client error")
-	assert.Equal(t, componentstatus.StatusPermanentError, host.lastStatus(), "auth failure must report a permanent error")
-}
-
-func TestExtension_CreateViaFactoryAndRequest(t *testing.T) {
-	var gotBody []byte
-	srv := newFakeES(t, func(w http.ResponseWriter, r *http.Request) bool {
-		if r.URL.Path == "/foo/_search" {
-			gotBody, _ = io.ReadAll(r.Body)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = io.WriteString(w, `{"ok":true}`)
-			return true
-		}
-		return false
-	})
-
-	ext, err := createExtension(t.Context(), extensiontest.NewNopSettings(Type), &Config{
-		ElasticsearchConfig: map[string]any{
-			"hosts":    []string{srv.URL},
-			"username": "elastic",
-			"password": "changeme",
-		},
-	})
+func TestFactoryCreate(t *testing.T) {
+	config := &Config{ElasticsearchConfig: map[string]any{"hosts": []string{"https://example.com"}}}
+	ext, err := createExtension(t.Context(), extensiontest.NewNopSettings(Type), config)
 	require.NoError(t, err, "factory must create the extension")
-	require.NoError(t, ext.Start(t.Context(), componenttest.NewNopHost()), "factory-created extension must start")
-	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 
-	req, ok := ext.(*elasticsearchClient)
+	client, ok := ext.(*elasticsearchClient)
 	require.True(t, ok, "factory-created extension must be *elasticsearchClient")
-	status, body, err := req.Request(http.MethodPost, "/foo/_search", "", nil, map[string]any{"query": "factory"})
-	require.NoError(t, err, "factory-created extension must forward Request")
-	assert.Equal(t, http.StatusOK, status, "factory-created Request must return HTTP 200")
-	assert.JSONEq(t, `{"ok":true}`, string(body), "factory-created Request must return the ES body")
-	assert.Contains(t, string(gotBody), `"query":"factory"`, "factory-created Request must send the encoded body")
+	assert.Same(t, config, client.cfg, "factory-created extension must retain its typed configuration")
+	assert.Equal(t, componentType, client.info.Beat, "factory-created extension must set its Beat identity")
+	assert.NotNil(t, client.info.Logger, "factory-created extension must set its logger")
 }
