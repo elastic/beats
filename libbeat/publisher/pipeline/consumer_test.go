@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -216,16 +217,22 @@ func TestEventConsumerUnblockingDebounceCoalesces(t *testing.T) {
 	c := newEventConsumer(logptest.NewTestingLogger(t, ""), nilObserver)
 	defer c.close()
 
+	parked := make(chan struct{})
+	hooked := &readyChanHookQueue{UnblockingQueue: q, parked: parked}
+
 	out := make(chan publisher.Batch)
 	c.setTarget(consumerTarget{
-		queue:      q,
+		queue:      hooked,
 		ch:         out,
 		batchSize:  8,
 		timeToLive: 3,
 	})
-	// Park the consumer on ReadyChan with an empty queue so the first
-	// publish takes the debounce path rather than the initial TryGet.
-	time.Sleep(50 * time.Millisecond)
+	// Wait until runUnblocking has been parked on ReadyChan.
+	select {
+	case <-parked:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for the consumer to park on ReadyChan")
+	}
 
 	p := q.Producer(queue.ProducerConfig{})
 	_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: 1}})
@@ -244,4 +251,15 @@ func TestEventConsumerUnblockingDebounceCoalesces(t *testing.T) {
 
 	batch := receiveBatch(t, out)
 	require.Len(t, batch.Events(), 3, "events published inside the debounce window should coalesce into one batch")
+}
+
+type readyChanHookQueue struct {
+	queue.UnblockingQueue[publisher.Event]
+	parked chan struct{}
+	once   sync.Once
+}
+
+func (q *readyChanHookQueue) ReadyChan() <-chan struct{} {
+	q.once.Do(func() { close(q.parked) })
+	return q.UnblockingQueue.ReadyChan()
 }
