@@ -9,16 +9,29 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: enhancement
+kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Update Go to 1.26.7
+summary: Reconnect the ETW input when its real-time session is stopped and restarted.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: |
+  When another controller stopped the real-time ETW session, for example
+  `logman stop <session> -ets`, Windows reports the trace as finished and the
+  input exited silently, staying down until Filebeat was restarted. The input
+  now treats this as a lost session: it reports Degraded, retries creating or
+  attaching to the session with a backoff of up to 30 seconds, and reports
+  Running again once it has reconnected. Only a session that is not running
+  is retried; an attempt that fails for a reason waiting cannot fix, such as
+  insufficient privileges, reports Failed. A session that was created but
+  could not be fully configured is now stopped rather than left running.
+  Reading from an .etl file is not affected. A new `reconnects_total` metric
+  counts the reconnection attempts.
+  The changes to the shared ETW reader that make a session safe to reuse are
+  listed under libbeat.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -28,7 +41,7 @@ summary: Update Go to 1.26.7
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+component: filebeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -36,10 +49,10 @@ component: all
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/52750
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-# issue: https://github.com/owner/repo/1234
+issue: https://github.com/elastic/beats/issues/49984
