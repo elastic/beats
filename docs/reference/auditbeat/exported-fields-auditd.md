@@ -515,7 +515,7 @@ The data from the audit messages.
 
 
 **`auditd.data.fp`**
-:   crypto key finger print
+:   crypto key fingerprint
 
     type: keyword
 

@@ -173,7 +173,7 @@ filebeat.inputs:
 How to setup the `auth.oauth2` credentials can be found in the Azure documentation [here](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
 
 ::::{note}
-According to our internal testing it seems that we require at least an access level of **blobOwner** for the service principle to be able to read the blobs. If you are facing any issues with the access level, ensure that the access level is set to **blobOwner**.
+According to our internal testing it seems that we require at least an access level of **blobOwner** for the service principal to be able to read the blobs. If you are facing any issues with the access level, ensure that the access level is set to **blobOwner**.
 ::::
 
 

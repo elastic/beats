@@ -102,7 +102,7 @@ The time interval (in seconds) when metrics are sent to the {{es}} cluster. A ne
 
 ### `state.period` [_state_period]
 
-The time interval (in seconds) when state information are sent to the {{es}} cluster. A new snapshot of Heartbeat state is generated and scheduled for publishing each period. The default value is 60 * time.Second.
+The time interval (in seconds) when state information is sent to the {{es}} cluster. A new snapshot of Heartbeat state is generated and scheduled for publishing each period. The default value is 60 * time.Second.
 
 
 ### `protocol` [_protocol]

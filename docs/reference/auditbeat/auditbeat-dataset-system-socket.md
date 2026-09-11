@@ -15,7 +15,7 @@ This functionality is in beta and is subject to change. The design and code is l
 ::::
 
 
-This is the `socket` dataset of the system module. It allows to monitor network traffic to and from running processes. It’s main features are:
+This is the `socket` dataset of the system module. It allows you to monitor network traffic to and from running processes. Its main features are:
 
 * Supports TCP and UDP sockets over IPv4 and IPv6.
 * Outputs per-flow bytes and packets counters.

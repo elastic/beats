@@ -46,7 +46,7 @@
         - name: error.message
           type: text
           description: >
-            Details about the error occurred
+            Details about the error that occurred
         - name: queue_group
           type: text
           description: >
