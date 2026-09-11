@@ -43,13 +43,13 @@ func newTestStore(t *testing.T, storeName string) backend.Store {
 		URL:      fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host),
 		Username: user,
 		Password: pass,
-	}, logptest.NewTestingLogger(t, ""))
+	}, logptest.NewTestingLogger(t, t.Name()))
 	require.NoError(t, err)
 
 	require.NoError(t, conn.Connect(t.Context()))
 	t.Cleanup(func() { _ = conn.Close() })
 
-	s := es.NewStore(t.Context(), logptest.NewTestingLogger(t, ""), conn, storeName)
+	s := es.NewStore(t.Context(), logptest.NewTestingLogger(t, t.Name()), conn, storeName)
 	t.Cleanup(func() { _ = s.Close() })
 
 	return s
@@ -188,7 +188,7 @@ func TestElasticStorage_Lifecycle(t *testing.T) {
 		},
 	}
 
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 
 	require.NoError(t, ext.Start(context.Background(), componenttest.NewNopHost()))
 	assert.NotNil(t, ext.client)
@@ -218,7 +218,7 @@ func TestElasticStorage_Start_BadCredentials(t *testing.T) {
 			"password": "wrongpassword",
 		},
 	}
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 	err := ext.Start(context.Background(), componenttest.NewNopHost())
 	// NewConnectedClient performs a ping that will receive a 401; it should err.
 	require.Error(t, err)
