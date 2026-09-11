@@ -167,6 +167,17 @@ shared:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
         mode: 0755
 
+  - &windows_binary_spec_fips
+    <<: *common_fips
+    files:
+      <<: *binary_files
+      install-service-{{.BeatName}}.ps1:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service.ps1.tmpl'
+        mode: 0755
+      uninstall-service-{{.BeatName}}.ps1:
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
+        mode: 0755
+
   - &docker_spec
     <<: *binary_spec
     extra_vars:
@@ -640,6 +651,12 @@ specs:
     ###
     # Elastic Licensed Packages
     ###
+    - os: windows
+      types: [zip]
+      spec:
+        <<: *windows_binary_spec_fips
+        <<: *elastic_license_for_binaries
+
     - os: linux
       types: [tgz]
       spec:
