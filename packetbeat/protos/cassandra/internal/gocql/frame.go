@@ -41,8 +41,8 @@ type frameHeader struct {
 	CustomPayload map[string][]byte
 }
 
-func (f frameHeader) ToMap() map[string]interface{} {
-	data := make(map[string]interface{})
+func (f frameHeader) ToMap() map[string]any {
+	data := make(map[string]any)
 	data["version"] = fmt.Sprintf("%d", f.Version.version())
 	data["flags"] = getHeadFlagString(f.Flags)
 	data["stream"] = f.Stream
@@ -56,7 +56,7 @@ func (f frameHeader) String() string {
 }
 
 var framerPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &Framer{compres: nil, isCompressed: false, Header: nil, r: nil, decoder: nil}
 	},
 }
@@ -168,7 +168,7 @@ func (f *Framer) ReadHeader() (head *frameHeader, err error) {
 }
 
 // reads a frame form the wire into the framers buffer
-func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
+func (f *Framer) ReadFrame() (data map[string]any, err error) {
 	defer func() {
 		// The casandra plugin uses panic for flow control, panicking on
 		// errors, so return recovered errors unless they are runtime.Error.
@@ -189,7 +189,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	decoder.r = f.r
 	f.decoder = decoder
 
-	data = make(map[string]interface{})
+	data = make(map[string]any)
 
 	// Only QUERY, PREPARE and EXECUTE queries support tracing
 	// If a response frame has the tracing flag set, its body contains
@@ -275,18 +275,18 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	return data, nil
 }
 
-func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
+func (f *Framer) parseErrorFrame() (data map[string]any) {
 	decoder := f.decoder
 	code := decoder.ReadInt()
 	msg := decoder.ReadString()
 
 	errT := ErrType(code)
 
-	data = make(map[string]interface{})
+	data = make(map[string]any)
 	data["code"] = code
 	data["msg"] = msg
 	data["type"] = errT.String()
-	detail := map[string]interface{}{}
+	detail := map[string]any{}
 	switch errT {
 	case errUnavailable:
 		cl := decoder.ReadConsistency()
@@ -368,15 +368,15 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 	return data
 }
 
-func (f *Framer) parseSupportedFrame() (data map[string]interface{}) {
-	data = make(map[string]interface{})
+func (f *Framer) parseSupportedFrame() (data map[string]any) {
+	data = make(map[string]any)
 	data["supported"] = (f.decoder).ReadStringMultiMap()
 	return data
 }
 
-func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
+func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]any {
 	decoder := f.decoder
-	meta := make(map[string]interface{})
+	meta := make(map[string]any)
 	flags := decoder.ReadInt()
 	meta["flags"] = getRowFlagString(flags)
 	colCount := decoder.ReadInt()
@@ -387,7 +387,7 @@ func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 		if f.proto >= protoVersion4 {
 			pkeyCount := decoder.ReadInt()
 			pkeys := make([]int, pkeyCount)
-			for i := 0; i < pkeyCount; i++ {
+			for i := range pkeyCount {
 				pkeys[i] = int(decoder.ReadShort())
 			}
 			meta["pkey_columns"] = pkeys
@@ -415,16 +415,16 @@ func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 	return meta
 }
 
-func (f *Framer) parseQueryFrame() (data map[string]interface{}) {
-	data = make(map[string]interface{})
+func (f *Framer) parseQueryFrame() (data map[string]any) {
+	data = make(map[string]any)
 	data["query"] = (f.decoder).ReadLongString()
 	return data
 }
 
-func (f *Framer) parseResultFrame() (data map[string]interface{}) {
+func (f *Framer) parseResultFrame() (data map[string]any) {
 	kind := (f.decoder).ReadInt()
 
-	data = make(map[string]interface{})
+	data = make(map[string]any)
 	switch kind {
 	case resultKindVoid:
 		data["type"] = "void"
@@ -445,16 +445,16 @@ func (f *Framer) parseResultFrame() (data map[string]interface{}) {
 	return data
 }
 
-func (f *Framer) parseResultRows() map[string]interface{} {
-	result := make(map[string]interface{})
+func (f *Framer) parseResultRows() map[string]any {
+	result := make(map[string]any)
 	result["meta"] = f.parseResultMetadata(false)
 	result["num_rows"] = (f.decoder).ReadInt()
 
 	return result
 }
 
-func (f *Framer) parseResultPrepared() map[string]interface{} {
-	result := make(map[string]interface{})
+func (f *Framer) parseResultPrepared() map[string]any {
+	result := make(map[string]any)
 
 	uuid, err := UUIDFromBytes((f.decoder).ReadShortBytes())
 	if err != nil {
@@ -474,8 +474,8 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 	return result
 }
 
-func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
-	data = make(map[string]interface{})
+func (f *Framer) parseResultSchemaChange() (data map[string]any) {
+	data = make(map[string]any)
 	decoder := f.decoder
 	if f.proto <= protoVersion2 {
 		change := decoder.ReadString()
@@ -512,26 +512,26 @@ func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
 	return data
 }
 
-func (f *Framer) parseAuthenticateFrame() (data map[string]interface{}) {
-	data = make(map[string]interface{})
+func (f *Framer) parseAuthenticateFrame() (data map[string]any) {
+	data = make(map[string]any)
 	data["class"] = (f.decoder).ReadString()
 	return data
 }
 
-func (f *Framer) parseAuthSuccessFrame() (data map[string]interface{}) {
-	data = make((map[string]interface{}))
+func (f *Framer) parseAuthSuccessFrame() (data map[string]any) {
+	data = make((map[string]any))
 	data["data"] = fmt.Sprintf("%q", (f.decoder).ReadBytes())
 	return data
 }
 
-func (f *Framer) parseAuthChallengeFrame() (data map[string]interface{}) {
-	data = make((map[string]interface{}))
+func (f *Framer) parseAuthChallengeFrame() (data map[string]any) {
+	data = make((map[string]any))
 	data["data"] = fmt.Sprintf("%q", (f.decoder).ReadBytes())
 	return data
 }
 
-func (f *Framer) parseEventFrame() (data map[string]interface{}) {
-	data = make((map[string]interface{}))
+func (f *Framer) parseEventFrame() (data map[string]any) {
+	data = make((map[string]any))
 	decoder := f.decoder
 	eventType := decoder.ReadString()
 	data["type"] = eventType

@@ -27,7 +27,7 @@ func SocketPath(dir string) string {
 	return `\\.\pipe\elastic\osquery\` + uuid.Must(uuid.NewV4()).String()
 }
 
-func platformArgs() map[string]interface{} {
+func platformArgs() map[string]any {
 	return nil
 }
 

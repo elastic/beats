@@ -12,7 +12,7 @@ import (
 )
 
 var gzipDecoderPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return new(gzip.Reader)
 	},
 }

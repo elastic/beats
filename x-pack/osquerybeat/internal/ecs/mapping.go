@@ -8,11 +8,11 @@ import "strings"
 
 const keySeparator = "."
 
-type Doc map[string]interface{}
+type Doc map[string]any
 
 type MappingInfo struct {
-	Field string      `json:"field,omitempty" config:"field,omitempty"`
-	Value interface{} `json:"value,omitempty" config:"value,omitempty"`
+	Field string `json:"field,omitempty" config:"field,omitempty"`
+	Value any    `json:"value,omitempty" config:"value,omitempty"`
 }
 
 // Mapping is ECS mapping definition where the key is the dotted ECS field name
@@ -20,7 +20,7 @@ type Mapping map[string]MappingInfo
 
 // Map creates the copy of the values from the doc[src] key to the doc[dst] key where the dst can be nested '.' delimited key
 // Source is expected to be a simple key name, the destination could be nested child node
-func (m Mapping) Map(doc map[string]interface{}) map[string]interface{} {
+func (m Mapping) Map(doc map[string]any) map[string]any {
 	res := make(Doc)
 	for dst, mi := range m {
 		if mi.Value != nil {
@@ -36,7 +36,7 @@ func (m Mapping) Map(doc map[string]interface{}) map[string]interface{} {
 	return res
 }
 
-func (d Doc) Get(key string) (val interface{}, ok bool) {
+func (d Doc) Get(key string) (val any, ok bool) {
 	keys := getKeys(key)
 	node := d
 
@@ -46,7 +46,7 @@ func (d Doc) Get(key string) (val interface{}, ok bool) {
 		}
 		val, ok = node[keys[i]]
 		if ok {
-			node, ok = val.(map[string]interface{})
+			node, ok = val.(map[string]any)
 			if ok {
 				continue
 			} else {
@@ -63,9 +63,9 @@ func (d Doc) Get(key string) (val interface{}, ok bool) {
 	return val, ok
 }
 
-func (d Doc) Set(key string, val interface{}) {
+func (d Doc) Set(key string, val any) {
 	keys := getKeys(key)
-	node := map[string]interface{}(d)
+	node := map[string]any(d)
 
 	// Create nested keys if needed
 	for i := 0; i < len(keys)-1; i++ {
@@ -75,7 +75,7 @@ func (d Doc) Set(key string, val interface{}) {
 
 		inode, ok := node[keys[i]]
 		if ok {
-			node, ok = inode.(map[string]interface{})
+			node, ok = inode.(map[string]any)
 			// Should never happen, internal implementation
 			if !ok {
 				return
@@ -85,7 +85,7 @@ func (d Doc) Set(key string, val interface{}) {
 			// otherwise the large numbers are serialized into scientific notation in bulk json
 			// which breaks values like unix timestamp in seconds
 			// Fixes the issue https://github.com/elastic/security-team/issues/1950
-			m := make(map[string]interface{})
+			m := make(map[string]any)
 			node[keys[i]] = m
 			node = m
 		}

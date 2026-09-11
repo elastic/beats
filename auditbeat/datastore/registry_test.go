@@ -193,10 +193,10 @@ func TestRegistryConcurrentOpenClose(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
-			for j := 0; j < iters; j++ {
+			for range iters {
 				b, err := OpenBucket("a", p)
 				if err != nil {
 					t.Errorf("concurrent OpenBucket: %v", err)

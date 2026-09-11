@@ -172,20 +172,20 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 	// Publish large test messages.
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
-	for i := 0; i < totalEvents; i++ {
+	for i := range totalEvents {
 		// #nosec G115 -- i is bounded by totalEvents and event ID is constrained to [1,1000].
 		safeWriteEvent(t, writer, uint32(i%1000)+1, strconv.Itoa(i)+" "+randomSentence(messageSize))
 	}
 
-	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
+	openLog := func(t testing.TB, config map[string]any) EventLog {
 		return openLog(t, nil, config)
 	}
 
 	t.Run("has_message", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1, "include_xml": includeXML})
+		log := openLog(t, map[string]any{"name": providerName, "batch_read_size": 1, "include_xml": includeXML})
 		defer log.Close()
 
-		for i := 0; i < 10; i++ {
+		for range 10 {
 			records, err := log.Read()
 			require.NotEmpty(t, records)
 			require.NoError(t, err)
@@ -197,7 +197,7 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 
 	// Test reading from an event log using a custom XML query.
 	t.Run("custom_xml_query", func(t *testing.T) {
-		cfg := map[string]interface{}{
+		cfg := map[string]any{
 			"id":          "custom-xml-query",
 			"xml_query":   customXMLQuery,
 			"include_xml": includeXML,
@@ -227,7 +227,7 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 	t.Run("batch_read_size_config", func(t *testing.T) {
 		const batchReadSize = 2
 
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize, "include_xml": includeXML})
+		log := openLog(t, map[string]any{"name": providerName, "batch_read_size": batchReadSize, "include_xml": includeXML})
 		defer log.Close()
 
 		records, err := log.Read()
@@ -242,7 +242,7 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 	// When combined with large messages this causes EvtNext to fail with
 	// RPC_S_INVALID_BOUND error. The reader should recover from the error.
 	t.Run("large_batch_read", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1024, "include_xml": includeXML})
+		log := openLog(t, map[string]any{"name": providerName, "batch_read_size": 1024, "include_xml": includeXML})
 		defer log.Close()
 
 		var eventCount int
@@ -270,7 +270,7 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 			t.Fatal(err)
 		}
 
-		log := openLog(t, map[string]interface{}{
+		log := openLog(t, map[string]any{
 			"name":           path,
 			"no_more_events": "stop",
 			"include_xml":    includeXML,
@@ -293,7 +293,7 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 			t.Fatal(err)
 		}
 
-		log := openLog(t, map[string]interface{}{
+		log := openLog(t, map[string]any{
 			"name":           path,
 			"no_more_events": "stop",
 			"event_id":       "3, 5",
@@ -374,7 +374,7 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 	}
 }
 
-func openLog(t testing.TB, state *checkpoint.EventLogState, config map[string]interface{}) EventLog {
+func openLog(t testing.TB, state *checkpoint.EventLogState, config map[string]any) EventLog {
 	cfg, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)

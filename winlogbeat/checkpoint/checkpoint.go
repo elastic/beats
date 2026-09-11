@@ -22,7 +22,7 @@ package checkpoint
 
 import (
 	"fmt"
-	"io/ioutil"
+	"maps"
 	"os"
 	"path/filepath"
 	"sort"
@@ -169,9 +169,7 @@ func (c *Checkpoint) States() map[string]EventLogState {
 	defer c.lock.RUnlock()
 
 	copy := make(map[string]EventLogState)
-	for k, v := range c.states {
-		copy[k] = v
-	}
+	maps.Copy(copy, c.states)
 
 	return copy
 }
@@ -267,7 +265,7 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 	c.fileLock.RLock()
 	defer c.fileLock.RUnlock()
 
-	contents, err := ioutil.ReadFile(c.file)
+	contents, err := os.ReadFile(c.file)
 	if err != nil {
 		if os.IsNotExist(err) {
 			err = nil

@@ -147,7 +147,7 @@ func TestParseValue(t *testing.T) {
 func TestFromDatabaseValue_Integer(t *testing.T) {
 	tests := []struct {
 		name    string
-		dbVal   interface{}
+		dbVal   any
 		wantRaw string
 		wantErr bool
 	}{
@@ -262,7 +262,7 @@ func TestFromDatabaseValue_Timestamp(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		dbVal      interface{}
+		dbVal      any
 		wantRaw    string
 		wantTsNano int64
 		wantErr    bool
@@ -338,7 +338,7 @@ func TestFromDatabaseValue_Date(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		dbVal   interface{}
+		dbVal   any
 		wantRaw string
 		wantErr bool
 	}{
@@ -408,7 +408,7 @@ func TestValueToDriverArg(t *testing.T) {
 		name      string
 		value     *Value
 		wantType  string
-		wantValue interface{}
+		wantValue any
 	}{
 		{
 			name: "integer",
@@ -690,7 +690,7 @@ func TestParseValue_Float(t *testing.T) {
 func TestFromDatabaseValue_Float(t *testing.T) {
 	tests := []struct {
 		name    string
-		dbVal   interface{}
+		dbVal   any
 		wantRaw string
 		wantErr bool
 	}{
@@ -797,7 +797,7 @@ func TestParseValue_Decimal(t *testing.T) {
 func TestFromDatabaseValue_Decimal(t *testing.T) {
 	tests := []struct {
 		name    string
-		dbVal   interface{}
+		dbVal   any
 		wantRaw string
 		wantErr bool
 	}{
@@ -1119,7 +1119,7 @@ func TestInferTypeFromDefaultValue(t *testing.T) {
 func TestInferTypeFromDatabaseValue(t *testing.T) {
 	tests := []struct {
 		name     string
-		dbVal    interface{}
+		dbVal    any
 		wantType string
 		wantErr  bool
 	}{

@@ -55,14 +55,14 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfigs(host string) []map[string]interface{} {
-	return []map[string]interface{}{
+func getConfigs(host string) []map[string]any {
+	return []map[string]any{
 		{
 			"module":     "jolokia",
 			"metricsets": []string{"jmx"},
 			"hosts":      []string{host},
 			"namespace":  "testnamespace",
-			"jmx.mappings": []map[string]interface{}{
+			"jmx.mappings": []map[string]any{
 				{
 					"mbean": "java.lang:type=Runtime",
 					"attributes": []map[string]string{
@@ -105,7 +105,7 @@ func getConfigs(host string) []map[string]interface{} {
 			"metricsets": []string{"jmx"},
 			"hosts":      []string{host},
 			"namespace":  "testnamespace",
-			"jmx.mappings": []map[string]interface{}{
+			"jmx.mappings": []map[string]any{
 				{
 					"mbean": "Catalina:name=*,type=ThreadPool",
 					"attributes": []map[string]string{
@@ -155,7 +155,7 @@ func getConfigs(host string) []map[string]interface{} {
 			"hosts":       []string{host},
 			"namespace":   "testnamespace",
 			"http_method": "GET",
-			"jmx.mappings": []map[string]interface{}{
+			"jmx.mappings": []map[string]any{
 				{
 					"mbean": "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
 					"attributes": []map[string]string{

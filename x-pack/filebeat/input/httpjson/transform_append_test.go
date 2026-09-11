@@ -22,14 +22,14 @@ func TestNewAppend(t *testing.T) {
 	cases := []struct {
 		name           string
 		constructor    constructor
-		config         map[string]interface{}
+		config         map[string]any
 		expectedTarget targetInfo
 		expectedErr    string
 	}{
 		{
 			name:        "newAppendResponse targets body",
 			constructor: newAppendResponse,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -37,7 +37,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendResponse targets something else",
 			constructor: newAppendResponse,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -45,7 +45,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendRequest targets body",
 			constructor: newAppendRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -53,7 +53,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendRequest targets header",
 			constructor: newAppendRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
@@ -61,7 +61,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendRequest targets url param",
 			constructor: newAppendRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
@@ -69,7 +69,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendRequest targets something else",
 			constructor: newAppendRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -77,7 +77,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendPagination targets body",
 			constructor: newAppendPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -85,7 +85,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendPagination targets header",
 			constructor: newAppendPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
@@ -93,7 +93,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendPagination targets url param",
 			constructor: newAppendPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
@@ -101,7 +101,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendPagination targets url value",
 			constructor: newAppendPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.value",
 			},
 			expectedErr: "invalid target type: url.value",
@@ -109,7 +109,7 @@ func TestNewAppend(t *testing.T) {
 		{
 			name:        "newAppendPagination targets something else",
 			constructor: newAppendPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -117,7 +117,6 @@ func TestNewAppend(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.config)
 			gotAppend, gotErr := tc.constructor(cfg, noopReporter{}, nil)
@@ -134,7 +133,7 @@ func TestNewAppend(t *testing.T) {
 func TestAppendFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
-		tfunc       func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+		tfunc       func(ctx *transformContext, transformable transformable, key string, val any) error
 		paramCtx    *transformContext
 		paramTr     transformable
 		paramKey    string
@@ -149,7 +148,7 @@ func TestAppendFunctions(t *testing.T) {
 			paramTr:     transformable{"body": mapstr.M{"a_key": "a_value"}},
 			paramKey:    "a_key",
 			paramVal:    "another_value",
-			expectedTr:  transformable{"body": mapstr.M{"a_key": []interface{}{"a_value", "another_value"}}},
+			expectedTr:  transformable{"body": mapstr.M{"a_key": []any{"a_value", "another_value"}}},
 			expectedErr: nil,
 		},
 		{
@@ -159,7 +158,7 @@ func TestAppendFunctions(t *testing.T) {
 			paramTr:     transformable{"body": mapstr.M{}},
 			paramKey:    "a_key",
 			paramVal:    "a_value",
-			expectedTr:  transformable{"body": mapstr.M{"a_key": []interface{}{"a_value"}}},
+			expectedTr:  transformable{"body": mapstr.M{"a_key": []any{"a_value"}}},
 			expectedErr: nil,
 		},
 		{
@@ -187,7 +186,6 @@ func TestAppendFunctions(t *testing.T) {
 	}
 
 	for _, tcase := range cases {
-		tcase := tcase
 		t.Run(tcase.name, func(t *testing.T) {
 			gotErr := tcase.tfunc(tcase.paramCtx, tcase.paramTr, tcase.paramKey, tcase.paramVal)
 			if tcase.expectedErr == nil {
@@ -304,7 +302,7 @@ func TestAppendTemplate(t *testing.T) {
 }
 
 func TestDifferentAppendValueTypes(t *testing.T) {
-	c1 := map[string]interface{}{
+	c1 := map[string]any{
 		"target":     "body.p1",
 		"value":      `{"param":"value"}`,
 		"value_type": "json",
@@ -325,8 +323,8 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	require.NoError(t, err)
 
 	exp := mapstr.M{
-		"p1": []interface{}{
-			map[string]interface{}{
+		"p1": []any{
+			map[string]any{
 				"param": "value",
 			},
 		},
@@ -334,7 +332,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 
 	assert.EqualValues(t, exp, tr.body())
 
-	c2 := map[string]interface{}{
+	c2 := map[string]any{
 		"target":     "body.p1",
 		"value":      "1",
 		"value_type": "int",
@@ -354,7 +352,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	require.NoError(t, err)
 
 	exp = mapstr.M{
-		"p1": []interface{}{int64(1)},
+		"p1": []any{int64(1)},
 	}
 
 	assert.EqualValues(t, exp, tr.body())
@@ -375,7 +373,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	require.NoError(t, err)
 
 	exp = mapstr.M{
-		"p1": []interface{}{"1"},
+		"p1": []any{"1"},
 	}
 
 	assert.EqualValues(t, exp, tr.body())

@@ -41,7 +41,7 @@ func newEventACKer(checkpoint *checkpoint.Checkpoint) *eventACKer {
 
 // ACKEvents receives callbacks from the publisher for every event that is
 // published. It persists the record number of the last event in each
-func (a *eventACKer) ACKEvents(data []interface{}) {
+func (a *eventACKer) ACKEvents(data []any) {
 	states := make(map[string]*checkpoint.EventLogState)
 
 	for _, datum := range data {

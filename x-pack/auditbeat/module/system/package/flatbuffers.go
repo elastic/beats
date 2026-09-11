@@ -24,7 +24,7 @@ import (
 var bufferPool sync.Pool
 
 func init() {
-	bufferPool.New = func() interface{} {
+	bufferPool.New = func() any {
 		return flatbuffers.NewBuilder(1024)
 	}
 }

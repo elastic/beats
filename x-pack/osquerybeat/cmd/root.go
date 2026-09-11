@@ -149,7 +149,7 @@ func osquerybeatCfgFromStreams(rawIn *proto.UnitExpectedConfig, agentInfo *clien
 			streamList[iter]["type"] = rawIn.Type
 		}
 		if v, ok := streamList[iter]["data_stream"]; ok {
-			if m, ok := v.(map[string]interface{}); ok {
+			if m, ok := v.(map[string]any); ok {
 				if _, ok := m["namespace"]; !ok {
 					m["namespace"] = ns
 				}

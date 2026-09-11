@@ -28,6 +28,7 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
+	"go.uber.org/zap"
 )
 
 // contextStopper is an optional extension of beat.Beater for beaters that can
@@ -52,7 +53,11 @@ type BeatReceiver struct {
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
 func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, set receiver.Settings) (BeatReceiver, error) {
 	receiverID := set.ID
-	ts := set.TelemetrySettings
+	bridgeTelemetrySettings := set.TelemetrySettings
+	// The Beat logger is built from the collector logger core and includes the
+	// component.* fields configured for this receiver, they're necessary to
+	// route the logs to the correct datastream.
+	bridgeTelemetrySettings.Logger = zap.New(b.Info.Logger.Core())
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -103,12 +108,15 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 
-	bridge, err := oteltelemetry.NewRegistryBridge(ts, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
+	bridge, err := oteltelemetry.NewRegistryBridge(bridgeTelemetrySettings, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
 	}
 
-	releaseSystem, err := oteltelemetry.AcquireSystemBridge(ts)
+	// The system bridge is shared by all receivers. Preserve the original
+	// settings so its logs are not permanently tagged with this receiver's
+	// component.* fields.
+	releaseSystem, err := oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
 	}

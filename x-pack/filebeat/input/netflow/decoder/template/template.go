@@ -84,10 +84,7 @@ func (t *Template) Apply(data *bytes.Buffer, n int) ([]record.Record, error) {
 	limit, alloc := n, n
 	if t.VariableLength {
 		limit = math.MaxInt16
-		alloc = n
-		if alloc > 16 {
-			alloc = 16
-		}
+		alloc = min(n, 16)
 	}
 	makeFn := t.makeFlow
 	if t.IsOptions {

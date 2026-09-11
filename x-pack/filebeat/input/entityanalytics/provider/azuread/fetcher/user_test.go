@@ -27,7 +27,7 @@ func TestUser_Merge(t *testing.T) {
 		"ok": {
 			In: &User{
 				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"a": "alpha",
 				},
 				MemberOf:           collections.NewUUIDSet(uuid.Must(uuid.FromString("fcda226a-c920-4d99-81bc-d2d691a6c212"))),
@@ -35,7 +35,7 @@ func TestUser_Merge(t *testing.T) {
 			},
 			InOther: &User{
 				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"b": "beta",
 				},
 				MemberOf:           collections.NewUUIDSet(uuid.Must(uuid.FromString("a77e8cbb-27a5-49d3-9d5e-801997621f87"))),
@@ -43,7 +43,7 @@ func TestUser_Merge(t *testing.T) {
 			},
 			Want: &User{
 				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"a": "alpha",
 					"b": "beta",
 				},
@@ -60,7 +60,6 @@ func TestUser_Merge(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

@@ -70,7 +70,7 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 	}
 
 	config := getConfig(service.Host())
-	config["key.patterns"] = []map[string]interface{}{
+	config["key.patterns"] = []map[string]any{
 		{
 			"pattern":  "foo",
 			"keyspace": 0,
@@ -123,12 +123,12 @@ func addEntry(t *testing.T, host string, key string, keyspace uint) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "redis",
 		"metricsets": []string{"key"},
 		"hosts":      []string{host + "/1"},
-		"key.patterns": []map[string]interface{}{
+		"key.patterns": []map[string]any{
 			{
 				"pattern": "foo",
 			},

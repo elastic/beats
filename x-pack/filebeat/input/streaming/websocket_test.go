@@ -45,7 +45,7 @@ func TestFollowStreamReturnsOnCancelWithStalledServer(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"url": "ws" + server.URL[4:] + "/stall",
 		"program": `
 			state.response.decode_json().as(body, {

@@ -24,7 +24,7 @@ var (
 )
 
 type Decoder interface {
-	Decode([]byte) (interface{}, error)
+	Decode([]byte) (any, error)
 	MinLength() uint16
 	MaxLength() uint16
 }
@@ -39,7 +39,7 @@ func (u UnsignedDecoder) MaxLength() uint16 {
 	return uint16(u)
 }
 
-func (u UnsignedDecoder) Decode(data []byte) (interface{}, error) {
+func (u UnsignedDecoder) Decode(data []byte) (any, error) {
 	n := len(data)
 	if n > int(u) {
 		return uint64(0), ErrOutOfBounds
@@ -57,7 +57,7 @@ func (u UnsignedDecoder) Decode(data []byte) (interface{}, error) {
 		return binary.BigEndian.Uint64(data), nil
 	default:
 		var value uint64
-		for i := 0; i < n; i++ {
+		for i := range n {
 			value = (value << 8) | uint64(data[i])
 		}
 		return value, nil
@@ -76,7 +76,7 @@ func (u SignedDecoder) MaxLength() uint16 {
 	return uint16(u)
 }
 
-func (u SignedDecoder) Decode(data []byte) (interface{}, error) {
+func (u SignedDecoder) Decode(data []byte) (any, error) {
 	n := len(data)
 	if n > int(u) {
 		return int64(0), ErrOutOfBounds
@@ -116,7 +116,7 @@ func (u FloatDecoder) MaxLength() uint16 {
 	return uint16(u)
 }
 
-func (u FloatDecoder) Decode(data []byte) (interface{}, error) {
+func (u FloatDecoder) Decode(data []byte) (any, error) {
 	n := len(data)
 	if n > int(u) {
 		return float64(0), ErrOutOfBounds
@@ -145,7 +145,7 @@ func (u BooleanDecoder) MaxLength() uint16 {
 	return 1
 }
 
-func (u BooleanDecoder) Decode(data []byte) (interface{}, error) {
+func (u BooleanDecoder) Decode(data []byte) (any, error) {
 	n := len(data)
 	switch n {
 	case 0:
@@ -181,7 +181,7 @@ func (u OctetArrayDecoder) MaxLength() uint16 {
 	return 0xffff
 }
 
-func (u OctetArrayDecoder) Decode(data []byte) (interface{}, error) {
+func (u OctetArrayDecoder) Decode(data []byte) (any, error) {
 	return data, nil
 }
 
@@ -197,7 +197,7 @@ func (u MacAddressDecoder) MaxLength() uint16 {
 	return 6
 }
 
-func (u MacAddressDecoder) Decode(data []byte) (interface{}, error) {
+func (u MacAddressDecoder) Decode(data []byte) (any, error) {
 	if len(data) != 6 {
 		return net.HardwareAddr{}, ErrOutOfBounds
 	}
@@ -216,7 +216,7 @@ func (u StringDecoder) MaxLength() uint16 {
 	return 0xffff
 }
 
-func (u StringDecoder) Decode(data []byte) (interface{}, error) {
+func (u StringDecoder) Decode(data []byte) (any, error) {
 	return strings.TrimRightFunc(string(data), func(r rune) bool {
 		return r == 0
 	}), nil
@@ -234,7 +234,7 @@ func (u DateTimeSecondsDecoder) MaxLength() uint16 {
 	return 4
 }
 
-func (u DateTimeSecondsDecoder) Decode(data []byte) (interface{}, error) {
+func (u DateTimeSecondsDecoder) Decode(data []byte) (any, error) {
 	if len(data) != 4 {
 		return time.Time{}, ErrOutOfBounds
 	}
@@ -253,7 +253,7 @@ func (u DateTimeMillisecondsDecoder) MaxLength() uint16 {
 	return 8
 }
 
-func (u DateTimeMillisecondsDecoder) Decode(data []byte) (interface{}, error) {
+func (u DateTimeMillisecondsDecoder) Decode(data []byte) (any, error) {
 	if len(data) != 8 {
 		return time.Time{}, ErrOutOfBounds
 	}
@@ -273,7 +273,7 @@ func (u NTPTimestampDecoder) MaxLength() uint16 {
 	return 8
 }
 
-func (u NTPTimestampDecoder) Decode(data []byte) (interface{}, error) {
+func (u NTPTimestampDecoder) Decode(data []byte) (any, error) {
 	if len(data) != 8 {
 		return time.Time{}, ErrOutOfBounds
 	}
@@ -294,7 +294,7 @@ func (u IPAddressDecoder) MaxLength() uint16 {
 	return uint16(u)
 }
 
-func (u IPAddressDecoder) Decode(data []byte) (interface{}, error) {
+func (u IPAddressDecoder) Decode(data []byte) (any, error) {
 	n := len(data)
 	if n != int(u) {
 		return net.IP{}, ErrOutOfBounds
@@ -317,7 +317,7 @@ func (u UnsupportedDecoder) MaxLength() uint16 {
 	return math.MaxUint16
 }
 
-func (u UnsupportedDecoder) Decode(data []byte) (interface{}, error) {
+func (u UnsupportedDecoder) Decode(data []byte) (any, error) {
 	return nil, ErrUnsupported
 }
 
@@ -335,7 +335,7 @@ func (u ACLIDDecoder) MaxLength() uint16 {
 	return aclIDLength
 }
 
-func (u ACLIDDecoder) Decode(data []byte) (interface{}, error) {
+func (u ACLIDDecoder) Decode(data []byte) (any, error) {
 	if len(data) != aclIDLength {
 		return nil, ErrOutOfBounds
 	}

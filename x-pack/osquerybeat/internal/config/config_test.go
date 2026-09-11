@@ -11,8 +11,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-func boolPtr(v bool) *bool { return &v }
-
 func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -77,7 +75,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 					AMD64: &InstallArtifactConfig{
 						ArtifactURL:      "http://example.com/osquery.tar.gz",
 						SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-						AllowInsecureURL: boolPtr(true),
+						AllowInsecureURL: new(true),
 					},
 				},
 			},
@@ -89,7 +87,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 					AMD64: &InstallArtifactConfig{
 						ArtifactURL:      "http://example.com/osquery.tar.gz",
 						SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-						AllowInsecureURL: boolPtr(false),
+						AllowInsecureURL: new(false),
 					},
 				},
 				AllowInsecureURL: true,
@@ -272,7 +270,7 @@ func TestInstallConfigPlatformOverrides(t *testing.T) {
 			AMD64: &InstallArtifactConfig{
 				ArtifactURL:      "https://example.org/osquery-linux.tar.gz",
 				SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				AllowInsecureURL: boolPtr(true),
+				AllowInsecureURL: new(true),
 			},
 		},
 	}
@@ -304,7 +302,7 @@ func TestInstallConfigOverridePrecedence(t *testing.T) {
 			AMD64: &InstallArtifactConfig{
 				ArtifactURL:      "https://example.org/osquery-linux-amd64.tar.gz",
 				SHA256:           "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-				AllowInsecureURL: boolPtr(true),
+				AllowInsecureURL: new(true),
 				SSL:              archSSL,
 			},
 		},
@@ -422,12 +420,12 @@ func TestGetOsqueryExtensions(t *testing.T) {
 	})
 
 	t.Run("unpacks config tags from yaml", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(map[string]interface{}{
-			"inputs": []map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
 				{
-					"osquery": map[string]interface{}{
-						"elastic_options": map[string]interface{}{
-							"extensions": map[string]interface{}{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"extensions": map[string]any{
 								"paths":   []string{"/opt/ext"},
 								"timeout": 15,
 								"require": []string{"my_extension"},

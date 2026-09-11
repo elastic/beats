@@ -60,8 +60,8 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"xml": mapstr.M{
-					"catalog": map[string]interface{}{
-						"book": map[string]interface{}{
+					"catalog": map[string]any{
+						"book": map[string]any{
 							"author": "William H. Gaddis",
 							"review": "One of the great seminal American novels of the 20th century.",
 							"seq":    "1",
@@ -95,7 +95,7 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"catalog": mapstr.M{
-					"book": map[string]interface{}{
+					"book": map[string]any{
 						"author": "William H. Gaddis",
 						"review": "One of the great seminal American novels of the 20th century.",
 						"seq":    "1",
@@ -128,8 +128,8 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"message": mapstr.M{
-					"catalog": map[string]interface{}{
-						"book": map[string]interface{}{
+					"catalog": map[string]any{
+						"book": map[string]any{
 							"author": "William H. Gaddis",
 							"review": "One of the great seminal American novels of the 20th century.",
 							"seq":    "1",
@@ -161,14 +161,14 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"message": mapstr.M{
-					"catalog": map[string]interface{}{
-						"book": []interface{}{
-							map[string]interface{}{
+					"catalog": map[string]any{
+						"book": []any{
+							map[string]any{
 								"author": "William H. Gaddis",
 								"review": "One of the great seminal American novels of the 20th century.",
 								"title":  "The Recognitions",
 							},
-							map[string]interface{}{
+							map[string]any{
 								"author": "Ralls, Kim",
 								"review": "Some review.",
 								"title":  "Midnight Rain",
@@ -198,13 +198,13 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"message": mapstr.M{
-					"auditbase": map[string]interface{}{
-						"contextcomponents": map[string]interface{}{
-							"component": []interface{}{
-								map[string]interface{}{
+					"auditbase": map[string]any{
+						"contextcomponents": map[string]any{
+							"component": []any{
+								map[string]any{
 									"relyingparty": "N/A",
 								},
-								map[string]interface{}{
+								map[string]any{
 									"primaryauth": "N/A",
 								},
 							},
@@ -241,21 +241,21 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"message": mapstr.M{
-					"catalog": map[string]interface{}{
-						"book": []interface{}{
-							map[string]interface{}{
+					"catalog": map[string]any{
+						"book": []any{
+							map[string]any{
 								"author": "William H. Gaddis",
 								"review": "One of the great seminal American novels of the 20th century.",
 								"title":  "The Recognitions",
 							},
-							map[string]interface{}{
+							map[string]any{
 								"author": "Ralls, Kim",
 								"review": "Some review.",
 								"title":  "Midnight Rain",
 							},
 						},
-						"secondcategory": map[string]interface{}{
-							"paper": map[string]interface{}{
+						"secondcategory": map[string]any{
+							"paper": map[string]any{
 								"description": "A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.",
 								"id":          "bk102",
 								"test2":       "Ralls, Kim",
@@ -282,8 +282,8 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"message": mapstr.M{
-					"catalog": map[string]interface{}{
-						"book": map[string]interface{}{
+					"catalog": map[string]any{
+						"book": map[string]any{
 							"author": "William H. Gaddis",
 							"review": "One of the great seminal American novels of the 20th century.",
 							"title":  "The Recognitions",
@@ -410,7 +410,6 @@ func TestDecodeXML(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		test := test
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
 
@@ -456,8 +455,8 @@ func TestDecodeXML(t *testing.T) {
 		}
 		expMeta := mapstr.M{
 			"xml": mapstr.M{
-				"catalog": map[string]interface{}{
-					"book": map[string]interface{}{
+				"catalog": map[string]any{
+					"book": map[string]any{
 						"author": "William H. Gaddis",
 						"review": "One of the great seminal American novels of the 20th century.",
 						"seq":    "1",
@@ -489,7 +488,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 	require.NoError(b, err)
 
 	b.Run("single_object", func(b *testing.B) {
-		evt := &beat.Event{Fields: map[string]interface{}{
+		evt := &beat.Event{Fields: map[string]any{
 			"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -509,7 +508,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 	})
 
 	b.Run("nested_and_array_object", func(b *testing.B) {
-		evt := &beat.Event{Fields: map[string]interface{}{
+		evt := &beat.Event{Fields: map[string]any{
 			"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -561,8 +560,8 @@ func TestXMLToDocumentID(t *testing.T) {
 
 	wantFields := mapstr.M{
 		"message": mapstr.M{
-			"catalog": map[string]interface{}{
-				"book": map[string]interface{}{
+			"catalog": map[string]any{
+				"book": map[string]any{
 					"author": "William H. Gaddis",
 					"review": "One of the great seminal American novels of the 20th century.",
 					"title":  "The Recognitions",

@@ -453,10 +453,7 @@ func TestServerPool(t *testing.T) {
 			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 			var wg sync.WaitGroup
 			for _, cfg := range cfgs {
-				cfg := cfg
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
+				wg.Go(func() {
 					err := servers.serve(ctx, cfg, pub.Publish, metrics)
 					if err != http.ErrServerClosed {
 						select {
@@ -464,7 +461,7 @@ func TestServerPool(t *testing.T) {
 						default:
 						}
 					}
-				}()
+				})
 			}
 			if wantErr == nil {
 				addrCount := make(map[string]int)
@@ -525,15 +522,12 @@ func TestServerPool(t *testing.T) {
 			// Try to re-register the same addresses.
 			ctx, cancel = newCtx("server_pool_test", test.name)
 			for _, cfg := range cfgs {
-				cfg := cfg
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
+				wg.Go(func() {
 					err := servers.serve(ctx, cfg, pub.Publish, metrics)
 					if err != nil && err != http.ErrServerClosed && wantErr == nil { //nolint:errorlint // http.ErrServerClosed is a documented sentinel, never wrapped.
 						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
 					}
-				}()
+				})
 			}
 			cancel()
 			wg.Wait()
@@ -648,14 +642,12 @@ func TestConcurrentExceedMaxInFlight(t *testing.T) {
 
 	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		err := servers.serve(ctx, cfg, delayedPublish, metrics)
 		if err != nil && err != http.ErrServerClosed {
 			t.Errorf("unexpected serve error: %v", err)
 		}
-	}()
+	})
 	waitForServer(t, addr, 5*time.Second)
 
 	var reqWg sync.WaitGroup
@@ -663,9 +655,7 @@ func TestConcurrentExceedMaxInFlight(t *testing.T) {
 	// Send first request with wait_for_completion_timeout.
 	// This will hold bytes in-flight until ACK (which we delay).
 	var firstStatus int
-	reqWg.Add(1)
-	go func() {
-		defer reqWg.Done()
+	reqWg.Go(func() {
 		resp, err := doRequest(http.MethodPost,
 			"http://"+addr+"/?wait_for_completion_timeout=5s",
 			"application/json",
@@ -676,16 +666,14 @@ func TestConcurrentExceedMaxInFlight(t *testing.T) {
 		}
 		firstStatus = resp.StatusCode
 		resp.Body.Close()
-	}()
+	})
 
 	// Wait a bit for first request to be processing (reading body, waiting for ACK).
 	time.Sleep(200 * time.Millisecond)
 
 	// Send second request while first is holding bytes.
 	var secondStatus int
-	reqWg.Add(1)
-	go func() {
-		defer reqWg.Done()
+	reqWg.Go(func() {
 		resp, err := doRequest(http.MethodPost,
 			"http://"+addr+"/?wait_for_completion_timeout=5s",
 			"application/json",
@@ -696,7 +684,7 @@ func TestConcurrentExceedMaxInFlight(t *testing.T) {
 		}
 		secondStatus = resp.StatusCode
 		resp.Body.Close()
-	}()
+	})
 
 	// Wait for second request to complete (should be rejected quickly).
 	time.Sleep(200 * time.Millisecond)
@@ -1137,11 +1125,9 @@ func TestPatternReregistration(t *testing.T) {
 	ctx1, cancel1 := newCtx("test", "input-1")
 	var wg sync.WaitGroup
 	err1 := make(chan error, 1)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		err1 <- servers.serve(ctx1, cfg, pub.Publish, metrics)
-	}()
+	})
 	waitForServer(t, "127.0.0.1:9023", 5*time.Second)
 
 	resp, err := doRequest("", "http://127.0.0.1:9023/a/", "application/json", strings.NewReader(`{"x":1}`))
@@ -1168,11 +1154,9 @@ func TestPatternReregistration(t *testing.T) {
 	// Re-register same pattern on a new server.
 	ctx2, cancel2 := newCtx("test", "input-2")
 	err2 := make(chan error, 1)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		err2 <- servers.serve(ctx2, cfg, pub.Publish, metrics)
-	}()
+	})
 	waitForServer(t, "127.0.0.1:9023", 5*time.Second)
 
 	resp, err = doRequest("", "http://127.0.0.1:9023/a/", "application/json", strings.NewReader(`{"x":2}`))

@@ -172,7 +172,7 @@ func (dr *deviceResolver) buildDeviceMap() (map[string]string, error) {
 	}
 
 	// Query each drive letter
-	for i := 0; i < 26; i++ {
+	for i := range 26 {
 		if (bitmask>>i)&1 == 1 {
 			driveLetter := string(byte('A' + i))
 			drivePath := driveLetter + ":"

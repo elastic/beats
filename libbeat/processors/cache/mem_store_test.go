@@ -47,7 +47,7 @@ var memStoreTests = []struct {
 				Effort:   10,
 			},
 			Put: &putConfig{
-				TTL: ptrTo(time.Second),
+				TTL: new(time.Second),
 			},
 		},
 		want: &memStore{
@@ -128,7 +128,7 @@ var memStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)
@@ -174,7 +174,7 @@ var memStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)
@@ -364,7 +364,7 @@ var memStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(10 * time.Minute),
+							TTL: new(10 * time.Minute),
 						},
 					}
 					s.add(putCfg)
@@ -479,5 +479,3 @@ func (s *memStoreSet) has(id string) bool {
 	s.mu.Unlock()
 	return ok
 }
-
-func ptrTo[T any](v T) *T { return &v }

@@ -57,7 +57,7 @@ func main() {
 		}
 
 		for _, r := range records {
-			evt, err := json.Marshal(map[string]interface{}{
+			evt, err := json.Marshal(map[string]any{
 				"@timestamp": r.Timestamp,
 				"type":       r.Type,
 				"exporter":   r.Exporter,

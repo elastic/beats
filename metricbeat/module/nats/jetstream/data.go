@@ -111,7 +111,7 @@ var (
 				"max_msg_size":         c.Int("config_max_msg_size"),
 				"subjects": s.Conv{
 					Key: "config_subjects",
-					Func: func(key string, data map[string]interface{}) (interface{}, error) {
+					Func: func(key string, data map[string]any) (any, error) {
 						emptyIface, err := mapstr.M(data).GetValue(key)
 						if err != nil {
 							return []string{}, s.NewKeyNotFoundError(key)
@@ -362,7 +362,7 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 		return fmt.Errorf("failure applying module schema: %w", err)
 	}
 
-	metricSetFields, err := jetstreamStatsSchema.Apply(map[string]interface{}{
+	metricSetFields, err := jetstreamStatsSchema.Apply(map[string]any{
 		"category":         statsCategory,
 		"max_memory":       response.Config.MaxMemory,
 		"max_storage":      response.Config.MaxStorage,
@@ -426,7 +426,7 @@ func accountMapping(r mb.ReporterV2, account JetstreamAccountDetails, response J
 		return fmt.Errorf("failure applying module schema: %w", err)
 	}
 
-	metricSetFields, err := jetstreamAccountSchema.Apply(map[string]interface{}{
+	metricSetFields, err := jetstreamAccountSchema.Apply(map[string]any{
 		"category":         accountCategory,
 		"id":               account.Id,
 		"name":             account.Name,
@@ -465,7 +465,7 @@ func streamMapping(r mb.ReporterV2, stream JetstreamStreamDetail, account Jetstr
 		return fmt.Errorf("failure applying module schema: %w", err)
 	}
 
-	metricSetFields, err := jetstreamStreamSchema.Apply(map[string]interface{}{
+	metricSetFields, err := jetstreamStreamSchema.Apply(map[string]any{
 		"category":                    streamCategory,
 		"name":                        stream.Name,
 		"created":                     stream.Created,
@@ -519,7 +519,7 @@ func consumerMapping(r mb.ReporterV2, consumer JetstreamConsumerDetail, stream J
 		return fmt.Errorf("failure applying module schema: %w", err)
 	}
 
-	metricSetFields, err := jetstreamConsumerSchema.Apply(map[string]interface{}{
+	metricSetFields, err := jetstreamConsumerSchema.Apply(map[string]any{
 		"category":               consumerCategory,
 		"stream_name":            stream.Name,
 		"name":                   consumer.Name,
@@ -569,7 +569,7 @@ func consumerMapping(r mb.ReporterV2, consumer JetstreamConsumerDetail, stream J
 }
 
 func getSharedEventDetails(response JetstreamResponse) (mapstr.M, time.Time, error) {
-	moduleFields, err := moduleSchema.Apply(map[string]interface{}{
+	moduleFields, err := moduleSchema.Apply(map[string]any{
 		"server_id": response.ServerID,
 		"now":       response.Now,
 	})

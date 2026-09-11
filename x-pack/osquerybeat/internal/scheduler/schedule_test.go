@@ -325,7 +325,7 @@ func TestRecurrenceSchedule_ExecutionIndex_Weekly(t *testing.T) {
 	// Every Monday and Wednesday, starting Monday Jan 15, 2024
 	s := &RecurrenceSchedule{
 		RRule:     "FREQ=WEEKLY;BYDAY=MO,WE",
-		StartDate: ptr(time.Date(2024, 1, 15, 9, 0, 0, 0, time.UTC)),
+		StartDate: new(time.Date(2024, 1, 15, 9, 0, 0, 0, time.UTC)),
 	}
 	require.NoError(t, s.Parse())
 
@@ -334,8 +334,6 @@ func TestRecurrenceSchedule_ExecutionIndex_Weekly(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, 4, n)
 }
-
-func ptr(t time.Time) *time.Time { return &t }
 
 func TestRecurrenceSchedule_WeeklyPattern(t *testing.T) {
 	// Every Monday and Wednesday
@@ -475,7 +473,7 @@ func TestRecurrenceSchedule_ValidateSplay(t *testing.T) {
 }
 
 func TestRecurrenceSchedule_Unpack(t *testing.T) {
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"rrule":      "FREQ=DAILY",
 		"start_date": "2024-01-15T09:00:00Z",
 		"end_date":   "2024-12-31T23:59:59Z",
@@ -494,7 +492,7 @@ func TestRecurrenceSchedule_Unpack(t *testing.T) {
 }
 
 func TestRecurrenceSchedule_UnpackNormalizesDatesToUTC(t *testing.T) {
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"rrule":      "FREQ=DAILY",
 		"start_date": "2024-01-15T11:00:00+02:00",
 		"end_date":   "2025-01-01T01:59:59+02:00",
@@ -511,7 +509,7 @@ func TestRecurrenceSchedule_UnpackNormalizesDatesToUTC(t *testing.T) {
 }
 
 func TestRecurrenceSchedule_UnpackDefaults(t *testing.T) {
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"rrule": "FREQ=DAILY",
 	}
 
@@ -524,12 +522,12 @@ func TestRecurrenceSchedule_UnpackDefaults(t *testing.T) {
 func TestRecurrenceSchedule_UnpackInvalidSplay(t *testing.T) {
 	tests := []struct {
 		name    string
-		cfg     map[string]interface{}
+		cfg     map[string]any
 		wantErr bool
 	}{
 		{
 			name: "invalid splay format",
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"rrule":      "FREQ=DAILY",
 				"start_date": "2024-01-15T09:00:00Z",
 				"splay":      "not a duration",
@@ -538,7 +536,7 @@ func TestRecurrenceSchedule_UnpackInvalidSplay(t *testing.T) {
 		},
 		{
 			name: "negative splay",
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"rrule":      "FREQ=DAILY",
 				"start_date": "2024-01-15T09:00:00Z",
 				"splay":      "-5m",
@@ -547,7 +545,7 @@ func TestRecurrenceSchedule_UnpackInvalidSplay(t *testing.T) {
 		},
 		{
 			name: "splay exceeds max",
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"rrule":      "FREQ=DAILY",
 				"start_date": "2024-01-15T09:00:00Z",
 				"splay":      "13h",
@@ -556,7 +554,7 @@ func TestRecurrenceSchedule_UnpackInvalidSplay(t *testing.T) {
 		},
 		{
 			name: "splay exceeds max",
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"rrule":      "FREQ=DAILY",
 				"start_date": "2024-01-15T09:00:00Z",
 				"splay":      "13h",

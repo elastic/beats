@@ -73,8 +73,8 @@ type dataprocMetadata struct {
 
 	User     map[string]string
 	Metadata map[string]string
-	Metrics  interface{}
-	System   interface{}
+	Metrics  any
+	System   any
 }
 
 type metadataCollector struct {

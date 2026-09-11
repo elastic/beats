@@ -61,12 +61,13 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
-	log       *logp.Logger
-	state     atomic.Pointer[initializedState]
-	cache     *cache
-	initOnce  sync.Once
-	wg        sync.WaitGroup
-	cancelCtx context.CancelFunc
+	log          *logp.Logger
+	state        atomic.Pointer[initializedState]
+	cache        *cache
+	initOnce     sync.Once
+	wg           sync.WaitGroup
+	cancelCtx    context.CancelFunc
+	appendFields bool
 }
 
 func init() {
@@ -145,9 +146,10 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	ctx, cancelCtx := context.WithCancel(context.Background())
 	processor := &kubernetesAnnotator{
-		log:       log,
-		cache:     newCache(config.CleanupTimeout),
-		cancelCtx: cancelCtx,
+		log:          log,
+		cache:        newCache(config.CleanupTimeout),
+		cancelCtx:    cancelCtx,
+		appendFields: config.AppendFields,
 	}
 
 	if config.WaitMetadata {
@@ -380,7 +382,7 @@ func (k *kubernetesAnnotator) init(ctx context.Context, config kubeAnnotatorConf
 // contains a map with various Kubernetes metadata.
 // This processor does not access or modify the `Meta` of the event.
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
-	if kubernetesMetadataExist(event) {
+	if kubernetesMetadataExist(event) && !k.appendFields {
 		return event, nil
 	}
 
@@ -404,16 +406,24 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 
 	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
 	if ociContainer != nil {
-		event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+		if k.appendFields {
+			event.Fields.DeepUpdateNoOverwrite(mapstr.M{"container": ociContainer})
+		} else {
+			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+		}
 	}
-	event.Fields.DeepUpdate(kubeMeta)
+	if k.appendFields {
+		event.Fields.DeepUpdateNoOverwrite(kubeMeta)
+	} else {
+		event.Fields.DeepUpdate(kubeMeta)
+	}
 
 	return event, nil
 }
 
 // RunPdata enriches the given pcommon.Map directly with Kubernetes metadata
 func (k *kubernetesAnnotator) RunPdata(body pcommon.Map) (bool, error) {
-	if _, ok := body.Get("kubernetes"); ok {
+	if _, ok := body.Get("kubernetes"); ok && !k.appendFields {
 		return false, nil
 	}
 
@@ -436,12 +446,13 @@ func (k *kubernetesAnnotator) RunPdata(body pcommon.Map) (bool, error) {
 	}
 
 	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
+	overwrite := !k.appendFields
 	if ociContainer != nil {
-		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body, true); err != nil {
+		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body, overwrite); err != nil {
 			return false, err
 		}
 	}
-	return false, otelmap.MergeMapstrIntoPdata(kubeMeta, body, true)
+	return false, otelmap.MergeMapstrIntoPdata(kubeMeta, body, overwrite)
 }
 
 // prepareKubeMetadata clones the cached metadata, builds the OCI container

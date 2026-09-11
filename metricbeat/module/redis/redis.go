@@ -109,7 +109,7 @@ func FetchSlowLogLength(c rd.Conn, logger *logp.Logger) (int64, error) {
 }
 
 // FetchKeyInfo collects info about a key
-func FetchKeyInfo(c rd.Conn, key string, logger *logp.Logger) (map[string]interface{}, error) {
+func FetchKeyInfo(c rd.Conn, key string, logger *logp.Logger) (map[string]any, error) {
 	keyType, err := rd.String(c.Do("TYPE", key))
 	if err != nil {
 		return nil, err
@@ -124,10 +124,10 @@ func FetchKeyInfo(c rd.Conn, key string, logger *logp.Logger) (map[string]interf
 		return nil, err
 	}
 
-	info := map[string]interface{}{
+	info := map[string]any{
 		"name": key,
 		"type": keyType,
-		"expire": map[string]interface{}{
+		"expire": map[string]any{
 			"ttl": keyTTL,
 		},
 	}

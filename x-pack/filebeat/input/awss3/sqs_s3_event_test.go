@@ -197,7 +197,6 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 
 		// Test will call ChangeMessageVisibility once and then keepalive will
 		// exit because the SQS receipt handle is not usable.

@@ -164,8 +164,8 @@ func opReplyParse(d *decoder, m *mongodbMessage, logger *logp.Logger) (bool, boo
 
 	logger.Debugf("Prepare to read %d document from reply", m.event["numberReturned"])
 
-	documents := make([]interface{}, numberReturned)
-	for i := int32(0); i < numberReturned; i++ {
+	documents := make([]any, numberReturned)
+	for i := range numberReturned {
 		var document bson.M
 		document, err = d.readDocument(logger)
 		if err != nil {
@@ -261,7 +261,7 @@ func opInsertParse(d *decoder, m *mongodbMessage, logger *logp.Logger) (bool, bo
 
 // Try to guess whether this key:value pair found in
 // the query represents a command.
-func isDatabaseCommand(key string, val interface{}) bool {
+func isDatabaseCommand(key string, val any) bool {
 	nameExists := false
 	for _, cmd := range databaseCommands {
 		if strings.EqualFold(cmd, key) {
@@ -423,7 +423,7 @@ func opMsgParse(d *decoder, m *mongodbMessage, logger *logp.Logger) (bool, bool)
 			logger.Errorf("An error occurred while parsing OP_MSG message: %s", err)
 			return false, false
 		}
-		m.documents = []interface{}{document}
+		m.documents = []any{document}
 
 	case msgKindDocumentSequence:
 		start := d.i
@@ -449,7 +449,7 @@ func opMsgParse(d *decoder, m *mongodbMessage, logger *logp.Logger) (bool, bool)
 			return false, false
 		}
 		m.event["message"] = cstring
-		var documents []interface{}
+		var documents []any
 		for d.i < start+int(size) {
 			document, err := d.readDocument(logger)
 			if err != nil {
@@ -576,7 +576,7 @@ func (d *decoder) readDocument(logger *logp.Logger) (bson.M, error) {
 	return documentMap, nil
 }
 
-func doc2str(documentMap interface{}) (string, error) {
+func doc2str(documentMap any) (string, error) {
 	document, err := json.Marshal(documentMap)
 	return string(document), err
 }

@@ -27,7 +27,7 @@ import (
 )
 
 type perfChannel interface {
-	C() <-chan interface{}
+	C() <-chan any
 	ErrC() <-chan error
 	LostC() <-chan uint64
 	Run() error

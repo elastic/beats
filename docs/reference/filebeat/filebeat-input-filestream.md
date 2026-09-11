@@ -389,6 +389,30 @@ take_over:
   from_ids: ["foo", "bar"]
 ```
 
+```{applies_to}
+stack: beta 9.6.0
+```
+When the previous input IDs are unknown — for example when migrating from many
+dynamically-created autodiscover inputs to a single static `filestream` input —
+use `take_over.from_any_id: true` instead of listing individual IDs.
+This takes over states from every previous `filestream` input, regardless of ID.
+`from_any_id` is mutually exclusive with `from_ids`.
+
+```yaml
+take_over:
+  enabled: true
+  from_any_id: true
+```
+
+When `from_ids` or `from_any_id` is set, files are not taken over from `log` inputs.
+
+::::{warning}
+`from_any_id` assumes each file is tracked by only one previous input. If multiple
+inputs have registry state for the same file, it is non-deterministic which state
+will be migrated. Use `from_ids` instead when multiple inputs may have tracked the
+same files.
+::::
+
 This take over mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.
@@ -1017,15 +1041,22 @@ This example shows you how to include messages that start with the string ERR or
 stack: ga 9.5.0
 ```
 
-Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under `auditd.log.*`.
+Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under a namespace that depends on the configured `mode` (see below).
 
 The parser sets the event timestamp from the audit record header, so `@timestamp` reflects when the audit event occurred rather than when Filebeat read it.
 
 :::{note}
-This parser is only supported on Linux. On other platforms, configuring it returns an error.
+This parser is only fully supported on Linux. On other platforms it acts as a pass-through: lines are forwarded unchanged and no audit fields are added.
 :::
 
 The supported configuration options are:
+
+**`mode`** {applies_to}`stack: ga 9.6.0+`
+:   (Optional) Controls the parser behavior. Valid values:
+
+    - `parse` (default): Each audit log line is parsed individually. Fields are added under `auditd.log.*`. This preserves one output event per input line.
+    - `coalesce`: Related audit records sharing the same sequence number are grouped into a single compound event using the same logic as `auditd_manager`. Fields are added under `auditd.data.*`, `auditd.summary.*`, and ECS root fields (`process.*`, `user.*`, `file.*`, and so on). Incomplete groups are flushed after a 2-second timeout.
+    - `none`: Disables parsing entirely. Lines pass through unchanged.
 
 **`log_errors`**
 :   (Optional) If `true`, parse errors are logged via the Filebeat logger. Defaults to `false`.
@@ -1033,7 +1064,10 @@ The supported configuration options are:
 **`add_error_key`**
 :   (Optional) If `true`, a parse error is added to the event under `error.message`. Defaults to `true`.
 
-Example configuration:
+**`resolve_ids`** {applies_to}`stack: ga 9.6.0+`
+:   (Optional) If `true`, UIDs and GIDs in coalesced events are resolved to names using the reading host's `/etc/passwd` and `/etc/group`. Only meaningful in `coalesce` mode. Defaults to `true`. Set to `false` when reading forwarded logs from a different host, where the local name database does not apply.
+
+Example configuration (per-line parsing, the default):
 
 ```yaml
 filebeat.inputs:
@@ -1045,6 +1079,20 @@ filebeat.inputs:
       - auditd:
           log_errors: true
           add_error_key: true
+```
+
+Example configuration (coalescing mode):
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: auditd-logs
+    paths:
+      - /var/log/audit/audit.log
+    parsers:
+      - auditd:
+          mode: coalesce
+          log_errors: true
 ```
 
 ### `encoding` [_encoding_2]

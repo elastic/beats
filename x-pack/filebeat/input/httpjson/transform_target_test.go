@@ -60,7 +60,6 @@ func TestGetTargetInfo(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got, gotErr := getTargetInfo(tc.param)
 			if tc.expectedErr == "" {

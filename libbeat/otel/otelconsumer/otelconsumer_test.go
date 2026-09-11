@@ -43,6 +43,7 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -342,6 +343,29 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, event4.Meta["_id"], docID)
 	})
 
+	t.Run("sets the elasticsearch.index attribute from raw_index metadata", func(t *testing.T) {
+		eventWithRawIndex := beat.Event{
+			Meta:   mapstr.M{"raw_index": "logs.ecs"},
+			Fields: mapstr.M{"message": "hello"},
+		}
+		batch := outest.NewBatch(eventWithRawIndex)
+
+		var indexAttr string
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			attr, ok := record.Attributes().Get(esIndexAttribute)
+			assert.True(t, ok, "elasticsearch.index attribute should be set")
+			indexAttr = attr.AsString()
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, "logs.ecs", indexAttr)
+	})
+
 	t.Run("sets the receivertest doc id attribute", func(t *testing.T) {
 		batch := outest.NewBatch(event4)
 
@@ -520,6 +544,68 @@ func TestFillLogRecordFromEventDoesNotError(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFillLogRecordFromEventCreated(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+	want := time.Date(2022, 11, 22, 19, 16, 32, 0, time.UTC)
+
+	t.Run("time.Time sets observed timestamp", func(t *testing.T) {
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": want}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("common.Time sets observed timestamp", func(t *testing.T) {
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": common.Time(want)}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("valid RFC3339 string parses correctly", func(t *testing.T) {
+		want, err := time.Parse(time.RFC3339, "2022-11-22T19:16:32.440Z")
+		require.NoError(t, err)
+
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": "2022-11-22T19:16:32.440Z"}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("valid RFC3339Nano string parses correctly", func(t *testing.T) {
+		want, err := time.Parse(time.RFC3339Nano, "2022-11-22T19:16:32.440123456Z")
+		require.NoError(t, err)
+
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": "2022-11-22T19:16:32.440123456Z"}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		assert.Equal(t, want.UTC(), logRecord.ObservedTimestamp().AsTime().UTC())
+	})
+
+	t.Run("invalid string falls back to current time", func(t *testing.T) {
+		before := time.Now()
+		event := publisher.Event{Content: beat.Event{
+			Fields: mapstr.M{"event": mapstr.M{"created": "not-a-timestamp"}},
+		}}
+		logRecord := plog.NewLogRecord()
+		require.NoError(t, fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false))
+		after := time.Now()
+
+		observed := logRecord.ObservedTimestamp().AsTime()
+		assert.False(t, observed.Before(before), "observed timestamp should not be before test start")
+		assert.False(t, observed.After(after), "observed timestamp should not be after test end")
+	})
 }
 
 // TestElasticsearchOutputVsExporterSerialization verifies that Beat events are

@@ -70,21 +70,21 @@ func TestRecurrenceQueryHandlerCreateScheduledQuerySkipsIneligibleQueries(t *tes
 }
 
 func TestRRuleDiffRows(t *testing.T) {
-	previous := rowsByKey([]map[string]interface{}{
+	previous := rowsByKey([]map[string]any{
 		{"id": int64(1), "name": "old"},
 		{"id": int64(2), "name": "same"},
 	})
-	current := rowsByKey([]map[string]interface{}{
+	current := rowsByKey([]map[string]any{
 		{"id": int64(2), "name": "same"},
 		{"id": int64(3), "name": "new"},
 	})
 
 	added, removed := diffRows(previous, current, true)
-	assert.ElementsMatch(t, []map[string]interface{}{{"id": int64(3), "name": "new"}}, added)
-	assert.ElementsMatch(t, []map[string]interface{}{{"id": int64(1), "name": "old"}}, removed)
+	assert.ElementsMatch(t, []map[string]any{{"id": int64(3), "name": "new"}}, added)
+	assert.ElementsMatch(t, []map[string]any{{"id": int64(1), "name": "old"}}, removed)
 
 	added, removed = diffRows(previous, current, false)
-	assert.ElementsMatch(t, []map[string]interface{}{{"id": int64(3), "name": "new"}}, added)
+	assert.ElementsMatch(t, []map[string]any{{"id": int64(3), "name": "new"}}, added)
 	assert.Empty(t, removed)
 }
 

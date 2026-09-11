@@ -9,6 +9,7 @@ package query
 import (
 	"database/sql"
 	"fmt"
+	"maps"
 	"net"
 	"os"
 	"path/filepath"
@@ -43,7 +44,7 @@ const testTableName = "cursor_test_events"
 // The per-instance *paths.Path is passed straight to the module so cursor state
 // resolves under the per-test temp directory, without relying on any global
 // paths singleton.
-func newMetricSetWithPaths(t *testing.T, config map[string]interface{}, p *paths.Path) mb.MetricSet {
+func newMetricSetWithPaths(t *testing.T, config map[string]any, p *paths.Path) mb.MetricSet {
 	t.Helper()
 
 	c, err := conf.NewConfigFrom(config)
@@ -176,7 +177,7 @@ func insertTestData(t *testing.T, db *sql.DB, driver string, n int) {
 		t.Fatalf("unsupported driver for insertTestData: %s", driver)
 	}
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i))
 		require.NoError(t, err)
 	}
@@ -209,7 +210,7 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 	// Insert test data with values for all cursor types
 	insertSQL := fmt.Sprintf(`INSERT INTO %s (event_data, created_at, score, price) VALUES ($1, $2, $3, $4)`, testTableName)
 	now := time.Now().UTC()
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		score := float64(i+1) * 1.5   // 1.5, 3.0, 4.5, 6.0, 7.5
 		price := float64(i+1) * 10.25 // 10.25, 20.50, 30.75, 41.00, 51.25
 		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), score, price)
@@ -243,7 +244,7 @@ func setupMySQLTestTable(t *testing.T, db *sql.DB) {
 	// Insert test data with values for all cursor types
 	insertSQL := fmt.Sprintf(`INSERT INTO %s (event_data, created_at, price) VALUES (?, ?, ?)`, testTableName)
 	now := time.Now().UTC()
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		price := float64(i+1) * 10.25 // 10.25, 20.50, 30.75, 41.00, 51.25
 		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), price)
 		require.NoError(t, err)
@@ -266,7 +267,7 @@ func testIntegerCursor(t *testing.T, driver, dsn string) {
 
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -324,7 +325,7 @@ func testTimestampCursor(t *testing.T, driver, dsn string) {
 
 	query := fmt.Sprintf("SELECT id, event_data, created_at FROM %s WHERE created_at > :cursor ORDER BY created_at ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -369,7 +370,7 @@ func testFloatCursor(t *testing.T, driver, dsn string) {
 	// With cursor default 0.0 and LIMIT 3, first fetch gets 1.5, 3.0, 4.5
 	query := fmt.Sprintf("SELECT id, event_data, score FROM %s WHERE score > :cursor ORDER BY score ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -423,7 +424,7 @@ func testDecimalCursor(t *testing.T, driver, dsn string) {
 	// With cursor default 0.00 and LIMIT 3, first fetch gets 10.25, 20.50, 30.75
 	query := fmt.Sprintf("SELECT id, event_data, price FROM %s WHERE price > :cursor ORDER BY price ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -477,7 +478,7 @@ func testDescendingIntegerCursor(t *testing.T, driver, dsn string) {
 	// Default 999999, first fetch gets ids 5, 4, 3 (ORDER BY id DESC LIMIT 3)
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id < :cursor ORDER BY id DESC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -536,7 +537,7 @@ func testCompoundWhereCursor(t *testing.T, driver, dsn string) {
 		"SELECT id, event_data FROM %s WHERE id > :cursor AND event_data LIKE 'event-%%' ORDER BY id ASC LIMIT 3",
 		testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -603,7 +604,7 @@ func TestCursorStatePersistence(t *testing.T) {
 
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -687,7 +688,7 @@ func TestCursorNullValues(t *testing.T) {
 	defaultTimestamp := now.Add(-time.Hour).Format(time.RFC3339)
 	query := fmt.Sprintf("SELECT id, event_data, updated_at FROM %s WHERE updated_at > :cursor OR updated_at IS NULL ORDER BY id ASC", tableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -857,7 +858,7 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 	// This gives enough data to test multi-batch pagination (e.g., 3+3+3+1+0).
 	insertSQL := `INSERT INTO cursor_test_events (event_data, created_at, event_date) VALUES (:1, :2, :3)`
 	now := time.Now().UTC()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		ts := now.Add(time.Duration(i) * time.Second)
 		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
 		require.NoError(t, err, "Failed to insert Oracle test data row %d", i)
@@ -884,7 +885,7 @@ func testOracleIntegerCursor(t *testing.T, dsn string) {
 	// :cursor is translated to :cursor_val for Oracle by cursor.TranslateQuery
 	query := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -955,7 +956,7 @@ func testOracleIntegerCursorRestart(t *testing.T, dsn string) {
 	// No FETCH FIRST — get all rows in one go
 	query := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1008,7 +1009,7 @@ func testOracleTimestampCursorMultiBatch(t *testing.T, dsn string) {
 
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1085,7 +1086,7 @@ func testOracleTimestampTimezoneHandling(t *testing.T, dsn string) {
 
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 5 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1140,7 +1141,7 @@ func testOracleTimestampPrecision(t *testing.T, dsn string) {
 	// FETCH FIRST 1 ROW ONLY to test single-row pagination
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 1 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1157,7 +1158,7 @@ func testOracleTimestampPrecision(t *testing.T, dsn string) {
 	// Fetch rows one at a time — precision loss would cause rows to be
 	// skipped (cursor jumps too far) or re-fetched (cursor doesn't advance).
 	var totalFetched int
-	for i := 0; i < 12; i++ { // 10 rows + 2 safety iterations
+	for i := range 12 { // 10 rows + 2 safety iterations
 		ms := newMetricSetWithPaths(t, cfg, testPaths)
 		events, errs := fetchEvents(t, ms)
 		require.Empty(t, errs, "Fetch %d should not have errors", i+1)
@@ -1205,7 +1206,7 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 	// Insert 6 rows across 6 distinct dates (today-5 .. today), all at midnight
 	// so TO_DATE comparison works cleanly.
 	today := time.Now().UTC().Truncate(24 * time.Hour)
-	for i := 0; i < 6; i++ {
+	for i := range 6 {
 		d := today.AddDate(0, 0, i-5) // today-5, today-4, ..., today
 		_, err := db.ExecContext(t.Context(),
 			fmt.Sprintf("INSERT INTO %s (event_data, event_date) VALUES (:1, :2)", tableName),
@@ -1222,7 +1223,7 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 		tableName,
 	)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1302,7 +1303,7 @@ func testOracleNullHandling(t *testing.T, db *sql.DB, dsn string) {
 		"SELECT id, event_data, updated_at FROM %s WHERE updated_at > :cursor OR updated_at IS NULL ORDER BY id ASC",
 		tableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1338,7 +1339,7 @@ func testOracleEmptyResultSet(t *testing.T, dsn string) {
 
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1383,7 +1384,7 @@ func testOracleQueryChangeResetsCursor(t *testing.T, dsn string) {
 	// First query — fetch 5 rows
 	query1 := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 5 ROWS ONLY"
 
-	cfg1 := map[string]interface{}{
+	cfg1 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1409,7 +1410,7 @@ func testOracleQueryChangeResetsCursor(t *testing.T, dsn string) {
 	// state key hash, so the cursor resets to default.
 	query2 := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg2 := map[string]interface{}{
+	cfg2 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1467,7 +1468,7 @@ func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 		))
 	}
 
-	var id, createdAt, eventDate interface{}
+	var id, createdAt, eventDate any
 	err = rows.Scan(&id, &createdAt, &eventDate)
 	require.NoError(t, err)
 
@@ -1599,7 +1600,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	// With params.Timezone=UTC, godror sends the raw UTC value and Oracle stores
 	// it as-is in the plain TIMESTAMP column (no timezone conversion on storage).
 	now := time.Now().UTC()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		ts := now.Add(time.Duration(i) * time.Second)
 		_, err := db.ExecContext(t.Context(),
 			fmt.Sprintf("INSERT INTO %s (event_data, created_at) VALUES (:1, :2)", tableName),
@@ -1642,7 +1643,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 		"SELECT id, event_data, created_at FROM %s WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY",
 		tableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{mismatchDSN},
@@ -1779,7 +1780,7 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 	// Insert test data
 	insertSQL := `INSERT INTO cursor_test_events (event_data, created_at, event_date) VALUES (@p1, @p2, @p3)`
 	now := time.Now().UTC()
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		ts := now.Add(time.Duration(i) * time.Second)
 		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
 		require.NoError(t, err, "Failed to insert MSSQL test data")
@@ -1802,7 +1803,7 @@ func testMSSQLIntegerCursor(t *testing.T, dsn string) {
 
 	query := "SELECT TOP 3 id, event_data FROM cursor_test_events WHERE id > @p1 ORDER BY id ASC"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1854,7 +1855,7 @@ func testMSSQLTimestampCursor(t *testing.T, dsn string) {
 	testPaths := createTestPaths(t)
 	defaultTimestamp := time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1895,7 +1896,7 @@ func testMSSQLDateCursor(t *testing.T, dsn string) {
 	testPaths := createTestPaths(t)
 	defaultDate := time.Now().Add(-24 * time.Hour).UTC().Format("2006-01-02")
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1950,7 +1951,7 @@ func waitForMSSQLConnection(t *testing.T, host string) {
 
 	dsn := GetMSSQLConnectionDSN(host)
 
-	for i := 0; i < maxRetries; i++ {
+	for i := range maxRetries {
 		db, err := sql.Open("sqlserver", dsn)
 		if err == nil {
 			err = db.PingContext(t.Context())
@@ -1963,10 +1964,7 @@ func waitForMSSQLConnection(t *testing.T, host string) {
 			}
 		}
 
-		delay := time.Duration(1<<uint(i)) * baseDelay
-		if delay > 30*time.Second {
-			delay = 30 * time.Second
-		}
+		delay := min(time.Duration(1<<uint(i))*baseDelay, 30*time.Second)
 
 		t.Logf("MSSQL not ready yet (attempt %d/%d), waiting %v: %v", i+1, maxRetries, delay, err)
 		time.Sleep(delay)
@@ -2003,7 +2001,7 @@ func TestCursorQueryChangeResetsState(t *testing.T) {
 	query1 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 2", testTableName)
 	query2 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfgBase := map[string]interface{}{
+	cfgBase := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2016,16 +2014,12 @@ func TestCursorQueryChangeResetsState(t *testing.T) {
 		"cursor.default":      "0",
 	}
 
-	cfg1 := map[string]interface{}{}
-	for k, v := range cfgBase {
-		cfg1[k] = v
-	}
+	cfg1 := map[string]any{}
+	maps.Copy(cfg1, cfgBase)
 	cfg1["sql_query"] = query1
 
-	cfg2 := map[string]interface{}{}
-	for k, v := range cfgBase {
-		cfg2[k] = v
-	}
+	cfg2 := map[string]any{}
+	maps.Copy(cfg2, cfgBase)
 	cfg2["sql_query"] = query2
 
 	// First run with query1 advances cursor to id=2.
@@ -2079,7 +2073,7 @@ func TestCursorStateIsolation(t *testing.T) {
 	query1 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 2", testTableName)
 	query2 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfg1 := map[string]interface{}{
+	cfg1 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2093,7 +2087,7 @@ func TestCursorStateIsolation(t *testing.T) {
 		"cursor.default":      "0",
 	}
 
-	cfg2 := map[string]interface{}{
+	cfg2 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2169,7 +2163,7 @@ func TestCursorRegistrySharing(t *testing.T) {
 	testPaths := createTestPaths(t)
 
 	// Configuration for first MetricSet - query with LIMIT 2
-	cfg1 := map[string]interface{}{
+	cfg1 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2185,7 +2179,7 @@ func TestCursorRegistrySharing(t *testing.T) {
 	}
 
 	// Configuration for second MetricSet - different query with LIMIT 3
-	cfg2 := map[string]interface{}{
+	cfg2 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2300,7 +2294,7 @@ func TestCursorQueryTimeout(t *testing.T) {
 		testTableName,
 	)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2372,7 +2366,7 @@ func TestCursorNormalQueryCompletesWithinTimeout(t *testing.T) {
 
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},

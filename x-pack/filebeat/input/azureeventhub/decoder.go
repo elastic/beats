@@ -55,7 +55,7 @@ type messageDecoder struct {
 // [^1]: the Diagnostic Settings is the Azure component used
 // to export logs and metrics from an Azure service.
 func (u *messageDecoder) Decode(bMessage []byte) []string {
-	var mapObject map[string][]interface{}
+	var mapObject map[string][]any
 	var records []string
 
 	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
@@ -92,7 +92,7 @@ func (u *messageDecoder) Decode(bMessage []byte) []string {
 	} else {
 		u.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
 		// in some cases the message is an array
-		var arrayObject []interface{}
+		var arrayObject []any
 		err = json.Unmarshal(bMessage, &arrayObject)
 		if err != nil {
 			// return entire message

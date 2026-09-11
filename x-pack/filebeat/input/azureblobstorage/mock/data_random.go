@@ -44,7 +44,7 @@ func generateMetadata() []byte {
 	const numDataSets = TotalRandomDataSets
 	dataSets := make([]Blob, numDataSets)
 
-	for i := 0; i < numDataSets; i++ {
+	for i := range numDataSets {
 		dataSets[i] = createRandomBlob(i)
 	}
 
@@ -92,7 +92,7 @@ func generateRandomBlob() []byte {
 	const numObjects = 10
 	dataObjects := make([]MyData, numObjects)
 
-	for i := 0; i < numObjects; i++ {
+	for i := range numObjects {
 		dataObjects[i] = createRandomData()
 	}
 

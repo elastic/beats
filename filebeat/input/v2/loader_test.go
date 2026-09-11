@@ -77,49 +77,29 @@ func TestLoader_New(t *testing.T) {
 	}
 }
 
-func TestLoader_Init(t *testing.T) {
-	pluginWithInit := func(name string, fn func() error) Plugin {
-		return Plugin{
-			Name:      name,
-			Stability: feature.Stable,
-			Manager:   &fakeInputManager{OnInit: fn},
-		}
-	}
-
-	t.Run("calls all input managers", func(t *testing.T) {
-		count := 0
-		incCountOnInit := func() error { count++; return nil }
-
-		setup := loaderConfig{
-			Plugins: []Plugin{
-				pluginWithInit("a", incCountOnInit),
-				pluginWithInit("b", incCountOnInit),
+func TestLoader_Close(t *testing.T) {
+	var closed int
+	loader := loaderConfig{
+		Plugins: []Plugin{
+			{
+				Name:      "a",
+				Stability: feature.Stable,
+				Manager: &fakeInputManager{
+					OnClose: func() { closed++ },
+				},
 			},
-		}
-		loader := setup.MustNewLoader()
-		err := loader.Init(nil)
-		expectNoError(t, err)
-		if count != 2 {
-			t.Errorf("expected init count 2, but got %v", count)
-		}
-	})
-
-	t.Run("stop init on error", func(t *testing.T) {
-		count := 0
-		incCountOnInit := func() error { count++; return errors.New("oops") }
-		setup := loaderConfig{
-			Plugins: []Plugin{
-				pluginWithInit("a", incCountOnInit),
-				pluginWithInit("b", incCountOnInit),
+			{
+				Name:      "b",
+				Stability: feature.Stable,
+				Manager: &fakeInputManager{
+					OnClose: func() { closed++ },
+				},
 			},
-		}
-		loader := setup.MustNewLoader()
-		err := loader.Init(nil)
-		expectError(t, err)
-		if count != 1 {
-			t.Errorf("expected init count 1, but got %v", count)
-		}
-	})
+		},
+	}.MustNewLoader()
+
+	loader.Close()
+	require.Equal(t, 2, closed, "Close must call every closable input manager")
 }
 
 func TestLoader_Configure(t *testing.T) {

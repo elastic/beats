@@ -146,7 +146,7 @@ func TestNonZeroRedirect(t *testing.T) {
 
 	var via []*http.Request
 	// Test requests within the limit
-	for i := 0; i < limit; i++ {
+	for range limit {
 		req := makeTestHTTPRequest(t)
 		assert.Nil(t, checker(req, via))
 		via = append(via, req)

@@ -70,8 +70,8 @@ func TestMapValue(t *testing.T) {
 		"value.empty":  {Value: ""},
 		"value.zero":   {Value: 0},
 		"value.number": {Value: 42},
-		"value.map":    {Value: map[string]interface{}{"foo": "bar"}},
-		"value.array":  {Value: []interface{}{"1234", "test", 42}},
+		"value.map":    {Value: map[string]any{"foo": "bar"}},
+		"value.array":  {Value: []any{"1234", "test", 42}},
 	}
 
 	doc := Doc(mapping.Map(testOsqueryResult))

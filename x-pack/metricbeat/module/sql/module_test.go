@@ -132,7 +132,7 @@ func TestGetCursorRegistryConcurrent(t *testing.T) {
 	}
 
 	type result struct {
-		reg interface{}
+		reg any
 		err error
 	}
 
@@ -140,7 +140,7 @@ func TestGetCursorRegistryConcurrent(t *testing.T) {
 	var wg sync.WaitGroup
 	resultsCh := make(chan result, n)
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		wg.Add(1)
 		go func(mod mb.Module) {
 			defer wg.Done()
@@ -161,7 +161,7 @@ func TestGetCursorRegistryConcurrent(t *testing.T) {
 	wg.Wait()
 	close(resultsCh)
 
-	var first interface{}
+	var first any
 	for r := range resultsCh {
 		require.NoError(t, r.err)
 		require.NotNil(t, r.reg)

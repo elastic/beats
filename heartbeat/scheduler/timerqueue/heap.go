@@ -33,12 +33,12 @@ func (th timerHeap) Swap(i, j int) {
 }
 
 // Push adds a new timerTask to the heap
-func (th *timerHeap) Push(tt interface{}) {
+func (th *timerHeap) Push(tt any) {
 	*th = append(*th, tt.(*timerTask))
 }
 
 // Pop returns the timerTask scheduled soonest.
-func (th *timerHeap) Pop() interface{} {
+func (th *timerHeap) Pop() any {
 	old := *th
 	n := len(old)
 	tt := old[n-1]

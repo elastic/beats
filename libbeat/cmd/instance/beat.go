@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -115,6 +114,8 @@ type Beat struct {
 	keystore   keystore.Keystore
 	processors processing.Supporter
 
+	hostnameOverride string
+
 	InputQueueSize int // Size of the producer queue used by most queues.
 
 	// shouldReexec is a flag to indicate the Beat should restart
@@ -128,6 +129,7 @@ type beatConfig struct {
 
 	// beat top-level settings
 	Name      string `config:"name"`
+	Hostname  string `config:"hostname"`
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
@@ -398,10 +400,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.MakeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
-		// Since now publisher is closed on Stop, we want to give some
-		// time to ack any pending events by default to avoid
-		// changing on stop behavior too much.
-		WaitClose:      time.Second,
+		WaitClose:      beaterStopGraceMargin,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -589,8 +588,20 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// acknowledge any outstanding events before we exit. Disconnect is
 	// idempotent, so a beater that already drained the pipeline itself with its
 	// own bounded timeout reaches this as a harmless no-op.
+	//
+	// Pass the beater's declared drain bound as the context deadline when one
+	// is set, so shutdown_timeout (or a beater-supplied default) controls how
+	// long we wait for the queue to flush. When no drain bound is declared,
+	// Disconnect falls back to the pipeline's own waitCloseTimeout
+	// (beaterStopGraceMargin = 1s).
 	if b.Publisher != nil {
-		if derr := b.Publisher.Disconnect(context.Background()); derr != nil {
+		ctx := context.Background()
+		if b.ShutdownTimeout > 0 {
+			var cancel context.CancelFunc
+			ctx, cancel = context.WithTimeout(context.Background(), b.ShutdownTimeout)
+			defer cancel()
+		}
+		if derr := b.Publisher.Disconnect(ctx); derr != nil {
 			logger.Errorf("error disconnecting publisher pipeline: %v", derr)
 		}
 	}
@@ -796,12 +807,34 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags converts -flag to --flags, parses the command line
-// flags, and it invokes the HandleFlags callback if implemented by
-// the Beat.
+// HostnameFlag holds the value of the --hostname flag.
+var HostnameFlag string
+
+// handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	flag.Parse()
 	return cfgfile.HandleFlags()
+}
+
+// ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
+// hostname override used by processors (add_host_metadata, add_observer_metadata).
+// It is a no-op when h is empty or blank.
+func (b *Beat) ApplyHostname(h, source string) {
+	if strings.TrimSpace(h) == "" {
+		return
+	}
+	beat.SetHostnameOverride(h)
+	h = beat.GetHostnameOverride()
+	b.Info.Hostname = h
+	b.Info.FQDN = h
+	b.hostnameOverride = h
+	if b.Info.Logger != nil {
+		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
+	}
+}
+
+// HostnameOverride returns the hostname override of this beat, or "" when it has none.
+func (b *Beat) HostnameOverride() string {
+	return b.hostnameOverride
 }
 
 // config reads the configuration file from disk, parses the common options
@@ -867,6 +900,13 @@ func (b *Beat) configure(settings Settings) error {
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
+
+	hostname := b.Config.Hostname
+	if HostnameFlag != "" {
+		hostname = HostnameFlag
+	}
+	b.ApplyHostname(hostname, "hostname config")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -896,23 +936,25 @@ func (b *Beat) configure(settings Settings) error {
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return fmt.Errorf("failed to get host information: %w", err)
-	}
+	if b.hostnameOverride == "" {
+		// Try to get the host's FQDN and set it.
+		h, err := sysinfo.Host()
+		if err != nil {
+			return fmt.Errorf("failed to get host information: %w", err)
+		}
 
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
+		fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
 
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+		fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// initialize config manager

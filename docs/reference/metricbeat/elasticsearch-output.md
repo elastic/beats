@@ -449,7 +449,7 @@ Specifies the behavior when the elasticsearch cluster explicitly rejects documen
 
 #### `drop` [_drop]
 
-The default behaviour, when an event is explicitly rejected by elasticsearch it is dropped.
+The default behavior is that when an event is explicitly rejected by Elasticsearch, it is dropped.
 
 ```yaml
 output.elasticsearch:

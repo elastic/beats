@@ -59,7 +59,7 @@ var fileStoreTests = []struct {
 				Effort:   10,
 			},
 			Put: &putConfig{
-				TTL: ptrTo(time.Second),
+				TTL: new(time.Second),
 			},
 		},
 		want: &fileStore{path: "testdata/new_put", memStore: memStore{
@@ -140,7 +140,7 @@ var fileStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)
@@ -186,7 +186,7 @@ var fileStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)
@@ -381,7 +381,7 @@ var fileStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)

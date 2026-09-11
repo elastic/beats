@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	path_pkg "path"
+	"slices"
 	"strings"
 )
 
@@ -60,8 +61,8 @@ func (tree FileTree) AddDir(path string) error {
 func (tree FileTree) Remove(path string) error {
 	components := strings.Split(path, PathSeparator)
 	last := -1
-	for pos := len(components) - 1; pos >= 0; pos-- {
-		if len(components[pos]) != 0 {
+	for pos, v := range slices.Backward(components) {
+		if len(v) != 0 {
 			last = pos
 			break
 		}
@@ -94,7 +95,7 @@ func (tree FileTree) At(path string) (FileTree, error) {
 func (tree FileTree) add(path string, value FileTree) error {
 	components := strings.Split(path, PathSeparator)
 	dir, last := tree, len(components)-1
-	for i := 0; i < last; i++ {
+	for i := range last {
 		if len(components[i]) == 0 {
 			continue
 		}

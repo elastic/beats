@@ -47,6 +47,9 @@ const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
 
+	// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
+	esIndexAttribute = "elasticsearch.index"
+
 	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
 	// It is duplicated here to avoid importing the receivertest package
 	// (and pulling its testify/testing deps) into production binaries.
@@ -224,6 +227,12 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 			observedTimestamp = pcommon.NewTimestampFromTime(created)
 		case common.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+		case string:
+			t, err := time.Parse(time.RFC3339Nano, created)
+			if err != nil {
+				t = time.Now()
+			}
+			observedTimestamp = pcommon.NewTimestampFromTime(t)
 		case nil:
 			// not set
 		default:
@@ -241,6 +250,14 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		}
 		// temporary workaround for https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/49337
 		applyNonStandardDataStreamIndex(logRecord, ds)
+	}
+
+	// If raw_index is set on event metadata, propagate it as the
+	// Elasticsearch index, potentially overwriting the non-standard
+	// data stream index. This matches the behavior of the Beats
+	// index selector.
+	if s, ok := event.Content.Meta["raw_index"].(string); ok {
+		logRecord.Attributes().PutStr(esIndexAttribute, s)
 	}
 
 	bodyMap := logRecord.Body().SetEmptyMap()
@@ -278,9 +295,6 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 // that restriction. Remove this function and sanitizeDataStreamField when upstream adds support.
 func applyNonStandardDataStreamIndex(logRecord plog.LogRecord, ds mapstr.M) {
 	const (
-		// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
-		esIndexAttribute = "elasticsearch.index"
-
 		// maxDataStreamBytes and disallowed* mirror the sanitisation constants in
 		// elasticsearchexporter so the computed index name matches exactly.
 		maxDataStreamBytes       = 100

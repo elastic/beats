@@ -5,6 +5,7 @@
 package awscloudwatch
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -215,6 +216,10 @@ type testInputStore struct {
 
 func (s *testInputStore) StoreFor(typ string) (*statestore.Store, error) {
 	return s.registry.Get(typ)
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func createTestInputStore() *testInputStore {

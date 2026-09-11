@@ -582,7 +582,7 @@ func TestValueTpl(t *testing.T) {
 							"foo",
 							"bar",
 						},
-						"iarr": []interface{}{
+						"iarr": []any{
 							"foo",
 							2,
 						},
@@ -789,7 +789,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "func toJSON",
 			value: "[[ toJSON .first_event.events ]]",
 			paramCtx: &transformContext{
-				firstEvent:   &mapstr.M{"events": []interface{}{map[string]interface{}{"id": 1234}}},
+				firstEvent:   &mapstr.M{"events": []any{map[string]any{"id": 1234}}},
 				lastEvent:    &mapstr.M{},
 				lastResponse: newTestResponse(nil, nil, ""),
 			},
@@ -799,7 +799,6 @@ func TestValueTpl(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.setup != nil {
 				tc.setup(t)

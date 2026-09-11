@@ -15,13 +15,13 @@ import (
 func TestConfig(t *testing.T) {
 	testCases := []struct {
 		name        string
-		userConfig  map[string]interface{}
+		userConfig  map[string]any
 		expected    *config
 		expectedErr string
 	}{
 		{
 			"defaults",
-			map[string]interface{}{},
+			map[string]any{},
 			&config{
 				ListenAddress: "localhost:5044",
 				Versions:      []string{"v1", "v2"},
@@ -30,7 +30,7 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"validate version",
-			map[string]interface{}{
+			map[string]any{
 				"versions": []string{"v3"},
 			},
 			nil,
@@ -38,7 +38,7 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"validate keepalive",
-			map[string]interface{}{
+			map[string]any{
 				"keepalive": "-1s",
 			},
 			nil,
@@ -46,7 +46,7 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"validate max_connections",
-			map[string]interface{}{
+			map[string]any{
 				"max_connections": -1,
 			},
 			nil,
@@ -55,7 +55,6 @@ func TestConfig(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			c := conf.MustNewConfigFrom(tc.userConfig)
 

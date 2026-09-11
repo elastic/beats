@@ -23,7 +23,7 @@ func (r *reloader) debugLogConfig(cfg *reload.ConfigWithMeta) {
 		return
 	}
 
-	var m map[string]interface{}
+	var m map[string]any
 	err := cfg.Config.Unpack(&m)
 	if err != nil {
 		r.log.Debugf("Failed to unpack the config for debug logging: %v", err)

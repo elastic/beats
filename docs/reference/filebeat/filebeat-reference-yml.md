@@ -899,10 +899,18 @@ filebeat.inputs:
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
 
-  # If `take_over` is set to `true`, this `filestream` will take over all files
-  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # When enabled, this `filestream` input takes over states from `log` inputs
+  # or other `filestream` inputs. Only files actively matched by `paths` are migrated.
   # This functionality is still in beta.
-  #take_over: false
+  #take_over:
+  #  enabled: true
+  #  # Take over from specific filestream inputs by exact ID.
+  #  # When set, files are not taken over from `log` inputs.
+  #  #from_ids: ["foo", "bar"]
+  #  # Take over from any previous filestream input, regardless of ID.
+  #  # Mutually exclusive with from_ids.
+  #  # When set, files are not taken over from `log` inputs.
+  #  #from_any_id: false
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -1297,6 +1305,13 @@ filebeat.inputs:
 #      - type: kubernetes
 #        node: ${NODE_NAME}
 #        hints.enabled: true
+#        # Restrict hints-generated input types. Disabled by default.
+#        # When enabled with an empty types list, defaults to log, filestream, and container.
+#        hints.input_allow_list.enabled: false
+#        #hints.input_allow_list.types:
+#        #  - log
+#        #  - filestream
+#        #  - container
 #        # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
 #        use_kubeadm: true
 #        hints.default_config:
@@ -2217,7 +2232,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 

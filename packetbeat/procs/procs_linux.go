@@ -260,7 +260,7 @@ func hexToIpv6(word string) (net.IP, error) {
 	if len(word) < 32 {
 		return nil, fmt.Errorf("got ip6 address of invalid length: %d", len(word))
 	}
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		start := i * 8
 		end := (i + 1) * 8
 		part, err := strconv.ParseUint(word[start:end], 16, 32)

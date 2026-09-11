@@ -12,10 +12,10 @@ import (
 
 // Logger exposes logging functions.
 type Logger interface {
-	Errorf(format string, args ...interface{})
-	Warnf(format string, args ...interface{})
-	Infof(format string, args ...interface{})
-	Debugf(format string, args ...interface{})
+	Errorf(format string, args ...any)
+	Warnf(format string, args ...any)
+	Infof(format string, args ...any)
+	Debugf(format string, args ...any)
 }
 
 // ProbeCondition is a function that allows to filter probes.

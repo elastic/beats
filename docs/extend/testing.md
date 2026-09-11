@@ -7,20 +7,20 @@ applies_to:
 
 # Testing [testing]
 
-Beats has a various sets of tests. This guide should help to understand how the different test suites work, how they are used and new tests are added.
+Beats has various sets of tests. This guide should help to understand how the different test suites work, how they are used and new tests are added.
 
 In general there are two major test suites:
 
 * Tests written in Go
 * Tests written in Python
 
-The tests written in Go use the [Go Testing package](https://golang.org/pkg/testing/). The tests written in Python depend on [pytest](https://docs.pytest.org/en/latest/) and require a compiled and executable binary from the Go code. The python test run a beat with a specific config and params and either check if the output is as expected or if the correct things show up in the logs.
+The tests written in Go use the [Go Testing package](https://golang.org/pkg/testing/). The tests written in Python depend on [pytest](https://docs.pytest.org/en/latest/) and require a compiled and executable binary from the Go code. The Python tests run a beat with a specific configuration and parameters and either check if the output is as expected or if the correct things show up in the logs.
 
 For both of the above test suites so called integration tests exists. Integration tests in Beats are tests which require an external system like Elasticsearch to test if the integration with this service works as expected. Beats provides in its testsuite docker containers and docker compose files to start these environments but a developer can run the required services also locally.
 
 ## Running Go Tests [_running_go_tests]
 
-The Go tests can be executed in each Go package by running `go test .`. This will execute all tests which don’t don’t require an external service to be running. To run all non integration tests for a beat run `mage unitTest`.
+The Go tests can be executed in each Go package by running `go test .`. This will execute all tests which don’t require an external service to be running. To run all non integration tests for a beat run `mage unitTest`.
 
 All Go tests are in the same package as the tested code itself and have the suffix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{{packagename}}_test`.
 

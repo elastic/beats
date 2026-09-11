@@ -34,14 +34,14 @@ import (
 // This duplicates hbtest.SummaryChecks to avoid an import cycle.
 // It could be refactored out, but it just isn't worth it.
 func SummaryValidator(up uint16, down uint16) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"summary":             summaryIsdef(up, down),
 		"monitor.duration.us": hbtestllext.IsInt64,
 	})
 }
 
 func summaryIsdef(up uint16, down uint16) isdef.IsDef {
-	return isdef.Is("summary", func(path llpath.Path, v interface{}) *llresult.Results {
+	return isdef.Is("summary", func(path llpath.Path, v any) *llresult.Results {
 		js, ok := v.(jobsummary.JobSummary)
 		if !ok {
 			return llresult.SimpleResult(path, false, "expected a *jobsummary.JobSummary, got %v", v)

@@ -147,7 +147,10 @@ cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4O
 cloud.auth: "auditbeat_setup:YOUR_PASSWORD" <1>
 ```
 
-1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/auditbeat/keystore.md).
+1. This example shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/auditbeat/keystore.md).
+
+::::{include} /reference/_snippets/aws-privatelink-cloud-id.md
+::::
 ::::::
 
 ::::::{applies-item} self: ga

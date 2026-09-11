@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package node_stats
 
@@ -88,6 +87,9 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 1777, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
 		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
 		require.EqualValues(t, 397269, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.completed"))
+
+		// no node in this fixture advertises the allowlisted attributes
+		require.Nil(t, auto_ops_testing.GetObjectValue(node1MetricSet, "attributes"))
 	} else if data.Version == "8.15.3" {
 		require.Equal(t, 59, len(nodeStatsEvents))
 		require.EqualValues(t, 59, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
@@ -107,10 +109,25 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 175109606, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.search.query_total"))
 		require.EqualValues(t, 3464297906, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.search.query_time_in_millis"))
 		require.EqualValues(t, 5358, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.segments.count"))
+		require.EqualValues(t, 277737431206550, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_size_in_bytes"))
+		require.EqualValues(t, 17452535488, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_operations"))
 		require.EqualValues(t, 32, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.threads"))
 		require.EqualValues(t, 24175874622, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
 		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
 		require.EqualValues(t, 383009, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.completed"))
+
+		// both allowlisted attributes present
+		require.Equal(t, "zone-0", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.logical_availability_zone"))
+		require.Equal(t, "aws.es.datahot.i3", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.instance_configuration"))
+
+		// only one of the two present: the missing one must not fail the node
+		node105MetricSet := nodeStatsEvents[slices.IndexFunc(nodeStatsEvents, func(event mb.Event) bool { return event.MetricSetFields["name"] == "instance-0000000105" })].MetricSetFields
+		require.Equal(t, "zone-2", auto_ops_testing.GetObjectValue(node105MetricSet, "attributes.logical_availability_zone"))
+		require.Nil(t, auto_ops_testing.GetObjectValue(node105MetricSet, "attributes.instance_configuration"))
+
+		// neither present: no empty attributes object is emitted
+		node107MetricSet := nodeStatsEvents[slices.IndexFunc(nodeStatsEvents, func(event mb.Event) bool { return event.MetricSetFields["name"] == "instance-0000000107" })].MetricSetFields
+		require.Nil(t, auto_ops_testing.GetObjectValue(node107MetricSet, "attributes"))
 	} else if data.Version == "9.2.0" {
 		require.Equal(t, 1, len(nodeStatsEvents))
 		require.EqualValues(t, 1, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
@@ -120,8 +137,14 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.Equal(t, false, node1MetricSet["is_elected_master"])
 		require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "master", "remote_cluster_client", "transform"}, node1MetricSet["roles"])
 		require.EqualValues(t, 2902603, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.docs.count"))
+		require.EqualValues(t, 593809157, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_size_in_bytes"))
+		require.EqualValues(t, 646725, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_operations"))
 		require.EqualValues(t, 2818360, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.count"))
 		require.EqualValues(t, 4510292000, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.off_heap.total_size_bytes"))
+
+		// both allowlisted attributes present
+		require.Equal(t, "zone-1", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.logical_availability_zone"))
+		require.Equal(t, "gcp.es.datahot.n2.68x10x45", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.instance_configuration"))
 	}
 
 	// some ignored values
@@ -139,6 +162,10 @@ func expectValidParsedDetailedWithNoCache(t *testing.T, data metricset.FetcherDa
 	require.Nil(t, node1MetricSet["index_rate_per_second"])
 	require.Nil(t, node1MetricSet["merge_rate_per_second"])
 	require.Nil(t, node1MetricSet["search_rate_per_second"])
+	require.Nil(t, node1MetricSet["ingest_docs_per_second"])
+	require.Nil(t, node1MetricSet["ingest_bytes_per_second"])
+	require.Nil(t, node1MetricSet["bulk_bytes_per_second"])
+	require.Nil(t, node1MetricSet["bulk_operations_per_second"])
 	require.Nil(t, node1MetricSet["index_latency_in_millis"])
 	require.Nil(t, node1MetricSet["merge_latency_in_millis"])
 	require.Nil(t, node1MetricSet["search_latency_in_millis"])
@@ -159,6 +186,18 @@ func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData
 	require.NotNil(t, node1MetricSet["index_latency_in_millis"])
 	require.NotNil(t, node1MetricSet["merge_latency_in_millis"])
 	require.NotNil(t, node1MetricSet["search_latency_in_millis"])
+
+	// ingest rates use docs/store which are present on all ES versions
+	require.NotNil(t, node1MetricSet["ingest_docs_per_second"])
+	require.NotNil(t, node1MetricSet["ingest_bytes_per_second"])
+	// bulk rates require indices.bulk which is only present on ES 8+
+	if data.Version == "7.17.0" {
+		require.Nil(t, node1MetricSet["bulk_bytes_per_second"])
+		require.Nil(t, node1MetricSet["bulk_operations_per_second"])
+	} else {
+		require.NotNil(t, node1MetricSet["bulk_bytes_per_second"])
+		require.NotNil(t, node1MetricSet["bulk_operations_per_second"])
+	}
 }
 
 // Expect a valid response from Elasticsearch to create N events

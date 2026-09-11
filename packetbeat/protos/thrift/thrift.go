@@ -526,7 +526,7 @@ func (thrift *thriftPlugin) readListOrSet(data []byte) (value string, ok bool, c
 	fields := []string{}
 	offset := 5
 
-	for i := 0; i < sz; i++ {
+	for i := range sz {
 		value, ok, complete, bytesRead := funcReader(data[offset:])
 		if !ok {
 			return "", false, false, 0
@@ -590,7 +590,7 @@ func (thrift *thriftPlugin) readMap(data []byte) (value string, ok bool, complet
 	fields := []string{}
 	offset := 6
 
-	for i := 0; i < sz; i++ {
+	for i := range sz {
 		key, ok, complete, bytesRead := funcReaderKey(data[offset:])
 		if !ok {
 			return "", false, false, 0

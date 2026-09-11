@@ -118,11 +118,11 @@ func (s *server) processBatch(batch *lj.Batch) {
 	acker.Ready()
 }
 
-func makeEvent(remoteAddr string, tlsState *tls.ConnectionState, lumberjackEvent interface{}, acker *batchACKTracker) beat.Event {
+func makeEvent(remoteAddr string, tlsState *tls.ConnectionState, lumberjackEvent any, acker *batchACKTracker) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields: map[string]interface{}{
-			"source": map[string]interface{}{
+		Fields: map[string]any{
+			"source": map[string]any{
 				"address": remoteAddr,
 			},
 			"lumberjack": lumberjackEvent,
@@ -131,8 +131,8 @@ func makeEvent(remoteAddr string, tlsState *tls.ConnectionState, lumberjackEvent
 	}
 
 	if tlsState != nil && len(tlsState.PeerCertificates) > 0 {
-		event.Fields["tls"] = map[string]interface{}{
-			"client": map[string]interface{}{
+		event.Fields["tls"] = map[string]any{
+			"client": map[string]any{
 				"subject": tlsState.PeerCertificates[0].Subject.CommonName,
 			},
 		}

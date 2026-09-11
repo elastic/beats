@@ -53,7 +53,7 @@ func GenExportPipelineCmd(settings instance.Settings) *cobra.Command {
 	return genExportPipelineCmd
 }
 
-func fatalf(msg string, vs ...interface{}) {
+func fatalf(msg string, vs ...any) {
 	fmt.Fprintf(os.Stderr, msg, vs...)
 	fmt.Fprintln(os.Stderr)
 	os.Exit(1)

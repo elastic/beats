@@ -25,8 +25,8 @@ import (
 func TestMetrics(t *testing.T) {
 	testCases := []struct {
 		name           string
-		setupServer    func(*testing.T, http.HandlerFunc, map[string]interface{})
-		baseConfig     map[string]interface{}
+		setupServer    func(*testing.T, http.HandlerFunc, map[string]any)
+		baseConfig     map[string]any
 		handler        http.HandlerFunc
 		expectedEvents []string
 		assertMetrics  func(reg *monitoring.Registry) error
@@ -37,31 +37,31 @@ func TestMetrics(t *testing.T) {
 			skipReason: "windows:flakey test on windows - see https://github.com/elastic/beats/issues/39676",
 
 			name: "Test pagination metrics",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 				server := httptest.NewServer(h)
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)
 			},
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"interval":       time.Millisecond,
 				"request.method": http.MethodPost,
-				"request.body": map[string]interface{}{
+				"request.body": map[string]any{
 					"field": "value",
 				},
-				"response.split": map[string]interface{}{
+				"response.split": map[string]any{
 					"target": "body.items",
-					"transforms": []interface{}{
-						map[string]interface{}{
-							"set": map[string]interface{}{
+					"transforms": []any{
+						map[string]any{
+							"set": map[string]any{
 								"target": "body.page",
 								"value":  "[[.last_response.page]]",
 							},
 						},
 					},
 				},
-				"response.pagination": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+				"response.pagination": []any{
+					map[string]any{
+						"set": map[string]any{
 							"target":                 "url.params.page",
 							"value":                  "[[.last_response.body.nextPageToken]]",
 							"fail_on_template_error": true,
@@ -75,12 +75,12 @@ func TestMetrics(t *testing.T) {
 				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
 			},
 			assertMetrics: func(reg *monitoring.Registry) error {
-				checkHasValue := func(v interface{}) bool {
+				checkHasValue := func(v any) bool {
 					switch t := v.(type) {
 					case int64:
 						return t > 0
-					case map[string]interface{}:
-						h := t["histogram"].(map[string]interface{})
+					case map[string]any:
+						h := t["histogram"].(map[string]any)
 						return h["count"].(int64) > 0 && h["max"].(int64) > 0
 					}
 					return false

@@ -218,7 +218,7 @@ func TestTemplateFunc(t *testing.T) {
 		Parse(`Hello {{ eventParam $ 1 }}! Foo {{ eventParam $ 2 }}.`))
 
 	buf := new(bytes.Buffer)
-	err := tmpl.Execute(buf, []interface{}{"world"})
+	err := tmpl.Execute(buf, []any{"world"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -269,7 +269,7 @@ func BenchmarkRenderer(b *testing.B) {
 
 	const totalEvents = 1000000
 	msg := strings.Repeat("Hello world! ", 21)
-	for i := 0; i < totalEvents; i++ {
+	for range totalEvents {
 		safeWriteEvent(b, writer, 10, msg)
 	}
 

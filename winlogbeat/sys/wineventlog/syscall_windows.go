@@ -456,7 +456,7 @@ func evtVariantInt16(v uint16) int16 { return int16(v) } //nolint:gosec // prese
 func evtVariantInt32(v uint32) int32 { return int32(v) } //nolint:gosec // preserve Windows EVT_VARIANT bit pattern
 func evtVariantInt64(v uint64) int64 { return int64(v) } //nolint:gosec // preserve Windows EVT_VARIANT bit pattern
 
-func (v EvtVariant) Data(buf []byte) (interface{}, error) {
+func (v EvtVariant) Data(buf []byte) (any, error) {
 	typ := v.Type.Mask()
 	switch typ {
 	case EvtVarTypeNull:
@@ -582,7 +582,7 @@ const (
 	EvtPublisherMetadataKeywordMessageID
 )
 
-func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, propertyID EvtPublisherMetadataPropertyID) (interface{}, error) {
+func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, propertyID EvtPublisherMetadataPropertyID) (any, error) {
 	var bufferUsed uint32
 	err := _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, 0, nil, &bufferUsed)
 	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
@@ -612,7 +612,7 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 	}
 }
 
-func EvtGetObjectArrayProperty(arrayHandle EvtObjectArrayPropertyHandle, propertyID EvtPublisherMetadataPropertyID, index uint32) (interface{}, error) {
+func EvtGetObjectArrayProperty(arrayHandle EvtObjectArrayPropertyHandle, propertyID EvtPublisherMetadataPropertyID, index uint32) (any, error) {
 	var bufferUsed uint32
 	err := _EvtGetObjectArrayProperty(arrayHandle, propertyID, index, 0, 0, nil, &bufferUsed)
 	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
@@ -647,7 +647,7 @@ func EvtGetObjectArraySize(handle EvtObjectArrayPropertyHandle) (uint32, error) 
 	return arrayLen, nil
 }
 
-func GetEventMetadataProperty(metadataHandle EvtHandle, propertyID EvtEventMetadataPropertyID) (interface{}, error) {
+func GetEventMetadataProperty(metadataHandle EvtHandle, propertyID EvtEventMetadataPropertyID) (any, error) {
 	var bufferUsed uint32
 	err := _EvtGetEventMetadataProperty(metadataHandle, 8, 0, 0, nil, &bufferUsed)
 	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.

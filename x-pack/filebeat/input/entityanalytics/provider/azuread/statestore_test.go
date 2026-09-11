@@ -124,7 +124,7 @@ func TestStateStore_Close(t *testing.T) {
 	ss.users = map[uuid.UUID]*fetcher.User{
 		user1ID: {
 			ID: user1ID,
-			Fields: map[string]interface{}{
+			Fields: map[string]any{
 				"userPrincipalName": "user.one@example.com",
 				"mail":              "user.one@example.com",
 				"displayName":       "User One",
@@ -143,18 +143,18 @@ func TestStateStore_Close(t *testing.T) {
 	ss.devices = map[uuid.UUID]*fetcher.Device{
 		device1ID: {
 			ID: device1ID,
-			Fields: map[string]interface{}{
+			Fields: map[string]any{
 				"accountEnabled":         true,
 				"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
 				"displayName":            "DESKTOP-LETW452G",
 				"operatingSystem":        "Windows",
 				"operatingSystemVersion": "10.0.19043.1337",
-				"physicalIds":            []interface{}{},
-				"extensionAttributes": map[string]interface{}{
+				"physicalIds":            []any{},
+				"extensionAttributes": map[string]any{
 					"extensionAttribute1": "BYOD-Device",
 				},
-				"alternativeSecurityIds": []interface{}{
-					map[string]interface{}{
+				"alternativeSecurityIds": []any{
+					map[string]any{
 						"type":             "2",
 						"identityProvider": nil,
 						"key":              "DGFSGHSGGTH345A...35DSFH0A",
@@ -307,7 +307,6 @@ func TestErrIsItemFound(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

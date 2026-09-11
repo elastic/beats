@@ -233,14 +233,14 @@ type apiEnvironment struct {
 	tenantID    string
 	contentType string
 	config      APIConfig
-	callback    func(event beat.Event, cursor interface{}) error
+	callback    func(event beat.Event, cursor any) error
 	status      status.StatusReporter
 	logger      *logp.Logger
 	clock       func() time.Time
 }
 
 // Report returns an action that produces a beat.Event from the given object.
-func (env apiEnvironment) Report(raw json.RawMessage, doc mapstr.M, private interface{}) poll.Action {
+func (env apiEnvironment) Report(raw json.RawMessage, doc mapstr.M, private any) poll.Action {
 	return func(poll.Enqueuer) error {
 		err := env.callback(env.toBeatEvent(raw, doc), private)
 		switch err {

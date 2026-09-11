@@ -133,13 +133,6 @@ func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]type
 	return receiveMessageOutput.Messages, nil
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func (a *awsSQSAPI) DeleteMessage(ctx context.Context, msg *types.Message) error {
 	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
 	defer cancel()

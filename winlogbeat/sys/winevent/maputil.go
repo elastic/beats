@@ -29,7 +29,7 @@ import (
 // AddOptional adds a key and value to the given MapStr if the value is not the
 // zero value for the type of v. It is safe to call the function with a nil
 // MapStr.
-func AddOptional(m mapstr.M, key string, v interface{}) {
+func AddOptional(m mapstr.M, key string, v any) {
 	if m != nil && !isZero(v) {
 		_, _ = m.Put(key, v)
 	}
@@ -49,7 +49,7 @@ func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 
 	// Explicitly use the unnamed type to prevent accidental use
 	// of mapstr.M path look-up methods.
-	h := make(map[string]interface{}, len(pairs))
+	h := make(map[string]any, len(pairs))
 
 	for i, kv := range pairs {
 		// Ignore empty values.
@@ -84,7 +84,7 @@ func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 }
 
 // isZero return true if the given value is the zero value for its type.
-func isZero(i interface{}) bool {
+func isZero(i any) bool {
 	switch i := i.(type) {
 	case nil:
 		return true

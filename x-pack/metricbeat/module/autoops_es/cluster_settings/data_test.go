@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package cluster_settings
 
@@ -18,7 +17,7 @@ import (
 )
 
 // Tests that Cluster Info is consistently reported, the Cluster Name, and the dynamic status from the filename
-func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]interface{}]) {
+func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]any]) {
 	require.NoError(t, data.Error)
 	require.Equal(t, 0, len(data.Reporter.GetErrors()))
 	require.Equal(t, 1, len(data.Reporter.GetEvents()))
@@ -38,6 +37,10 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 	require.Equal(t, displayName, auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.metadata.display_name"))
 	require.ElementsMatch(t, []string{"/app/data"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "path.data"))
 	require.Equal(t, "3", auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.search_power_min"))
+
+	// the frozen flood stage watermark is reported alongside the regular flood stage watermark
+	require.Equal(t, "95%", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.routing.allocation.disk.watermark.flood_stage"))
+	require.Equal(t, "95%", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.routing.allocation.disk.watermark.flood_stage_frozen"))
 
 	// schema is expected to drop this field if it appears (it does in one file)
 	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))

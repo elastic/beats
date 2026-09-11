@@ -27,6 +27,43 @@ import (
 	"time"
 )
 
+// RegistryLogPath returns the path to the filestream registry log file inside homeDir.
+// When Filebeat runs with --path.home homeDir, the registry is stored here.
+func RegistryLogPath(homeDir string) string {
+	return filepath.Join(homeDir, "data", "registry", "filebeat", "log.json")
+}
+
+// RegistryEntry is the public form of a parsed filestream registry entry.
+type RegistryEntry struct {
+	Key      string
+	Filename string
+	Offset   int
+	EOF      bool
+	TTL      time.Duration
+	Removed  bool
+}
+
+// ReadRegistry reads and returns all entries from the filestream registry log in homeDir.
+// It skips removed entries so only active state is returned.
+func ReadRegistry(t *testing.T, homeDir string) []RegistryEntry {
+	t.Helper()
+	entries, _ := readFilestreamRegistryLog(t, RegistryLogPath(homeDir))
+	var out []RegistryEntry
+	for _, e := range entries {
+		if e.Removed {
+			continue
+		}
+		out = append(out, RegistryEntry{
+			Key:      e.Key,
+			Filename: e.Filename,
+			Offset:   e.Offset,
+			EOF:      e.EOF,
+			TTL:      e.TTL,
+		})
+	}
+	return out
+}
+
 // AssertLastOffset takes path of the registry file and the expected offset
 // and returns true if the expected offset exists on registry. Otherwise
 // false is returned. It will fail the test on any error reading/parsing

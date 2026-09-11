@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Reduce allocations per event in filestream by normalizing event fields in place
+component: filebeat

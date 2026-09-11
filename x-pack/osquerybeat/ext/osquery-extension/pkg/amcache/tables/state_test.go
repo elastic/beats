@@ -130,13 +130,11 @@ func TestGetAmcacheState(t *testing.T) {
 
 	var wg sync.WaitGroup
 	for range 10 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			got := GetAmcacheState()
 			assert.NotNil(t, got, "Expected GetAmcacheState to return a non-nil value")
 			assert.Equal(t, got, instance, "Expected GetAmcacheState to return the same instance")
-		}()
+		})
 	}
 	wg.Wait()
 

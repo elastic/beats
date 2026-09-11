@@ -33,7 +33,7 @@ const (
 )
 
 // toType converts the given value string value to the specified data type.
-func toType(value string, typ DataType, settings *Settings) (interface{}, error) {
+func toType(value string, typ DataType, settings *Settings) (any, error) {
 	switch typ {
 	case StringType:
 		return value, nil

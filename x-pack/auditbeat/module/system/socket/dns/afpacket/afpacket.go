@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux
-// +build linux
 
 package afpacket
 
@@ -68,7 +67,7 @@ func newAFPacketSniffer(base mb.BaseMetricSet, log *logp.Logger) (parent.Sniffer
 		return nil, err
 	}
 
-	opts := []interface{}{
+	opts := []any{
 		afpacket.OptFrameSize(frameSize),
 		afpacket.OptBlockSize(blockSize),
 		afpacket.OptNumBlocks(numBlocks),

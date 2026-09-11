@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -48,7 +47,7 @@ type Guesser interface {
 	// Extract receives the events generated during trigger.
 	// Done is false when it needs to be called with more events. True when
 	// the guess has completed and results is a map with the discovered values.
-	Extract(event interface{}) (result mapstr.M, done bool)
+	Extract(event any) (result mapstr.M, done bool)
 	// Terminate performs cleanup after the guess is complete.
 	Terminate() error
 }
@@ -117,7 +116,7 @@ func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Con
 
 func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
 	limit := guess.MaxRepeats()
-	for i := 0; i < limit; i++ {
+	for i := range limit {
 		ctx.Log.Debugf(" --- %s run #%d", guess.Name(), i)
 		if result, err = guessOnce(guess, installer, ctx); err != nil {
 			return nil, err
@@ -200,7 +199,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		}
 	}()
 
-	thread.Run(func() (interface{}, error) {
+	thread.Run(func() (any, error) {
 		return nil, guesser.Trigger()
 	})
 

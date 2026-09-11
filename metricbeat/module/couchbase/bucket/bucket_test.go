@@ -20,7 +20,8 @@
 package bucket
 
 import (
-	"io/ioutil"
+	"os"
+
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -37,7 +38,7 @@ func TestFetchEventContents(t *testing.T) {
 	assert.NoError(t, err)
 
 	// response is a raw response from a couchbase
-	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
+	response, err := os.ReadFile(absPath + "/sample_response.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +48,7 @@ func TestFetchEventContents(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "couchbase",
 		"metricsets": []string{"bucket"},
 		"hosts":      []string{server.URL},

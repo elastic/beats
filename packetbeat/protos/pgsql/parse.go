@@ -423,7 +423,7 @@ func (pgsql *pgsqlPlugin) parseFields(s *pgsqlStream, buf []byte) error {
 	fields := []string{}
 	fieldsFormat := []byte{}
 
-	for i := 0; i < fieldCount; i++ {
+	for range fieldCount {
 		if len(buf) <= off {
 			return errFieldBufferShort
 		}

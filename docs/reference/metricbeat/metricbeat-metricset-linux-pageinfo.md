@@ -2,18 +2,13 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-linux-pageinfo.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Linux pageinfo metricset [metricbeat-metricset-linux-pageinfo]
-
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
 
 The pageinfo metricset reports on paging statistics as found in `/proc/pagetypeinfo`
 

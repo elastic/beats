@@ -107,14 +107,14 @@ func (pi *parsingInfo) prepareForNewMessage() {
 }
 
 //go:inline
-func (pi *parsingInfo) debugf(format string, args ...interface{}) {
+func (pi *parsingInfo) debugf(format string, args ...any) {
 	if pi.isDebug {
 		pi.sipLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
-func (pi *parsingInfo) detailedf(format string, args ...interface{}) {
+func (pi *parsingInfo) detailedf(format string, args ...any) {
 	if pi.isDetailedDebug {
 		pi.sipDetailedLogger.Debugf(format, args...)
 	}
