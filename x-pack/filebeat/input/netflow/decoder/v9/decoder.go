@@ -106,7 +106,7 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 	knownFields := d.GetFields()
 	logger := d.GetLogger()
 	record.Fields = make([]template.FieldTemplate, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		key, length, err := d.ReadFieldDefinition(buf)
 		if err != nil {
 			return template.Template{}, io.EOF

@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(keyspace uint, info map[string]interface{}) mb.Event {
+func eventMapping(keyspace uint, info map[string]any) mb.Event {
 	info["id"] = fmt.Sprintf("%d:%s", keyspace, info["name"])
 	return mb.Event{
 		MetricSetFields: info,

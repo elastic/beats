@@ -30,7 +30,7 @@ func TestSessionScriptParams(t *testing.T) {
 
 	t.Run("register required for params", func(t *testing.T) {
 		_, err := newScriptFromConfig(log, &scriptConfig{
-			Source: header + footer, Params: map[string]interface{}{
+			Source: header + footer, Params: map[string]any{
 				"p1": 42,
 			},
 		}, path)
@@ -51,7 +51,7 @@ func TestSessionScriptParams(t *testing.T) {
 		`
 		_, err := newScriptFromConfig(log, &scriptConfig{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"p1": 42,
 			},
 		}, path)
@@ -101,7 +101,7 @@ func TestSessionTestFunction(t *testing.T) {
 	t.Run("test success", func(t *testing.T) {
 		_, err := newScriptFromConfig(log, &scriptConfig{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"fail": false,
 			},
 		}, path)
@@ -111,7 +111,7 @@ func TestSessionTestFunction(t *testing.T) {
 	t.Run("test failure", func(t *testing.T) {
 		_, err := newScriptFromConfig(log, &scriptConfig{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"fail": true,
 			},
 		}, path)
@@ -173,7 +173,7 @@ func TestSessionParallel(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			for ctx.Err() == nil {

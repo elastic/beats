@@ -165,7 +165,7 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 
 	st := reflect.ValueOf(info).Elem()
 	typeOfT := st.Type()
-	source := map[string]interface{}{}
+	source := map[string]any{}
 
 	for i := 0; i < st.NumField(); i++ {
 		f := st.Field(i)

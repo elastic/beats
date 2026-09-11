@@ -112,7 +112,7 @@ func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 		currentIndex: 0,
 	}
 
-	for i := 0; i < totalListingObjectsForInputS3; i++ {
+	for i := range totalListingObjectsForInputS3 {
 		ret.objects = append(ret.objects, s3Types.Object{
 			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
 			ETag:         aws.String(fmt.Sprintf("etag-%s-%d", listPrefix, i)),
@@ -336,7 +336,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 		errChan := make(chan error)
 		wg := new(sync.WaitGroup)
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			wg.Add(1)
 			go func(i int, wg *sync.WaitGroup) {
 				defer wg.Done()

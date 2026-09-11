@@ -175,7 +175,7 @@ type downloadedObject struct {
 	body        io.ReadCloser
 	contentType string
 	requestURL  string
-	metadata    map[string]interface{}
+	metadata    map[string]any
 }
 
 func (op *objectProcessorV2) download(ctx context.Context, obj s3EventV2, rc *readerConfig) (*downloadedObject, error) {
@@ -378,7 +378,7 @@ type eventBuilderV2 struct {
 	obj        s3EventV2
 	hash       string
 	requestURL string
-	metadata   map[string]interface{}
+	metadata   map[string]any
 }
 
 func (b *eventBuilderV2) newEvent(message string, offset int64) beat.Event {

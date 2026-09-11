@@ -28,6 +28,10 @@ import (
 // States is a collection of states backed by one or more persistent stores
 // that may be differentiated by input type.
 type States interface {
+	// StoreKey returns a process-wide identifier for the persistent backend
+	// selected by StoreFor. Equal keys identify the same backend.
+	StoreKey() string
+
 	// StoreFor returns the storage registry for the given type.
 	// The value of typ is expected to have been obtained from
 	// cursor.InputManager.Type and represents the input type.

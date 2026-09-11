@@ -54,6 +54,38 @@ var (
 				IsUsable:       func(obj *NodeIndexShards) bool { return obj.SearchQueryTotal != nil },
 				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.SearchRatePerSecond = &value },
 			},
+			{
+				CalculateValue: utils.CalculateRate,
+				ConvertTime:    utils.MillisToSeconds,
+				GetTime:        utils.UseTimestamp[*NodeIndexShards],
+				GetValue:       func(obj *NodeIndexShards) int64 { return *obj.DocsCount },
+				IsUsable:       func(obj *NodeIndexShards) bool { return obj.DocsCount != nil },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.IngestDocsPerSecond = &value },
+			},
+			{
+				CalculateValue: utils.CalculateRate,
+				ConvertTime:    utils.MillisToSeconds,
+				GetTime:        utils.UseTimestamp[*NodeIndexShards],
+				GetValue:       func(obj *NodeIndexShards) int64 { return *obj.SizeInBytes },
+				IsUsable:       func(obj *NodeIndexShards) bool { return obj.SizeInBytes != nil },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.IngestBytesPerSecond = &value },
+			},
+			{
+				CalculateValue: utils.CalculateRate,
+				ConvertTime:    utils.MillisToSeconds,
+				GetTime:        utils.UseTimestamp[*NodeIndexShards],
+				GetValue:       func(obj *NodeIndexShards) int64 { return *obj.BulkTotalSizeInBytes },
+				IsUsable:       func(obj *NodeIndexShards) bool { return obj.BulkTotalSizeInBytes != nil },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.BulkBytesPerSecond = &value },
+			},
+			{
+				CalculateValue: utils.CalculateRate,
+				ConvertTime:    utils.MillisToSeconds,
+				GetTime:        utils.UseTimestamp[*NodeIndexShards],
+				GetValue:       func(obj *NodeIndexShards) int64 { return *obj.BulkTotalOperations },
+				IsUsable:       func(obj *NodeIndexShards) bool { return obj.BulkTotalOperations != nil },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.BulkOperationsPerSecond = &value },
+			},
 			// LATENCIES:
 			{
 				CalculateValue: utils.CalculateLatency,

@@ -8,7 +8,9 @@ package app_insights
 
 import (
 	"fmt"
+	"maps"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -40,7 +42,7 @@ var segmentNames = []string{
 
 type MetricValue struct {
 	SegmentName map[string]string
-	Value       map[string]interface{}
+	Value       map[string]any
 	Segments    []MetricValue
 	Interval    string
 	Start       *time.Time
@@ -59,7 +61,7 @@ func mapMetricValues(metricValues ListMetricsResultsItem) []MetricValue {
 		metricValue := MetricValue{
 			Start:       info.Start,
 			End:         info.End,
-			Value:       map[string]interface{}{},
+			Value:       map[string]any{},
 			SegmentName: map[string]string{},
 			Interval:    formatInterval(info.Start, info.End),
 		}
@@ -106,7 +108,7 @@ func formatInterval(start, end *time.Time) string {
 }
 
 func mapSegment(segment MetricsSegmentInfo, parentSeg map[string]string) MetricValue {
-	metricValue := MetricValue{Value: map[string]interface{}{}, SegmentName: map[string]string{}}
+	metricValue := MetricValue{Value: map[string]any{}, SegmentName: map[string]string{}}
 	if segment.AdditionalProperties != nil {
 		metrics := getAdditionalPropMetric(segment.AdditionalProperties)
 		for key, metric := range metrics {
@@ -122,9 +124,7 @@ func mapSegment(segment MetricsSegmentInfo, parentSeg map[string]string) MetricV
 		}
 	}
 	if len(parentSeg) > 0 {
-		for key, val := range parentSeg {
-			metricValue.SegmentName[key] = val
-		}
+		maps.Copy(metricValue.SegmentName, parentSeg)
 	}
 	if segment.Segments != nil {
 		for _, segment := range *segment.Segments {
@@ -137,12 +137,7 @@ func mapSegment(segment MetricsSegmentInfo, parentSeg map[string]string) MetricV
 }
 
 func isSegment(metric string) bool {
-	for _, seg := range segmentNames {
-		if metric == seg {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(segmentNames, metric)
 }
 
 type metricTimeKey struct {
@@ -344,9 +339,7 @@ func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, appli
 	segments := make(map[string]string)
 
 	for _, v := range metricValue {
-		for sn, sv := range v.SegmentName {
-			segments[sn] = sv
-		}
+		maps.Copy(segments, v.SegmentName)
 	}
 
 	if len(segments) > 0 {
@@ -364,11 +357,11 @@ func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, appli
 	return event
 }
 
-func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interface{} {
-	metricNames := make(map[string]interface{})
+func getAdditionalPropMetric(addProp map[string]any) map[string]any {
+	metricNames := make(map[string]any)
 	for key, val := range addProp {
 		switch v := val.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			for subKey, subVal := range v {
 				if subVal != nil {
 					metricNames[cleanMetricNames(fmt.Sprintf("%s.%s", key, subKey))] = subVal

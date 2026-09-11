@@ -1505,8 +1505,8 @@ func TestInsertTags(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			subIdentifiers := strings.Split(c.identifier, dimensionSeparator)
-			for _, subIdentifier := range subIdentifiers {
+			subIdentifiers := strings.SplitSeq(c.identifier, dimensionSeparator)
+			for subIdentifier := range subIdentifiers {
 				insertTags(events, c.identifier, subIdentifier, resourceTagMap)
 			}
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)

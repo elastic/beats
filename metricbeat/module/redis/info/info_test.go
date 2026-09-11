@@ -28,7 +28,7 @@ import (
 
 func TestNewMetricSet(t *testing.T) {
 	t.Run("regular url", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]any{
 			"module":     "redis",
 			"metricsets": []string{"info"},
 			"hosts": []string{
@@ -44,7 +44,7 @@ func TestNewMetricSet(t *testing.T) {
 	})
 
 	t.Run("pass in host", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]any{
 			"module":     "redis",
 			"metricsets": []string{"info"},
 			"hosts": []string{
@@ -62,7 +62,7 @@ func TestNewMetricSet(t *testing.T) {
 	})
 
 	t.Run("password in config", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]any{
 			"module":     "redis",
 			"metricsets": []string{"info"},
 			"hosts": []string{

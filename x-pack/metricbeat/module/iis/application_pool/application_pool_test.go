@@ -14,7 +14,7 @@ import (
 )
 
 func TestMetricsetNoErrors(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "iis",
 		"metricsets": []string{"application_pool"},
 	}

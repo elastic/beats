@@ -174,13 +174,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			if !ok {
 				m.Logger().Debugf("Error while casting containerID, got %T", containerID)
 			}
-			split := strings.Index(cID, "://")
-			if split != -1 {
-				kubernetes.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
+			before, after, ok := strings.Cut(cID, "://")
+			if ok {
+				kubernetes.ShouldPut(containerFields, "runtime", before, m.Logger())
 
 				// Add splitted container.id ECS field and update kubernetes.container.id with splitted value
-				kubernetes.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
-				kubernetes.ShouldPut(event, "id", cID[split+3:], m.Logger())
+				kubernetes.ShouldPut(containerFields, "id", after, m.Logger())
+				kubernetes.ShouldPut(event, "id", after, m.Logger())
 
 			}
 		}

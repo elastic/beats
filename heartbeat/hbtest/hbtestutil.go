@@ -74,7 +74,7 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 // character 'x'
 func SizedResponseHandler(bytes int) http.HandlerFunc {
 	var body strings.Builder
-	for i := 0; i < bytes; i++ {
+	for range bytes {
 		body.WriteString("x")
 	}
 
@@ -172,8 +172,8 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 
 	return lookslike.Compose(
 		hbtestllext.MaybeHasEventType,
-		lookslike.MustCompile(map[string]interface{}{
-			"monitor": map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
+			"monitor": map[string]any{
 				"ip":          ipCheck,
 				"status":      status,
 				"duration.us": hbtestllext.IsInt64,
@@ -191,7 +191,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 func SummaryStateChecks(up uint16, down uint16) validator.Validator {
 	return lookslike.Compose(
 		summarizertesthelper.SummaryValidator(up, down),
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"state": hbtestllext.IsMonitorState,
 		}),
 	)
@@ -199,8 +199,8 @@ func SummaryStateChecks(up uint16, down uint16) validator.Validator {
 
 // ResolveChecks returns a lookslike matcher for the 'resolve' fields.
 func ResolveChecks(ip string) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"resolve": map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
+		"resolve": map[string]any{
 			"ip":     ip,
 			"rtt.us": hbtestllext.IsInt64,
 		},
@@ -225,19 +225,19 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 func URLChecks(t *testing.T, u *url.URL) validator.Validator {
 	t.Helper()
 	require.NotNil(t, u)
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"url": wraputil.URLFields(u),
 	})
 }
 
 func ECSErrCodeChecks(ecode ecserr.ECode, messageContains string) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"error": hbtestllext.IsECSErrMatchingCode(ecode, messageContains),
 	})
 }
 
 func ECSErrChecks(eErr *ecserr.ECSErr) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"error": hbtestllext.IsECSErr(eErr),
 	})
 }
@@ -246,8 +246,8 @@ func ECSErrChecks(eErr *ecserr.ECSErr) validator.Validator {
 // consist of a message (or a lookslike isdef that can match the message) and a type under the error key.
 // The message is checked only as a substring since exact string matches can be fragile due to platform differences.
 func ErrorChecks(msgSubstr string, errType string) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"error": map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
+		"error": map[string]any{
 			"message": isdef.IsStringContaining(msgSubstr),
 			"type":    errType,
 		},
@@ -265,7 +265,7 @@ func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
 func RespondingTCPChecks() validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": hbtestllext.IsInt64})
+	return lookslike.MustCompile(map[string]any{"tcp.rtt.connect.us": hbtestllext.IsInt64})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded

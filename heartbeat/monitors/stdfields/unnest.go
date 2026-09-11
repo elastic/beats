@@ -43,7 +43,7 @@ type BaseStream struct {
 // UnnestStream detects configs that come from fleet and transforms the config into something compatible
 // with heartbeat, by mixing some fields (id, data_stream) with those from the first stream. It assumes
 // that there is exactly one stream associated with the input.
-func UnnestStream(config *conf.C, processors ...interface{}) (res *conf.C, err error) {
+func UnnestStream(config *conf.C, processors ...any) (res *conf.C, err error) {
 	optS := &OptionalStream{}
 	err = config.Unpack(optS)
 	if err != nil {

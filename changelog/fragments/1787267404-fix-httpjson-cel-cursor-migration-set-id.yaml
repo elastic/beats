@@ -1,0 +1,10 @@
+kind: bug-fix
+summary: Fix httpjson cursor migration losing position when redirecting to CEL with a named input in Agentless deployments.
+description: |
+  When an httpjson input with an id field uses run_as_cel: true to redirect to
+  the CEL input, the cursor migration path was not calling SetID on the state
+  store before reading the stored cursor. In Agentless deployments backed by the
+  Elasticsearch state store, SetID selects the per-input index, so omitting the
+  call caused the migration to read from the wrong index and silently fall back
+  to the default cursor state.
+component: filebeat

@@ -18,9 +18,9 @@
 package mtest
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -58,12 +58,12 @@ func Server(t *testing.T, c ServerConfig) *httptest.Server {
 	}
 
 	for k := range responses {
-		r, err := ioutil.ReadFile(filepath.Join(absPath, responses[k].file))
+		r, err := os.ReadFile(filepath.Join(absPath, responses[k].file))
 		responses[k].body = r
 		assert.NoError(t, err)
 	}
 
-	notFound, err := ioutil.ReadFile(filepath.Join(absPath, "notfound_response.json"))
+	notFound, err := os.ReadFile(filepath.Join(absPath, "notfound_response.json"))
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

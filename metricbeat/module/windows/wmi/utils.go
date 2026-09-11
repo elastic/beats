@@ -101,18 +101,18 @@ func internalConvertDateTime(v string) (time.Time, error) {
 }
 
 // Type conversion that applies to both arrays and scalars
-type WmiConversionFunction func(interface{}) (interface{}, error)
+type WmiConversionFunction func(any) (any, error)
 
 // General-purpose function that invokes the internal WMI conversion on
 // both strings and arrays to avoid code duplication.
-func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConversionFunction[T]) (interface{}, error) {
+func GenericWmiConversionFunction[T any](v any, convert internalWmiConversionFunction[T]) (any, error) {
 	if v == nil {
 		return nil, nil
 	}
 	switch value := v.(type) {
 	case string:
 		return convert(value)
-	case []interface{}:
+	case []any:
 		results := make([]T, 0, len(value))
 		for i, raw := range value {
 			str, ok := raw.(string)
@@ -131,26 +131,26 @@ func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConve
 	}
 }
 
-func ConvertUint64(v interface{}) (interface{}, error) {
+func ConvertUint64(v any) (any, error) {
 	return GenericWmiConversionFunction[uint64](v, internalConvertUint64)
 }
 
-func ConvertSint64(v interface{}) (interface{}, error) {
+func ConvertSint64(v any) (any, error) {
 	return GenericWmiConversionFunction[int64](v, internalConvertSint64)
 }
 
-func ConvertDatetime(v interface{}) (interface{}, error) {
+func ConvertDatetime(v any) (any, error) {
 	return GenericWmiConversionFunction[time.Time](v, internalConvertDateTime)
 }
 
-func ConvertIdentity(v interface{}) (interface{}, error) {
+func ConvertIdentity(v any) (any, error) {
 	return v, nil
 }
 
 // Function that returns a WmiConversionFunction that reports an error
 // independently of the input value.
 func getInvalidConversion(err error) WmiConversionFunction {
-	return func(v interface{}) (interface{}, error) {
+	return func(v any) (any, error) {
 		return nil, err
 	}
 }

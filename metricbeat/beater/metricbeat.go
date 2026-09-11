@@ -21,6 +21,10 @@ import (
 	"fmt"
 	"sync"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -28,20 +32,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/gohugoio/hashstructure"
-
-	// include all metricbeat specific builders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
-
-	// include all metricbeat specific appenders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
-
-	// Add metricbeat default processors
-	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.

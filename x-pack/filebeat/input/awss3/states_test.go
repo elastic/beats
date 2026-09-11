@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -88,7 +89,6 @@ func TestNormalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			store := openTestStatestore()
 			registry, err := newStateRegistry(nil, store, "", false, 0)
@@ -179,7 +179,7 @@ func TestNormalStateRegistry_CleanUp(t *testing.T) {
 }
 
 func TestNormalStateRegistry_PrefixHandling(t *testing.T) {
-	logger := logp.NewLogger("state-prefix-testing")
+	logger := logptest.NewTestingLogger(t, "state-prefix-testing")
 
 	t.Run("if prefix was set, accept only states with prefix", func(t *testing.T) {
 		// given
@@ -266,7 +266,7 @@ func TestNormalStateRegistry_GetOldestState(t *testing.T) {
 // ============================================================================
 
 func TestLexicographicalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
-	logger := logp.NewLogger("lexicographical-registry-test")
+	logger := logptest.NewTestingLogger(t, "lexicographical-registry-test")
 
 	t.Run("AddState uses IDWithLexicographicalOrdering", func(t *testing.T) {
 		store := openTestStatestore()
@@ -327,7 +327,7 @@ func TestLexicographicalStateRegistry_AddStateAndIsProcessed(t *testing.T) {
 }
 
 func TestLexicographicalStateRegistry_TailTracking(t *testing.T) {
-	logger := logp.NewLogger("lexicographical-registry-test")
+	logger := logptest.NewTestingLogger(t, "lexicographical-registry-test")
 
 	t.Run("GetStartAfterKey returns persisted tail", func(t *testing.T) {
 		store := openTestStatestore()
@@ -713,6 +713,10 @@ func (s *testInputStore) Close() {
 
 func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testInputStore) CleanupInterval() time.Duration {

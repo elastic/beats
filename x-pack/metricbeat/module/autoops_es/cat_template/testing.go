@@ -3,13 +3,13 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package cat_template
 
 import (
 	"os"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -40,7 +40,8 @@ func getMappingObject(t *testing.T, templateName string) string {
 }
 
 func getTemplateResponse(t *testing.T, templateNames []string, ignoredNames []string) []byte {
-	mappings := "{"
+	var mappings strings.Builder
+	mappings.WriteString("{")
 	added := 0
 
 	for _, name := range templateNames {
@@ -49,13 +50,14 @@ func getTemplateResponse(t *testing.T, templateNames []string, ignoredNames []st
 		}
 
 		if added != 0 {
-			mappings += ","
+			mappings.WriteString(",")
 		}
 
-		mappings += `"` + name + `":` + getMappingObject(t, name)
+		mappings.WriteString(`"` + name + `":` + getMappingObject(t, name))
 
 		added++
 	}
 
-	return []byte(mappings + "}")
+	mappings.WriteString("}")
+	return []byte(mappings.String())
 }

@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Rename log key `component` to `log.logger` to prevent mapping conflict on Elasticsearch
+component: osquerybeat
+issue: https://github.com/elastic/beats/issues/52888

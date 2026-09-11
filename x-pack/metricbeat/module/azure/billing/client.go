@@ -71,7 +71,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		Infow("Getting usage details for scope")
 
 	filter := fmt.Sprintf(
-		"properties/usageStart eq '%s' and properties/usageEnd eq '%s'",
+		"properties/usageStart ge '%s' and properties/usageEnd le '%s'",
 		timeOpts.usageStart.Format(time.RFC3339Nano),
 		timeOpts.usageEnd.Format(time.RFC3339Nano),
 	)

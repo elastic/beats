@@ -51,7 +51,7 @@ func TestUnpackConfigReplacesServers(t *testing.T) {
 		Version: 4,
 	}
 
-	userCfg := ucfg.MustNewConfigFrom(map[string]interface{}{
+	userCfg := ucfg.MustNewConfigFrom(map[string]any{
 		"ntp.servers": []string{"custom.ntp.org"},
 	})
 

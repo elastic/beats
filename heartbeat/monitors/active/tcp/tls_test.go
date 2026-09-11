@@ -107,8 +107,8 @@ func TestTLSInvalidCert(t *testing.T) {
 			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "ssl", mismatchedHostname, port),
 			hbtest.ResolveChecks(ip),
-			lookslike.MustCompile(map[string]interface{}{
-				"error": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
+				"error": map[string]any{
 					"message": x509.HostnameError{Certificate: cert, Host: mismatchedHostname}.Error(),
 					"type":    "io",
 				},

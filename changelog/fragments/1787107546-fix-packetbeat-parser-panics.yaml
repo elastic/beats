@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix panics in packetbeat SIP, TLS JA3, MySQL execute, and HTTP chunked parsers on malformed or truncated network input.
+component: packetbeat

@@ -27,7 +27,7 @@ import (
 // Stats contains the memory info that we get from the fetch request
 type Stats struct {
 	MemStats runtime.MemStats
-	Cmdline  []interface{}
+	Cmdline  []any
 }
 
 func eventMapping(stats Stats, m *MetricSet) mapstr.M {

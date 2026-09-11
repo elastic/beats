@@ -134,7 +134,7 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 	return event, nil
 }
 
-func mustGetMapStrValue(m mapstr.M, key string) interface{} {
+func mustGetMapStrValue(m mapstr.M, key string) any {
 	v, _ := m.GetValue(key)
 	return v
 }

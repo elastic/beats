@@ -174,10 +174,10 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 	// Start several goroutines.
 	g, _ := errgroup.WithContext(context.Background())
 
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		g.Go(func() error {
 			// Execute processor.
-			for i := 0; i < numEvents; i++ {
+			for i := range numEvents {
 				_, err := p.Run(&beat.Event{
 					Fields: mapstr.M{
 						"source.ip": "192.168.0." + strconv.Itoa(i%256),

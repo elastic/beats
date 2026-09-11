@@ -40,8 +40,8 @@ func TestData(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func getConfig(host, password string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host, password string) map[string]any {
+	return map[string]any{
 		"module":                "ceph",
 		"metricsets":            []string{"mgr_osd_pool_stats"},
 		"hosts":                 []string{host},
