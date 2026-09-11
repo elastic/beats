@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -318,6 +319,16 @@ func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
 		return InstallConfig{}
 	}
 	return *inputs[0].Osquery.ElasticOptions.Install
+}
+
+// GetOsqueryCheckTimeout returns the osqueryd --version startup check deadline
+// from elastic_options.check_timeout on the first input. Unset values use
+// DefaultCheckTimeout.
+func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
+	if len(inputs) == 0 || inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil {
+		return DefaultCheckTimeout, nil
+	}
+	return ParseCheckTimeout(inputs[0].Osquery.ElasticOptions.CheckTimeout)
 }
 
 // GetOsqueryExtensions returns customer-managed osquery extension settings

@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Clamp native schedule metadata and history timestamps when endpoint clock skew precedes the configured start date.
+component: osquerybeat

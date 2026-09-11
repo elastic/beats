@@ -11,10 +11,80 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+type recordingClient struct {
+	events []beat.Event
+}
+
+func (c *recordingClient) Publish(event beat.Event) {
+	c.events = append(c.events, event)
+}
+
+func (c *recordingClient) PublishAll(events []beat.Event) {
+	c.events = append(c.events, events...)
+}
+
+func (c *recordingClient) Close() error {
+	return nil
+}
+
+func TestPublishScheduledResponseTimestamp(t *testing.T) {
+	completedAt := time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC)
+	tests := []struct {
+		name                string
+		plannedScheduleTime time.Time
+		expectedTimestamp   time.Time
+	}{
+		{
+			name:                "uses completion time after planned slot",
+			plannedScheduleTime: completedAt.Add(-time.Minute),
+			expectedTimestamp:   completedAt,
+		},
+		{
+			name:                "floors timestamp at future planned slot",
+			plannedScheduleTime: completedAt.Add(30 * time.Minute),
+			expectedTimestamp:   completedAt.Add(30 * time.Minute),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &recordingClient{}
+			publisher := &Publisher{
+				log:                   logptest.NewTestingLogger(t, "scheduled_response"),
+				actionResponsesClient: client,
+			}
+
+			publisher.PublishScheduledResponse(
+				"schedule-id",
+				"",
+				"",
+				"",
+				"",
+				"response-id",
+				completedAt.Add(-time.Second),
+				completedAt,
+				tc.plannedScheduleTime,
+				3,
+				1,
+			)
+
+			require.Len(t, client.events, 1, "scheduled response should publish one event")
+			event := client.events[0]
+			assert.Equal(t, tc.expectedTimestamp, event.Timestamp, "scheduled response event timestamp should not precede its planned slot")
+			assert.Equal(t, completedAt.Format(time.RFC3339Nano), event.Fields["completed_at"], "completed_at should preserve the endpoint time")
+			assert.Equal(t, tc.plannedScheduleTime.Format(time.RFC3339Nano), event.Fields["planned_schedule_time"], "planned_schedule_time should preserve the computed slot")
+		})
+	}
+}
 
 func TestHitToEvent(t *testing.T) {
 
