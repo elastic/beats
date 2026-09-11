@@ -27,9 +27,11 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"syscall"
@@ -1957,31 +1959,6 @@ func TestGlobRoot(t *testing.T) {
 	}
 }
 
-func TestDepthBelow(t *testing.T) {
-	base := t.TempDir()
-
-	tests := []struct {
-		name    string
-		root    string
-		pattern string
-		want    int
-	}{
-		{"pattern equals root", base, base, 0},
-		{"one level", base, filepath.Join(base, "a.json"), 1},
-		{"two levels", base, filepath.Join(base, "x", "y.json"), 2},
-		{"three levels", base, filepath.Join(base, "x", "y", "z.json"), 3},
-		{"wildcards count as segments", base, filepath.Join(base, "*", "*.json"), 2},
-		{"nested root", filepath.Join(base, "a"), filepath.Join(base, "a", "b", "c.log"), 2},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.want, depthBelow(tc.root, tc.pattern),
-				"depthBelow(%q, %q)", tc.root, tc.pattern)
-		})
-	}
-}
-
 func TestBuildWalkGroups(t *testing.T) {
 	base := t.TempDir()
 	newScanner := func(paths ...string) *fileScanner {
@@ -1997,6 +1974,14 @@ func TestBuildWalkGroups(t *testing.T) {
 		assert.Empty(t, s.walkGroups)
 	})
 
+	patternsOf := func(g *walkGroup) []string {
+		out := make([]string, len(g.patterns))
+		for i, p := range g.patterns {
+			out[i] = p.pattern
+		}
+		return out
+	}
+
 	t.Run("expanded recursive set groups under one root", func(t *testing.T) {
 		root := filepath.Join(base, "a")
 		p1 := filepath.Join(root, "*.json")
@@ -2009,21 +1994,19 @@ func TestBuildWalkGroups(t *testing.T) {
 		require.Contains(t, s.walkGroups, root)
 		g := s.walkGroups[root]
 		assert.Equal(t, root, g.root)
-		assert.Equal(t, 3, g.maxDepth)
-		assert.Equal(t, map[int][]string{1: {p1}, 2: {p2}, 3: {p3}}, g.byDepth)
+		assert.Equal(t, []string{p1, p2, p3}, patternsOf(g))
 	})
 
-	t.Run("patterns sharing a root and depth are grouped together", func(t *testing.T) {
+	t.Run("patterns are ordered by depth, then configuration order", func(t *testing.T) {
 		root := filepath.Join(base, "a")
+		deep := filepath.Join(root, "*", "*.json")
 		pj := filepath.Join(root, "*.json")
 		pn := filepath.Join(root, "*.ndjson")
-		s := newScanner(pj, pn)
+		s := newScanner(deep, pj, pn)
 		s.buildWalkGroups()
 
 		require.Contains(t, s.walkGroups, root)
-		g := s.walkGroups[root]
-		assert.Equal(t, 1, g.maxDepth)
-		assert.Equal(t, map[int][]string{1: {pj, pn}}, g.byDepth)
+		assert.Equal(t, []string{pj, pn, deep}, patternsOf(s.walkGroups[root]))
 	})
 
 	t.Run("distinct roots produce distinct groups", func(t *testing.T) {
@@ -2036,8 +2019,8 @@ func TestBuildWalkGroups(t *testing.T) {
 		assert.Len(t, s.walkGroups, 2)
 		require.Contains(t, s.walkGroups, ra)
 		require.Contains(t, s.walkGroups, rb)
-		assert.Equal(t, map[int][]string{1: {pa}}, s.walkGroups[ra].byDepth)
-		assert.Equal(t, map[int][]string{1: {pb}}, s.walkGroups[rb].byDepth)
+		assert.Equal(t, []string{pa}, patternsOf(s.walkGroups[ra]))
+		assert.Equal(t, []string{pb}, patternsOf(s.walkGroups[rb]))
 	})
 
 	t.Run("mixes literals and globs", func(t *testing.T) {
@@ -2049,16 +2032,29 @@ func TestBuildWalkGroups(t *testing.T) {
 
 		assert.Equal(t, []string{lit}, s.literals)
 		require.Contains(t, s.walkGroups, root)
-		assert.Equal(t, map[int][]string{1: {glob}}, s.walkGroups[root].byDepth)
+		assert.Equal(t, []string{glob}, patternsOf(s.walkGroups[root]))
 	})
 
-	t.Run("invalid pattern is skipped", func(t *testing.T) {
-		bad := filepath.Join(base, "a", "[.json") // unterminated character class
-		s := newScanner(bad)
-		s.buildWalkGroups()
+	t.Run("malformed patterns are dropped and reported once", func(t *testing.T) {
+		// Each shape hides its bad token differently: in the only chunk, behind
+		// a valid directory component, and behind a '*' where filepath.Match
+		// stops validating.
+		for name, bad := range map[string]string{
+			"unterminated class":       filepath.Join(base, "a", "[.json"),
+			"in a directory component": filepath.Join(base, "app[", "*.log"),
+			"behind a wildcard":        filepath.Join(base, "app*["),
+		} {
+			t.Run(name, func(t *testing.T) {
+				inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+				s := &fileScanner{paths: []string{bad}, log: inMemoryLog}
+				s.buildWalkGroups()
 
-		assert.Empty(t, s.literals)
-		assert.Empty(t, s.walkGroups)
+				assert.Empty(t, s.literals)
+				assert.Empty(t, s.walkGroups)
+				assert.Equalf(t, 1, strings.Count(buff.String(), "invalid glob pattern"),
+					"logs:\n%s", buff.String())
+			})
+		}
 	})
 }
 
@@ -2069,10 +2065,13 @@ func TestWalk(t *testing.T) {
 		require.NoError(t, os.MkdirAll(filepath.Dir(path), 0o770))
 		require.NoError(t, os.WriteFile(path, []byte("data"), 0o660))
 	}
-	collect := func(g *walkGroup) []string {
-		s := &fileScanner{log: logger}
+	collect := func(patterns ...string) []string {
+		s := &fileScanner{log: logger, paths: patterns}
+		s.buildWalkGroups()
 		var got []string
-		s.walk(g, func(f string, _ int) { got = append(got, f) }, func(string) {})
+		for _, g := range s.walkGroups {
+			s.walk(g, func(f string, _ int) { got = append(got, f) }, func(string) {})
+		}
 		return got
 	}
 
@@ -2082,14 +2081,7 @@ func TestWalk(t *testing.T) {
 		mkfile(t, filepath.Join(base, "sub", "b.log"))         // depth 2
 		mkfile(t, filepath.Join(base, "sub", "deep", "c.log")) // depth 3: beyond maxDepth
 
-		got := collect(&walkGroup{
-			root:     base,
-			maxDepth: 2,
-			byDepth: map[int][]string{
-				1: {filepath.Join(base, "*.log")},
-				2: {filepath.Join(base, "*", "*.log")},
-			},
-		})
+		got := collect(filepath.Join(base, "*.log"), filepath.Join(base, "*", "*.log"))
 		assert.ElementsMatch(t, []string{
 			filepath.Join(base, "a.log"),
 			filepath.Join(base, "sub", "b.log"),
@@ -2101,11 +2093,7 @@ func TestWalk(t *testing.T) {
 		mkfile(t, filepath.Join(base, "real", "x.log"))
 		require.NoError(t, os.Symlink(filepath.Join(base, "real"), filepath.Join(base, "link")))
 
-		got := collect(&walkGroup{
-			root:     base,
-			maxDepth: 2,
-			byDepth:  map[int][]string{2: {filepath.Join(base, "*", "*.log")}},
-		})
+		got := collect(filepath.Join(base, "*", "*.log"))
 		assert.ElementsMatch(t, []string{
 			filepath.Join(base, "real", "x.log"),
 			filepath.Join(base, "link", "x.log"),
@@ -2117,11 +2105,7 @@ func TestWalk(t *testing.T) {
 		mkfile(t, filepath.Join(base, "a.log"))
 		require.NoError(t, os.Symlink(filepath.Join(base, "missing"), filepath.Join(base, "broken.log")))
 
-		got := collect(&walkGroup{
-			root:     base,
-			maxDepth: 1,
-			byDepth:  map[int][]string{1: {filepath.Join(base, "*.log")}},
-		})
+		got := collect(filepath.Join(base, "*.log"))
 		// filepath.Glob does not stat entries at the last pattern component, so a
 		// broken symlink is returned and later rejected by getIngestTarget.
 		assert.ElementsMatch(t, []string{
@@ -2136,38 +2120,12 @@ func TestWalk(t *testing.T) {
 		require.NoError(t, os.Mkdir(filepath.Join(base, "targetdir"), 0o770))
 		require.NoError(t, os.Symlink(filepath.Join(base, "targetdir"), filepath.Join(base, "linkdir")))
 
-		got := collect(&walkGroup{
-			root:     base,
-			maxDepth: 1,
-			byDepth:  map[int][]string{1: {filepath.Join(base, "*")}},
-		})
+		got := collect(filepath.Join(base, "*"))
 		assert.ElementsMatch(t, []string{
 			filepath.Join(base, "f.log"),
 			filepath.Join(base, "linkdir"),
 			filepath.Join(base, "targetdir"),
 		}, got, "entries matching the pattern must be yielded regardless of type, like filepath.Glob")
-	})
-
-	t.Run("logs a malformed pattern once per walk", func(t *testing.T) {
-		base := t.TempDir()
-		mkfile(t, filepath.Join(base, "appx", "f1.log"))
-		mkfile(t, filepath.Join(base, "appx", "f2.log"))
-
-		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
-		sc := &fileScanner{log: inMemoryLog}
-		var got []string
-		// "app[" is a malformed pattern (unclosed character class) that
-		// buildWalkGroups cannot detect upfront: matching it against "" fails on
-		// the literal prefix before the parser reaches the bad token.
-		sc.walk(&walkGroup{
-			root:     base,
-			maxDepth: 2,
-			byDepth:  map[int][]string{2: {filepath.Join(base, "app[", "*.log")}},
-		}, func(f string, _ int) { got = append(got, f) }, func(string) {})
-
-		assert.Empty(t, got, "no file can match a malformed pattern")
-		assert.Equalf(t, 1, strings.Count(buff.String(), "glob match("),
-			"a malformed pattern must be logged once per walk, not once per file, got logs:\n%s", buff.String())
 	})
 
 	t.Run("prunes subtrees that cannot match", func(t *testing.T) {
@@ -2176,11 +2134,7 @@ func TestWalk(t *testing.T) {
 		mkfile(t, filepath.Join(base, "x", "other", "g.log"))
 		mkfile(t, filepath.Join(base, "y", "app", "h.log"))
 
-		got := collect(&walkGroup{
-			root:     base,
-			maxDepth: 3,
-			byDepth:  map[int][]string{3: {filepath.Join(base, "*", "app", "*.log")}},
-		})
+		got := collect(filepath.Join(base, "*", "app", "*.log"))
 		// Only files under the literal "app" component can match; subtrees such
 		// as x/other must not contribute matches (and are not descended into).
 		assert.ElementsMatch(t, []string{
@@ -2191,11 +2145,7 @@ func TestWalk(t *testing.T) {
 
 	t.Run("missing root yields nothing", func(t *testing.T) {
 		base := t.TempDir()
-		got := collect(&walkGroup{
-			root:     filepath.Join(base, "does-not-exist"),
-			maxDepth: 1,
-			byDepth:  map[int][]string{1: {filepath.Join(base, "does-not-exist", "*.log")}},
-		})
+		got := collect(filepath.Join(base, "does-not-exist", "*.log"))
 		assert.Empty(t, got)
 	})
 }
@@ -3358,4 +3308,135 @@ func parseLogs(buff string) []logEntry {
 	}
 
 	return logEntries
+}
+
+func TestLiteralEnds(t *testing.T) {
+	tests := map[string][2]string{
+		"pod-*.log":    {"pod-", ".log"},
+		"*.log":        {"", ".log"},
+		"*-abc.log":    {"", "-abc.log"},
+		"app[0-9].log": {"app", ".log"},
+		"x[ab]":        {"x", ""},
+		"exact.log":    {"exact.log", "exact.log"},
+		"a?b":          {"a", "b"},
+	}
+	for comp, want := range tests {
+		assert.Equalf(t, want, [2]string{literalPrefix(comp), literalSuffix(comp)}, "literal ends of %q", comp)
+	}
+}
+
+func TestNewWalkPatternRejectsPatternEqualToRoot(t *testing.T) {
+	// Only reachable on Windows, where a volume root such as `\\?\C:\` contains a
+	// glob metacharacter and is its own directory.
+	_, err := newWalkPattern("/x", "/x", 0)
+	assert.Error(t, err)
+}
+
+// leafPat builds the walkPattern for a single-component glob.
+func leafPat(t *testing.T, comp string) walkPattern {
+	t.Helper()
+	p, err := newWalkPattern("", comp, 0)
+	require.NoError(t, err)
+	return p
+}
+
+func TestLeafCandidates(t *testing.T) {
+	names := []string{"a.log", "pod-0001-x.log", "pod-0002-x.log", "pod-0002-y.log", "z.log"}
+	pat := func(comp string) walkPattern { return leafPat(t, comp) }
+	tests := map[string]struct {
+		exact []walkPattern
+		want  []string
+	}{
+		"one literal prefix selects its block": {
+			exact: []walkPattern{pat("pod-0002-*.log")},
+			want:  []string{"pod-0002-x.log", "pod-0002-y.log"},
+		},
+		"several prefixes select their enclosing span": {
+			exact: []walkPattern{pat("a.*"), pat("pod-0001-*")},
+			want:  []string{"a.log", "pod-0001-x.log"},
+		},
+		"a pattern without prefix keeps every name": {
+			exact: []walkPattern{pat("pod-0001-*"), pat("*.log")},
+			want:  names,
+		},
+		"prefix sorting after every name selects nothing": {
+			exact: []walkPattern{pat("zz-*")},
+			want:  nil,
+		},
+		"prefix with no block selects nothing": {
+			exact: []walkPattern{pat("b-*")},
+			want:  nil,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, tc.want, leafCandidates(names, tc.exact))
+		})
+	}
+}
+
+// TestLeafPrefilterNeverDropsAMatch pins the guarantee the leaf fast paths rest
+// on: narrowing the names a pattern is matched against, by sorted prefix block
+// and by literal prefix and suffix, must not change which names match nor their
+// relative order.
+func TestLeafPrefilterNeverDropsAMatch(t *testing.T) {
+	rng := rand.New(rand.NewPCG(1, 2))
+	alphabet := []byte("ab-.")
+	randWord := func(n int) string {
+		b := make([]byte, n)
+		for i := range b {
+			b[i] = alphabet[rng.IntN(len(alphabet))]
+		}
+		return string(b)
+	}
+	randPattern := func() string {
+		var sb strings.Builder
+		for range 1 + rng.IntN(4) {
+			switch rng.IntN(5) {
+			case 0:
+				sb.WriteByte('*')
+			case 1:
+				sb.WriteByte('?')
+			case 2:
+				sb.WriteString("[ab]")
+			default:
+				sb.WriteString(randWord(1 + rng.IntN(2)))
+			}
+		}
+		return sb.String()
+	}
+
+	for range 2000 {
+		names := make([]string, 1+rng.IntN(12))
+		for i := range names {
+			names[i] = randWord(1 + rng.IntN(5))
+		}
+		slices.Sort(names)
+
+		exact := make([]walkPattern, 1+rng.IntN(3))
+		for i := range exact {
+			exact[i] = leafPat(t, randPattern())
+		}
+
+		matching := func(names []string) []string {
+			var out []string
+			for _, name := range names {
+				if slices.ContainsFunc(exact, func(p walkPattern) bool { return matchName(p.comps[0], name) }) {
+					out = append(out, name)
+				}
+			}
+			return out
+		}
+		require.Equalf(t, matching(names), matching(leafCandidates(names, exact)),
+			"names=%q patterns=%q", names, exact)
+
+		for _, p := range exact {
+			for _, name := range names {
+				if matchName(p.comps[0], name) {
+					require.Truef(t, strings.HasPrefix(name, p.leafPrefix) && strings.HasSuffix(name, p.leafSuffix),
+						"%q matches %q but its literal ends %q/%q reject it", p.comps[0], name, p.leafPrefix, p.leafSuffix)
+				}
+			}
+		}
+	}
 }
