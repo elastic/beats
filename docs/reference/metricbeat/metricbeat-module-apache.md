@@ -26,7 +26,7 @@ This module periodically fetches metrics from [Apache HTTPD](https://httpd.apach
 
 ## Compatibility [_compatibility_7]
 
-The Apache metricsets were tested with Apache 2.4.12 and 2.4.54 and are expected to work with all versions >= 2.2.31 and >= 2.4.16.
+The Apache metricsets were tested with Apache 2.4.68 and are expected to work with all versions >= 2.2.31 and >= 2.4.16.
 
 
 ## Dashboard [_dashboard_2]

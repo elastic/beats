@@ -97,7 +97,7 @@ changelog/fragments/
 /metricbeat/module/jolokia @elastic/obs-infraobs-integrations
 /metricbeat/module/kafka @elastic/obs-infraobs-integrations
 /metricbeat/module/kibana/ @elastic/stack-monitoring
-/metricbeat/module/kubernetes/ @elastic/obs-ds-hosted-services
+/metricbeat/module/kubernetes/ @elastic/obs-signals-metrics-team
 /metricbeat/module/logstash/ @elastic/stack-monitoring
 /metricbeat/module/memcached @elastic/obs-infraobs-integrations
 /metricbeat/module/mongodb @elastic/obs-infraobs-integrations

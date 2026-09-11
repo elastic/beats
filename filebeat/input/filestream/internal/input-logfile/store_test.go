@@ -431,7 +431,7 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	defer s.Release()
 	store := &sourceStore{
 		identifier:            &SourceIdentifier{"filestream::current-id::"},
-		identifiersToTakeOver: []*SourceIdentifier{{"filestream::previous-id::"}},
+		identifiersToTakeOver: []InputMatcher{&SourceIdentifier{"filestream::previous-id::"}},
 		store:                 s,
 	}
 
@@ -461,6 +461,59 @@ func TestSourceStoreTakeOver(t *testing.T) {
 			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
 			TTL:     60 * time.Second,
 			Meta:    map[string]any{"identifier_name": "test-file-identity"},
+		},
+	}
+	s.ephemeralStore.mu.Unlock()
+
+	checkEqualStoreState(t, want, backend.snapshot())
+}
+
+func TestSourceStoreTakeOverAnyID(t *testing.T) {
+	backend := createSampleStore(t, map[string]state{
+		"filestream::old-input-a::key1": {
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+		"filestream::old-input-b::key2": {
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+		"filestream::current-id::key3": { // Already owned — must not be touched
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+	})
+	s := testOpenStore(t, "filestream", backend)
+	defer s.Release()
+	store := &sourceStore{
+		identifier:    &SourceIdentifier{"filestream::current-id::"},
+		takeOverAnyID: true,
+		store:         s,
+	}
+
+	store.TakeOver(func(v TakeOverState) (string, any) {
+		m := testMeta{IdentifierName: v.IdentifierName}
+		// Remap both old IDs to current-id
+		newKey := strings.Replace(v.Key, "old-input-a::", "current-id::", 1)
+		newKey = strings.Replace(newKey, "old-input-b::", "current-id::", 1)
+		return newKey, m
+	})
+
+	s.ephemeralStore.mu.Lock()
+	want := map[string]state{
+		"filestream::current-id::key1": {
+			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
+			TTL:     60 * time.Second,
+			Meta:    map[string]any{"identifier_name": "test-file-identity"},
+		},
+		"filestream::current-id::key2": {
+			Updated: s.ephemeralStore.table["filestream::current-id::key2"].internalState.Updated,
+			TTL:     60 * time.Second,
+			Meta:    map[string]any{"identifier_name": "test-file-identity"},
+		},
+		"filestream::current-id::key3": { // Unchanged
+			TTL:  60 * time.Second,
+			Meta: map[string]any{"identifier_name": "test-file-identity"},
 		},
 	}
 	s.ephemeralStore.mu.Unlock()

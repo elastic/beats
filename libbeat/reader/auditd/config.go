@@ -51,6 +51,11 @@ type Config struct {
 	LogErrors bool `config:"log_errors"`
 	// AddErrorKey, if true, adds a parse error to the event under error.message.
 	AddErrorKey bool `config:"add_error_key"`
+	// ResolveIDs, if true, resolves UIDs and GIDs to names using the reading
+	// host's /etc/passwd and /etc/group. Only meaningful in coalesce mode.
+	// Default is true. Set to false when reading forwarded logs from a
+	// different host, where the local name database does not apply.
+	ResolveIDs bool `config:"resolve_ids"`
 }
 
 // DefaultConfig returns a Config populated with default values. The default
@@ -62,5 +67,6 @@ func DefaultConfig() Config {
 		Mode:        ModeParse,
 		LogErrors:   false,
 		AddErrorKey: true,
+		ResolveIDs:  true,
 	}
 }
