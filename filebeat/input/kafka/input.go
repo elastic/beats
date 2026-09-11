@@ -29,6 +29,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -64,6 +66,8 @@ func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 		return nil, err
 	}
 
+	kafka.SetSaramaLogger(logger.Named("kafka").WithOptions(zap.AddCallerSkip(1)))
+
 	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing Sarama config: %w", err)
@@ -86,11 +90,17 @@ func (input *kafkaInput) Name() string { return pluginName }
 func (input *kafkaInput) Test(ctx input.TestContext) error {
 	client, err := sarama.NewClient(input.config.Hosts, input.saramaConfig)
 	if err != nil {
-		ctx.Logger.Error(err)
+		return fmt.Errorf("failed to create kafka client: %w", err)
 	}
+	defer func() {
+		if closeErr := client.Close(); closeErr != nil {
+			ctx.Logger.Errorw("error closing kafka client", "error", closeErr)
+		}
+	}()
+
 	topics, err := client.Topics()
 	if err != nil {
-		ctx.Logger.Error(err)
+		return fmt.Errorf("failed to list kafka topics: %w", err)
 	}
 
 	var missingTopics []string
@@ -197,17 +207,24 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 		log:                      log,
 	}
 
-	input.saramaWaitGroup.Add(1)
-	defer func() {
-		consumerGroup.Close()
-		input.saramaWaitGroup.Done()
-	}()
-
-	// Listen asynchronously to any errors during the consume process
+	var errorsWG sync.WaitGroup
+	errorsWG.Add(1)
 	go func() {
+		defer errorsWG.Done()
 		for err := range consumerGroup.Errors() {
 			log.Errorw("Error reading from kafka", "error", err)
 		}
+	}()
+
+	input.saramaWaitGroup.Add(1)
+	defer func() {
+		if err := consumerGroup.Close(); err != nil {
+			log.Errorw("Error closing kafka consumer group", "error", err)
+		}
+		// Close() closes the errors channel asynchronously; wait so this
+		// goroutine cannot outlive the input and keep logging.
+		errorsWG.Wait()
+		input.saramaWaitGroup.Done()
 	}()
 
 	err := consumerGroup.Consume(context, input.config.Topics, handler)
