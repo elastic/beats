@@ -47,3 +47,13 @@ targets:
       file: testing/environments/snapshot.yml
       matchpattern: '(image: docker\.elastic\.co/.*):\d+.\d+.\d+-.*-SNAPSHOT'
       replacepattern: '$1:{{ source "latestVersion" }}-SNAPSHOT'
+
+  update-elasticsearch-kerberos:
+    name: "Update Elasticsearch Kerberos Dockerfile"
+    kind: file
+    sourceid: latestVersion
+    scmid: default
+    spec:
+      file: testing/environments/docker/elasticsearch_kerberos/Dockerfile
+      matchpattern: '(FROM docker\.elastic\.co/elasticsearch/elasticsearch):\d+.\d+.\d+-.*-SNAPSHOT'
+      replacepattern: '$1:{{ source "latestVersion" }}-SNAPSHOT'
