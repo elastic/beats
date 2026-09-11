@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -98,6 +97,8 @@ type Beat struct {
 	keystore   keystore.Keystore
 	processors processing.Supporter
 
+	hostnameOverride string
+
 	InputQueueSize int // Size of the producer queue used by most queues.
 
 	// shouldReexec is a flag to indicate the Beat should restart
@@ -111,6 +112,7 @@ type beatConfig struct {
 
 	// beat top-level settings
 	Name      string `config:"name"`
+	Hostname  string `config:"hostname"`
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
@@ -745,12 +747,34 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags converts -flag to --flags, parses the command line
-// flags, and it invokes the HandleFlags callback if implemented by
-// the Beat.
+// HostnameFlag holds the value of the --hostname flag.
+var HostnameFlag string
+
+// handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	flag.Parse()
 	return cfgfile.HandleFlags()
+}
+
+// ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
+// hostname override used by processors (add_host_metadata, add_observer_metadata).
+// It is a no-op when h is empty or blank.
+func (b *Beat) ApplyHostname(h, source string) {
+	if strings.TrimSpace(h) == "" {
+		return
+	}
+	beat.SetHostnameOverride(h)
+	h = beat.GetHostnameOverride()
+	b.Info.Hostname = h
+	b.Info.FQDN = h
+	b.hostnameOverride = h
+	if b.Info.Logger != nil {
+		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
+	}
+}
+
+// HostnameOverride returns the hostname override of this beat, or "" when it has none.
+func (b *Beat) HostnameOverride() string {
+	return b.hostnameOverride
 }
 
 // config reads the configuration file from disk, parses the common options
@@ -816,6 +840,13 @@ func (b *Beat) configure(settings Settings) error {
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
+
+	hostname := b.Config.Hostname
+	if HostnameFlag != "" {
+		hostname = HostnameFlag
+	}
+	b.ApplyHostname(hostname, "hostname config")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -845,23 +876,25 @@ func (b *Beat) configure(settings Settings) error {
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return fmt.Errorf("failed to get host information: %w", err)
-	}
+	if b.hostnameOverride == "" {
+		// Try to get the host's FQDN and set it.
+		h, err := sysinfo.Host()
+		if err != nil {
+			return fmt.Errorf("failed to get host information: %w", err)
+		}
 
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
+		fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
 
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+		fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// initialize config manager
