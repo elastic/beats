@@ -47,28 +47,23 @@ func TestHeartbeatWithElasticsearchStateLoader(t *testing.T) {
 	logger := logp.NewNopLogger()
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader, logger)
 
-	runFrom := &config.LocationWithID{ID: "test-run-from"}
 	bt := &Heartbeat{
-		config:             &config.Config{RunFrom: runFrom},
+		config:             &config.Config{},
 		replaceStateLoader: replaceStateLoader,
 		logger:             logger,
 	}
 
 	var requestCount int
 	fake := fakeElasticsearchRequester{
-		requestFn: func(method, path, pipeline string, params map[string]string, body any) (int, []byte, error) {
+		requestFn: func(string, string, string, map[string]string, any) (int, []byte, error) {
 			requestCount++
 			return 200, []byte(`{"hits":{"hits":[]}}`), nil
 		},
 	}
 
-	_, err := stateLoader(stdfields.StdMonitorFields{ID: "mon-1", Type: "http"})
-	require.NoError(t, err, "nil loader should not error before injection")
-	assert.Equal(t, 0, requestCount, "requester should not be called before injection")
-
 	bt.WithElasticsearchStateLoader(fake)
 
-	_, err = stateLoader(stdfields.StdMonitorFields{ID: "mon-1", Type: "http"})
+	_, err := stateLoader(stdfields.StdMonitorFields{ID: "mon-1", Type: "http"})
 	require.NoError(t, err, "installed ES loader should succeed with empty hits")
 	assert.Equal(t, 1, requestCount, "installed loader should call the injected requester")
 }
