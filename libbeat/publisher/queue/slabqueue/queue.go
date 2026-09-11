@@ -71,7 +71,8 @@ type Queue[T any] struct {
 	// this list drains.
 	pendingHead, pendingTail *batch[T]
 
-	// notify wakes Get when new events arrive.
+	// notify wakes Get when new events arrive. It is also handed out by
+	// ReadyChan so a consumer can wait for events in a select instead.
 	notify chan struct{}
 
 	// Per-queue live-event cap. This bounds the events live (published but not
@@ -240,6 +241,10 @@ func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
 	return p
 }
 
+func (q *Queue[T]) ReadyChan() <-chan struct{} {
+	return q.notify
+}
+
 // removeProducer unregisters a producer from the force-close fan-out set. Called
 // from producer.Close; safe to call for a producer that was never registered
 // (e.g. one created after the queue began closing).
@@ -288,7 +293,7 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 		q.mu.Unlock()
 
 		select {
-		case <-q.notify:
+		case <-q.ReadyChan():
 			// Loop and try to drain.
 		case <-q.closeCh:
 			// Loop; the closing/forced flags are now set, the next iteration
@@ -297,6 +302,44 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 			return nil, io.EOF
 		}
 	}
+}
+
+// TryGet returns up to maxEvents events from the queue without blocking. It returns
+// (nil, nil) when the queue is open but empty, and io.EOF once the queue is
+// closed and drained.
+//
+// Unlike Get it applies no debounce coalescing window, so a caller that wants
+// Get's batching behaviour has to impose the delay itself.
+//
+// When maxEvents caps the batch and events are left in the queue, TryGet
+// re-signals ReadyChan before returning.
+func (q *Queue[T]) TryGet(maxEvents int) (queue.Batch[T], error) {
+	q.mu.Lock()
+	if q.count > 0 {
+		n := q.count
+		if maxEvents > 0 {
+			n = min(n, maxEvents)
+		}
+		b := q.buildBatchLocked(n)
+		remaining := q.count
+		q.mu.Unlock()
+		q.pool.observer.ConsumeEvents(n, 0)
+		if remaining > 0 {
+			q.signal()
+		}
+		return b, nil
+	}
+	if q.forced.Load() || q.closing {
+		q.mu.Unlock()
+		return nil, io.EOF
+	}
+	q.mu.Unlock()
+
+	return nil, nil
+}
+
+func (q *Queue[T]) GetDebounce() time.Duration {
+	return q.debounce
 }
 
 // buildBatchLocked removes the first n events from this pipeline's FIFO and
@@ -455,8 +498,8 @@ func (q *Queue[T]) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{MaxEvents: maxEvents}
 }
 
-// signal wakes a goroutine blocked in Get. Non-blocking: at most one pending
-// wake-up is buffered.
+// signal wakes a goroutine blocked in Get, or one waiting on ReadyChan.
+// Non-blocking: at most one pending wake-up is buffered.
 func (q *Queue[T]) signal() {
 	select {
 	case q.notify <- struct{}{}:

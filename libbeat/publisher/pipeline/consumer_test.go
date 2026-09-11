@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -33,30 +34,40 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-func TestNoBatchAssemblyOnNilTarget(t *testing.T) {
-	// Create a minimal struct with only the channels we need. Batch assembly
-	// is triggered determinstically (i.e. no selects) at the start of each
-	// iteration of the run loop, so this way we can test synchronously
-	// instead of starting up the full goroutine and relying on a timeout,
-	// which can cause flakiness on CI. (This test does not pass without the
-	// code change to check for a nil channel.)
-	logger := logptest.NewTestingLogger(t, "")
-	c := &eventConsumer{
-		logger: logger.Named("eventConsumer test"),
-		queueReader: queueReader{
-			req: make(chan queueReaderRequest, 1),
-		},
-		done: make(chan struct{}),
+func TestBatchAssemblyRequiresOutputChannel(t *testing.T) {
+	newStoppedConsumer := func(t *testing.T) *eventConsumer {
+		t.Helper()
+		c := &eventConsumer{
+			logger: logptest.NewTestingLogger(t, "").Named("eventConsumer test"),
+			queueReader: queueReader{
+				req: make(chan queueReaderRequest, 1),
+			},
+			done: make(chan struct{}),
+		}
+		close(c.done)
+		return c
 	}
 
-	// Close immediately so the run loop returns
-	close(c.done)
+	t.Run("no request while the output channel is nil", func(t *testing.T) {
+		c := newStoppedConsumer(t)
 
-	c.run()
+		c.runBlocking(c.logger, consumerTarget{queue: &testQueue{}, batchSize: 4})
 
-	// Make sure no read request was sent
-	_, ok := <-c.queueReader.req
-	assert.False(t, ok, "The queue reader shouldn't get a read request when the target is nil")
+		req, ok := <-c.queueReader.req
+		assert.False(t, ok, "no read request should be sent while the target has no output channel, got %+v", req)
+	})
+
+	t.Run("request once the output channel is set", func(t *testing.T) {
+		c := newStoppedConsumer(t)
+
+		q := &testQueue{}
+		c.runBlocking(c.logger, consumerTarget{queue: q, ch: make(chan publisher.Batch), batchSize: 4})
+
+		req, ok := <-c.queueReader.req
+		require.True(t, ok, "a read request should be sent once the target has an output channel")
+		assert.Equal(t, q, req.queue, "the request should name the target's queue")
+		assert.Equal(t, 4, req.batchSize, "the request should carry the target's batch size")
+	})
 }
 
 func receiveBatch(t *testing.T, ch <-chan publisher.Batch) publisher.Batch {
@@ -187,4 +198,68 @@ func TestEventConsumerCloseReleasesHeldBatches(t *testing.T) {
 	}, time.Second, 10*time.Millisecond,
 		"all slots must return to the pool after consumer close (got %d/%d)",
 		pool.Available(), capacity)
+}
+
+// TestEventConsumerUnblockingDebounceCoalesces verifies that after ReadyChan
+// wakes, runUnblocking waits GetDebounce before TryGet so a trickle of
+// publishes becomes one batch rather than one batch per event.
+func TestEventConsumerUnblockingDebounceCoalesces(t *testing.T) {
+	const debounce = 40 * time.Millisecond
+	prev := slabqueue.DefaultGetDebounce
+	slabqueue.DefaultGetDebounce = debounce
+	t.Cleanup(func() { slabqueue.DefaultGetDebounce = prev })
+
+	pool := slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: 8}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	c := newEventConsumer(logptest.NewTestingLogger(t, ""), nilObserver)
+	defer c.close()
+
+	parked := make(chan struct{})
+	hooked := &readyChanHookQueue{UnblockingQueue: q, parked: parked}
+
+	out := make(chan publisher.Batch)
+	c.setTarget(consumerTarget{
+		queue:      hooked,
+		ch:         out,
+		batchSize:  8,
+		timeToLive: 3,
+	})
+	// Wait until runUnblocking has been parked on ReadyChan.
+	select {
+	case <-parked:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for the consumer to park on ReadyChan")
+	}
+
+	p := q.Producer(queue.ProducerConfig{})
+	_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: 1}})
+	require.True(t, ok, "first publish should succeed")
+
+	select {
+	case <-out:
+		t.Fatal("should not emit a batch before the debounce window expires")
+	case <-time.After(debounce / 2):
+	}
+
+	_, ok = p.Publish(publisher.Event{Content: beat.Event{Private: 2}})
+	require.True(t, ok, "second publish should succeed")
+	_, ok = p.Publish(publisher.Event{Content: beat.Event{Private: 3}})
+	require.True(t, ok, "third publish should succeed")
+
+	batch := receiveBatch(t, out)
+	require.Len(t, batch.Events(), 3, "events published inside the debounce window should coalesce into one batch")
+}
+
+type readyChanHookQueue struct {
+	queue.UnblockingQueue[publisher.Event]
+	parked chan struct{}
+	once   sync.Once
+}
+
+func (q *readyChanHookQueue) ReadyChan() <-chan struct{} {
+	q.once.Do(func() { close(q.parked) })
+	return q.UnblockingQueue.ReadyChan()
 }
