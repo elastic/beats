@@ -94,28 +94,52 @@ type filestream struct {
 	statFn   func(string) (os.FileInfo, error)
 }
 
+// filestreamInputManager wraps loginp.InputManager and releases the shared
+// directory cache when all inputs have stopped (on Close).
+type filestreamInputManager struct {
+	*loginp.InputManager
+	releaseDirReader func()
+}
+
+func (m *filestreamInputManager) Close() {
+	m.InputManager.Close()
+	m.releaseDirReader()
+}
+
 // Plugin creates a new filestream input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
+	dc, releaseDR := acquireSharedDirReader()
+	mgr := &filestreamInputManager{releaseDirReader: releaseDR}
+	mgr.InputManager = &loginp.InputManager{
+		Logger:              log,
+		StateStore:          store,
+		Type:                pluginName,
+		Configure:           makeConfigureFunc(dc),
+		DefaultCleanTimeout: -1,
+	}
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
-		Manager: &loginp.InputManager{
-			Logger:              log,
-			StateStore:          store,
-			Type:                pluginName,
-			Configure:           configure,
-			DefaultCleanTimeout: -1,
-		},
+		Manager:    mgr,
+	}
+}
+
+// makeConfigureFunc returns a configure function that closes over dc so the
+// shared dir cache flows into every prospector created by this plugin instance.
+func makeConfigureFunc(dc *dirCache) func(*conf.C, *logp.Logger, *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+	return func(cfg *conf.C, log *logp.Logger, src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+		return configure(cfg, log, src, dc)
 	}
 }
 
 func configure(
 	cfg *conf.C,
 	log *logp.Logger,
-	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+	src *loginp.SourceIdentifier,
+	dc *dirCache) (loginp.Prospector, loginp.Harvester, error) {
 
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
@@ -139,7 +163,7 @@ func configure(
 
 	c.TakeOver.LogWarnings(log)
 
-	prospector, err := newProspector(c, log, src)
+	prospector, err := newProspector(c, log, src, dc)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}

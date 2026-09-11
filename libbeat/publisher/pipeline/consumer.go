@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -89,6 +90,30 @@ func newEventConsumer(
 		c.run()
 	})
 
+	return c
+}
+
+func (c *eventConsumer) run() {
+	// The queue type is fixed for the life of a pipeline, but the first
+	// setTarget is often an empty pause (nil queue). Wait for a real queue
+	// before choosing a loop.
+	var target consumerTarget
+	for target.queue == nil {
+		select {
+		case target = <-c.targetChan:
+		case <-c.done:
+			return
+		}
+	}
+
+	log := c.logger
+	log.Debug("start pipeline event consumer")
+
+	if uq, ok := target.queue.(queue.UnblockingQueue[publisher.Event]); ok {
+		c.runUnblocking(log, target, uq)
+		return
+	}
+
 	// Even though we start a goroutine here, we don't include it in the
 	// waitGroup used for shutdown: if the queue itself is not closed yet,
 	// then the queueReader may be blocked in a read call to the queue,
@@ -98,28 +123,16 @@ func newEventConsumer(
 	// after the eventConsumer is already gone, so nothing is lost by
 	// letting it happen asynchronously.
 	go c.queueReader.run(log)
-
-	return c
+	c.runBlocking(log, target)
 }
 
-func (c *eventConsumer) run() {
-	log := c.logger
-
-	log.Debug("start pipeline event consumer")
+func (c *eventConsumer) runBlocking(log *logp.Logger, target consumerTarget) {
+	defer close(c.queueReader.req)
 
 	var (
-		// Whether there's an outstanding request to queueReader
-		pendingRead bool
-
-		// The batches waiting to be retried.
+		pendingRead  bool
 		retryBatches []*ttlBatch
-
-		// The batch read from the queue and waiting to be sent, if any.
-		queueBatch *ttlBatch
-
-		// The output channel (and associated parameters) that will receive
-		// the batches we're loading.
-		target consumerTarget
+		queueBatch   *ttlBatch
 	)
 
 outerLoop:
@@ -174,47 +187,162 @@ outerLoop:
 			pendingRead = false
 
 		case req := <-c.retryChan:
-			if req.decreaseTTL {
-				countFailed := len(req.batch.Events())
-
-				alive := req.batch.reduceTTL()
-
-				// Report retried vs dropped event count to the observer
-				countDropped := countFailed - len(req.batch.Events())
-				c.retryObserver.eventsDropped(countDropped)
-				c.retryObserver.eventsRetry(len(req.batch.Events()))
-
-				if !alive {
-					log.Info("Drop batch")
-					req.batch.Drop()
-					continue
-				}
+			if b := applyRetry(log, c.retryObserver, req); b != nil {
+				retryBatches = append(retryBatches, b)
 			}
-			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
-			// Release any batches we're still holding so the underlying
-			// queue can reclaim its backing storage without firing
-			// producer ACK callbacks. Release is the abandonment
-			// path: slabqueue returns its slot indices to the pool's
-			// free list; memqueue advances ackLoop past the batch
-			// without invoking input ACK handlers; diskqueue is a
-			// no-op (events stay on disk for next-process recovery).
-			// We must NOT call Drop here — Drop signals successful
-			// delivery and would falsely advance input registries for
-			// events the consumer is abandoning.
-			if queueBatch != nil {
-				queueBatch.Release()
-			}
-			for _, rb := range retryBatches {
-				rb.Release()
-			}
+			releaseHeldBatches(queueBatch, retryBatches)
 			break outerLoop
 		}
 	}
+}
 
-	// Close the queueReader request channel so it knows to shutdown.
-	close(c.queueReader.req)
+func (c *eventConsumer) runUnblocking(
+	log *logp.Logger,
+	target consumerTarget,
+	uq queue.UnblockingQueue[publisher.Event],
+) {
+	var (
+		retryBatches  []*ttlBatch
+		queueBatch    *ttlBatch
+		debounceTimer *time.Timer
+		debounceC     <-chan time.Time
+	)
+	stopDebounce := func() {
+		if debounceTimer == nil {
+			return
+		}
+		if !debounceTimer.Stop() {
+			select {
+			case <-debounceTimer.C:
+			default:
+			}
+		}
+		debounceC = nil
+	}
+	defer stopDebounce()
+
+outerLoop:
+	for {
+		// TryGet has no coalescing window of its own. Skip it while a
+		// debounce timer is running so ReadyChan can accumulate events
+		// the way blocking Get does.
+		if queueBatch == nil && uq != nil && target.ch != nil && debounceC == nil {
+			batch, err := uq.TryGet(target.batchSize)
+			if batch != nil {
+				queueBatch = newBatch(c, batch, target.timeToLive)
+			} else if err != nil {
+				// Queue closed or failed; stop fetching from it.
+				uq = nil
+			}
+		}
+
+		var active *ttlBatch
+		if len(retryBatches) > 0 {
+			active = retryBatches[0]
+		} else if queueBatch != nil {
+			active = queueBatch
+		}
+		var outputChan chan publisher.Batch
+		if active != nil {
+			outputChan = target.ch
+		}
+
+		// Wait on ReadyChan only when we need a new batch and none is
+		// available. uq is non-nil here, so ReadyChan is safe to call
+		// with no extra local channel.
+		if queueBatch == nil && uq != nil && target.ch != nil && active == nil {
+			select {
+			case <-uq.ReadyChan():
+				// First events are available. Wait GetDebounce before
+				// TryGet so a trickle does not become one batch per event.
+				// Extra ReadyChan signals during the window do not reset
+				// it; this matches slabqueue Get.
+				if debounceC == nil {
+					if d := uq.GetDebounce(); d > 0 {
+						if debounceTimer == nil {
+							debounceTimer = time.NewTimer(d)
+						} else {
+							debounceTimer.Reset(d)
+						}
+						debounceC = debounceTimer.C
+					}
+				}
+			case <-debounceC:
+				debounceC = nil
+			case target = <-c.targetChan:
+				stopDebounce()
+				uq, _ = target.queue.(queue.UnblockingQueue[publisher.Event])
+			case req := <-c.retryChan:
+				if b := applyRetry(log, c.retryObserver, req); b != nil {
+					retryBatches = append(retryBatches, b)
+				}
+			case <-c.done:
+				releaseHeldBatches(queueBatch, retryBatches)
+				break outerLoop
+			}
+			continue
+		}
+
+		select {
+		case outputChan <- active:
+			if len(retryBatches) > 0 {
+				retryBatches = retryBatches[1:]
+			} else {
+				queueBatch = nil
+			}
+
+		case target = <-c.targetChan:
+			stopDebounce()
+			uq, _ = target.queue.(queue.UnblockingQueue[publisher.Event])
+
+		case req := <-c.retryChan:
+			if b := applyRetry(log, c.retryObserver, req); b != nil {
+				retryBatches = append(retryBatches, b)
+			}
+
+		case <-c.done:
+			releaseHeldBatches(queueBatch, retryBatches)
+			break outerLoop
+		}
+	}
+}
+
+func applyRetry(log *logp.Logger, observer retryObserver, req retryRequest) *ttlBatch {
+	if !req.decreaseTTL {
+		return req.batch
+	}
+	countFailed := len(req.batch.Events())
+	alive := req.batch.reduceTTL()
+	countDropped := countFailed - len(req.batch.Events())
+	observer.eventsDropped(countDropped)
+	observer.eventsRetry(len(req.batch.Events()))
+	if !alive {
+		log.Info("Drop batch")
+		req.batch.Drop()
+		return nil
+	}
+	return req.batch
+}
+
+func releaseHeldBatches(queueBatch *ttlBatch, retryBatches []*ttlBatch) {
+	// Release any batches we're still holding so the underlying
+	// queue can reclaim its backing storage without firing
+	// producer ACK callbacks. Release is the abandonment
+	// path: slabqueue returns its slot indices to the pool's
+	// free list; memqueue advances ackLoop past the batch
+	// without invoking input ACK handlers; diskqueue is a
+	// no-op (events stay on disk for next-process recovery).
+	// We must NOT call Drop here — Drop signals successful
+	// delivery and would falsely advance input registries for
+	// events the consumer is abandoning.
+	if queueBatch != nil {
+		queueBatch.Release()
+	}
+	for _, rb := range retryBatches {
+		rb.Release()
+	}
 }
 
 func (c *eventConsumer) setTarget(target consumerTarget) {

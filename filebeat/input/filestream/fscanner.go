@@ -142,6 +142,11 @@ type fileScanner struct {
 	pathIndex       map[string]int
 	pathsCanOverlap bool
 
+	// dirCache is the shared process-wide directory cache; nil means read directly.
+	// dirCacheMaxAge is min(check_interval, maxDirCacheAge) and is passed per call.
+	dirCache       *dirCache
+	dirCacheMaxAge time.Duration
+
 	// Everything below exists only to avoid per-file allocations
 
 	hasher       hash.Hash
@@ -153,12 +158,21 @@ type fileScanner struct {
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
+	return newFileScannerWithCache(logger, paths, config, compression, nil, 0)
+}
+
+// newFileScannerWithCache is like newFileScanner but accepts a shared dirCache
+// and the per-call maxAge (typically min(check_interval, maxDirCacheAge)).
+// dc=nil means directory reads go directly to the OS without caching.
+func newFileScannerWithCache(logger *logp.Logger, paths []string, config fileScannerConfig, compression string, dc *dirCache, maxAge time.Duration) (*fileScanner, error) {
 	s := fileScanner{
-		paths:       paths,
-		cfg:         config,
-		log:         logger.Named("scanner"),
-		hasher:      sha256.New(),
-		compression: compression,
+		paths:          paths,
+		cfg:            config,
+		log:            logger.Named("scanner"),
+		hasher:         sha256.New(),
+		compression:    compression,
+		dirCache:       dc,
+		dirCacheMaxAge: maxAge,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -500,6 +514,20 @@ type walkPattern struct {
 	orderIndex int
 }
 
+func (s *fileScanner) readNames(dir string, shared bool) ([]string, error) {
+	if s.dirCache != nil {
+		return s.dirCache.readDirNames(dir, s.dirCacheMaxAge, shared)
+	}
+	return osDirNames(dir)
+}
+
+func (s *fileScanner) readEntries(dir string, shared bool) ([]os.DirEntry, error) {
+	if s.dirCache != nil {
+		return s.dirCache.readDirEntries(dir, s.dirCacheMaxAge, shared)
+	}
+	return os.ReadDir(dir)
+}
+
 // walk traverses g.root once and invokes process for every entry matching one of
 // the group's patterns. A directory is only descended into when its name matches
 // the next component of some pattern. Pattern depth bounds the recursion, which
@@ -567,10 +595,11 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 		}
 
-		// With nothing deeper to descend into, entry types are irrelevant: read
-		// only the names, avoiding os.ReadDir's per-entry os.DirEntry allocation.
+		shared := depth == 0 // only cache the walk root
+
 		if len(deeper) == 0 {
-			names, err := readDirNames(dir)
+			// Leaf: names only; Readdirnames avoids DirEntry allocation.
+			names, err := s.readNames(dir, shared)
 			if err != nil {
 				onReadError(err)
 				return
@@ -581,7 +610,8 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			return
 		}
 
-		entries, err := os.ReadDir(dir)
+		// Non-leaf: DirEntry values needed for IsDir / IsSymlink checks.
+		entries, err := s.readEntries(dir, shared)
 		if err != nil {
 			onReadError(err)
 			return
@@ -629,23 +659,6 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 		}
 	}
 	rec(g.root, 0, patterns)
-}
-
-// readDirNames returns the sorted entry names of dir, reading names only to avoid
-// os.ReadDir's per-entry os.DirEntry allocation. Used for leaf directories, where
-// entry types are not needed. Sorted to keep traversal order stable.
-func readDirNames(dir string) ([]string, error) {
-	f, err := os.Open(dir)
-	if err != nil {
-		return nil, err
-	}
-	names, err := f.Readdirnames(-1)
-	_ = f.Close()
-	if err != nil {
-		return nil, err
-	}
-	slices.Sort(names)
-	return names, nil
 }
 
 // hasGlobMeta reports whether path contains any glob metacharacter, mirroring the
