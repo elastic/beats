@@ -26,3 +26,7 @@
     - name: subexpiry
       type: long
       description: "Number of sub-keys with an expiry set (0 when not reported)."
+
+    - name: keys_with_volatile_items
+      type: long
+      description: "Number of keys with volatile items (0 when not reported)."

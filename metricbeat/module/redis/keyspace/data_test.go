@@ -70,6 +70,7 @@ func TestParseKeyspaceStats(t *testing.T) {
 		"db0": "keys=795341,expires=0,avg_ttl=0",
 		"db1": "keys=10,expires=1,avg_ttl=123,subexpiry=5",
 		"db2": "invalid",
+		"db3": "keys=5,expires=2,avg_ttl=1,keys_with_volatile_items=7",
 	}
 
 	out := parseKeyspaceStats(input)
@@ -79,9 +80,9 @@ func TestParseKeyspaceStats(t *testing.T) {
 		t.Fatalf("expected db2 to be ignored, but it was present: %v", out["db2"])
 	}
 
-	// Expect db0 and db1
-	if len(out) != 2 {
-		t.Fatalf("expected 2 keyspace entries, got %d: %v", len(out), out)
+	// Expect db0, db1 and db3
+	if len(out) != 3 {
+		t.Fatalf("expected 3 keyspace entries, got %d: %v", len(out), out)
 	}
 
 	// Validate db0
@@ -103,6 +104,10 @@ func TestParseKeyspaceStats(t *testing.T) {
 	if getInt64(t, db0["subexpiry"]) != 0 {
 		t.Fatalf("db0.subexpiry: expected default 0, got %v", db0["subexpiry"])
 	}
+	// keys_with_volatile_items should be added with default 0
+	if getInt64(t, db0["keys_with_volatile_items"]) != 0 {
+		t.Fatalf("db0.keys_with_volatile_items: expected default 0, got %v", db0["keys_with_volatile_items"])
+	}
 
 	// Validate db1 (with explicit subexpiry)
 	db1, ok := out["db1"]
@@ -120,5 +125,17 @@ func TestParseKeyspaceStats(t *testing.T) {
 	}
 	if getInt64(t, db1["subexpiry"]) != 5 {
 		t.Fatalf("db1.subexpiry: expected 5, got %v", db1["subexpiry"])
+	}
+
+	// Validate db3 (with explicit keys_with_volatile_items)
+	db3, ok := out["db3"]
+	if !ok {
+		t.Fatalf("db3 missing in output: %v", out)
+	}
+	if getInt64(t, db3["keys_with_volatile_items"]) != 7 {
+		t.Fatalf("db3.keys_with_volatile_items: expected 7, got %v", db3["keys_with_volatile_items"])
+	}
+	if getInt64(t, db3["subexpiry"]) != 0 {
+		t.Fatalf("db3.subexpiry: expected default 0, got %v", db3["subexpiry"])
 	}
 }
