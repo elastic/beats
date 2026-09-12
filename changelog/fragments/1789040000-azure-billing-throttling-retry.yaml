@@ -1,0 +1,39 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: bug-fix
+
+# Change summary; a 80ish characters long description of the change.
+summary: Stop losing a day of azure/billing data when Cost Management returns HTTP 429
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: >
+  The azure/billing metricset now honours the throttling hints Azure Cost
+  Management and Consumption return on HTTP 429. Those hints arrive in
+  "x-ms-ratelimit-microsoft.*-retry-after" headers, which the Azure SDK retry
+  policy ignores, so a throttled fetch used to fail after a few seconds of
+  backoff and, with no cursor and a 1440m period, the whole day of billing data
+  was lost. The hint is now translated into the standard Retry-After header, the
+  retry budget was raised so a per-minute quota window can clear (up to 5
+  retries, 10s base delay, 5m cap), and every request carries a ClientType
+  header so the calls no longer share the default Cost Management quota pool
+  with all unidentified callers in the tenant.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: metricbeat
+
+# PR URL; optional; the PR number that added the changeset.
+# If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
+# pr: https://github.com/owner/repo/1234
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+# If not present is automatically filled by the tooling with the issue linked to the PR number.
+# issue: https://github.com/owner/repo/1234
