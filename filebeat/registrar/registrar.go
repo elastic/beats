@@ -42,6 +42,13 @@ type Registrar struct {
 	done chan struct{}
 	wg   sync.WaitGroup
 
+	// he first log-family input to be created can start the registrar
+	// without knowing whether another already did.
+	startOnce sync.Once
+	// started reports whether startOnce ran Run rather than being claimed by
+	// Stop, which is what tells Stop whether anything will close the store.
+	started bool
+
 	// state storage
 	states       *file.States      // Map with all file paths inside and the corresponding state
 	store        *statestore.Store // Store keeps states in memory and on disk
@@ -105,18 +112,25 @@ func (r *Registrar) loadStates() error {
 	return nil
 }
 
+// Start loads the previous log file locations and runs the registrar. It is
+// called when the first input that produces file.State values is created, and
+// is safe to call any number of times: only the first call does anything.
 func (r *Registrar) Start() error {
-	// Load the previous log file locations now, for use in input
-	err := r.loadStates()
-	if err != nil {
-		return fmt.Errorf("error loading state: %w", err)
-	}
+	var err error
+	r.startOnce.Do(func() {
+		// Load the previous log file locations now, for use in input
+		if err = r.loadStates(); err != nil {
+			err = fmt.Errorf("error loading state: %w", err)
+			return
+		}
 
-	r.wg.Go(func() {
-		r.Run()
+		r.started = true
+		r.wg.Go(func() {
+			r.Run()
+		})
 	})
 
-	return nil
+	return err
 }
 
 // Stop stops the registry. It waits until Run function finished.
@@ -124,8 +138,18 @@ func (r *Registrar) Stop() {
 	r.log.Info("Stopping Registrar")
 	defer r.log.Info("Registrar stopped")
 
+	// Claim startOnce so an input created concurrently with shutdown cannot
+	// start a registrar after this point.
+	r.startOnce.Do(func() {})
+
 	close(r.done)
 	r.wg.Wait()
+
+	if !r.started {
+		if err := r.store.Close(); err != nil {
+			r.log.Errorf("Error closing the registry store: %v", err)
+		}
+	}
 }
 
 func (r *Registrar) Run() {
