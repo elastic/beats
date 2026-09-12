@@ -74,7 +74,44 @@ Example configuration using connection string authentication with processor v2:
   storage_account_container: "your-storage-container"
 ----
 
-**Note:** When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See <<_required_permissions,Required permissions>> for details.
+NOTE: When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See <<_required_permissions,Required permissions>> for details.
+
+=== Managed identity authentication (processor v2)
+
+Available since 8.19.12.
+
+Example configuration using Azure Managed Identity authentication with processor v2. This is ideal for workloads running on Azure VMs, Azure Container Apps, Azure Kubernetes Service (AKS), or other Azure services that support managed identities.
+
+*System-assigned managed identity:*
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "managed_identity"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+----
+
+*User-assigned managed identity:*
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "managed_identity"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  managed_identity_client_id: "your-user-assigned-identity-client-id"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+----
+
+NOTE: When using `managed_identity` authentication, the managed identity must have the appropriate Azure RBAC permissions. Refer to <<_required_permissions,Required permissions>> for details.
 
 == Authentication
 
@@ -84,13 +121,15 @@ The azure-eventhub input supports multiple authentication methods. The <<_auth_t
 
 The following authentication types are supported:
 
-- **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
+- *`connection_string`* (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
 
-- {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
+- *`client_secret`*: Uses Azure Active Directory service principal with client secret credentials.
+
+- *`managed_identity`*: Uses Azure Managed Identity. Supports both system-assigned and user-assigned managed identities. Available since 8.19.12.
 
 === Required permissions
 
-When using `client_secret` authentication, the service principal needs the following Azure RBAC permissions:
+When using `client_secret` or `managed_identity` authentication, the identity (service principal or managed identity) needs the following Azure RBAC permissions:
 
 **For Azure Event Hubs:**
 
@@ -145,8 +184,9 @@ Specifies the authentication method to use for both Event Hub and Storage Accoun
 
 Valid values include:
 
--  **`connection_string`** (default): Uses connection string authentication. You _must_ provide a `connection_string`.
--  **`client_secret` **: Uses Azure Active Directory service principal with client secret credentials.
+-  *`connection_string`* (default): Uses connection string authentication. You _must_ provide a `connection_string`.
+-  *`client_secret`*: Uses Azure Active Directory service principal with client secret credentials.
+-  *`managed_identity`*: Uses Azure Managed Identity. Ideal for workloads running on Azure infrastructure. Available since 8.19.12.
 
 === `connection_string`
 
@@ -158,7 +198,7 @@ This option is required if:
 * `auth_type` is not specified (in which case it defaults to `connection_string` for backwards compatibility)
 
 === `eventhub_namespace`
-The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
+The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret` or `managed_identity`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
 
 === `tenant_id`
 The Azure Active Directory tenant ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
@@ -169,8 +209,19 @@ The Azure Active Directory application (client) ID. Required when using `client_
 === `client_secret`
 The Azure Active Directory application client secret. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
+=== `managed_identity_client_id`
+
+Available since 8.19.12.
+
+The client ID of a user-assigned managed identity. Optional when using `managed_identity` authentication. If not specified, the system-assigned managed identity is used.
+
+Use this option when:
+
+* Your Azure resource has multiple user-assigned managed identities and you need to specify which one to use.
+* You want to use a user-assigned managed identity instead of the system-assigned managed identity.
+
 === `authority_host`
-The Azure Active Directory authority host. Optional when using `client_secret` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
+The Azure Active Directory authority host. Optional when using `client_secret` or `managed_identity` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
 
 Supported values:
 

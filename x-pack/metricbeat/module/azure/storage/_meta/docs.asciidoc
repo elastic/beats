@@ -32,4 +32,6 @@ The primary aggregation value will be retrieved for all the metrics contained in
 
 A default non configurable timegrain of 5 min is set so users are advised to configure an interval of 300s or  a multiply of it.
 
+`default_timegrain`:: (_string_) Sets the default time grain to use when collecting storage account metrics. Defaults to PT5M.
+
 

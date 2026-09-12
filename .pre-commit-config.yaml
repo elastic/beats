@@ -5,3 +5,16 @@ repos:
     -   id: check-merge-conflict
         args: ['--assume-in-merge']
         exclude: (^NOTICE.txt$)
+-   repo: local
+    hooks:
+    # Backports from main carry files for the Markdown docs toolchain, which
+    # nothing on this branch builds. They land as dead files and the prose they
+    # carry is never published.
+    -   id: reject-markdown-docs-toolchain
+        name: reject Markdown docs toolchain files (this branch builds AsciiDoc)
+        language: fail
+        entry: >-
+          This branch documents Beats in AsciiDoc and does not build these files.
+          Port the change to the matching .asciidoc source instead, then run
+          `mage collectDocs` in the beat directory to regenerate.
+        files: '(^docs/reference/.*\.md$|/_meta/docs\.md$|^docs/docset\.yml$)'
