@@ -7,12 +7,15 @@ package instance
 import (
 	"maps"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 )
@@ -65,5 +68,102 @@ func TestManager(t *testing.T) {
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, &management.FallbackManager{}, beat.Manager)
 		assert.False(t, management.UnderAgent())
+	})
+}
+
+func TestReceiverHostnameConfigField(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	cfg := map[string]any{
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
+	}
+
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+	require.NoError(t, err)
+
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "receiver-node", b.Info.FQDN)
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
+	assert.NotEqual(t, "receiver-node", b.Info.Name, "hostname: must not affect agent.name")
+}
+
+func TestReceiverNameAndHostnameAreIndependent(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	cfg := map[string]any{
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
+		"name":      "custom-name",
+	}
+
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+	require.NoError(t, err)
+
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "custom-name", b.Info.Name)
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
+}
+
+func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
+	tmpDir := t.TempDir()
+	baseCfg := map[string]any{
+		"filebeat": map[string]any{
+			"inputs": []map[string]any{
+				{
+					"type":    "benchmark",
+					"enabled": true,
+					"message": "test",
+					"count":   10,
+				},
+			},
+		},
+		"path.home": tmpDir,
+	}
+
+	t.Run("defaults to disabled metric logging when unset", func(t *testing.T) {
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), baseCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+		require.NotNil(t, beat.Config.MetricLogging)
+
+		var metricCfg struct {
+			Period time.Duration `config:"period"`
+		}
+		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
+		assert.Equal(t, time.Duration(0), metricCfg.Period)
+	})
+
+	t.Run("honors an explicitly configured period", func(t *testing.T) {
+		tmpCfg := map[string]any{}
+		maps.Copy(tmpCfg, baseCfg)
+		tmpCfg["logging.metrics.period"] = "15s"
+
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+		require.NotNil(t, beat.Config.MetricLogging)
+
+		var metricCfg struct {
+			Period time.Duration `config:"period"`
+		}
+		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
+		assert.Equal(t, 15*time.Second, metricCfg.Period)
+	})
+
+	t.Run("keeps the default period when an unrelated metric logging field is set", func(t *testing.T) {
+		tmpCfg := map[string]any{}
+		maps.Copy(tmpCfg, baseCfg)
+		tmpCfg["logging.metrics.enabled"] = true
+
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+		require.NotNil(t, beat.Config.MetricLogging)
+
+		var metricCfg struct {
+			Enabled bool          `config:"enabled"`
+			Period  time.Duration `config:"period"`
+		}
+		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
+		assert.True(t, metricCfg.Enabled)
+		assert.Equal(t, time.Duration(0), metricCfg.Period)
 	})
 }
