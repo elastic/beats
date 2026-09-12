@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Prevent file integrity monitoring failures when path discovery and event processing overlap.
+
+component: auditbeat

@@ -268,7 +268,8 @@ func (traverser *pTraverser) waitForWalk(ctx context.Context) error {
 		return nil
 	}
 
-	traverser.waitQueueChan = make(chan struct{})
+	waitQueueChan := make(chan struct{})
+	traverser.waitQueueChan = waitQueueChan
 	traverser.mtx.Unlock()
 
 	select {
@@ -279,7 +280,7 @@ func (traverser *pTraverser) waitForWalk(ctx context.Context) error {
 	case <-ctx.Done():
 		return ctx.Err()
 	// statQueue is empty
-	case <-traverser.waitQueueChan:
+	case <-waitQueueChan:
 		return nil
 	// timeout
 	case <-time.After(traverser.sMatchTimeout):
