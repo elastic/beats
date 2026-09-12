@@ -8,7 +8,9 @@ import "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricse
 
 const (
 	ClusterSettingsMetricSet = "cluster_settings"
-	ClusterSettingsPath      = "/_cluster/settings?include_defaults&filter_path=**.discovery,**.processors,**.cluster,**.repositories,**.bootstrap,**.search,**.indices,**.action,defaults.path.data"
+	// `gateway.*` settings are static and node-scoped, so they are requested by exact path under
+	// `defaults` only: `**.gateway` would pull in ~10 keys that the schema discards anyway.
+	ClusterSettingsPath = "/_cluster/settings?include_defaults&filter_path=**.discovery,**.processors,**.cluster,**.repositories,**.bootstrap,**.search,**.indices,**.action,defaults.path.data,defaults.gateway.expected_nodes,defaults.gateway.expected_data_nodes,defaults.gateway.recover_after_nodes,defaults.gateway.recover_after_data_nodes,defaults.gateway.recover_after_time"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
