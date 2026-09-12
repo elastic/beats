@@ -71,11 +71,6 @@ List of names the `providers` setting supports:
 
 - "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
 - "azure" for Azure Virtual Machine (enabled by default).
-   If the virtual machine is part of an AKS managed cluster, the fields
-   `orchestrator.cluster.name` and `orchestrator.cluster.id` can also be
-   retrieved. "TENANT_ID", "CLIENT_ID" and "CLIENT_SECRET" environment
-   variables need to be set for authentication purposes. If not set we
-   fallback to https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication?tabs=bash#2-authenticate-with-azure[DefaultAzureCredential] and user can choose different authentication methods (e.g. workload identity).
 - "digitalocean" for Digital Ocean (enabled by default).
 - "aws", or "ec2" for Amazon Web Services (enabled by default).
 - "gcp" for Google Copmute Enging (enabled by default).
@@ -83,6 +78,38 @@ List of names the `providers` setting supports:
 - "openstack-ssl", or "nova-ssl" for Openstack Nova when SSL metadata APIs are enabled (enabled by default).
 - "tencent", or "qcloud" for Tencent Cloud (disabled by default).
 - "hetzner" for Hetzner Cloud (enabled by default).
+
+[float]
+==== Azure Resource Manager authentication
+
+After Azure VM metadata is detected, `add_cloud_metadata` automatically makes a
+best-effort Azure Resource Manager (ARM) lookup for the optional
+`orchestrator.cluster.name` and `orchestrator.cluster.id` fields. This lookup is
+attempted on every Azure VM, including VMs that are not part of an AKS cluster.
+Failure to retrieve the optional AKS fields does not prevent the processor from
+adding the Azure VM metadata.
+
+When all three `TENANT_ID`, `CLIENT_ID`, and `CLIENT_SECRET` environment
+variables are set, the processor authenticates the ARM lookup explicitly with
+those service principal credentials. Otherwise it uses
+https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/credential-chains[DefaultAzureCredential],
+which tries a chain of credentials. On Windows, development-focused credentials
+in that chain can invoke child tools. Starting in Beats 8.19.8,
+`AzurePowerShellCredential` is included in the chain and invokes PowerShell with
+an encoded command.
+
+Starting in Beats 8.19.3, set `AZURE_TOKEN_CREDENTIALS=prod` to exclude
+development-focused credential providers while retaining
+`EnvironmentCredential`, `WorkloadIdentityCredential`, and
+`ManagedIdentityCredential`. This environment variable has process-wide scope
+and affects every `DefaultAzureCredential` instance in the Beat process, not
+only `add_cloud_metadata`. Restart the Beat after changing environment
+variables. For an Elastic Agent running as a Windows service, follow the
+https://www.elastic.co/docs/reference/fleet/host-proxy-env-vars#where-to-set-proxy-env-vars[Windows service environment procedure].
+
+Setting `AZURE_TOKEN_CREDENTIALS=prod` does not disable the ARM lookup. To
+disable the lookup, exclude `azure` from `providers`; doing so also disables all
+Azure VM metadata enrichment.
 
 For example, configuration below only utilize `aws` metadata retrival mechanism,
 
