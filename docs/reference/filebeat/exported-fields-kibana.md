@@ -76,6 +76,42 @@ Module for parsing Kibana logs.
     example: ['default', 'marketing']
 
 
+**`kibana.diff.format`**
+:   The schema of the saved object attribute diff attached to this event.
+
+    type: keyword
+
+    example: json_patch_extended
+
+
+## diff.ops [_diff.ops]
+
+JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation may include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those fields are stored in `_source` but not mapped (`dynamic: false` on this object) so mixed types cannot cause mapping conflicts. Mapping them as `object` with `enabled: false` is not sufficient: Elasticsearch still rejects non-object values such as strings.
+
+**`kibana.diff.ops.op`**
+:   The operation performed on the attribute.
+
+    type: keyword
+
+    example: replace
+
+
+**`kibana.diff.ops.path`**
+:   RFC 6901 JSON Pointer to the changed attribute.
+
+    type: keyword
+
+    example: /title
+
+
+**`kibana.diff.noOps.path`**
+:   RFC 6901 JSON Pointer to an attribute that was not changed by this event.
+
+    type: keyword
+
+    example: /description
+
+
 **`kibana.authentication_provider`**
 :   The authentication provider associated with a login event.
 
