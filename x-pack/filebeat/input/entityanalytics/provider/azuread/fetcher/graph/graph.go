@@ -359,8 +359,10 @@ func (f *graph) Devices(ctx context.Context, deltaLink string) ([]*fetcher.Devic
 			}
 			f.logger.Debugf("Got device %q from API", device.ID)
 
-			f.addRegistered(ctx, device, "registeredOwners", &device.RegisteredOwners)
-			f.addRegistered(ctx, device, "registeredUsers", &device.RegisteredUsers)
+			if !device.Deleted {
+				f.addRegistered(ctx, device, "registeredOwners", &device.RegisteredOwners)
+				f.addRegistered(ctx, device, "registeredUsers", &device.RegisteredUsers)
+			}
 
 			devices = append(devices, device)
 		}
