@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/heartbeat/tracer"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -49,4 +50,42 @@ func TestMakeESClient(t *testing.T) {
 		require.NoError(t, err)
 		assert.EqualValues(t, origTimeout, timeout)
 	})
+}
+
+func TestStopBeforeRunReleasesScheduler(t *testing.T) {
+	released := 0
+	bt := &Heartbeat{
+		done:             make(chan struct{}),
+		releaseScheduler: func() { released++ },
+		trace:            tracer.NewNoopTracer(),
+		logger:           logptest.NewTestingLogger(t, ""),
+	}
+
+	// A collector may create a receiver and give up on it without ever starting
+	// it. The scheduler it acquired has to be released anyway, otherwise it is
+	// pinned for the lifetime of the process.
+	bt.Stop()
+	assert.Equal(t, 1, released, "Stop must release the scheduler when Run never started")
+
+	// Run has nothing left to do, and must not release a second time.
+	require.NoError(t, bt.Run(nil))
+	assert.Equal(t, 1, released)
+}
+
+func TestStopAfterRunLeavesReleaseToRun(t *testing.T) {
+	released := 0
+	bt := &Heartbeat{
+		done:             make(chan struct{}),
+		releaseScheduler: func() { released++ },
+		logger:           logptest.NewTestingLogger(t, ""),
+	}
+
+	// Stand in for a Run that is under way: it releases the scheduler when it
+	// returns, after its monitors have wound down, so Stop must not do it early.
+	bt.schedMu.Lock()
+	bt.runStarted = true
+	bt.schedMu.Unlock()
+
+	bt.Stop()
+	assert.Zero(t, released, "Run is responsible for releasing the scheduler once it started")
 }
