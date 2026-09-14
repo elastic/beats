@@ -36,4 +36,12 @@ func TestNewClient(t *testing.T) {
 	}, http.DefaultClient)
 	require.NoError(t, err)
 	require.NotNil(t, c)
+
+	c, err = NewClient(&Config{
+		AuthType:   authPassword,
+		ConfigPath: cfg.Name(),
+		EnableFAST: true,
+	}, http.DefaultClient)
+	require.NoError(t, err)
+	require.NotNil(t, c)
 }

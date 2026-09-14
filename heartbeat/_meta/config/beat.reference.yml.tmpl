@@ -212,6 +212,9 @@ heartbeat.monitors:
     # Optional SPN override, e.g. HTTP/host.example.com. Derived from the URL by
     # default.
     #service_name: ''
+    # Enables Kerberos FAST authentication. This may conflict with certain
+    # Active Directory configurations. Default: false.
+    #enable_krb5_fast: false
 
   # NTLM (Integrated Windows Authentication). Mutually exclusive with basic auth
   # and kerberos. Not available in FIPS builds.

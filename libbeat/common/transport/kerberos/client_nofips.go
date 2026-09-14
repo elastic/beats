@@ -36,15 +36,19 @@ func NewClient(config *Config, httpClient *http.Client) (Client, error) {
 		return nil, fmt.Errorf("error creating Kerberos client: %w", err)
 	}
 
+	settings := []func(*krbclient.Settings){
+		krbclient.DisablePAFXFAST(!config.EnableFAST),
+	}
+
 	switch config.AuthType {
 	case authKeytab:
 		kTab, err := keytab.Load(config.KeyTabPath)
 		if err != nil {
 			return nil, fmt.Errorf("cannot load keytab file %s: %w", config.KeyTabPath, err)
 		}
-		krbClient = krbclient.NewWithKeytab(config.Username, config.Realm, kTab, krbConf)
+		krbClient = krbclient.NewWithKeytab(config.Username, config.Realm, kTab, krbConf, settings...)
 	case authPassword:
-		krbClient = krbclient.NewWithPassword(config.Username, config.Realm, config.Password, krbConf)
+		krbClient = krbclient.NewWithPassword(config.Username, config.Realm, config.Password, krbConf, settings...)
 	default:
 		return nil, ErrInvalidAuthType
 	}
