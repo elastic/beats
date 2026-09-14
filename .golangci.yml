@@ -51,6 +51,10 @@ linters:
               desc: superseded by maps
             - pkg: golang.org/x/exp/slices$
               desc: superseded by slices
+            - pkg: github.com/xdg-go/pbkdf2$
+              desc: not FIPS-validated; use stdlib crypto/pbkdf2, which is inside the Go Cryptographic Module boundary
+            - pkg: golang.org/x/crypto/pbkdf2$
+              desc: not FIPS-validated; use stdlib crypto/pbkdf2, which is inside the Go Cryptographic Module boundary
     errcheck:
       check-type-assertions: true
       check-blank: false
