@@ -8,10 +8,11 @@ import (
 	"context"
 	"fmt"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
