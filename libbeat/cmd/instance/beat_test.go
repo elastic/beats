@@ -655,7 +655,6 @@ func (m mockManager) RegisterAction(action management.Action) {}
 func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook management.DiagnosticHook) {
 }
 func (m mockManager) SetPayload(payload map[string]any)             {}
-func (m mockManager) SetOutputPayload(payload map[string]any)       {}
 func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
 func (m mockManager) PreInit() error                                { return nil }

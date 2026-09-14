@@ -273,6 +273,16 @@ func TestSchedulerPayloadReporterDoesNotStartWhenManagementDisabled(t *testing.T
 	assert.Empty(t, setter.payloads, "standalone mode should not send scheduler payloads")
 }
 
+func TestSchedulerPayloadReporterSkipsManagersWithoutOutputPayloadSupport(t *testing.T) {
+	source := &mutableSchedulerStatus{}
+	source.set(scheduler.Status{Jobs: map[string]scheduler.JobTypeStatus{}})
+
+	assert.NotPanics(t, func() {
+		stop := startManagedSchedulerPayloadReporter(true, struct{}{}, source)
+		stop()
+	}, "managers without output payload support should be ignored")
+}
+
 func TestSchedulerPayloadReporterStopsBeforeHeartbeatShutdown(t *testing.T) {
 	heartbeat := &Heartbeat{done: make(chan struct{})}
 	reporterStopped := false

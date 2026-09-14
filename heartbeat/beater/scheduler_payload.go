@@ -28,8 +28,10 @@ import (
 
 const schedulerPayloadInterval = 30 * time.Second
 
-// payloadSetter attaches scheduler telemetry to the Elastic Agent output unit.
-type payloadSetter interface {
+// outputPayloadSetter attaches scheduler telemetry to the Elastic Agent output
+// unit. This is intentionally optional because only the Fleet V2 manager has
+// an output unit to receive the telemetry.
+type outputPayloadSetter interface {
 	SetOutputPayload(map[string]any)
 }
 
@@ -76,10 +78,11 @@ func schedulerPayload(status scheduler.Status) map[string]any {
 
 func startManagedSchedulerPayloadReporter(
 	managed bool,
-	setter payloadSetter,
+	manager any,
 	statusProvider schedulerStatusProvider,
 ) func() {
-	if !managed {
+	setter, ok := manager.(outputPayloadSetter)
+	if !managed || !ok {
 		return func() {}
 	}
 
@@ -93,7 +96,7 @@ func startManagedSchedulerPayloadReporter(
 
 func (bt *Heartbeat) startManagedSchedulerPayloadReporter(
 	managed bool,
-	setter payloadSetter,
+	manager any,
 	statusProvider schedulerStatusProvider,
 ) func() {
 	bt.schedulerPayloadReporterMu.Lock()
@@ -105,7 +108,7 @@ func (bt *Heartbeat) startManagedSchedulerPayloadReporter(
 	default:
 	}
 
-	stop := startManagedSchedulerPayloadReporter(managed, setter, statusProvider)
+	stop := startManagedSchedulerPayloadReporter(managed, manager, statusProvider)
 	bt.schedulerPayloadReporterStop = stop
 	return stop
 }
@@ -116,7 +119,7 @@ func (bt *Heartbeat) startManagedSchedulerPayloadReporter(
 // scheduler stops generating state writes, while a change in the live
 // running/waiting gauges or in the delayed-start counters still propagates.
 func startSchedulerPayloadReporterWithTicks(
-	setter payloadSetter,
+	setter outputPayloadSetter,
 	statusProvider schedulerStatusProvider,
 	ticks <-chan time.Time,
 ) func() {
