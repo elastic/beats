@@ -206,7 +206,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event, snap bool) (mb.Event, 
 
 	// Ids
 	event.RootFields.Put("process.parent.pid", process.Proc.Ppid)
-	startTime := time.Unix(0, int64(process.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	startTime := time.Unix(0, int64(quark.TimeToWallclock(process.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 	if ms.HostID() != "" {
 		// TODO unify with sessionview and guarantee loss of precision
 		event.RootFields.Put("process.entity_id",
@@ -345,6 +345,16 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 		quarkMetrics.backend.Set("kprobe")
 	default:
 		quarkMetrics.backend.Set("invalid")
+	}
+
+	// Quark hands out timestamps in nanoseconds since boot, converted
+	// at the last moment with quark.TimeToWallclock(). Refresh the
+	// boottime epoch so a system clock step (say NTP correcting a
+	// clock that was wrong at boot) doesn't leave every converted
+	// timestamp skewed by the step size. Quark only stores the epoch
+	// if btime actually changed, which happens only on a step.
+	if err := quark.UpdateBoottime(); err != nil {
+		ms.log.Warnf("can't update quark boottime: %v", err)
 	}
 
 	*stamp = time.Now()
