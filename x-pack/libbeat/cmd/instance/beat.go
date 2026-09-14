@@ -156,6 +156,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	b.RawConfig = cfg
+
+	// Periodic metrics snapshots are expensive to collect and mostly
+	// redundant under a receiver, where metrics are already exported
+	// through the otel telemetry provider. Default them off.
+	b.Config.MetricLogging = config.MustNewConfigFrom(map[string]any{"period": 0})
+
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
