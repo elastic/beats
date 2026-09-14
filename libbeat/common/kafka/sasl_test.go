@@ -45,7 +45,7 @@ func TestValidate(t *testing.T) {
 		{mechanism: "scram-sha-512"}, // exercises strings.ToUpper
 		// OAUTHBEARER is a recognised mechanism; cross-field validation (rejecting
 		// OAUTHBEARER alongside username/password) lives in each outer config's
-		// Validate() via ValidateWithUsername.
+		// Validate() via ValidateWithUsernameAndPassword.
 		{mechanism: "OAUTHBEARER"},
 		// Unsupported mechanisms.
 		{mechanism: "GSSAPI", wantErr: true},
@@ -68,12 +68,12 @@ func TestValidate(t *testing.T) {
 	}
 }
 
-func TestValidateWithUsername(t *testing.T) {
+func TestValidateWithUsernameAndPassword(t *testing.T) {
 	tests := []struct {
-		name      string
-		mechanism string
-		username  string
-		wantErr   bool
+		name                string
+		mechanism           string
+		usernameAndPassword bool
+		wantErr             bool
 	}{
 		// OAUTHBEARER without credentials is a safe noop — SASL won't be enabled
 		// by callers that gate on username != "", so no silent protocol switch occurs.
@@ -81,18 +81,18 @@ func TestValidateWithUsername(t *testing.T) {
 		{name: "OAUTHBEARER lowercase no credentials", mechanism: "oauthbearer"},
 		// OAUTHBEARER with credentials is the dangerous case: callers would enable
 		// SASL/PLAIN with the configured password, not OAUTHBEARER.
-		{name: "OAUTHBEARER with username", mechanism: "OAUTHBEARER", username: "user", wantErr: true},
+		{name: "OAUTHBEARER with username", mechanism: "OAUTHBEARER", usernameAndPassword: true, wantErr: true},
 		// Other mechanisms with a username are fine — they use the credentials correctly.
-		{name: "PLAIN with username", mechanism: "PLAIN", username: "user"},
-		{name: "SCRAM-SHA-256 with username", mechanism: "SCRAM-SHA-256", username: "user"},
-		{name: "SCRAM-SHA-512 with username", mechanism: "SCRAM-SHA-512", username: "user"},
-		{name: "empty mechanism with username", mechanism: "", username: "user"},
+		{name: "PLAIN with username", mechanism: "PLAIN", usernameAndPassword: true},
+		{name: "SCRAM-SHA-256 with username", mechanism: "SCRAM-SHA-256", usernameAndPassword: true},
+		{name: "SCRAM-SHA-512 with username", mechanism: "SCRAM-SHA-512", usernameAndPassword: true},
+		{name: "empty mechanism with username", mechanism: "", usernameAndPassword: true},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := SaslConfig{SaslMechanism: tc.mechanism}
-			err := cfg.ValidateWithUsername(tc.username)
+			err := cfg.ValidateWithUsernameAndPassword(tc.usernameAndPassword)
 			if tc.wantErr {
 				require.Error(t, err)
 				assert.ErrorContains(t, err, "OAUTHBEARER")
