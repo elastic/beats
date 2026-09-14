@@ -234,6 +234,54 @@ func TestManager_Create(t *testing.T) {
 	})
 }
 
+func TestManager_DefaultCleanTimeout(t *testing.T) {
+	cases := []struct {
+		name       string
+		configured time.Duration
+		want       time.Duration
+	}{
+		{name: "unset falls back", configured: 0, want: 30 * time.Minute},
+		{name: "negative falls back", configured: -1, want: 30 * time.Minute},
+		{name: "configured is kept", configured: time.Second, want: time.Second},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			manager := &InputManager{DefaultCleanTimeout: tc.configured}
+			assert.Equal(t, tc.want, manager.defaultCleanTimeout())
+			assert.Equal(t, tc.configured, manager.DefaultCleanTimeout, "defaultCleanTimeout must not mutate the field")
+		})
+	}
+}
+
+func TestManager_CreateConcurrentCleanTimeout(t *testing.T) {
+	manager := constInput(t, sourceList("test"), &fakeTestInput{})
+	require.Zero(t, manager.DefaultCleanTimeout, "test needs an unset timeout")
+
+	const goroutines = 8
+	timeouts := make([]time.Duration, goroutines)
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+	for i := range goroutines {
+		wg.Go(func() {
+			<-start
+			inp, err := manager.Create(conf.NewConfig())
+			if !assert.NoError(t, err) {
+				return
+			}
+			timeouts[i] = inp.(*managedInput).cleanTimeout
+		})
+	}
+	close(start)
+	wg.Wait()
+
+	want := make([]time.Duration, goroutines)
+	for i := range want {
+		want[i] = 30 * time.Minute
+	}
+	assert.Equal(t, want, timeouts)
+}
+
 func TestManager_InputsTest(t *testing.T) {
 	var mu sync.Mutex
 	var seen []string
