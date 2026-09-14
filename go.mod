@@ -121,9 +121,9 @@ require (
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.28.0
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 	golang.org/x/mod v0.39.0
-	golang.org/x/net v0.57.0
+	golang.org/x/net v0.58.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
@@ -132,7 +132,7 @@ require (
 	golang.org/x/tools v0.48.0
 	google.golang.org/api v0.287.1
 	google.golang.org/genproto v0.0.0-20260519071638-aa98bba5eb94 // indirect
-	google.golang.org/grpc v1.83.0
+	google.golang.org/grpc v1.83.1
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -148,7 +148,7 @@ require (
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/compute v1.66.0
 	cloud.google.com/go/redis v1.25.0
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
@@ -195,7 +195,7 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.19.2
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.10.0
+	github.com/microsoft/go-mssqldb v1.11.0
 	github.com/microsoft/wmi v0.44.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.159.1-0.20260819055613-b7f4f425a7d9
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.159.0

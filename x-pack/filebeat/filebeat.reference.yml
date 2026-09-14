@@ -2713,7 +2713,7 @@ filebeat.inputs:
   # Configure cipher suites to be used for SSL connections.
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites.
+  # Configure curve types for TLS key exchange.
   #ssl.curve_types: []
 
   # Configure what types of client authentication are supported. Valid options
@@ -2851,7 +2851,7 @@ filebeat.inputs:
     # Configure cipher suites to be used for SSL connections.
     #ssl.cipher_suites: []
 
-    # Configure curve types for ECDHE based cipher suites.
+    # Configure curve types for TLS key exchange.
     #ssl.curve_types: []
 
     # Configure what types of client authentication are supported. Valid options
@@ -3701,7 +3701,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -3849,7 +3849,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4062,7 +4062,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4241,7 +4241,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4564,7 +4564,7 @@ setup.kibana:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4817,7 +4817,7 @@ logging.files:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
