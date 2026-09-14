@@ -35,7 +35,6 @@ import (
 	"go.elastic.co/ecszap"
 
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
@@ -476,7 +475,7 @@ func makeEventLogOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, er
 }
 
 func makeFileOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error) {
-	filename := paths.Resolve(paths.Logs, filepath.Join(cfg.Files.Path, cfg.LogFilename()))
+	filename := filepath.Join(cfg.Files.Path, cfg.LogFilename())
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(cfg.Files.MaxSize),

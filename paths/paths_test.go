@@ -62,18 +62,19 @@ func TestHomePath(t *testing.T) {
 
 	for _, test := range tests {
 		cfg := Path{Home: test.Home}
-		if err := Paths.initPaths(&cfg); err != nil {
+		p := New()
+		if err := p.initPaths(&cfg); err != nil {
 			t.Errorf("error on %+v: %v", test, err)
 			continue
 		}
 
-		assert.Equal(t, test.ResultHome, Resolve(Home, test.Path), "failed on %+v", test)
+		assert.Equal(t, test.ResultHome, p.Resolve(Home, test.Path), "failed on %+v", test)
 
 		// config path same as home path
-		assert.Equal(t, test.ResultHome, Resolve(Config, test.Path), "failed on %+v", test)
+		assert.Equal(t, test.ResultHome, p.Resolve(Config, test.Path), "failed on %+v", test)
 
 		// data path under home path
-		assert.Equal(t, test.ResultData, Resolve(Data, test.Path), "failed on %+v", test)
+		assert.Equal(t, test.ResultData, p.Resolve(Data, test.Path), "failed on %+v", test)
 	}
 }
 
@@ -113,12 +114,13 @@ func TestDataPath(t *testing.T) {
 
 	for _, test := range tests {
 		cfg := Path{Home: test.Home, Data: test.Data}
-		if err := Paths.initPaths(&cfg); err != nil {
+		p := New()
+		if err := p.initPaths(&cfg); err != nil {
 			t.Errorf("error on %+v: %v", test, err)
 			continue
 		}
 
-		assert.Equal(t, test.ResultData, Resolve(Data, test.Path), "failed on %+v", test)
+		assert.Equal(t, test.ResultData, p.Resolve(Data, test.Path), "failed on %+v", test)
 	}
 }
 
@@ -158,12 +160,13 @@ func TestLogsPath(t *testing.T) {
 
 	for _, test := range tests {
 		cfg := Path{Home: test.Home, Logs: test.Logs}
-		if err := Paths.initPaths(&cfg); err != nil {
+		p := New()
+		if err := p.initPaths(&cfg); err != nil {
 			t.Errorf("error on %+v: %v", test, err)
 			continue
 		}
 
-		assert.Equal(t, test.ResultLogs, Resolve(Logs, test.Path))
+		assert.Equal(t, test.ResultLogs, p.Resolve(Logs, test.Path))
 	}
 }
 

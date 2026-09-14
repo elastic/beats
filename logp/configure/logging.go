@@ -18,6 +18,7 @@
 package configure
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"strings"
@@ -26,6 +27,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // CLI flags for configuring logging.
@@ -50,8 +52,12 @@ func GetEnvironment() logp.Environment {
 }
 
 // Logging builds a logp.Config based on the given common.Config and the specified
-// CLI flags.
-func Logging(beatName string, cfg *config.C) error {
+// CLI flags. p resolves a relative file output path against the logs directory
+// and must not be nil.
+func Logging(beatName string, cfg *config.C, p *paths.Path) error {
+	if p == nil {
+		return errors.New("logp/configure: paths must not be nil")
+	}
 	config := logp.DefaultConfig(environment)
 	config.Beat = beatName
 	if cfg != nil {
@@ -61,12 +67,17 @@ func Logging(beatName string, cfg *config.C) error {
 	}
 
 	applyFlags(&config)
+	config.Files.Path = p.Resolve(paths.Logs, config.Files.Path)
 	return logp.Configure(config)
 }
 
 // LoggingWithOutputs builds a logp.Config based on the given common.Config and the specified
-// CLI flags along with the given outputs.
-func LoggingWithOutputs(beatName string, cfg *config.C, outputs ...zapcore.Core) error {
+// CLI flags along with the given outputs. p resolves a relative file output path
+// against the logs directory and must not be nil.
+func LoggingWithOutputs(beatName string, cfg *config.C, p *paths.Path, outputs ...zapcore.Core) error {
+	if p == nil {
+		return errors.New("logp/configure: paths must not be nil")
+	}
 	config := logp.DefaultConfig(environment)
 	config.Beat = beatName
 	if cfg != nil {
@@ -76,13 +87,15 @@ func LoggingWithOutputs(beatName string, cfg *config.C, outputs ...zapcore.Core)
 	}
 
 	applyFlags(&config)
+	config.Files.Path = p.Resolve(paths.Logs, config.Files.Path)
 	return logp.ConfigureWithOutputs(config, outputs...)
 }
 
 // LoggingWithTypedOutputsLocal applies some defaults and returns a local logger instance
-// that also routes typed log entries to a separate output.
-func LoggingWithTypedOutputsLocal(beatName string, cfg, typedCfg *config.C, logKey, kind string, outputs ...zapcore.Core) (*logp.Logger, error) {
-	logpConfig, typedLogpConfig, err := buildTypedOutputConfigs(beatName, cfg, typedCfg)
+// that also routes typed log entries to a separate output. p resolves relative
+// file output paths against the logs directory and must not be nil.
+func LoggingWithTypedOutputsLocal(beatName string, cfg, typedCfg *config.C, p *paths.Path, logKey, kind string, outputs ...zapcore.Core) (*logp.Logger, error) {
+	logpConfig, typedLogpConfig, err := buildTypedOutputConfigs(beatName, cfg, typedCfg, p)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +104,8 @@ func LoggingWithTypedOutputsLocal(beatName string, cfg, typedCfg *config.C, logK
 
 // LoggingWithTypedOutputsNonGlobal is identical to LoggingWithTypedOutputsLocal but does not
 // mutate the global logger, making it safe for creating component-specific loggers.
-func LoggingWithTypedOutputsNonGlobal(beatName string, cfg, typedCfg *config.C, logKey, kind string, outputs ...zapcore.Core) (*logp.Logger, error) {
-	logpConfig, typedLogpConfig, err := buildTypedOutputConfigs(beatName, cfg, typedCfg)
+func LoggingWithTypedOutputsNonGlobal(beatName string, cfg, typedCfg *config.C, p *paths.Path, logKey, kind string, outputs ...zapcore.Core) (*logp.Logger, error) {
+	logpConfig, typedLogpConfig, err := buildTypedOutputConfigs(beatName, cfg, typedCfg, p)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +114,10 @@ func LoggingWithTypedOutputsNonGlobal(beatName string, cfg, typedCfg *config.C, 
 
 // buildTypedOutputConfigs prepares the logging configuration for writing regular log entries
 // and typed event entries to separate outputs.
-func buildTypedOutputConfigs(beatName string, cfg, typedCfg *config.C) (logp.Config, logp.Config, error) {
+func buildTypedOutputConfigs(beatName string, cfg, typedCfg *config.C, p *paths.Path) (logp.Config, logp.Config, error) {
+	if p == nil {
+		return logp.Config{}, logp.Config{}, errors.New("logp/configure: paths must not be nil")
+	}
 	logpConfig := logp.DefaultConfig(environment)
 	logpConfig.Beat = beatName
 	if cfg != nil {
@@ -129,6 +145,10 @@ func buildTypedOutputConfigs(beatName string, cfg, typedCfg *config.C) (logp.Con
 	if typedLogpConfig.Files.Name == defaultName {
 		typedLogpConfig.Files.Name = beatName + "-events-data"
 	}
+
+	// logp uses Files.Path as-is, so relative paths must be anchored to the logs directory here.
+	logpConfig.Files.Path = p.Resolve(paths.Logs, logpConfig.Files.Path)
+	typedLogpConfig.Files.Path = p.Resolve(paths.Logs, typedLogpConfig.Files.Path)
 
 	return logpConfig, typedLogpConfig, nil
 }

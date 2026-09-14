@@ -18,13 +18,52 @@
 package configure
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+func TestBuildTypedOutputConfigsResolvesFilePaths(t *testing.T) {
+	logsDir := t.TempDir()
+	absDir := t.TempDir()
+
+	tests := []struct {
+		name     string
+		path     string
+		expected string
+	}{
+		{"empty resolves to logs dir", "", logsDir},
+		{"relative resolves under logs dir", "rel", filepath.Join(logsDir, "rel")},
+		{"absolute is unchanged", absDir, absDir},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(map[string]interface{}{"files.path": tc.path})
+			typedCfg := config.MustNewConfigFrom(map[string]interface{}{"files.path": tc.path})
+			p := &paths.Path{Logs: logsDir}
+
+			logpCfg, typedLogpCfg, err := buildTypedOutputConfigs("testbeat", cfg, typedCfg, p)
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, logpCfg.Files.Path)
+			require.Equal(t, tc.expected, typedLogpCfg.Files.Path)
+		})
+	}
+}
+
+func TestLoggingNilPathsErrors(t *testing.T) {
+	require.Error(t, Logging("testbeat", nil, nil))
+	require.Error(t, LoggingWithOutputs("testbeat", nil, nil))
+	_, err := LoggingWithTypedOutputsLocal("testbeat", nil, nil, nil, "log.type", "event")
+	require.Error(t, err)
+	_, err = LoggingWithTypedOutputsNonGlobal("testbeat", nil, nil, nil, "log.type", "event")
+	require.Error(t, err)
+}
 
 func TestLoggerOutputEnvironment(t *testing.T) {
 	testCases := []struct {
