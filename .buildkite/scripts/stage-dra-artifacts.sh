@@ -5,8 +5,9 @@
 ##  and stages the workflow's slice into artifacts/ for elastic/dra-prep.
 ##
 ##  On release branches, beats builds both snapshot and staging in the same
-##  build, so filenames distinguish them: snapshot files contain "-SNAPSHOT-"
-##  (or end in "-SNAPSHOT.csv"); staging files do not.
+##  build, so filenames distinguish them: snapshot files contain "-SNAPSHOT"
+##  (e.g. "-SNAPSHOT-linux-amd64.tar.gz", "-SNAPSHOT.csv", "-SNAPSHOT.zip");
+##  staging files do not.
 ##
 ##  Runs in dra-prep-pipeline.yml, a separate pipeline from the one that
 ##  packaged the artifacts, so the download is scoped to the parent build
@@ -29,10 +30,10 @@ echo "--- Preparing ${WORKFLOW} artifacts"
 mkdir -p artifacts
 
 if [[ "${WORKFLOW}" == "snapshot" ]]; then
-  find build/distributions -type f \( -name "*-SNAPSHOT-*" -o -name "*-SNAPSHOT.csv" \) \
+  find build/distributions -type f -name "*-SNAPSHOT*" \
     -exec cp {} artifacts/ \;
 else
-  find build/distributions -type f ! -name "*-SNAPSHOT-*" ! -name "*-SNAPSHOT.csv" \
+  find build/distributions -type f ! -name "*-SNAPSHOT*" \
     -exec cp {} artifacts/ \;
 fi
 
