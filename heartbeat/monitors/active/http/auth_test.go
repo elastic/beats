@@ -39,8 +39,9 @@ func kerberosTestConfig() *kerberosSettings {
 	}}
 }
 
+func boolPtr(v bool) *bool { return &v }
+
 func TestConfigAuthMutualExclusivity(t *testing.T) {
-	enabled := true
 	tests := map[string]struct {
 		cfg     Config
 		wantErr bool
@@ -52,10 +53,10 @@ func TestConfigAuthMutualExclusivity(t *testing.T) {
 			cfg: Config{Hosts: []string{"http://x"}, Kerberos: kerberosTestConfig()},
 		},
 		"ntlm only": {
-			cfg: Config{Hosts: []string{"http://x"}, NTLM: &NTLMConfig{Enabled: &enabled, Username: `D\u`, Password: "p"}},
+			cfg: Config{Hosts: []string{"http://x"}, NTLM: &NTLMConfig{Enabled: boolPtr(true), Username: `D\u`, Password: "p"}},
 		},
 		"basic + ntlm": {
-			cfg:     Config{Hosts: []string{"http://x"}, Username: "u", Password: "p", NTLM: &NTLMConfig{Enabled: &enabled, Username: `D\u`, Password: "p"}},
+			cfg:     Config{Hosts: []string{"http://x"}, Username: "u", Password: "p", NTLM: &NTLMConfig{Enabled: boolPtr(true), Username: `D\u`, Password: "p"}},
 			wantErr: true,
 		},
 		"password-only basic + kerberos": {
@@ -63,7 +64,7 @@ func TestConfigAuthMutualExclusivity(t *testing.T) {
 			wantErr: true,
 		},
 		"kerberos + ntlm": {
-			cfg:     Config{Hosts: []string{"http://x"}, Kerberos: kerberosTestConfig(), NTLM: &NTLMConfig{Enabled: &enabled, Username: `D\u`, Password: "p"}},
+			cfg:     Config{Hosts: []string{"http://x"}, Kerberos: kerberosTestConfig(), NTLM: &NTLMConfig{Enabled: boolPtr(true), Username: `D\u`, Password: "p"}},
 			wantErr: true,
 		},
 		"no auth": {
@@ -85,17 +86,14 @@ func TestConfigAuthMutualExclusivity(t *testing.T) {
 }
 
 func TestNTLMConfigValidate(t *testing.T) {
-	enabled := true
-	disabled := false
-
-	require.NoError(t, (&NTLMConfig{Enabled: &disabled}).Validate(), "disabled ntlm needs no credentials")
+	require.NoError(t, (&NTLMConfig{Enabled: boolPtr(false)}).Validate(), "disabled ntlm needs no credentials")
 	require.NoError(t, (*NTLMConfig)(nil).Validate(), "nil ntlm config must be safe to validate")
 
-	err := (&NTLMConfig{Enabled: &enabled, Password: "p"}).Validate()
+	err := (&NTLMConfig{Enabled: boolPtr(true), Password: "p"}).Validate()
 	require.Error(t, err, "missing username must fail")
 	assert.Contains(t, err.Error(), "username")
 
-	err = (&NTLMConfig{Enabled: &enabled, Username: "u"}).Validate()
+	err = (&NTLMConfig{Enabled: boolPtr(true), Username: "u"}).Validate()
 	require.Error(t, err, "missing password must fail")
 	assert.Contains(t, err.Error(), "password")
 }
@@ -119,8 +117,6 @@ func TestNTLMAuthUsername(t *testing.T) {
 }
 
 func TestBuildRequestAuthSchemes(t *testing.T) {
-	enabled := true
-
 	t.Run("basic sets Authorization Basic and Close", func(t *testing.T) {
 		cfg := defaultConfig()
 		cfg.Username = "user"
@@ -136,7 +132,7 @@ func TestBuildRequestAuthSchemes(t *testing.T) {
 
 	t.Run("ntlm sets domain\\user creds and disables Close", func(t *testing.T) {
 		cfg := defaultConfig()
-		cfg.NTLM = &NTLMConfig{Enabled: &enabled, Username: "user", Password: "pass", Domain: "CORP"}
+		cfg.NTLM = &NTLMConfig{Enabled: boolPtr(true), Username: "user", Password: "pass", Domain: "CORP"}
 		req, err := buildRequest("http://example.com", &cfg, nil)
 		require.NoError(t, err)
 		user, pass, ok := req.BasicAuth()
