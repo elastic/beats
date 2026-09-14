@@ -67,6 +67,6 @@ func TestCloseConnectionError(t *testing.T) {
 	resp.Body.Close()
 
 	logs := observedLogs.FilterMessageSnippet("Error reading from connection:").TakeAll()
-	assert.Equal(t, 0, len(logs), "did not ignore use of closed connection error")
+	assert.Empty(t, logs, "did not ignore use of closed connection error")
 
 }

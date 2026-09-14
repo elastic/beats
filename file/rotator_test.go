@@ -32,14 +32,12 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const logMessage = "Test file rotator.\n"
 
 func TestFileRotator(t *testing.T) {
-	err := logp.TestingSetup()
-	require.NoError(t, err)
-
 	dir := t.TempDir()
 	logname := "sample"
 	c := &testClock{time.Date(2021, 11, 11, 0, 0, 0, 0, time.Local)}
@@ -47,7 +45,7 @@ func TestFileRotator(t *testing.T) {
 	filename := filepath.Join(dir, logname)
 	r, err := file.NewFileRotator(filename,
 		file.MaxBackups(2),
-		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+		file.WithLogger(logptest.NewTestingLogger(t, "rotator").With(logp.Namespace("rotator"))),
 		file.WithClock(c),
 	)
 	if err != nil {
@@ -273,7 +271,7 @@ func TestRotateSymlink(t *testing.T) {
 	err = os.Symlink(privateFile, guessedFilename)
 	require.NoError(t, err)
 
-	logger, buf := logp.NewInMemory("rotator", logp.ConsoleEncoderConfig())
+	logger, buf := logp.NewInMemoryLocal("rotator", logp.ConsoleEncoderConfig())
 
 	r, err := file.NewFileRotator(filename,
 		file.MaxBackups(1),

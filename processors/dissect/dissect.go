@@ -255,7 +255,7 @@ func transformType(typ dataType, value string) (interface{}, error) {
 		return strToInt(value, 64)
 	case Integer:
 		i, err := strToInt(value, 32)
-		return int32(i), err
+		return int32(i), err //nolint:gosec // G115: strToInt parses with bitSize 32, so the value always fits in an int32
 	case Float:
 		f, err := strconv.ParseFloat(value, 32)
 		return float32(f), err

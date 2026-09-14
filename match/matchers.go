@@ -20,7 +20,6 @@ package match
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 	"strings"
 	"unsafe"
 )
@@ -179,7 +178,7 @@ func (m *prefixNumDate) Match(in []byte) bool {
 	for cnt := m.digits[0]; cnt > 0; cnt-- {
 		v := in[pos]
 		pos++
-		if !('0' <= v && v <= '9') {
+		if '0' > v || v > '9' {
 			return false
 		}
 	}
@@ -194,7 +193,7 @@ func (m *prefixNumDate) Match(in []byte) bool {
 		for cnt := m.digits[i]; cnt > 0; cnt-- {
 			v := in[pos]
 			pos++
-			if !('0' <= v && v <= '9') {
+			if '0' > v || v > '9' {
 				return false
 			}
 		}
@@ -227,7 +226,7 @@ func (m *emptyStringMatcher) String() string {
 
 func (m *emptyWhiteStringMatcher) MatchString(s string) bool {
 	for _, r := range s {
-		if !(r == 0x9 || r == 0xa || r == 0xc || r == 0xd || r == 0x20 || r == '\t') {
+		if r != 0x9 && r != 0xa && r != 0xc && r != 0xd && r != 0x20 && r != '\t' {
 			return false
 		}
 	}
@@ -236,7 +235,7 @@ func (m *emptyWhiteStringMatcher) MatchString(s string) bool {
 
 func (m *emptyWhiteStringMatcher) Match(bs []byte) bool {
 	for _, r := range bytesToString(bs) {
-		if !(r == 0x9 || r == 0xa || r == 0xc || r == 0xd || r == 0x20 || r == '\t') {
+		if r != 0x9 && r != 0xa && r != 0xc && r != 0xd && r != 0x20 && r != '\t' {
 			return false
 		}
 	}
@@ -255,11 +254,6 @@ func bytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-func stringToBytes(s string) (b []byte) {
-	pb := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	ps := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	pb.Data = ps.Data
-	pb.Len = ps.Len
-	pb.Cap = ps.Len
-	return b
+func stringToBytes(s string) []byte {
+	return unsafe.Slice(unsafe.StringData(s), len(s))
 }

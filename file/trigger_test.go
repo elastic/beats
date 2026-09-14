@@ -28,10 +28,10 @@ import (
 
 func TestInitTrigger(t *testing.T) {
 	var trigger initTrigger
-	assert.Equal(t, trigger.TriggerRotation(0), rotateReasonInitializing)
-	assert.Equal(t, trigger.TriggerRotation(0), rotateReasonNoRotate)
-	assert.Equal(t, trigger.TriggerRotation(0), rotateReasonNoRotate)
-	assert.Equal(t, trigger.TriggerRotation(0), rotateReasonNoRotate)
+	assert.Equal(t, rotateReasonInitializing, trigger.TriggerRotation(0))
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(0))
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(0))
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(0))
 }
 
 func TestSizeTrigger(t *testing.T) {
@@ -40,19 +40,19 @@ func TestSizeTrigger(t *testing.T) {
 		size:         0,
 	}
 
-	assert.EqualValues(t, trigger.size, 0)
-	assert.Equal(t, trigger.TriggerRotation(1), rotateReasonNoRotate)
-	assert.EqualValues(t, trigger.size, 1)
-	assert.Equal(t, trigger.TriggerRotation(1), rotateReasonNoRotate)
-	assert.EqualValues(t, trigger.size, 2)
-	assert.Equal(t, trigger.TriggerRotation(1), rotateReasonNoRotate)
-	assert.EqualValues(t, trigger.size, 3)
-	assert.Equal(t, trigger.TriggerRotation(1), rotateReasonNoRotate)
-	assert.EqualValues(t, trigger.size, 4)
-	assert.Equal(t, trigger.TriggerRotation(1), rotateReasonNoRotate)
-	assert.EqualValues(t, trigger.size, 5)
-	assert.Equal(t, trigger.TriggerRotation(1), rotateReasonFileSize)
-	assert.EqualValues(t, trigger.size, 0)
+	assert.EqualValues(t, 0, trigger.size)
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(1))
+	assert.EqualValues(t, 1, trigger.size)
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(1))
+	assert.EqualValues(t, 2, trigger.size)
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(1))
+	assert.EqualValues(t, 3, trigger.size)
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(1))
+	assert.EqualValues(t, 4, trigger.size)
+	assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(1))
+	assert.EqualValues(t, 5, trigger.size)
+	assert.Equal(t, rotateReasonFileSize, trigger.TriggerRotation(1))
+	assert.EqualValues(t, 0, trigger.size)
 }
 
 type always20240615 struct{}
@@ -87,7 +87,7 @@ func TestIntervalTrigger(t *testing.T) {
 
 	for _, testCase := range testCases {
 		duration, err := time.ParseDuration(testCase.duration)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		genericTrigger := newIntervalTrigger(duration, clock)
 		trigger, ok := genericTrigger.(*intervalTrigger)
 		assert.True(t, ok)
@@ -96,41 +96,41 @@ func TestIntervalTrigger(t *testing.T) {
 		assert.NotZero(t, trigger.lastRotate)
 
 		// Should not fire immediately
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 
 		// Test after a second and ensure it doesn't fire immediately after
 		trigger.lastRotate = clock.Now().Add(time.Second * -1)
 		assert.Equal(t, trigger.TriggerRotation(ignored) == rotateReasonTimeInterval, testCase.afterSecond)
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 
 		// Test after a minute and ensure it doesn't fire immediately after
 		trigger.lastRotate = clock.Now().Add(time.Minute * -1)
 		assert.Equal(t, trigger.TriggerRotation(ignored) == rotateReasonTimeInterval, testCase.afterMinute)
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 
 		// Test after an hour and ensure it doesn't fire immediately after
 		trigger.lastRotate = clock.Now().Add(time.Hour * -1)
 		assert.Equal(t, trigger.TriggerRotation(ignored) == rotateReasonTimeInterval, testCase.afterHour)
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 
 		// Test after a day and ensure it doesn't fire immediately after
 		trigger.lastRotate = clock.Now().Add(time.Hour * -24)
 		assert.Equal(t, trigger.TriggerRotation(ignored) == rotateReasonTimeInterval, testCase.afterDay)
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 
 		// Test after a week and ensure it doesn't fire immediately after
 		trigger.lastRotate = clock.Now().Add(time.Hour * -24 * 7)
 		assert.Equal(t, trigger.TriggerRotation(ignored) == rotateReasonTimeInterval, testCase.afterWeek)
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 
 		// Test after a month and ensure it doesn't fire immediately after
 		trigger.lastRotate = clock.Now().Add(time.Hour * -24 * 31)
 		assert.Equal(t, trigger.TriggerRotation(ignored) == rotateReasonTimeInterval, testCase.afterMonth)
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 
 		// Test after a year and ensure it doesn't fire immediately after
 		trigger.lastRotate = clock.Now().Add(time.Hour * -24 * 365)
 		assert.Equal(t, trigger.TriggerRotation(ignored) == rotateReasonTimeInterval, testCase.afterYear)
-		assert.Equal(t, trigger.TriggerRotation(ignored), rotateReasonNoRotate)
+		assert.Equal(t, rotateReasonNoRotate, trigger.TriggerRotation(ignored))
 	}
 }

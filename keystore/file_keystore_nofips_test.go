@@ -56,7 +56,7 @@ func TestOpensV1(t *testing.T) {
 	keys, err := ls.List()
 	require.NoError(t, err)
 	require.Len(t, keys, 1)
-	require.Equal(t, keys[0], "key")
+	require.Equal(t, "key", keys[0])
 }
 
 func TestFailsToOpenV2(t *testing.T) {

@@ -134,12 +134,12 @@ var tests []dissectTest
 func init() {
 	content, err := os.ReadFile("testdata/dissect_tests.json")
 	if err != nil {
-		os.Stderr.WriteString(fmt.Sprintf("could not read the content of 'dissect_tests', error: %s\n", err))
+		fmt.Fprintf(os.Stderr, "could not read the content of 'dissect_tests', error: %s\n", err)
 		os.Exit(1)
 	}
 
 	if err := json.Unmarshal(content, &tests); err != nil {
-		os.Stderr.WriteString(fmt.Sprintf("could not parse the content of 'dissect_tests', error: %s\n", err))
+		fmt.Fprintf(os.Stderr, "could not parse the content of 'dissect_tests', error: %s\n", err)
 		os.Exit(1)
 	}
 }

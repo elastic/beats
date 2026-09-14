@@ -172,7 +172,7 @@ func TestL(t *testing.T) {
 	if assert.Len(t, logs, 1) {
 		log := logs[0]
 		assert.Equal(t, zap.InfoLevel, log.Level)
-		assert.Equal(t, "", log.LoggerName)
+		assert.Empty(t, log.LoggerName)
 		assert.Equal(t, "infow", log.Message)
 		assert.Contains(t, log.ContextMap(), "rate")
 	}

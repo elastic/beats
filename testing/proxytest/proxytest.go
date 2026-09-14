@@ -176,7 +176,7 @@ func New(t *testing.T, optns ...Option) *Proxy {
 		opts.logFn = func(format string, a ...any) {}
 	}
 
-	l, err := net.Listen("tcp", opts.addr) //nolint:gosec,nolintlint // it's a test
+	l, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", opts.addr) //nolint:gosec,nolintlint // it's a test
 	if err != nil {
 		t.Fatalf("NewServer failed to create a net.Listener: %v", err)
 	}
@@ -289,8 +289,8 @@ func (p *Proxy) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		msg := fmt.Sprintf("could not make request: %#v", err.Error())
-		log.Print(msg)
-		_, _ = fmt.Fprint(w, msg)
+		log.Print(msg)            //nolint:gosec // G706: test proxy, the error is only logged for debugging tests
+		_, _ = fmt.Fprint(w, msg) //nolint:gosec // G705: test proxy, the error is only returned to the test client
 		return
 	}
 	defer resp.Body.Close()
@@ -349,7 +349,7 @@ func (p *Proxy) processRequest(r *http.Request) (*http.Response, error) {
 		r.Header.Add("Forwarded", "for="+host)
 	}
 
-	return p.client.Do(r)
+	return p.client.Do(r) //nolint:gosec // G704: this is a proxy, forwarding the incoming request is its purpose
 }
 
 // ProxiedRequests returns a slice with the "request log" with every request the
@@ -406,7 +406,11 @@ func addIDToReqCtx(r *http.Request, id string) *http.Request {
 }
 
 func idFromReqCtx(r *http.Request) string { //nolint:unused // kept for completeness
-	return r.Context().Value(ctxKeyRecID{}).(string)
+	id, ok := r.Context().Value(ctxKeyRecID{}).(string)
+	if !ok {
+		return ""
+	}
+	return id
 }
 
 func addLoggerReqCtx(r *http.Request, log *slog.Logger) *http.Request {

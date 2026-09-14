@@ -36,7 +36,7 @@ func TestDownloadRateJSON(t *testing.T) {
 		var unmarshalledDownloadRate DownloadRate
 		err = json.Unmarshal(data, &unmarshalledDownloadRate)
 		require.NoError(t, err)
-		require.Equal(t, float64(1794.7), float64(unmarshalledDownloadRate))
+		require.InDelta(t, 1794.7, float64(unmarshalledDownloadRate), 0.001)
 	})
 
 	// Infinity download rate
@@ -49,6 +49,7 @@ func TestDownloadRateJSON(t *testing.T) {
 		var unmarshalledDownloadRate DownloadRate
 		err = json.Unmarshal(data, &unmarshalledDownloadRate)
 		require.NoError(t, err)
-		require.Equal(t, math.MaxFloat64, float64(unmarshalledDownloadRate))
+		// Infinity must be marshalled to exactly math.MaxFloat64, so an exact float comparison is intended here.
+		require.Equal(t, math.MaxFloat64, float64(unmarshalledDownloadRate)) //nolint:testifylint // exact float comparison
 	})
 }

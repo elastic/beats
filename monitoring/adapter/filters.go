@@ -155,7 +155,7 @@ func Rename(from, to string) MetricFilter {
 // NameReplace replaces substrings in a metrics names with `new`.
 func NameReplace(old, new string) MetricFilter {
 	return ModifyName(func(name string) string {
-		return strings.Replace(name, old, new, -1)
+		return strings.ReplaceAll(name, old, new)
 	})
 }
 

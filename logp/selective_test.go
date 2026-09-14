@@ -60,7 +60,7 @@ func TestLoggerSelectors(t *testing.T) {
 	// Selectors only apply to debug level logs.
 	bad.Debug("not logged")
 	logs = observedLogs.TakeAll()
-	assert.Len(t, logs, 0)
+	assert.Empty(t, logs)
 
 	bad.Info("is also logged")
 	logs = observedLogs.TakeAll()

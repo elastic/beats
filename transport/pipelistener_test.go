@@ -83,7 +83,7 @@ func TestAcceptClosed(t *testing.T) {
 	err := l.Close()
 	assert.NoError(t, err)
 	_, err = l.Accept()
-	assert.Error(t, errListenerClosed, err)
+	assert.ErrorIs(t, err, errListenerClosed)
 }
 
 func TestDialClosed(t *testing.T) {
@@ -94,7 +94,7 @@ func TestDialClosed(t *testing.T) {
 	err := l.Close()
 	assert.NoError(t, err)
 	_, err = l.DialContext(context.Background(), "foo", "bar")
-	assert.Error(t, errListenerClosed, err)
+	assert.ErrorIs(t, err, errListenerClosed)
 }
 
 func TestDialContextCanceled(t *testing.T) {
@@ -106,5 +106,5 @@ func TestDialContextCanceled(t *testing.T) {
 	cancel()
 
 	_, err := l.DialContext(ctx, "foo", "bar")
-	assert.Error(t, context.Canceled, err)
+	assert.ErrorIs(t, err, context.Canceled)
 }

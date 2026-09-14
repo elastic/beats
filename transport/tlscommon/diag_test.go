@@ -117,9 +117,11 @@ func makeCertificateConfig(t *testing.T, ca tls.Certificate) CertificateConfig {
 		Bytes: crt.Certificate[0],
 	})
 	require.NotEmpty(t, crtBytes)
+	rsaKey, ok := crt.PrivateKey.(*rsa.PrivateKey)
+	require.True(t, ok, "expected *rsa.PrivateKey, got %T", crt.PrivateKey)
 	keyBytes := pem.EncodeToMemory(&pem.Block{
 		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(crt.PrivateKey.(*rsa.PrivateKey)),
+		Bytes: x509.MarshalPKCS1PrivateKey(rsaKey),
 	})
 	require.NotEmpty(t, keyBytes)
 	return CertificateConfig{

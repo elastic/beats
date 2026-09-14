@@ -20,6 +20,7 @@ package kibana
 import (
 	"fmt"
 	"net"
+	"net/netip"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -38,6 +39,10 @@ func MakeURL(defaultScheme string, defaultPath string, rawURL string, defaultPor
 	if !hasScheme.MatchString(rawURL) {
 		rawURL = fmt.Sprintf("%v://%v", defaultScheme, rawURL)
 	}
+
+	// Since Go 1.26, url.Parse rejects unbracketed IPv6 addresses in the host,
+	// so bracket them before parsing to keep accepting inputs like "2001:db8::1".
+	rawURL = bracketIPv6Host(rawURL)
 
 	addr, err := url.Parse(rawURL)
 	if err != nil {
@@ -80,6 +85,40 @@ func MakeURL(defaultScheme string, defaultPath string, rawURL string, defaultPor
 	}
 
 	return addr.String(), nil
+}
+
+// bracketIPv6Host wraps an unbracketed IPv6 address in the host subcomponent
+// of rawURL in square brackets, e.g. "http://2001:db8::1/path" becomes
+// "http://[2001:db8::1]/path". Any other input is returned unchanged.
+func bracketIPv6Host(rawURL string) string {
+	schemeEnd := strings.Index(rawURL, "://")
+	if schemeEnd < 0 {
+		return rawURL
+	}
+	authStart := schemeEnd + len("://")
+
+	authEnd := strings.IndexAny(rawURL[authStart:], "/?#")
+	if authEnd < 0 {
+		authEnd = len(rawURL)
+	} else {
+		authEnd += authStart
+	}
+
+	// Split optional userinfo from the host.
+	userinfo, host := "", rawURL[authStart:authEnd]
+	if at := strings.LastIndex(host, "@"); at >= 0 {
+		userinfo, host = host[:at+1], host[at+1:]
+	}
+
+	// Already bracketed, or not enough colons to be an IPv6 address.
+	if strings.Contains(host, "[") || strings.Count(host, ":") < 2 {
+		return rawURL
+	}
+	if _, err := netip.ParseAddr(host); err != nil {
+		return rawURL
+	}
+
+	return rawURL[:authStart] + userinfo + "[" + host + "]" + rawURL[authEnd:]
 }
 
 func EncodeURLParams(url string, params url.Values) string {

@@ -94,13 +94,13 @@ func TestFleetCreatePolicy(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	require.Equal(t, resp.ID, "a580c680-ea40-11ed-aae7-4b4fd4906b3d")
-	require.Equal(t, resp.Name, policyName)
-	require.Equal(t, resp.Description, policyDescription)
-	require.Equal(t, resp.Namespace, "default")
+	require.Equal(t, "a580c680-ea40-11ed-aae7-4b4fd4906b3d", resp.ID)
+	require.Equal(t, policyName, resp.Name)
+	require.Equal(t, policyDescription, resp.Description)
+	require.Equal(t, "default", resp.Namespace)
 	// require.Equal(t, resp.Status, "active")
 	// require.Equal(t, resp.IsManaged, false)
-	require.Equal(t, resp.MonitoringEnabled, []MonitoringEnabledOption{MonitoringEnabledLogs, MonitoringEnabledMetrics})
+	require.Equal(t, []MonitoringEnabledOption{MonitoringEnabledLogs, MonitoringEnabledMetrics}, resp.MonitoringEnabled)
 }
 
 func TestFleetGetPolicy(t *testing.T) {
@@ -127,7 +127,7 @@ func TestFleetGetPolicy(t *testing.T) {
 	require.Equal(t, id, resp.ID)
 	require.Equal(t, "Elastic-Agent (elastic-package)", resp.Name)
 	require.Equal(t, "default", resp.Namespace)
-	require.Equal(t, "", resp.Description)
+	require.Empty(t, resp.Description)
 	require.Equal(t, "fleet-custom-fleet-server-host", resp.FleetServerHostID)
 	require.Equal(t, []MonitoringEnabledOption{MonitoringEnabledLogs}, resp.MonitoringEnabled)
 }
@@ -210,10 +210,10 @@ func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	require.Equal(t, resp.ID, id)
+	require.Equal(t, id, resp.ID)
 	require.Equal(t, resp.Name, fmt.Sprintf("%s (%s)", name, id))
-	require.Equal(t, resp.APIKey, "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx==")
-	require.Equal(t, resp.PolicyID, policyID)
+	require.Equal(t, "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx==", resp.APIKey)
+	require.Equal(t, policyID, resp.PolicyID)
 	require.True(t, resp.Active)
 }
 
@@ -242,7 +242,7 @@ func TestFleetListAgents(t *testing.T) {
 	require.Equal(t, "eba58282-ec1c-4d9e-aac0-2b29f754b437", item.Agent.ID)
 	require.Equal(t, "8.8.0", item.Agent.Version)
 	require.Equal(t, "c75d66b1dac5", item.LocalMetadata.Host.Hostname)
-	require.Equal(t, true, item.LocalMetadata.Elastic.Agent.FIPS)
+	require.True(t, item.LocalMetadata.Elastic.Agent.FIPS)
 }
 
 func TestFleetGetAgent(t *testing.T) {
@@ -438,7 +438,7 @@ func TestFleetDownloadSource(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, id, resp.Item.ID)
 		require.Equal(t, name, resp.Item.Name)
-		require.NotEmpty(t, "http://test.local", resp.Item.Host)
+		require.Equal(t, "http://test.local", resp.Item.Host)
 		require.Nil(t, resp.Item.Auth)
 	})
 	t.Run("update", func(t *testing.T) {
@@ -449,7 +449,7 @@ func TestFleetDownloadSource(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, id, resp.Item.ID)
 		require.Equal(t, name, resp.Item.Name)
-		require.NotEmpty(t, "http://newtest.local", resp.Item.Host)
+		require.Equal(t, "http://newtest.local", resp.Item.Host)
 		require.Nil(t, resp.Item.Auth)
 	})
 }

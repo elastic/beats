@@ -31,6 +31,7 @@ import (
 	"runtime/pprof"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -117,15 +118,16 @@ func BeforeRun() {
 	mux.HandleFunc("/debug/vars", metricsHandler)
 
 	// Ensure we are listening before returning
-	listener, err := net.Listen("tcp", *httpprof)
+	listener, err := net.Listen("tcp", *httpprof) //nolint:noctx // no context is available here; the pprof listener lives for the whole process lifetime
 	if err != nil {
 		logger.Errorf("Failed to start pprof listener: %v", err)
 		os.Exit(1)
 	}
 
+	srv := &http.Server{Handler: mux, ReadHeaderTimeout: 10 * time.Second}
 	go func() {
 		// Serve returns always a non-nil error
-		err := http.Serve(listener, mux)
+		err := srv.Serve(listener)
 		logger.Infof("Finished pprof endpoint: %v", err)
 	}()
 }

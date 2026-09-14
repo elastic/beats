@@ -49,7 +49,7 @@ func TestConfiguration(t *testing.T) {
 		})
 
 		_, err := New(nil, simpleMux(), cfg)
-		assert.Equal(t, err == nil, false)
+		assert.Error(t, err)
 	})
 
 	t.Run("when security descriptor is set", func(t *testing.T) {
@@ -59,7 +59,7 @@ func TestConfiguration(t *testing.T) {
 		})
 
 		_, err := New(nil, simpleMux(), cfg)
-		assert.Equal(t, err == nil, false)
+		assert.Error(t, err)
 	})
 }
 
@@ -70,8 +70,7 @@ func TestSocket(t *testing.T) {
 	}
 
 	t.Run("socket doesn't exist before", func(t *testing.T) {
-		tmpDir := t.TempDir()
-		sockFile := tmpDir + "/test.sock"
+		sockFile := shortTempDir(t) + "/test.sock"
 
 		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host": "unix://" + sockFile,
@@ -98,7 +97,7 @@ func TestSocket(t *testing.T) {
 	})
 
 	t.Run("starting beat and recover a dangling socket file", func(t *testing.T) {
-		sockFile := t.TempDir() + "/test.sock"
+		sockFile := shortTempDir(t) + "/test.sock"
 
 		// Create the socket before the server.
 		f, err := os.Create(sockFile)
@@ -134,12 +133,27 @@ func isWindows() bool {
 	return runtime.GOOS == "windows"
 }
 
+// shortTempDir returns a temporary directory with a short path.
+//
+// Unix domain socket paths are limited to 104 bytes on macOS (108 on Linux).
+// t.TempDir() embeds the full (sub)test name in the path, which on macOS,
+// combined with the long $TMPDIR (/var/folders/...), easily exceeds that
+// limit and makes bind(2) fail with EINVAL.
+func shortTempDir(t *testing.T) string {
+	dir, err := os.MkdirTemp("", "api")
+	require.NoError(t, err, "cannot create temporary directory")
+	t.Cleanup(func() {
+		assert.NoError(t, os.RemoveAll(dir), "cannot remove temporary directory")
+	})
+	return dir
+}
+
 func getResponse(t *testing.T, sockFile, url string) string {
 	client := func(sockFile string) http.Client {
 		return http.Client{
 			Transport: &http.Transport{
-				DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-					return net.Dial("unix", sockFile)
+				DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+					return (&net.Dialer{}).DialContext(ctx, "unix", sockFile)
 				},
 			},
 		}
@@ -227,7 +241,7 @@ func TestAttachHandler(t *testing.T) {
 	assert.Equal(t, "test!", string(body))
 
 	err = s.AttachHandler("/test", h)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 type testHandler struct{}

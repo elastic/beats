@@ -178,7 +178,7 @@ func (u *timeUnfolder) OnArrayStart(ctx gotype.UnfoldCtx, len int, _ structform.
 }
 
 func (u *timeUnfolder) OnInt(ctx gotype.UnfoldCtx, in int64) error {
-	return u.OnUint(ctx, uint64(in))
+	return u.OnUint(ctx, uint64(in)) //nolint:gosec // G115: the encoded timestamp words are uint64, a negative value is reinterpreted on purpose
 }
 func (u *timeUnfolder) OnFloat(ctx gotype.UnfoldCtx, f float64) error {
 	return u.OnUint(ctx, uint64(f))
@@ -215,6 +215,11 @@ func (u *timeUnfolder) OnArrayFinished(ctx gotype.UnfoldCtx) error {
 	return nil
 }
 
+// timestampToBits encodes a timestamp into two uint64 words: 'extra' holds the
+// encoding version, the zone offset in minutes (as uint16) and the nanoseconds,
+// 'sec' holds the unix seconds.
+//
+//nolint:gosec // G115: the encoding intentionally packs signed values into unsigned words, bitsToTimestamp reverses it
 func timestampToBits(ts time.Time) (uint64, uint64) {
 	var (
 		off int16
@@ -242,6 +247,9 @@ func timestampToBits(ts time.Time) (uint64, uint64) {
 	return extra, sec
 }
 
+// bitsToTimestamp decodes a timestamp encoded by timestampToBits.
+//
+//nolint:gosec // G115: the decoding intentionally truncates the words back into the signed fields packed by timestampToBits
 func bitsToTimestamp(extra, sec uint64) (time.Time, error) {
 	var ts time.Time
 

@@ -260,7 +260,7 @@ func TestLoggerFileIsKeptOnTestFailure(t *testing.T) {
 	}
 
 	// Finally ensure the log file was kept and has the correct number of lines
-	f, err := os.Open(path)
+	f, err := os.Open(path) //nolint:gosec // G703: the path is reported by the test subprocess, it is test-owned
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			t.Fatalf("log file %q not found after the test exited", path)

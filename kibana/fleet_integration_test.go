@@ -201,8 +201,8 @@ func testUpdatePolicyKibana(t *testing.T, client *Client, testPolicy AgentPolicy
 	// Get uninstall tokens, should be one
 	uninstallTokenResp, err := client.GetPolicyUninstallTokens(ctx, respPolicy.ID)
 	require.NoError(t, err)
-	require.Greater(t, len(uninstallTokenResp.Items), 0, "Expected non-zero number of tokens")
-	require.Greater(t, len(uninstallTokenResp.Items[0].Token), 0, "expected non-empty token")
+	require.NotEmpty(t, uninstallTokenResp.Items, "Expected non-zero number of tokens")
+	require.NotEmpty(t, uninstallTokenResp.Items[0].Token, "expected non-empty token")
 
 	// Disable tamper protection
 	updatePolicyTamperProtection = AgentPolicyUpdateRequest{
@@ -357,7 +357,7 @@ func TestListAgents(t *testing.T) {
 
 	listResp, err := client.ListAgents(ctx, ListAgentsRequest{})
 	require.NoError(t, err)
-	require.Greater(t, len(listResp.Items), 0)
+	require.NotEmpty(t, listResp.Items)
 }
 
 func TestGetAgent(t *testing.T) {
@@ -373,14 +373,14 @@ func TestGetAgent(t *testing.T) {
 	nonExistentAgentID := uuid.Must(uuid.NewV4()).String()
 	agentResp, err := client.GetAgent(ctx, GetAgentRequest{ID: nonExistentAgentID})
 
-	require.NotNil(t, err)
+	require.Error(t, err)
 	require.Equal(t, fmt.Sprintf("Agent %s not found", nonExistentAgentID), err.Error())
 	require.Empty(t, agentResp.ID)
 
 	// Get the list of Agent and then get the Agent by ID from that list
 	listResp, err := client.ListAgents(ctx, ListAgentsRequest{})
 	require.NoError(t, err)
-	require.Greater(t, len(listResp.Items), 0)
+	require.NotEmpty(t, listResp.Items)
 
 	agentResp, err = client.GetAgent(ctx, GetAgentRequest{ID: listResp.Items[0].ID})
 	require.NoError(t, err)
@@ -400,7 +400,7 @@ func TestUnenrollAgent(t *testing.T) {
 	nonExistentAgentID := uuid.Must(uuid.NewV4()).String()
 	_, err = client.UnEnrollAgent(ctx, UnEnrollAgentRequest{ID: nonExistentAgentID})
 
-	require.NotNil(t, err)
+	require.Error(t, err)
 	require.Equal(t, fmt.Sprintf("Agent %s not found", nonExistentAgentID), err.Error())
 }
 

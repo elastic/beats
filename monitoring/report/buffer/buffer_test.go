@@ -26,7 +26,7 @@ import (
 func Test_ringBuffer(t *testing.T) {
 	t.Run("Len 2 buffer", func(t *testing.T) {
 		r := newBuffer(2)
-		assert.Equal(t, 2, len(r.entries))
+		assert.Len(t, r.entries, 2)
 		assert.False(t, r.full)
 		assert.Equal(t, 0, r.i)
 
@@ -35,25 +35,25 @@ func Test_ringBuffer(t *testing.T) {
 		r.add("1")
 		assert.False(t, r.full)
 		assert.Equal(t, 1, r.i)
-		assert.Equal(t, r.entries[0], "1")
+		assert.Equal(t, "1", r.entries[0])
 		assert.ElementsMatch(t, []string{"1"}, r.getAll())
 
 		r.add("2")
 		assert.True(t, r.full)
 		assert.Equal(t, 0, r.i)
-		assert.Equal(t, r.entries[1], "2")
+		assert.Equal(t, "2", r.entries[1])
 		assert.ElementsMatch(t, []string{"1", "2"}, r.getAll())
 
 		r.add("3")
 		assert.True(t, r.full)
 		assert.Equal(t, 1, r.i)
-		assert.Equal(t, r.entries[0], "3")
+		assert.Equal(t, "3", r.entries[0])
 		assert.ElementsMatch(t, []string{"2", "3"}, r.getAll())
 
 		r.add("4")
 		assert.True(t, r.full)
 		assert.Equal(t, 0, r.i)
-		assert.Equal(t, r.entries[1], "4")
+		assert.Equal(t, "4", r.entries[1])
 		assert.ElementsMatch(t, []string{"3", "4"}, r.getAll())
 	})
 

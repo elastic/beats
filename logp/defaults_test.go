@@ -136,7 +136,7 @@ func runTestEnvStderr(t *testing.T, envType logp.Environment) {
 	}
 
 	if os.Getenv("TEST_DEFAULT_CONFIG_STDERR") != "1" {
-		cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()), "-test.v") //nolint:gosec // This is intentionally running a subprocess
+		cmd := exec.CommandContext(t.Context(), os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()), "-test.v") //nolint:gosec // This is intentionally running a subprocess
 		cmd.Env = append(cmd.Env, "TEST_DEFAULT_CONFIG_STDERR=1")
 
 		var stderr bytes.Buffer

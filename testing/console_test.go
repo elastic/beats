@@ -37,7 +37,7 @@ func TestConsoleDriverInfo(t *testing.T) {
 	driver.Info("field", "value")
 
 	output.Flush()
-	assert.Equal(t, buffer.String(), "field: value\n")
+	assert.Equal(t, "field: value\n", buffer.String())
 }
 
 func TestConsoleDriverWarn(t *testing.T) {
@@ -46,7 +46,7 @@ func TestConsoleDriverWarn(t *testing.T) {
 	driver.Warn("warning", "you got a warning")
 
 	output.Flush()
-	assert.Equal(t, buffer.String(), "warning... WARN you got a warning\n")
+	assert.Equal(t, "warning... WARN you got a warning\n", buffer.String())
 }
 
 func TestConsoleDriverError(t *testing.T) {
@@ -58,7 +58,7 @@ func TestConsoleDriverError(t *testing.T) {
 	driver.Error("error", err)
 
 	output.Flush()
-	assert.Equal(t, buffer.String(), "no error... OK\nerror... ERROR This is an error\n")
+	assert.Equal(t, "no error... OK\nerror... ERROR This is an error\n", buffer.String())
 }
 
 func TestConsoleDriverFatal(t *testing.T) {
@@ -72,7 +72,7 @@ func TestConsoleDriverFatal(t *testing.T) {
 
 	output.Flush()
 	assert.True(t, killed)
-	assert.Equal(t, buffer.String(), "no error... OK\nerror... ERROR This is an error\n")
+	assert.Equal(t, "no error... OK\nerror... ERROR This is an error\n", buffer.String())
 }
 
 func TestConsoleDriverRun(t *testing.T) {
@@ -85,7 +85,7 @@ func TestConsoleDriverRun(t *testing.T) {
 
 	output.Flush()
 	assert.True(t, called)
-	assert.Equal(t, buffer.String(), "test...OK\n")
+	assert.Equal(t, "test...OK\n", buffer.String())
 }
 
 func TestConsoleDriverResult(t *testing.T) {
@@ -96,7 +96,7 @@ func TestConsoleDriverResult(t *testing.T) {
 	})
 
 	output.Flush()
-	assert.Equal(t, buffer.String(), "test...OK\n  result: \n   This is a multiline\n   result\n\n")
+	assert.Equal(t, "test...OK\n  result: \n   This is a multiline\n   result\n\n", buffer.String())
 }
 
 func TestConsoleDriverRunWithReports(t *testing.T) {
@@ -112,7 +112,7 @@ func TestConsoleDriverRunWithReports(t *testing.T) {
 
 	output.Flush()
 	assert.True(t, called)
-	assert.Equal(t, buffer.String(), "test...\n  field: value\n  error... ERROR This is an error\n")
+	assert.Equal(t, "test...\n  field: value\n  error... ERROR This is an error\n", buffer.String())
 }
 
 func createDriver(killer func()) (*bytes.Buffer, *bufio.Writer, *ConsoleDriver) {

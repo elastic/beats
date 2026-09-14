@@ -104,7 +104,7 @@ func TestCAPinning(t *testing.T) {
 
 				server := &http.Server{ //nolint:gosec // testing
 					Handler: mux,
-					TLSConfig: &tls.Config{ //nolint:gosec // testing
+					TLSConfig: &tls.Config{
 						Certificates: []tls.Certificate{
 							serverCert,
 						},
@@ -190,7 +190,7 @@ func TestCAPinning(t *testing.T) {
 
 		server := &http.Server{ //nolint:gosec // testing
 			Handler: mux,
-			TLSConfig: &tls.Config{ //nolint:gosec // testing
+			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{
 					serverCert,
 				},
@@ -264,7 +264,7 @@ func TestCAPinning(t *testing.T) {
 
 		server := &http.Server{ //nolint:gosec // testing
 			Handler: mux,
-			TLSConfig: &tls.Config{ //nolint:gosec // testing
+			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{
 					serverCert,
 				},

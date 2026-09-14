@@ -171,13 +171,13 @@ func TestExternalConfigLoading(t *testing.T) {
 			l := mustNewLoader(test.inputsFolder)
 			c, err := l.Load(test.configs)
 			if test.err {
-				require.NotNil(t, err)
+				require.Error(t, err)
 				return
 			}
 
-			require.Nil(t, err)
+			require.NoError(t, err)
 			raw, err := c.ToMapStr()
-			require.Nil(t, err)
+			require.NoError(t, err)
 			require.Equal(t, test.expectedConfig, raw)
 		})
 	}

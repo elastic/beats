@@ -183,7 +183,7 @@ func tlsDialWith(
 		d.Info("security", "server's certificate chain verification is enabled")
 	}
 
-	err = conn.Handshake()
+	err = conn.HandshakeContext(ctx)
 	d.Fatal("handshake", err)
 	if err != nil {
 		_ = conn.Close()

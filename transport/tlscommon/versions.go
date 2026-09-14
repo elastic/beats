@@ -17,7 +17,10 @@
 
 package tlscommon
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 // TLSVersion type for TLS version.
 type TLSVersion uint16
@@ -47,8 +50,14 @@ func (v *TLSVersion) Unpack(i interface{}) error {
 		}
 		*v = version
 	case int64:
+		if o < 0 || o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls version '%v'", o)
+		}
 		*v = TLSVersion(o)
 	case uint64:
+		if o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls version '%v'", o)
+		}
 		*v = TLSVersion(o)
 	default:
 		return fmt.Errorf("tls version is an unknown type: %T", o)

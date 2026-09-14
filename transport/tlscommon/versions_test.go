@@ -64,7 +64,7 @@ func TestTLSVersion(t *testing.T) {
 			require.Equal(t, tt.want, tv.Details())
 			if tt.want == nil {
 				require.Equal(t, tt.want, tv.Details())
-				require.Equal(t, tt.name, "unknown")
+				require.Equal(t, "unknown", tt.name)
 			} else {
 				require.Equal(t, tt.name, tv.String())
 			}
@@ -93,10 +93,22 @@ func Test_TLSVersion_Unpack(t *testing.T) {
 		in:     int64(0x303),
 		exp:    TLSVersion12,
 	}, {
+		name:   "negative int64",
+		hasErr: true,
+		in:     int64(-1),
+	}, {
+		name:   "int64 out of uint16 range",
+		hasErr: true,
+		in:     int64(0x10303),
+	}, {
 		name:   "uint64",
 		hasErr: false,
 		in:     uint64(0x303),
 		exp:    TLSVersion12,
+	}, {
+		name:   "uint64 out of uint16 range",
+		hasErr: true,
+		in:     uint64(0x10303),
 	}, {
 		name:   "unknown type",
 		hasErr: true,

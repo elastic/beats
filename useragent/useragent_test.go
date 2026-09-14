@@ -18,7 +18,6 @@
 package useragent
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,24 +33,24 @@ const (
 
 func TestUserAgent(t *testing.T) {
 	ua := UserAgent("FakeBeat", v, commit, buildTime)
-	assert.Regexp(t, regexp.MustCompile(`^Elastic-FakeBeat`), ua)
+	assert.Regexp(t, `^Elastic-FakeBeat`, ua)
 
 	ua2 := UserAgent("FakeBeat", v, commit, buildTime, "integration_name/1.2.3")
-	assert.Regexp(t, regexp.MustCompile(`; integration_name\/1\.2\.3\)$`), ua2)
+	assert.Regexp(t, `; integration_name\/1\.2\.3\)$`, ua2)
 }
 
 func TestUserAgentWithBeatTelemetry(t *testing.T) {
 	isFIPSDistribution := true
 	ua2 := UserAgentWithBeatTelemetry("FakeBeat", v, mode, unprivileged, isFIPSDistribution)
-	assert.Regexp(t, regexp.MustCompile(`^Elastic-FakeBeat`), ua2)
-	assert.Regexp(t, regexp.MustCompile(`; Managed; Unprivileged; FIPS\)$`), ua2)
+	assert.Regexp(t, `^Elastic-FakeBeat`, ua2)
+	assert.Regexp(t, `; Managed; Unprivileged; FIPS\)$`, ua2)
 
 	// Require deliberate update in case we want to extend the User Agent later
 	assert.LessOrEqual(t, len(ua2), 100, "User agent string should be less than 100 characters")
 
 	ua3 := UserAgentWithBeatTelemetry("FakeBeat", v, mode, unprivileged, isFIPSDistribution, "agentless")
-	assert.Regexp(t, regexp.MustCompile(`; Managed; Unprivileged; FIPS; agentless\)$`), ua3)
+	assert.Regexp(t, `; Managed; Unprivileged; FIPS; agentless\)$`, ua3)
 
 	ua4 := UserAgentWithBeatTelemetry("FakeBeat", v, mode, unprivileged, isFIPSDistribution, "agentless", " test ", "   ", "\r\n\t")
-	assert.Regexp(t, regexp.MustCompile(`; Managed; Unprivileged; FIPS; agentless; test\)$`), ua4)
+	assert.Regexp(t, `; Managed; Unprivileged; FIPS; agentless; test\)$`, ua4)
 }

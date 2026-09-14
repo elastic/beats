@@ -60,11 +60,11 @@ func TestPutRenames(t *testing.T) {
 
 	a := mapstr.M{}
 	err := Put(a, "com.docker.swarm.task", "x")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	err = Put(a, "com.docker.swarm.task.id", 1)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	err = Put(a, "com.docker.swarm.task.name", "foobar")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(mapstr.M{"com": mapstr.M{"docker": mapstr.M{"swarm": mapstr.M{
 		"task": mapstr.M{
 			"id":    1,
@@ -75,11 +75,11 @@ func TestPutRenames(t *testing.T) {
 	// order is not important:
 	b := mapstr.M{}
 	err = Put(b, "com.docker.swarm.task.id", 1)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	err = Put(b, "com.docker.swarm.task.name", "foobar")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	err = Put(b, "com.docker.swarm.task", "x")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(mapstr.M{"com": mapstr.M{"docker": mapstr.M{"swarm": mapstr.M{
 		"task": mapstr.M{
 			"id":    1,

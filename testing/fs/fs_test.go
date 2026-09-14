@@ -31,7 +31,9 @@ import (
 func TestTempDir(t *testing.T) {
 	t.Run("temp dir is created using os.TempDir", func(t *testing.T) {
 		tempDir := TempDir(t)
-		osTempDir := os.TempDir()
+		// On macOS $TMPDIR has a trailing slash, which os.TempDir returns
+		// verbatim, while filepath.Dir never returns a trailing slash.
+		osTempDir := filepath.Clean(os.TempDir())
 
 		baseDir := filepath.Dir(tempDir)
 		if baseDir != osTempDir {
@@ -63,6 +65,7 @@ func TestTempDirIsKeptOnTestFailure(t *testing.T) {
 		// 2. Use it when calling TempDir
 		// 3. Create a file just to ensure this actually run
 		tmpDir := TempDir(t, rootDir)
+		//nolint:gosec // G703: the root dir is set by the parent test process, it is test-owned
 		if err := os.WriteFile(filepath.Join(tmpDir, tempFilename), []byte("it works\n"), 0x666); err != nil {
 			t.Fatalf("cannot write temp file: %s", err)
 		}
@@ -121,7 +124,7 @@ func TestTempDirIsKeptOnTestFailure(t *testing.T) {
 		}
 	}
 
-	stat, err := os.Stat(tempFolder)
+	stat, err := os.Stat(tempFolder) //nolint:gosec // G703: the path is reported by the test subprocess, it is test-owned
 	if err != nil {
 		t.Fatalf("cannot stat created temp folder: %s", err)
 	}
@@ -130,11 +133,13 @@ func TestTempDirIsKeptOnTestFailure(t *testing.T) {
 		t.Errorf("%s must be a directory", tempFolder)
 	}
 
+	//nolint:gosec // G703: the path is reported by the test subprocess, it is test-owned
 	if _, err = os.Stat(filepath.Join(tempFolder, tempFilename)); err != nil {
 		t.Fatalf("cannot stat file create by subprocess: %s", err)
 	}
 
 	// Be nice and cleanup
+	//nolint:gosec // G703: the path is reported by the test subprocess, it is test-owned
 	if err := os.RemoveAll(tempFolder); err != nil {
 		t.Fatalf("cannot remove created folders: %s", err)
 	}

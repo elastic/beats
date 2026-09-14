@@ -139,7 +139,8 @@ func makeKeyCertPair(t testing.TB, blockType int, password string) (string, stri
 		}
 	case blockTypePKCS1Encrypted:
 		var err error
-		block, err = x509.EncryptPEMBlock(rand.Reader, "RSA PRIVATE KEY", x509.MarshalPKCS1PrivateKey(key), []byte(password), x509.PEMCipherAES256) //nolint:staticcheck // we need to support encrypted private keys
+		//nolint:staticcheck // we need to drop support for this, but while we don't, it needs to be tested.
+		block, err = x509.EncryptPEMBlock(rand.Reader, "RSA PRIVATE KEY", x509.MarshalPKCS1PrivateKey(key), []byte(password), x509.PEMCipherAES256)
 		require.NoError(t, err)
 	case blockTypePKCS8Encrypted:
 		//TODO: this uses an elastic implementation of pkcs8 as the stdlib does not support password protected pkcs8

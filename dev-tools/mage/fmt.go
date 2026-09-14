@@ -54,7 +54,7 @@ func (GoImports) Run() error {
 		return nil
 	}
 
-	fmt.Println(">> fmt - goimports: Formatting Go code") //nolint:forbidigo // it's a mage target
+	fmt.Println(">> fmt - goimports: Formatting Go code")
 	args := append(
 		[]string{"-local", GoImportsLocalPrefix, "-l", "-w"},
 		goFiles...,

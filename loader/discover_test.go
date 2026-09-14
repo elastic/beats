@@ -35,7 +35,7 @@ func TestDiscover(t *testing.T) {
 	) {
 		r, err := DiscoverFiles(filepath.Join(dst, "hel*"))
 		require.NoError(t, err)
-		assert.Equal(t, 2, len(r))
+		assert.Len(t, r, 2)
 	}))
 
 	t.Run("support direct file", withFiles([]string{"hello", "helllooo"}, func(
@@ -44,7 +44,7 @@ func TestDiscover(t *testing.T) {
 	) {
 		r, err := DiscoverFiles(filepath.Join(dst, "hello"))
 		require.NoError(t, err)
-		assert.Equal(t, 1, len(r))
+		assert.Len(t, r, 1)
 	}))
 
 	t.Run("support direct file and pattern", withFiles([]string{"hello", "helllooo", agentConfigFile}, func(
@@ -56,7 +56,7 @@ func TestDiscover(t *testing.T) {
 			filepath.Join(dst, agentConfigFile),
 		)
 		require.NoError(t, err)
-		assert.Equal(t, 3, len(r))
+		assert.Len(t, r, 3)
 	}))
 
 	t.Run("support direct file and pattern", withFiles([]string{"hello", "helllooo", agentConfigFile}, func(
@@ -65,7 +65,7 @@ func TestDiscover(t *testing.T) {
 	) {
 		r, err := DiscoverFiles(filepath.Join(dst, "donotmatch.yml"))
 		require.NoError(t, err)
-		assert.Equal(t, 0, len(r))
+		assert.Empty(t, r)
 	}))
 }
 

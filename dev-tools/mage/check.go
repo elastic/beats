@@ -102,6 +102,7 @@ func GitDiffIndex() ([]string, error) {
 
 // GitDiff runs 'git diff' and writes the output to stdout.
 func GitDiff() error {
+	//nolint:noctx // valid use since there is no context
 	c := exec.Command("git", "--no-pager", "diff", "--minimal")
 	c.Stdin = nil
 	c.Stdout = os.Stdout

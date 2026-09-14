@@ -66,7 +66,7 @@ func TestClientConfigValdiate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.c.Validate()
 			if tt.err == nil {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			} else {
 				assert.EqualError(t, err, tt.err.Error())
 			}

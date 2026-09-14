@@ -69,6 +69,7 @@ func GetGoMetrics(parent *monitoring.Registry, name string, logger *logp.Logger,
 // NewGoMetrics creates and registers a new GoMetricsRegistry with the parent
 // registry.
 func NewGoMetrics(parent *monitoring.Registry, name string, logger *logp.Logger, filters ...MetricFilter) *GoMetricsRegistry {
+	//nolint:staticcheck // NewGoMetrics is documented to create a new registry and panic if the name is taken; GetOrCreateRegistry would silently reuse it. Use GetGoMetrics for that.
 	return newGoMetrics(parent.NewRegistry(name, monitoring.IgnorePublishExpvar), logger, filters...)
 }
 

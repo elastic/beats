@@ -97,7 +97,7 @@ func TestOverrideWithCloudSettings(t *testing.T) {
 			err := OverrideWithCloudSettings(cfg)
 
 			test.errAssertionFunc(t, err)
-			assert.EqualValues(t, expected, cfg)
+			assert.Equal(t, expected, cfg)
 		})
 	}
 }

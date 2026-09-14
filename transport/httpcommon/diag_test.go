@@ -148,7 +148,7 @@ func Test_HTTPRequestOnHTTPSPort(t *testing.T) {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://google.com:443", nil)
 	require.NoError(t, err)
-	_, err = (&http.Client{}).Do(req) //nolint:bodyclose // expected to return an error
+	_, err = (&http.Client{}).Do(req)
 	require.Error(t, err)
 
 	var nErr *net.OpError
@@ -196,7 +196,7 @@ func Test_diagError(t *testing.T) {
 		srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
-		srv.TLS = &tls.Config{ //nolint:gosec //used for tests
+		srv.TLS = &tls.Config{
 			Certificates: []tls.Certificate{crt},
 		}
 		srv.StartTLS()
@@ -208,7 +208,7 @@ func Test_diagError(t *testing.T) {
 
 		client := http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{ //nolint:gosec //used for tests
+				TLSClientConfig: &tls.Config{
 					RootCAs: pool,
 				},
 			},
@@ -227,7 +227,7 @@ func Test_diagError(t *testing.T) {
 		srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
-		srv.TLS = &tls.Config{ //nolint:gosec //used for tests
+		srv.TLS = &tls.Config{
 			Certificates: []tls.Certificate{crt},
 			ClientAuth:   tls.RequireAndVerifyClientCert,
 		}
@@ -240,7 +240,7 @@ func Test_diagError(t *testing.T) {
 
 		client := http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{ //nolint:gosec //used for tests
+				TLSClientConfig: &tls.Config{
 					RootCAs: pool,
 				},
 			},
@@ -263,7 +263,7 @@ func Test_diagError(t *testing.T) {
 		srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
-		srv.TLS = &tls.Config{ //nolint:gosec //used for tests
+		srv.TLS = &tls.Config{
 			Certificates: []tls.Certificate{crt},
 			ClientAuth:   tls.RequireAndVerifyClientCert,
 			ClientCAs:    serverPool,
@@ -277,7 +277,7 @@ func Test_diagError(t *testing.T) {
 
 		client := http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{ //nolint:gosec //used for tests
+				TLSClientConfig: &tls.Config{
 					Certificates: []tls.Certificate{clientCrt},
 					RootCAs:      pool,
 				},

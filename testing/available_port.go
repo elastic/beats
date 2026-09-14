@@ -17,7 +17,10 @@
 
 package testing
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
 // AvailableTCP4Port returns an unused TCP port for 127.0.0.1.
 func AvailableTCP4Port() (uint16, error) {
@@ -32,7 +35,10 @@ func AvailableTCP4Port() (uint16, error) {
 	}
 	defer listener.Close()
 
-	tcpAddr := uint16(listener.Addr().(*net.TCPAddr).Port)
+	tcpAddr, ok := listener.Addr().(*net.TCPAddr)
+	if !ok {
+		return 0, fmt.Errorf("unexpected listener address type %T", listener.Addr())
+	}
 
-	return tcpAddr, nil
+	return uint16(tcpAddr.Port), nil //nolint:gosec // G115: a TCP port is always in the 0-65535 range
 }

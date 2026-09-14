@@ -37,19 +37,19 @@ func TestStringMarshalingS(t *testing.T) {
 	s := NewSecureString(secret)
 	v := fmt.Sprintf("%s", s) //nolint: staticcheck // the goal of the test is to check if the string is not printed
 
-	assert.Equal(t, v, "<SecureString>")
+	assert.Equal(t, "<SecureString>", v)
 }
 
 func TestStringMarshalingF(t *testing.T) {
 	s := NewSecureString(secret)
 	v := fmt.Sprintf("%v", s)
 
-	assert.Equal(t, v, "<SecureString>")
+	assert.Equal(t, "<SecureString>", v)
 }
 
 func TestStringGoStringerMarshaling(t *testing.T) {
 	s := NewSecureString(secret)
 	v := fmt.Sprintf("%#v", s)
 
-	assert.Equal(t, v, "<SecureString>")
+	assert.Equal(t, "<SecureString>", v)
 }

@@ -132,7 +132,7 @@ func runCommand(env map[string]string, cmd string, outputFile string, args ...st
 	var stdOut io.Writer
 	var stdErr io.Writer
 	if outputFile != "" {
-		fileOutput, err := os.Create(createDir(outputFile))
+		fileOutput, err := os.Create(createDir(outputFile)) //nolint:gosec // G703: OUTPUT is a trusted build-time env var, not untrusted input
 		if err != nil {
 			return false, fmt.Errorf("failed to create %s output file: %w", cmd, err)
 		}
@@ -154,6 +154,7 @@ func runCommand(env map[string]string, cmd string, outputFile string, args ...st
 // createDir creates the parent directory for the given file.
 func createDir(file string) string {
 	// Create the output directory.
+	//nolint:gosec // G703,G706: the file path is a trusted build-time env var, not untrusted input
 	if dir := filepath.Dir(file); dir != "." {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			log.Fatalf("Failed to create parent dir for %s", file)

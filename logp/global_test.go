@@ -52,7 +52,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.InfoLevel, logs[0].Level)
-		assert.Equal(t, "", logs[0].LoggerName)
+		assert.Empty(t, logs[0].LoggerName)
 		assert.Equal(t, "info", logs[0].Message)
 	}
 
@@ -60,7 +60,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.WarnLevel, logs[0].Level)
-		assert.Equal(t, "", logs[0].LoggerName)
+		assert.Empty(t, logs[0].LoggerName)
 		assert.Equal(t, "warning", logs[0].Message)
 	}
 
@@ -68,7 +68,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.ErrorLevel, logs[0].Level)
-		assert.Equal(t, "", logs[0].LoggerName)
+		assert.Empty(t, logs[0].LoggerName)
 		assert.Equal(t, "error", logs[0].Message)
 	}
 
@@ -76,7 +76,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.ErrorLevel, logs[0].Level)
-		assert.Equal(t, "", logs[0].LoggerName)
+		assert.Empty(t, logs[0].LoggerName)
 		assert.Equal(t, "critical", logs[0].Message)
 	}
 }

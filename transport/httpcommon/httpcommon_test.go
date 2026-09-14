@@ -242,7 +242,7 @@ func BenchmarkReadAll(b *testing.B) {
 							require.NoError(b, err)
 							data, err := io.ReadAll(tc.resp.Body)
 							require.NoError(b, err)
-							require.Equalf(b, size, len(data), "size does not match, expected %d, actual %d", size, len(data))
+							require.Lenf(b, data, size, "size does not match, expected %d, actual %d", size, len(data))
 						}
 					})
 					b.Run("bytes.Buffer+io.Copy", func(b *testing.B) {
@@ -251,7 +251,7 @@ func BenchmarkReadAll(b *testing.B) {
 							require.NoError(b, err)
 							data, err := ReadAll(tc.resp)
 							require.NoError(b, err)
-							require.Equalf(b, size, len(data), "size does not match, expected %d, actual %d", size, len(data))
+							require.Lenf(b, data, size, "size does not match, expected %d, actual %d", size, len(data))
 						}
 					})
 				})
@@ -502,7 +502,7 @@ func Test_HTTPAuthorization_ToMap(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			results := tc.auth.ToMap()
-			require.EqualValues(t, tc.expect, results)
+			require.Equal(t, tc.expect, results)
 		})
 	}
 }

@@ -52,7 +52,7 @@ func makeListener(cfg Config) (net.Listener, error) {
 		}
 	}
 
-	l, err := net.Listen(network, path)
+	l, err := net.Listen(network, path) //nolint:noctx // no context is available here; the listener's lifetime is managed by the Server
 	if err != nil {
 		return nil, err
 	}

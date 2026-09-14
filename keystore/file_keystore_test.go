@@ -45,8 +45,8 @@ func TestCanCreateAKeyStore(t *testing.T) {
 	writableKeystore, err := AsWritableKeystore(keyStore)
 	require.NoError(t, err)
 
-	require.Nil(t, writableKeystore.Store(keyValue, secretValue))
-	require.Nil(t, writableKeystore.Save())
+	require.NoError(t, writableKeystore.Store(keyValue, secretValue))
+	require.NoError(t, writableKeystore.Save())
 }
 
 func TestCanReadAnExistingKeyStoreWithEmptyString(t *testing.T) {
@@ -165,7 +165,7 @@ func TestReturnsUsedKeysInTheStore(t *testing.T) {
 	keys, err := listingKeystore.List()
 
 	require.NoError(t, err)
-	require.Equal(t, len(keys), 1)
+	require.Len(t, keys, 1)
 	require.Equal(t, keys[0], keyValue)
 }
 
@@ -235,7 +235,7 @@ func TestGetConfig(t *testing.T) {
 
 	port, err := cfg.String("super.nested", 0)
 	require.NoError(t, err)
-	require.Equal(t, port, "hello")
+	require.Equal(t, "hello", port)
 }
 
 func TestMissingEncryptedBlock(t *testing.T) {
@@ -334,10 +334,10 @@ func GetTemporaryKeystoreFile(t *testing.T) string {
 
 func TestRandomBytesLength(t *testing.T) {
 	r1, _ := randomBytes(5)
-	require.Equal(t, len(r1), 5)
+	require.Len(t, r1, 5)
 
 	r2, _ := randomBytes(4)
-	require.Equal(t, len(r2), 4)
+	require.Len(t, r2, 4)
 	require.NotEqual(t, string(r1[:]), string(r2[:]))
 }
 

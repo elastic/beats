@@ -335,7 +335,7 @@ func TestRetryWithBody(t *testing.T) {
 	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		n := requestCount.Add(1)
 		body, _ := io.ReadAll(r.Body)
-		assert.Equal(t, payload, string(body), "body must be identical on every attempt")
+		assert.Equal(t, payload, string(body), "body must be identical on every attempt") //nolint:testifylint // exact byte equality is the point of this test
 		if n < 2 {
 			w.WriteHeader(http.StatusBadGateway)
 			return

@@ -46,7 +46,7 @@ func TestNetDialer(d testing.Driver, timeout time.Duration) Dialer {
 		if err != nil {
 			return nil, err
 		}
-		addresses, err := net.LookupHost(host)
+		addresses, err := net.DefaultResolver.LookupHost(ctx, host)
 		d.Fatal("dns lookup", err)
 		d.Info("addresses", strings.Join(addresses, ", "))
 		if err != nil {
@@ -69,6 +69,7 @@ func UnixDialer(timeout time.Duration, sockFile string) Dialer {
 func TestUnixDialer(d testing.Driver, timeout time.Duration, sockFile string) Dialer {
 	return DialerFunc(func(ctx context.Context, network, address string) (net.Conn, error) {
 		d.Info("connecting using unix domain socket", sockFile)
-		return net.DialTimeout("unix", sockFile, timeout)
+		dialer := &net.Dialer{Timeout: timeout}
+		return dialer.DialContext(ctx, "unix", sockFile)
 	})
 }

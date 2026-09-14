@@ -33,7 +33,7 @@ func TestEmptyTlsConfig(t *testing.T) {
 	cfg, err := load("")
 	assert.NoError(t, err)
 
-	assert.Equal(t, cfg, &Config{})
+	assert.Equal(t, &Config{}, cfg)
 }
 
 func TestLoadWithEmptyValues(t *testing.T) {
@@ -51,7 +51,7 @@ func TestLoadWithEmptyValues(t *testing.T) {
   `)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg, &Config{})
+	assert.Equal(t, &Config{}, cfg)
 }
 
 func TestNoLoadNilConfig(t *testing.T) {
@@ -110,11 +110,11 @@ func TestApplyEmptyConfig(t *testing.T) {
 	cfg := tmp.BuildModuleClientConfig("")
 	assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 	assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
-	assert.Len(t, cfg.Certificates, 0)
+	assert.Empty(t, cfg.Certificates)
 	assert.Nil(t, cfg.RootCAs)
-	assert.Equal(t, true, cfg.InsecureSkipVerify)
-	assert.Len(t, cfg.CipherSuites, 0)
-	assert.Len(t, cfg.CurvePreferences, 0)
+	assert.True(t, cfg.InsecureSkipVerify)
+	assert.Empty(t, cfg.CipherSuites)
+	assert.Empty(t, cfg.CurvePreferences)
 	assert.Equal(t, tls.RenegotiateNever, cfg.Renegotiation)
 }
 
@@ -149,7 +149,7 @@ func TestApplyWithConfig(t *testing.T) {
 	} else {
 		assert.NotNil(t, cfg.VerifyConnection, "expected non-nil VerifyConnection for VerifyNone in FIPS builds")
 	}
-	assert.Equal(t, true, cfg.InsecureSkipVerify)
+	assert.True(t, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 	assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
@@ -174,12 +174,12 @@ key: mykey.pem
 
 		assert.NotNil(t, cfg)
 		// values not set by default
-		assert.Len(t, cfg.Certificates, 0)
+		assert.Empty(t, cfg.Certificates)
 		assert.Nil(t, cfg.ClientCAs)
-		assert.Len(t, cfg.CipherSuites, 0)
-		assert.Len(t, cfg.CurvePreferences, 0)
+		assert.Empty(t, cfg.CipherSuites)
+		assert.Empty(t, cfg.CurvePreferences)
 		// values set by default
-		assert.Equal(t, true, cfg.InsecureSkipVerify)
+		assert.True(t, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 		assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 		assert.Equal(t, tls.NoClientCert, cfg.ClientAuth)
@@ -205,15 +205,15 @@ key: mykey.pem
 
 		assert.NotNil(t, cfg)
 		// values not set by default
-		assert.Len(t, cfg.Certificates, 0)
+		assert.Empty(t, cfg.Certificates)
 		// ClientCAs is populated from the provider's initial pool. Go ignores it when
 		// InsecureSkipVerify=true; CA verification is done via VerifyConnection instead.
 		assert.NotNil(t, cfg.ClientCAs)
 		assert.NotNil(t, cfg.VerifyConnection, "expected VerifyConnection to enforce CA validation with dynamic CA provider")
-		assert.Len(t, cfg.CipherSuites, 0)
-		assert.Len(t, cfg.CurvePreferences, 0)
+		assert.Empty(t, cfg.CipherSuites)
+		assert.Empty(t, cfg.CurvePreferences)
 		// values set by default
-		assert.Equal(t, true, cfg.InsecureSkipVerify)
+		assert.True(t, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 		assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 		assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
@@ -267,7 +267,7 @@ func TestApplyWithServerConfig(t *testing.T) {
 	} else {
 		assert.NotNil(t, cfg.VerifyConnection, "expected non-nil VerifyConnection for VerifyNone in FIPS builds")
 	}
-	assert.Equal(t, true, cfg.InsecureSkipVerify)
+	assert.True(t, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 	assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))

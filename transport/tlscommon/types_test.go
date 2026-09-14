@@ -55,7 +55,7 @@ func TestLoadWithEmptyStringVerificationMode(t *testing.T) {
   `)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.VerificationMode, VerifyFull)
+	assert.Equal(t, VerifyFull, cfg.VerificationMode)
 }
 
 func TestLoadUnsupportedProtocols(t *testing.T) {
@@ -83,7 +83,7 @@ func TestLoadWithEmptyVerificationMode(t *testing.T) {
   `)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.VerificationMode, VerifyFull)
+	assert.Equal(t, VerifyFull, cfg.VerificationMode)
 }
 
 func TestRepackConfig(t *testing.T) {
@@ -106,14 +106,14 @@ func TestRepackConfig(t *testing.T) {
   `)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.VerificationMode, VerifyCertificate)
+	assert.Equal(t, VerifyCertificate, cfg.VerificationMode)
 
 	tmp, err := ucfg.NewFrom(cfg)
 	assert.NoError(t, err)
 
 	err = tmp.Unpack(cfg)
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.VerificationMode, VerifyCertificate)
+	assert.Equal(t, VerifyCertificate, cfg.VerificationMode)
 }
 
 func TestRepackConfigFromJSON(t *testing.T) {
@@ -132,14 +132,14 @@ func TestRepackConfigFromJSON(t *testing.T) {
   }`)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.VerificationMode, VerifyCertificate)
+	assert.Equal(t, VerifyCertificate, cfg.VerificationMode)
 
 	tmp, err := ucfg.NewFrom(cfg)
 	assert.NoError(t, err)
 
 	err = tmp.Unpack(cfg)
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.VerificationMode, VerifyCertificate)
+	assert.Equal(t, VerifyCertificate, cfg.VerificationMode)
 }
 
 func TestTLSClientAuthUnpack(t *testing.T) {

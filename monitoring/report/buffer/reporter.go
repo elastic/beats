@@ -55,10 +55,10 @@ func MakeReporter(cfg *c.C) (*reporter, error) {
 		entries:    map[string]*ringBuffer{},
 	}
 
-	for _, ns := range r.config.Namespaces {
+	for _, ns := range r.Namespaces {
 		reg := monitoring.GetNamespace(ns).GetRegistry()
 		r.registries[ns] = reg
-		r.entries[ns] = newBuffer(r.config.Size)
+		r.entries[ns] = newBuffer(r.Size)
 	}
 
 	r.wg.Add(1)
@@ -78,7 +78,7 @@ func (r *reporter) Stop() {
 
 // snapshotLoop will collect a snapshot for each monitored registry for the configured period and store them in the correct buffer.
 func (r *reporter) snapshotLoop() {
-	ticker := time.NewTicker(r.config.Period)
+	ticker := time.NewTicker(r.Period)
 	defer ticker.Stop()
 
 	for {

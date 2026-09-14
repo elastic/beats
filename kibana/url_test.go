@@ -18,7 +18,6 @@
 package kibana
 
 import (
-	"fmt"
 	"net/url"
 	"testing"
 
@@ -80,9 +79,10 @@ func TestGetUrl(t *testing.T) {
 	for input, output := range inputOutput {
 		urlNew, err := MakeURL("", "", input, 9200)
 		assert.NoError(t, err)
-		assert.Equal(t, output, urlNew, fmt.Sprintf("input: %v", input))
+		assert.Equal(t, output, urlNew, "input: %v", input)
 	}
 
+	//nolint:gosec // G101: fake credentials for testing
 	inputOutputWithDefaults := map[string]string{
 		"http://localhost":                          "http://localhost:9200/hello",
 		"http://localhost/test":                     "http://localhost:9200/test",
