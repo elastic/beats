@@ -1,0 +1,25 @@
+kind: bug-fix
+
+summary: Reject Kafka `sasl.mechanism: OAUTHBEARER` with username/password at startup to prevent silent SASL/PLAIN authentication.
+
+description: |
+  OAUTHBEARER passed config validation but was never wired into the Sarama
+  client. Because callers enable SASL before configuring the mechanism, and
+  Sarama's zero-value mechanism is PLAIN, a Kafka client configured for
+  OAUTHBEARER with a username/password authenticated with SASL/PLAIN instead,
+  sending the configured password to the broker.
+
+  OAUTHBEARER without username/password is now accepted and treated as a noop
+  (SASL is not enabled), which aligns with the expected future implementation.
+
+impact: |
+  Configuring `sasl.mechanism: OAUTHBEARER` alongside `username`/`password` is
+  now a startup error rather than a silent downgrade to SASL/PLAIN.
+
+action: |
+  If you configured `sasl.mechanism: OAUTHBEARER` with a `username` and
+  `password`, you were already authenticating with SASL/PLAIN. Set
+  `sasl.mechanism: PLAIN` explicitly, and rotate the password if it was sent
+  over a connection without TLS.
+
+component: libbeat

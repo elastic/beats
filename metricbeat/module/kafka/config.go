@@ -49,5 +49,5 @@ func (c *metricsetConfig) Validate() error {
 		return fmt.Errorf("password must be set when username is configured")
 	}
 
-	return nil
+	return c.Sasl.ValidateWithUsername(c.Username)
 }

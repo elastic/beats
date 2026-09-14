@@ -174,6 +174,10 @@ func (c *KafkaConfig) Validate() error {
 		return fmt.Errorf("password must be set when username is configured")
 	}
 
+	if err := c.Sasl.ValidateWithUsername(c.Username); err != nil {
+		return err
+	}
+
 	if c.Compression == "gzip" {
 		lvl := c.CompressionLevel
 		if lvl != sarama.CompressionLevelDefault && !(0 <= lvl && lvl <= 9) {

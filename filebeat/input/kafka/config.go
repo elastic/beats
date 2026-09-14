@@ -156,7 +156,8 @@ func (c *kafkaInputConfig) Validate() error {
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
 	}
-	return nil
+
+	return c.Sasl.ValidateWithUsername(c.Username)
 }
 
 func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Config, error) {
