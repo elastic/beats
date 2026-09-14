@@ -23,8 +23,9 @@ import (
 	"crypto/sha512"
 	"hash"
 
-	"github.com/elastic/sarama"
 	"github.com/xdg-go/scram"
+
+	"github.com/elastic/sarama"
 )
 
 // SHA256 and SHA512 are the hash generators used with SCRAM-SHA-256 and SCRAM-SHA-512 respectively.
@@ -42,11 +43,11 @@ type XDGSCRAMClient struct {
 }
 
 func (x *XDGSCRAMClient) Begin(userName, password, authzID string) (err error) {
-	x.Client, err = x.HashGeneratorFcn.NewClient(userName, password, authzID)
+	x.Client, err = x.NewClient(userName, password, authzID)
 	if err != nil {
 		return err
 	}
-	x.ClientConversation = x.Client.NewConversation()
+	x.ClientConversation = x.NewConversation()
 	return nil
 }
 
