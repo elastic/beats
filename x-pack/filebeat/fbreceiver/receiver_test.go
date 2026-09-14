@@ -191,7 +191,7 @@ func TestReceiverRecreatesAutodiscoverBuilders(t *testing.T) {
 		require.NoErrorf(t, err, "failed to create receiver on attempt %d", attempt+1)
 		require.NoErrorf(t, receiver.Start(t.Context(), componenttest.NewNopHost()), "failed to start receiver on attempt %d", attempt+1)
 		require.Eventuallyf(t, func() bool {
-			return builderCalls.Load() == int32(attempt+1)
+			return builderCalls.Load() == int32(attempt+1) //nolint:gosec // attempt is bounded by a small loop count
 		}, 5*time.Second, 10*time.Millisecond, "expected Registry.BuildBuilder to invoke the registered builder on attempt %d", attempt+1)
 		require.NoErrorf(t, receiver.Shutdown(t.Context()), "failed to shut down receiver on attempt %d", attempt+1)
 	}
