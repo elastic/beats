@@ -10,8 +10,6 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -45,9 +43,10 @@ func createExtension(
 	if !ok {
 		return nil, fmt.Errorf("could not convert otel config to elasticsearchclient config")
 	}
-	logger := logp.NewLogger("", zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return set.Logger.Named(componentType).Core()
-	}))
+	logger, err := logp.NewZapLogger(set.Logger.Named(componentType))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create logger: %w", err)
+	}
 
 	return &elasticsearchClient{
 		cfg:    config,

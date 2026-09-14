@@ -128,7 +128,8 @@ func newRaceFakeES() *raceFakeES {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = fmt.Fprintf(w, `{"ok":true,"token":%q}`, token)
+		response, _ := json.Marshal(map[string]any{"ok": true, "token": token})
+		_, _ = w.Write(response)
 	}))
 	return f
 }
