@@ -113,8 +113,8 @@ func TestNewReceiver(t *testing.T) {
 				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
 			assert.Condition(c, func() bool {
-				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+				metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+				return assert.NotEmpty(t, metricsSkipped.All(), "metric reporter did not initialize")
 			}, "failed to check metrics logging")
 		},
 	})
@@ -191,7 +191,7 @@ func TestReceiverRecreatesAutodiscoverBuilders(t *testing.T) {
 		require.NoErrorf(t, err, "failed to create receiver on attempt %d", attempt+1)
 		require.NoErrorf(t, receiver.Start(t.Context(), componenttest.NewNopHost()), "failed to start receiver on attempt %d", attempt+1)
 		require.Eventuallyf(t, func() bool {
-			return builderCalls.Load() == int32(attempt+1)
+			return builderCalls.Load() == int32(attempt+1) //nolint:gosec // attempt is bounded by a small loop count
 		}, 5*time.Second, 10*time.Millisecond, "expected Registry.BuildBuilder to invoke the registered builder on attempt %d", attempt+1)
 		require.NoErrorf(t, receiver.Shutdown(t.Context()), "failed to shut down receiver on attempt %d", attempt+1)
 	}
@@ -370,8 +370,8 @@ func TestMultipleReceivers(t *testing.T) {
 				startLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
 				assert.Equalf(c, 1, startLogs.Len(), "%v should have a single start log", helper)
 
-				startMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
-				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single start metrircs logging every 30s", helper)
+				startMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+helper.name))
+				assert.Equalf(c, 1, startMetricsLogs.Len(), "%v should have a single skipping metrics logging entry", helper)
 
 				metaPath := filepath.Join(helper.home, "/data/meta.json")
 				assert.FileExistsf(c, metaPath, "%s of %v should exist", metaPath, helper)
