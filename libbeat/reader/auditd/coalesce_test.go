@@ -23,6 +23,7 @@ import (
 	"errors"
 	"io"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -441,6 +442,69 @@ func TestCoalescingUserKeyMapping(t *testing.T) {
 	}
 	if _, err := msg.Fields.GetValue("auditd.user.names"); err == nil {
 		t.Error("auditd.user.names still present; want absent")
+	}
+}
+
+func TestCoalescingRawMessages(t *testing.T) {
+	lines := [][]byte{
+		[]byte(`type=SYSCALL msg=audit(1626700000.000:110): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=1 pid=110 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="id" exe="/usr/bin/id" key=(null)`),
+		[]byte(`type=EXECVE msg=audit(1626700000.000:110): argc=1 a0="id"`),
+		[]byte(`type=EOE msg=audit(1626700000.000:110):`),
+	}
+	cfg := coalesceConfig()
+	cfg.IncludeRawMessage = true
+	r := &testReader{messages: lines}
+	p := NewParser(r, cfg, logptest.NewTestingLogger(t, t.Name()))
+
+	msg, err := p.Next()
+	if err != nil {
+		t.Fatalf("Next() returned error: %v", err)
+	}
+
+	// auditd.messages must hold the two non-EOE records as "type=X msg=..." strings.
+	raw, err := msg.Fields.GetValue("auditd.messages")
+	if err != nil {
+		t.Fatalf("auditd.messages absent: %v", err)
+	}
+	rawSlice, ok := raw.([]string)
+	if !ok {
+		t.Fatalf("auditd.messages type = %T; want []string", raw)
+	}
+	if len(rawSlice) == 0 {
+		t.Fatal("auditd.messages is empty")
+	}
+	for _, s := range rawSlice {
+		if !strings.HasPrefix(s, "type=") {
+			t.Errorf("auditd.messages entry %q does not start with type=", s)
+		}
+	}
+
+	// msg.Content must be non-empty so the message field is set.
+	if len(msg.Content) == 0 {
+		t.Error("msg.Content is empty; want raw audit records joined with newline")
+	}
+}
+
+func TestCoalescingRawMessagesDisabled(t *testing.T) {
+	lines := [][]byte{
+		[]byte(`type=SYSCALL msg=audit(1626700000.000:111): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=1 pid=111 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="id" exe="/usr/bin/id" key=(null)`),
+		[]byte(`type=EOE msg=audit(1626700000.000:111):`),
+	}
+	cfg := coalesceConfig()
+	cfg.IncludeRawMessage = false
+	r := &testReader{messages: lines}
+	p := NewParser(r, cfg, logptest.NewTestingLogger(t, t.Name()))
+
+	msg, err := p.Next()
+	if err != nil {
+		t.Fatalf("Next() returned error: %v", err)
+	}
+
+	if _, err := msg.Fields.GetValue("auditd.messages"); err == nil {
+		t.Error("auditd.messages present; want absent when IncludeRawMessage=false")
+	}
+	if len(msg.Content) != 0 {
+		t.Errorf("msg.Content = %q; want empty when IncludeRawMessage=false", msg.Content)
 	}
 }
 

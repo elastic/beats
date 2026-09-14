@@ -50,8 +50,9 @@ type coalescingParser struct {
 }
 
 type pendingEvent struct {
-	evt   *aucoalesce.Event
-	bytes int
+	evt     *aucoalesce.Event
+	bytes   int
+	rawMsgs []string // populated when cfg.IncludeRawMessage is true
 }
 
 var (
@@ -100,7 +101,15 @@ func (p *coalescingParser) ReassemblyComplete(msgs []*auparse.AuditMessage) {
 	if p.cfg.ResolveIDs {
 		aucoalesce.ResolveIDs(evt)
 	}
-	p.pending = append(p.pending, pendingEvent{evt: evt})
+	pe := pendingEvent{evt: evt}
+	if p.cfg.IncludeRawMessage {
+		rawMsgs := make([]string, 0, len(msgs))
+		for _, m := range msgs {
+			rawMsgs = append(rawMsgs, "type="+m.RecordType.String()+" msg="+m.RawData)
+		}
+		pe.rawMsgs = rawMsgs
+	}
+	p.pending = append(p.pending, pe)
 }
 
 // EventsLost implements libaudit.Stream. It is called when sequence gaps are
@@ -134,7 +143,7 @@ func (p *coalescingParser) Next() (reader.Message, error) {
 			pe := p.pending[0]
 			p.pending[0] = pendingEvent{} // allow GC
 			p.pending = p.pending[1:]
-			return p.eventToMessage(pe.evt, pe.bytes), nil
+			return p.eventToMessage(pe), nil
 		}
 
 		// Flush timed-out groups.
@@ -207,13 +216,14 @@ func (p *coalescingParser) distributeBytesRead() {
 	p.bytesRead = perGroup * inflight
 }
 
-// eventToMessage converts a coalesced aucoalesce.Event into a reader.Message
+// eventToMessage converts a coalesced pendingEvent into a reader.Message
 // with fields matching the auditd_manager integration's output namespace
 // (auditd.data.*, auditd.summary.*, etc.) plus ECS root fields.
-func (p *coalescingParser) eventToMessage(evt *aucoalesce.Event, bytes int) reader.Message {
+func (p *coalescingParser) eventToMessage(pe pendingEvent) reader.Message {
+	evt := pe.evt
 	msg := reader.Message{
 		Ts:    evt.Timestamp,
-		Bytes: bytes,
+		Bytes: pe.bytes,
 	}
 
 	auditdFields := mapstr.M{
@@ -244,6 +254,10 @@ func (p *coalescingParser) eventToMessage(evt *aucoalesce.Event, bytes int) read
 			warnings = append(warnings, w.Error())
 		}
 		auditdFields["warnings"] = warnings
+	}
+	if len(pe.rawMsgs) != 0 {
+		auditdFields["messages"] = pe.rawMsgs
+		msg.Content = []byte(strings.Join(pe.rawMsgs, "\n"))
 	}
 
 	addSummaryFields(auditdFields, evt)
