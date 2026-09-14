@@ -42,6 +42,10 @@ import (
 // (see heartbeat/docker-compose.yml); the client authenticates with password
 // auth using the committed testdata/krb5.conf, so no keytab is needed host-side.
 //
+// CI runs this via heartbeat's Ubuntu "Go Integration Tests" step
+// (`mage goIntegTest`), which starts docker-compose then `go test -tags integration`
+// on the host against localhost:8080 / localhost:1088.
+//
 // Run locally with:
 //
 //	cd testing/environments/docker/heartbeat_kerberos && docker build -t hb-kdc:latest .
@@ -102,6 +106,9 @@ func requireReachable(t *testing.T, rawURL string) {
 	var d net.Dialer
 	conn, err := d.DialContext(ctx, "tcp", host)
 	if err != nil {
+		if os.Getenv("CI") != "" {
+			t.Fatalf("SPNEGO target %q not reachable; heartbeat_kerberos should be up via docker-compose in CI: %v", rawURL, err)
+		}
 		t.Skipf("SPNEGO target %q not reachable; start the heartbeat_kerberos fixture first: %v", rawURL, err)
 	}
 	_ = conn.Close()
