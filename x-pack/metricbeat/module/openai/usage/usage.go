@@ -60,7 +60,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sm, err := newStateManager(paths.Resolve(paths.Data, path.Join("state", base.Module().Name(), base.Name())))
+	baseModule, ok := base.Module().(*mb.BaseModule)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type %T", base.Module())
+	}
+
+	sm, err := newStateManager(baseModule.Paths.Resolve(paths.Data, path.Join("state", base.Module().Name(), base.Name())))
 	if err != nil {
 		return nil, fmt.Errorf("create state manager: %w", err)
 	}

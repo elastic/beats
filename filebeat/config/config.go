@@ -121,7 +121,7 @@ func mergeConfigFiles(configFiles []string, config *Config, logger *logp.Logger)
 }
 
 // FetchConfigs fetches and merges all config files given by configDir. All are put into one config object
-func (config *Config) FetchConfigs(logger *logp.Logger) error {
+func (config *Config) FetchConfigs(logger *logp.Logger, beatPaths *paths.Path) error {
 	configDir := config.ConfigDir
 
 	// If option not set, do nothing
@@ -132,7 +132,7 @@ func (config *Config) FetchConfigs(logger *logp.Logger) error {
 	logger.Warn(cfgwarn.Deprecate("7.0.0", "config_dir is deprecated. Use `filebeat.config.inputs` instead."))
 
 	// If configDir is relative, consider it relative to the config path
-	configDir = paths.Resolve(paths.Config, configDir)
+	configDir = beatPaths.Resolve(paths.Config, configDir)
 
 	// Check if optional configDir is set to fetch additional config files
 	logger.Infof("Additional config files are fetched from: %s", configDir)
