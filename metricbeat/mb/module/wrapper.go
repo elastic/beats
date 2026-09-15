@@ -173,7 +173,25 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			defer registry.Remove(metricsPath)
 			defer releaseStats(mw.monitoring.StatsRegistry(), msw.stats)
 			defer wg.Done()
-			defer msw.close()
+
+			// ensure we call msw.close() once
+			var closeOnce sync.Once
+			closeMetricSet := func() { closeOnce.Do(func() { msw.close() }) }
+			defer closeMetricSet()
+
+			// startPeriodicFetching (called by msw.run) performs a synchronous fetch before entering
+			// its select loop, so closing done cannot interrupt a blocked first
+			// Fetch(). The companion goroutine calls close() when done fires,
+			// giving the metricset a chance to unblock itself via Close().
+			stopCompanion := make(chan struct{})
+			defer close(stopCompanion)
+			go func() {
+				select {
+				case <-done:
+					closeMetricSet()
+				case <-stopCompanion:
+				}
+			}()
 
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
 			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())

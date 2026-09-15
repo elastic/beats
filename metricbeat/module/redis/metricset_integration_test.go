@@ -129,7 +129,7 @@ func newDummyMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *dummyMetricSet) Fetch(r mb.ReporterV2) {
 }
 
-func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interface{}) *MetricSet {
+func getMetricSet(t *testing.T, registry *mb.Register, config map[string]any) *MetricSet {
 	t.Helper()
 
 	c, err := conf.NewConfigFrom(config)
@@ -145,8 +145,8 @@ func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interfa
 	return ms.MetricSet
 }
 
-func getConfig(host string, password string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string, password string) map[string]any {
+	return map[string]any{
 		"module":     "redis",
 		"metricsets": "test",
 		"hosts":      []string{host},

@@ -100,6 +100,7 @@ func TestBuildCloudConfig(t *testing.T) {
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
 				config := Config{ResourceManagerEndpoint: test.resourceManagerEndpoint}
+				config.InitDefaults()
 				require.NoError(t, config.Validate(), "known cloud endpoint must validate without a trailing slash")
 				cfg := BuildCloudConfig(config)
 
@@ -141,6 +142,7 @@ func TestBuildCloudConfig(t *testing.T) {
 			ResourceManagerEndpoint: "https://management.microsoftazure.de/",
 			ResourceManagerAudience: "https://management.microsoftazure.de/",
 		}
+		config.InitDefaults()
 		require.NoError(t, config.Validate(), "legacy German cloud configuration must remain valid")
 
 		cfg := BuildCloudConfig(config)

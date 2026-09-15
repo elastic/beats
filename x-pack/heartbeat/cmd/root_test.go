@@ -8,6 +8,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"strings"
@@ -85,7 +86,7 @@ func readRawIn(filename string, rawIn *proto.UnitExpectedConfig) error {
 	return err
 }
 
-func readOut(filename string) (cfg []map[string]interface{}, err error) {
+func readOut(filename string) (cfg []map[string]any, err error) {
 	b, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -103,19 +104,19 @@ func readOut(filename string) (cfg []map[string]interface{}, err error) {
 func TestHeartbeatCfg_BrowserParamsDottedKeys(t *testing.T) {
 	tests := []struct {
 		name         string
-		streamFields map[string]interface{}
-		assert       func(t *testing.T, monitor map[string]interface{})
+		streamFields map[string]any
+		assert       func(t *testing.T, monitor map[string]any)
 	}{
 		{
 			name: "dotted param keys are preserved literally",
-			streamFields: map[string]interface{}{
-				"params": map[string]interface{}{
+			streamFields: map[string]any{
+				"params": map[string]any{
 					"subdomain":             "value1",
 					"subdomain.example.com": "value2",
 				},
 			},
-			assert: func(t *testing.T, monitor map[string]interface{}) {
-				params, ok := monitor["params"].(map[string]interface{})
+			assert: func(t *testing.T, monitor map[string]any) {
+				params, ok := monitor["params"].(map[string]any)
 				require.True(t, ok, "expected browser params map in monitor config")
 				assert.Equal(t, "value1", params["subdomain"], "expected non-dotted param key to be preserved")
 				assert.Equal(t, "value2", params["subdomain.example.com"], "expected dotted param key to be preserved literally")
@@ -123,23 +124,23 @@ func TestHeartbeatCfg_BrowserParamsDottedKeys(t *testing.T) {
 		},
 		{
 			name: "dotted keys outside params still expand",
-			streamFields: map[string]interface{}{
+			streamFields: map[string]any{
 				// A dotted key that is NOT a param must still expand to nested structure.
 				"a.b.c": "nested",
-				"params": map[string]interface{}{
+				"params": map[string]any{
 					"subdomain.example.com": "literal",
 				},
 			},
-			assert: func(t *testing.T, monitor map[string]interface{}) {
+			assert: func(t *testing.T, monitor map[string]any) {
 				// The non-param dotted key expands into nested maps.
-				a, ok := monitor["a"].(map[string]interface{})
+				a, ok := monitor["a"].(map[string]any)
 				require.True(t, ok, "expected dotted key 'a.b.c' to expand into nested maps")
-				b, ok := a["b"].(map[string]interface{})
+				b, ok := a["b"].(map[string]any)
 				require.True(t, ok, "expected 'a.b' to be a nested map")
 				assert.Equal(t, "nested", b["c"], "expected 'a.b.c' to expand")
 
 				// The param dotted key stays literal.
-				params, ok := monitor["params"].(map[string]interface{})
+				params, ok := monitor["params"].(map[string]any)
 				require.True(t, ok, "expected browser params map in monitor config")
 				assert.Equal(t, "literal", params["subdomain.example.com"], "expected param dotted key to stay literal")
 				assert.NotContains(t, params, "subdomain", "param dotted key must not expand")
@@ -158,7 +159,7 @@ func TestHeartbeatCfg_BrowserParamsDottedKeys(t *testing.T) {
 // runBrowserCfg loads the browser test fixture, merges the given fields into its
 // first (browser) stream, runs it through heartbeatCfg, and returns the
 // resulting monitor configs as maps.
-func runBrowserCfg(t *testing.T, streamFields map[string]interface{}) []map[string]interface{} {
+func runBrowserCfg(t *testing.T, streamFields map[string]any) []map[string]any {
 	t.Helper()
 
 	var rawIn proto.UnitExpectedConfig
@@ -166,15 +167,13 @@ func runBrowserCfg(t *testing.T, streamFields map[string]interface{}) []map[stri
 	require.NoError(t, err, "failed to read browser test fixture")
 
 	sourceMap := rawIn.GetSource().AsMap()
-	streams, ok := sourceMap["streams"].([]interface{})
+	streams, ok := sourceMap["streams"].([]any)
 	require.True(t, ok, "expected streams to be a slice")
 	require.NotEmpty(t, streams, "expected at least one stream")
 
-	browserStream, ok := streams[0].(map[string]interface{})
+	browserStream, ok := streams[0].(map[string]any)
 	require.True(t, ok, "expected browser stream to be an object")
-	for k, v := range streamFields {
-		browserStream[k] = v
-	}
+	maps.Copy(browserStream, streamFields)
 
 	rawIn.Source, err = structpb.NewStruct(sourceMap)
 	require.NoError(t, err, "failed to rebuild proto source")
@@ -189,15 +188,15 @@ func runBrowserCfg(t *testing.T, streamFields map[string]interface{}) []map[stri
 	return got
 }
 
-func cfgToArrMap(cfg []*reload.ConfigWithMeta) ([]map[string]interface{}, error) {
-	res := make([]map[string]interface{}, 0, len(cfg))
+func cfgToArrMap(cfg []*reload.ConfigWithMeta) ([]map[string]any, error) {
+	res := make([]map[string]any, 0, len(cfg))
 	for _, c := range cfg {
 		var m mapstr.M
 		err := c.Config.Unpack(&m)
 		if err != nil {
 			return nil, err
 		}
-		res = append(res, map[string]interface{}(m))
+		res = append(res, map[string]any(m))
 	}
 	return res, nil
 }

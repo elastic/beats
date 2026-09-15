@@ -85,7 +85,7 @@ func TestURLFields(t *testing.T) {
 			require.NoError(t, err)
 
 			got := URLFields(parsed)
-			testslike.Test(t, lookslike.MustCompile(map[string]interface{}(tt.want)), got)
+			testslike.Test(t, lookslike.MustCompile(map[string]any(tt.want)), got)
 		})
 	}
 }

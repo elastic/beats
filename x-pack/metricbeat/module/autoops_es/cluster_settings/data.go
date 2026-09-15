@@ -29,9 +29,10 @@ var (
 			"allocation": c.Dict("allocation", s.Schema{
 				"disk": c.Dict("disk", s.Schema{
 					"watermark": c.Dict("watermark", s.Schema{
-						"low":         c.Str("low", s.IgnoreAllErrors),
-						"high":        c.Str("high", s.IgnoreAllErrors),
-						"flood_stage": c.Str("flood_stage", s.IgnoreAllErrors),
+						"low":                c.Str("low", s.IgnoreAllErrors),
+						"high":               c.Str("high", s.IgnoreAllErrors),
+						"flood_stage":        c.Str("flood_stage", s.IgnoreAllErrors),
+						"flood_stage_frozen": c.Str("flood_stage.frozen", s.IgnoreAllErrors),
 					}, c.DictOptional),
 				}, c.DictOptional),
 				"node_concurrent_outgoing_recoveries": c.Str("node_concurrent_outgoing_recoveries", s.IgnoreAllErrors),
@@ -234,7 +235,7 @@ func flattenSettings(metricSetFields mapstr.M) mapstr.M {
 	return result
 }
 
-func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[string]interface{}) error {
+func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[string]any) error {
 	metricSetFields, err := schema.Apply(*settings)
 
 	if err != nil {

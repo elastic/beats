@@ -21,7 +21,6 @@ var (
 	DataCacheDir   = filepath.Join(DataDir, "cache")
 )
 
-// Windows ARM URL: https://github.com/osquery/osquery/releases/download/{{osqueryVersion}}/osquery-{{osqueryVersion}}.windows_arm64.zip
 const (
 	osqueryDownloadBaseURL       = "https://pkg.osquery.io"
 	osqueryDownloadGithubBaseURL = "https://github.com/osquery/osquery/releases/download"
@@ -43,15 +42,8 @@ const (
 
 	osqueryLensesDir = "lenses"
 
-	osqueryVersion = "5.23.0"
-	osqueryPkgExt  = ".pkg"
-	osqueryZipExt  = ".zip"
-
-	osqueryDistroDarwinSHA256        = "2621179c334a6482fa822732f121409bbccc36784db18f576e2965dfc4f1845d"
-	osqueryDistroLinuxSHA256         = "0045739a68475760f7bc26ca493afda71cc02a8e4d29984717742d3e4c099296"
-	osqueryDistroLinuxARMSHA256      = "d9d4e5f6eeabda4949ae0ba6a8db424c789ec60ffef99269f479ff4b73f46e33"
-	osqueryDistroWindowsARMZipSHA256 = "92a820a39c12f7516040b62dc8e8546469c821f505eed0b7ff1eb7e43cc4b018"
-	osqueryDistroWindowsX86ZipSHA256 = "5ddb8e1c23fd870838ef4ff47c0d2e5a080f22a6944fc4870d726e7b20e962a4"
+	osqueryPkgExt = ".pkg"
+	osqueryZipExt = ".zip"
 )
 
 type OSArch struct {
@@ -168,7 +160,7 @@ type Spec struct {
 
 func (s Spec) DistroFilename() string {
 	if s.PackSuffix == osqueryZipExt {
-		// Currently the only file whose source is a zip is the Windows ARM64 one
+		// The short suffix is used by the Windows ARM64 archive.
 		return osqueryName + "-" + osqueryVersion + ".windows_arm64" + s.PackSuffix
 	}
 	return osqueryName + "-" + osqueryVersion + s.PackSuffix
@@ -197,15 +189,6 @@ func (s Spec) URL(osname string) string {
 		return osqueryDownloadGithubBaseURL + "/" + osqueryVersion + "/" + s.DistroFilename()
 	}
 	return osqueryDownloadBaseURL + "/" + osname + "/" + s.DistroFilename()
-}
-
-var specs = map[OSArch]Spec{
-	{"linux", "amd64"}:   {"_1.linux_x86_64.tar.gz", osqueryDistroLinuxSHA256, true},
-	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
-	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
-	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
-	{"windows", "amd64"}: {".windows_x86_64.zip", osqueryDistroWindowsX86ZipSHA256, true},
-	{"windows", "arm64"}: {osqueryZipExt, osqueryDistroWindowsARMZipSHA256, true},
 }
 
 func GetSpec(osarch OSArch) (spec Spec, err error) {

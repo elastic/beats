@@ -13,7 +13,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/assert"
@@ -144,39 +143,39 @@ func TestGetMetricsInBatch(t *testing.T) {
 		m := &MockService{}
 		metrics := []azmetrics.Metric{
 			{
-				ID: to.Ptr("test"),
+				ID: new("test"),
 				Name: &azmetrics.LocalizableString{
-					Value:          to.Ptr("ActiveConnections"),
-					LocalizedValue: to.Ptr("Active Connections"),
+					Value:          new("ActiveConnections"),
+					LocalizedValue: new("Active Connections"),
 				},
 				TimeSeries: []azmetrics.TimeSeriesElement{
 					{
 						Data: []azmetrics.MetricValue{
 							{
-								Average:   to.Ptr(1.0),
-								Maximum:   to.Ptr(2.0),
-								Minimum:   to.Ptr(3.0),
-								TimeStamp: to.Ptr(time.Now()),
+								Average:   new(1.0),
+								Maximum:   new(2.0),
+								Minimum:   new(3.0),
+								TimeStamp: new(time.Now()),
 							},
 						},
 					},
 				},
-				Type:               to.Ptr("Microsoft.Insights/metrics"),
+				Type:               new("Microsoft.Insights/metrics"),
 				Unit:               &count,
-				DisplayDescription: to.Ptr("Total Active Connections for Microsoft.EventHub."),
-				ErrorCode:          to.Ptr("Success"),
+				DisplayDescription: new("Total Active Connections for Microsoft.EventHub."),
+				ErrorCode:          new("Success"),
 			},
 		}
 
 		m.On("QueryResources", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
 			[]azmetrics.MetricData{{
-				EndTime:        to.Ptr("2025-01-28T15:00:00Z"),
-				StartTime:      to.Ptr("2025-01-28T14:00:00Z"),
+				EndTime:        new("2025-01-28T15:00:00Z"),
+				StartTime:      new("2025-01-28T14:00:00Z"),
 				Values:         metrics,
-				Interval:       to.Ptr("PT1H"),
-				Namespace:      to.Ptr("Microsoft.EventHub/Namespaces"),
-				ResourceID:     to.Ptr("resourceId1"),
-				ResourceRegion: to.Ptr("West Europe")}},
+				Interval:       new("PT1H"),
+				Namespace:      new("Microsoft.EventHub/Namespaces"),
+				ResourceID:     new("resourceId1"),
+				ResourceRegion: new("West Europe")}},
 			nil,
 		)
 

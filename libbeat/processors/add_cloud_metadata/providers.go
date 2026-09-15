@@ -90,7 +90,7 @@ func providersFilter(configList providerList, allProviders map[string]provider) 
 		// this environment variable as a workaround in case the
 		// configured/default providers misbehave.
 		configList = nil
-		for _, name := range strings.Split(v, ",") {
+		for name := range strings.SplitSeq(v, ",") {
 			configList = append(configList, strings.TrimSpace(name))
 		}
 		if len(configList) == 0 {

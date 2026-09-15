@@ -115,7 +115,7 @@ func TestCertFields(t *testing.T) {
 	certNotAfter, err := time.Parse(time.RFC3339, "2020-07-16T03:15:39Z")
 	require.NoError(t, err)
 
-	elasticCertFields := lookslike.Strict(lookslike.MustCompile(map[string]interface{}{
+	elasticCertFields := lookslike.Strict(lookslike.MustCompile(map[string]any{
 		"server": mapstr.M{
 			"hash": mapstr.M{
 				"sha1":   "b7b4b89ef0d0caf39d223736f0fdbb03c7b426f1",
@@ -144,7 +144,7 @@ func TestCertFields(t *testing.T) {
 	letsEncryptCert := letsEncryptCerts(t)[0]
 
 	letsEncryptCertFields := func(notBefore time.Time, notAfter time.Time) validator.Validator {
-		return lookslike.Strict(lookslike.MustCompile(map[string]interface{}{
+		return lookslike.Strict(lookslike.MustCompile(map[string]any{
 			"server": mapstr.M{
 				"hash": mapstr.M{
 					"sha1":   "98d7ca35e3608b0ee7accc9ec665babdbdc6e39c",

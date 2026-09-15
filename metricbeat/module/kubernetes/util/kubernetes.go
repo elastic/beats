@@ -15,6 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Lock order: Watchers.lock and enricher.Lock are never held together.
+// Both may independently acquire activeWatcherLock:
+//
+//	Watchers.lock  →  activeWatcherLock
+//	enricher.Lock  →  activeWatcherLock
+
 package util
 
 import (
@@ -64,9 +70,10 @@ type kubernetesConfig struct {
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
 type Enricher interface {
-	// Start will start the Kubernetes watcher on the first call, does nothing on the rest
-	// errors are logged as warning
-	Start(*Watchers)
+	// Start waits for every required watcher to synchronize. Returns false if
+	// the enricher was stopped or a required watcher cannot be satisfied; the
+	// caller must then not fetch or publish.
+	Start(*Watchers) bool
 
 	// Stop will stop the Kubernetes watcher
 	Stop(*Watchers)
@@ -89,13 +96,33 @@ type enricher struct {
 	log           *logp.Logger
 
 	watchedResources []string
+
+	stopOnce sync.Once
+	stopCh   chan struct{} // closed exactly once, before releaseWatcherOwnership
 }
 
 type nilEnricher struct{}
 
-func (*nilEnricher) Start(*Watchers)   {}
-func (*nilEnricher) Stop(*Watchers)    {}
-func (*nilEnricher) Enrich([]mapstr.M) {}
+func (*nilEnricher) Start(*Watchers) bool { return true }
+func (*nilEnricher) Stop(*Watchers)       {}
+func (*nilEnricher) Enrich([]mapstr.M)    {}
+
+// watcherStart represents one in-progress watcher.Start() call, shared by every
+// enricher waiting for that watcher. The outcome is not stored here: waiters
+// re-read committed metaWatcher state after done closes, so a result that was
+// superseded (e.g. by a replacement) cannot be acted on.
+type watcherStart struct {
+	watcher kubernetes.Watcher // immutable after creation
+	done    chan struct{}
+}
+
+// watcherDependency pairs a required watcher with its registry name, so the
+// dependency list can be built under one lock acquisition and processed
+// afterwards without it.
+type watcherDependency struct {
+	name string
+	meta *metaWatcher
+}
 
 type watcherRegistration struct {
 	nodeScope bool
@@ -105,15 +132,18 @@ type watcherRegistration struct {
 type metaWatcher struct {
 	activeWatcherLock sync.RWMutex       // protects watcher while it is used, replaced, or withdrawn
 	watcher           kubernetes.Watcher // watcher responsible for watching a specific resource
-	started           bool               // true if watcher has started, false otherwise
+	started           bool               // watcher.Start() succeeded; informer cache is synced
+	starting          *watcherStart      // non-nil while active watcher.Start() runs
+	startErr          error              // terminal failure; blocks restarting a one-shot watcher
 
 	users       map[*enricher]watcherRegistration // enrichers that use this watcher/need it alive
 	enrichers   map[*enricher]struct{}            // enrichers that use this watcher as their primary source
 	metricsRepo *MetricsRepo                      // used to update container metrics derived from metadata, like resource limits
 
-	nodeScope             bool                               // whether the active watcher watches resources in the current node or the whole cluster
-	restartWatcher        kubernetes.Watcher                 // whether this watcher needs a restart. Only relevant in leader nodes due to metricsets with different nodescope(pod, state_pod)
-	restartWatcherFactory func() (kubernetes.Watcher, error) // creates a fresh replacement after a failed one-shot watcher start
+	nodeScope                 bool                               // whether the active watcher watches resources in the current node or the whole cluster
+	replacementWatcher        kubernetes.Watcher                 // staged cluster-scoped replacement (not yet starting)
+	pendingReplacement        *watcherStart                      // non-nil while replacement Start() runs
+	replacementWatcherFactory func() (kubernetes.Watcher, error) // creates a fresh replacement after a failed one-shot watcher start
 }
 
 // getActiveWatcherByKey keeps the active watcher alive while its store is read.
@@ -372,19 +402,9 @@ func hasClusterScopedUser(metaWatcher *metaWatcher) bool {
 	return false
 }
 
-// hasCommittedClusterScopedUser reports whether a pending cluster-wide
-// replacement may be activated.
-// The resource watcher registry must be locked by the caller.
-func hasCommittedClusterScopedUser(metaWatcher *metaWatcher) bool {
-	for _, registration := range metaWatcher.users {
-		if registration.committed && !registration.nodeScope {
-			return true
-		}
-	}
-	return false
-}
-
-// registerWatcherUser records ownership of one exact watched resource.
+// registerWatcherUser reserves one exact watched resource while the enricher is
+// initialized. This keeps a concurrently stopping owner from removing the
+// watcher while metadata generators are being created.
 // The resource watcher registry must be locked by the caller.
 func registerWatcherUser(resourceName string, metaWatcher *metaWatcher, e *enricher, primary, nodeScope bool) {
 	if addWatcherUser(metaWatcher, e, nodeScope) {
@@ -395,8 +415,10 @@ func registerWatcherUser(resourceName string, metaWatcher *metaWatcher, e *enric
 	}
 }
 
-// commitWatcherOwnership publishes a fully initialized enricher to Start and
-// watcher event handlers.
+// commitWatcherOwnership makes an enricher visible to Start and watcher event
+// handlers after its callbacks and indexes have been initialized. Registrations
+// are made earlier to reserve the shared watchers and rolled back if setup
+// fails.
 func commitWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
@@ -455,31 +477,32 @@ func createWatcher(
 
 	// If the watcher exists, exit
 	if ok {
-		if resourceMetaWatcher.nodeScope && !nodeScope && resourceMetaWatcher.restartWatcher == nil {
+		if resourceMetaWatcher.nodeScope && !nodeScope &&
+			resourceMetaWatcher.replacementWatcher == nil && resourceMetaWatcher.pendingReplacement == nil {
 			// It might happen that the watcher already exists, but is only being used to monitor the resources
 			// of a single node(e.g. created by pod metricset). In that case, we need to check if we are trying to create a new watcher that will track
 			// the resources of whole cluster(e.g. in case of state_pod metricset).
 			// If it is the case, then we need to update the watcher by changing its watch options (removing options.Node)
 			// A running watcher cannot be updated directly. Instead, we must create a new one with the correct watch options.
-			// The new restartWatcher must be identical to the old watcher, including the same handler function, with the only difference being the watch options.
+			// The replacement watcher must be identical to the old watcher, including the same handler function, with the only difference being the watch options.
 
 			if isNamespaced(resourceName) {
 				options.Namespace = namespace
 			}
-			restartWatcherFactory := func() (kubernetes.Watcher, error) {
-				restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
+			replacementWatcherFactory := func() (kubernetes.Watcher, error) {
+				replacementWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
 				if err != nil {
 					return nil, err
 				}
-				restartWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
-				return restartWatcher, nil
+				replacementWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
+				return replacementWatcher, nil
 			}
-			restartWatcher, err := restartWatcherFactory()
+			replacementWatcher, err := replacementWatcherFactory()
 			if err != nil {
 				return false, err
 			}
-			resourceMetaWatcher.restartWatcherFactory = restartWatcherFactory
-			resourceMetaWatcher.restartWatcher = restartWatcher
+			resourceMetaWatcher.replacementWatcherFactory = replacementWatcherFactory
+			resourceMetaWatcher.replacementWatcher = replacementWatcher
 		}
 		registerWatcherUser(resourceName, resourceMetaWatcher, e, !extraWatcher, nodeScope)
 		return false, nil
@@ -515,13 +538,13 @@ func createWatcher(
 	}
 
 	resourceMetaWatcher = &metaWatcher{
-		watcher:        watcher,
-		started:        false, // not started yet
-		users:          make(map[*enricher]watcherRegistration),
-		enrichers:      make(map[*enricher]struct{}),
-		metricsRepo:    metricsRepo,
-		restartWatcher: nil,
-		nodeScope:      nodeScope,
+		watcher:            watcher,
+		started:            false, // not started yet
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		metricsRepo:        metricsRepo,
+		replacementWatcher: nil,
+		nodeScope:          nodeScope,
 	}
 	resourceWatchers.metaWatchersMap[resourceName] = resourceMetaWatcher
 	registerWatcherUser(resourceName, resourceMetaWatcher, e, !extraWatcher, nodeScope)
@@ -737,8 +760,8 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 	mainWatcher := (*resourceMetaWatcher).watcher
 	if e != nil {
 		if registration, owned := resourceMetaWatcher.users[e]; owned &&
-			!registration.nodeScope && resourceMetaWatcher.nodeScope && resourceMetaWatcher.restartWatcher != nil {
-			mainWatcher = resourceMetaWatcher.restartWatcher
+			!registration.nodeScope && resourceMetaWatcher.nodeScope && resourceMetaWatcher.replacementWatcher != nil {
+			mainWatcher = resourceMetaWatcher.replacementWatcher
 		}
 	}
 
@@ -789,6 +812,7 @@ func newMetadataEnricher(metricsetName, resourceName string, config *kubernetesC
 		resourceName:  resourceName,
 		config:        config,
 		log:           log,
+		stopCh:        make(chan struct{}),
 	}
 }
 
@@ -1096,93 +1120,293 @@ func join(fields ...string) string {
 	return strings.Join(fields, resourceMetadataKeySeparator)
 }
 
-// Start starts all the watchers associated with a given enricher's resource.
-func (e *enricher) Start(resourceWatchers *Watchers) {
-	watcherToStop := e.start(resourceWatchers)
-	if watcherToStop != nil {
-		watcherToStop.Stop()
+// claimStart returns the current startup attempt for m, creating one if none
+// exists. claimed is true only for the caller that created it.
+// Caller must hold rw.lock.
+func claimStart(m *metaWatcher) (attempt *watcherStart, claimed bool) {
+	if m.starting != nil {
+		return m.starting, false
+	}
+	attempt = &watcherStart{watcher: m.watcher, done: make(chan struct{})}
+	m.starting = attempt
+	return attempt, true
+}
+
+// commitStart records the outcome of an active startup attempt. No-op if the
+// registry entry or the attempt pointer no longer matches.
+// Caller must hold rw.lock.
+func commitStart(name string, rw *Watchers, m *metaWatcher, attempt *watcherStart, err error) bool {
+	if rw.metaWatchersMap[name] != m || m.starting != attempt {
+		return false
+	}
+	m.starting = nil
+	if err == nil {
+		m.started = true
+		m.startErr = nil
+	} else {
+		m.startErr = err
+	}
+	return true
+}
+
+// launchStart runs watcher.Start() outside all locks and commits the result.
+// Caller must hold rw.lock and must have just claimed the attempt.
+func launchStart(rw *Watchers, log *logp.Logger, name string, m *metaWatcher, attempt *watcherStart) {
+	w := attempt.watcher
+	go func() {
+		err := w.Start()
+		rw.lock.Lock()
+		committed := commitStart(name, rw, m, attempt, err)
+		rw.lock.Unlock()
+		if err != nil && committed {
+			log.Warnf("Error starting %s watcher: %s", name, err)
+		}
+		close(attempt.done)
+	}()
+}
+
+// waitForAttempt blocks until the attempt finishes or the enricher stops.
+// When both are ready, stopCh wins: a stopped enricher must never observe success.
+func waitForAttempt(attempt *watcherStart, stopCh <-chan struct{}) bool {
+	select {
+	case <-attempt.done:
+		select {
+		case <-stopCh:
+			return false
+		default:
+			return true
+		}
+	case <-stopCh:
+		return false
 	}
 }
 
-func (e *enricher) start(resourceWatchers *Watchers) kubernetes.Watcher {
-	resourceWatchers.lock.Lock()
-	defer resourceWatchers.lock.Unlock()
-	var watcherToStop kubernetes.Watcher
+// stopped reports whether Stop() has been called, without blocking.
+func (e *enricher) stopped() bool {
+	select {
+	case <-e.stopCh:
+		return true
+	default:
+		return false
+	}
+}
 
-	if len(e.watchedResources) == 0 {
-		return nil
+// waitAndVerify blocks on the attempt, then decides readiness from committed
+// registry state rather than the attempt's own result.
+func (e *enricher) waitAndVerify(
+	rw *Watchers,
+	name string,
+	meta *metaWatcher,
+	attempt *watcherStart,
+	requireClusterScope bool,
+) bool {
+	if !waitForAttempt(attempt, e.stopCh) {
+		return false
 	}
 
-	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
-	if resourceMetaWatcher == nil {
-		return nil
+	rw.lock.Lock()
+	defer rw.lock.Unlock()
+
+	if rw.metaWatchersMap[name] != meta || !meta.started {
+		return false
 	}
-	registration, owned := resourceMetaWatcher.users[e]
-	if !owned || !registration.committed {
-		return nil
+	return !requireClusterScope || !meta.nodeScope
+}
+
+// collectExtraDependencies resolves the additional watchers this enricher's
+// metadata generator needs alongside its primary resource watcher. It verifies
+// ownership under one registry lock acquisition, then returns stable references
+// that can be processed after releasing the lock. Returns (nil, false) if any
+// required watcher is missing or unowned: caller must not fetch or publish.
+func (e *enricher) collectExtraDependencies(rw *Watchers) ([]watcherDependency, bool) {
+	requiredExtras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
+
+	rw.lock.Lock()
+	defer rw.lock.Unlock()
+
+	if e.stopped() {
+		return nil, false
+	}
+	primary := rw.metaWatchersMap[e.resourceName]
+	if primary == nil {
+		e.log.Warnf("Primary watcher %s for %s is not registered", e.resourceName, e.metricsetName)
+		return nil, false
+	}
+	if reg, owned := primary.users[e]; !owned || !reg.committed {
+		e.log.Warnf("Enricher for %s has no committed registration for %s", e.metricsetName, e.resourceName)
+		return nil, false
 	}
 
-	// Each resource may require multiple watchers. Firstly, we start the
-	// extra watchers as they are a dependency for the main resource watcher
-	// For example a pod watcher requires namespace and node watcher to be started
-	// first.
-	for _, resourceName := range e.watchedResources {
-		if resourceName == e.resourceName {
+	var dependencies []watcherDependency
+	for _, name := range requiredExtras {
+		if name == e.resourceName {
 			continue
 		}
-		extraWatcherMeta := resourceWatchers.metaWatchersMap[resourceName]
-		if extraWatcherMeta == nil {
-			continue
+		meta := rw.metaWatchersMap[name]
+		if meta == nil {
+			e.log.Debugf("Watcher %s required by %s is not registered; enrichment unavailable", name, e.metricsetName)
+			return nil, false
 		}
-		extraRegistration, extraOwned := extraWatcherMeta.users[e]
-		if extraOwned && extraRegistration.committed && !extraWatcherMeta.started {
-			if err := extraWatcherMeta.watcher.Start(); err != nil {
-				e.log.Warnf("Error starting %s watcher: %s", resourceName, err)
-			} else {
-				extraWatcherMeta.started = true
-			}
+		if reg, owned := meta.users[e]; !owned || !reg.committed {
+			e.log.Warnf("Enricher for %s does not own required watcher %s", e.metricsetName, name)
+			return nil, false
 		}
+		dependencies = append(dependencies, watcherDependency{name: name, meta: meta})
 	}
+	return dependencies, true
+}
 
-	// Start the main watcher if not already started.
-	// A pending cluster-wide replacement can be activated only after at least
-	// one cluster-scoped owner has completed construction. Start it before
-	// stopping the active watcher so a failed replacement does not interrupt
-	// metadata collection.
-	if resourceMetaWatcher.nodeScope && hasCommittedClusterScopedUser(resourceMetaWatcher) &&
-		resourceMetaWatcher.restartWatcher == nil && resourceMetaWatcher.restartWatcherFactory != nil {
-		restartWatcher, err := resourceMetaWatcher.restartWatcherFactory()
+// ensureWatcherReady ensures the named watcher is started. If not yet started,
+// it launches or joins an in-flight goroutine and waits, with enricher
+// cancellation via stopCh, for the outcome. Returns false if the enricher was
+// stopped or the watcher failed to start.
+func (e *enricher) ensureWatcherReady(rw *Watchers, name string, meta *metaWatcher) bool {
+	if e.stopped() {
+		return false
+	}
+	rw.lock.Lock()
+	if rw.metaWatchersMap[name] != meta {
+		rw.lock.Unlock()
+		if !e.stopped() {
+			e.log.Warnf("Watcher %s required by %s is no longer the registered instance", name, e.metricsetName)
+		}
+		return false
+	}
+	if meta.started {
+		rw.lock.Unlock()
+		return true
+	}
+	if meta.startErr != nil {
+		rw.lock.Unlock()
+		return false
+	}
+	attempt, claimed := claimStart(meta)
+	if claimed {
+		launchStart(rw, e.log, name, meta, attempt)
+	}
+	rw.lock.Unlock()
+	return e.waitAndVerify(rw, name, meta, attempt, false)
+}
+
+// claimReplacement joins an in-flight scope-replacement attempt or launches one.
+// Called with rw.lock held. The watcher starts without the lock; the goroutine
+// reacquires it before committing the result.
+// Returns (attempt, true) if a replacement is already in-flight or was just
+// launched, (nil, false) if no replacement can be staged.
+func claimReplacement(rw *Watchers, log *logp.Logger, name string, m *metaWatcher) (attempt *watcherStart, ok bool) {
+	if m.pendingReplacement != nil {
+		return m.pendingReplacement, true
+	}
+	if m.replacementWatcher == nil && m.replacementWatcherFactory != nil {
+		fresh, err := m.replacementWatcherFactory()
 		if err != nil {
-			e.log.Warnf("Error recreating %s watcher: %s", e.resourceName, err)
-		} else {
-			resourceMetaWatcher.restartWatcher = restartWatcher
+			log.Warnf("Error recreating %s watcher: %s", name, err)
+			return nil, false
 		}
+		m.replacementWatcher = fresh
 	}
-	if resourceMetaWatcher.restartWatcher != nil && hasCommittedClusterScopedUser(resourceMetaWatcher) {
-		if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
-			e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
-			watcherToStop = resourceMetaWatcher.restartWatcher
-			resourceMetaWatcher.restartWatcher = nil
-		} else {
-			if resourceMetaWatcher.started {
-				watcherToStop = resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
+	if m.replacementWatcher == nil {
+		return nil, false
+	}
+	replacementWatcher := m.replacementWatcher
+	wasFactory := m.replacementWatcherFactory
+	attempt = &watcherStart{watcher: replacementWatcher, done: make(chan struct{})}
+	m.replacementWatcher = nil
+	m.replacementWatcherFactory = nil
+	m.pendingReplacement = attempt
+	go func() {
+		err := replacementWatcher.Start()
+		rw.lock.Lock()
+		var toStop []kubernetes.Watcher
+		owned := rw.metaWatchersMap[name] == m && m.pendingReplacement == attempt
+		if owned {
+			m.pendingReplacement = nil
+			if err != nil {
+				// Restore factory so the next Start() can retry with a fresh instance.
+				m.replacementWatcherFactory = wasFactory
+				toStop = append(toStop, replacementWatcher)
 			} else {
-				resourceMetaWatcher.replaceActiveWatcher(resourceMetaWatcher.restartWatcher)
+				// Replacement synced: swap active watcher and stop the old one.
+				if old := m.replaceActiveWatcher(replacementWatcher); old != nil {
+					toStop = append(toStop, old)
+				}
+				m.nodeScope = false
+				m.starting = nil
+				m.started = true
+				m.startErr = nil
 			}
-			resourceMetaWatcher.restartWatcher = nil
-			resourceMetaWatcher.restartWatcherFactory = nil
-			resourceMetaWatcher.nodeScope = false
-			resourceMetaWatcher.started = true
 		}
-	} else if !resourceMetaWatcher.started {
-		if err := resourceMetaWatcher.watcher.Start(); err != nil {
-			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
-		} else {
-			resourceMetaWatcher.started = true
+		rw.lock.Unlock()
+		if err != nil && owned {
+			log.Warnf("Error starting replacement %s watcher: %s", name, err)
+		}
+		for _, w := range toStop {
+			w.Stop()
+		}
+		close(attempt.done)
+	}()
+	return attempt, true
+}
+
+// ensurePrimaryReady ensures the primary watcher is started and, if this enricher
+// requires cluster scope, that a scope upgrade has completed. Returns false if the
+// enricher was stopped, the watcher is missing, the enricher lost ownership, or
+// startup / upgrade failed.
+func (e *enricher) ensurePrimaryReady(rw *Watchers) bool {
+	if e.stopped() {
+		return false
+	}
+	rw.lock.Lock()
+	meta := rw.metaWatchersMap[e.resourceName]
+	if meta == nil {
+		rw.lock.Unlock()
+		return false
+	}
+	reg, owned := meta.users[e]
+	if !owned || !reg.committed {
+		rw.lock.Unlock()
+		return false
+	}
+	// Already started and the scope satisfies this enricher's registration.
+	if meta.started && (!meta.nodeScope || reg.nodeScope) {
+		rw.lock.Unlock()
+		return true
+	}
+	// Active watcher is node-scoped but this enricher needs cluster scope:
+	// launch or join a scope-replacement goroutine, then wait for it.
+	if meta.nodeScope && !reg.nodeScope {
+		attempt, ok := claimReplacement(rw, e.log, e.resourceName, meta)
+		if !ok {
+			rw.lock.Unlock()
+			return false
+		}
+		rw.lock.Unlock()
+		return e.waitAndVerify(rw, e.resourceName, meta, attempt, true)
+	}
+	rw.lock.Unlock()
+	return e.ensureWatcherReady(rw, e.resourceName, meta)
+}
+
+// Start starts all the watchers associated with a given enricher's resource.
+func (e *enricher) Start(resourceWatchers *Watchers) bool {
+	if e.stopped() {
+		return false
+	}
+	dependencies, ok := e.collectExtraDependencies(resourceWatchers)
+	if !ok {
+		return false
+	}
+	for _, dependency := range dependencies {
+		if !e.ensureWatcherReady(resourceWatchers, dependency.name, dependency.meta) {
+			return false
 		}
 	}
-
-	return watcherToStop
+	if !e.ensurePrimaryReady(resourceWatchers) {
+		return false
+	}
+	// Re-check cancellation after readiness verification so a Stop observed in
+	// this window makes Start return false.
+	return !e.stopped()
 }
 
 // releaseWatcherOwnership releases all exact watcher dependencies registered by
@@ -1204,13 +1428,32 @@ func releaseWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 		if removeWatcherUser(metaWatcher, e) {
 			delete(resourceWatchers.metaWatchersMap, resourceName)
 			activeWatcher := metaWatcher.withdrawActiveWatcher()
-			if metaWatcher.started {
-				metaWatcher.started = false
+			metaWatcher.started = false
+			if metaWatcher.starting != nil {
+				// Stopping this watcher unblocks the startup goroutine; its commit
+				// then no-ops because the registry entry is gone.
+				watchersToStop = append(watchersToStop, metaWatcher.starting.watcher)
+				metaWatcher.starting = nil
+			} else if activeWatcher != nil {
 				watchersToStop = append(watchersToStop, activeWatcher)
 			}
+			// Stop any in-flight replacement so its Start() goroutine unblocks.
+			if metaWatcher.pendingReplacement != nil {
+				watchersToStop = append(watchersToStop, metaWatcher.pendingReplacement.watcher)
+				metaWatcher.pendingReplacement = nil
+			}
 		} else if !hasClusterScopedUser(metaWatcher) {
-			metaWatcher.restartWatcher = nil
-			metaWatcher.restartWatcherFactory = nil
+			// Discard the staged cluster-wide replacement; it has not started.
+			metaWatcher.replacementWatcher = nil
+			metaWatcher.replacementWatcherFactory = nil
+			// If an upgrade is in flight, cancel it by stopping the pending
+			// replacement. nodeScope and starting describe the active watcher,
+			// which was never swapped out; commitStart clears starting when
+			// the watcher's Start() returns.
+			if metaWatcher.pendingReplacement != nil {
+				watchersToStop = append(watchersToStop, metaWatcher.pendingReplacement.watcher)
+				metaWatcher.pendingReplacement = nil
+			}
 		}
 	}
 	e.watchedResources = nil
@@ -1223,6 +1466,9 @@ func releaseWatcherOwnership(e *enricher, resourceWatchers *Watchers) {
 
 // Stop releases all watcher ownership held by the enricher.
 func (e *enricher) Stop(resourceWatchers *Watchers) {
+	// Close first: any Start() blocked in waitForAttempt returns false at once,
+	// whether or not this enricher is the last owner.
+	e.stopOnce.Do(func() { close(e.stopCh) })
 	releaseWatcherOwnership(e, resourceWatchers)
 }
 

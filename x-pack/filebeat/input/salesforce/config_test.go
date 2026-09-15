@@ -33,7 +33,7 @@ func TestValidate(t *testing.T) {
 			inputCfg: config{
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 					},
 				},
@@ -47,7 +47,7 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -57,8 +57,8 @@ func TestValidate(t *testing.T) {
 			inputCfg: config{
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
-						JWTBearerFlow:    &JWTBearerFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
+						JWTBearerFlow:    &JWTBearerFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -69,7 +69,7 @@ func TestValidate(t *testing.T) {
 				URL: "",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -81,7 +81,7 @@ func TestValidate(t *testing.T) {
 				URL:                   "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -91,14 +91,14 @@ func TestValidate(t *testing.T) {
 			inputCfg: config{
 				EventMonitoringMethod: &eventMonitoringMethod{
 					EventLogFile: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Duration(0),
 					},
 				},
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -108,14 +108,14 @@ func TestValidate(t *testing.T) {
 			inputCfg: config{
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Duration(0),
 					},
 				},
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -126,7 +126,7 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Cursor:   &cursorConfig{Field: "EventDate"},
 					},
@@ -134,7 +134,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -145,7 +145,7 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Query: &QueryConfig{
 							Default: &valueTpl{},
@@ -157,7 +157,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -168,7 +168,7 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					EventLogFile: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Query: &QueryConfig{
 							Default: &valueTpl{},
@@ -179,7 +179,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -190,7 +190,7 @@ func TestValidate(t *testing.T) {
 				Version: 45,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Query: &QueryConfig{
 							Default: &valueTpl{},
@@ -202,7 +202,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -213,12 +213,12 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Batch: &batchConfig{
-							Enabled:          pointer(true),
+							Enabled:          new(true),
 							InitialInterval:  0,
-							MaxWindowsPerRun: pointer(1),
+							MaxWindowsPerRun: new(1),
 							Window:           5 * time.Minute,
 						},
 					},
@@ -226,7 +226,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -237,12 +237,12 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Batch: &batchConfig{
-							Enabled:          pointer(true),
+							Enabled:          new(true),
 							InitialInterval:  time.Hour,
-							MaxWindowsPerRun: pointer(1),
+							MaxWindowsPerRun: new(1),
 							Window:           0,
 						},
 					},
@@ -250,7 +250,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -261,12 +261,12 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Batch: &batchConfig{
-							Enabled:          pointer(true),
+							Enabled:          new(true),
 							InitialInterval:  time.Hour,
-							MaxWindowsPerRun: pointer(0),
+							MaxWindowsPerRun: new(0),
 							Window:           5 * time.Minute,
 						},
 					},
@@ -274,7 +274,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -285,12 +285,12 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Batch: &batchConfig{
-							Enabled:          pointer(true),
+							Enabled:          new(true),
 							InitialInterval:  time.Hour,
-							MaxWindowsPerRun: pointer(2),
+							MaxWindowsPerRun: new(2),
 							Window:           5 * time.Minute,
 						},
 						Query: &QueryConfig{
@@ -303,7 +303,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -314,7 +314,7 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Query: &QueryConfig{
 							Default: getValueTpl(defaultLoginObjectQuery),
@@ -326,7 +326,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},
@@ -337,12 +337,12 @@ func TestValidate(t *testing.T) {
 				Version: 56,
 				EventMonitoringMethod: &eventMonitoringMethod{
 					Object: EventMonitoringConfig{
-						Enabled:  pointer(true),
+						Enabled:  new(true),
 						Interval: time.Hour,
 						Batch: &batchConfig{
-							Enabled:          pointer(true),
+							Enabled:          new(true),
 							InitialInterval:  time.Hour,
-							MaxWindowsPerRun: pointer(2),
+							MaxWindowsPerRun: new(2),
 							Window:           5 * time.Minute,
 						},
 						Query: &QueryConfig{
@@ -355,7 +355,7 @@ func TestValidate(t *testing.T) {
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &OAuth2{
-						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						UserPasswordFlow: &UserPasswordFlow{Enabled: new(true)},
 					},
 				},
 			},

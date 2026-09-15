@@ -20,6 +20,7 @@ package consumergroup
 import (
 	"fmt"
 	"io"
+	"maps"
 	"reflect"
 	"testing"
 
@@ -280,9 +281,7 @@ func testEvent(
 	}
 
 	for _, extra := range fields {
-		for k, v := range extra {
-			event[k] = v
-		}
+		maps.Copy(event, extra)
 	}
 	return event
 }

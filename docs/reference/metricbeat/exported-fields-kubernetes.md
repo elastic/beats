@@ -69,7 +69,7 @@ Kubernetes API server metrics
 
 
 **`kubernetes.apiserver.request.dry_run`**
-:   Wether the request uses dry run
+:   Whether the request uses dry run
 
     type: keyword
 

@@ -30,6 +30,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// Ensure MetricSet implements mb.Closer so dbus connections are released on stop/reload.
+var _ mb.Closer = (*MetricSet)(nil)
+
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
 // the MetricSet for each host defined in the module's configuration. After the
@@ -61,6 +64,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		counter:       1,
 		conn:          conn,
 	}, nil
+}
+
+// Close closes the dbus connection to logind.
+func (m *MetricSet) Close() error {
+	if m.conn == nil {
+		return nil
+	}
+	err := m.conn.Close()
+	m.conn = nil
+	return err
 }
 
 // Fetch methods implements the data gathering and data conversion to the right

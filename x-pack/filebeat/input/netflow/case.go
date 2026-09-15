@@ -34,7 +34,7 @@ func (c *caseConverter) memoize(nfName, converted string) string {
 }
 
 func (c *caseConverter) ToSnakeCase(orig record.Map) mapstr.M {
-	result := mapstr.M(make(map[string]interface{}, len(orig)))
+	result := mapstr.M(make(map[string]any, len(orig)))
 	c.rwMutex.RLock()
 	defer c.rwMutex.RUnlock()
 

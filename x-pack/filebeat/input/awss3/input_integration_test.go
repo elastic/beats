@@ -12,7 +12,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -66,7 +65,7 @@ func getTerraformOutputs(t *testing.T, isLocalStack bool) terraformOutputData {
 		outputFile = terraformOutputYML
 	}
 
-	ymlData, err := ioutil.ReadFile(path.Join(path.Dir(filename), outputFile))
+	ymlData, err := os.ReadFile(path.Join(path.Dir(filename), outputFile))
 	if os.IsNotExist(err) {
 		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test.", filepath.Dir(outputFile))
 	}
@@ -191,7 +190,7 @@ func makeLocalstackConfig(awsRegion string) (aws.Config, error) {
 	awsLocalstackEndpoint := "http://localhost:4566" // Default Localstack endpoint
 
 	// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
-	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...any) (aws.Endpoint, error) {
 		return aws.Endpoint{
 			PartitionID:   "aws",
 			URL:           awsLocalstackEndpoint,
@@ -544,7 +543,7 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, s3Client *s3.Client,
 	_, basefile, _, _ := runtime.Caller(0)
 	basedir := path.Dir(basefile)
 	for _, filename := range filenames {
-		data, err := ioutil.ReadFile(path.Join(basedir, filename))
+		data, err := os.ReadFile(path.Join(basedir, filename))
 		if err != nil {
 			t.Fatalf("Failed to open file %q, %v", filename, err)
 		}

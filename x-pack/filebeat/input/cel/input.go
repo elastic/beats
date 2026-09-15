@@ -465,7 +465,8 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			return err
 		}
 		if result.action.retry() {
-			continue
+			// If we hit a 429, try again subject to budget limits.
+			goto nextTry
 		}
 
 		// Empty or nil events finish the execution without setting runSpan status.
@@ -477,6 +478,7 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			okSpans(runSpan)
 			return nil
 		}
+	nextTry:
 		budget--
 		if budget <= 0 {
 			msg := "reached maximum number of CEL executions"
@@ -1143,6 +1145,8 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]any, header http.Hea
 				}
 				limiter.SetLimitAt(waitUntil, next)
 				limiter.SetBurstAt(waitUntil, burst)
+			case nil:
+				log.Errorw("unexpected nil returned for rate limit reset", "rate_limit", mapstr.M(rateLimit))
 			default:
 				log.Errorw("unexpected type returned for rate limit reset", "type", reflect.TypeOf(w).String(), "rate_limit", mapstr.M(rateLimit))
 			}
@@ -1176,6 +1180,8 @@ func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit r
 			return limit, false
 		}
 		limit = rate.Inf
+	case nil:
+		log.Errorw("unexpected nil returned for rate limit "+which, "rate_limit", mapstr.M(rateLimit))
 	default:
 		log.Errorw("unexpected type returned for rate limit "+which, "type", reflect.TypeOf(r).String(), "rate_limit", mapstr.M(rateLimit))
 	}

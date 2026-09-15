@@ -28,8 +28,8 @@ const (
 // Sanitizers can use the spec field to provide additional
 // configuration.
 type SanitizerSpec struct {
-	Type string                 `config:"type"`
-	Spec map[string]interface{} `config:"spec"`
+	Type string         `config:"type"`
+	Spec map[string]any `config:"spec"`
 }
 
 // Sanitizer defines the interface for sanitizing JSON data.
@@ -162,7 +162,7 @@ func (s *singleQuotesSanitizer) Init() error {
 type replaceAllSanitizer struct {
 	re          *regexp.Regexp
 	replacement string
-	spec        map[string]interface{}
+	spec        map[string]any
 }
 
 func (s *replaceAllSanitizer) Sanitize(jsonByte []byte) []byte {
@@ -201,7 +201,7 @@ func (s *replaceAllSanitizer) Init() error {
 // getStringFromSpec returns a string from the spec map.
 //
 // It returns an error if the spec entry key is missing or the value is not a string.
-func getStringFromSpec(spec map[string]interface{}, entryKey string) (string, error) {
+func getStringFromSpec(spec map[string]any, entryKey string) (string, error) {
 	value, ok := spec[entryKey]
 	if !ok {
 		return "", fmt.Errorf("missing sanitizer spec entry: %s", entryKey)

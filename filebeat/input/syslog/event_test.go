@@ -170,7 +170,7 @@ func TestIsValid(t *testing.T) {
 
 func itb(i int) []byte {
 	if i < 10 {
-		return []byte(fmt.Sprintf("0%d", i))
+		return fmt.Appendf(nil, "0%d", i)
 	}
 	return []byte(strconv.Itoa(i))
 }

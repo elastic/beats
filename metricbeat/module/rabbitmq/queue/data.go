@@ -84,7 +84,7 @@ var (
 )
 
 func eventsMapping(content []byte, r mb.ReporterV2) error {
-	var queues []map[string]interface{}
+	var queues []map[string]any
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
 		return fmt.Errorf("error in mapping: %w", err)
@@ -98,7 +98,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	return nil
 }
 
-func eventMapping(queue map[string]interface{}) mb.Event {
+func eventMapping(queue map[string]any) mb.Event {
 	fields, _ := schema.Apply(queue)
 
 	moduleFields := mapstr.M{}

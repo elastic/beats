@@ -697,3 +697,22 @@ func Test_PreparedStatement(t *testing.T) {
 	send(tcp.TCPDirectionReverse, "01000001011e0000020364656600000008636f6c5f305f305f000c3f001500000008810000000005000003fe000001200a00000400000b0000000000000005000005fe00000120")
 	assert.Len(t, results.events, 2)
 }
+
+// TestParseMysqlExecuteStatementTruncated confirms that parseMysqlExecuteStatement
+// does not panic when the parameter data is absent (truncated payload).
+func TestParseMysqlExecuteStatementTruncated(t *testing.T) {
+	mysql := mysqlModForTests(nil)
+
+	// data is exactly 16 bytes (the minimum for the header path to advance past
+	// the null-bitmap), with stmtBound=0 so the saved nparamType is used.
+	// paramOffset ends up at 16 == dataLen, so data[paramOffset] would panic
+	// without the bounds check added for FIELD_TYPE_TINY.
+	data := make([]byte, 16)
+	// stmtBound byte (index 15) is already 0; nparamType is supplied via stmtdata.
+	stmt := &mysqlStmtData{numOfParameters: 1, nparamType: []uint8{0x01}}
+
+	got := mysql.parseMysqlExecuteStatement(data, stmt)
+	if got != nil {
+		t.Errorf("parseMysqlExecuteStatement(truncated) = %v; want nil", got)
+	}
+}

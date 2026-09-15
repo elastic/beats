@@ -85,7 +85,7 @@ func TestCheckTagFiltersExist(t *testing.T) {
 	cases := []struct {
 		title          string
 		tagFilters     []Tag
-		tags           interface{}
+		tags           any
 		expectedExists bool
 	}{
 		{

@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"syscall"
 	"unsafe"
 
@@ -68,9 +69,21 @@ type Session struct {
 	// It is obtained from StartTrace when a new trace is started.
 	// This handler is needed to enable, query or stop the trace.
 	handler uintptr
+
+	// mu guards traceHandler and stopping. StartConsumer sets them on the
+	// consumer's goroutine while StopSession reads and sets them from
+	// whichever goroutine is shutting the session down.
+	mu sync.Mutex
 	// traceHandler is the trace processing handle.
 	// It is used to control the trace that receives and processes events.
 	traceHandler uint64
+	// stopping records that StopSession has been called. StartConsumer checks
+	// it once the trace is open: a stop that arrived before then found no
+	// handle to close, and without this check ProcessTrace would block on a
+	// session that nobody is going to end. Only Reset clears it, so a
+	// session that has been stopped cannot be consumed again until it has
+	// been reset.
+	stopping bool
 
 	// Pointers to functions that make calls to the Windows API.
 	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
@@ -196,10 +209,40 @@ func NewSession(conf Config) (*Session, error) {
 	return session, nil
 }
 
-// StartConsumer initializes and starts the ETW event tracing session.
+// Reset prepares the session to be created or attached to again after its
+// consumer has returned, which for a realtime session happens when another
+// controller stops it. Callers must call StopSession first, to release the
+// trace handle, and then Reset before starting the session again: Reset is
+// the only thing that clears the stop recorded by StopSession, and until it
+// runs StartConsumer returns without consuming. The handles from the previous
+// run and the pending stop are discarded and the session properties are
+// rebuilt, because StartTrace and ControlTrace write into the properties
+// buffer (session GUID, handle, live buffer counts) and feeding the previous
+// session's output back in as input is not safe.
+//
+// Callback is kept as is on purpose: StartConsumer registers it with
+// syscall.NewCallback, which dedupes on the function value and never frees
+// registrations, so reusing the same value is what keeps reconnects from
+// leaking callback slots.
+func (s *Session) Reset() {
+	s.handler = 0
+	s.mu.Lock()
+	s.traceHandler = 0
+	s.stopping = false
+	s.mu.Unlock()
+	if s.properties != nil {
+		s.properties = newSessionProperties(s.Name, s.config)
+	}
+}
+
+// StartConsumer initializes and starts the ETW event tracing session. It
+// blocks until the trace ends. If StopSession was called before the trace was
+// open, StartConsumer closes the trace itself and returns nil without
+// processing events, the same outcome as a stop that arrives while
+// ProcessTrace is running. This includes a StopSession from a previous run:
+// a stopped session must be Reset before it is started again.
 func (s *Session) StartConsumer() error {
 	var elf EventTraceLogfile
-	var err error
 
 	// Configure EventTraceLogfile based on the session type (realtime or not).
 	if !s.Realtime {
@@ -227,7 +270,7 @@ func (s *Session) StartConsumer() error {
 
 	// Open an ETW trace processing handle for consuming events
 	// from an ETW real-time trace session or an ETW log file.
-	s.traceHandler, err = s.openTrace(&elf)
+	traceHandler, err := s.openTrace(&elf)
 	switch {
 	case err == nil:
 	// Handle specific errors for trace opening.
@@ -239,8 +282,23 @@ func (s *Session) StartConsumer() error {
 		return fmt.Errorf("failed to open trace: %w", err)
 	}
 
+	// Publish the handle and check for a stop in one step, so that every
+	// ordering against StopSession is covered: a stop that ran before this
+	// point is seen here and closes the trace; one that runs after it finds
+	// the handle and closes it, which makes ProcessTrace return.
+	s.mu.Lock()
+	s.traceHandler = traceHandler
+	stopping := s.stopping
+	s.mu.Unlock()
+	if stopping {
+		if err := s.closeTrace(traceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
+			return fmt.Errorf("failed to close trace after stop: %w", err)
+		}
+		return nil
+	}
+
 	// Process the trace. This function blocks until processing ends.
-	if err := s.processTrace(&s.traceHandler, 1, nil, nil); err != nil {
+	if err := s.processTrace(&traceHandler, 1, nil, nil); err != nil {
 		return fmt.Errorf("failed to process trace: %w", err)
 	}
 	return nil

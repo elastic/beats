@@ -33,7 +33,7 @@ type sysmetricMetric struct {
  */
 func (e *sysmetricCollector) calculateQuery() string {
 	if len(e.patterns) == 0 {
-		e.patterns = make([]interface{}, 1)
+		e.patterns = make([]any, 1)
 		e.patterns[0] = "%"
 	}
 

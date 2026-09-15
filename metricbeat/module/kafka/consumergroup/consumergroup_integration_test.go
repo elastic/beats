@@ -53,7 +53,7 @@ func TestData(t *testing.T) {
 	defer c.Close()
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(host))
-	for retries := 0; retries < 3; retries++ {
+	for range 3 {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
 			return
@@ -79,7 +79,7 @@ func TestFetch(t *testing.T) {
 
 	var data []mb.Event
 	var errors []error
-	for retries := 0; retries < 3; retries++ {
+	for range 3 {
 		data, errors = mbtest.ReportingFetchV2Error(f)
 		if len(data) > 0 {
 			continue
@@ -115,8 +115,8 @@ func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error)
 	return consumerGroup, nil
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "kafka",
 		"metricsets": []string{"consumergroup"},
 		"hosts":      []string{host},

@@ -147,7 +147,7 @@ var (
 )
 
 func eventsMapping(r mb.ReporterV2, content []byte) error {
-	var nodes []map[string]interface{}
+	var nodes []map[string]any
 	err := json.Unmarshal(content, &nodes)
 	if err != nil {
 		return fmt.Errorf("error in Unmarshal: %w", err)
@@ -160,7 +160,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	return nil
 }
 
-func eventMapping(node map[string]interface{}) mb.Event {
+func eventMapping(node map[string]any) mb.Event {
 	event, _ := schema.Apply(node)
 	return mb.Event{
 		MetricSetFields: event,

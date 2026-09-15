@@ -19,7 +19,7 @@ package http
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -124,7 +124,7 @@ func TestCheckJsonExpression(t *testing.T) {
 			)
 
 			require.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
 			checkRes := checker(res, string(body))
 
@@ -141,12 +141,12 @@ func TestCheckJsonExpression(t *testing.T) {
 }
 
 func TestCheckJsonCondition(t *testing.T) {
-	fooBazEqualsBar := conf.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": map[string]interface{}{"baz": "bar"}}})
+	fooBazEqualsBar := conf.MustNewConfigFrom(map[string]any{"equals": map[string]any{"foo": map[string]any{"baz": "bar"}}})
 	fooBazEqualsBarConf := &conditions.Config{}
 	err := fooBazEqualsBar.Unpack(fooBazEqualsBarConf)
 	require.NoError(t, err)
 
-	fooBazEqualsBarInt := conf.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": 1}})
+	fooBazEqualsBarInt := conf.MustNewConfigFrom(map[string]any{"equals": map[string]any{"foo": 1}})
 	fooBazEqualsBarIntConf := &conditions.Config{}
 	err = fooBazEqualsBarInt.Unpack(fooBazEqualsBarIntConf)
 	require.NoError(t, err)
@@ -220,7 +220,7 @@ func TestCheckJsonCondition(t *testing.T) {
 
 			checker, err := checkJson([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}}, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
 			checkRes := checker(res, string(body))
 

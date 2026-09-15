@@ -52,9 +52,9 @@ func (p *PerformanceDataFetcher) GetPerfMetrics(ctx context.Context,
 	objectName string,
 	objectReference types.ManagedObjectReference,
 	metrics map[string]*types.PerfCounterInfo,
-	metricSet map[string]struct{}) (metricMap map[string]interface{}, err error) {
+	metricSet map[string]struct{}) (metricMap map[string]any, err error) {
 
-	metricMap = make(map[string]interface{})
+	metricMap = make(map[string]any)
 
 	availableMetric, err := p.perfManager.AvailableMetric(ctx, objectReference, period)
 	if err != nil {

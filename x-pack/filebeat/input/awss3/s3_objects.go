@@ -508,7 +508,7 @@ func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 	allMeta := map[string]any{}
 
 	// Get headers using AWS SDK struct tags.
-	fields := reflect.TypeOf(resp).Elem()
+	fields := reflect.TypeFor[s3.GetObjectOutput]()
 	values := reflect.ValueOf(resp).Elem()
 	for i := 0; i < fields.NumField(); i++ {
 		f := fields.Field(i)

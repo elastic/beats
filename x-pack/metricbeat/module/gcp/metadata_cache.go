@@ -6,6 +6,7 @@ package gcp
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 
@@ -60,9 +61,7 @@ func (c *Cache[T]) EnsureFresh(refreshFunc func() (map[string]T, error)) error {
 	}
 
 	c.data = make(map[string]T, len(newData))
-	for k, v := range newData {
-		c.data[k] = v
-	}
+	maps.Copy(c.data, newData)
 	c.lastRefreshed = time.Now()
 
 	return nil

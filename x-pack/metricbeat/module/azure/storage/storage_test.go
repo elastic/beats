@@ -43,7 +43,7 @@ var (
 		"resources": []mapstr.M{
 			{
 				"resource_id": "test",
-				"metrics": []map[string]interface{}{
+				"metrics": []map[string]any{
 					{
 						"name": []string{"*"},
 					}},

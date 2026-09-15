@@ -169,7 +169,7 @@ func (m *Manager) initDefault() error {
 
 // CursorValueForQuery returns the cursor value converted to a driver-compatible argument.
 // The returned value is ready to be passed to db.QueryContext().
-func (m *Manager) CursorValueForQuery() interface{} {
+func (m *Manager) CursorValueForQuery() any {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -231,7 +231,7 @@ func (m *Manager) UpdateFromResults(rows []mapstr.M) error {
 
 	for idx, row := range rows {
 		// Find the cursor column (case-insensitive)
-		var rawVal interface{}
+		var rawVal any
 		var found bool
 
 		for key, val := range row {
@@ -366,7 +366,7 @@ func inferTypeFromRows(rows []mapstr.M, columnLower string) (string, error) {
 	inferredType := ""
 	for _, row := range rows {
 		var (
-			rawVal interface{}
+			rawVal any
 			found  bool
 		)
 

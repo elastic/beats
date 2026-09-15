@@ -72,6 +72,27 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	if err != nil {
 		return c, err
 	}
+	// Under agent semantics the flows stream is delivered alongside the
+	// protocols streams, so it may arrive as a protocols list entry with
+	// type "flow". Route it to the flows configuration, consistent with
+	// NewAgentConfig.
+	protocols := c.ProtocolsList[:0]
+	for _, protocol := range c.ProtocolsList {
+		module := struct {
+			Type string `config:"type"`
+		}{}
+		if err := protocol.Unpack(&module); err != nil {
+			return c, err
+		}
+		if module.Type == "flow" {
+			if err := protocol.Unpack(&c.Flows); err != nil {
+				return c, err
+			}
+			continue
+		}
+		protocols = append(protocols, protocol)
+	}
+	c.ProtocolsList = protocols
 	iface, err := cfg.Child("interfaces", -1)
 	if err == nil {
 		if !iface.IsArray() {

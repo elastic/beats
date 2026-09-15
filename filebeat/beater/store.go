@@ -166,6 +166,11 @@ func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
 	return s.shared.registry.Get(s.storeName)
 }
 
+// StoreKey returns the identifier of the shared persistent registry backend.
+func (s *filebeatStore) StoreKey() string {
+	return s.storeKey
+}
+
 func (s *filebeatStore) CleanupInterval() time.Duration {
 	return s.cleanInterval
 }
