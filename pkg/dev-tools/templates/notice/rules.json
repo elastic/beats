@@ -1,0 +1,21 @@
+{
+  "allowlist": [
+    "Apache-2.0",
+    "BSD",
+    "BSD-2-Clause",
+    "BSD-2-Clause-FreeBSD",
+    "BSD-3-Clause",
+    "CC0-1.0",
+    "Elastic",
+    "ISC",
+    "MIT",
+    "MPL-2.0",
+    "Public Domain",
+    "Zlib"
+  ],
+  "maybelist": [
+    "EPL-1.0",
+    "GPL-3.0",
+    "LGPL-3.0"
+  ]
+}
