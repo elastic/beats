@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
@@ -136,7 +136,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -254,7 +254,7 @@ func TestOsquerybeatEarlyShutdownDuringCheck(t *testing.T) {
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -417,7 +417,7 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -457,7 +457,7 @@ func TestOsquerybeatStatusReporting_ManagerPreInitFailure(t *testing.T) {
 		preInitErr: assert.AnError,
 	}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -488,7 +488,7 @@ func TestNewCheckTimeout(t *testing.T) {
 	newBeat := func(t *testing.T) *beat.Beat {
 		t.Helper()
 		b := &beat.Beat{
-			Info:       beat.Info{Logger: logp.NewLogger("test")},
+			Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 			Registry:   reload.NewRegistry(),
 			Monitoring: beatmonitoring.NewMonitoring(),
 		}
@@ -547,7 +547,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{Manager: mgr}
 	ob := &osquerybeat{
-		qp: newQueryProfiler(logp.NewLogger("test")),
+		qp: newQueryProfiler(logptest.NewTestingLogger(t, "")),
 	}
 	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
 		rows: []map[string]any{
