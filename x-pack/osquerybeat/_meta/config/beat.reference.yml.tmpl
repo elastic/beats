@@ -7,6 +7,10 @@ osquerybeat:
 #    - type: osquery
 #      osquery:
 #        elastic_options:
+#          # Optional deadline for the osqueryd --version startup check. Uses Go
+#          # duration format. Default: 15s. Increase on hosts where antivirus
+#          # scanning delays the first osqueryd exec.
+#          #check_timeout: 15s
 #          query_profile_storage:
 #            # Enable local storage of live query profiles.
 #            #enabled: true
