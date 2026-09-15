@@ -89,6 +89,13 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
+func (cim *InputManager) defaultCleanTimeout() time.Duration {
+	if cim.DefaultCleanTimeout <= 0 {
+		return 30 * time.Minute
+	}
+	return cim.DefaultCleanTimeout
+}
+
 // ensureSetup opens the shared store on first call. It must NOT be called
 // with cim.mu held: it releases and re-acquires the lock around the blocking
 // globalCache.Acquire call so that a concurrent Close() can always proceed.
@@ -101,9 +108,6 @@ func (cim *InputManager) ensureSetup(inputID string) error {
 	if cim.closed {
 		cim.mu.Unlock()
 		return errors.New("input manager is closed")
-	}
-	if cim.DefaultCleanTimeout <= 0 {
-		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
 	log := cim.Logger.With("input_type", cim.Type)
 	key := cim.StateStore.StoreKey() + "::" + cim.Type
@@ -180,7 +184,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	settings := struct {
 		ID            string        `config:"id"`
 		CleanInactive time.Duration `config:"clean_inactive"`
-	}{ID: "", CleanInactive: cim.DefaultCleanTimeout}
+	}{ID: "", CleanInactive: cim.defaultCleanTimeout()}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
