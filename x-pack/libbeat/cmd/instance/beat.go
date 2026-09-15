@@ -156,6 +156,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	b.RawConfig = cfg
+
+	// Periodic metrics snapshots are expensive to collect and mostly
+	// redundant under a receiver, where metrics are already exported
+	// through the otel telemetry provider. Default them off.
+	b.Config.MetricLogging = config.MustNewConfigFrom(map[string]any{"period": 0})
+
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
@@ -170,6 +176,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("could not parse features: %w", err)
 	}
+
+	b.ApplyHostname(b.Config.Hostname, "config hostname field")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -193,15 +202,17 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	fqdn, err := fqdnOnce()
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+	if b.HostnameOverride() == "" {
+		// Try to get the host's FQDN and set it.
+		fqdn, err := fqdnOnce()
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// register NewOtelManager
