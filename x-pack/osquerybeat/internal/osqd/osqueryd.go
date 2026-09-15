@@ -190,52 +190,7 @@ func (q *OSQueryD) DataPath() string {
 	return q.dataPath
 }
 
-<<<<<<< HEAD
-// Check checks if the binary exists and executable
-=======
-// SetExtensions updates the customer-managed extension entries (directories, files,
-// or glob patterns) to resolve, an optional extensions_timeout override (seconds,
-// reverts to the construction-time default when <= 0), and the extension names
-// osqueryd must wait for at startup (extensions_require). The new set is applied on
-// the next Run (which rewrites the autoload file via prepare()).
-func (q *OSQueryD) SetExtensions(paths []string, timeout int, require []string) {
-	q.extMx.Lock()
-	defer q.extMx.Unlock()
-	q.extensionEntries = append([]string(nil), paths...)
-	q.extensionRequire = append([]string(nil), require...)
-	if timeout > 0 {
-		q.extensionsTimeout = timeout
-	} else {
-		q.extensionsTimeout = q.baseExtensionsTimeout
-	}
-}
-
-func (q *OSQueryD) getExtensionEntries() []string {
-	q.extMx.Lock()
-	defer q.extMx.Unlock()
-	return append([]string(nil), q.extensionEntries...)
-}
-
-func (q *OSQueryD) getExtensionRequire() []string {
-	q.extMx.Lock()
-	defer q.extMx.Unlock()
-	return append([]string(nil), q.extensionRequire...)
-}
-
-func (q *OSQueryD) getExtensionsTimeout() int {
-	q.extMx.Lock()
-	defer q.extMx.Unlock()
-	return q.extensionsTimeout
-}
-
-// AutoloadPath returns the path of the osquery extensions autoload file within
-// the given osquery data directory.
-func AutoloadPath(dataPath string) string {
-	return filepath.Join(dataPath, osqueryAutoload)
-}
-
 // Check checks if the binary exists and is executable.
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 func (q *OSQueryD) Check(ctx context.Context) error {
 	err := q.prepareBinPath()
 	if err != nil {

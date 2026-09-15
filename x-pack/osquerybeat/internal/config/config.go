@@ -318,8 +318,6 @@ func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
 	return *inputs[0].Osquery.ElasticOptions.Install
 }
 
-<<<<<<< HEAD
-=======
 // GetOsqueryCheckTimeout returns the osqueryd --version startup check deadline
 // from elastic_options.check_timeout on the first input. Unset values use
 // DefaultCheckTimeout.
@@ -330,20 +328,6 @@ func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
 	return ParseCheckTimeout(inputs[0].Osquery.ElasticOptions.CheckTimeout)
 }
 
-// GetOsqueryExtensions returns customer-managed osquery extension settings
-// (elastic_options.extensions) from the first input if available.
-func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
-	if len(inputs) == 0 {
-		return ExtensionsConfig{}
-	}
-	o := inputs[0].Osquery
-	if o == nil || o.ElasticOptions == nil || o.ElasticOptions.Extensions == nil {
-		return ExtensionsConfig{}
-	}
-	return *o.ElasticOptions.Extensions
-}
-
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 // GetProfilingEnabled returns the global query profiling default from the first input.
 // This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
 // Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
