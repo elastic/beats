@@ -31,6 +31,44 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+func TestValidateCredentials(t *testing.T) {
+	tests := []struct {
+		name      string
+		username  string
+		password  string
+		mechanism string
+		wantErr   bool
+		errSubstr string
+	}{
+		{name: "username and password", username: "user", password: "secret"},
+		{name: "empty credentials"},
+		{name: "OAUTHBEARER no credentials", mechanism: "OAUTHBEARER"},
+		{name: "username without password", username: "user", wantErr: true, errSubstr: "password must be set"},
+		{name: "password without username", password: "secret", wantErr: true, errSubstr: "username must be set"},
+		{name: "OAUTHBEARER with username", mechanism: "OAUTHBEARER", username: "user", password: "secret", wantErr: true, errSubstr: "OAUTHBEARER"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := defaultConfig()
+			cfg.Hosts = []string{"localhost:9092"}
+			cfg.Username = tc.username
+			cfg.Password = tc.password
+			cfg.Sasl.SaslMechanism = tc.mechanism
+
+			err := cfg.Validate()
+			if tc.wantErr {
+				require.Error(t, err)
+				if tc.errSubstr != "" {
+					assert.ErrorContains(t, err, tc.errSubstr)
+				}
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
 // TestNewSaramaConfigDefaults verifies that the default input config maps the
 // consumer-group and network timeouts onto sarama's own defaults, so that
 // existing configurations are unaffected by these options being added.
