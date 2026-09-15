@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/filesystem"
+	fs "github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/filesystem"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -134,11 +134,17 @@ func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 func (m *MetricSet) filesystemsDiag() []byte {
-	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	sys, ok := m.Module().(resolve.Resolver)
+	if !ok {
+		return fmt.Appendf(nil, "Error fetching data: module %T does not implement resolve.Resolver", m.Module())
+	}
 	return diagnostics.GetRawFileOrErrorString(sys, "/proc/filesystems")
 }
 
 func (m *MetricSet) mountsDiag() []byte {
-	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	sys, ok := m.Module().(resolve.Resolver)
+	if !ok {
+		return fmt.Appendf(nil, "Error fetching data: module %T does not implement resolve.Resolver", m.Module())
+	}
 	return diagnostics.GetRawFileOrErrorString(sys, "/proc/mounts")
 }
