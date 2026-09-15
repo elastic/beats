@@ -15,6 +15,9 @@ const (
 	MaxSplay = 12 * time.Hour
 	// DefaultSplay is the default splay duration (disabled)
 	DefaultSplay = 0
+	// DefaultCheckTimeout is the osqueryd --version startup check deadline
+	// when elastic_options.check_timeout is unset.
+	DefaultCheckTimeout = 15 * time.Second
 )
 
 // RRuleScheduleConfig represents an RRULE-based schedule configuration
@@ -102,6 +105,78 @@ type ElasticOptions struct {
 	Install *InstallConfig `config:"install" json:"-"`
 	// Profiling groups all query profiling settings (global publish default and local storage).
 	Profiling *ProfilingConfig `config:"profiling" json:"-"`
+<<<<<<< HEAD
+=======
+	// Extensions configures loading of customer-managed osquery extensions.
+	Extensions *ExtensionsConfig `config:"extensions" json:"-"`
+	// CheckTimeout optionally overrides the osqueryd --version startup check
+	// deadline. Go duration format ("15s", "30s", "1m"). Default: 15s.
+	CheckTimeout string `config:"check_timeout" json:"-"`
+}
+
+// ParseCheckTimeout parses elastic_options.check_timeout. An empty value
+// returns DefaultCheckTimeout. The duration must be greater than zero.
+func ParseCheckTimeout(raw string) (time.Duration, error) {
+	if raw == "" {
+		return DefaultCheckTimeout, nil
+	}
+	d, err := time.ParseDuration(raw)
+	if err != nil {
+		return 0, fmt.Errorf("invalid osquery.elastic_options.check_timeout %q: %w", raw, err)
+	}
+	if d <= 0 {
+		return 0, fmt.Errorf("osquery.elastic_options.check_timeout must be greater than 0, got %s", raw)
+	}
+	return d, nil
+}
+
+// ExtensionsConfig configures loading of customer-managed (third-party or
+// customer-built) osquery extensions. These extensions are NOT developed,
+// validated, or supported by Elastic; customers are fully responsible for
+// their security, maintenance, and stability.
+//
+// Paths lists absolute entries on the endpoint, where each entry may be:
+//   - a directory: every extension binary found directly in it is autoloaded
+//     (files ending in ".ext" on Unix or ".exe" on Windows);
+//   - a file: that specific extension binary is autoloaded;
+//   - a glob pattern (containing *, ? or [ ]): each match is resolved as a
+//     directory or file per the rules above.
+//
+// Symlinks are rejected (entries, glob matches, and directory contents) so the
+// binary that is validated is the one osqueryd executes.
+//
+// Entries are resolved when osqueryd is (re)started, which happens when the
+// extension configuration (or other osquery options) change. Adding or removing
+// binaries in a configured directory does NOT trigger a reload by itself.
+//
+// osquerybeat never copies these binaries and never writes into the Elastic
+// Agent install tree; it only appends the resolved paths to the osquery
+// extensions autoload file that lives in the runtime data directory. osqueryd
+// enforces safe file permissions on autoloaded extensions (owned by the running
+// user, not writable by group or others); unsafe, non-executable, or otherwise
+// invalid binaries are skipped and logged rather than aborting startup.
+type ExtensionsConfig struct {
+	// Paths lists absolute directories, files, or glob patterns to resolve into
+	// extension binaries.
+	Paths []string `config:"paths" json:"-"`
+	// Timeout optionally overrides osquery's extensions_timeout (seconds), the
+	// time osqueryd waits for autoloaded extensions to register.
+	Timeout int `config:"timeout" json:"-"`
+	// Require lists extension names osqueryd must wait for at startup
+	// (osquery's extensions_require); queries do not run until the named
+	// extensions have registered or extensions_timeout elapses. Use this to
+	// avoid "no such table" races against slow-registering extensions.
+	Require []string `config:"require" json:"-"`
+}
+
+// PathsOrEmpty returns the configured extension paths, or an empty slice when no
+// extensions are configured.
+func (c *ExtensionsConfig) PathsOrEmpty() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Paths
+>>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 }
 
 // ProfilingConfig groups all query profiling settings. When ProfilingAll is enabled (the default),
