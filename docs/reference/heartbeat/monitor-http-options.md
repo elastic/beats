@@ -86,7 +86,14 @@ On by default. Set `response.include_headers` to `false` to disable.
 
 ## `response` [monitor-http-response]
 
-Controls the indexing of the HTTP response body contents to the `http.response.body.contents` field.
+Controls the processing and ingestion of the HTTP response body contents to the `http.response.body.contents` field.
+
+### `check_body_max_bytes`
+
+Sets the upper boundary for the HTTP responso body length (in bytes). Defaults to 4096 bytes.
+This limit is overriden when `response.include_body_max_bytes` is set to a higher value.
+
+### `include_body`
 
 Set `response.include_body` to one of the options listed below.
 
@@ -99,8 +106,10 @@ Set `response.include_body` to one of the options listed below.
 **`always`**
 :   Always include the body with checks.
 
-Set `response.include_body_max_bytes` to control the maximum size of the stored body contents. Defaults to 1024 bytes.
 
+### `include_body_max_bytes`
+
+Set `response.include_body_max_bytes` to control the maximum size of the stored body contents. Defaults to 1024 bytes.
 
 ### `check` [monitor-http-check]
 
