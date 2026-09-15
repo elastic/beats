@@ -425,6 +425,42 @@ protocols:
 		},
 	},
 	{
+		// Agent semantics deliver the flows stream in the protocols
+		// list; it must be routed to the flows configuration.
+		name: "flow_in_protocols_list",
+		config: `
+interfaces.device: default_route
+
+protocols:
+- type: flow
+  timeout: 30s
+  period: -1s
+  index: logs-network_traffic.flow-default
+
+- type: amqp
+  ports: [5672]
+`,
+		want: Config{
+			Interfaces: []InterfaceConfig{{
+				Device: "default_route",
+			}},
+			Flows: &Flows{
+				Timeout: "30s",
+				Period:  "-1s",
+				Index:   "logs-network_traffic.flow-default",
+			},
+			Protocols: map[string]*config.C{},
+			ProtocolsList: []*config.C{
+				config.MustNewConfigFrom(map[string]any{
+					"type": "amqp",
+					"ports": []int{
+						5672,
+					},
+				}),
+			},
+		},
+	},
+	{
 		name: "duplicated_interface",
 		config: `
 interfaces:

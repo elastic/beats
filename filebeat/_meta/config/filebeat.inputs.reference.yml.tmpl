@@ -504,6 +504,10 @@ filebeat.inputs:
   #  from `filestream` inputs that were assigned these IDs.
   #  Taking over from `log` inputs is disabled when `from_ids` is set.
   #  from_ids: ["foo", "bar"]
+  #  If `from_any_id` is true, files are taken over from any previous
+  #  `filestream` input, regardless of its ID. Mutually exclusive with `from_ids`.
+  #  Taking over from `log` inputs is disabled when `from_any_id` is set.
+  #  from_any_id: false
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -665,7 +669,7 @@ filebeat.inputs:
   # Configure cipher suites to be used for SSL connections.
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites.
+  # Configure curve types for TLS key exchange.
   #ssl.curve_types: []
 
   # Configure what types of client authentication are supported. Valid options
@@ -820,7 +824,7 @@ filebeat.inputs:
     # Configure cipher suites to be used for SSL connections.
     #ssl.cipher_suites: []
 
-    # Configure curve types for ECDHE based cipher suites.
+    # Configure curve types for TLS key exchange.
     #ssl.curve_types: []
 
     # Configure what types of client authentication are supported. Valid options

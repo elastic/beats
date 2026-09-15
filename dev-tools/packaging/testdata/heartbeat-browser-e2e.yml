@@ -1,0 +1,26 @@
+# Exit after running the monitor once.
+heartbeat.run_once: true
+heartbeat.publish_timeout: 30s
+
+output.console:
+  enabled: true
+  codec.json:
+    pretty: false
+
+heartbeat.monitors:
+  - type: browser
+    id: generated-image-browser-e2e
+    name: generated-image-browser-e2e
+    schedule: '@every 1m'
+    timeout: 30s
+    max_attempts: 1
+    screenshots: "off"
+    source:
+      inline:
+        script: |-
+          step('page loads', async () => {
+            await page.goto('data:text/html,%3Ctitle%3EHeartbeat%20Browser%20E2E%3C%2Ftitle%3E');
+            if (await page.title() !== 'Heartbeat Browser E2E') {
+              throw new Error('unexpected page title');
+            }
+          });

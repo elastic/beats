@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add Box JWT server authentication as an auth.oauth2.provider option for the CEL input.
+component: filebeat

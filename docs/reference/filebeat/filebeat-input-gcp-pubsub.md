@@ -88,6 +88,22 @@ filebeat.inputs:
 ```
 
 
+### `api_endpoint` [_api_endpoint]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Optional Google Cloud Pub/Sub API endpoint to connect to. When specified, Filebeat connects to this endpoint instead of the default `pubsub.googleapis.com:443`. This is useful for connecting through Private Service Connect (PSC), custom Universe Domains, or reverse proxies.
+
+```yaml
+filebeat.inputs:
+- type: gcp-pubsub
+  . . .
+  api_endpoint: custom-pubsub-endpoint.googleapis.com:443
+```
+
+
 ## Common options [filebeat-input-gcp-pubsub-common-options]
 
 The following configuration options are supported by all inputs.

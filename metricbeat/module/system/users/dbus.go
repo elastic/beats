@@ -65,11 +65,13 @@ func initDbusConnection() (*dbus.Conn, error) {
 
 	err = conn.Auth([]dbus.Auth{auth})
 	if err != nil {
+		conn.Close()
 		return nil, fmt.Errorf("error authenticating: %w", err)
 	}
 
 	err = conn.Hello()
 	if err != nil {
+		conn.Close()
 		return nil, fmt.Errorf("error in Hello: %w", err)
 	}
 

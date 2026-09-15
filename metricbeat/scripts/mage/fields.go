@@ -45,7 +45,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       []string{"module/docker", "module/kubernetes"},
 			ModulesToExclude: nil,
 			Outfile:          "include/list_docker.go",
-			BuildTags:        "\n//go:build (linux || darwin || windows) && !agentbeat\n",
+			BuildTags:        "\n//go:build (linux || darwin || windows) && !securityonly\n",
 			Pkg:              "include",
 			SkipInitModule:   true,
 		})
@@ -62,6 +62,37 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			BuildTags:        "\n//go:build !agentbeat\n",
 			Pkg:              "include",
 			SkipInitModule:   false,
+		})
+	if err != nil {
+		return err
+	}
+	// generate include/list_init_agentbeat.go
+	err = devtools.GenerateIncludeListGo(
+		devtools.IncludeListOptions{
+			ImportDirs:       []string{"processor/add_kubernetes_metadata"},
+			ModuleDirs:       nil,
+			ModulesToExclude: nil,
+			Outfile:          "include/list_init_agentbeat.go",
+			BuildTags:        "\n//go:build agentbeat && !securityonly\n",
+			Pkg:              "include",
+			SkipInitModule:   false,
+		})
+	if err != nil {
+		return err
+	}
+	// generate include/list_common_securityonly.go
+	// ImportDirs picks up the top-level module package (registers the module factory via init()),
+	// while ModuleDirs finds the metricsets one level down via their _meta directories.
+	err = devtools.GenerateIncludeListGo(
+		devtools.IncludeListOptions{
+			ImportDirs:            []string{"module/linux", "module/system", "module/windows"},
+			ModuleDirs:            []string{"module/linux", "module/system", "module/windows"},
+			ModulesToExclude:      nil,
+			Outfile:               "include/list_common_securityonly.go",
+			BuildTags:             "\n//go:build securityonly\n",
+			Pkg:                   "include",
+			SkipInitModule:        true,
+			ForceInitializeModule: true,
 		})
 	if err != nil {
 		return err

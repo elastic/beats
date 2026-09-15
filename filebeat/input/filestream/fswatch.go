@@ -89,9 +89,25 @@ func newFileWatcher(
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
+	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, nil, 0)
+}
+
+// newFileWatcherWithDirReader is like newFileWatcher but accepts a shared dirCache
+// and the per-call maxAge for the directory listing cache. dc=nil disables caching.
+func newFileWatcherWithDirReader(
+	logger *logp.Logger,
+	paths []string,
+	config fileWatcherConfig,
+	compression string,
+	sendNotChanged bool,
+	fi fileIdentifier,
+	srci *loginp.SourceIdentifier,
+	dc *dirCache,
+	maxAge time.Duration,
+) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(logger, paths, config.Scanner, compression)
+	scanner, err := newFileScannerWithCache(logger, paths, config.Scanner, compression, dc, maxAge)
 	if err != nil {
 		return nil, err
 	}
@@ -579,6 +595,14 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 // completedFingerprints set, so these pre-watch scans cannot suppress the
 // bridging raw header a still-growing entry needs to migrate its registry key
 // after a restart.
+//
+// The dir-cache is bypassed: Init scans happen before the watch loop writes
+// any files, so caching their results would stale-serve the first watch scan.
 func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
+	if fs, ok := w.scanner.(*fileScanner); ok {
+		dc := fs.dirCache
+		fs.dirCache = nil
+		defer func() { fs.dirCache = dc }()
+	}
 	return w.scanner.GetFiles(opts)
 }

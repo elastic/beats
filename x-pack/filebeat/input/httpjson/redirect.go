@@ -63,6 +63,7 @@ func (m InputManager) migrateCursor(src, dst *conf.C) {
 		return
 	}
 	defer store.Close()
+	store.SetID(id)
 
 	key := cursorKey("httpjson", id, u.String())
 	var entry map[string]any
