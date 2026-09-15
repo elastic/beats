@@ -1,6 +1,6 @@
 kind: bug-fix
 
-summary: Reject Kafka `sasl.mechanism: OAUTHBEARER` with username/password at startup to prevent silent SASL/PLAIN authentication.
+summary: "Reject Kafka `sasl.mechanism: OAUTHBEARER` with username/password at startup to prevent silent SASL/PLAIN authentication."
 
 description: |
   OAUTHBEARER passed config validation but was never wired into the Sarama
