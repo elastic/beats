@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+#
+# Runs elastic/dra-prep + the summary annotation for a single DRA workflow
+# (snapshot or staging), then triggers unified-release-dra-processing.
+#
+# Only ever triggered by packaging.pipeline.yml's DRA publish group — never
+# run from GitHub activity directly (see catalog-info.yaml: trigger_mode: none).
+# Expects WORKFLOW and DRY_RUN as build-level env, passed by the trigger step.
+# STACK_VERSION, VERSION_QUALIFIER, and DRA_UPLOAD are resolved in
+# .buildkite/hooks/pre-command, gated on this pipeline's slug.
+
+env:
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1782878510"
+
+steps:
+  - label: ":package: DRA Prep (${WORKFLOW})"
+    key: "dra-prep"
+    command: ".buildkite/scripts/stage-dra-artifacts.sh"
+    env:
+      DRA_WORKFLOW: "${WORKFLOW}"
+      VERSION_QUALIFIER: "${VERSION_QUALIFIER:-}"
+    agents:
+      provider: gcp
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+    timeout_in_minutes: 30
+    plugins:
+      # Must match the google_oidc_plugin anchor in packaging.pipeline.yml
+      - elastic/oblt-google-auth#v1.3.1:
+          lifetime: 10800 # seconds
+          project-id: "elastic-observability-ci"
+          project-number: "911195782929"
+      - elastic/dra-prep#v0.1.6:
+          product_id: "beats"
+          stack_version: "${STACK_VERSION}"
+          workflow: "${WORKFLOW}"
+          upload: ${DRA_UPLOAD}
+
+  - label: ":memo: Annotate DRA build"
+    if: build.env('DRY_RUN') != "true"
+    depends_on: "dra-prep"
+    command: ".buildkite/scripts/dra-annotate.sh ${WORKFLOW}"
+    agents:
+      provider: gcp
+      image: "${IMAGE_UBUNTU_X86_64}"
+    timeout_in_minutes: 5
+
+  - label: ":pipeline: DRA processing for beats (${WORKFLOW})"
+    if: build.env('DRY_RUN') != "true"
+    trigger: "unified-release-dra-processing"
+    depends_on: "dra-prep"
+    build:
+      env:
+        DRA_PRODUCT_ID: "beats"
+        DRA_STACK_VERSION: "${STACK_VERSION}"
+        DRA_WORKFLOW: "${WORKFLOW}"
