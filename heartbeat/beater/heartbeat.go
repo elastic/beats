@@ -48,8 +48,10 @@ import (
 
 // Heartbeat represents the root datastructure of this beat.
 type Heartbeat struct {
-	done     chan struct{}
-	stopOnce sync.Once
+	done                         chan struct{}
+	stopOnce                     sync.Once
+	schedulerPayloadReporterMu   sync.Mutex
+	schedulerPayloadReporterStop func()
 	// config is used for iterating over elements of the config.
 	config             *config.Config
 	scheduler          *scheduler.Scheduler
@@ -207,6 +209,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // b.Manager.Start is deprecated in favour of PreInit/PostInit; refactor is deferred
 		return err
 	}
+	stopSchedulerPayloadReporter := bt.startManagedSchedulerPayloadReporter(b.Manager.Enabled(), b.Manager, bt.scheduler)
+	defer stopSchedulerPayloadReporter()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
@@ -322,7 +326,15 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	bt.stopOnce.Do(func() { close(bt.done) })
+	bt.stopOnce.Do(func() {
+		bt.schedulerPayloadReporterMu.Lock()
+		defer bt.schedulerPayloadReporterMu.Unlock()
+
+		if bt.schedulerPayloadReporterStop != nil {
+			bt.schedulerPayloadReporterStop()
+		}
+		close(bt.done)
+	})
 }
 
 func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
