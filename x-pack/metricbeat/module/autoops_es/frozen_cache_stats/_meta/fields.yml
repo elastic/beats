@@ -1,0 +1,62 @@
+- name: frozen_cache_stats
+  type: group
+  release: beta
+  description: >
+    Searchable snapshot shared cache statistics per node.
+  fields:
+    - name: id
+      type: keyword
+      description: >
+        Node ID.
+    - name: shared_cache.reads
+      type: long
+      description: >
+        Total number of shared cache reads (counter).
+    - name: shared_cache.writes
+      type: long
+      description: >
+        Total number of shared cache writes (counter).
+    - name: shared_cache.evictions
+      type: long
+      description: >
+        Total number of shared cache evictions (counter).
+    - name: shared_cache.size_in_bytes
+      type: long
+      description: >
+        Total size of the shared cache in bytes (gauge).
+    - name: shared_cache.region_size_in_bytes
+      type: long
+      description: >
+        Size of each cache region in bytes.
+    - name: shared_cache.num_regions
+      type: long
+      description: >
+        Number of cache regions.
+    - name: shared_cache.bytes_written_in_bytes
+      type: long
+      description: >
+        Total bytes written to the shared cache (counter).
+    - name: shared_cache.bytes_read_in_bytes
+      type: long
+      description: >
+        Total bytes read from the shared cache (counter).
+    - name: shared_cache_reads_per_second
+      type: float
+      description: >
+        Rate of shared cache reads per second.
+    - name: shared_cache_writes_per_second
+      type: float
+      description: >
+        Rate of shared cache writes per second.
+    - name: shared_cache_evictions_per_second
+      type: float
+      description: >
+        Rate of shared cache evictions per second.
+    - name: shared_cache_bytes_written_per_second
+      type: float
+      description: >
+        Rate of bytes written to the shared cache per second.
+    - name: shared_cache_bytes_read_per_second
+      type: float
+      description: >
+        Rate of bytes read from the shared cache per second.

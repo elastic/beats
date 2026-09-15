@@ -938,6 +938,98 @@ component template information from the cluster
     type: keyword
 
 
+## frozen_cache_stats [_frozen_cache_stats]
+
+```{applies_to}
+stack: beta
+```
+
+Searchable snapshot shared cache statistics per node.
+
+**`autoops_es.frozen_cache_stats.id`**
+:   Node ID.
+
+    type: keyword
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.reads`**
+:   Total number of shared cache reads (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.writes`**
+:   Total number of shared cache writes (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.evictions`**
+:   Total number of shared cache evictions (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.size_in_bytes`**
+:   Total size of the shared cache in bytes (gauge).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.region_size_in_bytes`**
+:   Size of each cache region in bytes.
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.num_regions`**
+:   Number of cache regions.
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.bytes_written_in_bytes`**
+:   Total bytes written to the shared cache (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.bytes_read_in_bytes`**
+:   Total bytes read from the shared cache (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_reads_per_second`**
+:   Rate of shared cache reads per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_writes_per_second`**
+:   Rate of shared cache writes per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_evictions_per_second`**
+:   Rate of shared cache evictions per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_bytes_written_per_second`**
+:   Rate of bytes written to the shared cache per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_bytes_read_per_second`**
+:   Rate of bytes read from the shared cache per second.
+
+    type: float
+
+
 ## index_template [_index_template]
 
 ```{applies_to}
