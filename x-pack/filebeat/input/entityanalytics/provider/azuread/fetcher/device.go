@@ -39,8 +39,11 @@ type Device struct {
 	Deleted bool `json:"deleted"`
 }
 
-// Merge will merge the attributes, owners, users and group memberships of
-// another Device instance into this Device. The IDs of the devices must match.
+// Merge merges the attributes and group memberships of other into d, and
+// replaces d's registered owners and users with those from other. Group
+// memberships are accumulated because the delta API returns incremental
+// changes; registered owners and users are replaced because the API always
+// returns the complete current set. The IDs of the devices must match.
 func (d *Device) Merge(other *Device) {
 	if d.ID != other.ID {
 		return
@@ -52,11 +55,7 @@ func (d *Device) Merge(other *Device) {
 	other.TransitiveMemberOf.ForEach(func(elem uuid.UUID) {
 		d.TransitiveMemberOf.Add(elem)
 	})
-	other.RegisteredOwners.ForEach(func(elem uuid.UUID) {
-		d.RegisteredOwners.Add(elem)
-	})
-	other.RegisteredUsers.ForEach(func(elem uuid.UUID) {
-		d.RegisteredUsers.Add(elem)
-	})
+	d.RegisteredOwners = other.RegisteredOwners
+	d.RegisteredUsers = other.RegisteredUsers
 	d.Deleted = other.Deleted
 }

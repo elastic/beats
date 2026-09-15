@@ -67,10 +67,8 @@ func TestDevice_Merge(t *testing.T) {
 				),
 				RegisteredOwners: collections.NewUUIDSet(
 					uuid.Must(uuid.FromString("81d1b5cd-7cd6-469d-9fe8-0a5c6cf2a7b6")),
-					uuid.Must(uuid.FromString("c59fbdb8-e442-46b1-8d72-c8ac0b78ec0a")),
 				),
 				RegisteredUsers: collections.NewUUIDSet(
-					uuid.Must(uuid.FromString("27cea005-7377-4175-b2ef-e9d64c977f4d")),
 					uuid.Must(uuid.FromString("5e6d279a-ce2b-43b8-a38f-3110907e1974")),
 					uuid.Must(uuid.FromString("c59fbdb8-e442-46b1-8d72-c8ac0b78ec0a")),
 				),
