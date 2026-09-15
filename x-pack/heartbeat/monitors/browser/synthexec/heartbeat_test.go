@@ -46,6 +46,31 @@ func TestHeartbeatRunner(t *testing.T) {
 	assert.Equal(t, []string{JourneyStart, CmdStatus}, eventTypes, "runner must forward events before closing the request stream")
 }
 
+func TestHeartbeatRunnerMultiplexesRequests(t *testing.T) {
+	runner := NewHeartbeatRunner(func() *SynthCmd {
+		cmd := exec.Command(os.Args[0], "-test.run=TestHeartbeatRunnerHelper", "--")
+		cmd.Env = append(os.Environ(), "GO_WANT_HEARTBEAT_HELPER=1")
+		return &SynthCmd{Cmd: cmd}
+	})
+	t.Cleanup(func() {
+		_ = runner.Close()
+	})
+
+	ctx := context.WithValue(context.Background(), SynthexecTimeoutKey, time.Second)
+	first, err := runner.run(ctx, heartbeatRunRequest{ID: "run-1", Type: "run", Source: heartbeatSource{Type: "inline", Script: "step('first', () => {})"}})
+	require.NoError(t, err, "first request must start")
+	second, err := runner.run(ctx, heartbeatRunRequest{ID: "run-2", Type: "run", Source: heartbeatSource{Type: "inline", Script: "step('second', () => {})"}})
+	require.NoError(t, err, "second request must start without waiting for the first")
+
+	for _, mpx := range []*ExecMultiplexer{first, second} {
+		var eventTypes []string
+		for event := range mpx.SynthEvents() {
+			eventTypes = append(eventTypes, event.Type)
+		}
+		assert.Equal(t, []string{JourneyStart, CmdStatus}, eventTypes, "each request must receive only its own events")
+	}
+}
+
 func TestHeartbeatRunnerHelper(t *testing.T) {
 	if os.Getenv("GO_WANT_HEARTBEAT_HELPER") != "1" {
 		return
@@ -65,7 +90,11 @@ func TestHeartbeatRunnerHelper(t *testing.T) {
 		if err := json.Unmarshal(scanner.Bytes(), &request); err != nil {
 			os.Exit(1)
 		}
-		if err := eventEncoder.Encode(SynthEvent{Type: JourneyStart}); err != nil {
+		event, err := json.Marshal(SynthEvent{Type: JourneyStart})
+		if err != nil {
+			os.Exit(1)
+		}
+		if err := eventEncoder.Encode(heartbeatEventEnvelope{ID: request.ID, Type: "heartbeat/event", Event: event}); err != nil {
 			os.Exit(1)
 		}
 		if err := eventEncoder.Encode(heartbeatEventEnvelope{ID: request.ID, Type: heartbeatProtocolID}); err != nil {

@@ -102,6 +102,35 @@ func TestAPIInlineUsesPersistentRunner(t *testing.T) {
 	assert.NotNil(t, s.apiRunner, "API source job without arbitrary CLI arguments must use a persistent runner")
 }
 
+func TestAPIInlineSharesPersistentRunner(t *testing.T) {
+	newJob := func(id string) *SourceJob {
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"type": "api",
+			"name": "My API monitor",
+			"id":   id,
+			"source": mapstr.M{
+				"inline": mapstr.M{
+					"script": "step('request', async () => {})",
+				},
+			},
+		})
+		job, err := NewSourceJob(cfg)
+		require.NoError(t, err, "API source job must parse")
+		job.jobs()
+		return job
+	}
+
+	first := newJob("first")
+	second := newJob("second")
+	require.Same(t, first.apiRunner, second.apiRunner, "inline API monitors must share the worker-pool process")
+	runner := first.apiRunner
+
+	require.NoError(t, first.Close(), "first source job must release its runner lease")
+	assert.False(t, second.apiRunner.Closed(), "releasing one source job must leave the shared runner available")
+	require.NoError(t, second.Close(), "second source job must release its runner lease")
+	assert.True(t, runner.Closed(), "final source job release must stop the shared runner")
+}
+
 func TestAPIWithSyntheticsArgsUsesOneShotRunner(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"type": "api",

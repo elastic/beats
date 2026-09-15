@@ -13,7 +13,7 @@ kind: feature
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Reuse a persistent Synthetics process for API monitor journeys.
+summary: Run API monitor journeys through a shared parallel Synthetics worker pool.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change

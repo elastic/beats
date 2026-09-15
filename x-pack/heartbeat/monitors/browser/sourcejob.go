@@ -30,6 +30,7 @@ type SourceJob struct {
 	cancel     context.CancelFunc
 	mtx        sync.Mutex
 	apiRunner  *synthexec.HeartbeatRunner
+	apiLease   *synthexec.HeartbeatRunnerLease
 }
 
 func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
@@ -97,9 +98,13 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 func (sj *SourceJob) Close() error {
 	sj.mtx.Lock()
 	apiRunner := sj.apiRunner
+	apiLease := sj.apiLease
 	sj.apiRunner = nil
+	sj.apiLease = nil
 	sj.mtx.Unlock()
-	if apiRunner != nil {
+	if apiLease != nil {
+		apiLease.Close()
+	} else if apiRunner != nil {
 		_ = apiRunner.Close()
 	}
 
@@ -270,7 +275,11 @@ func (sj *SourceJob) inlineAPIRunner() *synthexec.HeartbeatRunner {
 	sj.mtx.Lock()
 	defer sj.mtx.Unlock()
 	if sj.apiRunner == nil || sj.apiRunner.Closed() {
-		sj.apiRunner = synthexec.NewHeartbeatInlineRunner()
+		if sj.apiLease != nil {
+			sj.apiLease.Close()
+		}
+		sj.apiLease = synthexec.AcquireHeartbeatInlineRunner()
+		sj.apiRunner = sj.apiLease.Runner
 	}
 	return sj.apiRunner
 }
@@ -282,12 +291,16 @@ func (sj *SourceJob) projectAPIRunner(projectPath string) (*synthexec.HeartbeatR
 		return sj.apiRunner, nil
 	}
 
-	runner, err := synthexec.NewHeartbeatProjectRunner(projectPath)
+	if sj.apiLease != nil {
+		sj.apiLease.Close()
+	}
+	lease, err := synthexec.AcquireHeartbeatProjectRunner(projectPath)
 	if err != nil {
 		return nil, err
 	}
-	sj.apiRunner = runner
-	return runner, nil
+	sj.apiLease = lease
+	sj.apiRunner = lease.Runner
+	return sj.apiRunner, nil
 }
 
 // Plugin exposes the SourceJob as a monitor plugin. Exported so the `api`

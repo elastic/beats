@@ -37,23 +37,22 @@ const (
 
 var errHeartbeatRunnerClosed = errors.New("heartbeat synthetics runner is not running")
 
-// HeartbeatRunner keeps one @elastic/synthetics process alive and serializes
-// API journey runs through its internal NDJSON protocol. Serializing is
-// required because the Synthetics global Runner is single-flight.
+// HeartbeatRunner keeps one @elastic/synthetics process alive and multiplexes
+// API journey runs through its internal worker-pool protocol.
 type HeartbeatRunner struct {
 	newCmd func() *SynthCmd
 
 	startOnce sync.Once
 	startErr  error
 
-	mu       sync.Mutex
-	cmd      *SynthCmd
-	stdin    io.WriteCloser
-	active   *heartbeatPending
-	closed   chan struct{}
-	requests chan *heartbeatPending
-	ready    chan error
-	closeMu  sync.Once
+	mu      sync.Mutex
+	writeMu sync.Mutex
+	cmd     *SynthCmd
+	stdin   io.WriteCloser
+	active  map[string]*heartbeatPending
+	closed  chan struct{}
+	ready   chan error
+	closeMu sync.Once
 }
 
 type heartbeatPending struct {
@@ -111,18 +110,19 @@ type heartbeatControlMessage struct {
 }
 
 type heartbeatEventEnvelope struct {
-	ID   string `json:"id"`
-	Type string `json:"type"`
+	ID    string          `json:"id"`
+	Type  string          `json:"type"`
+	Event json.RawMessage `json:"event"`
 }
 
 // NewHeartbeatRunner returns a lazy persistent Synthetics runner. It starts
 // only when the monitor's first job executes.
 func NewHeartbeatRunner(newCmd func() *SynthCmd) *HeartbeatRunner {
 	return &HeartbeatRunner{
-		newCmd:   newCmd,
-		closed:   make(chan struct{}),
-		requests: make(chan *heartbeatPending, 64),
-		ready:    make(chan error, 1),
+		newCmd: newCmd,
+		active: make(map[string]*heartbeatPending),
+		closed: make(chan struct{}),
+		ready:  make(chan error, 1),
 	}
 }
 
@@ -149,6 +149,88 @@ func NewHeartbeatProjectRunner(projectPath string) (*HeartbeatRunner, error) {
 	}), nil
 }
 
+// HeartbeatRunnerLease holds a reference to a runner shared by API monitor
+// source jobs. Closing the lease stops the child only after its final user has
+// stopped.
+type HeartbeatRunnerLease struct {
+	Runner  *HeartbeatRunner
+	release func()
+	once    sync.Once
+}
+
+// Close releases the runner reference held by this lease.
+func (l *HeartbeatRunnerLease) Close() {
+	if l == nil {
+		return
+	}
+	l.once.Do(l.release)
+}
+
+type sharedHeartbeatRunner struct {
+	runner *HeartbeatRunner
+	refs   int
+}
+
+var heartbeatRunnerPool = struct {
+	sync.Mutex
+	runners map[string]*sharedHeartbeatRunner
+}{runners: make(map[string]*sharedHeartbeatRunner)}
+
+func acquireHeartbeatRunner(key string, newRunner func() *HeartbeatRunner) *HeartbeatRunnerLease {
+	heartbeatRunnerPool.Lock()
+	shared := heartbeatRunnerPool.runners[key]
+	if shared == nil || shared.runner.Closed() {
+		shared = &sharedHeartbeatRunner{runner: newRunner()}
+		heartbeatRunnerPool.runners[key] = shared
+	}
+	shared.refs++
+	heartbeatRunnerPool.Unlock()
+
+	return &HeartbeatRunnerLease{
+		Runner: shared.runner,
+		release: func() {
+			heartbeatRunnerPool.Lock()
+			current := heartbeatRunnerPool.runners[key]
+			if current != shared {
+				heartbeatRunnerPool.Unlock()
+				return
+			}
+			shared.refs--
+			if shared.refs > 0 {
+				heartbeatRunnerPool.Unlock()
+				return
+			}
+			delete(heartbeatRunnerPool.runners, key)
+			heartbeatRunnerPool.Unlock()
+			_ = shared.runner.Close()
+		},
+	}
+}
+
+// AcquireHeartbeatInlineRunner returns the shared inline API worker pool.
+func AcquireHeartbeatInlineRunner() *HeartbeatRunnerLease {
+	return acquireHeartbeatRunner("inline", NewHeartbeatInlineRunner)
+}
+
+// AcquireHeartbeatProjectRunner returns the shared API worker pool for a
+// Synthetics installation. Different projects at the same npm root can share
+// workers because the project path is supplied in each protocol request.
+func AcquireHeartbeatProjectRunner(projectPath string) (*HeartbeatRunnerLease, error) {
+	npmRoot, err := getNpmRoot(projectPath)
+	if err != nil {
+		return nil, err
+	}
+
+	bin := filepath.Join(npmRoot, "node_modules/.bin/elastic-synthetics")
+	return acquireHeartbeatRunner("project:"+npmRoot, func() *HeartbeatRunner {
+		return NewHeartbeatRunner(func() *SynthCmd {
+			cmd := exec.Command(bin, "heartbeat") //nolint:gosec,noctx // binary is resolved from the monitor project
+			cmd.Dir = npmRoot
+			return &SynthCmd{Cmd: cmd}
+		})
+	}), nil
+}
+
 // Closed reports whether the child process has exited or was closed.
 func (r *HeartbeatRunner) Closed() bool {
 	select {
@@ -168,6 +250,8 @@ func (r *HeartbeatRunner) Close() error {
 		r.mu.Lock()
 		cmd := r.cmd
 		stdin := r.stdin
+		active := r.active
+		r.active = make(map[string]*heartbeatPending)
 		r.mu.Unlock()
 		if stdin != nil {
 			_ = stdin.Close()
@@ -175,8 +259,9 @@ func (r *HeartbeatRunner) Close() error {
 		if cmd != nil && cmd.Process != nil {
 			closeErr = cmd.Process.Kill()
 		}
-		r.finishActive(errHeartbeatRunnerClosed)
-		r.finishQueued(errHeartbeatRunnerClosed)
+		for _, pending := range active {
+			r.finish(pending, errHeartbeatRunnerClosed)
+		}
 	})
 	return closeErr
 }
@@ -274,7 +359,6 @@ func (r *HeartbeatRunner) startProcess() error {
 		if err != nil {
 			return err
 		}
-		go r.dispatch()
 		return nil
 	case <-time.After(10 * time.Second):
 		_ = r.Close()
@@ -286,64 +370,6 @@ func (r *HeartbeatRunner) signalReady(err error) {
 	select {
 	case r.ready <- err:
 	default:
-	}
-}
-
-func (r *HeartbeatRunner) dispatch() {
-	for {
-		select {
-		case <-r.closed:
-			return
-		case pending := <-r.requests:
-			if r.Closed() {
-				r.finish(pending, errHeartbeatRunnerClosed)
-				continue
-			}
-			r.mu.Lock()
-			if r.active != nil || r.stdin == nil {
-				r.mu.Unlock()
-				r.finish(pending, errHeartbeatRunnerClosed)
-				continue
-			}
-			r.active = pending
-			stdin := r.stdin
-			r.mu.Unlock()
-
-			if err := json.NewEncoder(stdin).Encode(pending.request); err != nil {
-				r.finishActive(err)
-			}
-
-			var timeout <-chan time.Time
-			var timer *time.Timer
-			if pending.timeout > 0 {
-				timer = time.NewTimer(pending.timeout)
-				timeout = timer.C
-			}
-
-			select {
-			case <-pending.finished:
-			case <-r.closed:
-				r.finish(pending, errHeartbeatRunnerClosed)
-			case <-timeout:
-				r.mu.Lock()
-				cmd := r.cmd
-				r.mu.Unlock()
-				cmdString := "elastic-synthetics heartbeat"
-				if cmd != nil {
-					cmdString = cmd.String()
-				}
-				r.finishActive(heartbeatTimeoutError{timeout: pending.timeout, cmd: cmdString})
-				_ = r.Close()
-			}
-			if timer != nil {
-				if !timer.Stop() {
-					select {
-					case <-timer.C:
-					default:
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -368,13 +394,22 @@ func (r *HeartbeatRunner) readHeartbeatEvents(reader *os.File) {
 			r.finishActiveForID(envelope.ID, nil)
 			continue
 		}
+		if envelope.Type == "heartbeat/event" {
+			var event SynthEvent
+			if err := json.Unmarshal(envelope.Event, &event); err != nil {
+				logp.L().Warnf("Could not decode Heartbeat Synthetics event: %v", err)
+				continue
+			}
+			r.writeActiveEventForID(envelope.ID, &event)
+			continue
+		}
 
 		var event SynthEvent
 		if err := json.Unmarshal(raw, &event); err != nil {
 			logp.L().Warnf("Could not decode Heartbeat Synthetics event: %v", err)
 			continue
 		}
-		r.writeActiveEvent(&event)
+		r.writeAllActiveEvents(&event)
 	}
 }
 
@@ -402,7 +437,7 @@ func (r *HeartbeatRunner) readHeartbeatControl(reader *os.File) {
 func (r *HeartbeatRunner) readHeartbeatOutput(reader io.Reader, typ string) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		r.writeActiveEvent(&SynthEvent{
+		r.writeAllActiveEvents(&SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 			Payload:              mapstr.M{"message": scanner.Text()},
@@ -413,44 +448,37 @@ func (r *HeartbeatRunner) readHeartbeatOutput(reader io.Reader, typ string) {
 	}
 }
 
-func (r *HeartbeatRunner) writeActiveEvent(event *SynthEvent) {
+func (r *HeartbeatRunner) writeActiveEventForID(id string, event *SynthEvent) {
 	r.mu.Lock()
-	pending := r.active
+	pending := r.active[id]
 	r.mu.Unlock()
 	if pending != nil {
 		pending.mpx.writeSynthEvent(event)
 	}
 }
 
-func (r *HeartbeatRunner) finishActive(err error) {
+func (r *HeartbeatRunner) writeAllActiveEvents(event *SynthEvent) {
 	r.mu.Lock()
-	pending := r.active
-	r.active = nil
+	active := make([]*heartbeatPending, 0, len(r.active))
+	for _, pending := range r.active {
+		active = append(active, pending)
+	}
 	r.mu.Unlock()
-	r.finish(pending, err)
+	for _, pending := range active {
+		pending.mpx.writeSynthEvent(event)
+	}
 }
 
 func (r *HeartbeatRunner) finishActiveForID(id string, err error) {
 	r.mu.Lock()
-	pending := r.active
-	if pending == nil || pending.request.ID != id {
+	pending := r.active[id]
+	if pending == nil {
 		r.mu.Unlock()
 		return
 	}
-	r.active = nil
+	delete(r.active, id)
 	r.mu.Unlock()
 	r.finish(pending, err)
-}
-
-func (r *HeartbeatRunner) finishQueued(err error) {
-	for {
-		select {
-		case pending := <-r.requests:
-			r.finish(pending, err)
-		default:
-			return
-		}
-	}
 }
 
 func (r *HeartbeatRunner) finish(pending *heartbeatPending, err error) {
@@ -491,11 +519,43 @@ func (r *HeartbeatRunner) run(ctx context.Context, request heartbeatRunRequest) 
 		finished: make(chan struct{}),
 	}
 	pending.timeout, _ = ctx.Value(SynthexecTimeoutKey).(time.Duration)
-	select {
-	case r.requests <- pending:
-		return pending.mpx, nil
-	case <-r.closed:
+	r.mu.Lock()
+	if r.Closed() || r.stdin == nil {
+		r.mu.Unlock()
 		return nil, errHeartbeatRunnerClosed
+	}
+	stdin := r.stdin
+	r.active[request.ID] = pending
+	r.mu.Unlock()
+
+	r.writeMu.Lock()
+	err := json.NewEncoder(stdin).Encode(request)
+	r.writeMu.Unlock()
+	if err != nil {
+		r.finishActiveForID(request.ID, err)
+		return nil, err
+	}
+	if pending.timeout > 0 {
+		go r.watchTimeout(pending)
+	}
+	return pending.mpx, nil
+}
+
+func (r *HeartbeatRunner) watchTimeout(pending *heartbeatPending) {
+	timer := time.NewTimer(pending.timeout)
+	defer timer.Stop()
+	select {
+	case <-pending.finished:
+	case <-r.closed:
+	case <-timer.C:
+		r.mu.Lock()
+		cmd := r.cmd
+		r.mu.Unlock()
+		cmdString := "elastic-synthetics heartbeat"
+		if cmd != nil {
+			cmdString = cmd.String()
+		}
+		r.finishActiveForID(pending.request.ID, heartbeatTimeoutError{timeout: pending.timeout, cmd: cmdString})
 	}
 }
 
