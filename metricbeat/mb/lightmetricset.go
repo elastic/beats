@@ -30,9 +30,9 @@ type LightMetricSet struct {
 	Module  string
 	Default bool `config:"default"`
 	Input   struct {
-		Module    string      `config:"module" validate:"required"`
-		MetricSet string      `config:"metricset" validate:"required"`
-		Defaults  interface{} `config:"defaults"`
+		Module    string `config:"module" validate:"required"`
+		MetricSet string `config:"metricset" validate:"required"`
+		Defaults  any    `config:"defaults"`
 	} `config:"input" validate:"required"`
 	Processors processors.PluginConfig `config:"processors"`
 }
@@ -115,11 +115,10 @@ func (m *LightMetricSet) baseModule(base BaseMetricSet) (*BaseModule, error) {
 	}
 
 	// Create the base module
-	baseModule, err := newBaseModuleFromConfig(rawConfig, base.Logger())
+	baseModule, err := newBaseModuleFromConfig(rawConfig, base.Logger(), base.GetPath())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create base module: %w", err)
 	}
 	baseModule.name = m.Module
 	return &baseModule, nil
-
 }

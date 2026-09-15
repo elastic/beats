@@ -16,6 +16,7 @@ jobs:
     if: contains(github.event.issue.labels.*.name, 'flaky-test') && contains(github.event.issue.labels.*.name, 'triaged')
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-issue-fixer.lock.yml@v0
     with:
+      report-failure-as-issue: false
       allowed-bot-users: "github-actions[bot],elastic-vault-github-plugin-prod[bot]"
       additional-instructions: |
         Use `skip-changelog` and `backport-active-all` labels when creating the pull request.

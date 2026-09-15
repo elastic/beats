@@ -69,6 +69,6 @@ func TestGetNonExistentFactory(t *testing.T) {
 	f, err := GetFactory("noSuchFactory")
 	assert.Nil(t, f)
 	if assert.Error(t, err) {
-		assert.Equal(t, "Error creating input. No such input type exist: 'noSuchFactory'", err.Error())
+		assert.Equal(t, "Error creating input. No such input type exists: 'noSuchFactory'", err.Error())
 	}
 }

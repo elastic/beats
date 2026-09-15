@@ -95,7 +95,7 @@ func (s *PodTestSuite) TestEventMapping() {
 
 	s.basicTests(events, err)
 
-	cpuMemoryTestCases := map[string]interface{}{
+	cpuMemoryTestCases := map[string]any{
 		// calculated pct fields:
 		"cpu.usage.nanocores": 11263994,
 		"cpu.usage.node.pct":  0.005631997,
@@ -123,7 +123,7 @@ func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
 
 	s.basicTests(events, err)
 
-	cpuMemoryTestCases := map[string]interface{}{
+	cpuMemoryTestCases := map[string]any{
 		"cpu.usage.nanocores": 11263994,
 		"cpu.usage.limit.pct": 0.022527988,
 
@@ -145,7 +145,7 @@ func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
 
 	s.basicTests(events, err)
 
-	cpuMemoryTestCases := map[string]interface{}{
+	cpuMemoryTestCases := map[string]any{
 		"cpu.usage.nanocores": 11263994,
 		"cpu.usage.limit.pct": 0.022527988,
 
@@ -168,7 +168,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_NodeAndOneContaine
 
 	s.basicTests(events, err)
 
-	cpuMemoryTestCases := map[string]interface{}{
+	cpuMemoryTestCases := map[string]any{
 		// Following comments explain what is the difference with the test `TestEventMapping`
 		"cpu.usage.nanocores": 22527988,    // 2x usage since 2 container
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
@@ -200,7 +200,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllMemLimits() {
 
 	s.basicTests(events, err)
 
-	cpuMemoryTestCases := map[string]interface{}{
+	cpuMemoryTestCases := map[string]any{
 		// Following comments explain what is the difference with the test `TestEventMapping
 		"cpu.usage.nanocores": 22527988,    // 2x usage since 2 container
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
@@ -215,7 +215,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllMemLimits() {
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-func (s *PodTestSuite) testValue(event mapstr.M, field string, expected interface{}) {
+func (s *PodTestSuite) testValue(event mapstr.M, field string, expected any) {
 	data, err := event.GetValue(field)
 	s.NoError(err, "Could not read field "+field)
 	s.EqualValues(expected, data, "Wrong value for field "+field)
@@ -238,7 +238,7 @@ func (s *PodTestSuite) basicTests(events []mapstr.M, err error) {
 
 	s.Len(events, 1, "got wrong number of events")
 
-	basicTestCases := map[string]interface{}{
+	basicTestCases := map[string]any{
 		"name": "nginx-deployment-2303442956-pcqfc",
 		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
 
@@ -251,7 +251,7 @@ func (s *PodTestSuite) basicTests(events []mapstr.M, err error) {
 	s.RunMetricsTests(events[0], basicTestCases)
 }
 
-func (s *PodTestSuite) RunMetricsTests(events mapstr.M, testCases map[string]interface{}) {
+func (s *PodTestSuite) RunMetricsTests(events mapstr.M, testCases map[string]any) {
 	for k, v := range testCases {
 		s.testValue(events, k, v)
 	}

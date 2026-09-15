@@ -215,7 +215,7 @@ func getServiceHandleInformation(log *logp.Logger, service *Status, rawService *
 	if stat, ok := serviceStates[ServiceState(rawService.ServiceStatusProcess.DwCurrentState)]; ok {
 		state = stat
 	} else {
-		state = "Can not define State"
+		state = "Cannot determine state"
 	}
 	service.CurrentState = state
 

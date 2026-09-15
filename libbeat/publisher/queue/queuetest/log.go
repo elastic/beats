@@ -59,9 +59,7 @@ func withOptLogOutput(capture bool, fn func(*testing.T)) func(*testing.T) {
 		}
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			defer r.Close()
 
 			scanner := bufio.NewScanner(r)
@@ -73,7 +71,7 @@ func withOptLogOutput(capture bool, fn func(*testing.T)) func(*testing.T) {
 					stderr.WriteString("\n")
 				}
 			}
-		}()
+		})
 
 		os.Stderr = w
 		defer func() {
@@ -104,47 +102,47 @@ func NewTestLogger(t *testing.T) *TestLogger {
 	return &TestLogger{t}
 }
 
-func (l *TestLogger) Debug(vs ...interface{}) {
+func (l *TestLogger) Debug(vs ...any) {
 	if debug {
 		l.t.Log(vs...)
 		print(vs)
 	}
 }
 
-func (l *TestLogger) Info(vs ...interface{}) {
+func (l *TestLogger) Info(vs ...any) {
 	l.t.Log(vs...)
 	print(vs)
 }
 
-func (l *TestLogger) Err(vs ...interface{}) {
+func (l *TestLogger) Err(vs ...any) {
 	l.t.Error(vs...)
 	print(vs)
 }
 
-func (l *TestLogger) Debugf(format string, v ...interface{}) {
+func (l *TestLogger) Debugf(format string, v ...any) {
 	if debug {
 		l.t.Logf(format, v...)
 		printf(format, v)
 	}
 }
 
-func (l *TestLogger) Infof(format string, v ...interface{}) {
+func (l *TestLogger) Infof(format string, v ...any) {
 	l.t.Logf(format, v...)
 	printf(format, v)
 }
-func (l *TestLogger) Errf(format string, v ...interface{}) {
+func (l *TestLogger) Errf(format string, v ...any) {
 	l.t.Errorf(format, v...)
 	printf(format, v)
 }
 
-func print(vs []interface{}) {
+func print(vs []any) {
 	if printLog {
 		//nolint: forbidigo // Printing is ok during specialized tests.
 		fmt.Println(vs...)
 	}
 }
 
-func printf(format string, vs []interface{}) {
+func printf(format string, vs []any) {
 	if printLog {
 		//nolint: forbidigo // Printing is ok during specialized tests.
 		fmt.Printf(format, vs...)

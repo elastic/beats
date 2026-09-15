@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest/azure"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
@@ -289,13 +288,13 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 
 func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {
 	return pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: acker.LastEventPrivateReporter(func(acked int, data interface{}) {
+		EventListener: acker.LastEventPrivateReporter(func(acked int, data any) {
 			// fmt.Println(acked, data)
 		}),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.
-			EventNormalization: to.Ptr(false),
+			EventNormalization: new(false),
 		},
 	})
 }

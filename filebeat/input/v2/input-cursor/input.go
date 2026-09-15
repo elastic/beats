@@ -74,7 +74,6 @@ func (inp *managedInput) Name() string { return inp.input.Name() }
 func (inp *managedInput) Test(ctx input.TestContext) error {
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
-		source := source
 		grp.Go(func() (err error) {
 			return inp.testSource(ctx, source)
 		})
@@ -121,9 +120,17 @@ func (inp *managedInput) Run(
 	// stage.)
 	monitoring.NewString(ctx.MetricsRegistry, "input").Set(inputmon.InputNested)
 
+	// Acquire a lease on the shared store. This increments the cache user
+	// count so the store cannot be drained by a concurrent Close() call
+	// until all source goroutines have finished and leaseRelease is called.
+	store, leaseRelease, ok := inp.manager.acquireLease()
+	if !ok {
+		return errors.New("input manager store is not available")
+	}
+	defer leaseRelease()
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
-		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
 			inpCtxID := ctx.ID + "::" + source.Name()
@@ -148,7 +155,7 @@ func (inp *managedInput) Run(
 			}
 			inpCtx = inpCtx.WithStatusReporter(ctx)
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
+			if err = inp.runSource(inpCtx, store, source, pc); err != nil {
 				cancel()
 			}
 			return err
@@ -204,10 +211,10 @@ func (inp *managedInput) createSourceID(s Source) string {
 }
 
 func newInputACKHandler(log *logp.Logger) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		var n uint
 		var last int
-		for i := 0; i < len(private); i++ {
+		for i := range private {
 			current := private[i]
 			if current == nil {
 				continue

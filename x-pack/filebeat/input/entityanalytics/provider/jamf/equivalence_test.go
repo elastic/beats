@@ -7,18 +7,13 @@ package jamf
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"sort"
 	"testing"
-	"time"
-
-	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/entcollect"
 	ecjamf "github.com/elastic/entcollect/provider/jamf"
@@ -42,8 +37,7 @@ import (
 //   - Minimal-state detects API absences as deletions via idset; legacy
 //     has no equivalent detection on incremental.
 func TestEquivalence_FullSync(t *testing.T) {
-	tenant, username, password, client, cleanup := startEquivServer(t)
-	defer cleanup()
+	tenant, username, password, client := testjamf.StartServer(t)
 
 	legacyPayloads := runLegacyFetch(t, tenant, username, password, client)
 	minimalDocs := runMinimalFullSync(t, tenant, username, password, client)
@@ -64,11 +58,11 @@ func TestEquivalence_FullSync(t *testing.T) {
 // tag drift between the two type definitions.
 func TestEquivalence_DeviceTypes(t *testing.T) {
 	var legacy jamf.Computers
-	if err := json.Unmarshal(computers, &legacy); err != nil {
+	if err := json.Unmarshal(testjamf.ComputersJSON, &legacy); err != nil {
 		t.Fatalf("unmarshal legacy: %v", err)
 	}
 	var ec ecjamf.Computers
-	if err := json.Unmarshal(computers, &ec); err != nil {
+	if err := json.Unmarshal(testjamf.ComputersJSON, &ec); err != nil {
 		t.Fatalf("unmarshal entcollect: %v", err)
 	}
 
@@ -231,49 +225,6 @@ func filterDocsByKind(docs []entcollect.Document, kind entcollect.EntityKind) []
 	return out
 }
 
-// startEquivServer returns a TLS httptest server that serves Jamf token and
-// computer-list endpoints using the package-level computers fixture.
-func startEquivServer(t *testing.T) (tenant, username, password string, client *http.Client, cleanup func()) {
-	t.Helper()
-
-	username = "testuser"
-	password = "testpassword"
-
-	var tok jamf.Token
-	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/auth/token", func(w http.ResponseWriter, r *http.Request) {
-		user, pass, ok := r.BasicAuth()
-		if !ok || user != username || pass != password {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-		tok.Token = uuid.Must(uuid.NewV4()).String()
-		tok.Expires = time.Now().UTC().Add(time.Hour)
-		fmt.Fprintf(w, `{"token":%q,"expires":%q}`,
-			tok.Token, tok.Expires.Format(time.RFC3339))
-	})
-	mux.HandleFunc("/api/preview/computers", func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Authorization") != "Bearer "+tok.Token || !tok.IsValidFor(0) {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write(computers)
-	})
-
-	srv := httptest.NewTLSServer(mux)
-	u, err := url.Parse(srv.URL)
-	if err != nil {
-		srv.Close()
-		t.Fatal(err)
-	}
-	return u.Host, username, password, srv.Client(), srv.Close
-}
-
 // testWriter adapts a *testing.T into an io.Writer for slog output.
 type testWriter struct{ t *testing.T }
 
@@ -316,7 +267,6 @@ func (m *equivMemStore) Delete(key string) error {
 
 func (m *equivMemStore) Each(fn func(string, func(any) error) (bool, error)) error {
 	for k, v := range m.data {
-		v := v
 		cont, err := fn(k, func(dst any) error { return json.Unmarshal(v, dst) })
 		if err != nil {
 			return err

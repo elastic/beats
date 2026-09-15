@@ -31,7 +31,7 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"paths":             []string{"/usr/bin"},
 		"hash_types":        []string{"sha256", "sha512"},
 		"max_file_size":     "1 GiB",
@@ -61,7 +61,7 @@ func TestConfig(t *testing.T) {
 }
 
 func TestConfigInvalid(t *testing.T) {
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"paths":             []string{"/usr/bin"},
 		"hash_types":        []string{"crc32", "sha256", "hmac"},
 		"max_file_size":     "32 Hz",
@@ -92,7 +92,7 @@ func TestConfigInvalid(t *testing.T) {
 	}
 	assert.Len(t, merr.Unwrap(), 4)
 
-	config, err = conf.NewConfigFrom(map[string]interface{}{
+	config, err = conf.NewConfigFrom(map[string]any{
 		"paths":         []string{"/usr/bin"},
 		"hash_types":    []string{"crc32", "sha256", "hmac"},
 		"exclude_files": "unmatched)",
@@ -119,7 +119,7 @@ func TestConfigInvalid(t *testing.T) {
 }
 
 func TestConfigInvalidMaxFileSize(t *testing.T) {
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"paths":         []string{"/usr/bin"},
 		"max_file_size": "0", // Value must be >= 0.
 	})
@@ -140,7 +140,7 @@ func TestConfigEvalSymlinks(t *testing.T) {
 	dir := setupTestDir(t)
 	defer os.RemoveAll(dir)
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"paths": []string{filepath.Join(dir, "link_to_subdir")},
 	})
 	if err != nil {
@@ -158,7 +158,7 @@ func TestConfigEvalSymlinks(t *testing.T) {
 }
 
 func TestConfigRemoveDuplicates(t *testing.T) {
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"paths": []string{"/path/a", "/path/a"},
 	})
 	if err != nil {

@@ -20,6 +20,7 @@ package filestream
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"strings"
 	"testing"
 	"time"
@@ -100,7 +101,7 @@ func TestConfigValidate(t *testing.T) {
 
 	t.Run("compression requires fingerprint file_identity", func(t *testing.T) {
 		makeFileIdentity := func(t *testing.T, name string) *conf.Namespace {
-			cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			cfg := conf.MustNewConfigFrom(map[string]any{
 				name: nil,
 			})
 			ns := &conf.Namespace{}
@@ -299,86 +300,205 @@ read_until_eof.enabled: false
 func TestNormalizeConfig(t *testing.T) {
 	tcs := []struct {
 		name        string
-		cfg         map[string]interface{}
+		cfg         map[string]any
+		wantErr     string
 		wantEnabled bool
+		wantGrowing bool
+		wantWarn    bool
 	}{
 		{
-			name: "path identity disables prospector.scanner.fingerprint by default",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"path": nil},
+			name: "path identity disables fingerprint",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"path": nil},
 			},
 			wantEnabled: false,
 		},
 		{
-			name: "native identity disables scanner fingerprint by default",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"native": nil},
+			name: "native identity disables fingerprint",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"native": nil},
 			},
 			wantEnabled: false,
 		},
 		{
-			name: "explicit scanner fingerprint true is preserved",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"path": nil},
-				"prospector": map[string]interface{}{
-					"scanner": map[string]interface{}{
-						"fingerprint": map[string]interface{}{"enabled": true},
-					},
-				},
-			},
-			wantEnabled: true,
-		},
-		{
-			name: "explicit scanner fingerprint false is preserved",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"fingerprint": nil},
-				"prospector": map[string]interface{}{
-					"scanner": map[string]interface{}{
-						"fingerprint": map[string]interface{}{"enabled": false},
+			name: "explicit scanner enabled=true is ignored for path identity",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"path": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": true},
 					},
 				},
 			},
 			wantEnabled: false,
+			wantWarn:    true,
 		},
 		{
-			name: "fingerprint identity keeps default scanner fingerprint",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{"fingerprint": nil},
+			name: "explicit scanner enabled=false is ignored for fingerprint identity",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": false},
+					},
+				},
 			},
 			wantEnabled: true,
+			wantGrowing: true,
+			wantWarn:    true,
 		},
 		{
-			name: "non-fingerprint inode_marker disables scanner fingerprint by default",
-			cfg: map[string]interface{}{
-				"file_identity": map[string]interface{}{
-					"inode_marker": map[string]interface{}{"path": "/logs/.filebeat-marker"},
+			name: "explicit scanner enabled=false is ignored for default identity",
+			cfg: map[string]any{
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": false},
+					},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+			wantWarn:    true,
+		},
+		{
+			name: "explicit scanner enabled=false matching native identity does not warn",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"native": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": false},
+					},
 				},
 			},
 			wantEnabled: false,
 		},
 		{
-			name:        "no file_identity keeps default scanner fingerprint",
-			cfg:         map[string]interface{}{},
+			name: "explicit scanner enabled=true matching fingerprint identity does not warn",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": true},
+					},
+				},
+			},
 			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "fingerprint identity enables growing",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "inode_marker identity disables fingerprint",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"inode_marker": map[string]any{"path": "/logs/.filebeat-marker"},
+				},
+			},
+			wantEnabled: false,
+		},
+		{
+			name:        "default identity enables growing",
+			cfg:         map[string]any{},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "growing=true enables scanner growing",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": true},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "growing=false disables scanner growing",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": false},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
+		{
+			name: "scanner-level growing is ignored",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"growing": false},
+					},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "identity growing overrides scanner-level growing",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": false},
+				},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"growing": true},
+					},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
+		{
+			name: "invalid growing is rejected",
+			cfg: map[string]any{
+				"file_identity": map[string]any{
+					"fingerprint": map[string]any{"growing": "not-a-bool"},
+				},
+			},
+			wantErr: "cannot read 'file_identity.fingerprint' config",
 		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
 			c := defaultConfig()
-			cfg := map[string]interface{}{
+			cfg := map[string]any{
 				"paths": []string{"/tmp/logs/*.log"},
 			}
-			for key, value := range tc.cfg {
-				cfg[key] = value
-			}
+			maps.Copy(cfg, tc.cfg)
 			raw := conf.MustNewConfigFrom(cfg)
-			require.NoError(t, raw.Unpack(&c))
+			require.NoError(t, raw.Unpack(&c),
+				"unpack should succeed; rejection happens in normalizeConfig")
 
-			err := normalizeConfig(raw, &c)
+			logger, obs := logptest.NewTestingLoggerWithObserver(t, "")
+			err := normalizeConfig(raw, &c, logger)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr)
+				return
+			}
 			require.NoError(t, err)
 
-			assert.Equal(t, tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled)
+			assert.Equal(t,
+				tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled,
+				"FileWatcher.Scanner.Fingerprint.Enabled did not match")
+			assert.Equal(t,
+				tc.wantGrowing, c.FileWatcher.Scanner.Fingerprint.Growing,
+				"FileWatcher.Scanner.Fingerprint.Growing did not match")
+
+			wantWarnings := 0
+			if tc.wantWarn {
+				wantWarnings = 1
+			}
+			assert.Len(t, obs.FilterMessageSnippet("'prospector.scanner.fingerprint.enabled' is deprecated").All(), wantWarnings,
+				"unexpected number of scanner fingerprint deprecation warnings")
 		})
 	}
 }

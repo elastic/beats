@@ -56,7 +56,7 @@ const (
 )
 
 var convPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &Converter{}
 	},
 }
@@ -88,7 +88,7 @@ func (c *Converter) init() {
 // value given by to.
 // The operation fails if the values are not compatible (for example trying to
 // convert an object into an int), or `to` is no pointer.
-func (c *Converter) Convert(to, from interface{}) (err error) {
+func (c *Converter) Convert(to, from any) (err error) {
 	if c.unfold == nil || c.fold == nil {
 		c.init()
 	}
@@ -124,7 +124,7 @@ func (c *Converter) Convert(to, from interface{}) (err error) {
 //	             empty string, array or `nil` pointers are assumed to be empty. In either case the original value
 //	             in `to` will not be overwritten.
 //	`omit`, `-`: Do not convert the field.
-func Convert(to, from interface{}) (err error) {
+func Convert(to, from any) (err error) {
 	c := convPool.Get().(*Converter)
 	defer convPool.Put(c)
 	return c.Convert(to, from)

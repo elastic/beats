@@ -18,6 +18,8 @@
 package queue
 
 import (
+	"time"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -50,6 +52,17 @@ type Queue[T any] interface {
 	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
 	// there is no bound on the number of returned events.
 	Get(eventCount int) (Batch[T], error)
+}
+
+type UnblockingQueue[T any] interface {
+	Queue[T]
+	// Unblocking Get retrieves a batch of up to eventCount events without blocking.
+	// If the queue is empty, it returns nil.
+	TryGet(eventCount int) (Batch[T], error)
+	// ReadyChan returns a channel that notifies when the queue is ready to be read.
+	ReadyChan() <-chan struct{}
+	// GetDebounce returns the debounce time of the queue.
+	GetDebounce() time.Duration
 }
 
 // If encoderFactory is provided, then the resulting queue must use it to
@@ -100,6 +113,21 @@ type Producer[T any] interface {
 	// Note: A queue may still send ACK signals even after Close is called on
 	// the originating Producer. The pipeline client must accept these ACKs.
 	Close()
+
+	// ACKWaitChan returns a channel that is closed once this producer has been
+	// Closed AND every event it published has been acknowledged. Producers that
+	// do not track in-memory acknowledgments (the disk queue, where events are
+	// durably persisted, or producers created without an ACK callback) close it
+	// as soon as Close is called.
+	//
+	// The channel is also closed if the underlying queue is force-closed, so a
+	// caller waiting on it can never hang past queue teardown. It is never
+	// closed while the producer is still open, even if every event published so
+	// far has been acknowledged.
+	//
+	// The same channel instance is returned across calls. ACKWaitChan is safe to
+	// call concurrently with Publish, TryPublish and Close.
+	ACKWaitChan() <-chan struct{}
 }
 
 // Batch of entries (usually publisher.Event) to be returned to Consumers.

@@ -21,7 +21,8 @@ package health
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
+
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,7 +36,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	mockResponse, err := ioutil.ReadFile("./_meta/test/simple.json")
+	mockResponse, err := os.ReadFile("./_meta/test/simple.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +46,7 @@ func TestFetchEventContents(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "traefik",
 		"metricsets": []string{"health"},
 		"hosts":      []string{server.URL},

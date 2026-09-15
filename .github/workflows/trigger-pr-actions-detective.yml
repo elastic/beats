@@ -18,6 +18,7 @@ jobs:
       toJSON(github.event.workflow_run.pull_requests) != '[]'
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-pr-actions-detective.lock.yml@v0
     with:
+      report-failure-as-issue: false
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         export GOTOOLCHAIN=auto

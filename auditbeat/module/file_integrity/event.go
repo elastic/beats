@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"maps"
 	"math"
 	"os"
 	"os/user"
@@ -429,9 +430,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 		file["hash"] = hashes
 	}
-	for k, v := range e.ParserResults {
-		file[k] = v
-	}
+	maps.Copy(file, e.ParserResults)
 
 	out.MetricSetFields.Put("event.kind", "event")
 	out.MetricSetFields.Put("event.category", []string{"file"})

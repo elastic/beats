@@ -135,7 +135,7 @@ func (s *split) split(ctx context.Context, trCtx *transformContext, root mapstr.
 
 	switch s.kind {
 	case "", splitTypeArr:
-		varr, ok := v.([]interface{})
+		varr, ok := v.([]any)
 		if !ok {
 			return errExpectedSplitArr
 		}
@@ -215,7 +215,7 @@ func (s *split) split(ctx context.Context, trCtx *transformContext, root mapstr.
 			h.handleEvent(ctx, root)
 			return errEmptyField
 		}
-		for _, substr := range strings.Split(vstr, s.delimiter) {
+		for substr := range strings.SplitSeq(vstr, s.delimiter) {
 			if err := s.processMessageSplitString(ctx, trCtx, root, substr, h); err != nil {
 				s.log.Debug(err)
 			}
@@ -229,7 +229,7 @@ func (s *split) split(ctx context.Context, trCtx *transformContext, root mapstr.
 
 // processMessage processes an array or map split result value, v, via h after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) processMessage(ctx context.Context, trCtx *transformContext, root mapstr.M, key string, v interface{}, h handler) error {
+func (s *split) processMessage(ctx context.Context, trCtx *transformContext, root mapstr.M, key string, v any, h handler) error {
 	obj, ok := toMapStr(v, s.targetInfo.Name)
 	if !ok {
 		return errExpectedSplitObj
@@ -266,16 +266,16 @@ func (s *split) processMessage(ctx context.Context, trCtx *transformContext, roo
 	return nil
 }
 
-func toMapStr(v interface{}, key string) (mapstr.M, bool) {
+func toMapStr(v any, key string) (mapstr.M, bool) {
 	if v == nil {
 		return mapstr.M{}, false
 	}
 	switch t := v.(type) {
 	case mapstr.M:
 		return t, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(t), true
-	case string, []bool, []int, []string, []interface{}:
+	case string, []bool, []int, []string, []any:
 		return mapstr.M{key: t}, true
 	}
 	return mapstr.M{}, false

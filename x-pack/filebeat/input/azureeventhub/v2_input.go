@@ -19,7 +19,6 @@ import (
 	"github.com/coder/websocket"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2/checkpoints"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
@@ -243,7 +242,6 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 	// transient errors (network failures) and we need to
 	// restart it.
 	processorRunBackoff := backoff.NewEqualJitterBackoff(
-		ctx.Done(),
 		processorRestartBackoff,    // initial backoff
 		processorRestartMaxBackoff, // max backoff
 	)
@@ -299,7 +297,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 			// unrecoverable.
 			//
 			// We wait before retrying to start the processor.
-			processorRunBackoff.Wait()
+			processorRunBackoff.Wait(ctx)
 
 			// Update input metrics.
 			in.metrics.processorRestarts.Inc()
@@ -331,9 +329,9 @@ func createProcessorOptions(config azureInputConfig) *azeventhubs.ProcessorOptio
 
 	switch config.ProcessorStartPosition {
 	case startPositionEarliest:
-		defaultStartPosition.Earliest = to.Ptr(true)
+		defaultStartPosition.Earliest = new(true)
 	case startPositionLatest:
-		defaultStartPosition.Latest = to.Ptr(true)
+		defaultStartPosition.Latest = new(true)
 	}
 
 	return &azeventhubs.ProcessorOptions{
@@ -616,7 +614,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.
-			EventNormalization: to.Ptr(false),
+			EventNormalization: new(false),
 		},
 	})
 }

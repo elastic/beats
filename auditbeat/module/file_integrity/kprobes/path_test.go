@@ -324,15 +324,13 @@ func (p *pathTestSuite) TestAddTraverserContextCancel() {
 
 	errChan := make(chan error)
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		errPath := pTrav.AddPathToMonitor(ctx, tmpDir)
 		if errPath != nil {
 			errChan <- errPath
 		}
 		close(errChan)
-	}()
+	})
 
 	tries := 0
 	for {
@@ -366,15 +364,13 @@ func (p *pathTestSuite) TestAddTimeout() {
 
 	errChan := make(chan error)
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		errPath := pTrav.AddPathToMonitor(ctx, tmpDir)
 		if errPath != nil {
 			errChan <- errPath
 		}
 		close(errChan)
-	}()
+	})
 
 	select {
 	case err = <-errChan:
@@ -450,15 +446,13 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 
 	errChan := make(chan error)
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		errPath := pTrav.AddPathToMonitor(ctx, tmpDir)
 		if errPath != nil {
 			errChan <- errPath
 		}
 		close(errChan)
-	}()
+	})
 
 	tries := 0
 	for idx := 0; idx < len(expectedStatQueue); {
@@ -557,15 +551,13 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 
 	errChan := make(chan error)
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		errPath := pTrav.AddPathToMonitor(ctx, tmpDir)
 		if errPath != nil {
 			errChan <- errPath
 		}
 		close(errChan)
-	}()
+	})
 
 	tries := 0
 	for idx := 0; idx < len(expectedStatQueue); {

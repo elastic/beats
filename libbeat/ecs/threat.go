@@ -231,7 +231,7 @@ type Threat struct {
 
 type Enrichments struct {
 	// Object containing associated indicators enriching the event.
-	Indicator map[string]interface{} `ecs:"indicator"`
+	Indicator map[string]any `ecs:"indicator"`
 
 	// The date and time when intelligence source first reported sighting this
 	// indicator.

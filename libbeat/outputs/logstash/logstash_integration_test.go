@@ -148,7 +148,7 @@ func testElasticsearchIndex(test string) string {
 func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	windowSize := integrationTestWindowSize
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"hosts":         []string{getLogstashHost()},
 		"index":         testLogstashIndex(test),
 		"bulk_max_size": &windowSize,
@@ -179,7 +179,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	connection := esConnect(t, index)
 
 	bulkSize := 0
-	config, _ := conf.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]any{
 		"hosts":            []string{getElasticsearchHost()},
 		"index":            connection.index,
 		"bulk_max_size":    &bulkSize,
@@ -191,7 +191,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	logger := logptest.NewTestingLogger(t, "")
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	im, err := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(
-		map[string]interface{}{
+		map[string]any{
 			"setup.ilm.enabled": false,
 		},
 	))
@@ -224,7 +224,7 @@ func (es *esConnection) Cleanup() {
 	}
 }
 
-func (es *esConnection) Read() ([]map[string]interface{}, error) {
+func (es *esConnection) Read() ([]map[string]any, error) {
 	_, _, err := es.Refresh(es.index)
 	if err != nil {
 		es.t.Errorf("Failed to refresh: %s", err)
@@ -237,7 +237,7 @@ func (es *esConnection) Read() ([]map[string]interface{}, error) {
 		return nil, err
 	}
 
-	hits := make([]map[string]interface{}, len(resp.Hits.Hits))
+	hits := make([]map[string]any, len(resp.Hits.Hits))
 	for i, hit := range resp.Hits.Hits {
 		json.Unmarshal(hit, &hits[i]) //nolint:errcheck //This is a test file, can ignore
 	}
@@ -336,7 +336,7 @@ func TestSendMultipleViaLogstashTLS(t *testing.T) {
 func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
@@ -397,9 +397,9 @@ func testSendMultipleBatchesViaLogstash(
 	defer ls.Cleanup()
 
 	batches := make([][]beat.Event, 0, numBatches)
-	for i := 0; i < numBatches; i++ {
+	for i := range numBatches {
 		batch := make([]beat.Event, 0, batchSize)
-		for j := 0; j < batchSize; j++ {
+		for j := range batchSize {
 			event := beat.Event{
 				Timestamp: time.Now(),
 				Fields: mapstr.M{
@@ -540,10 +540,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	checkEvent(t, lsResp[0], esResp[0])
 }
 
-func checkEvent(t *testing.T, ls, es map[string]interface{}) {
-	lsEvent, ok := ls["_source"].(map[string]interface{})
+func checkEvent(t *testing.T, ls, es map[string]any) {
+	lsEvent, ok := ls["_source"].(map[string]any)
 	assert.True(t, ok)
-	esEvent, ok := es["_source"].(map[string]interface{})
+	esEvent, ok := es["_source"].(map[string]any)
 	assert.True(t, ok)
 	commonFields := []string{"@timestamp", "host", "type", "message"}
 	for _, field := range commonFields {

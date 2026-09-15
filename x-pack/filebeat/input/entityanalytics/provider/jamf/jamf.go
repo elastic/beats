@@ -11,13 +11,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/fs"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -113,15 +109,10 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	syncTimer := time.NewTimer(syncWaitTime)
 	updateTimer := time.NewTimer(updateWaitTime)
 
-	if p.cfg.Tracer.enabled() {
-		id := sanitizeFileName(inputCtx.IDWithoutName)
-		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputCtx.Agent.Paths, Name, path)
+	if p.cfg.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(inputCtx.Agent.Paths, Name, inputCtx.IDWithoutName, p.cfg.Tracer.Filename)
 		if err != nil {
 			return err
-		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, inputCtx.Agent.Paths.Resolve(paths.Logs, Name))
 		}
 		p.cfg.Tracer.Filename = resolved
 	}
@@ -146,9 +137,13 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				msg := "Error running full sync"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running full sync"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.syncError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful full sync")
@@ -170,9 +165,13 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				msg := "Error running incremental update"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running incremental update"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.updateError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
@@ -207,11 +206,6 @@ func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, e
 	return client.StandardClient(), nil
 }
 
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
-
 // requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
 // is non-nil.
 func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Logger) *http.Client {
@@ -221,22 +215,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	if !cfg.Tracer.enabled() {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err := os.Remove(cfg.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Tracer.Filename, log)
 		return cli
 	}
 
@@ -254,18 +233,8 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	traceLogger := zap.New(core)
 
 	maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
+	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 	return cli
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
-// repeated instances. The request.tracer.filename may have ":" when an input
-// has cursor config and the macOS Finder will treat this as path-separator and
-// causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // clientOption returns constructed client configuration options, including
@@ -312,10 +281,10 @@ func newRetryLog(log *logp.Logger) *retryLog {
 	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
 }
 
-func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
-func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
-func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
-func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+func (l *retryLog) Error(msg string, kv ...any) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...any)  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...any) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...any)  { l.log.Warnw(msg, kv...) }
 
 // runFullSync performs a full synchronization. It will fetch user and group
 // identities from Azure Active Directory, enrich users with group memberships,

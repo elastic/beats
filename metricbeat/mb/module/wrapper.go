@@ -90,12 +90,16 @@ type stats struct {
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
-func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beatmonitoring.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
-	module, metricSets, err := mb.NewModule(config, r, p, logger)
+func NewWrapper(config *conf.C, r *mb.Register, info *beat.Info, monitoring beatmonitoring.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
+	beatInfo := *info
+	if p != nil {
+		beatInfo.Paths = p
+	}
+	module, metricSets, err := mb.NewModule(config, r, beatInfo)
 	if err != nil {
 		return nil, err
 	}
-	return createWrapper(module, metricSets, monitoring, logger, options...)
+	return createWrapper(module, metricSets, monitoring, info.Logger, options...)
 }
 
 // NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
@@ -169,7 +173,25 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			defer registry.Remove(metricsPath)
 			defer releaseStats(mw.monitoring.StatsRegistry(), msw.stats)
 			defer wg.Done()
-			defer msw.close()
+
+			// ensure we call msw.close() once
+			var closeOnce sync.Once
+			closeMetricSet := func() { closeOnce.Do(func() { msw.close() }) }
+			defer closeMetricSet()
+
+			// startPeriodicFetching (called by msw.run) performs a synchronous fetch before entering
+			// its select loop, so closing done cannot interrupt a blocked first
+			// Fetch(). The companion goroutine calls close() when done fires,
+			// giving the metricset a chance to unblock itself via Close().
+			stopCompanion := make(chan struct{})
+			defer close(stopCompanion)
+			go func() {
+				select {
+				case <-done:
+					closeMetricSet()
+				case <-stopCompanion:
+				}
+			}()
 
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
 			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
@@ -368,7 +390,7 @@ func (r *channelContext) Err() error {
 		return nil
 	}
 }
-func (r *channelContext) Value(key interface{}) interface{} { return nil }
+func (r *channelContext) Value(key any) any { return nil }
 
 type reporterV2 struct {
 	*eventReporter

@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -37,11 +36,6 @@ var once sync.Once
 // HostFSConfig is a bare struct for unpacking the config we get from agent or metricbeat
 type HostFSConfig struct {
 	HostFS string `config:"hostfs"`
-}
-
-// MetricbeatHostFSConfig carries config information for the hostfs setting
-type MetricbeatHostFSConfig struct {
-	HostFS string `config:"system.hostfs"`
 }
 
 // InitSystemModule initializes either either the system or linux module. This will produce different modules depending on if we're running under agent or not.
@@ -90,8 +84,6 @@ func metricbeatInit(base mb.BaseModule, modulePath string) (mb.Module, error) {
 
 }
 
-// A user can supply either `system.hostfs` or `hostfs`.
-// In additon, we will probably want to change Integration Config values to `hostfs` as well.
 // We need to figure out which one we got, if any.
 // Returns false if no config value was set
 func findConfigValue(base mb.BaseModule) (string, bool, error) {
@@ -103,17 +95,6 @@ func findConfigValue(base mb.BaseModule) (string, bool, error) {
 	// if the newer value is set, just use that.
 	if partialConfig.HostFS != "" {
 		return partialConfig.HostFS, true, nil
-	}
-
-	legacyConfig := MetricbeatHostFSConfig{}
-	err = base.UnpackConfig(&legacyConfig)
-	if err != nil {
-		return "", false, fmt.Errorf("error unpacking legacy config: %w", err)
-	}
-	if legacyConfig.HostFS != "" {
-		base.Logger.Warn(cfgwarn.Deprecate("8.0.0", "The system.hostfs config value will be removed, use `hostfs` from within the module config."))
-		// Only fallback to this if the user didn't set anything else
-		return legacyConfig.HostFS, true, nil
 	}
 
 	return "/", false, nil

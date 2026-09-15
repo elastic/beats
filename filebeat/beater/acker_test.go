@@ -46,30 +46,30 @@ func (sl *mockStatelessLogger) Published(count int) bool {
 func TestACKer(t *testing.T) {
 	tests := []struct {
 		name      string
-		data      []interface{}
+		data      []any
 		stateless int
 		stateful  []file.State
 	}{
 		{
 			name:      "only stateless",
-			data:      []interface{}{nil, nil},
+			data:      []any{nil, nil},
 			stateless: 2,
 		},
 		{
 			name:      "only stateful",
-			data:      []interface{}{file.State{Source: "-"}, file.State{Source: "-"}},
+			data:      []any{file.State{Source: "-"}, file.State{Source: "-"}},
 			stateful:  []file.State{{Source: "-"}, {Source: "-"}},
 			stateless: 0,
 		},
 		{
 			name:      "both",
-			data:      []interface{}{file.State{Source: "-"}, nil, file.State{Source: "-"}},
+			data:      []any{file.State{Source: "-"}, nil, file.State{Source: "-"}},
 			stateful:  []file.State{{Source: "-"}, {Source: "-"}},
 			stateless: 1,
 		},
 		{
 			name:      "any other Private type",
-			data:      []interface{}{struct{}{}, nil},
+			data:      []any{struct{}{}, nil},
 			stateless: 2,
 		},
 	}

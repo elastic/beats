@@ -44,23 +44,23 @@ type WebSocketHandler func(*testing.T, *websocket.Conn, []string)
 
 var inputTests = []struct {
 	name          string
-	server        func(*testing.T, WebSocketHandler, map[string]interface{}, []string)
-	proxyServer   func(*testing.T, WebSocketHandler, map[string]interface{}, []string) *httptest.Server
-	oauth2Server  func(*testing.T, http.HandlerFunc, map[string]interface{})
+	server        func(*testing.T, WebSocketHandler, map[string]any, []string)
+	proxyServer   func(*testing.T, WebSocketHandler, map[string]any, []string) *httptest.Server
+	oauth2Server  func(*testing.T, http.HandlerFunc, map[string]any)
 	handler       WebSocketHandler
 	oauth2Handler http.HandlerFunc
-	config        map[string]interface{}
+	config        map[string]any
 	response      []string
 	time          func() time.Time
-	persistCursor map[string]interface{}
-	want          []map[string]interface{}
+	persistCursor map[string]any
+	want          []map[string]any
 	wantErr       error
 }{
 	{
 		name:    "single_event",
 		server:  newWebSocketTestServer(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -92,23 +92,23 @@ var inputTests = []struct {
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyA"
 		   }`},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
 				"ts":   "2017-08-17T14:54:12.949180-07:00",
 				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
-				"sm": map[string]interface{}{
-					"tls": map[string]interface{}{
+				"sm": map[string]any{
+					"tls": map[string]any{
 						"verify": "NONE",
 					},
 					"stat":   "Sent",
 					"qid":    "v7HLqYbx029423",
 					"dsn":    "2.0.0",
 					"mailer": "*file*",
-					"to": []interface{}{
+					"to": []any{
 						"/dev/null",
 					},
 					"ctladdr": "<user1@example.com> (8/0)",
@@ -124,7 +124,7 @@ var inputTests = []struct {
 		name:    "multiple_events",
 		server:  newWebSocketTestServer(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -183,23 +183,23 @@ var inputTests = []struct {
 				"id": "ZeYGULpZmL5N0151HN1OyX"
 	   }`,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
 				"ts":   "2017-08-17T14:54:12.949180-07:00",
 				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
-				"sm": map[string]interface{}{
-					"tls": map[string]interface{}{
+				"sm": map[string]any{
+					"tls": map[string]any{
 						"verify": "NONE",
 					},
 					"stat":   "Sent",
 					"qid":    "v7HLqYbx029423",
 					"dsn":    "2.0.0",
 					"mailer": "*file*",
-					"to": []interface{}{
+					"to": []any{
 						"/dev/null",
 					},
 					"ctladdr": "<user1@example.com> (8/0)",
@@ -210,21 +210,21 @@ var inputTests = []struct {
 				"id": "ZeYGULpZmL5N0151HN1OyA",
 			},
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
 				"ts":   "2017-08-17T14:54:12.949180-07:00",
 				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
-				"sm": map[string]interface{}{
-					"tls": map[string]interface{}{
+				"sm": map[string]any{
+					"tls": map[string]any{
 						"verify": "NONE",
 					},
 					"stat":   "Sent",
 					"qid":    "v7HLqYbx029423",
 					"dsn":    "2.0.0",
 					"mailer": "*file*",
-					"to": []interface{}{
+					"to": []any{
 						"/dev/null",
 					},
 					"ctladdr": "<user1@example.com> (8/0)",
@@ -240,7 +240,7 @@ var inputTests = []struct {
 		name:    "bad_cursor",
 		server:  newWebSocketTestServer(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -260,7 +260,7 @@ var inputTests = []struct {
 		name:    "invalid_url_scheme",
 		server:  invalidWebSocketTestServer(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -272,12 +272,12 @@ var inputTests = []struct {
 		name:    "cursor_condition_check",
 		server:  newWebSocketTestServer(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 	              state.response.decode_json().as(inner_body,{
 					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ?  [inner_body] : [],
 	          })`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"cursor": map[string]int{
 					"last_updated": 1502908200,
 				},
@@ -300,9 +300,9 @@ var inputTests = []struct {
 	          "ts": 1503081000
 	      }`,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint-1.com",
 					"cid":   "mmeng_vxciml",
 				},
@@ -314,12 +314,12 @@ var inputTests = []struct {
 		name:    "auth_basic_token",
 		server:  webSocketTestServerWithAuth(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
-			"auth": map[string]interface{}{
+			"auth": map[string]any{
 				"basic_token": basicToken,
 			},
 		},
@@ -333,9 +333,9 @@ var inputTests = []struct {
 	          "ts": 1502908200
 	      }`,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
@@ -347,12 +347,12 @@ var inputTests = []struct {
 		name:    "auth_bearer_token",
 		server:  webSocketTestServerWithAuth(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
-			"auth": map[string]interface{}{
+			"auth": map[string]any{
 				"bearer_token": bearerToken,
 			},
 		},
@@ -366,9 +366,9 @@ var inputTests = []struct {
 	          "ts": 1502908200
 	      }`,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
@@ -380,13 +380,13 @@ var inputTests = []struct {
 		name:    "auth_custom",
 		server:  webSocketTestServerWithAuth(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
-			"auth": map[string]interface{}{
-				"custom": map[string]interface{}{
+			"auth": map[string]any{
+				"custom": map[string]any{
 					"header": customHeader,
 					"value":  customValue,
 				},
@@ -402,9 +402,9 @@ var inputTests = []struct {
 	          "ts": 1502908200
 	      }`,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
@@ -416,12 +416,12 @@ var inputTests = []struct {
 		name:    "test_retry_success",
 		server:  webSocketServerWithRetry(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
-			"retry": map[string]interface{}{
+			"retry": map[string]any{
 				"max_attempts": 3,
 				"wait_min":     "1s",
 				"wait_max":     "2s",
@@ -437,9 +437,9 @@ var inputTests = []struct {
 	          "ts": 1502908200
 	      }`,
 		},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
@@ -451,12 +451,12 @@ var inputTests = []struct {
 		name:    "test_retry_failure",
 		server:  webSocketServerWithRetry(httptest.NewServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
-			"retry": map[string]interface{}{
+			"retry": map[string]any{
 				"max_attempts": 2,
 				"wait_min":     "1s",
 				"wait_max":     "2s",
@@ -468,12 +468,12 @@ var inputTests = []struct {
 		name:    "single_event_tls",
 		server:  webSocketServerWithTLS(httptest.NewUnstartedServer),
 		handler: defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
-			"ssl": map[string]interface{}{
+			"ssl": map[string]any{
 				"enabled":                 true,
 				"certificate_authorities": []string{"testdata/certs/ca.crt"},
 				"certificate":             "testdata/certs/cert.pem",
@@ -506,23 +506,23 @@ var inputTests = []struct {
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyA"
 		   }`},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
 				"ts":   "2017-08-17T14:54:12.949180-07:00",
 				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
-				"sm": map[string]interface{}{
-					"tls": map[string]interface{}{
+				"sm": map[string]any{
+					"tls": map[string]any{
 						"verify": "NONE",
 					},
 					"stat":   "Sent",
 					"qid":    "v7HLqYbx029423",
 					"dsn":    "2.0.0",
 					"mailer": "*file*",
-					"to": []interface{}{
+					"to": []any{
 						"/dev/null",
 					},
 					"ctladdr": "<user1@example.com> (8/0)",
@@ -538,7 +538,7 @@ var inputTests = []struct {
 		name:        "basic_proxy_forwarding",
 		proxyServer: newWebSocketProxyTestServer,
 		handler:     defaultHandler,
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -570,23 +570,23 @@ var inputTests = []struct {
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyA"
 			 }`},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
 				"ts":   "2017-08-17T14:54:12.949180-07:00",
 				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
-				"sm": map[string]interface{}{
-					"tls": map[string]interface{}{
+				"sm": map[string]any{
+					"tls": map[string]any{
 						"verify": "NONE",
 					},
 					"stat":   "Sent",
 					"qid":    "v7HLqYbx029423",
 					"dsn":    "2.0.0",
 					"mailer": "*file*",
-					"to": []interface{}{
+					"to": []any{
 						"/dev/null",
 					},
 					"ctladdr": "<user1@example.com> (8/0)",
@@ -600,7 +600,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "oauth2_blank_auth_style",
-		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["auth.token_url"] = s.URL + "/token"
 			config["url"] = "ws://placeholder"
@@ -609,8 +609,8 @@ var inputTests = []struct {
 		oauth2Handler: oauth2TokenHandler,
 		server:        webSocketTestServerWithAuth(httptest.NewServer),
 		handler:       defaultHandler,
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"client_id":     "a_client_id",
 				"client_secret": "a_client_secret",
 				"scopes": []string{
@@ -652,23 +652,23 @@ var inputTests = []struct {
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyA"
 			 }`},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
 				"ts":   "2017-08-17T14:54:12.949180-07:00",
 				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
-				"sm": map[string]interface{}{
-					"tls": map[string]interface{}{
+				"sm": map[string]any{
+					"tls": map[string]any{
 						"verify": "NONE",
 					},
 					"stat":   "Sent",
 					"qid":    "v7HLqYbx029423",
 					"dsn":    "2.0.0",
 					"mailer": "*file*",
-					"to": []interface{}{
+					"to": []any{
 						"/dev/null",
 					},
 					"ctladdr": "<user1@example.com> (8/0)",
@@ -682,7 +682,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "oauth2_in_params_auth_style",
-		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
 			config["auth.token_url"] = s.URL + "/token"
 			config["url"] = "ws://placeholder"
@@ -691,8 +691,8 @@ var inputTests = []struct {
 		oauth2Handler: oauth2TokenHandler,
 		server:        webSocketTestServerWithAuth(httptest.NewServer),
 		handler:       defaultHandler,
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"auth_style":    "in_params",
 				"client_id":     "a_client_id",
 				"client_secret": "a_client_secret",
@@ -735,23 +735,23 @@ var inputTests = []struct {
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyA"
 			 }`},
-		want: []map[string]interface{}{
+		want: []map[string]any{
 			{
-				"pps": map[string]interface{}{
+				"pps": map[string]any{
 					"agent": "example.proofpoint.com",
 					"cid":   "mmeng_uivm071",
 				},
 				"ts":   "2017-08-17T14:54:12.949180-07:00",
 				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
-				"sm": map[string]interface{}{
-					"tls": map[string]interface{}{
+				"sm": map[string]any{
+					"tls": map[string]any{
 						"verify": "NONE",
 					},
 					"stat":   "Sent",
 					"qid":    "v7HLqYbx029423",
 					"dsn":    "2.0.0",
 					"mailer": "*file*",
-					"to": []interface{}{
+					"to": []any{
 						"/dev/null",
 					},
 					"ctladdr": "<user1@example.com> (8/0)",
@@ -767,17 +767,17 @@ var inputTests = []struct {
 
 var urlEvalTests = []struct {
 	name   string
-	config map[string]interface{}
+	config map[string]any
 	time   func() time.Time
 	want   string
 }{
 	{
 		name: "cursor based url modification",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"url":         "ws://testapi/getresults",
 			"url_program": `has(state.cursor) && has(state.cursor.since) ? state.url+"?since="+ state.cursor.since : state.url`,
-			"state": map[string]interface{}{
-				"cursor": map[string]interface{}{
+			"state": map[string]any{
+				"cursor": map[string]any{
 					"since": "2017-08-17T14:54:12",
 				},
 			},
@@ -786,11 +786,11 @@ var urlEvalTests = []struct {
 	},
 	{
 		name: "cursor based url modification using simplified query",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"url":         "ws://testapi/getresults",
 			"url_program": `state.url + "?since=" + state.?cursor.since.orValue(state.url)`,
-			"state": map[string]interface{}{
-				"cursor": map[string]interface{}{
+			"state": map[string]any{
+				"cursor": map[string]any{
 					"since": "2017-08-17T14:54:12",
 				},
 			},
@@ -799,10 +799,10 @@ var urlEvalTests = []struct {
 	},
 	{
 		name: "url modification with no cursor",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"url":         "ws://testapi/getresults",
 			"url_program": `has(state.cursor) && has(state.cursor.since) ? state.url+"?since="+ state.cursor.since: state.url+"?since="+ state.initial_start_time`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"initial_start_time": "2022-01-01T00:00:00Z",
 			},
 		},
@@ -810,10 +810,10 @@ var urlEvalTests = []struct {
 	},
 	{
 		name: "url modification with no cursor, using simplified query",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"url":         "ws://testapi/getresults",
 			"url_program": `state.url + "?since=" + state.?cursor.since.orValue(state.initial_start_time)`,
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"initial_start_time": "2022-01-01T00:00:00Z",
 			},
 		},
@@ -841,9 +841,9 @@ func TestURLEval(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
-			var state map[string]interface{}
+			var state map[string]any
 			if conf.State == nil {
-				state = make(map[string]interface{})
+				state = make(map[string]any)
 			} else {
 				state = conf.State
 			}
@@ -852,7 +852,7 @@ func TestURLEval(t *testing.T) {
 			if now == nil {
 				now = time.Now
 			}
-			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, logptest.NewTestingLogger(t, "websocket_url_eval_test"), now)
+			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, "", logptest.NewTestingLogger(t, "websocket_url_eval_test"), now)
 			if err != nil && !errors.Is(err, context.Canceled) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, nil)
 			}
@@ -945,13 +945,13 @@ func TestInput(t *testing.T) {
 // cloneConfig returns a deep copy of m via a JSON round-trip. This prevents
 // server factories from mutating the package-level inputTests table, which
 // would otherwise cause stale URLs and state when tests are run with -count >1.
-func cloneConfig(t *testing.T, m map[string]interface{}) map[string]interface{} {
+func cloneConfig(t *testing.T, m map[string]any) map[string]any {
 	t.Helper()
 	b, err := json.Marshal(m)
 	if err != nil {
 		t.Fatalf("failed to marshal config for deep copy: %v", err)
 	}
-	var clone map[string]interface{}
+	var clone map[string]any
 	if err := json.Unmarshal(b, &clone); err != nil {
 		t.Fatalf("failed to unmarshal config for deep copy: %v", err)
 	}
@@ -1006,7 +1006,7 @@ func TestURLProgramReconnect(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"url":         "ws" + server.URL[4:] + "/v1/stream",
 		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
 		"program": `
@@ -1014,7 +1014,7 @@ func TestURLProgramReconnect(t *testing.T) {
 				"cursor": {"last_timestamp": body.ts},
 				"events": [body],
 			})`,
-		"retry": map[string]interface{}{
+		"retry": map[string]any{
 			"blanket_retries": true,
 			"wait_min":        "10ms",
 			"wait_max":        "50ms",
@@ -1109,7 +1109,7 @@ func TestURLProgramReconnectZeroEvents(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"url":         "ws" + server.URL[4:] + "/v1/stream",
 		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
 		"program": `
@@ -1119,7 +1119,7 @@ func TestURLProgramReconnectZeroEvents(t *testing.T) {
 				:
 					{"events": []}
 			)`,
-		"retry": map[string]interface{}{
+		"retry": map[string]any{
 			"blanket_retries": true,
 			"wait_min":        "10ms",
 			"wait_max":        "50ms",
@@ -1176,14 +1176,14 @@ type publisher struct {
 	done      func()
 	mu        sync.Mutex
 	published []beat.Event
-	cursors   []map[string]interface{}
+	cursors   []map[string]any
 }
 
-func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+func (p *publisher) Publish(e beat.Event, cursor any) error {
 	p.mu.Lock()
 	p.published = append(p.published, e)
 	if cursor != nil {
-		c, ok := cursor.(map[string]interface{})
+		c, ok := cursor.(map[string]any)
 		if !ok {
 			return fmt.Errorf("invalid cursor type for testing: %T", cursor)
 		}
@@ -1194,8 +1194,8 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	return nil
 }
 
-func newWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
-	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+func newWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]any, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]any, response []string) {
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			upgrader := websocket.Upgrader{
 				CheckOrigin: func(r *http.Request) bool {
@@ -1220,8 +1220,8 @@ func newWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*tes
 }
 
 // invalidWebSocketTestServer returns a function that creates a WebSocket server with an invalid URL scheme.
-func invalidWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
-	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+func invalidWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]any, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]any, response []string) {
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			upgrader := websocket.Upgrader{
 				CheckOrigin: func(r *http.Request) bool {
@@ -1243,8 +1243,8 @@ func invalidWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(
 }
 
 // webSocketTestServerWithAuth returns a function that creates a WebSocket server with authentication. This does not however simulate a TLS connection.
-func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
-	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]any, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]any, response []string) {
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			upgrader := websocket.Upgrader{
 				CheckOrigin: func(r *http.Request) bool {
@@ -1288,8 +1288,8 @@ func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func
 }
 
 // webSocketServerWithRetry returns a function that creates a WebSocket server that rejects the first two connection attempts and accepts the third.
-func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
-	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]any, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]any, response []string) {
 		var attempt int
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			attempt++
@@ -1321,8 +1321,8 @@ func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*t
 }
 
 // webSocketServerWithTLS simulates a WebSocket server with TLS based authentication.
-func webSocketServerWithTLS(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
-	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+func webSocketServerWithTLS(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]any, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]any, response []string) {
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			upgrader := websocket.Upgrader{
 				CheckOrigin: func(r *http.Request) bool {
@@ -1433,7 +1433,7 @@ func webSocketProxyHandler(targetURL string) http.HandlerFunc {
 }
 
 // newWebSocketProxyTestServer creates a proxy server forwarding WebSocket traffic.
-func newWebSocketProxyTestServer(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) *httptest.Server {
+func newWebSocketProxyTestServer(t *testing.T, handler WebSocketHandler, config map[string]any, response []string) *httptest.Server {
 	backendServer := webSocketTestServer(t, handler, response)
 	t.Cleanup(backendServer.Close)
 	config["url"] = "ws" + backendServer.URL[4:]

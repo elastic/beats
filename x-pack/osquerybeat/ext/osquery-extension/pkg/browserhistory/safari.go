@@ -42,8 +42,8 @@ func newSafariParser(ctx context.Context, location searchLocation, log *logger.L
 
 func inferSafariBrowserName(path string) string {
 	normalized := filepath.ToSlash(path)
-	segments := strings.Split(normalized, "/")
-	for _, segment := range segments {
+	segments := strings.SplitSeq(normalized, "/")
+	for segment := range segments {
 		segment = strings.TrimSpace(segment)
 		if segment == "" {
 			continue

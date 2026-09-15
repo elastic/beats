@@ -49,8 +49,8 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, 2801, events[0].MetricSetFields["available_bits"])
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "system",
 		"metricsets": []string{"entropy"},
 		"hostfs":     "./_meta/testdata",

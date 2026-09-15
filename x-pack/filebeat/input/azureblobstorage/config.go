@@ -6,6 +6,7 @@ package azureblobstorage
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
@@ -14,6 +15,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
+)
+
+// Default retry settings. These mirror the Azure SDK's own pipeline retry
+// policy defaults, so leaving the retry block (or any field within it) unset
+// behaves exactly as it did before these options existed. They are seeded in
+// defaultConfig rather than relying on the SDK's implicit zero-value fallback,
+// which keeps the effective policy visible and testable.
+const (
+	defaultMaxRetries        = 3
+	defaultInitialRetryDelay = 800 * time.Millisecond
+	defaultMaxRetryDelay     = 60 * time.Second
 )
 
 // defaultReaderConfig is a default readerConfig state that is used to evaluate
@@ -65,6 +77,15 @@ type config struct {
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
 	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
 	PathPrefix string `config:"path_prefix"`
+	// Retry tunes how transient Azure Storage failures are retried. It applies
+	// to the whole account (all containers), since the SDK client is created per
+	// container from these shared values.
+	Retry retryConfig `config:"retry"`
+
+	// clientOptions is used internally for testing purposes only and should not be
+	// configured by users. Every Azure client the input creates starts from these
+	// options.
+	clientOptions azcore.ClientOptions
 }
 
 // container contains the config for each specific blob storage container in the root account.
@@ -121,6 +142,30 @@ type readerConfig struct {
 	OverrideEncoding bool `config:"override_encoding"`
 }
 
+// retryConfig tunes how the input copes with transient Azure Storage failures,
+// such as HTTP 429/503 throttling ("ServerBusy") or brief network drops. These
+// values feed the Azure SDK's pipeline retry policy, which every request passes
+// through, so they cover both blob listing (pagination) and blob downloads.
+//
+// The defaults (seeded in defaultConfig) mirror the Azure SDK's own retry
+// policy, so omitting the retry block behaves exactly as before these options
+// existed.
+type retryConfig struct {
+	// MaxRetries is how many times a failed request is retried after the first
+	// attempt. Defaults to 3. A negative value disables retrying of failed
+	// requests. (Note that the SDK's blob-download stream reader always retries
+	// a mid-stream read failure at least a few times regardless of this value.)
+	MaxRetries int32 `config:"max_retries"`
+	// InitialRetryDelay is the starting delay for the exponential backoff
+	// between attempts. Each subsequent retry waits longer, capped by
+	// MaxRetryDelay. Defaults to 800ms.
+	InitialRetryDelay time.Duration `config:"initial_retry_delay"`
+	// MaxRetryDelay caps the backoff so that, during a long outage, the input
+	// keeps retrying at a steady interval instead of drifting towards ever
+	// larger waits. Defaults to 60s.
+	MaxRetryDelay time.Duration `config:"max_retry_delay"`
+}
+
 // authConfig defines the various authentication methods for connecting to Azure Storage.
 // Only one authentication method should be configured.
 type authConfig struct {
@@ -130,6 +175,11 @@ type authConfig struct {
 	ConnectionString *connectionStringConfig `config:"connection_string"`
 	// OAuth2 uses OAuth 2.0 for authentication, typically with Azure Active Directory.
 	OAuth2 *OAuth2Config `config:"oauth2"`
+	// ManagedIdentity uses the managed identity of the Azure host that runs
+	// Filebeat, so the config holds no secret. It is a value and carries an Enabled
+	// field because go-ucfg leaves a pointer nil for a block with no fields set,
+	// which is how a system-assigned identity is written.
+	ManagedIdentity managedIdentityConfig `config:"managed_identity"`
 }
 
 // connectionStringConfig holds the details for connection string-based authentication.
@@ -152,19 +202,53 @@ type OAuth2Config struct {
 	ClientSecret string `config:"client_secret"`
 	// TenantID is the Azure Active Directory tenant ID for OAuth 2.0 authentication.
 	TenantID string `config:"tenant_id"`
-	// clientOptions is used internally for testing purposes only and should not be configured by users.
-	clientOptions azcore.ClientOptions
+}
+
+// managedIdentityConfig holds the details for managed identity authentication.
+// Azure gives the token to the host that runs Filebeat, so this config holds no
+// secret.
+type managedIdentityConfig struct {
+	// Enabled selects managed identity authentication.
+	Enabled bool `config:"enabled"`
+	// ClientID names a user-assigned managed identity. An empty value selects the
+	// system-assigned identity of the host.
+	ClientID string `config:"client_id"`
 }
 
 func defaultConfig() config {
 	return config{
 		AccountName: "some_account",
+		Retry: retryConfig{
+			MaxRetries:        defaultMaxRetries,
+			InitialRetryDelay: defaultInitialRetryDelay,
+			MaxRetryDelay:     defaultMaxRetryDelay,
+		},
 	}
 }
 
 func (c config) Validate() error {
 	if c.Auth.OAuth2 != nil && (c.Auth.OAuth2.ClientID == "" || c.Auth.OAuth2.ClientSecret == "" || c.Auth.OAuth2.TenantID == "") {
 		return errors.New("client_id, client_secret and tenant_id are required for OAuth2 auth")
+	}
+	if c.Auth.ManagedIdentity.ClientID != "" && !c.Auth.ManagedIdentity.Enabled {
+		return errors.New("auth.managed_identity.enabled must be true to use auth.managed_identity.client_id")
+	}
+	// Managed identity is tried last, so a config that also sets
+	// auth.shared_credentials, auth.connection_string or auth.oauth2 would use
+	// that method and silently ignore managed identity.
+	if c.Auth.ManagedIdentity.Enabled && (c.Auth.SharedCredentials != nil || c.Auth.ConnectionString != nil || c.Auth.OAuth2 != nil) {
+		return errors.New("auth.managed_identity cannot be combined with another auth method")
+	}
+	if c.Retry.InitialRetryDelay < 0 {
+		return fmt.Errorf("retry.initial_retry_delay must not be negative, got %s", c.Retry.InitialRetryDelay)
+	}
+	if c.Retry.MaxRetryDelay < 0 {
+		return fmt.Errorf("retry.max_retry_delay must not be negative, got %s", c.Retry.MaxRetryDelay)
+	}
+	// A ceiling below the starting delay is almost certainly a mistake, and would
+	// silently clamp every backoff to MaxRetryDelay.
+	if c.Retry.MaxRetryDelay > 0 && c.Retry.InitialRetryDelay > c.Retry.MaxRetryDelay {
+		return fmt.Errorf("retry.max_retry_delay (%s) must not be smaller than retry.initial_retry_delay (%s)", c.Retry.MaxRetryDelay, c.Retry.InitialRetryDelay)
 	}
 	return nil
 }

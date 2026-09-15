@@ -29,14 +29,6 @@ func TestEncodingFlagHas(t *testing.T) {
 	}
 }
 
-func stringPtr(s string) *string {
-	return &s
-}
-
-func intPtr(i int) *int {
-	return &i
-}
-
 func TestMarshalToMapWithFlags(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -198,8 +190,8 @@ func TestMarshalToMapWithFlags(t *testing.T) {
 				StrPtr *string
 				IntPtr *int
 			}{
-				StrPtr: stringPtr("hello"),
-				IntPtr: intPtr(123),
+				StrPtr: new("hello"),
+				IntPtr: new(123),
 			},
 			flags:    0,
 			expected: map[string]string{"StrPtr": "hello", "IntPtr": "123"},
@@ -739,8 +731,8 @@ func TestGenerateColumnDefinitions_pointerStruct(t *testing.T) {
 		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
 	}
 	for i := range cols {
-		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
-			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type { //nolint:gosec // lengths checked above
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type) //nolint:gosec // lengths checked above
 		}
 	}
 }
@@ -784,8 +776,8 @@ func TestGenerateColumnDefinitions_skippedFields(t *testing.T) {
 		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
 	}
 	for i := range cols {
-		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
-			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type { //nolint:gosec // lengths checked above
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type) //nolint:gosec // lengths checked above
 		}
 	}
 }
@@ -807,7 +799,7 @@ func TestGenerateColumnDefinitions_nilInput(t *testing.T) {
 func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
 	type testStruct struct {
 		Public    string `osquery:"public"`
-		private   string `osquery:"private"` //nolint:unused -- meaningful for test coverage
+		private   string `osquery:"private"` //nolint:unused // meaningful for test coverage
 		Exported2 int    `osquery:"exported2"`
 	}
 	expected := []table.ColumnDefinition{

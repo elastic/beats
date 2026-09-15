@@ -14,7 +14,7 @@ import (
 )
 
 func filebeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	var modules []map[string]interface{}
+	var modules []map[string]any
 	var err error
 	modules, err = management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
@@ -46,13 +47,15 @@ type apiValidator struct {
 func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) {
 	if v.basicAuth {
 		username, password, _ := r.BasicAuth()
-		if v.username != username || v.password != password {
+		usernameMatch := subtle.ConstantTimeCompare([]byte(v.username), []byte(username))
+		passwordMatch := subtle.ConstantTimeCompare([]byte(v.password), []byte(password))
+		if usernameMatch&passwordMatch != 1 {
 			return http.StatusUnauthorized, errIncorrectUserOrPass
 		}
 	}
 
 	if v.secretHeader != "" && v.secretValue != "" {
-		if v.secretValue != r.Header.Get(v.secretHeader) {
+		if subtle.ConstantTimeCompare([]byte(v.secretValue), []byte(r.Header.Get(v.secretHeader))) != 1 {
 			return http.StatusUnauthorized, errIncorrectHeaderSecret
 		}
 	}

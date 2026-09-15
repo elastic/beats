@@ -32,7 +32,7 @@ func TestEventIterator(t *testing.T) {
 	defer tearDown()
 
 	const eventCount = 1500
-	for i := 0; i < eventCount; i++ {
+	for i := range eventCount {
 		safeWriteEvent(t, writer, 1, "Test message "+strconv.Itoa(i+1))
 	}
 

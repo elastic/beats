@@ -99,11 +99,11 @@ func dnsHashToString(h uint8) string {
 // string representation is unknown then the numeric value will be returned
 // as a string.
 func dnsTypeBitsMapToString(t []uint16) string {
-	var s string
-	for i := 0; i < len(t); i++ {
-		s += dnsTypeToString(t[i]) + " "
+	var s strings.Builder
+	for i := range t {
+		s.WriteString(dnsTypeToString(t[i]) + " ")
 	}
-	return strings.TrimSuffix(s, " ")
+	return strings.TrimSuffix(s.String(), " ")
 }
 
 // saltToString converts a NSECX salt to uppercase and
@@ -133,7 +133,7 @@ func hexStringToString(hexString string) (string, error) {
 		default:
 			if value < 32 || value >= 127 {
 				// Unprintable characters are written as \\DDD (e.g. \\012).
-				s = append(s, []byte(fmt.Sprintf("\\%03d", int(value)))...)
+				s = append(s, fmt.Appendf(nil, "\\%03d", int(value))...)
 			} else {
 				s = append(s, value)
 			}

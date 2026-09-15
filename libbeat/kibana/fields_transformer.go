@@ -229,7 +229,7 @@ func addParams(format *mapstr.M, version *version.V, f mapping.Field) {
 	addVersionedFormatParam(format, version, "urlTemplate", f.UrlTemplate)
 }
 
-func addFormatParam(f *mapstr.M, key string, val interface{}) {
+func addFormatParam(f *mapstr.M, key string, val any) {
 	switch val.(type) {
 	case string:
 		if v := val.(string); v != "" {

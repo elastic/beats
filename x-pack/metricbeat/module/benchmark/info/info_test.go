@@ -21,7 +21,7 @@ func TestFetch(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			config := map[string]interface{}{
+			config := map[string]any{
 				"module":     "benchmark",
 				"period":     "1s",
 				"metricsets": []string{"info"},

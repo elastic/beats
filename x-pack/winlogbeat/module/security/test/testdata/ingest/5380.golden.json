@@ -2,7 +2,7 @@
   {
     "@timestamp": "2023-01-17T10:11:25.557Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credential-find",
@@ -73,7 +73,7 @@
   {
     "@timestamp": "2023-01-17T10:11:25.532Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credential-find",
@@ -144,7 +144,7 @@
   {
     "@timestamp": "2023-01-17T10:11:25.498Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credential-find",
@@ -215,7 +215,7 @@
   {
     "@timestamp": "2023-01-17T10:11:24.775Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credential-find",
@@ -286,7 +286,7 @@
   {
     "@timestamp": "2023-01-17T10:11:24.542Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "vault-credential-find",

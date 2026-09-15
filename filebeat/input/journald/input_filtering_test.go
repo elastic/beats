@@ -136,11 +136,11 @@ func TestInputUnits(t *testing.T) {
 func TestInputIncludeMatches(t *testing.T) {
 	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
 	tests := map[string]struct {
-		includeMatches   map[string]interface{}
+		includeMatches   map[string]any
 		expectedMessages []string
 	}{
 		"single match condition": {
-			includeMatches: map[string]interface{}{
+			includeMatches: map[string]any{
 				"match": []string{
 					"log.syslog.facility.code=3",
 				},
@@ -156,7 +156,7 @@ func TestInputIncludeMatches(t *testing.T) {
 			},
 		},
 		"multiple match condition": {
-			includeMatches: map[string]interface{}{
+			includeMatches: map[string]any{
 				"match": []string{
 					"journald.process.name=systemd",
 					"log.syslog.facility.code=3",
@@ -256,7 +256,11 @@ func TestInputSeek(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			if testCase.cursor != "" {
-				store, _ := env.stateStore.StoreFor("")
+				store, err := env.stateStore.StoreFor("")
+				if err != nil {
+					t.Fatalf("failed to open store: %v", err)
+				}
+				defer store.Close()
 				tmp := map[string]any{}
 				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
 					t.Fatal(err)

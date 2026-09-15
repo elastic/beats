@@ -21,7 +21,7 @@ package helper
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"runtime"
 	"testing"
@@ -63,13 +63,13 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/",
 		}
 
-		h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+		h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()
 		require.NoError(t, err)
 		defer r.Body.Close()
-		content, err := ioutil.ReadAll(r.Body)
+		content, err := io.ReadAll(r.Body)
 		require.NoError(t, err)
 		assert.Equal(t, []byte("ehlo!"), content)
 	})
@@ -96,13 +96,13 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/ok",
 		}
 
-		h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+		h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()
 		require.NoError(t, err)
 		defer r.Body.Close()
-		content, err := ioutil.ReadAll(r.Body)
+		content, err := io.ReadAll(r.Body)
 		require.NoError(t, err)
 		assert.Equal(t, []byte("ehlo!"), content)
 	})

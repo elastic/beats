@@ -39,7 +39,7 @@ func newTestMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func TestMetricSet(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("cloudfoundry"))
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":        "cloudfoundrytest",
 		"client_id":     "dummy",
 		"client_secret": "dummy",

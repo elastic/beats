@@ -20,6 +20,7 @@ package reload
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -281,7 +282,7 @@ func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
 }
 
 func DefaultHashConfig(c *config.C) (uint64, error) {
-	var config map[string]interface{}
+	var config map[string]any
 	if err := c.Unpack(&config); err != nil {
 		return 0, err
 	}
@@ -291,9 +292,7 @@ func DefaultHashConfig(c *config.C) (uint64, error) {
 
 func (r *HBRunnerList) copyRunnerList() map[uint64]cfgfile.Runner {
 	list := make(map[uint64]cfgfile.Runner, len(r.runners))
-	for k, v := range r.runners {
-		list[k] = v
-	}
+	maps.Copy(list, r.runners)
 	return list
 }
 

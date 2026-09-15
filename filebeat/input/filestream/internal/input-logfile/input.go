@@ -19,10 +19,10 @@ package input_logfile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
@@ -33,16 +33,19 @@ import (
 type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
-	id                     string
-	manager                *InputManager
-	ackCH                  *updateChan
-	sourceIdentifier       *SourceIdentifier
-	previousSrcIdentifiers []*SourceIdentifier
-	prospector             Prospector
-	harvester              Harvester
-	cleanTimeout           time.Duration
-	harvesterLimit         uint64
-	readUntilEOF           ReadUntilEOFConfig
+	id                 string
+	manager            *InputManager
+	ackCH              *updateChan
+	sourceIdentifier   *SourceIdentifier
+	previousMatchers   []InputMatcher
+	takeOverAnyID      bool
+	prospector         Prospector
+	harvester          Harvester
+	cleanTimeout       time.Duration
+	harvesterLimit     uint64
+	readUntilEOF       ReadUntilEOFConfig
+	backoff            BackoffConfig
+	stateCheckInterval time.Duration
 }
 
 // Name is required to implement the v2.Input interface
@@ -59,47 +62,63 @@ func (inp *managedInput) Run(
 	pipeline beat.PipelineConnector,
 ) (err error) {
 
+	// Acquire a lease on the shared cache entry.
+	leaseRelease, ok := inp.manager.acquireLease()
+	if !ok {
+		return errors.New("input manager store is not available")
+	}
+	defer leaseRelease()
+
 	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs
 	defer inp.manager.StopInput(inp.id)
 	ctx.UpdateStatus(status.Starting, "")
-	groupStore := inp.manager.getRetainedStore()
+	// Retain both stores before starting any goroutines so that a failed
+	// second retain cannot leave already-running harvesters without a way to
+	// stop cleanly.
+	groupStore, err := inp.manager.getRetainedStore()
+	if err != nil {
+		return err
+	}
 	defer groupStore.Release()
 
-	// Setup cancellation using a custom cancel context. All workers will be
+	prospectorStore, err := inp.manager.getRetainedStore()
+	if err != nil {
+		return err
+	}
+	defer prospectorStore.Release()
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousMatchers, inp.takeOverAnyID)
+
+	// Setup cancellation using a custom cancel context. All harvesters will be
 	// stopped if one failed badly by returning an error.
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
 	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
-	harvesterGroupStopTimeout := time.Minute // magic number
-	if inp.readUntilEOF.Enabled {
-		// keep the magic alive
-		harvesterGroupStopTimeout +=
-			inp.readUntilEOF.Timeout + 100*time.Millisecond
-	}
-	hg := &defaultHarvesterGroup{
-		pipeline:     pipeline,
-		readers:      newReaderGroup(),
-		cleanTimeout: inp.cleanTimeout,
-		harvester:    inp.harvester,
-		readUntilEOF: inp.readUntilEOF,
-		store:        groupStore,
-		ackCH:        inp.ackCH,
-		identifier:   inp.sourceIdentifier,
-		tg: task.NewGroup(
-			inp.harvesterLimit,
-			harvesterGroupStopTimeout,
-			ctx.Logger,
-			"harvester:"),
-		metrics: metrics,
-		inputID: inp.id,
-	}
 
-	prospectorStore := inp.manager.getRetainedStore()
-	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
+	// The harvester scheduler is shared by every filestream input in the process.
+	engine, releaseEngine := acquireEngine(inp.manager.Logger)
+	defer releaseEngine()
+
+	hg := newHarvesterRunner(
+		engine,
+		releaseEngine,
+		ctx,
+		inp.harvesterLimit,
+		pipeline,
+		inp.harvester,
+		inp.cleanTimeout,
+		groupStore,
+		inp.ackCH,
+		inp.sourceIdentifier,
+		metrics,
+		inp.id,
+		inp.readUntilEOF,
+		inp.backoff,
+		inp.stateCheckInterval,
+	)
+	hg.start()
 
 	if err := inp.prospector.TakeOver(sourceStore, inp.sourceIdentifier.ID); err != nil {
 		return fmt.Errorf("prospector failed to take over states: %w", err)
@@ -109,7 +128,7 @@ func (inp *managedInput) Run(
 	// Any errors encountered by harvester will change state to Degraded
 	ctx.UpdateStatus(status.Running, "")
 
-	inp.prospector.Run(ctx, sourceStore, hg)
+	inp.prospector.Run(ctx, sourceStore, hg, metrics)
 
 	return nil
 }

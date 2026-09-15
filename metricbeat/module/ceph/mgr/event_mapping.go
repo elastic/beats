@@ -39,7 +39,7 @@ type Result struct {
 }
 
 // UnmarshalResponse method unmarshals the content to the given response object.
-func UnmarshalResponse(content []byte, response interface{}) error {
+func UnmarshalResponse(content []byte, response any) error {
 	var request Request
 	err := json.Unmarshal(content, &request)
 	if err != nil {

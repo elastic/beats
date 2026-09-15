@@ -41,7 +41,7 @@ type testCase struct {
 var testCases = []testCase{
 	{
 		"%SEC-6-IPACCESSLOGP: list 100 denied udp 198.51.100.1(55934) -> 198.51.100.255(15600), 1 packet",
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"cisco.ios.access_list": "100",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.255",
@@ -65,7 +65,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGDP: list 100 denied icmp 198.51.100.1 -> 198.51.100.2 (3/5), 1 packet",
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"cisco.ios.access_list": "100",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.2",
@@ -89,7 +89,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGRP: list 170 denied igmp 198.51.100.1 -> 224.168.168.168, 1 packet",
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"cisco.ios.access_list": "170",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.168.168.168",
@@ -111,7 +111,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGSP: list INBOUND-ON-AP denied igmp 198.51.100.1 -> 224.0.0.2 (20), 1 packet",
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"cisco.ios.access_list": "INBOUND-ON-AP",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.0.0.2",
@@ -134,7 +134,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGNP: list 1 permitted 0 198.51.100.1 -> 239.10.10.10, 1 packet",
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"cisco.ios.access_list": "1",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "239.10.10.10",
@@ -156,7 +156,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGRL: access-list logging rate-limited or missed 18 packets",
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"cisco.ios.facility": "SEC",
 			"event.code":         "IPACCESSLOGRL",
 			"event.original":     isdef.IsNonEmptyString,
@@ -168,7 +168,7 @@ var testCases = []testCase{
 
 	{
 		"%IPV6-6-ACCESSLOGP: list ACL-IPv6-E0/0-IN/10 permitted tcp 2001:DB8::3(1027) -> 2001:DB8:1000::1(22), 9 packets",
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"cisco.ios.facility": "IPV6",
 			"event.code":         "ACCESSLOGP",
 			"event.original":     isdef.IsNonEmptyString,
@@ -199,7 +199,6 @@ func TestFilebeatSyslogCisco(t *testing.T) {
 
 func testInput(t *testing.T, input string, p beat.Processor) {
 	for i, tc := range testCases {
-		tc := tc
 		t.Run(fmt.Sprintf("%s/%d", input, i), func(t *testing.T) {
 			if input == "log" {
 				tc.message = logInputHeaders[i%len(logInputHeaders)] + tc.message

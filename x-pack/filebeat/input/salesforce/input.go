@@ -63,9 +63,6 @@ type salesforceInput struct {
 	config
 }
 
-// // The Filebeat user-agent is provided to the program as useragent.
-// var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
-
 // Plugin returns the input plugin.
 func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
@@ -980,10 +977,10 @@ func newRetryLog(log *logp.Logger) *retryLog {
 	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
 }
 
-func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
-func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
-func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
-func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+func (l *retryLog) Error(msg string, kv ...any) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...any)  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...any) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...any)  { l.log.Warnw(msg, kv...) }
 
 // retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
 // but return the last retry attempt's response and a nil error to allow the retryablehttp.Client

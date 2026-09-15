@@ -39,7 +39,7 @@ type Base struct {
 	// Can be used to add meta information to events. Should not contain nested
 	// objects. All values are stored as keyword.
 	// Example: `docker` and `k8s` labels.
-	Labels map[string]interface{} `ecs:"labels"`
+	Labels map[string]any `ecs:"labels"`
 
 	// For log events the message field contains the log message, optimized for
 	// viewing in a log viewer.

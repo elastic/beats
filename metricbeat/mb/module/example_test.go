@@ -41,7 +41,7 @@ import (
 // module.
 func ExampleWrapper() {
 	// Build a configuration object.
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -55,7 +55,7 @@ func ExampleWrapper() {
 		return
 	}
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, logger, beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, &beat.Info{Logger: logger}, beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -67,9 +67,7 @@ func ExampleWrapper() {
 
 	// Process events from the output channel until it is closed.
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		for event := range output {
 			event.Fields.Put("event.duration", 111)
 
@@ -78,7 +76,7 @@ func ExampleWrapper() {
 				fmt.Println(output)
 			}
 		}
-	}()
+	})
 
 	// Simulate running for a while.
 	time.Sleep(50 * time.Millisecond)
@@ -125,7 +123,7 @@ func ExampleRunner() {
 	// for demonstration purposes.
 	var b *beat.Beat
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -139,7 +137,7 @@ func ExampleRunner() {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, &beat.Info{Logger: logp.NewNopLogger()}, beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	if err != nil {
 		return
 	}
@@ -174,7 +172,7 @@ func encodeEvent(event beat.Event) (string, error) {
 	// FIX: need to parse and re-encode, so fields ordering in final json document
 	//      keeps stable.
 
-	var tmp interface{}
+	var tmp any
 	if err := stdjson.Unmarshal(output, &tmp); err != nil {
 		panic(err)
 	}

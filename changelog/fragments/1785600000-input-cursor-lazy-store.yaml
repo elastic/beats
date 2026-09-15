@@ -1,0 +1,37 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: enhancement
+
+# Change summary; a 80ish characters long description of the change.
+summary: Open a cursor input's registry store only when an input of that type runs
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: >
+  Filebeat opened a registry store and started a registry cleanup goroutine for
+  every registered cursor input type at startup, whether or not any input of that
+  type was configured. A Beat collecting a single input therefore carried nine
+  open stores and nine idle goroutines for input types it never ran. Both are now
+  created when the first input of that type is configured.
+
+  A registry that cannot be opened is now reported when the input starts rather
+  than when Filebeat starts, so it fails only the inputs that need it instead of
+  the whole Beat.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: filebeat
+
+# PR URL; optional; the PR number that added the changeset.
+# If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
+# pr: https://github.com/owner/repo/1234
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+# If not present is automatically filled by the tooling with the issue linked to the PR number.
+# issue: https://github.com/owner/repo/1234

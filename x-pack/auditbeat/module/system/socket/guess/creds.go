@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -119,7 +118,7 @@ func (g *guessStructCreds) Terminate() error {
 }
 
 // Extract receives the struct cred dump and discovers the offsets.
-func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessStructCreds) Extract(ev any) (mapstr.M, bool) {
 	raw := ev.([]byte)
 	if len(raw) != credDumpBytes {
 		return nil, false

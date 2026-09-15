@@ -28,6 +28,10 @@ import (
 // States is a collection of states backed by one or more persistent stores
 // that may be differentiated by input type.
 type States interface {
+	// StoreKey returns a process-wide identifier for the persistent backend
+	// selected by StoreFor. Equal keys identify the same backend.
+	StoreKey() string
+
 	// StoreFor returns the storage registry for the given type.
 	// The value of typ is expected to have been obtained from
 	// cursor.InputManager.Type and represents the input type.
@@ -114,7 +118,7 @@ func (s *Store) Has(key string) (bool, error) {
 // Get unpacks the value for a given key into "into".
 // Get returns an error if the store has already been closed, the key does not
 // exist, or the storage backend returns an error.
-func (s *Store) Get(key string, into interface{}) error {
+func (s *Store) Get(key string, into any) error {
 	const operation = "store/get"
 	if err := s.active.Add(1); err != nil {
 		return &ErrorClosed{operation: operation, name: s.shared.name}
@@ -131,7 +135,7 @@ func (s *Store) Get(key string, into interface{}) error {
 // Set inserts or overwrite a key value pair.
 // Set returns an error if the store has been closed, the value can not be
 // encoded by the store, or the storage backend did failed.
-func (s *Store) Set(key string, from interface{}) error {
+func (s *Store) Set(key string, from any) error {
 	const operation = "store/set"
 	if err := s.active.Add(1); err != nil {
 		return &ErrorClosed{operation: operation, name: s.shared.name}

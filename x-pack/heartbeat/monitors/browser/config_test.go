@@ -69,7 +69,7 @@ func TestHashConfig(t *testing.T) {
 		},
 		"params": mapstr.M{},
 	})
-	original, err := hashConfig(cfg)
+	original, err := HashConfig(cfg)
 	assert.NoError(t, err, "failed to hash job config")
 	cfg = conf.MustNewConfigFrom(mapstr.M{
 		"name": "My Name",
@@ -81,7 +81,7 @@ func TestHashConfig(t *testing.T) {
 		},
 		"params": mapstr.M{"key": "value"},
 	})
-	modified, err := hashConfig(cfg)
+	modified, err := HashConfig(cfg)
 	assert.NoError(t, err, "failed to hash job config")
 
 	require.Equal(t, original, modified, "unmatching confg hash")

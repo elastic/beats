@@ -82,9 +82,9 @@ func WaitDuration(d time.Duration) signaler {
 	return WaitTimer(time.NewTimer(d))
 }
 
-func WithLog(s signaler, msg string) signaler {
+func WithLog(s signaler, msg string, logger *logp.Logger) signaler {
 	return func() {
 		s()
-		logp.L().Infof("%v", msg)
+		logger.Infof("%v", msg)
 	}
 }

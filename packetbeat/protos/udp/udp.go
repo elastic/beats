@@ -45,10 +45,11 @@ type UDP struct {
 	portMap   map[uint16]protos.Protocol
 
 	metrics *inputMetrics
+	logger  *logp.Logger
 }
 
 // NewUDP creates and returns a new UDP.
-func NewUDP(p protos.Protocols, id, device string, idx int) (*UDP, error) {
+func NewUDP(p protos.Protocols, id, device string, idx int, logger *logp.Logger) (*UDP, error) {
 	portMap, err := buildPortsMap(p.GetAllUDP())
 	if err != nil {
 		return nil, err
@@ -57,9 +58,10 @@ func NewUDP(p protos.Protocols, id, device string, idx int) (*UDP, error) {
 	udp := &UDP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap),
+		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap, logger),
+		logger:    logger.Named("udp"),
 	}
-	logp.Debug("udp", "Port map: %v", portMap)
+	logger.Debugf("Port map: %v", portMap)
 
 	return udp, nil
 }
@@ -94,18 +96,18 @@ func buildPortsMap(plugins map[protos.Protocol]protos.UDPPlugin) (map[uint16]pro
 func (udp *UDP) Process(id *flows.FlowID, pkt *protos.Packet) {
 	protocol := udp.decideProtocol(&pkt.Tuple)
 	if protocol == protos.UnknownProtocol {
-		logp.Debug("udp", "unknown protocol")
+		udp.logger.Debug("unknown protocol")
 		return
 	}
 
 	plugin := udp.protocols.GetUDP(protocol)
 	if plugin == nil {
-		logp.Debug("udp", "Ignoring protocol for which we have no module loaded: %s", protocol)
+		udp.logger.Debugf("Ignoring protocol for which we have no module loaded: %s", protocol)
 		return
 	}
 
 	if len(pkt.Payload) > 0 {
-		logp.Debug("udp", "Parsing packet from %v of length %d.",
+		udp.logger.Debugf("Parsing packet from %v of length %d.",
 			pkt.Tuple.String(), len(pkt.Payload))
 		plugin.ParseUDP(pkt)
 		udp.metrics.log(pkt)
@@ -151,7 +153,7 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the UDP processor. If id or
 // device is empty a nil inputMetric is returned.
-func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *inputMetrics {
+func newInputMetrics(id, device string, ports map[uint16]protos.Protocol, logger *logp.Logger) *inputMetrics {
 	if id == "" || device == "" {
 		// An empty id signals to not record metrics,
 		// while an empty device means we are reading
@@ -169,10 +171,9 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		processingTime: metrics.NewUniformSample(1024),
 	}
 
-	// TODO: https://github.com/elastic/ingest-dev/issues/6000
-	_ = adapter.NewGoMetrics(reg, "arrival_period", logp.NewLogger(""), adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)

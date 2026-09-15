@@ -22,6 +22,7 @@ package perfmon
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 )
 
@@ -84,10 +85,5 @@ func (conf *Config) ShouldMatchByParentInstance() bool {
 }
 
 func isValidFormat(format string) bool {
-	for _, form := range allowedFormats {
-		if form == format {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allowedFormats, format)
 }

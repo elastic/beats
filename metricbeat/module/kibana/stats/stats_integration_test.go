@@ -92,6 +92,7 @@ func getKibanaVersion(t *testing.T, kibanaHostPort string) (*version.V, error) {
 	if err != nil {
 		return nil, err
 	}
+	req.SetBasicAuth("admin", "testing")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err

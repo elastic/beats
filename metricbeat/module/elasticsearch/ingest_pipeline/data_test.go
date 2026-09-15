@@ -18,7 +18,7 @@
 package ingest_pipeline
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -36,7 +36,7 @@ func TestMapper(t *testing.T) {
 		ClusterName: "helloworld",
 	}
 
-	ingestData, err := ioutil.ReadFile("./_meta/test/stats.json")
+	ingestData, err := os.ReadFile("./_meta/test/stats.json")
 	require.NoError(t, err)
 
 	err = eventsMapping(reporter, info, ingestData, true, true)
@@ -92,7 +92,7 @@ func TestSampling(t *testing.T) {
 		ClusterName: "helloworld",
 	}
 
-	ingestData, err := ioutil.ReadFile("./_meta/test/stats.json")
+	ingestData, err := os.ReadFile("./_meta/test/stats.json")
 	require.NoError(t, err)
 
 	err = eventsMapping(reporter, info, ingestData, true, false) // set sampling to false
@@ -117,7 +117,7 @@ func TestSampling(t *testing.T) {
 	require.Equal(t, 0, len(processorEvents))
 }
 
-func requireMetricSetFields(t *testing.T, event mb.Event, fieldName string, expected interface{}) {
+func requireMetricSetFields(t *testing.T, event mb.Event, fieldName string, expected any) {
 	val, err := event.MetricSetFields.GetValue(fieldName)
 	require.NoError(t, err)
 	require.Equal(t, expected, val)

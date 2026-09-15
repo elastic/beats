@@ -30,7 +30,7 @@ func InitializeModule() {
 	//Add IP Port Indexer as a default indexer
 	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"lookup_fields": []string{"service.address"},
 	}
 	fieldCfg, err := conf.NewConfigFrom(config)

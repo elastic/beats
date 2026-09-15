@@ -26,8 +26,8 @@ func TestData(t *testing.T) {
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     system.ModuleName,
 		"metricsets": []string{"host"},
 	}

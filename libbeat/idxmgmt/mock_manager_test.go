@@ -31,8 +31,8 @@ type mockILMSupport struct {
 
 type onCall struct {
 	name    string
-	args    []interface{}
-	returns []interface{}
+	args    []any
+	returns []any
 }
 
 func makeMockILMSupport(calls ...onCall) lifecycle.SupportFactory {
@@ -45,7 +45,7 @@ func makeMockILMSupport(calls ...onCall) lifecycle.SupportFactory {
 	}
 }
 
-func (c onCall) Return(values ...interface{}) onCall {
+func (c onCall) Return(values ...any) onCall {
 	c.returns = values
 	return c
 }
@@ -95,6 +95,6 @@ func (m *mockILMSupport) PolicyName() string {
 	return args.String(0)
 }
 
-func makeOnCall(name string, args ...interface{}) onCall {
+func makeOnCall(name string, args ...any) onCall {
 	return onCall{name: name, args: args}
 }

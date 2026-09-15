@@ -52,13 +52,13 @@ var (
 
 // Routes stores routes related information
 type Routes struct {
-	Now      time.Time                `json:"now"`
-	ServerID string                   `json:"server_id"`
-	Routes   []map[string]interface{} `json:"routes,omitempty"`
+	Now      time.Time        `json:"now"`
+	ServerID string           `json:"server_id"`
+	Routes   []map[string]any `json:"routes,omitempty"`
 }
 
 // eventMapping maps a route to a Metricbeat event using routesSchema
-func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Event, error) {
+func eventMapping(content map[string]any, fieldsSchema s.Schema) (mb.Event, error) {
 	fields, err := fieldsSchema.Apply(content)
 	if err != nil {
 		return mb.Event{}, fmt.Errorf("error applying routes schema: %w", err)

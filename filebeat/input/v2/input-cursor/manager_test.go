@@ -37,13 +37,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 )
 
 type fakeTestInput struct {
@@ -56,25 +56,48 @@ type stringSource string
 func TestManager_Init(t *testing.T) {
 	// Integration style tests for the InputManager and the state garbage collector
 
-	t.Run("stopping the taskgroup kills internal go-routines", func(t *testing.T) {
+	// The store is opened lazily on Create so that registered-but-never-configured
+	// input types do not pay a startup cost.
+	t.Run("no store is opened and no goroutine started until an input is created", func(t *testing.T) {
+		goroutines := resources.NewGoroutinesChecker()
+
+		manager := cleanerManager(t, createSampleStore(t, nil))
+
+		require.Nil(t, manager.store, "store must not be opened before Create")
+		_, err := goroutines.WaitUntilOriginalCount()
+		require.NoError(t, err, "no goroutine must be started before Create")
+
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
+		require.NoError(t, err)
+		require.NotNil(t, manager.store, "Create must open the registry store")
+	})
+
+	// The store is opened with the input ID, which is only known once a config
+	// has been unpacked in Create.
+	t.Run("the store is opened with the created input's ID", func(t *testing.T) {
+		stateStore := createSampleStore(t, map[string]state{
+			"test::mykey": {Cursor: "value1"},
+		})
+
+		manager := cleanerManager(t, stateStore)
+
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
+		require.NoError(t, err)
+
+		snap := storeMemorySnapshot(manager.store)
+		assert.Contains(t, snap, "test::mykey")
+		assert.Equal(t, "value1", snap["test::mykey"].Cursor)
+	})
+
+	t.Run("calling Close kills the cleaner goroutine", func(t *testing.T) {
 		numRoutines := runtime.NumGoroutine()
 
-		var grp unison.TaskGroup
-		store := createSampleStore(t, nil)
-		manager := &InputManager{
-			Logger:              logptest.NewTestingLogger(t, "test"),
-			StateStore:          store,
-			Type:                "test",
-			DefaultCleanTimeout: 10 * time.Millisecond,
-		}
-
-		err := manager.Init(&grp)
+		manager := cleanerManager(t, createSampleStore(t, nil))
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
 
 		time.Sleep(200 * time.Millisecond)
-		_ = grp.Stop()
-
-		// wait for all go-routines to be gone
+		manager.Close()
 
 		for numRoutines < runtime.NumGoroutine() {
 			time.Sleep(1 * time.Millisecond)
@@ -90,60 +113,77 @@ func TestManager_Init(t *testing.T) {
 		})
 		store.GCPeriod = 10 * time.Millisecond
 
-		var grp unison.TaskGroup
-		//nolint:errcheck // We don't need the error from grp.Stop()
-		defer grp.Stop()
-		manager := &InputManager{
-			Logger:              logptest.NewTestingLogger(t, "test"),
-			StateStore:          store,
-			Type:                "test",
-			DefaultCleanTimeout: 10 * time.Millisecond,
-		}
+		manager := cleanerManager(t, store)
 
-		err := manager.Init(&grp)
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{}))
 		require.NoError(t, err)
 
 		for len(store.snapshot()) > 0 {
 			time.Sleep(1 * time.Millisecond)
 		}
 	})
+
+	// Two reload paths — static config, central management, autodiscovery — can
+	// create inputs of one type concurrently, and each of those is now what
+	// opens the store and starts the cleaner.
+	t.Run("concurrent Create opens one store and starts one cleaner", func(t *testing.T) {
+		manager := cleanerManager(t, createSampleStore(t, nil))
+
+		var wg sync.WaitGroup
+		for i := range 8 {
+			wg.Go(func() {
+				_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
+					"id": fmt.Sprintf("input-%d", i),
+				}))
+				assert.NoError(t, err)
+			})
+		}
+		wg.Wait()
+
+		require.NotNil(t, manager.store)
+	})
 }
 
-func TestManager_InitDefersStoreForES(t *testing.T) {
-	// Verify that ES-backed inputs defer store creation from Init() to Create().
-	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
-	features.ReinitForTest()
-	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
-
-	data := map[string]state{
-		"test::mykey": {Cursor: "value1"},
-	}
-	stateStore := createSampleStore(t, data)
-
-	var grp unison.TaskGroup
-	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+// cleanerManager builds an InputManager whose Create succeeds, with a clean
+// timeout short enough for the garbage collector to act within a test.
+func cleanerManager(t *testing.T, store statestore.States) *InputManager {
+	t.Helper()
 
 	manager := &InputManager{
 		Logger:              logptest.NewTestingLogger(t, "test"),
-		StateStore:          stateStore,
+		StateStore:          store,
 		Type:                "test",
-		DefaultCleanTimeout: 30 * time.Minute,
+		DefaultCleanTimeout: 10 * time.Millisecond,
 		Configure: func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error) {
 			return sourceList("mykey"), &fakeTestInput{}, nil
 		},
 	}
+	t.Cleanup(manager.Close)
+	return manager
+}
 
-	// Init() should not create a store for ES-backed inputs.
-	err := manager.Init(&grp)
-	require.NoError(t, err)
-	assert.Nil(t, manager.store, "store should be nil after Init() for ES-backed inputs")
+// TestManager_InitDefersStoreForES covers the Elasticsearch-backed store, which
+// has always been opened from Create because it needs the input ID. All input
+// types now take that path; this pins that the ES-specific store still reaches
+// it, since SetID is a no-op for the file-backed backends and only matters here.
+func TestManager_InitDefersStoreForES(t *testing.T) {
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
 
-	// Create() should create the store with the inputID.
-	_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+	stateStore := createSampleStore(t, map[string]state{
+		"test::mykey": {Cursor: "value1"},
+	})
+
+	manager := cleanerManager(t, stateStore)
+
+	require.Nil(t, manager.store, "store should be nil before Create()")
+
+	_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
 		"id": "my-input-id",
 	}))
 	require.NoError(t, err)
-	assert.NotNil(t, manager.store, "store should be created after Create()")
+	require.NotNil(t, manager.store, "store should be created after Create()")
 
 	snap := storeMemorySnapshot(manager.store)
 	assert.Contains(t, snap, "test::mykey")
@@ -182,12 +222,12 @@ func TestManager_Create(t *testing.T) {
 			return sourceList(config.Sources...), &fakeTestInput{}, err
 		})
 
-		_, err := manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
 
-		_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
@@ -201,7 +241,8 @@ func TestManager_InputsTest(t *testing.T) {
 	sources := sourceList("source1", "source2")
 
 	t.Run("test is run for each source", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sources, &fakeTestInput{
 			OnTest: func(source Source, _ input.TestContext) error {
@@ -223,7 +264,8 @@ func TestManager_InputsTest(t *testing.T) {
 	})
 
 	t.Run("cancel gets distributed to all source tests", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sources, &fakeTestInput{
 			OnTest: func(_ Source, ctx input.TestContext) error {
@@ -238,11 +280,9 @@ func TestManager_InputsTest(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.TODO())
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{Cancelation: ctx})
-		}()
+		})
 
 		cancel()
 		wg.Wait()
@@ -250,7 +290,8 @@ func TestManager_InputsTest(t *testing.T) {
 	})
 
 	t.Run("fail if test for one source fails", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		failing := Source(stringSource("source1"))
 		sources := []Source{failing, stringSource("source2")}
@@ -270,19 +311,18 @@ func TestManager_InputsTest(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{})
 			t.Logf("Test returned: %v", err)
-		}()
+		})
 
 		wg.Wait()
 		require.Error(t, err)
 	})
 
 	t.Run("panic is captured", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sources, &fakeTestInput{
 			OnTest: func(source Source, _ input.TestContext) error {
@@ -294,12 +334,10 @@ func TestManager_InputsTest(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{Logger: logptest.NewTestingLogger(t, "test")})
 			t.Logf("Test returned: %v", err)
-		}()
+		})
 
 		wg.Wait()
 		require.Error(t, err)
@@ -310,7 +348,8 @@ func TestManager_InputsRun(t *testing.T) {
 	// Integration style tests for the InputManager and Input.Run
 
 	t.Run("input returned with error", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sourceList("test"), &fakeTestInput{
 			OnRun: func(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
@@ -321,8 +360,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
@@ -340,7 +378,8 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("panic is captured", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sourceList("test"), &fakeTestInput{
 			OnRun: func(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
@@ -351,8 +390,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
@@ -370,7 +408,8 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("shutdown on signal", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		manager := constInput(t, sourceList("test"), &fakeTestInput{
 			OnRun: func(ctx input.Context, _ Source, _ Cursor, _ Publisher) error {
@@ -387,9 +426,7 @@ func TestManager_InputsRun(t *testing.T) {
 
 		var clientCounters pubtest.ClientCounter
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
 				ID:              id,
@@ -400,7 +437,7 @@ func TestManager_InputsRun(t *testing.T) {
 				Logger:          manager.Logger,
 			}
 			err = inp.Run(ctx, clientCounters.BuildConnector())
-		}()
+		})
 
 		cancel()
 		wg.Wait()
@@ -484,7 +521,8 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("event ACK triggers execution of update operations", func(t *testing.T) {
-		defer resources.NewGoroutinesChecker().Check(t)
+		goroutines := resources.NewGoroutinesChecker()
+		t.Cleanup(func() { goroutines.Check(t) })
 
 		store := createSampleStore(t, nil)
 		var wgSend sync.WaitGroup
@@ -508,8 +546,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		// setup publishing pipeline and capture ACKer, so we can simulate progress in the Output
 		var acker beat.EventListener
@@ -529,9 +566,7 @@ func TestManager_InputsRun(t *testing.T) {
 
 		// start the input
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
 				ID:              id,
@@ -542,7 +577,7 @@ func TestManager_InputsRun(t *testing.T) {
 				Logger:          manager.Logger,
 			}
 			err = inp.Run(ctx, pipeline)
-		}()
+		})
 		// wait for test setup to shut down
 		defer wg.Wait()
 
@@ -569,6 +604,96 @@ func TestManager_InputsRun(t *testing.T) {
 		acker.ACKEvents(3)
 		require.Equal(t, "test-cursor-state6", store.snapshot()["test::key"].Cursor)
 	})
+}
+
+func TestManager_RunHoldsLeaseUntilDone(t *testing.T) {
+	// Verify that calling InputManager.Close() while inp.Run() is still
+	// executing does not prematurely drain the shared store. Without the lease
+	// acquired in Run(), the cache user count would drop to zero on Close(),
+	// triggering the closeFn while source goroutines still hold store references
+	// and have cursor updates pending in the ACK pipeline.
+
+	store := createSampleStore(t, nil)
+
+	inputRunning := make(chan struct{})
+	inputProceed := make(chan struct{})
+
+	var capturedAcker beat.EventListener
+	ackSet := make(chan struct{})
+	var ackOnce sync.Once
+
+	manager := &InputManager{
+		Logger:              logptest.NewTestingLogger(t, "test"),
+		StateStore:          store,
+		Type:                "test",
+		DefaultCleanTimeout: time.Minute,
+		Configure: func(_ *conf.C, _ *logp.Logger) ([]Source, Input, error) {
+			return sourceList("key"), &fakeTestInput{
+				OnRun: func(_ input.Context, _ Source, _ Cursor, pub Publisher) error {
+					// Publish before signalling so the test knows AddEvent
+					// has already been called when it proceeds.
+					_ = pub.Publish(beat.Event{Fields: mapstr.M{"hello": "world"}}, "cursor-while-closing")
+					close(inputRunning)
+					<-inputProceed
+					return nil
+				},
+			}, nil
+		},
+	}
+
+	pipeline := &pubtest.FakeConnector{
+		ConnectFunc: func(cfg beat.ClientConfig) (beat.Client, error) {
+			ackOnce.Do(func() {
+				capturedAcker = cfg.EventListener
+				close(ackSet)
+			})
+			return &pubtest.FakeClient{
+				PublishFunc: func(event beat.Event) {
+					capturedAcker.AddEvent(event, true)
+				},
+			}, nil
+		},
+	}
+
+	inp, err := manager.Create(conf.NewConfig())
+	require.NoError(t, err)
+
+	var runErr error
+	var runWg sync.WaitGroup
+	runWg.Go(func() {
+		id := uuid.Must(uuid.NewV4()).String()
+		inpCtx := input.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     t.Context(),
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          manager.Logger,
+		}
+		runErr = inp.Run(inpCtx, pipeline)
+	})
+
+	// Wait for the input goroutine to be running and the ACK handler to be wired.
+	<-inputRunning
+	<-ackSet
+
+	// Close manager while the input goroutine is still executing. Without the
+	// lease, this would drop e.users to 0, trigger cache drain, and close the
+	// persistent store before the ACK handler runs.
+	manager.Close()
+
+	// ACK the event. The cursor updateOp writes to the store; with the lease
+	// fix the store is still alive here because leaseRelease() has not been
+	// called yet (the goroutine is still blocked on inputProceed).
+	capturedAcker.ACKEvents(1)
+
+	// The cursor state must have been written successfully.
+	require.Equal(t, "cursor-while-closing", store.snapshot()["test::key"].Cursor)
+
+	// Let the goroutine finish, which releases the lease and allows the drain.
+	close(inputProceed)
+	runWg.Wait()
+	require.NoError(t, runErr)
 }
 
 func TestLockResource(t *testing.T) {
@@ -615,15 +740,13 @@ func TestLockResource(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			resOther := store.Get("test::key")
 			err := lockResource(log, resOther, context.TODO())
 			if err == nil {
 				releaseResource(resOther)
 			}
-		}()
+		})
 
 		go func() {
 			time.Sleep(100 * time.Millisecond)
@@ -637,12 +760,14 @@ func TestLockResource(t *testing.T) {
 func (s stringSource) Name() string { return string(s) }
 
 func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C, *logp.Logger) ([]Source, Input, error)) *InputManager {
-	return &InputManager{
+	m := &InputManager{
 		Logger:     logptest.NewTestingLogger(t, "test"),
 		StateStore: createSampleStore(t, nil),
 		Type:       "test",
 		Configure:  configure,
 	}
+	t.Cleanup(m.Close)
+	return m
 }
 
 func constConfigureResult(t *testing.T, sources []Source, inp Input, err error) *InputManager {

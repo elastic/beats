@@ -5,6 +5,8 @@
 package fetcher
 
 import (
+	"maps"
+
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
@@ -35,6 +37,10 @@ type User struct {
 	// persisted; it is populated during each sync/update cycle when the "mfa"
 	// enrich_with option is set.
 	MFA *MFARegistrationDetails `json:"-"`
+	// SignInActivity contains sign-in activity details for this user. This field
+	// is not persisted; it is populated during each sync/update cycle when the
+	// "sign_in_activity" enrich_with option is set.
+	SignInActivity *SignInActivityDetails `json:"-"`
 }
 
 // MFARegistrationDetails contains MFA registration information for a user
@@ -54,15 +60,25 @@ type MFARegistrationDetails struct {
 	UserType                                      string   `json:"userType"`
 }
 
+// SignInActivityDetails contains sign-in activity information for a user
+// retrieved from the /users?$select=id,signInActivity endpoint. This data
+// is not persisted across sync cycles.
+type SignInActivityDetails struct {
+	LastSignInDateTime                string `json:"lastSignInDateTime,omitempty"`
+	LastSignInRequestId               string `json:"lastSignInRequestId,omitempty"`
+	LastNonInteractiveSignInDateTime  string `json:"lastNonInteractiveSignInDateTime,omitempty"`
+	LastNonInteractiveSignInRequestId string `json:"lastNonInteractiveSignInRequestId,omitempty"`
+	LastSuccessfulSignInDateTime      string `json:"lastSuccessfulSignInDateTime,omitempty"`
+	LastSuccessfulSignInRequestId     string `json:"lastSuccessfulSignInRequestId,omitempty"`
+}
+
 // Merge will merge the attributes and group memberships of another User
 // instance into this User. The IDs of both users must match.
 func (u *User) Merge(other *User) {
 	if u.ID != other.ID {
 		return
 	}
-	for k, v := range other.Fields {
-		u.Fields[k] = v
-	}
+	maps.Copy(u.Fields, other.Fields)
 	other.MemberOf.ForEach(func(elem uuid.UUID) {
 		u.MemberOf.Add(elem)
 	})

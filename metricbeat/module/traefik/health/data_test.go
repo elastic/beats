@@ -29,14 +29,14 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	// Taken from actual response from a Traefik instance's health API endpoint
-	input := map[string]interface{}{
+	input := map[string]any{
 		"pid":               1,
 		"uptime":            "16h43m51.452460402s",
 		"uptime_sec":        60231.452460402,
 		"time":              "2018-06-27 20:59:57.166337808 +0000 UTC m=+60231.514060714",
 		"unixtime":          1530133197,
-		"status_code_count": map[string]interface{}{},
-		"total_status_code_count": map[string]interface{}{
+		"status_code_count": map[string]any{},
+		"total_status_code_count": map[string]any{
 			"200": 17,
 			"404": 1,
 		},

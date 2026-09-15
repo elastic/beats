@@ -2,8 +2,8 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-linux.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See dev-tools/mage/generate_fields_docs.go
@@ -18,10 +18,6 @@ linux system metrics
 
 ## conntrack [_conntrack]
 
-```{applies_to}
-stack: beta
-```
-
 conntrack
 
 ## summary [_summary]
@@ -29,7 +25,7 @@ conntrack
 summary of nf_conntrack statistics, summed across CPU cores
 
 **`linux.conntrack.summary.drop`**
-:   packets dropped due to conntrack failiure
+:   packets dropped due to conntrack failure
 
     type: long
 
@@ -59,7 +55,7 @@ summary of nf_conntrack statistics, summed across CPU cores
 
 
 **`linux.conntrack.summary.insert_failed`**
-:   Number of entries where list insert insert failed
+:   Number of entries where list insert failed
 
     type: long
 
@@ -77,10 +73,6 @@ summary of nf_conntrack statistics, summed across CPU cores
 
 
 ## iostat [_iostat]
-
-```{applies_to}
-stack: beta
-```
 
 iostat
 
@@ -168,10 +160,6 @@ iostat
 
 ## ksm [_ksm]
 
-```{applies_to}
-stack: beta
-```
-
 ksm
 
 ## stats [_stats]
@@ -197,7 +185,7 @@ KSM statistics
 
 
 **`linux.ksm.stats.full_scans`**
-:   Number of times mergable pages have been scanned.
+:   Number of times mergeable pages have been scanned.
 
     type: long
 
@@ -215,10 +203,6 @@ KSM statistics
 
 
 ## memory [_memory]
-
-```{applies_to}
-stack: beta
-```
 
 Linux memory data
 
@@ -327,7 +311,7 @@ This group contains statistics related to huge pages usage on the system.
 
 
 **`linux.memory.hugepages.surplus`**
-:   Number of overcommited huge pages.
+:   Number of overcommitted huge pages.
 
     type: long
 
@@ -403,10 +387,6 @@ This group contains statistics related to the swap memory usage on the system.
 
 
 ## pageinfo [_pageinfo]
-
-```{applies_to}
-stack: beta
-```
 
 pageinfo
 

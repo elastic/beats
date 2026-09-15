@@ -76,7 +76,7 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Helper()
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields, nil)
+		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, logptest.NewTestingLogger(t, ""))
 
 		log, observedLogs := logptest.NewTestingLoggerWithObserver(t, "t")
 		logger.SetLogger(log)
@@ -112,8 +112,8 @@ func TestSimpleJob(t *testing.T) {
 		[]validator.Validator{
 			lookslike.Compose(
 				urlValidator(t, "tcp://foo.com:80"),
-				lookslike.MustCompile(map[string]interface{}{
-					"monitor": map[string]interface{}{
+				lookslike.MustCompile(map[string]any{
+					"monitor": map[string]any{
 						"duration.us": hbtestllext.IsInt64,
 						"id":          testMonFields.ID,
 						"name":        testMonFields.Name,
@@ -164,8 +164,8 @@ func TestAdditionalStdFields(t *testing.T) {
 				f.Service.Name = "mysvc"
 				return f
 			},
-			lookslike.MustCompile(map[string]interface{}{
-				"service": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
+				"service": map[string]any{
 					"name": "mysvc",
 				},
 			}),
@@ -177,8 +177,8 @@ func TestAdditionalStdFields(t *testing.T) {
 				f.Origin = "ui"
 				return f
 			},
-			lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{"origin": "ui"},
+			lookslike.MustCompile(map[string]any{
+				"monitor": map[string]any{"origin": "ui"},
 			}),
 		},
 	}
@@ -193,8 +193,8 @@ func TestAdditionalStdFields(t *testing.T) {
 					lookslike.Compose(
 						tt.validator,
 						urlValidator(t, "tcp://foo.com:80"),
-						lookslike.MustCompile(map[string]interface{}{
-							"monitor": map[string]interface{}{
+						lookslike.MustCompile(map[string]any{
+							"monitor": map[string]any{
 								"duration.us": hbtestllext.IsInt64,
 								"id":          testMonFields.ID,
 								"name":        testMonFields.Name,
@@ -224,9 +224,9 @@ func TestErrorJob(t *testing.T) {
 	errorJobValidator := lookslike.Compose(
 		stateValidator(),
 		hbtestllext.MaybeHasEventType,
-		lookslike.MustCompile(map[string]interface{}{"error": map[string]interface{}{"message": "myerror", "type": "io"}}),
-		lookslike.MustCompile(map[string]interface{}{
-			"monitor": map[string]interface{}{
+		lookslike.MustCompile(map[string]any{"error": map[string]any{"message": "myerror", "type": "io"}}),
+		lookslike.MustCompile(map[string]any{
+			"monitor": map[string]any{
 				"duration.us": hbtestllext.IsInt64,
 				"id":          testMonFields.ID,
 				"name":        testMonFields.Name,
@@ -258,8 +258,8 @@ func TestMultiJobNoConts(t *testing.T) {
 	validatorMaker := func(u string) validator.Validator {
 		return lookslike.Compose(
 			urlValidator(t, u),
-			lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
+				"monitor": map[string]any{
 					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo("id"),
 					"name":        testMonFields.Name,
@@ -307,10 +307,10 @@ func TestMultiJobConts(t *testing.T) {
 	contJobValidator := func(u string, msg string) validator.Validator {
 		return lookslike.Compose(
 			urlValidator(t, u),
-			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
+			lookslike.MustCompile(map[string]any{"cont": msg}),
 			hbtestllext.MaybeHasEventType,
-			lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
+				"monitor": map[string]any{
 					"duration.us": isdef.Optional(hbtestllext.IsInt64),
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
@@ -372,9 +372,9 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 		return lookslike.Compose(
 			urlValidator(t, u),
 			hbtestllext.MaybeHasEventType,
-			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
-			lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{"cont": msg}),
+			lookslike.MustCompile(map[string]any{
+				"monitor": map[string]any{
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -387,7 +387,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 		)
 	}
 
-	metaCancelledValidator := lookslike.MustCompile(map[string]interface{}{eventext.EventCancelledMetaKey: true})
+	metaCancelledValidator := lookslike.MustCompile(map[string]any{eventext.EventCancelledMetaKey: true})
 	testCommonWrap(t, testDef{
 		"multi-job-continuations",
 		testMonFields,
@@ -432,11 +432,11 @@ func makeURLJob(t *testing.T, u string) jobs.Job {
 func urlValidator(t *testing.T, u string) validator.Validator {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
-	return lookslike.MustCompile(map[string]interface{}{"url": map[string]interface{}(wraputil.URLFields(parsed))})
+	return lookslike.MustCompile(map[string]any{"url": map[string]any(wraputil.URLFields(parsed))})
 }
 
 func stateValidator() validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"state": hbtestllext.IsMonitorState,
 	})
 }
@@ -523,9 +523,9 @@ func TestInlineBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					hbtestllext.MaybeHasEventType,
 					urlValidator(t, "http://foo.com"),
-					lookslike.MustCompile(map[string]interface{}{
+					lookslike.MustCompile(map[string]any{
 						"state": isdef.Optional(hbtestllext.IsMonitorState),
-						"monitor": map[string]interface{}{
+						"monitor": map[string]any{
 							"type":        "browser",
 							"id":          inlineMonitorValues.id,
 							"name":        inlineMonitorValues.name,
@@ -607,9 +607,9 @@ func TestProjectBrowserJob(t *testing.T) {
 
 	expectedMonFields := lookslike.Compose(
 		hbtestllext.MaybeHasDuration,
-		lookslike.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
 			"state": isdef.Optional(hbtestllext.IsMonitorState),
-			"monitor": map[string]interface{}{
+			"monitor": map[string]any{
 				"type":        "browser",
 				"id":          projectMonitorValues.id,
 				"name":        projectMonitorValues.name,
@@ -651,9 +651,9 @@ func TestProjectBrowserJob(t *testing.T) {
 					expectedMonFields,
 					hbtestllext.MaybeHasEventType,
 					summarizertesthelper.SummaryValidator(1, 0),
-					lookslike.MustCompile(map[string]interface{}{
-						"monitor": map[string]interface{}{"status": "up"},
-						"event": map[string]interface{}{
+					lookslike.MustCompile(map[string]any{
+						"monitor": map[string]any{"status": "up"},
+						"event": map[string]any{
 							"type": "heartbeat/summary",
 						},
 					}),
@@ -673,13 +673,13 @@ func TestProjectBrowserJob(t *testing.T) {
 					expectedMonFields,
 					hbtestllext.MaybeHasEventType,
 					summarizertesthelper.SummaryValidator(0, 1),
-					lookslike.MustCompile(map[string]interface{}{
-						"monitor": map[string]interface{}{"status": "down"},
-						"error": map[string]interface{}{
+					lookslike.MustCompile(map[string]any{
+						"monitor": map[string]any{"status": "down"},
+						"error": map[string]any{
 							"type":    isdef.IsString,
 							"message": "testerr",
 						},
-						"event": map[string]interface{}{
+						"event": map[string]any{
 							"type": "heartbeat/summary",
 						},
 					}),
@@ -706,7 +706,7 @@ func TestECSErrors(t *testing.T) {
 				wrappedECSErr.Error(),
 			)
 
-			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, ecse, projectMonitorValues)}, testBrowserMonFields, nil)
+			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, ecse, projectMonitorValues)}, testBrowserMonFields, nil, logptest.NewTestingLogger(t, ""))
 			event := &beat.Event{}
 			_, err := j[0](event)
 			require.NoError(t, err)

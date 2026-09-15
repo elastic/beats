@@ -82,3 +82,19 @@ func TestJa3(t *testing.T) {
 		assert.Equal(t, test.Fingerprint, actual)
 	}
 }
+
+func TestExtractJa3ArrayTruncated(t *testing.T) {
+	// A single-byte raw value where the length prefix claims 1 byte of elements
+	// but there is no data after the prefix. This must not panic.
+	got := extractJa3Array([]byte{0x01}, 1)
+	if got != nil {
+		t.Errorf("extractJa3Array(truncated, 1) = %v; want nil", got)
+	}
+
+	// Two-byte element size: length prefix says 2 bytes of elements but raw
+	// only contains the 2-byte prefix itself.
+	got = extractJa3Array([]byte{0x00, 0x02}, 2)
+	if got != nil {
+		t.Errorf("extractJa3Array(truncated, 2) = %v; want nil", got)
+	}
+}

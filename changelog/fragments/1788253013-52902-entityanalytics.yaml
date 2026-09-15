@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Update github.com/elastic/entcollect to fix bugs in the EntraID and Okta providers.
+component: filebeat

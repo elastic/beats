@@ -28,7 +28,7 @@ Beat  | Description
 
 In addition to the above Beats, which are officially supported by
 [Elastic](https://elastic.co), the community has created a set of other Beats
-that make use of libbeat but live outside of this Github repository. We maintain
+that make use of libbeat but live outside of this GitHub repository. We maintain
 a list of community Beats
 [here](https://www.elastic.co/guide/en/beats/libbeat/master/community-beats.html).
 

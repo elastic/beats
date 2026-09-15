@@ -21,28 +21,28 @@ import "fmt"
 
 // Fields represents an arbitrary map in a config file.
 type Fields struct {
-	fields map[string]interface{}
+	fields map[string]any
 }
 
 // Unpack unpacks nested fields set with dot notation like foo.bar into the proper nesting
 // in a nested map/slice structure.
-func (f *Fields) Unpack(to interface{}) error {
-	m, ok := to.(map[string]interface{})
+func (f *Fields) Unpack(to any) error {
+	m, ok := to.(map[string]any)
 	if !ok {
 		return fmt.Errorf("wrong type, expect map")
 	}
 
-	f.fields = map[string]interface{}{}
+	f.fields = map[string]any{}
 
-	var expand func(key string, value interface{})
+	var expand func(key string, value any)
 
-	expand = func(key string, value interface{}) {
+	expand = func(key string, value any) {
 		switch v := value.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			for k, val := range v {
 				expand(fmt.Sprintf("%v.%v", key, k), val)
 			}
-		case []interface{}:
+		case []any:
 			for i := range v {
 				expand(fmt.Sprintf("%v.%v", key, i), v[i])
 			}

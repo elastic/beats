@@ -32,7 +32,7 @@ import (
 type mockESClient struct {
 	serverless  bool
 	hasPolicy   bool
-	foundPolicy interface{}
+	foundPolicy any
 }
 
 func (client *mockESClient) GetVersion() version.V {
@@ -43,7 +43,7 @@ func (client *mockESClient) IsServerless() bool {
 	return client.serverless
 }
 
-func (client *mockESClient) Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error) {
+func (client *mockESClient) Request(method, path string, pipeline string, params map[string]string, body any) (int, []byte, error) {
 	if method == "PUT" {
 		client.foundPolicy = body
 	}
@@ -97,8 +97,8 @@ func TestESSetup(t *testing.T) {
 		err             bool
 		expectedPUTPath string
 		expectedName    string
-		expectedPolicy  interface{}
-		existingPolicy  interface{}
+		expectedPolicy  any
+		existingPolicy  any
 	}{
 		"serverless-with-correct-defaults": {
 			serverless:      true,

@@ -7,17 +7,22 @@ package httpjson
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,21 +38,21 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	testServer := httptest.NewServer(dateCursorHandler())
 	t.Cleanup(testServer.Close)
 
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
 		"interval":       1,
 		"request.method": "GET",
 		"request.url":    testServer.URL,
-		"request.transforms": []interface{}{
-			map[string]interface{}{
-				"set": map[string]interface{}{
+		"request.transforms": []any{
+			map[string]any{
+				"set": map[string]any{
 					"target":  "url.params.$filter",
 					"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 					"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 				},
 			},
 		},
-		"cursor": map[string]interface{}{
-			"timestamp": map[string]interface{}{
+		"cursor": map[string]any{
+			"timestamp": map[string]any{
 				"value": `[[index .last_response.body "@timestamp"]]`,
 			},
 		},
@@ -56,14 +61,14 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	config := defaultConfig()
 	assert.NoError(t, cfg.Unpack(&config))
 
-	log := logp.NewLogger("")
+	log := logptest.NewTestingLogger(t, "")
 	ctx := context.Background()
 	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	assert.NoError(t, err)
 
-	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil)
+	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "")
 	assert.NoError(t, err)
-	pagination := newPagination(config, client, noopReporter{}, log)
+	pagination := newPagination(config, client, noopReporter{}, log, "")
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
 
 	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
@@ -74,17 +79,17 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// first request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		mapstr.M{"timestamp": "2002-10-02T15:00:00Z"},
 		trCtx.cursorMap(),
 	)
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.firstEvent,
 	)
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.lastEvent,
@@ -93,10 +98,11 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// ignore since has dynamic date and content length values
 	// and is not relevant
 	lastResp.header = nil
-	assert.EqualValues(t,
+	assert.Equal(
+		t,
 		&response{
 			page: 0,
-			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z"))),
+			url:  *newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z")),
 			body: mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		},
 		lastResp,
@@ -105,19 +111,19 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	// second request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		mapstr.M{"timestamp": "2002-10-02T15:00:01Z"},
 		trCtx.cursorMap(),
 	)
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.firstEvent,
 	)
 
-	assert.EqualValues(
+	assert.Equal(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.lastEvent,
@@ -125,10 +131,11 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	lastResp = trCtx.lastResponse.clone()
 	lastResp.header = nil
-	assert.EqualValues(t,
+	assert.Equal(
+		t,
 		&response{
 			page: 0,
-			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z"))),
+			url:  *newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z")),
 			body: mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		},
 		lastResp,
@@ -137,7 +144,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 	ctx := context.Background()
-	log := logp.NewLogger("")
+	log := logptest.NewTestingLogger(t, "")
 	cfg := defaultChainConfig()
 
 	url, _ := url.Parse("https://example.com")
@@ -190,17 +197,15 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			tt.args.cfg.Chain[0].Step = tt.args.step
 			tt.args.cfg.Chain[0].While = tt.args.while
-			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil)
+			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil, "")
 			assert.NoError(t, err)
 			assert.NotNil(t, requestFactories)
 			for _, rf := range requestFactories {
 				assert.Equal(t, rf.user, user)
 				assert.Equal(t, rf.password, password)
 			}
-
 		})
 	}
 }
@@ -209,7 +214,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 	cfg := defaultChainConfig()
 	cfg.Request.URL = &urlConfig{URL: &url.URL{}}
 	ctx := context.Background()
-	log := logp.NewLogger("newChainClientTestLogger")
+	log := logptest.NewTestingLogger(t, "newChainClientTestLogger")
 
 	type args struct {
 		ctx        context.Context
@@ -243,7 +248,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 }
 
 func Test_evaluateResponse(t *testing.T) {
-	log := logp.NewLogger("newEvaluateResponseTestLogger")
+	log := logptest.NewTestingLogger(t, "newEvaluateResponseTestLogger")
 	responseTrue := bytes.NewBufferString(`{"status": "completed"}`).Bytes()
 	responseFalse := bytes.NewBufferString(`{"status": "initiated"}`).Bytes()
 
@@ -351,6 +356,333 @@ func TestProcessExpression(t *testing.T) {
 		got := processExpression(test.in)
 		assert.Equal(t, test.want, got)
 	}
+}
+
+func TestSameOrigin(t *testing.T) {
+	tests := []struct {
+		name   string
+		base   string
+		target string
+		want   bool
+	}{
+		{name: "same_host", base: "https://api.example.com/v1", target: "https://api.example.com/v2", want: true},
+		{name: "same_host_different_path", base: "https://api.example.com/events", target: "https://api.example.com/events?page=2", want: true},
+		{name: "different_host", base: "https://api.example.com", target: "https://evil.example.net", want: false},
+		{name: "different_subdomain", base: "https://api.example.com", target: "https://cdn.example.com", want: false},
+		{name: "scheme_downgrade", base: "https://api.example.com", target: "http://api.example.com", want: false},
+		{name: "scheme_upgrade", base: "http://api.example.com", target: "https://api.example.com", want: false},
+		{name: "same_ip", base: "https://192.168.1.1/api", target: "https://192.168.1.1/api?page=2", want: true},
+		{name: "different_ip", base: "https://192.168.1.1", target: "https://10.0.0.1", want: false},
+		{name: "different_port", base: "https://api.example.com:443", target: "https://api.example.com:8443", want: false},
+		{name: "explicit_default_port_matches_implicit", base: "https://api.example.com", target: "https://api.example.com:443", want: true},
+		{name: "explicit_non_default_port", base: "https://api.example.com:9200", target: "https://api.example.com:9200", want: true},
+		{name: "http_default_port_matches_implicit", base: "http://api.example.com", target: "http://api.example.com:80", want: true},
+		{name: "http_non_default_port", base: "http://api.example.com:8080", target: "http://api.example.com:8080", want: true},
+		{name: "http_different_port", base: "http://api.example.com:8080", target: "http://api.example.com:9090", want: false},
+		{name: "metadata_ssrf", base: "https://api.provider.com", target: "http://169.254.169.254/latest/meta-data/", want: false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			base := newURL(test.base)
+			target := newURL(test.target)
+			got := sameOrigin(base, target)
+			if got != test.want {
+				t.Errorf("sameOrigin(%q, %q) = %v, want %v", test.base, test.target, got, test.want)
+			}
+		})
+	}
+}
+
+func TestAllowedOrigin(t *testing.T) {
+	base := newURL("https://api.example.com")
+
+	tests := []struct {
+		name    string
+		allowed []string
+		target  string
+		want    bool
+	}{
+		{name: "same_as_base", target: "https://api.example.com/page/2", want: true},
+		{name: "cross_origin_no_allowlist", target: "https://cdn.example.net/page/2", want: false},
+		{
+			name:    "cross_origin_allowlisted",
+			allowed: []string{"https://cdn.example.net"},
+			target:  "https://cdn.example.net/page/2",
+			want:    true,
+		},
+		{
+			name:    "cross_origin_not_in_allowlist",
+			allowed: []string{"https://cdn.example.net"},
+			target:  "https://evil.example.org/page/2",
+			want:    false,
+		},
+		{
+			name:    "scheme_downgrade_despite_allowlist",
+			allowed: []string{"https://cdn.example.net"},
+			target:  "http://cdn.example.net/page/2",
+			want:    false,
+		},
+		{
+			name:    "http_allowlist_entry_cannot_bypass_https_base",
+			allowed: []string{"http://cdn.example.net"},
+			target:  "http://cdn.example.net/page/2",
+			want:    false,
+		},
+		{
+			name:    "allowlisted_with_matching_port",
+			allowed: []string{"https://cdn.example.net:8443"},
+			target:  "https://cdn.example.net:8443/page/2",
+			want:    true,
+		},
+		{
+			name:    "allowlisted_with_different_port",
+			allowed: []string{"https://cdn.example.net:8443"},
+			target:  "https://cdn.example.net:9443/page/2",
+			want:    false,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var allowed []*url.URL
+			for _, s := range test.allowed {
+				allowed = append(allowed, newURL(s))
+			}
+			target := newURL(test.target)
+			got := allowedOrigin(base, allowed, target)
+			if got != test.want {
+				t.Errorf("allowedOrigin(base, %v, %q) = %v, want %v", test.allowed, test.target, got, test.want)
+			}
+		})
+	}
+}
+
+func TestPaginationRejectsCrossOriginURL(t *testing.T) {
+	base := newURL("https://api.example.com/v1/events")
+	rf := &requestFactory{
+		url:        *base,
+		method:     "GET",
+		originURL:  base,
+		log:        logptest.NewTestingLogger(t, "test"),
+		encoder:    registeredEncoders[""],
+		transforms: []basicTransform{},
+	}
+
+	trCtx := emptyTransformContext()
+	trCtx.lastResponse = &response{
+		url: *base,
+	}
+
+	// With no transforms mutating the URL, the request should succeed
+	// because the URL remains the same as the configured origin.
+	req, err := rf.newHTTPRequest(context.Background(), trCtx)
+	if err != nil {
+		t.Fatalf("same-origin request failed: %v", err)
+	}
+	if req.URL.Hostname() != "api.example.com" {
+		t.Fatalf("unexpected hostname: %s", req.URL.Hostname())
+	}
+
+	// Now simulate a transform that replaced the URL with a cross-origin one.
+	evil := newURL("https://evil.example.net/steal")
+	rf.url = *evil
+	_, err = rf.newHTTPRequest(context.Background(), trCtx)
+	if err == nil {
+		t.Fatal("expected error for cross-origin pagination URL, got nil")
+	}
+	if !strings.Contains(err.Error(), "does not match configured origin") {
+		t.Errorf("newHTTPRequest() error = %q; want substring %q", err, "does not match configured origin")
+	}
+}
+
+func TestChainStepOriginValidation(t *testing.T) {
+	tests := []struct {
+		name        string
+		base        string
+		chainTarget string
+		allowed     []string
+		wantErr     error
+	}{
+		{
+			name:        "same_origin",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://api.example.com/v1/details",
+		},
+		{
+			name:        "cross_origin_rejected",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://evil.example.net/steal",
+			wantErr:     errors.New(`pagination URL origin "evil.example.net" does not match configured origin "api.example.com"`),
+		},
+		{
+			name:        "cross_origin_port_rejected",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://api.example.com:8443/steal",
+			wantErr:     errors.New(`pagination URL origin "api.example.com:8443" does not match configured origin "api.example.com"`),
+		},
+		{
+			name:        "allowlisted_origin",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://cdn.example.net/v1/details",
+			allowed:     []string{"https://cdn.example.net"},
+		},
+		{
+			name:        "not_in_allowlist",
+			base:        "https://api.example.com/v1/details",
+			chainTarget: "https://evil.example.org/steal",
+			allowed:     []string{"https://cdn.example.net"},
+			wantErr:     errors.New(`pagination URL origin "evil.example.org" does not match configured origin "api.example.com"`),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var allowed []*url.URL
+			for _, s := range test.allowed {
+				allowed = append(allowed, newURL(s))
+			}
+			base := newURL(test.base)
+			target := newURL(test.chainTarget)
+			rf := &requestFactory{
+				url:            *target,
+				method:         "GET",
+				originURL:      base,
+				allowedOrigins: allowed,
+				isChain:        true,
+				log:            logptest.NewTestingLogger(t, t.Name()),
+				encoder:        registeredEncoders[""],
+				transforms:     []basicTransform{},
+			}
+
+			trCtx := emptyTransformContext()
+			trCtx.lastResponse = &response{url: *base}
+
+			_, err := rf.newHTTPRequest(context.Background(), trCtx)
+			if !sameError(err, test.wantErr) {
+				t.Errorf("unexpected error: got=%q want=%q", err, test.wantErr)
+			}
+		})
+	}
+}
+
+func TestChainPaginationFailureDoesNotAdvanceCursor(t *testing.T) {
+	requester, trCtx, publisher := newChainPaginationTestRequester(t, nil)
+
+	err := requester.doRequest(t.Context(), trCtx, publisher)
+	require.Error(t, err, "interval should fail when a paginated chain request fails")
+	assert.Contains(t, err.Error(), "502", "error should surface the transient chain HTTP failure")
+	assert.Equal(t, "p1", trCtx.cursorMap()["page"], "cursor should remain on the last successfully chained page")
+}
+
+func TestChainPaginationIgnoredFailureAdvancesCursor(t *testing.T) {
+	requester, trCtx, publisher := newChainPaginationTestRequester(t, []any{
+		map[string]any{
+			"set": map[string]any{
+				"target":                 "header.X-Test",
+				"value":                  `[[if eq .parent_last_response.body.page "p1"]]ok[[else]][[.parent_last_response.body.missing]][[end]]`,
+				"fail_on_template_error": true,
+				"do_not_log_failure":     true,
+			},
+		},
+	})
+
+	err := requester.doRequest(t.Context(), trCtx, publisher)
+	require.NoError(t, err, "an intentionally ignored chain error should not fail the interval")
+	assert.Equal(t, "p2", trCtx.cursorMap()["page"], "ignored chain error should retain the advanced page cursor")
+}
+
+func TestChainProcessorHandleErrorPropagates(t *testing.T) {
+	want := errors.New("failed to process paginated response")
+	p := &chainProcessor{
+		req:    &requester{log: logptest.NewTestingLogger(t, "")},
+		status: noopReporter{},
+	}
+
+	p.handleError(want)
+
+	require.ErrorIs(t, p.err, want, "response processing error should fail the interval")
+}
+
+func newChainPaginationTestRequester(t *testing.T, chainTransforms []any) (*requester, *transformContext, statelessPublisher) {
+	t.Helper()
+
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/":
+			fmt.Fprintf(w, `{"records":[{"id":"1"}],"page":"p1","nextLink":"%s/page2"}`, serverURL)
+		case "/page2":
+			fmt.Fprintln(w, `{"records":[{"id":"2"}],"page":"p2"}`)
+		case "/1":
+			fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+		case "/2":
+			w.WriteHeader(http.StatusBadGateway)
+			fmt.Fprintln(w, `{"error":"transient chain failure"}`)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	t.Cleanup(server.Close)
+	serverURL = server.URL
+
+	chainStep := map[string]any{
+		"request.method": "GET",
+		"request.url":    server.URL + "/$.records[:].id",
+		"replace":        "$.records[:].id",
+	}
+	if chainTransforms != nil {
+		chainStep["request.transforms"] = chainTransforms
+	}
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"interval":       1,
+		"request.method": "GET",
+		"request.url":    server.URL,
+		"response.pagination": []any{
+			map[string]any{
+				"set": map[string]any{
+					"target":                 "url.value",
+					"value":                  "[[.last_response.body.nextLink]]",
+					"fail_on_template_error": true,
+				},
+			},
+		},
+		"chain": []any{
+			map[string]any{
+				"step": chainStep,
+			},
+		},
+		"cursor": map[string]any{
+			"page": map[string]any{
+				"value": "[[ .last_event.page ]]",
+			},
+		},
+	})
+
+	config := defaultConfig()
+	require.NoError(t, cfg.Unpack(&config), "unpacking test config should succeed")
+
+	log := logptest.NewTestingLogger(t, "")
+	client, err := newHTTPClient(t.Context(), config.Auth, config.Request, noopReporter{}, log, nil, nil)
+	require.NoError(t, err, "creating http client should succeed")
+
+	requestFactory, err := newRequestFactory(t.Context(), config, noopReporter{}, log, nil, nil, "")
+	require.NoError(t, err, "creating request factory should succeed")
+	pagination := newPagination(config, client, noopReporter{}, log, "")
+	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
+	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
+
+	trCtx := emptyTransformContext()
+	trCtx.cursor = newCursor(config.Cursor, noopReporter{}, log)
+
+	return requester, trCtx, statelessPublisher{&beattest.FakeClient{}}
+}
+
+func TestPaginationRequestFactorySetsUserAgent(t *testing.T) {
+	const wantUA = "Elastic-Filebeat/9.5.0 (linux; amd64)"
+	u, _ := url.Parse("https://api.example.com/v1/events")
+	rf := newPaginationRequestFactory("GET", "", *u, &mapstr.M{}, nil, nil, nil, noopReporter{}, logptest.NewTestingLogger(t, t.Name()), wantUA)
+
+	req, err := rf.newRequest(emptyTransformContext())
+	require.NoError(t, err)
+	assert.Equal(t, wantUA, req.header().Get("User-Agent"))
 }
 
 func defaultChainConfig() config {

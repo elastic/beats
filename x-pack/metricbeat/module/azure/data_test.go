@@ -87,7 +87,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 		}
 
@@ -149,7 +149,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			}, {
 				Key:           fmt.Sprintf("%s.%s", metricName, "max"),
 				Value:         &maxValue,
@@ -158,7 +158,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			}, {
 				Key:           fmt.Sprintf("%s.%s", metricName, "avg"),
 				Value:         &avgValue,
@@ -167,7 +167,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "total"),
@@ -177,7 +177,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "count"),
@@ -187,7 +187,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 		}
 
@@ -222,7 +222,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "max"),
@@ -232,7 +232,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "avg"),
@@ -242,7 +242,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "total"),
@@ -252,7 +252,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "count"),
@@ -262,7 +262,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Timestamp:     timestamp,
 				ResourceId:    resourceId,
 				ResourceSubId: resourceSubId,
-				Dimensions:    map[string]interface{}{},
+				Dimensions:    map[string]any{},
 			},
 		}
 

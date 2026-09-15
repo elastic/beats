@@ -72,7 +72,7 @@ type Observer struct {
 	// and zone information to classify ingress traffic.  Single armed
 	// monitoring such as a network sensor on a span port should only use
 	// observer.ingress to categorize traffic.
-	Ingress map[string]interface{} `ecs:"ingress"`
+	Ingress map[string]any `ecs:"ingress"`
 
 	// Network zone of incoming traffic as reported by the observer to
 	// categorize the source area of ingress traffic. e.g. internal, External,
@@ -83,7 +83,7 @@ type Observer struct {
 	// and zone information to classify egress traffic.  Single armed
 	// monitoring such as a network sensor on a span port should only use
 	// observer.ingress to categorize traffic.
-	Egress map[string]interface{} `ecs:"egress"`
+	Egress map[string]any `ecs:"egress"`
 
 	// Network zone of outbound traffic as reported by the observer to
 	// categorize the destination area of egress traffic, e.g. Internal,

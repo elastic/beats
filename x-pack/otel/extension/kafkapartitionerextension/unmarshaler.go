@@ -26,5 +26,5 @@ func unmarshalLogs(message []byte) (mapstr.M, error) {
 	case mapstr.M:
 		return v, nil
 	}
-	return nil, fmt.Errorf("unmarshaled value shoud be a map, found %T", val)
+	return nil, fmt.Errorf("unmarshaled value should be a map, found %T", val)
 }

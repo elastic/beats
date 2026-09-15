@@ -108,7 +108,7 @@ func (p prog) eval(bytes []byte, ctx *ctx) ([]byte, error) {
 		case opZeros:
 			digits := int(p.p[i])
 			i++
-			for x := 0; x < digits; x++ {
+			for range digits {
 				bytes = append(bytes, '0')
 			}
 		case opTwoDigit:

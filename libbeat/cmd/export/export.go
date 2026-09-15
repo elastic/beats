@@ -102,7 +102,7 @@ func (c *fileClient) Write(component string, name string, body string) error {
 	return err
 }
 
-func fatalf(msg string, vs ...interface{}) {
+func fatalf(msg string, vs ...any) {
 	fmt.Fprintf(os.Stderr, msg, vs...)
 	fmt.Fprintln(os.Stderr)
 	os.Exit(1)

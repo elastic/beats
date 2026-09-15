@@ -20,7 +20,6 @@ package generator
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 )
@@ -83,7 +82,7 @@ func copyTemplate(template, dest string, replace map[string]string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(dest, c, 0o644)
+	err = os.WriteFile(dest, c, 0o644)
 	if err != nil {
 		return fmt.Errorf("cannot copy template: %v", err)
 	}
@@ -92,7 +91,7 @@ func copyTemplate(template, dest string, replace map[string]string) error {
 }
 
 func readTemplate(template string, replace map[string]string) ([]byte, error) {
-	c, err := ioutil.ReadFile(template)
+	c, err := os.ReadFile(template)
 	if err != nil {
 		return []byte{}, fmt.Errorf("cannot read template: %v", err)
 	}

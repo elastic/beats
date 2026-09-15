@@ -51,7 +51,7 @@ type HBRunnerFactory interface {
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
 type RunnerFactory struct {
-	info                  beat.Info
+	info                  *beat.Info
 	addTask               scheduler.AddTask
 	stateLoader           monitorstate.StateLoader
 	byId                  map[string]*Monitor
@@ -95,12 +95,12 @@ type FactoryParams struct {
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
 func NewFactory(fp FactoryParams) *RunnerFactory {
 	return &RunnerFactory{
-		info:                  fp.BeatInfo,
+		info:                  &fp.BeatInfo,
 		addTask:               fp.AddTask,
 		byId:                  map[string]*Monitor{},
 		mtx:                   &sync.Mutex{},
 		pluginsReg:            fp.PluginsReg,
-		logger:                logp.L(),
+		logger:                fp.BeatInfo.Logger,
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
@@ -150,7 +150,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		return NoopRunner{}, nil
 	}
 
-	configEditor, err := newCommonPublishConfigs(f.info, f.beatLocation, c)
+	configEditor, err := newCommonPublishConfigs(*f.info, f.beatLocation, c)
 	if err != nil {
 		return nil, err
 	}
@@ -194,8 +194,8 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	loc := getLocation(f.beatLocation, sf)
 	if loc != nil {
 		geoMap, _ := util.GeoConfigToMap(loc.Geo)
-		err = c.Merge(map[string]interface{}{
-			"run_from": map[string]interface{}{
+		err = c.Merge(map[string]any{
+			"run_from": map[string]any{
 				"id":  loc.ID,
 				"geo": geoMap,
 			},
@@ -205,7 +205,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
@@ -226,7 +226,7 @@ func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	if !config.Enabled() {
 		return nil
 	}
-	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
+	return checkMonitorConfig(config, plugin.GlobalPluginsReg, *f.info)
 }
 
 // getLocation returns the location either from the stdfields or the beat preferring stdfields. Returns nil if declared in neither spot.
@@ -318,7 +318,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		geoM, err := util.GeoConfigToMap(location.Geo)
 		if err != nil {
 			geoErrOnce.Do(func() {
-				logp.L().Warnf("could not add heartbeat geo info: %v", err)
+				info.Logger.Warnf("could not add heartbeat geo info: %v", err)
 			})
 		}
 
@@ -332,12 +332,9 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		procs.AddProcessor(addfields.NewAddFields(obsFields, true, true))
 	}
 
-	// always use synthetics data streams for browser monitors, there is no good reason not to
-	// the default `heartbeat` data stream won't split out network and screenshot data.
-	// at some point we should make all monitors use the `synthetics` datastreams and retire
-	// the heartbeat one, but browser is the only beta one, and it would be a breaking change
-	// to do so otherwise.
-	if monitorType == "browser" && settings.DataStream == nil {
+	// Synthetics-driven monitors (browser, api) use the synthetics data streams so
+	// network/screenshot/api-network sub-streams split out; the default heartbeat one can't.
+	if stdfields.IsSyntheticsType(monitorType) && settings.DataStream == nil {
 		settings.DataStream = &add_data_stream.DataStream{}
 	}
 
@@ -354,7 +351,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 	}
 
 	if !settings.Index.IsEmpty() {
-		logp.L().Warn("Deprecated use of 'index' setting in heartbeat monitor, use 'data_stream' instead!")
+		info.Logger.Warn("Deprecated use of 'index' setting in heartbeat monitor, use 'data_stream' instead!")
 		proc, err := indexProcessor(&settings.Index, info)
 		if err != nil {
 			return nil, err

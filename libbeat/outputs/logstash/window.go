@@ -66,10 +66,7 @@ func (w *window) tryGrowWindow(batchSize int) {
 
 			windowSize = newWindowSize
 		} else if windowSize < w.maxOkWindowSize {
-			windowSize = int(math.Ceil(1.5 * float64(windowSize)))
-			if windowSize > w.maxOkWindowSize {
-				windowSize = w.maxOkWindowSize
-			}
+			windowSize = min(int(math.Ceil(1.5*float64(windowSize))), w.maxOkWindowSize)
 		}
 
 		atomic.StoreInt32(&w.windowSize, int32(windowSize))

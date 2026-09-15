@@ -31,7 +31,7 @@ import (
 )
 
 func TestExportTimezone(t *testing.T) {
-	testConfig, err := config.NewConfigFrom(map[string]interface{}{
+	testConfig, err := config.NewConfigFrom(map[string]any{
 		"format": "abbreviation",
 	})
 	if err != nil {
@@ -94,7 +94,7 @@ func TestTimezoneCacheRefreshOnChange(t *testing.T) {
 	loc.cache.Store(&tzEntry{zone: zone, offset: offset, boxedFormat: loc.Format(zone, offset)})
 	first := loc.cache.Load()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_, err := loc.Run(&beat.Event{Fields: mapstr.M{}})
 		assert.NoError(t, err, "Run should not error")
 	}

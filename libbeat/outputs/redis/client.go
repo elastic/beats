@@ -226,7 +226,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 	// XXX: requires key.IsConst() == true
 	dest, _ := c.key.Select(&beat.Event{Fields: mapstr.M{}})
 	return func(_ outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
-		args := make([]interface{}, 1, len(data)+1)
+		args := make([]any, 1, len(data)+1)
 		args[0] = dest
 
 		okEvents, args := serializeEvents(c.log, args, 1, data, c.index, c.codec)
@@ -254,7 +254,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishFn {
 	return func(key outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		var okEvents []publisher.Event
-		serialized := make([]interface{}, 0, len(data))
+		serialized := make([]any, 0, len(data))
 		okEvents, serialized = serializeEvents(c.log, serialized, 0, data, c.index, c.codec)
 		c.observer.PermanentErrors(len(data) - len(okEvents))
 		if len(serialized) == 0 {
@@ -310,16 +310,15 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 
 func serializeEvents(
 	log *logp.Logger,
-	to []interface{},
+	to []any,
 	i int,
 	data []publisher.Event,
 	index string,
 	codec codec.Codec,
-) ([]publisher.Event, []interface{}) {
+) ([]publisher.Event, []any) {
 
 	succeeded := data
 	for _, d := range data {
-		d := d
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v. Check the event_data log (configured by logging.event_data.files.path) to view the event", err)
@@ -338,7 +337,6 @@ failLoop:
 	succeeded = data[:i]
 	rest := data[i+1:]
 	for _, d := range rest {
-		d := d
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v. Check the event_data log (configured by logging.event_data.files.path) to view the event", err)

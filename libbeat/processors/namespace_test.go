@@ -50,7 +50,7 @@ func TestNamespace(t *testing.T) {
 		err := ns.Register(test.name, newTestFilterRule)
 		fatalError(t, err)
 
-		cfg, _ := config.NewConfigFrom(map[string]interface{}{
+		cfg, _ := config.NewConfigFrom(map[string]any{
 			test.name: nil,
 		})
 
@@ -74,24 +74,24 @@ func TestNamespaceError(t *testing.T) {
 	tests := []struct {
 		title   string
 		factory Constructor
-		config  interface{}
+		config  any
 	}{
 		{
 			"no module configured",
 			newTestFilterRule,
-			map[string]interface{}{},
+			map[string]any{},
 		},
 		{
 			"unknown module configured",
 			newTestFilterRule,
-			map[string]interface{}{
+			map[string]any{
 				"notTest": nil,
 			},
 		},
 		{
 			"too many modules",
 			newTestFilterRule,
-			map[string]interface{}{
+			map[string]any{
 				"a":    nil,
 				"b":    nil,
 				"test": nil,
@@ -102,7 +102,7 @@ func TestNamespaceError(t *testing.T) {
 			func(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
 				return nil, errors.New("test")
 			},
-			map[string]interface{}{
+			map[string]any{
 				"test": nil,
 			},
 		},
@@ -121,6 +121,53 @@ func TestNamespaceError(t *testing.T) {
 		_, err = ns.Plugin()(config, logptest.NewTestingLogger(t, ""))
 		assert.Error(t, err)
 	}
+}
+
+func TestGetConstructor(t *testing.T) {
+	t.Run("returns constructor for simple name", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("test", newTestFilterRule)
+		fatalError(t, err)
+
+		c, err := ns.GetConstructor("test")
+		assert.NoError(t, err)
+		assert.NotNil(t, c)
+	})
+
+	t.Run("returns constructor for namespaced path", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("a.b.c", newTestFilterRule)
+		fatalError(t, err)
+
+		c, err := ns.GetConstructor("a.b.c")
+		assert.NoError(t, err)
+		assert.NotNil(t, c)
+	})
+
+	t.Run("returns error when leaf key does not exist", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("test", newTestFilterRule)
+		fatalError(t, err)
+
+		_, err = ns.GetConstructor("missing")
+		assert.Error(t, err)
+	})
+
+	t.Run("returns error when intermediate namespace key does not exist", func(t *testing.T) {
+		ns := NewNamespace()
+
+		_, err := ns.GetConstructor("a.b.c")
+		assert.Error(t, err)
+	})
+
+	t.Run("returns error when intermediate key is a plugin not a namespace", func(t *testing.T) {
+		ns := NewNamespace()
+		err := ns.Register("a", newTestFilterRule)
+		fatalError(t, err)
+
+		_, err = ns.GetConstructor("a.b")
+		assert.Error(t, err)
+	})
 }
 
 func newTestFilterRule(_ *config.C, _ *logp.Logger) (beat.Processor, error) {

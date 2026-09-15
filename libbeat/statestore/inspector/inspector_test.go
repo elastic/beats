@@ -80,8 +80,8 @@ func TestGetStates_Empty(t *testing.T) {
 func TestGetStates_WithEntries(t *testing.T) {
 	tr := newTestRegistry(t)
 	store := tr.store(t)
-	require.NoError(t, store.Set("key-b", map[string]interface{}{"offset": 100}), "failed to set key-b")
-	require.NoError(t, store.Set("key-a", map[string]interface{}{"offset": 200}), "failed to set key-a")
+	require.NoError(t, store.Set("key-b", map[string]any{"offset": 100}), "failed to set key-b")
+	require.NoError(t, store.Set("key-a", map[string]any{"offset": 200}), "failed to set key-a")
 	require.NoError(t, store.Close())
 
 	handler := New()
@@ -105,7 +105,7 @@ func TestGetStates_WithEntries(t *testing.T) {
 func TestGetStates_Pretty(t *testing.T) {
 	tr := newTestRegistry(t)
 	store := tr.store(t)
-	require.NoError(t, store.Set("k", map[string]interface{}{"v": 1}), "failed to set key")
+	require.NoError(t, store.Set("k", map[string]any{"v": 1}), "failed to set key")
 	require.NoError(t, store.Close())
 
 	handler := New()
@@ -127,7 +127,7 @@ func TestGetStates_Pretty(t *testing.T) {
 func TestDeleteState(t *testing.T) {
 	tr := newTestRegistry(t)
 	store := tr.store(t)
-	require.NoError(t, store.Set("to-delete", map[string]interface{}{"val": 1}), "failed to set key")
+	require.NoError(t, store.Set("to-delete", map[string]any{"val": 1}), "failed to set key")
 	require.NoError(t, store.Close())
 
 	handler := New()
@@ -172,7 +172,7 @@ func TestDeleteState_KeyWithSlashes(t *testing.T) {
 	tr := newTestRegistry(t)
 	store := tr.store(t)
 	key := "filestream::input-id::/var/log/syslog"
-	require.NoError(t, store.Set(key, map[string]interface{}{"offset": 42}), "failed to set key with slashes")
+	require.NoError(t, store.Set(key, map[string]any{"offset": 42}), "failed to set key with slashes")
 	require.NoError(t, store.Close())
 
 	handler := New()
@@ -195,7 +195,7 @@ func TestDeleteState_PercentEncodedKey(t *testing.T) {
 	tr := newTestRegistry(t)
 	store := tr.store(t)
 	key := "filestream::my-id::/var/log/syslog"
-	require.NoError(t, store.Set(key, map[string]interface{}{"offset": 99}), "failed to set key")
+	require.NoError(t, store.Set(key, map[string]any{"offset": 99}), "failed to set key")
 	require.NoError(t, store.Close())
 
 	handler := New()
@@ -222,7 +222,7 @@ func TestDeleteState_PercentEncodedKey(t *testing.T) {
 func TestGetStatesHTML(t *testing.T) {
 	tr := newTestRegistry(t)
 	store := tr.store(t)
-	require.NoError(t, store.Set("html-key", map[string]interface{}{"offset": 10}), "failed to set key")
+	require.NoError(t, store.Set("html-key", map[string]any{"offset": 10}), "failed to set key")
 	require.NoError(t, store.Close())
 
 	handler := New()

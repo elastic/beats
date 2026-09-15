@@ -32,9 +32,9 @@ func newApplicationID(id string) *jumpliststypes.ApplicationID {
 // It is used to create a new ApplicationId object from the file name.
 func getAppIdFromFileName(filePath string) *jumpliststypes.ApplicationID {
 	fileName := filepath.Base(filePath)
-	dotIndex := strings.Index(fileName, ".")
-	if dotIndex != -1 {
-		return newApplicationID(fileName[:dotIndex])
+	before, _, ok := strings.Cut(fileName, ".")
+	if ok {
+		return newApplicationID(before)
 	}
 	return newApplicationID("")
 }

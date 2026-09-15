@@ -28,7 +28,7 @@ func TestNOTCondition(t *testing.T) {
 	configs := []Config{
 		{
 			NOT: &Config{
-				Equals: &Fields{fields: map[string]interface{}{
+				Equals: &Fields{fields: map[string]any{
 					"method": "GET",
 				}},
 			},

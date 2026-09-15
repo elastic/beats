@@ -71,7 +71,7 @@ To collect and ship monitoring data:
 
 1. The next step depends on how you want to run {{metricbeat}}:
 
-    * If you’re running as a service and want to run a separate monitoring instance, take the the steps required for your environment to run two instances of {{metricbeat}} as a service. The steps for doing this vary by platform and are beyond the scope of this documentation.
+    * If you’re running as a service and want to run a separate monitoring instance, take the steps required for your environment to run two instances of {{metricbeat}} as a service. The steps for doing this vary by platform and are beyond the scope of this documentation.
     * If you’re running the binary directly in the foreground and want to run a separate monitoring instance, install {{metricbeat}} to a different path. If necessary, set `path.config`, `path.data`, and `path.log` to point to the correct directories. See [Directory layout](/reference/metricbeat/directory-layout.md) for the default locations.
 
 2. Enable the `beat-xpack` module in {{metricbeat}}.<br>

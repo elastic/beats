@@ -103,7 +103,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	// Errors might be reported as {"message":"<error message>"}
 	// let's look for that structure
-	var jsonResponse map[string]interface{}
+	var jsonResponse map[string]any
 	if err = json.Unmarshal(content, &jsonResponse); err == nil {
 		if retMessage := jsonResponse[msgElement]; retMessage != "" {
 			// there is an error message element, let's use it

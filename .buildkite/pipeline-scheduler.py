@@ -63,7 +63,7 @@ def get_json_with_retries(uri, retries=3, delay=5) -> typing.Dict:
             print(f"Retrying in {delay} seconds ...")
             time.sleep(delay)
         except json.JSONDecodeError as e:
-            fail_with_error(f"Error [{e}] when deserialing JSON from [{uri}]")
+            fail_with_error(f"Error [{e}] when deserializing JSON from [{uri}]")
     fail_with_error(f"Failed to retrieve JSON content from [{uri}] after [{retries}] retries")
     return {}  # for IDE typing checks
 

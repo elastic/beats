@@ -63,7 +63,7 @@ func newLiveProfileStore(log *logp.Logger, dir string, maxProfiles int) (*livePr
 	return store, nil
 }
 
-func (s *liveProfileStore) Record(query string, profile map[string]interface{}) {
+func (s *liveProfileStore) Record(query string, profile map[string]any) {
 	if s == nil || query == "" {
 		return
 	}
@@ -91,11 +91,11 @@ func (s *liveProfileStore) Record(query string, profile map[string]interface{}) 
 	s.mx.Unlock()
 }
 
-func (s *liveProfileStore) RecordLiveProfile(query string, profile map[string]interface{}) {
+func (s *liveProfileStore) RecordLiveProfile(query string, profile map[string]any) {
 	s.Record(query, profile)
 }
 
-func (s *liveProfileStore) List() []map[string]interface{} {
+func (s *liveProfileStore) List() []map[string]any {
 	if s == nil {
 		return nil
 	}
@@ -110,7 +110,7 @@ func (s *liveProfileStore) List() []map[string]interface{} {
 
 	type profileEntry struct {
 		modTime int64
-		data    map[string]interface{}
+		data    map[string]any
 	}
 
 	var results []profileEntry
@@ -130,7 +130,7 @@ func (s *liveProfileStore) List() []map[string]interface{} {
 			}
 			continue
 		}
-		var payload map[string]interface{}
+		var payload map[string]any
 		if err := json.Unmarshal(bytes, &payload); err != nil {
 			if s.log != nil {
 				s.log.Debugw("failed to unmarshal live query profile", "file", path, "error", err)
@@ -154,7 +154,7 @@ func (s *liveProfileStore) List() []map[string]interface{} {
 		return results[i].modTime > results[j].modTime
 	})
 
-	profiles := make([]map[string]interface{}, 0, len(results))
+	profiles := make([]map[string]any, 0, len(results))
 	for _, item := range results {
 		profiles = append(profiles, item.data)
 	}

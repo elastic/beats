@@ -9,6 +9,8 @@ services:
       kibana:        { condition: service_healthy }
       cometd: { condition: service_healthy }
       kafka: { condition: service_healthy }
+      redis: { condition: service_healthy }      
+      mosquitto: { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -51,11 +53,11 @@ services:
     command: bash -c "/start.sh"
     
   googlepubsub:
-    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-467.0.0-0}-1
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-582.0.0-0}-1
     build:
       context: ${ES_BEATS}/testing/environments/docker/googlepubsub
       args:
-        SDK_VERSION: ${SDK_VERSION:-467.0.0-0}
+        SDK_VERSION: ${SDK_VERSION:-582.0.0-0}
     hostname: googlepubsub
     ports:
       - 8432:8432
@@ -114,6 +116,11 @@ services:
     environment:
       - ADVERTISED_HOST=kafka
 
+  mosquitto:
+    build: ${ES_BEATS}/testing/environments/docker/mosquitto
+    ports:
+      - 1883:1883
+
   logstash:
     depends_on:
       - init-logstash
@@ -134,6 +141,11 @@ services:
       - logstash_testdata:/usr/share/nginx/html:ro
     ports:
       - 8082:80
+
+  redis:
+    build: ${ES_BEATS}/testing/environments/docker/redis
+    ports:
+      - 6379:6379
 
 volumes:
   logstash_testdata:

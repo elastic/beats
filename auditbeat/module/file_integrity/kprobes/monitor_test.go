@@ -96,7 +96,7 @@ func (p *monitorTestSuite) TestRunPerfChannelLost() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -133,7 +133,7 @@ func (p *monitorTestSuite) TestRunPerfChannelErr() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -171,7 +171,7 @@ func (p *monitorTestSuite) TestRunPathErr() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -211,7 +211,7 @@ func (p *monitorTestSuite) TestRunUnknownEventType() {
 	type Unknown struct{}
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -248,7 +248,7 @@ func (p *monitorTestSuite) TestRunPerfCloseEventChan() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -281,7 +281,7 @@ func (p *monitorTestSuite) TestDoubleStart() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -318,7 +318,7 @@ func (p *monitorTestSuite) TestAddPathNotClosed() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -343,7 +343,7 @@ func (p *monitorTestSuite) TestRunNoError() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -412,7 +412,7 @@ func (p *monitorTestSuite) TestRunEmitError() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}

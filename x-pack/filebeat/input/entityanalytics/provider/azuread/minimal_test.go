@@ -24,14 +24,15 @@ import (
 //     values; the returned sync intervals must match, confirming that
 //     at least the duration fields are wired through end-to-end.
 func TestMinimalConfigRoundTrip(t *testing.T) {
-	const wantFields = 13
-	if got := reflect.TypeOf(ecentraid.Config{}).NumField(); got != wantFields {
+	const wantFields = 14
+	if got := reflect.TypeFor[ecentraid.Config]().NumField(); got != wantFields {
 		t.Fatalf("ecentraid.Config has %d exported fields, want %d; "+
 			"update localConf inside minimalProvider and this test", got, wantFields)
 	}
 
 	wantSync := 48 * time.Hour
 	wantUpdate := 30 * time.Minute
+	scratchDir := "/scratch"
 
 	cfg := config.MustNewConfigFrom(map[string]any{
 		"tenant_id":       "test-tenant",
@@ -47,6 +48,7 @@ func TestMinimalConfigRoundTrip(t *testing.T) {
 		"select.devices":  []string{"displayName", "operatingSystem"},
 		"sync_interval":   wantSync.String(),
 		"update_interval": wantUpdate.String(),
+		"scratch_dir":     scratchDir,
 	})
 
 	_, gotSync, gotUpdate, err := minimalProvider(cfg, nil)

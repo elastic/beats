@@ -30,7 +30,7 @@ import (
 )
 
 type timeseriesProcessor struct {
-	dimensions map[string]interface{}
+	dimensions map[string]any
 	prefixes   []string
 }
 
@@ -47,7 +47,7 @@ func NewTimeSeriesProcessor(fields mapping.Fields, logger *logp.Logger) beat.Pro
 
 	// remove false values and convert to map where a nil value means
 	// it's a dimension
-	dimensionsNilDict := map[string]interface{}{}
+	dimensionsNilDict := map[string]any{}
 	for k, isDimension := range dimensions {
 		if isDimension {
 			dimensionsNilDict[k] = nil

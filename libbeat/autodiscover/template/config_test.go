@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -33,19 +33,19 @@ import (
 )
 
 func TestConfigsMapping(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck // legacy test logger setup
 
-	config, _ := conf.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct": "config",
 	})
 
-	configPorts, _ := conf.NewConfigFrom(map[string]interface{}{
+	configPorts, _ := conf.NewConfigFrom(map[string]any{
 		"correct": "config",
 		"hosts":   [1]string{"1.2.3.4:8080"},
 	})
 
 	const envValue = "valuefromenv"
-	configFromEnv, _ := conf.NewConfigFrom(map[string]interface{}{
+	configFromEnv, _ := conf.NewConfigFrom(map[string]any{
 		"correct": envValue,
 	})
 
@@ -171,7 +171,7 @@ func TestConfigsMapping(t *testing.T) {
 func TestConfigsMappingKeystore(t *testing.T) {
 	secret := "mapping_secret"
 	//expected config
-	config, _ := conf.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct":  "config",
 		"password": secret,
 	})
@@ -227,7 +227,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 func TestConfigsMappingKeystoreProvider(t *testing.T) {
 	secret := "mapping_provider_secret"
 	//expected config
-	config, _ := conf.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]any{
 		"correct":  "config",
 		"password": secret,
 	})
@@ -331,8 +331,8 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 		panic(err)
 	}
 
-	writableKeystore.Store("PASSWORD", []byte(secret))
-	writableKeystore.Save()
+	writableKeystore.Store("PASSWORD", []byte(secret)) //nolint:errcheck // test helper
+	writableKeystore.Save()                            //nolint:errcheck // test helper
 	return keyStore
 }
 

@@ -16,12 +16,12 @@ import (
 
 var configTests = []struct {
 	name    string
-	config  map[string]interface{}
+	config  map[string]any
 	wantErr error
 }{
 	{
 		name: "invalid_url_scheme",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					bytes(state.response).decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -32,7 +32,7 @@ var configTests = []struct {
 	},
 	{
 		name: "missing_url",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					bytes(state.response).decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -42,7 +42,7 @@ var configTests = []struct {
 	},
 	{
 		name: "invalid_program",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					bytes(state.response).decode_json().as(inner_body,{
 					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ? 
@@ -56,8 +56,8 @@ var configTests = []struct {
 	},
 	{
 		name: "invalid_regexps",
-		config: map[string]interface{}{
-			"regexp": map[string]interface{}{
+		config: map[string]any{
+			"regexp": map[string]any{
 				"products":  "(?i)(xq>)d+)",
 				"solutions": "(?i)(Search|Observability|Security)",
 			},
@@ -67,8 +67,8 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_regexps",
-		config: map[string]interface{}{
-			"regexp": map[string]interface{}{
+		config: map[string]any{
+			"regexp": map[string]any{
 				"products":  "(?i)(Elasticsearch|Beats|Logstash|Kibana)",
 				"solutions": "(?i)(Search|Observability|Security)",
 			},
@@ -77,17 +77,17 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_config",
-		config: map[string]interface{}{
+		config: map[string]any{
 			"program": `
 					bytes(state.response).decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"url": "wss://localhost:443/v1/stream",
-			"regexp": map[string]interface{}{
+			"regexp": map[string]any{
 				"products":  "(?i)(Elasticsearch|Beats|Logstash|Kibana)",
 				"solutions": "(?i)(Search|Observability|Security)",
 			},
-			"state": map[string]interface{}{
+			"state": map[string]any{
 				"cursor": map[string]int{
 					"last_updated": 1502908200,
 				},
@@ -96,8 +96,8 @@ var configTests = []struct {
 	},
 	{
 		name: "invalid_retry_wait_min_greater_than_wait_max",
-		config: map[string]interface{}{
-			"retry": map[string]interface{}{
+		config: map[string]any{
+			"retry": map[string]any{
 				"max_attempts": 3,
 				"wait_min":     "3s",
 				"wait_max":     "2s",
@@ -108,8 +108,8 @@ var configTests = []struct {
 	},
 	{
 		name: "invalid_retry_max_attempts_eq_zero",
-		config: map[string]interface{}{
-			"retry": map[string]interface{}{
+		config: map[string]any{
+			"retry": map[string]any{
 				"max_attempts": 0,
 				"wait_min":     "1s",
 				"wait_max":     "2s",
@@ -120,8 +120,8 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_retry",
-		config: map[string]interface{}{
-			"retry": map[string]interface{}{
+		config: map[string]any{
+			"retry": map[string]any{
 				"max_attempts": 3,
 				"wait_min":     "2s",
 				"wait_max":     "5s",
@@ -131,8 +131,8 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_retry_with_infinite",
-		config: map[string]interface{}{
-			"retry": map[string]interface{}{
+		config: map[string]any{
+			"retry": map[string]any{
 				"infinite_retries": true,
 				"max_attempts":     0,
 				"wait_min":         "1s",
@@ -143,8 +143,8 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_authStyle_default",
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"client_id":     "a_client_id",
 				"client_secret": "a_client_secret",
 				"token_url":     "https://localhost:443/token",
@@ -154,8 +154,8 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_authStyle_in_params",
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"auth_style":    "in_params",
 				"client_id":     "a_client_id",
 				"client_secret": "a_client_secret",
@@ -166,8 +166,8 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_authStyle_in_header",
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"auth_style":    "in_header",
 				"client_id":     "a_client_id",
 				"client_secret": "a_client_secret",
@@ -178,8 +178,8 @@ var configTests = []struct {
 	},
 	{
 		name: "invalid_authStyle",
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"auth_style":    "in_query",
 				"client_id":     "a_client_id",
 				"client_secret": "a_client_secret",
@@ -191,8 +191,8 @@ var configTests = []struct {
 	},
 	{
 		name: "valid_tokenExpiryBuffer",
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"client_id":           "a_client_id",
 				"client_secret":       "a_client_secret",
 				"token_url":           "https://localhost:443/token",
@@ -203,8 +203,8 @@ var configTests = []struct {
 	},
 	{
 		name: "invalid_tokenExpiryBuffer",
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
+		config: map[string]any{
+			"auth": map[string]any{
 				"client_id":           "a_client_id",
 				"client_secret":       "a_client_secret",
 				"token_url":           "https://localhost:443/token",

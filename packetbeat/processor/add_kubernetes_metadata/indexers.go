@@ -30,7 +30,7 @@ func InitializeModule() {
 	// Add IP Port Indexer as a default indexer
 	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
 
-	formatCfg, err := conf.NewConfigFrom(map[string]interface{}{
+	formatCfg, err := conf.NewConfigFrom(map[string]any{
 		"format": "%{[ip]}:%{[port]}",
 	})
 	if err == nil {

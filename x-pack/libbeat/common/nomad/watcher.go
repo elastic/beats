@@ -276,10 +276,7 @@ func (w *watcher) fetchNodeID() (string, error) {
 }
 
 func backoff(failures uint) {
-	wait := 1 << failures * time.Second
-	if wait > maxBackoff {
-		wait = maxBackoff
-	}
+	wait := min(1<<failures*time.Second, maxBackoff)
 
 	time.Sleep(wait)
 }

@@ -19,6 +19,7 @@ package log
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -33,9 +34,11 @@ import (
 var (
 	prevSnap = monitoring.FlatSnapshot{
 		Ints: map[string]int64{
-			"count":        10,
-			"gone":         1,
-			"active_gauge": 6,
+			"count":                             10,
+			"gone":                              1,
+			"active_gauge":                      6,
+			"filebeat.filestream.files_matched": 10,
+			"filebeat.filestream.files_empty":   4,
 		},
 		Floats: map[string]float64{
 			"system.load.1":     2.0,
@@ -45,9 +48,11 @@ var (
 	}
 	curSnap = monitoring.FlatSnapshot{
 		Ints: map[string]int64{
-			"count":        20,
-			"new":          1,
-			"active_gauge": 5,
+			"count":                             20,
+			"new":                               1,
+			"active_gauge":                      5,
+			"filebeat.filestream.files_matched": 3,
+			"filebeat.filestream.files_empty":   2,
 		},
 		Floats: map[string]float64{
 			"system.load.1":     1.2,
@@ -74,6 +79,8 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 	assert.InDelta(t, 1.2, delta.Floats["system.load.1"], 0.001)
 	assert.InDelta(t, 2, delta.Floats["float_counter"], 0.001)
 	assert.EqualValues(t, 5, delta.Ints["active_gauge"])
+	assert.EqualValues(t, 3, delta.Ints["filebeat.filestream.files_matched"])
+	assert.EqualValues(t, 2, delta.Ints["filebeat.filestream.files_empty"])
 	assert.InDelta(t, 4.1, delta.Floats["foo.histogram.p99"], 0.001)
 	assert.NotContains(t, delta.Ints, "gone")
 }
@@ -114,11 +121,72 @@ func TestReporterLog(t *testing.T) {
 	}
 }
 
+func TestZeroPeriodSkipsLogging(t *testing.T) {
+	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
+
+	r := &Reporter{
+		config:     config{Period: 0},
+		done:       make(chan struct{}),
+		logger:     logger.Named("monitoring"),
+		registries: map[string]*monitoring.Registry{},
+	}
+
+	r.wg.Go(func() {
+		r.snapshotLoop()
+	})
+
+	// The goroutine should exit immediately when Period == 0.
+	exited := make(chan struct{})
+	go func() {
+		r.wg.Wait()
+		close(exited)
+	}()
+	select {
+	case <-exited:
+	case <-time.After(5 * time.Second):
+		t.Fatal("snapshotLoop goroutine did not exit within 5s for zero period")
+	}
+
+	// No periodic metrics log lines should have been emitted.
+	for _, log := range zapLogs.TakeAll() {
+		assert.NotContains(t, log.Message, "Starting metrics logging")
+		assert.NotContains(t, log.Message, "Non-zero metrics")
+		assert.NotContains(t, log.Message, "No non-zero metrics")
+		assert.NotContains(t, log.Message, "Total metrics")
+		assert.Contains(t, log.Message, "Skipping metrics logging")
+	}
+}
+
+// TestZeroPeriodConfig verifies that a config with period=0 does not panic
+// (time.NewTicker panics on a zero duration) and that Period is parsed as 0.
+func TestZeroPeriodConfig(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"period": "0s",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rep, err := MakeReporter(beat.Info{Logger: logger}, cfg, beatmonitoring.NewGlobalMonitoring())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rep.Stop()
+
+	reporter, ok := rep.(*Reporter)
+	if !ok {
+		t.Fatal("MakeReporter did not return a *Reporter")
+	}
+	assert.Equal(t, time.Duration(0), reporter.Period)
+}
+
 func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, expectedValue, v) //nolint:testifylint // we don't care if types are different
+	assert.EqualValues(t, expectedValue, v)
 }

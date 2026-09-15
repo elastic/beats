@@ -73,6 +73,7 @@ logging:
   selectors:
     - "input"
     - "input.filestream"
+    - "input.filestream.store_cache"
     - "input.filestream.file_watcher"
     - "input.filestream.prospector"
     - "input.filestream.scanner"
@@ -168,6 +169,7 @@ logging:
   selectors:
     - "input"
     - "input.filestream"
+    - "input.filestream.store_cache"
     - "input.filestream.file_watcher"
     - "input.filestream.prospector"
     - "input.filestream.scanner"
@@ -496,6 +498,7 @@ logging:
   selectors:
     - input
     - input.filestream
+    - input.filestream.store_cache
     - input.filestream.prospector
   metrics:
     enabled: false
@@ -640,6 +643,7 @@ logging:
   selectors:
     - input
     - input.filestream
+    - input.filestream.store_cache
     - input.filestream.prospector
   metrics:
     enabled: false
@@ -790,6 +794,78 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	if filebeat.LogContains(deprecationLog) {
 		t.Fatalf("deprecation log %q must not be present when using the new syntax", deprecationLog)
 	}
+}
+
+// TestFilestreamTakeOverFromAnyID ensures that take_over.from_any_id: true
+// migrates state from a previous filestream input without requiring the old
+// input ID to be listed explicitly.
+//
+// The test runs Filebeat with one input ID, stops it, then restarts with a
+// different ID and from_any_id: true. It asserts that no events are
+// re-ingested and the registry is correctly migrated.
+//
+// File fingerprints (64-byte prefix):
+//   - 01.log: 6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be
+//   - 02.log: db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a
+func TestFilestreamTakeOverFromAnyID(t *testing.T) {
+	oldID := "first-id"
+	newID := "second-id"
+
+	testDataPath, err := filepath.Abs("./testdata")
+	if err != nil {
+		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+	}
+
+	logFiles := []string{}
+	for _, f := range []string{"01.log", "02.log", "01.txt", "02.txt"} {
+		logFiles = append(logFiles, filepath.Join(testDataPath, "take-over", f))
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+
+	// Phase 1: ingest with the old ID.
+	vars := map[string]any{
+		"inputID":  oldID,
+		"homePath": workDir,
+		"testdata": testDataPath,
+	}
+	cfgYAML := getConfig(t, vars, "take-over", "from-any-id.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	waitForEOF(t, filebeat, logFiles)
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+	filebeat.Stop()
+
+	// Phase 2: restart with a new ID and from_any_id: true.
+	// No events should be re-ingested.
+	vars["inputID"] = newID
+	vars["takeOver"] = true
+
+	cfgYAML = getConfig(t, vars, "take-over", "from-any-id.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.RemoveLogFiles()
+
+	filebeat.Start()
+	waitForEOF(t, filebeat, logFiles)
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+	filebeat.Stop()
+
+	assertRegistry(
+		t,
+		workDir,
+		testDataPath,
+		filepath.Join(testDataPath,
+			"take-over",
+			"expected-registry-happy-path.json"),
+		"Entries in the registry are different from the expectation",
+	)
 }
 
 func TestFilestreamTakeOverFromLogInput(t *testing.T) {

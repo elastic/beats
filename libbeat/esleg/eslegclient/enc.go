@@ -43,7 +43,7 @@ var (
 type BodyEncoder interface {
 	bulkBodyEncoder
 	Reader() io.Reader
-	Marshal(doc interface{}) error
+	Marshal(doc any) error
 }
 
 type bulkBodyEncoder interface {
@@ -54,8 +54,8 @@ type bulkBodyEncoder interface {
 }
 
 type BulkWriter interface {
-	Add(meta, obj interface{}) error
-	AddRaw(raw interface{}) error
+	Add(meta, obj any) error
+	AddRaw(raw any) error
 }
 
 type countingWriter struct {
@@ -137,7 +137,7 @@ func (b *jsonEncoder) Reader() io.Reader {
 	return b.buf
 }
 
-func (b *jsonEncoder) Marshal(obj interface{}) error {
+func (b *jsonEncoder) Marshal(obj any) error {
 	b.Reset()
 	return b.AddRaw(obj)
 }
@@ -149,7 +149,7 @@ type RawEncoding struct {
 	Encoding []byte
 }
 
-func (b *jsonEncoder) AddRaw(obj interface{}) error {
+func (b *jsonEncoder) AddRaw(obj any) error {
 	var err error
 	switch v := obj.(type) {
 	case beat.Event:
@@ -174,7 +174,7 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 	return err
 }
 
-func (b *jsonEncoder) Add(meta, obj interface{}) error {
+func (b *jsonEncoder) Add(meta, obj any) error {
 	pos := b.buf.Len()
 	if err := b.AddRaw(meta); err != nil {
 		b.buf.Truncate(pos)
@@ -236,14 +236,14 @@ func (g *gzipEncoder) AddHeader(header *http.Header) {
 	header.Add(HeaderUncompressedLength, strconv.FormatInt(g.counter.WrittenBytes, 10))
 }
 
-func (g *gzipEncoder) Marshal(obj interface{}) error {
+func (g *gzipEncoder) Marshal(obj any) error {
 	g.Reset()
 	return g.AddRaw(obj)
 }
 
 var nl = []byte("\n")
 
-func (g *gzipEncoder) AddRaw(obj interface{}) error {
+func (g *gzipEncoder) AddRaw(obj any) error {
 	var err error
 	switch v := obj.(type) {
 	case beat.Event:
@@ -273,7 +273,7 @@ func (g *gzipEncoder) AddRaw(obj interface{}) error {
 	return nil
 }
 
-func (g *gzipEncoder) Add(meta, obj interface{}) error {
+func (g *gzipEncoder) Add(meta, obj any) error {
 	pos := g.buf.Len()
 	if err := g.AddRaw(meta); err != nil {
 		g.buf.Truncate(pos)

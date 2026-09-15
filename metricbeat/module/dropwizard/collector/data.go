@@ -32,17 +32,17 @@ type DropWizardEvent struct {
 }
 
 // NewPromEvent creates a prometheus event based on the given string
-func eventMapping(metrics map[string]interface{}) map[string]mapstr.M {
+func eventMapping(metrics map[string]any) map[string]mapstr.M {
 	eventList := map[string]mapstr.M{}
 
 	for _, metricSet := range metrics {
 		switch t := metricSet.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			for key, value := range t {
 				name, tags := splitTagsFromMetricName(key)
 				valueMap := mapstr.M{}
 
-				metric, _ := value.(map[string]interface{})
+				metric, _ := value.(map[string]any)
 				for k, v := range metric {
 					switch v.(type) {
 					case string:
@@ -131,7 +131,7 @@ func splitTagsFromMetricName(metricName string) (string, mapstr.M) {
 }
 
 // convertValue takes the input string and converts it to int of float
-func convertValue(value json.Number) interface{} {
+func convertValue(value json.Number) any {
 	if i, err := value.Int64(); err == nil {
 		return i
 	}

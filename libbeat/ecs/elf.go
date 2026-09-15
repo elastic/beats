@@ -66,10 +66,10 @@ type Elf struct {
 	Sections []Sections `ecs:"sections"`
 
 	// List of exported element names and types.
-	Exports map[string]interface{} `ecs:"exports"`
+	Exports map[string]any `ecs:"exports"`
 
 	// List of imported element names and types.
-	Imports map[string]interface{} `ecs:"imports"`
+	Imports map[string]any `ecs:"imports"`
 
 	// List of shared libraries used by this ELF object.
 	SharedLibraries string `ecs:"shared_libraries"`

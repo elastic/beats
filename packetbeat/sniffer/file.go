@@ -41,12 +41,12 @@ type fileHandler struct {
 	log *logp.Logger
 }
 
-func newFileHandler(file string, topSpeed bool, maxLoopCount int) (*fileHandler, error) {
+func newFileHandler(file string, topSpeed bool, maxLoopCount int, logger *logp.Logger) (*fileHandler, error) {
 	h := &fileHandler{
 		file:         file,
 		topSpeed:     topSpeed,
 		maxLoopCount: maxLoopCount,
-		log:          logp.NewLogger("sniffer"),
+		log:          logger,
 	}
 	if err := h.open(); err != nil {
 		return nil, err

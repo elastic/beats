@@ -57,7 +57,7 @@ func TestUrlLib(t *testing.T) {
 	ctx := context.Background()
 	for _, test := range urlTests {
 		t.Run(test.name, func(t *testing.T) {
-			prg, ast, err := newProgram(ctx, test.src, "state", nil, logptest.NewTestingLogger(t, ""))
+			prg, ast, err := newProgram(ctx, test.src, "state", nil, "", logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("failed to compile src: %v", err)
 			}

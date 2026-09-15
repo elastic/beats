@@ -29,10 +29,9 @@ import (
 // live on each Queue; this struct just carries the "next" link plus the
 // producer needed for ACK callbacks.
 type slot[T any] struct {
-	event      T
-	next       int // index of the next slot in the owning pipeline's FIFO, or -1
-	producer   *producer[T]
-	producerID uint64
+	event    T
+	next     int // index of the next slot in the owning pipeline's FIFO, or -1
+	producer *producer[T]
 }
 
 // Pool is the shared backing storage for events from multiple pipelines.
@@ -164,6 +163,27 @@ func (p *Pool[T]) setTarget(n int) {
 	}
 }
 
+// setChunkCount swaps in a directory holding exactly n chunks, allocating fresh
+// trailing chunks when growing and dropping trailing chunks when shrinking; it
+// is a no-op if the directory already has n chunks. The chunks themselves are
+// shared with the previous directory (never moved or copied), so pointers into
+// surviving chunks stay valid. It must be called with growMu held, and the new
+// directory is published atomically. Grow must call this before pushing the
+// backing indices to the free list, so an acquirer always observes a directory
+// containing the chunk for any index it grabs.
+func (p *Pool[T]) setChunkCount(n int) {
+	cur := p.dir.Load().chunks
+	if n == len(cur) {
+		return
+	}
+	nc := make([]*chunk[T], n)
+	copy(nc, cur) // copies min(n, len(cur)) chunk pointers
+	for i := len(cur); i < n; i++ {
+		nc[i] = &chunk[T]{}
+	}
+	p.dir.Store(&directory[T]{chunks: nc})
+}
+
 // growLocked raises capacity to n by allocating any missing chunks, publishing
 // the new directory, and pushing the new indices [old, n) to the free list. It
 // must be called with growMu held. Indices are published only after the
@@ -174,15 +194,7 @@ func (p *Pool[T]) growLocked(n int) {
 	if n <= old {
 		return
 	}
-	if need := numChunks(n); need > len(p.dir.Load().chunks) {
-		cur := p.dir.Load().chunks
-		nc := make([]*chunk[T], need)
-		copy(nc, cur)
-		for i := len(cur); i < need; i++ {
-			nc[i] = &chunk[T]{}
-		}
-		p.dir.Store(&directory[T]{chunks: nc})
-	}
+	p.setChunkCount(numChunks(n))
 	for i := old; i < n; i++ {
 		p.free.pushNoSignal(i)
 	}
@@ -199,23 +211,18 @@ func (p *Pool[T]) growLocked(n int) {
 // held.
 func (p *Pool[T]) shrinkLocked() {
 	for {
-		cap := int(p.capacity.Load())
-		if cap <= int(p.target.Load()) {
+		curCap := int(p.capacity.Load())
+		if curCap <= int(p.target.Load()) {
 			return
 		}
-		top := cap - 1
+		top := curCap - 1
 		if !p.free.removeIndex(top) {
 			// The top slot is still in use; it will be retired when released.
 			return
 		}
 		p.capacity.Store(int64(top))
 		// Reclaim any trailing chunk the shrink just emptied.
-		if want := numChunks(top); want < len(p.dir.Load().chunks) {
-			cur := p.dir.Load().chunks
-			nc := make([]*chunk[T], want)
-			copy(nc, cur[:want])
-			p.dir.Store(&directory[T]{chunks: nc})
-		}
+		p.setChunkCount(numChunks(top))
 	}
 }
 
@@ -267,6 +274,13 @@ func (p *Pool[T]) acquire(home int, closeCh <-chan struct{}) (int, bool) {
 // a push.
 func (p *Pool[T]) releaseSlot(i int) {
 	p.free.push(i)
+	p.maybeShrink()
+}
+
+// maybeShrink converges a lazy shrink one step further if one is in progress
+// (capacity > target). The check is a single atomic comparison, so the
+// steady-state release path pays only that before returning.
+func (p *Pool[T]) maybeShrink() {
 	if p.capacity.Load() > p.target.Load() {
 		p.growMu.Lock()
 		p.shrinkLocked()
@@ -286,23 +300,12 @@ func (p *Pool[T]) releaseSlots(indices []int) {
 		return
 	}
 	p.free.pushBatch(indices)
-	if p.capacity.Load() > p.target.Load() {
-		p.growMu.Lock()
-		p.shrinkLocked()
-		p.growMu.Unlock()
-	}
+	p.maybeShrink()
 	p.free.maybeWakeAll()
 }
 
 // isClosed reports whether the pool has been shut down.
-func (p *Pool[T]) isClosed() bool {
-	select {
-	case <-p.closed:
-		return true
-	default:
-		return false
-	}
-}
+func (p *Pool[T]) isClosed() bool { return chClosed(p.closed) }
 
 // chClosed is a non-blocking check for a closed signal channel.
 func chClosed(ch <-chan struct{}) bool {
@@ -317,8 +320,9 @@ func chClosed(ch <-chan struct{}) bool {
 	}
 }
 
-// getBatch returns a recycled or freshly allocated *batch[T]. Callers
-// are responsible for populating it via fillBatch before exposing it.
+// getBatch returns a fully-reset *batch[T] (queue == nil, empty slices, flags
+// cleared) — either recycled via putBatch or freshly allocated. The caller only
+// needs to set queue and append indices before exposing it; see Queue.Get.
 func (p *Pool[T]) getBatch() *batch[T] {
 	b, _ := p.batchPool.Get().(*batch[T])
 	return b
@@ -425,13 +429,11 @@ func (p *Pool[T]) syncTargetToQueues() {
 	// order, letting a stale max overwrite a fresh one.
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	max := 0
+	largest := 0
 	for q := range p.queues {
-		if l := int(q.limit.Load()); l > max {
-			max = l
-		}
+		largest = max(largest, int(q.limit.Load()))
 	}
-	if max > 0 {
-		p.setTarget(max)
+	if largest > 0 {
+		p.setTarget(largest)
 	}
 }

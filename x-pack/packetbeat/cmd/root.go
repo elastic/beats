@@ -91,14 +91,14 @@ func defaultProcessors() []mapstr.M {
 	return []mapstr.M{
 		{
 			"if.contains.tags": "forwarded",
-			"then": []interface{}{
+			"then": []any{
 				mapstr.M{
 					"drop_fields": mapstr.M{
-						"fields": []interface{}{"host"},
+						"fields": []any{"host"},
 					},
 				},
 			},
-			"else": []interface{}{
+			"else": []any{
 				mapstr.M{
 					"add_host_metadata": nil,
 				},

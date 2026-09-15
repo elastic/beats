@@ -19,6 +19,7 @@ package beater
 
 import (
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 
@@ -34,6 +35,7 @@ import (
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
+	"github.com/elastic/beats/v7/packetbeat/npcap"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
@@ -48,23 +50,30 @@ type noopReporter struct{}
 func (noopReporter) UpdateStatus(status.Status, string) {}
 
 type processor struct {
-	wg              sync.WaitGroup
-	publisher       *publish.TransactionPublisher
-	flows           *flows.Flows
-	sniffer         *sniffer.Sniffer
-	shutdownTimeout time.Duration
-	err             chan error
-	status          status.StatusReporter
+	wg             sync.WaitGroup
+	publisher      *publish.TransactionPublisher
+	flows          *flows.Flows
+	sniffer        *sniffer.Sniffer
+	err            chan error
+	statusMu       sync.RWMutex
+	status         status.StatusReporter
+	publishTimeout time.Duration
+	// degradedReason is a non-fatal configuration problem detected at
+	// creation time. It is reported when the processor starts, rather
+	// than at creation, because under OTel management the status
+	// reporter is only injected after the runner has been created.
+	degradedReason string
 }
 
-func newProcessor(shutdownTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error, status status.StatusReporter) *processor {
+func newProcessor(publishTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error, degradedReason string, status status.StatusReporter) *processor {
 	return &processor{
-		publisher:       publisher,
-		flows:           flows,
-		sniffer:         sniffer,
-		err:             err,
-		shutdownTimeout: shutdownTimeout,
-		status:          status,
+		publisher:      publisher,
+		flows:          flows,
+		sniffer:        sniffer,
+		err:            err,
+		status:         status,
+		publishTimeout: publishTimeout,
+		degradedReason: degradedReason,
 	}
 }
 
@@ -77,10 +86,14 @@ func (p *processor) Start() {
 		p.flows.Start()
 	}
 	p.wg.Add(1)
-	go func() {
+	p.wg.Go(func() {
 		defer p.wg.Done()
 
-		p.UpdateStatus(status.Running, "running packetbeat processor")
+		if p.degradedReason != "" {
+			p.UpdateStatus(status.Degraded, p.degradedReason)
+		} else {
+			p.UpdateStatus(status.Running, "running packetbeat processor")
+		}
 		err := p.sniffer.Run()
 		if err != nil {
 			p.err <- fmt.Errorf("sniffer loop failed: %w", err)
@@ -88,7 +101,7 @@ func (p *processor) Start() {
 			return
 		}
 		p.err <- nil
-	}()
+	})
 }
 
 func (p *processor) Stop() {
@@ -98,20 +111,33 @@ func (p *processor) Stop() {
 		p.flows.Stop()
 	}
 	p.wg.Wait()
-	// wait for shutdownTimeout to let the publisher flush
+
+	// wait for publish timeout to let the publisher flush
 	// whatever pending events
-	if p.shutdownTimeout > 0 {
-		time.Sleep(p.shutdownTimeout)
+	if p.publishTimeout > 0 {
+		time.Sleep(p.publishTimeout)
 	}
+
 	p.publisher.Stop()
 	p.UpdateStatus(status.Stopped, "stopped packetbeat processor")
 }
 
 // UpdateStatus wraps the status reporter we get from central management
 func (p *processor) UpdateStatus(status status.Status, message string) {
-	if p.status != nil {
-		p.status.UpdateStatus(status, message)
+	p.statusMu.RLock()
+	reporter := p.status
+	p.statusMu.RUnlock()
+	if reporter != nil {
+		reporter.UpdateStatus(status, message)
 	}
+}
+
+// SetStatusReporter implements status.WithStatusReporter so the OTel
+// factory wrapper can inject a sub-reporter after the runner is created.
+func (p *processor) SetStatusReporter(reporter status.StatusReporter) {
+	p.statusMu.Lock()
+	p.status = reporter
+	p.statusMu.Unlock()
 }
 
 // processorFactory controls construction of modules runners.
@@ -119,15 +145,17 @@ type processorFactory struct {
 	name         string
 	err          chan error
 	beat         *beat.Beat
-	configurator func(*conf.C) (config.Config, error)
+	configurator func(*conf.C, *logp.Logger) (config.Config, error)
+	logger       *logp.Logger
 }
 
-func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C) (config.Config, error)) *processorFactory {
+func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C, *logp.Logger) (config.Config, error)) *processorFactory {
 	return &processorFactory{
 		name:         name,
 		err:          err,
 		beat:         beat,
 		configurator: configurator,
+		logger:       beat.Info.Logger,
 	}
 }
 
@@ -137,11 +165,11 @@ func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, c
 		statusReporter = noopReporter{}
 	}
 	statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
-	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, statusReporter)
+	publishTimeout, publisher, flows, sniffer, errChan, degradedReason, err := p.create(pipeline, cfg, statusReporter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
 	}
-	return newProcessor(duration, publisher, flows, sniffer, errChan, statusReporter), nil
+	return newProcessor(publishTimeout, publisher, flows, sniffer, errChan, degradedReason, statusReporter), nil
 }
 
 // Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
@@ -149,16 +177,20 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	return p.CreateWithReporter(pipeline, cfg, nil)
 }
 
-func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, error) {
-	config, err := p.configurator(cfg)
+func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, string, error) {
+	config, err := p.configurator(cfg, p.logger)
 	if err != nil {
-		logp.Err("Failed to read the beat config: %v, %v", err, config)
-		return 0, nil, nil, nil, nil, err
+		p.logger.Errorf("Failed to read the beat config: %v, %v", err, config)
+		return 0, nil, nil, nil, nil, "", err
+	}
+	degradedReason, err := unknownProtocolsReason(config)
+	if err != nil {
+		return 0, nil, nil, nil, nil, "", err
 	}
 	id, err := configID(cfg)
 	if err != nil {
-		logp.Err("Failed to generate ID from config: %v, %v", err, config)
-		return 0, nil, nil, nil, nil, err
+		p.logger.Errorf("Failed to generate ID from config: %v, %v", err, config)
+		return 0, nil, nil, nil, nil, "", err
 	}
 	if len(config.Interfaces) != 0 {
 		// Install Npcap if needed. This needs to happen before any other
@@ -175,7 +207,13 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		// interface.
 		err := installNpcap(p.beat, cfg)
 		if err != nil {
-			return 0, nil, nil, nil, nil, err
+			return 0, nil, nil, nil, nil, "", err
+		}
+		// Ensure the DLL is loaded whether Npcap was just installed above
+		// or was already present from a previous run.
+		err = npcap.LoadNpcap()
+		if err != nil {
+			return 0, nil, nil, nil, nil, "", err
 		}
 	}
 
@@ -185,33 +223,65 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		config.IgnoreOutgoing,
 		config.Interfaces[0].File == "",
 		config.Interfaces[0].InternalNetworks,
+		p.logger,
 	)
 	if err != nil {
-		return 0, nil, nil, nil, nil, err
+		return 0, nil, nil, nil, nil, "", err
 	}
 
 	var watch procs.ProcessesWatcher
 	// Enable the process watcher only if capturing live traffic
 	if config.Interfaces[0].File == "" {
-		err = watch.Init(config.Procs)
+		err = watch.Init(config.Procs, p.logger)
 		if err != nil {
-			logp.Critical("%s", err.Error())
-			return 0, nil, nil, nil, nil, err
+			p.logger.Errorf("%s", err.Error())
+			return 0, nil, nil, nil, nil, "", err
 		}
 	} else {
-		logp.Info("Process watcher disabled when file input is used")
+		p.logger.Info("Process watcher disabled when file input is used")
 	}
 
 	flows, err := setupFlows(pipeline, &watch, config, p.beat.Info.Logger)
 	if err != nil {
-		return 0, nil, nil, nil, nil, err
+		return 0, nil, nil, nil, nil, "", err
 	}
-	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, reporter)
+	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, reporter, p.logger)
 	if err != nil {
-		return 0, nil, nil, nil, nil, err
+		return 0, nil, nil, nil, nil, "", err
 	}
 
-	return config.ShutdownTimeout, publisher, flows, sniffer, p.err, nil
+	return config.PublishTimeout, publisher, flows, sniffer, p.err, degradedReason, nil
+}
+
+// unknownProtocolsReason returns a status message if the configuration holds
+// protocol entries that have no registered protocol plugin. Such entries are
+// logged and ignored during protocol setup rather than causing a hard
+// failure, so they are surfaced by marking the processor degraded.
+func unknownProtocolsReason(cfg config.Config) (string, error) {
+	var unknown []string
+	for name := range cfg.Protocols {
+		// icmp is special-cased during protocol setup, so it is never
+		// an unknown protocol.
+		if name != "icmp" && protos.Lookup(name) == protos.UnknownProtocol {
+			unknown = append(unknown, name)
+		}
+	}
+	for _, protocol := range cfg.ProtocolsList {
+		module := struct {
+			Type string `config:"type"`
+		}{}
+		if err := protocol.Unpack(&module); err != nil {
+			return "", err
+		}
+		if module.Type != "" && module.Type != "icmp" && protos.Lookup(module.Type) == protos.UnknownProtocol {
+			unknown = append(unknown, module.Type)
+		}
+	}
+	if len(unknown) == 0 {
+		return "", nil
+	}
+	slices.Sort(unknown)
+	return fmt.Sprintf("configuration ignored for unknown protocol plugins: %v", slices.Compact(unknown)), nil
 }
 
 // setupFlows returns a *flows.Flows that will publish to the provided pipeline,
@@ -242,10 +312,18 @@ func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg confi
 		return nil, err
 	}
 
-	return flows.NewFlows(client.PublishAll, watch, cfg.Flows)
+	return flows.NewFlows(client.PublishAll, watch, cfg.Flows, logger)
 }
 
-func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows, reporter status.StatusReporter) (*sniffer.Sniffer, error) {
+func setupSniffer(
+	id string,
+	cfg config.Config,
+	pub *publish.TransactionPublisher,
+	watch *procs.ProcessesWatcher,
+	flows *flows.Flows,
+	reporter status.StatusReporter,
+	logger *logp.Logger,
+) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -268,16 +346,16 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces = append(interfaces, iface)
 	}
 
-	logp.Debug("main", "Initializing protocol plugins")
+	logger.Debug("Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
 	var closers []func()
 	for i, iface := range interfaces {
 		protocols := protos.NewProtocols()
-		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
+		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}
-		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
+		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg, logger)
 		closers = append(closers, protocols.Close)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
@@ -285,7 +363,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(id, false, "", decoders, interfaces, reporter, closers...)
+	return sniffer.New(id, false, "", decoders, interfaces, reporter, logger, closers...)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
@@ -311,7 +389,7 @@ func configID(config *conf.C) (string, error) {
 		return tmp.ID, nil
 	}
 
-	var h map[string]interface{}
+	var h map[string]any
 	_ = config.Unpack(&h)
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {

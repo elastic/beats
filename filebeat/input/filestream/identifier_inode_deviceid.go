@@ -21,7 +21,7 @@ package filestream
 
 import (
 	"fmt"
-	"io/ioutil"
+
 	"os"
 	"path/filepath"
 	"time"
@@ -80,7 +80,7 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 		return ""
 	}
 	if i.markerFileLastModifitaion.Before(fi.ModTime()) {
-		contents, err := ioutil.ReadFile(i.markerPath)
+		contents, err := os.ReadFile(i.markerPath)
 		if err != nil {
 			i.log.Errorf("Error while reading contents of marker file: %v", err)
 			return ""
@@ -99,7 +99,7 @@ func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
+		fileID:              formatIdentity(i.name, osstate.InodeString()+"-"+i.markerContents()),
 		identifierGenerator: i.name,
 	}
 }

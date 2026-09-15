@@ -20,7 +20,8 @@
 package container
 
 import (
-	"io/ioutil"
+	"io"
+
 	"os"
 	"testing"
 
@@ -70,7 +71,7 @@ func (s *ContainerTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
 	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	s.NoError(err, "cannot read test file "+testFile)
 
 	return body
@@ -87,7 +88,7 @@ func (s *ContainerTestSuite) TestEventMapping() {
 
 	s.basicTests(events, err)
 
-	cpuMemoryTestCases := map[string]interface{}{
+	cpuMemoryTestCases := map[string]any{
 		"cpu.usage.core.ns":   43959424,
 		"cpu.usage.nanocores": 11263994,
 
@@ -109,7 +110,7 @@ func (s *ContainerTestSuite) TestEventMapping() {
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 
 	containerEcsFields := ecsfields(events[0], s.Logger)
-	testEcs := map[string]interface{}{
+	testEcs := map[string]any{
 		"cpu.usage":    0.005631997,
 		"memory.usage": 0.01,
 		"name":         "nginx",
@@ -117,7 +118,7 @@ func (s *ContainerTestSuite) TestEventMapping() {
 	s.RunMetricsTests(containerEcsFields, testEcs)
 }
 
-func (s *ContainerTestSuite) testValue(event mapstr.M, field string, expected interface{}) {
+func (s *ContainerTestSuite) testValue(event mapstr.M, field string, expected any) {
 	data, err := event.GetValue(field)
 	s.NoError(err, "Could not read field "+field)
 	s.EqualValues(expected, data, "Wrong value for field "+field)
@@ -140,7 +141,7 @@ func (s *ContainerTestSuite) basicTests(events []mapstr.M, err error) {
 
 	s.Len(events, 1, "got wrong number of events")
 
-	basicTestCases := map[string]interface{}{
+	basicTestCases := map[string]any{
 		"logs.available.bytes": int64(98727014400),
 		"logs.capacity.bytes":  int64(101258067968),
 		"logs.used.bytes":      28672,
@@ -159,7 +160,7 @@ func (s *ContainerTestSuite) basicTests(events []mapstr.M, err error) {
 	s.RunMetricsTests(events[0], basicTestCases)
 }
 
-func (s *ContainerTestSuite) RunMetricsTests(event mapstr.M, testCases map[string]interface{}) {
+func (s *ContainerTestSuite) RunMetricsTests(event mapstr.M, testCases map[string]any) {
 	for k, v := range testCases {
 		s.testValue(event, k, v)
 	}

@@ -26,12 +26,14 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/klauspost/compress/gzip"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
@@ -55,7 +57,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	// the Harvester detects the rename first thus allowing
 	// the output to receive the event and then close the source file.
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":      "10ms",
@@ -100,7 +102,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":      "1ms",
@@ -157,7 +159,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":      "24h",
@@ -200,7 +202,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -238,7 +240,7 @@ func TestFilestreamEmptyLine(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -279,7 +281,7 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -305,7 +307,7 @@ func TestFilestreamExceedBuffer(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"buffer_size":                            10,
@@ -336,7 +338,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.fingerprint.enabled": false,
@@ -374,14 +376,13 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 	}
 
 	for name, enc := range encodings {
-		name := name
 		encoder := enc.NewEncoder()
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			testlogName := "test.log"
 			id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-			inp := env.mustCreateInput(map[string]interface{}{
+			inp := env.mustCreateInput(map[string]any{
 				"id":                                     id,
 				"paths":                                  []string{env.abspath(testlogName)},
 				"encoding":                               name,
@@ -416,7 +417,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -452,7 +453,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -482,7 +483,7 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
@@ -517,7 +518,7 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
@@ -554,7 +555,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
@@ -592,7 +593,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"file_identity.native":                   map[string]any{},
@@ -638,7 +639,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -674,7 +675,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -714,7 +715,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(testlogName),
@@ -761,7 +762,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "5s",
@@ -795,7 +796,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -827,7 +828,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "200ms",
@@ -880,7 +881,7 @@ func TestFilestreamIgnoreSymlink(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -912,7 +913,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -946,7 +947,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	secondTestlogName := "test2.log"
 	symlinkName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -998,7 +999,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -1044,7 +1045,7 @@ func TestFilestreamSymlinkAndFile(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(testlogName),
@@ -1078,7 +1079,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath("*"),
@@ -1121,52 +1122,13 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.requireRegistryEntryCount(1)
 }
 
-func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
-	env := newInputTestingEnvironment(t)
-
-	logFiles := []struct {
-		path  string
-		lines []string
-	}{
-		{path: "log-a.log",
-			lines: []string{"1-aaaaaaaaaa", "2-aaaaaaaaaa"}},
-		{path: "log-b.log",
-			lines: []string{"1-bbbbbbbbbb", "2-bbbbbbbbbb"}},
-	}
-	for _, lf := range logFiles {
-		env.mustWriteToFile(
-			lf.path, []byte(strings.Join(lf.lines, "\n")+"\n"))
-	}
-
-	id := "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded"
-	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                  id,
-		"harvester_limit":     1,
-		"close.reader.on_eof": true,
-		"paths": []string{
-			env.abspath(logFiles[0].path),
-			env.abspath(logFiles[1].path)},
-		"prospector.scanner.fingerprint.enabled": false,
-		"file_identity.native":                   map[string]any{},
-	})
-
-	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
-
-	env.startInput(ctx, id, inp)
-
-	env.waitUntilEventCountCtx(ctx, 4)
-
-	cancel()
-	env.waitUntilInputStops()
-}
-
 // test_decode_error from test_harvester.py
 func TestFilestreamDecodeError(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"encoding":                               "utf-16be",
@@ -1211,7 +1173,7 @@ func TestFilestreamDebugReader(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.fingerprint.enabled": false,
@@ -1248,7 +1210,7 @@ func TestFilestreamDebugReader(t *testing.T) {
 func TestGlobalIDCannotBeUsed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	testlogName := "test.log"
-	_, err := env.createInput(map[string]interface{}{
+	_, err := env.createInput(map[string]any{
 		"id":                                     ".global",
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.fingerprint.enabled": false,
@@ -1265,7 +1227,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath("*"),
@@ -1314,7 +1276,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath("*"),
@@ -1365,17 +1327,9 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	integration.WriteLogFile(t, logFilePath, 50, false)
 
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	// The duration used to configure the input need to obey
-	// the following restrictions:
-	//  - Backoff needs to be longer than the prospector and close check
-	//    interval, as well as the inactive timeout so we can have a
-	//    a harvester failing to start because there is one blocked on
-	//    its backoff.
-	//  - Close check interval needs to be smaller than the prospector
-	//    check interval
-	//  - Inactive timeout needs to me as small as possible so the reader
-	//    context is closed due to inactivity while the reader is waiting
-	//    on its backoff.
+	// Close check interval needs to be smaller than the prospector check
+	// interval. Inactive timeout should be shorter than backoff so the
+	// reader context is cancelled while waiting on backoff.
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1389,54 +1343,167 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	})
 
 	env.startInput(t.Context(), id, inp)
-	// File has been fully read
-	env.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
-		1*time.Second)
 
-	// File is inactive, the reader context will be cancelled
+	// The initial 50 lines are read.
+	env.waitUntilEventCount(50)
+
+	// The file becomes inactive and the harvester closes it: the waker evaluates
+	// the parked file and closes it on close_inactive.
 	env.WaitLogsContains(
-		fmt.Sprintf("'%s' is inactive", logFilePathStr),
-		5*time.Second,
+		fmt.Sprintf("File is inactive. Closing. Path='%s'", logFilePathStr),
+		10*time.Second,
 		"missing 'file is inactive' logs")
 
-	// Add more data to the file while the reader is blocked
-	// on its backoff and its context has been cancelled.
+	// Add more data after the file went inactive.
 	integration.WriteLogFile(t, logFilePath, 5, true)
 
-	// Ensure the FileWatcher detected the new data and sent a write event
-	env.WaitLogsContains(
-		fmt.Sprintf("File %s has been updated", logFilePathStr),
-		3*time.Second)
-
-	// Ensure the write event did not start a new harvester
-	env.WaitLogsContains("Harvester already running", 2*time.Second)
-
-	// Wait for the harvester to close
-	env.WaitLogsContains("Stopped harvester for file", 2*time.Second)
-
-	// Wait for a new scan from the fileWatcher
-	env.WaitLogsContains("Start next scan", 2*time.Second)
-
-	// Ensure it got notified when the harvester closed and the offset
-	// is correct
-	env.WaitLogsContains(
-		"Updating previous state because harvester was closed.",
-		1*time.Second)
-
-	// Ensure the fileWatcher sent an write event
-	env.WaitLogsContains(
-		fmt.Sprintf("File %s has been updated", logFilePathStr),
-		1*time.Second)
-
-	// Wait for a new harvester to start
-	env.WaitLogsContains("Starting harvester for file", 1*time.Second)
-
-	// Wait for EOF to be reached
-	env.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
-		2*time.Second)
-
-	// Ensure all events have been ingested
+	// The new data is eventually re-read (either by resuming the parked file or
+	// by the prospector re-harvesting it on its next scan).
 	env.waitUntilEventCount(55)
+}
+
+// harvesterInputConfig returns a base filestream config used by the harvester
+// behavior tests below (read/tail, open-files cap, close-on-EOF, gzip).
+func harvesterInputConfig(env *inputTestingEnvironment, pathGlob string) (string, map[string]any) {
+	id := "harvester-" + uuid.Must(uuid.NewV4()).String()
+	return id, map[string]any{
+		"id":                                     id,
+		"paths":                                  []string{pathGlob},
+		"prospector.scanner.check_interval":      "10ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+	}
+}
+
+// TestHarvesterReadsAndTails verifies that the input reads an existing file,
+// persists the offset, and tails appended data.
+func TestHarvesterReadsAndTails(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logName := "pool.log"
+	id, cfg := harvesterInputConfig(env, env.abspath(logName)+"*")
+	inp := env.mustCreateInput(cfg)
+
+	line1 := []byte("first line\n")
+	env.mustWriteToFile(logName, line1)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	env.waitUntilEventCount(1)
+	env.requireOffsetInRegistry(logName, id, len(line1))
+
+	// Tail: appended data must be picked up by the parked-then-resumed session.
+	line2 := []byte("second line\n")
+	env.mustAppendToFile(logName, line2)
+
+	env.waitUntilEventCount(2)
+	env.requireOffsetInRegistry(logName, id, len(line1)+len(line2))
+
+	env.requireEventsReceived([]string{"first line", "second line"})
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// TestHarvesterLimitCyclesThroughFiles verifies that many more files than the
+// harvester_limit are all read, with correct content. harvester_limit is a hard
+// cap on simultaneously open files, so with limit=1 only one file is open at a
+// time; close.reader.on_eof closes each file once it is read to EOF, freeing the
+// slot so the next queued file is promoted. The single slot thus cycles through
+// all the files until every one has been harvested.
+func TestHarvesterLimitCyclesThroughFiles(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	const numFiles = 50
+	const linesPerFile = 3
+
+	id, cfg := harvesterInputConfig(env, env.abspath("multi-")+"*")
+	// One open file at a time; close-on-EOF frees the slot so the queue promotes
+	// the next file, exercising the open-files cap and its promotion path.
+	cfg["harvester_limit"] = 1
+	cfg["close.reader.on_eof"] = true
+	inp := env.mustCreateInput(cfg)
+
+	var want []string
+	for f := range numFiles {
+		name := fmt.Sprintf("multi-%02d.log", f)
+		var content []byte
+		for l := range linesPerFile {
+			line := fmt.Sprintf("file%02d-line%d", f, l)
+			want = append(want, line)
+			content = append(content, []byte(line+"\n")...)
+		}
+		env.mustWriteToFile(name, content)
+	}
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	env.waitUntilEventCount(numFiles * linesPerFile)
+
+	got := env.getOutputMessages()
+	sort.Strings(got)
+	sort.Strings(want)
+	if len(got) != len(want) {
+		t.Fatalf("expected %d events, got %d", len(want), len(got))
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("event %d mismatch: want %q got %q", i, want[i], got[i])
+		}
+	}
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+// TestHarvesterGZIP verifies a gzip file is read once to EOF and the session is
+// torn down (gzip never tails/parks; it returns SliceDone).
+func TestHarvesterGZIP(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logName := "data.log.gz"
+	id := "harvester-gzip-" + uuid.Must(uuid.NewV4()).String()
+	// compression=auto requires the fingerprint file identity. Use a small
+	// fingerprint length so the (small) gzip file is not skipped by the scanner.
+	cfg := map[string]any{
+		"id":                                id,
+		"paths":                             []string{env.abspath(logName) + "*"},
+		"prospector.scanner.check_interval": "10ms",
+		"prospector.scanner.fingerprint": map[string]any{
+			"enabled": true,
+			"offset":  0,
+			"length":  64,
+		},
+		"compression": "auto",
+	}
+	inp := env.mustCreateInput(cfg)
+
+	var want []string
+	for i := range 20 {
+		want = append(want, fmt.Sprintf("gzip line %02d", i))
+	}
+	var plain bytes.Buffer
+	for _, l := range want {
+		plain.WriteString(l + "\n")
+	}
+	var compressed bytes.Buffer
+	gw := gzip.NewWriter(&compressed)
+	if _, err := gw.Write(plain.Bytes()); err != nil {
+		t.Fatalf("cannot gzip content: %v", err)
+	}
+	if err := gw.Close(); err != nil {
+		t.Fatalf("cannot close gzip writer: %v", err)
+	}
+	env.mustWriteToFile(logName, compressed.Bytes())
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	env.waitUntilEventCount(len(want))
+	env.requireEventsReceived(want)
+
+	cancelInput()
+	env.waitUntilInputStops()
 }

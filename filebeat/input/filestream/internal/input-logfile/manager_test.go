@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -47,6 +48,10 @@ func (s *testSource) Name() string {
 	return s.name
 }
 
+func (s *testSource) LogPath() string {
+	return s.name
+}
+
 type noopProspector struct{}
 
 func (m noopProspector) Init(_, _ StoreUpdater, _ func(Source) string) error {
@@ -57,7 +62,7 @@ func (m noopProspector) TakeOver(_ StoreUpdater, _ func(Source) string) error {
 	return nil
 }
 
-func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup) {}
+func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup, _ *Metrics) {}
 
 func (m noopProspector) Test() error {
 	return nil
@@ -82,7 +87,6 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)
@@ -201,6 +205,7 @@ func TestInputManager_Create(t *testing.T) {
 				}}
 			cfg, err := config.NewConfigFrom("id: my-id")
 			require.NoError(t, err)
+			initInputManager(t, cim)
 
 			_, err = cim.Create(cfg)
 			require.ErrorIs(t, err, errNoInputRunner)
@@ -261,6 +266,7 @@ id: %s
 paths:
   - /var/log/bar
 `, tc.id))
+				initInputManager(t, cim)
 
 				_, err = cim.Create(cfg1)
 				require.NoError(t, err, "1st input should have been created")
@@ -325,6 +331,7 @@ id: t-wing
 paths:
   - /var/log/bar
 `)
+		initInputManager(t, cim)
 
 		// Happy path, if an input fails to start, it's ID is removed from cim.ids list and
 		// can be re-used.
@@ -412,6 +419,7 @@ allow_deprecated_id_duplication: true
 paths:
   - /var/log/bar
 `)
+		initInputManager(t, cim)
 		_, err = cim.Create(cfg1)
 		require.NoError(t, err, "1st input should have been created")
 		// Create an input with a duplicated ID
@@ -428,12 +436,205 @@ paths:
 	})
 }
 
+func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
+	setupCacheForTest(t)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	newManager := func() *InputManager {
+		return &InputManager{
+			Logger:     logp.NewNopLogger(),
+			StateStore: states,
+			Type:       "filestream",
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+				return nil, nil, errNoInputRunner
+			},
+		}
+	}
+	first, second := newManager(), newManager()
+	t.Cleanup(first.Close)
+	t.Cleanup(second.Close)
+
+	// Trigger setup on both managers by calling Create. setup() acquires the
+	// store before Configure is called, so entry is set even on Create error.
+	_, err := first.Create(config.MustNewConfigFrom(map[string]any{"id": "first-input"}))
+	require.ErrorIs(t, err, errNoInputRunner)
+	_, err = second.Create(config.MustNewConfigFrom(map[string]any{"id": "second-input"}))
+	require.ErrorIs(t, err, errNoInputRunner)
+
+	require.Same(t, first.entry.store, second.entry.store)
+	require.Same(t, first.entry.ackCH, second.entry.ackCH)
+	require.Equal(t, 1, globalCache.Len(), "both managers must share one cache entry")
+
+	first.Close()
+	require.Equal(t, 1, globalCache.Len(), "one manager closed; entry still in use by second")
+	require.NotNil(t, second.entry)
+
+	second.Close()
+}
+
+func TestInputManager_CreateOnlyAcquiresOneStoreReference(t *testing.T) {
+	setupCacheForTest(t)
+
+	states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+	manager := &InputManager{
+		Logger:     logp.NewNopLogger(),
+		StateStore: states,
+		Type:       "filestream",
+		Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+			return nil, nil, errNoInputRunner
+		},
+	}
+	t.Cleanup(manager.Close)
+
+	const workers = 10
+	var wg sync.WaitGroup
+	for i := range workers {
+		wg.Go(func() {
+			_, _ = manager.Create(config.MustNewConfigFrom(map[string]any{
+				"id": fmt.Sprintf("input-%d", i),
+			}))
+		})
+	}
+	wg.Wait()
+
+	require.NotNil(t, manager.entry)
+	require.Equal(t, 1, globalCache.Len(), "concurrent Creates must share one cache entry")
+
+	manager.Close()
+}
+
+func initInputManager(t *testing.T, cim *InputManager) {
+	t.Helper()
+	if cim.StateStore.CleanupInterval() <= 0 {
+		if ts, ok := cim.StateStore.(testStateStore); ok {
+			cim.StateStore = ts.WithGCPeriod(time.Minute)
+		}
+	}
+	t.Cleanup(cim.Close)
+}
+
+// TestInputManager_Create_BackoffConfig asserts InputManager.Create wires the
+// filestream input's backoff config (independently parsed here, like
+// read_until_eof and harvester_limit) into the harvesterRunner it builds:
+// defaulted when absent, and taken from the config when set.
+func TestInputManager_Create_BackoffConfig(t *testing.T) {
+	newManager := func(t *testing.T) *InputManager {
+		t.Helper()
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		testStore, err := storeReg.Get("test")
+		require.NoError(t, err)
+		log, _ := newBufferLogger()
+		manager := &InputManager{
+			Logger:     log,
+			StateStore: testStateStore{Store: testStore},
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+				var wg sync.WaitGroup
+				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+			},
+		}
+		initInputManager(t, manager)
+		return manager
+	}
+
+	t.Run("defaulted when absent from config", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: backoff-default
+paths:
+  - /var/log/foo
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, DefaultBackoffConfig(), mi.backoff)
+	})
+
+	t.Run("taken from config when set", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: backoff-custom
+paths:
+  - /var/log/foo
+backoff:
+  init: 5s
+  max: 30s
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, BackoffConfig{Init: 5 * time.Second, Max: 30 * time.Second}, mi.backoff)
+	})
+}
+
+// TestInputManager_Create_StateCheckInterval asserts InputManager.Create wires
+// close.on_state_change.check_interval (independently parsed here, like
+// backoff and read_until_eof) into the harvesterRunner it builds: defaulted
+// when absent, and taken from the config when set.
+func TestInputManager_Create_StateCheckInterval(t *testing.T) {
+	newManager := func(t *testing.T) *InputManager {
+		t.Helper()
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		testStore, err := storeReg.Get("test")
+		require.NoError(t, err)
+		log, _ := newBufferLogger()
+		manager := &InputManager{
+			Logger:     log,
+			StateStore: testStateStore{Store: testStore},
+			Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+				var wg sync.WaitGroup
+				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+			},
+		}
+		initInputManager(t, manager)
+		return manager
+	}
+
+	t.Run("defaulted when absent from config", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: check-interval-default
+paths:
+  - /var/log/foo
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, DefaultStateCheckInterval, mi.stateCheckInterval)
+	})
+
+	t.Run("taken from config when set", func(t *testing.T) {
+		cim := newManager(t)
+		cfg := config.MustNewConfigFrom(`
+type: filestream
+id: check-interval-custom
+paths:
+  - /var/log/foo
+close.on_state_change.check_interval: 20s
+`)
+		inp, err := cim.Create(cfg)
+		require.NoError(t, err)
+
+		mi, ok := inp.(*managedInput)
+		require.True(t, ok)
+		assert.Equal(t, 20*time.Second, mi.stateCheckInterval)
+	})
+}
+
 func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	buf := &bytes.Buffer{}
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
+	writeSyncer := zapcore.Lock(zapcore.AddSync(buf))
+	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core { //nolint:forbidigo // test helper builds a buffer-backed logger to assert on emitted logs
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))
 	return log, buf
@@ -515,6 +716,38 @@ take_over:
 			cfgYAML:   "take_over: 42",
 			expectErr: true,
 		},
+		"from_any_id enabled": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: true`,
+			expected: TakeOverConfig{
+				Enabled:   true,
+				FromAnyID: true,
+			},
+		},
+		"from_any_id disabled": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: false`,
+			expected: TakeOverConfig{
+				Enabled:   true,
+				FromAnyID: false,
+			},
+		},
+		"from_any_id invalid type": {
+			cfgYAML:   `take_over.from_any_id: "yes"`,
+			expectErr: true,
+		},
+		"from_any_id and from_ids are mutually exclusive": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: true
+  from_ids: ["foo"]`,
+			expectErr: true,
+		},
 	}
 
 	for name, tc := range testCases {
@@ -533,4 +766,27 @@ take_over:
 			assert.Equal(t, tc.expected, outer.TakeOver, "TakeOverConfig was not parsed correctly")
 		})
 	}
+}
+
+// mockHarvester is a minimal Harvester used by manager tests that only need a
+// Harvester value to construct an input; its sessions are never driven, so
+// OpenSession returns a nil session. Runner behaviour is tested with the
+// controllable fakes in harvester_runner_test.go.
+type mockHarvester struct {
+	wg    *sync.WaitGroup
+	onRun func(v2.Context, Source, Cursor, Publisher) error
+}
+
+func (m *mockHarvester) Name() string { return "mock" }
+
+func (m *mockHarvester) Test(_ Source, _ v2.TestContext) error { return nil }
+
+func (m *mockHarvester) OpenSession(
+	_ v2.Context, _ Source, _ string, _ Cursor, _ *Metrics,
+) (HarvesterSession, error) {
+	return nil, nil
+}
+
+func correctOnRun(_ v2.Context, _ Source, _ Cursor, _ Publisher) error {
+	return nil
 }

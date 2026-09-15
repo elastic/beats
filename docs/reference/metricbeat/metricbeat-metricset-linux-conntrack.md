@@ -2,18 +2,13 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-linux-conntrack.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Linux conntrack metricset [metricbeat-metricset-linux-conntrack]
-
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
 
 The conntrack module reports on performance counters for the linux connection tracking component of netfilter. Conntrack uses a [hash table](http://people.netfilter.org/pablo/docs/login.pdf) to track the state of network connections.
 

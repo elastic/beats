@@ -24,14 +24,14 @@ func TestNewSet(t *testing.T) {
 	cases := []struct {
 		name           string
 		constructor    constructor
-		config         map[string]interface{}
+		config         map[string]any
 		expectedTarget targetInfo
 		expectedErr    string
 	}{
 		{
 			name:        "newSetResponse targets body",
 			constructor: newSetResponse,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -39,7 +39,7 @@ func TestNewSet(t *testing.T) {
 		{
 			name:        "newSetResponse targets something else",
 			constructor: newSetResponse,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -47,7 +47,7 @@ func TestNewSet(t *testing.T) {
 		{
 			name:        "newSetRequestPagination targets body",
 			constructor: newSetRequestPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -55,7 +55,7 @@ func TestNewSet(t *testing.T) {
 		{
 			name:        "newSetRequestPagination targets header",
 			constructor: newSetRequestPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
@@ -63,7 +63,7 @@ func TestNewSet(t *testing.T) {
 		{
 			name:        "newSetRequestPagination targets url param",
 			constructor: newSetRequestPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
@@ -71,7 +71,7 @@ func TestNewSet(t *testing.T) {
 		{
 			name:        "newSetRequestPagination targets url value",
 			constructor: newSetRequestPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.value",
 			},
 			expectedTarget: targetInfo{Type: "url.value"},
@@ -79,7 +79,7 @@ func TestNewSet(t *testing.T) {
 		{
 			name:        "newSetRequestPagination targets something else",
 			constructor: newSetRequestPagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -87,7 +87,6 @@ func TestNewSet(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.config)
 			gotSet, gotErr := tc.constructor(cfg, noopReporter{}, nil)
@@ -104,7 +103,7 @@ func TestNewSet(t *testing.T) {
 func TestSetFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
-		tfunc       func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+		tfunc       func(ctx *transformContext, transformable transformable, key string, val any) error
 		paramCtx    *transformContext
 		paramTr     transformable
 		paramKey    string
@@ -154,7 +153,6 @@ func TestSetFunctions(t *testing.T) {
 	}
 
 	for _, tcase := range cases {
-		tcase := tcase
 		t.Run(tcase.name, func(t *testing.T) {
 			gotErr := tcase.tfunc(tcase.paramCtx, tcase.paramTr, tcase.paramKey, tcase.paramVal)
 			if tcase.expectedErr == nil {
@@ -271,7 +269,7 @@ func TestSetTemplate(t *testing.T) {
 }
 
 func TestDifferentSetValueTypes(t *testing.T) {
-	c1 := map[string]interface{}{
+	c1 := map[string]any{
 		"target":     "body.p1",
 		"value":      `{"param":"value"}`,
 		"value_type": "json",
@@ -292,14 +290,14 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	require.NoError(t, err)
 
 	exp := mapstr.M{
-		"p1": map[string]interface{}{
+		"p1": map[string]any{
 			"param": "value",
 		},
 	}
 
 	assert.EqualValues(t, exp, tr.body())
 
-	c2 := map[string]interface{}{
+	c2 := map[string]any{
 		"target":     "body.p1",
 		"value":      "1",
 		"value_type": "int",

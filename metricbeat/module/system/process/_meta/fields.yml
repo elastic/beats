@@ -657,7 +657,7 @@
               type: long
               format: bytes
               description: >
-                Size of memory-mapped mapped files, including tmpfs (shmem),
+                Size of memory-mapped files, including tmpfs (shmem),
                 in bytes.
 
             - name: stats.page_faults

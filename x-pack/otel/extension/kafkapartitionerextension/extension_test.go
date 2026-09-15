@@ -151,7 +151,7 @@ func TestE2E_RandomPartitioner_MapMessages(t *testing.T) {
 	const numPartitions = 12
 	tp := p.ForTopic("events")
 
-	for i := 0; i < 30; i++ {
+	for i := range 30 {
 		rec := makeJSONRecord(t, map[string]any{"event_id": fmt.Sprintf("evt-%d", i)})
 		part := tp.Partition(rec, numPartitions)
 		assert.GreaterOrEqual(t, part, 0, "event %d: partition must be ≥ 0", i)
@@ -175,7 +175,7 @@ func TestE2E_RoundRobinPartitioner_MapMessages(t *testing.T) {
 	tp := p.ForTopic("logs")
 
 	seen := make(map[int]bool)
-	for i := 0; i < numPartitions*3; i++ {
+	for i := range numPartitions * 3 {
 		rec := makeJSONRecord(t, map[string]any{"log_line": fmt.Sprintf("line %d", i)})
 		part := tp.Partition(rec, numPartitions)
 		assert.GreaterOrEqual(t, part, 0)

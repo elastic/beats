@@ -9,12 +9,12 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/go-concert/unison"
 )
 
 const inputName = "aws-s3"
@@ -35,14 +35,16 @@ type s3InputManager struct {
 	path   *paths.Path
 }
 
-func (im *s3InputManager) Init(grp unison.Group) error {
-	return nil
-}
+func (im *s3InputManager) Close() {}
 
 func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
+	}
+
+	if features.AwsS3V2() {
+		return newInputV2(config, im.store, im.path, im.logger)
 	}
 
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig, im.logger)
@@ -66,6 +68,3 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	return nil, fmt.Errorf("configuration has no SQS queue URL and no S3 bucket ARN")
 }
-
-// boolPtr returns a pointer to b.
-func boolPtr(b bool) *bool { return &b }

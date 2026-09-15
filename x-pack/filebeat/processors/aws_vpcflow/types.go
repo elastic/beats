@@ -40,7 +40,7 @@ func (dt dataType) String() string {
 }
 
 // toType converts the given value string value to the specified data type.
-func toType(value string, typ dataType) (interface{}, error) {
+func toType(value string, typ dataType) (any, error) {
 	switch typ {
 	case stringType:
 		return value, nil

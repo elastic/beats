@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -79,12 +80,7 @@ func (c config) Validate() error {
 }
 
 func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, a)
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -343,8 +339,8 @@ func createTags(tagsItem bigquery.Value) []tag {
 	var tagsArray []tag
 
 	if tags, ok := tagsItem.(string); ok {
-		pairs := strings.Split(tags, ",")
-		for _, pair := range pairs {
+		pairs := strings.SplitSeq(tags, ",")
+		for pair := range pairs {
 			kv := strings.Split(pair, ":")
 			if len(kv) == 2 {
 				tagsArray = append(tagsArray, tag{Key: kv[0], Value: kv[1]})

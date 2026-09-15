@@ -34,7 +34,7 @@ type statelessLogger interface {
 // eventAcker handles publisher pipeline ACKs and forwards
 // them to the registrar or directly to the stateless logger.
 func eventACKer(statelessOut statelessLogger, statefulOut statefulLogger) beat.EventListener {
-	return acker.EventPrivateReporter(func(_ int, data []interface{}) {
+	return acker.EventPrivateReporter(func(_ int, data []any) {
 		stateless := 0
 		states := make([]file.State, 0, len(data))
 		for _, datum := range data {

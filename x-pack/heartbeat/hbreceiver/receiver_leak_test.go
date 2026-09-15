@@ -84,7 +84,7 @@ func startAndStopReceiver(t *testing.T, factory receiver.Factory, consumer consu
 	require.NoError(t, rec.Start(t.Context(), componenttest.NewNopHost()))
 	if !assert.Eventually(t,
 		func() bool {
-			return observedLogs.FilterMessageSnippet("Starting metrics logging every 30s").Len() >= 1
+			return observedLogs.FilterMessageSnippet("Skipping metrics logging").Len() >= 1
 		},
 		60*time.Second,
 		1*time.Second,

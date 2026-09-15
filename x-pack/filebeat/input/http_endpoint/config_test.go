@@ -11,9 +11,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	confpkg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/lumberjack"
 )
 
 func Test_validateConfig(t *testing.T) {
@@ -55,7 +55,7 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
+				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
 			},
 		},
 		{
@@ -64,7 +64,7 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
+				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
 			},
 		},
 	}
@@ -92,8 +92,6 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
-
-func ptrTo[T any](v T) *T { return &v }
 
 func TestApplyInFlightDefaults(t *testing.T) {
 	tests := []struct {

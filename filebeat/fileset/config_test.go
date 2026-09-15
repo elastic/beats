@@ -27,9 +27,9 @@ import (
 )
 
 func TestInputSettings(t *testing.T) {
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"enabled": true,
-		"input": map[string]interface{}{
+		"input": map[string]any{
 			"close_eof": true,
 		},
 	}

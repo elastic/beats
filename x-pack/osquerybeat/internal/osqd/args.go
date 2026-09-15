@@ -6,6 +6,7 @@ package osqd
 
 import (
 	"fmt"
+	"maps"
 	"reflect"
 	"strings"
 )
@@ -21,7 +22,7 @@ const (
 )
 
 type Args []string
-type Flags map[string]interface{}
+type Flags map[string]any
 
 func (f Flags) GetString(key string) string {
 	if f == nil {
@@ -108,9 +109,7 @@ var protectedFlags = Flags{
 func init() {
 	// Append platform specific flags
 	plArgs := platformArgs()
-	for k, v := range plArgs {
-		protectedFlags[k] = v
-	}
+	maps.Copy(protectedFlags, plArgs)
 }
 
 func convertToArgs(flags Flags) Args {

@@ -52,7 +52,7 @@ func newQueryProfiler(log *logp.Logger) *queryProfiler {
 	}
 }
 
-func (p *queryProfiler) profileScheduledQuery(ctx context.Context, qe queryExecutor, queryName string) (map[string]interface{}, error) {
+func (p *queryProfiler) profileScheduledQuery(ctx context.Context, qe queryExecutor, queryName string) (map[string]any, error) {
 	escapedName := strings.ReplaceAll(queryName, "'", "''")
 	query := osqueryScheduleProfileQueryPrefix + escapedName + osqueryScheduleProfileQuerySuffix
 	rows, err := qe.Query(ctx, query, 10*time.Second)
@@ -74,7 +74,7 @@ func (p *queryProfiler) profileScheduledQuery(ctx context.Context, qe queryExecu
 	lastMemory := toInt64(row["last_memory"])
 
 	cpuMS := userMS + systemMS
-	profile := map[string]interface{}{
+	profile := map[string]any{
 		"source":                 "scheduled",
 		"query_name":             queryName,
 		"utilization":            utilizationFromMillis(cpuMS, wallMS),
@@ -113,7 +113,7 @@ func (p *queryProfiler) scheduledProfilesDiagnostics(ctx context.Context, qe que
 	return data
 }
 
-func (p *queryProfiler) scheduledProfilesDiagnosticsPayload(ctx context.Context, qe queryExecutor) (map[string]interface{}, error) {
+func (p *queryProfiler) scheduledProfilesDiagnosticsPayload(ctx context.Context, qe queryExecutor) (map[string]any, error) {
 	if qe == nil {
 		return nil, fmt.Errorf("osquery client is not connected")
 	}
@@ -123,14 +123,14 @@ func (p *queryProfiler) scheduledProfilesDiagnosticsPayload(ctx context.Context,
 		return nil, fmt.Errorf("failed to query osquery_schedule: %w", err)
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"osquery_schedule": rows,
 		"count":            len(rows),
 	}, nil
 }
 
 func diagnosticsErrorJSON(message string) []byte {
-	payload := map[string]interface{}{
+	payload := map[string]any{
 		"error": message,
 	}
 	data, err := json.MarshalIndent(payload, "", "  ")
@@ -139,6 +139,13 @@ func diagnosticsErrorJSON(message string) []byte {
 	}
 	return data
 }
+
+// Runtime profiling (collectRuntimeSnapshot + buildRuntimeQueryProfile) measures the
+// osqueryd process via processes joined to osquery_info. Live actions and RRULE runs
+// use the same osqdcli.Client, which serializes Query calls with a mutex and a limit
+// of one in flight, so snapshots for those paths do not overlap with each other on
+// that client. Native queries scheduled inside osqueryd still run in the same process;
+// their CPU/memory can therefore appear blended into deltas bracketing an extension query.
 
 func collectRuntimeSnapshot(ctx context.Context, qe queryExecutor) (runtimeSnapshot, error) {
 	var snap runtimeSnapshot
@@ -165,28 +172,26 @@ LIMIT 1`, 5*time.Second)
 	return snap, nil
 }
 
-func buildLiveQueryProfile(query string, before, after runtimeSnapshot, duration time.Duration, queryErr error) map[string]interface{} {
-	userDelta := after.userTimeMS - before.userTimeMS
-	if userDelta < 0 {
-		userDelta = 0
-	}
-	systemDelta := after.systemTimeMS - before.systemTimeMS
-	if systemDelta < 0 {
-		systemDelta = 0
-	}
+func buildLiveQueryProfile(query string, before, after runtimeSnapshot, duration time.Duration, queryErr error) map[string]any {
+	return buildRuntimeQueryProfile("live", query, before, after, duration, queryErr)
+}
+
+// buildRuntimeQueryProfile builds a profile from osquery process metrics before and after a query.
+// source distinguishes collection contexts (for example "live" vs "rrule") for downstream consumers.
+// See the comment above collectRuntimeSnapshot for how concurrent osquery work affects these metrics.
+func buildRuntimeQueryProfile(source, query string, before, after runtimeSnapshot, duration time.Duration, queryErr error) map[string]any {
+	userDelta := max(after.userTimeMS-before.userTimeMS, 0)
+	systemDelta := max(after.systemTimeMS-before.systemTimeMS, 0)
 	cpuMS := userDelta + systemDelta
-	wallMS := duration.Milliseconds()
-	if wallMS < 0 {
-		wallMS = 0
-	}
+	wallMS := max(duration.Milliseconds(), 0)
 
 	exitCode := int64(0)
 	if queryErr != nil {
 		exitCode = 1
 	}
 
-	return map[string]interface{}{
-		"source":      "live",
+	return map[string]any{
+		"source":      source,
 		"query":       query,
 		"utilization": utilizationFromMillis(cpuMS, wallMS),
 		"duration":    wallMS,
@@ -205,7 +210,7 @@ func utilizationFromMillis(cpuMS, wallMS int64) float64 {
 	return float64(cpuMS) / float64(wallMS) * 100.0
 }
 
-func toInt64(v interface{}) int64 {
+func toInt64(v any) int64 {
 	switch n := v.(type) {
 	case int:
 		return int64(n)
@@ -232,7 +237,7 @@ func toInt64(v interface{}) int64 {
 	return 0
 }
 
-func toString(v interface{}) string {
+func toString(v any) string {
 	switch s := v.(type) {
 	case string:
 		return s

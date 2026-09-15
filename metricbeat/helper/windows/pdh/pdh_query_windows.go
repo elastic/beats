@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 	"syscall"
 	"unsafe"
@@ -52,7 +53,7 @@ type Query struct {
 // CounterValue contains the performance counter values.
 type CounterValue struct {
 	Instance    string
-	Measurement interface{}
+	Measurement any
 	Err         CounterValueError
 }
 
@@ -143,7 +144,7 @@ func (q *Query) RemoveUnusedCounters(counters []string) error {
 	}
 	unused := make(map[string]*Counter)
 	for counterPath, counter := range q.Counters {
-		if !matchCounter(counterPath, counters) {
+		if !slices.Contains(counters, counterPath) {
 			unused[counterPath] = counter
 		}
 	}
@@ -160,15 +161,6 @@ func (q *Query) RemoveUnusedCounters(counters []string) error {
 	return nil
 }
 
-func matchCounter(counterPath string, counterList []string) bool {
-	for _, cn := range counterList {
-		if cn == counterPath {
-			return true
-		}
-	}
-	return false
-}
-
 // CollectData collects the value for all counters in the query.
 func (q *Query) CollectData() error {
 	return PdhCollectQueryData(q.Handle)
@@ -181,7 +173,7 @@ func (q *Query) CollectDataEx(interval uint32, event windows.Handle) error {
 
 // GetFormattedCounterValues returns an array of formatted values for a query.
 func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
-	if q.Counters == nil || len(q.Counters) == 0 {
+	if len(q.Counters) == 0 {
 		return nil, errors.New("no counter list found")
 	}
 	rtn := make(map[string][]CounterValue, len(q.Counters))
@@ -273,7 +265,7 @@ func returnLastInstance(match string) string {
 	var innerMatch string
 	var matches []string
 	runeMatch := []rune(match)
-	for i := 0; i < len(runeMatch); i++ {
+	for i := range runeMatch {
 		char := string(runeMatch[i])
 
 		// check if string ends between parentheses

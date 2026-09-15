@@ -576,7 +576,7 @@ filebeat.inputs:
 
   # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
   #multiline.match: after
 
   # The maximum number of lines that are combined into one event.
@@ -684,7 +684,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -733,17 +733,17 @@ filebeat.inputs:
   # original for harvesting but will report the symlink name as the source.
   #prospector.scanner.symlinks: false
 
-  # If enabled, instead of relying on the device ID and inode values when comparing files,
-  # compare hashes of the given byte ranges in files. A file becomes an ingest target
-  # when its size grows larger than offset+length (see below). Until then it's ignored.
+  # Deprecated and ignored. Scanner fingerprinting identifies files by hashing
+  # configured byte ranges instead of relying on device IDs and inode values. It
+  # is enabled if and only if the fingerprint file identity (the default) is used.
   #prospector.scanner.fingerprint.enabled: true
 
-  # If fingerprint mode is enabled, sets the offset from the beginning of the file
-  # for the byte range used for computing the fingerprint value.
+  # Sets the offset from the beginning of the file for the byte range used for
+  # computing the fingerprint value.
   #prospector.scanner.fingerprint.offset: 0
 
-  # If fingerprint mode is enabled, sets the length of the byte range used for
-  # computing the fingerprint value. Cannot be less than 64 bytes.
+  # Sets the length of the byte range used for computing the fingerprint value.
+  # Cannot be less than 64 bytes.
   #prospector.scanner.fingerprint.length: 1024
 
   ### Parsers configuration
@@ -779,7 +779,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -899,10 +899,18 @@ filebeat.inputs:
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
 
-  # If `take_over` is set to `true`, this `filestream` will take over all files
-  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # When enabled, this `filestream` input takes over states from `log` inputs
+  # or other `filestream` inputs. Only files actively matched by `paths` are migrated.
   # This functionality is still in beta.
-  #take_over: false
+  #take_over:
+  #  enabled: true
+  #  # Take over from specific filestream inputs by exact ID.
+  #  # When set, files are not taken over from `log` inputs.
+  #  #from_ids: ["foo", "bar"]
+  #  # Take over from any previous filestream input, regardless of ID.
+  #  # Mutually exclusive with from_ids.
+  #  # When set, files are not taken over from `log` inputs.
+  #  #from_any_id: false
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -970,7 +978,7 @@ filebeat.inputs:
 #- type: redis
   #enabled: false
 
-  # List of hosts to pool to retrieve the slow log information.
+  # List of hosts to poll to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
   # How often the input checks for redis slow log.
@@ -1083,6 +1091,19 @@ filebeat.inputs:
 
   # How long to wait before retrying a failed read.
   #consume_backoff: 2s
+
+  # Network timeout for the connection to the brokers (dial, read and write).
+  #timeout: 30s
+
+  # Keep-alive period for active network connections (0 disables it).
+  #keep_alive: 0s
+
+  # Consumer group session timeout. Increase for higher-latency consumers to
+  # avoid spurious rebalances.
+  #session_timeout: 10s
+
+  # How often the consumer sends heartbeats. Must be lower than session_timeout.
+  #heartbeat_interval: 3s
 
   # How long to wait for the minimum number of input bytes while reading.
   #max_wait_time: 250ms
@@ -1284,6 +1305,13 @@ filebeat.inputs:
 #      - type: kubernetes
 #        node: ${NODE_NAME}
 #        hints.enabled: true
+#        # Restrict hints-generated input types. Disabled by default.
+#        # When enabled with an empty types list, defaults to log, filestream, and container.
+#        hints.input_allow_list.enabled: false
+#        #hints.input_allow_list.types:
+#        #  - log
+#        #  - filestream
+#        #  - container
 #        # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
 #        use_kubeadm: true
 #        hints.default_config:
@@ -2204,7 +2232,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -2763,7 +2791,7 @@ logging.files:
 # sensitive information) together with other log messages, a different
 # log file, only for log entries containing raw events, is used. It will
 # use the same level, selectors and all other configurations from the
-# default logger, but it will have it's own file configuration.
+# default logger, but it will have its own file configuration.
 #
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.

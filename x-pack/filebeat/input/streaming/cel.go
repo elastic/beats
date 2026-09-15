@@ -22,15 +22,13 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
 
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/mito/lib"
 )
 
 var (
 	// mimetypes holds supported MIME type mappings.
-	mimetypes = map[string]interface{}{
+	mimetypes = map[string]any{
 		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
 		"application/x-ndjson":     lib.NDJSON,
 		"application/zip":          lib.Zip,
@@ -56,10 +54,7 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 	return patterns, nil
 }
 
-// The Filebeat user-agent is provided to the program as useragent.
-var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
-
-func newProgram(ctx context.Context, src, root string, patterns map[string]*regexp.Regexp, log *logp.Logger) (cel.Program, *cel.Ast, error) {
+func newProgram(ctx context.Context, src, root string, patterns map[string]*regexp.Regexp, userAgent string, log *logp.Logger) (cel.Program, *cel.Ast, error) {
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
@@ -72,7 +67,7 @@ func newProgram(ctx context.Context, src, root string, patterns map[string]*rege
 		lib.Try(),
 		lib.Debug(debug(log)),
 		lib.MIME(mimetypes),
-		lib.Globals(map[string]interface{}{
+		lib.Globals(map[string]any{
 			"useragent": userAgent,
 		}),
 	}
@@ -233,16 +228,16 @@ func parseURL(arg ref.Val) ref.Val {
 	if err != nil {
 		return types.NewErr("%s", err)
 	}
-	var user interface{}
+	var user any
 	if u.User != nil {
 		password, passwordSet := u.User.Password()
-		user = map[string]interface{}{
+		user = map[string]any{
 			"Username":    u.User.Username(),
 			"Password":    password,
 			"PasswordSet": passwordSet,
 		}
 	}
-	return types.NewStringInterfaceMap(types.DefaultTypeAdapter, map[string]interface{}{
+	return types.NewStringInterfaceMap(types.DefaultTypeAdapter, map[string]any{
 		"Scheme":      u.Scheme,
 		"Opaque":      u.Opaque,
 		"User":        user,
@@ -265,7 +260,7 @@ func formatURL(arg ref.Val) ref.Val {
 	if err != nil {
 		return types.NewErr("no such overload for format_url: %v", err)
 	}
-	m, ok := v.(map[string]interface{})
+	m, ok := v.(map[string]any)
 	if !ok {
 		// This should never happen.
 		return types.NewErr("unexpected type for url map: %T", v)
@@ -318,7 +313,7 @@ func formatURL(arg ref.Val) ref.Val {
 
 // maybeStringLookup returns a string from m[key] if it is present and the
 // empty string if not. It panics is m[key] is not a string.
-func maybeStringLookup(m map[string]interface{}, key string) string {
+func maybeStringLookup(m map[string]any, key string) string {
 	v, ok := m[key]
 	if !ok {
 		return ""
@@ -328,7 +323,7 @@ func maybeStringLookup(m map[string]interface{}, key string) string {
 
 // maybeBoolLookup returns a bool from m[key] if it is present and false if
 // not. It panics is m[key] is not a bool.
-func maybeBoolLookup(m map[string]interface{}, key string) bool {
+func maybeBoolLookup(m map[string]any, key string) bool {
 	v, ok := m[key]
 	if !ok {
 		return false

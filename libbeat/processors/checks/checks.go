@@ -19,6 +19,7 @@ package checks
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -70,13 +71,7 @@ func RequireFields(fields ...string) func(*config.C) error {
 func AllowedFields(fields ...string) func(*config.C) error {
 	return func(cfg *config.C) error {
 		for _, field := range cfg.GetFields() {
-			found := false
-			for _, allowed := range fields {
-				if field == allowed {
-					found = true
-					break
-				}
-			}
+			found := slices.Contains(fields, field)
 
 			if !found {
 				return fmt.Errorf("unexpected %v option", field)

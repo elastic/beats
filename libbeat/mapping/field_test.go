@@ -207,7 +207,7 @@ func TestAnalyzer(t *testing.T) {
 			input: []byte(`{"name": "test", "analyzer": {"custom": {"type": "pattern", "pattern":"[\\W&&[^-]]+"}}}`),
 			output: Field{
 				Name:     "test",
-				Analyzer: Analyzer{Name: "custom", Definition: map[string]interface{}{"type": "pattern", "pattern": "[\\W\u0026\u0026[^-]]+"}},
+				Analyzer: Analyzer{Name: "custom", Definition: map[string]any{"type": "pattern", "pattern": "[\\W\u0026\u0026[^-]]+"}},
 			},
 			err: nil,
 		},

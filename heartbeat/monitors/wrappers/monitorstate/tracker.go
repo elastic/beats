@@ -33,7 +33,7 @@ import (
 // before seen monitor, which usually means using ES. If set to nil
 // it will use ES if configured, otherwise it will only track state from
 // memory.
-func NewTracker(sl StateLoader, flappingEnabled bool) *Tracker {
+func NewTracker(sl StateLoader, flappingEnabled bool, logger *logp.Logger) *Tracker {
 	if sl == nil {
 		sl = NilStateLoader
 	}
@@ -42,6 +42,7 @@ func NewTracker(sl StateLoader, flappingEnabled bool) *Tracker {
 		mtx:             sync.Mutex{},
 		stateLoader:     sl,
 		flappingEnabled: flappingEnabled,
+		logger:          logger,
 	}
 }
 
@@ -50,6 +51,7 @@ type Tracker struct {
 	mtx             sync.Mutex
 	stateLoader     StateLoader
 	flappingEnabled bool
+	logger          *logp.Logger
 }
 
 // StateLoader has signature as loadLastESState, useful for test mocking, and maybe for a future impl
@@ -65,7 +67,7 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 	state := t.GetCurrentState(sf, RetryConfig{})
 	if state == nil {
 		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
-		logp.L().Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
+		t.logger.Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
 		t.states[sf.ID] = state
 	} else {
 		state.recordCheck(sf, newStatus, isFinalAttempt)
@@ -105,19 +107,19 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 		loadedState, err = t.stateLoader(sf)
 		if err == nil {
 			if loadedState != nil {
-				logp.L().Infof("loaded previous state for monitor %s: %s", sf.ID, loadedState.String())
+				t.logger.Infof("loaded previous state for monitor %s: %s", sf.ID, loadedState.String())
 			}
 			break
 		}
 		var loaderError LoaderError
 		if errors.As(err, &loaderError) && !loaderError.Retry {
-			logp.L().Warnf("failed to load previous monitor state: %v", loaderError)
+			t.logger.Warnf("failed to load previous monitor state: %v", loaderError)
 			break
 		}
 
 		// last attempt, exit and log error without sleeping
 		if i == attempts {
-			logp.L().Warnf("failed to load previous monitor state: %s after %d attempts: %v", sf.ID, i, err)
+			t.logger.Warnf("failed to load previous monitor state: %s after %d attempts: %v", sf.ID, i, err)
 			break
 		}
 
@@ -126,7 +128,7 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 		if rc.waitFn != nil {
 			sleepFor = rc.waitFn()
 		}
-		logp.L().Warnf("could not load previous monitor state, retrying in %d milliseconds: %v", sleepFor.Milliseconds(), err)
+		t.logger.Warnf("could not load previous monitor state, retrying in %d milliseconds: %v", sleepFor.Milliseconds(), err)
 		time.Sleep(sleepFor)
 	}
 
@@ -143,7 +145,7 @@ func NilStateLoader(_ stdfields.StdMonitorFields) (*State, error) {
 	return nil, nil
 }
 
-func AtomicStateLoader(inner StateLoader) (sl StateLoader, replace func(StateLoader)) {
+func AtomicStateLoader(inner StateLoader, logger *logp.Logger) (sl StateLoader, replace func(StateLoader)) {
 	mtx := &sync.Mutex{}
 	return func(currentSL stdfields.StdMonitorFields) (*State, error) {
 			mtx.Lock()
@@ -154,12 +156,12 @@ func AtomicStateLoader(inner StateLoader) (sl StateLoader, replace func(StateLoa
 			mtx.Lock()
 			defer mtx.Unlock()
 			inner = sl
-			logp.L().Info("Updated atomic state loader")
+			logger.Info("Updated atomic state loader")
 		}
 }
 
-func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoader, replace func(StateLoader)) {
-	stateLoader, replaceStateLoader := AtomicStateLoader(inner)
+func DeferredStateLoader(inner StateLoader, timeout time.Duration, logger *logp.Logger) (sl StateLoader, replace func(StateLoader)) {
+	stateLoader, replaceStateLoader := AtomicStateLoader(inner, logger)
 
 	wg := sync.WaitGroup{}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -171,7 +173,7 @@ func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoad
 		<-ctx.Done()
 
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			logp.L().Warn("Timeout trying to defer state loader")
+			logger.Warn("Timeout trying to defer state loader")
 		}
 	}()
 

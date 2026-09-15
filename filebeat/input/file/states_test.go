@@ -81,7 +81,6 @@ var cleanupTests = []struct {
 
 func TestCleanup(t *testing.T) {
 	for _, test := range cleanupTests {
-		test := test
 		t.Run(test.title, func(t *testing.T) {
 			states := NewStates(logptest.NewTestingLogger(t, ""))
 			states.SetStates([]State{test.state})

@@ -186,7 +186,7 @@ func kubernetesClusterName() string {
 	version = strings.NewReplacer(".", "-").Replace(version)
 
 	clusterName := "{{.BeatName}}-{{.Version}}-{{.ShortCommit}}-{{.StackEnvironment}}"
-	clusterName = mage.MustExpand(clusterName, map[string]interface{}{
+	clusterName = mage.MustExpand(clusterName, map[string]any{
 		"StackEnvironment": mage.StackEnvironment,
 		"ShortCommit":      commit[:10],
 		"Version":          version,

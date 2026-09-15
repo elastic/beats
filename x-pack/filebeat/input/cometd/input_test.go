@@ -89,7 +89,7 @@ func TestSingleInput(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -148,7 +148,7 @@ func TestInputStop_Wait(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -178,16 +178,14 @@ func TestInputStop_Wait(t *testing.T) {
 	var waitForEventCollection sync.WaitGroup
 	var waitForConnections sync.WaitGroup
 	waitForEventCollection.Add(1)
-	waitForConnections.Add(1)
-	go func() {
+	waitForConnections.Go(func() {
 		require.Equal(t, 1, bay.GetConnectedCount()) // current open channels count should be 1
 		event := <-eventsCh
 		assertEventMatches(t, expected, event) // wait for single event
 		waitForEventCollection.Done()
 		time.Sleep(100 * time.Millisecond)           // let input.Stop() be executed.
 		require.Equal(t, 0, bay.GetConnectedCount()) // current open channels count should be 0
-		waitForConnections.Done()
-	}()
+	})
 
 	waitForEventCollection.Wait()
 	input.Wait()
@@ -269,7 +267,7 @@ func TestMultiInput(t *testing.T) {
 	expected1.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected1.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -425,7 +423,7 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -497,7 +495,7 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 	close(eventsCh)
 
 	go func() {
-		for j := 0; j < expectedEventCount; j++ {
+		for range expectedEventCount {
 			event := <-eventsCh
 			assertEventMatches(t, expected, event)
 		}
@@ -543,7 +541,7 @@ func TestNegativeCases(t *testing.T) {
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
 	expected.Msg.Channel = "channel_name"
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",

@@ -37,7 +37,7 @@ func TestHostParser(t *testing.T) {
 		{"unix:///var/lib/uwsgi.sock", "unix:///var/lib/uwsgi.sock"},
 	}
 
-	m := mbtest.NewTestModule(t, map[string]interface{}{})
+	m := mbtest.NewTestModule(t, map[string]any{})
 
 	for _, test := range tests {
 		hi, err := HostParser(m, test.host)

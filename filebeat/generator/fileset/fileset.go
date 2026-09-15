@@ -28,7 +28,7 @@ import (
 func Generate(module, fileset, modulesPath, beatsPath string) error {
 	modulePath := path.Join(modulesPath, "module", module)
 	if !generator.DirExists(modulePath) {
-		return fmt.Errorf("module does not exist, please create module first by create-module command")
+		return fmt.Errorf("module does not exist, please create the module first with the create-module command")
 	}
 
 	filesetPath := path.Join(modulesPath, "module", module, fileset)

@@ -33,8 +33,9 @@ type Tracer interface {
 }
 
 type SockTracer struct {
-	path string
-	sock net.Conn
+	path   string
+	sock   net.Conn
+	logger *logp.Logger
 }
 
 const (
@@ -43,8 +44,10 @@ const (
 	MSG_ABORT = "abort"
 )
 
-func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
+func NewSockTracer(path string, wait time.Duration, logger *logp.Logger) (st SockTracer, err error) {
 	st.path = path
+	st.logger = logger
+
 	delay := time.Millisecond * 250
 
 	started := time.Now()
@@ -54,10 +57,10 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 			return st, fmt.Errorf("wait time for sock trace exceeded: %s", wait)
 		}
 		if _, err := os.Stat(st.path); err == nil {
-			logp.L().Infof("socktracer found file for unix socket: %s, will attempt to connect", path)
+			st.logger.Infof("socktracer found file for unix socket: %s, will attempt to connect", path)
 			break
 		} else {
-			logp.L().Infof("socktracer could not find file for unix socket at: %s, will retry in %s", path, delay)
+			st.logger.Infof("socktracer could not find file for unix socket at: %s, will retry in %s", path, delay)
 			time.Sleep(delay)
 		}
 	}
@@ -73,14 +76,14 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 func (st SockTracer) Start() {
 	err := st.write(MSG_START)
 	if err != nil {
-		logp.L().Errorf("could not write start trace message: %s", err)
+		st.logger.Errorf("could not write start trace message: %s", err)
 	}
 }
 
 func (st SockTracer) Abort() {
 	err := st.write(MSG_ABORT)
 	if err != nil {
-		logp.L().Errorf("could not write abort trace message: %s", err)
+		st.logger.Errorf("could not write abort trace message: %s", err)
 	}
 	st.closeSock()
 }
@@ -88,7 +91,7 @@ func (st SockTracer) Abort() {
 func (st SockTracer) Close() {
 	err := st.write(MSG_STOP)
 	if err != nil {
-		logp.L().Errorf("could not write stop trace message: %s", err)
+		st.logger.Errorf("could not write stop trace message: %s", err)
 	}
 	st.closeSock()
 }
@@ -96,7 +99,7 @@ func (st SockTracer) Close() {
 func (st SockTracer) closeSock() {
 	err := st.sock.Close()
 	if err != nil {
-		logp.L().Errorf("could not close trace sock: %s", err)
+		st.logger.Errorf("could not close trace sock: %s", err)
 	}
 }
 

@@ -128,9 +128,9 @@ func sendData(ctx context.Context, t testing.TB, bindAddress string, numberOfEve
 	}()
 	t.Log("Lumberjack client connected.")
 
-	events := make([]interface{}, 0, numberOfEvents)
-	for i := 0; i < numberOfEvents; i++ {
-		events = append(events, map[string]interface{}{
+	events := make([]any, 0, numberOfEvents)
+	for i := range numberOfEvents {
+		events = append(events, map[string]any{
 			"message": "hello world!",
 			"index":   i,
 		})

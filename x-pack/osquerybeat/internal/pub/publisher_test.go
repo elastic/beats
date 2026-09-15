@@ -22,10 +22,10 @@ func TestHitToEvent(t *testing.T) {
 
 	type params struct {
 		index, eventType, idValue, idFieldKey, responseID string
-		meta                                              map[string]interface{}
-		hit                                               map[string]interface{}
+		meta                                              map[string]any
+		hit                                               map[string]any
 		ecsm                                              ecs.Mapping
-		reqData                                           interface{}
+		reqData                                           any
 	}
 
 	genParams := func(mask int) (p params) {
@@ -43,7 +43,7 @@ func TestHitToEvent(t *testing.T) {
 			p.responseID = uuid.Must(uuid.NewV4()).String()
 		}
 		if mask>>2&1 > 0 {
-			p.hit = map[string]interface{}{
+			p.hit = map[string]any{
 				"foo": "bar",
 			}
 		}
@@ -55,16 +55,16 @@ func TestHitToEvent(t *testing.T) {
 			}
 		}
 		if mask&1 > 0 {
-			p.reqData = map[string]interface{}{
+			p.reqData = map[string]any{
 				"query": "select * from uptime",
 			}
 		}
 		return p
 	}
 
-	for i := 0; i < maxMask; i++ {
+	for i := range maxMask {
 		p := genParams(i)
-		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", p.meta, p.hit, p.ecsm, p.reqData)
+		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", "", "", p.meta, p.hit, p.ecsm, p.reqData)
 
 		if p.index != "" {
 			diff := cmp.Diff(p.index, ev.Meta[events.FieldMetaRawIndex])
@@ -123,8 +123,8 @@ func TestActionResultToEvent(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		req, res map[string]interface{}
-		want     map[string]interface{}
+		req, res map[string]any
+		want     map[string]any
 	}{
 		{
 			name: "successful",
@@ -243,8 +243,10 @@ func TestHitToEvent_SpaceID(t *testing.T) {
 		uuid.Must(uuid.NewV4()).String(),
 		spaceID,
 		"",
+		"",
+		"",
 		nil,
-		map[string]interface{}{"foo": "bar"},
+		map[string]any{"foo": "bar"},
 		nil,
 		nil,
 	)
@@ -264,8 +266,10 @@ func TestHitToEvent_PackID(t *testing.T) {
 		uuid.Must(uuid.NewV4()).String(),
 		"",
 		packID,
+		"",
+		"",
 		nil,
-		map[string]interface{}{"foo": "bar"},
+		map[string]any{"foo": "bar"},
 		nil,
 		nil,
 	)
@@ -275,8 +279,89 @@ func TestHitToEvent_PackID(t *testing.T) {
 	}
 }
 
-func toMap(t *testing.T, s string) map[string]interface{} {
-	var m map[string]interface{}
+func TestHitToEvent_PackNameAndQueryName(t *testing.T) {
+	packName := "My Pack"
+	queryName := "processes"
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"sched-123",
+		"schedule_id",
+		uuid.Must(uuid.NewV4()).String(),
+		"",
+		"pack-xyz",
+		packName,
+		queryName,
+		nil,
+		map[string]any{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if diff := cmp.Diff(packName, ev.Fields["pack_name"]); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(queryName, ev.Fields["query_name"]); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"action-123",
+		"action_id",
+		uuid.Must(uuid.NewV4()).String(),
+		"",
+		"",
+		"",
+		"",
+		nil,
+		map[string]any{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if _, ok := ev.Fields["pack_name"]; ok {
+		t.Error(`expected no "pack_name" field when packName is empty`)
+	}
+	if _, ok := ev.Fields["query_name"]; ok {
+		t.Error(`expected no "query_name" field when queryName is empty`)
+	}
+}
+
+func TestQueryProfileToEvent_SpaceID(t *testing.T) {
+	tests := []struct {
+		name    string
+		spaceID string
+		present bool
+	}{
+		{name: "present", spaceID: "production", present: true},
+		{name: "absent", spaceID: "", present: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fields := queryProfileToEvent("", "", "", tc.spaceID, map[string]any{"key": "val"}, nil)
+			got, ok := fields["space_id"]
+			if tc.present {
+				if !ok {
+					t.Errorf("expected space_id %q, field not present", tc.spaceID)
+				} else if got != tc.spaceID {
+					t.Errorf("space_id mismatch: got=%q want=%q", got, tc.spaceID)
+				}
+			} else {
+				if ok {
+					t.Errorf("expected no space_id field, got %v", got)
+				}
+			}
+		})
+	}
+}
+
+func toMap(t *testing.T, s string) map[string]any {
+	var m map[string]any
 	err := json.Unmarshal([]byte(s), &m)
 	if err != nil {
 		t.Fatal(err)

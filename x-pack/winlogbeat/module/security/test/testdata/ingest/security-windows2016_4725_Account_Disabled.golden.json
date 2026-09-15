@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:28:40.0015275Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "disabled-user-account",
@@ -78,7 +78,7 @@
   {
     "@timestamp": "2019-09-06T13:28:55.2644212Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "disabled-user-account",

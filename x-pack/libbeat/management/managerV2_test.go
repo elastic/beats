@@ -130,8 +130,8 @@ func TestManagerV2(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-1",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
@@ -151,15 +151,15 @@ func TestManagerV2(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-2",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
 							{
 								Id: "system/metrics-system.filesystem-default-system-3",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
@@ -326,8 +326,8 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-1",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
@@ -361,8 +361,8 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-1",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "10m",
 								}),
 							},
@@ -555,7 +555,7 @@ func TestOutputError(t *testing.T) {
 				Type: "mock",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"Is":        "this",
 						"required?": "Yes!",
 					}),
@@ -582,7 +582,7 @@ func TestOutputError(t *testing.T) {
 				Type: "mock",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"this":     "is",
 						"required": true,
 					}),
@@ -693,7 +693,7 @@ func TestErrorPerUnit(t *testing.T) {
 			Type: "mock",
 			Name: "mock",
 			Source: integration.RequireNewStruct(t,
-				map[string]interface{}{
+				map[string]any{
 					"Is":        "this",
 					"required?": "Yes!",
 				}),
@@ -713,7 +713,7 @@ func TestErrorPerUnit(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "filestream-id",
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id": "input-unit1",
 					}),
 				},
@@ -733,7 +733,7 @@ func TestErrorPerUnit(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "filestream-id",
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id": "input-unit2",
 					}),
 				},

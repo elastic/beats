@@ -281,8 +281,8 @@ func TestEventMapping(t *testing.T) {
 	var mappings []StatsdMapping
 	_ = yaml.Unmarshal([]byte(mappingsYml), &mappings)
 
-	countValue := map[string]interface{}{"count": 4}
-	timerValue := map[string]interface{}{
+	countValue := map[string]any{"count": 4}
+	timerValue := map[string]any{
 		"stddev":    0,
 		"p99_9":     100,
 		"mean_rate": 0.2689038235718098,
@@ -299,11 +299,11 @@ func TestEventMapping(t *testing.T) {
 		"15m_rate":  0.2,
 	}
 
-	gaugeValue := map[string]interface{}{"value": 2}
+	gaugeValue := map[string]any{"value": 2}
 
 	for _, test := range []struct {
 		metricName  string
-		metricValue interface{}
+		metricValue any
 		expected    mapstr.M
 	}{
 		{
@@ -1145,7 +1145,7 @@ func process(packets []string, ms *MetricSet) error {
 }
 
 func TestTagsGrouping(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric1:1.0|g|#k1:v1,k2:v2",
 		"metric2:2|c|#k1:v1,k2:v2",
@@ -1203,7 +1203,7 @@ func TestTagsGrouping(t *testing.T) {
 }
 
 func TestTagsCleanup(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd", "ttl": "1s"}).(*MetricSet)
 	testData := []string{
 		"metric1:1|g|#k1:v1,k2:v2",
 
@@ -1231,11 +1231,11 @@ func TestTagsCleanup(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, mapstr.M{"metric1": map[string]interface{}{"value": float64(3)}})
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{"metric1": map[string]any{"value": float64(3)}})
 }
 
 func TestSetReset(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd", "ttl": "1s"}).(*MetricSet)
 	testData := []string{
 		"metric1:hello|s|#k1:v1,k2:v2",
 		"metric1:again|s|#k1:v1,k2:v2",
@@ -1246,14 +1246,14 @@ func TestSetReset(t *testing.T) {
 	events := ms.getEvents()
 	require.Len(t, events, 1)
 
-	assert.Equal(t, 2, events[0].MetricSetFields["metric1"].(map[string]interface{})["count"])
+	assert.Equal(t, 2, events[0].MetricSetFields["metric1"].(map[string]any)["count"])
 
 	events = ms.getEvents()
-	assert.Equal(t, 0, events[0].MetricSetFields["metric1"].(map[string]interface{})["count"])
+	assert.Equal(t, 0, events[0].MetricSetFields["metric1"].(map[string]any)["count"])
 }
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1.0|g|#k1:v1,k2:v2",
 		"metric02:2|c|#k1:v1,k2:v2",
@@ -1278,7 +1278,7 @@ func TestData(t *testing.T) {
 }
 
 func TestGaugeDeltas(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1.0|g|#k1:v1,k2:v2",
 		"metric01:-2.0|g|#k1:v1,k2:v2",
@@ -1290,7 +1290,7 @@ func TestGaugeDeltas(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"value": -1.0},
+		"metric01": map[string]any{"value": -1.0},
 	})
 
 	// same value reported again
@@ -1298,12 +1298,12 @@ func TestGaugeDeltas(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"value": -1.0},
+		"metric01": map[string]any{"value": -1.0},
 	})
 }
 
 func TestCounter(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|c|#k1:v1,k2:v2",
 		"metric01:2|c|#k1:v1,k2:v2",
@@ -1315,7 +1315,7 @@ func TestCounter(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(3)},
+		"metric01": map[string]any{"count": int64(3)},
 	})
 
 	// reset
@@ -1323,12 +1323,12 @@ func TestCounter(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(0)},
+		"metric01": map[string]any{"count": int64(0)},
 	})
 }
 
 func TestCounterSampled(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|c|@0.1",
 		"metric01:2|c|@0.2",
@@ -1340,12 +1340,12 @@ func TestCounterSampled(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(20)},
+		"metric01": map[string]any{"count": int64(20)},
 	})
 }
 
 func TestCounterSampledZero(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|c|@0.0",
 	}
@@ -1357,7 +1357,7 @@ func TestCounterSampledZero(t *testing.T) {
 }
 
 func TestTimerSampled(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:2|ms|@0.01",
 		"metric01:1|ms|@0.1",
@@ -1375,7 +1375,7 @@ func TestTimerSampled(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	actualMetric01 := events[0].MetricSetFields["metric01"].(map[string]interface{})
+	actualMetric01 := events[0].MetricSetFields["metric01"].(map[string]any)
 
 	// returns the extrapolated count
 	assert.Equal(t, int64(116), actualMetric01["count"])
@@ -1388,7 +1388,7 @@ func TestTimerSampled(t *testing.T) {
 }
 
 func TestChangeType(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|ms",
 		"metric01:2|c",
@@ -1400,7 +1400,7 @@ func TestChangeType(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(2)},
+		"metric01": map[string]any{"count": int64(2)},
 	}, events[0].MetricSetFields)
 }
 
@@ -1430,7 +1430,7 @@ func BenchmarkIngest(b *testing.B) {
 			},
 		}
 	}
-	ms := mbtest.NewMetricSet(b, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(b, map[string]any{"module": "statsd"}).(*MetricSet)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

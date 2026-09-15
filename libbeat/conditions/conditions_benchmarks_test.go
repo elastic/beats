@@ -53,7 +53,7 @@ func BenchmarkCombinedCondition(b *testing.B) {
 	config := Config{
 		OR: []Config{
 			{
-				Range: &Fields{fields: map[string]interface{}{
+				Range: &Fields{fields: map[string]any{
 					"http.code.gte": 100,
 					"http.code.lt":  300,
 				}},
@@ -61,12 +61,12 @@ func BenchmarkCombinedCondition(b *testing.B) {
 			{
 				AND: []Config{
 					{
-						Equals: &Fields{fields: map[string]interface{}{
+						Equals: &Fields{fields: map[string]any{
 							"status": 200,
 						}},
 					},
 					{
-						Equals: &Fields{fields: map[string]interface{}{
+						Equals: &Fields{fields: map[string]any{
 							"type": "http",
 						}},
 					},

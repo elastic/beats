@@ -71,7 +71,7 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 		ModuleFields: mapstr.M{},
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Beat's State API response: %w", err)
@@ -147,13 +147,13 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 	return nil
 }
 
-func getClusterUUID(state map[string]interface{}) string {
+func getClusterUUID(state map[string]any) string {
 	o, exists := state["outputs"]
 	if !exists {
 		return ""
 	}
 
-	outputs, ok := o.(map[string]interface{})
+	outputs, ok := o.(map[string]any)
 	if !ok {
 		return ""
 	}
@@ -163,7 +163,7 @@ func getClusterUUID(state map[string]interface{}) string {
 		return ""
 	}
 
-	elasticsearch, ok := e.(map[string]interface{})
+	elasticsearch, ok := e.(map[string]any)
 	if !ok {
 		return ""
 	}
@@ -181,13 +181,13 @@ func getClusterUUID(state map[string]interface{}) string {
 	return clusterUUID
 }
 
-func isOutputES(state map[string]interface{}) bool {
+func isOutputES(state map[string]any) bool {
 	o, exists := state["output"]
 	if !exists {
 		return false
 	}
 
-	output, ok := o.(map[string]interface{})
+	output, ok := o.(map[string]any)
 	if !ok {
 		return false
 	}
@@ -205,13 +205,13 @@ func isOutputES(state map[string]interface{}) bool {
 	return name == "elasticsearch"
 }
 
-func getMonitoringClusterUUID(state map[string]interface{}) string {
+func getMonitoringClusterUUID(state map[string]any) string {
 	m, exists := state["monitoring"]
 	if !exists {
 		return ""
 	}
 
-	monitoring, ok := m.(map[string]interface{})
+	monitoring, ok := m.(map[string]any)
 	if !ok {
 		return ""
 	}

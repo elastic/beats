@@ -25,6 +25,7 @@ import (
 	"math"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -58,7 +59,7 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 func FromMapstr[T mapstrOrMap](dst pcommon.Map, src T) error {
 	dst.EnsureCapacity(len(src))
 	for key, value := range src {
-		if err := FromValue(dst.PutEmpty(key), value); err != nil {
+		if err := putIntoMap(key, value, dst); err != nil {
 			return err
 		}
 	}
@@ -117,6 +118,12 @@ func FromValue(dst pcommon.Value, value any) error {
 		return FromMapstr(dst.SetEmptyMap(), v)
 	case map[string]any:
 		return FromMapstr(dst.SetEmptyMap(), v)
+	case map[string]string:
+		fromStringMap(dst.SetEmptyMap(), v)
+		return nil
+	case map[string]int:
+		fromIntMap(dst.SetEmptyMap(), v)
+		return nil
 	case []mapstr.M:
 		return fromMapSlice(dst.SetEmptySlice(), v)
 	case []map[string]any:
@@ -182,6 +189,189 @@ func FromValue(dst pcommon.Value, value any) error {
 	}
 }
 
+// putIntoMap encodes val under key in dst using the typed Put* methods on
+// pcommon.Map (PutStr, PutInt, PutBool, …) rather than the PutEmpty+Set*
+// two-step. PutEmpty allocates an empty AnyValue slot and Set* allocates
+// the typed wrapper, two allocations per field. The typed Put* methods fold
+// both into one.
+func putIntoMap(key string, val any, dst pcommon.Map) error {
+	switch v := val.(type) {
+	case nil:
+		dst.PutEmpty(key)
+		return nil
+	case string:
+		dst.PutStr(key, v)
+	case bool:
+		dst.PutBool(key, v)
+	case int:
+		dst.PutInt(key, int64(v))
+	case int8:
+		dst.PutInt(key, int64(v))
+	case int16:
+		dst.PutInt(key, int64(v))
+	case int32:
+		dst.PutInt(key, int64(v))
+	case int64:
+		dst.PutInt(key, v)
+	case uint:
+		dst.PutInt(key, maskUnsignedInt(uint64(v)))
+	case uint8:
+		dst.PutInt(key, int64(v))
+	case uint16:
+		dst.PutInt(key, int64(v))
+	case uint32:
+		dst.PutInt(key, int64(v))
+	case uint64:
+		dst.PutInt(key, maskUnsignedInt(v))
+	case float32:
+		setFloat32Value(dst.PutEmpty(key), v)
+	case float64:
+		setFloat64Value(dst.PutEmpty(key), v)
+	case mapstr.M:
+		return FromMapstr(dst.PutEmptyMap(key), v)
+	case map[string]any:
+		return FromMapstr(dst.PutEmptyMap(key), v)
+	case map[string]string:
+		fromStringMap(dst.PutEmptyMap(key), v)
+	case map[string]int:
+		fromIntMap(dst.PutEmptyMap(key), v)
+	default:
+		return FromValue(dst.PutEmpty(key), val)
+	}
+	return nil
+}
+
+// MergeMapstrIntoPdata deep-merges src into dst, equivalent to
+// mapstr.M.DeepUpdate for pcommon.Map. For map-typed values, existing map
+// entries in dst are recursed into rather than replaced. All other values are
+// encoded via [putIntoMap]. Overwrite controls whether non-map values in
+// dst are replaced when keys collide.
+func MergeMapstrIntoPdata(src mapstr.M, dst pcommon.Map, overwrite bool) error {
+	for key, val := range src {
+		if err := mergeVal(key, val, dst, overwrite); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func mergeVal(key string, val any, dst pcommon.Map, overwrite bool) error {
+	var m mapstr.M
+	switch x := val.(type) {
+	case mapstr.M:
+		m = x
+	case map[string]any:
+		m = mapstr.M(x)
+	}
+	if m != nil {
+		if existing, ok := dst.Get(key); ok && existing.Type() == pcommon.ValueTypeMap {
+			// Both sides are maps: recurse, respecting overwrite.
+			return MergeMapstrIntoPdata(m, existing.Map(), overwrite)
+		}
+		// src is a map and dst key is absent or a non-map scalar: always write the map.
+		// This matches mapstr.deepUpdateValue which replaces non-map values with maps
+		// regardless of the overwrite flag.
+		return FromMapstr(dst.PutEmptyMap(key), m)
+	}
+	if _, ok := dst.Get(key); ok && !overwrite {
+		return nil
+	}
+	return putIntoMap(key, val, dst)
+}
+
+// PdataValuesMap wraps a pcommon.Map to satisfy the conditions.ValuesMap interface,
+// allowing condition evaluation directly on a log record body without a ToMapstr call.
+type PdataValuesMap struct {
+	M pcommon.Map
+}
+
+// GetValue retrieves the value at the given dotted key path and returns it as
+// a Go primitive (string, int64, float64, bool, []interface{}, or map[string]interface{}).
+func (p PdataValuesMap) GetValue(key string) (any, error) {
+	v, ok := GetAtPath(key, p.M)
+	if !ok {
+		return nil, mapstr.ErrKeyNotFound
+	}
+	return v.AsRaw(), nil
+}
+
+// GetAtPath retrieves the value at a dotted key path (e.g. "cloud.instance.id")
+// from m, traversing nested maps as needed.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.GetValue behaviour for keys stored flat), then falls back
+// to path navigation.
+func GetAtPath(key string, m pcommon.Map) (pcommon.Value, bool) {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
+		return m.Get(key)
+	}
+	if v, found := m.Get(key); found {
+		return v, true
+	}
+	parent, ok := m.Get(before)
+	if !ok || parent.Type() != pcommon.ValueTypeMap {
+		return pcommon.Value{}, false
+	}
+	return GetAtPath(after, parent.Map())
+}
+
+// PutAtPath encodes val at a dotted key path (e.g. "cloud.instance.id") in m,
+// creating intermediate maps as needed. Existing intermediate maps are
+// preserved (not replaced).
+func PutAtPath(key string, val any, m pcommon.Map) error {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
+		return putIntoMap(key, val, m)
+	}
+	head, rest := before, after
+	if existing, ok := m.Get(head); ok && existing.Type() == pcommon.ValueTypeMap {
+		return PutAtPath(rest, val, existing.Map())
+	}
+	return PutAtPath(rest, val, m.PutEmptyMap(head))
+}
+
+// DeleteAtPath removes the value at a dotted key path (e.g. "cloud.instance.id")
+// from m, traversing nested maps as needed. Returns false if the path did not exist.
+// For keys that contain dots, it tries the full key as a literal name first
+// (matching mapstr.M.Delete behaviour for keys stored flat), then falls back
+// to path navigation.
+func DeleteAtPath(key string, m pcommon.Map) bool {
+	before, after, ok := strings.Cut(key, ".")
+	if !ok {
+		return m.Remove(key)
+	}
+	if m.Remove(key) {
+		return true
+	}
+	parent, ok := m.Get(before)
+	if !ok || parent.Type() != pcommon.ValueTypeMap {
+		return false
+	}
+	return DeleteAtPath(after, parent.Map())
+}
+
+// FlattenKeys returns all key paths in m as dotted strings (e.g. "cloud.instance.id"),
+// including intermediate map keys. This mirrors the behaviour of mapstr.M.FlattenKeys:
+// children are listed before their parent map key.
+func FlattenKeys(m pcommon.Map) []string {
+	out := make([]string, 0, m.Len())
+	flattenPdataKeys("", m, &out)
+	return out
+}
+
+func flattenPdataKeys(prefix string, m pcommon.Map, out *[]string) {
+	for k, v := range m.All() {
+		fullKey := k
+		if prefix != "" {
+			fullKey = prefix + "." + k
+		}
+		if v.Type() == pcommon.ValueTypeMap {
+			flattenPdataKeys(fullKey, v.Map(), out)
+		}
+		*out = append(*out, fullKey)
+	}
+}
+
 // FormatTimestamp renders t in the layout the elasticsearchexporter's
 // bodymap encoding expects for @timestamp.
 func FormatTimestamp(t time.Time) string {
@@ -223,6 +413,12 @@ func fromReflective(dst pcommon.Value, value any) error {
 		return FromMapstr(dst.SetEmptyMap(), m)
 	case reflect.Slice, reflect.Array:
 		return fromReflectiveSlice(dst.SetEmptySlice(), ref)
+	case reflect.Map:
+		if ref.Type().Key().Kind() != reflect.String {
+			dst.SetStr(fmt.Sprintf("unknown type: %T", value))
+			return nil
+		}
+		return fromReflectiveMap(dst.SetEmptyMap(), ref)
 	case reflect.Pointer, reflect.Interface:
 		if ref.IsNil() {
 			return nil
@@ -237,8 +433,33 @@ func fromReflective(dst pcommon.Value, value any) error {
 func fromReflectiveSlice(dst pcommon.Slice, ref reflect.Value) error {
 	n := ref.Len()
 	dst.EnsureCapacity(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if err := FromValue(dst.AppendEmpty(), ref.Index(i).Interface()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func fromStringMap(dst pcommon.Map, src map[string]string) {
+	dst.EnsureCapacity(len(src))
+	for k, v := range src {
+		dst.PutStr(k, v)
+	}
+}
+
+func fromIntMap(dst pcommon.Map, src map[string]int) {
+	dst.EnsureCapacity(len(src))
+	for k, v := range src {
+		dst.PutInt(k, int64(v))
+	}
+}
+
+func fromReflectiveMap(dst pcommon.Map, ref reflect.Value) error {
+	dst.EnsureCapacity(ref.Len())
+	iter := ref.MapRange()
+	for iter.Next() {
+		if err := putIntoMap(iter.Key().String(), iter.Value().Interface(), dst); err != nil {
 			return err
 		}
 	}

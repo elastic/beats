@@ -28,7 +28,7 @@ func TestSanitizersSanitize(t *testing.T) {
 
 	raSanitizer, err := newSanitizer(SanitizerSpec{
 		Type: SanitizerReplaceAll,
-		Spec: map[string]interface{}{
+		Spec: map[string]any{
 			"pattern":     `\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`,
 			"replacement": "{}",
 		},

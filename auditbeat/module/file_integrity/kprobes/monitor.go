@@ -71,7 +71,7 @@ type Monitor struct {
 	log         *logp.Logger
 	ctx         context.Context
 	cancelFn    context.CancelFunc
-	running     uint32
+	running     atomic.Uint32
 	isRecursive bool
 	closeErr    error
 }
@@ -120,7 +120,7 @@ func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exe
 }
 
 func (w *Monitor) Add(path string) error {
-	switch atomic.LoadUint32(&w.running) {
+	switch w.running.Load() {
 	case 0:
 		return errors.New("monitor not started")
 	case 2:
@@ -131,11 +131,11 @@ func (w *Monitor) Add(path string) error {
 }
 
 func (w *Monitor) Close() error {
-	if !atomic.CompareAndSwapUint32(&w.running, 1, 2) {
-		switch atomic.LoadUint32(&w.running) {
+	if !w.running.CompareAndSwap(1, 2) {
+		switch w.running.Load() {
 		case 0:
 			// monitor hasn't started yet
-			atomic.StoreUint32(&w.running, 2)
+			w.running.Store(2)
 		default:
 			return nil
 		}
@@ -165,7 +165,7 @@ func (w *Monitor) writeErr(err error) {
 }
 
 func (w *Monitor) Start() error {
-	if !atomic.CompareAndSwapUint32(&w.running, 0, 1) {
+	if !w.running.CompareAndSwap(0, 1) {
 		return errors.New("monitor already started")
 	}
 

@@ -7,16 +7,20 @@ package beater
 import (
 	"context"
 	"errors"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"golang.org/x/sync/errgroup"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func waitGroupWithTimeout(ctx context.Context, g *errgroup.Group, to time.Duration) error {
@@ -55,12 +59,12 @@ func TestOsqueryRunnerCancellable(t *testing.T) {
 	to := 10 * time.Second
 
 	parentCtx := context.Background()
-	logger := logp.NewLogger("osquery_runner")
+	logger := logptest.NewTestingLogger(t, "osquery_runner")
 
 	runCh := make(chan struct{}, 1)
 
 	//nolint:unparam // false positive on returning nil error, need this signature
-	runfn := func(ctx context.Context, _ osqd.Flags, _ <-chan []config.InputConfig) error {
+	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
 		runCh <- struct{}{}
 		<-ctx.Done()
 		return nil
@@ -103,14 +107,14 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	to := 10 * time.Second
 
 	parentCtx := context.Background()
-	logger := logp.NewLogger("osquery_runner")
+	logger := logptest.NewTestingLogger(t, "osquery_runner")
 
 	runCh := make(chan struct{}, 1)
 
 	var runs int
 
 	//nolint:unparam // false positive on returning nil error, need this signature
-	runfn := func(ctx context.Context, _ osqd.Flags, _ <-chan []config.InputConfig) error {
+	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
 		runs++
 		runCh <- struct{}{}
 		<-ctx.Done()
@@ -143,7 +147,7 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	inputConfigs := []config.InputConfig{
 		{
 			Osquery: &config.OsqueryConfig{
-				Options: map[string]interface{}{
+				Options: map[string]any{
 					"foo": "bar",
 				},
 			},
@@ -188,4 +192,194 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	if diff != "" {
 		t.Error(diff)
 	}
+}
+
+func TestOsqueryRunnerRestartOnExtensionsChange(t *testing.T) {
+	to := 10 * time.Second
+
+	parentCtx := context.Background()
+	logger := logptest.NewTestingLogger(t, "osquery_runner")
+
+	runCh := make(chan struct{}, 1)
+
+	var (
+		mx       sync.Mutex
+		runs     int
+		lastExts config.ExtensionsConfig
+	)
+
+	// Drain inputCh like the real runOsquery does, so no-restart updates do not
+	// block the runner loop.
+	//nolint:unparam // false positive on returning nil error, need this signature
+	runfn := func(ctx context.Context, _ osqd.Flags, exts config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error {
+		mx.Lock()
+		runs++
+		lastExts = exts
+		mx.Unlock()
+		runCh <- struct{}{}
+		for {
+			select {
+			case <-ctx.Done():
+				return nil
+			case <-inputCh:
+			}
+		}
+	}
+
+	ctx, cn := context.WithCancel(parentCtx)
+	defer cn()
+
+	g, ctx := errgroup.WithContext(ctx)
+
+	runner := newOsqueryRunner(logger)
+	g.Go(func() error {
+		return runner.Run(ctx, runfn)
+	})
+
+	withExt := func(ext config.ExtensionsConfig) []config.InputConfig {
+		return []config.InputConfig{
+			{
+				Osquery: &config.OsqueryConfig{
+					ElasticOptions: &config.ElasticOptions{
+						Extensions: &ext,
+					},
+				},
+			},
+		}
+	}
+
+	// Initial start with one extension entry.
+	if err := runner.Update(ctx, withExt(config.ExtensionsConfig{Paths: []string{"/opt/ext/a"}})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, to); err != nil {
+		t.Fatal("failed starting:", err)
+	}
+
+	// Changing the entry set should restart the runner function.
+	if err := runner.Update(ctx, withExt(config.ExtensionsConfig{Paths: []string{"/opt/ext/a", "/opt/ext/b"}})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, to); err != nil {
+		t.Fatal("failed starting after extensions update:", err)
+	}
+
+	// Same entry set should not restart the runner function.
+	if err := runner.Update(ctx, withExt(config.ExtensionsConfig{Paths: []string{"/opt/ext/a", "/opt/ext/b"}})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, 300*time.Millisecond); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatal("unexpected error type after update with the same extensions:", err)
+	}
+
+	// A timeout-only change should restart the runner function.
+	if err := runner.Update(ctx, withExt(config.ExtensionsConfig{Paths: []string{"/opt/ext/a", "/opt/ext/b"}, Timeout: 30})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, to); err != nil {
+		t.Fatal("failed starting after timeout update:", err)
+	}
+
+	// A require-only change should restart the runner function.
+	if err := runner.Update(ctx, withExt(config.ExtensionsConfig{Paths: []string{"/opt/ext/a", "/opt/ext/b"}, Timeout: 30, Require: []string{"my_extension"}})); err != nil {
+		t.Fatal("failed runner update:", err)
+	}
+	if err := waitForStart(ctx, runCh, to); err != nil {
+		t.Fatal("failed starting after require update:", err)
+	}
+
+	cn()
+
+	er := waitGroupWithTimeout(parentCtx, g, to)
+	if er != nil && !errors.Is(er, context.Canceled) {
+		t.Fatal("failed running:", er)
+	}
+
+	mx.Lock()
+	defer mx.Unlock()
+	if diff := cmp.Diff(4, runs); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff([]string{"/opt/ext/a", "/opt/ext/b"}, lastExts.Paths); diff != "" {
+		t.Errorf("extensions not propagated to runfn: %s", diff)
+	}
+	if diff := cmp.Diff([]string{"my_extension"}, lastExts.Require); diff != "" {
+		t.Errorf("extensions require not propagated to runfn: %s", diff)
+	}
+}
+
+func TestOsqueryRunnerRecoversFromTransientErrors(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+	}{
+		{
+			name: "extension ping timeout",
+			err:  errors.New("extension ping failed: timeout after 200ms"),
+		},
+		{
+			name: "broken pipe",
+			err:  errors.New("write: broken pipe"),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(t.Context())
+			defer cancel()
+
+			started := make(chan struct{}, 2)
+			var runs atomic.Int32
+			runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+				run := runs.Add(1)
+				started <- struct{}{}
+				if run == 1 {
+					return tc.err
+				}
+				<-ctx.Done()
+				return nil
+			}
+
+			g, ctx := errgroup.WithContext(ctx)
+			runner := newOsqueryRunner(logptest.NewTestingLogger(t, "osquery_runner"))
+			g.Go(func() error {
+				return runner.Run(ctx, runfn)
+			})
+
+			inputs := []config.InputConfig{{Osquery: &config.OsqueryConfig{}}}
+			require.NoError(t, runner.Update(ctx, inputs), "failed to start osquery runner")
+			require.NoError(t, waitForStart(ctx, started, 10*time.Second), "first osquery run did not start")
+			require.NoError(t, waitForStart(ctx, started, 10*time.Second), "osquery did not restart after %v", tc.err)
+
+			cancel()
+			err := waitGroupWithTimeout(t.Context(), g, 10*time.Second)
+			require.ErrorIs(t, err, context.Canceled, "runner returned an unexpected error after recovery")
+			assert.GreaterOrEqual(t, runs.Load(), int32(2), "recoverable error did not restart osquery")
+		})
+	}
+}
+
+func TestOsqueryRunnerReturnsUnrecoverableError(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+
+	wantErr := errors.New("invalid configuration")
+	started := make(chan struct{}, 1)
+	runfn := func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan []config.InputConfig) error {
+		started <- struct{}{}
+		return wantErr
+	}
+
+	g, ctx := errgroup.WithContext(ctx)
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "osquery_runner"))
+	g.Go(func() error {
+		return runner.Run(ctx, runfn)
+	})
+
+	inputs := []config.InputConfig{{Osquery: &config.OsqueryConfig{}}}
+	require.NoError(t, runner.Update(ctx, inputs), "failed to start osquery runner")
+	require.NoError(t, waitForStart(ctx, started, 10*time.Second), "osquery run did not start")
+
+	err := waitGroupWithTimeout(t.Context(), g, 10*time.Second)
+	require.ErrorIs(t, err, wantErr, "runner did not return the unrecoverable error")
 }
