@@ -1,0 +1,10 @@
+kind: upgrade
+summary: Update go-quark for quark 0.8 since-boot timestamps
+description: >
+  quark 0.8 hands out process timestamps as nanoseconds since boot instead
+  of since the epoch. Auditbeat now converts process.start/process.end to
+  wallclock with quark.TimeToWallclock() and keeps quark's boottime epoch
+  fresh, so timestamps stay correct even when the system clock is stepped,
+  as when NTP corrects a clock that was wrong at boot. Emitted events are
+  unchanged.
+component: auditbeat

@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/network"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/network"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
@@ -62,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	counterInfo, err := fetchNetStats()
 	if err != nil {
-		return fmt.Errorf("Error fetching stats: %w", err)
+		return fmt.Errorf("error fetching stats: %w", err)
 	}
 	if counterInfo == nil {
 		return errors.New("NetworkCounters not available on this platform")
