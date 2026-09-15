@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
@@ -834,6 +835,59 @@ func TestReloadNilOutputUnit(t *testing.T) {
 	require.NotPanics(t, func() {
 		mm.reload(map[unitKey]*agentUnit{})
 	}, "reload must not panic when there is no output unit")
+}
+
+func TestReloadOutputCallsConfigHandlerWithRawExpectedConfig(t *testing.T) {
+	r := reload.NewRegistry()
+	output := &reloadable{}
+	r.MustRegisterOutput(output)
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{Enabled: false},
+		r,
+		nil,
+		logptest.NewTestingLogger(t, ""),
+	)
+	require.NoError(t, err, "could not instantiate ManagerV2")
+
+	cm, ok := m.(*BeatV2Manager)
+	require.True(t, ok, "unexpected type for BeatV2Manager: %T", m)
+
+	var received *conf.C
+	cm.SetOutputConfigHandler(func(cfg *conf.C) {
+		assert.NotNil(t, output.Config(), "output should reload before the handler is called")
+		received = cfg
+	})
+
+	unit := newAgentUnit(&mockClientUnit{expected: client.Expected{
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "elasticsearch",
+			Source: requireNewStruct(t, map[string]any{
+				"hosts": []any{"https://example.invalid:9200"},
+				"heartbeat": map[string]any{
+					"jobs": map[string]any{
+						"browser": map[string]any{"limit": 3},
+					},
+				},
+			}),
+		},
+	}}, logptest.NewTestingLogger(t, ""))
+
+	_, err = cm.reloadOutput(unit)
+	require.NoError(t, err, "output reload should succeed")
+	require.NotNil(t, received, "output config handler should receive the raw expected config")
+
+	var config struct {
+		Heartbeat struct {
+			Jobs map[string]struct {
+				Limit int64 `config:"limit"`
+			} `config:"jobs"`
+		} `config:"heartbeat"`
+	}
+	require.NoError(t, received.Unpack(&config), "handler config should unpack")
+	assert.Equal(t, int64(3), config.Heartbeat.Jobs["browser"].Limit,
+		"handler should receive Heartbeat control-plane fields from the output unit")
 }
 
 type reloadable struct {
