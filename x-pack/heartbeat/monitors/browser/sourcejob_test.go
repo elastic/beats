@@ -80,6 +80,53 @@ func TestValidInline(t *testing.T) {
 	require.NoError(t, e)
 }
 
+func TestAPIInlineUsesPersistentRunner(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"type": "api",
+		"name": "My API monitor",
+		"id":   "my-api-monitor",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "step('request', async () => {})",
+			},
+		},
+	})
+	s, err := NewSourceJob(cfg)
+	require.NoError(t, err, "API source job must parse")
+	t.Cleanup(func() {
+		assert.NoError(t, s.Close(), "API source job must close its persistent runner")
+	})
+
+	jobs := s.jobs()
+	assert.Len(t, jobs, 1, "API source job must expose one scheduled job")
+	assert.NotNil(t, s.apiRunner, "API source job without arbitrary CLI arguments must use a persistent runner")
+}
+
+func TestAPIWithSyntheticsArgsUsesOneShotRunner(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"type": "api",
+		"name": "My API monitor",
+		"id":   "my-api-monitor",
+		"synthetics_args": []string{
+			"--capability", "trace",
+		},
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "step('request', async () => {})",
+			},
+		},
+	})
+	s, err := NewSourceJob(cfg)
+	require.NoError(t, err, "API source job must parse")
+	t.Cleanup(func() {
+		assert.NoError(t, s.Close(), "API source job must close cleanly")
+	})
+
+	jobs := s.jobs()
+	assert.Len(t, jobs, 1, "API source job must expose one scheduled job")
+	assert.Nil(t, s.apiRunner, "API source job with arbitrary CLI arguments must preserve the one-shot runner")
+}
+
 func TestNameRequired(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"id": "myId",
