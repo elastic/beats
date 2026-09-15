@@ -211,7 +211,7 @@ require (
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.2
 	go.elastic.co/apm/module/apmhttp/v2 v2.7.12
 	go.elastic.co/apm/v2 v2.7.12
-	go.mongodb.org/mongo-driver v1.17.9
+	go.mongodb.org/mongo-driver v1.17.10
 	go.opentelemetry.io/collector/component v1.65.0
 	go.opentelemetry.io/collector/component/componentstatus v0.159.0
 	go.opentelemetry.io/collector/config/configtls v1.65.0
