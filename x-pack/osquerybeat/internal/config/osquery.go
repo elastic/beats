@@ -6,112 +6,21 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
+	"time"
 )
 
-<<<<<<< HEAD
-// ElasticOptions contains Beat-specific options that are not part of
-// osquery's native config schema.
-type ElasticOptions struct {
-	Install             *InstallConfig             `config:"install" json:"-"`
-	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
-=======
 const (
-	// MaxSplay is the maximum allowed splay duration (aligns with daily-or-longer RRULE minimum).
-	MaxSplay = 12 * time.Hour
-	// DefaultSplay is the default splay duration (disabled)
-	DefaultSplay = 0
 	// DefaultCheckTimeout is the osqueryd --version startup check deadline
 	// when elastic_options.check_timeout is unset.
 	DefaultCheckTimeout = 15 * time.Second
 )
 
-// RRuleScheduleConfig represents an RRULE-based schedule configuration
-// This provides an alternative to osquery's native interval-based scheduling
-type RRuleScheduleConfig struct {
-	// RRule is the RFC 5545 recurrence rule string
-	// Examples: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO,WE"
-	RRule string `config:"rrule" json:"rrule,omitempty"`
-
-	// StartDate is the required start date for the schedule (RFC3339 format)
-	// Queries will not run before this date
-	StartDate string `config:"start_date,omitempty" json:"start_date,omitempty"`
-
-	// EndDate is the optional end date for the schedule (RFC3339 format)
-	// Queries will not run after this date
-	EndDate string `config:"end_date,omitempty" json:"end_date,omitempty"`
-
-	// Splay is the maximum random delay before query execution.
-	// This helps spread out query execution times to avoid thundering herd effects.
-	// Accepts duration strings: "30s", "5m", "2h", etc.
-	// Range: 0s to 12h (see MaxSplay). Default: 0s (disabled).
-	Splay string `config:"splay,omitempty" json:"splay,omitempty"`
-
-	// Timeout is the query execution timeout in seconds
-	// Default is 60 seconds if not specified
-	Timeout int `config:"timeout,omitempty" json:"timeout,omitempty"`
-}
-
-// GetSplay parses and returns the splay duration, defaulting to 0s if not set
-func (c *RRuleScheduleConfig) GetSplay() (time.Duration, error) {
-	if c.Splay == "" {
-		return DefaultSplay, nil
-	}
-
-	d, err := time.ParseDuration(c.Splay)
-	if err != nil {
-		return 0, fmt.Errorf("invalid splay duration '%s': %w", c.Splay, err)
-	}
-
-	if d < 0 {
-		return 0, fmt.Errorf("splay cannot be negative: %s", c.Splay)
-	}
-
-	if d > MaxSplay {
-		return 0, fmt.Errorf("splay cannot exceed %v, got: %s", MaxSplay, c.Splay)
-	}
-
-	return d, nil
-}
-
-// ParseStartDate parses the start date string into a time.Time pointer
-func (c *RRuleScheduleConfig) ParseStartDate() (*time.Time, error) {
-	if c.StartDate == "" {
-		return nil, fmt.Errorf("start_date is required for rrule schedules")
-	}
-	t, err := time.Parse(time.RFC3339, c.StartDate)
-	if err != nil {
-		return nil, err
-	}
-	t = t.UTC()
-	return &t, nil
-}
-
-// ParseEndDate parses the end date string into a time.Time pointer
-func (c *RRuleScheduleConfig) ParseEndDate() (*time.Time, error) {
-	if c.EndDate == "" {
-		return nil, nil
-	}
-	t, err := time.Parse(time.RFC3339, c.EndDate)
-	if err != nil {
-		return nil, err
-	}
-	t = t.UTC()
-	return &t, nil
-}
-
-// IsEnabled returns true if an RRULE is configured
-func (c *RRuleScheduleConfig) IsEnabled() bool {
-	return c != nil && c.RRule != ""
-}
-
 // ElasticOptions contains Beat-specific options that are not part of
 // osquery's native config schema.
 type ElasticOptions struct {
-	Install *InstallConfig `config:"install" json:"-"`
-	// Profiling groups all query profiling settings (global publish default and local storage).
-	Profiling *ProfilingConfig `config:"profiling" json:"-"`
-	// Extensions configures loading of customer-managed osquery extensions.
-	Extensions *ExtensionsConfig `config:"extensions" json:"-"`
+	Install             *InstallConfig             `config:"install" json:"-"`
+	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
 	// CheckTimeout optionally overrides the osqueryd --version startup check
 	// deadline. Go duration format ("15s", "30s", "1m"). Default: 15s.
 	CheckTimeout string `config:"check_timeout" json:"-"`
@@ -131,83 +40,6 @@ func ParseCheckTimeout(raw string) (time.Duration, error) {
 		return 0, fmt.Errorf("osquery.elastic_options.check_timeout must be greater than 0, got %s", raw)
 	}
 	return d, nil
-}
-
-// ExtensionsConfig configures loading of customer-managed (third-party or
-// customer-built) osquery extensions. These extensions are NOT developed,
-// validated, or supported by Elastic; customers are fully responsible for
-// their security, maintenance, and stability.
-//
-// Paths lists absolute entries on the endpoint, where each entry may be:
-//   - a directory: every extension binary found directly in it is autoloaded
-//     (files ending in ".ext" on Unix or ".exe" on Windows);
-//   - a file: that specific extension binary is autoloaded;
-//   - a glob pattern (containing *, ? or [ ]): each match is resolved as a
-//     directory or file per the rules above.
-//
-// Symlinks are rejected (entries, glob matches, and directory contents) so the
-// binary that is validated is the one osqueryd executes.
-//
-// Entries are resolved when osqueryd is (re)started, which happens when the
-// extension configuration (or other osquery options) change. Adding or removing
-// binaries in a configured directory does NOT trigger a reload by itself.
-//
-// osquerybeat never copies these binaries and never writes into the Elastic
-// Agent install tree; it only appends the resolved paths to the osquery
-// extensions autoload file that lives in the runtime data directory. osqueryd
-// enforces safe file permissions on autoloaded extensions (owned by the running
-// user, not writable by group or others); unsafe, non-executable, or otherwise
-// invalid binaries are skipped and logged rather than aborting startup.
-type ExtensionsConfig struct {
-	// Paths lists absolute directories, files, or glob patterns to resolve into
-	// extension binaries.
-	Paths []string `config:"paths" json:"-"`
-	// Timeout optionally overrides osquery's extensions_timeout (seconds), the
-	// time osqueryd waits for autoloaded extensions to register.
-	Timeout int `config:"timeout" json:"-"`
-	// Require lists extension names osqueryd must wait for at startup
-	// (osquery's extensions_require); queries do not run until the named
-	// extensions have registered or extensions_timeout elapses. Use this to
-	// avoid "no such table" races against slow-registering extensions.
-	Require []string `config:"require" json:"-"`
-}
-
-// PathsOrEmpty returns the configured extension paths, or an empty slice when no
-// extensions are configured.
-func (c *ExtensionsConfig) PathsOrEmpty() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Paths
-}
-
-// ProfilingConfig groups all query profiling settings. When ProfilingAll is enabled (the default),
-// profiles are collected and published to the osquery_manager.query_profile data stream for all
-// queries that do not set their own profiling flag. It still requires the query_profile input stream
-// to be present for events to be published. Storage controls local retention of live profiles
-// for diagnostics, independent of publishing.
-type ProfilingConfig struct {
-	ProfilingAll *bool                      `config:"profiling_all" json:"-"`
-	Storage      *QueryProfileStorageConfig `config:"storage" json:"-"`
-}
-
-// ProfilingAllOrDefault returns the global profiling default, which is enabled unless
-// explicitly set to false.
-func (c ProfilingConfig) ProfilingAllOrDefault() bool {
-	if c.ProfilingAll == nil {
-		return true
-	}
-	return *c.ProfilingAll
-}
-
-// ResolveProfiling returns the effective profiling decision for a query: a per-query
-// override wins when set, otherwise the global default applies.
-func ResolveProfiling(globalDefault bool, override *bool) bool {
-	if override != nil {
-		return *override
-	}
-	return globalDefault
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 }
 
 // QueryProfileStorageConfig controls local storage of live query profiles.

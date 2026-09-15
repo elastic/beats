@@ -314,9 +314,6 @@ func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
 	return *inputs[0].Osquery.ElasticOptions.Install
 }
 
-<<<<<<< HEAD
-// GetQueryProfileStorageConfig returns live query profile storage settings from the first input if available.
-=======
 // GetOsqueryCheckTimeout returns the osqueryd --version startup check deadline
 // from elastic_options.check_timeout on the first input. Unset values use
 // DefaultCheckTimeout.
@@ -327,32 +324,7 @@ func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
 	return ParseCheckTimeout(inputs[0].Osquery.ElasticOptions.CheckTimeout)
 }
 
-// GetOsqueryExtensions returns customer-managed osquery extension settings
-// (elastic_options.extensions) from the first input if available.
-func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
-	if len(inputs) == 0 {
-		return ExtensionsConfig{}
-	}
-	o := inputs[0].Osquery
-	if o == nil || o.ElasticOptions == nil || o.ElasticOptions.Extensions == nil {
-		return ExtensionsConfig{}
-	}
-	return *o.ElasticOptions.Extensions
-}
-
-// GetProfilingEnabled returns the global query profiling default from the first input.
-// This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
-// Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
-func GetProfilingEnabled(inputs []InputConfig) bool {
-	if len(inputs) == 0 || inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.Profiling == nil {
-		return ProfilingConfig{}.ProfilingAllOrDefault()
-	}
-	return inputs[0].Osquery.ElasticOptions.Profiling.ProfilingAllOrDefault()
-}
-
-// GetQueryProfileStorageConfig returns live query profile storage settings
-// (elastic_options.profiling.storage) from the first input if available.
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
+// GetQueryProfileStorageConfig returns live query profile storage settings from the first input if available.
 func GetQueryProfileStorageConfig(inputs []InputConfig) QueryProfileStorageConfig {
 	if len(inputs) == 0 {
 		return QueryProfileStorageConfig{}

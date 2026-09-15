@@ -91,20 +91,13 @@ type osquerybeat struct {
 	cancel context.CancelFunc
 	mx     sync.Mutex
 
-<<<<<<< HEAD
-	diagMx        sync.RWMutex
-	diagQueryExec queryExecutor
-=======
 	// clockSkewWarnLogged latches the pre-start clamp warning to once per
 	// schedule name. handleQueryResult runs per result document, so without
 	// this a persistently skewed agent would warn on every snapshot/diff hit.
 	clockSkewWarnLogged map[string]struct{}
 
-	diagMx          sync.RWMutex
-	diagQueryExec   queryExecutor
-	diagExtensions  config.ExtensionsConfig
-	diagOsqueryData string
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
+	diagMx        sync.RWMutex
+	diagQueryExec queryExecutor
 
 	// parent process watcher
 	watcher *Watcher
@@ -254,11 +247,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
-<<<<<<< HEAD
-=======
-		osqd.WithDataPath(bt.osqueryDataPath),
 		osqd.WithCheckTimeout(bt.checkTimeout),
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 	}
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
@@ -311,19 +300,12 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
-<<<<<<< HEAD
 	// Ensure that all the hooks and actions are ready before starting the Manager
 	// to receive configuration.
 	bt.registerDiagnosticHooks(b)
-	if err := b.Manager.Start(); err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
-		return err
-	}
-	defer b.Manager.Stop()
-=======
 	b.Manager.PostInit()
 	managerEarlyStop = nil
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
+	defer b.Manager.Stop()
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
@@ -645,11 +627,6 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-<<<<<<< HEAD
-	runTime := time.Unix(res.UnixTime, 0)
-	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
-	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
-=======
 	runTime := time.Unix(res.UnixTime, 0).UTC()
 	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
 	if clockSkewClamped && bt.shouldLogClockSkewWarn(res.Name) {
@@ -660,8 +637,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			plannedScheduleTime.Format(time.RFC3339Nano),
 		)
 	}
-	publishResolved := func(resultType, action string, hits []map[string]any) {
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
+	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
 		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, meta, hits, qi.ECSMapping, nil)

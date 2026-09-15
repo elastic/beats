@@ -99,12 +99,6 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
-<<<<<<< HEAD
-func (m *testManager) PreInit() error                      { return nil }
-func (m *testManager) PostInit()                           {}
-func (m *testManager) Stop()                               { m.stopped = true }
-func (m *testManager) WaitForStop(_ time.Duration) bool    { return true }
-=======
 func (m *testManager) PreInit() error {
 	m.mx.Lock()
 	defer m.mx.Unlock()
@@ -121,7 +115,7 @@ func (m *testManager) Stop() {
 	defer m.mx.Unlock()
 	m.stopped = true
 }
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
+func (m *testManager) WaitForStop(_ time.Duration) bool    { return true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
@@ -141,10 +135,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	mgr := &testManager{}
 	b := &beat.Beat{
-<<<<<<< HEAD
-=======
 		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -262,10 +253,7 @@ func TestOsquerybeatEarlyShutdownDuringCheck(t *testing.T) {
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-<<<<<<< HEAD
-=======
 		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -385,27 +373,6 @@ func newTestBeatPaths(t *testing.T) *paths.Path {
 // TestOsquerybeatStatusReporting_CheckFailure tests status reporting when osqueryd
 // fails or times out during its startup check.
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
-<<<<<<< HEAD
-	mgr := &testManager{}
-	b := &beat.Beat{
-		Manager:    mgr,
-		Registry:   reload.NewRegistry(),
-		Monitoring: beatmonitoring.NewMonitoring(),
-	}
-	b.Info.Paths = newTestBeatPaths(t)
-
-	cfg := agentconfig.NewConfig()
-	beater, err := New(b, cfg)
-	require.NoError(t, err)
-
-	// Inject mock osqueryd that fails the check
-	ob, ok := beater.(*osquerybeat)
-	require.True(t, ok)
-	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
-		return &mockOsqueryd{
-			checkErr: assert.AnError, // Check fails
-		}, nil
-=======
 	tests := []struct {
 		name     string
 		checkErr error
@@ -418,7 +385,6 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 			name:     "timeout",
 			checkErr: errors.New("osqueryd check timed out after 15s: context deadline exceeded"),
 		},
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 	}
 
 	for _, tc := range tests {
@@ -450,10 +416,7 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-<<<<<<< HEAD
-=======
 		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -493,10 +456,7 @@ func TestOsquerybeatStatusReporting_ManagerPreInitFailure(t *testing.T) {
 		preInitErr: assert.AnError,
 	}
 	b := &beat.Beat{
-<<<<<<< HEAD
-=======
 		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
->>>>>>> 10b9af2 ([osquerybeat] Bound configurable startup check and harden clock-skew handling (#52992))
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),

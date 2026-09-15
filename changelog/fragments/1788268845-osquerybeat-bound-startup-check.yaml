@@ -5,4 +5,3 @@ description: >
   osquerybeat now bounds the osqueryd --version startup check (default 15s) so a hung
   validation cannot leave the unit stuck in STARTING. The deadline is configurable via
   `osquery.elastic_options.check_timeout` (Go duration, for example `30s`).
-
