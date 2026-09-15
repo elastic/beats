@@ -84,8 +84,8 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]a
 		require.Equal(t, []any{}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "discovery.zen.ping.unicast.hosts"))
 		require.Equal(t, "5s", auto_ops_testing.GetObjectValue(event.MetricSetFields, "discovery.zen.ping.unicast.hosts_resolve_timeout"))
 
-		// this cluster has no archived settings, so no empty key is added to the event
-		require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "archived"))
+		// this cluster has no archived settings, so the key is absent rather than empty
+		require.NotContains(t, event.MetricSetFields, "archived")
 	} else if data.Version == "8.15.3" {
 		require.Equal(t, ".ent-search-*-logs-*,-.ent-search-*,+*", auto_ops_testing.GetObjectValue(event.MetricSetFields, "action.auto_create_index"))
 
