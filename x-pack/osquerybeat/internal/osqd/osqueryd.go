@@ -18,6 +18,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"go.uber.org/zap/zapcore"
 
@@ -37,6 +38,7 @@ const (
 	defaultCertsDir              = "certs"
 	defaultLensesDir             = "lenses"
 	defaultConfigRefreshInterval = 30 // interval osqueryd will poll for configuration changed; scheduled queries configuration for now
+	defaultCheckTimeout          = 15 * time.Second
 )
 
 const (
@@ -77,6 +79,7 @@ type OSQueryD struct {
 
 	extensionsTimeout     int
 	configRefreshInterval int
+	checkTimeout          time.Duration
 
 	// baseExtensionsTimeout is the effective extensions_timeout after construction
 	// options are applied; SetExtensions reverts to it when the configuration no
@@ -99,6 +102,16 @@ type Option func(*OSQueryD)
 func WithExtensionsTimeout(to int) Option {
 	return func(q *OSQueryD) {
 		q.extensionsTimeout = to
+	}
+}
+
+// WithCheckTimeout sets the osqueryd --version startup check deadline.
+// Values <= 0 leave the default (15s) in place.
+func WithCheckTimeout(to time.Duration) Option {
+	return func(q *OSQueryD) {
+		if to > 0 {
+			q.checkTimeout = to
+		}
 	}
 }
 
@@ -161,6 +174,7 @@ func newOsqueryD(socketPath string, opts ...Option) (*OSQueryD, error) {
 		socketPath:            socketPath,
 		extensionsTimeout:     defaultExtensionsTimeout,
 		configRefreshInterval: defaultConfigRefreshInterval,
+		checkTimeout:          defaultCheckTimeout,
 	}
 
 	for _, opt := range opts {
@@ -250,27 +264,37 @@ func AutoloadPath(dataPath string) string {
 	return filepath.Join(dataPath, osqueryAutoload)
 }
 
-// Check checks if the binary exists and executable
+// Check checks if the binary exists and is executable.
 func (q *OSQueryD) Check(ctx context.Context) error {
 	err := q.prepareBinPath()
 	if err != nil {
 		return fmt.Errorf("failed to prepare bin path, %w", err)
 	}
 
-	//nolint:gosec // works as expected
-	cmd := exec.CommandContext(
-		ctx,
-		osquerydPath(q.binPath),
-		"--S",
-		"--version",
-	)
+	return runCheckWithTimeout(ctx, q.checkTimeout, func(checkCtx context.Context) error {
+		//nolint:gosec // The executable path is selected from the validated runtime.
+		cmd := exec.CommandContext(
+			checkCtx,
+			osquerydPath(q.binPath),
+			"--S",
+			"--version",
+		)
+		return cmd.Run()
+	})
+}
 
-	err = cmd.Start()
-	if err != nil {
-		return err
+func runCheckWithTimeout(ctx context.Context, timeout time.Duration, check func(context.Context) error) error {
+	checkCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	err := check(checkCtx)
+	if parentErr := ctx.Err(); parentErr != nil {
+		return parentErr
 	}
-
-	return cmd.Wait()
+	if errors.Is(checkCtx.Err(), context.DeadlineExceeded) {
+		return fmt.Errorf("osqueryd check timed out after %s: %w", timeout, checkCtx.Err())
+	}
+	return err
 }
 
 // Run executes osqueryd binary as a child process
