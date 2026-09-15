@@ -65,7 +65,7 @@ require (
 	github.com/elastic/go-seccomp-bpf v1.5.0
 	github.com/elastic/go-structform v0.0.12
 	github.com/elastic/go-sysinfo v1.15.5
-	github.com/elastic/go-ucfg v0.9.1
+	github.com/elastic/go-ucfg v0.9.2
 	github.com/elastic/gosigar v0.14.4
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fearful-symmetry/gorapl v0.0.4
@@ -171,10 +171,9 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.10.0
 	github.com/elastic/elastic-agent-libs v0.46.3
-	github.com/elastic/elastic-agent-system-metrics v0.14.5
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
-	github.com/elastic/go-quark v0.6.0
+	github.com/elastic/go-quark v0.8.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/mito v1.27.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
@@ -210,7 +209,7 @@ require (
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.12
 	go.elastic.co/apm/module/apmhttp/v2 v2.7.12
 	go.elastic.co/apm/v2 v2.7.12
-	go.mongodb.org/mongo-driver v1.17.9
+	go.mongodb.org/mongo-driver v1.17.10
 	go.opentelemetry.io/collector/component v1.65.1-0.20260824174011-67fef8cb7049
 	go.opentelemetry.io/collector/component/componentstatus v0.159.1-0.20260824174011-67fef8cb7049
 	go.opentelemetry.io/collector/config/configtls v1.65.1-0.20260824174011-67fef8cb7049
@@ -366,7 +365,7 @@ require (
 	github.com/ebitengine/purego v0.10.2 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.8.0 // indirect
 	github.com/elastic/go-docappender/v2 v2.14.1 // indirect
-	github.com/elastic/go-windows v1.0.2 // indirect
+	github.com/elastic/go-windows v1.0.2
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
