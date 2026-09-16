@@ -45,10 +45,11 @@ type elasticsearchClient struct {
 	requestMu   sync.Mutex
 	client      *eslegclient.Connection
 	cancel      context.CancelFunc
+	starting    bool
 	closed      bool
 }
 
-func (e *elasticsearchClient) Start(_ context.Context, host component.Host) error {
+func (e *elasticsearchClient) Start(ctx context.Context, host component.Host) error {
 	if e == nil {
 		return errors.New("elasticsearchclient extension is nil")
 	}
@@ -65,19 +66,51 @@ func (e *elasticsearchClient) Start(_ context.Context, host component.Host) erro
 	}
 
 	// Connection stores this context on every subsequent HTTP request, so use
-	// an extension-owned context that is cancelled in Shutdown.
+	// an extension-owned context that is cancelled in Shutdown. While startup
+	// is in progress, also cancel it if the Collector cancels Start's context.
 	clientCtx, cancel := context.WithCancel(context.Background())
+	stopStartCancellation := context.AfterFunc(ctx, cancel)
+
+	e.lifecycleMu.Lock()
+	if e.closed {
+		e.lifecycleMu.Unlock()
+		stopStartCancellation()
+		cancel()
+		return ErrShutdown
+	}
+	if e.starting || e.client != nil {
+		e.lifecycleMu.Unlock()
+		stopStartCancellation()
+		cancel()
+		return errors.New("elasticsearchclient extension is already started")
+	}
+	e.starting = true
+	// Publish cancellation before connecting so Shutdown can interrupt the
+	// initial Elasticsearch ping.
+	e.cancel = cancel
+	e.lifecycleMu.Unlock()
+
 	client, err := newConnectedClient(clientCtx, e.cfg, e.info, e.logger)
+	stopStartCancellation()
 	if err != nil {
 		cancel()
-		err = fmt.Errorf("failed connecting elasticsearch client: %w", err)
-		componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
-		return err
+		if startErr := ctx.Err(); startErr != nil {
+			return e.startFailed(host, startErr)
+		}
+		return e.startFailed(host, err)
+	}
+	// The initial ping may succeed just before Start is canceled. Do not publish
+	// a client whose startup lifecycle was canceled after the ping completed.
+	if err := ctx.Err(); err != nil {
+		cancel()
+		_ = client.Close()
+		return e.startFailed(host, err)
 	}
 
 	e.lifecycleMu.Lock()
-	defer e.lifecycleMu.Unlock()
 	if e.closed {
+		e.starting = false
+		e.lifecycleMu.Unlock()
 		cancel()
 		if closeErr := client.Close(); closeErr != nil {
 			return fmt.Errorf("elasticsearchclient extension is shut down: failed closing unused client: %w", closeErr)
@@ -85,10 +118,28 @@ func (e *elasticsearchClient) Start(_ context.Context, host component.Host) erro
 		return ErrShutdown
 	}
 
+	e.starting = false
 	e.client = client
-	e.cancel = cancel
+	e.lifecycleMu.Unlock()
 	componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
 	return nil
+}
+
+// startFailed clears the cancellation function published for a failed Start.
+func (e *elasticsearchClient) startFailed(host component.Host, connectErr error) error {
+	e.lifecycleMu.Lock()
+	closed := e.closed
+	e.starting = false
+	e.cancel = nil
+	e.lifecycleMu.Unlock()
+
+	if closed {
+		return ErrShutdown
+	}
+
+	err := fmt.Errorf("failed connecting elasticsearch client: %w", connectErr)
+	componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
+	return err
 }
 
 // newConnectedClient adapts the extension's explicit endpoint and transport
