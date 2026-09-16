@@ -562,11 +562,7 @@ require (
 )
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/storage v1.66.0
-=======
 	cloud.google.com/go/storage v1.67.1
->>>>>>> fda1180 (build(deps): bump the gcp-sdks group across 1 directory with 2 updates (#53187))
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
