@@ -23,6 +23,7 @@ import (
 	"go.opentelemetry.io/collector/extension/extensiontest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -62,8 +63,9 @@ func newTestExtension(esCfg map[string]any, logger *logp.Logger) *elasticsearchC
 		}
 	}
 	return &elasticsearchClient{
-		cfg:    config,
-		logger: logger,
+		cfg:            config,
+		logger:         logger,
+		connectBackoff: backoff.NewExpBackoff(0, 0),
 		info: beat.Info{
 			Beat:   componentType,
 			Logger: logger,
@@ -339,7 +341,6 @@ func TestExtension_OfflineStartReconnects(t *testing.T) {
 	srv.Listener = listener
 	srv.Start()
 	t.Cleanup(srv.Close)
-	time.Sleep(reconnectDelay)
 
 	status, _, err := ext.Request(http.MethodGet, "/_cluster/health", "", nil, nil)
 	require.NoError(t, err, "a later request must reconnect after Elasticsearch recovers")
