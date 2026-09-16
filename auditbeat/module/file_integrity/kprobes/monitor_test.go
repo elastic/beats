@@ -589,7 +589,7 @@ func (p *monitorTestSuite) TestNew() {
 	kps, err := tfs.ListKProbes()
 	p.Require().NoError(err)
 	for _, kp := range kps {
-		p.Assert().NotEqual("auditbeat_fim", kp.Group,
+		p.NotEqual("auditbeat_fim", kp.Group,
 			"kprobe %s/%s was not removed on Close", kp.Group, kp.Name)
 	}
 }
