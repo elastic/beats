@@ -21,6 +21,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -34,7 +35,10 @@ var (
 	ErrShutdown = errors.New("elasticsearchclient extension is shut down")
 )
 
-const reconnectDelay = time.Second
+const (
+	reconnectBackoffInitial = time.Second
+	reconnectBackoffMax     = time.Minute
+)
 
 // elasticsearchClient owns non-thread-safe Elasticsearch connections.
 // requestMu serializes connection and request operations, while lifecycleMu
@@ -51,8 +55,8 @@ type elasticsearchClient struct {
 	client           *eslegclient.Connection
 	ctx              context.Context
 	cancel           context.CancelFunc
-	nextConnect      time.Time
-	connectErr       error
+	connectBackoff   backoff.Backoff
+	reconnectPending bool
 	started          bool
 	closed           bool
 }
@@ -103,6 +107,10 @@ func (e *elasticsearchClient) Start(_ context.Context, host component.Host) erro
 	e.candidateClients = candidateClients
 	e.ctx = clientCtx
 	e.cancel = cancel
+	if e.connectBackoff == nil {
+		e.connectBackoff = backoff.NewExpBackoff(reconnectBackoffInitial, reconnectBackoffMax)
+	}
+	e.reconnectPending = false
 	e.lifecycleMu.Unlock()
 
 	componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
@@ -167,8 +175,7 @@ func (e *elasticsearchClient) Shutdown(_ context.Context) error {
 	e.candidateClients = nil
 	e.client = nil
 	e.ctx = nil
-	e.connectErr = nil
-	e.nextConnect = time.Time{}
+	e.reconnectPending = false
 	if cancel != nil {
 		cancel()
 	}
@@ -240,7 +247,7 @@ func (e *elasticsearchClient) Request(
 
 	status, resp, err := client.Request(method, path, pipeline, params, body)
 	if status == 0 && err != nil {
-		e.markDisconnected(client, err)
+		e.markDisconnected(client)
 	}
 	if (status == 0 && err != nil) || status >= 500 {
 		requestErr := err
@@ -266,8 +273,16 @@ func (e *elasticsearchClient) Request(
 // requestMu is held, so Connect and the eventual Request never race with each
 // other or with another reconnect attempt.
 func (e *elasticsearchClient) connect(candidateClients []*eslegclient.Connection, ctx context.Context) (*eslegclient.Connection, error) {
-	if err := e.cachedConnectError(); err != nil {
-		return nil, err
+	e.lifecycleMu.Lock()
+	reconnectPending := e.reconnectPending
+	connectBackoff := e.connectBackoff
+	e.lifecycleMu.Unlock()
+
+	// The first lazy connection must be attempted immediately. After any
+	// connection or transport failure, wait before the next attempt so callers
+	// do not repeatedly dial unavailable hosts.
+	if reconnectPending && !connectBackoff.Wait(ctx) {
+		return nil, ErrShutdown
 	}
 
 	errs := make([]string, 0, len(candidateClients))
@@ -286,41 +301,26 @@ func (e *elasticsearchClient) connect(candidateClients []*eslegclient.Connection
 			return nil, ErrShutdown
 		}
 		e.client = client
-		e.connectErr = nil
-		e.nextConnect = time.Time{}
+		e.reconnectPending = false
+		connectBackoff.Reset()
 		e.lifecycleMu.Unlock()
 		return client, nil
 	}
 	err := fmt.Errorf("couldn't connect to any configured Elasticsearch hosts: %s", strings.Join(errs, "; "))
-	e.recordConnectFailure(err)
+	e.lifecycleMu.Lock()
+	if !e.closed {
+		e.reconnectPending = true
+	}
+	e.lifecycleMu.Unlock()
 	return nil, err
 }
 
-func (e *elasticsearchClient) markDisconnected(client *eslegclient.Connection, err error) {
+func (e *elasticsearchClient) markDisconnected(client *eslegclient.Connection) {
 	e.lifecycleMu.Lock()
 	defer e.lifecycleMu.Unlock()
 	if !e.closed && e.client == client {
 		e.client = nil
-		e.connectErr = err
-		e.nextConnect = time.Now().Add(reconnectDelay)
-	}
-}
-
-func (e *elasticsearchClient) cachedConnectError() error {
-	e.lifecycleMu.Lock()
-	defer e.lifecycleMu.Unlock()
-	if e.connectErr != nil && time.Now().Before(e.nextConnect) {
-		return e.connectErr
-	}
-	return nil
-}
-
-func (e *elasticsearchClient) recordConnectFailure(err error) {
-	e.lifecycleMu.Lock()
-	defer e.lifecycleMu.Unlock()
-	if !e.closed {
-		e.connectErr = err
-		e.nextConnect = time.Now().Add(reconnectDelay)
+		e.reconnectPending = true
 	}
 }
 
