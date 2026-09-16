@@ -1,6 +1,8 @@
 - name: frozen_cache_stats
   type: group
   release: beta
+  version:
+    beta: 9.5.0
   description: >
     Searchable snapshot shared cache statistics per node.
   fields:

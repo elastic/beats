@@ -941,7 +941,7 @@ component template information from the cluster
 ## frozen_cache_stats [_frozen_cache_stats]
 
 ```{applies_to}
-stack: beta
+stack: beta 9.5.0
 ```
 
 Searchable snapshot shared cache statistics per node.
