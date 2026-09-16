@@ -85,7 +85,7 @@ Module for parsing Kibana logs.
 
 
 **`kibana.diff.ops`**
-:   JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation may include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those fields are stored in `_source` but not mapped (`dynamic: false` on this object) so mixed types cannot cause mapping conflicts. Mapping them as `object` with `enabled: false` is not sufficient: Elasticsearch still rejects non-object values such as strings.
+:   JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation may include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those two fields are intentionally not declared: `dynamic: false` on this object stores them in `_source` without adding a mapping, so the first event to arrive can never fix their type and later events with a different type are never rejected.
 
     type: object
 
