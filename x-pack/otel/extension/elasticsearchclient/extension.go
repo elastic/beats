@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // Package elasticsearchclient is an OpenTelemetry Collector extension that owns
-// the lifecycle of a single eslegclient.Connection per configured instance.
+// the lifecycle of a single Elasticsearch connection per configured instance.
 package elasticsearchclient
 
 import (
@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"go.opentelemetry.io/collector/component"
@@ -18,8 +19,8 @@ import (
 	"go.opentelemetry.io/collector/extension"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -57,9 +58,8 @@ func (e *elasticsearchClient) Start(_ context.Context, host component.Host) erro
 		return err
 	}
 
-	c, err := cfg.NewConfigFrom(e.cfg.ElasticsearchConfig)
-	if err != nil {
-		err = fmt.Errorf("failed creating elasticsearch config: %w", err)
+	if err := e.cfg.Validate(); err != nil {
+		err = fmt.Errorf("invalid elasticsearchclient configuration: %w", err)
 		componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
 		return err
 	}
@@ -67,7 +67,7 @@ func (e *elasticsearchClient) Start(_ context.Context, host component.Host) erro
 	// Connection stores this context on every subsequent HTTP request, so use
 	// an extension-owned context that is cancelled in Shutdown.
 	clientCtx, cancel := context.WithCancel(context.Background())
-	client, err := eslegclient.NewConnectedClient(clientCtx, c, e.info)
+	client, err := newConnectedClient(clientCtx, e.cfg, e.info, e.logger)
 	if err != nil {
 		cancel()
 		err = fmt.Errorf("failed connecting elasticsearch client: %w", err)
@@ -89,6 +89,50 @@ func (e *elasticsearchClient) Start(_ context.Context, host component.Host) erro
 	e.cancel = cancel
 	componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
 	return nil
+}
+
+// newConnectedClient adapts the extension's explicit endpoint and transport
+// contract to the eslegclient settings.
+func newConnectedClient(ctx context.Context, cfg *Config, info beat.Info, logger *logp.Logger) (*eslegclient.Connection, error) {
+	parameters := cfg.Parameters
+	if len(parameters) == 0 {
+		parameters = nil
+	}
+
+	errs := make([]string, 0, len(cfg.Hosts))
+	for _, host := range cfg.Hosts {
+		esURL, err := common.MakeURL(cfg.Protocol, cfg.Path, host, 9200)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("invalid host %q: %v", host, err))
+			continue
+		}
+
+		client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+			URL:             esURL,
+			Beatname:        info.Beat,
+			UserAgent:       info.UserAgent,
+			Username:        cfg.Username,
+			Password:        cfg.Password,
+			APIKey:          cfg.APIKey,
+			Headers:         cfg.Headers,
+			Parameters:      parameters,
+			Transport:       cfg.Transport,
+			IdleConnTimeout: cfg.Transport.IdleConnTimeout,
+		}, logger)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("creating client for %s: %v", esURL, err))
+			continue
+		}
+
+		if err := client.Connect(ctx); err != nil {
+			_ = client.Close()
+			errs = append(errs, fmt.Sprintf("connecting to %s: %v", esURL, err))
+			continue
+		}
+		return client, nil
+	}
+
+	return nil, fmt.Errorf("couldn't connect to any configured Elasticsearch hosts: %s", strings.Join(errs, "; "))
 }
 
 func (e *elasticsearchClient) Shutdown(_ context.Context) error {

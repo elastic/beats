@@ -48,8 +48,20 @@ func (h *reportingHost) lastStatus() componentstatus.Status {
 }
 
 func newTestExtension(esCfg map[string]any, logger *logp.Logger) *elasticsearchClient {
+	config := &Config{}
+	config.Transport.Timeout = defaultRequestTimeout
+	config.Transport.IdleConnTimeout = defaultIdleConnTimeout
+	if esCfg != nil {
+		config.Hosts, _ = esCfg["hosts"].([]string)
+		config.Username, _ = esCfg["username"].(string)
+		config.Password, _ = esCfg["password"].(string)
+		config.APIKey, _ = esCfg["api_key"].(string)
+		if timeout, ok := esCfg["timeout"].(string); ok {
+			config.Transport.Timeout, _ = time.ParseDuration(timeout)
+		}
+	}
 	return &elasticsearchClient{
-		cfg:    &Config{ElasticsearchConfig: esCfg},
+		cfg:    config,
 		logger: logger,
 		info: beat.Info{
 			Beat:   componentType,
@@ -93,7 +105,8 @@ func TestFactoryType(t *testing.T) {
 	assert.Equal(t, "elasticsearchclient", factory.Type().String(), "OTel component type must be elasticsearchclient")
 	cfg, ok := factory.CreateDefaultConfig().(*Config)
 	require.True(t, ok, "default config must be *Config")
-	assert.Nil(t, cfg.ElasticsearchConfig, "default remain-config must be empty")
+	assert.Equal(t, defaultRequestTimeout, cfg.Transport.Timeout, "default request timeout must be configured")
+	assert.Equal(t, defaultIdleConnTimeout, cfg.Transport.IdleConnTimeout, "default idle timeout must be configured")
 }
 
 func TestFactoryCreate_InvalidConfigType(t *testing.T) {
@@ -311,12 +324,12 @@ func TestExtension_StartFailed_MissingHosts(t *testing.T) {
 
 	err := ext.Start(t.Context(), host)
 	require.Error(t, err, "Start without hosts must fail")
-	assert.Contains(t, err.Error(), "failed connecting elasticsearch client", "startup failure must wrap the client error")
+	assert.Contains(t, err.Error(), "invalid elasticsearchclient configuration", "startup failure must identify invalid configuration")
 	assert.Equal(t, componentstatus.StatusPermanentError, host.lastStatus(), "startup failure must report a permanent error")
 }
 
 func TestFactoryCreate(t *testing.T) {
-	config := &Config{ElasticsearchConfig: map[string]any{"hosts": []string{"https://example.com"}}}
+	config := &Config{Hosts: []string{"https://example.com"}}
 	ext, err := createExtension(t.Context(), extensiontest.NewNopSettings(Type), config)
 	require.NoError(t, err, "factory must create the extension")
 
