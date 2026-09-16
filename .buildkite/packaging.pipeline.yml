@@ -392,13 +392,15 @@ steps:
           - start-gate-snapshot
           - packaging-snapshot
           - dashboards-snapshot
-        trigger: "beats-dra-prep-pipeline"
-        build:
-          commit: "${BUILDKITE_COMMIT}"
-          branch: "${BUILDKITE_BRANCH}"
-          env:
-            WORKFLOW: "snapshot"
-            DRY_RUN: "${DRY_RUN}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          WORKFLOW: "snapshot"
+        command: |
+          source .buildkite/scripts/packaging/resolve-dra-version.sh
+          buildkite-agent pipeline upload .buildkite/dra-prep-pipeline.yml
 
       - label: ":pipeline: DRA Prep (staging)"
         # TODO remove OR clause below (see earlier comment)
@@ -408,13 +410,15 @@ steps:
           - start-gate-staging
           - packaging-staging
           - dashboards-staging
-        trigger: "beats-dra-prep-pipeline"
-        build:
-          commit: "${BUILDKITE_COMMIT}"
-          branch: "${BUILDKITE_BRANCH}"
-          env:
-            WORKFLOW: "staging"
-            DRY_RUN: "${DRY_RUN}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          WORKFLOW: "staging"
+        command: |
+          source .buildkite/scripts/packaging/resolve-dra-version.sh
+          buildkite-agent pipeline upload .buildkite/dra-prep-pipeline.yml
 
   - wait
 
