@@ -17,11 +17,13 @@ type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
 }
 
-func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
+func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error {
 	hb.Logger.Info("starting heartbeat receiver")
+
 	if err := hb.BeatReceiver.Start(host); err != nil {
-		return fmt.Errorf("error starting heartbeat receiverL %w", err)
+		return fmt.Errorf("starting heartbeat receiver: %w", err)
 	}
+
 	return nil
 }
 
@@ -30,5 +32,6 @@ func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
 	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
+
 	return nil
 }
