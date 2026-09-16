@@ -1,0 +1,14 @@
+kind: bug-fix
+
+summary: Fix duplicated and grammatically incorrect wording in user-facing error messages
+
+description: >
+  Three user-visible error messages contained wording defects that made log
+  output confusing: the GCS input repeated "job with job id", the Winlogbeat
+  event log metadata store contained the duplicated word "for for event ID",
+  and the Filestream input used the wrong article in "a os.File". The messages
+  now read "job with ID", "for event ID", and "an os.File" respectively.
+
+component: filebeat, winlogbeat
+
+issue: https://github.com/elastic/beats/issues/52807
