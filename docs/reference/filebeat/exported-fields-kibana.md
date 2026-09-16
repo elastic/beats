@@ -84,9 +84,11 @@ Module for parsing Kibana logs.
     example: json_patch_extended
 
 
-## diff.ops [_diff.ops]
+**`kibana.diff.ops`**
+:   JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation may include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those fields are stored in `_source` but not mapped (`dynamic: false` on this object) so mixed types cannot cause mapping conflicts. Mapping them as `object` with `enabled: false` is not sufficient: Elasticsearch still rejects non-object values such as strings.
 
-JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation may include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those fields are stored in `_source` but not mapped (`dynamic: false` on this object) so mixed types cannot cause mapping conflicts. Mapping them as `object` with `enabled: false` is not sufficient: Elasticsearch still rejects non-object values such as strings.
+    type: object
+
 
 **`kibana.diff.ops.op`**
 :   The operation performed on the attribute.
@@ -102,6 +104,12 @@ JSON Patch operations describing the saved object attributes changed by this eve
     type: keyword
 
     example: /title
+
+
+**`kibana.diff.noOps`**
+:   Attributes present in the saved object but not changed by this event.
+
+    type: object
 
 
 **`kibana.diff.noOps.path`**
