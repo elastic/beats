@@ -44,7 +44,7 @@
           example: "json_patch_extended"
           type: keyword
         - name: diff.ops
-          type: group
+          type: object
           dynamic: false
           description: >
             JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana.
@@ -60,10 +60,14 @@
               description: "RFC 6901 JSON Pointer to the changed attribute."
               example: "/title"
               type: keyword
-        - name: diff.noOps.path
-          description: "RFC 6901 JSON Pointer to an attribute that was not changed by this event."
-          example: "/description"
-          type: keyword
+        - name: diff.noOps
+          type: object
+          description: "Attributes present in the saved object but not changed by this event."
+          fields:
+            - name: path
+              description: "RFC 6901 JSON Pointer to an attribute that was not changed by this event."
+              example: "/description"
+              type: keyword
         - name: authentication_provider
           description: "The authentication provider associated with a login event."
           example: "basic1"
