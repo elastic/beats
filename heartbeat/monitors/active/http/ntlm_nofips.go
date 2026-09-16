@@ -17,31 +17,18 @@
 
 //go:build !requirefips
 
-package kerberos
+package http
 
 import (
 	"net/http"
-	"os"
-	"testing"
 
-	"github.com/stretchr/testify/require"
+	ntlmssp "github.com/Azure/go-ntlmssp"
 )
 
-func TestNewClient(t *testing.T) {
-	cfg, err := os.CreateTemp(t.TempDir(), "config")
-	require.NoError(t, err)
-	c, err := NewClient(&Config{
-		AuthType:   authPassword,
-		ConfigPath: cfg.Name(),
-	}, http.DefaultClient)
-	require.NoError(t, err)
-	require.NotNil(t, c)
-
-	c, err = NewClient(&Config{
-		AuthType:   authPassword,
-		ConfigPath: cfg.Name(),
-		EnableFAST: true,
-	}, http.DefaultClient)
-	require.NoError(t, err)
-	require.NotNil(t, c)
+// wrapNTLMRoundTripper wraps the transport with the NTLM negotiator, which
+// converts the request's Basic auth credentials into an NTLM/Negotiate
+// handshake. NTLM relies on MD4/RC4, so it is unavailable in FIPS builds (see
+// ntlm_fips.go).
+func wrapNTLMRoundTripper(rt http.RoundTripper) (http.RoundTripper, error) {
+	return ntlmssp.Negotiator{RoundTripper: rt}, nil
 }
