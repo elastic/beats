@@ -9,20 +9,19 @@
 ##  (e.g. "-SNAPSHOT-linux-amd64.tar.gz", "-SNAPSHOT.csv", "-SNAPSHOT.zip");
 ##  staging files do not.
 ##
-##  Runs in dra-prep-pipeline.yml, a separate pipeline from the one that
-##  packaged the artifacts, so the download is scoped to the parent build
-##  via BUILDKITE_TRIGGERED_FROM_BUILD_ID (auto-propagated by Buildkite to
-##  any build started by a trigger step).
+##  Runs in dra-prep-pipeline.yml, dynamically uploaded into the same build
+##  that packaged the artifacts (see packaging.pipeline.yml's DRA publish
+##  group), so the artifacts are already present in this build - no
+##  cross-build download needed.
 ##
 
 set -euo pipefail
 
 WORKFLOW="${DRA_WORKFLOW:?DRA_WORKFLOW is required}"
-PARENT_BUILD_ID="${BUILDKITE_TRIGGERED_FROM_BUILD_ID:?BUILDKITE_TRIGGERED_FROM_BUILD_ID is required}"
 VERSION_QUALIFIER="${VERSION_QUALIFIER:-}"
 
-echo "--- Restoring artifacts from parent build ${PARENT_BUILD_ID}"
-buildkite-agent artifact download "build/**/*" . --build "${PARENT_BUILD_ID}"
+echo "--- Restoring artifacts from this build"
+buildkite-agent artifact download "build/**/*" .
 
 echo "--- Normalizing filenames (${WORKFLOW})"
 
