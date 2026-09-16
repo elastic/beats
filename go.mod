@@ -145,7 +145,7 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
-	cloud.google.com/go/compute v1.67.0
+	cloud.google.com/go/compute v1.68.0
 	cloud.google.com/go/redis v1.25.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.0
@@ -566,7 +566,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.66.0
+	cloud.google.com/go/storage v1.67.1
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
