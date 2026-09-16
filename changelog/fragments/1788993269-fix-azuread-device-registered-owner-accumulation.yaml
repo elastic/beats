@@ -1,0 +1,11 @@
+kind: bug-fix
+summary: Fix Azure AD entity analytics accumulating stale registered owners and users on devices.
+description: |
+  Device.Merge was accumulating RegisteredOwners and RegisteredUsers across syncs
+  instead of replacing them. Because the Graph API always returns the complete
+  current list, the correct behaviour is replacement. Stale entries persisted
+  indefinitely, eventually bloating the kvstore.
+
+  Additionally, registered owner and user lookups were issued for deleted devices,
+  causing noisy 404 errors from the Graph API.
+component: filebeat
