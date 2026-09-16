@@ -411,6 +411,39 @@ var serverPoolTests = []struct {
 			{"json": mapstr.M{"c": int64(3)}},
 		},
 	},
+	{
+		// A request that decodes to no events is well-formed and must get
+		// the configured response rather than a dropped connection.
+		// Before the fix, the first request below drops the TCP connection,
+		// doRequest returns EOF, and t.Fatalf fires.
+		name:   "empty_batches",
+		method: http.MethodPost,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPost,
+				ResponseCode:  http.StatusOK,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", event: `[]`, wantBody: `{"message": "success"}`},
+			{url: "http://127.0.0.1:9001/", event: `[[]]`, wantBody: `{"message": "success"}`},
+			{url: "http://127.0.0.1:9001/", event: `[1,null]`, wantBody: `{"message": "success"}`},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `[]`, wantBody: `{"message": "success"}`},
+			// The connection is still usable and real events still publish.
+			{url: "http://127.0.0.1:9001/", event: `{"a":1}`, wantBody: `{"message": "success"}`},
+		},
+		wantStatus: http.StatusOK,
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+		},
+	},
 }
 
 type target struct {
