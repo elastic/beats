@@ -262,6 +262,11 @@ type ScanResults struct {
 	// its subtree, a file covers itself) the scan could not observe because of a
 	// resource or permission error, as opposed to being gone.
 	Unobservable []string
+	// Vanished is the list of paths the scan listed but could no longer find when
+	// it inspected them, typically because of a concurrent rename or delete.
+	// Their state must be held until a later, consistent scan can tell a
+	// rename from a deletion.
+	Vanished []string
 }
 
 // FSScanner retrieves a list of files from the file system.
