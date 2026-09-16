@@ -7,26 +7,23 @@ package hbreceiver
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
-	"go.uber.org/zap"
 )
 
 type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
-	wg sync.WaitGroup
 }
 
-func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	hb.wg.Go(func() {
-		hb.Logger.Info("starting heartbeat receiver")
-		if err := hb.BeatReceiver.Start(host); err != nil {
-			hb.Logger.Error("error starting heartbeat receiver", zap.Error(err))
-		}
-	})
+func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error {
+	hb.Logger.Info("starting heartbeat receiver")
+
+	if err := hb.BeatReceiver.Start(host); err != nil {
+		return fmt.Errorf("starting heartbeat receiver: %w", err)
+	}
+
 	return nil
 }
 
@@ -35,6 +32,6 @@ func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
 	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
-	hb.wg.Wait()
+
 	return nil
 }
