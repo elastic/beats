@@ -37,13 +37,19 @@ type Device struct {
 	Modified bool `json:"-"`
 	// Deleted indicates the device has been deleted.
 	Deleted bool `json:"deleted"`
+	// RegisteredFetched indicates that registered owners and users were
+	// successfully fetched from the API. Merge only replaces the stored
+	// registered sets when this is true, preventing a transient API error
+	// from wiping ownership data that is already in the kvstore.
+	RegisteredFetched bool `json:"-"`
 }
 
-// Merge merges the attributes and group memberships of other into d, and
-// replaces d's registered owners and users with those from other. Group
+// Merge merges the attributes and group memberships of other into d. Group
 // memberships are accumulated because the delta API returns incremental
-// changes; registered owners and users are replaced because the API always
-// returns the complete current set. The IDs of the devices must match.
+// changes. Registered owners and users are replaced because the API always
+// returns the complete current set, but only when other.RegisteredFetched is
+// true; if the fetch failed, the existing kvstore values are preserved. The
+// IDs of the devices must match.
 func (d *Device) Merge(other *Device) {
 	if d.ID != other.ID {
 		return
@@ -55,7 +61,9 @@ func (d *Device) Merge(other *Device) {
 	other.TransitiveMemberOf.ForEach(func(elem uuid.UUID) {
 		d.TransitiveMemberOf.Add(elem)
 	})
-	d.RegisteredOwners = other.RegisteredOwners
-	d.RegisteredUsers = other.RegisteredUsers
+	if other.RegisteredFetched {
+		d.RegisteredOwners = other.RegisteredOwners
+		d.RegisteredUsers = other.RegisteredUsers
+	}
 	d.Deleted = other.Deleted
 }
