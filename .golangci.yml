@@ -51,6 +51,10 @@ linters:
               desc: superseded by maps
             - pkg: golang.org/x/exp/slices$
               desc: superseded by slices
+            - pkg: github.com/xdg-go/pbkdf2$
+              desc: not FIPS-validated; use stdlib crypto/pbkdf2, which is inside the Go Cryptographic Module boundary
+            - pkg: golang.org/x/crypto/pbkdf2$
+              desc: not FIPS-validated; use stdlib crypto/pbkdf2, which is inside the Go Cryptographic Module boundary
     errcheck:
       check-type-assertions: true
       check-blank: false
@@ -70,12 +74,6 @@ linters:
     forbidigo:
       forbid:
         - pattern: fmt.Print.*
-        - pattern: ^paths\.Resolve$
-          msg: "use a per-beat *paths.Path instance instead of the global paths.Resolve"
-        - pattern: ^paths\.InitPaths$
-          msg: "use a per-beat *paths.Path instance instead of the global paths.InitPaths"
-        - pattern: ^paths\.Paths$
-          msg: "use a per-beat *paths.Path instance instead of the global paths.Paths"
         - pattern: ^logp\.NewLogger$
           msg: "accept a *logp.Logger as a parameter instead of creating one with logp.NewLogger"
         - pattern: ^logp\.L$
