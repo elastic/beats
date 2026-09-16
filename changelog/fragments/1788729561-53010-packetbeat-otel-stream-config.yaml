@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix per-stream interface, procs, and ignore_outgoing configuration being dropped when packetbeat runs as an OTel receiver
+component: packetbeat
+issue: https://github.com/elastic/beats/issues/53010
