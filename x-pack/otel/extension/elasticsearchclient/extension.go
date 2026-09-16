@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // Package elasticsearchclient is an OpenTelemetry Collector extension that owns
-// the lifecycle of a single Elasticsearch connection per configured instance.
+// the lifecycle of Elasticsearch connections per configured instance.
 package elasticsearchclient
 
 import (
@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
@@ -27,29 +28,36 @@ import (
 var (
 	_ extension.Extension = (*elasticsearchClient)(nil)
 
-	// ErrNotStarted is returned by Request when Start has not created a client.
+	// ErrNotStarted is returned by Request before Start has initialized the extension.
 	ErrNotStarted = errors.New("elasticsearchclient extension is not started")
 	// ErrShutdown is returned by Request after Shutdown.
 	ErrShutdown = errors.New("elasticsearchclient extension is shut down")
 )
 
-// elasticsearchClient owns one non-thread-safe Elasticsearch connection.
-// requestMu serializes requests, while lifecycleMu lets Shutdown cancel an
-// in-flight request before waiting to close the client.
+const reconnectDelay = time.Second
+
+// elasticsearchClient owns non-thread-safe Elasticsearch connections.
+// requestMu serializes connection and request operations, while lifecycleMu
+// lets Shutdown cancel an in-flight request before waiting to close clients.
 type elasticsearchClient struct {
 	cfg    *Config
 	logger *logp.Logger
 	info   beat.Info
 
-	lifecycleMu sync.Mutex
-	requestMu   sync.Mutex
-	client      *eslegclient.Connection
-	cancel      context.CancelFunc
-	starting    bool
-	closed      bool
+	lifecycleMu      sync.Mutex
+	requestMu        sync.Mutex
+	host             component.Host
+	candidateClients []*eslegclient.Connection
+	client           *eslegclient.Connection
+	ctx              context.Context
+	cancel           context.CancelFunc
+	nextConnect      time.Time
+	connectErr       error
+	started          bool
+	closed           bool
 }
 
-func (e *elasticsearchClient) Start(ctx context.Context, host component.Host) error {
+func (e *elasticsearchClient) Start(_ context.Context, host component.Host) error {
 	if e == nil {
 		return errors.New("elasticsearchclient extension is nil")
 	}
@@ -65,97 +73,58 @@ func (e *elasticsearchClient) Start(ctx context.Context, host component.Host) er
 		return err
 	}
 
-	// Connection stores this context on every subsequent HTTP request, so use
-	// an extension-owned context that is cancelled in Shutdown. While startup
-	// is in progress, also cancel it if the Collector cancels Start's context.
+	candidateClients, err := newCandidateClients(e.cfg, e.info, e.logger)
+	if err != nil {
+		err = fmt.Errorf("invalid elasticsearchclient configuration: %w", err)
+		componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
+		return err
+	}
+
+	// Connection stores this context on every subsequent HTTP request. It is
+	// owned by the extension rather than Start because Collector Start contexts
+	// end after initialization, while requests continue until Shutdown.
 	clientCtx, cancel := context.WithCancel(context.Background())
-	stopStartCancellation := context.AfterFunc(ctx, cancel)
 
 	e.lifecycleMu.Lock()
 	if e.closed {
 		e.lifecycleMu.Unlock()
-		stopStartCancellation()
 		cancel()
+		closeClients(candidateClients)
 		return ErrShutdown
 	}
-	if e.starting || e.client != nil {
+	if e.started {
 		e.lifecycleMu.Unlock()
-		stopStartCancellation()
 		cancel()
+		closeClients(candidateClients)
 		return errors.New("elasticsearchclient extension is already started")
 	}
-	e.starting = true
-	// Publish cancellation before connecting so Shutdown can interrupt the
-	// initial Elasticsearch ping.
+	e.started = true
+	e.host = host
+	e.candidateClients = candidateClients
+	e.ctx = clientCtx
 	e.cancel = cancel
 	e.lifecycleMu.Unlock()
 
-	client, err := newConnectedClient(clientCtx, e.cfg, e.info, e.logger)
-	stopStartCancellation()
-	if err != nil {
-		cancel()
-		if startErr := ctx.Err(); startErr != nil {
-			return e.startFailed(host, startErr)
-		}
-		return e.startFailed(host, err)
-	}
-	// The initial ping may succeed just before Start is canceled. Do not publish
-	// a client whose startup lifecycle was canceled after the ping completed.
-	if err := ctx.Err(); err != nil {
-		cancel()
-		_ = client.Close()
-		return e.startFailed(host, err)
-	}
-
-	e.lifecycleMu.Lock()
-	if e.closed {
-		e.starting = false
-		e.lifecycleMu.Unlock()
-		cancel()
-		if closeErr := client.Close(); closeErr != nil {
-			return fmt.Errorf("elasticsearchclient extension is shut down: failed closing unused client: %w", closeErr)
-		}
-		return ErrShutdown
-	}
-
-	e.starting = false
-	e.client = client
-	e.lifecycleMu.Unlock()
 	componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
 	return nil
 }
 
-// startFailed clears the cancellation function published for a failed Start.
-func (e *elasticsearchClient) startFailed(host component.Host, connectErr error) error {
-	e.lifecycleMu.Lock()
-	closed := e.closed
-	e.starting = false
-	e.cancel = nil
-	e.lifecycleMu.Unlock()
-
-	if closed {
-		return ErrShutdown
-	}
-
-	err := fmt.Errorf("failed connecting elasticsearch client: %w", connectErr)
-	componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
-	return err
-}
-
-// newConnectedClient adapts the extension's explicit endpoint and transport
-// contract to the eslegclient settings.
-func newConnectedClient(ctx context.Context, cfg *Config, info beat.Info, logger *logp.Logger) (*eslegclient.Connection, error) {
+// newCandidateClients adapts the extension's explicit endpoint and transport
+// contract to eslegclient settings without connecting. Since connections are
+// lazy, Start cannot select a reachable host, so one candidate is retained
+// per configured host for failover and reconnect; only one becomes active.
+func newCandidateClients(cfg *Config, info beat.Info, logger *logp.Logger) ([]*eslegclient.Connection, error) {
 	parameters := cfg.Parameters
 	if len(parameters) == 0 {
 		parameters = nil
 	}
 
-	errs := make([]string, 0, len(cfg.Hosts))
+	candidateClients := make([]*eslegclient.Connection, 0, len(cfg.Hosts))
 	for _, host := range cfg.Hosts {
 		esURL, err := common.MakeURL(cfg.Protocol, cfg.Path, host, 9200)
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("invalid host %q: %v", host, err))
-			continue
+			_ = closeClients(candidateClients)
+			return nil, fmt.Errorf("invalid host %q: %w", host, err)
 		}
 
 		client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
@@ -171,19 +140,13 @@ func newConnectedClient(ctx context.Context, cfg *Config, info beat.Info, logger
 			IdleConnTimeout: cfg.Transport.IdleConnTimeout,
 		}, logger)
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("creating client for %s: %v", esURL, err))
-			continue
+			_ = closeClients(candidateClients)
+			return nil, fmt.Errorf("creating client for %s: %w", esURL, err)
 		}
-
-		if err := client.Connect(ctx); err != nil {
-			_ = client.Close()
-			errs = append(errs, fmt.Sprintf("connecting to %s: %v", esURL, err))
-			continue
-		}
-		return client, nil
+		candidateClients = append(candidateClients, client)
 	}
 
-	return nil, fmt.Errorf("couldn't connect to any configured Elasticsearch hosts: %s", strings.Join(errs, "; "))
+	return candidateClients, nil
 }
 
 func (e *elasticsearchClient) Shutdown(_ context.Context) error {
@@ -200,14 +163,18 @@ func (e *elasticsearchClient) Shutdown(_ context.Context) error {
 
 	cancel := e.cancel
 	e.cancel = nil
-	client := e.client
+	candidateClients := e.candidateClients
+	e.candidateClients = nil
 	e.client = nil
+	e.ctx = nil
+	e.connectErr = nil
+	e.nextConnect = time.Time{}
 	if cancel != nil {
 		cancel()
 	}
 	e.lifecycleMu.Unlock()
 
-	if client == nil {
+	if len(candidateClients) == 0 {
 		return nil
 	}
 
@@ -217,8 +184,7 @@ func (e *elasticsearchClient) Shutdown(_ context.Context) error {
 	// before closing the client.
 	e.requestMu.Lock()
 	defer e.requestMu.Unlock()
-	err := client.Close()
-	if err != nil {
+	if err := closeClients(candidateClients); err != nil {
 		return fmt.Errorf("failed closing elasticsearch client: %w", err)
 	}
 	return nil
@@ -250,13 +216,129 @@ func (e *elasticsearchClient) Request(
 		e.lifecycleMu.Unlock()
 		return 0, nil, ErrShutdown
 	}
-	if e.client == nil {
+	if !e.started {
 		e.lifecycleMu.Unlock()
 		return 0, nil, ErrNotStarted
 	}
 	client := e.client
+	candidateClients := e.candidateClients
+	clientCtx := e.ctx
+	host := e.host
 	e.lifecycleMu.Unlock()
 
+	if client == nil {
+		var err error
+		client, err = e.connect(candidateClients, clientCtx)
+		if err != nil {
+			if errors.Is(err, ErrShutdown) {
+				return 0, nil, err
+			}
+			componentstatus.ReportStatus(host, componentstatus.NewRecoverableErrorEvent(err))
+			return 0, nil, err
+		}
+	}
+
 	status, resp, err := client.Request(method, path, pipeline, params, body)
+	if status == 0 && err != nil {
+		e.markDisconnected(client, err)
+	}
+	if (status == 0 && err != nil) || status >= 500 {
+		requestErr := err
+		if requestErr == nil {
+			requestErr = fmt.Errorf("elasticsearch returned HTTP %d", status)
+		}
+		if !e.isClosed() {
+			componentstatus.ReportStatus(
+				host,
+				componentstatus.NewRecoverableErrorEvent(
+					fmt.Errorf("elasticsearch request failed: %w", requestErr),
+				),
+			)
+		}
+	} else if err == nil {
+		componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
+	}
+
 	return status, bytes.Clone(resp), err
+}
+
+// connect selects the first reachable configured host. It is called while
+// requestMu is held, so Connect and the eventual Request never race with each
+// other or with another reconnect attempt.
+func (e *elasticsearchClient) connect(candidateClients []*eslegclient.Connection, ctx context.Context) (*eslegclient.Connection, error) {
+	if err := e.cachedConnectError(); err != nil {
+		return nil, err
+	}
+
+	errs := make([]string, 0, len(candidateClients))
+	for _, client := range candidateClients {
+		if err := client.Connect(ctx); err != nil {
+			if e.isClosed() {
+				return nil, ErrShutdown
+			}
+			errs = append(errs, fmt.Sprintf("connecting to %s: %v", client.URL, err))
+			continue
+		}
+
+		e.lifecycleMu.Lock()
+		if e.closed {
+			e.lifecycleMu.Unlock()
+			return nil, ErrShutdown
+		}
+		e.client = client
+		e.connectErr = nil
+		e.nextConnect = time.Time{}
+		e.lifecycleMu.Unlock()
+		return client, nil
+	}
+	err := fmt.Errorf("couldn't connect to any configured Elasticsearch hosts: %s", strings.Join(errs, "; "))
+	e.recordConnectFailure(err)
+	return nil, err
+}
+
+func (e *elasticsearchClient) markDisconnected(client *eslegclient.Connection, err error) {
+	e.lifecycleMu.Lock()
+	defer e.lifecycleMu.Unlock()
+	if !e.closed && e.client == client {
+		e.client = nil
+		e.connectErr = err
+		e.nextConnect = time.Now().Add(reconnectDelay)
+	}
+}
+
+func (e *elasticsearchClient) cachedConnectError() error {
+	e.lifecycleMu.Lock()
+	defer e.lifecycleMu.Unlock()
+	if e.connectErr != nil && time.Now().Before(e.nextConnect) {
+		return e.connectErr
+	}
+	return nil
+}
+
+func (e *elasticsearchClient) recordConnectFailure(err error) {
+	e.lifecycleMu.Lock()
+	defer e.lifecycleMu.Unlock()
+	if !e.closed {
+		e.connectErr = err
+		e.nextConnect = time.Now().Add(reconnectDelay)
+	}
+}
+
+func (e *elasticsearchClient) isClosed() bool {
+	e.lifecycleMu.Lock()
+	defer e.lifecycleMu.Unlock()
+	return e.closed
+}
+
+func closeClients(clients []*eslegclient.Connection) error {
+	var errs []string
+	for _, client := range clients {
+		if err := client.Close(); err != nil {
+			errs = append(errs, err.Error())
+		}
+	}
+	if len(errs) > 0 {
+		return errors.New(strings.Join(errs, "; "))
+	}
+	return nil
 }

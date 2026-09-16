@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/base64"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -309,122 +310,41 @@ func TestExtension_ShutdownCancelsInFlightRequest(t *testing.T) {
 	}
 }
 
-func TestExtension_StartCancellationCancelsInitialPing(t *testing.T) {
-	pingStarted := make(chan struct{})
-	pingCanceled := make(chan struct{})
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet || r.URL.Path != "/" {
-			w.WriteHeader(http.StatusNotFound)
+func TestExtension_OfflineStartReconnects(t *testing.T) {
+	// Retain an address but close its listener before Start. This verifies that
+	// remote availability is not a startup dependency.
+	placeholder := newFakeES(t, nil)
+	address := placeholder.Listener.Addr().String()
+	placeholder.Close()
+
+	host := &reportingHost{Host: componenttest.NewNopHost()}
+	ext := newTestExtension(map[string]any{"hosts": []string{"http://" + address}}, logp.NewNopLogger())
+	startExtension(t, ext, host)
+	assert.Equal(t, componentstatus.StatusOK, host.lastStatus(), "offline Start must still report healthy initialization")
+
+	_, _, err := ext.Request(http.MethodGet, "/_cluster/health", "", nil, nil)
+	require.Error(t, err, "the first request must report the unavailable endpoint")
+	assert.Equal(t, componentstatus.StatusRecoverableError, host.lastStatus(), "connection failure must be recoverable")
+
+	srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/" {
+			pingOK(w)
 			return
 		}
-		close(pingStarted)
-		<-r.Context().Done()
-		close(pingCanceled)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"ok":true}`)
 	}))
+	listener, err := net.Listen("tcp", address)
+	require.NoError(t, err, "the released endpoint must be available for recovery")
+	srv.Listener = listener
+	srv.Start()
 	t.Cleanup(srv.Close)
+	time.Sleep(reconnectDelay)
 
-	ext := newTestExtension(map[string]any{
-		"hosts":   []string{srv.URL},
-		"timeout": "1m",
-	}, logp.NewNopLogger())
-	startCtx, cancelStart := context.WithCancel(context.Background())
-	startDone := make(chan error, 1)
-	go func() {
-		startDone <- ext.Start(startCtx, componenttest.NewNopHost())
-	}()
-
-	select {
-	case <-pingStarted:
-	case <-time.After(10 * time.Second):
-		t.Fatal("initial Elasticsearch ping did not start")
-	}
-	cancelStart()
-
-	select {
-	case err := <-startDone:
-		require.Error(t, err, "Start must fail when its context is canceled")
-		assert.ErrorIs(t, err, context.Canceled, "Start failure must retain the cancellation cause")
-	case <-time.After(10 * time.Second):
-		t.Fatal("canceled Start did not return")
-	}
-
-	select {
-	case <-pingCanceled:
-	case <-time.After(10 * time.Second):
-		t.Fatal("initial Elasticsearch ping was not canceled")
-	}
-
-	require.NoError(t, ext.Shutdown(context.Background()), "Shutdown after a failed Start must succeed")
-}
-
-func TestExtension_ShutdownCancelsInitialPing(t *testing.T) {
-	pingStarted := make(chan struct{})
-	pingCanceled := make(chan struct{})
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet || r.URL.Path != "/" {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-		close(pingStarted)
-		<-r.Context().Done()
-		close(pingCanceled)
-	}))
-	t.Cleanup(srv.Close)
-
-	ext := newTestExtension(map[string]any{
-		"hosts":   []string{srv.URL},
-		"timeout": "1m",
-	}, logp.NewNopLogger())
-	startDone := make(chan error, 1)
-	go func() {
-		startDone <- ext.Start(context.Background(), componenttest.NewNopHost())
-	}()
-
-	select {
-	case <-pingStarted:
-	case <-time.After(10 * time.Second):
-		t.Fatal("initial Elasticsearch ping did not start")
-	}
-
-	shutdownDone := make(chan error, 1)
-	go func() {
-		shutdownDone <- ext.Shutdown(context.Background())
-	}()
-
-	select {
-	case err := <-shutdownDone:
-		require.NoError(t, err, "Shutdown must cancel a startup ping and return")
-	case <-time.After(10 * time.Second):
-		t.Fatal("Shutdown did not return while Start was connecting")
-	}
-
-	select {
-	case err := <-startDone:
-		assert.ErrorIs(t, err, ErrShutdown, "Start must report that Shutdown won the lifecycle race")
-	case <-time.After(10 * time.Second):
-		t.Fatal("Start did not return after Shutdown canceled its ping")
-	}
-
-	select {
-	case <-pingCanceled:
-	case <-time.After(10 * time.Second):
-		t.Fatal("initial Elasticsearch ping was not canceled by Shutdown")
-	}
-}
-
-func TestExtension_StartContextCancellationDoesNotCancelRunningClient(t *testing.T) {
-	srv := newFakeES(t, nil)
-	ext := newTestExtension(map[string]any{
-		"hosts": []string{srv.URL},
-	}, logp.NewNopLogger())
-	startCtx, cancelStart := context.WithCancel(context.Background())
-	require.NoError(t, ext.Start(startCtx, componenttest.NewNopHost()), "Start must succeed")
-	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
-
-	cancelStart()
 	status, _, err := ext.Request(http.MethodGet, "/_cluster/health", "", nil, nil)
-	require.NoError(t, err, "canceling Start's context after startup must not cancel requests")
-	assert.Equal(t, http.StatusOK, status, "the running client must remain usable")
+	require.NoError(t, err, "a later request must reconnect after Elasticsearch recovers")
+	assert.Equal(t, http.StatusOK, status, "recovered Elasticsearch must answer the request")
+	assert.Equal(t, componentstatus.StatusOK, host.lastStatus(), "recovery must restore healthy status")
 }
 
 func TestExtension_ShutdownNeverStarted(t *testing.T) {
