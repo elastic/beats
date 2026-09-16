@@ -12,10 +12,6 @@
 # .buildkite/scripts/packaging/resolve-dra-version.sh immediately before this
 # file is uploaded.
 
-env:
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1782878510"
-
 steps:
   - label: ":package: DRA Prep (${WORKFLOW})"
     key: "dra-prep-${WORKFLOW}"
@@ -24,9 +20,7 @@ steps:
       DRA_WORKFLOW: "${WORKFLOW}"
       VERSION_QUALIFIER: "${VERSION_QUALIFIER:-}"
     agents:
-      provider: gcp
-      image: "${IMAGE_UBUNTU_X86_64}"
-      machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+      provider: k8s
     timeout_in_minutes: 30
     plugins:
       # Must match the google_oidc_plugin anchor in packaging.pipeline.yml
@@ -45,8 +39,7 @@ steps:
     depends_on: "dra-prep-${WORKFLOW}"
     command: ".buildkite/scripts/dra-annotate.sh ${WORKFLOW}"
     agents:
-      provider: gcp
-      image: "${IMAGE_UBUNTU_X86_64}"
+      provider: k8s
     timeout_in_minutes: 5
 
   - label: ":pipeline: DRA processing for beats (${WORKFLOW})"

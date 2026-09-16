@@ -393,9 +393,7 @@ steps:
           - packaging-snapshot
           - dashboards-snapshot
         agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          provider: k8s
         env:
           WORKFLOW: "snapshot"
         command: |
@@ -411,9 +409,7 @@ steps:
           - packaging-staging
           - dashboards-staging
         agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          provider: k8s
         env:
           WORKFLOW: "staging"
         command: |
