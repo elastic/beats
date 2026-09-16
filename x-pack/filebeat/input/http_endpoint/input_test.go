@@ -762,6 +762,7 @@ func TestNewHTTPEndpoint(t *testing.T) {
 		ListenPort:    "9200",
 		ResponseBody:  "{}",
 		Method:        http.MethodPost,
+		ResponseCode:  http.StatusOK,
 	}
 	h, err := newHTTPEndpoint(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
