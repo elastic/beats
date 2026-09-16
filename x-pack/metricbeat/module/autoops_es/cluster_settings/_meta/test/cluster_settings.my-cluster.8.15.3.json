@@ -204,6 +204,11 @@
         "path": {
             "data": ["/app/data"]
         },
+        "gateway": {
+            "expected_data_nodes": "0",
+            "recover_after_data_nodes": "-1",
+            "recover_after_time": "5m"
+        },
         "ccr": {
             "indices": {
                 "recovery": {
