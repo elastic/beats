@@ -579,6 +579,19 @@ func (p *monitorTestSuite) TestNew() {
 	}
 
 	p.Require().Equal(expectedEvents, seenEvents)
+
+	p.Require().NoError(m.Close())
+
+	// Confirm the kernel is left clean: no auditbeat_fim probes should
+	// remain after Close.
+	tfs, err := tracing.NewTraceFS()
+	p.Require().NoError(err)
+	kps, err := tfs.ListKProbes()
+	p.Require().NoError(err)
+	for _, kp := range kps {
+		p.Assert().NotEqual("auditbeat_fim", kp.Group,
+			"kprobe %s/%s was not removed on Close", kp.Group, kp.Name)
+	}
 }
 
 const kernelURL string = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.6.7.tar.xz"
