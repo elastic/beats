@@ -18,7 +18,7 @@
 package streaming
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"testing"
 
@@ -26,7 +26,7 @@ import (
 )
 
 func TestResetableLimitedReader(t *testing.T) {
-	maxReadBuffer := 400
+	const maxReadBuffer = 400
 
 	t.Run("WhenMaxReadIsReachedInMultipleRead", func(t *testing.T) {
 		r := strings.NewReader(randomString(maxReadBuffer * 2))
@@ -64,7 +64,7 @@ func randomString(l int) string {
 	charsets := []byte("abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789")
 	message := make([]byte, l)
 	for i := range message {
-		message[i] = charsets[rand.Intn(len(charsets))]
+		message[i] = charsets[rand.IntN(len(charsets))]
 	}
 	return string(message)
 }

@@ -205,16 +205,3 @@ entries:
       file:
         name: 1787267404-fix-httpjson-cel-cursor-migration-set-id.yaml
         checksum: 219c6f11bc18db2d081b367da6222fa70d9ae46d
-    - kind: bug-fix
-      summary: Revert non-Ironbank container images to UBI9.
-      description: ""
-      component: all
-      pr:
-        - https://github.com/elastic/beats/pull/52823
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1787598969
-      file:
-        name: 1787598969-revert-non-ironbank-container-images-to-ubi9.yaml
-        checksum: 1b0e1c935a59e1ea06727e2264e452f7921c2c61
