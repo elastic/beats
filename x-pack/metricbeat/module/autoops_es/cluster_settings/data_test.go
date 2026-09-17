@@ -39,11 +39,8 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 	require.ElementsMatch(t, []string{"/app/data"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "path.data"))
 	require.Equal(t, "3", auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.search_power_min"))
 
-<<<<<<< HEAD
-=======
-	// the frozen flood stage watermark is reported alongside the regular flood stage watermark
+	// the flood stage watermark is reported
 	require.Equal(t, "95%", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.routing.allocation.disk.watermark.flood_stage"))
-	require.Equal(t, "95%", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.routing.allocation.disk.watermark.flood_stage_frozen"))
 
 	// allocation and rebalance settings present in every supported version
 	require.Equal(t, "all", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.routing.allocation.enable"))
@@ -97,7 +94,6 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 		require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "gateway.recover_after_nodes"))
 	}
 
->>>>>>> 17be87e (feat(autoops_es): persist additional cluster settings in cluster_settings (#53145))
 	// schema is expected to drop this field if it appears (it does in one file)
 	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))
 }
