@@ -60,7 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sm, err := newStateManager(paths.Resolve(paths.Data, path.Join("state", base.Module().Name(), base.Name())))
+	sm, err := newStateManager(base.GetPath().Resolve(paths.Data, path.Join("state", base.Module().Name(), base.Name())))
 	if err != nil {
 		return nil, fmt.Errorf("create state manager: %w", err)
 	}
@@ -332,7 +332,7 @@ func (m *MetricSet) processTTSData(data []TtsData) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processFTData(data []interface{}) {
+func (m *MetricSet) processFTData(data []any) {
 	events := make([]mb.Event, 0, len(data))
 	for _, ft := range data {
 		event := mb.Event{
@@ -347,7 +347,7 @@ func (m *MetricSet) processFTData(data []interface{}) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processAssistantCodeInterpreterData(data []interface{}) {
+func (m *MetricSet) processAssistantCodeInterpreterData(data []any) {
 	events := make([]mb.Event, 0, len(data))
 	for _, aci := range data {
 		event := mb.Event{
@@ -362,7 +362,7 @@ func (m *MetricSet) processAssistantCodeInterpreterData(data []interface{}) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processRetrievalStorageData(data []interface{}) {
+func (m *MetricSet) processRetrievalStorageData(data []any) {
 	events := make([]mb.Event, 0, len(data))
 	for _, rs := range data {
 		event := mb.Event{
