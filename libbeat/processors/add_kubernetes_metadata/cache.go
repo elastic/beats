@@ -55,6 +55,22 @@ func (c *cache) get(key string) mapstr.M {
 	return c.metadata[key]
 }
 
+// getFirstMatch returns metadata for the first matching candidate, or nil.
+// Holds the lock for the full scan so the cleanup goroutine cannot evict a later candidate between probes.
+func (c *cache) getFirstMatch(candidates []string) mapstr.M {
+	c.Lock()
+	defer c.Unlock()
+	for _, index := range candidates {
+		if t, ok := c.deleted[index]; ok {
+			c.deleted[index] = t.Add(c.timeout)
+		}
+		if m := c.metadata[index]; m != nil {
+			return m
+		}
+	}
+	return nil
+}
+
 func (c *cache) delete(key string) {
 	c.Lock()
 	defer c.Unlock()
