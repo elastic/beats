@@ -944,10 +944,9 @@ func TestPartialInputFailureDoesNotBlockHealthyUnits(t *testing.T) {
 		t.Fatalf("could not instantiate ManagerV2: %s", err)
 	}
 
-	if err := m.Start(); err != nil {
-		t.Fatalf("could not start ManagerV2: %s", err)
-	}
+	require.NoError(t, m.PreInit(), "could not pre-init ManagerV2")
 	defer m.Stop()
+	m.PostInit()
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
