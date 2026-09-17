@@ -206,7 +206,8 @@ func TestPodUIDIndexer_WithContainers(t *testing.T) {
 		// <uid>/<name>: name + image only (no id/runtime).
 		cMeta, err := byIndex[uid+"/mycontainer"].GetValue("kubernetes.container")
 		assert.NoError(t, err)
-		cm := cMeta.(mapstr.M)
+		cm, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
 		assert.Equal(t, "mycontainer", cm["name"])
 		assert.Equal(t, "myimage@sha256:abc", cm["image"])
 		assert.Empty(t, cm["id"])
@@ -215,7 +216,8 @@ func TestPodUIDIndexer_WithContainers(t *testing.T) {
 		// <uid>/<name>/0: name + image + id + runtime.
 		cMeta, err = byIndex[uid+"/mycontainer/0"].GetValue("kubernetes.container")
 		assert.NoError(t, err)
-		cm = cMeta.(mapstr.M)
+		cm, ok = cMeta.(mapstr.M)
+		assert.True(t, ok)
 		assert.Equal(t, "mycontainer", cm["name"])
 		assert.Equal(t, "myimage@sha256:abc", cm["image"])
 		assert.Equal(t, "deadbeef", cm["id"])
@@ -268,12 +270,16 @@ func TestPodUIDIndexer_WithContainers(t *testing.T) {
 		// <uid>/<name>/2: live container id
 		cMeta, err := byIndex[uid+"/mycontainer/2"].GetValue("kubernetes.container")
 		assert.NoError(t, err)
-		assert.Equal(t, "live1234", cMeta.(mapstr.M)["id"])
+		cm2, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
+		assert.Equal(t, "live1234", cm2["id"])
 
 		// <uid>/<name>/1: previous container id
 		cMeta, err = byIndex[uid+"/mycontainer/1"].GetValue("kubernetes.container")
 		assert.NoError(t, err)
-		assert.Equal(t, "prev5678", cMeta.(mapstr.M)["id"])
+		cm1, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
+		assert.Equal(t, "prev5678", cm1["id"])
 	})
 
 	t.Run("spec_only_no_status", func(t *testing.T) {

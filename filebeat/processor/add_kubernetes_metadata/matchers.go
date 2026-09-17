@@ -143,8 +143,7 @@ func (f *LogPathMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 								// strip .gz so compressed rotated logs (e.g. 0.log.gz) are parsed like 0.log
 								basename = strings.TrimSuffix(basename, ".gz")
 								// guard against digit directory segments (e.g. container/3/real.log)
-								if strings.HasSuffix(basename, ".log") {
-									logName := strings.TrimSuffix(basename, ".log")
+								if logName, ok := strings.CutSuffix(basename, ".log"); ok {
 									if _, err := strconv.Atoi(logName); err == nil {
 										f.logger.Debugf("Using pod uid/container/restart: %s/%s/%s", podUID, containerName, logName)
 										return []string{
