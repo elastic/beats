@@ -5,8 +5,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/53080
       issue: []
       impact: ""
       action: ""
@@ -19,8 +18,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52572
       issue:
         - https://github.com/elastic/beats/issues/52571
       impact: ""
@@ -34,8 +32,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52650
       issue: []
       impact: ""
       action: ""
@@ -48,8 +45,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52667
       issue: []
       impact: ""
       action: ""
@@ -97,8 +93,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52869
       issue:
         - https://github.com/elastic/beats/issues/52624
       impact: ""
@@ -112,8 +107,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52870
       issue: []
       impact: ""
       action: ""
@@ -131,8 +125,7 @@ entries:
         last successfully chained page so the next run retries it.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52996
       issue: []
       impact: ""
       action: ""
@@ -149,8 +142,7 @@ entries:
         concurrently with a merged per-feed cursor.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52997
       issue: []
       impact: ""
       action: ""
@@ -164,8 +156,7 @@ entries:
         The Kubernetes metadata enricher held the shared watcher registry lock while waiting for an informer cache to synchronize. When the Kubernetes API was unreachable or RBAC denied the initial LIST, that wait never completed and Stop() could not acquire the same lock to cancel it, hanging the metricset and blocking shutdown. Watcher startup now runs outside the registry lock as a shared attempt, and each metricset can cancel its own wait independently of other owners of the same watcher. Metricsets that successfully registered all their required metadata watchers now wait for those watchers to be ready before publishing. When add_metadata is disabled or client creation fails, the enricher is a no-op and publishing continues unenriched as before. A metricset whose extra metadata watcher (such as namespace enrichment) failed to register or synchronize does not collect.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/52409
       issue: []
       impact: ""
       action: ""
@@ -178,8 +169,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/53027
       issue: []
       impact: ""
       action: ""
@@ -199,8 +189,7 @@ entries:
         causing noisy 404 errors from the Graph API.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/53134
       issue: []
       impact: ""
       action: ""
@@ -213,8 +202,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53264
-        - https://github.com/elastic/beats/pull/53278
+        - https://github.com/elastic/beats/pull/53218
       issue: []
       impact: ""
       action: ""
