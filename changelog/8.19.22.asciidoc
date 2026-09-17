@@ -1,0 +1,76 @@
+// begin 8.19.22 relnotes
+
+[[release-notes-8.19.22]]
+==  8.19.22
+
+Review important information about the  8.19.22 release.
+
+
+
+
+
+
+
+
+
+
+
+
+[discrete]
+[[enhancements-8.19.22]]
+=== Enhancements
+
+
+
+
+**Filebeat**
+
+* Add api_endpoint configuration option to gcp-pubsub input to allow overriding the default Pub/Sub API endpoint. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+* Add hints.input_allow_list to restrict Filebeat hints-generated input types. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] https://github.com/elastic/beats/issues/52624[#52624]
+
+
+**Packetbeat**
+
+* Log Npcap installer diagnostic files on installation failure. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.22]]
+=== Bug fixes
+
+
+
+
+**All**
+
+* Revert non-Ironbank container images to UBI9. https://github.com/elastic/beats/pull/52823[#52823] 
+
+
+**Filebeat**
+
+* Scope the aws-s3 polling state registry to the input&#39;s bucket. https://github.com/elastic/beats/pull/52728[#52728] https://github.com/elastic/beats/issues/52721[#52721]
+* Prevent httpjson chain pagination from advancing the cursor when a chained request fails. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+* Follow every CrowdStrike discover resource instead of only the first feed. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+* Fix Azure AD entity analytics accumulating stale registered owners and users on devices. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+* Fix Active Directory entity analytics panic when ssl.certificate_authorities is set. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+
+
+**Heartbeat**
+
+* Match Kibana maintenance windows for nth-weekday, tzid, until, hourly, inclusive duration, and old dtstart. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] https://github.com/elastic/beats/issues/52571[#52571]
+
+
+**Metricbeat**
+
+* Fix Kubernetes metadata watcher deadlock that blocked metricset shutdown. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+
+
+**Packetbeat**
+
+* Censor HTTP parameters for mixed-case `hide_keywords` entries. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+* Fix bounds-check panics in Packetbeat TLS and Cassandra protocol parsers. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+* Fix rendering of TLS certificate serial numbers so each byte is always represented as two hex digits, matching OpenSSL output. https://github.com/elastic/beats/pull/53264[#53264] https://github.com/elastic/beats/pull/53278[#53278] 
+
+// end 8.19.22 relnotes
