@@ -810,6 +810,151 @@ func TestErrorPerUnit(t *testing.T) {
 	}, 10*time.Second, 100*time.Millisecond, "desired state, was not reached")
 }
 
+// TestPartialInputFailureDoesNotBlockHealthyUnits verifies that when one input
+// unit fails config validation, the remaining healthy units still transition
+// from CONFIGURING to HEALTHY instead of being stuck. This is a regression
+// test for the premature return in the errList case of reload().
+func TestPartialInputFailureDoesNotBlockHealthyUnits(t *testing.T) {
+	r := reload.NewRegistry()
+
+	output := &mockOutput{
+		ReloadFn: func(config *reload.ConfigWithMeta) error {
+			return nil
+		},
+	}
+	r.MustRegisterOutput(output)
+
+	const failUnitID = "input-unit-fail"
+	inputs := &mockReloadable{
+		ReloadFn: func(configs []*reload.ConfigWithMeta) error {
+			var errs []error
+			for _, cfg := range configs {
+				if cfg.InputUnitID == failUnitID {
+					errs = append(errs, cfgfile.UnitError{
+						UnitID: cfg.InputUnitID,
+						Err:    errors.New("config validation error"),
+					})
+				}
+			}
+			return errors.Join(errs...)
+		},
+	}
+	r.MustRegisterInput(inputs)
+
+	stateReached := atomic.Bool{}
+
+	outputUnit := &proto.UnitExpected{
+		Id:             "output-unit",
+		Type:           proto.UnitType_OUTPUT,
+		State:          proto.State_HEALTHY,
+		ConfigStateIdx: 1,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "mock",
+			Name: "mock",
+			Source: integration.RequireNewStruct(t, map[string]any{
+				"key": "value",
+			}),
+		},
+	}
+	healthyInputUnit := &proto.UnitExpected{
+		Id:             "input-unit-ok",
+		Type:           proto.UnitType_INPUT,
+		State:          proto.State_HEALTHY,
+		ConfigStateIdx: 1,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "input-unit-config-id-ok",
+			Type: "filestream",
+			Name: "ok",
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-id-ok",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id": "input-unit-ok",
+					}),
+				},
+			},
+		},
+	}
+	failingInputUnit := &proto.UnitExpected{
+		Id:             failUnitID,
+		Type:           proto.UnitType_INPUT,
+		State:          proto.State_HEALTHY,
+		ConfigStateIdx: 1,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "input-unit-config-id-fail",
+			Type: "filestream",
+			Name: "fail",
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-id-fail",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id": failUnitID,
+					}),
+				},
+			},
+		},
+	}
+
+	units := []*proto.UnitExpected{outputUnit, healthyInputUnit, failingInputUnit}
+	desiredState := []*proto.UnitExpected{
+		outputUnit,
+		healthyInputUnit,
+		{
+			Id:             failUnitID,
+			Type:           proto.UnitType_INPUT,
+			State:          proto.State_FAILED,
+			ConfigStateIdx: 1,
+		},
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if DoesStateMatch(observed, desiredState, 0) {
+				stateReached.Store(true)
+			}
+			return &proto.CheckinExpected{
+				Units: units,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	if err := server.Start(); err != nil {
+		t.Fatalf("could not start mock Elastic-Agent server: %s", err)
+	}
+	defer server.Stop()
+
+	c := client.NewV2(
+		fmt.Sprintf(":%d", server.Port),
+		"",
+		client.VersionInfo{},
+		client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{Enabled: true},
+		r,
+		c,
+		logptest.NewTestingLogger(t, ""),
+	)
+	if err != nil {
+		t.Fatalf("could not instantiate ManagerV2: %s", err)
+	}
+
+	if err := m.Start(); err != nil {
+		t.Fatalf("could not start ManagerV2: %s", err)
+	}
+	defer m.Stop()
+
+	require.Eventually(t, func() bool {
+		return stateReached.Load()
+	}, 10*time.Second, 100*time.Millisecond,
+		"healthy units must reach HEALTHY state when a sibling input unit fails config validation")
+}
+
 // TestReloadNilOutputUnit verifies reload does not panic when no output unit is present.
 func TestReloadNilOutputUnit(t *testing.T) {
 	r := reload.NewRegistry()
