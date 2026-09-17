@@ -565,7 +565,7 @@ func Test_apiResponse(t *testing.T) {
 			name: "empty_array",
 			conf: defaultConfig(),
 			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`[]`))
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[]`))
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
@@ -577,7 +577,7 @@ func Test_apiResponse(t *testing.T) {
 			name: "nested_empty_array",
 			conf: defaultConfig(),
 			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`[[]]`))
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[[]]`))
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
@@ -591,7 +591,7 @@ func Test_apiResponse(t *testing.T) {
 			name: "array_of_non_objects",
 			conf: defaultConfig(),
 			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`[1,null]`))
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[1,null]`))
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
@@ -603,7 +603,7 @@ func Test_apiResponse(t *testing.T) {
 			name: "whitespace_only_body",
 			conf: defaultConfig(),
 			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString("  \n  "))
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString("  \n  "))
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
@@ -617,7 +617,7 @@ func Test_apiResponse(t *testing.T) {
 			name: "empty_array_wait_for_completion",
 			conf: defaultConfig(),
 			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/?wait_for_completion_timeout=1s", bytes.NewBufferString(`[]`))
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/?wait_for_completion_timeout=1s", bytes.NewBufferString(`[]`))
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
@@ -627,12 +627,12 @@ func Test_apiResponse(t *testing.T) {
 		},
 		{
 			// A request with no body at all is rejected, unlike a request
-			// whose body holds no events. httptest.NewRequest only yields
-			// http.NoBody when it is passed explicitly.
+			// whose body holds no events. httptest.NewRequestWithContext only
+			// yields http.NoBody when it is passed explicitly.
 			name: "no_body",
 			conf: defaultConfig(),
 			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", http.NoBody)
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
@@ -651,7 +651,7 @@ func Test_apiResponse(t *testing.T) {
 				return c
 			}(),
 			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", http.NoBody)
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
