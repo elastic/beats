@@ -18,6 +18,7 @@
 package slabqueue
 
 import (
+	"io"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -1226,6 +1227,83 @@ func TestResizeUnderConcurrentTraffic(t *testing.T) {
 	assert.Equal(t, int64(pipelines*perPipe), delivered.Load(),
 		"every published event must be delivered exactly once across resizes")
 	pool.Shutdown()
+}
+
+// TestTryGetEmptyAndClosed covers TryGet's two no-batch cases: (nil, nil) while
+// the queue is open but empty, and io.EOF once it is closed and drained.
+func TestTryGetEmptyAndClosed(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+
+	b, err := q.TryGet(0)
+	assert.Nil(t, b, "an empty open queue should yield no batch")
+	assert.NoError(t, err, "an empty open queue is not an error; the caller is expected to wait on ReadyChan")
+
+	p := q.Producer(queue.ProducerConfig{})
+	_, ok := p.Publish(1)
+	require.True(t, ok, "publish should succeed")
+
+	require.NoError(t, q.Close(false), "graceful close should succeed")
+
+	// A gracefully closed queue keeps delivering what is already queued.
+	b, err = q.TryGet(0)
+	require.NoError(t, err, "a closing queue should still deliver queued events")
+	require.NotNil(t, b, "a closing queue should still deliver queued events")
+	assert.Equal(t, 1, b.Count(), "the queued event should come back")
+	b.Done()
+
+	b, err = q.TryGet(0)
+	assert.Nil(t, b, "a closed and drained queue should yield no batch")
+	assert.ErrorIs(t, err, io.EOF, "a closed and drained queue should report io.EOF")
+}
+
+// TestTryGetResignalsRemainder verifies that a TryGet capped by maxEvents
+// re-arms ReadyChan for the remainder. ReadyChan is edge-triggered, so without
+// this a select-driven consumer would stall on the leftovers.
+func TestTryGetResignalsRemainder(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 8}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	for i := range 5 {
+		_, ok := p.Publish(i)
+		require.True(t, ok, "publish %d should succeed", i)
+	}
+
+	// Consume the publish wake-up so the only signal left is TryGet's.
+	select {
+	case <-q.ReadyChan():
+	default:
+	}
+
+	b, err := q.TryGet(2)
+	require.NoError(t, err, "TryGet on a non-empty queue should not error")
+	require.Equal(t, 2, b.Count(), "TryGet should cap the batch at maxEvents")
+
+	select {
+	case <-q.ReadyChan():
+	default:
+		t.Fatal("TryGet left 3 events behind but did not re-signal ReadyChan")
+	}
+
+	// The other half of the condition: this TryGet empties the queue, so it
+	// must not signal. A wake-up here would send the consumer back for a batch
+	// that isn't there.
+	b2, err := q.TryGet(0)
+	require.NoError(t, err, "TryGet should return the remainder")
+	require.Equal(t, 3, b2.Count(), "the remainder should still be queued")
+
+	select {
+	case <-q.ReadyChan():
+		t.Fatal("TryGet drained the queue but still re-signalled ReadyChan")
+	default:
+	}
+
+	b.Done()
+	b2.Done()
 }
 
 // drainOnce returns and acks all currently-queued events on q. It assumes at
