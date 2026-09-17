@@ -21,6 +21,7 @@ steps:
       VERSION_QUALIFIER: "${VERSION_QUALIFIER:-}"
     agents:
       provider: k8s
+      ephemeralStorage: "40G"
     timeout_in_minutes: 30
     plugins:
       # Must match the google_oidc_plugin anchor in packaging.pipeline.yml
