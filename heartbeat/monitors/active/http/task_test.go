@@ -148,12 +148,29 @@ func TestNonZeroRedirect(t *testing.T) {
 	// Test requests within the limit
 	for range limit {
 		req := makeTestHTTPRequest(t)
-		assert.Nil(t, checker(req, via))
+		assert.NoError(t, checker(req, via))
 		via = append(via, req)
 	}
 
 	// We are now at the limit, this request should fail
 	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via))
+}
+
+func TestRedirectLimitIndependentOfVia(t *testing.T) {
+	limit := 5
+	var redirects []string
+	checker := makeCheckRedirect(limit, &redirects)
+
+	// The Kerberos SPNEGO client follows each hop with a new Client.Do(), so
+	// via never accumulates. The limit must still apply.
+	via := []*http.Request{makeTestHTTPRequest(t)}
+	for range limit - 1 {
+		req := makeTestHTTPRequest(t)
+		assert.NoError(t, checker(req, via), "redirects within the limit should be allowed")
+	}
+
+	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via), "limit must apply even when via does not grow")
+	assert.Len(t, redirects, limit, "every hop should still be recorded")
 }
 
 func TestRequestBuildingWithCustomHost(t *testing.T) {

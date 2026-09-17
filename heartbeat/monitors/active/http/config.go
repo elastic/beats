@@ -37,14 +37,62 @@ type Config struct {
 
 	Mode monitors.IPSettings `config:",inline"`
 
-	// authentication
+	// Basic authentication
 	Username string `config:"username"`
 	Password string `config:"password"`
+
+	// Kerberos/SPNEGO (Negotiate) authentication. Accepts a nested object or a
+	// base64-encoded YAML/JSON string of that object (Fleet / synthetics).
+	Kerberos *kerberosSettings `config:"kerberos"`
+
+	// NTLM (Integrated Windows Authentication) authentication. Accepts a nested
+	// object or a base64-encoded YAML/JSON string of that object.
+	NTLM *NTLMConfig `config:"ntlm"`
 
 	// http(s) ping validation
 	Check checkConfig `config:"check"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+}
+
+// NTLMConfig holds the credentials used for NTLM (NTLMv1/NTLMv2)
+// authentication against the monitored endpoint.
+type NTLMConfig struct {
+	Enabled  *bool  `config:"enabled"`
+	Username string `config:"username"`
+	Password string `config:"password"`
+	// Domain is optional when the domain is already encoded in the username
+	// as "DOMAIN\\user" or "user@domain".
+	Domain string `config:"domain"`
+}
+
+// IsEnabled returns true when the NTLM block is present and not explicitly
+// disabled. It is safe to call on a nil receiver.
+func (n *NTLMConfig) IsEnabled() bool {
+	return n != nil && (n.Enabled == nil || *n.Enabled)
+}
+
+// authUsername returns the username in the "DOMAIN\\user" form expected by the
+// NTLM negotiator, combining the separate domain field when provided.
+func (n *NTLMConfig) authUsername() string {
+	if n.Domain != "" && !strings.ContainsAny(n.Username, `\@`) {
+		return n.Domain + `\` + n.Username
+	}
+	return n.Username
+}
+
+// Validate validates the NTLMConfig object.
+func (n *NTLMConfig) Validate() error {
+	if !n.IsEnabled() {
+		return nil
+	}
+	if n.Username == "" {
+		return fmt.Errorf("ntlm authentication requires a username")
+	}
+	if n.Password == "" {
+		return fmt.Errorf("ntlm authentication requires a password")
+	}
+	return nil
 }
 
 type responseConfig struct {
@@ -157,7 +205,7 @@ func (c *compressionConfig) Validate() error {
 		return nil
 	}
 
-	if !(0 <= c.Level && c.Level <= 9) {
+	if c.Level < 0 || c.Level > 9 {
 		return fmt.Errorf("compression level %v invalid", c.Level)
 	}
 
@@ -168,6 +216,22 @@ func (c *compressionConfig) Validate() error {
 func (c *Config) Validate() error {
 	if len(c.Hosts) == 0 && len(c.URLs) == 0 {
 		return fmt.Errorf("hosts is a mandatory parameter")
+	}
+
+	// Only a single authentication scheme can be active at once: basic
+	// (username/password), Kerberos, or NTLM.
+	authMethods := 0
+	if c.Username != "" || c.Password != "" {
+		authMethods++
+	}
+	if c.Kerberos.IsEnabled() {
+		authMethods++
+	}
+	if c.NTLM.IsEnabled() {
+		authMethods++
+	}
+	if authMethods > 1 {
+		return fmt.Errorf("only one authentication method may be configured: choose one of basic (username/password), kerberos, or ntlm")
 	}
 
 	if len(c.URLs) != 0 {

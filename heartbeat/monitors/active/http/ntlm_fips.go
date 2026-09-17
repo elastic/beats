@@ -15,33 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !requirefips
+//go:build requirefips
 
-package kerberos
+package http
 
 import (
+	"errors"
 	"net/http"
-	"os"
-	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
-func TestNewClient(t *testing.T) {
-	cfg, err := os.CreateTemp(t.TempDir(), "config")
-	require.NoError(t, err)
-	c, err := NewClient(&Config{
-		AuthType:   authPassword,
-		ConfigPath: cfg.Name(),
-	}, http.DefaultClient)
-	require.NoError(t, err)
-	require.NotNil(t, c)
-
-	c, err = NewClient(&Config{
-		AuthType:   authPassword,
-		ConfigPath: cfg.Name(),
-		EnableFAST: true,
-	}, http.DefaultClient)
-	require.NoError(t, err)
-	require.NotNil(t, c)
+// wrapNTLMRoundTripper rejects NTLM in FIPS builds: the protocol depends on
+// non-FIPS-approved primitives (MD4/RC4), and the go-ntlmssp implementation is
+// intentionally not linked into FIPS binaries.
+func wrapNTLMRoundTripper(_ http.RoundTripper) (http.RoundTripper, error) {
+	return nil, errors.New("ntlm authentication is not supported in fips mode")
 }
