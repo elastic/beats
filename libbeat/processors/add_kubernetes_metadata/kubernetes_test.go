@@ -961,7 +961,8 @@ func TestAnnotatorCacheEvictionOnUpdate(t *testing.T) {
 		if !ok {
 			return nil
 		}
-		return v.([]string)
+		idxs, _ := v.([]string)
+		return idxs
 	}
 
 	// Seed with restart 0.

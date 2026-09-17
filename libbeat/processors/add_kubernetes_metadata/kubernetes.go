@@ -529,7 +529,8 @@ func (k *kubernetesAnnotator) addPod(indexers *Indexers, pod *kubernetes.Pod) {
 // Keys are tracked because they change between updates (e.g. restart-count indexes).
 func (k *kubernetesAnnotator) deleteRecordedIndexes(uid string) {
 	if prev, ok := k.indexed.LoadAndDelete(uid); ok {
-		for _, idx := range prev.([]string) {
+		idxs, _ := prev.([]string)
+		for _, idx := range idxs {
 			k.cache.delete(idx)
 		}
 	}

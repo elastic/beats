@@ -308,7 +308,8 @@ func TestPodUIDIndexer_WithContainers(t *testing.T) {
 		}
 		cMeta, err := byIndex[uid+"/pending"].GetValue("kubernetes.container")
 		assert.NoError(t, err)
-		cm := cMeta.(mapstr.M)
+		cm, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
 		assert.Equal(t, "pending", cm["name"])
 		assert.Equal(t, "pending:latest", cm["image"])
 	})
