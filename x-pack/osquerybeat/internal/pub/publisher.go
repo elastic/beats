@@ -54,11 +54,22 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	// Setup configuration pointers to the clients and corresponding default datasets
+	// Locate each stream by dataset so that delivery order does not affect
+	// which client handles which data stream.
+	var resultInput, actionResponsesInput, profileInput *config.InputConfig
+	for i := range inputs {
+		switch inputs[i].Datastream.Dataset {
+		case config.DefaultDataset, "":
+			resultInput = &inputs[i]
+		case config.DefaultActionResponsesDataset:
+			actionResponsesInput = &inputs[i]
+		case config.DefaultQueryProfileDataset:
+			profileInput = &inputs[i]
+		}
+	}
 
-	// The osquery_manager.result is always first
-	if len(inputs) > 0 {
-		processors, err := p.processorsForInputConfig(inputs[0], config.DefaultDataset)
+	if resultInput != nil {
+		processors, err := p.processorsForInputConfig(*resultInput, config.DefaultDataset)
 		if err != nil {
 			return err
 		}
@@ -80,12 +91,11 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		if oldclient != nil {
 			oldclient.Close()
 		}
-
 	}
 
-	// Attach remaining DefaultActionResultsDataset if present
-	if len(inputs) > 1 {
-		processors, err := p.processorsForInputConfig(inputs[1], config.DefaultActionResponsesDataset)
+	// Attach DefaultActionResponsesDataset if present
+	if actionResponsesInput != nil {
+		processors, err := p.processorsForInputConfig(*actionResponsesInput, config.DefaultActionResponsesDataset)
 		if err != nil {
 			return err
 		}
@@ -114,16 +124,8 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		}
 	}
 
-	// Attach optional query profiling stream if present, identified by dataset.
-	// For query profile events to be published, the integration (e.g. Fleet policy) must include
-	// an input stream with dataset osquery_manager.query_profile. Otherwise profile events are dropped.
-	var profileInput *config.InputConfig
-	for i := range inputs {
-		if inputs[i].Datastream.Dataset == config.DefaultQueryProfileDataset {
-			profileInput = &inputs[i]
-			break
-		}
-	}
+	// Attach optional query profiling stream if present. For query profile events to be
+	// published, the integration must include a stream with dataset osquery_manager.query_profile.
 	if profileInput != nil {
 		processors, err := p.processorsForInputConfig(*profileInput, config.DefaultQueryProfileDataset)
 		if err != nil {
