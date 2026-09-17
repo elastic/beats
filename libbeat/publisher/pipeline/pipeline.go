@@ -40,12 +40,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-// reaperInterval is how often the reaper re-checks pending clients whose events
-// have not drained yet. Finalization is cleanup, not latency-sensitive, so a
-// coarse interval keeps the reaper cheap; a client whose events are already
-// acked when it is handed over is finalized immediately on the notify wakeup.
-const reaperInterval = 50 * time.Millisecond
-
 // Pipeline implementation providint all beats publisher functionality.
 // The pipeline consists of clients, processors, a central queue, an output
 // controller and the actual outputs.
@@ -90,19 +84,6 @@ type Pipeline struct {
 	// disconnected. Guarded by clientsMu.
 	clientsMu sync.Mutex
 	clients   map[*client]struct{}
-
-	// reaper state. A single goroutine (reapClosedClients) finalizes clients
-	// that were Closed while the pipeline keeps running, as soon as their
-	// events drain (their producer's ACKWaitChan closes), instead of waiting
-	// for the whole pipeline to disconnect. This keeps the clients map, ack
-	// handlers and active-client metrics from growing under high client churn.
-	// reaperPending holds the clients awaiting drain (guarded by reaperMu);
-	// reaperNotify wakes the reaper when the set changes; reaperDone stops it.
-	reaperMu      sync.Mutex
-	reaperPending map[*client]struct{}
-	reaperNotify  chan struct{}
-	reaperDone    chan struct{}
-	reaperWG      sync.WaitGroup
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -282,15 +263,19 @@ func (p *Pipeline) Disconnect(ctx context.Context) error {
 		}
 		p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
 
+		// Release this pipeline from the shared reaper. release() acquires
+		// its internal sweepMu as a barrier, so any c.disconnect() call
+		// the reaper goroutine started for this pipeline's clients is
+		// guaranteed to have completed before release() returns. After
+		// this point the reaper will never touch p's clients again.
+		sharedReaper.release(p)
+
 		// Stage two of client shutdown: the queue has now drained or been
 		// force-closed and no further acknowledgments will arrive, so finalize
 		// every still-registered client (stop ack handling, drop references).
+		// disconnect() is idempotent, so clients the reaper already finalized
+		// are skipped (they removed themselves from p.clients on finalization).
 		p.disconnectClients()
-
-		// Stop the reaper now that all clients are finalized, and wait for it
-		// to exit so it does not outlive the pipeline.
-		close(p.reaperDone)
-		p.reaperWG.Wait()
 
 		p.observer.cleanup()
 	})
@@ -331,79 +316,17 @@ func (p *Pipeline) disconnectClients() {
 	}
 }
 
-// startReaper initializes the reaper state and launches the reaper goroutine.
+// startReaper registers this pipeline with the process-wide shared reaper.
 // Called once from each pipeline constructor.
 func (p *Pipeline) startReaper() {
-	p.reaperPending = make(map[*client]struct{})
-	p.reaperNotify = make(chan struct{}, 1)
-	p.reaperDone = make(chan struct{})
-	p.reaperWG.Go(func() {
-		p.reapClosedClients()
-	})
+	sharedReaper.acquire(p)
 }
 
-// finalizeWhenDrained hands a Closed client to the reaper so it is finalized
-// (stage two) as soon as its already-published events are acknowledged, rather
-// than lingering until the whole pipeline disconnects.
+// finalizeWhenDrained hands a Closed client to the shared reaper so it is
+// finalized (stage two) as soon as its already-published events are
+// acknowledged, rather than lingering until the whole pipeline disconnects.
 func (p *Pipeline) finalizeWhenDrained(c *client) {
-	p.reaperMu.Lock()
-	p.reaperPending[c] = struct{}{}
-	p.reaperMu.Unlock()
-	// Wake the reaper so it rebuilds its wait set. Non-blocking: a pending
-	// notify already covers this change.
-	select {
-	case p.reaperNotify <- struct{}{}:
-	default:
-	}
-}
-
-// reapClosedClients runs as a single goroutine for the pipeline's lifetime. It
-// finalizes Closed-but-not-yet-drained clients as their events are
-// acknowledged. Each pass non-blockingly sweeps the pending set and finalizes
-// every client whose ACKWaitChan has closed — O(pending) per pass, so a burst
-// of closing clients drains in one pass rather than the O(N^2) a per-client
-// wait would cost. When nothing is pending it blocks until a client is handed
-// over or the pipeline disconnects; otherwise it re-sweeps every reaperInterval.
-// Using one goroutine (not one per client) also keeps it out of per-client
-// goroutine-leak accounting.
-func (p *Pipeline) reapClosedClients() {
-	for {
-		p.reaperMu.Lock()
-		var ready []*client
-		for c := range p.reaperPending {
-			select {
-			case <-c.producer.ACKWaitChan():
-				ready = append(ready, c)
-			default:
-			}
-		}
-		for _, c := range ready {
-			delete(p.reaperPending, c)
-		}
-		pending := len(p.reaperPending)
-		p.reaperMu.Unlock()
-
-		for _, c := range ready {
-			c.disconnect()
-		}
-
-		if pending == 0 {
-			// Nothing to watch: block until a client is handed over or we stop.
-			select {
-			case <-p.reaperDone:
-				return
-			case <-p.reaperNotify:
-			}
-		} else {
-			// Some clients are still draining: re-sweep soon.
-			select {
-			case <-p.reaperDone:
-				return
-			case <-p.reaperNotify:
-			case <-time.After(reaperInterval):
-			}
-		}
-	}
+	sharedReaper.add(p, c)
 }
 
 // Connect creates a new client with default settings.
