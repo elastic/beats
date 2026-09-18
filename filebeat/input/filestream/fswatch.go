@@ -397,8 +397,37 @@ func (w *fileWatcher) watch(
 		}
 	}
 
+<<<<<<< HEAD
 	// Unmatched-leftover deletes: prev files that weren't matched by either
 	// the exact-FileID or the prefix-match rename pass are genuinely gone.
+=======
+	// Postpone deletes for unmatched entries the scan could not resolve. An
+	// unobservable prefix (e.g. a directory that hit EMFILE) and a path that
+	// vanished mid-scan (a concurrent rename or delete) are both inconclusive:
+	// treating them as deleted would wipe registry state and re-ingest from
+	// offset 0 once the next scan sees the file again.
+	postponed := 0
+	postponedUnobservable := 0
+	if len(scanResults.Unobservable) > 0 || len(scanResults.Vanished) > 0 {
+		unobservable := pathSet(scanResults.Unobservable)
+		vanished := pathSet(scanResults.Vanished)
+		for remainingPath, remainingDesc := range w.prev {
+			failedObservation := underAnyPrefix(remainingPath, unobservable)
+			if !failedObservation && !underAnyPrefix(remainingPath, vanished) {
+				continue
+			}
+			if failedObservation {
+				postponedUnobservable++
+			}
+			scanResults.Files[remainingPath] = remainingDesc
+			delete(w.prev, remainingPath)
+			postponed++
+		}
+	}
+
+	// Unmatched-leftover deletes: prev files matched by neither rename pass and
+	// not postponed above are genuinely gone.
+>>>>>>> 7b2abed (filestream: preserve state for paths that vanish mid-scan (#53280))
 	for remainingPath, remainingDesc := range w.prev {
 		srcID := w.getFileIdentity(remainingDesc)
 		select {
@@ -431,6 +460,18 @@ func (w *fileWatcher) watch(
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	// Only a genuine observation failure is worth warning about. A path that
+	// vanished mid-scan is an ordinary rename or delete and resolves itself on
+	// the next scan.
+	if postponedUnobservable > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
+		w.lastPostponedWarn = now
+		w.log.Warnf("some previously seen files could not be observed (e.g. file-descriptor exhaustion) in the last %s, postponing their delete detection to avoid re-ingestion. See the filebeat.filestream.scan_errors metric for the current count.",
+			postponedWarnInterval)
+	}
+
+>>>>>>> 7b2abed (filestream: preserve state for paths that vanish mid-scan (#53280))
 	w.log.Debugw("File scan complete",
 		"total", len(paths),
 		"written", writtenCount,
@@ -524,6 +565,37 @@ func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
 	return w.sourceIdentifier.ID(src)
 }
 
+<<<<<<< HEAD
+=======
+// pathSet indexes paths for underAnyPrefix lookups.
+func pathSet(paths []string) map[string]struct{} {
+	set := make(map[string]struct{}, len(paths))
+	for _, p := range paths {
+		set[p] = struct{}{}
+	}
+	return set
+}
+
+// underAnyPrefix reports whether path equals, or is nested under, any of
+// the prefixes. Separator-aware, so "/a/b" is not a prefix of "/a/bc".
+func underAnyPrefix(path string, prefixes map[string]struct{}) bool {
+	if len(prefixes) == 0 {
+		return false
+	}
+	if _, ok := prefixes[path]; ok {
+		return true
+	}
+	for i := len(path) - 1; i > 0; i-- {
+		if path[i] == filepath.Separator {
+			if _, ok := prefixes[path[:i]]; ok {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+>>>>>>> 7b2abed (filestream: preserve state for paths that vanish mid-scan (#53280))
 func createEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
 	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd, SrcID: srcID}
 }
