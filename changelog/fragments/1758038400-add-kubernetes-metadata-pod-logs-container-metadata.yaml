@@ -2,9 +2,11 @@ kind: enhancement
 
 summary: >
   add_kubernetes_metadata: events matched from /var/log/pods/ with resource_type:pod now
-  include container.name and container.image (always), plus container.id and container.runtime
-  for the currently-running log file. Rotated log files from earlier container restarts receive
-  name and image only.
+  include kubernetes.container.name and container.image.name (always), plus container.id and
+  container.runtime for the currently-running log file. The immediately preceding restart also
+  receives container.id and container.runtime when its container ID is available from
+  LastTerminationState. Older rotated log files receive kubernetes.container.name and
+  container.image.name only.
 
 component: libbeat
 
