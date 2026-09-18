@@ -263,17 +263,17 @@ func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 		}
 		cid, err := ev.ID()
 		if err != nil {
-			return err
+			return errors.Join(err, ev.Close())
 		}
 		if len(format.Probe.Filter) > 0 {
 			fd, err := ev.FD()
 			if err != nil {
-				return err
+				return errors.Join(err, ev.Close())
 			}
 			fbytes := []byte(format.Probe.Filter + "\x00")
 			_, _, errNo := unix.Syscall(unix.SYS_IOCTL, uintptr(fd), unix.PERF_EVENT_IOC_SET_FILTER, uintptr(unsafe.Pointer(&fbytes[0])))
 			if errNo != 0 {
-				return fmt.Errorf("unable to set filter '%s': %w", format.Probe.Filter, errNo)
+				return errors.Join(fmt.Errorf("unable to set filter '%s': %w", format.Probe.Filter, errNo), ev.Close())
 			}
 		}
 		c.streams[cid] = stream{probeID: format.ID, decoder: decoder}
