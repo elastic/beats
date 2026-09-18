@@ -12,25 +12,59 @@ import (
 
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func BenchmarkGenerateEvents(b *testing.B) {
-	// Create a sample set of metrics
-	metrics := createSampleMetrics()
-
-	// Create an instance of remoteWriteTypedGenerator
-	generator := remoteWriteTypedGenerator{
-		// Initialize with appropriate values
-		metricsCount: true,
-		// Add other necessary fields
+func newRemoteWriteTypedGeneratorForTest(t *testing.T, configure func(*remoteWriteTypedGenerator)) (*remoteWriteTypedGenerator, func(time.Time)) {
+	t.Helper()
+	start := time.Unix(1000, 0)
+	g, setNow := newTestTypedGenerator(t, defaultHistogramAssemblyConfig(), start)
+	if configure != nil {
+		configure(g)
 	}
+	return g, setNow
+}
+
+func flushHistogramEventsQuiet(g *remoteWriteTypedGenerator) map[string]mb.Event {
+	return g.FlushExpired(g.now().Add(g.assemblyConfig.QuietPeriod + time.Millisecond))
+}
+
+func flushAllHistogramsHardTimeout(g *remoteWriteTypedGenerator) map[string]mb.Event {
+	return g.FlushExpired(g.now().Add(g.assemblyConfig.HardTimeout))
+}
+
+func benchmarkTypedGenerator(metricsCount bool) *remoteWriteTypedGenerator {
+	return benchmarkTypedGeneratorWithAssembly(metricsCount, true)
+}
+
+func benchmarkTypedGeneratorWithAssembly(metricsCount, assemblyEnabled bool) *remoteWriteTypedGenerator {
+	counters := xcollector.NewCounterCache(time.Minute)
+	g := &remoteWriteTypedGenerator{
+		metricsCount:    metricsCount,
+		counterCache:    counters,
+		assemblyConfig:  defaultHistogramAssemblyConfig(),
+		now:             time.Now,
+		retainedFlushes: make(map[string]mb.Event),
+	}
+	if assemblyEnabled {
+		g.assembler = newHistogramAssembler(g.assemblyConfig, nil)
+	}
+	g.counterCache.Start()
+	return g
+}
+
+func BenchmarkGenerateEvents(b *testing.B) {
+	metrics := createSampleMetrics()
+	generator := benchmarkTypedGenerator(true)
+	defer generator.counterCache.Stop()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		generator.GenerateEvents(metrics)
 	}
 }
@@ -85,13 +119,9 @@ func createSampleMetrics() model.Samples {
 // TestGenerateEventsCounter tests counter simple cases
 func TestGenerateEventsCounter(t *testing.T) {
 
-	counters := xcollector.NewCounterCache(1 * time.Second)
-
-	g := remoteWriteTypedGenerator{
-		counterCache: counters,
-		rateCounters: true,
-	}
-	g.counterCache.Start()
+	g, _ := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+	})
 	timestamp := model.Time(424242)
 	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
@@ -151,13 +181,9 @@ func TestGenerateEventsCounter(t *testing.T) {
 // TestGenerateEventsCounterSameLabels tests multiple counters with same labels
 func TestGenerateEventsCounterSameLabels(t *testing.T) {
 
-	counters := xcollector.NewCounterCache(1 * time.Second)
-
-	g := remoteWriteTypedGenerator{
-		counterCache: counters,
-		rateCounters: true,
-	}
-	g.counterCache.Start()
+	g, _ := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+	})
 	timestamp := model.Time(424242)
 	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
@@ -242,13 +268,9 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 // TestGenerateEventsCounterDifferentLabels tests multiple counters with different labels
 func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 
-	counters := xcollector.NewCounterCache(1 * time.Second)
-
-	g := remoteWriteTypedGenerator{
-		counterCache: counters,
-		rateCounters: true,
-	}
-	g.counterCache.Start()
+	g, _ := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+	})
 
 	timestamp := model.Time(424242)
 	labels := mapstr.M{
@@ -374,13 +396,9 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 // TestGenerateEventsGaugeDifferentLabels tests multiple gauges with different labels
 func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 
-	counters := xcollector.NewCounterCache(1 * time.Second)
-
-	g := remoteWriteTypedGenerator{
-		counterCache: counters,
-		rateCounters: true,
-	}
-	g.counterCache.Start()
+	g, _ := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+	})
 	timestamp := model.Time(424242)
 	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
@@ -529,13 +547,9 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 // TestGenerateEventsQuantilesDifferentLabels tests summaries with different labels
 func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 
-	counters := xcollector.NewCounterCache(1 * time.Second)
-
-	g := remoteWriteTypedGenerator{
-		counterCache: counters,
-		rateCounters: true,
-	}
-	g.counterCache.Start()
+	g, _ := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+	})
 
 	timestamp := model.Time(424242)
 	labels := mapstr.M{
@@ -721,14 +735,11 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 // TestGenerateEventsHistogramsDifferentLabels tests histograms with different labels
 func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 
-	counters := xcollector.NewCounterCache(1 * time.Second)
-
-	g := remoteWriteTypedGenerator{
-		counterCache: counters,
-		rateCounters: true,
-	}
-	g.counterCache.Start()
+	g, setNow := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+	})
 	timestamp := model.Time(424242)
+	setNow(timestamp.Time())
 	labels := mapstr.M{
 		"runtime": model.LabelValue("linux"),
 	}
@@ -870,7 +881,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			Timestamp: timestamp,
 		},
 	}
-	events := g.GenerateEvents(metrics)
+	events := mergeEvents(g.GenerateEvents(metrics), flushHistogramEventsQuiet(g))
 
 	expected := mapstr.M{
 		"http_request_duration_seconds": mapstr.M{
@@ -928,6 +939,9 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
+	// The first histogram flushed after QuietPeriod, and its tombstone remains
+	// active for HardTimeout from that flush.
+	setNow(timestamp.Time().Add(g.assemblyConfig.QuietPeriod + g.assemblyConfig.HardTimeout + time.Second))
 	metrics = model.Samples{
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -1061,7 +1075,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			Timestamp: timestamp,
 		},
 	}
-	events = g.GenerateEvents(metrics)
+	events = mergeEvents(g.GenerateEvents(metrics), flushHistogramEventsQuiet(g))
 
 	expected = mapstr.M{
 		"http_request_duration_seconds": mapstr.M{
@@ -1119,22 +1133,94 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	assert.EqualValues(t, e.ModuleFields, expected2)
 }
 
+// TestGenerateEventsHistogramPartialAcrossRequests verifies cross-request bucket assembly.
+func TestGenerateEventsHistogramPartialAcrossRequests(t *testing.T) {
+	g, setNow := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+	})
+
+	timestamp := model.Time(424242)
+	setNow(timestamp.Time())
+	labels := mapstr.M{
+		"runtime": model.LabelValue("linux"),
+	}
+	eventKey := labels.String() + timestamp.Time().String()
+
+	firstBatch := model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime":  "linux",
+				"le":       "0.25",
+			},
+			Value:     model.SampleValue(10),
+			Timestamp: timestamp,
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime":  "linux",
+				"le":       "0.50",
+			},
+			Value:     model.SampleValue(20),
+			Timestamp: timestamp,
+		},
+	}
+
+	secondBatch := model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime":  "linux",
+				"le":       "+Inf",
+			},
+			Value:     model.SampleValue(30),
+			Timestamp: timestamp,
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_sum",
+				"runtime":  "linux",
+			},
+			Value:     model.SampleValue(45),
+			Timestamp: timestamp,
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_count",
+				"runtime":  "linux",
+			},
+			Value:     model.SampleValue(46),
+			Timestamp: timestamp,
+		},
+	}
+
+	firstEvents := g.GenerateEvents(firstBatch)
+	assert.Empty(t, firstEvents, "first batch buckets must be buffered without immediate events")
+
+	setNow(timestamp.Time().Add(2 * time.Second))
+	secondEvents := g.GenerateEvents(secondBatch)
+	require.Len(t, secondEvents, 1, "second batch should emit sum/count immediately")
+	assert.NotContains(t, secondEvents[eventKey].ModuleFields, "http_request_duration_seconds", "histogram must not emit before flush")
+
+	flushed := flushHistogramEventsQuiet(g)
+	require.Contains(t, flushed, eventKey)
+	hist := flushed[eventKey].ModuleFields["http_request_duration_seconds"].(mapstr.M)["histogram"].(mapstr.M)
+
+	assert.Equal(t, []float64{0.125, 0.375, 0.5}, hist["values"], "flush must merge buckets across requests")
+}
+
 // TestGenerateEventsCounterWithDefinedPattern tests counter with defined pattern
 func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
-
-	counters := xcollector.NewCounterCache(1 * time.Second)
 
 	counterPatterns, err := p.CompilePatternList(&[]string{"_mycounter"})
 	if err != nil {
 		panic(err)
 	}
-	g := remoteWriteTypedGenerator{
-		counterCache:    counters,
-		rateCounters:    true,
-		counterPatterns: counterPatterns,
-	}
-
-	g.counterCache.Start()
+	g, _ := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+		g.counterPatterns = counterPatterns
+	})
 
 	timestamp := model.Time(424242)
 	labels := mapstr.M{
@@ -1196,20 +1282,17 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 // TestGenerateEventsHistogramWithDefinedPattern tests histogram with defined pattern
 func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 
-	counters := xcollector.NewCounterCache(1 * time.Second)
-
 	histogramPatterns, err := p.CompilePatternList(&[]string{"_myhistogram"})
 	if err != nil {
 		panic(err)
 	}
-	g := remoteWriteTypedGenerator{
-		counterCache:      counters,
-		rateCounters:      true,
-		histogramPatterns: histogramPatterns,
-	}
+	g, setNow := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+		g.rateCounters = true
+		g.histogramPatterns = histogramPatterns
+	})
 
-	g.counterCache.Start()
 	timestamp := model.Time(424242)
+	setNow(timestamp.Time())
 	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
@@ -1226,7 +1309,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 			Timestamp: timestamp,
 		},
 	}
-	events := g.GenerateEvents(metrics)
+	events := mergeEvents(g.GenerateEvents(metrics), flushAllHistogramsHardTimeout(g))
 
 	expected := mapstr.M{
 		"net_conntrack_listener_conn_closed_myhistogram": mapstr.M{
@@ -1243,6 +1326,9 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
+	// The first histogram flushed at timestamp+HardTimeout, so its tombstone
+	// expires one more HardTimeout later.
+	setNow(timestamp.Time().Add(2*g.assemblyConfig.HardTimeout + time.Second))
 	metrics = model.Samples{
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -1254,7 +1340,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 			Timestamp: timestamp,
 		},
 	}
-	events = g.GenerateEvents(metrics)
+	events = mergeEvents(g.GenerateEvents(metrics), flushAllHistogramsHardTimeout(g))
 
 	expected = mapstr.M{
 		"net_conntrack_listener_conn_closed_myhistogram": mapstr.M{
@@ -1425,12 +1511,12 @@ func TestMetricsCount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			generator := remoteWriteTypedGenerator{
-				metricsCount: true,
-				counterCache: xcollector.NewCounterCache(time.Minute),
-			}
+			generator, setNow := newRemoteWriteTypedGeneratorForTest(t, func(g *remoteWriteTypedGenerator) {
+				g.metricsCount = true
+			})
+			setNow(time.Unix(2000, 0))
 
-			events := generator.GenerateEvents(tt.samples)
+			events := mergeEvents(generator.GenerateEvents(tt.samples), flushAllHistogramsHardTimeout(generator))
 
 			for _, event := range events {
 				count, ok := event.RootFields["metrics_count"]
