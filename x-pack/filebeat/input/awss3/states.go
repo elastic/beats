@@ -15,9 +15,68 @@ import (
 
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 
+<<<<<<< HEAD
 // states handles list of s3 object state. One must use newStates to instantiate a
 // file states registry. Using the zero-value is not safe.
 type states struct {
+=======
+// stateRegistry defines the interface for managing S3 object states.
+// This allows different implementations for normal mode vs lexicographical ordering mode.
+type stateRegistry interface {
+	// IsProcessed returns true if the object with the given ID has been processed.
+	IsProcessed(id string) bool
+
+	// AddState adds or updates a state in the registry.
+	AddState(st state) error
+
+	// CleanUp removes states that are not in the provided knownIDs list.
+	CleanUp(knownIDs []string) error
+
+	// GetStartAfterKey returns the key to use for S3 ListObjects StartAfter parameter.
+	// For lexicographical mode, this returns the persisted tail key.
+	// Returns empty string if no tail exists.
+	GetStartAfterKey() string
+
+	// MarkObjectInFlight marks an object key as currently being processed.
+	// In lexicographical mode, this updates the in-memory tail tracking and
+	// persists the new tail if it's smaller than the current tail.
+	MarkObjectInFlight(key string) error
+
+	// UnmarkObjectInFlight removes an object key from in-flight tracking.
+	// Called when processing fails or is skipped (not when completing successfully).
+	// Updates and persists the tail if needed.
+	UnmarkObjectInFlight(key string) error
+
+	// Close closes the underlying store.
+	Close()
+}
+
+// newStateRegistry creates the appropriate state registry based on configuration.
+// bucket is the name of the bucket the input polls, used to scope the loaded
+// states to this input. The persistent store is shared by all aws-s3 inputs of
+// the process, so without this scoping an input would load (and later clean up)
+// states belonging to other inputs. An empty bucket disables the scoping.
+func newStateRegistry(log *logp.Logger, stateStore statestore.States, bucket string, keyPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (stateRegistry, error) {
+	// When lexicographical ordering is enabled, pass the input type to allow
+	// ES state store routing for agentless deployments
+	storeKey := ""
+	if lexicographicalOrdering {
+		storeKey = inputName
+	}
+	store, err := stateStore.StoreFor(storeKey, "")
+	if err != nil {
+		return nil, fmt.Errorf("can't access persistent store: %w", err)
+	}
+
+	if lexicographicalOrdering {
+		return newLexicographicalStateRegistry(log, store, bucket, keyPrefix, lexicographicalLookbackKeys)
+	}
+	return newNormalStateRegistry(log, store, bucket, keyPrefix)
+}
+
+// baseStateRegistry contains shared functionality between registry implementations.
+type baseStateRegistry struct {
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 	// Completed S3 object states, indexed by state ID.
 	// statesLock must be held to access states.
 	states     map[string]*state

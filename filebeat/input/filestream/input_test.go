@@ -273,10 +273,17 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 
+<<<<<<< HEAD
+=======
+func (s *testStore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("test:%p", s.registry)
+}
+
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func (s *testStore) CleanupInterval() time.Duration {
 	return time.Second
 }

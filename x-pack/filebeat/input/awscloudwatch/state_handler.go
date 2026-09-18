@@ -49,7 +49,7 @@ func newStateHandler(log *logp.Logger, cfg config, store statestore.States) (*st
 	if err != nil {
 		return nil, err
 	}
-	st, err := store.StoreFor("")
+	st, err := store.StoreFor("", "")
 	if err != nil {
 		return nil, fmt.Errorf("error accessing persistence store: %w", err)
 	}

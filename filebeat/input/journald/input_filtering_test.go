@@ -256,7 +256,15 @@ func TestInputSeek(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			if testCase.cursor != "" {
+<<<<<<< HEAD
 				store, _ := env.stateStore.StoreFor("")
+=======
+				store, err := env.stateStore.StoreFor("", "")
+				if err != nil {
+					t.Fatalf("failed to open store: %v", err)
+				}
+				defer store.Close()
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 				tmp := map[string]any{}
 				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
 					t.Fatal(err)

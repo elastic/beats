@@ -1911,6 +1911,195 @@ service:
 		"receivers must have different diskqueue paths")
 }
 
+<<<<<<< HEAD
+=======
+func TestFilebeatOTelHTTPJSONStateStoreIsPerInputID(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	// Register the cleanup before Setenv so the flags are reloaded after the
+	// env var is restored.
+	t.Cleanup(func() { features.ReinitForTest() })
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
+	features.ReinitForTest()
+
+	// Fixed publication time, so a poll reveals where the input started.
+	const cursorTime = "2026-01-01T00:00:00Z"
+
+	// Each input polls its own path so requests can be attributed to it.
+	var mu sync.Mutex
+	sinceByInput := map[string][]string{}
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		id := strings.TrimPrefix(r.URL.Path, "/")
+		sinceByInput[id] = append(sinceByInput[id], parseParams(t, r.RequestURI).Format(time.RFC3339))
+		mu.Unlock()
+
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(response{Message: "Hello", Published: cursorTime})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}))
+	defer testServer.Close()
+
+	sinceValues := func(id string) []string {
+		mu.Lock()
+		defer mu.Unlock()
+		return slices.Clone(sinceByInput[id])
+	}
+
+	host := integration.GetESURL(t, "http")
+	password, _ := host.User.Password()
+	suffix := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	params := struct {
+		ESURL, Username, Password, InputURL, PathHome string
+		InputIDs                                      []string
+	}{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: host.User.Username(),
+		Password: password,
+		InputURL: testServer.URL,
+		// One path.home, so both receivers resolve to the same shared registry.
+		PathHome: t.TempDir(),
+		InputIDs: []string{"httpjson-a-" + suffix, "httpjson-b-" + suffix},
+	}
+
+	configTemplate := `receivers:
+{{- range $id := .InputIDs }}
+  filebeatreceiver/{{ $id }}:
+    filebeat:
+      inputs:
+        - type: httpjson
+          id: {{ $id }}
+          enabled: true
+          interval: 1s
+          request.url: {{ $.InputURL }}/{{ $id }}
+          request.method: GET
+          request.transforms:
+            - set:
+                target: url.params.since
+                value: '[[.cursor.published]]'
+                default: '[[formatDate (now (parseDuration "-24h")) "RFC3339"]]'
+          cursor:
+            published:
+              value: '[[.last_event.published]]'
+    queue.mem.flush.timeout: 0s
+    setup.template.enabled: false
+    storage: elasticsearch_storage
+    path.home: {{ $.PathHome }}
+{{- end }}
+extensions:
+  elasticsearch_storage:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+exporters:
+  debug:
+service:
+  extensions:
+    - elasticsearch_storage
+  pipelines:
+    logs:
+      receivers:
+{{- range $id := .InputIDs }}
+        - filebeatreceiver/{{ $id }}
+{{- end }}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+`
+
+	configStr := renderOtelConfig(t, configTemplate, params)
+	es := esapi.New(integration.GetESClient(t, "http"))
+
+	// Each input's index must hold its own cursor, at the published time the
+	// server reports, and nothing else. Wait for the value as the key appears
+	// at input start before any event is acknowledged and the cursor saved.
+	wantCursors := map[string]map[string]string{}
+	for _, id := range params.InputIDs {
+		wantCursors[id] = map[string]string{
+			"httpjson::" + id + "::" + params.InputURL + "/" + id: cursorTime,
+		}
+	}
+	requireOwnCursorOnly := func() {
+		t.Helper()
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			for _, id := range params.InputIDs {
+				assert.Equalf(ct, wantCursors[id],
+					stateStoreCursors(t.Context(), ct, es, "agentless-state-"+id),
+					"agentless-state-%s must hold exactly its own input's cursor", id)
+			}
+		}, time.Minute, time.Second)
+	}
+
+	collector := oteltestcol.New(t, configStr)
+	requireOwnCursorOnly()
+
+	pollsBeforeRestart := map[string]int{}
+	for _, id := range params.InputIDs {
+		pollsBeforeRestart[id] = len(sinceValues(id))
+	}
+	collector.Shutdown()
+
+	oteltestcol.New(t, configStr)
+
+	// Every input must resume from its own stored cursor.
+	for _, id := range params.InputIDs {
+		require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+			since := sinceValues(id)
+			if !assert.Greater(ct, len(since), pollsBeforeRestart[id]) {
+				return
+			}
+			assert.Equal(ct, cursorTime, since[pollsBeforeRestart[id]])
+		}, time.Minute, time.Second, "input %s must resume from its stored cursor after the restart", id)
+	}
+	requireOwnCursorOnly()
+}
+
+// stateStoreCursors maps each document id in an agentless state index to the
+// publication time stored in its cursor.
+func stateStoreCursors(ctx context.Context, ct *assert.CollectT, es *esapi.API, index string) map[string]string {
+	res, err := es.Search(
+		es.Search.WithIndex(index),
+		es.Search.WithSize(100),
+		es.Search.WithContext(ctx),
+	)
+	if !assert.NoError(ct, err) {
+		return nil
+	}
+	defer res.Body.Close()
+	if !assert.Falsef(ct, res.IsError(), "search %s: %s", index, res.Status()) {
+		return nil
+	}
+
+	var result struct {
+		Hits struct {
+			Hits []struct {
+				ID     string `json:"_id"`
+				Source struct {
+					V struct {
+						Cursor struct {
+							Published string `json:"published"`
+						} `json:"cursor"`
+					} `json:"v"`
+				} `json:"_source"`
+			} `json:"hits"`
+		} `json:"hits"`
+	}
+	assert.NoError(ct, json.NewDecoder(res.Body).Decode(&result))
+
+	cursors := make(map[string]string, len(result.Hits.Hits))
+	for _, h := range result.Hits.Hits {
+		cursors[h.ID] = h.Source.V.Cursor.Published
+	}
+	return cursors
+}
+
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func BenchmarkFilebeatOTelCollector(b *testing.B) {
 	numReceivers := 4
 

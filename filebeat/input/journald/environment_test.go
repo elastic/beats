@@ -181,23 +181,6 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 10*time.Second, 10*time.Millisecond, &msg)
 }
 
-// waitUntilEventCount waits until total count events arrive to the client.
-func (e *inputTestingEnvironment) waitUntilEventsPublished(published int) {
-	e.t.Helper()
-	msg := strings.Builder{}
-	require.Eventually(e.t, func() bool {
-		sum := len(e.pipeline.GetAllEvents())
-		if sum >= published {
-			return true
-		}
-
-		msg.Reset()
-		fmt.Fprintf(&msg, "too few events; expected: %d, actual: %d", published, sum)
-
-		return false
-	}, 5*time.Second, 10*time.Millisecond, &msg)
-}
-
 func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
 	t := e.t
 	t.Helper()
@@ -233,10 +216,17 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
+<<<<<<< HEAD
+=======
+func (s *testInputStore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("test:%p", s.registry)
+}
+
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
 }

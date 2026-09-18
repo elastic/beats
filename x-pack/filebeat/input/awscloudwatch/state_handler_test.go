@@ -213,10 +213,17 @@ type testInputStore struct {
 	registry *statestore.Registry
 }
 
-func (s *testInputStore) StoreFor(typ string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(typ, _ string) (*statestore.Store, error) {
 	return s.registry.Get(typ)
 }
 
+<<<<<<< HEAD
+=======
+func (s *testInputStore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("test:%p", s.registry)
+}
+
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func createTestInputStore() *testInputStore {
 	return &testInputStore{
 		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),

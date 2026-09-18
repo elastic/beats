@@ -42,10 +42,17 @@ type testStateStore struct {
 	registry *statestore.Registry
 }
 
-func (s *testStateStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testStateStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get(testStoreName)
 }
 
+<<<<<<< HEAD
+=======
+func (s *testStateStore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("test:%p", s.registry)
+}
+
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func (s *testStateStore) CleanupInterval() time.Duration {
 	return time.Second
 }
