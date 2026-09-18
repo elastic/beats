@@ -26,6 +26,7 @@ import (
 	"io"
 	"maps"
 	"os"
+	"path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -475,46 +476,17 @@ func (s *fileScanner) debugLogUnobservable(prefixes []string) {
 // base directory, indexed by their depth below that directory so the walker only
 // tests a file against the patterns that can possibly match it.
 type walkGroup struct {
-	root     string
-	maxDepth int
-	byDepth  map[int][]string
+	root string
+	// patterns is in ascending depth order, then configured order, so that
+	// matchLeaf's first-match break is deterministic.
+	patterns []walkPattern
 }
 
 // buildWalkGroups partitions s.paths into literal paths and walk groups keyed by
 // their base directory, so patterns sharing a base read the tree only once.
-// Patterns invalid upfront are dropped and reported here; ones that escape this
-// check (a bad token behind a literal prefix never reaches the parser when
-// matching "") are reported once per scan by walk.
+// A pattern with a malformed component can match nothing; it is reported and
+// dropped here.
 func (s *fileScanner) buildWalkGroups() {
-	groups := map[string]*walkGroup{}
-	var literals []string
-
-	for _, path := range s.paths {
-		if !hasGlobMeta(path) {
-			literals = append(literals, path)
-			continue
-		}
-
-		if _, err := filepath.Match(path, ""); err != nil {
-			s.log.Errorf("invalid glob pattern %q: %v", path, err)
-			continue
-		}
-
-		root := globRoot(path)
-		g := groups[root]
-		if g == nil {
-			g = &walkGroup{root: root, byDepth: map[int][]string{}}
-			groups[root] = g
-		}
-		d := depthBelow(root, path)
-		g.byDepth[d] = append(g.byDepth[d], path)
-		if d > g.maxDepth {
-			g.maxDepth = d
-		}
-	}
-	s.walkGroups = groups
-	s.literals = literals
-
 	// Index every pattern by its position, and record whether any two patterns can
 	// match the same file. When none can, the walk's matched pattern is the file's
 	// scan-order position, so matchedEarlier resolves collisions from these indices
@@ -526,6 +498,35 @@ func (s *fileScanner) buildWalkGroups() {
 		}
 	}
 	s.pathsCanOverlap = pathsCanOverlap(s.paths)
+
+	groups := map[string]*walkGroup{}
+	var literals []string
+	for _, path := range s.paths {
+		if !hasGlobMeta(path) {
+			literals = append(literals, path)
+			continue
+		}
+
+		root := globRoot(path)
+		wp, err := newWalkPattern(root, path, s.pathIndex[path])
+		if err != nil {
+			s.log.Errorf("invalid glob pattern %q: %v", path, err)
+			continue
+		}
+		g := groups[root]
+		if g == nil {
+			g = &walkGroup{root: root}
+			groups[root] = g
+		}
+		g.patterns = append(g.patterns, wp)
+	}
+	for _, g := range groups {
+		slices.SortStableFunc(g.patterns, func(a, b walkPattern) int {
+			return len(a.comps) - len(b.comps)
+		})
+	}
+	s.walkGroups = groups
+	s.literals = literals
 }
 
 // walkPattern is a group pattern together with its path components below the
@@ -534,9 +535,69 @@ func (s *fileScanner) buildWalkGroups() {
 type walkPattern struct {
 	pattern string
 	comps   []string
+	// leafPrefix and leafSuffix are the literal text at either end of the last
+	// component. Every file the pattern matches starts and ends with them, so a
+	// name failing either is rejected without running filepath.Match.
+	leafPrefix, leafSuffix string
 	// orderIndex is the pattern's position in s.paths, carried through to process
 	// so a matched file's scan order is known without rescanning s.paths.
 	orderIndex int
+}
+
+// newWalkPattern splits pattern below root and validates every component with
+// path.Match, which unlike filepath.Match parses the whole component whatever
+// the name. On a separator-free component the two agree on whether a name
+// matches, so a component accepted here never makes filepath.Match fail.
+func newWalkPattern(root, pattern string, orderIndex int) (walkPattern, error) {
+	comps := patternComponents(root, pattern)
+	if len(comps) == 0 {
+		return walkPattern{}, fmt.Errorf("no path component below base directory %q", root)
+	}
+	for _, c := range comps {
+		if _, err := path.Match(c, ""); err != nil {
+			return walkPattern{}, err
+		}
+	}
+	leaf := comps[len(comps)-1]
+	return walkPattern{
+		pattern:    pattern,
+		comps:      comps,
+		leafPrefix: literalPrefix(leaf),
+		leafSuffix: literalSuffix(leaf),
+		orderIndex: orderIndex,
+	}, nil
+}
+
+// matchName reports whether name matches comp. comp was validated by
+// newWalkPattern, so filepath.Match cannot fail.
+func matchName(comp, name string) bool {
+	matched, _ := filepath.Match(comp, name)
+	return matched
+}
+
+// leafCandidates narrows sorted names to those that can match at least one
+// pattern: a match must start with its pattern's literal prefix, and names
+// sharing a prefix are contiguous when sorted, so each pattern selects one
+// block. The enclosing span of every block is returned; a pattern without a
+// literal prefix widens it to the whole slice. matchLeaf's per-pattern check
+// covers names inside the span but outside a block.
+func leafCandidates(names []string, exact []walkPattern) []string {
+	lo, hi := len(names), 0
+	for _, p := range exact {
+		if p.leafPrefix == "" {
+			return names
+		}
+		start, _ := slices.BinarySearch(names, p.leafPrefix)
+		end := start
+		for end < len(names) && strings.HasPrefix(names[end], p.leafPrefix) {
+			end++
+		}
+		lo, hi = min(lo, start), max(hi, end)
+	}
+	if lo >= hi {
+		return nil
+	}
+	return names[lo:hi]
 }
 
 func (s *fileScanner) readNames(dir string, shared bool) ([]string, error) {
@@ -566,26 +627,6 @@ type walkSink interface {
 // the next component of some pattern. Pattern depth bounds the recursion, which
 // preserves the RecursiveGlobDepth cap and makes symlink cycles safe.
 func (s *fileScanner) walk(g *walkGroup, sink walkSink) {
-	// Flatten the group's patterns in ascending depth order, not map order, so
-	// malformed-pattern logging and matchLeaf's first-match break are deterministic
-	// rather than dependent on Go's map iteration.
-	patterns := make([]walkPattern, 0, len(g.byDepth))
-	for d := 0; d <= g.maxDepth; d++ {
-		for _, p := range g.byDepth[d] {
-			patterns = append(patterns, walkPattern{pattern: p, comps: patternComponents(g.root, p), orderIndex: s.pathIndex[p]})
-		}
-	}
-
-	// badPatterns dedups ErrBadPattern logs: filepath.Match reports a malformed
-	// pattern for every candidate name, but one line per scan is enough.
-	badPatterns := map[string]struct{}{}
-	logBadPattern := func(pattern string, err error) {
-		if _, seen := badPatterns[pattern]; !seen {
-			badPatterns[pattern] = struct{}{}
-			s.log.Errorf("glob match(%q) failed: %v", pattern, err)
-		}
-	}
-
 	// rec reads dir, whose entries are at childDepth below the root. alive holds
 	// the patterns whose components matched every ancestor directory of dir.
 	var rec func(dir string, depth int, alive []walkPattern)
@@ -622,12 +663,10 @@ func (s *fileScanner) walk(g *walkGroup, sink walkSink) {
 		// checked here, and the full path is built only on a match.
 		matchLeaf := func(name string) {
 			for _, p := range exact {
-				matched, matchErr := filepath.Match(p.comps[childDepth-1], name)
-				if matchErr != nil {
-					logBadPattern(p.pattern, matchErr)
+				if !strings.HasPrefix(name, p.leafPrefix) || !strings.HasSuffix(name, p.leafSuffix) {
 					continue
 				}
-				if matched {
+				if matchName(p.comps[childDepth-1], name) {
 					sink.process(filepath.Join(dir, name), p.orderIndex)
 					break
 				}
@@ -643,7 +682,7 @@ func (s *fileScanner) walk(g *walkGroup, sink walkSink) {
 				onReadError(err)
 				return
 			}
-			for _, name := range names {
+			for _, name := range leafCandidates(names, exact) {
 				matchLeaf(name)
 			}
 			return
@@ -668,12 +707,7 @@ func (s *fileScanner) walk(g *walkGroup, sink walkSink) {
 			// none matching means nothing below this directory can ever match.
 			var childAlive []walkPattern
 			for _, p := range deeper {
-				ok, matchErr := filepath.Match(p.comps[childDepth-1], e.Name())
-				if matchErr != nil {
-					logBadPattern(p.pattern, matchErr)
-					continue
-				}
-				if ok {
+				if matchName(p.comps[childDepth-1], e.Name()) {
 					childAlive = append(childAlive, p)
 				}
 			}
@@ -697,17 +731,40 @@ func (s *fileScanner) walk(g *walkGroup, sink walkSink) {
 			}
 		}
 	}
-	rec(g.root, 0, patterns)
+	rec(g.root, 0, g.patterns)
 }
 
-// hasGlobMeta reports whether path contains any glob metacharacter, mirroring the
-// unexported path/filepath.hasMeta.
-func hasGlobMeta(path string) bool {
-	magic := `*?[`
-	if filepath.Separator != '\\' {
-		magic = `*?[\`
+// globMagic is the set of glob metacharacters filepath.Match recognises. On
+// Windows the backslash is the path separator, so it does not escape there.
+var globMagic = func() string {
+	if filepath.Separator == '\\' {
+		return `*?[`
 	}
-	return strings.ContainsAny(path, magic)
+	return `*?[\`
+}()
+
+// hasGlobMeta reports whether path contains any glob metacharacter.
+func hasGlobMeta(path string) bool {
+	return strings.ContainsAny(path, globMagic)
+}
+
+// literalPrefix returns the leading part of a glob component that has no
+// metacharacter.
+func literalPrefix(comp string) string {
+	if i := strings.IndexAny(comp, globMagic); i >= 0 {
+		return comp[:i]
+	}
+	return comp
+}
+
+// literalSuffix returns the trailing part of a glob component that has no
+// metacharacter. A ']' counts as one so that the body of a character class is
+// never taken for literal text.
+func literalSuffix(comp string) string {
+	if i := strings.LastIndexAny(comp, globMagic+"]"); i >= 0 {
+		return comp[i+1:]
+	}
+	return comp
 }
 
 // globRoot returns the longest leading directory of pattern that has no glob
@@ -722,12 +779,6 @@ func globRoot(pattern string) string {
 		dir = parent
 	}
 	return dir
-}
-
-// depthBelow returns the number of path segments of pattern below root, including
-// the trailing filename segment. root must be an ancestor of pattern.
-func depthBelow(root, pattern string) int {
-	return len(patternComponents(root, pattern))
 }
 
 // patternComponents returns pattern's path segments below root. root must be an
