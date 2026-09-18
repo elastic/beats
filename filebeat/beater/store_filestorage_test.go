@@ -44,7 +44,7 @@ func TestOpenStateStore_OtelFileStorageSetGet(t *testing.T) {
 	require.NoError(t, err)
 	defer fb.Close()
 
-	st, err := fb.StoreFor("filestream")
+	st, err := fb.StoreFor("filestream", "")
 	require.NoError(t, err)
 	defer st.Close()
 

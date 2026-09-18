@@ -505,9 +505,9 @@ func newCountingStateStoreWithRegistry(key string, registry *statestore.Registry
 	return &countingStateStore{registry: registry, key: key}
 }
 
-func (s *countingStateStore) StoreKey() string { return s.key }
+func (s *countingStateStore) StoreKey(_, _ string) string { return s.key }
 
-func (s *countingStateStore) StoreFor(name string) (*statestore.Store, error) {
+func (s *countingStateStore) StoreFor(name, _ string) (*statestore.Store, error) {
 	s.storeForCalls.Add(1)
 	return s.registry.Get(name)
 }
@@ -532,7 +532,7 @@ func newBlockingStateStore(key string, firstStoreForError error) *blockingStateS
 	}
 }
 
-func (s *blockingStateStore) StoreFor(name string) (*statestore.Store, error) {
+func (s *blockingStateStore) StoreFor(name, _ string) (*statestore.Store, error) {
 	if s.storeForCalls.Add(1) == 1 {
 		close(s.firstStoreForStarted)
 		<-s.releaseFirstStoreFor
