@@ -55,12 +55,8 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-<<<<<<< HEAD
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
-=======
 				ResponseCode: http.StatusOK,
-				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
->>>>>>> 1223bed (x-pack/filebeat/input/http_endpoint: fix dropped connection on empty event batch (#53261))
+				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
 			},
 		},
 		{
@@ -69,12 +65,8 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
-<<<<<<< HEAD
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
-=======
 				ResponseCode: http.StatusOK,
-				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
->>>>>>> 1223bed (x-pack/filebeat/input/http_endpoint: fix dropped connection on empty event batch (#53261))
+				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
 			},
 		},
 		{
