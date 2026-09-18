@@ -26,14 +26,24 @@ import (
 )
 
 // States is a collection of states backed by one or more persistent stores
-// that may be differentiated by input type.
+// that may be differentiated by input type and ID.
 type States interface {
+<<<<<<< HEAD
 	// StoreFor returns the storage registry for the given type.
 	// The value of typ is expected to have been obtained from
 	// cursor.InputManager.Type and represents the input type.
 	// Whether the receiver considers the value of typ is
+=======
+	// StoreKey returns a process-wide identifier for the persistent backend
+	// selected by StoreFor. Equal keys identify the same backend.
+	StoreKey(typ, id string) string
+
+	// StoreFor returns the store for the input type and ID.
+	// Implementations can ignore typ or id if they share a store across inputs.
+	// Whether the receiver considers the value of typ and ID is
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 	// implementation dependent.
-	StoreFor(typ string) (*Store, error)
+	StoreFor(typ, id string) (*Store, error)
 
 	// CleanupInterval returns the time between garbage collection
 	// runs for the stores owned by the States.
@@ -75,10 +85,6 @@ func newStore(shared *sharedStore) *Store {
 	return &Store{
 		shared: shared,
 	}
-}
-
-func (s *Store) SetID(id string) {
-	s.shared.backend.SetID(id)
 }
 
 // Close deactivates the current store. No new transacation can be generated.
