@@ -441,6 +441,7 @@ func TestGraph_Devices(t *testing.T) {
 				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 				uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
 			),
+			RegisteredFetched: true,
 		},
 		{
 			ID: uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
@@ -471,6 +472,7 @@ func TestGraph_Devices(t *testing.T) {
 			RegisteredUsers: collections.NewUUIDSet(
 				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			),
+			RegisteredFetched: true,
 		},
 	}
 

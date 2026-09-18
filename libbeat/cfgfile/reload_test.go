@@ -21,7 +21,6 @@ package cfgfile
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -37,7 +36,7 @@ import (
 
 func TestReloader(t *testing.T) {
 	// Create random temp directory
-	dir, err := ioutil.TempDir("", "libbeat-reloader")
+	dir, err := os.MkdirTemp("", "libbeat-reloader")
 	defer os.RemoveAll(dir)
 	if err != nil {
 		t.Fatal(err)
@@ -53,7 +52,8 @@ func TestReloader(t *testing.T) {
 	})
 	// config.C{}
 
-	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config, paths.Paths)
+	// The glob is absolute, so an empty paths.Path resolves it unchanged.
+	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config, paths.New())
 	retryCount := 10
 
 	go reloader.Run(nil)
