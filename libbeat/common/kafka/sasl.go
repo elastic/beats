@@ -39,7 +39,7 @@ func (c *SaslConfig) Validate() error {
 	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
 	case "", saslTypePlaintext, saslTypeSCRAMSHA256, saslTypeSCRAMSHA512, saslTypeOauthBearer:
 	default:
-		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256|OAUTHBEARER", c.SaslMechanism)
+		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
 	}
 	return nil
 }
