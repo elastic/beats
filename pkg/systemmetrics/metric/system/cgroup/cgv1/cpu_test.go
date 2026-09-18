@@ -22,9 +22,11 @@ package cgv1
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/testhelpers"
 )
@@ -47,7 +49,29 @@ func TestCpuStats(t *testing.T) {
 
 	assert.Equal(t, uint64(769021), cpu.Stats.Periods)
 	assert.Equal(t, uint64(1046), cpu.Stats.Throttled.Periods)
-	assert.Equal(t, uint64(352597023453), cpu.Stats.Throttled.Us)
+	assert.Equal(t, uint64(352597023), cpu.Stats.Throttled.Us, "throttled time must be reported in microseconds")
+}
+
+func TestCpuStatsNanosToUsec(t *testing.T) {
+	dir := t.TempDir()
+	const content = `nr_periods 7
+nr_throttled 2
+throttled_time 50000
+`
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "cpu.stat"), []byte(content), 0o600),
+		"could not write test cpu.stat")
+
+	cpu := CPUSubsystem{}
+	require.NoError(t, cpuStat(dir, &cpu), "cpuStat must not fail")
+
+	expected := CPUStats{
+		Periods: 7,
+		Throttled: ThrottledField{
+			Periods: 2,
+			Us:      50,
+		},
+	}
+	assert.Equal(t, expected, cpu.Stats, "throttled_time must be converted from nanoseconds to microseconds")
 }
 
 func TestCpuCFS(t *testing.T) {
