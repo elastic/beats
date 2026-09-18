@@ -263,7 +263,7 @@ This matcher has the following configuration settings:
 :   (Optional) Type of the resource to obtain the ID of. Valid `resource_type`:
     * `pod`: to make the lookup based on the pod UID. When `resource_type` is set to `pod`, `logs_path` must be set as well, supported path in this case:
       * `/var/lib/kubelet/pods/` used to read logs from mounted into the pod volumes, those logs end up under `/var/lib/kubelet/pods/<pod UID>/volumes/<volume name>/...` To use `/var/lib/kubelet/pods/` as a `log_path`, `/var/lib/kubelet/pods` must be mounted into the filebeat Pods.
-      * `/var/log/pods/` Note: when using `resource_type: 'pod'` logs will be enriched only with pod metadata: pod id, pod name, etc., not container metadata.
+      * `/var/log/pods/` When using `resource_type: 'pod'` with this path, logs are enriched with pod metadata and container metadata (`kubernetes.container.name`, `container.image.name`). For the currently-running log file (`<n>.log` where `<n>` matches the container's current restart count), `container.id` and `container.runtime` are also included. The immediately preceding restart's log file also receives `container.id` and `container.runtime` when its container ID is available from `LastTerminationState`. Older rotated log files receive `kubernetes.container.name` and `container.image.name` only. Note: `/var/lib/kubelet/pods/` paths are enriched with pod metadata only (no container segment in the path).
     * `container`: to make the lookup based on the container ID, `logs_path` must be set to `/var/log/containers/`. It defaults to `container`.
 
 
