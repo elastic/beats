@@ -35,7 +35,6 @@ import (
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/features"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -63,13 +62,13 @@ func TestManager_Init(t *testing.T) {
 
 		manager := cleanerManager(t, createSampleStore(t, nil))
 
-		require.Nil(t, manager.store, "store must not be opened before Create")
+		require.Empty(t, manager.releases, "store must not be opened before Create")
 		_, err := goroutines.WaitUntilOriginalCount()
 		require.NoError(t, err, "no goroutine must be started before Create")
 
 		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
 		require.NoError(t, err)
-		require.NotNil(t, manager.store, "Create must open the registry store")
+		require.Len(t, manager.releases, 1, "Create must open the registry store")
 	})
 
 	// The store is opened with the input ID, which is only known once a config
@@ -84,7 +83,7 @@ func TestManager_Init(t *testing.T) {
 		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "my-input-id"}))
 		require.NoError(t, err)
 
-		snap := storeMemorySnapshot(manager.store)
+		snap := storeMemorySnapshot(leasedStore(t, manager, "my-input-id"))
 		assert.Contains(t, snap, "test::mykey")
 		assert.Equal(t, "value1", snap["test::mykey"].Cursor)
 	})
@@ -123,9 +122,8 @@ func TestManager_Init(t *testing.T) {
 		}
 	})
 
-	// Two reload paths — static config, central management, autodiscovery — can
-	// create inputs of one type concurrently, and each of those is now what
-	// opens the store and starts the cleaner.
+	// Configuration reloads can create inputs of one type concurrently.
+	// With file storage, all input IDs use the same key and must share one store.
 	t.Run("concurrent Create opens one store and starts one cleaner", func(t *testing.T) {
 		manager := cleanerManager(t, createSampleStore(t, nil))
 
@@ -140,8 +138,18 @@ func TestManager_Init(t *testing.T) {
 		}
 		wg.Wait()
 
-		require.NotNil(t, manager.store)
+		require.Len(t, manager.releases, 1)
 	})
+}
+
+// leasedStore returns the store for inputID and keeps it open until the test ends.
+func leasedStore(t *testing.T, manager *InputManager, inputID string) *store {
+	t.Helper()
+
+	s, release, ok := globalCache.Lease(manager.cacheKey(inputID))
+	require.True(t, ok, "no active store for input id %q", inputID)
+	t.Cleanup(release)
+	return s
 }
 
 // cleanerManager builds an InputManager whose Create succeeds, with a clean
@@ -162,32 +170,53 @@ func cleanerManager(t *testing.T, store statestore.States) *InputManager {
 	return manager
 }
 
-// TestManager_InitDefersStoreForES covers the Elasticsearch-backed store, which
-// has always been opened from Create because it needs the input ID. All input
-// types now take that path; this pins that the ES-specific store still reaches
-// it, since SetID is a no-op for the file-backed backends and only matters here.
-func TestManager_InitDefersStoreForES(t *testing.T) {
-	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
-	features.ReinitForTest()
-	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
+// Elasticsearch inputs with different IDs must use separate cursor stores,
+// even when they have the same input type.
+func TestManager_ESStorePerInputID(t *testing.T) {
+	t.Run("one manager keeps a store per input id", func(t *testing.T) {
+		stateStore := createESStore(t)
+		manager := cleanerManager(t, stateStore)
 
-	stateStore := createSampleStore(t, map[string]state{
-		"test::mykey": {Cursor: "value1"},
+		for _, id := range []string{"input-a", "input-b"} {
+			_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": id}))
+			require.NoError(t, err)
+		}
+		require.Len(t, manager.releases, 2)
+
+		// State written to one input's store must not appear in the other store.
+		storeA := leasedStore(t, manager, "input-a")
+		storeA.UpdateTTL(storeA.Get("test::input-a::mykey"), time.Minute)
+
+		assert.Contains(t, stateStore.snapshotFor(t, "input-a"), "test::input-a::mykey")
+		assert.Empty(t, stateStore.snapshotFor(t, "input-b"))
 	})
 
-	manager := cleanerManager(t, stateStore)
+	t.Run("managers sharing an input id share one store", func(t *testing.T) {
+		stateStore := createESStore(t)
+		first := cleanerManager(t, stateStore)
+		second := cleanerManager(t, stateStore)
 
-	require.Nil(t, manager.store, "store should be nil before Create()")
+		for _, manager := range []*InputManager{first, second} {
+			_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "shared"}))
+			require.NoError(t, err)
+		}
 
-	_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
-		"id": "my-input-id",
-	}))
-	require.NoError(t, err)
-	require.NotNil(t, manager.store, "store should be created after Create()")
+		assert.Same(t, leasedStore(t, first, "shared"), leasedStore(t, second, "shared"))
+	})
 
-	snap := storeMemorySnapshot(manager.store)
-	assert.Contains(t, snap, "test::mykey")
-	assert.Equal(t, "value1", snap["test::mykey"].Cursor)
+	t.Run("Close releases every store the manager opened", func(t *testing.T) {
+		before := globalCache.Len()
+		manager := cleanerManager(t, createESStore(t))
+
+		for _, id := range []string{"input-a", "input-b"} {
+			_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": id}))
+			require.NoError(t, err)
+		}
+		require.Equal(t, before+2, globalCache.Len())
+
+		manager.Close()
+		assert.Equal(t, before, globalCache.Len())
+	})
 }
 
 func TestManager_Create(t *testing.T) {
