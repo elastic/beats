@@ -44,8 +44,8 @@ func (c *SaslConfig) Validate() error {
 	return nil
 }
 
-// ValidateWithUsernameAndPassword checks cross-field invariants that require knowledge of the
-// configured credentials. Call this from any outer config Validate() that owns
+// ValidateWithUsernameAndPassword ensures both username/password is not configured along
+// with sasl.mechanism: OAUTHBEARER. Call this from any outer config Validate() that owns
 // both the SASL mechanism and the username field.
 func (c *SaslConfig) ValidateWithUsernameAndPassword(usernameAndPassword bool) error {
 	if usernameAndPassword && strings.ToUpper(c.SaslMechanism) == saslTypeOauthBearer {
