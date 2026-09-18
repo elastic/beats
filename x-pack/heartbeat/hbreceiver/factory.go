@@ -43,9 +43,22 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	settings := cmd.HeartbeatSettings()
 	settings.ElasticLicensed = true
 
+	// Extract browser params before ucfg parses the map with PathSep("."),
+	// which would expand dotted keys (e.g. "subdomain.example.com") into a
+	// nested map. They are restored after parsing.
+	// See https://github.com/elastic/elastic-agent/issues/16285.
+	browserParams, err := extractBrowserMonitorParams(cfg.Beatconfig)
+	if err != nil {
+		return nil, fmt.Errorf("error extracting browser params: %w", err)
+	}
+
 	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
+	}
+
+	if err := restoreBrowserMonitorParams(b.RawConfig, browserParams); err != nil {
+		return nil, fmt.Errorf("error restoring browser params: %w", err)
 	}
 
 	beatCreator := beater.New
