@@ -242,10 +242,12 @@ func TestLogsPathMatcher_DigitDirectoryNotRestartCount(t *testing.T) {
 	cfgResourceType := "pod"
 	// pathDirs[6] = "3" (a directory name, not a "<n>.log" filename).
 	// Must fall back to uid/container only — no restart-count candidate.
-	source := fmt.Sprintf("/var/log/pods/namespace_pod-name_%s/container/3/real.log", puid)
-	// This path has an extra segment; source HasPrefix check still passes for the pod dir,
-	// but pathDirs[podUIDPos+2]="3" is not "3.log", so no restart candidate is produced.
-	// The outer .log guard passes (real.log), so we expect uid/container + uid fallbacks.
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/3/real.log"
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\3\\real.log"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
 		[]string{puid + "/container", puid})
 }
