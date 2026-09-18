@@ -73,6 +73,7 @@ type storeCache struct {
 	entries map[string]*storeCacheEntry
 }
 
+<<<<<<< HEAD
 var globalStoreCache = storeCache{entries: make(map[string]*storeCacheEntry)}
 
 // acquireStore returns the shared store for a backend. The first caller initializes it;
@@ -80,6 +81,14 @@ var globalStoreCache = storeCache{entries: make(map[string]*storeCacheEntry)}
 func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*store, error) {
 	key := states.StoreKey()
 	logger = logger.
+=======
+// acquireStore returns the shared cacheEntry for a backend, opening it on
+// first access. The returned release function must be called exactly once when
+// the caller is done with the entry.
+func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*cacheEntry, func(), error) {
+	key := states.StoreKey("", "")
+	log := logger.
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 		Named("filestream.store_cache").
 		WithLazy(zap.String("filestream_store_key", key))
 	// Retry after a concurrent initialization or draining store has completed.
