@@ -268,7 +268,153 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 		// delete from previous state to mark that we've seen the existing file again
 		delete(w.prev, path)
+<<<<<<< HEAD
 		// Delete used state from closedHarvesters
+=======
+	}
+
+	// Remaining files in the prev map are missing from this scan in a priority
+	// order:
+	//
+	//   1. Exact-FileID rename match — works for every identity including
+	//      static fingerprint. Catches a plain rename where the file's
+	//      content (and so its fingerprint) is unchanged.
+	//   2. Prefix-match rename detection (growing fingerprint only) —
+	//      catches rename + content growth in the same scan.
+	//   3. Postpone deletes for entries under an unobservable prefix. Runs
+	//      AFTER both rename passes so a file renamed out of a directory that
+	//      became unobservable this scan is still detected as a rename, instead
+	//      of being carried forward here AND re-created from offset 0.
+	//   4. Unmatched-leftover emission — anything still in w.prev becomes
+	//      OpDelete, anything still in newFilesByName becomes OpCreate.
+
+	// Exact-FileID rename match.
+
+	// remaining files in the prev map are the ones that are missing
+	// either because they have been deleted or renamed
+	for remainingPath, remainingDesc := range w.prev {
+		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
+		if !renamed {
+			continue
+		}
+
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- renamedEvent(
+			remainingPath, newDesc.Filename, *newDesc, srcID):
+			renamedCount++
+		}
+
+		delete(newFilesByName, newDesc.Filename)
+		delete(newFilesByID, remainingDesc.FileID())
+		delete(w.prev, remainingPath)
+	}
+
+	// Prefix-match candidates are the still-growing prev entries left after
+	// the exact-match pass (GrowingRaw is empty for completed entries, which
+	// match by their SHA-256 identity instead). The index is only built when
+	// this scan has a new file that could justify a match — a delete-only
+	// scan pays no hashing.
+	var shortFingerprints *shortFingerprintSet
+	if w.growingFingerprint {
+		for _, newDesc := range newFilesByName {
+			if newDesc.Fingerprint.Complete() {
+				shortFingerprints = newShortFingerprintSet()
+				break
+			}
+		}
+	}
+	if shortFingerprints != nil {
+		for remainingPath, remainingDesc := range w.prev {
+			if raw := remainingDesc.Fingerprint.GrowingRaw(); raw != "" {
+				shortFingerprints.AddRaw(remainingPath, raw, remainingPath)
+			}
+		}
+	}
+
+	// Growing fingerprint: prefix-match rename detection.
+	// For each new file that didn't match exactly, look for an unmatched prev entry whose raw
+	// fingerprint is a STRICT PREFIX of the new file's raw material. The same file must be renamed
+	// AND grown across the threshold in a single scan.
+	//
+	// The match is deliberately restricted to a new file whose fingerprint is Complete(): a short
+	// raw prefix alone is too weak to prove identity, so a distinct file that appears in the same
+	// scan a tracked file vanished and merely shares a leading header would otherwise be classified
+	// as a rename.
+	if shortFingerprints.Len() > 0 {
+		type prefixMatch struct {
+			oldPath string
+			newPath string
+			newDesc *loginp.FileDescriptor
+		}
+		var matches []prefixMatch
+
+		for newPath, newDesc := range newFilesByName {
+			// Only a completed fingerprint is strong enough to justify a cross-path rename match.
+			if !newDesc.Fingerprint.Complete() {
+				continue
+			}
+			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint.Raw, "")
+			if found {
+				matches = append(matches, prefixMatch{oldPath, newPath, newDesc})
+				shortFingerprints.Remove(oldPath)
+			}
+		}
+
+		for _, m := range matches {
+			remainingDesc := w.prev[m.oldPath]
+			srcID := w.getFileIdentity(remainingDesc)
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID):
+				renamedCount++
+			}
+
+			delete(newFilesByName, m.newPath)
+			delete(newFilesByID, m.newDesc.FileID())
+			delete(w.prev, m.oldPath)
+		}
+	}
+
+	// Postpone deletes for unmatched entries the scan could not resolve. An
+	// unobservable prefix (e.g. a directory that hit EMFILE) and a path that
+	// vanished mid-scan (a concurrent rename or delete) are both inconclusive:
+	// treating them as deleted would wipe registry state and re-ingest from
+	// offset 0 once the next scan sees the file again.
+	postponed := 0
+	postponedUnobservable := 0
+	if len(scanResults.Unobservable) > 0 || len(scanResults.Vanished) > 0 {
+		unobservable := pathSet(scanResults.Unobservable)
+		vanished := pathSet(scanResults.Vanished)
+		for remainingPath, remainingDesc := range w.prev {
+			failedObservation := underAnyPrefix(remainingPath, unobservable)
+			if !failedObservation && !underAnyPrefix(remainingPath, vanished) {
+				continue
+			}
+			if failedObservation {
+				postponedUnobservable++
+			}
+			scanResults.Files[remainingPath] = remainingDesc
+			delete(w.prev, remainingPath)
+			postponed++
+		}
+	}
+
+	// Unmatched-leftover deletes: prev files matched by neither rename pass and
+	// not postponed above are genuinely gone.
+	for remainingPath, remainingDesc := range w.prev {
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- deleteEvent(remainingPath, remainingDesc, srcID):
+			removedCount++
+		}
+
+>>>>>>> 7b2abed (filestream: preserve state for paths that vanish mid-scan (#53280))
 		w.closedHarvestersMutex.Lock()
 		delete(w.closedHarvesters, srcID)
 		w.closedHarvestersMutex.Unlock()
@@ -301,6 +447,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		}
 	}
 
+<<<<<<< HEAD
 	// remaining files in newFiles are newly created files
 	for path, fd := range newFilesByName {
 		select {
@@ -309,6 +456,15 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		case w.events <- createEvent(path, *fd, w.getFileIdentity(*fd)):
 			createdCount++
 		}
+=======
+	// Only a genuine observation failure is worth warning about. A path that
+	// vanished mid-scan is an ordinary rename or delete and resolves itself on
+	// the next scan.
+	if postponedUnobservable > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
+		w.lastPostponedWarn = now
+		w.log.Warnf("some previously seen files could not be observed (e.g. file-descriptor exhaustion) in the last %s, postponing their delete detection to avoid re-ingestion. See the filebeat.filestream.scan_errors metric for the current count.",
+			postponedWarnInterval)
+>>>>>>> 7b2abed (filestream: preserve state for paths that vanish mid-scan (#53280))
 	}
 
 	w.log.Debugw("File scan complete",
@@ -331,6 +487,37 @@ func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
 	return w.sourceIdentifier.ID(src)
 }
 
+<<<<<<< HEAD
+=======
+// pathSet indexes paths for underAnyPrefix lookups.
+func pathSet(paths []string) map[string]struct{} {
+	set := make(map[string]struct{}, len(paths))
+	for _, p := range paths {
+		set[p] = struct{}{}
+	}
+	return set
+}
+
+// underAnyPrefix reports whether path equals, or is nested under, any of
+// the prefixes. Separator-aware, so "/a/b" is not a prefix of "/a/bc".
+func underAnyPrefix(path string, prefixes map[string]struct{}) bool {
+	if len(prefixes) == 0 {
+		return false
+	}
+	if _, ok := prefixes[path]; ok {
+		return true
+	}
+	for i := len(path) - 1; i > 0; i-- {
+		if path[i] == filepath.Separator {
+			if _, ok := prefixes[path[:i]]; ok {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+>>>>>>> 7b2abed (filestream: preserve state for paths that vanish mid-scan (#53280))
 func createEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
 	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd, SrcID: srcID}
 }
