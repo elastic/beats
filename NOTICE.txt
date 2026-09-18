@@ -12841,11 +12841,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-quark@v0.6.0
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-seccomp-bpf
-Version: v1.5.0
+Version: v1.6.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@v1.5.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@v1.6.0/LICENSE.txt:
 
 
                                  Apache License
