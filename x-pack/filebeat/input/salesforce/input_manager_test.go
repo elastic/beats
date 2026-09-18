@@ -36,9 +36,16 @@ var _ statestore.States = stateStore{}
 
 type stateStore struct{}
 
+<<<<<<< HEAD
 func (stateStore) StoreFor(string) (*statestore.Store, error) {
 	return makeTestStore(map[string]interface{}{"hello": "world"}), nil
 }
+=======
+func (stateStore) StoreFor(_, _ string) (*statestore.Store, error) {
+	return makeTestStore(map[string]any{"hello": "world"}), nil
+}
+func (stateStore) StoreKey(_, _ string) string    { return "salesforce-test-store" }
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func (stateStore) CleanupInterval() time.Duration { return time.Duration(0) }
 
 func TestInputManager(t *testing.T) {

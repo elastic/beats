@@ -1,0 +1,236 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package beater
+
+import (
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/filebeat/config"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
+)
+
+func testOpenStore(t *testing.T, dir string) *filebeatStore {
+	t.Helper()
+	beatPaths := paths.New()
+	beatPaths.Data = dir
+
+	store, err := openStateStore(t.Context(), beat.Info{Beat: "test", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
+		Path:          "",
+		Permissions:   0600,
+		CleanInterval: 5 * time.Second,
+	})
+	require.NoError(t, err)
+	return store
+}
+
+func TestOpenStateStore_SamePathSharesRegistry(t *testing.T) {
+	dir := t.TempDir()
+
+	s1 := testOpenStore(t, dir)
+	s2 := testOpenStore(t, dir)
+
+	assert.Same(t, s1.shared, s2.shared, "stores with the same path should share the same sharedRegistries")
+	assert.Equal(t, s1.StoreKey("", ""), s2.StoreKey("", ""), "stores with the same backend should have the same key")
+
+	globalMu.Lock()
+	assert.Equal(t, 2, s1.shared.refCount)
+	globalMu.Unlock()
+
+	s1.Close()
+	s2.Close()
+}
+
+func TestFilebeatStore_StoreKeyMatchesBackendAndPath(t *testing.T) {
+	beatPaths := paths.New()
+	beatPaths.Data = t.TempDir()
+	cfg := config.Registry{
+		Path:        "registry",
+		Permissions: 0o600,
+		Backend:     "memlog",
+	}
+	expected := storeKey(beatPaths.Resolve(paths.Data, cfg.Path), cfg.Backend)
+
+	first, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "first", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer first.Close()
+	second, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "second", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer second.Close()
+
+	assert.Equal(t, expected, first.StoreKey("", ""))
+	assert.Equal(t, expected, second.StoreKey("", ""))
+}
+
+// Elasticsearch inputs with different IDs must use separate stores.
+// Other input types must share the file store.
+func TestFilebeatStore_ElasticsearchStoreIsPerInputID(t *testing.T) {
+	// Restore the environment before reloading the feature flags during cleanup.
+	t.Cleanup(features.ReinitForTest)
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+
+	beatPaths := paths.New()
+	beatPaths.Data = t.TempDir()
+	cfg := config.Registry{
+		Path:               "registry",
+		Permissions:        0o600,
+		Backend:            "memlog",
+		ESStorageExtension: storetest.NewMemoryStoreBackend(),
+	}
+
+	s, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "test", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer s.Close()
+
+	assert.NotEqual(t, s.StoreKey("test", "a"), s.StoreKey("test", "b"))
+
+	fileKey := storeKey(beatPaths.Resolve(paths.Data, cfg.Path), cfg.Backend)
+	assert.Equal(t, fileKey, s.StoreKey("other", "a"))
+	assert.Equal(t, fileKey, s.StoreKey("other", "b"))
+
+	storeA, err := s.StoreFor("test", "a")
+	require.NoError(t, err)
+	defer storeA.Close()
+	storeB, err := s.StoreFor("test", "b")
+	require.NoError(t, err)
+	defer storeB.Close()
+
+	require.NoError(t, storeA.Set("key", "value"))
+	has, err := storeB.Has("key")
+	require.NoError(t, err)
+	assert.False(t, has, "inputs with different ids must not share state")
+}
+
+func TestOpenStateStore_DifferentPathsGetDifferentRegistries(t *testing.T) {
+	dir1 := t.TempDir()
+	dir2 := t.TempDir()
+
+	s1 := testOpenStore(t, dir1)
+	s2 := testOpenStore(t, dir2)
+
+	assert.NotSame(t, s1.shared, s2.shared, "stores with different paths should not share registries")
+	assert.NotEqual(t, s1.StoreKey("", ""), s2.StoreKey("", ""), "stores with different backends should have different keys")
+
+	s1.Close()
+	s2.Close()
+}
+
+func TestOpenStateStore_CloseDecrementsRefCount(t *testing.T) {
+	dir := t.TempDir()
+
+	s1 := testOpenStore(t, dir)
+	s2 := testOpenStore(t, dir)
+
+	s1.Close()
+
+	globalMu.Lock()
+	assert.Equal(t, 1, s2.shared.refCount)
+	globalMu.Unlock()
+
+	s2.Close()
+}
+
+func TestOpenStateStore_LastCloseRemovesFromGlobal(t *testing.T) {
+	dir := t.TempDir()
+
+	s1 := testOpenStore(t, dir)
+	resolvedKey := s1.storeKey
+
+	s2 := testOpenStore(t, dir)
+
+	s1.Close()
+
+	globalMu.Lock()
+	_, exists := globalStores[resolvedKey]
+	globalMu.Unlock()
+	assert.True(t, exists, "entry should still exist when refCount > 0")
+
+	s2.Close()
+
+	globalMu.Lock()
+	_, exists = globalStores[resolvedKey]
+	globalMu.Unlock()
+	assert.False(t, exists, "entry should be removed when last store is closed")
+}
+
+func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
+	dir := t.TempDir()
+
+	const n = 20
+	stores := make([]*filebeatStore, n)
+	var wg sync.WaitGroup
+
+	// Open stores concurrently
+	wg.Add(n)
+	for i := range n {
+		go func(i int) {
+			defer wg.Done()
+			stores[i] = testOpenStore(t, dir)
+		}(i)
+	}
+	wg.Wait()
+
+	// All should share the same sharedRegistries
+	for i := 1; i < n; i++ {
+		assert.Same(t, stores[0].shared, stores[i].shared)
+	}
+
+	globalMu.Lock()
+	assert.Equal(t, n, stores[0].shared.refCount)
+	globalMu.Unlock()
+
+	// Close all concurrently
+	wg.Add(n)
+	for i := range n {
+		go func(i int) {
+			defer wg.Done()
+			stores[i].Close()
+		}(i)
+	}
+	wg.Wait()
+
+	resolvedKey := stores[0].storeKey
+	globalMu.Lock()
+	_, exists := globalStores[resolvedKey]
+	globalMu.Unlock()
+	assert.False(t, exists, "entry should be cleaned up after all stores are closed")
+}

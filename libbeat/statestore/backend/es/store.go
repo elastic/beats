@@ -57,6 +57,11 @@ type store struct {
 	mx     sync.Mutex
 	cli    *eslegclient.Connection
 	cliErr error
+<<<<<<< HEAD
+=======
+
+	base *baseStore
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 }
 
 const docType = "_doc"
@@ -100,6 +105,7 @@ func (s *store) waitReady() error {
 	}
 }
 
+<<<<<<< HEAD
 func (s *store) SetID(id string) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
@@ -110,6 +116,8 @@ func (s *store) SetID(id string) {
 	s.index = renderIndexName(id)
 }
 
+=======
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func (s *store) Close() error {
 	s.mx.Lock()
 	defer s.mx.Unlock()
@@ -311,6 +319,10 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 		s.log.Errorf("ES store, failed to create elasticsearch client: %v", err)
 		s.cliErr = err
 	} else {
+<<<<<<< HEAD
+=======
+		s.base = NewStore(ctx, s.log, cli, s.name)
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 		s.cli = cli
 	}
 
