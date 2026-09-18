@@ -1,0 +1,208 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package tlscommon
+
+import (
+	"crypto/tls"
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+// CertificateReload is the configuration for hot-reloading TLS certificates.
+// Use DefaultCertificateReload to get a value with sensible defaults (enabled,
+// 5 s reload interval).
+type CertificateReload struct {
+	Enabled        *bool         `config:"enabled" yaml:"enabled,omitempty"`
+	ReloadInterval time.Duration `config:"reload_interval" yaml:"reload_interval,omitempty"`
+}
+
+// DefaultCertificateReload returns a CertificateReload with sensible defaults:
+// enabled with a 5-second reload interval.
+func DefaultCertificateReload() CertificateReload {
+	enabled := true
+	return CertificateReload{
+		Enabled:        &enabled,
+		ReloadInterval: defaultReloadInterval,
+	}
+}
+
+// IsEnabled returns true unless certificate reload has been explicitly disabled.
+func (c *CertificateReload) IsEnabled() bool {
+	return c.Enabled == nil || *c.Enabled
+}
+
+// ServerConfig defines the user configurable tls options for any TCP based service.
+type ServerConfig struct {
+	Enabled           *bool               `config:"enabled" yaml:"enabled,omitempty"`
+	VerificationMode  TLSVerificationMode `config:"verification_mode" yaml:"verification_mode,omitempty"` // one of 'none', 'full', 'strict', 'certificate'
+	Versions          []TLSVersion        `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
+	CipherSuites      []CipherSuite       `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
+	CAs               []string            `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
+	Certificate       CertificateConfig   `config:",inline" yaml:",inline"`
+	CurveTypes        []TLSCurveType      `config:"curve_types" yaml:"curve_types,omitempty"`
+	ClientAuth        *TLSClientAuth      `config:"client_authentication" yaml:"client_authentication,omitempty"` //`none`, `optional` or `required`
+	CASha256          []string            `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
+	CertificateReload CertificateReload   `config:"certificate_reload" yaml:"certificate_reload,omitempty"`
+}
+
+// LoadTLSServerConfig tranforms a ServerConfig into a `tls.Config` to be used directly with golang
+// network types.
+func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig, error) {
+	if !config.IsEnabled() {
+		return nil, nil
+	}
+
+	var fail []error
+	logFail := func(es ...error) {
+		for _, e := range es {
+			if e != nil {
+				fail = append(fail, e)
+			}
+		}
+	}
+
+	cipherSuites := make([]uint16, len(config.CipherSuites))
+	for idx, suite := range config.CipherSuites {
+		cipherSuites[idx] = uint16(suite)
+	}
+
+	curves := make([]tls.CurveID, len(config.CurveTypes))
+	for idx, id := range config.CurveTypes {
+		curves[idx] = tls.CurveID(id)
+	}
+
+	var clientCAs certPoolProvider
+
+	if len(config.CAs) > 0 && config.CertificateReload.IsEnabled() {
+		reloader, err := NewCAReloader(config.CAs, config.CertificateReload.ReloadInterval, logger)
+		logFail(err)
+		if reloader != nil {
+			clientCAs = reloader
+		}
+	} else if len(config.CAs) > 0 {
+		pool, errs := LoadCertificateAuthorities(config.CAs, logger)
+		logFail(errs...)
+		clientCAs = newStaticCertPool(pool)
+	}
+
+	certs := make([]tls.Certificate, 0)
+	var reloader *CertReloader
+
+	// Skip cert reloading when inline PEMs are used; reloading only makes sense with file paths.
+	if config.Certificate.Certificate != "" && config.CertificateReload.IsEnabled() &&
+		!isInlinePEM(config.Certificate.Certificate) && !isInlinePEM(config.Certificate.Key) {
+		reloadOpts, err := config.Certificate.reloaderOptions()
+		logFail(err)
+		if config.CertificateReload.ReloadInterval > 0 {
+			reloadOpts = append(reloadOpts, WithReloadInterval(config.CertificateReload.ReloadInterval))
+		}
+		reloader, err = NewCertReloader(config.Certificate.Certificate, config.Certificate.Key, logger, reloadOpts...)
+		logFail(err)
+	} else {
+		cert, err := LoadCertificate(&config.Certificate, logger)
+		logFail(err)
+		if cert != nil {
+			certs = []tls.Certificate{*cert}
+		}
+	}
+
+	// fail, if any error occurred when loading certificate files
+	if len(fail) != 0 {
+		return nil, errors.Join(fail...)
+	}
+
+	clientAuth := TLSClientAuthNone
+	if config.ClientAuth != nil {
+		clientAuth = *config.ClientAuth
+	}
+
+	// return config if no error occurred
+	return &TLSConfig{
+		Versions:         config.Versions,
+		Verification:     config.VerificationMode,
+		Certificates:     certs,
+		clientCAs:        clientCAs,
+		CipherSuites:     config.CipherSuites,
+		CurvePreferences: curves,
+		ClientAuth:       tls.ClientAuthType(clientAuth),
+		CASha256:         config.CASha256,
+		Logger:           logger,
+		certReloader:     reloader,
+	}, nil
+}
+
+// Unpack unpacks the TLS Server configuration.
+func (c *ServerConfig) Unpack(cfg config.C) error {
+	const clientAuthKey = "client_authentication"
+	const ca = "certificate_authorities"
+
+	// When we have explicitly defined the `certificate_authorities` in the configuration we default
+	// to `required` for the `client_authentication`, when CA is not defined we should set to `none`.
+	if cfg.HasField(ca) && !cfg.HasField(clientAuthKey) {
+		err := cfg.SetString(clientAuthKey, -1, "required")
+		if err != nil {
+			return fmt.Errorf("failed to set client_authentication to required: %w", err)
+		}
+	}
+	type serverCfg ServerConfig
+	var sCfg serverCfg
+	if err := cfg.Unpack(&sCfg); err != nil {
+		return err
+	}
+	*c = ServerConfig(sCfg)
+	return nil
+}
+
+// Validate values the TLSConfig struct making sure certificate sure we have both a certificate and
+// a key.
+func (c *ServerConfig) Validate() error {
+	if c.IsEnabled() {
+		// c.Certificate.Validate() ensures that both a certificate and key
+		// are specified, or neither are specified. For server-side TLS we
+		// require both to be specified.
+		if c.Certificate.Certificate == "" {
+			return ErrCertificateUnspecified
+		}
+	}
+	for _, v := range c.Versions {
+		if err := v.Validate(); err != nil {
+			return err
+		}
+
+	}
+	for _, cs := range c.CipherSuites {
+		if err := cs.Validate(); err != nil {
+			return err
+		}
+	}
+	for _, ct := range c.CurveTypes {
+		if err := ct.Validate(); err != nil {
+			return err
+		}
+	}
+	return c.Certificate.Validate()
+}
+
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (c *ServerConfig) IsEnabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
+}

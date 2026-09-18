@@ -1,0 +1,17 @@
+{"name": "github.com/elastic/elastic-agent-client/v7", "licenceType": "Elastic"}
+{"name": "github.com/gorhill/cronexpr", "licenceType": "Apache-2.0", "licenceFile":"APLv2"}
+{"name": "github.com/hashicorp/cronexpr", "licenceType": "Apache-2.0", "licenceFile":"APLv2"}
+{"name": "github.com/miekg/dns", "licenceType": "BSD"}
+{"name": "github.com/kr/logfmt", "licenceFile": "Readme", "licenceType": "MIT"}
+{"name": "github.com/samuel/go-parser", "licenceType": "BSD-3-Clause"}
+{"name": "github.com/xeipuuv/gojsonpointer", "licenceFile": "LICENSE-APACHE-2.0.txt", "licenceType": "Apache-2.0"}
+{"name": "github.com/xeipuuv/gojsonreference", "licenceFile": "LICENSE-APACHE-2.0.txt", "licenceType": "Apache-2.0"}
+{"name": "github.com/xeipuuv/gojsonschema", "licenceFile": "LICENSE-APACHE-2.0.txt", "licenceType": "Apache-2.0"}
+{"name": "github.com/chzyer/logex", "licenceType": "MIT"}
+{"name": "github.com/munnerz/goautoneg", "licenceType": "BSD-3-Clause"}
+{"name": "github.com/pelletier/go-buffruneio", "licenceType": "MIT"}
+{"name": "github.com/urso/magetools", "licenceType": "Apache-2.0"}
+{"name": "kernel.org/pub/linux/libs/security/libcap/cap", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
+{"name": "kernel.org/pub/linux/libs/security/libcap/psx", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
+{"name": "github.com/awslabs/kinesis-aggregation/go", "licenceType": "Apache-2.0", "url": "https://github.com/awslabs/kinesis-aggregation/blob/master/LICENSE.txt"}
+{"name": "github.com/pascaldekloe/goe", "licenceType": "CC0-1.0", "url": "https://github.com/pascaldekloe/goe/blob/master/LICENSE"}

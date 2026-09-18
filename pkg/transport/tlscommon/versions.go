@@ -1,0 +1,73 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package tlscommon
+
+import (
+	"fmt"
+	"math"
+)
+
+// TLSVersion type for TLS version.
+type TLSVersion uint16
+
+func (v TLSVersion) String() string {
+	if details := v.Details(); details != nil {
+		return details.Combined
+	}
+	return "unknown"
+}
+
+// Details returns a a ProtocolAndVersions struct containing detailed version metadata.
+func (v TLSVersion) Details() *TLSVersionDetails {
+	if found, ok := tlsInverseLookup[v]; ok {
+		return &found
+	}
+	return nil
+}
+
+// Unpack transforms the string into a constant.
+func (v *TLSVersion) Unpack(i interface{}) error {
+	switch o := i.(type) {
+	case string:
+		version, found := tlsProtocolVersions[o]
+		if !found {
+			return fmt.Errorf("invalid tls version '%v'", o)
+		}
+		*v = version
+	case int64:
+		if o < 0 || o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls version '%v'", o)
+		}
+		*v = TLSVersion(o)
+	case uint64:
+		if o > math.MaxUint16 {
+			return fmt.Errorf("invalid tls version '%v'", o)
+		}
+		*v = TLSVersion(o)
+	default:
+		return fmt.Errorf("tls version is an unknown type: %T", o)
+	}
+	return nil
+}
+
+func (v *TLSVersion) Validate() error {
+	if *v < TLSVersionMin || *v > TLSVersionMax {
+		return fmt.Errorf("unsupported tls version: %v", v)
+	}
+	return nil
+}
