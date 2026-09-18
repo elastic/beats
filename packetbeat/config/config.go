@@ -76,15 +76,29 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	// protocols streams, so it may arrive as a protocols list entry with
 	// type "flow". Route it to the flows configuration, consistent with
 	// NewAgentConfig.
+	//
+	// When running as an OTel receiver, elastic-agent delivers per-stream
+	// interface and procs settings inside each protocol entry rather than
+	// at the top level. Extract them here so they are not silently dropped.
 	protocols := c.ProtocolsList[:0]
+	perStreamDevices := make(map[string]bool)
 	for _, protocol := range c.ProtocolsList {
-		module := struct {
-			Type string `config:"type"`
+		stream := struct {
+			Type      string             `config:"type"`
+			Interface *InterfaceConfig   `config:"interface"`
+			Procs     *procs.ProcsConfig `config:"procs"`
 		}{}
-		if err := protocol.Unpack(&module); err != nil {
+		if err := protocol.Unpack(&stream); err != nil {
 			return c, err
 		}
-		if module.Type == "flow" {
+		if stream.Interface != nil && !perStreamDevices[stream.Interface.Device] {
+			perStreamDevices[stream.Interface.Device] = true
+			c.Interfaces = append(c.Interfaces, *stream.Interface)
+		}
+		if stream.Procs != nil {
+			c.Procs = mergeProcsConfig(c.Procs, *stream.Procs)
+		}
+		if stream.Type == "flow" {
 			if err := protocol.Unpack(&c.Flows); err != nil {
 				return c, err
 			}
@@ -100,6 +114,9 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 		}
 	}
 	c.Interface = nil
+	if len(c.Interfaces) == 0 {
+		c.Interfaces = []InterfaceConfig{{Device: defaultDevice()}}
+	}
 	counts := make(map[string]int)
 	for i, iface := range c.Interfaces {
 		name := iface.Device
