@@ -5,9 +5,7 @@
 package httpjson
 
 import (
-	"encoding/json"
 	"fmt"
-	"sync"
 	"testing"
 	"time"
 
@@ -16,7 +14,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -441,7 +438,11 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("realistic_full_config", func(t *testing.T) {
+<<<<<<< HEAD
 		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+=======
+		cfg := conf.MustNewConfigFrom(map[string]any{ //nolint:gosec // dummy credentials in a test fixture
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 			"type":        "httpjson",
 			"id":          "okta-system-log",
 			"interval":    "120s",
@@ -576,7 +577,7 @@ state.url.with({
 func TestMigrateCursor(t *testing.T) {
 	t.Run("injects_stored_cursor", func(t *testing.T) {
 		store := newTestStore()
-		s, err := store.StoreFor("httpjson")
+		s, err := store.StoreFor("httpjson", "")
 		require.NoError(t, err)
 		err = s.Set("httpjson::my-input::https://api.example.com/events", map[string]interface{}{
 			"ttl":     0,
@@ -628,7 +629,7 @@ func TestMigrateCursor(t *testing.T) {
 
 	t.Run("no_id", func(t *testing.T) {
 		store := newTestStore()
-		s, err := store.StoreFor("httpjson")
+		s, err := store.StoreFor("httpjson", "")
 		require.NoError(t, err)
 		err = s.Set("httpjson::https://api.example.com/events", map[string]interface{}{
 			"ttl":     0,
@@ -658,7 +659,7 @@ func TestMigrateCursor(t *testing.T) {
 
 	t.Run("no_state_in_config", func(t *testing.T) {
 		store := newTestStore()
-		s, err := store.StoreFor("httpjson")
+		s, err := store.StoreFor("httpjson", "")
 		require.NoError(t, err)
 		err = s.Set("httpjson::no-state::https://api.example.com/events", map[string]interface{}{
 			"ttl":     0,
@@ -688,7 +689,7 @@ func TestMigrateCursor(t *testing.T) {
 
 	t.Run("idempotent", func(t *testing.T) {
 		store := newTestStore()
-		s, err := store.StoreFor("httpjson")
+		s, err := store.StoreFor("httpjson", "")
 		require.NoError(t, err)
 		err = s.Set("httpjson::idem::https://api.example.com/events", map[string]interface{}{
 			"ttl":     0,
@@ -722,20 +723,20 @@ func TestMigrateCursor(t *testing.T) {
 		require.Equal(t, v1, v2)
 	})
 
-	t.Run("set_id_scoped_store", func(t *testing.T) {
-		// Simulate an Elasticsearch-backed store where SetID routes to a different
-		// index. The cursor was previously written under the "my-input" namespace;
-		// migrateCursor must call SetID so it reads from the right partition.
-		b := newNamespacedMemBackend()
-		b.partitions["my-input"] = map[string]any{
-			"httpjson::my-input::https://api.example.com/events": map[string]any{
-				"ttl":     0,
-				"updated": time.Now(),
-				"cursor":  map[string]any{"timestamp": "2025-06-15T10:30:00Z"},
-			},
-		}
-
-		store := newNamespacedTestStore(b)
+	t.Run("id_scoped_store", func(t *testing.T) {
+		// Elasticsearch uses one index per input ID.
+		// migrateCursor must select the store for "my-input" to find its cursor.
+		store := &namespacedTestStore{testStore: newTestStore()}
+		t.Cleanup(store.Close)
+		s, err := store.StoreFor("httpjson", "my-input")
+		require.NoError(t, err, "open the store for my-input")
+		defer s.Close()
+		err = s.Set("httpjson::my-input::https://api.example.com/events", map[string]any{
+			"ttl":     0,
+			"updated": time.Now(),
+			"cursor":  map[string]any{"timestamp": "2025-06-15T10:30:00Z"},
+		})
+		require.NoError(t, err, "save the cursor for my-input")
 		mgr := NewInputManager(logp.NewNopLogger(), store)
 		cfg := conf.MustNewConfigFrom(map[string]any{
 			"type":        "httpjson",
@@ -748,11 +749,11 @@ func TestMigrateCursor(t *testing.T) {
 		})
 
 		_, newCfg, err := mgr.Redirect(cfg)
-		require.NoError(t, err)
+		require.NoError(t, err, "redirect httpjson to CEL")
 
 		v, err := newCfg.String("state.cursor.timestamp", -1)
-		require.NoError(t, err)
-		require.Equal(t, "2025-06-15T10:30:00Z", v)
+		require.NoError(t, err, "read the migrated cursor")
+		require.Equal(t, "2025-06-15T10:30:00Z", v, "use the cursor from the store for my-input")
 	})
 }
 
@@ -774,6 +775,7 @@ func newTestStore() *testStore {
 	}
 }
 
+<<<<<<< HEAD
 func (s *testStore) Close()                                     { s.registry.Close() }
 func (s *testStore) StoreFor(string) (*statestore.Store, error) { return s.registry.Get("filebeat") }
 func (s *testStore) CleanupInterval() time.Duration             { return 0 }
@@ -897,25 +899,27 @@ func (d jsonValueDecoder) Decode(dst any) error {
 		return err
 	}
 	return json.Unmarshal(buf, dst)
+=======
+func (s *testStore) Close() { s.registry.Close() }
+func (s *testStore) StoreFor(_, _ string) (*statestore.Store, error) {
+	return s.registry.Get("filebeat")
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 }
+func (s *testStore) StoreKey(_, _ string) string    { return fmt.Sprintf("test:%p", s.registry) }
+func (s *testStore) CleanupInterval() time.Duration { return 0 }
 
 var _ statestore.States = (*namespacedTestStore)(nil)
 
-// namespacedTestStore implements statestore.States backed by a
-// namespacedMemBackend, for use in tests that require SetID-aware storage.
+// namespacedTestStore uses a separate store for each input ID.
 type namespacedTestStore struct {
-	registry *statestore.Registry
+	*testStore
 }
 
-// newNamespacedTestStore returns a namespacedTestStore backed by b.
-func newNamespacedTestStore(b *namespacedMemBackend) *namespacedTestStore {
-	return &namespacedTestStore{registry: statestore.NewRegistry(b)}
+// StoreFor returns the store for the input ID.
+func (s *namespacedTestStore) StoreFor(_, id string) (*statestore.Store, error) {
+	return s.registry.Get(id)
 }
 
-// StoreFor returns the shared "filebeat" store from the underlying registry.
-func (s *namespacedTestStore) StoreFor(_ string) (*statestore.Store, error) {
-	return s.registry.Get("filebeat")
+func (s *namespacedTestStore) StoreKey(_, id string) string {
+	return fmt.Sprintf("namespaced:%p::%s", s.registry, id)
 }
-
-func (s *namespacedTestStore) StoreKey() string               { return fmt.Sprintf("namespaced:%p", s.registry) }
-func (s *namespacedTestStore) CleanupInterval() time.Duration { return 0 }

@@ -213,7 +213,3 @@ func (s *MapStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) err
 func (d valueUnpacker) Decode(to any) error {
 	return typeconv.Convert(to, d.from)
 }
-
-func (s *MapStore) SetID(_ string) {
-	// NOOP
-}

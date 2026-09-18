@@ -146,14 +146,36 @@ func (s *filebeatStore) Close() {
 	}
 }
 
-// StoreFor returns the storage registry depending on the type. Default is the file store.
-func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
-	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.shared.esRegistry != nil {
-		return s.shared.esRegistry.Get(s.storeName)
+// StoreFor returns the store for the input type and ID. It uses file storage by default.
+func (s *filebeatStore) StoreFor(typ, id string) (*statestore.Store, error) {
+	if s.usesES(typ) {
+		return s.shared.esRegistry.Get(s.esStoreName(id))
 	}
 	return s.shared.registry.Get(s.storeName)
 }
 
+<<<<<<< HEAD
+=======
+// StoreKey returns the identifier of the shared persistent registry backend.
+func (s *filebeatStore) StoreKey(typ, id string) string {
+	if s.usesES(typ) {
+		return s.storeKey + "::es::" + s.esStoreName(id)
+	}
+	return s.storeKey
+}
+
+func (s *filebeatStore) usesES(typ string) bool {
+	return features.IsElasticsearchStateStoreEnabledForInput(typ) && s.shared.esRegistry != nil
+}
+
+func (s *filebeatStore) esStoreName(id string) string {
+	if id == "" {
+		return s.storeName
+	}
+	return id
+}
+
+>>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 func (s *filebeatStore) CleanupInterval() time.Duration {
 	return s.cleanInterval
 }
