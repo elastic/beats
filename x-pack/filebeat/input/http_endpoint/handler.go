@@ -175,6 +175,17 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// An empty body must be detected here, before the reader is wrapped
+	// below; the in-flight counter, body size limit and request tracer
+	// wrappers all defeat the http.NoBody identity comparison that
+	// httpReadJSON makes.
+	if body == http.NoBody {
+		h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusNotAcceptable, errBodyEmpty)
+		h.status.UpdateStatus(status.Degraded, "unable to read message JSON: "+errBodyEmpty.Error())
+		h.metrics.apiErrors.Add(1)
+		return
+	}
+
 	// If we are tracking in flight bytes, wrap body with countReader for
 	// just-in-time byte counting. The countReader tracks bytes as they are read.
 	// On return Close releases the bytes. In the error case this is immediate,
@@ -229,20 +240,24 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
-	var (
-		respCode int
-		respBody string
-	)
+	// The configured response is sent for any well-formed request, including
+	// one that holds no events; it is only replaced by a CRC validator's
+	// response when the request is a CRC challenge.
+	respCode, respBody := h.responseCode, h.responseBody
 
 	h.metrics.batchSize.Update(int64(len(objs)))
 	for _, obj := range objs {
-		var err error
 		if h.crc != nil {
-			respCode, respBody, err = h.crc.validate(obj)
+			// Keep the validator's results out of respCode and respBody until
+			// we know the object is a CRC challenge; validate returns zero
+			// values for objects that are not.
+			code, body, err := h.crc.validate(obj)
 			if err == nil {
-				// CRC request processed
+				// CRC request processed.
+				respCode, respBody = code, body
 				break
-			} else if !errors.Is(err, errNotCRC) {
+			}
+			if !errors.Is(err, errNotCRC) {
 				h.metrics.apiErrors.Add(1)
 				h.status.UpdateStatus(status.Degraded, "request did not validate with CRC: "+err.Error())
 				h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
@@ -251,14 +266,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		acker.Add()
-		if err = h.publishEvent(obj, headers, acker); err != nil {
+		if err := h.publishEvent(obj, headers, acker); err != nil {
 			h.metrics.apiErrors.Add(1)
 			h.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
 			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
 		h.metrics.eventsPublished.Add(1)
-		respCode, respBody = h.responseCode, h.responseBody
 	}
 
 	acker.Ready()
