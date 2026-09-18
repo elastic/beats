@@ -97,13 +97,13 @@ func TestIsObservationError(t *testing.T) {
 	}
 }
 
-func TestUnderAnyUnobservable(t *testing.T) {
+func TestUnderAnyPrefix(t *testing.T) {
 	set := func(paths ...string) map[string]struct{} {
-		m := make(map[string]struct{}, len(paths))
-		for _, path := range paths {
-			m[filepath.FromSlash(path)] = struct{}{}
+		native := make([]string, len(paths))
+		for i, path := range paths {
+			native[i] = filepath.FromSlash(path)
 		}
-		return m
+		return pathSet(native)
 	}
 
 	cases := []struct {
@@ -194,8 +194,8 @@ func TestUnderAnyUnobservable(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.want, underAnyUnobservable(filepath.FromSlash(tc.path), tc.prefixes),
-				"underAnyUnobservable(%q, %v)", filepath.FromSlash(tc.path), tc.prefixes)
+			assert.Equal(t, tc.want, underAnyPrefix(filepath.FromSlash(tc.path), tc.prefixes),
+				"underAnyPrefix(%q, %v)", filepath.FromSlash(tc.path), tc.prefixes)
 		})
 	}
 }
@@ -2058,6 +2058,19 @@ func TestBuildWalkGroups(t *testing.T) {
 	})
 }
 
+// collectingSink records the entries a walk matches and ignores the rest.
+type collectingSink struct {
+	matched      []string
+	unobservable []string
+	vanished     []string
+}
+
+func (c *collectingSink) process(filename string, _ int) { c.matched = append(c.matched, filename) }
+func (c *collectingSink) recordUnobservable(prefix string) {
+	c.unobservable = append(c.unobservable, prefix)
+}
+func (c *collectingSink) recordVanished(prefix string) { c.vanished = append(c.vanished, prefix) }
+
 func TestWalk(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	mkfile := func(t *testing.T, path string) {
@@ -2068,11 +2081,11 @@ func TestWalk(t *testing.T) {
 	collect := func(patterns ...string) []string {
 		s := &fileScanner{log: logger, paths: patterns}
 		s.buildWalkGroups()
-		var got []string
+		sink := &collectingSink{}
 		for _, g := range s.walkGroups {
-			s.walk(g, func(f string, _ int) { got = append(got, f) }, func(string) {})
+			s.walk(g, sink)
 		}
-		return got
+		return sink.matched
 	}
 
 	t.Run("matches by depth and bounds recursion", func(t *testing.T) {
@@ -2317,6 +2330,7 @@ type queuedScanner struct {
 type scanResult struct {
 	files        map[string]loginp.FileDescriptor
 	unobservable []string
+	vanished     []string
 }
 
 func (q *queuedScanner) GetFiles(loginp.FileScanOptions) loginp.ScanResults {
@@ -2329,6 +2343,7 @@ func (q *queuedScanner) GetFiles(loginp.FileScanOptions) loginp.ScanResults {
 		Files:        r.files,
 		Metrics:      loginp.FileScanMetrics{ScanErrors: int64(len(r.unobservable))},
 		Unobservable: r.unobservable,
+		Vanished:     r.vanished,
 	}
 }
 
@@ -2381,6 +2396,40 @@ func TestFileWatcherThrottlesPostponedWarning(t *testing.T) {
 
 	assert.Equalf(t, 1, strings.Count(buff.String(), "postponing their"),
 		"the postponed-delete warning must be throttled to once per interval, got logs:\n%s", buff.String())
+}
+
+func TestFileWatcherDoesNotWarnForVanishedPaths(t *testing.T) {
+	base := t.TempDir()
+	a := filepath.Join(base, "a.log")
+	b := filepath.Join(base, "b.log")
+	desc := func(path string) loginp.FileDescriptor {
+		return loginp.FileDescriptor{
+			Filename:    path,
+			Fingerprint: completeFP("fp:" + path),
+			Info:        file.ExtendFileInfo(&testFileInfo{name: filepath.Base(path), size: 5}),
+		}
+	}
+	s := &queuedScanner{scans: []scanResult{
+		{files: map[string]loginp.FileDescriptor{a: desc(a), b: desc(b)}},
+		{files: map[string]loginp.FileDescriptor{a: desc(a)}, vanished: []string{b}},
+		{files: map[string]loginp.FileDescriptor{a: desc(a)}, vanished: []string{b}},
+	}}
+	inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+	w := newStubWatcher(s)
+	w.log = inMemoryLog
+	m := newTestMetrics()
+	baseline := m.ScanErrors.Get()
+
+	w.watch(t.Context(), m, 0, time.Time{})
+	drainPendingFSEvents(w.events)
+	w.watch(t.Context(), m, 0, time.Time{})
+	events := drainPendingFSEvents(w.events)
+
+	assert.Empty(t, events, "a vanished path must not produce a delete event")
+	assert.Contains(t, w.prev, b, "a vanished path must keep its state for the next scan")
+	assert.Equal(t, baseline, m.ScanErrors.Get(), "a vanished path must not raise scan_errors")
+	assert.NotContainsf(t, buff.String(), "postponing their",
+		"an ordinary rename or delete must not warn, got logs:\n%s", buff.String())
 }
 
 // TestFileWatcherPostponesDeletesUnderUnobservablePaths is the watcher half of the
