@@ -32,9 +32,11 @@ impact: |
   a factor of 1000, and values collected before and after the upgrade are not
   comparable. On cgroups v2 hosts the beat self-monitoring metric
   `beat.cgroup.cpu.stats.throttled.ns` grows by a factor of 1000. Nothing
-  changes for `system.process.cgroup.cpu.stats.throttled.us` on cgroups v2, or
-  for `beat.cgroup.cpu.stats.throttled.ns` on cgroups v1, which were already
-  correct.
+  changes for `system.process.cgroup.cpu.stats.throttled.us` on cgroups v2,
+  which was already correct. On cgroups v1 the value of
+  `beat.cgroup.cpu.stats.throttled.ns` is unchanged except that it is now
+  truncated to whole microseconds, losing up to 999ns of a counter that is
+  typically in the seconds range.
 
 action: |
   Review dashboards, alerting rules and queries that read
@@ -44,7 +46,9 @@ action: |
 
 # Affected component; usually one of "elastic-agent", "fleet-server",
 # "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+# metricbeat owns system.process.cgroup.cpu.stats.throttled.us; libbeat owns the
+# beat.cgroup.cpu.stats.throttled.ns self-monitoring metric that every beat emits.
+component: metricbeat, libbeat
 
 # PR URL; optional; the PR number that added the changeset.
 # pr: https://github.com/owner/repo/1234
