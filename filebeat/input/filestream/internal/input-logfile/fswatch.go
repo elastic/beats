@@ -120,6 +120,38 @@ type FSEvent struct {
 	SrcID string
 }
 
+<<<<<<< HEAD
+=======
+// FileScanOptions contains scan-time settings that influence file metrics.
+type FileScanOptions struct {
+	// CurrentTime is the reference (current) time for a set of
+	// older/inactive time comparisons.
+	CurrentTime time.Time
+	// IgnoreOlder is the ignore_older threshold.
+	IgnoreOlder time.Duration
+	// IgnoreInactiveSince is the ignore_inactive reference time.
+	IgnoreInactiveSince time.Time
+}
+
+// ScanResults is the outcome of a single FSScanner.GetFiles scan.
+type ScanResults struct {
+	// Files are the monitored files found by the scan, keyed by path. Each value
+	// is the descriptor holding all necessary information about the file.
+	Files map[string]FileDescriptor
+	// Metrics is this scan's metrics snapshot.
+	Metrics FileScanMetrics
+	// Unobservable is the list of "unobservable" path prefixes (a directory covers
+	// its subtree, a file covers itself) the scan could not observe because of a
+	// resource or permission error, as opposed to being gone.
+	Unobservable []string
+	// Vanished is the list of paths the scan listed but could no longer find when
+	// it inspected them, typically because of a concurrent rename or delete.
+	// Their state must be held until a later, consistent scan can tell a
+	// rename from a deletion.
+	Vanished []string
+}
+
+>>>>>>> 7b2abed (filestream: preserve state for paths that vanish mid-scan (#53280))
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
 	// GetFiles returns the list of monitored files.
