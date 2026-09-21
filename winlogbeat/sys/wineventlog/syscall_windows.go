@@ -503,7 +503,7 @@ func (v EvtVariant) Data(buf []byte) (any, error) {
 	case EvtVarTypeBinary:
 		addr := unsafe.Pointer(&buf[0])
 		offset := v.ValueAsUintPtr() - uintptr(addr)
-		return sys.BinaryToString(buf[offset:]), nil
+		return sys.BinaryToString(buf[offset : offset+uintptr(v.Count)]), nil
 	case EvtVarTypeGuid:
 		addr := unsafe.Pointer(&buf[0])
 		offset := v.ValueAsUintPtr() - uintptr(addr)
