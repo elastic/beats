@@ -782,6 +782,16 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
 					delete(healthyInputs, unitErr.UnitID)
 				}
+<<<<<<< HEAD
+=======
+
+			default:
+				// That is not one of the cases we know how to handle, hard stop
+				// with generic error.
+				cm.logger.Errorf("unexpected error reloading units: %s", err)
+				cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot reload inputs: %s", err))
+				return
+>>>>>>> e64ccbe (healthy input units stuck in CONFIGURING when sibling fails config validation (#53299))
 			}
 		}
 	}
