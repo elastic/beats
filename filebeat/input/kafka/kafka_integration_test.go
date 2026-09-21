@@ -72,6 +72,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/sarama"
 
@@ -619,11 +620,11 @@ func TestInputWithStickyRebalanceStrategy(t *testing.T) {
 		{message: "sticky-3"},
 	}
 	for _, m := range messages {
-		writeToKafkaTopic(t, testTopic, m.message, m.headers)
+		testutil.WriteToKafkaTopic(t, testTopic, m.message, m.headers)
 	}
 
 	config := conf.MustNewConfigFrom(mapstr.M{
-		"hosts":              getTestKafkaHost(),
+		"hosts":              testutil.GetTestKafkaHost(),
 		"topics":             []string{testTopic},
 		"group_id":           groupID,
 		"wait_close":         0,
