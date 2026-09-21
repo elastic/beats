@@ -48,7 +48,15 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
-	beatCreator := beater.New
+	// Receivers sharing a scheduler group share their scheduler, and so their
+	// concurrency limits. Without an explicit group each receiver gets its own,
+	// keyed by its unique id.
+	schedulerGroup := cfg.SchedulerGroup
+	if schedulerGroup == "" {
+		schedulerGroup = set.ID.String()
+	}
+
+	beatCreator := beater.NewWithSchedulerGroup(schedulerGroup)
 	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
