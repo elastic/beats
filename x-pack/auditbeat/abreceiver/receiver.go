@@ -26,6 +26,7 @@ func (ab *auditbeatReceiver) Start(ctx context.Context, host component.Host) err
 }
 
 func (ab *auditbeatReceiver) Shutdown(ctx context.Context) error {
+	ab.Logger.Info("stopping auditbeat receiver")
 	if err := ab.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping auditbeat receiver: %w", err)
 	}

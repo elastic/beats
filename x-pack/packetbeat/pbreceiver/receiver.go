@@ -26,6 +26,7 @@ func (pb *packetbeatReceiver) Start(ctx context.Context, host component.Host) er
 }
 
 func (pb *packetbeatReceiver) Shutdown(ctx context.Context) error {
+	pb.Logger.Info("stopping packetbeat receiver")
 	if err := pb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping packetbeat receiver: %w", err)
 	}
