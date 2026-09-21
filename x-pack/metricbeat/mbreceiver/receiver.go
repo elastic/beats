@@ -7,26 +7,22 @@ package mbreceiver
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
-	"go.uber.org/zap"
 )
 
 type metricbeatReceiver struct {
 	xpInstance.BeatReceiver
-	wg sync.WaitGroup
 }
 
 func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	mb.wg.Go(func() {
-		mb.Logger.Info("starting metricbeat receiver")
-		if err := mb.BeatReceiver.Start(host); err != nil {
-			mb.Logger.Error("error starting metricbeat receiver", zap.Error(err))
-		}
-	})
+	mb.Logger.Info("starting metricbeat receiver")
+	if err := mb.BeatReceiver.Start(host); err != nil {
+		return fmt.Errorf("error starting metricbeat receiver: %w", err)
+	}
+
 	return nil
 }
 
@@ -35,6 +31,5 @@ func (mb *metricbeatReceiver) Shutdown(ctx context.Context) error {
 	if err := mb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
-	mb.wg.Wait()
 	return nil
 }
