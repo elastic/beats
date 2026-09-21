@@ -20,7 +20,7 @@
 
 // # Running integration tests
 //
-// These tests require a running Kafka broker. The easiest way is to use the
+// These tests require a running Kafka broker. The easiest way to run it is to use the
 // pre-built Docker image from testing/environments/docker/kafka.
 //
 // ## Start Kafka (standalone, outside docker-compose)
