@@ -55,12 +55,12 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// Deprecated: BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
-// Go integration tests now build the binary automatically via TestMain.
+// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Deprecated: For Go integration tests only. The test binary is now built automatically via TestMain.
 func BuildSystemTestBinary() error {
-	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests. " +
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests only. " +
 		"The test binary is now built automatically via TestMain. " +
-		"This target is only needed for Python system tests.")
+		"This target remains required for Python system tests.")
 	return devtools.BuildSystemTestBinary()
 }
 
